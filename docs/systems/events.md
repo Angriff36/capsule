@@ -1,6 +1,6 @@
 # Events
 
-> Owns the CapsuleX operator experience for Client, Venue, Event, and EventGuest. Commercial documents and client contacts are owned by [commercial-billing.md](commercial-billing.md).
+> Owns the CapsuleX operator experience for Client, Venue, Event, and EventGuest. Commercial documents and client contacts belong to the planned Commercial and billing system and are not part of this workspace.
 
 ## Purpose and shipped outcome
 
