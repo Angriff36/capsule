@@ -11,7 +11,8 @@
   "scripts": {
     "baseline:decay": "bun scripts/check-baseline-decay.ts",
     "build": "vite build",
-    "check": "bun run toolchain && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
+    "check": "bun run toolchain && bun run check:event-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
+    "check:event-manifest": "bun scripts/check-event-manifest-integration.ts",
     "codegen": "convex codegen",
     "deploy": "convex deploy",
     "dev": "vite",
