@@ -9,22 +9,24 @@
     "bun": ">=1.3.4"
   },
   "scripts": {
-    "prepare": "git config core.hooksPath .githooks",
-    "dev": "vite",
-    "dev:convex": "convex dev",
-    "build": "vite build",
-    "toolchain": "bun scripts/check-toolchain.ts",
-    "typecheck": "tsc --noEmit",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "secrets": "bun scripts/check-secrets.ts",
     "baseline:decay": "bun scripts/check-baseline-decay.ts",
+    "build": "vite build",
     "check": "bun run toolchain && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
     "codegen": "convex codegen",
+    "deploy": "convex deploy",
+    "dev": "vite",
+    "dev:convex": "convex dev",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "manifest:build": "manifest build",
+    "manifest:compile": "manifest compile --merge",
+    "prepare": "git config core.hooksPath .githooks",
+    "secrets": "bun scripts/check-secrets.ts",
     "seed": "bun scripts/seed-convex.ts",
-    "deploy": "convex deploy"
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "toolchain": "bun scripts/check-toolchain.ts",
+    "typecheck": "tsc --noEmit"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json,md,css,yml,yaml,html}": "prettier --write"
