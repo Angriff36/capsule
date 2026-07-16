@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant Vendor as Vendor
+    participant EventBus
+    Client->>+Vendor: reinstate()
+    Note over Vendor: Policies: vendorRead, vendorWrite, vendorExecute
+    Note over Vendor: Guards (4)
+    Vendor->>Vendor: guard[0]: self.onboardedAt != null
+    Vendor->>Vendor: guard[1]: self.status == #quot;suspended#quot;
+    Vendor->>Vendor: guard[2]: self.deletedAt == null
+    Vendor->>Vendor: guard[3]: roleAllows(user.role, #quot;inventoryManageAccess#quot;)
+    Vendor->>Vendor: mutate.status
+    Vendor->>Vendor: mutate.suspendedAt
+    Vendor->>Vendor: mutate.suspensionReason
+    Vendor->>EventBus: emit VendorReinstated on vendor.reinstated
+    Vendor-->>-Client: void

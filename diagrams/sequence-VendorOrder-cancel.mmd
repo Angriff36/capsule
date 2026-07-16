@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant VendorOrder as VendorOrder
+    participant EventBus
+    Client->>+VendorOrder: cancel(reason)
+    Note over VendorOrder: Policies: vendorOrderRead, vendorOrderWrite, vendorOrderExecute
+    Note over VendorOrder: Guards (3)
+    VendorOrder->>VendorOrder: guard[0]: self.status == #quot;draft#quot; or self.status == #quot;submitted#quot; or s...
+    VendorOrder->>VendorOrder: guard[1]: self.deletedAt == null
+    VendorOrder->>VendorOrder: guard[2]: roleAllows(user.role, #quot;inventoryManageAccess#quot;)
+    VendorOrder->>VendorOrder: compute.previousStatus
+    VendorOrder->>VendorOrder: mutate.status
+    VendorOrder->>VendorOrder: mutate.cancelledAt
+    VendorOrder->>VendorOrder: mutate.cancellationReason
+    VendorOrder->>EventBus: emit VendorOrderCancelled on vendor_order.cancelled
+    VendorOrder-->>-Client: void

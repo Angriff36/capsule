@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client
+    participant Person as Person
+    participant EventBus
+    Client->>+Person: reactivate()
+    Note over Person: Policies: personRead, personWrite, personExecute
+    Note over Person: Guards (2)
+    Person->>Person: guard[0]: self.status == #quot;inactive#quot;
+    Person->>Person: guard[1]: self.deletedAt == null
+    Person->>Person: mutate.status
+    Person->>EventBus: emit PersonReactivated on person.reactivated
+    Person-->>-Client: void

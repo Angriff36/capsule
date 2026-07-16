@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant Client
+    participant PrepTask as PrepTask
+    participant EventBus
+    Client->>+PrepTask: open(eventId, ingredientId, quantity, unit, ingredientDemandId, dishId, recipeId, station, dueAt, notes)
+    Note over PrepTask: Policies: prepTaskRead, prepTaskWrite, prepTaskExecute
+    Note over PrepTask: Guards (5)
+    PrepTask->>PrepTask: guard[0]: self.claimedAt == null
+    PrepTask->>PrepTask: guard[1]: self.status == #quot;pending#quot;
+    PrepTask->>PrepTask: guard[2]: self.deletedAt == null
+    PrepTask->>PrepTask: guard[3]: self.event != null
+    PrepTask->>PrepTask: guard[4]: self.ingredient != null and self.ingredient.status == #quot;ac...
+    PrepTask->>PrepTask: mutate.eventId
+    PrepTask->>PrepTask: mutate.ingredientId
+    PrepTask->>PrepTask: mutate.ingredientDemandId
+    PrepTask->>PrepTask: mutate.dishId
+    PrepTask->>PrepTask: mutate.recipeId
+    PrepTask->>PrepTask: mutate.quantity
+    PrepTask->>PrepTask: mutate.unit
+    PrepTask->>PrepTask: mutate.station
+    PrepTask->>PrepTask: mutate.dueAt
+    PrepTask->>PrepTask: mutate.notes
+    PrepTask->>EventBus: emit PrepTaskOpened on prep_task.opened
+    PrepTask-->>-Client: void

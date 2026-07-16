@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant Client
+    participant Vendor as Vendor
+    participant EventBus
+    Client->>+Vendor: onboard(name, email, phone, addressLine1, city, region, postalCode, countryCode, paymentTermsDays, notes)
+    Note over Vendor: Policies: vendorRead, vendorWrite, vendorExecute
+    Note over Vendor: Guards (2)
+    Vendor->>Vendor: guard[0]: self.onboardedAt == null
+    Vendor->>Vendor: guard[1]: self.deletedAt == null
+    Vendor->>Vendor: mutate.name
+    Vendor->>Vendor: mutate.email
+    Vendor->>Vendor: mutate.phone
+    Vendor->>Vendor: mutate.addressLine1
+    Vendor->>Vendor: mutate.city
+    Vendor->>Vendor: mutate.region
+    Vendor->>Vendor: mutate.postalCode
+    Vendor->>Vendor: mutate.countryCode
+    Vendor->>Vendor: mutate.paymentTermsDays
+    Vendor->>Vendor: mutate.notes
+    Vendor->>Vendor: mutate.onboardedAt
+    Vendor->>EventBus: emit VendorOnboarded on vendor.onboarded
+    Vendor-->>-Client: void

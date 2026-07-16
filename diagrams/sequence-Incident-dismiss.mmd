@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant Incident as Incident
+    participant EventBus
+    Client->>+Incident: dismiss(reason)
+    Note over Incident: Policies: incidentRead, incidentWrite, incidentExecute
+    Note over Incident: Guards (4)
+    Incident->>Incident: guard[0]: self.status == #quot;open#quot; or self.status == #quot;investigating#quot;
+    Incident->>Incident: guard[1]: self.reportedAt != null
+    Incident->>Incident: guard[2]: self.deletedAt == null
+    Incident->>Incident: guard[3]: roleAllows(user.role, #quot;eventManageAccess#quot;) or roleAllows(...
+    Incident->>Incident: compute.previousStatus
+    Incident->>Incident: mutate.dismissalReason
+    Incident->>Incident: mutate.status
+    Incident->>Incident: mutate.dismissedAt
+    Incident->>EventBus: emit IncidentDismissed on incident.dismissed
+    Incident-->>-Client: void

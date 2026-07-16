@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant Menu as Menu
+    participant EventBus
+    Client->>+Menu: archive(reason)
+    Note over Menu: Policies: menuRead, menuWrite, menuExecute
+    Note over Menu: Guards (3)
+    Menu->>Menu: guard[0]: self.status == #quot;draft#quot; or self.status == #quot;published#quot;
+    Menu->>Menu: guard[1]: self.deletedAt == null
+    Menu->>Menu: guard[2]: roleAllows(user.role, #quot;kitchenManageAccess#quot;)
+    Menu->>Menu: mutate.status
+    Menu->>Menu: mutate.archivedAt
+    Menu->>Menu: mutate.archiveReason
+    Menu->>EventBus: emit MenuArchived on menu.archived
+    Menu-->>-Client: void

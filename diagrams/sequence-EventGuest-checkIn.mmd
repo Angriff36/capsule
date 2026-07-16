@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant EventGuest as EventGuest
+    participant EventBus
+    Client->>+EventGuest: checkIn()
+    Note over EventGuest: Policies: eventGuestRead, eventGuestWrite, eventGuestExecute
+    Note over EventGuest: Guards (3)
+    EventGuest->>EventGuest: guard[0]: self.rsvpStatus == #quot;confirmed#quot;
+    EventGuest->>EventGuest: guard[1]: self.checkedInAt == null
+    EventGuest->>EventGuest: guard[2]: self.deletedAt == null
+    EventGuest->>EventGuest: compute.checkInTime
+    EventGuest->>EventGuest: mutate.checkedInAt
+    EventGuest->>EventBus: emit EventGuestCheckedIn on event_guest.checked_in
+    EventGuest-->>-Client: void

@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client
+    participant Organization as Organization
+    participant EventBus
+    Client->>+Organization: register(name)
+    Note over Organization: Policies: organizationRead, organizationWrite, organizationExecute
+    Note over Organization: Guards (2)
+    Organization->>Organization: guard[0]: self.deletedAt == null
+    Organization->>Organization: guard[1]: roleAllows(user.role, #quot;adminAccess#quot;)
+    Organization->>Organization: mutate.name
+    Organization->>EventBus: emit OrganizationRegistered on organization.registered
+    Organization-->>-Client: void

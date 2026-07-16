@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant InventoryItem as InventoryItem
+    participant EventBus
+    Client->>+InventoryItem: open(ingredientId, locationId, unit, quantityOnHand, parLevel, reorderThreshold, unitCost)
+    Note over InventoryItem: Policies: inventoryItemRead, inventoryItemWrite, inventoryItemExecute
+    Note over InventoryItem: Guards (2)
+    InventoryItem->>InventoryItem: guard[0]: self.stockedAt == null
+    InventoryItem->>InventoryItem: guard[1]: self.deletedAt == null
+    InventoryItem->>InventoryItem: compute.previousQuantity
+    InventoryItem->>InventoryItem: mutate.ingredientId
+    InventoryItem->>InventoryItem: mutate.locationId
+    InventoryItem->>InventoryItem: mutate.unit
+    InventoryItem->>InventoryItem: mutate.quantityOnHand
+    InventoryItem->>InventoryItem: mutate.parLevel
+    InventoryItem->>InventoryItem: mutate.reorderThreshold
+    InventoryItem->>InventoryItem: mutate.unitCost
+    InventoryItem->>InventoryItem: mutate.stockedAt
+    InventoryItem->>EventBus: emit InventoryItemOpened on inventory_item.opened
+    InventoryItem-->>-Client: void

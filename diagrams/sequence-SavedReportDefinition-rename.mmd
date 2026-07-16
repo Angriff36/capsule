@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant SavedReportDefinition as SavedReportDefinition
+    participant EventBus
+    Client->>+SavedReportDefinition: rename(name)
+    Note over SavedReportDefinition: Policies: savedReportRead, savedReportWrite, savedReportExecute
+    Note over SavedReportDefinition: Guards (5)
+    SavedReportDefinition->>SavedReportDefinition: guard[0]: self.status == #quot;active#quot;
+    SavedReportDefinition->>SavedReportDefinition: guard[1]: self.definedAt != null
+    SavedReportDefinition->>SavedReportDefinition: guard[2]: self.deletedAt == null
+    SavedReportDefinition->>SavedReportDefinition: guard[3]: user.id != null
+    SavedReportDefinition->>SavedReportDefinition: guard[4]: self.ownerId == user.id or roleAllows(user.role, #quot;manageA...
+    SavedReportDefinition->>SavedReportDefinition: mutate.name
+    SavedReportDefinition->>EventBus: emit SavedReportRenamed on saved_report.renamed
+    SavedReportDefinition-->>-Client: void

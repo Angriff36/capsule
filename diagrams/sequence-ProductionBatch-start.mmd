@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant ProductionBatch as ProductionBatch
+    participant EventBus
+    Client->>+ProductionBatch: start()
+    Note over ProductionBatch: Policies: productionBatchRead, productionBatchWrite, productionBatchExecute
+    Note over ProductionBatch: Guards (3)
+    ProductionBatch->>ProductionBatch: guard[0]: self.status == #quot;planned#quot;
+    ProductionBatch->>ProductionBatch: guard[1]: self.plannedAt != null
+    ProductionBatch->>ProductionBatch: guard[2]: self.deletedAt == null
+    ProductionBatch->>ProductionBatch: compute.previousStatus
+    ProductionBatch->>ProductionBatch: mutate.status
+    ProductionBatch->>ProductionBatch: mutate.startedAt
+    ProductionBatch->>EventBus: emit ProductionBatchStarted on production_batch.started
+    ProductionBatch-->>-Client: void

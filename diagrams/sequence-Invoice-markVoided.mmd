@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant Invoice as Invoice
+    participant EventBus
+    Client->>+Invoice: markVoided(reason)
+    Note over Invoice: Policies: invoiceRead, invoiceWrite, invoiceExecute
+    Note over Invoice: Guards (3)
+    Invoice->>Invoice: guard[0]: self.status == #quot;draft#quot; or self.status == #quot;sent#quot; or self.s...
+    Invoice->>Invoice: guard[1]: self.deletedAt == null
+    Invoice->>Invoice: guard[2]: self.amountPaid == 0
+    Invoice->>Invoice: mutate.status
+    Invoice->>Invoice: mutate.voidReason
+    Invoice->>Invoice: mutate.voidedAt
+    Invoice->>EventBus: emit InvoiceVoided on invoice.voided
+    Invoice-->>-Client: void

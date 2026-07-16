@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant PurchaseNeed as PurchaseNeed
+    participant EventBus
+    Client->>+PurchaseNeed: cancel(reason)
+    Note over PurchaseNeed: Policies: purchaseNeedRead, purchaseNeedWrite, purchaseNeedExecute
+    Note over PurchaseNeed: Guards (3)
+    PurchaseNeed->>PurchaseNeed: guard[0]: self.status == #quot;open#quot; or self.status == #quot;ordered#quot;
+    PurchaseNeed->>PurchaseNeed: guard[1]: self.deletedAt == null
+    PurchaseNeed->>PurchaseNeed: guard[2]: roleAllows(user.role, #quot;inventoryManageAccess#quot;)
+    PurchaseNeed->>PurchaseNeed: compute.previousStatus
+    PurchaseNeed->>PurchaseNeed: mutate.status
+    PurchaseNeed->>PurchaseNeed: mutate.cancelledAt
+    PurchaseNeed->>PurchaseNeed: mutate.cancellationReason
+    PurchaseNeed->>EventBus: emit PurchaseNeedCancelled on purchase_need.cancelled
+    PurchaseNeed-->>-Client: void

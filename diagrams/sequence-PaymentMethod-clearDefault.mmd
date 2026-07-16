@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Client
+    participant PaymentMethod as PaymentMethod
+    participant EventBus
+    Client->>+PaymentMethod: clearDefault()
+    Note over PaymentMethod: Policies: paymentMethodRead, paymentMethodWrite, paymentMethodExecute
+    Note over PaymentMethod: Guards (3)
+    PaymentMethod->>PaymentMethod: guard[0]: self.registeredAt != null
+    PaymentMethod->>PaymentMethod: guard[1]: self.status == #quot;active#quot;
+    PaymentMethod->>PaymentMethod: guard[2]: self.deletedAt == null
+    PaymentMethod->>PaymentMethod: mutate.isDefault
+    PaymentMethod->>EventBus: emit PaymentMethodDefaultCleared on payment_method.default_cleared
+    PaymentMethod-->>-Client: void

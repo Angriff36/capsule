@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant Client
+    participant IngredientDemand as IngredientDemand
+    participant EventBus
+    Client->>+IngredientDemand: calculate(eventId, ingredientId, requiredQuantity, unit, servings, dishId, sourceRecipeLineQuantity, sourceBatchMultiplier, sourceYieldQuantity)
+    Note over IngredientDemand: Policies: ingredientDemandRead, ingredientDemandWrite, ingredientDemandExecute
+    Note over IngredientDemand: Guards (5)
+    IngredientDemand->>IngredientDemand: guard[0]: self.calculatedAt == null
+    IngredientDemand->>IngredientDemand: guard[1]: self.status == #quot;pending#quot;
+    IngredientDemand->>IngredientDemand: guard[2]: self.deletedAt == null
+    IngredientDemand->>IngredientDemand: guard[3]: self.event != null
+    IngredientDemand->>IngredientDemand: guard[4]: self.ingredient != null and self.ingredient.status == #quot;ac...
+    IngredientDemand->>IngredientDemand: mutate.eventId
+    IngredientDemand->>IngredientDemand: mutate.ingredientId
+    IngredientDemand->>IngredientDemand: mutate.requiredQuantity
+    IngredientDemand->>IngredientDemand: mutate.unit
+    IngredientDemand->>IngredientDemand: mutate.servings
+    IngredientDemand->>IngredientDemand: mutate.dishId
+    IngredientDemand->>IngredientDemand: mutate.sourceRecipeLineQuantity
+    IngredientDemand->>IngredientDemand: mutate.sourceBatchMultiplier
+    IngredientDemand->>IngredientDemand: mutate.sourceYieldQuantity
+    IngredientDemand->>IngredientDemand: mutate.status
+    IngredientDemand->>IngredientDemand: mutate.calculatedAt
+    IngredientDemand->>EventBus: emit IngredientDemandCalculated on ingredient_demand.calculated
+    IngredientDemand-->>-Client: void

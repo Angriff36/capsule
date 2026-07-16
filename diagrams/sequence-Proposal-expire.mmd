@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Client
+    participant Proposal as Proposal
+    participant EventBus
+    Client->>+Proposal: expire()
+    Note over Proposal: Policies: proposalRead, proposalWrite, proposalExecute
+    Note over Proposal: Guards (2)
+    Proposal->>Proposal: guard[0]: self.status == #quot;sent#quot; or self.status == #quot;viewed#quot;
+    Proposal->>Proposal: guard[1]: self.deletedAt == null
+    Proposal->>Proposal: mutate.status
+    Proposal->>Proposal: mutate.expiredAt
+    Proposal->>EventBus: emit ProposalExpired on proposal.expired
+    Proposal-->>-Client: void

@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant InventoryItem as InventoryItem
+    participant EventBus
+    Client->>+InventoryItem: remove(reason)
+    Note over InventoryItem: Policies: inventoryItemRead, inventoryItemWrite, inventoryItemExecute
+    Note over InventoryItem: Guards (3)
+    InventoryItem->>InventoryItem: guard[0]: self.stockedAt != null
+    InventoryItem->>InventoryItem: guard[1]: self.deletedAt == null
+    InventoryItem->>InventoryItem: guard[2]: roleAllows(user.role, #quot;inventoryManageAccess#quot;)
+    InventoryItem->>InventoryItem: compute.previousQuantity
+    InventoryItem->>InventoryItem: mutate.deletedAt
+    InventoryItem->>InventoryItem: mutate.removedAt
+    InventoryItem->>EventBus: emit InventoryItemRemoved on inventory_item.removed
+    InventoryItem-->>-Client: void

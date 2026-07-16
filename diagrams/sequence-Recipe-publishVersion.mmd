@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant Recipe as Recipe
+    participant EventBus
+    Client->>+Recipe: publishVersion()
+    Note over Recipe: Policies: recipeRead, recipeWrite, recipeExecute
+    Note over Recipe: Guards (4)
+    Recipe->>Recipe: guard[0]: self.status == #quot;draft#quot;
+    Recipe->>Recipe: guard[1]: self.draftedAt != null
+    Recipe->>Recipe: guard[2]: self.deletedAt == null
+    Recipe->>Recipe: guard[3]: roleAllows(user.role, #quot;kitchenManageAccess#quot;)
+    Recipe->>Recipe: mutate.status
+    Recipe->>Recipe: mutate.publishedAt
+    Recipe->>EventBus: emit RecipeVersionPublished on recipe.version_published
+    Recipe-->>-Client: void

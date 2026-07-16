@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant InventoryItem as InventoryItem
+    participant EventBus
+    Client->>+InventoryItem: receiveStock(quantity, unitCost)
+    Note over InventoryItem: Policies: inventoryItemRead, inventoryItemWrite, inventoryItemExecute
+    Note over InventoryItem: Guards (2)
+    InventoryItem->>InventoryItem: guard[0]: self.stockedAt != null
+    InventoryItem->>InventoryItem: guard[1]: self.deletedAt == null
+    InventoryItem->>InventoryItem: compute.previousQuantity
+    InventoryItem->>InventoryItem: compute.nextQuantity
+    InventoryItem->>InventoryItem: mutate.quantityOnHand
+    InventoryItem->>InventoryItem: mutate.unitCost
+    InventoryItem->>EventBus: emit InventoryStockReceived on inventory_item.stock_received
+    InventoryItem-->>-Client: void

@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant VendorOrder as VendorOrder
+    participant EventBus
+    Client->>+VendorOrder: confirm()
+    Note over VendorOrder: Policies: vendorOrderRead, vendorOrderWrite, vendorOrderExecute
+    Note over VendorOrder: Guards (3)
+    VendorOrder->>VendorOrder: guard[0]: self.status == #quot;submitted#quot;
+    VendorOrder->>VendorOrder: guard[1]: self.submittedAt != null
+    VendorOrder->>VendorOrder: guard[2]: self.deletedAt == null
+    VendorOrder->>VendorOrder: compute.previousStatus
+    VendorOrder->>VendorOrder: mutate.status
+    VendorOrder->>VendorOrder: mutate.confirmedAt
+    VendorOrder->>EventBus: emit VendorOrderConfirmed on vendor_order.confirmed
+    VendorOrder-->>-Client: void

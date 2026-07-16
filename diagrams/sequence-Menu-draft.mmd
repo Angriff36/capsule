@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant Menu as Menu
+    participant EventBus
+    Client->>+Menu: draft(name, description, category, isTemplate, basePrice, pricePerPerson, minGuests, maxGuests)
+    Note over Menu: Policies: menuRead, menuWrite, menuExecute
+    Note over Menu: Guards (2)
+    Menu->>Menu: guard[0]: self.draftedAt == null
+    Menu->>Menu: guard[1]: self.deletedAt == null
+    Menu->>Menu: mutate.name
+    Menu->>Menu: mutate.description
+    Menu->>Menu: mutate.category
+    Menu->>Menu: mutate.isTemplate
+    Menu->>Menu: mutate.basePrice
+    Menu->>Menu: mutate.pricePerPerson
+    Menu->>Menu: mutate.minGuests
+    Menu->>Menu: mutate.maxGuests
+    Menu->>Menu: mutate.draftedAt
+    Menu->>EventBus: emit MenuDrafted on menu.drafted
+    Menu-->>-Client: void

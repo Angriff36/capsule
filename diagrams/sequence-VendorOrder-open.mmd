@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant VendorOrder as VendorOrder
+    participant EventBus
+    Client->>+VendorOrder: open(vendorId, eventId, orderNumber, notes)
+    Note over VendorOrder: Policies: vendorOrderRead, vendorOrderWrite, vendorOrderExecute
+    Note over VendorOrder: Guards (4)
+    VendorOrder->>VendorOrder: guard[0]: self.openedAt == null
+    VendorOrder->>VendorOrder: guard[1]: self.status == #quot;draft#quot;
+    VendorOrder->>VendorOrder: guard[2]: self.deletedAt == null
+    VendorOrder->>VendorOrder: guard[3]: self.vendor != null and self.vendor.status == #quot;active#quot; an...
+    VendorOrder->>VendorOrder: mutate.vendorId
+    VendorOrder->>VendorOrder: mutate.eventId
+    VendorOrder->>VendorOrder: mutate.orderNumber
+    VendorOrder->>VendorOrder: mutate.notes
+    VendorOrder->>VendorOrder: mutate.openedAt
+    VendorOrder->>EventBus: emit VendorOrderOpened on vendor_order.opened
+    VendorOrder-->>-Client: void

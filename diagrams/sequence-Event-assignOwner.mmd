@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client
+    participant Event as Event
+    participant EventBus
+    Client->>+Event: assignOwner(assignedToId)
+    Note over Event: Policies: eventRead, eventWrite, eventExecute
+    Note over Event: Guards (2)
+    Event->>Event: guard[0]: self.stage == #quot;planning#quot; or self.stage == #quot;pending_approv...
+    Event->>Event: guard[1]: self.deletedAt == null
+    Event->>Event: mutate.assignedToId
+    Event->>EventBus: emit EventOwnerAssigned on event.owner_assigned
+    Event-->>-Client: void

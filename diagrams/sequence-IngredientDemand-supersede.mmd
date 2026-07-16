@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant IngredientDemand as IngredientDemand
+    participant EventBus
+    Client->>+IngredientDemand: supersede(reason)
+    Note over IngredientDemand: Policies: ingredientDemandRead, ingredientDemandWrite, ingredientDemandExecute
+    Note over IngredientDemand: Guards (4)
+    IngredientDemand->>IngredientDemand: guard[0]: self.status == #quot;calculated#quot; or self.status == #quot;confirmed#quot;
+    IngredientDemand->>IngredientDemand: guard[1]: self.calculatedAt != null
+    IngredientDemand->>IngredientDemand: guard[2]: self.deletedAt == null
+    IngredientDemand->>IngredientDemand: guard[3]: roleAllows(user.role, #quot;inventoryManageAccess#quot;)
+    IngredientDemand->>IngredientDemand: compute.previousQuantity
+    IngredientDemand->>IngredientDemand: mutate.status
+    IngredientDemand->>IngredientDemand: mutate.supersededAt
+    IngredientDemand->>IngredientDemand: mutate.supersedeReason
+    IngredientDemand->>EventBus: emit IngredientDemandSuperseded on ingredient_demand.superseded
+    IngredientDemand-->>-Client: void

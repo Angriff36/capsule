@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant Invoice as Invoice
+    participant EventBus
+    Client->>+Invoice: applyPayment(paymentAmount, paymentId)
+    Note over Invoice: Policies: invoiceRead, invoiceWrite, invoiceExecute
+    Note over Invoice: Guards (2)
+    Invoice->>Invoice: guard[0]: self.status == #quot;sent#quot; or self.status == #quot;viewed#quot; or self....
+    Invoice->>Invoice: guard[1]: self.deletedAt == null
+    Invoice->>Invoice: compute.nextPaid
+    Invoice->>Invoice: compute.nextDue
+    Invoice->>Invoice: mutate.amountPaid
+    Invoice->>Invoice: mutate.amountDue
+    Invoice->>Invoice: mutate.status
+    Invoice->>Invoice: mutate.paidAt
+    Invoice->>EventBus: emit InvoicePaymentApplied on invoice.payment_applied
+    Invoice-->>-Client: void

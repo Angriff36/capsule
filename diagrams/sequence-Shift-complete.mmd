@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant Shift as Shift
+    participant EventBus
+    Client->>+Shift: complete()
+    Note over Shift: Policies: shiftRead, shiftWrite, shiftExecute
+    Note over Shift: Guards (5)
+    Shift->>Shift: guard[0]: self.status == #quot;started#quot;
+    Shift->>Shift: guard[1]: self.startedAt != null
+    Shift->>Shift: guard[2]: self.deletedAt == null
+    Shift->>Shift: guard[3]: user.id != null
+    Shift->>Shift: guard[4]: self.personId == user.id or roleAllows(user.role, #quot;workfo...
+    Shift->>Shift: compute.previousStatus
+    Shift->>Shift: mutate.status
+    Shift->>Shift: mutate.completedAt
+    Shift->>EventBus: emit ShiftCompleted on shift.completed
+    Shift-->>-Client: void

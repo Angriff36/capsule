@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant Client
+    participant EventGuest as EventGuest
+    participant EventBus
+    Client->>+EventGuest: withdraw(reason)
+    Note over EventGuest: Policies: eventGuestRead, eventGuestWrite, eventGuestExecute
+    Note over EventGuest: Guards (1)
+    EventGuest->>EventGuest: guard[0]: self.deletedAt == null
+    EventGuest->>EventGuest: mutate.deletedAt
+    EventGuest->>EventBus: emit EventGuestWithdrawn on event_guest.withdrawn
+    EventGuest-->>-Client: void

@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant Invoice as Invoice
+    participant EventBus
+    Client->>+Invoice: markOverdue()
+    Note over Invoice: Policies: invoiceRead, invoiceWrite, invoiceExecute
+    Note over Invoice: Guards (3)
+    Invoice->>Invoice: guard[0]: self.status == #quot;sent#quot; or self.status == #quot;viewed#quot; or self....
+    Invoice->>Invoice: guard[1]: self.deletedAt == null
+    Invoice->>Invoice: guard[2]: self.dueDate != null and self.dueDate < now()
+    Invoice->>Invoice: mutate.status
+    Invoice->>Invoice: mutate.overdueSince
+    Invoice->>EventBus: emit InvoiceMarkedOverdue on invoice.marked_overdue
+    Invoice-->>-Client: void

@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant Contract as Contract
+    participant EventBus
+    Client->>+Contract: sign(signedBy)
+    Note over Contract: Policies: contractRead, contractWrite, contractExecute
+    Note over Contract: Guards (2)
+    Contract->>Contract: guard[0]: self.status == #quot;viewed#quot;
+    Contract->>Contract: guard[1]: self.deletedAt == null
+    Contract->>Contract: compute.signedAtValue
+    Contract->>Contract: mutate.status
+    Contract->>Contract: mutate.signedBy
+    Contract->>Contract: mutate.signedAt
+    Contract->>EventBus: emit ContractSigned on contract.signed
+    Contract-->>-Client: void

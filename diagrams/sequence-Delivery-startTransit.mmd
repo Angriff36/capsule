@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant Delivery as Delivery
+    participant EventBus
+    Client->>+Delivery: startTransit()
+    Note over Delivery: Policies: deliveryRead, deliveryWrite, deliveryExecute
+    Note over Delivery: Guards (6)
+    Delivery->>Delivery: guard[0]: self.status == #quot;scheduled#quot;
+    Delivery->>Delivery: guard[1]: self.scheduledAt != null
+    Delivery->>Delivery: guard[2]: self.driverId != null
+    Delivery->>Delivery: guard[3]: self.deletedAt == null
+    Delivery->>Delivery: guard[4]: user.id != null
+    Delivery->>Delivery: guard[5]: self.driverId == user.id or roleAllows(user.role, #quot;logist...
+    Delivery->>Delivery: compute.previousStatus
+    Delivery->>Delivery: mutate.status
+    Delivery->>Delivery: mutate.departedAt
+    Delivery->>EventBus: emit DeliveryTransitStarted on delivery.transit_started
+    Delivery-->>-Client: void

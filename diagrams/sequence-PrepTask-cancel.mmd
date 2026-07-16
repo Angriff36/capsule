@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant PrepTask as PrepTask
+    participant EventBus
+    Client->>+PrepTask: cancel(reason)
+    Note over PrepTask: Policies: prepTaskRead, prepTaskWrite, prepTaskExecute
+    Note over PrepTask: Guards (3)
+    PrepTask->>PrepTask: guard[0]: self.status == #quot;pending#quot; or self.status == #quot;claimed#quot; or s...
+    PrepTask->>PrepTask: guard[1]: self.deletedAt == null
+    PrepTask->>PrepTask: guard[2]: roleAllows(user.role, #quot;kitchenLeadAccess#quot;)
+    PrepTask->>PrepTask: compute.previousStatus
+    PrepTask->>PrepTask: mutate.status
+    PrepTask->>PrepTask: mutate.cancelledAt
+    PrepTask->>PrepTask: mutate.cancellationReason
+    PrepTask->>EventBus: emit PrepTaskCancelled on prep_task.cancelled
+    PrepTask-->>-Client: void

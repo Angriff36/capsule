@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant Recipe as Recipe
+    participant EventBus
+    Client->>+Recipe: retire(reason)
+    Note over Recipe: Policies: recipeRead, recipeWrite, recipeExecute
+    Note over Recipe: Guards (3)
+    Recipe->>Recipe: guard[0]: self.status == #quot;draft#quot; or self.status == #quot;published#quot;
+    Recipe->>Recipe: guard[1]: self.deletedAt == null
+    Recipe->>Recipe: guard[2]: roleAllows(user.role, #quot;kitchenManageAccess#quot;)
+    Recipe->>Recipe: mutate.status
+    Recipe->>Recipe: mutate.retiredAt
+    Recipe->>Recipe: mutate.retirementReason
+    Recipe->>EventBus: emit RecipeRetired on recipe.retired
+    Recipe-->>-Client: void

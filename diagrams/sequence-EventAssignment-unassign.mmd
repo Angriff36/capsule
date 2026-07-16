@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant EventAssignment as EventAssignment
+    participant EventBus
+    Client->>+EventAssignment: unassign()
+    Note over EventAssignment: Policies: eventAssignmentRead, eventAssignmentWrite, eventAssignmentExecute
+    Note over EventAssignment: Guards (4)
+    EventAssignment->>EventAssignment: guard[0]: self.status == #quot;assigned#quot; or self.status == #quot;confirmed#quot;
+    EventAssignment->>EventAssignment: guard[1]: self.assignedAt != null
+    EventAssignment->>EventAssignment: guard[2]: self.deletedAt == null
+    EventAssignment->>EventAssignment: guard[3]: roleAllows(user.role, #quot;workforceManageAccess#quot;)
+    EventAssignment->>EventAssignment: compute.previousStatus
+    EventAssignment->>EventAssignment: mutate.status
+    EventAssignment->>EventAssignment: mutate.unassignedAt
+    EventAssignment->>EventBus: emit EventAssignmentUnassigned on event_assignment.unassigned
+    EventAssignment-->>-Client: void

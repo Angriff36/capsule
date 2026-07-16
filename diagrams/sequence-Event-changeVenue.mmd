@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant Event as Event
+    participant EventBus
+    Client->>+Event: changeVenue(venueId, venueName, venueAddress)
+    Note over Event: Policies: eventRead, eventWrite, eventExecute
+    Note over Event: Guards (2)
+    Event->>Event: guard[0]: self.stage == #quot;planning#quot; or self.stage == #quot;pending_approv...
+    Event->>Event: guard[1]: self.deletedAt == null
+    Event->>Event: mutate.venueId
+    Event->>Event: mutate.venueName
+    Event->>Event: mutate.venueAddress
+    Event->>EventBus: emit EventVenueChanged on event.venue_changed
+    Event-->>-Client: void

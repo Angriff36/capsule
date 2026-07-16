@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant Ingredient as Ingredient
+    participant EventBus
+    Client->>+Ingredient: updateDetails(name, unit, category)
+    Note over Ingredient: Policies: ingredientRead, ingredientWrite, ingredientExecute
+    Note over Ingredient: Guards (2)
+    Ingredient->>Ingredient: guard[0]: self.status == #quot;active#quot;
+    Ingredient->>Ingredient: guard[1]: self.deletedAt == null
+    Ingredient->>Ingredient: mutate.name
+    Ingredient->>Ingredient: mutate.unit
+    Ingredient->>Ingredient: mutate.category
+    Ingredient->>EventBus: emit IngredientDetailsUpdated on ingredient.details_updated
+    Ingredient-->>-Client: void

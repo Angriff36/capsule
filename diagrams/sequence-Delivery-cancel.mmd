@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant Delivery as Delivery
+    participant EventBus
+    Client->>+Delivery: cancel(reason)
+    Note over Delivery: Policies: deliveryRead, deliveryWrite, deliveryExecute
+    Note over Delivery: Guards (3)
+    Delivery->>Delivery: guard[0]: self.status == #quot;scheduled#quot; or self.status == #quot;in_transit#quot;
+    Delivery->>Delivery: guard[1]: self.deletedAt == null
+    Delivery->>Delivery: guard[2]: roleAllows(user.role, #quot;logisticsManageAccess#quot;)
+    Delivery->>Delivery: compute.previousStatus
+    Delivery->>Delivery: mutate.status
+    Delivery->>Delivery: mutate.cancelledAt
+    Delivery->>Delivery: mutate.cancellationReason
+    Delivery->>EventBus: emit DeliveryCancelled on delivery.cancelled
+    Delivery-->>-Client: void

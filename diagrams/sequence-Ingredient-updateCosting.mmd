@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant Ingredient as Ingredient
+    participant EventBus
+    Client->>+Ingredient: updateCosting(costPerUnit)
+    Note over Ingredient: Policies: ingredientRead, ingredientWrite, ingredientExecute
+    Note over Ingredient: Guards (3)
+    Ingredient->>Ingredient: guard[0]: self.status == #quot;active#quot;
+    Ingredient->>Ingredient: guard[1]: self.deletedAt == null
+    Ingredient->>Ingredient: guard[2]: roleAllows(user.role, #quot;kitchenManageAccess#quot;)
+    Ingredient->>Ingredient: compute.previousCostPerUnit
+    Ingredient->>Ingredient: mutate.costPerUnit
+    Ingredient->>EventBus: emit IngredientCostingUpdated on ingredient.costing_updated
+    Ingredient-->>-Client: void

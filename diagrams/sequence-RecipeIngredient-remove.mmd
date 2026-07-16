@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client
+    participant RecipeIngredient as RecipeIngredient
+    participant EventBus
+    Client->>+RecipeIngredient: remove(reason)
+    Note over RecipeIngredient: Policies: recipeIngredientRead, recipeIngredientWrite, recipeIngredientExecute
+    Note over RecipeIngredient: Guards (2)
+    RecipeIngredient->>RecipeIngredient: guard[0]: self.addedAt != null
+    RecipeIngredient->>RecipeIngredient: guard[1]: self.deletedAt == null
+    RecipeIngredient->>RecipeIngredient: mutate.deletedAt
+    RecipeIngredient->>EventBus: emit RecipeIngredientRemoved on recipe_ingredient.removed
+    RecipeIngredient-->>-Client: void

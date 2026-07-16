@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client
+    participant Organization as Organization
+    participant EventBus
+    Client->>+Organization: deactivate()
+    Note over Organization: Policies: organizationRead, organizationWrite, organizationExecute
+    Note over Organization: Guards (1)
+    Organization->>Organization: guard[0]: self.status == #quot;active#quot; or self.status == #quot;suspended#quot;
+    Organization->>Organization: mutate.status
+    Organization->>Organization: mutate.deletedAt
+    Organization->>EventBus: emit OrganizationDeactivated on organization.deactivated
+    Organization-->>-Client: void

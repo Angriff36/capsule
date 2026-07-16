@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant AvailabilityWindow as AvailabilityWindow
+    participant EventBus
+    Client->>+AvailabilityWindow: withdraw()
+    Note over AvailabilityWindow: Policies: availabilityRead, availabilityWrite, availabilityExecute
+    Note over AvailabilityWindow: Guards (5)
+    AvailabilityWindow->>AvailabilityWindow: guard[0]: self.status == #quot;active#quot;
+    AvailabilityWindow->>AvailabilityWindow: guard[1]: self.declaredAt != null
+    AvailabilityWindow->>AvailabilityWindow: guard[2]: self.deletedAt == null
+    AvailabilityWindow->>AvailabilityWindow: guard[3]: user.id != null
+    AvailabilityWindow->>AvailabilityWindow: guard[4]: self.personId == user.id or roleAllows(user.role, #quot;workfo...
+    AvailabilityWindow->>AvailabilityWindow: compute.previousStatus
+    AvailabilityWindow->>AvailabilityWindow: mutate.status
+    AvailabilityWindow->>AvailabilityWindow: mutate.withdrawnAt
+    AvailabilityWindow->>EventBus: emit AvailabilityWithdrawn on availability.withdrawn
+    AvailabilityWindow-->>-Client: void

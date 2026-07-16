@@ -1,0 +1,8 @@
+node_modules/
+.convex/
+.env.local
+dist/
+.DS_Store
+*.log
+coverage/
+.artifacts/

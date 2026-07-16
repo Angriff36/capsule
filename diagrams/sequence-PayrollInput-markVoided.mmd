@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant PayrollInput as PayrollInput
+    participant EventBus
+    Client->>+PayrollInput: markVoided(reason)
+    Note over PayrollInput: Policies: payrollInputRead, payrollInputWrite, payrollInputExecute
+    Note over PayrollInput: Guards (2)
+    PayrollInput->>PayrollInput: guard[0]: self.status == #quot;draft#quot; or self.status == #quot;prepared#quot; or se...
+    PayrollInput->>PayrollInput: guard[1]: self.deletedAt == null
+    PayrollInput->>PayrollInput: mutate.status
+    PayrollInput->>PayrollInput: mutate.voidedAt
+    PayrollInput->>PayrollInput: mutate.voidReason
+    PayrollInput->>EventBus: emit PayrollInputVoided on payroll_input.voided
+    PayrollInput-->>-Client: void

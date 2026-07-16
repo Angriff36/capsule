@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant Ingredient as Ingredient
+    participant EventBus
+    Client->>+Ingredient: introduce(name, unit, costPerUnit, allergens, category)
+    Note over Ingredient: Policies: ingredientRead, ingredientWrite, ingredientExecute
+    Note over Ingredient: Guards (2)
+    Ingredient->>Ingredient: guard[0]: self.introducedAt == null
+    Ingredient->>Ingredient: guard[1]: self.deletedAt == null
+    Ingredient->>Ingredient: mutate.name
+    Ingredient->>Ingredient: mutate.unit
+    Ingredient->>Ingredient: mutate.costPerUnit
+    Ingredient->>Ingredient: mutate.allergens
+    Ingredient->>Ingredient: mutate.category
+    Ingredient->>Ingredient: mutate.introducedAt
+    Ingredient->>EventBus: emit IngredientIntroduced on ingredient.introduced
+    Ingredient-->>-Client: void

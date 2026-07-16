@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant Dish as Dish
+    participant EventBus
+    Client->>+Dish: reinstate()
+    Note over Dish: Policies: dishRead, dishWrite, dishExecute
+    Note over Dish: Guards (3)
+    Dish->>Dish: guard[0]: self.status == #quot;retired#quot;
+    Dish->>Dish: guard[1]: self.deletedAt == null
+    Dish->>Dish: guard[2]: roleAllows(user.role, #quot;kitchenManageAccess#quot;)
+    Dish->>Dish: mutate.status
+    Dish->>Dish: mutate.retiredAt
+    Dish->>Dish: mutate.retirementReason
+    Dish->>EventBus: emit DishReinstated on dish.reinstated
+    Dish-->>-Client: void

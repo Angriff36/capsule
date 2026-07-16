@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant PrepTask as PrepTask
+    participant EventBus
+    Client->>+PrepTask: claim()
+    Note over PrepTask: Policies: prepTaskRead, prepTaskWrite, prepTaskExecute
+    Note over PrepTask: Guards (3)
+    PrepTask->>PrepTask: guard[0]: self.status == #quot;pending#quot;
+    PrepTask->>PrepTask: guard[1]: self.deletedAt == null
+    PrepTask->>PrepTask: guard[2]: user.id != null
+    PrepTask->>PrepTask: compute.previousStatus
+    PrepTask->>PrepTask: mutate.assignedToId
+    PrepTask->>PrepTask: mutate.status
+    PrepTask->>PrepTask: mutate.claimedAt
+    PrepTask->>EventBus: emit PrepTaskClaimed on prep_task.claimed
+    PrepTask-->>-Client: void

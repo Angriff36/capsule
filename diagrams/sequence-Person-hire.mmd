@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant Person as Person
+    participant EventBus
+    Client->>+Person: hire(givenName, familyName, email, phone, role, employmentType, employeeNumber, authSubjectId)
+    Note over Person: Policies: personRead, personWrite, personExecute
+    Note over Person: Guards (1)
+    Person->>Person: guard[0]: self.deletedAt == null
+    Person->>Person: mutate.givenName
+    Person->>Person: mutate.familyName
+    Person->>Person: mutate.email
+    Person->>Person: mutate.phone
+    Person->>Person: mutate.role
+    Person->>Person: mutate.employmentType
+    Person->>Person: mutate.employeeNumber
+    Person->>Person: mutate.authSubjectId
+    Person->>Person: mutate.hireDate
+    Person->>Person: mutate.terminationDate
+    Person->>EventBus: emit PersonHired on person.hired
+    Person-->>-Client: void

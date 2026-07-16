@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant PackList as PackList
+    participant EventBus
+    Client->>+PackList: open(eventId, name, purpose, notes)
+    Note over PackList: Policies: packListRead, packListWrite, packListExecute
+    Note over PackList: Guards (4)
+    PackList->>PackList: guard[0]: self.openedAt == null
+    PackList->>PackList: guard[1]: self.status == #quot;draft#quot;
+    PackList->>PackList: guard[2]: self.deletedAt == null
+    PackList->>PackList: guard[3]: self.event != null
+    PackList->>PackList: mutate.eventId
+    PackList->>PackList: mutate.name
+    PackList->>PackList: mutate.purpose
+    PackList->>PackList: mutate.notes
+    PackList->>PackList: mutate.openedAt
+    PackList->>EventBus: emit PackListOpened on pack_list.opened
+    PackList-->>-Client: void

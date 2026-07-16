@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client
+    participant AvailabilityWindow as AvailabilityWindow
+    participant EventBus
+    Client->>+AvailabilityWindow: declare(personId, startsAt, endsAt, notes)
+    Note over AvailabilityWindow: Policies: availabilityRead, availabilityWrite, availabilityExecute
+    Note over AvailabilityWindow: Guards (5)
+    AvailabilityWindow->>AvailabilityWindow: guard[0]: self.declaredAt == null
+    AvailabilityWindow->>AvailabilityWindow: guard[1]: self.status == #quot;active#quot;
+    AvailabilityWindow->>AvailabilityWindow: guard[2]: self.deletedAt == null
+    AvailabilityWindow->>AvailabilityWindow: guard[3]: user.id != null
+    AvailabilityWindow->>AvailabilityWindow: guard[4]: personId == user.id or roleAllows(user.role, #quot;workforceMa...
+    AvailabilityWindow->>AvailabilityWindow: mutate.personId
+    AvailabilityWindow->>AvailabilityWindow: mutate.startsAt
+    AvailabilityWindow->>AvailabilityWindow: mutate.endsAt
+    AvailabilityWindow->>AvailabilityWindow: mutate.notes
+    AvailabilityWindow->>AvailabilityWindow: mutate.declaredAt
+    AvailabilityWindow->>EventBus: emit AvailabilityDeclared on availability.declared
+    AvailabilityWindow-->>-Client: void

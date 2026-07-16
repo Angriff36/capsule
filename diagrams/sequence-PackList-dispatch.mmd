@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant PackList as PackList
+    participant EventBus
+    Client->>+PackList: dispatch()
+    Note over PackList: Policies: packListRead, packListWrite, packListExecute
+    Note over PackList: Guards (3)
+    PackList->>PackList: guard[0]: self.status == #quot;loaded#quot;
+    PackList->>PackList: guard[1]: self.loadedAt != null
+    PackList->>PackList: guard[2]: self.deletedAt == null
+    PackList->>PackList: compute.previousStatus
+    PackList->>PackList: mutate.status
+    PackList->>PackList: mutate.dispatchedAt
+    PackList->>EventBus: emit PackListDispatched on pack_list.dispatched
+    PackList-->>-Client: void

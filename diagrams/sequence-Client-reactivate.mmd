@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant Client as Client
+    participant EventBus
+    Client->>+Client: reactivate()
+    Note over Client: Policies: clientRead, clientWrite, clientExecute
+    Note over Client: Guards (3)
+    Client->>Client: guard[0]: self.status == #quot;archived#quot;
+    Client->>Client: guard[1]: self.deletedAt == null
+    Client->>Client: guard[2]: roleAllows(user.role, #quot;salesManageAccess#quot;)
+    Client->>Client: mutate.status
+    Client->>Client: mutate.archivedAt
+    Client->>EventBus: emit ClientReactivated on client.reactivated
+    Client-->>-Client: void

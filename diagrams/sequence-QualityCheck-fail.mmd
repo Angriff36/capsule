@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client
+    participant QualityCheck as QualityCheck
+    participant EventBus
+    Client->>+QualityCheck: fail(notes)
+    Note over QualityCheck: Policies: qualityCheckRead, qualityCheckWrite, qualityCheckExecute
+    Note over QualityCheck: Guards (4)
+    QualityCheck->>QualityCheck: guard[0]: self.status == #quot;pending#quot;
+    QualityCheck->>QualityCheck: guard[1]: self.openedAt != null
+    QualityCheck->>QualityCheck: guard[2]: self.deletedAt == null
+    QualityCheck->>QualityCheck: guard[3]: user.id != null
+    QualityCheck->>QualityCheck: compute.previousStatus
+    QualityCheck->>QualityCheck: mutate.result
+    QualityCheck->>QualityCheck: mutate.checkedById
+    QualityCheck->>QualityCheck: mutate.notes
+    QualityCheck->>QualityCheck: mutate.status
+    QualityCheck->>QualityCheck: mutate.completedAt
+    QualityCheck->>EventBus: emit QualityCheckFailed on quality_check.failed
+    QualityCheck-->>-Client: void

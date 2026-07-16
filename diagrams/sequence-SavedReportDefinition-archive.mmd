@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant SavedReportDefinition as SavedReportDefinition
+    participant EventBus
+    Client->>+SavedReportDefinition: archive()
+    Note over SavedReportDefinition: Policies: savedReportRead, savedReportWrite, savedReportExecute
+    Note over SavedReportDefinition: Guards (5)
+    SavedReportDefinition->>SavedReportDefinition: guard[0]: self.status == #quot;active#quot;
+    SavedReportDefinition->>SavedReportDefinition: guard[1]: self.definedAt != null
+    SavedReportDefinition->>SavedReportDefinition: guard[2]: self.deletedAt == null
+    SavedReportDefinition->>SavedReportDefinition: guard[3]: user.id != null
+    SavedReportDefinition->>SavedReportDefinition: guard[4]: self.ownerId == user.id or roleAllows(user.role, #quot;manageA...
+    SavedReportDefinition->>SavedReportDefinition: compute.previousStatus
+    SavedReportDefinition->>SavedReportDefinition: mutate.status
+    SavedReportDefinition->>SavedReportDefinition: mutate.archivedAt
+    SavedReportDefinition->>EventBus: emit SavedReportArchived on saved_report.archived
+    SavedReportDefinition-->>-Client: void

@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client
+    participant EventDish as EventDish
+    participant EventBus
+    Client->>+EventDish: select(eventId, dishId, quantityServings, course, serviceStyle, specialInstructions)
+    Note over EventDish: Policies: eventDishRead, eventDishWrite, eventDishExecute
+    Note over EventDish: Guards (3)
+    EventDish->>EventDish: guard[0]: self.selectedAt == null
+    EventDish->>EventDish: guard[1]: self.deletedAt == null
+    EventDish->>EventDish: guard[2]: self.event != null and self.event.stage == #quot;planning#quot; or ...
+    EventDish->>EventDish: mutate.eventId
+    EventDish->>EventDish: mutate.dishId
+    EventDish->>EventDish: mutate.quantityServings
+    EventDish->>EventDish: mutate.course
+    EventDish->>EventDish: mutate.serviceStyle
+    EventDish->>EventDish: mutate.specialInstructions
+    EventDish->>EventDish: mutate.selectedAt
+    EventDish->>EventBus: emit EventDishSelected on event_dish.selected
+    EventDish-->>-Client: void

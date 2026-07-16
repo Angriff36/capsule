@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant Menu as Menu
+    participant EventBus
+    Client->>+Menu: updatePricing(basePrice, pricePerPerson, minGuests, maxGuests)
+    Note over Menu: Policies: menuRead, menuWrite, menuExecute
+    Note over Menu: Guards (3)
+    Menu->>Menu: guard[0]: self.status == #quot;draft#quot; or self.status == #quot;published#quot;
+    Menu->>Menu: guard[1]: self.deletedAt == null
+    Menu->>Menu: guard[2]: roleAllows(user.role, #quot;kitchenManageAccess#quot;)
+    Menu->>Menu: mutate.basePrice
+    Menu->>Menu: mutate.pricePerPerson
+    Menu->>Menu: mutate.minGuests
+    Menu->>Menu: mutate.maxGuests
+    Menu->>EventBus: emit MenuPricingUpdated on menu.pricing_updated
+    Menu-->>-Client: void

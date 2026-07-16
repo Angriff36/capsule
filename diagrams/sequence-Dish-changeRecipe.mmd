@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant Dish as Dish
+    participant EventBus
+    Client->>+Dish: changeRecipe(recipeId)
+    Note over Dish: Policies: dishRead, dishWrite, dishExecute
+    Note over Dish: Guards (3)
+    Dish->>Dish: guard[0]: self.status == #quot;active#quot;
+    Dish->>Dish: guard[1]: self.deletedAt == null
+    Dish->>Dish: guard[2]: roleAllows(user.role, #quot;kitchenManageAccess#quot;)
+    Dish->>Dish: compute.previousRecipeId
+    Dish->>Dish: mutate.recipeId
+    Dish->>EventBus: emit DishRecipeChanged on dish.recipe_changed
+    Dish-->>-Client: void

@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant ClientContact as ClientContact
+    participant EventBus
+    Client->>+ClientContact: remove()
+    Note over ClientContact: Policies: clientContactRead, clientContactWrite, clientContactExecute
+    Note over ClientContact: Guards (3)
+    ClientContact->>ClientContact: guard[0]: self.status == #quot;active#quot;
+    ClientContact->>ClientContact: guard[1]: self.addedAt != null
+    ClientContact->>ClientContact: guard[2]: self.deletedAt == null
+    ClientContact->>ClientContact: mutate.status
+    ClientContact->>ClientContact: mutate.removedAt
+    ClientContact->>EventBus: emit ClientContactRemoved on client_contact.removed
+    ClientContact-->>-Client: void

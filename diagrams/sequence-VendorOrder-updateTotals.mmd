@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant VendorOrder as VendorOrder
+    participant EventBus
+    Client->>+VendorOrder: updateTotals(subtotal, taxAmount, shippingAmount)
+    Note over VendorOrder: Policies: vendorOrderRead, vendorOrderWrite, vendorOrderExecute
+    Note over VendorOrder: Guards (3)
+    VendorOrder->>VendorOrder: guard[0]: self.openedAt != null
+    VendorOrder->>VendorOrder: guard[1]: self.status == #quot;draft#quot; or self.status == #quot;submitted#quot;
+    VendorOrder->>VendorOrder: guard[2]: self.deletedAt == null
+    VendorOrder->>VendorOrder: compute.previousTotal
+    VendorOrder->>VendorOrder: compute.nextTotal
+    VendorOrder->>VendorOrder: mutate.subtotal
+    VendorOrder->>VendorOrder: mutate.taxAmount
+    VendorOrder->>VendorOrder: mutate.shippingAmount
+    VendorOrder->>VendorOrder: mutate.totalAmount
+    VendorOrder->>EventBus: emit VendorOrderTotalsUpdated on vendor_order.totals_updated
+    VendorOrder-->>-Client: void

@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant EventAssignment as EventAssignment
+    participant EventBus
+    Client->>+EventAssignment: checkOut()
+    Note over EventAssignment: Policies: eventAssignmentRead, eventAssignmentWrite, eventAssignmentExecute
+    Note over EventAssignment: Guards (5)
+    EventAssignment->>EventAssignment: guard[0]: self.status == #quot;checked_in#quot;
+    EventAssignment->>EventAssignment: guard[1]: self.checkedInAt != null
+    EventAssignment->>EventAssignment: guard[2]: self.deletedAt == null
+    EventAssignment->>EventAssignment: guard[3]: user.id != null
+    EventAssignment->>EventAssignment: guard[4]: self.personId == user.id or roleAllows(user.role, #quot;workfo...
+    EventAssignment->>EventAssignment: compute.previousStatus
+    EventAssignment->>EventAssignment: mutate.status
+    EventAssignment->>EventAssignment: mutate.checkedOutAt
+    EventAssignment->>EventBus: emit EventAssignmentCheckedOut on event_assignment.checked_out
+    EventAssignment-->>-Client: void

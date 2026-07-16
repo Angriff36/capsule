@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant TimeRecord as TimeRecord
+    participant EventBus
+    Client->>+TimeRecord: clockIn(personId, shiftId, eventId, notes)
+    Note over TimeRecord: Policies: timeRecordRead, timeRecordWrite, timeRecordExecute
+    Note over TimeRecord: Guards (6)
+    TimeRecord->>TimeRecord: guard[0]: self.clockInAt == null
+    TimeRecord->>TimeRecord: guard[1]: self.status == #quot;open#quot;
+    TimeRecord->>TimeRecord: guard[2]: self.deletedAt == null
+    TimeRecord->>TimeRecord: guard[3]: user.id != null
+    TimeRecord->>TimeRecord: guard[4]: personId == user.id or roleAllows(user.role, #quot;workforceMa...
+    TimeRecord->>TimeRecord: guard[5]: self.person != null and self.person.status == #quot;active#quot;
+    TimeRecord->>TimeRecord: mutate.personId
+    TimeRecord->>TimeRecord: mutate.shiftId
+    TimeRecord->>TimeRecord: mutate.eventId
+    TimeRecord->>TimeRecord: mutate.notes
+    TimeRecord->>TimeRecord: mutate.clockInAt
+    TimeRecord->>EventBus: emit TimeRecordClockedIn on time_record.clocked_in
+    TimeRecord-->>-Client: void

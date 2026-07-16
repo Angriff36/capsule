@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant PaymentMethod as PaymentMethod
+    participant EventBus
+    Client->>+PaymentMethod: register(clientId, methodType, provider, lastFour, isDefault, notes)
+    Note over PaymentMethod: Policies: paymentMethodRead, paymentMethodWrite, paymentMethodExecute
+    Note over PaymentMethod: Guards (4)
+    PaymentMethod->>PaymentMethod: guard[0]: self.registeredAt == null
+    PaymentMethod->>PaymentMethod: guard[1]: self.status == #quot;active#quot;
+    PaymentMethod->>PaymentMethod: guard[2]: self.deletedAt == null
+    PaymentMethod->>PaymentMethod: guard[3]: self.client != null
+    PaymentMethod->>PaymentMethod: mutate.clientId
+    PaymentMethod->>PaymentMethod: mutate.methodType
+    PaymentMethod->>PaymentMethod: mutate.provider
+    PaymentMethod->>PaymentMethod: mutate.lastFour
+    PaymentMethod->>PaymentMethod: mutate.isDefault
+    PaymentMethod->>PaymentMethod: mutate.notes
+    PaymentMethod->>PaymentMethod: mutate.registeredAt
+    PaymentMethod->>EventBus: emit PaymentMethodRegistered on payment_method.registered
+    PaymentMethod-->>-Client: void

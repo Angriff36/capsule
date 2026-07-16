@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant IngredientDemand as IngredientDemand
+    participant EventBus
+    Client->>+IngredientDemand: confirm()
+    Note over IngredientDemand: Policies: ingredientDemandRead, ingredientDemandWrite, ingredientDemandExecute
+    Note over IngredientDemand: Guards (3)
+    IngredientDemand->>IngredientDemand: guard[0]: self.status == #quot;calculated#quot;
+    IngredientDemand->>IngredientDemand: guard[1]: self.calculatedAt != null
+    IngredientDemand->>IngredientDemand: guard[2]: self.deletedAt == null
+    IngredientDemand->>IngredientDemand: mutate.status
+    IngredientDemand->>IngredientDemand: mutate.confirmedAt
+    IngredientDemand->>EventBus: emit IngredientDemandConfirmed on ingredient_demand.confirmed
+    IngredientDemand-->>-Client: void

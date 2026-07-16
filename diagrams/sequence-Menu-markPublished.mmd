@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant Menu as Menu
+    participant EventBus
+    Client->>+Menu: markPublished()
+    Note over Menu: Policies: menuRead, menuWrite, menuExecute
+    Note over Menu: Guards (4)
+    Menu->>Menu: guard[0]: self.status == #quot;draft#quot;
+    Menu->>Menu: guard[1]: self.draftedAt != null
+    Menu->>Menu: guard[2]: self.deletedAt == null
+    Menu->>Menu: guard[3]: roleAllows(user.role, #quot;kitchenManageAccess#quot;)
+    Menu->>Menu: mutate.status
+    Menu->>Menu: mutate.publishedAt
+    Menu->>EventBus: emit MenuPublished on menu.published
+    Menu-->>-Client: void

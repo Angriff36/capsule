@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant Shift as Shift
+    participant EventBus
+    Client->>+Shift: schedule(personId, startsAt, endsAt, eventId, role, notes)
+    Note over Shift: Policies: shiftRead, shiftWrite, shiftExecute
+    Note over Shift: Guards (5)
+    Shift->>Shift: guard[0]: self.scheduledAt == null
+    Shift->>Shift: guard[1]: self.status == #quot;scheduled#quot;
+    Shift->>Shift: guard[2]: self.deletedAt == null
+    Shift->>Shift: guard[3]: self.person != null
+    Shift->>Shift: guard[4]: roleAllows(user.role, #quot;workforceManageAccess#quot;)
+    Shift->>Shift: mutate.personId
+    Shift->>Shift: mutate.eventId
+    Shift->>Shift: mutate.startsAt
+    Shift->>Shift: mutate.endsAt
+    Shift->>Shift: mutate.role
+    Shift->>Shift: mutate.notes
+    Shift->>Shift: mutate.scheduledAt
+    Shift->>EventBus: emit ShiftScheduled on shift.scheduled
+    Shift-->>-Client: void

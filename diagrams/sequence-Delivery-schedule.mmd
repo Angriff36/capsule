@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant Client
+    participant Delivery as Delivery
+    participant EventBus
+    Client->>+Delivery: schedule(packListId, eventId, destination, windowStartsAt, windowEndsAt, driverId, notes)
+    Note over Delivery: Policies: deliveryRead, deliveryWrite, deliveryExecute
+    Note over Delivery: Guards (5)
+    Delivery->>Delivery: guard[0]: self.scheduledAt == null
+    Delivery->>Delivery: guard[1]: self.status == #quot;scheduled#quot;
+    Delivery->>Delivery: guard[2]: self.deletedAt == null
+    Delivery->>Delivery: guard[3]: self.packList != null and self.packList.status == #quot;packed...
+    Delivery->>Delivery: guard[4]: self.event != null
+    Delivery->>Delivery: mutate.packListId
+    Delivery->>Delivery: mutate.eventId
+    Delivery->>Delivery: mutate.destination
+    Delivery->>Delivery: mutate.windowStartsAt
+    Delivery->>Delivery: mutate.windowEndsAt
+    Delivery->>Delivery: mutate.driverId
+    Delivery->>Delivery: mutate.notes
+    Delivery->>Delivery: mutate.scheduledAt
+    Delivery->>EventBus: emit DeliveryScheduled on delivery.scheduled
+    Delivery-->>-Client: void

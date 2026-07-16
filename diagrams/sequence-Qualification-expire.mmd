@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant Qualification as Qualification
+    participant EventBus
+    Client->>+Qualification: expire()
+    Note over Qualification: Policies: qualificationRead, qualificationWrite, qualificationExecute
+    Note over Qualification: Guards (5)
+    Qualification->>Qualification: guard[0]: self.status == #quot;active#quot;
+    Qualification->>Qualification: guard[1]: self.grantedAt != null
+    Qualification->>Qualification: guard[2]: self.expiresAt != null
+    Qualification->>Qualification: guard[3]: self.deletedAt == null
+    Qualification->>Qualification: guard[4]: roleAllows(user.role, #quot;workforceManageAccess#quot;)
+    Qualification->>Qualification: compute.previousStatus
+    Qualification->>Qualification: mutate.status
+    Qualification->>Qualification: mutate.expiredAt
+    Qualification->>EventBus: emit QualificationExpired on qualification.expired
+    Qualification-->>-Client: void

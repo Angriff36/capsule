@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant Delivery as Delivery
+    participant EventBus
+    Client->>+Delivery: markFailed(reason)
+    Note over Delivery: Policies: deliveryRead, deliveryWrite, deliveryExecute
+    Note over Delivery: Guards (4)
+    Delivery->>Delivery: guard[0]: self.status == #quot;scheduled#quot; or self.status == #quot;in_transit#quot;
+    Delivery->>Delivery: guard[1]: self.scheduledAt != null
+    Delivery->>Delivery: guard[2]: self.deletedAt == null
+    Delivery->>Delivery: guard[3]: roleAllows(user.role, #quot;logisticsManageAccess#quot;)
+    Delivery->>Delivery: compute.previousStatus
+    Delivery->>Delivery: mutate.status
+    Delivery->>Delivery: mutate.failedAt
+    Delivery->>Delivery: mutate.failureReason
+    Delivery->>EventBus: emit DeliveryFailed on delivery.failed
+    Delivery-->>-Client: void

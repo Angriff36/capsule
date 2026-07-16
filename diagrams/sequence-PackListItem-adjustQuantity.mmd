@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant PackListItem as PackListItem
+    participant EventBus
+    Client->>+PackListItem: adjustQuantity(requiredQuantity)
+    Note over PackListItem: Policies: packListItemRead, packListItemWrite, packListItemExecute
+    Note over PackListItem: Guards (4)
+    PackListItem->>PackListItem: guard[0]: self.status == #quot;listed#quot;
+    PackListItem->>PackListItem: guard[1]: self.listedAt != null
+    PackListItem->>PackListItem: guard[2]: self.deletedAt == null
+    PackListItem->>PackListItem: guard[3]: self.packList != null and self.packList.status == #quot;draft#quot;...
+    PackListItem->>PackListItem: compute.previousRequired
+    PackListItem->>PackListItem: mutate.requiredQuantity
+    PackListItem->>EventBus: emit PackListItemQuantityAdjusted on pack_list_item.quantity_adjusted
+    PackListItem-->>-Client: void

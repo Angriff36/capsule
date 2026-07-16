@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant Event as Event
+    participant EventBus
+    Client->>+Event: changeRequirements(accessibilityNeeds, serviceRequirements, operationalRequirements)
+    Note over Event: Policies: eventRead, eventWrite, eventExecute
+    Note over Event: Guards (2)
+    Event->>Event: guard[0]: self.stage == #quot;planning#quot; or self.stage == #quot;pending_approv...
+    Event->>Event: guard[1]: self.deletedAt == null
+    Event->>Event: mutate.accessibilityNeeds
+    Event->>Event: mutate.serviceRequirements
+    Event->>Event: mutate.operationalRequirements
+    Event->>EventBus: emit EventRequirementsChanged on event.requirements_changed
+    Event-->>-Client: void

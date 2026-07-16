@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant Person as Person
+    participant EventBus
+    Client->>+Person: terminate(reason)
+    Note over Person: Policies: personRead, personWrite, personExecute
+    Note over Person: Guards (2)
+    Person->>Person: guard[0]: self.status == #quot;active#quot; or self.status == #quot;inactive#quot;
+    Person->>Person: guard[1]: roleAllows(user.role, #quot;adminAccess#quot;)
+    Person->>Person: mutate.status
+    Person->>Person: mutate.terminationDate
+    Person->>Person: mutate.deletedAt
+    Person->>EventBus: emit PersonTerminated on person.terminated
+    Person-->>-Client: void

@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant Menu as Menu
+    participant EventBus
+    Client->>+Menu: reviseDetails(name, description, category, isTemplate)
+    Note over Menu: Policies: menuRead, menuWrite, menuExecute
+    Note over Menu: Guards (2)
+    Menu->>Menu: guard[0]: self.status == #quot;draft#quot;
+    Menu->>Menu: guard[1]: self.deletedAt == null
+    Menu->>Menu: mutate.name
+    Menu->>Menu: mutate.description
+    Menu->>Menu: mutate.category
+    Menu->>Menu: mutate.isTemplate
+    Menu->>EventBus: emit MenuDetailsRevised on menu.details_revised
+    Menu-->>-Client: void

@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Client
+    participant Invoice as Invoice
+    participant EventBus
+    Client->>+Invoice: markViewed()
+    Note over Invoice: Policies: invoiceRead, invoiceWrite, invoiceExecute
+    Note over Invoice: Guards (2)
+    Invoice->>Invoice: guard[0]: self.status == #quot;sent#quot;
+    Invoice->>Invoice: guard[1]: self.deletedAt == null
+    Invoice->>Invoice: mutate.status
+    Invoice->>Invoice: mutate.viewedAt
+    Invoice->>EventBus: emit InvoiceViewed on invoice.viewed
+    Invoice-->>-Client: void

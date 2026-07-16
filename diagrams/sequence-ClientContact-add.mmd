@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant Client
+    participant ClientContact as ClientContact
+    participant EventBus
+    Client->>+ClientContact: add(clientId, givenName, familyName, title, email, phone, mobile, isPrimary, isBillingContact, notes)
+    Note over ClientContact: Policies: clientContactRead, clientContactWrite, clientContactExecute
+    Note over ClientContact: Guards (4)
+    ClientContact->>ClientContact: guard[0]: self.addedAt == null
+    ClientContact->>ClientContact: guard[1]: self.status == #quot;active#quot;
+    ClientContact->>ClientContact: guard[2]: self.deletedAt == null
+    ClientContact->>ClientContact: guard[3]: self.client != null
+    ClientContact->>ClientContact: mutate.clientId
+    ClientContact->>ClientContact: mutate.givenName
+    ClientContact->>ClientContact: mutate.familyName
+    ClientContact->>ClientContact: mutate.title
+    ClientContact->>ClientContact: mutate.email
+    ClientContact->>ClientContact: mutate.phone
+    ClientContact->>ClientContact: mutate.mobile
+    ClientContact->>ClientContact: mutate.isPrimary
+    ClientContact->>ClientContact: mutate.isBillingContact
+    ClientContact->>ClientContact: mutate.notes
+    ClientContact->>ClientContact: mutate.addedAt
+    ClientContact->>EventBus: emit ClientContactAdded on client_contact.added
+    ClientContact-->>-Client: void

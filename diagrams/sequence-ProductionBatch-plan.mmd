@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client
+    participant ProductionBatch as ProductionBatch
+    participant EventBus
+    Client->>+ProductionBatch: plan(recipeId, plannedYield, yieldUnit, eventId, notes)
+    Note over ProductionBatch: Policies: productionBatchRead, productionBatchWrite, productionBatchExecute
+    Note over ProductionBatch: Guards (4)
+    ProductionBatch->>ProductionBatch: guard[0]: self.plannedAt == null
+    ProductionBatch->>ProductionBatch: guard[1]: self.status == #quot;planned#quot;
+    ProductionBatch->>ProductionBatch: guard[2]: self.deletedAt == null
+    ProductionBatch->>ProductionBatch: guard[3]: self.recipe != null and self.recipe.status == #quot;published#quot;
+    ProductionBatch->>ProductionBatch: mutate.recipeId
+    ProductionBatch->>ProductionBatch: mutate.eventId
+    ProductionBatch->>ProductionBatch: mutate.plannedYield
+    ProductionBatch->>ProductionBatch: mutate.yieldUnit
+    ProductionBatch->>ProductionBatch: mutate.notes
+    ProductionBatch->>ProductionBatch: mutate.plannedAt
+    ProductionBatch->>EventBus: emit ProductionBatchPlanned on production_batch.planned
+    ProductionBatch-->>-Client: void

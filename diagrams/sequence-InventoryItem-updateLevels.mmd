@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant InventoryItem as InventoryItem
+    participant EventBus
+    Client->>+InventoryItem: updateLevels(parLevel, reorderThreshold, unitCost)
+    Note over InventoryItem: Policies: inventoryItemRead, inventoryItemWrite, inventoryItemExecute
+    Note over InventoryItem: Guards (3)
+    InventoryItem->>InventoryItem: guard[0]: self.stockedAt != null
+    InventoryItem->>InventoryItem: guard[1]: self.deletedAt == null
+    InventoryItem->>InventoryItem: guard[2]: roleAllows(user.role, #quot;inventoryManageAccess#quot;)
+    InventoryItem->>InventoryItem: mutate.parLevel
+    InventoryItem->>InventoryItem: mutate.reorderThreshold
+    InventoryItem->>InventoryItem: mutate.unitCost
+    InventoryItem->>EventBus: emit InventoryLevelsUpdated on inventory_item.levels_updated
+    InventoryItem-->>-Client: void
