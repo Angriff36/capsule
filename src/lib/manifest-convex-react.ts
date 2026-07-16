@@ -22,6 +22,11 @@ export function useAvailabilityWindowWithdraw() {
   return useMutation(api.mutations.AvailabilityWindow_withdraw);
 }
 
+/** Governed creation hook for AvailabilityWindow.declare. */
+export function useCreateAvailabilityWindow() {
+  return useMutation(api.mutations.AvailabilityWindow_createViaDeclare);
+}
+
 /** Reactive list for Client. */
 export function useListClient() {
   return useQuery(api.queries.listClient);
@@ -62,6 +67,11 @@ export function useClientRegister() {
   return useMutation(api.mutations.Client_register);
 }
 
+/** Governed creation hook for Client.register. */
+export function useCreateClient() {
+  return useMutation(api.mutations.Client_createViaRegister);
+}
+
 /** Reactive list for ClientContact. */
 export function useListClientContact() {
   return useQuery(api.queries.listClientContact);
@@ -90,6 +100,11 @@ export function useClientContactSetPrimary() {
 /** Mutation hook for ClientContact.updateDetails. */
 export function useClientContactUpdateDetails() {
   return useMutation(api.mutations.ClientContact_updateDetails);
+}
+
+/** Governed creation hook for ClientContact.add. */
+export function useCreateClientContact() {
+  return useMutation(api.mutations.ClientContact_createViaAdd);
 }
 
 /** Reactive list for Contract. */
@@ -132,6 +147,11 @@ export function useContractSign() {
   return useMutation(api.mutations.Contract_sign);
 }
 
+/** Governed creation hook for Contract.draft. */
+export function useCreateContract() {
+  return useMutation(api.mutations.Contract_createViaDraft);
+}
+
 /** Reactive list for Delivery. */
 export function useListDelivery() {
   return useQuery(api.queries.listDelivery);
@@ -165,6 +185,11 @@ export function useDeliverySchedule() {
 /** Mutation hook for Delivery.startTransit. */
 export function useDeliveryStartTransit() {
   return useMutation(api.mutations.Delivery_startTransit);
+}
+
+/** Governed creation hook for Delivery.schedule. */
+export function useCreateDelivery() {
+  return useMutation(api.mutations.Delivery_createViaSchedule);
 }
 
 /** Reactive list for Dish. */
@@ -210,6 +235,11 @@ export function useDishReviseDetails() {
 /** Mutation hook for Dish.updatePortioning. */
 export function useDishUpdatePortioning() {
   return useMutation(api.mutations.Dish_updatePortioning);
+}
+
+/** Governed creation hook for Dish.introduce. */
+export function useCreateDish() {
+  return useMutation(api.mutations.Dish_createViaIntroduce);
 }
 
 /** Reactive list for Event. */
@@ -297,6 +327,11 @@ export function useEventSubmitForApproval() {
   return useMutation(api.mutations.Event_submitForApproval);
 }
 
+/** Governed creation hook for Event.planEngagement. */
+export function useCreateEvent() {
+  return useMutation(api.mutations.Event_createViaPlanEngagement);
+}
+
 /** Reactive list for EventAllergenCheck. */
 export function useListEventAllergenCheck() {
   return useQuery(api.queries.listEventAllergenCheck);
@@ -310,6 +345,11 @@ export function useGetEventAllergenCheck(id: string | "skip") {
 /** Mutation hook for EventAllergenCheck.record. */
 export function useEventAllergenCheckRecord() {
   return useMutation(api.mutations.EventAllergenCheck_record);
+}
+
+/** Governed creation hook for EventAllergenCheck.record. */
+export function useCreateEventAllergenCheck() {
+  return useMutation(api.mutations.EventAllergenCheck_createViaRecord);
 }
 
 /** Reactive list for EventAssignment. */
@@ -352,6 +392,11 @@ export function useEventAssignmentUnassign() {
   return useMutation(api.mutations.EventAssignment_unassign);
 }
 
+/** Governed creation hook for EventAssignment.assign. */
+export function useCreateEventAssignment() {
+  return useMutation(api.mutations.EventAssignment_createViaAssign);
+}
+
 /** Reactive list for EventCloseout. */
 export function useListEventCloseout() {
   return useQuery(api.queries.listEventCloseout);
@@ -370,6 +415,11 @@ export function useEventCloseoutCapture() {
 /** Mutation hook for EventCloseout.finalize. */
 export function useEventCloseoutFinalize() {
   return useMutation(api.mutations.EventCloseout_finalize);
+}
+
+/** Governed creation hook for EventCloseout.capture. */
+export function useCreateEventCloseout() {
+  return useMutation(api.mutations.EventCloseout_createViaCapture);
 }
 
 /** Reactive list for EventDish. */
@@ -405,6 +455,11 @@ export function useEventDishSelect() {
 /** Mutation hook for EventDish.updateInstructions. */
 export function useEventDishUpdateInstructions() {
   return useMutation(api.mutations.EventDish_updateInstructions);
+}
+
+/** Governed creation hook for EventDish.select. */
+export function useCreateEventDish() {
+  return useMutation(api.mutations.EventDish_createViaSelect);
 }
 
 /** Reactive list for EventGuest. */
@@ -447,6 +502,11 @@ export function useEventGuestWithdraw() {
   return useMutation(api.mutations.EventGuest_withdraw);
 }
 
+/** Governed creation hook for EventGuest.invite. */
+export function useCreateEventGuest() {
+  return useMutation(api.mutations.EventGuest_createViaInvite);
+}
+
 /** Reactive list for Incident. */
 export function useListIncident() {
   return useQuery(api.queries.listIncident);
@@ -475,6 +535,11 @@ export function useIncidentMarkResolved() {
 /** Mutation hook for Incident.report. */
 export function useIncidentReport() {
   return useMutation(api.mutations.Incident_report);
+}
+
+/** Governed creation hook for Incident.report. */
+export function useCreateIncident() {
+  return useMutation(api.mutations.Incident_createViaReport);
 }
 
 /** Reactive list for Ingredient. */
@@ -517,6 +582,11 @@ export function useIngredientUpdateDetails() {
   return useMutation(api.mutations.Ingredient_updateDetails);
 }
 
+/** Governed creation hook for Ingredient.introduce. */
+export function useCreateIngredient() {
+  return useMutation(api.mutations.Ingredient_createViaIntroduce);
+}
+
 /** Reactive list for IngredientDemand. */
 export function useListIngredientDemand() {
   return useQuery(api.queries.listIngredientDemand);
@@ -550,6 +620,11 @@ export function useIngredientDemandRecalculate() {
 /** Mutation hook for IngredientDemand.supersede. */
 export function useIngredientDemandSupersede() {
   return useMutation(api.mutations.IngredientDemand_supersede);
+}
+
+/** Governed creation hook for IngredientDemand.calculate. */
+export function useCreateIngredientDemand() {
+  return useMutation(api.mutations.IngredientDemand_createViaCalculate);
 }
 
 /** Reactive list for InventoryItem. */
@@ -602,6 +677,11 @@ export function useInventoryItemUpdateLevels() {
   return useMutation(api.mutations.InventoryItem_updateLevels);
 }
 
+/** Governed creation hook for InventoryItem.open. */
+export function useCreateInventoryItem() {
+  return useMutation(api.mutations.InventoryItem_createViaOpen);
+}
+
 /** Reactive list for InventoryReservation. */
 export function useListInventoryReservation() {
   return useQuery(api.queries.listInventoryReservation);
@@ -625,6 +705,11 @@ export function useInventoryReservationRelease() {
 /** Mutation hook for InventoryReservation.reserve. */
 export function useInventoryReservationReserve() {
   return useMutation(api.mutations.InventoryReservation_reserve);
+}
+
+/** Governed creation hook for InventoryReservation.reserve. */
+export function useCreateInventoryReservation() {
+  return useMutation(api.mutations.InventoryReservation_createViaReserve);
 }
 
 /** Reactive list for Invoice. */
@@ -677,6 +762,11 @@ export function useInvoiceWriteOff() {
   return useMutation(api.mutations.Invoice_writeOff);
 }
 
+/** Governed creation hook for Invoice.issue. */
+export function useCreateInvoice() {
+  return useMutation(api.mutations.Invoice_createViaIssue);
+}
+
 /** Reactive list for Menu. */
 export function useListMenu() {
   return useQuery(api.queries.listMenu);
@@ -722,6 +812,11 @@ export function useMenuUpdatePricing() {
   return useMutation(api.mutations.Menu_updatePricing);
 }
 
+/** Governed creation hook for Menu.draft. */
+export function useCreateMenu() {
+  return useMutation(api.mutations.Menu_createViaDraft);
+}
+
 /** Reactive list for Organization. */
 export function useListOrganization() {
   return useQuery(api.queries.listOrganization);
@@ -755,6 +850,11 @@ export function useOrganizationRename() {
 /** Mutation hook for Organization.suspend. */
 export function useOrganizationSuspend() {
   return useMutation(api.mutations.Organization_suspend);
+}
+
+/** Governed creation hook for Organization.register. */
+export function useCreateOrganization() {
+  return useMutation(api.mutations.Organization_createViaRegister);
 }
 
 /** Reactive list for PackList. */
@@ -797,6 +897,11 @@ export function usePackListStartPacking() {
   return useMutation(api.mutations.PackList_startPacking);
 }
 
+/** Governed creation hook for PackList.open. */
+export function useCreatePackList() {
+  return useMutation(api.mutations.PackList_createViaOpen);
+}
+
 /** Reactive list for PackListItem. */
 export function useListPackListItem() {
   return useQuery(api.queries.listPackListItem);
@@ -825,6 +930,11 @@ export function usePackListItemMarkMissing() {
 /** Mutation hook for PackListItem.markPacked. */
 export function usePackListItemMarkPacked() {
   return useMutation(api.mutations.PackListItem_markPacked);
+}
+
+/** Governed creation hook for PackListItem.addItem. */
+export function useCreatePackListItem() {
+  return useMutation(api.mutations.PackListItem_createViaAddItem);
 }
 
 /** Reactive list for Payment. */
@@ -860,6 +970,11 @@ export function usePaymentRefund() {
 /** Mutation hook for Payment.settle. */
 export function usePaymentSettle() {
   return useMutation(api.mutations.Payment_settle);
+}
+
+/** Governed creation hook for Payment.record. */
+export function useCreatePayment() {
+  return useMutation(api.mutations.Payment_createViaRecord);
 }
 
 /** Reactive list for PaymentMethod. */
@@ -907,6 +1022,11 @@ export function usePaymentMethodRemove() {
   return useMutation(api.mutations.PaymentMethod_remove);
 }
 
+/** Governed creation hook for PaymentMethod.register. */
+export function useCreatePaymentMethod() {
+  return useMutation(api.mutations.PaymentMethod_createViaRegister);
+}
+
 /** Reactive list for PayrollInput. */
 export function useListPayrollInput() {
   return useQuery(api.queries.listPayrollInput);
@@ -930,6 +1050,11 @@ export function usePayrollInputMarkVoided() {
 /** Mutation hook for PayrollInput.prepare. */
 export function usePayrollInputPrepare() {
   return useMutation(api.mutations.PayrollInput_prepare);
+}
+
+/** Governed creation hook for PayrollInput.prepare. */
+export function useCreatePayrollInput() {
+  return useMutation(api.mutations.PayrollInput_createViaPrepare);
 }
 
 /** Reactive list for Person. */
@@ -970,6 +1095,11 @@ export function usePersonReactivate() {
 /** Mutation hook for Person.terminate. */
 export function usePersonTerminate() {
   return useMutation(api.mutations.Person_terminate);
+}
+
+/** Governed creation hook for Person.hire. */
+export function useCreatePerson() {
+  return useMutation(api.mutations.Person_createViaHire);
 }
 
 /** Reactive list for PrepTask. */
@@ -1022,6 +1152,11 @@ export function usePrepTaskUnblock() {
   return useMutation(api.mutations.PrepTask_unblock);
 }
 
+/** Governed creation hook for PrepTask.open. */
+export function useCreatePrepTask() {
+  return useMutation(api.mutations.PrepTask_createViaOpen);
+}
+
 /** Reactive list for ProductionBatch. */
 export function useListProductionBatch() {
   return useQuery(api.queries.listProductionBatch);
@@ -1050,6 +1185,11 @@ export function useProductionBatchPlan() {
 /** Mutation hook for ProductionBatch.start. */
 export function useProductionBatchStart() {
   return useMutation(api.mutations.ProductionBatch_start);
+}
+
+/** Governed creation hook for ProductionBatch.plan. */
+export function useCreateProductionBatch() {
+  return useMutation(api.mutations.ProductionBatch_createViaPlan);
 }
 
 /** Reactive list for Proposal. */
@@ -1090,6 +1230,11 @@ export function useProposalMarkViewed() {
 /** Mutation hook for Proposal.send. */
 export function useProposalSend() {
   return useMutation(api.mutations.Proposal_send);
+}
+
+/** Governed creation hook for Proposal.draft. */
+export function useCreateProposal() {
+  return useMutation(api.mutations.Proposal_createViaDraft);
 }
 
 /** Reactive list for PurchaseNeed. */
@@ -1147,6 +1292,11 @@ export function useQualificationRevoke() {
   return useMutation(api.mutations.Qualification_revoke);
 }
 
+/** Governed creation hook for Qualification.grant. */
+export function useCreateQualification() {
+  return useMutation(api.mutations.Qualification_createViaGrant);
+}
+
 /** Reactive list for QualityCheck. */
 export function useListQualityCheck() {
   return useQuery(api.queries.listQualityCheck);
@@ -1175,6 +1325,11 @@ export function useQualityCheckPass() {
 /** Mutation hook for QualityCheck.reinspect. */
 export function useQualityCheckReinspect() {
   return useMutation(api.mutations.QualityCheck_reinspect);
+}
+
+/** Governed creation hook for QualityCheck.fail. */
+export function useCreateQualityCheck() {
+  return useMutation(api.mutations.QualityCheck_createViaFail);
 }
 
 /** Reactive list for Recipe. */
@@ -1212,6 +1367,11 @@ export function useRecipeReviseDraft() {
   return useMutation(api.mutations.Recipe_reviseDraft);
 }
 
+/** Governed creation hook for Recipe.draft. */
+export function useCreateRecipe() {
+  return useMutation(api.mutations.Recipe_createViaDraft);
+}
+
 /** Reactive list for RecipeIngredient. */
 export function useListRecipeIngredient() {
   return useQuery(api.queries.listRecipeIngredient);
@@ -1235,6 +1395,11 @@ export function useRecipeIngredientAdjustQuantity() {
 /** Mutation hook for RecipeIngredient.remove. */
 export function useRecipeIngredientRemove() {
   return useMutation(api.mutations.RecipeIngredient_remove);
+}
+
+/** Governed creation hook for RecipeIngredient.add. */
+export function useCreateRecipeIngredient() {
+  return useMutation(api.mutations.RecipeIngredient_createViaAdd);
 }
 
 /** Reactive list for SavedReportDefinition. */
@@ -1277,6 +1442,11 @@ export function useSavedReportDefinitionUpdateDefinition() {
   return useMutation(api.mutations.SavedReportDefinition_updateDefinition);
 }
 
+/** Governed creation hook for SavedReportDefinition.createDefinition. */
+export function useCreateSavedReportDefinition() {
+  return useMutation(api.mutations.SavedReportDefinition_createViaCreateDefinition);
+}
+
 /** Reactive list for Shift. */
 export function useListShift() {
   return useQuery(api.queries.listShift);
@@ -1312,6 +1482,11 @@ export function useShiftStart() {
   return useMutation(api.mutations.Shift_start);
 }
 
+/** Governed creation hook for Shift.schedule. */
+export function useCreateShift() {
+  return useMutation(api.mutations.Shift_createViaSchedule);
+}
+
 /** Reactive list for StorageLocation. */
 export function useListStorageLocation() {
   return useQuery(api.queries.listStorageLocation);
@@ -1342,6 +1517,11 @@ export function useStorageLocationReviseDetails() {
   return useMutation(api.mutations.StorageLocation_reviseDetails);
 }
 
+/** Governed creation hook for StorageLocation.register. */
+export function useCreateStorageLocation() {
+  return useMutation(api.mutations.StorageLocation_createViaRegister);
+}
+
 /** Reactive list for TimeRecord. */
 export function useListTimeRecord() {
   return useQuery(api.queries.listTimeRecord);
@@ -1365,6 +1545,11 @@ export function useTimeRecordClockOut() {
 /** Mutation hook for TimeRecord.correct. */
 export function useTimeRecordCorrect() {
   return useMutation(api.mutations.TimeRecord_correct);
+}
+
+/** Governed creation hook for TimeRecord.clockIn. */
+export function useCreateTimeRecord() {
+  return useMutation(api.mutations.TimeRecord_createViaClockIn);
 }
 
 /** Reactive list for Vendor. */
@@ -1400,6 +1585,11 @@ export function useVendorTerminate() {
 /** Mutation hook for Vendor.updateDetails. */
 export function useVendorUpdateDetails() {
   return useMutation(api.mutations.Vendor_updateDetails);
+}
+
+/** Governed creation hook for Vendor.onboard. */
+export function useCreateVendor() {
+  return useMutation(api.mutations.Vendor_createViaOnboard);
 }
 
 /** Reactive list for VendorOrder. */
@@ -1447,6 +1637,11 @@ export function useVendorOrderUpdateTotals() {
   return useMutation(api.mutations.VendorOrder_updateTotals);
 }
 
+/** Governed creation hook for VendorOrder.open. */
+export function useCreateVendorOrder() {
+  return useMutation(api.mutations.VendorOrder_createViaOpen);
+}
+
 /** Reactive list for VendorOrderLine. */
 export function useListVendorOrderLine() {
   return useQuery(api.queries.listVendorOrderLine);
@@ -1470,6 +1665,11 @@ export function useVendorOrderLineCancelLine() {
 /** Mutation hook for VendorOrderLine.recordReceipt. */
 export function useVendorOrderLineRecordReceipt() {
   return useMutation(api.mutations.VendorOrderLine_recordReceipt);
+}
+
+/** Governed creation hook for VendorOrderLine.addLine. */
+export function useCreateVendorOrderLine() {
+  return useMutation(api.mutations.VendorOrderLine_createViaAddLine);
 }
 
 /** Reactive list for Venue. */
@@ -1507,6 +1707,11 @@ export function useVenueUpdateDetails() {
   return useMutation(api.mutations.Venue_updateDetails);
 }
 
+/** Governed creation hook for Venue.register. */
+export function useCreateVenue() {
+  return useMutation(api.mutations.Venue_createViaRegister);
+}
+
 /** Reactive list for WasteRecord. */
 export function useListWasteRecord() {
   return useQuery(api.queries.listWasteRecord);
@@ -1527,4 +1732,9 @@ export function useWasteRecordVoidRecord() {
   return useMutation(api.mutations.WasteRecord_voidRecord);
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 305 as const;
+/** Governed creation hook for WasteRecord.record. */
+export function useCreateWasteRecord() {
+  return useMutation(api.mutations.WasteRecord_createViaRecord);
+}
+
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 347 as const;

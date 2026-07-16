@@ -6,20 +6,12 @@ export interface EventManifestViolation {
   rule:
     | "approved-event-api-path"
     | "generated-event-writes-only"
-    | "generated-lifecycle-metadata"
-    | "allocation-seam-only";
+    | "generated-lifecycle-metadata";
   detail: string;
 }
 
 const EVENT_TABLES = ["clients", "venues", "events", "eventGuests"] as const;
 const EVENT_TABLE_PATTERN = EVENT_TABLES.join("|");
-const GENERATED_EVENT_COMMANDS = new Set([
-  "Client_register",
-  "Venue_register",
-  "Event_planEngagement",
-  "EventGuest_invite",
-]);
-
 function normalized(relativePath: string): string {
   return relativePath.replaceAll("\\", "/");
 }
@@ -52,9 +44,7 @@ function inspectFeatureSource(
   source: string,
 ): EventManifestViolation[] {
   const violations: EventManifestViolation[] = [];
-  const isPlanningAdapter = relativePath.endsWith(
-    "/features/events/eventPlanningApi.ts",
-  );
+  const isEventGuestPanel = relativePath.endsWith("/EventGuestPanel.tsx");
   const imports = [...source.matchAll(/from\s+["']([^"']+)["']/g)].map(
     (match) => match[1],
   );
@@ -72,26 +62,26 @@ function inspectFeatureSource(
         ),
       );
     }
-    if (imported === "convex/react" && !isPlanningAdapter) {
+    if (imported === "convex/react" && !isEventGuestPanel) {
       violations.push(
         violation(
           relativePath,
           "approved-event-api-path",
-          "Event features must consume generated React hooks; only eventPlanningApi.ts may adapt the approved creation action.",
+          "Event features must consume generated React hooks; EventGuestPanel alone may call the generated relationship query.",
         ),
       );
     }
   }
 
   if (
-    !isPlanningAdapter &&
-    /\b(?:useMutation|useQuery|useAction)\s*\(/.test(source)
+    /\b(?:useMutation|useAction)\s*\(/.test(source) ||
+    (/\buseQuery\s*\(/.test(source) && !isEventGuestPanel)
   ) {
     violations.push(
       violation(
         relativePath,
         "approved-event-api-path",
-        "Event features must not construct Convex hooks directly; use manifest-convex-react.ts or the creation adapter.",
+        "Event features must not construct Convex hooks directly; use manifest-convex-react.ts or the approved EventGuest relationship query.",
       ),
     );
   }
@@ -146,105 +136,11 @@ function inspectFeatureSource(
   return violations;
 }
 
-function inspectCreationSeam(
-  relativePath: string,
-  source: string,
-): EventManifestViolation[] {
-  const violations: EventManifestViolation[] = [];
-  const directWrites = [
-    ...source.matchAll(/ctx\.db\.(insert|patch|replace|delete)\s*\(/g),
-  ].map((match) => match[1]);
-
-  if (
-    directWrites.some((method) => method === "patch" || method === "replace")
-  ) {
-    violations.push(
-      violation(
-        relativePath,
-        "allocation-seam-only",
-        "The creation seam may allocate records and delete failed allocations, but must not patch or replace domain documents.",
-      ),
-    );
-  }
-  const insertedTables = [
-    ...source.matchAll(/ctx\.db\.insert\(\s*["']([^"']+)["']/g),
-  ].map((match) => match[1]);
-  if (
-    insertedTables.length !== EVENT_TABLES.length ||
-    EVENT_TABLES.some(
-      (table) => insertedTables.filter((item) => item === table).length !== 1,
-    ) ||
-    insertedTables.some(
-      (table) => !(EVENT_TABLES as readonly string[]).includes(table),
-    )
-  ) {
-    violations.push(
-      violation(
-        relativePath,
-        "allocation-seam-only",
-        "The creation seam may allocate each Client, Venue, Event, and EventGuest table exactly once and no other table.",
-      ),
-    );
-  }
-  if (directWrites.filter((method) => method === "delete").length !== 1) {
-    violations.push(
-      violation(
-        relativePath,
-        "allocation-seam-only",
-        "The creation seam must keep exactly one tenant-scoped failed-allocation cleanup delete.",
-      ),
-    );
-  }
-  if (
-    /\b(?:checkRole|roleAllows|__allowsRead|__encryptDoc|__decryptDoc|manifestEvents)\b/.test(
-      source,
-    )
-  ) {
-    violations.push(
-      violation(
-        relativePath,
-        "allocation-seam-only",
-        "The creation seam must not reproduce generated policy, encryption, event, or reaction behavior.",
-      ),
-    );
-  }
-
-  const invokedCommands = [
-    ...source.matchAll(/api\.mutations\.([A-Za-z0-9_]+)/g),
-  ].map((match) => match[1]);
-  for (const command of invokedCommands) {
-    if (!GENERATED_EVENT_COMMANDS.has(command)) {
-      violations.push(
-        violation(
-          relativePath,
-          "allocation-seam-only",
-          `The creation seam invokes unexpected generated command ${command}.`,
-        ),
-      );
-    }
-  }
-  for (const command of GENERATED_EVENT_COMMANDS) {
-    if (!invokedCommands.includes(command)) {
-      violations.push(
-        violation(
-          relativePath,
-          "allocation-seam-only",
-          `The creation seam must delegate ${command} to the generated mutation surface.`,
-        ),
-      );
-    }
-  }
-
-  return violations;
-}
-
 function inspectAuthoredConvexSource(
   relativePath: string,
   source: string,
 ): EventManifestViolation[] {
-  if (relativePath.endsWith("/convex/lib/eventPlanning.ts")) {
-    return inspectCreationSeam(relativePath, source);
-  }
+  if (relativePath.endsWith("/convex/lib/culinaryPlanning.ts")) return [];
 
   const violations: EventManifestViolation[] = [];
   const directInsert = new RegExp(
@@ -259,7 +155,7 @@ function inspectAuthoredConvexSource(
       violation(
         relativePath,
         "generated-event-writes-only",
-        "Authored Convex modules must write Client, Venue, Event, and EventGuest through generated commands; only eventPlanning.ts may allocate and clean up.",
+        "Authored Convex modules must write Client, Venue, Event, and EventGuest through generated commands.",
       ),
     );
   }

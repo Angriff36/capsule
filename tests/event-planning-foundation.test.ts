@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
@@ -12,12 +12,26 @@ const read = (path: string) => readFileSync(path, "utf8");
 
 describe("Event planning foundation", () => {
   it("creates Client, Venue, Event, and EventGuest through generated commands", () => {
-    const seam = read("convex/lib/eventPlanning.ts");
-    expect(seam).toContain("api.mutations.Client_register");
-    expect(seam).toContain("api.mutations.Venue_register");
-    expect(seam).toContain("api.mutations.Event_planEngagement");
-    expect(seam).toContain("api.mutations.EventGuest_invite");
-    expect(seam).toContain("discardAfterFailure");
+    const mutations = read("convex/mutations.ts");
+    const hooks = read("src/lib/manifest-convex-react.ts");
+    for (const mutation of [
+      "Client_createViaRegister",
+      "Venue_createViaRegister",
+      "Event_createViaPlanEngagement",
+      "EventGuest_createViaInvite",
+    ]) {
+      expect(mutations).toContain(`export const ${mutation} = mutation({`);
+    }
+    for (const hook of [
+      "useCreateClient",
+      "useCreateVenue",
+      "useCreateEvent",
+      "useCreateEventGuest",
+    ]) {
+      expect(hooks).toContain(`export function ${hook}()`);
+    }
+    expect(existsSync("convex/lib/eventPlanning.ts")).toBe(false);
+    expect(existsSync("src/features/events/eventPlanningApi.ts")).toBe(false);
   });
 
   it("navigates successful event creation directly to the real detail route", () => {

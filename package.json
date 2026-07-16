@@ -33,7 +33,7 @@
     "*.{ts,tsx,js,jsx,json,md,css,yml,yaml,html}": "prettier --write"
   },
   "dependencies": {
-    "@angriff36/manifest": "3.6.10",
+    "@angriff36/manifest": "3.6.12",
     "@clerk/react": "^6.12.4",
     "@fontsource-variable/archivo": "^5.2.5",
     "@fontsource/ibm-plex-mono": "^5.2.5",
@@ -43,14 +43,14 @@
     "react-router-dom": "^6.30.0"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.1.0",
+    "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.5.0",
     "@vitest/coverage-v8": "3.2.7",
     "lint-staged": "^17.0.8",
     "prettier": "^3.9.5",
-    "tailwindcss": "^4.1.0",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
     "vite": "^6.3.0",
     "vitest": "^3.2.4"

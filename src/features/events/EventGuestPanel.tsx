@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
-import type { Id } from "../../lib/api";
+import { useQuery } from "convex/react";
+import { api, type Id } from "../../lib/api";
 import { formatDate, formatTime } from "../../lib/format";
 import {
   useEventGuestAssignTable,
@@ -7,13 +8,12 @@ import {
   useEventGuestRsvpConfirm,
   useEventGuestRsvpDecline,
   useEventGuestWithdraw,
-  useListEventGuest,
+  useCreateEventGuest,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, Section, Skeleton, StatusChip } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { eventGuestPolicy } from "./EventGuestPolicy";
 import { FailureBanner } from "./FailureBanner";
-import { useCreateEventGuest } from "./eventPlanningApi";
 
 type GuestAction = {
   kind: "decline" | "table" | "withdraw";
@@ -30,7 +30,9 @@ function list(value: string): string[] | undefined {
 }
 
 export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
-  const allGuests = useListEventGuest();
+  const eventGuests = useQuery(api.queries.listEventGuestByEventId, {
+    eventId,
+  });
   const invite = useCreateEventGuest();
   const confirm = useEventGuestRsvpConfirm();
   const decline = useEventGuestRsvpDecline();
@@ -44,15 +46,10 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
 
   const guests = useMemo(
     () =>
-      (allGuests ?? [])
-        .filter(
-          (guest) =>
-            guest.eventId === eventId &&
-            guest.invitedAt != null &&
-            guest.deletedAt == null,
-        )
+      (eventGuests ?? [])
+        .filter((guest) => guest.invitedAt != null && guest.deletedAt == null)
         .sort((left, right) => left.name.localeCompare(right.name)),
-    [allGuests, eventId],
+    [eventGuests],
   );
 
   const run = async (key: string, work: () => Promise<unknown>) => {
@@ -162,7 +159,7 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
           </form>
         ) : null}
 
-        {allGuests === undefined ? (
+        {eventGuests === undefined ? (
           <div className="space-y-2">
             <Skeleton className="h-16" />
             <Skeleton className="h-16" />

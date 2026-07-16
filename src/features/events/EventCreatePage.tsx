@@ -11,7 +11,7 @@ import {
   useCreateClient,
   useCreateEvent,
   useCreateVenue,
-} from "./eventPlanningApi";
+} from "../../lib/manifest-convex-react";
 import { clientDisplayName } from "./clientName";
 
 const VENUE_TYPES = [

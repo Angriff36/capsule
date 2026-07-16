@@ -12,7 +12,7 @@ describe("Event Manifest integration guard", () => {
     expect(inspectEventManifestIntegration()).toEqual([]);
   });
 
-  it("routes Event feature writes through generated hooks or the creation adapter", () => {
+  it("routes Event feature writes through generated hooks", () => {
     const detail = read("src/features/events/EventDetailPage.tsx");
     const guests = read("src/features/events/EventGuestPanel.tsx");
     const create = read("src/features/events/EventCreatePage.tsx");
@@ -22,8 +22,9 @@ describe("Event Manifest integration guard", () => {
     expect(detail).toContain("useEventChangeHeadcount");
     expect(guests).toContain('from "../../lib/manifest-convex-react"');
     expect(guests).toContain("useEventGuestRsvpConfirm");
-    expect(create).toContain('from "./eventPlanningApi"');
+    expect(create).toContain('from "../../lib/manifest-convex-react"');
     expect(create).toContain("useCreateEvent");
+    expect(guests).toContain("listEventGuestByEventId");
   });
 
   it("requires lifecycle availability to consume generated transition metadata", () => {
@@ -80,21 +81,6 @@ describe("Event Manifest integration guard", () => {
         ]),
       );
     }
-  });
-
-  it("preserves allocation cleanup but rejects domain logic in the creation seam", () => {
-    const seam = read("convex/lib/eventPlanning.ts");
-    expect(inspectEventSource("convex/lib/eventPlanning.ts", seam)).toEqual([]);
-
-    const violations = inspectEventSource(
-      "convex/lib/eventPlanning.ts",
-      `${seam}\nconst allowed = checkRole(user.role, "eventAccess");\n`,
-    );
-    expect(violations).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ rule: "allocation-seam-only" }),
-      ]),
-    );
   });
 
   it("rejects locally recreated Event lifecycle transition tables", () => {

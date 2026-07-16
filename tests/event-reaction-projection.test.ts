@@ -1,7 +1,9 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-function commandBlock(source: string, start: string, end: string): string {
+function runnerBlock(source: string, runner: string, exported: string): string {
+  const start = `async function ${runner}`;
+  const end = `export const ${exported} = mutation({`;
   const from = source.indexOf(start);
   const to = source.indexOf(end, from + start.length);
   if (from < 0 || to < 0)
@@ -12,18 +14,44 @@ function commandBlock(source: string, start: string, end: string): string {
 describe("Event lifecycle reaction projection", () => {
   it("keeps approval and cancellation fan-out payload access flat", () => {
     const mutations = readFileSync("convex/mutations.ts", "utf8");
-    const approve = commandBlock(
+    const approve = runnerBlock(
       mutations,
-      "export const Event_approve = mutation({",
-      "export const Event_assignOwner = mutation({",
+      "__runEventApprove",
+      "Event_approve",
     );
-    const cancel = commandBlock(
-      mutations,
-      "export const Event_cancel = mutation({",
-      "export const Event_changeHeadcount = mutation({",
-    );
+    const cancel = runnerBlock(mutations, "__runEventCancel", "Event_cancel");
     expect(approve).toContain("payload.eventId");
     expect(cancel).toContain("payload.reason");
     expect(`${approve}\n${cancel}`).not.toContain("payload.payload");
+  });
+
+  it("dispatches the known reaction paths through governed command runners", () => {
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    const paths = [
+      ["__runEventApprove", "Event_approve", "__runIngredientDemandConfirm"],
+      ["__runEventCancel", "Event_cancel", "__runInvoiceMarkVoided"],
+      ["__runPaymentSettle", "Payment_settle", "__runInvoiceApplyPayment"],
+      [
+        "__runQualityCheckFail",
+        "QualityCheck_fail",
+        "__runPrepTaskMarkBlocked",
+      ],
+      [
+        "__runIngredientDemandConfirm",
+        "IngredientDemand_confirm",
+        "__runPurchaseNeedCreate",
+      ],
+      [
+        "__runVendorOrderLineAddLine",
+        "VendorOrderLine_addLine",
+        "__runPurchaseNeedMarkOrdered",
+      ],
+    ] as const;
+
+    for (const [runner, exported, targetRunner] of paths) {
+      const block = runnerBlock(mutations, runner, exported);
+      expect(block).toContain(targetRunner);
+      expect(block).not.toContain("ctx.runMutation(api.mutations");
+    }
   });
 });
