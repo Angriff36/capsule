@@ -502,7 +502,7 @@ export const AvailabilityWindow_withdraw = mutation({
         const __from = String(__cur);
         const __to = "withdrawn";
         const __allowed: Record<string, string[]> = { "active": ["withdrawn"], "withdrawn": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -551,7 +551,7 @@ export const Client_archive = mutation({
         const __from = String(__cur);
         const __to = "archived";
         const __allowed: Record<string, string[]> = { "active": ["archived"], "archived": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -731,7 +731,7 @@ export const Client_reactivate = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["archived"], "archived": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -911,7 +911,7 @@ export const ClientContact_remove = mutation({
         const __from = String(__cur);
         const __to = "removed";
         const __allowed: Record<string, string[]> = { "active": ["removed"], "removed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1091,7 +1091,7 @@ export const Contract_expire = mutation({
         const __from = String(__cur);
         const __to = "expired";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1134,7 +1134,7 @@ export const Contract_markViewed = mutation({
         const __from = String(__cur);
         const __to = "viewed";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1180,7 +1180,7 @@ export const Contract_markVoided = mutation({
         const __from = String(__cur);
         const __to = "voided";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1227,7 +1227,7 @@ export const Contract_send = mutation({
         const __from = String(__cur);
         const __to = "sent";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1274,7 +1274,7 @@ export const Contract_sign = mutation({
         const __from = String(__cur);
         const __to = "signed";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1324,7 +1324,7 @@ export const Delivery_cancel = mutation({
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "scheduled": ["in_transit", "failed", "cancelled"], "in_transit": ["delivered", "failed", "cancelled"], "delivered": [], "failed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1375,7 +1375,7 @@ export const Delivery_confirmDelivery = mutation({
         const __from = String(__cur);
         const __to = "delivered";
         const __allowed: Record<string, string[]> = { "scheduled": ["in_transit", "failed", "cancelled"], "in_transit": ["delivered", "failed", "cancelled"], "delivered": [], "failed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1426,7 +1426,7 @@ export const Delivery_markFailed = mutation({
         const __from = String(__cur);
         const __to = "failed";
         const __allowed: Record<string, string[]> = { "scheduled": ["in_transit", "failed", "cancelled"], "in_transit": ["delivered", "failed", "cancelled"], "delivered": [], "failed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1533,7 +1533,7 @@ export const Delivery_startTransit = mutation({
         const __from = String(__cur);
         const __to = "in_transit";
         const __allowed: Record<string, string[]> = { "scheduled": ["in_transit", "failed", "cancelled"], "in_transit": ["delivered", "failed", "cancelled"], "delivered": [], "failed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1698,7 +1698,7 @@ export const Dish_reinstate = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["retired"], "retired": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1746,7 +1746,7 @@ export const Dish_retire = mutation({
         const __from = String(__cur);
         const __to = "retired";
         const __allowed: Record<string, string[]> = { "active": ["retired"], "retired": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1873,7 +1873,7 @@ export const Event_approve = mutation({
         const __from = String(__cur);
         const __to = "approved";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1963,7 +1963,7 @@ export const Event_beginExecution = mutation({
         const __from = String(__cur);
         const __to = "executing";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2012,7 +2012,7 @@ export const Event_cancel = mutation({
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2274,7 +2274,7 @@ export const Event_closeOut = mutation({
         const __from = String(__cur);
         const __to = "closed_out";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2321,7 +2321,7 @@ export const Event_complete = mutation({
         const __from = String(__cur);
         const __to = "completed";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2483,7 +2483,7 @@ export const Event_returnToPlanning = mutation({
         const __from = String(__cur);
         const __to = "planning";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2530,7 +2530,7 @@ export const Event_submitForApproval = mutation({
         const __from = String(__cur);
         const __to = "pending_approval";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2588,7 +2588,7 @@ export const EventAllergenCheck_record = mutation({
         const __from = String(__cur);
         const __to = "recorded";
         const __allowed: Record<string, string[]> = { "pending": ["recorded"], "recorded": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2697,7 +2697,7 @@ export const EventAssignment_checkIn = mutation({
         const __from = String(__cur);
         const __to = "checked_in";
         const __allowed: Record<string, string[]> = { "assigned": ["confirmed", "checked_in", "no_show", "unassigned"], "confirmed": ["checked_in", "no_show", "unassigned"], "checked_in": ["checked_out"], "checked_out": [], "no_show": [], "unassigned": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2747,7 +2747,7 @@ export const EventAssignment_checkOut = mutation({
         const __from = String(__cur);
         const __to = "checked_out";
         const __allowed: Record<string, string[]> = { "assigned": ["confirmed", "checked_in", "no_show", "unassigned"], "confirmed": ["checked_in", "no_show", "unassigned"], "checked_in": ["checked_out"], "checked_out": [], "no_show": [], "unassigned": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2797,7 +2797,7 @@ export const EventAssignment_confirm = mutation({
         const __from = String(__cur);
         const __to = "confirmed";
         const __allowed: Record<string, string[]> = { "assigned": ["confirmed", "checked_in", "no_show", "unassigned"], "confirmed": ["checked_in", "no_show", "unassigned"], "checked_in": ["checked_out"], "checked_out": [], "no_show": [], "unassigned": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2846,7 +2846,7 @@ export const EventAssignment_markNoShow = mutation({
         const __from = String(__cur);
         const __to = "no_show";
         const __allowed: Record<string, string[]> = { "assigned": ["confirmed", "checked_in", "no_show", "unassigned"], "confirmed": ["checked_in", "no_show", "unassigned"], "checked_in": ["checked_out"], "checked_out": [], "no_show": [], "unassigned": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2895,7 +2895,7 @@ export const EventAssignment_unassign = mutation({
         const __from = String(__cur);
         const __to = "unassigned";
         const __allowed: Record<string, string[]> = { "assigned": ["confirmed", "checked_in", "no_show", "unassigned"], "confirmed": ["checked_in", "no_show", "unassigned"], "checked_in": ["checked_out"], "checked_out": [], "no_show": [], "unassigned": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3016,7 +3016,7 @@ export const EventCloseout_finalize = mutation({
         const __from = String(__cur);
         const __to = "finalized";
         const __allowed: Record<string, string[]> = { "draft": ["finalized"], "finalized": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3325,7 +3325,7 @@ export const EventGuest_invite = mutation({
         const __from = String(__cur);
         const __to = "pending";
         const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3379,7 +3379,7 @@ export const EventGuest_rsvpConfirm = mutation({
         const __from = String(__cur);
         const __to = "confirmed";
         const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3427,7 +3427,7 @@ export const EventGuest_rsvpDecline = mutation({
         const __from = String(__cur);
         const __to = "declined";
         const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3509,7 +3509,7 @@ export const Incident_beginInvestigation = mutation({
         const __from = String(__cur);
         const __to = "investigating";
         const __allowed: Record<string, string[]> = { "open": ["investigating", "resolved", "dismissed"], "investigating": ["resolved", "dismissed"], "resolved": [], "dismissed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3558,7 +3558,7 @@ export const Incident_dismiss = mutation({
         const __from = String(__cur);
         const __to = "dismissed";
         const __allowed: Record<string, string[]> = { "open": ["investigating", "resolved", "dismissed"], "investigating": ["resolved", "dismissed"], "resolved": [], "dismissed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3607,7 +3607,7 @@ export const Incident_markResolved = mutation({
         const __from = String(__cur);
         const __to = "resolved";
         const __allowed: Record<string, string[]> = { "open": ["investigating", "resolved", "dismissed"], "investigating": ["resolved", "dismissed"], "resolved": [], "dismissed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3741,7 +3741,7 @@ export const Ingredient_discontinue = mutation({
         const __from = String(__cur);
         const __to = "discontinued";
         const __allowed: Record<string, string[]> = { "active": ["discontinued"], "discontinued": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3830,7 +3830,7 @@ export const Ingredient_reinstate = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["discontinued"], "discontinued": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3966,7 +3966,7 @@ export const IngredientDemand_calculate = mutation({
         const __from = String(__cur);
         const __to = "calculated";
         const __allowed: Record<string, string[]> = { "pending": ["calculated"], "calculated": ["confirmed", "superseded"], "confirmed": ["fulfilled", "superseded"], "fulfilled": [], "superseded": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4020,7 +4020,7 @@ export const IngredientDemand_confirm = mutation({
         const __from = String(__cur);
         const __to = "confirmed";
         const __allowed: Record<string, string[]> = { "pending": ["calculated"], "calculated": ["confirmed", "superseded"], "confirmed": ["fulfilled", "superseded"], "fulfilled": [], "superseded": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4067,7 +4067,7 @@ export const IngredientDemand_fulfill = mutation({
         const __from = String(__cur);
         const __to = "fulfilled";
         const __allowed: Record<string, string[]> = { "pending": ["calculated"], "calculated": ["confirmed", "superseded"], "confirmed": ["fulfilled", "superseded"], "fulfilled": [], "superseded": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4154,7 +4154,7 @@ export const IngredientDemand_supersede = mutation({
         const __from = String(__cur);
         const __to = "superseded";
         const __allowed: Record<string, string[]> = { "pending": ["calculated"], "calculated": ["confirmed", "superseded"], "confirmed": ["fulfilled", "superseded"], "fulfilled": [], "superseded": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4511,7 +4511,7 @@ export const InventoryReservation_consume = mutation({
         const __from = String(__cur);
         const __to = "consumed";
         const __allowed: Record<string, string[]> = { "pending": ["active"], "active": ["released", "consumed"], "released": [], "consumed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4559,7 +4559,7 @@ export const InventoryReservation_release = mutation({
         const __from = String(__cur);
         const __to = "released";
         const __allowed: Record<string, string[]> = { "pending": ["active"], "active": ["released", "consumed"], "released": [], "consumed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4615,7 +4615,7 @@ export const InventoryReservation_reserve = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "pending": ["active"], "active": ["released", "consumed"], "released": [], "consumed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4669,7 +4669,7 @@ export const Invoice_applyPayment = mutation({
         const __from = String(__cur);
         const __to = String(((nextDue === 0) ? "paid" : "partial"));
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4776,7 +4776,7 @@ export const Invoice_markOverdue = mutation({
         const __from = String(__cur);
         const __to = "overdue";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4820,7 +4820,7 @@ export const Invoice_markViewed = mutation({
         const __from = String(__cur);
         const __to = "viewed";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4867,7 +4867,7 @@ export const Invoice_markVoided = mutation({
         const __from = String(__cur);
         const __to = "voided";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4919,7 +4919,7 @@ export const Invoice_recordRefund = mutation({
         const __from = String(__cur);
         const __to = "partial";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4967,7 +4967,7 @@ export const Invoice_send = mutation({
         const __from = String(__cur);
         const __to = "sent";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5016,7 +5016,7 @@ export const Invoice_writeOff = mutation({
         const __from = String(__cur);
         const __to = "written_off";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5065,7 +5065,7 @@ export const Menu_archive = mutation({
         const __from = String(__cur);
         const __to = "archived";
         const __allowed: Record<string, string[]> = { "draft": ["published", "archived"], "published": ["draft", "archived"], "archived": ["draft"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5162,7 +5162,7 @@ export const Menu_markPublished = mutation({
         const __from = String(__cur);
         const __to = "published";
         const __allowed: Record<string, string[]> = { "draft": ["published", "archived"], "published": ["draft", "archived"], "archived": ["draft"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5207,7 +5207,7 @@ export const Menu_restore = mutation({
         const __from = String(__cur);
         const __to = "draft";
         const __allowed: Record<string, string[]> = { "draft": ["published", "archived"], "published": ["draft", "archived"], "archived": ["draft"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5295,7 +5295,7 @@ export const Menu_unpublish = mutation({
         const __from = String(__cur);
         const __to = "draft";
         const __allowed: Record<string, string[]> = { "draft": ["published", "archived"], "published": ["draft", "archived"], "archived": ["draft"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5379,7 +5379,7 @@ export const Organization_deactivate = mutation({
         const __from = String(__cur);
         const __to = "deactivated";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "deactivated"], "suspended": ["active", "deactivated"], "deactivated": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5423,7 +5423,7 @@ export const Organization_reactivate = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "deactivated"], "suspended": ["active", "deactivated"], "deactivated": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5533,7 +5533,7 @@ export const Organization_suspend = mutation({
         const __from = String(__cur);
         const __to = "suspended";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "deactivated"], "suspended": ["active", "deactivated"], "deactivated": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5581,7 +5581,7 @@ export const PackList_cancel = mutation({
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "draft": ["packing", "cancelled"], "packing": ["packed", "cancelled"], "packed": ["loaded", "cancelled"], "loaded": ["dispatched", "cancelled"], "dispatched": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5630,7 +5630,7 @@ export const PackList_dispatch = mutation({
         const __from = String(__cur);
         const __to = "dispatched";
         const __allowed: Record<string, string[]> = { "draft": ["packing", "cancelled"], "packing": ["packed", "cancelled"], "packed": ["loaded", "cancelled"], "loaded": ["dispatched", "cancelled"], "dispatched": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5678,7 +5678,7 @@ export const PackList_markLoaded = mutation({
         const __from = String(__cur);
         const __to = "loaded";
         const __allowed: Record<string, string[]> = { "draft": ["packing", "cancelled"], "packing": ["packed", "cancelled"], "packed": ["loaded", "cancelled"], "loaded": ["dispatched", "cancelled"], "dispatched": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5726,7 +5726,7 @@ export const PackList_markPacked = mutation({
         const __from = String(__cur);
         const __to = "packed";
         const __allowed: Record<string, string[]> = { "draft": ["packing", "cancelled"], "packing": ["packed", "cancelled"], "packed": ["loaded", "cancelled"], "loaded": ["dispatched", "cancelled"], "dispatched": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5819,7 +5819,7 @@ export const PackList_startPacking = mutation({
         const __from = String(__cur);
         const __to = "packing";
         const __allowed: Record<string, string[]> = { "draft": ["packing", "cancelled"], "packing": ["packed", "cancelled"], "packed": ["loaded", "cancelled"], "loaded": ["dispatched", "cancelled"], "dispatched": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5877,7 +5877,7 @@ export const PackListItem_addItem = mutation({
         const __from = String(__cur);
         const __to = "listed";
         const __allowed: Record<string, string[]> = { "pending": ["listed"], "listed": ["packed", "missing"], "packed": [], "missing": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5967,7 +5967,7 @@ export const PackListItem_markMissing = mutation({
         const __from = String(__cur);
         const __to = "missing";
         const __allowed: Record<string, string[]> = { "pending": ["listed"], "listed": ["packed", "missing"], "packed": [], "missing": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6018,7 +6018,7 @@ export const PackListItem_markPacked = mutation({
         const __from = String(__cur);
         const __to = "packed";
         const __allowed: Record<string, string[]> = { "pending": ["listed"], "listed": ["packed", "missing"], "packed": [], "missing": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6064,7 +6064,7 @@ export const Payment_beginProcessing = mutation({
         const __from = String(__cur);
         const __to = "processing";
         const __allowed: Record<string, string[]> = { "pending": ["processing", "completed", "failed"], "processing": ["completed", "failed"], "completed": ["refunded"], "failed": [], "refunded": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6110,7 +6110,7 @@ export const Payment_fail = mutation({
         const __from = String(__cur);
         const __to = "failed";
         const __allowed: Record<string, string[]> = { "pending": ["processing", "completed", "failed"], "processing": ["completed", "failed"], "completed": ["refunded"], "failed": [], "refunded": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6208,7 +6208,7 @@ export const Payment_refund = mutation({
         const __from = String(__cur);
         const __to = "refunded";
         const __allowed: Record<string, string[]> = { "pending": ["processing", "completed", "failed"], "processing": ["completed", "failed"], "completed": ["refunded"], "failed": [], "refunded": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6254,7 +6254,7 @@ export const Payment_settle = mutation({
         const __from = String(__cur);
         const __to = "completed";
         const __allowed: Record<string, string[]> = { "pending": ["processing", "completed", "failed"], "processing": ["completed", "failed"], "completed": ["refunded"], "failed": [], "refunded": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6333,7 +6333,7 @@ export const PaymentMethod_expire = mutation({
         const __from = String(__cur);
         const __to = "expired";
         const __allowed: Record<string, string[]> = { "active": ["expired", "invalid", "fraudulent", "removed"], "expired": ["active"], "invalid": [], "fraudulent": [], "removed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6379,7 +6379,7 @@ export const PaymentMethod_invalidate = mutation({
         const __from = String(__cur);
         const __to = "invalid";
         const __allowed: Record<string, string[]> = { "active": ["expired", "invalid", "fraudulent", "removed"], "expired": ["active"], "invalid": [], "fraudulent": [], "removed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6456,7 +6456,7 @@ export const PaymentMethod_reactivate = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["expired", "invalid", "fraudulent", "removed"], "expired": ["active"], "invalid": [], "fraudulent": [], "removed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6547,7 +6547,7 @@ export const PaymentMethod_remove = mutation({
         const __from = String(__cur);
         const __to = "removed";
         const __allowed: Record<string, string[]> = { "active": ["expired", "invalid", "fraudulent", "removed"], "expired": ["active"], "invalid": [], "fraudulent": [], "removed": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6594,7 +6594,7 @@ export const PayrollInput_finalize = mutation({
         const __from = String(__cur);
         const __to = "finalized";
         const __allowed: Record<string, string[]> = { "draft": ["prepared", "voided"], "prepared": ["finalized", "voided"], "finalized": ["voided"], "voided": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6644,7 +6644,7 @@ export const PayrollInput_markVoided = mutation({
         const __from = String(__cur);
         const __to = "voided";
         const __allowed: Record<string, string[]> = { "draft": ["prepared", "voided"], "prepared": ["finalized", "voided"], "finalized": ["voided"], "voided": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6714,7 +6714,7 @@ export const PayrollInput_prepare = mutation({
         const __from = String(__cur);
         const __to = "prepared";
         const __allowed: Record<string, string[]> = { "draft": ["prepared", "voided"], "prepared": ["finalized", "voided"], "finalized": ["voided"], "voided": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6849,7 +6849,7 @@ export const Person_deactivate = mutation({
         const __from = String(__cur);
         const __to = "inactive";
         const __allowed: Record<string, string[]> = { "active": ["inactive", "terminated"], "inactive": ["active", "terminated"], "terminated": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6946,7 +6946,7 @@ export const Person_reactivate = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["inactive", "terminated"], "inactive": ["active", "terminated"], "terminated": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6992,7 +6992,7 @@ export const Person_terminate = mutation({
         const __from = String(__cur);
         const __to = "terminated";
         const __allowed: Record<string, string[]> = { "active": ["inactive", "terminated"], "inactive": ["active", "terminated"], "terminated": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7042,7 +7042,7 @@ export const PrepTask_cancel = mutation({
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7090,7 +7090,7 @@ export const PrepTask_claim = mutation({
         const __from = String(__cur);
         const __to = "claimed";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7140,7 +7140,7 @@ export const PrepTask_complete = mutation({
         const __from = String(__cur);
         const __to = "completed";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7189,7 +7189,7 @@ export const PrepTask_markBlocked = mutation({
         const __from = String(__cur);
         const __to = "blocked";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7295,7 +7295,7 @@ export const PrepTask_release = mutation({
         const __from = String(__cur);
         const __to = "pending";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7343,7 +7343,7 @@ export const PrepTask_start = mutation({
         const __from = String(__cur);
         const __to = "in_progress";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7390,7 +7390,7 @@ export const PrepTask_unblock = mutation({
         const __from = String(__cur);
         const __to = "pending";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7442,7 +7442,7 @@ export const ProductionBatch_cancel = mutation({
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "planned": ["in_progress", "cancelled"], "in_progress": ["completed", "cancelled"], "completed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7491,7 +7491,7 @@ export const ProductionBatch_complete = mutation({
         const __from = String(__cur);
         const __to = "completed";
         const __allowed: Record<string, string[]> = { "planned": ["in_progress", "cancelled"], "in_progress": ["completed", "cancelled"], "completed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7584,7 +7584,7 @@ export const ProductionBatch_start = mutation({
         const __from = String(__cur);
         const __to = "in_progress";
         const __allowed: Record<string, string[]> = { "planned": ["in_progress", "cancelled"], "in_progress": ["completed", "cancelled"], "completed": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7630,7 +7630,7 @@ export const Proposal_accept = mutation({
         const __from = String(__cur);
         const __to = "accepted";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "accepted", "declined", "expired"], "viewed": ["accepted", "declined", "expired"], "accepted": [], "declined": [], "expired": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7675,7 +7675,7 @@ export const Proposal_decline = mutation({
         const __from = String(__cur);
         const __to = "declined";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "accepted", "declined", "expired"], "viewed": ["accepted", "declined", "expired"], "accepted": [], "declined": [], "expired": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7787,7 +7787,7 @@ export const Proposal_expire = mutation({
         const __from = String(__cur);
         const __to = "expired";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "accepted", "declined", "expired"], "viewed": ["accepted", "declined", "expired"], "accepted": [], "declined": [], "expired": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7831,7 +7831,7 @@ export const Proposal_markViewed = mutation({
         const __from = String(__cur);
         const __to = "viewed";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "accepted", "declined", "expired"], "viewed": ["accepted", "declined", "expired"], "accepted": [], "declined": [], "expired": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7878,7 +7878,7 @@ export const Proposal_send = mutation({
         const __from = String(__cur);
         const __to = "sent";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "accepted", "declined", "expired"], "viewed": ["accepted", "declined", "expired"], "accepted": [], "declined": [], "expired": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7926,7 +7926,7 @@ export const PurchaseNeed_cancel = mutation({
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "open": ["ordered", "cancelled"], "ordered": ["fulfilled", "cancelled"], "fulfilled": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8027,7 +8027,7 @@ export const PurchaseNeed_markFulfilled = mutation({
         const __from = String(__cur);
         const __to = "fulfilled";
         const __allowed: Record<string, string[]> = { "open": ["ordered", "cancelled"], "ordered": ["fulfilled", "cancelled"], "fulfilled": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8075,7 +8075,7 @@ export const PurchaseNeed_markOrdered = mutation({
         const __from = String(__cur);
         const __to = "ordered";
         const __allowed: Record<string, string[]> = { "open": ["ordered", "cancelled"], "ordered": ["fulfilled", "cancelled"], "fulfilled": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8126,7 +8126,7 @@ export const Qualification_expire = mutation({
         const __from = String(__cur);
         const __to = "expired";
         const __allowed: Record<string, string[]> = { "active": ["expired", "revoked"], "expired": [], "revoked": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8229,7 +8229,7 @@ export const Qualification_revoke = mutation({
         const __from = String(__cur);
         const __to = "revoked";
         const __allowed: Record<string, string[]> = { "active": ["expired", "revoked"], "expired": [], "revoked": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8279,7 +8279,7 @@ export const QualityCheck_fail = mutation({
         const __from = String(__cur);
         const __to = "failed";
         const __allowed: Record<string, string[]> = { "pending": ["passed", "failed"], "passed": ["pending"], "failed": ["pending"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8374,7 +8374,7 @@ export const QualityCheck_pass = mutation({
         const __from = String(__cur);
         const __to = "passed";
         const __allowed: Record<string, string[]> = { "pending": ["passed", "failed"], "passed": ["pending"], "failed": ["pending"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8424,7 +8424,7 @@ export const QualityCheck_reinspect = mutation({
         const __from = String(__cur);
         const __to = "pending";
         const __allowed: Record<string, string[]> = { "pending": ["passed", "failed"], "passed": ["pending"], "failed": ["pending"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8523,7 +8523,7 @@ export const Recipe_publishVersion = mutation({
         const __from = String(__cur);
         const __to = "published";
         const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8570,7 +8570,7 @@ export const Recipe_retire = mutation({
         const __from = String(__cur);
         const __to = "retired";
         const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8617,7 +8617,7 @@ export const Recipe_retract = mutation({
         const __from = String(__cur);
         const __to = "draft";
         const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8829,7 +8829,7 @@ export const SavedReportDefinition_archive = mutation({
         const __from = String(__cur);
         const __to = "archived";
         const __allowed: Record<string, string[]> = { "active": ["archived"], "archived": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8994,7 +8994,7 @@ export const SavedReportDefinition_restore = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["archived"], "archived": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9083,7 +9083,7 @@ export const Shift_cancel = mutation({
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "scheduled": ["started", "cancelled", "no_show"], "started": ["completed", "cancelled", "no_show"], "completed": [], "cancelled": [], "no_show": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9134,7 +9134,7 @@ export const Shift_complete = mutation({
         const __from = String(__cur);
         const __to = "completed";
         const __allowed: Record<string, string[]> = { "scheduled": ["started", "cancelled", "no_show"], "started": ["completed", "cancelled", "no_show"], "completed": [], "cancelled": [], "no_show": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9182,7 +9182,7 @@ export const Shift_markNoShow = mutation({
         const __from = String(__cur);
         const __to = "no_show";
         const __allowed: Record<string, string[]> = { "scheduled": ["started", "cancelled", "no_show"], "started": ["completed", "cancelled", "no_show"], "completed": [], "cancelled": [], "no_show": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9283,7 +9283,7 @@ export const Shift_start = mutation({
         const __from = String(__cur);
         const __to = "started";
         const __allowed: Record<string, string[]> = { "scheduled": ["started", "cancelled", "no_show"], "started": ["completed", "cancelled", "no_show"], "completed": [], "cancelled": [], "no_show": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9329,7 +9329,7 @@ export const StorageLocation_activate = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["inactive"], "inactive": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9378,7 +9378,7 @@ export const StorageLocation_deactivate = mutation({
         const __from = String(__cur);
         const __to = "inactive";
         const __allowed: Record<string, string[]> = { "active": ["inactive"], "inactive": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9567,7 +9567,7 @@ export const TimeRecord_clockOut = mutation({
         const __from = String(__cur);
         const __to = "closed";
         const __allowed: Record<string, string[]> = { "open": ["closed"], "closed": ["corrected"], "corrected": ["corrected"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9627,7 +9627,7 @@ export const TimeRecord_correct = mutation({
         const __from = String(__cur);
         const __to = "corrected";
         const __allowed: Record<string, string[]> = { "open": ["closed"], "closed": ["corrected"], "corrected": ["corrected"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9735,7 +9735,7 @@ export const Vendor_reinstate = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "terminated"], "suspended": ["active", "terminated"], "terminated": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9786,7 +9786,7 @@ export const Vendor_suspend = mutation({
         const __from = String(__cur);
         const __to = "suspended";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "terminated"], "suspended": ["active", "terminated"], "terminated": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9837,7 +9837,7 @@ export const Vendor_terminate = mutation({
         const __from = String(__cur);
         const __to = "terminated";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "terminated"], "suspended": ["active", "terminated"], "terminated": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9944,7 +9944,7 @@ export const VendorOrder_cancel = mutation({
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "draft": ["submitted", "cancelled"], "submitted": ["confirmed", "cancelled"], "confirmed": ["partially_received", "received", "cancelled"], "partially_received": ["received", "cancelled"], "received": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9991,7 +9991,7 @@ export const VendorOrder_confirm = mutation({
         const __from = String(__cur);
         const __to = "confirmed";
         const __allowed: Record<string, string[]> = { "draft": ["submitted", "cancelled"], "submitted": ["confirmed", "cancelled"], "confirmed": ["partially_received", "received", "cancelled"], "partially_received": ["received", "cancelled"], "received": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10037,7 +10037,7 @@ export const VendorOrder_markPartiallyReceived = mutation({
         const __from = String(__cur);
         const __to = "partially_received";
         const __allowed: Record<string, string[]> = { "draft": ["submitted", "cancelled"], "submitted": ["confirmed", "cancelled"], "confirmed": ["partially_received", "received", "cancelled"], "partially_received": ["received", "cancelled"], "received": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10082,7 +10082,7 @@ export const VendorOrder_markReceived = mutation({
         const __from = String(__cur);
         const __to = "received";
         const __allowed: Record<string, string[]> = { "draft": ["submitted", "cancelled"], "submitted": ["confirmed", "cancelled"], "confirmed": ["partially_received", "received", "cancelled"], "partially_received": ["received", "cancelled"], "received": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10171,7 +10171,7 @@ export const VendorOrder_submit = mutation({
         const __from = String(__cur);
         const __to = "submitted";
         const __allowed: Record<string, string[]> = { "draft": ["submitted", "cancelled"], "submitted": ["confirmed", "cancelled"], "confirmed": ["partially_received", "received", "cancelled"], "partially_received": ["received", "cancelled"], "received": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10272,7 +10272,7 @@ export const VendorOrderLine_addLine = mutation({
         const __from = String(__cur);
         const __to = "added";
         const __allowed: Record<string, string[]> = { "pending": ["added", "cancelled"], "added": ["receiving", "complete", "cancelled"], "receiving": ["complete", "cancelled"], "complete": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10333,7 +10333,7 @@ export const VendorOrderLine_cancelLine = mutation({
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "pending": ["added", "cancelled"], "added": ["receiving", "complete", "cancelled"], "receiving": ["complete", "cancelled"], "complete": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10391,7 +10391,7 @@ export const VendorOrderLine_recordReceipt = mutation({
         const __from = String(__cur);
         const __to = String(nextStatus);
         const __allowed: Record<string, string[]> = { "pending": ["added", "cancelled"], "added": ["receiving", "complete", "cancelled"], "receiving": ["complete", "cancelled"], "complete": [], "cancelled": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10441,7 +10441,7 @@ export const Venue_activate = mutation({
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["inactive"], "inactive": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10527,7 +10527,7 @@ export const Venue_deactivate = mutation({
         const __from = String(__cur);
         const __to = "inactive";
         const __allowed: Record<string, string[]> = { "active": ["inactive"], "inactive": ["active"] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10711,7 +10711,7 @@ export const WasteRecord_record = mutation({
         const __from = String(__cur);
         const __to = "recorded";
         const __allowed: Record<string, string[]> = { "pending": ["recorded"], "recorded": ["voided"], "voided": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10767,7 +10767,7 @@ export const WasteRecord_voidRecord = mutation({
         const __from = String(__cur);
         const __to = "voided";
         const __allowed: Record<string, string[]> = { "pending": ["recorded"], "recorded": ["voided"], "voided": [] };
-        if (Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
