@@ -1,0 +1,443 @@
+// Capsule logistics — PackList + PackListItem.
+// Product-required packing facts; capsule-pro has NO PackList aggregate.
+// Vehicle + Return/loss deferred. Delivery lives in delivery.manifest.
+
+use "../workforce/assignment.manifest"
+
+enum PackListStatus {
+  draft
+  packing
+  packed
+  loaded
+  dispatched
+  cancelled
+}
+
+enum PackListItemStatus {
+  pending
+  listed
+  packed
+  missing
+}
+
+// Packing manifest for one Event.
+entity PackList mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required searchable name: string = ""
+  property purpose: string?
+  property encrypted notes: string?
+  property required status: PackListStatus = "draft"
+  property openedAt: datetime?
+  property packingStartedAt: datetime?
+  property packedAt: datetime?
+  property loadedAt: datetime?
+  property dispatchedAt: datetime?
+  property cancelledAt: datetime?
+  property cancellationReason: string?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  hasMany items: PackListItem
+
+  constraint packListOpenedNamed: self.openedAt == null or length(trim(self.name)) > 0 "Opened pack lists require a name"
+
+  transition status from "draft" to ["packing", "cancelled"]
+  transition status from "packing" to ["packed", "cancelled"]
+  transition status from "packed" to ["loaded", "cancelled"]
+  transition status from "loaded" to ["dispatched", "cancelled"]
+  transition status from "dispatched" to []
+  transition status from "cancelled" to []
+
+  default policy packListRead read: roleAllows(user.role, "logisticsAccess") "Logistics staff may read pack lists"
+  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") "Logistics staff may write pack lists through commands"
+  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") "Logistics staff may execute pack list commands"
+
+  command open(
+    eventId: uuid,
+    name: string,
+    optional purpose: string,
+    optional notes: string
+  ) {
+    guard self.openedAt == null
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.event != null
+    constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
+    constraint openNamePresent: length(trim(name)) > 0 "Pack list name is required"
+    mutate eventId = eventId
+    mutate name = name
+    mutate purpose = purpose != null ? purpose : self.purpose
+    mutate notes = notes != null ? notes : self.notes
+    mutate openedAt = now()
+    emit PackListOpened {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      name: name
+      purpose: purpose != null ? purpose : self.purpose
+      status: "draft"
+    }
+  }
+
+  command startPacking() {
+    guard self.status == "draft"
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "packing"
+    mutate packingStartedAt = now()
+    emit PackListPackingStarted {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      name: self.name
+      previousStatus: previousStatus
+      status: "packing"
+    }
+  }
+
+  command markPacked() {
+    guard self.status == "packing"
+    guard self.packingStartedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "packed"
+    mutate packedAt = now()
+    emit PackListPacked {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      name: self.name
+      previousStatus: previousStatus
+      status: "packed"
+      packedAt: self.packedAt
+    }
+  }
+
+  command markLoaded() {
+    guard self.status == "packed"
+    guard self.packedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "loaded"
+    mutate loadedAt = now()
+    emit PackListLoaded {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      name: self.name
+      previousStatus: previousStatus
+      status: "loaded"
+      loadedAt: self.loadedAt
+    }
+  }
+
+  command dispatch() {
+    guard self.status == "loaded"
+    guard self.loadedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "dispatched"
+    mutate dispatchedAt = now()
+    emit PackListDispatched {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      name: self.name
+      previousStatus: previousStatus
+      status: "dispatched"
+      dispatchedAt: self.dispatchedAt
+    }
+  }
+
+  command cancel(reason: string) {
+    guard self.status == "draft" or self.status == "packing" or self.status == "packed" or self.status == "loaded"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "logisticsManageAccess")
+    constraint cancelPackListReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit PackListCancelled {
+      packListId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      name: self.name
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
+  store PackList in durable
+}
+
+// EventCancelled → cancel pending/active pack lists for that event.
+on EventCancelled fanOut PackList where eventId = payload.eventId
+  run cancel
+  params { reason: payload.reason }
+
+// Line on a PackList. Description covers equipment/containers; optional Dish /
+// ProductionBatch refs when packing produced culinary output (no Equipment entity).
+entity PackListItem mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required packListId: uuid
+  property required description: string = ""
+  property dishId: uuid?
+  property productionBatchId: uuid?
+  property required requiredQuantity: decimal(12, 4) = 0
+  property required packedQuantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required status: PackListItemStatus = "pending"
+  property listedAt: datetime?
+  property packedAt: datetime?
+  property missingAt: datetime?
+
+  belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  belongsTo productionBatch: ProductionBatch fields [tenantId, productionBatchId] references [tenantId, id]
+
+  constraint itemListedComplete: self.listedAt == null or (length(trim(self.description)) > 0 and self.requiredQuantity > 0) "Listed pack items require a description and positive required quantity"
+  constraint itemPackedNonnegative: self.packedQuantity >= 0 "Packed quantity cannot be negative"
+  constraint itemPackedNotOver: self.packedQuantity <= self.requiredQuantity "Packed quantity cannot exceed required quantity"
+
+  transition status from "pending" to ["listed"]
+  transition status from "listed" to ["packed", "missing"]
+  transition status from "packed" to []
+  transition status from "missing" to []
+
+  default policy packListItemRead read: roleAllows(user.role, "logisticsAccess") "Logistics staff may read pack list items"
+  default policy packListItemWrite write: roleAllows(user.role, "logisticsAccess") "Logistics staff may write pack list items through commands"
+  default policy packListItemExecute execute: roleAllows(user.role, "logisticsAccess") "Logistics staff may execute pack list item commands"
+
+  command addItem(
+    packListId: uuid,
+    description: string,
+    requiredQuantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    optional dishId: uuid,
+    optional productionBatchId: uuid
+  ) {
+    guard self.listedAt == null
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.openedAt != null and (self.packList.status == "draft" or self.packList.status == "packing")
+    constraint addItemPackListMatch: packListId == self.packListId "Add item packListId must match the seeded pack list reference"
+    constraint addItemDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "Add item dishId must match the seeded dish reference when provided"
+    constraint addItemBatchMatch: productionBatchId == null or self.productionBatchId == null or productionBatchId == self.productionBatchId "Add item productionBatchId must match the seeded batch reference when provided"
+    constraint addItemDescriptionPresent: length(trim(description)) > 0 "Pack item description is required"
+    constraint addItemQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    mutate packListId = packListId
+    mutate description = description
+    mutate dishId = dishId != null ? dishId : self.dishId
+    mutate productionBatchId = productionBatchId != null ? productionBatchId : self.productionBatchId
+    mutate requiredQuantity = requiredQuantity
+    mutate unit = unit
+    mutate status = "listed"
+    mutate listedAt = now()
+    emit PackListItemAdded {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: packListId
+      eventId: self.packList.eventId
+      description: description
+      dishId: dishId != null ? dishId : self.dishId
+      productionBatchId: productionBatchId != null ? productionBatchId : self.productionBatchId
+      requiredQuantity: requiredQuantity
+      unit: unit
+      status: "listed"
+    }
+  }
+
+  command markPacked(packedQuantity: decimal(12, 4)) {
+    guard self.status == "listed"
+    guard self.listedAt != null
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status == "packing"
+    constraint markPackedQuantityPositive: packedQuantity > 0 "Packed quantity must be positive"
+    constraint markPackedNotOver: packedQuantity <= self.requiredQuantity "Packed quantity cannot exceed required quantity"
+    compute previousStatus = self.status
+    compute previousPacked = self.packedQuantity
+    mutate packedQuantity = packedQuantity
+    mutate status = "packed"
+    mutate packedAt = now()
+    emit PackListItemPacked {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      eventId: self.packList.eventId
+      description: self.description
+      previousStatus: previousStatus
+      status: "packed"
+      previousPackedQuantity: previousPacked
+      packedQuantity: packedQuantity
+      requiredQuantity: self.requiredQuantity
+      unit: self.unit
+    }
+  }
+
+  command markMissing() {
+    guard self.status == "listed"
+    guard self.listedAt != null
+    guard self.deletedAt == null
+    guard self.packList != null and self.packList.status == "packing"
+    compute previousStatus = self.status
+    mutate status = "missing"
+    mutate missingAt = now()
+    emit PackListItemMissing {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      eventId: self.packList.eventId
+      description: self.description
+      previousStatus: previousStatus
+      status: "missing"
+      requiredQuantity: self.requiredQuantity
+      packedQuantity: self.packedQuantity
+      unit: self.unit
+    }
+  }
+
+  command adjustQuantity(requiredQuantity: decimal(12, 4)) {
+    guard self.status == "listed"
+    guard self.listedAt != null
+    guard self.deletedAt == null
+    guard self.packList != null and (self.packList.status == "draft" or self.packList.status == "packing")
+    constraint adjustQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    constraint adjustQuantityAbovePacked: requiredQuantity >= self.packedQuantity "Required quantity cannot be below packed quantity"
+    compute previousRequired = self.requiredQuantity
+    mutate requiredQuantity = requiredQuantity
+    emit PackListItemQuantityAdjusted {
+      packListItemId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      eventId: self.packList.eventId
+      description: self.description
+      previousRequiredQuantity: previousRequired
+      requiredQuantity: requiredQuantity
+      packedQuantity: self.packedQuantity
+      unit: self.unit
+      status: self.status
+    }
+  }
+
+  store PackListItem in durable
+}
+
+event PackListOpened: "pack_list.opened" {
+  packListId: string
+  tenantId: string
+  eventId: string
+  name: string
+  purpose: string?
+  status: PackListStatus
+}
+
+event PackListPackingStarted: "pack_list.packing_started" {
+  packListId: string
+  tenantId: string
+  eventId: string
+  name: string
+  previousStatus: PackListStatus
+  status: PackListStatus
+}
+
+event PackListPacked: "pack_list.packed" {
+  packListId: string
+  tenantId: string
+  eventId: string
+  name: string
+  previousStatus: PackListStatus
+  status: PackListStatus
+  packedAt: datetime?
+}
+
+event PackListLoaded: "pack_list.loaded" {
+  packListId: string
+  tenantId: string
+  eventId: string
+  name: string
+  previousStatus: PackListStatus
+  status: PackListStatus
+  loadedAt: datetime?
+}
+
+event PackListDispatched: "pack_list.dispatched" {
+  packListId: string
+  tenantId: string
+  eventId: string
+  name: string
+  previousStatus: PackListStatus
+  status: PackListStatus
+  dispatchedAt: datetime?
+}
+
+event PackListCancelled: "pack_list.cancelled" {
+  packListId: string
+  tenantId: string
+  eventId: string
+  name: string
+  previousStatus: PackListStatus
+  status: PackListStatus
+  reason: string
+}
+
+event PackListItemAdded: "pack_list_item.added" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  description: string
+  dishId: string?
+  productionBatchId: string?
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  status: PackListItemStatus
+}
+
+event PackListItemPacked: "pack_list_item.packed" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  description: string
+  previousStatus: PackListItemStatus
+  status: PackListItemStatus
+  previousPackedQuantity: decimal(12, 4)
+  packedQuantity: decimal(12, 4)
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event PackListItemMissing: "pack_list_item.missing" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  description: string
+  previousStatus: PackListItemStatus
+  status: PackListItemStatus
+  requiredQuantity: decimal(12, 4)
+  packedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event PackListItemQuantityAdjusted: "pack_list_item.quantity_adjusted" {
+  packListItemId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  description: string
+  previousRequiredQuantity: decimal(12, 4)
+  requiredQuantity: decimal(12, 4)
+  packedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  status: PackListItemStatus
+}

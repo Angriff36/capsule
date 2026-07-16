@@ -1,0 +1,1096 @@
+// Capsule client engagement, venue, event, and guest-attendance lifecycle.
+// EventDish is authored in src/culinary/menu.manifest (culinary/menu slice).
+
+use "../identity/person.manifest"
+
+// ---------------------------------------------------------------------------
+// Closed vocabularies
+// ---------------------------------------------------------------------------
+
+enum ClientType {
+  company
+  person
+}
+
+enum ClientStatus {
+  active
+  archived
+}
+
+enum EventStage {
+  planning
+  pending_approval
+  approved
+  executing
+  completed
+  cancelled
+  closed_out
+}
+
+enum VenueType {
+  client_site
+  banquet_hall
+  outdoor
+  office
+  private_home
+  other
+}
+
+enum VenueStatus {
+  active
+  inactive
+}
+
+enum RsvpStatus {
+  pending
+  confirmed
+  declined
+}
+
+// ---------------------------------------------------------------------------
+// Client — the catering client account behind one or more engagements.
+// ---------------------------------------------------------------------------
+
+entity Client mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required clientType: ClientType = "company"
+  property searchable companyName: string?
+  property searchable givenName: string?
+  property searchable familyName: string?
+  property encrypted email: string?
+  property encrypted phone: string?
+  property website: string?
+  property encrypted addressLine1: string?
+  property encrypted addressLine2: string?
+  property encrypted city: string?
+  property encrypted region: string?
+  property encrypted postalCode: string?
+  property encrypted countryCode: string?
+  property private encrypted taxId: string?
+  property required taxExempt: boolean = false
+  property required paymentTermsDays: int = 30
+  property notes: string?
+  property assignedToId: uuid?
+  property required status: ClientStatus = "active"
+  property registeredAt: datetime?
+  property archivedAt: datetime?
+
+  ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
+  hasMany events: Event
+
+  computed displayName: string = self.clientType == "company" ? self.companyName : self.givenName + " " + self.familyName
+  computed isArchived: boolean = self.status == "archived"
+
+  // registeredAt gates the invariant while register applies field mutations.
+  constraint clientIdentityComplete: self.registeredAt == null or (self.clientType == "company" and self.companyName != null and length(trim(self.companyName)) > 0) or (self.clientType == "person" and self.givenName != null and length(trim(self.givenName)) > 0) "Company clients require a company name; person clients require a given name"
+  constraint validPaymentTerms: self.paymentTermsDays >= 0 and self.paymentTermsDays <= 365 "Payment terms must be between 0 and 365 days"
+  constraint validCountryCode: self.countryCode == null or length(trim(self.countryCode)) == 2 "Country code must contain two characters"
+
+  transition status from "active" to ["archived"]
+  transition status from "archived" to ["active"]
+
+  default policy clientRead read: roleAllows(user.role, "salesAccess") "Sales staff may read client accounts"
+  // Write policies gate command mutation (semantics.md § policy enforcement:
+  // "enforced only at command execution"; no separate store-level write gate).
+  // Staff tier here; manager-only commands carry explicit roleAllows guards.
+  default policy clientWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write client accounts through commands"
+  default policy clientExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute client commands"
+
+  command register(
+    clientType: ClientType,
+    optional companyName: string,
+    optional givenName: string,
+    optional familyName: string,
+    optional email: string,
+    optional phone: string,
+    optional website: string,
+    optional addressLine1: string,
+    optional addressLine2: string,
+    optional city: string,
+    optional region: string,
+    optional postalCode: string,
+    optional countryCode: string,
+    optional taxId: string,
+    optional taxExempt: boolean,
+    optional paymentTermsDays: number,
+    optional notes: string,
+    optional assignedToId: uuid
+  ) {
+    guard self.registeredAt == null
+    guard self.deletedAt == null
+    constraint registerIdentity: (clientType == "company" and companyName != null and length(trim(companyName)) > 0) or (clientType == "person" and givenName != null and length(trim(givenName)) > 0) "Company clients require a company name; person clients require a given name"
+    constraint registerTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Payment terms must be between 0 and 365 days"
+    constraint registerCountry: countryCode == null or length(trim(countryCode)) == 2 "Country code must contain two characters"
+    mutate clientType = clientType
+    mutate companyName = companyName
+    mutate givenName = givenName
+    mutate familyName = familyName
+    mutate email = email
+    mutate phone = phone
+    mutate website = website
+    mutate addressLine1 = addressLine1
+    mutate addressLine2 = addressLine2
+    mutate city = city
+    mutate region = region
+    mutate postalCode = postalCode
+    mutate countryCode = countryCode
+    mutate taxId = taxId
+    mutate taxExempt = taxExempt != null ? taxExempt : false
+    mutate paymentTermsDays = paymentTermsDays != null ? paymentTermsDays : 30
+    mutate notes = notes
+    mutate assignedToId = assignedToId
+    mutate registeredAt = now()
+    emit ClientRegistered {
+      clientId: self.id
+      tenantId: self.tenantId
+      clientType: clientType
+    }
+  }
+
+  command changeContact(
+    optional email: string,
+    optional phone: string,
+    optional website: string,
+    optional addressLine1: string,
+    optional addressLine2: string,
+    optional city: string,
+    optional region: string,
+    optional postalCode: string,
+    optional countryCode: string
+  ) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint contactCountry: countryCode == null or length(trim(countryCode)) == 2 "Country code must contain two characters"
+    mutate email = email
+    mutate phone = phone
+    mutate website = website
+    mutate addressLine1 = addressLine1
+    mutate addressLine2 = addressLine2
+    mutate city = city
+    mutate region = region
+    mutate postalCode = postalCode
+    mutate countryCode = countryCode
+    emit ClientContactChanged {
+      clientId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command changeBillingProfile(
+    paymentTermsDays: number,
+    taxExempt: boolean,
+    optional taxId: string
+  ) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesManageAccess")
+    constraint billingTerms: paymentTermsDays >= 0 and paymentTermsDays <= 365 "Payment terms must be between 0 and 365 days"
+    mutate paymentTermsDays = paymentTermsDays
+    mutate taxExempt = taxExempt
+    mutate taxId = taxId
+    emit ClientBillingProfileChanged {
+      clientId: self.id
+      tenantId: self.tenantId
+      paymentTermsDays: paymentTermsDays
+      taxExempt: taxExempt
+    }
+  }
+
+  command assignOwner(optional assignedToId: uuid) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate assignedToId = assignedToId
+    emit ClientOwnerAssigned {
+      clientId: self.id
+      tenantId: self.tenantId
+      assignedToId: assignedToId
+    }
+  }
+
+  command archive(reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesManageAccess")
+    constraint archiveReason: length(trim(reason)) > 0 "Archive reason is required"
+    mutate status = "archived"
+    mutate archivedAt = now()
+    emit ClientArchived {
+      clientId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "archived"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesManageAccess")
+    mutate status = "active"
+    mutate archivedAt = null
+    emit ClientReactivated {
+      clientId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Client in durable
+}
+
+// ---------------------------------------------------------------------------
+// Venue — canonical reusable event location plus catering-operational notes.
+// ---------------------------------------------------------------------------
+
+entity Venue mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property required venueType: VenueType = "other"
+  property encrypted addressLine1: string?
+  property encrypted addressLine2: string?
+  property encrypted city: string?
+  property encrypted region: string?
+  property encrypted postalCode: string?
+  property encrypted countryCode: string?
+  property encrypted contactName: string?
+  property encrypted contactEmail: string?
+  property encrypted contactPhone: string?
+  property accessNotes: string?
+  property cateringNotes: string?
+  property required capacity: int = 0
+  property required status: VenueStatus = "active"
+  property registeredAt: datetime?
+  property deactivatedAt: datetime?
+  property deactivationReason: string?
+
+  hasMany events: Event
+
+  computed isActive: boolean = self.status == "active"
+
+  constraint venueIdentityComplete: self.registeredAt == null or length(trim(self.name)) > 0 "Registered venues require a name"
+  constraint venueCapacityNonnegative: self.capacity >= 0 "Venue capacity cannot be negative"
+
+  transition status from "active" to ["inactive"]
+  transition status from "inactive" to ["active"]
+
+  default policy venueRead read: roleAllows(user.role, "eventAccess") "Event staff may read venues"
+  default policy venueWrite write: roleAllows(user.role, "eventAccess") "Event staff may write venues through commands"
+  default policy venueExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute venue commands"
+
+  command register(
+    name: string,
+    venueType: VenueType,
+    capacity: number,
+    optional addressLine1: string,
+    optional addressLine2: string,
+    optional city: string,
+    optional region: string,
+    optional postalCode: string,
+    optional countryCode: string,
+    optional contactName: string,
+    optional contactEmail: string,
+    optional contactPhone: string,
+    optional accessNotes: string,
+    optional cateringNotes: string
+  ) {
+    guard self.registeredAt == null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint registerVenueName: length(trim(name)) > 0 "Venue name is required"
+    constraint registerVenueCapacity: capacity >= 0 "Venue capacity cannot be negative"
+    mutate name = name
+    mutate venueType = venueType
+    mutate capacity = capacity
+    mutate addressLine1 = addressLine1
+    mutate addressLine2 = addressLine2
+    mutate city = city
+    mutate region = region
+    mutate postalCode = postalCode
+    mutate countryCode = countryCode
+    mutate contactName = contactName
+    mutate contactEmail = contactEmail
+    mutate contactPhone = contactPhone
+    mutate accessNotes = accessNotes
+    mutate cateringNotes = cateringNotes
+    mutate registeredAt = now()
+    emit VenueRegistered {
+      venueId: self.id
+      tenantId: self.tenantId
+      name: name
+      venueType: venueType
+      capacity: capacity
+    }
+  }
+
+  command updateDetails(
+    name: string,
+    venueType: VenueType,
+    optional addressLine1: string,
+    optional addressLine2: string,
+    optional city: string,
+    optional region: string,
+    optional postalCode: string,
+    optional countryCode: string,
+    optional contactName: string,
+    optional contactEmail: string,
+    optional contactPhone: string,
+    optional accessNotes: string,
+    optional cateringNotes: string
+  ) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint updateVenueName: length(trim(name)) > 0 "Venue name is required"
+    mutate name = name
+    mutate venueType = venueType
+    mutate addressLine1 = addressLine1
+    mutate addressLine2 = addressLine2
+    mutate city = city
+    mutate region = region
+    mutate postalCode = postalCode
+    mutate countryCode = countryCode
+    mutate contactName = contactName
+    mutate contactEmail = contactEmail
+    mutate contactPhone = contactPhone
+    mutate accessNotes = accessNotes
+    mutate cateringNotes = cateringNotes
+    emit VenueDetailsUpdated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command changeCapacity(capacity: number) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint changeVenueCapacity: capacity >= 0 "Venue capacity cannot be negative"
+    compute previousCapacity = self.capacity
+    mutate capacity = capacity
+    emit VenueCapacityChanged {
+      venueId: self.id
+      tenantId: self.tenantId
+      previousCapacity: previousCapacity
+      capacity: capacity
+    }
+  }
+
+  command deactivate(reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint deactivateVenueReason: length(trim(reason)) > 0 "Venue deactivation reason is required"
+    mutate status = "inactive"
+    mutate deactivatedAt = now()
+    mutate deactivationReason = reason
+    emit VenueDeactivated {
+      venueId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command activate() {
+    guard self.status == "inactive"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    mutate status = "active"
+    mutate deactivatedAt = null
+    mutate deactivationReason = null
+    emit VenueActivated {
+      venueId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Venue in durable
+}
+
+// ---------------------------------------------------------------------------
+// Event — the governed engagement shared by every later operational domain.
+// Readiness is derived later from prep, staffing, logistics, and quality facts;
+// it is intentionally not a manually stored lifecycle stage here.
+// ---------------------------------------------------------------------------
+
+entity Event mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required clientId: uuid
+  property venueId: uuid?
+  property assignedToId: uuid?
+  property required searchable title: string = ""
+  property required eventType: string = ""
+  property startsAt: datetime?
+  property endsAt: datetime?
+  property venueName: string?
+  property venueAddress: string?
+  property required expectedHeadcount: int = 0
+  property encrypted primaryContactName: string?
+  property encrypted primaryContactEmail: string?
+  property encrypted primaryContactPhone: string?
+  property accessibilityNeeds: list<string> = []
+  property serviceRequirements: string?
+  property operationalRequirements: string?
+  property required budgetAmount: money(12, 2) = 0
+  property required quotedPrice: money(12, 2) = 0
+  property required stage: EventStage = "planning"
+  property plannedAt: datetime?
+  property approvedAt: datetime?
+  property executionStartedAt: datetime?
+  property completedAt: datetime?
+  property cancelledAt: datetime?
+  property closedOutAt: datetime?
+  property cancellationReason: string?
+
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
+  ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
+  hasMany guests: EventGuest
+  // EventDish inverse remains omitted (PB010) — culinary entry still compiles
+  // without production/logistics. Ops inverses below require compile entry
+  // packing.manifest / time.manifest (or later) so PrepTask/PackList/Delivery/
+  // EventAssignment are in scope.
+  hasMany prepTasks: PrepTask
+  hasMany packLists: PackList
+  hasMany deliveries: Delivery
+  hasMany assignments: EventAssignment
+
+  computed isTerminal: boolean = self.stage == "cancelled" or self.stage == "closed_out"
+  computed isEditable: boolean = self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+  // Readiness: no incomplete prep, undelivered logistics work, or open pack lists.
+  // Staffing coverage math remains deferred (NO EVIDENCE) — assignments hasMany
+  // is navigation only until coverage is product-defined.
+  // builtins.md: count_of(arr, predicate) over hasMany; PB007 still blocks
+  // referencing this computed from beginExecution's guard.
+  computed isReadyForExecution: boolean = count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
+
+  // plannedAt gates full engagement invariants while planEngagement mutates fields.
+  constraint eventPlanComplete: self.plannedAt == null or (length(trim(self.title)) > 0 and length(trim(self.eventType)) > 0 and self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.expectedHeadcount >= 1 and self.expectedHeadcount <= 100000 and self.primaryContactName != null and length(trim(self.primaryContactName)) > 0) "Planned events require a title, type, valid date range, headcount, and primary contact"
+  constraint validEventPricing: self.budgetAmount >= 0 and self.quotedPrice >= 0 "Event pricing cannot be negative"
+
+  transition stage from "planning" to ["pending_approval", "cancelled"]
+  transition stage from "pending_approval" to ["planning", "approved", "cancelled"]
+  transition stage from "approved" to ["planning", "executing", "cancelled"]
+  transition stage from "executing" to ["completed", "cancelled"]
+  transition stage from "completed" to ["closed_out"]
+  transition stage from "cancelled" to []
+  transition stage from "closed_out" to []
+
+  default policy eventRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read events"
+  // Write policies gate command mutation (see Client note); staff tier here,
+  // manager-only commands (approve/cancel/changePricing/...) carry guards.
+  default policy eventWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may write events through commands"
+  default policy eventExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may execute event commands"
+
+  command planEngagement(
+    clientId: uuid,
+    title: string,
+    eventType: string,
+    startsAt: datetime,
+    endsAt: datetime,
+    expectedHeadcount: number,
+    primaryContactName: string,
+    budgetAmount: money(12, 2),
+    quotedPrice: money(12, 2),
+    optional venueId: uuid,
+    optional venueName: string,
+    optional venueAddress: string,
+    optional primaryContactEmail: string,
+    optional primaryContactPhone: string,
+    optional accessibilityNeeds: list<string>,
+    optional serviceRequirements: string,
+    optional operationalRequirements: string,
+    optional assignedToId: uuid
+  ) {
+    guard self.stage == "planning"
+    guard self.plannedAt == null
+    guard self.deletedAt == null
+    constraint planTitle: length(trim(title)) > 0 "Event title is required"
+    constraint planType: length(trim(eventType)) > 0 "Event type is required"
+    constraint planDates: endsAt > startsAt "Event end must be after its start"
+    constraint planHeadcount: expectedHeadcount >= 1 and expectedHeadcount <= 100000 "Headcount must be between 1 and 100000"
+    constraint planContact: length(trim(primaryContactName)) > 0 "Primary contact name is required"
+    constraint planPricing: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
+    mutate clientId = clientId
+    mutate title = title
+    mutate eventType = eventType
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate venueId = venueId
+    mutate venueName = venueName
+    mutate venueAddress = venueAddress
+    mutate expectedHeadcount = expectedHeadcount
+    mutate primaryContactName = primaryContactName
+    mutate primaryContactEmail = primaryContactEmail
+    mutate primaryContactPhone = primaryContactPhone
+    mutate accessibilityNeeds = accessibilityNeeds != null ? accessibilityNeeds : []
+    mutate serviceRequirements = serviceRequirements
+    mutate operationalRequirements = operationalRequirements
+    mutate budgetAmount = budgetAmount
+    mutate quotedPrice = quotedPrice
+    mutate assignedToId = assignedToId
+    mutate plannedAt = now()
+    emit EventPlanned {
+      eventId: self.id
+      tenantId: self.tenantId
+      clientId: clientId
+      venueId: venueId
+      startsAt: startsAt
+      endsAt: endsAt
+      expectedHeadcount: expectedHeadcount
+    }
+  }
+
+  command reschedule(startsAt: datetime, endsAt: datetime) {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.deletedAt == null
+    constraint scheduleDates: endsAt > startsAt "Event end must be after its start"
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    emit EventScheduleChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+      startsAt: startsAt
+      endsAt: endsAt
+    }
+  }
+
+  command changeVenue(optional venueId: uuid, optional venueName: string, optional venueAddress: string) {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.deletedAt == null
+    mutate venueId = venueId
+    mutate venueName = venueName
+    mutate venueAddress = venueAddress
+    emit EventVenueChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+      venueId: venueId
+      venueName: venueName
+      venueAddress: venueAddress
+    }
+  }
+
+  command changeHeadcount(newHeadcount: number) {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "executing"
+    guard self.deletedAt == null
+    constraint headcountRange: newHeadcount >= 1 and newHeadcount <= 100000 "Headcount must be between 1 and 100000"
+    compute previousHeadcount = self.expectedHeadcount
+    mutate expectedHeadcount = newHeadcount
+    emit EventHeadcountChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+      previousHeadcount: previousHeadcount
+      newHeadcount: newHeadcount
+    }
+  }
+
+  command changePrimaryContact(
+    primaryContactName: string,
+    optional primaryContactEmail: string,
+    optional primaryContactPhone: string
+  ) {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.deletedAt == null
+    constraint contactName: length(trim(primaryContactName)) > 0 "Primary contact name is required"
+    mutate primaryContactName = primaryContactName
+    mutate primaryContactEmail = primaryContactEmail
+    mutate primaryContactPhone = primaryContactPhone
+    emit EventPrimaryContactChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command changeRequirements(
+    optional accessibilityNeeds: list<string>,
+    optional serviceRequirements: string,
+    optional operationalRequirements: string
+  ) {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.deletedAt == null
+    mutate accessibilityNeeds = accessibilityNeeds != null ? accessibilityNeeds : []
+    mutate serviceRequirements = serviceRequirements
+    mutate operationalRequirements = operationalRequirements
+    emit EventRequirementsChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+      accessibilityNeeds: accessibilityNeeds != null ? accessibilityNeeds : []
+      serviceRequirements: serviceRequirements
+      operationalRequirements: operationalRequirements
+    }
+  }
+
+  command changePricing(budgetAmount: money(12, 2), quotedPrice: money(12, 2)) {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "salesManageAccess")
+    constraint pricingNonnegative: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
+    mutate budgetAmount = budgetAmount
+    mutate quotedPrice = quotedPrice
+    emit EventPricingChanged {
+      eventId: self.id
+      tenantId: self.tenantId
+      budgetAmount: budgetAmount
+      quotedPrice: quotedPrice
+    }
+  }
+
+  command assignOwner(optional assignedToId: uuid) {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.deletedAt == null
+    mutate assignedToId = assignedToId
+    emit EventOwnerAssigned {
+      eventId: self.id
+      tenantId: self.tenantId
+      assignedToId: assignedToId
+    }
+  }
+
+  command submitForApproval() {
+    guard self.stage == "planning"
+    guard self.plannedAt != null
+    guard self.deletedAt == null
+    mutate stage = "pending_approval"
+    emit EventSubmittedForApproval {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command returnToPlanning(reason: string) {
+    guard self.stage == "pending_approval" or self.stage == "approved"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint returnReason: length(trim(reason)) > 0 "Return reason is required"
+    mutate stage = "planning"
+    mutate approvedAt = null
+    emit EventReturnedToPlanning {
+      eventId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command approve() {
+    guard self.stage == "pending_approval"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    mutate stage = "approved"
+    mutate approvedAt = now()
+    emit EventApproved {
+      eventId: self.id
+      tenantId: self.tenantId
+      expectedHeadcount: self.expectedHeadcount
+      startsAt: self.startsAt
+      endsAt: self.endsAt
+    }
+  }
+
+  command beginExecution() {
+    guard self.stage == "approved"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventAccess")
+    // Manifest 3.6.3 rejects computed-property references in guards (PB007).
+    // Inline the same readiness formula as isReadyForExecution.
+    guard count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
+    mutate stage = "executing"
+    mutate executionStartedAt = now()
+    emit EventExecutionStarted {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command complete() {
+    guard self.stage == "executing"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    mutate stage = "completed"
+    mutate completedAt = now()
+    emit EventCompleted {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command cancel(reason: string) {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved" or self.stage == "executing"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint cancellationReasonPresent: length(trim(reason)) > 0 "Cancellation reason is required"
+    mutate stage = "cancelled"
+    mutate cancellationReason = reason
+    mutate cancelledAt = now()
+    emit EventCancelled {
+      eventId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      reason: reason
+    }
+  }
+
+  command closeOut() {
+    guard self.stage == "completed"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    mutate stage = "closed_out"
+    mutate closedOutAt = now()
+    emit EventClosedOut {
+      eventId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  store Event in durable
+}
+
+// ---------------------------------------------------------------------------
+// EventGuest — individual invitation, RSVP, accommodation, and check-in facts.
+// Aggregate Event.expectedHeadcount changes only through Event.changeHeadcount.
+// ---------------------------------------------------------------------------
+
+entity EventGuest mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required searchable name: string = ""
+  property encrypted email: string?
+  property encrypted phone: string?
+  property dietaryRestrictions: list<string> = []
+  property allergenRestrictions: list<string> = []
+  property accessibilityNeeds: list<string> = []
+  property required specialMealRequired: boolean = false
+  property required rsvpStatus: RsvpStatus = "pending"
+  property invitedAt: datetime?
+  property respondedAt: datetime?
+  property declineReason: string?
+  property checkedInAt: datetime?
+  property tableAssignment: string?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  computed isCheckedIn: boolean = self.checkedInAt != null
+
+  constraint guestIdentityComplete: self.invitedAt == null or length(trim(self.name)) > 0 "Invited guests require a name"
+
+  transition rsvpStatus from "pending" to ["confirmed", "declined"]
+  transition rsvpStatus from "confirmed" to ["confirmed", "declined"]
+  transition rsvpStatus from "declined" to []
+
+  default policy eventGuestRead read: roleAllows(user.role, "eventAccess") "Event staff may read guest attendance"
+  default policy eventGuestWrite write: roleAllows(user.role, "eventAccess") "Event staff may write guest attendance through commands"
+  default policy eventGuestExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute guest attendance commands"
+
+  command invite(
+    eventId: uuid,
+    name: string,
+    optional email: string,
+    optional phone: string,
+    optional dietaryRestrictions: list<string>,
+    optional allergenRestrictions: list<string>,
+    optional accessibilityNeeds: list<string>,
+    optional specialMealRequired: boolean
+  ) {
+    guard self.invitedAt == null
+    guard self.deletedAt == null
+    constraint inviteGuestName: length(trim(name)) > 0 "Guest name is required"
+    mutate eventId = eventId
+    mutate name = name
+    mutate email = email
+    mutate phone = phone
+    mutate dietaryRestrictions = dietaryRestrictions != null ? dietaryRestrictions : []
+    mutate allergenRestrictions = allergenRestrictions != null ? allergenRestrictions : []
+    mutate accessibilityNeeds = accessibilityNeeds != null ? accessibilityNeeds : []
+    mutate specialMealRequired = specialMealRequired != null ? specialMealRequired : false
+    mutate rsvpStatus = "pending"
+    mutate invitedAt = now()
+    emit EventGuestInvited {
+      guestId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      name: name
+    }
+  }
+
+  command rsvpConfirm() {
+    guard self.rsvpStatus == "pending" or self.rsvpStatus == "confirmed"
+    guard self.deletedAt == null
+    mutate rsvpStatus = "confirmed"
+    mutate respondedAt = now()
+    mutate declineReason = null
+    emit EventGuestRsvpConfirmed {
+      guestId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command rsvpDecline(optional reason: string) {
+    guard self.rsvpStatus == "pending" or self.rsvpStatus == "confirmed"
+    guard self.deletedAt == null
+    mutate rsvpStatus = "declined"
+    mutate respondedAt = now()
+    mutate declineReason = reason
+    emit EventGuestRsvpDeclined {
+      guestId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      reason: reason
+    }
+  }
+
+  command checkIn() {
+    guard self.rsvpStatus == "confirmed"
+    guard self.checkedInAt == null
+    guard self.deletedAt == null
+    compute checkInTime = now()
+    mutate checkedInAt = checkInTime
+    emit EventGuestCheckedIn {
+      guestId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      checkedInAt: checkInTime
+    }
+  }
+
+  command assignTable(tableAssignment: string) {
+    guard self.rsvpStatus != "declined"
+    guard self.deletedAt == null
+    constraint tableAssignmentPresent: length(trim(tableAssignment)) > 0 "Table assignment is required"
+    mutate tableAssignment = tableAssignment
+    emit EventGuestTableAssigned {
+      guestId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      tableAssignment: tableAssignment
+    }
+  }
+
+  command withdraw(reason: string) {
+    guard self.deletedAt == null
+    constraint withdrawReasonPresent: length(trim(reason)) > 0 "Withdrawal reason is required"
+    mutate deletedAt = now()
+    emit EventGuestWithdrawn {
+      guestId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      reason: reason
+    }
+  }
+
+  store EventGuest in durable
+}
+
+event VenueRegistered: "venue.registered" {
+  venueId: string
+  tenantId: string
+  name: string
+  venueType: VenueType
+  capacity: number
+}
+
+event VenueDetailsUpdated: "venue.details_updated" {
+  venueId: string
+  tenantId: string
+}
+
+event VenueCapacityChanged: "venue.capacity_changed" {
+  venueId: string
+  tenantId: string
+  previousCapacity: number
+  capacity: number
+}
+
+event VenueDeactivated: "venue.deactivated" {
+  venueId: string
+  tenantId: string
+  reason: string
+}
+
+event VenueActivated: "venue.activated" {
+  venueId: string
+  tenantId: string
+}
+
+event ClientRegistered: "client.registered" {
+  clientId: string
+  tenantId: string
+  clientType: string
+}
+
+event ClientContactChanged: "client.contact_changed" {
+  clientId: string
+  tenantId: string
+}
+
+event ClientBillingProfileChanged: "client.billing_profile_changed" {
+  clientId: string
+  tenantId: string
+  paymentTermsDays: number
+  taxExempt: boolean
+}
+
+event ClientOwnerAssigned: "client.owner_assigned" {
+  clientId: string
+  tenantId: string
+  assignedToId: string?
+}
+
+event ClientArchived: "client.archived" {
+  clientId: string
+  tenantId: string
+  reason: string
+}
+
+event ClientReactivated: "client.reactivated" {
+  clientId: string
+  tenantId: string
+}
+
+event EventPlanned: "event.planned" {
+  eventId: string
+  tenantId: string
+  clientId: string
+  venueId: string?
+  startsAt: datetime
+  endsAt: datetime
+  expectedHeadcount: number
+}
+
+event EventScheduleChanged: "event.schedule_changed" {
+  eventId: string
+  tenantId: string
+  startsAt: datetime
+  endsAt: datetime
+}
+
+event EventVenueChanged: "event.venue_changed" {
+  eventId: string
+  tenantId: string
+  venueId: string?
+  venueName: string?
+  venueAddress: string?
+}
+
+event EventHeadcountChanged: "event.headcount_changed" {
+  eventId: string
+  tenantId: string
+  previousHeadcount: number
+  newHeadcount: number
+}
+
+event EventPrimaryContactChanged: "event.primary_contact_changed" {
+  eventId: string
+  tenantId: string
+}
+
+event EventRequirementsChanged: "event.requirements_changed" {
+  eventId: string
+  tenantId: string
+  accessibilityNeeds: list<string>
+  serviceRequirements: string?
+  operationalRequirements: string?
+}
+
+event EventPricingChanged: "event.pricing_changed" {
+  eventId: string
+  tenantId: string
+  budgetAmount: money(12, 2)
+  quotedPrice: money(12, 2)
+}
+
+event EventOwnerAssigned: "event.owner_assigned" {
+  eventId: string
+  tenantId: string
+  assignedToId: string?
+}
+
+event EventSubmittedForApproval: "event.submitted_for_approval" {
+  eventId: string
+  tenantId: string
+}
+
+event EventReturnedToPlanning: "event.returned_to_planning" {
+  eventId: string
+  tenantId: string
+  reason: string
+}
+
+event EventApproved: "event.approved" {
+  eventId: string
+  tenantId: string
+  expectedHeadcount: number
+  startsAt: datetime
+  endsAt: datetime
+}
+
+event EventExecutionStarted: "event.execution_started" {
+  eventId: string
+  tenantId: string
+}
+
+event EventCompleted: "event.completed" {
+  eventId: string
+  tenantId: string
+}
+
+event EventCancelled: "event.cancelled" {
+  eventId: string
+  tenantId: string
+  clientId: string
+  reason: string
+}
+
+event EventClosedOut: "event.closed_out" {
+  eventId: string
+  tenantId: string
+  clientId: string
+}
+
+event EventGuestInvited: "event_guest.invited" {
+  guestId: string
+  tenantId: string
+  eventId: string
+  name: string
+}
+
+event EventGuestRsvpConfirmed: "event_guest.rsvp_confirmed" {
+  guestId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventGuestRsvpDeclined: "event_guest.rsvp_declined" {
+  guestId: string
+  tenantId: string
+  eventId: string
+  reason: string?
+}
+
+event EventGuestCheckedIn: "event_guest.checked_in" {
+  guestId: string
+  tenantId: string
+  eventId: string
+  checkedInAt: datetime
+}
+
+event EventGuestTableAssigned: "event_guest.table_assigned" {
+  guestId: string
+  tenantId: string
+  eventId: string
+  tableAssignment: string
+}
+
+event EventGuestWithdrawn: "event_guest.withdrawn" {
+  guestId: string
+  tenantId: string
+  eventId: string
+  reason: string
+}

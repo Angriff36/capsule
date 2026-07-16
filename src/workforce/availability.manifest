@@ -1,0 +1,107 @@
+// Capsule workforce — AvailabilityWindow (Person-declared availability).
+// Compile chain: time → packing → … → assignment → shift → this file → prep.
+// Recurrence (capsule-pro dayOfWeek) deferred — OD022.
+// TimeRecord authored in workforce-2 (`time.manifest`).
+
+use "../production/prep.manifest"
+
+enum AvailabilityWindowStatus {
+  active
+  withdrawn
+}
+
+// One-shot availability interval for a Person. Workers declare/withdraw their
+// own windows via trusted user.id; managers may act for others.
+entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required personId: uuid
+  property startsAt: datetime?
+  property endsAt: datetime?
+  property encrypted notes: string?
+  property required status: AvailabilityWindowStatus = "active"
+  property declaredAt: datetime?
+  property withdrawnAt: datetime?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
+  constraint availabilityDeclaredComplete: self.declaredAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt) "Declared availability requires a valid start/end range"
+
+  transition status from "active" to ["withdrawn"]
+  transition status from "withdrawn" to []
+
+  default policy availabilityRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read availability windows"
+  default policy availabilityWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write availability through commands"
+  default policy availabilityExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute availability commands"
+
+  command declare(
+    personId: uuid,
+    startsAt: datetime,
+    endsAt: datetime,
+    optional notes: string
+  ) {
+    guard self.declaredAt == null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard user.id != null
+    guard personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    constraint declarePersonMatch: personId == self.personId "Declare personId must match the seeded person reference"
+    constraint declareDates: endsAt > startsAt "Availability end must be after its start"
+    mutate personId = personId
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate notes = notes != null ? notes : self.notes
+    mutate declaredAt = now()
+    emit AvailabilityDeclared {
+      availabilityWindowId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      startsAt: startsAt
+      endsAt: endsAt
+      status: "active"
+    }
+  }
+
+  command withdraw() {
+    guard self.status == "active"
+    guard self.declaredAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "withdrawn"
+    mutate withdrawnAt = now()
+    emit AvailabilityWithdrawn {
+      availabilityWindowId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      startsAt: self.startsAt
+      endsAt: self.endsAt
+      previousStatus: previousStatus
+      status: "withdrawn"
+    }
+  }
+
+  store AvailabilityWindow in durable
+}
+
+event AvailabilityDeclared: "availability.declared" {
+  availabilityWindowId: string
+  tenantId: string
+  personId: string
+  startsAt: datetime
+  endsAt: datetime
+  status: AvailabilityWindowStatus
+}
+
+event AvailabilityWithdrawn: "availability.withdrawn" {
+  availabilityWindowId: string
+  tenantId: string
+  personId: string
+  startsAt: datetime?
+  endsAt: datetime?
+  previousStatus: AvailabilityWindowStatus
+  status: AvailabilityWindowStatus
+}

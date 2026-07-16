@@ -1,0 +1,11 @@
+// Capsule sales/billing — compile entry for Invoice + Payment + PaymentMethod.
+// CollectionCase / deposits / PaymentRefundAttempt / InvoiceLine deferred (OD040).
+// EventCancelled voids unpaid draft/sent/viewed/overdue invoices (D041).
+
+use "./payment.manifest"
+
+// Event cancellation voids unpaid invoices still in draft/sent/viewed/overdue.
+// Paid and partial invoices are deliberately skipped (markVoided amountPaid guard).
+on EventCancelled fanOut Invoice where eventId = payload.eventId
+  run markVoided
+  params { reason: payload.reason }

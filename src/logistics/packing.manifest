@@ -1,0 +1,5 @@
+// Capsule logistics — PackList, PackListItem, Delivery.
+// Compile chain continues via workforce time.manifest (TimeRecord + Qualification).
+// Vehicle + Return/loss deferred (OD025).
+
+use "./delivery.manifest"

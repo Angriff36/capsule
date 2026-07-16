@@ -1,0 +1,245 @@
+// Capsule insights — SavedReportDefinition (user-saved chart/report config).
+// Compile entry for the insights / saved-reports slice; uses quality chain.
+// Reporting projections still derive from governed ops facts (D035); this
+// entity governs *saved UI report definitions*, not summary aggregates.
+
+use "../quality/incident.manifest"
+
+enum SavedReportStatus {
+  active
+  archived
+}
+
+// Domains a saved report may subject over. Culinary/procurement/quality are
+// omitted until product elevates them as first-class report subjects (OD044).
+enum ReportSubjectArea {
+  events
+  sales
+  inventory
+  production
+  workforce
+  logistics
+  finance
+}
+
+// `private` and `tenant` are reserved identifiers — use owner_only / tenant_wide.
+enum ReportSharingScope {
+  owner_only
+  team
+  tenant_wide
+}
+
+// User-owned saved chart/report configuration. Owner is stamped from trusted
+// user.id (never client-supplied). definition is intentionally schemaless UI
+// configuration (PROMPT.md catch-all exception; type json per semantics.md).
+// chartType remains an open string — vega-lite catalog is UI-owned (OD045).
+entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property ownerId: uuid?
+  property required searchable name: string = ""
+  property required subjectArea: ReportSubjectArea = "events"
+  property required chartType: string = ""
+  property required definition: json = {}
+  property required sharingScope: ReportSharingScope = "owner_only"
+  property required status: SavedReportStatus = "active"
+  property definedAt: datetime?
+  property archivedAt: datetime?
+  property restoredAt: datetime?
+
+  ref owner: Person fields [tenantId, ownerId] references [tenantId, id]
+
+  constraint savedReportDefinedComplete: self.definedAt == null or (length(trim(self.name)) > 0 and length(trim(self.chartType)) > 0 and self.ownerId != null) "Defined reports require a name, chart type, and owner"
+
+  transition status from "active" to ["archived"]
+  transition status from "archived" to ["active"]
+
+  // Per-row read gate: owner_only rows visible to owner (or managers); team /
+  // tenant_wide readable by any staffAccess principal (semantics.md read gate).
+  default policy savedReportRead read: self.ownerId == user.id or self.sharingScope != "owner_only" or roleAllows(user.role, "manageAccess") "Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable"
+  default policy savedReportWrite write: roleAllows(user.role, "staffAccess") "Staff may write saved reports through commands"
+  default policy savedReportExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute saved report commands"
+
+  // Not the reserved `create` auto-create path (trap #3) — harness seeds a blank
+  // instance; createDefinition mutates ownership + definition onto it.
+  command createDefinition(
+    name: string,
+    subjectArea: ReportSubjectArea,
+    chartType: string,
+    definition: json,
+    optional sharingScope: ReportSharingScope
+  ) {
+    guard self.definedAt == null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint createName: length(trim(name)) > 0 "Report name is required"
+    constraint createChartType: length(trim(chartType)) > 0 "Chart type is required"
+    mutate ownerId = user.id
+    mutate name = name
+    mutate subjectArea = subjectArea
+    mutate chartType = chartType
+    mutate definition = definition
+    mutate sharingScope = sharingScope != null ? sharingScope : "owner_only"
+    mutate definedAt = now()
+    emit SavedReportDefinitionCreated {
+      savedReportDefinitionId: self.id
+      tenantId: self.tenantId
+      ownerId: user.id
+      name: name
+      subjectArea: subjectArea
+      chartType: chartType
+      sharingScope: sharingScope != null ? sharingScope : "owner_only"
+      status: "active"
+    }
+  }
+
+  command rename(name: string) {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.ownerId == user.id or roleAllows(user.role, "manageAccess")
+    constraint renameName: length(trim(name)) > 0 "Report name is required"
+    mutate name = name
+    emit SavedReportRenamed {
+      savedReportDefinitionId: self.id
+      tenantId: self.tenantId
+      ownerId: self.ownerId
+      name: name
+      status: self.status
+    }
+  }
+
+  command updateDefinition(
+    optional chartType: string,
+    optional definition: json,
+    optional subjectArea: ReportSubjectArea
+  ) {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.ownerId == user.id or roleAllows(user.role, "manageAccess")
+    constraint updateChartType: chartType == null or length(trim(chartType)) > 0 "Chart type cannot be blank"
+    mutate chartType = chartType != null ? chartType : self.chartType
+    mutate definition = definition != null ? definition : self.definition
+    mutate subjectArea = subjectArea != null ? subjectArea : self.subjectArea
+    emit SavedReportDefinitionUpdated {
+      savedReportDefinitionId: self.id
+      tenantId: self.tenantId
+      ownerId: self.ownerId
+      chartType: self.chartType
+      subjectArea: self.subjectArea
+      status: self.status
+    }
+  }
+
+  command changeSharing(sharingScope: ReportSharingScope) {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.ownerId == user.id or roleAllows(user.role, "manageAccess")
+    mutate sharingScope = sharingScope
+    emit SavedReportSharingChanged {
+      savedReportDefinitionId: self.id
+      tenantId: self.tenantId
+      ownerId: self.ownerId
+      sharingScope: sharingScope
+      status: self.status
+    }
+  }
+
+  command archive() {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.ownerId == user.id or roleAllows(user.role, "manageAccess")
+    compute previousStatus = self.status
+    mutate status = "archived"
+    mutate archivedAt = now()
+    emit SavedReportArchived {
+      savedReportDefinitionId: self.id
+      tenantId: self.tenantId
+      ownerId: self.ownerId
+      previousStatus: previousStatus
+      status: "archived"
+    }
+  }
+
+  command restore() {
+    guard self.status == "archived"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.ownerId == user.id or roleAllows(user.role, "manageAccess")
+    compute previousStatus = self.status
+    mutate status = "active"
+    mutate restoredAt = now()
+    emit SavedReportRestored {
+      savedReportDefinitionId: self.id
+      tenantId: self.tenantId
+      ownerId: self.ownerId
+      previousStatus: previousStatus
+      status: "active"
+    }
+  }
+
+  store SavedReportDefinition in durable
+}
+
+event SavedReportDefinitionCreated: "saved_report.created" {
+  savedReportDefinitionId: string
+  tenantId: string
+  ownerId: string
+  name: string
+  subjectArea: ReportSubjectArea
+  chartType: string
+  sharingScope: ReportSharingScope
+  status: SavedReportStatus
+}
+
+event SavedReportRenamed: "saved_report.renamed" {
+  savedReportDefinitionId: string
+  tenantId: string
+  ownerId: string?
+  name: string
+  status: SavedReportStatus
+}
+
+event SavedReportDefinitionUpdated: "saved_report.definition_updated" {
+  savedReportDefinitionId: string
+  tenantId: string
+  ownerId: string?
+  chartType: string
+  subjectArea: ReportSubjectArea
+  status: SavedReportStatus
+}
+
+event SavedReportSharingChanged: "saved_report.sharing_changed" {
+  savedReportDefinitionId: string
+  tenantId: string
+  ownerId: string?
+  sharingScope: ReportSharingScope
+  status: SavedReportStatus
+}
+
+event SavedReportArchived: "saved_report.archived" {
+  savedReportDefinitionId: string
+  tenantId: string
+  ownerId: string?
+  previousStatus: SavedReportStatus
+  status: SavedReportStatus
+}
+
+event SavedReportRestored: "saved_report.restored" {
+  savedReportDefinitionId: string
+  tenantId: string
+  ownerId: string?
+  previousStatus: SavedReportStatus
+  status: SavedReportStatus
+}

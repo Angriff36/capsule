@@ -1,0 +1,224 @@
+// Capsule workforce — Shift (scheduled work period for a Person).
+// Clock-in/out duration facts live on TimeRecord (`time.manifest`); this entity
+// tracks schedule lifecycle only. Optional Event ref; Schedule/OpenShift deferred.
+
+use "./availability.manifest"
+
+enum ShiftStatus {
+  scheduled
+  started
+  completed
+  cancelled
+  no_show
+}
+
+entity Shift mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required personId: uuid
+  property eventId: uuid?
+  property startsAt: datetime?
+  property endsAt: datetime?
+  property role: string?
+  property encrypted notes: string?
+  property required status: ShiftStatus = "scheduled"
+  property scheduledAt: datetime?
+  property startedAt: datetime?
+  property completedAt: datetime?
+  property cancelledAt: datetime?
+  property cancellationReason: string?
+  property noShowAt: datetime?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint shiftScheduledComplete: self.scheduledAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt) "Scheduled shifts require a valid start/end range"
+
+  transition status from "scheduled" to ["started", "cancelled", "no_show"]
+  transition status from "started" to ["completed", "cancelled", "no_show"]
+  transition status from "completed" to []
+  transition status from "cancelled" to []
+  transition status from "no_show" to []
+
+  default policy shiftRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read shifts"
+  default policy shiftWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write shifts through commands"
+  default policy shiftExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute shift commands"
+
+  command schedule(
+    personId: uuid,
+    startsAt: datetime,
+    endsAt: datetime,
+    optional eventId: uuid,
+    optional role: string,
+    optional notes: string
+  ) {
+    guard self.scheduledAt == null
+    guard self.status == "scheduled"
+    guard self.deletedAt == null
+    guard self.person != null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint schedulePersonMatch: personId == self.personId "Schedule personId must match the seeded person reference"
+    constraint scheduleEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Schedule eventId must match the seeded event reference when provided"
+    constraint scheduleDates: endsAt > startsAt "Shift end must be after its start"
+    mutate personId = personId
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate role = role != null ? role : self.role
+    mutate notes = notes != null ? notes : self.notes
+    mutate scheduledAt = now()
+    emit ShiftScheduled {
+      shiftId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      eventId: eventId != null ? eventId : self.eventId
+      startsAt: startsAt
+      endsAt: endsAt
+      role: role != null ? role : self.role
+      status: "scheduled"
+    }
+  }
+
+  command start() {
+    guard self.status == "scheduled"
+    guard self.scheduledAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "started"
+    mutate startedAt = now()
+    emit ShiftStarted {
+      shiftId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      eventId: self.eventId
+      startsAt: self.startsAt
+      endsAt: self.endsAt
+      previousStatus: previousStatus
+      status: "started"
+    }
+  }
+
+  command complete() {
+    guard self.status == "started"
+    guard self.startedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "completed"
+    mutate completedAt = now()
+    emit ShiftCompleted {
+      shiftId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      eventId: self.eventId
+      startsAt: self.startsAt
+      endsAt: self.endsAt
+      previousStatus: previousStatus
+      status: "completed"
+    }
+  }
+
+  command cancel(reason: string) {
+    guard self.status == "scheduled" or self.status == "started"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint cancelShiftReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit ShiftCancelled {
+      shiftId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      eventId: self.eventId
+      startsAt: self.startsAt
+      endsAt: self.endsAt
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
+  command markNoShow() {
+    guard self.status == "scheduled" or self.status == "started"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "no_show"
+    mutate noShowAt = now()
+    emit ShiftNoShowMarked {
+      shiftId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      eventId: self.eventId
+      startsAt: self.startsAt
+      endsAt: self.endsAt
+      previousStatus: previousStatus
+      status: "no_show"
+    }
+  }
+
+  store Shift in durable
+}
+
+event ShiftScheduled: "shift.scheduled" {
+  shiftId: string
+  tenantId: string
+  personId: string
+  eventId: string?
+  startsAt: datetime
+  endsAt: datetime
+  role: string?
+  status: ShiftStatus
+}
+
+event ShiftStarted: "shift.started" {
+  shiftId: string
+  tenantId: string
+  personId: string
+  eventId: string?
+  startsAt: datetime?
+  endsAt: datetime?
+  previousStatus: ShiftStatus
+  status: ShiftStatus
+}
+
+event ShiftCompleted: "shift.completed" {
+  shiftId: string
+  tenantId: string
+  personId: string
+  eventId: string?
+  startsAt: datetime?
+  endsAt: datetime?
+  previousStatus: ShiftStatus
+  status: ShiftStatus
+}
+
+event ShiftCancelled: "shift.cancelled" {
+  shiftId: string
+  tenantId: string
+  personId: string
+  eventId: string?
+  startsAt: datetime?
+  endsAt: datetime?
+  previousStatus: ShiftStatus
+  status: ShiftStatus
+  reason: string
+}
+
+event ShiftNoShowMarked: "shift.no_show_marked" {
+  shiftId: string
+  tenantId: string
+  personId: string
+  eventId: string?
+  startsAt: datetime?
+  endsAt: datetime?
+  previousStatus: ShiftStatus
+  status: ShiftStatus
+}

@@ -1,0 +1,153 @@
+// Capsule inventory storage locations. Stock lines and reservations live in
+// stock.manifest (compile entry).
+
+use "../culinary/menu.manifest"
+
+enum StorageLocationStatus {
+  active
+  inactive
+}
+
+// Named place where stock is held (walk-in, freezer, dry storage, offsite…).
+// locationType stays an open string until a closed catalog is evidenced (OD013).
+entity StorageLocation mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property locationType: string?
+  property temperatureZone: string?
+  property minTemperature: decimal(6, 2)?
+  property maxTemperature: decimal(6, 2)?
+  property temperatureUnit: string?
+  property required status: StorageLocationStatus = "active"
+  property registeredAt: datetime?
+  property deactivatedAt: datetime?
+  property deactivationReason: string?
+
+  hasMany stockLines: InventoryItem
+
+  computed isActive: boolean = self.status == "active"
+
+  constraint locationIdentityComplete: self.registeredAt == null or length(trim(self.name)) > 0 "Registered storage locations require a name"
+
+  transition status from "active" to ["inactive"]
+  transition status from "inactive" to ["active"]
+
+  default policy storageLocationRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read storage locations"
+  default policy storageLocationWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write storage locations through commands"
+  default policy storageLocationExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute storage location commands"
+
+  command register(
+    name: string,
+    optional locationType: string,
+    optional temperatureZone: string,
+    optional minTemperature: decimal(6, 2),
+    optional maxTemperature: decimal(6, 2),
+    optional temperatureUnit: string
+  ) {
+    guard self.registeredAt == null
+    guard self.deletedAt == null
+    constraint registerLocationName: length(trim(name)) > 0 "Storage location name is required"
+    mutate name = name
+    mutate locationType = locationType
+    mutate temperatureZone = temperatureZone
+    mutate minTemperature = minTemperature
+    mutate maxTemperature = maxTemperature
+    mutate temperatureUnit = temperatureUnit != null ? temperatureUnit : "F"
+    mutate registeredAt = now()
+    emit StorageLocationRegistered {
+      storageLocationId: self.id
+      tenantId: self.tenantId
+      name: name
+      locationType: locationType
+      temperatureZone: temperatureZone
+    }
+  }
+
+  command reviseDetails(
+    name: string,
+    optional locationType: string,
+    optional temperatureZone: string,
+    optional minTemperature: decimal(6, 2),
+    optional maxTemperature: decimal(6, 2),
+    optional temperatureUnit: string
+  ) {
+    guard self.registeredAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint reviseLocationName: length(trim(name)) > 0 "Storage location name is required"
+    mutate name = name
+    mutate locationType = locationType
+    mutate temperatureZone = temperatureZone
+    mutate minTemperature = minTemperature
+    mutate maxTemperature = maxTemperature
+    mutate temperatureUnit = temperatureUnit != null ? temperatureUnit : self.temperatureUnit
+    emit StorageLocationDetailsRevised {
+      storageLocationId: self.id
+      tenantId: self.tenantId
+      name: name
+      locationType: locationType
+      temperatureZone: temperatureZone
+    }
+  }
+
+  command deactivate(reason: string) {
+    guard self.status == "active"
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    constraint deactivateLocationReason: length(trim(reason)) > 0 "Deactivation reason is required"
+    mutate status = "inactive"
+    mutate deactivatedAt = now()
+    mutate deactivationReason = reason
+    emit StorageLocationDeactivated {
+      storageLocationId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command activate() {
+    guard self.status == "inactive"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    mutate status = "active"
+    mutate deactivatedAt = null
+    mutate deactivationReason = null
+    emit StorageLocationActivated {
+      storageLocationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store StorageLocation in durable
+}
+
+event StorageLocationRegistered: "storage_location.registered" {
+  storageLocationId: string
+  tenantId: string
+  name: string
+  locationType: string?
+  temperatureZone: string?
+}
+
+event StorageLocationDetailsRevised: "storage_location.details_revised" {
+  storageLocationId: string
+  tenantId: string
+  name: string
+  locationType: string?
+  temperatureZone: string?
+}
+
+event StorageLocationDeactivated: "storage_location.deactivated" {
+  storageLocationId: string
+  tenantId: string
+  reason: string
+}
+
+event StorageLocationActivated: "storage_location.activated" {
+  storageLocationId: string
+  tenantId: string
+}

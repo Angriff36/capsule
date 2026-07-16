@@ -1,0 +1,214 @@
+// Capsule culinary ingredients — closed unit/allergen vocabularies and Ingredient.
+
+use "../operations/event.manifest"
+
+enum UnitOfMeasure {
+  each
+  gram
+  kilogram
+  ounce
+  pound
+  milliliter
+  liter
+  teaspoon
+  tablespoon
+  cup
+  pint
+  quart
+  gallon
+  portion
+}
+
+// US major food allergens (Big-8) plus sesame (FASTER Act). Evidence stored
+// free-form strings; this slice governs the culinary catalog vocabulary.
+enum AllergenCode {
+  milk
+  eggs
+  fish
+  crustacean_shellfish
+  tree_nuts
+  peanuts
+  wheat
+  soybeans
+  sesame
+}
+
+enum IngredientStatus {
+  active
+  discontinued
+}
+
+entity Ingredient mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property required unit: UnitOfMeasure = "each"
+  property allergens: list<AllergenCode> = []
+  property required costPerUnit: money(12, 2) = 0
+  property category: string?
+  property required status: IngredientStatus = "active"
+  property introducedAt: datetime?
+  property discontinuedAt: datetime?
+  property discontinuationReason: string?
+
+  hasMany recipeLines: RecipeIngredient
+
+  computed isActive: boolean = self.status == "active"
+  computed isDiscontinued: boolean = self.status == "discontinued"
+
+  constraint ingredientIdentityComplete: self.introducedAt == null or length(trim(self.name)) > 0 "Introduced ingredients require a name"
+  constraint ingredientCostNonnegative: self.costPerUnit >= 0 "Ingredient cost per unit cannot be negative"
+
+  transition status from "active" to ["discontinued"]
+  transition status from "discontinued" to ["active"]
+
+  default policy ingredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read ingredients"
+  default policy ingredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write ingredients through commands"
+  default policy ingredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute ingredient commands"
+
+  command introduce(
+    name: string,
+    unit: UnitOfMeasure,
+    costPerUnit: money(12, 2),
+    optional allergens: list<AllergenCode>,
+    optional category: string
+  ) {
+    guard self.introducedAt == null
+    guard self.deletedAt == null
+    constraint introduceIngredientName: length(trim(name)) > 0 "Ingredient name is required"
+    constraint introduceIngredientCost: costPerUnit >= 0 "Ingredient cost per unit cannot be negative"
+    mutate name = name
+    mutate unit = unit
+    mutate costPerUnit = costPerUnit
+    mutate allergens = allergens != null ? allergens : []
+    mutate category = category
+    mutate introducedAt = now()
+    emit IngredientIntroduced {
+      ingredientId: self.id
+      tenantId: self.tenantId
+      name: name
+      unit: unit
+      costPerUnit: costPerUnit
+      allergens: allergens != null ? allergens : []
+    }
+  }
+
+  command updateDetails(
+    name: string,
+    unit: UnitOfMeasure,
+    optional category: string
+  ) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint updateIngredientName: length(trim(name)) > 0 "Ingredient name is required"
+    mutate name = name
+    mutate unit = unit
+    mutate category = category
+    emit IngredientDetailsUpdated {
+      ingredientId: self.id
+      tenantId: self.tenantId
+      name: name
+      unit: unit
+    }
+  }
+
+  command classifyAllergens(allergens: list<AllergenCode>) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate allergens = allergens
+    emit IngredientAllergensClassified {
+      ingredientId: self.id
+      tenantId: self.tenantId
+      allergens: allergens
+    }
+  }
+
+  command updateCosting(costPerUnit: money(12, 2)) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint costingNonnegative: costPerUnit >= 0 "Ingredient cost per unit cannot be negative"
+    compute previousCostPerUnit = self.costPerUnit
+    mutate costPerUnit = costPerUnit
+    emit IngredientCostingUpdated {
+      ingredientId: self.id
+      tenantId: self.tenantId
+      previousCostPerUnit: previousCostPerUnit
+      costPerUnit: costPerUnit
+      unit: self.unit
+    }
+  }
+
+  command discontinue(reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint discontinueReason: length(trim(reason)) > 0 "Discontinuation reason is required"
+    mutate status = "discontinued"
+    mutate discontinuedAt = now()
+    mutate discontinuationReason = reason
+    emit IngredientDiscontinued {
+      ingredientId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reinstate() {
+    guard self.status == "discontinued"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "active"
+    mutate discontinuedAt = null
+    mutate discontinuationReason = null
+    emit IngredientReinstated {
+      ingredientId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Ingredient in durable
+}
+
+event IngredientIntroduced: "ingredient.introduced" {
+  ingredientId: string
+  tenantId: string
+  name: string
+  unit: UnitOfMeasure
+  costPerUnit: money(12, 2)
+  allergens: list<AllergenCode>
+}
+
+event IngredientDetailsUpdated: "ingredient.details_updated" {
+  ingredientId: string
+  tenantId: string
+  name: string
+  unit: UnitOfMeasure
+}
+
+event IngredientAllergensClassified: "ingredient.allergens_classified" {
+  ingredientId: string
+  tenantId: string
+  allergens: list<AllergenCode>
+}
+
+event IngredientCostingUpdated: "ingredient.costing_updated" {
+  ingredientId: string
+  tenantId: string
+  previousCostPerUnit: money(12, 2)
+  costPerUnit: money(12, 2)
+  unit: UnitOfMeasure
+}
+
+event IngredientDiscontinued: "ingredient.discontinued" {
+  ingredientId: string
+  tenantId: string
+  reason: string
+}
+
+event IngredientReinstated: "ingredient.reinstated" {
+  ingredientId: string
+  tenantId: string
+}

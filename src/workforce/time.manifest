@@ -1,0 +1,330 @@
+// Capsule workforce-2 — TimeRecord + Qualification.
+// Compile entry: uses logistics packing head (PackList/Delivery + prior chain).
+// Training courses/sessions (TrainingModule/Assignment/Attempt) deferred — OD027.
+// Schedule/OpenShift remain deferred (OD024).
+
+use "../logistics/packing.manifest"
+
+enum TimeRecordStatus {
+  open
+  closed
+  corrected
+}
+
+enum QualificationStatus {
+  active
+  expired
+  revoked
+}
+
+// Worked time for a Person (maps capsule-pro TimeEntry). Optional Shift/Event
+// refs; duration is a pure computed from clock datetimes (durationBetween).
+// No pay-rate fields — none evidenced on TimeEntry.
+entity TimeRecord mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required personId: uuid
+  property shiftId: uuid?
+  property eventId: uuid?
+  property clockInAt: datetime?
+  property clockOutAt: datetime?
+  property breakMinutes: int? = 0
+  property encrypted notes: string?
+  property required status: TimeRecordStatus = "open"
+  property correctedAt: datetime?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+  belongsTo shift: Shift fields [tenantId, shiftId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  // Pure datetime arithmetic (builtins.md durationBetween / durationMinutes) —
+  // no now() in computed. Named workedMinutes to avoid shadowing the builtin.
+  computed workedMinutes: number? = self.clockOutAt != null and self.clockInAt != null ? durationBetween(self.clockInAt, self.clockOutAt) / durationMinutes(1) : null
+
+  constraint timeRecordClosedComplete: self.status == "open" or (self.clockInAt != null and self.clockOutAt != null and self.clockOutAt >= self.clockInAt) "Closed or corrected time records require clock-out at or after clock-in"
+  constraint timeRecordBreakNonNegative: self.breakMinutes == null or self.breakMinutes >= 0 "Break minutes must be non-negative"
+
+  transition status from "open" to ["closed"]
+  transition status from "closed" to ["corrected"]
+  transition status from "corrected" to ["corrected"]
+
+  default policy timeRecordRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read time records"
+  default policy timeRecordWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write time records through commands"
+  default policy timeRecordExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute time record commands"
+
+  command clockIn(
+    personId: uuid,
+    optional shiftId: uuid,
+    optional eventId: uuid,
+    optional notes: string
+  ) {
+    guard self.clockInAt == null
+    guard self.status == "open"
+    guard self.deletedAt == null
+    guard user.id != null
+    guard personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    guard self.person != null and self.person.status == "active"
+    constraint clockInPersonMatch: personId == self.personId "Clock-in personId must match the seeded person reference"
+    constraint clockInShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "Clock-in shiftId must match the seeded shift reference when provided"
+    constraint clockInEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Clock-in eventId must match the seeded event reference when provided"
+    mutate personId = personId
+    mutate shiftId = shiftId != null ? shiftId : self.shiftId
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate notes = notes != null ? notes : self.notes
+    mutate clockInAt = now()
+    emit TimeRecordClockedIn {
+      timeRecordId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      shiftId: shiftId != null ? shiftId : self.shiftId
+      eventId: eventId != null ? eventId : self.eventId
+      clockInAt: self.clockInAt
+      status: "open"
+    }
+  }
+
+  command clockOut(
+    optional breakMinutes: number,
+    optional notes: string
+  ) {
+    guard self.status == "open"
+    guard self.clockInAt != null
+    guard self.clockOutAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    constraint clockOutBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes must be non-negative"
+    mutate clockOutAt = now()
+    mutate breakMinutes = breakMinutes != null ? breakMinutes : self.breakMinutes
+    mutate notes = notes != null ? notes : self.notes
+    mutate status = "closed"
+    emit TimeRecordClockedOut {
+      timeRecordId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      shiftId: self.shiftId
+      eventId: self.eventId
+      clockInAt: self.clockInAt
+      clockOutAt: self.clockOutAt
+      breakMinutes: breakMinutes != null ? breakMinutes : self.breakMinutes
+      status: "closed"
+    }
+  }
+
+  command correct(
+    clockInAt: datetime,
+    clockOutAt: datetime,
+    optional breakMinutes: number,
+    optional notes: string
+  ) {
+    guard self.status == "closed" or self.status == "corrected"
+    guard self.clockInAt != null
+    guard self.clockOutAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint correctDates: clockOutAt >= clockInAt "Corrected clock-out must be at or after clock-in"
+    constraint correctBreakNonNegative: breakMinutes == null or breakMinutes >= 0 "Break minutes must be non-negative"
+    compute previousClockInAt = self.clockInAt
+    compute previousClockOutAt = self.clockOutAt
+    compute previousBreakMinutes = self.breakMinutes
+    mutate clockInAt = clockInAt
+    mutate clockOutAt = clockOutAt
+    mutate breakMinutes = breakMinutes != null ? breakMinutes : self.breakMinutes
+    mutate notes = notes != null ? notes : self.notes
+    mutate status = "corrected"
+    mutate correctedAt = now()
+    emit TimeRecordCorrected {
+      timeRecordId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      previousClockInAt: previousClockInAt
+      previousClockOutAt: previousClockOutAt
+      previousBreakMinutes: previousBreakMinutes
+      clockInAt: clockInAt
+      clockOutAt: clockOutAt
+      breakMinutes: breakMinutes != null ? breakMinutes : self.breakMinutes
+      status: "corrected"
+    }
+  }
+
+  store TimeRecord in durable
+}
+
+// Certification/skill held by a Person (maps capsule-pro EmployeeCertification).
+// Training modules/assignments/attempts are distinct and deferred (OD027).
+// isExpired via now() omitted — time-dependent computeds are nondeterministic (OD028).
+entity Qualification mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required personId: uuid
+  property required name: string = ""
+  property certificationType: string?
+  property issuedAt: datetime?
+  property expiresAt: datetime?
+  property documentRef: string?
+  property encrypted notes: string?
+  property required status: QualificationStatus = "active"
+  property grantedAt: datetime?
+  property revokedAt: datetime?
+  property expiredAt: datetime?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
+  constraint qualificationGrantedComplete: self.grantedAt == null or (length(trim(self.name)) > 0 and self.issuedAt != null and (self.expiresAt == null or self.expiresAt > self.issuedAt)) "Granted qualifications require a name, issued date, and valid optional expiry"
+  constraint qualificationExpiryOrder: self.expiresAt == null or self.issuedAt == null or self.expiresAt > self.issuedAt "Qualification expiry must be after issued date"
+
+  transition status from "active" to ["expired", "revoked"]
+  transition status from "expired" to []
+  transition status from "revoked" to []
+
+  default policy qualificationRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read qualifications"
+  default policy qualificationWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write qualifications through commands"
+  default policy qualificationExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute qualification commands"
+
+  command grant(
+    personId: uuid,
+    name: string,
+    issuedAt: datetime,
+    optional certificationType: string,
+    optional expiresAt: datetime,
+    optional documentRef: string,
+    optional notes: string
+  ) {
+    guard self.grantedAt == null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard self.person != null and self.person.status == "active"
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint grantPersonMatch: personId == self.personId "Grant personId must match the seeded person reference"
+    constraint grantNamePresent: length(trim(name)) > 0 "Qualification name is required"
+    constraint grantExpiryOrder: expiresAt == null or expiresAt > issuedAt "Qualification expiry must be after issued date"
+    mutate personId = personId
+    mutate name = name
+    mutate certificationType = certificationType != null ? certificationType : self.certificationType
+    mutate issuedAt = issuedAt
+    mutate expiresAt = expiresAt != null ? expiresAt : self.expiresAt
+    mutate documentRef = documentRef != null ? documentRef : self.documentRef
+    mutate notes = notes != null ? notes : self.notes
+    mutate grantedAt = now()
+    emit QualificationGranted {
+      qualificationId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      name: name
+      certificationType: certificationType != null ? certificationType : self.certificationType
+      issuedAt: issuedAt
+      expiresAt: expiresAt != null ? expiresAt : self.expiresAt
+      status: "active"
+    }
+  }
+
+  command revoke(optional notes: string) {
+    guard self.status == "active"
+    guard self.grantedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "revoked"
+    mutate revokedAt = now()
+    mutate notes = notes != null ? notes : self.notes
+    emit QualificationRevoked {
+      qualificationId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      name: self.name
+      previousStatus: previousStatus
+      status: "revoked"
+    }
+  }
+
+  command expire() {
+    guard self.status == "active"
+    guard self.grantedAt != null
+    guard self.expiresAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "expired"
+    mutate expiredAt = now()
+    emit QualificationExpired {
+      qualificationId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      name: self.name
+      expiresAt: self.expiresAt
+      previousStatus: previousStatus
+      status: "expired"
+    }
+  }
+
+  store Qualification in durable
+}
+
+event TimeRecordClockedIn: "time_record.clocked_in" {
+  timeRecordId: string
+  tenantId: string
+  personId: string
+  shiftId: string?
+  eventId: string?
+  clockInAt: datetime?
+  status: TimeRecordStatus
+}
+
+event TimeRecordClockedOut: "time_record.clocked_out" {
+  timeRecordId: string
+  tenantId: string
+  personId: string
+  shiftId: string?
+  eventId: string?
+  clockInAt: datetime?
+  clockOutAt: datetime?
+  breakMinutes: number?
+  status: TimeRecordStatus
+}
+
+event TimeRecordCorrected: "time_record.corrected" {
+  timeRecordId: string
+  tenantId: string
+  personId: string
+  previousClockInAt: datetime?
+  previousClockOutAt: datetime?
+  previousBreakMinutes: number?
+  clockInAt: datetime
+  clockOutAt: datetime
+  breakMinutes: number?
+  status: TimeRecordStatus
+}
+
+event QualificationGranted: "qualification.granted" {
+  qualificationId: string
+  tenantId: string
+  personId: string
+  name: string
+  certificationType: string?
+  issuedAt: datetime
+  expiresAt: datetime?
+  status: QualificationStatus
+}
+
+event QualificationRevoked: "qualification.revoked" {
+  qualificationId: string
+  tenantId: string
+  personId: string
+  name: string
+  previousStatus: QualificationStatus
+  status: QualificationStatus
+}
+
+event QualificationExpired: "qualification.expired" {
+  qualificationId: string
+  tenantId: string
+  personId: string
+  name: string
+  expiresAt: datetime?
+  previousStatus: QualificationStatus
+  status: QualificationStatus
+}

@@ -1,0 +1,321 @@
+// Capsule sales/billing — Invoice entity (Payment + entry reactions elsewhere).
+// Line items are JSON-only in evidence — no InvoiceLine entity (OD040).
+
+use "./payment-method.manifest"
+
+enum InvoiceStatus {
+  draft
+  sent
+  viewed
+  overdue
+  partial
+  paid
+  voided
+  written_off
+}
+
+// Client invoice for an engagement. Optional eventId links the governed Event;
+// stored amountPaid/amountDue are command-maintained (applyPayment) — a
+// computed sum over hasMany cannot drive transitions (D040).
+entity Invoice mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required clientId: uuid
+  property eventId: uuid?
+  property unique invoiceNumber: string?
+  property required subtotal: money(12, 2) = 0
+  property required taxAmount: money(12, 2) = 0
+  property required discountAmount: money(12, 2) = 0
+  property required total: money(12, 2) = 0
+  property required amountPaid: money(12, 2) = 0
+  property required amountDue: money(12, 2) = 0
+  property required paymentTermsDays: int = 30
+  property dueDate: datetime?
+  property notes: string?
+  property required status: InvoiceStatus = "draft"
+  property issuedAt: datetime?
+  property sentAt: datetime?
+  property viewedAt: datetime?
+  property overdueSince: datetime?
+  property paidAt: datetime?
+  property voidedAt: datetime?
+  property voidReason: string?
+  property writtenOffAt: datetime?
+  property writeOffReason: string?
+
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref event: Event fields [tenantId, eventId] references [tenantId, id]
+  hasMany payments: Payment
+
+  constraint invoiceIssuedComplete: self.issuedAt == null or (length(trim(self.invoiceNumber)) > 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0 and self.amountPaid >= 0 and self.amountDue >= 0) "Issued invoices require a number and non-negative money amounts"
+  constraint invoiceTotalsConsistent: self.issuedAt == null or self.total == self.subtotal + self.taxAmount - self.discountAmount "Invoice total must equal subtotal plus tax minus discount"
+  constraint invoiceBalanceConsistent: self.issuedAt == null or self.amountDue == self.total - self.amountPaid "Invoice amount due must equal total minus amount paid"
+
+  transition status from "draft" to ["sent", "voided"]
+  transition status from "sent" to ["viewed", "overdue", "partial", "paid", "voided"]
+  transition status from "viewed" to ["overdue", "partial", "paid", "voided"]
+  transition status from "overdue" to ["partial", "paid", "written_off", "voided"]
+  transition status from "partial" to ["partial", "paid", "overdue", "written_off"]
+  transition status from "paid" to ["partial"]
+  transition status from "voided" to []
+  transition status from "written_off" to []
+
+  default policy invoiceRead read: roleAllows(user.role, "financeAccess") "Finance staff may read invoices"
+  default policy invoiceWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write invoices through commands"
+  default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute invoice commands"
+
+  command issue(
+    clientId: uuid,
+    invoiceNumber: string,
+    subtotal: money(12, 2),
+    taxAmount: money(12, 2),
+    discountAmount: money(12, 2),
+    total: money(12, 2),
+    optional eventId: uuid,
+    optional paymentTermsDays: number,
+    optional dueDate: datetime,
+    optional notes: string
+  ) {
+    guard self.issuedAt == null
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.client != null
+    constraint issueClientMatch: clientId == self.clientId "Issue clientId must match the seeded client reference"
+    constraint issueEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Issue eventId must match the seeded event reference when both are set"
+    constraint issueNumber: length(trim(invoiceNumber)) > 0 "Invoice number is required"
+    constraint issueMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "Invoice money amounts cannot be negative"
+    constraint issueTotalMatch: total == subtotal + taxAmount - discountAmount "Invoice total must equal subtotal plus tax minus discount"
+    mutate clientId = clientId
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate invoiceNumber = invoiceNumber
+    mutate subtotal = subtotal
+    mutate taxAmount = taxAmount
+    mutate discountAmount = discountAmount
+    mutate total = total
+    mutate amountPaid = 0
+    mutate amountDue = total
+    mutate paymentTermsDays = paymentTermsDays != null ? paymentTermsDays : 30
+    mutate dueDate = dueDate
+    mutate notes = notes
+    mutate issuedAt = now()
+    emit InvoiceIssued {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: clientId
+      eventId: eventId != null ? eventId : self.eventId
+      invoiceNumber: invoiceNumber
+      total: total
+      amountDue: total
+    }
+  }
+
+  command send() {
+    guard self.status == "draft"
+    guard self.issuedAt != null
+    guard self.deletedAt == null
+    constraint sendBalance: self.amountDue > 0 "Cannot send an invoice with zero balance"
+    mutate status = "sent"
+    mutate sentAt = now()
+    emit InvoiceSent {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      invoiceNumber: self.invoiceNumber
+      total: self.total
+      amountDue: self.amountDue
+    }
+  }
+
+  command markViewed() {
+    guard self.status == "sent"
+    guard self.deletedAt == null
+    mutate status = "viewed"
+    mutate viewedAt = now()
+    emit InvoiceViewed {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+    }
+  }
+
+  command applyPayment(paymentAmount: money(12, 2), optional paymentId: string) {
+    guard self.status == "sent" or self.status == "viewed" or self.status == "overdue" or self.status == "partial"
+    guard self.deletedAt == null
+    constraint applyPositive: paymentAmount > 0 "Payment amount must be positive"
+    constraint applyWithinDue: paymentAmount <= self.amountDue "Payment amount cannot exceed amount due"
+    compute nextPaid = self.amountPaid + paymentAmount
+    compute nextDue = self.amountDue - paymentAmount
+    mutate amountPaid = nextPaid
+    mutate amountDue = nextDue
+    mutate status = nextDue == 0 ? "paid" : "partial"
+    mutate paidAt = nextDue == 0 ? now() : self.paidAt
+    emit InvoicePaymentApplied {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      paymentId: paymentId
+      paymentAmount: paymentAmount
+      amountPaid: nextPaid
+      amountDue: nextDue
+      status: nextDue == 0 ? "paid" : "partial"
+    }
+  }
+
+  command recordRefund(refundAmount: money(12, 2), paymentId: string) {
+    guard self.status == "paid" or self.status == "partial"
+    guard self.deletedAt == null
+    constraint refundPositive: refundAmount > 0 "Refund amount must be positive"
+    constraint refundWithinPaid: refundAmount <= self.amountPaid "Refund amount cannot exceed amount paid"
+    constraint refundPaymentId: length(trim(paymentId)) > 0 "Payment id is required for refund"
+    compute nextPaid = self.amountPaid - refundAmount
+    compute nextDue = self.amountDue + refundAmount
+    mutate amountPaid = nextPaid
+    mutate amountDue = nextDue
+    mutate status = "partial"
+    mutate paidAt = null
+    emit InvoiceRefundRecorded {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      paymentId: paymentId
+      refundAmount: refundAmount
+      amountPaid: nextPaid
+      amountDue: nextDue
+    }
+  }
+
+  command markOverdue() {
+    guard self.status == "sent" or self.status == "viewed" or self.status == "partial"
+    guard self.deletedAt == null
+    guard self.dueDate != null and self.dueDate < now()
+    mutate status = "overdue"
+    mutate overdueSince = now()
+    emit InvoiceMarkedOverdue {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      amountDue: self.amountDue
+    }
+  }
+
+  command markVoided(reason: string) {
+    guard self.status == "draft" or self.status == "sent" or self.status == "viewed" or self.status == "overdue"
+    guard self.deletedAt == null
+    guard self.amountPaid == 0
+    constraint voidReasonPresent: length(trim(reason)) > 0 "Void reason is required"
+    mutate status = "voided"
+    mutate voidReason = reason
+    mutate voidedAt = now()
+    emit InvoiceVoided {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      reason: reason
+    }
+  }
+
+  command writeOff(reason: string, writeOffAmount: money(12, 2)) {
+    guard self.status == "overdue" or self.status == "partial"
+    guard self.deletedAt == null
+    constraint writeOffReasonPresent: length(trim(reason)) > 0 "Write-off reason is required"
+    constraint writeOffPositive: writeOffAmount > 0 "Write-off amount must be positive"
+    constraint writeOffWithinDue: writeOffAmount <= self.amountDue "Write-off amount cannot exceed amount due"
+    mutate status = "written_off"
+    mutate amountDue = 0
+    mutate writeOffReason = reason
+    mutate writtenOffAt = now()
+    emit InvoiceWrittenOff {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      reason: reason
+      writeOffAmount: writeOffAmount
+    }
+  }
+
+  store Invoice in durable
+}
+
+event InvoiceIssued: "invoice.issued" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  invoiceNumber: string
+  total: money(12, 2)
+  amountDue: money(12, 2)
+}
+
+event InvoiceSent: "invoice.sent" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  invoiceNumber: string?
+  total: money(12, 2)
+  amountDue: money(12, 2)
+}
+
+event InvoiceViewed: "invoice.viewed" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+}
+
+event InvoicePaymentApplied: "invoice.payment_applied" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  paymentId: string?
+  paymentAmount: money(12, 2)
+  amountPaid: money(12, 2)
+  amountDue: money(12, 2)
+  status: InvoiceStatus
+}
+
+event InvoiceRefundRecorded: "invoice.refund_recorded" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  paymentId: string
+  refundAmount: money(12, 2)
+  amountPaid: money(12, 2)
+  amountDue: money(12, 2)
+}
+
+event InvoiceMarkedOverdue: "invoice.marked_overdue" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  amountDue: money(12, 2)
+}
+
+event InvoiceVoided: "invoice.voided" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  reason: string
+}
+
+event InvoiceWrittenOff: "invoice.written_off" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  reason: string
+  writeOffAmount: money(12, 2)
+}

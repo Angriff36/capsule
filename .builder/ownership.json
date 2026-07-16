@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "files": {},
+  "package": {
+    "dependencies": {},
+    "devDependencies": {},
+    "scripts": {}
+  },
+  "editableManifest": {
+    "paths": [
+      "manifest.config.yaml",
+      "src/culinary/dish.manifest",
+      "src/culinary/ingredient.manifest",
+      "src/culinary/menu.manifest",
+      "src/culinary/recipe.manifest",
+      "src/finance/closeout.manifest",
+      "src/finance/event-closeout.manifest",
+      "src/finance/payroll-input.manifest",
+      "src/foundation/base.manifest",
+      "src/identity/person.manifest",
+      "src/insights/report.manifest",
+      "src/inventory/demand.manifest",
+      "src/inventory/location.manifest",
+      "src/inventory/stock.manifest",
+      "src/logistics/delivery.manifest",
+      "src/logistics/pack-list.manifest",
+      "src/logistics/packing.manifest",
+      "src/operations/event.manifest",
+      "src/procurement/order.manifest",
+      "src/procurement/purchase-need.manifest",
+      "src/procurement/vendor.manifest",
+      "src/production/batch.manifest",
+      "src/production/prep.manifest",
+      "src/production/task.manifest",
+      "src/quality/allergen-check.manifest",
+      "src/quality/incident.manifest",
+      "src/sales/contact.manifest",
+      "src/sales/contract.manifest",
+      "src/sales/invoice-core.manifest",
+      "src/sales/invoice.manifest",
+      "src/sales/payment-method.manifest",
+      "src/sales/payment.manifest",
+      "src/sales/proposal.manifest",
+      "src/workforce/assignment.manifest",
+      "src/workforce/availability.manifest",
+      "src/workforce/shift.manifest",
+      "src/workforce/time.manifest"
+    ],
+    "configPath": "manifest.config.yaml"
+  }
+}

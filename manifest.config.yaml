@@ -1,0 +1,18 @@
+# Capsule Manifest project config (build-level).
+# Schema: @angriff36/manifest/docs/spec/config/manifest.config.schema.json
+#
+# Convex authContextImport is required for tenant + policy IR (PB025).
+# Builder convex-application preset v1.3.1 supplies the same option and emits
+# convex/lib/authContext.ts as the author seam (identity not inlined into
+# generated functions).
+
+src: src
+output: generated/ir
+
+projections:
+  convex:
+    output: convex
+    options:
+      authContextImport: ./lib/authContext
+      policyMode: enforce
+      includeTenantFilter: true

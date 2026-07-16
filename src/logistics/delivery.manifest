@@ -1,0 +1,239 @@
+// Capsule logistics — Delivery (transport of one PackList).
+// Maps product Delivery; capsule-pro evidence spans Dispatch/Route/Shipment.
+
+use "./pack-list.manifest"
+
+enum DeliveryStatus {
+  scheduled
+  in_transit
+  delivered
+  failed
+  cancelled
+}
+
+entity Delivery mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required packListId: uuid
+  property required eventId: uuid
+  property driverId: uuid?
+  property required destination: string = ""
+  property windowStartsAt: datetime?
+  property windowEndsAt: datetime?
+  property encrypted notes: string?
+  property required status: DeliveryStatus = "scheduled"
+  property scheduledAt: datetime?
+  property departedAt: datetime?
+  property deliveredAt: datetime?
+  property failedAt: datetime?
+  property failureReason: string?
+  property cancelledAt: datetime?
+  property cancellationReason: string?
+
+  belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo driver: Person fields [tenantId, driverId] references [tenantId, id]
+
+  constraint deliveryScheduledComplete: self.scheduledAt == null or (length(trim(self.destination)) > 0 and self.windowStartsAt != null and self.windowEndsAt != null and self.windowEndsAt > self.windowStartsAt) "Scheduled deliveries require a destination and a valid delivery window"
+
+  transition status from "scheduled" to ["in_transit", "failed", "cancelled"]
+  transition status from "in_transit" to ["delivered", "failed", "cancelled"]
+  transition status from "delivered" to []
+  transition status from "failed" to []
+  transition status from "cancelled" to []
+
+  default policy deliveryRead read: roleAllows(user.role, "logisticsAccess") "Logistics staff may read deliveries"
+  default policy deliveryWrite write: roleAllows(user.role, "logisticsAccess") "Logistics staff may write deliveries through commands"
+  default policy deliveryExecute execute: roleAllows(user.role, "logisticsAccess") "Logistics staff may execute delivery commands"
+
+  command schedule(
+    packListId: uuid,
+    eventId: uuid,
+    destination: string,
+    windowStartsAt: datetime,
+    windowEndsAt: datetime,
+    optional driverId: uuid,
+    optional notes: string
+  ) {
+    guard self.scheduledAt == null
+    guard self.status == "scheduled"
+    guard self.deletedAt == null
+    guard self.packList != null and (self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
+    guard self.event != null
+    constraint schedulePackListMatch: packListId == self.packListId "Schedule packListId must match the seeded pack list reference"
+    constraint scheduleEventMatch: eventId == self.eventId "Schedule eventId must match the seeded event reference"
+    constraint scheduleDriverMatch: driverId == null or self.driverId == null or driverId == self.driverId "Schedule driverId must match the seeded driver reference when provided"
+    constraint scheduleDestinationPresent: length(trim(destination)) > 0 "Delivery destination is required"
+    constraint scheduleWindowDates: windowEndsAt > windowStartsAt "Delivery window end must be after its start"
+    mutate packListId = packListId
+    mutate eventId = eventId
+    mutate destination = destination
+    mutate windowStartsAt = windowStartsAt
+    mutate windowEndsAt = windowEndsAt
+    mutate driverId = driverId != null ? driverId : self.driverId
+    mutate notes = notes != null ? notes : self.notes
+    mutate scheduledAt = now()
+    emit DeliveryScheduled {
+      deliveryId: self.id
+      tenantId: self.tenantId
+      packListId: packListId
+      eventId: eventId
+      driverId: driverId != null ? driverId : self.driverId
+      destination: destination
+      windowStartsAt: windowStartsAt
+      windowEndsAt: windowEndsAt
+      status: "scheduled"
+    }
+  }
+
+  command startTransit() {
+    guard self.status == "scheduled"
+    guard self.scheduledAt != null
+    guard self.driverId != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.driverId == user.id or roleAllows(user.role, "logisticsManageAccess")
+    compute previousStatus = self.status
+    mutate status = "in_transit"
+    mutate departedAt = now()
+    emit DeliveryTransitStarted {
+      deliveryId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      eventId: self.eventId
+      driverId: self.driverId
+      previousStatus: previousStatus
+      status: "in_transit"
+      departedAt: self.departedAt
+    }
+  }
+
+  command confirmDelivery() {
+    guard self.status == "in_transit"
+    guard self.departedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.driverId == user.id or roleAllows(user.role, "logisticsManageAccess")
+    compute previousStatus = self.status
+    mutate status = "delivered"
+    mutate deliveredAt = now()
+    emit DeliveryConfirmed {
+      deliveryId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      eventId: self.eventId
+      driverId: self.driverId
+      previousStatus: previousStatus
+      status: "delivered"
+      deliveredAt: self.deliveredAt
+    }
+  }
+
+  command markFailed(reason: string) {
+    guard self.status == "scheduled" or self.status == "in_transit"
+    guard self.scheduledAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "logisticsManageAccess")
+    constraint failDeliveryReason: length(trim(reason)) > 0 "Failure reason is required"
+    compute previousStatus = self.status
+    mutate status = "failed"
+    mutate failedAt = now()
+    mutate failureReason = reason
+    emit DeliveryFailed {
+      deliveryId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      eventId: self.eventId
+      driverId: self.driverId
+      previousStatus: previousStatus
+      status: "failed"
+      reason: reason
+    }
+  }
+
+  command cancel(reason: string) {
+    guard self.status == "scheduled" or self.status == "in_transit"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "logisticsManageAccess")
+    constraint cancelDeliveryReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit DeliveryCancelled {
+      deliveryId: self.id
+      tenantId: self.tenantId
+      packListId: self.packListId
+      eventId: self.eventId
+      driverId: self.driverId
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
+  store Delivery in durable
+}
+
+event DeliveryScheduled: "delivery.scheduled" {
+  deliveryId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  driverId: string?
+  destination: string
+  windowStartsAt: datetime
+  windowEndsAt: datetime
+  status: DeliveryStatus
+}
+
+event DeliveryTransitStarted: "delivery.transit_started" {
+  deliveryId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  driverId: string?
+  previousStatus: DeliveryStatus
+  status: DeliveryStatus
+  departedAt: datetime?
+}
+
+event DeliveryConfirmed: "delivery.confirmed" {
+  deliveryId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  driverId: string?
+  previousStatus: DeliveryStatus
+  status: DeliveryStatus
+  deliveredAt: datetime?
+}
+
+event DeliveryFailed: "delivery.failed" {
+  deliveryId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  driverId: string?
+  previousStatus: DeliveryStatus
+  status: DeliveryStatus
+  reason: string
+}
+
+event DeliveryCancelled: "delivery.cancelled" {
+  deliveryId: string
+  tenantId: string
+  packListId: string
+  eventId: string
+  driverId: string?
+  previousStatus: DeliveryStatus
+  status: DeliveryStatus
+  reason: string
+}
+
+// EventCancelled → cancel scheduled/in-transit deliveries for that event.
+on EventCancelled fanOut Delivery where eventId = payload.eventId
+  run cancel
+  params { reason: payload.reason }

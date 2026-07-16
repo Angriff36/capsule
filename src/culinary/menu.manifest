@@ -1,0 +1,397 @@
+// Capsule culinary menu and event dish selection.
+// Compile entry: reaches Dish (dish.manifest) and culinary building blocks.
+
+use "./dish.manifest"
+
+enum MenuStatus {
+  draft
+  published
+  archived
+}
+
+// Named curated offering. MenuDish (M:N Menu↔Dish lines) is deferred — the
+// 3-entity cap keeps EventDish for demand-driving event selection (D018).
+entity Menu mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property description: string?
+  property category: string?
+  property required isTemplate: boolean = false
+  property required basePrice: money(12, 2) = 0
+  property required pricePerPerson: money(12, 2) = 0
+  property required minGuests: int = 0
+  property required maxGuests: int = 0
+  property required status: MenuStatus = "draft"
+  property draftedAt: datetime?
+  property publishedAt: datetime?
+  property archivedAt: datetime?
+  property archiveReason: string?
+
+  computed isPublished: boolean = self.status == "published"
+  computed isEditable: boolean = self.status == "draft"
+
+  constraint menuIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Drafted menus require a name"
+  constraint menuPricingNonnegative: self.basePrice >= 0 and self.pricePerPerson >= 0 "Menu pricing cannot be negative"
+  constraint menuGuestBounds: self.minGuests >= 0 and self.maxGuests >= 0 and (self.maxGuests == 0 or self.maxGuests >= self.minGuests) "Menu max guests must be zero (unlimited) or at least min guests"
+
+  transition status from "draft" to ["published", "archived"]
+  transition status from "published" to ["draft", "archived"]
+  transition status from "archived" to ["draft"]
+
+  default policy menuRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read menus"
+  default policy menuWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write menus through commands"
+  default policy menuExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute menu commands"
+
+  command draft(
+    name: string,
+    optional description: string,
+    optional category: string,
+    optional isTemplate: boolean,
+    optional basePrice: money(12, 2),
+    optional pricePerPerson: money(12, 2),
+    optional minGuests: number,
+    optional maxGuests: number
+  ) {
+    guard self.draftedAt == null
+    guard self.deletedAt == null
+    constraint draftMenuName: length(trim(name)) > 0 "Menu name is required"
+    constraint draftMenuPricing: (basePrice == null or basePrice >= 0) and (pricePerPerson == null or pricePerPerson >= 0) "Menu pricing cannot be negative"
+    constraint draftMenuGuests: (minGuests == null or minGuests >= 0) and (maxGuests == null or maxGuests >= 0) and (minGuests == null or maxGuests == null or maxGuests == 0 or maxGuests >= minGuests) "Menu max guests must be zero (unlimited) or at least min guests"
+    mutate name = name
+    mutate description = description
+    mutate category = category
+    mutate isTemplate = isTemplate != null ? isTemplate : false
+    mutate basePrice = basePrice != null ? basePrice : 0
+    mutate pricePerPerson = pricePerPerson != null ? pricePerPerson : 0
+    mutate minGuests = minGuests != null ? minGuests : 0
+    mutate maxGuests = maxGuests != null ? maxGuests : 0
+    mutate draftedAt = now()
+    emit MenuDrafted {
+      menuId: self.id
+      tenantId: self.tenantId
+      name: name
+      isTemplate: isTemplate != null ? isTemplate : false
+    }
+  }
+
+  command reviseDetails(
+    name: string,
+    optional description: string,
+    optional category: string,
+    optional isTemplate: boolean
+  ) {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    constraint reviseMenuName: length(trim(name)) > 0 "Menu name is required"
+    mutate name = name
+    mutate description = description
+    mutate category = category
+    mutate isTemplate = isTemplate != null ? isTemplate : self.isTemplate
+    emit MenuDetailsRevised {
+      menuId: self.id
+      tenantId: self.tenantId
+      name: name
+    }
+  }
+
+  command updatePricing(
+    basePrice: money(12, 2),
+    pricePerPerson: money(12, 2),
+    minGuests: number,
+    maxGuests: number
+  ) {
+    guard self.status == "draft" or self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint pricingMenuNonnegative: basePrice >= 0 and pricePerPerson >= 0 "Menu pricing cannot be negative"
+    constraint pricingMenuGuests: minGuests >= 0 and maxGuests >= 0 and (maxGuests == 0 or maxGuests >= minGuests) "Menu max guests must be zero (unlimited) or at least min guests"
+    mutate basePrice = basePrice
+    mutate pricePerPerson = pricePerPerson
+    mutate minGuests = minGuests
+    mutate maxGuests = maxGuests
+    emit MenuPricingUpdated {
+      menuId: self.id
+      tenantId: self.tenantId
+      basePrice: basePrice
+      pricePerPerson: pricePerPerson
+      minGuests: minGuests
+      maxGuests: maxGuests
+    }
+  }
+
+  command markPublished() {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "published"
+    mutate publishedAt = now()
+    emit MenuPublished {
+      menuId: self.id
+      tenantId: self.tenantId
+      name: self.name
+    }
+  }
+
+  command unpublish(reason: string) {
+    guard self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint unpublishMenuReason: length(trim(reason)) > 0 "Unpublish reason is required"
+    mutate status = "draft"
+    mutate publishedAt = null
+    emit MenuUnpublished {
+      menuId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command archive(reason: string) {
+    guard self.status == "draft" or self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint archiveMenuReason: length(trim(reason)) > 0 "Archive reason is required"
+    mutate status = "archived"
+    mutate archivedAt = now()
+    mutate archiveReason = reason
+    emit MenuArchived {
+      menuId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command restore() {
+    guard self.status == "archived"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "draft"
+    mutate archivedAt = null
+    mutate archiveReason = null
+    mutate publishedAt = null
+    emit MenuRestored {
+      menuId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Menu in durable
+}
+
+// Event-selected dish with servings — drives later demand recalculation.
+entity EventDish mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required dishId: uuid
+  property required quantityServings: int = 1
+  property course: string?
+  property serviceStyle: string?
+  property specialInstructions: string?
+  property selectedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+
+  constraint eventDishServingsPositive: self.selectedAt == null or self.quantityServings > 0 "Event dish servings must be positive"
+
+  default policy eventDishRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read event dish selections"
+  default policy eventDishWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may write event dish selections through commands"
+  default policy eventDishExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may execute event dish selection commands"
+
+  command select(
+    eventId: uuid,
+    dishId: uuid,
+    quantityServings: number,
+    optional course: string,
+    optional serviceStyle: string,
+    optional specialInstructions: string
+  ) {
+    guard self.selectedAt == null
+    guard self.deletedAt == null
+    // Stage check uses belongsTo traversal (semantics.md relationship
+    // resolution in guard expressions). Seed eventId before select so the
+    // parent Event resolves; param must match the seeded FK.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved")
+    constraint selectEventMatch: eventId == self.eventId "Select eventId must match the seeded event reference"
+    constraint selectServingsPositive: quantityServings > 0 "Event dish servings must be positive"
+    mutate eventId = eventId
+    mutate dishId = dishId
+    mutate quantityServings = quantityServings
+    mutate course = course
+    mutate serviceStyle = serviceStyle
+    mutate specialInstructions = specialInstructions
+    mutate selectedAt = now()
+    emit EventDishSelected {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      dishId: dishId
+      quantityServings: quantityServings
+      course: course
+      serviceStyle: serviceStyle
+    }
+  }
+
+  command adjustServings(quantityServings: number) {
+    guard self.selectedAt != null
+    guard self.deletedAt == null
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved")
+    constraint adjustServingsPositive: quantityServings > 0 "Event dish servings must be positive"
+    compute previousQuantityServings = self.quantityServings
+    mutate quantityServings = quantityServings
+    emit EventDishServingsAdjusted {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      previousQuantityServings: previousQuantityServings
+      quantityServings: quantityServings
+    }
+  }
+
+  command changeCourse(optional course: string, optional serviceStyle: string) {
+    guard self.selectedAt != null
+    guard self.deletedAt == null
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved")
+    mutate course = course
+    mutate serviceStyle = serviceStyle
+    emit EventDishCourseChanged {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      course: course
+      serviceStyle: serviceStyle
+    }
+  }
+
+  command updateInstructions(optional specialInstructions: string) {
+    guard self.selectedAt != null
+    guard self.deletedAt == null
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved")
+    mutate specialInstructions = specialInstructions
+    emit EventDishInstructionsUpdated {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+    }
+  }
+
+  command remove(reason: string) {
+    guard self.selectedAt != null
+    guard self.deletedAt == null
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved")
+    constraint removeEventDishReason: length(trim(reason)) > 0 "Removal reason is required"
+    compute previousQuantityServings = self.quantityServings
+    mutate deletedAt = now()
+    mutate removedAt = now()
+    emit EventDishRemoved {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      previousQuantityServings: previousQuantityServings
+      reason: reason
+    }
+  }
+
+  store EventDish in durable
+}
+
+event MenuDrafted: "menu.drafted" {
+  menuId: string
+  tenantId: string
+  name: string
+  isTemplate: boolean
+}
+
+event MenuDetailsRevised: "menu.details_revised" {
+  menuId: string
+  tenantId: string
+  name: string
+}
+
+event MenuPricingUpdated: "menu.pricing_updated" {
+  menuId: string
+  tenantId: string
+  basePrice: money(12, 2)
+  pricePerPerson: money(12, 2)
+  minGuests: number
+  maxGuests: number
+}
+
+event MenuPublished: "menu.published" {
+  menuId: string
+  tenantId: string
+  name: string
+}
+
+event MenuUnpublished: "menu.unpublished" {
+  menuId: string
+  tenantId: string
+  reason: string
+}
+
+event MenuArchived: "menu.archived" {
+  menuId: string
+  tenantId: string
+  reason: string
+}
+
+event MenuRestored: "menu.restored" {
+  menuId: string
+  tenantId: string
+}
+
+event EventDishSelected: "event_dish.selected" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  quantityServings: number
+  course: string?
+  serviceStyle: string?
+}
+
+event EventDishServingsAdjusted: "event_dish.servings_adjusted" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  previousQuantityServings: number
+  quantityServings: number
+}
+
+event EventDishCourseChanged: "event_dish.course_changed" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  course: string?
+  serviceStyle: string?
+}
+
+event EventDishInstructionsUpdated: "event_dish.instructions_updated" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+}
+
+event EventDishRemoved: "event_dish.removed" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  previousQuantityServings: number
+  reason: string
+}

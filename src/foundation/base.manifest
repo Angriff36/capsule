@@ -1,0 +1,254 @@
+// Capsule foundation — single tenant declaration, role hierarchy, shared
+// mixins, and the Organization account that operates inside a tenant.
+//
+// Every later domain file must `use` this module (or a successor entry that
+// re-exports it) so tenant/roles are declared exactly once.
+
+tenant tenantId : string from context.tenantId
+
+// ---------------------------------------------------------------------------
+// Roles — capability hierarchy for Capsule operators.
+// Policies check roleAllows(user.role, "<capability>"); never role-name lists.
+// Unknown roles deny by default. Deny is absolute over inherited allows.
+// ---------------------------------------------------------------------------
+
+role staff {
+  allow staffAccess
+}
+
+role kitchen_staff extends staff {
+  allow kitchenAccess
+}
+
+role kitchen_lead extends kitchen_staff {
+  allow kitchenLeadAccess
+}
+
+role sales_staff extends staff {
+  allow salesAccess
+}
+
+role event_staff extends staff {
+  allow eventAccess
+}
+
+role inventory_staff extends staff {
+  allow inventoryAccess
+}
+
+role procurement_staff extends inventory_staff {
+  allow procurementAccess
+}
+
+role logistics_staff extends staff {
+  allow logisticsAccess
+}
+
+role driver extends logistics_staff {}
+
+role workforce_staff extends staff {
+  allow workforceAccess
+}
+
+role finance_staff extends staff {
+  allow financeAccess
+}
+
+role manager extends staff {
+  allow manageAccess
+}
+
+role kitchen_manager extends manager {
+  allow kitchenAccess
+  allow kitchenLeadAccess
+  allow kitchenManageAccess
+}
+
+role sales_manager extends manager {
+  allow salesAccess
+  allow salesManageAccess
+}
+
+role event_manager extends manager {
+  allow eventAccess
+  allow eventManageAccess
+}
+
+role inventory_manager extends manager {
+  allow inventoryAccess
+  allow procurementAccess
+  allow inventoryManageAccess
+}
+
+role logistics_manager extends manager {
+  allow logisticsAccess
+  allow logisticsManageAccess
+}
+
+role workforce_manager extends manager {
+  allow workforceAccess
+  allow workforceManageAccess
+}
+
+role finance_manager extends manager {
+  allow financeAccess
+  allow financeManageAccess
+}
+
+role admin extends manager {
+  allow adminAccess
+  allow kitchenAccess
+  allow kitchenLeadAccess
+  allow kitchenManageAccess
+  allow salesAccess
+  allow salesManageAccess
+  allow eventAccess
+  allow eventManageAccess
+  allow inventoryAccess
+  allow procurementAccess
+  allow inventoryManageAccess
+  allow logisticsAccess
+  allow logisticsManageAccess
+  allow workforceAccess
+  allow workforceManageAccess
+  allow financeAccess
+  allow financeManageAccess
+}
+
+role owner extends admin {}
+
+role system extends admin {}
+
+// ---------------------------------------------------------------------------
+// Mixins — applied with header form: `entity X mixin TenantScoped, SoftDeletable`
+// Modifier keywords must follow `property` (e.g. `property indexed required`).
+// ---------------------------------------------------------------------------
+
+entity TenantScoped {
+  property required id: uuid
+  // Must match tenant declaration / context.tenantId (string), not uuid.
+  property indexed required tenantId: string
+}
+
+entity SoftDeletable {
+  property deletedAt: datetime?
+}
+
+// ---------------------------------------------------------------------------
+// Organization — catering operator account inside a tenant.
+// ---------------------------------------------------------------------------
+
+enum OrganizationStatus {
+  active
+  suspended
+  deactivated
+}
+
+entity Organization mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string
+  property required status: OrganizationStatus = "active"
+
+  computed isOperable: boolean = self.status == "active" and self.deletedAt == null
+
+  constraint namePresent: length(trim(self.name)) > 0 "Organization name is required"
+
+  transition status from "active" to ["suspended", "deactivated"]
+  transition status from "suspended" to ["active", "deactivated"]
+  transition status from "deactivated" to []
+
+  default policy organizationRead read: roleAllows(user.role, "staffAccess") "Staff may read organization records"
+  default policy organizationWrite write: roleAllows(user.role, "manageAccess") "Managers may write organization records"
+  default policy organizationExecute execute: roleAllows(user.role, "manageAccess") "Managers may execute organization commands"
+
+  // Stricter than default manageAccess: admin-only registration.
+  // Named non-default policies do not attach to commands on Manifest 3.6.3 —
+  // use a command guard (see docs/projection-blockers.md PB004).
+  command register(name: string) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint registerName: length(trim(name)) > 0 "Organization name is required"
+    mutate name = name
+    emit OrganizationRegistered {
+      organizationId: self.id
+      tenantId: self.tenantId
+      name: name
+    }
+  }
+
+  command rename(name: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint renameName: length(trim(name)) > 0 "Organization name is required"
+    mutate name = name
+    emit OrganizationRenamed {
+      organizationId: self.id
+      tenantId: self.tenantId
+      name: name
+    }
+  }
+
+  command suspend(reason: string = "") {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate status = "suspended"
+    emit OrganizationSuspended {
+      organizationId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "suspended"
+    guard self.deletedAt == null
+    mutate status = "active"
+    emit OrganizationReactivated {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command deactivate() {
+    guard self.status == "active" or self.status == "suspended"
+    mutate status = "deactivated"
+    mutate deletedAt = now()
+    emit OrganizationDeactivated {
+      organizationId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Organization in durable
+}
+
+event OrganizationRegistered: "organization.registered" {
+  organizationId: string
+  tenantId: string
+  name: string
+}
+
+event OrganizationRenamed: "organization.renamed" {
+  organizationId: string
+  tenantId: string
+  name: string
+}
+
+event OrganizationSuspended: "organization.suspended" {
+  organizationId: string
+  tenantId: string
+  reason: string
+}
+
+event OrganizationReactivated: "organization.reactivated" {
+  organizationId: string
+  tenantId: string
+}
+
+event OrganizationDeactivated: "organization.deactivated" {
+  organizationId: string
+  tenantId: string
+}

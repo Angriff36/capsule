@@ -1,0 +1,163 @@
+// Capsule sales — ClientContact under a Client account (D008 delivery).
+// Compile chain continues via contract.manifest / proposal.manifest.
+// Lead, ClientInteraction, ClientPreference deferred (OD037).
+
+use "../workforce/time.manifest"
+
+enum ClientContactStatus {
+  active
+  removed
+}
+
+// Person-level contact for a Client. Single-primary-per-client is not
+// expressible as a per-instance constraint or conditional unique (OD036).
+entity ClientContact mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required clientId: uuid
+  property searchable givenName: string?
+  property searchable familyName: string?
+  property title: string?
+  property encrypted email: string?
+  property encrypted phone: string?
+  property encrypted mobile: string?
+  property required isPrimary: boolean = false
+  property required isBillingContact: boolean = false
+  property notes: string?
+  property required status: ClientContactStatus = "active"
+  property addedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+
+  constraint contactIdentityComplete: self.addedAt == null or (self.givenName != null and length(trim(self.givenName)) > 0) "Active contacts require a given name"
+
+  transition status from "active" to ["removed"]
+  transition status from "removed" to []
+
+  default policy clientContactRead read: roleAllows(user.role, "salesAccess") "Sales staff may read client contacts"
+  default policy clientContactWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write client contacts through commands"
+  default policy clientContactExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute client contact commands"
+
+  command add(
+    clientId: uuid,
+    givenName: string,
+    optional familyName: string,
+    optional title: string,
+    optional email: string,
+    optional phone: string,
+    optional mobile: string,
+    optional isPrimary: boolean,
+    optional isBillingContact: boolean,
+    optional notes: string
+  ) {
+    guard self.addedAt == null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard self.client != null
+    constraint addClientMatch: clientId == self.clientId "Add clientId must match the seeded client reference"
+    constraint addGivenName: length(trim(givenName)) > 0 "Contact given name is required"
+    mutate clientId = clientId
+    mutate givenName = givenName
+    mutate familyName = familyName
+    mutate title = title
+    mutate email = email
+    mutate phone = phone
+    mutate mobile = mobile
+    mutate isPrimary = isPrimary != null ? isPrimary : false
+    mutate isBillingContact = isBillingContact != null ? isBillingContact : false
+    mutate notes = notes
+    mutate addedAt = now()
+    emit ClientContactAdded {
+      clientContactId: self.id
+      tenantId: self.tenantId
+      clientId: clientId
+      isPrimary: isPrimary != null ? isPrimary : false
+      isBillingContact: isBillingContact != null ? isBillingContact : false
+    }
+  }
+
+  command updateDetails(
+    givenName: string,
+    optional familyName: string,
+    optional title: string,
+    optional email: string,
+    optional phone: string,
+    optional mobile: string,
+    optional isBillingContact: boolean,
+    optional notes: string
+  ) {
+    guard self.status == "active"
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint updateGivenName: length(trim(givenName)) > 0 "Contact given name is required"
+    mutate givenName = givenName
+    mutate familyName = familyName != null ? familyName : self.familyName
+    mutate title = title != null ? title : self.title
+    mutate email = email != null ? email : self.email
+    mutate phone = phone != null ? phone : self.phone
+    mutate mobile = mobile != null ? mobile : self.mobile
+    mutate isBillingContact = isBillingContact != null ? isBillingContact : self.isBillingContact
+    mutate notes = notes != null ? notes : self.notes
+    emit ClientContactDetailsUpdated {
+      clientContactId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  command setPrimary() {
+    guard self.status == "active"
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    mutate isPrimary = true
+    emit ClientContactPrimarySet {
+      clientContactId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  command remove() {
+    guard self.status == "active"
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    mutate status = "removed"
+    mutate removedAt = now()
+    emit ClientContactRemoved {
+      clientContactId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  store ClientContact in durable
+}
+
+event ClientContactAdded: "client_contact.added" {
+  clientContactId: string
+  tenantId: string
+  clientId: string
+  isPrimary: boolean
+  isBillingContact: boolean
+}
+
+event ClientContactDetailsUpdated: "client_contact.details_updated" {
+  clientContactId: string
+  tenantId: string
+  clientId: string
+}
+
+event ClientContactPrimarySet: "client_contact.primary_set" {
+  clientContactId: string
+  tenantId: string
+  clientId: string
+}
+
+event ClientContactRemoved: "client_contact.removed" {
+  clientContactId: string
+  tenantId: string
+  clientId: string
+}

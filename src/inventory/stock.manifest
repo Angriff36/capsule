@@ -1,0 +1,469 @@
+// Capsule inventory foundation — on-hand stock and per-event reservations.
+// ~~Demand Requirements, Waste, and procurement are later slices.~~
+// Demand + waste: `demand.manifest` (2026-07-15). Procurement is next.
+// Compile entry for this file alone still reaches culinary + operations via location → menu.
+
+use "./location.manifest"
+
+enum InventoryReservationStatus {
+  pending
+  active
+  released
+  consumed
+}
+
+// On-hand stock of one Ingredient at one StorageLocation (product StockItem;
+// folds capsule-pro InventoryStock into the primary stock entity).
+entity InventoryItem mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, ingredientId, locationId]
+  timestamps
+  versionProperty version: number
+
+  property required ingredientId: uuid
+  property required locationId: uuid
+  property required quantityOnHand: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required parLevel: decimal(12, 4) = 0
+  property required reorderThreshold: decimal(12, 4) = 0
+  property required unitCost: money(12, 2) = 0
+  property stockedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
+  hasMany reservations: InventoryReservation
+
+  computed isBelowPar: boolean = self.parLevel > 0 and self.quantityOnHand < self.parLevel
+  computed isBelowReorder: boolean = self.reorderThreshold > 0 and self.quantityOnHand < self.reorderThreshold
+  computed inventoryValue: money(12, 2) = self.quantityOnHand * self.unitCost
+
+  constraint stockNonnegative: self.stockedAt == null or self.quantityOnHand >= 0 "Quantity on hand cannot be negative"
+  constraint stockParNonnegative: self.parLevel >= 0 "Par level cannot be negative"
+  constraint stockReorderNonnegative: self.reorderThreshold >= 0 "Reorder threshold cannot be negative"
+  constraint stockCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
+
+  default policy inventoryItemRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read stock items"
+  default policy inventoryItemWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write stock items through commands"
+  default policy inventoryItemExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute stock item commands"
+
+  command open(
+    ingredientId: uuid,
+    locationId: uuid,
+    unit: UnitOfMeasure,
+    optional quantityOnHand: decimal(12, 4),
+    optional parLevel: decimal(12, 4),
+    optional reorderThreshold: decimal(12, 4),
+    optional unitCost: money(12, 2)
+  ) {
+    guard self.stockedAt == null
+    guard self.deletedAt == null
+    constraint openStockIngredientMatch: ingredientId == self.ingredientId "Open ingredientId must match the seeded ingredient reference"
+    constraint openStockLocationMatch: locationId == self.locationId "Open locationId must match the seeded location reference"
+    constraint openStockQuantityNonnegative: quantityOnHand == null or quantityOnHand >= 0 "Quantity on hand cannot be negative"
+    constraint openStockParNonnegative: parLevel == null or parLevel >= 0 "Par level cannot be negative"
+    constraint openStockReorderNonnegative: reorderThreshold == null or reorderThreshold >= 0 "Reorder threshold cannot be negative"
+    constraint openStockCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    compute previousQuantity = self.quantityOnHand
+    mutate ingredientId = ingredientId
+    mutate locationId = locationId
+    mutate unit = unit
+    mutate quantityOnHand = quantityOnHand != null ? quantityOnHand : 0
+    mutate parLevel = parLevel != null ? parLevel : 0
+    mutate reorderThreshold = reorderThreshold != null ? reorderThreshold : 0
+    mutate unitCost = unitCost != null ? unitCost : 0
+    mutate stockedAt = now()
+    emit InventoryItemOpened {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      ingredientId: ingredientId
+      locationId: locationId
+      previousQuantity: previousQuantity
+      quantityOnHand: quantityOnHand != null ? quantityOnHand : 0
+      unit: unit
+      unitCost: unitCost != null ? unitCost : 0
+    }
+  }
+
+  command receiveStock(quantity: decimal(12, 4), optional unitCost: money(12, 2)) {
+    guard self.stockedAt != null
+    guard self.deletedAt == null
+    constraint receiveQuantityPositive: quantity > 0 "Received quantity must be positive"
+    constraint receiveCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    compute previousQuantity = self.quantityOnHand
+    compute nextQuantity = self.quantityOnHand + quantity
+    mutate quantityOnHand = nextQuantity
+    mutate unitCost = unitCost != null ? unitCost : self.unitCost
+    emit InventoryStockReceived {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      previousQuantity: previousQuantity
+      quantityOnHand: nextQuantity
+      receivedQuantity: quantity
+      unit: self.unit
+      unitCost: unitCost != null ? unitCost : self.unitCost
+    }
+  }
+
+  command adjustQuantity(delta: decimal(12, 4), reason: string) {
+    guard self.stockedAt != null
+    guard self.deletedAt == null
+    constraint adjustReasonRequired: length(trim(reason)) > 0 "Adjustment reason is required"
+    constraint adjustResultNonnegative: self.quantityOnHand + delta >= 0 "Quantity on hand cannot be negative"
+    compute previousQuantity = self.quantityOnHand
+    compute nextQuantity = self.quantityOnHand + delta
+    mutate quantityOnHand = nextQuantity
+    emit InventoryQuantityAdjusted {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      previousQuantity: previousQuantity
+      quantityOnHand: nextQuantity
+      delta: delta
+      unit: self.unit
+      reason: reason
+    }
+  }
+
+  command recount(actualQuantity: decimal(12, 4)) {
+    guard self.stockedAt != null
+    guard self.deletedAt == null
+    constraint recountNonnegative: actualQuantity >= 0 "Recount quantity cannot be negative"
+    compute previousQuantity = self.quantityOnHand
+    mutate quantityOnHand = actualQuantity
+    emit InventoryRecounted {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      previousQuantity: previousQuantity
+      quantityOnHand: actualQuantity
+      unit: self.unit
+    }
+  }
+
+  command transferOut(quantity: decimal(12, 4), destinationLocationId: uuid) {
+    guard self.stockedAt != null
+    guard self.deletedAt == null
+    constraint transferOutPositive: quantity > 0 "Transfer quantity must be positive"
+    constraint transferOutAvailable: self.quantityOnHand >= quantity "Cannot transfer more than quantity on hand"
+    compute previousQuantity = self.quantityOnHand
+    compute nextQuantity = self.quantityOnHand - quantity
+    mutate quantityOnHand = nextQuantity
+    emit InventoryTransferredOut {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      destinationLocationId: destinationLocationId
+      previousQuantity: previousQuantity
+      quantityOnHand: nextQuantity
+      transferredQuantity: quantity
+      unit: self.unit
+    }
+  }
+
+  command transferIn(quantity: decimal(12, 4), sourceLocationId: uuid) {
+    guard self.stockedAt != null
+    guard self.deletedAt == null
+    constraint transferInPositive: quantity > 0 "Transfer quantity must be positive"
+    compute previousQuantity = self.quantityOnHand
+    compute nextQuantity = self.quantityOnHand + quantity
+    mutate quantityOnHand = nextQuantity
+    emit InventoryTransferredIn {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      sourceLocationId: sourceLocationId
+      previousQuantity: previousQuantity
+      quantityOnHand: nextQuantity
+      transferredQuantity: quantity
+      unit: self.unit
+    }
+  }
+
+  command updateLevels(
+    parLevel: decimal(12, 4),
+    reorderThreshold: decimal(12, 4),
+    optional unitCost: money(12, 2)
+  ) {
+    guard self.stockedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    constraint levelsParNonnegative: parLevel >= 0 "Par level cannot be negative"
+    constraint levelsReorderNonnegative: reorderThreshold >= 0 "Reorder threshold cannot be negative"
+    constraint levelsCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    mutate parLevel = parLevel
+    mutate reorderThreshold = reorderThreshold
+    mutate unitCost = unitCost != null ? unitCost : self.unitCost
+    emit InventoryLevelsUpdated {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      parLevel: parLevel
+      reorderThreshold: reorderThreshold
+      unitCost: unitCost != null ? unitCost : self.unitCost
+    }
+  }
+
+  command remove(reason: string) {
+    guard self.stockedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    constraint removeStockReason: length(trim(reason)) > 0 "Removal reason is required"
+    compute previousQuantity = self.quantityOnHand
+    mutate deletedAt = now()
+    mutate removedAt = now()
+    emit InventoryItemRemoved {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      previousQuantity: previousQuantity
+      quantityOnHand: self.quantityOnHand
+      reason: reason
+    }
+  }
+
+  store InventoryItem in durable
+}
+
+// Quantity of an InventoryItem held for an Event. Capsule-pro only stored
+// aggregate quantityReserved; this entity is the durable per-event fact
+// cancellation-release flows will consume (reactions deferred).
+entity InventoryReservation mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required inventoryItemId: uuid
+  property required eventId: uuid
+  property required ingredientId: uuid
+  property required quantity: decimal(12, 4) = 0
+  property required status: InventoryReservationStatus = "pending"
+  property reservedAt: datetime?
+  property releasedAt: datetime?
+  property consumedAt: datetime?
+  property releaseReason: string?
+
+  belongsTo inventoryItem: InventoryItem fields [tenantId, inventoryItemId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+
+  constraint reservationQuantityPositive: self.reservedAt == null or self.quantity > 0 "Reservation quantity must be positive"
+
+  transition status from "pending" to ["active"]
+  transition status from "active" to ["released", "consumed"]
+  transition status from "released" to []
+  transition status from "consumed" to []
+
+  default policy inventoryReservationRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read inventory reservations"
+  default policy inventoryReservationWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write inventory reservations through commands"
+  default policy inventoryReservationExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute inventory reservation commands"
+
+  command reserve(
+    inventoryItemId: uuid,
+    eventId: uuid,
+    ingredientId: uuid,
+    quantity: decimal(12, 4)
+  ) {
+    guard self.reservedAt == null
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    // Stage check uses belongsTo traversal (semantics.md relationship
+    // resolution in guard expressions). Seed eventId before reserve so the
+    // parent Event resolves; param must match the seeded FK.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    guard self.inventoryItem != null and self.inventoryItem.stockedAt != null and self.inventoryItem.deletedAt == null
+    constraint reserveItemMatch: inventoryItemId == self.inventoryItemId "Reserve inventoryItemId must match the seeded stock reference"
+    constraint reserveEventMatch: eventId == self.eventId "Reserve eventId must match the seeded event reference"
+    constraint reserveIngredientMatch: ingredientId == self.inventoryItem.ingredientId "Reserve ingredientId must match the stock ingredient"
+    constraint reserveQuantityPositive: quantity > 0 "Reservation quantity must be positive"
+    mutate inventoryItemId = inventoryItemId
+    mutate eventId = eventId
+    mutate ingredientId = ingredientId
+    mutate quantity = quantity
+    mutate status = "active"
+    mutate reservedAt = now()
+    emit InventoryReserved {
+      inventoryReservationId: self.id
+      tenantId: self.tenantId
+      inventoryItemId: inventoryItemId
+      eventId: eventId
+      ingredientId: ingredientId
+      quantity: quantity
+    }
+  }
+
+  command release(reason: string) {
+    guard self.status == "active"
+    guard self.reservedAt != null
+    guard self.deletedAt == null
+    constraint releaseReasonRequired: length(trim(reason)) > 0 "Release reason is required"
+    compute previousQuantity = self.quantity
+    mutate status = "released"
+    mutate releasedAt = now()
+    mutate releaseReason = reason
+    emit InventoryReservationReleased {
+      inventoryReservationId: self.id
+      tenantId: self.tenantId
+      inventoryItemId: self.inventoryItemId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      previousQuantity: previousQuantity
+      quantity: self.quantity
+      reason: reason
+    }
+  }
+
+  command consume() {
+    guard self.status == "active"
+    guard self.reservedAt != null
+    guard self.deletedAt == null
+    compute previousQuantity = self.quantity
+    mutate status = "consumed"
+    mutate consumedAt = now()
+    emit InventoryReservationConsumed {
+      inventoryReservationId: self.id
+      tenantId: self.tenantId
+      inventoryItemId: self.inventoryItemId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      previousQuantity: previousQuantity
+      quantity: self.quantity
+    }
+  }
+
+  store InventoryReservation in durable
+}
+
+event InventoryItemOpened: "inventory_item.opened" {
+  inventoryItemId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  previousQuantity: decimal(12, 4)
+  quantityOnHand: decimal(12, 4)
+  unit: UnitOfMeasure
+  unitCost: money(12, 2)
+}
+
+event InventoryStockReceived: "inventory_item.stock_received" {
+  inventoryItemId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  previousQuantity: decimal(12, 4)
+  quantityOnHand: decimal(12, 4)
+  receivedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  unitCost: money(12, 2)
+}
+
+event InventoryQuantityAdjusted: "inventory_item.quantity_adjusted" {
+  inventoryItemId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  previousQuantity: decimal(12, 4)
+  quantityOnHand: decimal(12, 4)
+  delta: decimal(12, 4)
+  unit: UnitOfMeasure
+  reason: string
+}
+
+event InventoryRecounted: "inventory_item.recounted" {
+  inventoryItemId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  previousQuantity: decimal(12, 4)
+  quantityOnHand: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event InventoryTransferredOut: "inventory_item.transferred_out" {
+  inventoryItemId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  destinationLocationId: string
+  previousQuantity: decimal(12, 4)
+  quantityOnHand: decimal(12, 4)
+  transferredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event InventoryTransferredIn: "inventory_item.transferred_in" {
+  inventoryItemId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  sourceLocationId: string
+  previousQuantity: decimal(12, 4)
+  quantityOnHand: decimal(12, 4)
+  transferredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event InventoryLevelsUpdated: "inventory_item.levels_updated" {
+  inventoryItemId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  parLevel: decimal(12, 4)
+  reorderThreshold: decimal(12, 4)
+  unitCost: money(12, 2)
+}
+
+event InventoryItemRemoved: "inventory_item.removed" {
+  inventoryItemId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  previousQuantity: decimal(12, 4)
+  quantityOnHand: decimal(12, 4)
+  reason: string
+}
+
+event InventoryReserved: "inventory_reservation.reserved" {
+  inventoryReservationId: string
+  tenantId: string
+  inventoryItemId: string
+  eventId: string
+  ingredientId: string
+  quantity: decimal(12, 4)
+}
+
+event InventoryReservationReleased: "inventory_reservation.released" {
+  inventoryReservationId: string
+  tenantId: string
+  inventoryItemId: string
+  eventId: string
+  ingredientId: string
+  previousQuantity: decimal(12, 4)
+  quantity: decimal(12, 4)
+  reason: string
+}
+
+event InventoryReservationConsumed: "inventory_reservation.consumed" {
+  inventoryReservationId: string
+  tenantId: string
+  inventoryItemId: string
+  eventId: string
+  ingredientId: string
+  previousQuantity: decimal(12, 4)
+  quantity: decimal(12, 4)
+}
+
+// EventCancelled → release reservations for that event (fanOut matches eventId;
+// release guards keep non-active rows from mutating — failed reaction commands
+// do not fail the parent cancel).
+on EventCancelled fanOut InventoryReservation where eventId = payload.eventId
+  run release
+  params { reason: payload.reason }

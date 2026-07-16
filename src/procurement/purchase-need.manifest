@@ -1,0 +1,231 @@
+// Capsule procurement trigger — PurchaseNeed: the governed purchasing-order
+// line emitted when an event or its prep list (IngredientDemand) is confirmed.
+// User directive 2026-07-15: "when a prep list or event is confirmed it emits
+// a purchasing order for the inventory of the dishes on the event". Vendor
+// grouping stays a human procurement step (VendorOrder.open + addLine) because
+// Ingredient carries no vendor linkage; needs link the resulting order lines
+// back to the demand that caused them (product definition § 3).
+// Compile chain: order.manifest → this file → production/task.manifest.
+
+use "./order.manifest"
+
+enum PurchaseNeedStatus {
+  open
+  ordered
+  fulfilled
+  cancelled
+}
+
+// One purchase need per confirmed IngredientDemand (OD018 resolved by user
+// directive). Created by reaction, never by a user form.
+entity PurchaseNeed mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, ingredientDemandId]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required ingredientDemandId: uuid
+  property required ingredientId: uuid
+  property required requiredQuantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property vendorOrderId: uuid?
+  property vendorOrderLineId: uuid?
+  property required status: PurchaseNeedStatus = "open"
+  property openedAt: datetime?
+  property orderedAt: datetime?
+  property fulfilledAt: datetime?
+  property cancelledAt: datetime?
+  property cancellationReason: string?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  ref vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
+  ref vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
+
+  constraint needQuantityPositive: self.openedAt == null or self.requiredQuantity > 0 "Required quantity must be positive once opened"
+
+  transition status from "open" to ["ordered", "cancelled"]
+  transition status from "ordered" to ["fulfilled", "cancelled"]
+  transition status from "fulfilled" to []
+  transition status from "cancelled" to []
+
+  default policy purchaseNeedRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read purchase needs"
+  default policy purchaseNeedWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write purchase needs through commands"
+  default policy purchaseNeedExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute purchase need commands"
+
+  // Reserved runtime create name — required for the reaction-wired create path
+  // (semantics.md § Manual parent id on create; PROMPT trap 3 correction).
+  // Same-named params seed the bootstrap INSERT.
+  command create(
+    eventId: uuid,
+    ingredientDemandId: uuid,
+    ingredientId: uuid,
+    requiredQuantity: decimal(12, 4),
+    unit: UnitOfMeasure
+  ) {
+    guard self.openedAt == null
+    guard self.deletedAt == null
+    constraint createNeedQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    mutate openedAt = now()
+    emit PurchaseNeedOpened {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      ingredientDemandId: ingredientDemandId
+      ingredientId: ingredientId
+      requiredQuantity: requiredQuantity
+      unit: unit
+      status: "open"
+    }
+  }
+
+  command markOrdered(vendorOrderId: uuid, vendorOrderLineId: uuid) {
+    guard self.status == "open"
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate vendorOrderId = vendorOrderId
+    mutate vendorOrderLineId = vendorOrderLineId
+    mutate status = "ordered"
+    mutate orderedAt = now()
+    emit PurchaseNeedOrdered {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      vendorOrderId: vendorOrderId
+      vendorOrderLineId: vendorOrderLineId
+      previousStatus: previousStatus
+      status: "ordered"
+    }
+  }
+
+  // Receiving automation stays deferred (OD019); fulfilment is an explicit
+  // procurement acknowledgement until line-received targeting is product-defined.
+  command markFulfilled() {
+    guard self.status == "ordered"
+    guard self.orderedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "fulfilled"
+    mutate fulfilledAt = now()
+    emit PurchaseNeedFulfilled {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      previousStatus: previousStatus
+      status: "fulfilled"
+    }
+  }
+
+  command cancel(reason: string) {
+    guard self.status == "open" or self.status == "ordered"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    constraint cancelNeedReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit PurchaseNeedCancelled {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
+  store PurchaseNeed in durable
+}
+
+event PurchaseNeedOpened: "purchase_need.opened" {
+  purchaseNeedId: string
+  tenantId: string
+  eventId: string
+  ingredientDemandId: string
+  ingredientId: string
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  status: PurchaseNeedStatus
+}
+
+event PurchaseNeedOrdered: "purchase_need.ordered" {
+  purchaseNeedId: string
+  tenantId: string
+  eventId: string
+  ingredientDemandId: string
+  ingredientId: string
+  vendorOrderId: string
+  vendorOrderLineId: string
+  previousStatus: PurchaseNeedStatus
+  status: PurchaseNeedStatus
+}
+
+event PurchaseNeedFulfilled: "purchase_need.fulfilled" {
+  purchaseNeedId: string
+  tenantId: string
+  eventId: string
+  ingredientDemandId: string
+  ingredientId: string
+  previousStatus: PurchaseNeedStatus
+  status: PurchaseNeedStatus
+}
+
+event PurchaseNeedCancelled: "purchase_need.cancelled" {
+  purchaseNeedId: string
+  tenantId: string
+  eventId: string
+  ingredientDemandId: string
+  ingredientId: string
+  previousStatus: PurchaseNeedStatus
+  status: PurchaseNeedStatus
+  reason: string
+}
+
+// ---------------------------------------------------------------------------
+// Confirmation → purchasing-order flow.
+// ---------------------------------------------------------------------------
+
+// Event confirmed (approved) → confirm every calculated IngredientDemand for
+// the event (the dish-derived prep/purchase list). Demands not in "calculated"
+// are deliberately skipped by confirm's guards (same skip pattern as the
+// EventCancelled → Invoice.markVoided fan-out).
+on EventApproved fanOut IngredientDemand where eventId = payload.eventId
+  run confirm
+
+// Prep-list line confirmed (directly by inventory staff, or via the event
+// approval fan-out above) → open the purchase need. `resolve null` is the
+// Manifest 3.6.3 form of the reaction-wired create path (parser requires a
+// resolve clause; null instanceId routes to runtime create).
+on IngredientDemandConfirmed run PurchaseNeed.create
+  resolve null
+  params {
+    eventId: payload.eventId,
+    ingredientDemandId: payload.ingredientDemandId,
+    ingredientId: payload.ingredientId,
+    requiredQuantity: payload.requiredQuantity,
+    unit: payload.unit
+  }
+
+// Procurement adds a demand-linked line to a vendor order → the need is ordered.
+on VendorOrderLineAdded fanOut PurchaseNeed where ingredientDemandId = payload.ingredientDemandId
+  run markOrdered
+  params {
+    vendorOrderId: payload.vendorOrderId,
+    vendorOrderLineId: payload.vendorOrderLineId
+  }
+
+// Event cancellation stops open purchasing work (product definition § 3 /
+// interconnection requirements: cancellation stops inappropriate downstream work).
+on EventCancelled fanOut PurchaseNeed where eventId = payload.eventId
+  run cancel
+  params { reason: payload.reason }

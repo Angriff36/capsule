@@ -1,0 +1,213 @@
+// Capsule sales/billing — Payment against Invoice.
+// Settlement applies to Invoice via reaction (replaces capsule-pro middleware).
+// Chargeback / partial-refund / accepted-not-applied deferred (OD040).
+
+use "./invoice-core.manifest"
+
+enum PaymentStatus {
+  pending
+  processing
+  completed
+  failed
+  refunded
+}
+
+enum PaymentMethodKind {
+  card
+  check
+  cash
+  ach
+  other
+}
+
+entity Payment mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required invoiceId: uuid
+  property required clientId: uuid
+  property eventId: uuid?
+  property required amount: money(12, 2) = 0
+  property required method: PaymentMethodKind = "card"
+  property required status: PaymentStatus = "pending"
+  property paymentMethodId: uuid?
+  property notes: string?
+  property recordedAt: datetime?
+  property settledAt: datetime?
+  property failedAt: datetime?
+  property refundedAt: datetime?
+  property failureReason: string?
+  property refundReason: string?
+
+  belongsTo invoice: Invoice fields [tenantId, invoiceId] references [tenantId, id]
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref event: Event fields [tenantId, eventId] references [tenantId, id]
+  ref paymentMethod: PaymentMethod fields [tenantId, paymentMethodId] references [tenantId, id]
+
+  constraint paymentAmountPositive: self.recordedAt == null or self.amount > 0 "Payment amount must be positive"
+
+  transition status from "pending" to ["processing", "completed", "failed"]
+  transition status from "processing" to ["completed", "failed"]
+  transition status from "completed" to ["refunded"]
+  transition status from "failed" to []
+  transition status from "refunded" to []
+
+  default policy paymentRead read: roleAllows(user.role, "financeAccess") "Finance staff may read payments"
+  default policy paymentWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write payments through commands"
+  default policy paymentExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute payment commands"
+
+  command record(
+    invoiceId: uuid,
+    clientId: uuid,
+    amount: money(12, 2),
+    method: PaymentMethodKind,
+    optional eventId: uuid,
+    optional paymentMethodId: uuid,
+    optional notes: string
+  ) {
+    guard self.recordedAt == null
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    guard self.invoice != null
+    guard self.client != null
+    constraint recordInvoiceMatch: invoiceId == self.invoiceId "Record invoiceId must match the seeded invoice reference"
+    constraint recordClientMatch: clientId == self.clientId "Record clientId must match the seeded client reference"
+    constraint recordPositive: amount > 0 "Payment amount must be positive"
+    mutate invoiceId = invoiceId
+    mutate clientId = clientId
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate amount = amount
+    mutate method = method
+    mutate paymentMethodId = paymentMethodId
+    mutate notes = notes
+    mutate recordedAt = now()
+    emit PaymentRecorded {
+      paymentId: self.id
+      tenantId: self.tenantId
+      invoiceId: invoiceId
+      clientId: clientId
+      eventId: eventId != null ? eventId : self.eventId
+      amount: amount
+      method: method
+    }
+  }
+
+  command beginProcessing() {
+    guard self.status == "pending"
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    mutate status = "processing"
+    emit PaymentProcessingStarted {
+      paymentId: self.id
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      amount: self.amount
+    }
+  }
+
+  command settle() {
+    guard self.status == "pending" or self.status == "processing"
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    mutate status = "completed"
+    mutate settledAt = now()
+    emit PaymentSettled {
+      paymentId: self.id
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      clientId: self.clientId
+      eventId: self.eventId
+      amount: self.amount
+      method: self.method
+    }
+  }
+
+  command fail(reason: string) {
+    guard self.status == "pending" or self.status == "processing"
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    constraint failReasonPresent: length(trim(reason)) > 0 "Failure reason is required"
+    mutate status = "failed"
+    mutate failedAt = now()
+    mutate failureReason = reason
+    emit PaymentFailed {
+      paymentId: self.id
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      amount: self.amount
+      reason: reason
+    }
+  }
+
+  command refund(reason: string) {
+    guard self.status == "completed"
+    guard self.deletedAt == null
+    constraint refundReasonPresent: length(trim(reason)) > 0 "Refund reason is required"
+    mutate status = "refunded"
+    mutate refundedAt = now()
+    mutate refundReason = reason
+    emit PaymentRefunded {
+      paymentId: self.id
+      tenantId: self.tenantId
+      invoiceId: self.invoiceId
+      clientId: self.clientId
+      amount: self.amount
+      reason: reason
+    }
+  }
+
+  store Payment in durable
+}
+
+event PaymentRecorded: "payment.recorded" {
+  paymentId: string
+  tenantId: string
+  invoiceId: string
+  clientId: string
+  eventId: string?
+  amount: money(12, 2)
+  method: PaymentMethodKind
+}
+
+event PaymentProcessingStarted: "payment.processing_started" {
+  paymentId: string
+  tenantId: string
+  invoiceId: string
+  amount: money(12, 2)
+}
+
+event PaymentSettled: "payment.settled" {
+  paymentId: string
+  tenantId: string
+  invoiceId: string
+  clientId: string
+  eventId: string?
+  amount: money(12, 2)
+  method: PaymentMethodKind
+}
+
+event PaymentFailed: "payment.failed" {
+  paymentId: string
+  tenantId: string
+  invoiceId: string
+  amount: money(12, 2)
+  reason: string
+}
+
+event PaymentRefunded: "payment.refunded" {
+  paymentId: string
+  tenantId: string
+  invoiceId: string
+  clientId: string
+  amount: money(12, 2)
+  reason: string
+}
+
+// Settled payments apply to the invoice (replaces capsule-pro middleware).
+on PaymentSettled run Invoice.applyPayment
+  resolve payload.invoiceId
+  params {
+    paymentAmount: payload.amount
+    paymentId: payload.paymentId
+  }

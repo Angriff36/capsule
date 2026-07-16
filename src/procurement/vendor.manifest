@@ -1,0 +1,210 @@
+// Capsule procurement — external vendor records acted on by procurement staff.
+// VendorOrder + VendorOrderLine live in order.manifest (compile entry).
+// PurchaseNeed and Receipt aggregates deferred (no first-class evidence).
+// Compile chain: order → vendor → inventory/demand → stock → …
+
+use "../inventory/demand.manifest"
+
+enum VendorStatus {
+  active
+  suspended
+  terminated
+}
+
+// Tenant-scoped external supplier record (capsule-pro InventorySupplier).
+// Not a Capsule login role — procurement/receiving staff act on this record.
+entity Vendor mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string
+  property encrypted email: string?
+  property encrypted phone: string?
+  property encrypted addressLine1: string?
+  property encrypted city: string?
+  property encrypted region: string?
+  property encrypted postalCode: string?
+  property encrypted countryCode: string?
+  property required paymentTermsDays: int = 30
+  property notes: string?
+  property required status: VendorStatus = "active"
+  property onboardedAt: datetime?
+  property suspendedAt: datetime?
+  property suspensionReason: string?
+  property terminatedAt: datetime?
+  property terminationReason: string?
+
+  // VendorOrder belongsTo Vendor is declared in order.manifest; inverse
+  // hasMany omitted so this file stays a standalone harness entry (PB010 pattern).
+
+  constraint vendorNamePresent: self.onboardedAt == null or length(trim(self.name)) > 0 "Vendor name is required once onboarded"
+  constraint vendorPaymentTerms: self.paymentTermsDays >= 0 and self.paymentTermsDays <= 365 "Payment terms must be between 0 and 365 days"
+  constraint vendorCountryCode: self.countryCode == null or length(trim(self.countryCode)) == 2 "Country code must contain two characters"
+
+  transition status from "active" to ["suspended", "terminated"]
+  transition status from "suspended" to ["active", "terminated"]
+  transition status from "terminated" to []
+
+  default policy vendorRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendors"
+  default policy vendorWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write vendors through commands"
+  default policy vendorExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute vendor commands"
+
+  command onboard(
+    name: string,
+    optional email: string,
+    optional phone: string,
+    optional addressLine1: string,
+    optional city: string,
+    optional region: string,
+    optional postalCode: string,
+    optional countryCode: string,
+    optional paymentTermsDays: number,
+    optional notes: string
+  ) {
+    guard self.onboardedAt == null
+    guard self.deletedAt == null
+    constraint onboardName: length(trim(name)) > 0 "Vendor name is required"
+    constraint onboardPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Payment terms must be between 0 and 365 days"
+    constraint onboardCountryCode: countryCode == null or length(trim(countryCode)) == 2 "Country code must contain two characters"
+    mutate name = name
+    mutate email = email
+    mutate phone = phone
+    mutate addressLine1 = addressLine1
+    mutate city = city
+    mutate region = region
+    mutate postalCode = postalCode
+    mutate countryCode = countryCode
+    mutate paymentTermsDays = paymentTermsDays != null ? paymentTermsDays : 30
+    mutate notes = notes
+    mutate onboardedAt = now()
+    emit VendorOnboarded {
+      vendorId: self.id
+      tenantId: self.tenantId
+      name: name
+      paymentTermsDays: paymentTermsDays != null ? paymentTermsDays : 30
+    }
+  }
+
+  command updateDetails(
+    name: string,
+    optional email: string,
+    optional phone: string,
+    optional addressLine1: string,
+    optional city: string,
+    optional region: string,
+    optional postalCode: string,
+    optional countryCode: string,
+    optional paymentTermsDays: number,
+    optional notes: string
+  ) {
+    guard self.onboardedAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint updateVendorName: length(trim(name)) > 0 "Vendor name is required"
+    constraint updateVendorPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Payment terms must be between 0 and 365 days"
+    constraint updateVendorCountryCode: countryCode == null or length(trim(countryCode)) == 2 "Country code must contain two characters"
+    mutate name = name
+    mutate email = email != null ? email : self.email
+    mutate phone = phone != null ? phone : self.phone
+    mutate addressLine1 = addressLine1 != null ? addressLine1 : self.addressLine1
+    mutate city = city != null ? city : self.city
+    mutate region = region != null ? region : self.region
+    mutate postalCode = postalCode != null ? postalCode : self.postalCode
+    mutate countryCode = countryCode != null ? countryCode : self.countryCode
+    mutate paymentTermsDays = paymentTermsDays != null ? paymentTermsDays : self.paymentTermsDays
+    mutate notes = notes != null ? notes : self.notes
+    emit VendorDetailsUpdated {
+      vendorId: self.id
+      tenantId: self.tenantId
+      name: name
+      paymentTermsDays: paymentTermsDays != null ? paymentTermsDays : self.paymentTermsDays
+    }
+  }
+
+  command suspend(reason: string) {
+    guard self.onboardedAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    constraint suspendVendorReason: length(trim(reason)) > 0 "Suspension reason is required"
+    mutate status = "suspended"
+    mutate suspendedAt = now()
+    mutate suspensionReason = reason
+    emit VendorSuspended {
+      vendorId: self.id
+      tenantId: self.tenantId
+      name: self.name
+      reason: reason
+    }
+  }
+
+  command reinstate() {
+    guard self.onboardedAt != null
+    guard self.status == "suspended"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    mutate status = "active"
+    mutate suspendedAt = null
+    mutate suspensionReason = null
+    emit VendorReinstated {
+      vendorId: self.id
+      tenantId: self.tenantId
+      name: self.name
+    }
+  }
+
+  command terminate(reason: string) {
+    guard self.onboardedAt != null
+    guard self.status == "active" or self.status == "suspended"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    constraint terminateVendorReason: length(trim(reason)) > 0 "Termination reason is required"
+    mutate status = "terminated"
+    mutate terminatedAt = now()
+    mutate terminationReason = reason
+    mutate deletedAt = now()
+    emit VendorTerminated {
+      vendorId: self.id
+      tenantId: self.tenantId
+      name: self.name
+      reason: reason
+    }
+  }
+
+  store Vendor in durable
+}
+
+event VendorOnboarded: "vendor.onboarded" {
+  vendorId: string
+  tenantId: string
+  name: string
+  paymentTermsDays: number
+}
+
+event VendorDetailsUpdated: "vendor.details_updated" {
+  vendorId: string
+  tenantId: string
+  name: string
+  paymentTermsDays: number
+}
+
+event VendorSuspended: "vendor.suspended" {
+  vendorId: string
+  tenantId: string
+  name: string
+  reason: string
+}
+
+event VendorReinstated: "vendor.reinstated" {
+  vendorId: string
+  tenantId: string
+  name: string
+}
+
+event VendorTerminated: "vendor.terminated" {
+  vendorId: string
+  tenantId: string
+  name: string
+  reason: string
+}

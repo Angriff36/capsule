@@ -1,0 +1,163 @@
+// Capsule closeout & finance — EventCloseout immutable snapshot fact.
+// Folds EventProfitability-style totals into stored capture fields (no
+// silent recalculate). Cross-domain aggregation is a command-supplied
+// parameter set (OD041); not a reaction from EventClosedOut.
+
+use "../sales/invoice.manifest"
+
+enum EventCloseoutStatus {
+  draft
+  finalized
+}
+
+// One immutable closeout snapshot per Event (alternate key tenant+event).
+// Capture records reconciled numbers at/after Event.closeOut; finalize
+// freezes the fact — no mutation once finalized (D042 / D035 boundary).
+entity EventCloseout mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, eventId]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required actualRevenue: money(12, 2) = 0
+  property required budgetedRevenue: money(12, 2) = 0
+  property required revenueVariance: money(12, 2) = 0
+  property required actualIngredientCost: money(12, 2) = 0
+  property required actualWasteCost: money(12, 2) = 0
+  property required actualLaborCost: money(12, 2) = 0
+  property required actualVendorCost: money(12, 2) = 0
+  property required budgetedCost: money(12, 2) = 0
+  property required totalActualCost: money(12, 2) = 0
+  property required costVariance: money(12, 2) = 0
+  property required grossProfit: money(12, 2) = 0
+  property required expectedHeadcount: int = 0
+  property required actualHeadcount: int = 0
+  property unresolvedIssues: string?
+  property performanceNotes: string?
+  property notes: string?
+  property required status: EventCloseoutStatus = "draft"
+  property capturedAt: datetime?
+  property finalizedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint closeoutCapturedMoneyNonnegative: self.capturedAt == null or (self.actualRevenue >= 0 and self.budgetedRevenue >= 0 and self.actualIngredientCost >= 0 and self.actualWasteCost >= 0 and self.actualLaborCost >= 0 and self.actualVendorCost >= 0 and self.budgetedCost >= 0 and self.totalActualCost >= 0) "Captured closeout money amounts cannot be negative"
+  constraint closeoutTotalCostConsistent: self.capturedAt == null or self.totalActualCost == self.actualIngredientCost + self.actualWasteCost + self.actualLaborCost + self.actualVendorCost "Total actual cost must equal ingredient plus waste plus labor plus vendor costs"
+  constraint closeoutRevenueVarianceConsistent: self.capturedAt == null or self.revenueVariance == self.budgetedRevenue - self.actualRevenue "Revenue variance must equal budgeted revenue minus actual revenue"
+  constraint closeoutCostVarianceConsistent: self.capturedAt == null or self.costVariance == self.budgetedCost - self.totalActualCost "Cost variance must equal budgeted cost minus total actual cost"
+  constraint closeoutGrossProfitConsistent: self.capturedAt == null or self.grossProfit == self.actualRevenue - self.totalActualCost "Gross profit must equal actual revenue minus total actual cost"
+  constraint closeoutHeadcountNonnegative: self.capturedAt == null or (self.expectedHeadcount >= 0 and self.actualHeadcount >= 0) "Headcount values cannot be negative"
+
+  transition status from "draft" to ["finalized"]
+  transition status from "finalized" to []
+
+  default policy eventCloseoutRead read: roleAllows(user.role, "financeAccess") "Finance staff may read event closeouts"
+  default policy eventCloseoutWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write event closeouts through commands"
+  default policy eventCloseoutExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute event closeout commands"
+
+  command capture(
+    eventId: uuid,
+    actualRevenue: money(12, 2),
+    budgetedRevenue: money(12, 2),
+    revenueVariance: money(12, 2),
+    actualIngredientCost: money(12, 2),
+    actualWasteCost: money(12, 2),
+    actualLaborCost: money(12, 2),
+    actualVendorCost: money(12, 2),
+    budgetedCost: money(12, 2),
+    totalActualCost: money(12, 2),
+    costVariance: money(12, 2),
+    grossProfit: money(12, 2),
+    expectedHeadcount: number,
+    actualHeadcount: number,
+    optional unresolvedIssues: string,
+    optional performanceNotes: string,
+    optional notes: string
+  ) {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.event != null
+    guard self.event.stage == "closed_out"
+    constraint captureEventMatch: eventId == self.eventId "Capture eventId must match the seeded event reference"
+    constraint captureMoneyNonnegative: actualRevenue >= 0 and budgetedRevenue >= 0 and actualIngredientCost >= 0 and actualWasteCost >= 0 and actualLaborCost >= 0 and actualVendorCost >= 0 and budgetedCost >= 0 and totalActualCost >= 0 "Closeout money amounts cannot be negative"
+    constraint captureTotalCost: totalActualCost == actualIngredientCost + actualWasteCost + actualLaborCost + actualVendorCost "Total actual cost must equal ingredient plus waste plus labor plus vendor costs"
+    constraint captureRevenueVariance: revenueVariance == budgetedRevenue - actualRevenue "Revenue variance must equal budgeted revenue minus actual revenue"
+    constraint captureCostVariance: costVariance == budgetedCost - totalActualCost "Cost variance must equal budgeted cost minus total actual cost"
+    constraint captureGrossProfit: grossProfit == actualRevenue - totalActualCost "Gross profit must equal actual revenue minus total actual cost"
+    constraint captureHeadcountNonnegative: expectedHeadcount >= 0 and actualHeadcount >= 0 "Headcount values cannot be negative"
+    mutate eventId = eventId
+    mutate actualRevenue = actualRevenue
+    mutate budgetedRevenue = budgetedRevenue
+    mutate revenueVariance = revenueVariance
+    mutate actualIngredientCost = actualIngredientCost
+    mutate actualWasteCost = actualWasteCost
+    mutate actualLaborCost = actualLaborCost
+    mutate actualVendorCost = actualVendorCost
+    mutate budgetedCost = budgetedCost
+    mutate totalActualCost = totalActualCost
+    mutate costVariance = costVariance
+    mutate grossProfit = grossProfit
+    mutate expectedHeadcount = expectedHeadcount
+    mutate actualHeadcount = actualHeadcount
+    mutate unresolvedIssues = unresolvedIssues
+    mutate performanceNotes = performanceNotes
+    mutate notes = notes
+    mutate capturedAt = now()
+    emit EventCloseoutCaptured {
+      closeoutId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      actualRevenue: actualRevenue
+      totalActualCost: totalActualCost
+      grossProfit: grossProfit
+      actualHeadcount: actualHeadcount
+      status: "draft"
+    }
+  }
+
+  command finalize() {
+    guard self.status == "draft"
+    guard self.capturedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "financeManageAccess")
+    mutate status = "finalized"
+    mutate finalizedAt = now()
+    emit EventCloseoutFinalized {
+      closeoutId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      actualRevenue: self.actualRevenue
+      totalActualCost: self.totalActualCost
+      grossProfit: self.grossProfit
+      revenueVariance: self.revenueVariance
+      costVariance: self.costVariance
+      status: "finalized"
+    }
+  }
+
+  store EventCloseout in durable
+}
+
+event EventCloseoutCaptured: "event_closeout.captured" {
+  closeoutId: string
+  tenantId: string
+  eventId: string
+  actualRevenue: money(12, 2)
+  totalActualCost: money(12, 2)
+  grossProfit: money(12, 2)
+  actualHeadcount: number
+  status: string
+}
+
+event EventCloseoutFinalized: "event_closeout.finalized" {
+  closeoutId: string
+  tenantId: string
+  eventId: string
+  actualRevenue: money(12, 2)
+  totalActualCost: money(12, 2)
+  grossProfit: money(12, 2)
+  revenueVariance: money(12, 2)
+  costVariance: money(12, 2)
+  status: string
+}

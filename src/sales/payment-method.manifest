@@ -1,0 +1,206 @@
+// Capsule sales/billing — PaymentMethod (stored client payment instrument).
+// Compile chain: invoice.manifest (entry) → this file → proposal → …
+// CollectionCase / deposits / PaymentRefundAttempt deferred (OD040).
+
+use "./proposal.manifest"
+
+enum PaymentMethodType {
+  card
+  check
+  cash
+  ach
+  other
+}
+
+enum PaymentMethodStatus {
+  active
+  expired
+  invalid
+  fraudulent
+  removed
+}
+
+// Client-owned payment instrument. Default exclusivity across methods is open
+// (same class as OD036 — setDefault only flips the bound row).
+entity PaymentMethod mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required clientId: uuid
+  property required methodType: PaymentMethodType = "card"
+  property provider: string?
+  property lastFour: string?
+  property required isDefault: boolean = false
+  property required status: PaymentMethodStatus = "active"
+  property registeredAt: datetime?
+  property expiredAt: datetime?
+  property invalidatedAt: datetime?
+  property removedAt: datetime?
+  property notes: string?
+
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+
+  transition status from "active" to ["expired", "invalid", "fraudulent", "removed"]
+  transition status from "expired" to ["active"]
+  transition status from "invalid" to []
+  transition status from "fraudulent" to []
+  transition status from "removed" to []
+
+  default policy paymentMethodRead read: roleAllows(user.role, "financeAccess") "Finance staff may read payment methods"
+  default policy paymentMethodWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write payment methods through commands"
+  default policy paymentMethodExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute payment method commands"
+
+  command register(
+    clientId: uuid,
+    methodType: PaymentMethodType,
+    optional provider: string,
+    optional lastFour: string,
+    optional isDefault: boolean,
+    optional notes: string
+  ) {
+    guard self.registeredAt == null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard self.client != null
+    constraint registerClientMatch: clientId == self.clientId "Register clientId must match the seeded client reference"
+    constraint registerLastFour: lastFour == null or length(trim(lastFour)) <= 4 "Last-four hint must be at most four characters"
+    mutate clientId = clientId
+    mutate methodType = methodType
+    mutate provider = provider
+    mutate lastFour = lastFour
+    mutate isDefault = isDefault != null ? isDefault : false
+    mutate notes = notes
+    mutate registeredAt = now()
+    emit PaymentMethodRegistered {
+      paymentMethodId: self.id
+      tenantId: self.tenantId
+      clientId: clientId
+      methodType: methodType
+      isDefault: isDefault != null ? isDefault : false
+    }
+  }
+
+  command makeDefault() {
+    guard self.registeredAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate isDefault = true
+    emit PaymentMethodDefaultSet {
+      paymentMethodId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  command clearDefault() {
+    guard self.registeredAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate isDefault = false
+    emit PaymentMethodDefaultCleared {
+      paymentMethodId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  command expire() {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate status = "expired"
+    mutate expiredAt = now()
+    emit PaymentMethodExpired {
+      paymentMethodId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "expired"
+    guard self.deletedAt == null
+    mutate status = "active"
+    mutate expiredAt = null
+    emit PaymentMethodReactivated {
+      paymentMethodId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  command invalidate(reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint invalidateReason: length(trim(reason)) > 0 "Invalidation reason is required"
+    mutate status = "invalid"
+    mutate invalidatedAt = now()
+    mutate notes = reason
+    emit PaymentMethodInvalidated {
+      paymentMethodId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      reason: reason
+    }
+  }
+
+  command remove() {
+    guard self.status == "active" or self.status == "expired" or self.status == "invalid"
+    guard self.deletedAt == null
+    mutate status = "removed"
+    mutate removedAt = now()
+    mutate isDefault = false
+    emit PaymentMethodRemoved {
+      paymentMethodId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  store PaymentMethod in durable
+}
+
+event PaymentMethodRegistered: "payment_method.registered" {
+  paymentMethodId: string
+  tenantId: string
+  clientId: string
+  methodType: PaymentMethodType
+  isDefault: boolean
+}
+
+event PaymentMethodDefaultSet: "payment_method.default_set" {
+  paymentMethodId: string
+  tenantId: string
+  clientId: string
+}
+
+event PaymentMethodDefaultCleared: "payment_method.default_cleared" {
+  paymentMethodId: string
+  tenantId: string
+  clientId: string
+}
+
+event PaymentMethodExpired: "payment_method.expired" {
+  paymentMethodId: string
+  tenantId: string
+  clientId: string
+}
+
+event PaymentMethodReactivated: "payment_method.reactivated" {
+  paymentMethodId: string
+  tenantId: string
+  clientId: string
+}
+
+event PaymentMethodInvalidated: "payment_method.invalidated" {
+  paymentMethodId: string
+  tenantId: string
+  clientId: string
+  reason: string
+}
+
+event PaymentMethodRemoved: "payment_method.removed" {
+  paymentMethodId: string
+  tenantId: string
+  clientId: string
+}

@@ -1,0 +1,485 @@
+// Capsule procurement — vendor orders and line receiving facts.
+// ~~PurchaseNeed and Receipt aggregates deferred (evidence: no first-class
+// PurchaseNeed; receiving lives on PO lines + inventory restock reaction).~~
+// 2026-07-15: PurchaseNeed authored in purchase-need.manifest (user directive;
+// OD018 resolved). Receipt aggregate remains deferred (OD019).
+// Compile entry: uses vendor → demand → stock → culinary → operations.
+
+use "./vendor.manifest"
+
+enum VendorOrderStatus {
+  draft
+  submitted
+  confirmed
+  partially_received
+  received
+  cancelled
+}
+
+enum VendorOrderLineStatus {
+  pending
+  added
+  receiving
+  complete
+  cancelled
+}
+
+// Order to one Vendor (capsule-pro PurchaseOrder). Totals are money facts;
+// line receiving emits stock-update payloads for a later InventoryItem reaction.
+entity VendorOrder mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required vendorId: uuid
+  property eventId: uuid?
+  property orderNumber: string?
+  property required subtotal: money(12, 2) = 0
+  property required taxAmount: money(12, 2) = 0
+  property required shippingAmount: money(12, 2) = 0
+  property required totalAmount: money(12, 2) = 0
+  property notes: string?
+  property required status: VendorOrderStatus = "draft"
+  property openedAt: datetime?
+  property submittedAt: datetime?
+  property confirmedAt: datetime?
+  property receivedAt: datetime?
+  property cancelledAt: datetime?
+  property cancellationReason: string?
+
+  belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  hasMany lines: VendorOrderLine
+
+  constraint orderMoneyNonnegative: self.subtotal >= 0 and self.taxAmount >= 0 and self.shippingAmount >= 0 and self.totalAmount >= 0 "Order money amounts cannot be negative"
+
+  transition status from "draft" to ["submitted", "cancelled"]
+  transition status from "submitted" to ["confirmed", "cancelled"]
+  transition status from "confirmed" to ["partially_received", "received", "cancelled"]
+  transition status from "partially_received" to ["received", "cancelled"]
+  transition status from "received" to []
+  transition status from "cancelled" to []
+
+  default policy vendorOrderRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor orders"
+  default policy vendorOrderWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write vendor orders through commands"
+  default policy vendorOrderExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute vendor order commands"
+
+  command open(
+    vendorId: uuid,
+    optional eventId: uuid,
+    optional orderNumber: string,
+    optional notes: string
+  ) {
+    guard self.openedAt == null
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.vendor != null and self.vendor.status == "active" and self.vendor.onboardedAt != null
+    constraint openVendorMatch: vendorId == self.vendorId "Open vendorId must match the seeded vendor reference"
+    constraint openEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Open eventId must match the seeded event reference when provided"
+    mutate vendorId = vendorId
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate orderNumber = orderNumber
+    mutate notes = notes
+    mutate openedAt = now()
+    emit VendorOrderOpened {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: vendorId
+      eventId: eventId != null ? eventId : self.eventId
+      orderNumber: orderNumber
+      status: "draft"
+    }
+  }
+
+  command updateTotals(
+    subtotal: money(12, 2),
+    taxAmount: money(12, 2),
+    shippingAmount: money(12, 2)
+  ) {
+    guard self.openedAt != null
+    guard self.status == "draft" or self.status == "submitted"
+    guard self.deletedAt == null
+    constraint totalsNonnegative: subtotal >= 0 and taxAmount >= 0 and shippingAmount >= 0 "Order money amounts cannot be negative"
+    compute previousTotal = self.totalAmount
+    compute nextTotal = subtotal + taxAmount + shippingAmount
+    mutate subtotal = subtotal
+    mutate taxAmount = taxAmount
+    mutate shippingAmount = shippingAmount
+    mutate totalAmount = nextTotal
+    emit VendorOrderTotalsUpdated {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      previousTotalAmount: previousTotal
+      subtotal: subtotal
+      taxAmount: taxAmount
+      shippingAmount: shippingAmount
+      totalAmount: nextTotal
+    }
+  }
+
+  command submit() {
+    guard self.openedAt != null
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "submitted"
+    mutate submittedAt = now()
+    emit VendorOrderSubmitted {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      previousStatus: previousStatus
+      status: "submitted"
+      totalAmount: self.totalAmount
+    }
+  }
+
+  command confirm() {
+    guard self.status == "submitted"
+    guard self.submittedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "confirmed"
+    mutate confirmedAt = now()
+    emit VendorOrderConfirmed {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      previousStatus: previousStatus
+      status: "confirmed"
+      totalAmount: self.totalAmount
+    }
+  }
+
+  command markPartiallyReceived() {
+    guard self.status == "confirmed"
+    guard self.confirmedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "partially_received"
+    emit VendorOrderPartiallyReceived {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      previousStatus: previousStatus
+      status: "partially_received"
+      totalAmount: self.totalAmount
+    }
+  }
+
+  command markReceived() {
+    guard self.status == "confirmed" or self.status == "partially_received"
+    guard self.confirmedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "received"
+    mutate receivedAt = now()
+    emit VendorOrderReceived {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      previousStatus: previousStatus
+      status: "received"
+      totalAmount: self.totalAmount
+    }
+  }
+
+  command cancel(reason: string) {
+    guard self.status == "draft" or self.status == "submitted" or self.status == "confirmed" or self.status == "partially_received"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    constraint cancelOrderReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit VendorOrderCancelled {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      previousStatus: previousStatus
+      status: "cancelled"
+      totalAmount: self.totalAmount
+      reason: reason
+    }
+  }
+
+  store VendorOrder in durable
+}
+
+// Ordered/received quantity line for one Ingredient on a VendorOrder
+// (capsule-pro PurchaseOrderItem). Discrepancy + location facts support a
+// later InventoryItem.receiveStock reaction; no separate Receipt aggregate.
+entity VendorOrderLine mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required vendorOrderId: uuid
+  property required ingredientId: uuid
+  property ingredientDemandId: uuid?
+  property locationId: uuid?
+  property required orderedQuantity: decimal(12, 4) = 0
+  property required receivedQuantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required unitCost: money(12, 2) = 0
+  property discrepancyQuantity: decimal(12, 4)?
+  property discrepancyNotes: string?
+  property required status: VendorOrderLineStatus = "pending"
+  property addedAt: datetime?
+  property completedAt: datetime?
+  property cancelledAt: datetime?
+
+  belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
+  belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
+
+  computed lineTotal: money(12, 2) = self.orderedQuantity * self.unitCost
+  computed remainingQuantity: decimal(12, 4) = self.orderedQuantity - self.receivedQuantity
+
+  constraint lineOrderedPositive: self.addedAt == null or self.orderedQuantity > 0 "Ordered quantity must be positive once added"
+  constraint lineReceivedNonnegative: self.receivedQuantity >= 0 "Received quantity cannot be negative"
+  constraint lineReceivedNotOver: self.receivedQuantity <= self.orderedQuantity "Received quantity cannot exceed ordered quantity"
+  constraint lineCostNonnegative: self.unitCost >= 0 "Unit cost cannot be negative"
+
+  transition status from "pending" to ["added", "cancelled"]
+  transition status from "added" to ["receiving", "complete", "cancelled"]
+  transition status from "receiving" to ["complete", "cancelled"]
+  transition status from "complete" to []
+  transition status from "cancelled" to []
+
+  default policy vendorOrderLineRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor order lines"
+  default policy vendorOrderLineWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write vendor order lines through commands"
+  default policy vendorOrderLineExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute vendor order line commands"
+
+  command addLine(
+    vendorOrderId: uuid,
+    ingredientId: uuid,
+    orderedQuantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    unitCost: money(12, 2),
+    optional ingredientDemandId: uuid,
+    optional locationId: uuid
+  ) {
+    guard self.addedAt == null
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft" and self.vendorOrder.openedAt != null
+    guard self.ingredient != null and self.ingredient.status == "active"
+    constraint addLineOrderMatch: vendorOrderId == self.vendorOrderId "Add line vendorOrderId must match the seeded order reference"
+    constraint addLineIngredientMatch: ingredientId == self.ingredientId "Add line ingredientId must match the seeded ingredient reference"
+    constraint addLineDemandMatch: ingredientDemandId == null or self.ingredientDemandId == null or ingredientDemandId == self.ingredientDemandId "Add line ingredientDemandId must match the seeded demand reference when provided"
+    constraint addLineLocationMatch: locationId == null or self.locationId == null or locationId == self.locationId "Add line locationId must match the seeded location reference when provided"
+    constraint addLineQuantityPositive: orderedQuantity > 0 "Ordered quantity must be positive"
+    constraint addLineCostNonnegative: unitCost >= 0 "Unit cost cannot be negative"
+    mutate vendorOrderId = vendorOrderId
+    mutate ingredientId = ingredientId
+    mutate ingredientDemandId = ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
+    mutate locationId = locationId != null ? locationId : self.locationId
+    mutate orderedQuantity = orderedQuantity
+    mutate unit = unit
+    mutate unitCost = unitCost
+    mutate status = "added"
+    mutate addedAt = now()
+    emit VendorOrderLineAdded {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: vendorOrderId
+      ingredientId: ingredientId
+      ingredientDemandId: ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
+      eventId: self.vendorOrder.eventId
+      orderedQuantity: orderedQuantity
+      unit: unit
+      unitCost: unitCost
+    }
+  }
+
+  command recordReceipt(
+    quantity: decimal(12, 4),
+    locationId: uuid,
+    optional discrepancyQuantity: decimal(12, 4),
+    optional discrepancyNotes: string
+  ) {
+    guard self.addedAt != null
+    guard self.status == "added" or self.status == "receiving"
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and (self.vendorOrder.status == "confirmed" or self.vendorOrder.status == "partially_received")
+    constraint receiptLocationMatch: self.locationId == null or locationId == self.locationId "Receipt locationId must match the seeded location when one was pre-set"
+    constraint receiptQuantityPositive: quantity > 0 "Received quantity must be positive"
+    constraint receiptNotOver: self.receivedQuantity + quantity <= self.orderedQuantity "Received quantity cannot exceed ordered quantity"
+    constraint receiptDiscrepancyNonnegative: discrepancyQuantity == null or discrepancyQuantity >= 0 "Discrepancy quantity cannot be negative"
+    compute previousReceived = self.receivedQuantity
+    compute nextReceived = self.receivedQuantity + quantity
+    compute nextStatus = nextReceived == self.orderedQuantity ? "complete" : "receiving"
+    mutate locationId = locationId
+    mutate receivedQuantity = nextReceived
+    mutate discrepancyQuantity = discrepancyQuantity != null ? discrepancyQuantity : self.discrepancyQuantity
+    mutate discrepancyNotes = discrepancyNotes != null ? discrepancyNotes : self.discrepancyNotes
+    mutate status = nextStatus
+    mutate completedAt = nextReceived == self.orderedQuantity ? now() : self.completedAt
+    emit VendorOrderLineReceived {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: self.vendorOrderId
+      ingredientId: self.ingredientId
+      ingredientDemandId: self.ingredientDemandId
+      eventId: self.vendorOrder.eventId
+      locationId: locationId
+      previousReceivedQuantity: previousReceived
+      receivedQuantity: nextReceived
+      receiptQuantity: quantity
+      orderedQuantity: self.orderedQuantity
+      unit: self.unit
+      unitCost: self.unitCost
+      discrepancyQuantity: discrepancyQuantity != null ? discrepancyQuantity : self.discrepancyQuantity
+    }
+  }
+
+  command cancelLine(reason: string) {
+    guard self.addedAt != null
+    guard self.status == "added" or self.status == "receiving"
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and (self.vendorOrder.status == "draft" or self.vendorOrder.status == "submitted" or self.vendorOrder.status == "confirmed")
+    guard roleAllows(user.role, "inventoryManageAccess")
+    constraint cancelLineReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate deletedAt = now()
+    emit VendorOrderLineCancelled {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: self.vendorOrderId
+      ingredientId: self.ingredientId
+      ingredientDemandId: self.ingredientDemandId
+      eventId: self.vendorOrder.eventId
+      orderedQuantity: self.orderedQuantity
+      receivedQuantity: self.receivedQuantity
+      unit: self.unit
+      reason: reason
+    }
+  }
+
+  store VendorOrderLine in durable
+}
+
+event VendorOrderOpened: "vendor_order.opened" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  eventId: string?
+  orderNumber: string?
+  status: VendorOrderStatus
+}
+
+event VendorOrderTotalsUpdated: "vendor_order.totals_updated" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  eventId: string?
+  previousTotalAmount: money(12, 2)
+  subtotal: money(12, 2)
+  taxAmount: money(12, 2)
+  shippingAmount: money(12, 2)
+  totalAmount: money(12, 2)
+}
+
+event VendorOrderSubmitted: "vendor_order.submitted" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  eventId: string?
+  previousStatus: VendorOrderStatus
+  status: VendorOrderStatus
+  totalAmount: money(12, 2)
+}
+
+event VendorOrderConfirmed: "vendor_order.confirmed" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  eventId: string?
+  previousStatus: VendorOrderStatus
+  status: VendorOrderStatus
+  totalAmount: money(12, 2)
+}
+
+event VendorOrderPartiallyReceived: "vendor_order.partially_received" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  eventId: string?
+  previousStatus: VendorOrderStatus
+  status: VendorOrderStatus
+  totalAmount: money(12, 2)
+}
+
+event VendorOrderReceived: "vendor_order.received" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  eventId: string?
+  previousStatus: VendorOrderStatus
+  status: VendorOrderStatus
+  totalAmount: money(12, 2)
+}
+
+event VendorOrderCancelled: "vendor_order.cancelled" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  eventId: string?
+  previousStatus: VendorOrderStatus
+  status: VendorOrderStatus
+  totalAmount: money(12, 2)
+  reason: string
+}
+
+event VendorOrderLineAdded: "vendor_order_line.added" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  ingredientId: string
+  ingredientDemandId: string?
+  eventId: string?
+  orderedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  unitCost: money(12, 2)
+}
+
+event VendorOrderLineReceived: "vendor_order_line.received" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  ingredientId: string
+  ingredientDemandId: string?
+  eventId: string?
+  locationId: string
+  previousReceivedQuantity: decimal(12, 4)
+  receivedQuantity: decimal(12, 4)
+  receiptQuantity: decimal(12, 4)
+  orderedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  unitCost: money(12, 2)
+  discrepancyQuantity: decimal(12, 4)?
+}
+
+event VendorOrderLineCancelled: "vendor_order_line.cancelled" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  ingredientId: string
+  ingredientDemandId: string?
+  eventId: string?
+  orderedQuantity: decimal(12, 4)
+  receivedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  reason: string
+}

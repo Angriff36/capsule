@@ -1,0 +1,103 @@
+// Capsule execution & quality — EventAllergenCheck (human event-time
+// verification). Automated guest-restriction × dish-allergen matching is
+// deferred (OD008/OD010/OD043). Compile chain continues via closeout entry.
+
+use "../finance/closeout.manifest"
+
+enum EventAllergenCheckStatus {
+  pending
+  recorded
+}
+
+enum EventAllergenCheckResult {
+  pass
+  flagged
+}
+
+// Event-time allergen verification fact. Records a human check that guest
+// restrictions were considered against served dishes — not an automated
+// multi-hop match (AllergenWarning-shaped evidence; product §7 attachment).
+entity EventAllergenCheck mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property eventDishId: uuid?
+  property dishId: uuid?
+  property result: EventAllergenCheckResult?
+  property flaggedAllergens: list<AllergenCode> = []
+  property notes: string?
+  property checkedById: uuid?
+  property required status: EventAllergenCheckStatus = "pending"
+  property checkedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  belongsTo checkedBy: Person fields [tenantId, checkedById] references [tenantId, id]
+
+  constraint allergenCheckImmutable: self.checkedAt == null or self.status == "recorded" "Recorded allergen checks are immutable"
+  constraint allergenCheckFlagConsistency: self.checkedAt == null or (self.result == "pass" and length(self.flaggedAllergens) == 0) or (self.result == "flagged" and length(self.flaggedAllergens) > 0) "Pass requires no flagged allergens; flagged requires at least one"
+
+  transition status from "pending" to ["recorded"]
+  transition status from "recorded" to []
+
+  default policy allergenCheckRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may read event allergen checks"
+  default policy allergenCheckWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may write event allergen checks through commands"
+  default policy allergenCheckExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may execute event allergen check commands"
+
+  command record(
+    eventId: uuid,
+    result: EventAllergenCheckResult,
+    optional eventDishId: uuid,
+    optional dishId: uuid,
+    optional flaggedAllergens: list<AllergenCode>,
+    optional notes: string
+  ) {
+    guard self.status == "pending"
+    guard self.checkedAt == null
+    guard self.deletedAt == null
+    guard self.event != null
+    guard user.id != null
+    constraint recordEventMatch: eventId == self.eventId "Record eventId must match the seeded event reference"
+    constraint recordEventDishMatch: eventDishId == null or self.eventDishId == null or eventDishId == self.eventDishId "Record eventDishId must match the seeded event dish reference when provided"
+    constraint recordDishMatch: dishId == null or self.dishId == null or dishId == self.dishId "Record dishId must match the seeded dish reference when provided"
+    constraint recordFlagConsistency: (result == "pass" and (flaggedAllergens == null or length(flaggedAllergens) == 0)) or (result == "flagged" and flaggedAllergens != null and length(flaggedAllergens) > 0) "Pass requires no flagged allergens; flagged requires at least one"
+    compute nextFlags = flaggedAllergens != null ? flaggedAllergens : []
+    mutate eventId = eventId
+    mutate eventDishId = eventDishId != null ? eventDishId : self.eventDishId
+    mutate dishId = dishId != null ? dishId : self.dishId
+    mutate result = result
+    mutate flaggedAllergens = nextFlags
+    mutate notes = notes != null ? notes : self.notes
+    mutate checkedById = user.id
+    mutate status = "recorded"
+    mutate checkedAt = now()
+    emit EventAllergenCheckRecorded {
+      allergenCheckId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      eventDishId: eventDishId != null ? eventDishId : self.eventDishId
+      dishId: dishId != null ? dishId : self.dishId
+      result: result
+      flaggedAllergens: nextFlags
+      checkedById: user.id
+      status: "recorded"
+    }
+  }
+
+  store EventAllergenCheck in durable
+}
+
+event EventAllergenCheckRecorded: "event_allergen_check.recorded" {
+  allergenCheckId: string
+  tenantId: string
+  eventId: string
+  eventDishId: string?
+  dishId: string?
+  result: EventAllergenCheckResult
+  flaggedAllergens: list<AllergenCode>
+  checkedById: string
+  status: EventAllergenCheckStatus
+}

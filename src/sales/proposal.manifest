@@ -1,0 +1,247 @@
+// Capsule sales/commercial-1 — Proposal (+ ClientContact, Contract via use).
+// Compile chain head was this file; billing entry is now invoice.manifest.
+// ProposalAccepted → Event.create is NOT declared (OD035 — no Event.create;
+// planEngagement requires a bound instance, semantics.md § Reactions resolve).
+// Lead / ClientInteraction / ProposalLineItem / ProposalDraft deferred (OD037).
+
+use "./contract.manifest"
+
+enum ProposalStatus {
+  draft
+  sent
+  viewed
+  accepted
+  declined
+  expired
+}
+
+// Sales offer for a Client. Line items omitted in this trio (send requires a
+// non-empty title instead). Optional eventId links after acceptance when known.
+entity Proposal mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required clientId: uuid
+  property eventId: uuid?
+  property unique proposalNumber: string?
+  property required searchable title: string = ""
+  property eventDate: datetime?
+  property eventType: string?
+  property required guestCount: int = 0
+  property venueName: string?
+  property venueAddress: string?
+  property required subtotal: money(12, 2) = 0
+  property required taxAmount: money(12, 2) = 0
+  property required discountAmount: money(12, 2) = 0
+  property required total: money(12, 2) = 0
+  property expiresAt: datetime?
+  property notes: string?
+  property terms: string?
+  property required status: ProposalStatus = "draft"
+  property draftedAt: datetime?
+  property sentAt: datetime?
+  property viewedAt: datetime?
+  property acceptedAt: datetime?
+  property declinedAt: datetime?
+  property expiredAt: datetime?
+
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint proposalDraftComplete: self.draftedAt == null or (length(trim(self.title)) > 0 and self.guestCount >= 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0) "Drafted proposals require a title and non-negative money and guest counts"
+  constraint proposalTotalsConsistent: self.draftedAt == null or self.total == self.subtotal + self.taxAmount - self.discountAmount "Proposal total must equal subtotal plus tax minus discount"
+
+  transition status from "draft" to ["sent"]
+  transition status from "sent" to ["viewed", "accepted", "declined", "expired"]
+  transition status from "viewed" to ["accepted", "declined", "expired"]
+  transition status from "accepted" to []
+  transition status from "declined" to []
+  transition status from "expired" to []
+
+  default policy proposalRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposals"
+  default policy proposalWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposals through commands"
+  default policy proposalExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal commands"
+
+  command draft(
+    clientId: uuid,
+    title: string,
+    subtotal: money(12, 2),
+    taxAmount: money(12, 2),
+    discountAmount: money(12, 2),
+    total: money(12, 2),
+    optional proposalNumber: string,
+    optional eventDate: datetime,
+    optional eventType: string,
+    optional guestCount: number,
+    optional venueName: string,
+    optional venueAddress: string,
+    optional expiresAt: datetime,
+    optional notes: string,
+    optional terms: string
+  ) {
+    guard self.draftedAt == null
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.client != null
+    constraint draftClientMatch: clientId == self.clientId "Draft clientId must match the seeded client reference"
+    constraint draftTitle: length(trim(title)) > 0 "Proposal title is required"
+    constraint draftGuestCount: guestCount == null or guestCount >= 0 "Guest count cannot be negative"
+    constraint draftMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "Proposal money amounts cannot be negative"
+    constraint draftTotalMatch: total == subtotal + taxAmount - discountAmount "Proposal total must equal subtotal plus tax minus discount"
+    mutate clientId = clientId
+    mutate title = title
+    mutate proposalNumber = proposalNumber
+    mutate eventDate = eventDate
+    mutate eventType = eventType
+    mutate guestCount = guestCount != null ? guestCount : 0
+    mutate venueName = venueName
+    mutate venueAddress = venueAddress
+    mutate subtotal = subtotal
+    mutate taxAmount = taxAmount
+    mutate discountAmount = discountAmount
+    mutate total = total
+    mutate expiresAt = expiresAt
+    mutate notes = notes
+    mutate terms = terms
+    mutate draftedAt = now()
+    emit ProposalDrafted {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: clientId
+      title: title
+      total: total
+    }
+  }
+
+  command send() {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    guard self.client != null and self.client.status == "active"
+    constraint sendTitle: length(trim(self.title)) > 0 "Proposal title is required before send"
+    mutate status = "sent"
+    mutate sentAt = now()
+    emit ProposalSent {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      title: self.title
+      total: self.total
+    }
+  }
+
+  command markViewed() {
+    guard self.status == "sent"
+    guard self.deletedAt == null
+    mutate status = "viewed"
+    mutate viewedAt = now()
+    emit ProposalViewed {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  command accept(optional eventId: uuid) {
+    guard self.status == "sent" or self.status == "viewed"
+    guard self.deletedAt == null
+    guard self.expiresAt == null or self.expiresAt > now()
+    mutate status = "accepted"
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate acceptedAt = now()
+    emit ProposalAccepted {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: eventId != null ? eventId : self.eventId
+      title: self.title
+      eventDate: self.eventDate
+      eventType: self.eventType
+      guestCount: self.guestCount
+      venueName: self.venueName
+      venueAddress: self.venueAddress
+      subtotal: self.subtotal
+      taxAmount: self.taxAmount
+      discountAmount: self.discountAmount
+      total: self.total
+    }
+  }
+
+  command decline() {
+    guard self.status == "sent" or self.status == "viewed"
+    guard self.deletedAt == null
+    mutate status = "declined"
+    mutate declinedAt = now()
+    emit ProposalDeclined {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  command expire() {
+    guard self.status == "sent" or self.status == "viewed"
+    guard self.deletedAt == null
+    mutate status = "expired"
+    mutate expiredAt = now()
+    emit ProposalExpired {
+      proposalId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  store Proposal in durable
+}
+
+event ProposalDrafted: "proposal.drafted" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+  title: string
+  total: money(12, 2)
+}
+
+event ProposalSent: "proposal.sent" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+  title: string
+  total: money(12, 2)
+}
+
+event ProposalViewed: "proposal.viewed" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+}
+
+event ProposalAccepted: "proposal.accepted" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  title: string
+  eventDate: datetime?
+  eventType: string?
+  guestCount: number
+  venueName: string?
+  venueAddress: string?
+  subtotal: money(12, 2)
+  taxAmount: money(12, 2)
+  discountAmount: money(12, 2)
+  total: money(12, 2)
+}
+
+event ProposalDeclined: "proposal.declined" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+}
+
+event ProposalExpired: "proposal.expired" {
+  proposalId: string
+  tenantId: string
+  clientId: string
+}

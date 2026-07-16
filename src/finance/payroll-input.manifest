@@ -1,0 +1,176 @@
+// Capsule closeout & finance — PayrollInput rollup for export.
+// Sensitive rate/amount fields are private+encrypted (D043). Defaults use
+// financeManageAccess (narrower than invoice financeAccess).
+
+use "./event-closeout.manifest"
+
+enum PayrollInputStatus {
+  draft
+  prepared
+  finalized
+  voided
+}
+
+// Per-Person period rollup of worked minutes and pay amounts for payroll
+// export. Optional event/shift attribution (product §8 event payroll inputs;
+// capsule-pro TimeEntry had no eventId — OD042).
+entity PayrollInput mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required personId: uuid
+  property required periodStart: datetime
+  property required periodEnd: datetime
+  property eventId: uuid?
+  property shiftId: uuid?
+  property required regularMinutes: int = 0
+  property required overtimeMinutes: int = 0
+  property required totalMinutes: int = 0
+  property private encrypted hourlyRate: money(12, 2)?
+  property private encrypted overtimeRate: money(12, 2)?
+  property private encrypted grossAmount: money(12, 2)?
+  property encrypted notes: string?
+  property required status: PayrollInputStatus = "draft"
+  property preparedAt: datetime?
+  property finalizedAt: datetime?
+  property voidedAt: datetime?
+  property voidReason: string?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+  ref event: Event fields [tenantId, eventId] references [tenantId, id]
+  ref shift: Shift fields [tenantId, shiftId] references [tenantId, id]
+
+  constraint payrollPreparedMinutesNonnegative: self.preparedAt == null or (self.regularMinutes >= 0 and self.overtimeMinutes >= 0 and self.totalMinutes >= 0) "Prepared payroll minutes cannot be negative"
+  constraint payrollTotalMinutesConsistent: self.preparedAt == null or self.totalMinutes == self.regularMinutes + self.overtimeMinutes "Total minutes must equal regular plus overtime"
+  constraint payrollPeriodOrder: self.preparedAt == null or self.periodEnd >= self.periodStart "Payroll period end must be at or after period start"
+  constraint payrollRatesNonnegative: self.preparedAt == null or ((self.hourlyRate == null or self.hourlyRate >= 0) and (self.overtimeRate == null or self.overtimeRate >= 0) and (self.grossAmount == null or self.grossAmount >= 0)) "Payroll rate and amount fields cannot be negative"
+
+  transition status from "draft" to ["prepared", "voided"]
+  transition status from "prepared" to ["finalized", "voided"]
+  transition status from "finalized" to ["voided"]
+  transition status from "voided" to []
+
+  default policy payrollInputRead read: roleAllows(user.role, "financeManageAccess") "Finance managers may read payroll inputs"
+  default policy payrollInputWrite write: roleAllows(user.role, "financeManageAccess") "Finance managers may write payroll inputs through commands"
+  default policy payrollInputExecute execute: roleAllows(user.role, "financeManageAccess") "Finance managers may execute payroll input commands"
+
+  command prepare(
+    personId: uuid,
+    periodStart: datetime,
+    periodEnd: datetime,
+    regularMinutes: number,
+    overtimeMinutes: number,
+    totalMinutes: number,
+    optional eventId: uuid,
+    optional shiftId: uuid,
+    optional hourlyRate: money(12, 2),
+    optional overtimeRate: money(12, 2),
+    optional grossAmount: money(12, 2),
+    optional notes: string
+  ) {
+    guard self.status == "draft"
+    guard self.preparedAt == null
+    guard self.deletedAt == null
+    guard self.person != null
+    constraint preparePersonMatch: personId == self.personId "Prepare personId must match the seeded person reference"
+    constraint prepareEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Prepare eventId must match the seeded event reference when both are set"
+    constraint prepareShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "Prepare shiftId must match the seeded shift reference when both are set"
+    constraint preparePeriodOrder: periodEnd >= periodStart "Payroll period end must be at or after period start"
+    constraint prepareMinutesNonnegative: regularMinutes >= 0 and overtimeMinutes >= 0 and totalMinutes >= 0 "Payroll minutes cannot be negative"
+    constraint prepareTotalMinutes: totalMinutes == regularMinutes + overtimeMinutes "Total minutes must equal regular plus overtime"
+    constraint prepareRatesNonnegative: (hourlyRate == null or hourlyRate >= 0) and (overtimeRate == null or overtimeRate >= 0) and (grossAmount == null or grossAmount >= 0) "Payroll rate and amount fields cannot be negative"
+    mutate personId = personId
+    mutate periodStart = periodStart
+    mutate periodEnd = periodEnd
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate shiftId = shiftId != null ? shiftId : self.shiftId
+    mutate regularMinutes = regularMinutes
+    mutate overtimeMinutes = overtimeMinutes
+    mutate totalMinutes = totalMinutes
+    mutate hourlyRate = hourlyRate
+    mutate overtimeRate = overtimeRate
+    mutate grossAmount = grossAmount
+    mutate notes = notes
+    mutate status = "prepared"
+    mutate preparedAt = now()
+    emit PayrollInputPrepared {
+      payrollInputId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      eventId: eventId != null ? eventId : self.eventId
+      periodStart: periodStart
+      periodEnd: periodEnd
+      totalMinutes: totalMinutes
+      status: "prepared"
+    }
+  }
+
+  command finalize() {
+    guard self.status == "prepared"
+    guard self.preparedAt != null
+    guard self.deletedAt == null
+    mutate status = "finalized"
+    mutate finalizedAt = now()
+    emit PayrollInputFinalized {
+      payrollInputId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      eventId: self.eventId
+      periodStart: self.periodStart
+      periodEnd: self.periodEnd
+      totalMinutes: self.totalMinutes
+      status: "finalized"
+    }
+  }
+
+  command markVoided(reason: string) {
+    guard self.status == "draft" or self.status == "prepared" or self.status == "finalized"
+    guard self.deletedAt == null
+    constraint voidReasonPresent: length(trim(reason)) > 0 "Void reason is required"
+    mutate status = "voided"
+    mutate voidedAt = now()
+    mutate voidReason = reason
+    emit PayrollInputVoided {
+      payrollInputId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      eventId: self.eventId
+      reason: reason
+      status: "voided"
+    }
+  }
+
+  store PayrollInput in durable
+}
+
+event PayrollInputPrepared: "payroll_input.prepared" {
+  payrollInputId: string
+  tenantId: string
+  personId: string
+  eventId: string?
+  periodStart: datetime
+  periodEnd: datetime
+  totalMinutes: number
+  status: string
+}
+
+event PayrollInputFinalized: "payroll_input.finalized" {
+  payrollInputId: string
+  tenantId: string
+  personId: string
+  eventId: string?
+  periodStart: datetime
+  periodEnd: datetime
+  totalMinutes: number
+  status: string
+}
+
+event PayrollInputVoided: "payroll_input.voided" {
+  payrollInputId: string
+  tenantId: string
+  personId: string
+  eventId: string?
+  reason: string
+  status: string
+}

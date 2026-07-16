@@ -1,0 +1,211 @@
+// Capsule sales — Contract (evidence EventContract) for an Event + Client.
+// Compile chain: proposal.manifest (entry) → this file → contact → time.
+// ContractSigned → Event.confirm is NOT declared (OD038 — no confirm consumer).
+
+use "./contact.manifest"
+
+enum ContractStatus {
+  draft
+  sent
+  viewed
+  signed
+  expired
+  voided
+}
+
+// Commercial agreement tied to a Client engagement Event. Signer identity is
+// an external name string (not a Person). Historical capsule-pro name was
+// EventContract; product name here is Contract.
+entity Contract mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required clientId: uuid
+  property unique contractNumber: string?
+  property required searchable title: string = ""
+  property documentUrl: string?
+  property expiresAt: datetime?
+  property sentAt: datetime?
+  property viewedAt: datetime?
+  property signedAt: datetime?
+  property signedBy: string?
+  property voidedAt: datetime?
+  property voidReason: string?
+  property notes: string?
+  property required status: ContractStatus = "draft"
+  property draftedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+
+  constraint contractDraftComplete: self.draftedAt == null or length(trim(self.title)) > 0 "Drafted contracts require a title"
+
+  transition status from "draft" to ["sent"]
+  transition status from "sent" to ["viewed", "expired", "voided"]
+  transition status from "viewed" to ["signed", "expired", "voided"]
+  transition status from "signed" to []
+  transition status from "expired" to []
+  transition status from "voided" to []
+
+  default policy contractRead read: roleAllows(user.role, "salesAccess") "Sales staff may read contracts"
+  default policy contractWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write contracts through commands"
+  default policy contractExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute contract commands"
+
+  command draft(
+    eventId: uuid,
+    clientId: uuid,
+    title: string,
+    optional contractNumber: string,
+    optional documentUrl: string,
+    optional expiresAt: datetime,
+    optional notes: string
+  ) {
+    guard self.draftedAt == null
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.event != null
+    guard self.client != null
+    constraint draftEventMatch: eventId == self.eventId "Draft eventId must match the seeded event reference"
+    constraint draftClientMatch: clientId == self.clientId "Draft clientId must match the seeded client reference"
+    constraint draftTitle: length(trim(title)) > 0 "Contract title is required"
+    mutate eventId = eventId
+    mutate clientId = clientId
+    mutate title = title
+    mutate contractNumber = contractNumber
+    mutate documentUrl = documentUrl
+    mutate expiresAt = expiresAt
+    mutate notes = notes
+    mutate draftedAt = now()
+    emit ContractDrafted {
+      contractId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      clientId: clientId
+      title: title
+    }
+  }
+
+  command send() {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    constraint sendTitle: length(trim(self.title)) > 0 "Contract title is required before send"
+    mutate status = "sent"
+    mutate sentAt = now()
+    emit ContractSent {
+      contractId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      clientId: self.clientId
+    }
+  }
+
+  command markViewed() {
+    guard self.status == "sent"
+    guard self.deletedAt == null
+    mutate status = "viewed"
+    mutate viewedAt = now()
+    emit ContractViewed {
+      contractId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      clientId: self.clientId
+    }
+  }
+
+  command sign(signedBy: string) {
+    guard self.status == "viewed"
+    guard self.deletedAt == null
+    constraint signerPresent: length(trim(signedBy)) > 0 "Signer name is required"
+    compute signedAtValue = now()
+    mutate status = "signed"
+    mutate signedBy = signedBy
+    mutate signedAt = signedAtValue
+    emit ContractSigned {
+      contractId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      clientId: self.clientId
+      signedBy: signedBy
+      signedAt: signedAtValue
+    }
+  }
+
+  command expire() {
+    guard self.status == "sent" or self.status == "viewed"
+    guard self.deletedAt == null
+    mutate status = "expired"
+    emit ContractExpired {
+      contractId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      clientId: self.clientId
+    }
+  }
+
+  command markVoided(reason: string) {
+    guard self.status == "sent" or self.status == "viewed"
+    guard self.deletedAt == null
+    constraint voidReasonPresent: length(trim(reason)) > 0 "Void reason is required"
+    mutate status = "voided"
+    mutate voidReason = reason
+    mutate voidedAt = now()
+    emit ContractVoided {
+      contractId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      clientId: self.clientId
+      reason: reason
+    }
+  }
+
+  store Contract in durable
+}
+
+event ContractDrafted: "contract.drafted" {
+  contractId: string
+  tenantId: string
+  eventId: string
+  clientId: string
+  title: string
+}
+
+event ContractSent: "contract.sent" {
+  contractId: string
+  tenantId: string
+  eventId: string
+  clientId: string
+}
+
+event ContractViewed: "contract.viewed" {
+  contractId: string
+  tenantId: string
+  eventId: string
+  clientId: string
+}
+
+event ContractSigned: "contract.signed" {
+  contractId: string
+  tenantId: string
+  eventId: string
+  clientId: string
+  signedBy: string
+  signedAt: datetime?
+}
+
+event ContractExpired: "contract.expired" {
+  contractId: string
+  tenantId: string
+  eventId: string
+  clientId: string
+}
+
+event ContractVoided: "contract.voided" {
+  contractId: string
+  tenantId: string
+  eventId: string
+  clientId: string
+  reason: string
+}

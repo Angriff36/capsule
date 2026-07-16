@@ -1,0 +1,186 @@
+// Capsule production — QualityCheck (pass/fail against PrepTask and/or batch).
+// Compile entry: uses batch → task → procurement order chain.
+// Failed checks emit subject ids for interconnection dependent-work block.
+
+use "./batch.manifest"
+
+enum QualityCheckStatus {
+  pending
+  passed
+  failed
+}
+
+enum QualityCheckResult {
+  pass
+  fail
+}
+
+entity QualityCheck mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property prepTaskId: uuid?
+  property productionBatchId: uuid?
+  property notes: string?
+  property result: QualityCheckResult?
+  property checkedById: uuid?
+  property required status: QualityCheckStatus = "pending"
+  property openedAt: datetime?
+  property completedAt: datetime?
+
+  belongsTo prepTask: PrepTask fields [tenantId, prepTaskId] references [tenantId, id]
+  belongsTo productionBatch: ProductionBatch fields [tenantId, productionBatchId] references [tenantId, id]
+  belongsTo checkedBy: Person fields [tenantId, checkedById] references [tenantId, id]
+
+  constraint qualitySubjectRequired: self.openedAt == null or self.prepTaskId != null or self.productionBatchId != null "Quality check must reference a PrepTask or ProductionBatch"
+
+  transition status from "pending" to ["passed", "failed"]
+  transition status from "passed" to ["pending"]
+  transition status from "failed" to ["pending"]
+
+  default policy qualityCheckRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read quality checks"
+  default policy qualityCheckWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write quality checks through commands"
+  default policy qualityCheckExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute quality check commands"
+
+  command open(
+    optional prepTaskId: uuid,
+    optional productionBatchId: uuid,
+    optional notes: string
+  ) {
+    guard self.openedAt == null
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    constraint openSubjectRequired: prepTaskId != null or productionBatchId != null or self.prepTaskId != null or self.productionBatchId != null "Quality check must reference a PrepTask or ProductionBatch"
+    constraint openPrepMatch: prepTaskId == null or self.prepTaskId == null or prepTaskId == self.prepTaskId "Open prepTaskId must match the seeded prep task reference when provided"
+    constraint openBatchMatch: productionBatchId == null or self.productionBatchId == null or productionBatchId == self.productionBatchId "Open productionBatchId must match the seeded batch reference when provided"
+    mutate prepTaskId = prepTaskId != null ? prepTaskId : self.prepTaskId
+    mutate productionBatchId = productionBatchId != null ? productionBatchId : self.productionBatchId
+    mutate notes = notes != null ? notes : self.notes
+    mutate openedAt = now()
+    emit QualityCheckOpened {
+      qualityCheckId: self.id
+      tenantId: self.tenantId
+      prepTaskId: prepTaskId != null ? prepTaskId : self.prepTaskId
+      productionBatchId: productionBatchId != null ? productionBatchId : self.productionBatchId
+      status: "pending"
+    }
+  }
+
+  command pass(optional notes: string) {
+    guard self.status == "pending"
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    compute previousStatus = self.status
+    mutate result = "pass"
+    mutate checkedById = user.id
+    mutate notes = notes != null ? notes : self.notes
+    mutate status = "passed"
+    mutate completedAt = now()
+    emit QualityCheckPassed {
+      qualityCheckId: self.id
+      tenantId: self.tenantId
+      prepTaskId: self.prepTaskId
+      productionBatchId: self.productionBatchId
+      checkedById: user.id
+      result: "pass"
+      previousStatus: previousStatus
+      status: "passed"
+      notes: notes != null ? notes : self.notes
+    }
+  }
+
+  command fail(optional notes: string) {
+    guard self.status == "pending"
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    compute previousStatus = self.status
+    mutate result = "fail"
+    mutate checkedById = user.id
+    mutate notes = notes != null ? notes : self.notes
+    mutate status = "failed"
+    mutate completedAt = now()
+    emit QualityCheckFailed {
+      qualityCheckId: self.id
+      tenantId: self.tenantId
+      prepTaskId: self.prepTaskId
+      productionBatchId: self.productionBatchId
+      checkedById: user.id
+      result: "fail"
+      previousStatus: previousStatus
+      status: "failed"
+      notes: notes != null ? notes : self.notes
+    }
+  }
+
+  command reinspect() {
+    guard self.status == "passed" or self.status == "failed"
+    guard self.completedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenLeadAccess") or roleAllows(user.role, "kitchenManageAccess")
+    compute previousStatus = self.status
+    mutate result = null
+    mutate checkedById = null
+    mutate status = "pending"
+    mutate completedAt = null
+    emit QualityCheckReopened {
+      qualityCheckId: self.id
+      tenantId: self.tenantId
+      prepTaskId: self.prepTaskId
+      productionBatchId: self.productionBatchId
+      previousStatus: previousStatus
+      status: "pending"
+    }
+  }
+
+  store QualityCheck in durable
+}
+
+event QualityCheckOpened: "quality_check.opened" {
+  qualityCheckId: string
+  tenantId: string
+  prepTaskId: string?
+  productionBatchId: string?
+  status: QualityCheckStatus
+}
+
+event QualityCheckPassed: "quality_check.passed" {
+  qualityCheckId: string
+  tenantId: string
+  prepTaskId: string?
+  productionBatchId: string?
+  checkedById: string
+  result: QualityCheckResult
+  previousStatus: QualityCheckStatus
+  status: QualityCheckStatus
+  notes: string?
+}
+
+event QualityCheckFailed: "quality_check.failed" {
+  qualityCheckId: string
+  tenantId: string
+  prepTaskId: string?
+  productionBatchId: string?
+  checkedById: string
+  result: QualityCheckResult
+  previousStatus: QualityCheckStatus
+  status: QualityCheckStatus
+  notes: string?
+}
+
+event QualityCheckReopened: "quality_check.reopened" {
+  qualityCheckId: string
+  tenantId: string
+  prepTaskId: string?
+  productionBatchId: string?
+  previousStatus: QualityCheckStatus
+  status: QualityCheckStatus
+}
+
+// QualityCheckFailed → block the referenced PrepTask (resolve skips when
+// prepTaskId is absent; markBlocked requires kitchenLeadAccess — same actor).
+on QualityCheckFailed run PrepTask.markBlocked
+  resolve payload.prepTaskId
+  params { reason: "Quality check failed" }

@@ -1,0 +1,227 @@
+// Capsule identity — tenant-scoped people (operators) and role binding.
+// Depends on foundation for tenant, roles, and mixins.
+
+use "../foundation/base.manifest"
+
+// ---------------------------------------------------------------------------
+// Closed vocabularies
+// ---------------------------------------------------------------------------
+
+enum PersonStatus {
+  active
+  inactive
+  terminated
+}
+
+enum EmploymentType {
+  full_time
+  part_time
+  contractor
+  temporary
+}
+
+// Mirrors foundation role names so membership role storage stays closed.
+enum CapsuleRole {
+  staff
+  kitchen_staff
+  kitchen_lead
+  sales_staff
+  event_staff
+  inventory_staff
+  procurement_staff
+  logistics_staff
+  driver
+  workforce_staff
+  finance_staff
+  manager
+  kitchen_manager
+  sales_manager
+  event_manager
+  inventory_manager
+  logistics_manager
+  workforce_manager
+  finance_manager
+  admin
+  owner
+  system
+}
+
+// ---------------------------------------------------------------------------
+// Person — first-class tenant membership for Capsule operators
+// ---------------------------------------------------------------------------
+
+entity Person mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, email]
+  timestamps
+  versionProperty version: number
+
+  property required searchable givenName: string
+  property required searchable familyName: string
+  property required encrypted email: string
+  property encrypted phone: string?
+  property required role: CapsuleRole = "staff"
+  // Optional link to external auth subject (Clerk/etc.). Sync of claims into
+  // runtime user.role is a projection/identity-provider concern.
+  property authSubjectId: string?
+  property employeeNumber: string?
+  property required employmentType: EmploymentType = "full_time"
+  property required status: PersonStatus = "active"
+  property hireDate: datetime?
+  property terminationDate: datetime?
+
+  computed displayName: string = self.givenName + " " + self.familyName
+  computed isAssignable: boolean = self.status == "active" and self.deletedAt == null
+
+  // After hire, identity fields must remain present. Gated on hireDate so
+  // create/bootstrap seeds (empty defaults) and field-by-field mutates during
+  // hire are not blocked mid-command (runtime validates each mutate patch).
+  // Keep expression on one line — multiline parenthesized or-constraints fail parse.
+  constraint identityComplete: self.hireDate == null or (length(trim(self.givenName)) > 0 and length(trim(self.familyName)) > 0 and length(trim(self.email)) > 0) "Hired people require given name, family name, and email"
+
+  transition status from "active" to ["inactive", "terminated"]
+  transition status from "inactive" to ["active", "terminated"]
+  transition status from "terminated" to []
+
+  default policy personRead read: roleAllows(user.role, "staffAccess") "Staff may read people"
+  default policy personWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write people"
+  default policy personExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute people commands"
+
+  command hire(
+    givenName: string,
+    familyName: string,
+    email: string,
+    optional phone: string,
+    optional role: CapsuleRole,
+    optional employmentType: EmploymentType,
+    optional employeeNumber: string,
+    optional authSubjectId: string
+  ) {
+    guard self.deletedAt == null
+    constraint hireGiven: length(trim(givenName)) > 0 "Given name is required"
+    constraint hireFamily: length(trim(familyName)) > 0 "Family name is required"
+    constraint hireEmail: length(trim(email)) > 0 "Email is required"
+    mutate givenName = givenName
+    mutate familyName = familyName
+    mutate email = email
+    mutate phone = phone
+    mutate role = role != null ? role : "staff"
+    mutate employmentType = employmentType != null ? employmentType : "full_time"
+    mutate employeeNumber = employeeNumber
+    mutate authSubjectId = authSubjectId
+    // status defaults/seeds as active; do not self-transition active→active
+    mutate hireDate = now()
+    mutate terminationDate = null
+    emit PersonHired {
+      personId: self.id
+      tenantId: self.tenantId
+      email: email
+      role: self.role
+    }
+  }
+
+  command correctIdentity(
+    givenName: string,
+    familyName: string,
+    optional phone: string
+  ) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint correctGiven: length(trim(givenName)) > 0 "Given name is required"
+    constraint correctFamily: length(trim(familyName)) > 0 "Family name is required"
+    mutate givenName = givenName
+    mutate familyName = familyName
+    mutate phone = phone
+    emit PersonIdentityCorrected {
+      personId: self.id
+      tenantId: self.tenantId
+      givenName: givenName
+      familyName: familyName
+    }
+  }
+
+  // Admin-only: changing Capsule role is more sensitive than profile edits.
+  command assignRole(role: CapsuleRole) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    mutate role = role
+    emit PersonRoleAssigned {
+      personId: self.id
+      tenantId: self.tenantId
+      role: role
+    }
+  }
+
+  command deactivate() {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate status = "inactive"
+    emit PersonDeactivated {
+      personId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "inactive"
+    guard self.deletedAt == null
+    mutate status = "active"
+    emit PersonReactivated {
+      personId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Admin-only terminal exit from the operator roster.
+  command terminate(reason: string = "") {
+    guard self.status == "active" or self.status == "inactive"
+    guard roleAllows(user.role, "adminAccess")
+    mutate status = "terminated"
+    mutate terminationDate = now()
+    mutate deletedAt = now()
+    emit PersonTerminated {
+      personId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  store Person in durable
+}
+
+event PersonHired: "person.hired" {
+  personId: string
+  tenantId: string
+  email: string
+  role: string
+}
+
+event PersonIdentityCorrected: "person.identity_corrected" {
+  personId: string
+  tenantId: string
+  givenName: string
+  familyName: string
+}
+
+event PersonRoleAssigned: "person.role_assigned" {
+  personId: string
+  tenantId: string
+  role: string
+}
+
+event PersonDeactivated: "person.deactivated" {
+  personId: string
+  tenantId: string
+}
+
+event PersonReactivated: "person.reactivated" {
+  personId: string
+  tenantId: string
+}
+
+event PersonTerminated: "person.terminated" {
+  personId: string
+  tenantId: string
+  reason: string
+}

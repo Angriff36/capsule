@@ -1,0 +1,188 @@
+// Capsule production — ProductionBatch (recipe yield execution).
+// Product-required; capsule-pro has NO ProductionBatch entity evidence.
+
+use "./task.manifest"
+
+enum ProductionBatchStatus {
+  planned
+  in_progress
+  completed
+  cancelled
+}
+
+entity ProductionBatch mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required recipeId: uuid
+  property eventId: uuid?
+  property required plannedYield: decimal(12, 4) = 0
+  property actualYield: decimal(12, 4)?
+  property required yieldUnit: UnitOfMeasure = "portion"
+  property notes: string?
+  property required status: ProductionBatchStatus = "planned"
+  property plannedAt: datetime?
+  property startedAt: datetime?
+  property completedAt: datetime?
+  property cancelledAt: datetime?
+  property cancellationReason: string?
+
+  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint batchPlannedPositive: self.plannedAt == null or self.plannedYield > 0 "Planned yield must be positive once planned"
+  constraint batchActualNonnegative: self.actualYield == null or self.actualYield >= 0 "Actual yield cannot be negative"
+
+  transition status from "planned" to ["in_progress", "cancelled"]
+  transition status from "in_progress" to ["completed", "cancelled"]
+  transition status from "completed" to []
+  transition status from "cancelled" to []
+
+  default policy productionBatchRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read production batches"
+  default policy productionBatchWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write production batches through commands"
+  default policy productionBatchExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute production batch commands"
+
+  command plan(
+    recipeId: uuid,
+    plannedYield: decimal(12, 4),
+    yieldUnit: UnitOfMeasure,
+    optional eventId: uuid,
+    optional notes: string
+  ) {
+    guard self.plannedAt == null
+    guard self.status == "planned"
+    guard self.deletedAt == null
+    guard self.recipe != null and self.recipe.status == "published"
+    constraint planRecipeMatch: recipeId == self.recipeId "Plan recipeId must match the seeded recipe reference"
+    constraint planEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Plan eventId must match the seeded event reference when provided"
+    constraint planYieldPositive: plannedYield > 0 "Planned yield must be positive"
+    mutate recipeId = recipeId
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate plannedYield = plannedYield
+    mutate yieldUnit = yieldUnit
+    mutate notes = notes != null ? notes : self.notes
+    mutate plannedAt = now()
+    emit ProductionBatchPlanned {
+      productionBatchId: self.id
+      tenantId: self.tenantId
+      recipeId: recipeId
+      eventId: eventId != null ? eventId : self.eventId
+      plannedYield: plannedYield
+      yieldUnit: yieldUnit
+      status: "planned"
+    }
+  }
+
+  command start() {
+    guard self.status == "planned"
+    guard self.plannedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "in_progress"
+    mutate startedAt = now()
+    emit ProductionBatchStarted {
+      productionBatchId: self.id
+      tenantId: self.tenantId
+      recipeId: self.recipeId
+      eventId: self.eventId
+      plannedYield: self.plannedYield
+      yieldUnit: self.yieldUnit
+      previousStatus: previousStatus
+      status: "in_progress"
+    }
+  }
+
+  command complete(actualYield: decimal(12, 4)) {
+    guard self.status == "in_progress"
+    guard self.startedAt != null
+    guard self.deletedAt == null
+    constraint completeYieldNonnegative: actualYield >= 0 "Actual yield cannot be negative"
+    compute previousStatus = self.status
+    mutate actualYield = actualYield
+    mutate status = "completed"
+    mutate completedAt = now()
+    emit ProductionBatchCompleted {
+      productionBatchId: self.id
+      tenantId: self.tenantId
+      recipeId: self.recipeId
+      eventId: self.eventId
+      plannedYield: self.plannedYield
+      actualYield: actualYield
+      yieldUnit: self.yieldUnit
+      previousStatus: previousStatus
+      status: "completed"
+    }
+  }
+
+  command cancel(reason: string) {
+    guard self.status == "planned" or self.status == "in_progress"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenLeadAccess")
+    constraint cancelBatchReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit ProductionBatchCancelled {
+      productionBatchId: self.id
+      tenantId: self.tenantId
+      recipeId: self.recipeId
+      eventId: self.eventId
+      plannedYield: self.plannedYield
+      actualYield: self.actualYield
+      yieldUnit: self.yieldUnit
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
+  store ProductionBatch in durable
+}
+
+event ProductionBatchPlanned: "production_batch.planned" {
+  productionBatchId: string
+  tenantId: string
+  recipeId: string
+  eventId: string?
+  plannedYield: decimal(12, 4)
+  yieldUnit: UnitOfMeasure
+  status: ProductionBatchStatus
+}
+
+event ProductionBatchStarted: "production_batch.started" {
+  productionBatchId: string
+  tenantId: string
+  recipeId: string
+  eventId: string?
+  plannedYield: decimal(12, 4)
+  yieldUnit: UnitOfMeasure
+  previousStatus: ProductionBatchStatus
+  status: ProductionBatchStatus
+}
+
+event ProductionBatchCompleted: "production_batch.completed" {
+  productionBatchId: string
+  tenantId: string
+  recipeId: string
+  eventId: string?
+  plannedYield: decimal(12, 4)
+  actualYield: decimal(12, 4)
+  yieldUnit: UnitOfMeasure
+  previousStatus: ProductionBatchStatus
+  status: ProductionBatchStatus
+}
+
+event ProductionBatchCancelled: "production_batch.cancelled" {
+  productionBatchId: string
+  tenantId: string
+  recipeId: string
+  eventId: string?
+  plannedYield: decimal(12, 4)
+  actualYield: decimal(12, 4)?
+  yieldUnit: UnitOfMeasure
+  previousStatus: ProductionBatchStatus
+  status: ProductionBatchStatus
+  reason: string
+}

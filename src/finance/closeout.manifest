@@ -1,0 +1,6 @@
+// Capsule closeout & finance — compile entry for EventCloseout + PayrollInput.
+// No FinalizeEventWithReporting saga (OD032 disposition 2026-07-15): capture
+// is an explicit command with supplied reconciled numbers; no compensation
+// targets beyond Event.closeOut itself.
+
+use "./payroll-input.manifest"

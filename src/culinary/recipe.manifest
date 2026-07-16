@@ -1,0 +1,326 @@
+// Capsule culinary recipes — Recipe (with folded version/yield) and RecipeIngredient.
+
+use "./ingredient.manifest"
+
+enum RecipeStatus {
+  draft
+  published
+  retired
+}
+
+entity Recipe mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property category: string?
+  property cuisine: string?
+  property description: string?
+  property instructions: string?
+  property required versionNumber: int = 1
+  property required yieldQuantity: decimal(10, 2) = 1
+  property required yieldUnit: UnitOfMeasure = "portion"
+  property required batchMultiplier: decimal(10, 4) = 1
+  property required status: RecipeStatus = "draft"
+  property draftedAt: datetime?
+  property publishedAt: datetime?
+  property retiredAt: datetime?
+  property retirementReason: string?
+
+  hasMany ingredientLines: RecipeIngredient
+
+  computed isPublished: boolean = self.status == "published"
+  computed isEditable: boolean = self.status == "draft"
+
+  constraint recipeIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Drafted recipes require a name"
+  constraint recipeYieldPositive: self.yieldQuantity > 0 "Recipe yield quantity must be positive"
+  constraint recipeBatchPositive: self.batchMultiplier > 0 "Recipe batch multiplier must be positive"
+
+  transition status from "draft" to ["published", "retired"]
+  transition status from "published" to ["draft", "retired"]
+  transition status from "retired" to []
+
+  default policy recipeRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read recipes"
+  default policy recipeWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write recipes through commands"
+  default policy recipeExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute recipe commands"
+
+  command draft(
+    name: string,
+    yieldQuantity: decimal(10, 2),
+    yieldUnit: UnitOfMeasure,
+    optional batchMultiplier: decimal(10, 4),
+    optional category: string,
+    optional cuisine: string,
+    optional description: string,
+    optional instructions: string
+  ) {
+    guard self.draftedAt == null
+    guard self.deletedAt == null
+    constraint draftRecipeName: length(trim(name)) > 0 "Recipe name is required"
+    constraint draftYieldPositive: yieldQuantity > 0 "Recipe yield quantity must be positive"
+    constraint draftBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Recipe batch multiplier must be positive"
+    mutate name = name
+    mutate yieldQuantity = yieldQuantity
+    mutate yieldUnit = yieldUnit
+    mutate batchMultiplier = batchMultiplier != null ? batchMultiplier : 1
+    mutate category = category
+    mutate cuisine = cuisine
+    mutate description = description
+    mutate instructions = instructions
+    mutate versionNumber = 1
+    mutate draftedAt = now()
+    emit RecipeDrafted {
+      recipeId: self.id
+      tenantId: self.tenantId
+      name: name
+      yieldQuantity: yieldQuantity
+      yieldUnit: yieldUnit
+      batchMultiplier: batchMultiplier != null ? batchMultiplier : 1
+      versionNumber: 1
+    }
+  }
+
+  command reviseDraft(
+    name: string,
+    yieldQuantity: decimal(10, 2),
+    yieldUnit: UnitOfMeasure,
+    batchMultiplier: decimal(10, 4),
+    optional category: string,
+    optional cuisine: string,
+    optional description: string,
+    optional instructions: string
+  ) {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    constraint reviseRecipeName: length(trim(name)) > 0 "Recipe name is required"
+    constraint reviseYieldPositive: yieldQuantity > 0 "Recipe yield quantity must be positive"
+    constraint reviseBatchPositive: batchMultiplier > 0 "Recipe batch multiplier must be positive"
+    mutate name = name
+    mutate yieldQuantity = yieldQuantity
+    mutate yieldUnit = yieldUnit
+    mutate batchMultiplier = batchMultiplier
+    mutate category = category
+    mutate cuisine = cuisine
+    mutate description = description
+    mutate instructions = instructions
+    emit RecipeDraftRevised {
+      recipeId: self.id
+      tenantId: self.tenantId
+      name: name
+      yieldQuantity: yieldQuantity
+      yieldUnit: yieldUnit
+      batchMultiplier: batchMultiplier
+      versionNumber: self.versionNumber
+    }
+  }
+
+  command publishVersion() {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "published"
+    mutate publishedAt = now()
+    emit RecipeVersionPublished {
+      recipeId: self.id
+      tenantId: self.tenantId
+      versionNumber: self.versionNumber
+      yieldQuantity: self.yieldQuantity
+      yieldUnit: self.yieldUnit
+      batchMultiplier: self.batchMultiplier
+    }
+  }
+
+  command retract() {
+    guard self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    compute nextVersion = self.versionNumber + 1
+    mutate status = "draft"
+    mutate publishedAt = null
+    mutate versionNumber = nextVersion
+    emit RecipeVersionRetracted {
+      recipeId: self.id
+      tenantId: self.tenantId
+      versionNumber: nextVersion
+    }
+  }
+
+  command retire(reason: string) {
+    guard self.status == "draft" or self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint retireReason: length(trim(reason)) > 0 "Retirement reason is required"
+    mutate status = "retired"
+    mutate retiredAt = now()
+    mutate retirementReason = reason
+    emit RecipeRetired {
+      recipeId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  store Recipe in durable
+}
+
+entity RecipeIngredient mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required recipeId: uuid
+  property required ingredientId: uuid
+  property required quantity: decimal(10, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required sortOrder: int = 0
+  property prepNotes: string?
+  property addedAt: datetime?
+
+  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+
+  constraint lineQuantityPositive: self.addedAt == null or self.quantity > 0 "Recipe ingredient quantity must be positive"
+
+  default policy recipeIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read recipe ingredient lines"
+  default policy recipeIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write recipe ingredient lines through commands"
+  default policy recipeIngredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute recipe ingredient line commands"
+
+  command add(
+    recipeId: uuid,
+    ingredientId: uuid,
+    quantity: decimal(10, 4),
+    unit: UnitOfMeasure,
+    optional sortOrder: number,
+    optional prepNotes: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    constraint addLineQuantity: quantity > 0 "Recipe ingredient quantity must be positive"
+    mutate recipeId = recipeId
+    mutate ingredientId = ingredientId
+    mutate quantity = quantity
+    mutate unit = unit
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate prepNotes = prepNotes
+    mutate addedAt = now()
+    emit RecipeIngredientAdded {
+      recipeIngredientId: self.id
+      tenantId: self.tenantId
+      recipeId: recipeId
+      ingredientId: ingredientId
+      quantity: quantity
+      unit: unit
+    }
+  }
+
+  command adjustQuantity(quantity: decimal(10, 4), unit: UnitOfMeasure) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint adjustLineQuantity: quantity > 0 "Recipe ingredient quantity must be positive"
+    compute previousQuantity = self.quantity
+    compute previousUnit = self.unit
+    mutate quantity = quantity
+    mutate unit = unit
+    emit RecipeIngredientQuantityAdjusted {
+      recipeIngredientId: self.id
+      tenantId: self.tenantId
+      recipeId: self.recipeId
+      ingredientId: self.ingredientId
+      previousQuantity: previousQuantity
+      previousUnit: previousUnit
+      quantity: quantity
+      unit: unit
+    }
+  }
+
+  command remove(reason: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint removeLineReason: length(trim(reason)) > 0 "Removal reason is required"
+    mutate deletedAt = now()
+    emit RecipeIngredientRemoved {
+      recipeIngredientId: self.id
+      tenantId: self.tenantId
+      recipeId: self.recipeId
+      ingredientId: self.ingredientId
+      quantity: self.quantity
+      unit: self.unit
+      reason: reason
+    }
+  }
+
+  store RecipeIngredient in durable
+}
+
+event RecipeDrafted: "recipe.drafted" {
+  recipeId: string
+  tenantId: string
+  name: string
+  yieldQuantity: decimal(10, 2)
+  yieldUnit: UnitOfMeasure
+  batchMultiplier: decimal(10, 4)
+  versionNumber: number
+}
+
+event RecipeDraftRevised: "recipe.draft_revised" {
+  recipeId: string
+  tenantId: string
+  name: string
+  yieldQuantity: decimal(10, 2)
+  yieldUnit: UnitOfMeasure
+  batchMultiplier: decimal(10, 4)
+  versionNumber: number
+}
+
+event RecipeVersionPublished: "recipe.version_published" {
+  recipeId: string
+  tenantId: string
+  versionNumber: number
+  yieldQuantity: decimal(10, 2)
+  yieldUnit: UnitOfMeasure
+  batchMultiplier: decimal(10, 4)
+}
+
+event RecipeVersionRetracted: "recipe.version_retracted" {
+  recipeId: string
+  tenantId: string
+  versionNumber: number
+}
+
+event RecipeRetired: "recipe.retired" {
+  recipeId: string
+  tenantId: string
+  reason: string
+}
+
+event RecipeIngredientAdded: "recipe_ingredient.added" {
+  recipeIngredientId: string
+  tenantId: string
+  recipeId: string
+  ingredientId: string
+  quantity: decimal(10, 4)
+  unit: UnitOfMeasure
+}
+
+event RecipeIngredientQuantityAdjusted: "recipe_ingredient.quantity_adjusted" {
+  recipeIngredientId: string
+  tenantId: string
+  recipeId: string
+  ingredientId: string
+  previousQuantity: decimal(10, 4)
+  previousUnit: UnitOfMeasure
+  quantity: decimal(10, 4)
+  unit: UnitOfMeasure
+}
+
+event RecipeIngredientRemoved: "recipe_ingredient.removed" {
+  recipeIngredientId: string
+  tenantId: string
+  recipeId: string
+  ingredientId: string
+  quantity: decimal(10, 4)
+  unit: UnitOfMeasure
+  reason: string
+}

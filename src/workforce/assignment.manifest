@@ -1,0 +1,250 @@
+// Capsule workforce — EventAssignment (Person staffed onto an Event).
+// Compile chain: time.manifest → packing → … → this file → shift → availability.
+// Maps capsule-pro EventStaff. Training courses/sessions deferred (OD027).
+
+use "./shift.manifest"
+
+enum EventAssignmentStatus {
+  assigned
+  confirmed
+  checked_in
+  checked_out
+  no_show
+  unassigned
+}
+
+// Person assigned to an Event in an operational function. Role is an open
+// string until a closed staffing-role catalog is evidenced (OD023).
+entity EventAssignment mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required personId: uuid
+  property required role: string = ""
+  property startsAt: datetime?
+  property endsAt: datetime?
+  property encrypted notes: string?
+  property required status: EventAssignmentStatus = "assigned"
+  property assignedAt: datetime?
+  property confirmedAt: datetime?
+  property checkedInAt: datetime?
+  property checkedOutAt: datetime?
+  property noShowAt: datetime?
+  property unassignedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
+  constraint assignmentOpenedComplete: self.assignedAt == null or (length(trim(self.role)) > 0 and (self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt)) "Assigned staffing requires a role and a valid optional shift window"
+
+  transition status from "assigned" to ["confirmed", "checked_in", "no_show", "unassigned"]
+  transition status from "confirmed" to ["checked_in", "no_show", "unassigned"]
+  transition status from "checked_in" to ["checked_out"]
+  transition status from "checked_out" to []
+  transition status from "no_show" to []
+  transition status from "unassigned" to []
+
+  default policy eventAssignmentRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read event assignments"
+  default policy eventAssignmentWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write event assignments through commands"
+  default policy eventAssignmentExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute event assignment commands"
+
+  command assign(
+    eventId: uuid,
+    personId: uuid,
+    role: string,
+    optional startsAt: datetime,
+    optional endsAt: datetime,
+    optional notes: string
+  ) {
+    guard self.assignedAt == null
+    guard self.status == "assigned"
+    guard self.deletedAt == null
+    guard self.event != null
+    guard self.person != null and self.person.status == "active"
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint assignEventMatch: eventId == self.eventId "Assign eventId must match the seeded event reference"
+    constraint assignPersonMatch: personId == self.personId "Assign personId must match the seeded person reference"
+    constraint assignRolePresent: length(trim(role)) > 0 "Assignment role is required"
+    constraint assignShiftDates: startsAt == null or endsAt == null or endsAt > startsAt "Assignment shift end must be after its start"
+    mutate eventId = eventId
+    mutate personId = personId
+    mutate role = role
+    mutate startsAt = startsAt != null ? startsAt : self.startsAt
+    mutate endsAt = endsAt != null ? endsAt : self.endsAt
+    mutate notes = notes != null ? notes : self.notes
+    mutate assignedAt = now()
+    emit EventAssignmentAssigned {
+      eventAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      personId: personId
+      role: role
+      startsAt: startsAt != null ? startsAt : self.startsAt
+      endsAt: endsAt != null ? endsAt : self.endsAt
+      status: "assigned"
+    }
+  }
+
+  command confirm() {
+    guard self.status == "assigned"
+    guard self.assignedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "confirmed"
+    mutate confirmedAt = now()
+    emit EventAssignmentConfirmed {
+      eventAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      personId: self.personId
+      role: self.role
+      previousStatus: previousStatus
+      status: "confirmed"
+    }
+  }
+
+  command checkIn() {
+    guard self.status == "assigned" or self.status == "confirmed"
+    guard self.assignedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "checked_in"
+    mutate checkedInAt = now()
+    emit EventAssignmentCheckedIn {
+      eventAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      personId: self.personId
+      role: self.role
+      previousStatus: previousStatus
+      status: "checked_in"
+    }
+  }
+
+  command checkOut() {
+    guard self.status == "checked_in"
+    guard self.checkedInAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "checked_out"
+    mutate checkedOutAt = now()
+    emit EventAssignmentCheckedOut {
+      eventAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      personId: self.personId
+      role: self.role
+      previousStatus: previousStatus
+      status: "checked_out"
+    }
+  }
+
+  command markNoShow() {
+    guard self.status == "assigned" or self.status == "confirmed"
+    guard self.assignedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "no_show"
+    mutate noShowAt = now()
+    emit EventAssignmentNoShowMarked {
+      eventAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      personId: self.personId
+      role: self.role
+      previousStatus: previousStatus
+      status: "no_show"
+    }
+  }
+
+  command unassign() {
+    guard self.status == "assigned" or self.status == "confirmed"
+    guard self.assignedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "unassigned"
+    mutate unassignedAt = now()
+    emit EventAssignmentUnassigned {
+      eventAssignmentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      personId: self.personId
+      role: self.role
+      previousStatus: previousStatus
+      status: "unassigned"
+    }
+  }
+
+  store EventAssignment in durable
+}
+
+event EventAssignmentAssigned: "event_assignment.assigned" {
+  eventAssignmentId: string
+  tenantId: string
+  eventId: string
+  personId: string
+  role: string
+  startsAt: datetime?
+  endsAt: datetime?
+  status: EventAssignmentStatus
+}
+
+event EventAssignmentConfirmed: "event_assignment.confirmed" {
+  eventAssignmentId: string
+  tenantId: string
+  eventId: string
+  personId: string
+  role: string
+  previousStatus: EventAssignmentStatus
+  status: EventAssignmentStatus
+}
+
+event EventAssignmentCheckedIn: "event_assignment.checked_in" {
+  eventAssignmentId: string
+  tenantId: string
+  eventId: string
+  personId: string
+  role: string
+  previousStatus: EventAssignmentStatus
+  status: EventAssignmentStatus
+}
+
+event EventAssignmentCheckedOut: "event_assignment.checked_out" {
+  eventAssignmentId: string
+  tenantId: string
+  eventId: string
+  personId: string
+  role: string
+  previousStatus: EventAssignmentStatus
+  status: EventAssignmentStatus
+}
+
+event EventAssignmentNoShowMarked: "event_assignment.no_show_marked" {
+  eventAssignmentId: string
+  tenantId: string
+  eventId: string
+  personId: string
+  role: string
+  previousStatus: EventAssignmentStatus
+  status: EventAssignmentStatus
+}
+
+event EventAssignmentUnassigned: "event_assignment.unassigned" {
+  eventAssignmentId: string
+  tenantId: string
+  eventId: string
+  personId: string
+  role: string
+  previousStatus: EventAssignmentStatus
+  status: EventAssignmentStatus
+}

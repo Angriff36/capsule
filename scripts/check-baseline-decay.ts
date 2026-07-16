@@ -4,7 +4,8 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-const ROOT_CAP = 35;
+/** Includes live-Manifest roots: `manifest.config.yaml` + `.builder/`. */
+const ROOT_CAP = 37;
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {

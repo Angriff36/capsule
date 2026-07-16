@@ -1,0 +1,231 @@
+// Capsule culinary Dish — served item built from a published Recipe.
+// Menu and EventDish live in menu.manifest (compile entry).
+
+use "./recipe.manifest"
+
+enum DishStatus {
+  active
+  retired
+}
+
+entity Dish mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required recipeId: uuid
+  property required searchable name: string = ""
+  property description: string?
+  property category: string?
+  property course: string?
+  property serviceStyle: string?
+  property required portionSize: decimal(10, 2) = 1
+  property required portionUnit: UnitOfMeasure = "portion"
+  property dietaryTags: list<string> = []
+  // Stored summary: multi-hop Ingredient allergen aggregation via Recipe is
+  // not expressible as a single computed (OD010). Commands maintain this list.
+  property allergenSummary: list<AllergenCode> = []
+  property required status: DishStatus = "active"
+  property introducedAt: datetime?
+  property retiredAt: datetime?
+  property retirementReason: string?
+
+  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+
+  computed isActive: boolean = self.status == "active"
+  computed isRetired: boolean = self.status == "retired"
+
+  constraint dishIdentityComplete: self.introducedAt == null or length(trim(self.name)) > 0 "Introduced dishes require a name"
+  constraint dishPortionPositive: self.introducedAt == null or self.portionSize > 0 "Dish portion size must be positive"
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  default policy dishRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dishes"
+  default policy dishWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dishes through commands"
+  default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish commands"
+
+  command introduce(
+    recipeId: uuid,
+    name: string,
+    portionSize: decimal(10, 2),
+    portionUnit: UnitOfMeasure,
+    optional description: string,
+    optional category: string,
+    optional course: string,
+    optional serviceStyle: string,
+    optional dietaryTags: list<string>,
+    optional allergenSummary: list<AllergenCode>
+  ) {
+    guard self.introducedAt == null
+    guard self.deletedAt == null
+    constraint introduceDishName: length(trim(name)) > 0 "Dish name is required"
+    constraint introduceDishPortion: portionSize > 0 "Dish portion size must be positive"
+    mutate recipeId = recipeId
+    mutate name = name
+    mutate portionSize = portionSize
+    mutate portionUnit = portionUnit
+    mutate description = description
+    mutate category = category
+    mutate course = course
+    mutate serviceStyle = serviceStyle
+    mutate dietaryTags = dietaryTags != null ? dietaryTags : []
+    mutate allergenSummary = allergenSummary != null ? allergenSummary : []
+    mutate introducedAt = now()
+    emit DishIntroduced {
+      dishId: self.id
+      tenantId: self.tenantId
+      recipeId: recipeId
+      name: name
+      portionSize: portionSize
+      portionUnit: portionUnit
+      allergenSummary: allergenSummary != null ? allergenSummary : []
+    }
+  }
+
+  command reviseDetails(
+    name: string,
+    optional description: string,
+    optional category: string,
+    optional course: string,
+    optional serviceStyle: string,
+    optional dietaryTags: list<string>
+  ) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint reviseDishName: length(trim(name)) > 0 "Dish name is required"
+    mutate name = name
+    mutate description = description
+    mutate category = category
+    mutate course = course
+    mutate serviceStyle = serviceStyle
+    mutate dietaryTags = dietaryTags != null ? dietaryTags : self.dietaryTags
+    emit DishDetailsRevised {
+      dishId: self.id
+      tenantId: self.tenantId
+      name: name
+    }
+  }
+
+  command changeRecipe(recipeId: uuid) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    compute previousRecipeId = self.recipeId
+    mutate recipeId = recipeId
+    emit DishRecipeChanged {
+      dishId: self.id
+      tenantId: self.tenantId
+      previousRecipeId: previousRecipeId
+      recipeId: recipeId
+    }
+  }
+
+  command updatePortioning(portionSize: decimal(10, 2), portionUnit: UnitOfMeasure) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint updateDishPortion: portionSize > 0 "Dish portion size must be positive"
+    compute previousPortionSize = self.portionSize
+    compute previousPortionUnit = self.portionUnit
+    mutate portionSize = portionSize
+    mutate portionUnit = portionUnit
+    emit DishPortioningUpdated {
+      dishId: self.id
+      tenantId: self.tenantId
+      previousPortionSize: previousPortionSize
+      previousPortionUnit: previousPortionUnit
+      portionSize: portionSize
+      portionUnit: portionUnit
+    }
+  }
+
+  command classifyAllergens(allergenSummary: list<AllergenCode>) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate allergenSummary = allergenSummary
+    emit DishAllergensClassified {
+      dishId: self.id
+      tenantId: self.tenantId
+      allergenSummary: allergenSummary
+    }
+  }
+
+  command retire(reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint retireDishReason: length(trim(reason)) > 0 "Retirement reason is required"
+    mutate status = "retired"
+    mutate retiredAt = now()
+    mutate retirementReason = reason
+    emit DishRetired {
+      dishId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reinstate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "active"
+    mutate retiredAt = null
+    mutate retirementReason = null
+    emit DishReinstated {
+      dishId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Dish in durable
+}
+
+event DishIntroduced: "dish.introduced" {
+  dishId: string
+  tenantId: string
+  recipeId: string
+  name: string
+  portionSize: decimal(10, 2)
+  portionUnit: UnitOfMeasure
+  allergenSummary: list<AllergenCode>
+}
+
+event DishDetailsRevised: "dish.details_revised" {
+  dishId: string
+  tenantId: string
+  name: string
+}
+
+event DishRecipeChanged: "dish.recipe_changed" {
+  dishId: string
+  tenantId: string
+  previousRecipeId: string
+  recipeId: string
+}
+
+event DishPortioningUpdated: "dish.portioning_updated" {
+  dishId: string
+  tenantId: string
+  previousPortionSize: decimal(10, 2)
+  previousPortionUnit: UnitOfMeasure
+  portionSize: decimal(10, 2)
+  portionUnit: UnitOfMeasure
+}
+
+event DishAllergensClassified: "dish.allergens_classified" {
+  dishId: string
+  tenantId: string
+  allergenSummary: list<AllergenCode>
+}
+
+event DishRetired: "dish.retired" {
+  dishId: string
+  tenantId: string
+  reason: string
+}
+
+event DishReinstated: "dish.reinstated" {
+  dishId: string
+  tenantId: string
+}

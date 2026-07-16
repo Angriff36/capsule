@@ -1,4 +1,6 @@
-# CapsuleX baseline checklist
+# Capsule baseline checklist
+
+~~Title previously said “CapsuleX”.~~ **Correction (2026-07-16):** this repo is **Capsule**.
 
 Day-0 gates for this repo. Evidence: `.artifacts/baseline-evidence.md` (local)
 and the last green `bun run check` / CI run.
@@ -31,4 +33,7 @@ and the last green `bun run check` / CI run.
 
 ## Root cap
 
-Aim ≤35 tracked root entries (excluding `node_modules` / `dist` / `graphify-out`). Enforced by `bun run baseline:decay`.
+~~Aim ≤35 tracked root entries (excluding `node_modules` / `dist` / `graphify-out`).~~
+**Correction (2026-07-16):** Aim ≤37 — live Manifest project adds root
+`manifest.config.yaml` and `.builder/` (ownership). Still excludes
+`node_modules` / `dist` / `graphify-out`. Enforced by `bun run baseline:decay`.

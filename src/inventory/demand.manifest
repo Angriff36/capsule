@@ -1,0 +1,374 @@
+// Capsule inventory demand & waste — event-scoped ingredient requirements
+// and recorded stock loss.
+// ~~Procurement (PurchaseNeed / VendorOrder / Receipt) is the next slice.~~
+// Procurement: Vendor + VendorOrder + VendorOrderLine in src/procurement/
+// (2026-07-15). Compile entry for this file alone still reaches culinary + ops.
+
+use "./stock.manifest"
+
+enum IngredientDemandStatus {
+  pending
+  calculated
+  confirmed
+  fulfilled
+  superseded
+}
+
+enum WasteReason {
+  spoilage
+  prep_error
+  overproduction
+  other
+}
+
+enum WasteRecordStatus {
+  pending
+  recorded
+  voided
+}
+
+// Materialized required quantity of one Ingredient for one Event.
+// Prep-list derivation (recipe line × batch × servings / yield) lands via
+// later reactions; this entity stores the governed result and its inputs.
+// Shortage vs on-hand/reservations is deferred (OD015) — no hasMany edges
+// from this entity to InventoryItem / InventoryReservation for aggregate
+// computeds (builtins.md aggregates over hasMany only).
+entity IngredientDemand mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, eventId, ingredientId]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required ingredientId: uuid
+  property required requiredQuantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property servings: decimal(12, 4)?
+  property dishId: uuid?
+  property sourceRecipeLineQuantity: decimal(12, 4)?
+  property sourceBatchMultiplier: decimal(12, 4)?
+  property sourceYieldQuantity: decimal(12, 4)?
+  property required status: IngredientDemandStatus = "pending"
+  property calculatedAt: datetime?
+  property confirmedAt: datetime?
+  property fulfilledAt: datetime?
+  property supersededAt: datetime?
+  property supersedeReason: string?
+  property lastRecalculationReason: string?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+
+  constraint demandQuantityNonnegative: self.calculatedAt == null or self.requiredQuantity > 0 "Required quantity must be positive once calculated"
+
+  transition status from "pending" to ["calculated"]
+  transition status from "calculated" to ["confirmed", "superseded"]
+  transition status from "confirmed" to ["fulfilled", "superseded"]
+  transition status from "fulfilled" to []
+  transition status from "superseded" to []
+
+  default policy ingredientDemandRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read ingredient demand"
+  default policy ingredientDemandWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write ingredient demand through commands"
+  default policy ingredientDemandExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute ingredient demand commands"
+
+  command calculate(
+    eventId: uuid,
+    ingredientId: uuid,
+    requiredQuantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    optional servings: decimal(12, 4),
+    optional dishId: uuid,
+    optional sourceRecipeLineQuantity: decimal(12, 4),
+    optional sourceBatchMultiplier: decimal(12, 4),
+    optional sourceYieldQuantity: decimal(12, 4)
+  ) {
+    guard self.calculatedAt == null
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    guard self.event != null
+    guard self.ingredient != null and self.ingredient.status == "active"
+    constraint calculateEventMatch: eventId == self.eventId "Calculate eventId must match the seeded event reference"
+    constraint calculateIngredientMatch: ingredientId == self.ingredientId "Calculate ingredientId must match the seeded ingredient reference"
+    constraint calculateQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    constraint calculateServingsNonnegative: servings == null or servings >= 0 "Servings cannot be negative"
+    constraint calculateRecipeLineNonnegative: sourceRecipeLineQuantity == null or sourceRecipeLineQuantity >= 0 "Source recipe line quantity cannot be negative"
+    constraint calculateBatchNonnegative: sourceBatchMultiplier == null or sourceBatchMultiplier >= 0 "Source batch multiplier cannot be negative"
+    constraint calculateYieldPositive: sourceYieldQuantity == null or sourceYieldQuantity > 0 "Source yield quantity must be positive when provided"
+    mutate eventId = eventId
+    mutate ingredientId = ingredientId
+    mutate requiredQuantity = requiredQuantity
+    mutate unit = unit
+    mutate servings = servings != null ? servings : self.servings
+    mutate dishId = dishId != null ? dishId : self.dishId
+    mutate sourceRecipeLineQuantity = sourceRecipeLineQuantity != null ? sourceRecipeLineQuantity : self.sourceRecipeLineQuantity
+    mutate sourceBatchMultiplier = sourceBatchMultiplier != null ? sourceBatchMultiplier : self.sourceBatchMultiplier
+    mutate sourceYieldQuantity = sourceYieldQuantity != null ? sourceYieldQuantity : self.sourceYieldQuantity
+    mutate status = "calculated"
+    mutate calculatedAt = now()
+    emit IngredientDemandCalculated {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      ingredientId: ingredientId
+      dishId: dishId != null ? dishId : self.dishId
+      requiredQuantity: requiredQuantity
+      unit: unit
+      servings: servings != null ? servings : self.servings
+    }
+  }
+
+  command confirm() {
+    guard self.status == "calculated"
+    guard self.calculatedAt != null
+    guard self.deletedAt == null
+    mutate status = "confirmed"
+    mutate confirmedAt = now()
+    emit IngredientDemandConfirmed {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      requiredQuantity: self.requiredQuantity
+      unit: self.unit
+    }
+  }
+
+  command recalculate(newQuantity: decimal(12, 4), reason: string) {
+    guard self.status == "calculated" or self.status == "confirmed"
+    guard self.calculatedAt != null
+    guard self.deletedAt == null
+    constraint recalculateQuantityPositive: newQuantity > 0 "Recalculated quantity must be positive"
+    constraint recalculateReasonRequired: length(trim(reason)) > 0 "Recalculation reason is required"
+    compute previousQuantity = self.requiredQuantity
+    mutate requiredQuantity = newQuantity
+    mutate lastRecalculationReason = reason
+    emit IngredientDemandRecalculated {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      previousQuantity: previousQuantity
+      requiredQuantity: newQuantity
+      unit: self.unit
+      reason: reason
+    }
+  }
+
+  command fulfill() {
+    guard self.status == "confirmed"
+    guard self.confirmedAt != null
+    guard self.deletedAt == null
+    mutate status = "fulfilled"
+    mutate fulfilledAt = now()
+    emit IngredientDemandFulfilled {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      requiredQuantity: self.requiredQuantity
+      unit: self.unit
+    }
+  }
+
+  command supersede(reason: string) {
+    guard self.status == "calculated" or self.status == "confirmed"
+    guard self.calculatedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    constraint supersedeReasonRequired: length(trim(reason)) > 0 "Supersede reason is required"
+    compute previousQuantity = self.requiredQuantity
+    mutate status = "superseded"
+    mutate supersededAt = now()
+    mutate supersedeReason = reason
+    emit IngredientDemandSuperseded {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      previousQuantity: previousQuantity
+      requiredQuantity: self.requiredQuantity
+      unit: self.unit
+      reason: reason
+    }
+  }
+
+  store IngredientDemand in durable
+}
+
+// Recorded loss of ingredient stock at a storage location. Optional Event
+// provenance when the loss is event-linked. Stock decrement reaction deferred.
+entity WasteRecord mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required ingredientId: uuid
+  property required locationId: uuid
+  property eventId: uuid?
+  property required quantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required reason: WasteReason = "other"
+  property required unitCost: money(12, 2) = 0
+  property required status: WasteRecordStatus = "pending"
+  property notes: string?
+  property recordedAt: datetime?
+  property voidedAt: datetime?
+  property voidReason: string?
+
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  computed costImpact: money(12, 2) = self.quantity * self.unitCost
+
+  constraint wasteQuantityPositive: self.recordedAt == null or self.quantity > 0 "Waste quantity must be positive once recorded"
+  constraint wasteCostNonnegative: self.unitCost >= 0 "Waste unit cost cannot be negative"
+
+  transition status from "pending" to ["recorded"]
+  transition status from "recorded" to ["voided"]
+  transition status from "voided" to []
+
+  default policy wasteRecordRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read waste records"
+  default policy wasteRecordWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write waste records through commands"
+  default policy wasteRecordExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute waste record commands"
+
+  command record(
+    ingredientId: uuid,
+    locationId: uuid,
+    quantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    reason: WasteReason,
+    optional eventId: uuid,
+    optional unitCost: money(12, 2),
+    optional notes: string
+  ) {
+    guard self.recordedAt == null
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    guard self.ingredient != null and self.ingredient.status == "active"
+    guard self.location != null and self.location.status == "active"
+    constraint recordIngredientMatch: ingredientId == self.ingredientId "Record ingredientId must match the seeded ingredient reference"
+    constraint recordLocationMatch: locationId == self.locationId "Record locationId must match the seeded location reference"
+    constraint recordQuantityPositive: quantity > 0 "Waste quantity must be positive"
+    constraint recordCostNonnegative: unitCost == null or unitCost >= 0 "Waste unit cost cannot be negative"
+    mutate ingredientId = ingredientId
+    mutate locationId = locationId
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate quantity = quantity
+    mutate unit = unit
+    mutate reason = reason
+    mutate unitCost = unitCost != null ? unitCost : self.unitCost
+    mutate notes = notes != null ? notes : self.notes
+    mutate status = "recorded"
+    mutate recordedAt = now()
+    emit WasteRecorded {
+      wasteRecordId: self.id
+      tenantId: self.tenantId
+      ingredientId: ingredientId
+      locationId: locationId
+      eventId: eventId != null ? eventId : self.eventId
+      quantity: quantity
+      unit: unit
+      reason: reason
+      unitCost: unitCost != null ? unitCost : self.unitCost
+    }
+  }
+
+  command voidRecord(reason: string) {
+    guard self.status == "recorded"
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    constraint voidReasonRequired: length(trim(reason)) > 0 "Void reason is required"
+    mutate status = "voided"
+    mutate voidedAt = now()
+    mutate voidReason = reason
+    emit WasteVoided {
+      wasteRecordId: self.id
+      tenantId: self.tenantId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      eventId: self.eventId
+      quantity: self.quantity
+      unit: self.unit
+      reason: reason
+    }
+  }
+
+  store WasteRecord in durable
+}
+
+event IngredientDemandCalculated: "ingredient_demand.calculated" {
+  ingredientDemandId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  dishId: string?
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  servings: decimal(12, 4)?
+}
+
+event IngredientDemandConfirmed: "ingredient_demand.confirmed" {
+  ingredientDemandId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event IngredientDemandRecalculated: "ingredient_demand.recalculated" {
+  ingredientDemandId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  previousQuantity: decimal(12, 4)
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  reason: string
+}
+
+event IngredientDemandFulfilled: "ingredient_demand.fulfilled" {
+  ingredientDemandId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event IngredientDemandSuperseded: "ingredient_demand.superseded" {
+  ingredientDemandId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  previousQuantity: decimal(12, 4)
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  reason: string
+}
+
+event WasteRecorded: "waste_record.recorded" {
+  wasteRecordId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  eventId: string?
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  reason: WasteReason
+  unitCost: money(12, 2)
+}
+
+event WasteVoided: "waste_record.voided" {
+  wasteRecordId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  eventId: string?
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  reason: string
+}

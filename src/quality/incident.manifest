@@ -1,0 +1,208 @@
+// Capsule execution & quality — Incident (event-attached operational
+// incident). Compile entry for quality slice; uses allergen-check → closeout
+// chain. Battle boards are projection/UI aggregations (not entities here).
+
+use "./allergen-check.manifest"
+
+enum IncidentStatus {
+  open
+  investigating
+  resolved
+  dismissed
+}
+
+enum IncidentSeverity {
+  low
+  medium
+  high
+  critical
+}
+
+enum IncidentCategory {
+  food_safety
+  injury
+  equipment
+  service
+  other
+}
+
+// Operational incident recorded at/for an Event, optionally linked to prep,
+// delivery, or shift work. Product §7 requires incident attachment; capsule-pro
+// evidence has NO Incident entity — enums are product-closed vocabularies.
+entity Incident mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property prepTaskId: uuid?
+  property deliveryId: uuid?
+  property shiftId: uuid?
+  property required severity: IncidentSeverity = "medium"
+  property required category: IncidentCategory = "other"
+  property required description: string = ""
+  property resolution: string?
+  property dismissalReason: string?
+  property reportedById: uuid?
+  property required status: IncidentStatus = "open"
+  property reportedAt: datetime?
+  property investigatingAt: datetime?
+  property resolvedAt: datetime?
+  property dismissedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo prepTask: PrepTask fields [tenantId, prepTaskId] references [tenantId, id]
+  belongsTo delivery: Delivery fields [tenantId, deliveryId] references [tenantId, id]
+  belongsTo shift: Shift fields [tenantId, shiftId] references [tenantId, id]
+  belongsTo reportedBy: Person fields [tenantId, reportedById] references [tenantId, id]
+
+  constraint incidentDescriptionPresent: self.reportedAt == null or length(trim(self.description)) > 0 "Reported incidents require a description"
+
+  transition status from "open" to ["investigating", "resolved", "dismissed"]
+  transition status from "investigating" to ["resolved", "dismissed"]
+  transition status from "resolved" to []
+  transition status from "dismissed" to []
+
+  default policy incidentRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may read incidents"
+  default policy incidentWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may write incidents through commands"
+  default policy incidentExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may execute incident commands"
+
+  command report(
+    eventId: uuid,
+    severity: IncidentSeverity,
+    category: IncidentCategory,
+    description: string,
+    optional prepTaskId: uuid,
+    optional deliveryId: uuid,
+    optional shiftId: uuid
+  ) {
+    guard self.reportedAt == null
+    guard self.status == "open"
+    guard self.deletedAt == null
+    guard self.event != null
+    guard user.id != null
+    constraint reportEventMatch: eventId == self.eventId "Report eventId must match the seeded event reference"
+    constraint reportPrepMatch: prepTaskId == null or self.prepTaskId == null or prepTaskId == self.prepTaskId "Report prepTaskId must match the seeded prep task reference when provided"
+    constraint reportDeliveryMatch: deliveryId == null or self.deliveryId == null or deliveryId == self.deliveryId "Report deliveryId must match the seeded delivery reference when provided"
+    constraint reportShiftMatch: shiftId == null or self.shiftId == null or shiftId == self.shiftId "Report shiftId must match the seeded shift reference when provided"
+    constraint reportDescriptionPresent: length(trim(description)) > 0 "Incident description is required"
+    mutate eventId = eventId
+    mutate prepTaskId = prepTaskId != null ? prepTaskId : self.prepTaskId
+    mutate deliveryId = deliveryId != null ? deliveryId : self.deliveryId
+    mutate shiftId = shiftId != null ? shiftId : self.shiftId
+    mutate severity = severity
+    mutate category = category
+    mutate description = description
+    mutate reportedById = user.id
+    mutate reportedAt = now()
+    emit IncidentReported {
+      incidentId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      severity: severity
+      category: category
+      reportedById: user.id
+      status: "open"
+    }
+  }
+
+  command beginInvestigation() {
+    guard self.status == "open"
+    guard self.reportedAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "investigating"
+    mutate investigatingAt = now()
+    emit IncidentInvestigationStarted {
+      incidentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      severity: self.severity
+      previousStatus: previousStatus
+      status: "investigating"
+    }
+  }
+
+  // `resolve` is a reserved word — markResolved is the product resolve action.
+  command markResolved(resolution: string) {
+    guard self.status == "open" or self.status == "investigating"
+    guard self.reportedAt != null
+    guard self.deletedAt == null
+    constraint resolveTextPresent: length(trim(resolution)) > 0 "Resolution is required"
+    compute previousStatus = self.status
+    mutate resolution = resolution
+    mutate status = "resolved"
+    mutate resolvedAt = now()
+    emit IncidentResolved {
+      incidentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      severity: self.severity
+      previousStatus: previousStatus
+      status: "resolved"
+      resolution: resolution
+    }
+  }
+
+  command dismiss(reason: string) {
+    guard self.status == "open" or self.status == "investigating"
+    guard self.reportedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "kitchenManageAccess")
+    constraint dismissReasonPresent: length(trim(reason)) > 0 "Dismissal reason is required"
+    compute previousStatus = self.status
+    mutate dismissalReason = reason
+    mutate status = "dismissed"
+    mutate dismissedAt = now()
+    emit IncidentDismissed {
+      incidentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      severity: self.severity
+      previousStatus: previousStatus
+      status: "dismissed"
+      reason: reason
+    }
+  }
+
+  store Incident in durable
+}
+
+event IncidentReported: "incident.reported" {
+  incidentId: string
+  tenantId: string
+  eventId: string
+  severity: IncidentSeverity
+  category: IncidentCategory
+  reportedById: string
+  status: IncidentStatus
+}
+
+event IncidentInvestigationStarted: "incident.investigation_started" {
+  incidentId: string
+  tenantId: string
+  eventId: string
+  severity: IncidentSeverity
+  previousStatus: IncidentStatus
+  status: IncidentStatus
+}
+
+event IncidentResolved: "incident.resolved" {
+  incidentId: string
+  tenantId: string
+  eventId: string
+  severity: IncidentSeverity
+  previousStatus: IncidentStatus
+  status: IncidentStatus
+  resolution: string
+}
+
+event IncidentDismissed: "incident.dismissed" {
+  incidentId: string
+  tenantId: string
+  eventId: string
+  severity: IncidentSeverity
+  previousStatus: IncidentStatus
+  status: IncidentStatus
+  reason: string
+}

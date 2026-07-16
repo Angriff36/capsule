@@ -1,0 +1,376 @@
+// Capsule production — PrepTask (claim/start/complete + block for quality).
+// Station is an open string property (Station entity deferred). Compile chain
+// continues via batch.manifest → prep.manifest (entry).
+
+use "../procurement/purchase-need.manifest"
+
+enum PrepTaskStatus {
+  pending
+  claimed
+  in_progress
+  blocked
+  completed
+  cancelled
+}
+
+// Event-scoped prep/production work item for one Ingredient (optional demand/
+// dish/recipe provenance). Claim sets assignee from acting user.id — never a
+// client-supplied userId (semantics.md § User-Facing Boundary).
+entity PrepTask mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required ingredientId: uuid
+  property ingredientDemandId: uuid?
+  property dishId: uuid?
+  property recipeId: uuid?
+  property required quantity: decimal(12, 4) = 0
+  property completedQuantity: decimal(12, 4)?
+  property required unit: UnitOfMeasure = "each"
+  property station: string?
+  property dueAt: datetime?
+  property assignedToId: uuid?
+  property notes: string?
+  property required status: PrepTaskStatus = "pending"
+  property claimedAt: datetime?
+  property startedAt: datetime?
+  property completedAt: datetime?
+  property cancelledAt: datetime?
+  property cancellationReason: string?
+  property blockedAt: datetime?
+  property blockReason: string?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+  belongsTo assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
+
+  constraint prepQuantityPositive: self.claimedAt == null or self.quantity > 0 "Prep quantity must be positive once opened"
+  constraint prepCompletedNonnegative: self.completedQuantity == null or self.completedQuantity >= 0 "Completed quantity cannot be negative"
+
+  transition status from "pending" to ["claimed", "blocked", "cancelled"]
+  transition status from "claimed" to ["in_progress", "pending", "blocked", "cancelled"]
+  transition status from "in_progress" to ["completed", "blocked", "cancelled"]
+  transition status from "blocked" to ["pending", "cancelled"]
+  transition status from "completed" to []
+  transition status from "cancelled" to []
+
+  default policy prepTaskRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read prep tasks"
+  default policy prepTaskWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write prep tasks through commands"
+  default policy prepTaskExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute prep task commands"
+
+  command open(
+    eventId: uuid,
+    ingredientId: uuid,
+    quantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    optional ingredientDemandId: uuid,
+    optional dishId: uuid,
+    optional recipeId: uuid,
+    optional station: string,
+    optional dueAt: datetime,
+    optional notes: string
+  ) {
+    guard self.claimedAt == null
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    guard self.event != null
+    guard self.ingredient != null and self.ingredient.status == "active"
+    constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
+    constraint openIngredientMatch: ingredientId == self.ingredientId "Open ingredientId must match the seeded ingredient reference"
+    constraint openDemandMatch: ingredientDemandId == null or self.ingredientDemandId == null or ingredientDemandId == self.ingredientDemandId "Open ingredientDemandId must match the seeded demand reference when provided"
+    constraint openQuantityPositive: quantity > 0 "Prep quantity must be positive"
+    mutate eventId = eventId
+    mutate ingredientId = ingredientId
+    mutate ingredientDemandId = ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
+    mutate dishId = dishId != null ? dishId : self.dishId
+    mutate recipeId = recipeId != null ? recipeId : self.recipeId
+    mutate quantity = quantity
+    mutate unit = unit
+    mutate station = station != null ? station : self.station
+    mutate dueAt = dueAt != null ? dueAt : self.dueAt
+    mutate notes = notes != null ? notes : self.notes
+    emit PrepTaskOpened {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      ingredientId: ingredientId
+      ingredientDemandId: ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
+      dishId: dishId != null ? dishId : self.dishId
+      recipeId: recipeId != null ? recipeId : self.recipeId
+      quantity: quantity
+      unit: unit
+      station: station != null ? station : self.station
+      dueAt: dueAt != null ? dueAt : self.dueAt
+      status: "pending"
+    }
+  }
+
+  command claim() {
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint claimQuantityReady: self.quantity > 0 "Prep quantity must be positive before claim"
+    compute previousStatus = self.status
+    mutate assignedToId = user.id
+    mutate status = "claimed"
+    mutate claimedAt = now()
+    emit PrepTaskClaimed {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      assignedToId: user.id
+      quantity: self.quantity
+      unit: self.unit
+      previousStatus: previousStatus
+      status: "claimed"
+    }
+  }
+
+  command release() {
+    guard self.status == "claimed"
+    guard self.claimedAt != null
+    guard self.deletedAt == null
+    guard self.assignedToId == user.id or roleAllows(user.role, "kitchenLeadAccess")
+    compute previousStatus = self.status
+    compute previousAssignee = self.assignedToId
+    mutate assignedToId = null
+    mutate status = "pending"
+    mutate claimedAt = null
+    emit PrepTaskReleased {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      previousAssignedToId: previousAssignee
+      quantity: self.quantity
+      unit: self.unit
+      previousStatus: previousStatus
+      status: "pending"
+    }
+  }
+
+  command start() {
+    guard self.status == "claimed"
+    guard self.claimedAt != null
+    guard self.assignedToId != null
+    guard self.deletedAt == null
+    compute previousStatus = self.status
+    mutate status = "in_progress"
+    mutate startedAt = now()
+    emit PrepTaskStarted {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      assignedToId: self.assignedToId
+      quantity: self.quantity
+      unit: self.unit
+      previousStatus: previousStatus
+      status: "in_progress"
+    }
+  }
+
+  command complete(optional completedQuantity: decimal(12, 4)) {
+    guard self.status == "in_progress"
+    guard self.startedAt != null
+    guard self.deletedAt == null
+    constraint completeQuantityNonnegative: completedQuantity == null or completedQuantity >= 0 "Completed quantity cannot be negative"
+    compute previousStatus = self.status
+    compute nextCompleted = completedQuantity != null ? completedQuantity : self.quantity
+    mutate completedQuantity = nextCompleted
+    mutate status = "completed"
+    mutate completedAt = now()
+    emit PrepTaskCompleted {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      assignedToId: self.assignedToId
+      quantity: self.quantity
+      completedQuantity: nextCompleted
+      unit: self.unit
+      previousStatus: previousStatus
+      status: "completed"
+    }
+  }
+
+  command markBlocked(reason: string) {
+    guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenLeadAccess")
+    constraint blockReasonRequired: length(trim(reason)) > 0 "Block reason is required"
+    compute previousStatus = self.status
+    mutate status = "blocked"
+    mutate blockedAt = now()
+    mutate blockReason = reason
+    emit PrepTaskBlocked {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      quantity: self.quantity
+      unit: self.unit
+      previousStatus: previousStatus
+      status: "blocked"
+      reason: reason
+    }
+  }
+
+  command unblock() {
+    guard self.status == "blocked"
+    guard self.blockedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenLeadAccess")
+    compute previousStatus = self.status
+    mutate status = "pending"
+    mutate blockedAt = null
+    mutate blockReason = null
+    mutate assignedToId = null
+    mutate claimedAt = null
+    mutate startedAt = null
+    emit PrepTaskUnblocked {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      quantity: self.quantity
+      unit: self.unit
+      previousStatus: previousStatus
+      status: "pending"
+    }
+  }
+
+  command cancel(reason: string) {
+    guard self.status == "pending" or self.status == "claimed" or self.status == "in_progress" or self.status == "blocked"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenLeadAccess")
+    constraint cancelPrepReason: length(trim(reason)) > 0 "Cancellation reason is required"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate cancellationReason = reason
+    emit PrepTaskCancelled {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      quantity: self.quantity
+      unit: self.unit
+      previousStatus: previousStatus
+      status: "cancelled"
+      reason: reason
+    }
+  }
+
+  store PrepTask in durable
+}
+
+event PrepTaskOpened: "prep_task.opened" {
+  prepTaskId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  ingredientDemandId: string?
+  dishId: string?
+  recipeId: string?
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  station: string?
+  dueAt: datetime?
+  status: PrepTaskStatus
+}
+
+event PrepTaskClaimed: "prep_task.claimed" {
+  prepTaskId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  assignedToId: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  previousStatus: PrepTaskStatus
+  status: PrepTaskStatus
+}
+
+event PrepTaskReleased: "prep_task.released" {
+  prepTaskId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  previousAssignedToId: string?
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  previousStatus: PrepTaskStatus
+  status: PrepTaskStatus
+}
+
+event PrepTaskStarted: "prep_task.started" {
+  prepTaskId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  assignedToId: string?
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  previousStatus: PrepTaskStatus
+  status: PrepTaskStatus
+}
+
+event PrepTaskCompleted: "prep_task.completed" {
+  prepTaskId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  assignedToId: string?
+  quantity: decimal(12, 4)
+  completedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  previousStatus: PrepTaskStatus
+  status: PrepTaskStatus
+}
+
+event PrepTaskBlocked: "prep_task.blocked" {
+  prepTaskId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  previousStatus: PrepTaskStatus
+  status: PrepTaskStatus
+  reason: string
+}
+
+event PrepTaskUnblocked: "prep_task.unblocked" {
+  prepTaskId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  previousStatus: PrepTaskStatus
+  status: PrepTaskStatus
+}
+
+event PrepTaskCancelled: "prep_task.cancelled" {
+  prepTaskId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  previousStatus: PrepTaskStatus
+  status: PrepTaskStatus
+  reason: string
+}
+
+// EventCancelled → cancel open prep work for that event.
+on EventCancelled fanOut PrepTask where eventId = payload.eventId
+  run cancel
+  params { reason: payload.reason }
