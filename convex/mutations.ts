@@ -1893,7 +1893,7 @@ export const Event_approve = mutation({
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, expectedHeadcount: __after.expectedHeadcount, startsAt: __after.startsAt, endsAt: __after.endsAt, _subject: { entity: "Event", command: "approve", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventApproved", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: __after.tenantId, expectedHeadcount: __after.expectedHeadcount, startsAt: __after.startsAt, endsAt: __after.endsAt }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.payload.eventId)).collect();
+    const fanRows0 = await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     for (const __row of fanRows0) {
       await ctx.runMutation(api.mutations.IngredientDemand_confirm, { docId: (__row as any)._id } as any);
     }
@@ -2033,29 +2033,29 @@ export const Event_cancel = mutation({
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, clientId: __after.clientId, reason: reason, _subject: { entity: "Event", command: "cancel", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventCancelled", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: __after.tenantId, clientId: __after.clientId, reason: reason }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("deliveries").withIndex("by_eventId", (q) => q.eq("eventId", payload.payload.eventId)).collect();
+    const fanRows0 = await ctx.db.query("deliveries").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     for (const __row of fanRows0) {
-      await ctx.runMutation(api.mutations.Delivery_cancel, { docId: (__row as any)._id, reason: payload.payload.reason } as any);
+      await ctx.runMutation(api.mutations.Delivery_cancel, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows1 = await ctx.db.query("inventoryReservations").withIndex("by_eventId", (q) => q.eq("eventId", payload.payload.eventId)).collect();
+    const fanRows1 = await ctx.db.query("inventoryReservations").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     for (const __row of fanRows1) {
-      await ctx.runMutation(api.mutations.InventoryReservation_release, { docId: (__row as any)._id, reason: payload.payload.reason } as any);
+      await ctx.runMutation(api.mutations.InventoryReservation_release, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows2 = await ctx.db.query("invoices").withIndex("by_eventId", (q) => q.eq("eventId", payload.payload.eventId)).collect();
+    const fanRows2 = await ctx.db.query("invoices").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     for (const __row of fanRows2) {
-      await ctx.runMutation(api.mutations.Invoice_markVoided, { docId: (__row as any)._id, reason: payload.payload.reason } as any);
+      await ctx.runMutation(api.mutations.Invoice_markVoided, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows3 = await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", payload.payload.eventId)).collect();
+    const fanRows3 = await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     for (const __row of fanRows3) {
-      await ctx.runMutation(api.mutations.PackList_cancel, { docId: (__row as any)._id, reason: payload.payload.reason } as any);
+      await ctx.runMutation(api.mutations.PackList_cancel, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows4 = await ctx.db.query("prepTasks").withIndex("by_eventId", (q) => q.eq("eventId", payload.payload.eventId)).collect();
+    const fanRows4 = await ctx.db.query("prepTasks").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     for (const __row of fanRows4) {
-      await ctx.runMutation(api.mutations.PrepTask_cancel, { docId: (__row as any)._id, reason: payload.payload.reason } as any);
+      await ctx.runMutation(api.mutations.PrepTask_cancel, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows5 = await ctx.db.query("purchaseNeeds").withIndex("by_eventId", (q) => q.eq("eventId", payload.payload.eventId)).collect();
+    const fanRows5 = await ctx.db.query("purchaseNeeds").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
     for (const __row of fanRows5) {
-      await ctx.runMutation(api.mutations.PurchaseNeed_cancel, { docId: (__row as any)._id, reason: payload.payload.reason } as any);
+      await ctx.runMutation(api.mutations.PurchaseNeed_cancel, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
     return { ...doc, ...updates };
   },
@@ -10298,9 +10298,9 @@ export const VendorOrderLine_addLine = mutation({
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: vendorOrderId, ingredientId: ingredientId, ingredientDemandId: ((ingredientDemandId != null) ? ingredientDemandId : __after.ingredientDemandId), eventId: __after.vendorOrder.eventId, orderedQuantity: orderedQuantity, unit: unit, unitCost: unitCost, _subject: { entity: "VendorOrderLine", command: "addLine", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "VendorOrderLineAdded", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: vendorOrderId, ingredientId: ingredientId, ingredientDemandId: ((ingredientDemandId != null) ? ingredientDemandId : __after.ingredientDemandId), eventId: __after.vendorOrder.eventId, orderedQuantity: orderedQuantity, unit: unit, unitCost: unitCost }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.payload.ingredientDemandId)).collect();
+    const fanRows0 = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.ingredientDemandId)).collect();
     for (const __row of fanRows0) {
-      await ctx.runMutation(api.mutations.PurchaseNeed_markOrdered, { docId: (__row as any)._id, vendorOrderId: payload.payload.vendorOrderId, vendorOrderLineId: payload.payload.vendorOrderLineId } as any);
+      await ctx.runMutation(api.mutations.PurchaseNeed_markOrdered, { docId: (__row as any)._id, vendorOrderId: payload.vendorOrderId, vendorOrderLineId: payload.vendorOrderLineId } as any);
     }
     return { ...doc, ...updates };
   },

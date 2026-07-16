@@ -1,6 +1,6 @@
 import { Component, type ReactNode } from "react";
 import { Route, Routes } from "react-router-dom";
-import { EventCreatePlaceholder } from "../features/events/EventCreatePlaceholder";
+import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { HomePage } from "../features/home/HomePage";
@@ -43,7 +43,7 @@ export function App() {
           <Route element={<AppShell />}>
             <Route index element={<HomePage />} />
             <Route path="/events" element={<EventsListPage />} />
-            <Route path="/events/new" element={<EventCreatePlaceholder />} />
+            <Route path="/events/new" element={<EventCreatePage />} />
             <Route path="/events/:id" element={<EventDetailPage />} />
             <Route path="/kitchen" element={<KitchenRoutePlaceholder />} />
             {NAV_AREAS.filter((a) => a.planned).map((a) => (

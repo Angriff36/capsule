@@ -127,7 +127,7 @@ export function EventsListPage() {
             hint={
               search || tab !== "all"
                 ? "Try a different stage tab or clear the search."
-                : "Plan the first engagement when create is wired."
+                : "Create the first engagement to begin planning."
             }
           />
         ) : (

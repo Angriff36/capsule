@@ -93,6 +93,9 @@
   select.input {
     @apply cursor-pointer;
   }
+  .field-label {
+    @apply grid gap-1 text-[11px] font-medium tracking-[0.02em] text-ink-2;
+  }
   .chip {
     @apply inline-flex h-[19px] items-center gap-1 rounded-full border px-2 text-[10px] font-semibold tracking-[0.07em] uppercase;
   }

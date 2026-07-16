@@ -1,4 +1,14 @@
 import type { EventStage } from "./eventStatus";
+import {
+  EventApproveLifecycle,
+  EventBeginExecutionLifecycle,
+  EventCancelLifecycle,
+  EventCloseOutLifecycle,
+  EventCompleteLifecycle,
+  EventReturnToPlanningLifecycle,
+  EventSubmitForApprovalLifecycle,
+} from "../../generated/manifest-wiring-bindings";
+import { classifyCommandFailure } from "./CommandFailure";
 
 export type EventLifecycleActionKey =
   | "submitForApproval"
@@ -16,90 +26,90 @@ export interface EventLifecycleAction {
   needsReason?: boolean;
 }
 
-/** UI offer set mirroring generated Event stage transitions (mutations enforce). */
+const ACTIONS: ReadonlyArray<
+  EventLifecycleAction & {
+    lifecycle: ReadonlyArray<{ property: string; from: string; to: string }>;
+  }
+> = [
+  {
+    key: "submitForApproval",
+    label: "Submit for approval",
+    kind: "primary",
+    lifecycle: EventSubmitForApprovalLifecycle,
+  },
+  {
+    key: "returnToPlanning",
+    label: "Return to planning",
+    kind: "ghost",
+    needsReason: true,
+    lifecycle: EventReturnToPlanningLifecycle,
+  },
+  {
+    key: "approve",
+    label: "Approve",
+    kind: "primary",
+    lifecycle: EventApproveLifecycle,
+  },
+  {
+    key: "beginExecution",
+    label: "Begin execution",
+    kind: "primary",
+    lifecycle: EventBeginExecutionLifecycle,
+  },
+  {
+    key: "complete",
+    label: "Complete",
+    kind: "primary",
+    lifecycle: EventCompleteLifecycle,
+  },
+  {
+    key: "closeOut",
+    label: "Close out",
+    kind: "primary",
+    lifecycle: EventCloseOutLifecycle,
+  },
+  {
+    key: "cancel",
+    label: "Cancel event",
+    kind: "danger",
+    needsReason: true,
+    lifecycle: EventCancelLifecycle,
+  },
+];
+
+const PLANNING_REVISION_STAGES = new Set<string>(
+  [
+    ...EventSubmitForApprovalLifecycle,
+    ...EventApproveLifecycle,
+    ...EventBeginExecutionLifecycle,
+  ].map((transition) => transition.from),
+);
+const HEADCOUNT_REVISION_STAGES = new Set<string>([
+  ...PLANNING_REVISION_STAGES,
+  ...EventCompleteLifecycle.map((transition) => transition.from),
+]);
+
+/** UI offer set derived from generated, proven Event stage transitions. */
 export class EventLifecyclePolicy {
   availableActions(stage: string): EventLifecycleAction[] {
-    const actions: EventLifecycleAction[] = [];
-    if (stage === "planning") {
-      actions.push({
-        key: "submitForApproval",
-        label: "Submit for approval",
-        kind: "primary",
-      });
-    }
-    if (stage === "pending_approval") {
-      actions.push({ key: "approve", label: "Approve", kind: "primary" });
-      actions.push({
-        key: "returnToPlanning",
-        label: "Return to planning",
-        kind: "ghost",
-        needsReason: true,
-      });
-    }
-    if (stage === "approved") {
-      actions.push({
-        key: "beginExecution",
-        label: "Begin execution",
-        kind: "primary",
-      });
-      actions.push({
-        key: "returnToPlanning",
-        label: "Return to planning",
-        kind: "ghost",
-        needsReason: true,
-      });
-    }
-    if (stage === "executing") {
-      actions.push({ key: "complete", label: "Complete", kind: "primary" });
-    }
-    if (stage === "completed") {
-      actions.push({ key: "closeOut", label: "Close out", kind: "primary" });
-    }
-    if (
-      stage === "planning" ||
-      stage === "pending_approval" ||
-      stage === "approved" ||
-      stage === "executing"
-    ) {
-      actions.push({
-        key: "cancel",
-        label: "Cancel event",
-        kind: "danger",
-        needsReason: true,
-      });
-    }
-    return actions;
+    return ACTIONS.filter((action) =>
+      action.lifecycle.some(
+        (transition) =>
+          transition.property === "stage" && transition.from === stage,
+      ),
+    ).map(({ lifecycle: _lifecycle, ...action }) => action);
   }
 
   isEditableStage(stage: string): boolean {
-    return (
-      stage === "planning" ||
-      stage === "pending_approval" ||
-      stage === "approved" ||
-      stage === "executing"
-    );
+    return PLANNING_REVISION_STAGES.has(stage);
+  }
+
+  canChangeHeadcount(stage: string): boolean {
+    return HEADCOUNT_REVISION_STAGES.has(stage);
   }
 
   humanizeCommandError(message: string): string {
-    if (/Guard \d+ failed/.test(message)) {
-      return "The event's current stage does not allow this action.";
-    }
-    if (/No tenant in authentication context/.test(message)) {
-      return "Your account has no workspace assigned yet.";
-    }
-    if (/Headcount must be between/.test(message)) {
-      return "Headcount must be between 1 and 100000.";
-    }
-    if (/Cancellation reason is required/.test(message)) {
-      return "A cancellation reason is required.";
-    }
-    const policy =
-      message.match(/Uncaught Error: (.+?)\b/) ??
-      message.trim().match(/^(.+)$/);
-    if (policy?.[1] && /may |permission|role/i.test(policy[1])) {
-      return `Your role does not have permission for this (${policy[1]}).`;
-    }
-    return message;
+    return classifyCommandFailure(message).detail;
   }
 
   assertStage(stage: string): stage is EventStage {
