@@ -13,7 +13,8 @@ Every slice must:
 5. handle loading, populated, empty, denied, guard-blocked, constraint-blocked, conflict, and unexpected-error states;
 6. preserve the `DESIGN.md` archetype on desktop and mobile;
 7. avoid hand edits to generated files and avoid app-local business consequences;
-8. pass dependency checks and `bun run check` before completion.
+8. update the public owning system page with the implemented routes, roles, commands, lifecycle states, failure behavior, explicit limitations, and proof paths; generated capability presence alone is not a shipping claim;
+9. pass dependency checks and `bun run check` before completion.
 
 ## Sequence
 
