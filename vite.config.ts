@@ -15,6 +15,8 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],
+    environmentMatchGlobs: [["tests/proofs/**", "edge-runtime"]],
+    server: { deps: { inline: ["convex-test"] } },
     coverage: {
       provider: "v8",
       reporter: ["text", "json-summary"],

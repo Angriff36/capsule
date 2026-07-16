@@ -13,3 +13,6 @@ package-lock.json
 npm-shrinkwrap.json
 yarn.lock
 pnpm-lock.yaml
+
+generated/ir/
+.tmp/

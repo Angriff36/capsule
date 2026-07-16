@@ -28,11 +28,24 @@ class BaselineDecayCheck {
   }
 
   private checkRootCap(): void {
-    const entries = readdirSync(ROOT).filter((name) => {
-      if (name === "node_modules" || name === "dist" || name === "graphify-out")
-        return false;
-      return true;
-    });
+    // Count only entries that would appear in a clean CI checkout + committed
+    // roots. Local tool caches (.git, .convex, .codex, …) must not inflate the
+    // cap — otherwise baseline:decay is machine-dependent.
+    const localOnly = new Set([
+      "node_modules",
+      "dist",
+      "graphify-out",
+      "coverage",
+      ".git",
+      ".convex",
+      ".artifacts",
+      ".codex",
+      ".agents",
+      ".fallow",
+      ".tmp",
+      ".env.local",
+    ]);
+    const entries = readdirSync(ROOT).filter((name) => !localOnly.has(name));
     if (entries.length > ROOT_CAP) {
       this.failures.push(
         `root entry count ${entries.length} exceeds cap ${ROOT_CAP}`,
