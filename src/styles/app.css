@@ -573,6 +573,28 @@
   .recipe-catalog {
     padding-top: 2.4rem;
   }
+  .kitchen-book-nav {
+    display: flex;
+    gap: 1.6rem;
+    overflow-x: auto;
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.9rem 0 0;
+  }
+  .kitchen-book-nav a {
+    flex: none;
+    border-bottom: 2px solid transparent;
+    padding: 0.75rem 0;
+    color: var(--color-ink-3);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .kitchen-book-nav a:hover,
+  .kitchen-book-nav a.active {
+    border-bottom-color: var(--color-accent);
+    color: var(--color-brand);
+  }
   .recipe-index-heading {
     display: flex;
     align-items: flex-end;
@@ -661,6 +683,22 @@
     padding-right: 0.7rem;
     padding-left: 0.7rem;
     background: var(--color-inset);
+  }
+  .culinary-index-row {
+    display: grid;
+    grid-template-columns:
+      38px minmax(220px, 1.4fr) minmax(120px, 0.5fr) minmax(120px, 0.55fr)
+      90px 18px;
+    align-items: center;
+    gap: 1.4rem;
+    padding: 1.2rem 0;
+  }
+  .culinary-row-actions {
+    display: flex;
+    grid-column: 2 / -1;
+    justify-content: flex-end;
+    gap: 0.35rem;
+    margin-top: -0.4rem;
   }
   .recipe-index-number {
     color: var(--color-accent-deep);
@@ -826,6 +864,100 @@
     display: grid;
     gap: 1.4rem;
     padding: 2.2rem 0;
+  }
+  .culinary-create-form,
+  .culinary-edit-form {
+    margin-top: 1.6rem;
+    border: 1px solid var(--color-line-2);
+    background: var(--color-panel);
+    padding: 1.25rem;
+  }
+  .culinary-create-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .culinary-create-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+    padding-top: 1rem;
+  }
+  .culinary-line-form {
+    display: grid;
+    grid-template-columns:
+      minmax(180px, 1.5fr) 100px 130px minmax(180px, 1fr)
+      auto;
+    gap: 0.7rem;
+    margin-top: 1.2rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-inset);
+    padding: 1rem;
+  }
+  .culinary-line-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.3rem;
+  }
+  .event-menu-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(320px, 1.1fr);
+    gap: 3rem;
+    padding-top: 2.5rem;
+  }
+  .event-menu-brief {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 1rem;
+    border-top: 1px solid var(--color-line);
+    border-bottom: 1px solid var(--color-line);
+  }
+  .event-menu-brief div {
+    padding: 0.8rem;
+    border-left: 1px solid var(--color-line);
+  }
+  .event-menu-brief div:first-child {
+    border-left: 0;
+  }
+  .event-menu-brief dt {
+    color: var(--color-ink-3);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .event-menu-brief dd {
+    margin-top: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+  }
+  .event-dish-list {
+    margin-top: 1.25rem;
+    border-top: 1px solid var(--color-ink);
+  }
+  .event-dish-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid var(--color-line);
+    padding: 1rem 0;
+  }
+  .event-dish-list strong {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 400;
+  }
+  .event-dish-list span {
+    color: var(--color-ink-3);
+    font-size: 10px;
+  }
+  .event-dish-list p {
+    font-family: var(--font-mono);
+    font-size: 10px;
   }
 
   .culinary-document {
@@ -1178,6 +1310,27 @@
   .ingredient-list li > span:last-child {
     grid-column: 2;
   }
+  .ingredient-list .culinary-line-actions {
+    grid-column: 2;
+  }
+  .culinary-index-row {
+    grid-template-columns: 28px minmax(0, 1fr) 78px 14px;
+    gap: 0.8rem;
+  }
+  .culinary-index-row .recipe-index-taxonomy,
+  .culinary-index-row .recipe-index-tags {
+    display: none;
+  }
+  .culinary-row-actions {
+    grid-column: 2 / -1;
+  }
+  .culinary-line-form,
+  .event-menu-layout {
+    grid-template-columns: 1fr;
+  }
+  .event-menu-layout {
+    gap: 2rem;
+  }
   .method-list li {
     grid-template-columns: 30px minmax(0, 1fr);
     gap: 1rem;
@@ -1219,6 +1372,35 @@
   }
   .recipe-version-empty {
     padding: 2rem;
+  }
+  .culinary-create-grid {
+    grid-template-columns: 1fr;
+  }
+  .culinary-create-grid .sm\:col-span-2 {
+    grid-column: auto;
+  }
+  .culinary-index-row {
+    grid-template-columns: 24px minmax(0, 1fr) 14px;
+  }
+  .culinary-index-row .recipe-index-state {
+    display: none;
+  }
+  .event-menu-brief {
+    grid-template-columns: 1fr;
+  }
+  .event-menu-brief div,
+  .event-menu-brief div:first-child {
+    border-top: 1px solid var(--color-line);
+    border-left: 0;
+  }
+  .event-menu-brief div:first-child {
+    border-top: 0;
+  }
+  .event-dish-list li {
+    grid-template-columns: 1fr auto;
+  }
+  .event-dish-list li > div:last-child {
+    grid-column: 1 / -1;
   }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -53,6 +53,14 @@ Generated Convex surfaces import `getAuthContext` from `./lib/authContext`. That
 - Generated runtime behavior still needs focused reaction tests. Structural generation and typed wiring do not prove downstream reactions execute correctly.
 - `bun run check:event-manifest` enforces this authored Event boundary and is part of `bun run check`.
 
+## Authored Culinary integration
+
+- Use generated hooks from `src/lib/manifest-convex-react.ts` first, including the governed `useCreate*` hooks for Ingredient, Recipe, RecipeIngredient, Dish, Menu, and EventDish.
+- Culinary creation needs no authored allocation seam. The generated `createVia*` mutations allocate the document, invoke the canonical command behavior, and clean up rejected allocations.
+- Keep validation, tenant enforcement, lifecycle, events, and reactions in generated runtime behavior. Consume lifecycle availability from `src/generated/manifest-wiring-bindings.ts`; do not recreate transition tables in authored Kitchen code.
+- Generated runtime behavior still requires focused reaction tests. Typed wiring and generated creation cleanup do not prove downstream demand or production reactions execute correctly.
+- `bun run check:culinary-manifest` enforces this authored Culinary boundary and is part of `bun run check`.
+
 ## Hard rule
 
 If regeneration would clobber an author seam, **stop**. Preserve `convex/lib/**`, `convex/auth.config.ts`, and `convex/authStatus.ts`. Never “fix” generated output by hand — re-assemble or re-codegen from the authoritative source.

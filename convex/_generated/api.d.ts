@@ -13,7 +13,6 @@ import type * as computed from "../computed.js";
 import type * as crons from "../crons.js";
 import type * as http from "../http.js";
 import type * as lib_authContext from "../lib/authContext.js";
-import type * as lib_culinaryPlanning from "../lib/culinaryPlanning.js";
 import type * as lib_encryption from "../lib/encryption.js";
 import type * as mutations from "../mutations.js";
 import type * as queries from "../queries.js";
@@ -31,7 +30,6 @@ declare const fullApi: ApiFromModules<{
   crons: typeof crons;
   http: typeof http;
   "lib/authContext": typeof lib_authContext;
-  "lib/culinaryPlanning": typeof lib_culinaryPlanning;
   "lib/encryption": typeof lib_encryption;
   mutations: typeof mutations;
   queries: typeof queries;

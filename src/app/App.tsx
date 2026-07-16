@@ -1,10 +1,12 @@
 import { Component, type ReactNode } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { HomePage } from "../features/home/HomePage";
-import { KitchenRoutePlaceholder } from "../features/kitchen/KitchenRoutePlaceholder";
+import { EventMenuPage } from "../features/kitchen/EventMenuPage";
+import { KitchenCatalogPage } from "../features/kitchen/KitchenCatalogPage";
+import { RecipeDetailPage } from "../features/kitchen/RecipeDetailPage";
 import { ErrorState } from "../ui/primitives";
 import { AuthGate } from "./AuthGate";
 import { NAV_AREAS } from "./nav";
@@ -45,7 +47,28 @@ export function App() {
             <Route path="/events" element={<EventsListPage />} />
             <Route path="/events/new" element={<EventCreatePage />} />
             <Route path="/events/:id" element={<EventDetailPage />} />
-            <Route path="/kitchen" element={<KitchenRoutePlaceholder />} />
+            <Route
+              path="/kitchen"
+              element={<Navigate to="/kitchen/recipes" replace />}
+            />
+            <Route
+              path="/kitchen/recipes"
+              element={<KitchenCatalogPage section="recipes" />}
+            />
+            <Route path="/kitchen/recipes/:id" element={<RecipeDetailPage />} />
+            <Route
+              path="/kitchen/ingredients"
+              element={<KitchenCatalogPage section="ingredients" />}
+            />
+            <Route
+              path="/kitchen/dishes"
+              element={<KitchenCatalogPage section="dishes" />}
+            />
+            <Route
+              path="/kitchen/menus"
+              element={<KitchenCatalogPage section="menus" />}
+            />
+            <Route path="/kitchen/event-menu" element={<EventMenuPage />} />
             {NAV_AREAS.filter((a) => a.planned).map((a) => (
               <Route key={a.path} path={a.path} element={<PlannedAreaPage />} />
             ))}
