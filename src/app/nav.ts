@@ -36,8 +36,6 @@ export const NAV_AREAS: NavArea[] = [
     label: "Inventory",
     group: "Operate",
     icon: BoxIcon,
-    planned:
-      "Items, storage locations, cycle counts and PARs — follows the Kitchen slice.",
   },
   {
     path: "/logistics",

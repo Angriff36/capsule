@@ -1190,6 +1190,271 @@
   }
 }
 
+.supply-stage {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.supply-masthead,
+.order-folio-masthead,
+.order-controls,
+.supply-form-heading,
+.ledger-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.supply-masthead {
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-line-2);
+}
+
+.supply-masthead-actions,
+.supply-row-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.supply-tabs {
+  margin: -0.5rem 0 0;
+}
+
+.supply-degraded {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.32fr) minmax(0, 1fr);
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in srgb, var(--color-warn) 32%, var(--color-line));
+  border-radius: 5px;
+  background: var(--color-warn-soft);
+  color: var(--color-ink-2);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.supply-degraded strong {
+  color: var(--color-warn);
+}
+
+.supply-form {
+  padding: 1.2rem;
+  border-top: 2px solid var(--color-brand);
+  background: var(--color-inset);
+}
+
+.supply-form-heading h2,
+.ledger-heading h2,
+.vendor-index h2 {
+  margin-top: 0.2rem;
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.supply-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+
+.supply-span-2 {
+  grid-column: span 2;
+}
+
+.working-ledger {
+  min-width: 0;
+  border-top: 1px solid var(--color-ink);
+}
+
+.ledger-heading {
+  align-items: end;
+  padding: 1.15rem 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.ledger-heading > span {
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.supply-table-wrap {
+  overflow-x: auto;
+}
+
+.supply-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.supply-table th {
+  padding: 0.7rem 0.8rem;
+  color: var(--color-ink-3);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.supply-table td {
+  padding: 0.85rem 0.8rem;
+  border-top: 1px solid var(--color-line);
+  vertical-align: middle;
+}
+
+.supply-table tbody tr:hover {
+  background: var(--color-inset);
+}
+
+.supply-table td strong,
+.supply-table td small {
+  display: block;
+}
+
+.supply-table td small,
+.supply-muted {
+  margin-top: 2px;
+  color: var(--color-ink-3);
+  font-size: 10px;
+}
+
+.supply-number {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.supply-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.55fr);
+  gap: 2rem;
+}
+
+.purchase-queue,
+.vendor-index ul,
+.order-lines ul {
+  list-style: none;
+}
+
+.purchase-queue > li {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) auto minmax(180px, auto);
+  align-items: center;
+  gap: 0.8rem 1rem;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.purchase-queue strong,
+.purchase-queue span,
+.purchase-queue small,
+.vendor-index strong,
+.vendor-index span {
+  display: block;
+}
+
+.purchase-queue small {
+  grid-column: 1 / -1;
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+.purchase-queue div > span,
+.vendor-index div > span {
+  margin-top: 3px;
+  color: var(--color-ink-3);
+  font-size: 11px;
+}
+
+.vendor-index {
+  padding: 1.1rem 1.2rem;
+  border-radius: 10px;
+  background: var(--color-inset);
+}
+
+.vendor-index li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.order-folio-masthead {
+  align-items: end;
+  padding: 1rem 0 1.6rem;
+  border-bottom: 1px solid var(--color-line-2);
+}
+
+.order-state {
+  display: grid;
+  justify-items: end;
+  gap: 0.35rem;
+}
+
+.order-state strong {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 400;
+}
+
+.order-state span {
+  color: var(--color-ink-3);
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.order-controls {
+  align-items: center;
+  padding: 0.8rem 0 1.4rem;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.order-line-summary {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 140px 140px auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.order-line-summary strong,
+.order-line-summary span {
+  display: block;
+}
+
+.order-line-summary span {
+  margin-top: 3px;
+  color: var(--color-ink-3);
+  font-size: 10px;
+}
+
+.order-line-quantity strong {
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+.receipt-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(120px, 1fr)) auto;
+  align-items: end;
+  gap: 0.8rem;
+  padding: 1rem;
+  background: var(--color-inset);
+}
+
 @keyframes journal-entry {
   from {
     opacity: 0;
@@ -1403,6 +1668,53 @@
     grid-column: 1 / -1;
   }
 }
+@media (max-width: 900px) {
+  .supply-split {
+    grid-template-columns: 1fr;
+  }
+  .receipt-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 767px) {
+  .supply-masthead,
+  .order-folio-masthead,
+  .order-controls {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .supply-masthead-actions {
+    width: 100%;
+  }
+  .supply-degraded {
+    grid-template-columns: 1fr;
+  }
+  .purchase-queue > li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .purchase-queue .supply-row-actions {
+    grid-column: 1 / -1;
+  }
+  .order-state {
+    justify-items: start;
+  }
+  .order-line-summary {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+@media (max-width: 520px) {
+  .supply-form-grid,
+  .receipt-form {
+    grid-template-columns: 1fr;
+  }
+  .supply-span-2 {
+    grid-column: auto;
+  }
+  .supply-masthead-actions .btn,
+  .order-controls > .supply-row-actions {
+    width: 100%;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -1413,6 +1725,7 @@
   }
   .operations-stage *,
   .recipe-book-stage *,
+  .supply-stage *,
   .app-shell-sidebar *,
   .app-shell-header * {
     transition-duration: 0.01ms;

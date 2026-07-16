@@ -11,9 +11,10 @@
   "scripts": {
     "baseline:decay": "bun scripts/check-baseline-decay.ts",
     "build": "vite build",
-    "check": "bun run toolchain && bun run check:event-manifest && bun run check:culinary-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
+    "check": "bun run toolchain && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
     "check:culinary-manifest": "bun scripts/check-culinary-manifest-integration.ts",
     "check:event-manifest": "bun scripts/check-event-manifest-integration.ts",
+    "check:supply-manifest": "bun scripts/check-supply-manifest-integration.ts",
     "codegen": "convex codegen",
     "deploy": "convex deploy",
     "dev": "vite",

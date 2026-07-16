@@ -1,4 +1,4 @@
-import { Component, type ReactNode } from "react";
+import { Component, lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
@@ -7,11 +7,36 @@ import { HomePage } from "../features/home/HomePage";
 import { EventMenuPage } from "../features/kitchen/EventMenuPage";
 import { KitchenCatalogPage } from "../features/kitchen/KitchenCatalogPage";
 import { RecipeDetailPage } from "../features/kitchen/RecipeDetailPage";
-import { ErrorState } from "../ui/primitives";
+import { ErrorState, TableSkeleton } from "../ui/primitives";
 import { AuthGate } from "./AuthGate";
 import { NAV_AREAS } from "./nav";
 import { PlannedAreaPage } from "./PlannedAreaPage";
 import { AppShell } from "./shell/AppShell";
+
+const DemandLedgerPage = lazy(() =>
+  import("../features/inventory/DemandLedgerPage").then((module) => ({
+    default: module.DemandLedgerPage,
+  })),
+);
+const StockBookPage = lazy(() =>
+  import("../features/inventory/StockBookPage").then((module) => ({
+    default: module.StockBookPage,
+  })),
+);
+const PurchasingPage = lazy(() =>
+  import("../features/inventory/PurchasingPage").then((module) => ({
+    default: module.PurchasingPage,
+  })),
+);
+const VendorOrderPage = lazy(() =>
+  import("../features/inventory/VendorOrderPage").then((module) => ({
+    default: module.VendorOrderPage,
+  })),
+);
+
+function SupplyRoute({ children }: { children: ReactNode }) {
+  return <Suspense fallback={<TableSkeleton rows={8} />}>{children}</Suspense>;
+}
 
 class AppErrorBoundary extends Component<
   { children: ReactNode },
@@ -69,6 +94,42 @@ export function App() {
               element={<KitchenCatalogPage section="menus" />}
             />
             <Route path="/kitchen/event-menu" element={<EventMenuPage />} />
+            <Route
+              path="/inventory"
+              element={<Navigate to="/inventory/demand" replace />}
+            />
+            <Route
+              path="/inventory/demand"
+              element={
+                <SupplyRoute>
+                  <DemandLedgerPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/inventory/stock"
+              element={
+                <SupplyRoute>
+                  <StockBookPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/inventory/purchasing"
+              element={
+                <SupplyRoute>
+                  <PurchasingPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/inventory/orders/:id"
+              element={
+                <SupplyRoute>
+                  <VendorOrderPage />
+                </SupplyRoute>
+              }
+            />
             {NAV_AREAS.filter((a) => a.planned).map((a) => (
               <Route key={a.path} path={a.path} element={<PlannedAreaPage />} />
             ))}
