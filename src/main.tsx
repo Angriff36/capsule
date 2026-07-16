@@ -13,8 +13,7 @@ import { AuthSetupRequired, isAuthConfigured } from "./app/AuthGate";
 
 const convexUrl = import.meta.env.VITE_CONVEX_URL as string | undefined;
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as
-  | string
-  | undefined;
+  string | undefined;
 
 const root = document.getElementById("root");
 if (!root) throw new Error("#root not found");

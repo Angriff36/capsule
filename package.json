@@ -13,15 +13,21 @@
     "dev": "vite",
     "dev:convex": "convex dev",
     "build": "vite build",
+    "toolchain": "bun scripts/check-toolchain.ts",
     "typecheck": "tsc --noEmit",
-    "lint": "biome check .",
-    "format": "biome check --write .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "secrets": "bun scripts/check-secrets.ts",
-    "check": "bun run typecheck && bun run lint && bun run secrets && bun run test && bun run build",
+    "baseline:decay": "bun scripts/check-baseline-decay.ts",
+    "check": "bun run toolchain && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
     "codegen": "convex codegen",
     "seed": "bun scripts/seed-convex.ts",
     "deploy": "convex deploy"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,json,md,css,yml,yaml,html}": "prettier --write"
   },
   "dependencies": {
     "@angriff36/manifest": "3.6.10",
@@ -34,11 +40,13 @@
     "react-router-dom": "^6.30.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.4",
     "@tailwindcss/vite": "^4.1.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.5.0",
+    "@vitest/coverage-v8": "3.2.7",
+    "lint-staged": "^17.0.8",
+    "prettier": "^3.9.5",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.9.3",
     "vite": "^6.3.0",

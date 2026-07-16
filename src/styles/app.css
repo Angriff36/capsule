@@ -646,10 +646,9 @@
   }
   .recipe-index > li > a {
     display: grid;
-    grid-template-columns: 38px minmax(220px, 1.4fr) minmax(120px, 0.5fr) minmax(
-        120px,
-        0.55fr
-      ) 90px 18px;
+    grid-template-columns:
+      38px minmax(220px, 1.4fr) minmax(120px, 0.5fr) minmax(120px, 0.55fr)
+      90px 18px;
     align-items: center;
     gap: 1.4rem;
     padding: 1.2rem 0;

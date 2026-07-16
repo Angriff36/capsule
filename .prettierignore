@@ -1,0 +1,29 @@
+# Generated / Manifest assembly (do not reformat)
+convex/_generated/
+convex/schema.ts
+convex/queries.ts
+convex/mutations.ts
+convex/http.ts
+convex/crons.ts
+convex/sagas.ts
+convex/computed.ts
+src/generated/
+src/lib/manifest-convex-react.ts
+schemas/
+wiring/
+scripts/seed-convex.ts
+tests/manifest-convex.contract.test.ts
+diagrams/
+ASSEMBLY_REPORT.json
+manifest-context-summary.json
+
+# Build / tooling noise
+dist/
+graphify-out/
+.artifacts/
+.convex/
+node_modules/
+bun.lock
+package-lock.json
+*.min.js
+*.min.css
