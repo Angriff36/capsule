@@ -4,6 +4,7 @@ import { EventsRoutePlaceholder } from "../features/events/EventsRoutePlaceholde
 import { HomePage } from "../features/home/HomePage";
 import { KitchenRoutePlaceholder } from "../features/kitchen/KitchenRoutePlaceholder";
 import { ErrorState } from "../ui/primitives";
+import { AuthGate } from "./AuthGate";
 import { NAV_AREAS } from "./nav";
 import { PlannedAreaPage } from "./PlannedAreaPage";
 import { AppShell } from "./shell/AppShell";
@@ -35,27 +36,29 @@ class AppErrorBoundary extends Component<
 export function App() {
   return (
     <AppErrorBoundary>
-      <Routes>
-        <Route element={<AppShell />}>
-          <Route index element={<HomePage />} />
-          <Route path="/events" element={<EventsRoutePlaceholder />} />
-          <Route path="/events/new" element={<EventsRoutePlaceholder />} />
-          <Route path="/events/:id" element={<EventsRoutePlaceholder />} />
-          <Route path="/kitchen" element={<KitchenRoutePlaceholder />} />
-          {NAV_AREAS.filter((a) => a.planned).map((a) => (
-            <Route key={a.path} path={a.path} element={<PlannedAreaPage />} />
-          ))}
-          <Route
-            path="*"
-            element={
-              <ErrorState
-                title="Page not found"
-                detail="The address does not match any Capsule screen."
-              />
-            }
-          />
-        </Route>
-      </Routes>
+      <AuthGate>
+        <Routes>
+          <Route element={<AppShell />}>
+            <Route index element={<HomePage />} />
+            <Route path="/events" element={<EventsRoutePlaceholder />} />
+            <Route path="/events/new" element={<EventsRoutePlaceholder />} />
+            <Route path="/events/:id" element={<EventsRoutePlaceholder />} />
+            <Route path="/kitchen" element={<KitchenRoutePlaceholder />} />
+            {NAV_AREAS.filter((a) => a.planned).map((a) => (
+              <Route key={a.path} path={a.path} element={<PlannedAreaPage />} />
+            ))}
+            <Route
+              path="*"
+              element={
+                <ErrorState
+                  title="Page not found"
+                  detail="The address does not match any Capsule screen."
+                />
+              }
+            />
+          </Route>
+        </Routes>
+      </AuthGate>
     </AppErrorBoundary>
   );
 }

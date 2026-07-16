@@ -1,3 +1,4 @@
+import { OrganizationSwitcher, UserButton, useUser } from "@clerk/react";
 import { Link, useLocation } from "react-router-dom";
 import { WORKSPACE_NAME } from "../../lib/workspace";
 import { BellIcon, ChevronRightIcon, SearchIcon } from "../../ui/icons";
@@ -136,28 +137,40 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
           </p>
         </Popover>
 
-        <WorkspaceAccountPlaceholder />
+        <AccountMenu />
       </div>
     </header>
   );
 }
 
-/** Auth UI lands in the authentication/org flow — shell shows workspace chrome only. */
-function WorkspaceAccountPlaceholder() {
+/** Clerk user + org switcher. Authorization remains server-side claims only. */
+function AccountMenu() {
+  const { user } = useUser();
   return (
     <div className="flex items-center gap-2 pl-1.5">
+      <OrganizationSwitcher
+        hidePersonal
+        afterCreateOrganizationUrl="/"
+        afterSelectOrganizationUrl="/"
+        appearance={{
+          elements: {
+            rootBox: "flex items-center",
+            organizationSwitcherTrigger:
+              "h-8 rounded-xs border border-transparent px-2 text-[12px] text-ink-2 hover:border-line-2 hover:bg-inset",
+          },
+        }}
+      />
       <div className="text-right max-sm:hidden">
         <p className="max-w-40 truncate text-[12px] leading-tight font-medium">
-          Account
+          {user?.fullName ??
+            user?.primaryEmailAddress?.emailAddress ??
+            "Account"}
         </p>
-        <p className="text-[10.5px] leading-tight text-ink-3">{WORKSPACE_NAME}</p>
+        <p className="text-[10.5px] leading-tight text-ink-3">
+          {WORKSPACE_NAME}
+        </p>
       </div>
-      <span
-        className="grid h-8 w-8 place-items-center rounded-full border border-line-2 bg-inset text-[11px] font-semibold text-ink-2"
-        aria-hidden="true"
-      >
-        C
-      </span>
+      <UserButton />
     </div>
   );
 }
