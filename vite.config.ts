@@ -15,5 +15,18 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["tests/**/*.test.ts"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json-summary"],
+      reportsDirectory: ".artifacts/coverage",
+      include: ["src/app/auth/**", "src/app/navigation/**"],
+      thresholds: {
+        // Ratchet only upward. Measured 2026-07-16 on membership + nav catalog.
+        lines: 100,
+        functions: 100,
+        statements: 100,
+        branches: 100,
+      },
+    },
   },
 });

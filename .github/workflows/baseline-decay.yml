@@ -1,0 +1,30 @@
+name: baseline-decay
+
+on:
+  schedule:
+    - cron: "0 15 1 * *" # monthly
+  workflow_dispatch:
+
+concurrency:
+  group: baseline-decay
+  cancel-in-progress: true
+
+jobs:
+  decay:
+    name: baseline-decay
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Baseline decay checks
+        run: bun run baseline:decay
