@@ -118,6 +118,7 @@ export function TableSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <div className="space-y-2 p-3" role="status" aria-label="Loading">
       {Array.from({ length: rows }, (_, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: static skeleton placeholders
         <Skeleton key={i} className="h-6" />
       ))}
     </div>

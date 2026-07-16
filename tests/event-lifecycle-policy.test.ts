@@ -5,12 +5,14 @@ describe("EventLifecyclePolicy", () => {
   const policy = new EventLifecyclePolicy();
 
   it("offers submit from planning and approve from pending_approval", () => {
-    expect(
-      policy.availableActions("planning").map((a) => a.key),
-    ).toContain("submitForApproval");
+    expect(policy.availableActions("planning").map((a) => a.key)).toContain(
+      "submitForApproval",
+    );
     expect(
       policy.availableActions("pending_approval").map((a) => a.key),
-    ).toEqual(expect.arrayContaining(["approve", "returnToPlanning", "cancel"]));
+    ).toEqual(
+      expect.arrayContaining(["approve", "returnToPlanning", "cancel"]),
+    );
   });
 
   it("closes the lifecycle with closeOut after completed", () => {

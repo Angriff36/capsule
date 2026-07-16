@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { NavigationCatalog } from "../src/app/navigation/NavigationCatalog";
 import { NAV_AREAS } from "../src/app/nav";
+import { NavigationCatalog } from "../src/app/navigation/NavigationCatalog";
 
 describe("NavigationCatalog", () => {
   const catalog = new NavigationCatalog(NAV_AREAS);

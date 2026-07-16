@@ -1,9 +1,15 @@
 node_modules/
 .convex/
+.env
 .env.local
 dist/
 .DS_Store
 *.log
 coverage/
 .artifacts/
+graphify-out/
 *.tsbuildinfo
+package-lock.json
+npm-shrinkwrap.json
+yarn.lock
+pnpm-lock.yaml

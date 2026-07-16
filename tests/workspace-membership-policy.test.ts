@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { WorkspaceMembershipPolicy } from "../src/app/auth/WorkspaceMembershipPolicy";
 import { isAuthConfigured } from "../src/app/AuthGate";
+import { WorkspaceMembershipPolicy } from "../src/app/auth/WorkspaceMembershipPolicy";
 
 describe("WorkspaceMembershipPolicy", () => {
   const policy = new WorkspaceMembershipPolicy();

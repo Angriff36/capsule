@@ -2,8 +2,8 @@ import { OrganizationSwitcher, UserButton, useUser } from "@clerk/react";
 import { Link, useLocation } from "react-router-dom";
 import { WORKSPACE_NAME } from "../../lib/workspace";
 import { BellIcon, ChevronRightIcon, SearchIcon } from "../../ui/icons";
-import { navigationCatalog } from "../navigation/NavigationCatalog";
 import { NAV_AREAS } from "../nav";
+import { navigationCatalog } from "../navigation/NavigationCatalog";
 
 function useBreadcrumbs(): Array<{ label: string; to?: string }> {
   const { pathname } = useLocation();

@@ -32,8 +32,8 @@ import {
 } from "../../ui/primitives";
 import { clientDisplayName } from "./clientName";
 import {
-  eventLifecyclePolicy,
   type EventLifecycleActionKey,
+  eventLifecyclePolicy,
 } from "./EventLifecyclePolicy";
 
 export function EventDetailPage() {
@@ -54,9 +54,9 @@ export function EventDetailPage() {
   const reschedule = useEventReschedule();
 
   const [error, setError] = useState<string | null>(null);
-  const [reasonFor, setReasonFor] = useState<"cancel" | "returnToPlanning" | null>(
-    null,
-  );
+  const [reasonFor, setReasonFor] = useState<
+    "cancel" | "returnToPlanning" | null
+  >(null);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -133,9 +133,7 @@ export function EventDetailPage() {
         lead={
           <span className="font-mono text-[12px]">
             {event.eventType} · {clientDisplayName(event.clientId, clients)}
-            {event.startsAt != null
-              ? ` · ${relativeDays(event.startsAt)}`
-              : ""}
+            {event.startsAt != null ? ` · ${relativeDays(event.startsAt)}` : ""}
           </span>
         }
         actions={

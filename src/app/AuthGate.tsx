@@ -1,4 +1,9 @@
-import { OrganizationSwitcher, SignIn, SignOutButton, useOrganization } from "@clerk/react";
+import {
+  OrganizationSwitcher,
+  SignIn,
+  SignOutButton,
+  useOrganization,
+} from "@clerk/react";
 import {
   Authenticated,
   AuthLoading,
@@ -9,8 +14,8 @@ import {
 import type { ReactNode } from "react";
 import { api } from "../lib/api";
 import {
-  workspaceMembershipPolicy,
   type AuthStatusSnapshot,
+  workspaceMembershipPolicy,
 } from "./auth/WorkspaceMembershipPolicy";
 
 /** True once VITE_CLERK_PUBLISHABLE_KEY exists in the (uncommitted) local env. */
@@ -98,8 +103,8 @@ function MembershipRequired({
     <GateShell title="Workspace membership setup required">
       <p className="leading-relaxed text-ink-2">
         You are signed in, but your account has not been assigned {missing} yet,
-        so Capsule keeps everything locked. Choose or create a Clerk organization
-        (workspace), then confirm your session token includes{" "}
+        so Capsule keeps everything locked. Choose or create a Clerk
+        organization (workspace), then confirm your session token includes{" "}
         <code className="font-mono">role</code> and{" "}
         <code className="font-mono">tenantId</code> claims.
       </p>

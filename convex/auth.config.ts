@@ -6,7 +6,8 @@ import type { AuthConfig } from "convex/server";
 export default {
   providers: [
     {
-      domain: process.env.CLERK_JWT_ISSUER_DOMAIN!,
+      // Convex injects deployment env at runtime; fail closed if unset there.
+      domain: process.env.CLERK_JWT_ISSUER_DOMAIN ?? "",
       applicationID: "convex",
     },
   ],

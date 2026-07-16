@@ -9,7 +9,9 @@ export function HomePage() {
       <header className="journal-masthead">
         <div>
           <p className="eyebrow">Capsule operations</p>
-          <h1 className="display-title editorial-underline">The service desk</h1>
+          <h1 className="display-title editorial-underline">
+            The service desk
+          </h1>
           <p className="mt-4 max-w-2xl text-[14px] leading-6 text-ink-2">
             Navigate the workspace from the rail. Events, kitchen, and planned
             areas share one shell, theme, and command palette.
@@ -26,7 +28,10 @@ export function HomePage() {
       />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <Link to="/events" className="card group px-4 py-4 transition-colors hover:border-brand/40">
+        <Link
+          to="/events"
+          className="card group px-4 py-4 transition-colors hover:border-brand/40"
+        >
           <CalendarIcon className="text-brand" width={20} height={20} />
           <p className="mt-3 font-medium">Events</p>
           <p className="mt-1 text-[12px] leading-relaxed text-ink-3">
@@ -34,7 +39,10 @@ export function HomePage() {
             mutations.
           </p>
         </Link>
-        <Link to="/kitchen" className="card group px-4 py-4 transition-colors hover:border-brand/40">
+        <Link
+          to="/kitchen"
+          className="card group px-4 py-4 transition-colors hover:border-brand/40"
+        >
           <p className="font-medium">Kitchen</p>
           <p className="mt-1 text-[12px] leading-relaxed text-ink-3">
             Recipe book follows the Events slice validation.

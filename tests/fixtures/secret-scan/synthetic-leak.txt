@@ -1,0 +1,2 @@
+# Synthetic fixture for SecretScan self-test. Not a real credential.
+sk_test_thisIsNotARealClerkSecretKeyZZZZ
