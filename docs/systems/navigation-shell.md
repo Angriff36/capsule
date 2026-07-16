@@ -14,8 +14,18 @@
 
 - `NAV_AREAS` defines primary rail entries (Operate / People / Business / System).
 - Areas with `planned` render `PlannedAreaPage` instead of a feature module.
-- Shipping slices today: Home, Events, Kitchen (placeholder). Others stay planned until proven.
+- Shipping routes today: Home and Events list/create/detail. Kitchen remains a placeholder; all other domain workspaces are planned.
+- The current catalog was copied from Capsule-V2 and still names non-canonical legacy concepts. [`index.md`](index.md) is the authority for which systems belong in CapsuleX.
+
+## Target information architecture
+
+- **Operate:** Home, Events, Kitchen, Inventory/Procurement, Logistics.
+- **People:** Team and Workforce.
+- **Business:** Clients/Commercial, Finance/Closeout, Reports.
+- **System:** Organization/access surfaces backed by current Organization, Person, Clerk, and authored seams.
+
+Only coherent shipping routes belong in the persistent icon rail. Canonical planned systems may live in the overflow drawer. Facilities, equipment/work orders, notifications, API keys, leads/deals, marketing, knowledge base, vehicles/returns, and other Capsule-Pro-only concepts must not appear as product promises without approved Manifest source.
 
 ## Rule
 
-Add new product surface by extending `NAV_AREAS` and a `src/features/<slice>/` module. Do not invent parallel nav trees.
+Add a product surface only after it has an owner in [`index.md`](index.md), a slice in [`../product/implementation-plan.md`](../product/implementation-plan.md), and a coherent authored `src/features/<slice>/` outcome. Then extend `NAV_AREAS`; do not invent parallel nav trees.
