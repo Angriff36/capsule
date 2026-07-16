@@ -30,7 +30,8 @@ export function HomePage() {
           <CalendarIcon className="text-brand" width={20} height={20} />
           <p className="mt-3 font-medium">Events</p>
           <p className="mt-1 text-[12px] leading-relaxed text-ink-3">
-            List and detail screens land next; the route is live in the shell.
+            List and detail are wired to generated CapsuleX queries and stage
+            mutations.
           </p>
         </Link>
         <Link to="/kitchen" className="card group px-4 py-4 transition-colors hover:border-brand/40">

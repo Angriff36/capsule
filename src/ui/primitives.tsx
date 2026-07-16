@@ -1,18 +1,20 @@
 import type { ReactNode } from "react";
-import { type EventStatus, STATUS_LABEL } from "../features/events/eventStatus";
+import { type EventStage, STAGE_LABEL } from "../features/events/eventStatus";
 
-const STATUS_CHIP: Record<EventStatus, string> = {
-  draft: "border-line-2 bg-mute-soft text-ink-2",
-  confirmed: "border-ok/30 bg-ok-soft text-ok",
+const STAGE_CHIP: Record<EventStage, string> = {
+  planning: "border-line-2 bg-mute-soft text-ink-2",
+  pending_approval: "border-warn/30 bg-warn-soft text-warn",
+  approved: "border-ok/30 bg-ok-soft text-ok",
+  executing: "border-info/30 bg-info-soft text-info",
   completed: "border-info/30 bg-info-soft text-info",
-  archived: "border-line-2 bg-inset text-ink-3",
   cancelled: "border-danger/30 bg-danger-soft text-danger",
+  closed_out: "border-line-2 bg-inset text-ink-3",
 };
 
 export function StatusChip({ status }: { status: string }) {
-  const known = (STATUS_LABEL as Record<string, string>)[status];
+  const known = (STAGE_LABEL as Record<string, string>)[status];
   const cls =
-    (STATUS_CHIP as Record<string, string>)[status] ??
+    (STAGE_CHIP as Record<string, string>)[status] ??
     "border-line-2 bg-inset text-ink-2";
   return <span className={`chip ${cls}`}>{known ?? status}</span>;
 }
@@ -33,7 +35,7 @@ export function PageHeader({
         {lead ? <p className="mt-0.5 text-ink-2">{lead}</p> : null}
       </div>
       {actions ? (
-        <div className="flex items-center gap-2">{actions}</div>
+        <div className="flex flex-wrap items-center gap-2">{actions}</div>
       ) : null}
     </header>
   );
@@ -116,29 +118,8 @@ export function TableSkeleton({ rows = 6 }: { rows?: number }) {
   return (
     <div className="space-y-2 p-3" role="status" aria-label="Loading">
       {Array.from({ length: rows }, (_, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: static placeholder rows never reorder
         <Skeleton key={i} className="h-6" />
       ))}
-    </div>
-  );
-}
-
-export function Stat({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: ReactNode;
-  sub?: ReactNode;
-}) {
-  return (
-    <div className="card px-3.5 py-3">
-      <div className="meta-term">{label}</div>
-      <div className="mt-1 font-mono text-[21px] leading-none font-medium">
-        {value}
-      </div>
-      {sub ? <div className="mt-1.5 text-[12px] text-ink-3">{sub}</div> : null}
     </div>
   );
 }

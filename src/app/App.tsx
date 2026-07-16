@@ -1,6 +1,8 @@
 import { Component, type ReactNode } from "react";
 import { Route, Routes } from "react-router-dom";
-import { EventsRoutePlaceholder } from "../features/events/EventsRoutePlaceholder";
+import { EventCreatePlaceholder } from "../features/events/EventCreatePlaceholder";
+import { EventDetailPage } from "../features/events/EventDetailPage";
+import { EventsListPage } from "../features/events/EventsListPage";
 import { HomePage } from "../features/home/HomePage";
 import { KitchenRoutePlaceholder } from "../features/kitchen/KitchenRoutePlaceholder";
 import { ErrorState } from "../ui/primitives";
@@ -40,9 +42,9 @@ export function App() {
         <Routes>
           <Route element={<AppShell />}>
             <Route index element={<HomePage />} />
-            <Route path="/events" element={<EventsRoutePlaceholder />} />
-            <Route path="/events/new" element={<EventsRoutePlaceholder />} />
-            <Route path="/events/:id" element={<EventsRoutePlaceholder />} />
+            <Route path="/events" element={<EventsListPage />} />
+            <Route path="/events/new" element={<EventCreatePlaceholder />} />
+            <Route path="/events/:id" element={<EventDetailPage />} />
             <Route path="/kitchen" element={<KitchenRoutePlaceholder />} />
             {NAV_AREAS.filter((a) => a.planned).map((a) => (
               <Route key={a.path} path={a.path} element={<PlannedAreaPage />} />
