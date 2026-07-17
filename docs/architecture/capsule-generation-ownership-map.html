@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Builder · Capsule Generation Ownership Map</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #0a0e16;
+        --ink-2: #0e131f;
+        --panel: #121927;
+        --panel-2: #161f30;
+        --line: #243246;
+        --grid: rgba(86, 156, 214, 0.06);
+        --cyan: #56b6c2;
+        --cyan-br: #7fd6e0;
+        --amber: #e0a64a;
+        --amber-br: #f4c06a;
+        --green: #7fb069;
+        --violet: #9d8df1;
+        --rose: #e06c75;
+        --paper: #e7ecf3;
+        --paper-dim: #9bacc4;
+        --paper-mute: #5e7088;
+        --mono: "IBM Plex Mono", ui-monospace, monospace;
+        --sans: "IBM Plex Sans", system-ui, sans-serif;
+        --disp: "Bricolage Grotesque", var(--sans);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background-color: var(--ink);
+        background-image:
+          linear-gradient(var(--grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+          radial-gradient(
+            ellipse 70% 45% at 50% -8%,
+            rgba(224, 166, 74, 0.08),
+            transparent 55%
+          );
+        background-size:
+          32px 32px,
+          32px 32px,
+          100% 100%;
+        color: var(--paper);
+        font-family: var(--sans);
+        line-height: 1.6;
+      }
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 28px;
+      }
+      code,
+      .mono {
+        font-family: var(--mono);
+      }
+      header {
+        padding: 80px 0 48px;
+        border-bottom: 1px solid var(--line);
+      }
+      .kicker {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: var(--amber);
+        margin-bottom: 20px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 800;
+        font-size: clamp(34px, 5.5vw, 64px);
+        line-height: 1;
+        letter-spacing: -0.02em;
+        margin-bottom: 18px;
+      }
+      .lede {
+        max-width: 700px;
+        color: var(--paper-dim);
+        font-size: 17px;
+      }
+      section {
+        padding: 64px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(24px, 3.2vw, 36px);
+        margin-bottom: 28px;
+      }
+      .lanes {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+      }
+      .lane {
+        background: linear-gradient(180deg, var(--panel-2), var(--panel));
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        padding: 18px 16px;
+        min-height: 220px;
+      }
+      .lane .lk {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--paper-mute);
+      }
+      .lane .lt {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 18px;
+        margin: 8px 0 12px;
+      }
+      .lane ul {
+        margin-left: 16px;
+        color: var(--paper-dim);
+        font-size: 13px;
+      }
+      .lane ul li {
+        margin-bottom: 7px;
+      }
+      .lane.edit {
+        border-top: 3px solid var(--green);
+      }
+      .lane.gen {
+        border-top: 3px solid var(--amber);
+      }
+      .lane.app {
+        border-top: 3px solid var(--violet);
+      }
+      .lane.prot {
+        border-top: 3px solid var(--rose);
+      }
+      .flow {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr auto 1fr;
+        gap: 12px;
+        align-items: stretch;
+        margin-top: 8px;
+      }
+      .box {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        padding: 18px;
+      }
+      .box h3 {
+        font-family: var(--disp);
+        font-size: 18px;
+        margin-bottom: 8px;
+      }
+      .box p {
+        color: var(--paper-dim);
+        font-size: 13.5px;
+      }
+      .arrow {
+        display: grid;
+        place-items: center;
+        color: var(--cyan);
+        font-family: var(--mono);
+        font-size: 22px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+      th,
+      td {
+        border: 1px solid var(--line);
+        padding: 12px 14px;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        background: var(--ink-2);
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--paper-mute);
+      }
+      td code {
+        color: var(--cyan-br);
+        background: rgba(255, 255, 255, 0.04);
+        padding: 1px 5px;
+        border-radius: 2px;
+      }
+      footer {
+        padding: 36px 0 60px;
+        color: var(--paper-mute);
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .lanes,
+        .flow {
+          grid-template-columns: 1fr;
+        }
+        .arrow {
+          transform: rotate(90deg);
+          padding: 4px 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <div class="kicker">Ownership contract · 2026-07-16</div>
+        <h1>Capsule generation ownership map</h1>
+        <p class="lede">
+          Machine-readable ownership in
+          <code>.builder/ownership.json</code> separates Capsule-editable
+          Manifest inputs from Builder-generated digests.
+        </p>
+      </div>
+    </header>
+
+    <section>
+      <div class="wrap">
+        <h2>Four lanes</h2>
+        <div class="lanes">
+          <div class="lane edit">
+            <div class="lk">Lane A</div>
+            <div class="lt">Editable Manifest</div>
+            <ul>
+              <li><code>*.manifest</code></li>
+              <li><code>manifest.config.yaml|yml|ts</code></li>
+              <li>Recorded in <code>editableManifest.paths</code></li>
+              <li>Never hashed as generated</li>
+            </ul>
+          </div>
+          <div class="lane gen">
+            <div class="lk">Lane B</div>
+            <div class="lt">Builder generated</div>
+            <ul>
+              <li><code>convex/*</code> projections</li>
+              <li>wiring / zod / contract-tests</li>
+              <li>SHA-256 in <code>files</code></li>
+              <li>Conflict if hand-edited</li>
+            </ul>
+          </div>
+          <div class="lane app">
+            <div class="lk">Lane C</div>
+            <div class="lt">Application owned</div>
+            <ul>
+              <li>UI, routes, customization</li>
+              <li>Auth/crypto seams after customize</li>
+              <li>Extra package scripts/deps</li>
+              <li>Preserved on update</li>
+            </ul>
+          </div>
+          <div class="lane prot">
+            <div class="lk">Lane D</div>
+            <div class="lt">Protected state</div>
+            <ul>
+              <li><code>.env*</code></li>
+              <li><code>.convex/</code></li>
+              <li>Lockfiles</li>
+              <li>Never claimable / never auto-deploy</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2>Update decision flow</h2>
+        <div class="flow">
+          <div class="box">
+            <h3>1. Load Capsule Manifest</h3>
+            <p>
+              Read in-project <code>.manifest</code> + config. Compile via
+              Manifest public APIs. External <code>Manifest-source</code> is
+              unused.
+            </p>
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <h3>2. Assemble generated set</h3>
+            <p>
+              <code>resolveProjectionOptions</code> applies
+              naming/aliases/storage maps. Preset emits only Lane B files.
+            </p>
+          </div>
+          <div class="arrow">→</div>
+          <div class="box">
+            <h3>3. Plan with ownership</h3>
+            <p>
+              Add/modify/delete only unchanged generated digests. Editable + app
+              + protected paths are skipped or conflicted.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <h2>ownership.json shape</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Field</th>
+              <th>Owner</th>
+              <th>Update behavior</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>files</code></td>
+              <td>Builder</td>
+              <td>Replace when digest still matches; conflict when modified</td>
+            </tr>
+            <tr>
+              <td><code>package</code></td>
+              <td>Builder requirements</td>
+              <td>Structural merge; app-only entries survive</td>
+            </tr>
+            <tr>
+              <td><code>editableManifest</code></td>
+              <td>Capsule</td>
+              <td>Preserved; never written from generated output</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        Builder docs · capsule-generation-ownership-map.html · created
+        2026-07-16 · companion to live-capsule-manifest-project.html
+      </div>
+    </footer>
+  </body>
+</html>

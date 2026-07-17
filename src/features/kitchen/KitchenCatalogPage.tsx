@@ -22,7 +22,11 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
-import { recipePath, type KitchenSection } from "./kitchenRoutes";
+import {
+  RECIPE_IMPORT_PATH,
+  recipePath,
+  type KitchenSection,
+} from "./kitchenRoutes";
 
 const UNITS = [
   "each",
@@ -187,12 +191,19 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
             menu records.
           </p>
         </div>
-        <button
-          className="btn btn-primary"
-          onClick={() => setShowCreate((value) => !value)}
-        >
-          {showCreate ? "Close form" : `New ${section.slice(0, -1)}`}
-        </button>
+        <div className="recipe-book-masthead-actions">
+          {section === "recipes" ? (
+            <Link to={RECIPE_IMPORT_PATH} className="btn btn-ghost">
+              Import recipe
+            </Link>
+          ) : null}
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowCreate((value) => !value)}
+          >
+            {showCreate ? "Close form" : `New ${section.slice(0, -1)}`}
+          </button>
+        </div>
       </header>
 
       <KitchenBookNav />

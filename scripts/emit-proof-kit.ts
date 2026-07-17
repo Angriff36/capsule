@@ -29,17 +29,38 @@ const WORKFORCE_ENTITIES = [
   "TimeRecord",
   "Qualification",
 ] as const;
+const CULINARY_ENTITIES = [
+  "Ingredient",
+  "Recipe",
+  "RecipeIngredient",
+  "Dish",
+  "Menu",
+] as const;
 const CATALOG_ENTITIES = [
   ...SUPPLY_ENTITIES,
   ...PRODUCTION_ENTITIES,
   ...WORKFORCE_ENTITIES,
+  ...CULINARY_ENTITIES,
 ] as const;
 
 const DEMAND_RUNTIME_TEST =
   "tests/proofs/ingredient-demand-confirm.runtime.test.ts";
 const QUALITY_RUNTIME_TEST =
   "tests/proofs/quality-check-fail-block.runtime.test.ts";
+const SHIFT_RUNTIME_TEST = "tests/proofs/shift-lifecycle.runtime.test.ts";
+const RECIPE_IMPORT_RUNTIME_TEST =
+  "tests/proofs/recipe-import-finalize.runtime.test.ts";
 const STRUCTURAL_TEST = "tests/event-reaction-projection.test.ts";
+const SHIFT_RUNTIME_PROOF_IDS = [
+  "Shift.schedule",
+  "Shift.start",
+  "Shift.complete",
+] as const;
+const RECIPE_IMPORT_PROOF_IDS = [
+  "Recipe.draft",
+  "Ingredient.introduce",
+  "RecipeIngredient.add",
+] as const;
 
 function compileIr(): void {
   mkdirSync(path.dirname(irPath), { recursive: true });
@@ -124,7 +145,12 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
   );
   const demandReactionId = reactionProofId(demandReaction);
   const qualityReactionId = reactionProofId(qualityReaction);
-  const runtimeProofIds = new Set([demandReactionId, qualityReactionId]);
+  const runtimeProofIds = new Set<string>([
+    demandReactionId,
+    qualityReactionId,
+    ...SHIFT_RUNTIME_PROOF_IDS,
+    ...RECIPE_IMPORT_PROOF_IDS,
+  ]);
   const structuralProofIds = new Set([demandReactionId, qualityReactionId]);
 
   const catalog = emitCapabilityCatalog(ir, {
@@ -148,6 +174,14 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
         structuralTest: STRUCTURAL_TEST,
         runtimeTest: QUALITY_RUNTIME_TEST,
       },
+      ...SHIFT_RUNTIME_PROOF_IDS.map((proofId) => ({
+        proofId,
+        runtimeTest: SHIFT_RUNTIME_TEST,
+      })),
+      ...RECIPE_IMPORT_PROOF_IDS.map((proofId) => ({
+        proofId,
+        runtimeTest: RECIPE_IMPORT_RUNTIME_TEST,
+      })),
     ],
   });
 
@@ -220,11 +254,11 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
   const workforceCatalog = emitCapabilityCatalog(ir, {
     entityFilter: WORKFORCE_ENTITIES,
     versions,
-    runtimeProofIds: new Set(),
+    runtimeProofIds: new Set(SHIFT_RUNTIME_PROOF_IDS),
     structuralProofIds: new Set(),
   });
-  // Workforce has no cross-entity reactions in the IR; its runtime proof is
-  // the governed createVia + command lifecycle (tests/proofs/shift-lifecycle).
+  // Workforce has no cross-entity reactions in the IR; runtime evidence is the
+  // governed createVia + command lifecycle in SHIFT_RUNTIME_TEST.
   const workforceLifecycleStates = [
     "assigned",
     "confirmed",

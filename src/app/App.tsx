@@ -5,6 +5,7 @@ import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { HomePage } from "../features/home/HomePage";
 import { EventMenuPage } from "../features/kitchen/EventMenuPage";
+import { RecipeImportPage } from "../features/kitchen/import/RecipeImportPage";
 import { KitchenCatalogPage } from "../features/kitchen/KitchenCatalogPage";
 import { RecipeDetailPage } from "../features/kitchen/RecipeDetailPage";
 import { ErrorState, TableSkeleton } from "../ui/primitives";
@@ -99,6 +100,10 @@ export function App() {
             <Route
               path="/kitchen/recipes"
               element={<KitchenCatalogPage section="recipes" />}
+            />
+            <Route
+              path="/kitchen/recipes/import"
+              element={<RecipeImportPage />}
             />
             <Route path="/kitchen/recipes/:id" element={<RecipeDetailPage />} />
             <Route

@@ -9,14 +9,15 @@ pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
 
 ## Model routing
 
-| Role                            | Model                     | Mechanism                                              |
-| ------------------------------- | ------------------------- | ------------------------------------------------------ |
-| Scheduler                       | Claude Code `/loop` ticks | 2h ticks, work hours, weekdays                         |
-| Brain (triage, state, dispatch) | Fable 5                   | runs `loop-triage`, owns STATE.md                      |
-| Implementers (L2 — **OFF**)     | TBD at graduation         | dispatch mechanism decided then                        |
-| Review gate (L2 — **OFF**)      | Codex (gpt-5.6-sol)       | `.claude/agents/loop-verifier.md` wraps `codex exec`   |
-| Circuit breaker                 | loop-context              | `loop-ledger.json`; 3× same error / 5 fails → escalate |
-| Final gate                      | Human (Ryan)              | STATE.md High Priority + escalations                   |
+| Role                        | Model                                                 | Mechanism                                                                                                                                                                                                                                                |
+| --------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Scheduler                   | Windows Task Scheduler (`capsule-loop-tick`)          | 9:15–17:15 every 2h weekdays → `.claude/loop-tick.cmd` → headless `claude -p` on a worker profile                                                                                                                                                        |
+| Tick runner (triage, state) | **GLM 5.2** (z.ai plan), auto-fallback **MiniMax-M3** | `~/.claude/claude-glm.ps1` / `claude-minimax.ps1` profiles — zero Anthropic quota; reads `.claude/loop-tick-prompt.txt`, runs `loop-triage`, owns STATE.md; scoped Edit perms (state files only). Manual alternate: Codex `gpt-5.6-luna` (`codex exec`). |
+| Overseer                    | Fable 5 — on-demand only                              | reviews STATE.md when the human asks; judges graduation; NEVER runs ticks. No Anthropic-quota model runs ticks (incl. Sonnet).                                                                                                                           |
+| Implementers (L2 — **OFF**) | TBD at graduation                                     | dispatch mechanism decided then                                                                                                                                                                                                                          |
+| Review gate (L2 — **OFF**)  | Codex (gpt-5.6-sol)                                   | `.claude/agents/loop-verifier.md` wraps `codex exec`                                                                                                                                                                                                     |
+| Circuit breaker             | loop-context                                          | `loop-ledger.json`; 3× same error / 5 fails → escalate                                                                                                                                                                                                   |
+| Final gate                  | Human (Ryan)                                          | STATE.md High Priority + escalations                                                                                                                                                                                                                     |
 
 ## Active loops
 
@@ -54,6 +55,13 @@ MCP not required for this pattern — triage uses `gh` CLI (read-only) and git.
 
 - Anything matching the denylist in `loop-constraints.md`
 - Convex schema changes (`convex/schema.ts`) and anything under `convex/_generated`
-- Manifest pipeline changes — go through the `manifest` skill; never hand-edit `generated/**`
+- **Builder-owned trees** (see `.builder/ownership.json`): never hand-edit.
+  Regen happens ONLY via the app-local Builder CLI —
+  `bun run manifest:regen`). Conflicts block apply.
+  Details: `docs/generation/manifest-builder.md`, Builder `mintlify/guides/safe-regeneration.mdx`.
+- Editable Manifest source (`src/**/*.manifest`, `manifest.config.yaml`) and
+  `.builder/**` — human-only; the loop reports, never edits
 - Deploys: `convex deploy` / `bun run deploy` are forbidden to the loop
+  (Builder never deploys Convex either — `bun run codegen` / `bun run dev:convex`
+  are human steps after apply)
 - Pushes, merges, PR closes

@@ -34,6 +34,8 @@ bun run check
 
 toolchain → typecheck → format:check (Prettier) → secrets → test:coverage → build → baseline:decay. CI runs the same script.
 
+Full command reference (build from scratch, regen, maintenance, features): [commands.md](./commands.md) (essentials) · [operations/commands.md](./operations/commands.md) (full).
+
 ## Reset local state
 
 - Frontend: delete `dist/`, restart Vite

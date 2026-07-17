@@ -113,6 +113,20 @@ describe("Event planning foundation", () => {
     expect(markup).toContain('data-failure-category="guard_blocked"');
   });
 
+  it("turns wrapped Convex guard failures into actionable creation guidance", () => {
+    const failure = classifyCommandFailure(
+      "[CONVEX M(mutations:Ingredient_createViaIntroduce)] [Request ID: a95c55eb16003c2d] Server Error\nUncaught Error: Guard 0 failed\nCalled by client",
+    );
+    expect(failure.category).toBe("guard_blocked");
+    expect(failure.title).toBe("Ingredient wasn't created");
+    expect(failure.detail).toBe(
+      "The ingredient could not be created because one of its requirements was not met. Nothing was saved. Request ID: a95c55eb16003c2d.",
+    );
+    expect(failure.detail).toContain("a95c55eb16003c2d");
+    expect(failure.detail).not.toContain("Guard 0 failed");
+    expect(failure.detail).not.toMatch(/lifecycle|refresh/i);
+  });
+
   it("wires every supported guest command into the dossier", () => {
     const panel = read("src/features/events/EventGuestPanel.tsx");
     for (const hook of [

@@ -9,7 +9,7 @@ import { resolve } from "node:path";
  * durable loop-engineering roots (`loop-budget.md`, `loop-constraints.md`,
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
-const ROOT_CAP = 40;
+const ROOT_CAP = 41;
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {
@@ -48,6 +48,10 @@ class BaselineDecayCheck {
       ".fallow",
       ".tmp",
       ".env.local",
+      // Editor / IDE local state — never part of a clean CI checkout
+      ".cursor",
+      ".sonarlint",
+      ".vscode",
     ]);
     const entries = readdirSync(ROOT).filter((name) => !localOnly.has(name));
     if (entries.length > ROOT_CAP) {

@@ -16,3 +16,5 @@ export const KITCHEN_SECTIONS: readonly {
 export function recipePath(id: string) {
   return `/kitchen/recipes/${id}`;
 }
+
+export const RECIPE_IMPORT_PATH = "/kitchen/recipes/import";

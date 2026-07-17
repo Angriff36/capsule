@@ -8,8 +8,8 @@ sequenceDiagram
     PrepTask->>PrepTask: guard[0]: self.claimedAt == null
     PrepTask->>PrepTask: guard[1]: self.status == #quot;pending#quot;
     PrepTask->>PrepTask: guard[2]: self.deletedAt == null
-    PrepTask->>PrepTask: guard[3]: self.event != null
-    PrepTask->>PrepTask: guard[4]: self.ingredient != null and self.ingredient.status == #quot;ac...
+    PrepTask->>PrepTask: guard[3]: self.eventId != null
+    PrepTask->>PrepTask: guard[4]: self.ingredientId != null
     PrepTask->>PrepTask: mutate.eventId
     PrepTask->>PrepTask: mutate.ingredientId
     PrepTask->>PrepTask: mutate.ingredientDemandId

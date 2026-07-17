@@ -13,11 +13,21 @@ this file is the human-readable policy.
 **/credentials/**
 convex/schema.ts
 convex/_generated/**
-generated/**            # Manifest output — regenerate via the manifest skill
+generated/**            # proof-kit / IR scratch — never hand-edit owned paths; use bun run manifest:regen
+.builder/**             # ownership digests — Builder pipeline state
+src/**/*.manifest       # editable Manifest source — human-only
+manifest.config.yaml
 src/**/auth/**
 src/**/payments/**
 src/**/billing/**
 ```
+
+Builder-owned files (429 paths in `.builder/ownership.json`, incl. `convex/lib/**`,
+`convex/mutations.ts`, `schemas/**`, `src/generated/**`, `package.json`) are also
+off-limits: they regenerate via the app-local Builder CLI —
+`bun run manifest:regen` only. Conflicts block apply.
+Hand-edits become `owned-file-modified` conflicts that block regen. See
+`docs/generation/manifest-builder.md` and Builder `mintlify/guides/safe-regeneration.mdx`.
 
 ## Auto-merge policy
 

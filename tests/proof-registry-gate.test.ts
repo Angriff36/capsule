@@ -51,6 +51,24 @@ describe("proof registry gate", () => {
     expect(qualityReaction?.runtimeTest).toBe(
       "tests/proofs/quality-check-fail-block.runtime.test.ts",
     );
+    for (const id of ["Shift.schedule", "Shift.start", "Shift.complete"]) {
+      const shiftProof = registry.proofs.find((p) => p.id === id);
+      expect(shiftProof?.status).toBe("runtime_proven");
+      expect(shiftProof?.runtimeTest).toBe(
+        "tests/proofs/shift-lifecycle.runtime.test.ts",
+      );
+    }
+    for (const id of [
+      "Recipe.draft",
+      "Ingredient.introduce",
+      "RecipeIngredient.add",
+    ]) {
+      const importProof = registry.proofs.find((p) => p.id === id);
+      expect(importProof?.status).toBe("runtime_proven");
+      expect(importProof?.runtimeTest).toBe(
+        "tests/proofs/recipe-import-finalize.runtime.test.ts",
+      );
+    }
   });
 
   it("fails when runtime test path is missing (negative proof)", () => {

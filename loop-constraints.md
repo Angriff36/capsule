@@ -23,8 +23,12 @@
 
 - Never edit `.env`, `.env.*`, `**/secrets/**`, `**/credentials/**`
 - Never edit `convex/schema.ts` or `convex/_generated/**` without human approval
-- Never edit `generated/**` — Manifest output; regenerate via the `manifest` skill, never hand-edit
-- Never edit `.manifest` files or the manifest pipeline outside the `manifest` skill
+- Never edit **Builder-owned files** (listed in `.builder/ownership.json`) or
+  `generated/**` — regen with `bun run manifest:regen` only.
+- **Never run** `manifest generate`, `manifest:build`, or
+  `place-manifest-convex-react.ts`.
+- Never edit `.builder/**`, `src/**/*.manifest`, or `manifest.config.yaml` —
+  editable Manifest source is human-only
 - Never edit auth, payments, or billing code without human approval
 
 ## Code (applies at L2)

@@ -4,18 +4,21 @@ Catering and event operations workspace: React UI, Convex data plane, Clerk auth
 
 ## Docs
 
-| Doc                                                                        | What                                         |
-| -------------------------------------------------------------------------- | -------------------------------------------- |
-| [docs/architecture/overview.md](docs/architecture/overview.md)             | System map                                   |
-| [docs/architecture/boundaries.md](docs/architecture/boundaries.md)         | Authored vs generated                        |
-| [docs/systems/auth.md](docs/systems/auth.md)                               | Clerk + AuthGate + membership                |
-| [docs/systems/events.md](docs/systems/events.md)                           | First domain slice                           |
-| [docs/systems/navigation-shell.md](docs/systems/navigation-shell.md)       | AppShell / nav                               |
-| [docs/generation/manifest-builder.md](docs/generation/manifest-builder.md) | How this repo is produced                    |
-| [docs/operations/local-dev.md](docs/operations/local-dev.md)               | Clone → env → run                            |
-| [PRESET.md](PRESET.md)                                                     | Manifest assembly receipt (do not duplicate) |
-| [AGENTS.md](AGENTS.md)                                                     | Agent commands                               |
-| [CLAUDE.md](CLAUDE.md)                                                     | Agent behavior rules                         |
+| Doc                                                                              | What                                         |
+| -------------------------------------------------------------------------------- | -------------------------------------------- |
+| [docs/architecture/overview.md](docs/architecture/overview.md)                   | System map                                   |
+| [docs/architecture/boundaries.md](docs/architecture/boundaries.md)               | Authored vs generated                        |
+| [docs/systems/auth.md](docs/systems/auth.md)                                     | Clerk + AuthGate + membership                |
+| [docs/systems/events.md](docs/systems/events.md)                                 | First domain slice                           |
+| [docs/systems/navigation-shell.md](docs/systems/navigation-shell.md)             | AppShell / nav                               |
+| [docs/generation/manifest-builder.md](docs/generation/manifest-builder.md)       | How this repo is produced                    |
+| [docs/generation/command-idempotency.md](docs/generation/command-idempotency.md) | Native command idempotency (runtime)         |
+| [docs/commands.md](docs/commands.md)                                             | Essential commands (start here)              |
+| [docs/operations/commands.md](docs/operations/commands.md)                       | Full command reference                       |
+| [docs/operations/local-dev.md](docs/operations/local-dev.md)                     | Clone → env → run                            |
+| [PRESET.md](PRESET.md)                                                           | Manifest assembly receipt (do not duplicate) |
+| [AGENTS.md](AGENTS.md)                                                           | Agent commands                               |
+| [CLAUDE.md](CLAUDE.md)                                                           | Agent behavior rules                         |
 
 ## Quick start
 

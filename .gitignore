@@ -9,6 +9,11 @@ dist/
 coverage/
 .artifacts/
 graphify-out/
+
+# Editor / IDE local state
+.cursor/
+.sonarlint/
+.vscode/
 *.tsbuildinfo
 package-lock.json
 npm-shrinkwrap.json
@@ -25,3 +30,4 @@ generated/ir/
 .loop-worktrees/
 .claude/scheduled_tasks.json
 .claude/scheduled_tasks.lock
+.claude/loop-tick.log

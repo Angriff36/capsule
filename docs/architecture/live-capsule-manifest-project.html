@@ -1,0 +1,649 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Builder · Live Capsule Manifest Project</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --ink: #0a0e16;
+        --ink-2: #0e131f;
+        --panel: #121927;
+        --panel-2: #161f30;
+        --line: #243246;
+        --grid: rgba(86, 156, 214, 0.06);
+        --cyan: #56b6c2;
+        --cyan-br: #7fd6e0;
+        --amber: #e0a64a;
+        --amber-br: #f4c06a;
+        --green: #7fb069;
+        --violet: #9d8df1;
+        --rose: #e06c75;
+        --paper: #e7ecf3;
+        --paper-dim: #9bacc4;
+        --paper-mute: #5e7088;
+        --mono: "IBM Plex Mono", ui-monospace, monospace;
+        --sans: "IBM Plex Sans", system-ui, sans-serif;
+        --disp: "Bricolage Grotesque", var(--sans);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background-color: var(--ink);
+        background-image:
+          linear-gradient(var(--grid) 1px, transparent 1px),
+          linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+          radial-gradient(
+            ellipse 80% 50% at 50% -10%,
+            rgba(86, 182, 194, 0.1),
+            transparent 60%
+          );
+        background-size:
+          32px 32px,
+          32px 32px,
+          100% 100%;
+        color: var(--paper);
+        font-family: var(--sans);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 28px;
+      }
+      a {
+        color: var(--cyan-br);
+        text-decoration: none;
+      }
+      code,
+      .mono {
+        font-family: var(--mono);
+      }
+      header {
+        padding: 88px 0 56px;
+        border-bottom: 1px solid var(--line);
+        position: relative;
+      }
+      .kicker {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: var(--cyan);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+      .kicker::before {
+        content: "";
+        width: 38px;
+        height: 1px;
+        background: var(--cyan);
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 800;
+        font-size: clamp(36px, 6vw, 72px);
+        line-height: 0.98;
+        letter-spacing: -0.02em;
+        margin-bottom: 24px;
+      }
+      h1 .em {
+        color: var(--amber);
+      }
+      .lede {
+        max-width: 720px;
+        font-size: 18px;
+        color: var(--paper-dim);
+      }
+      .lede strong {
+        color: var(--paper);
+        font-weight: 600;
+      }
+      .meta-row {
+        margin-top: 36px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+      }
+      .chip {
+        border: 1px solid var(--line);
+        background: var(--panel);
+        padding: 7px 13px;
+        border-radius: 2px;
+        color: var(--paper-dim);
+      }
+      .chip b {
+        color: var(--cyan-br);
+        font-weight: 600;
+      }
+      section {
+        padding: 72px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .sec-head {
+        display: flex;
+        align-items: baseline;
+        gap: 16px;
+        margin-bottom: 40px;
+      }
+      .sec-num {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--amber);
+        border: 1px solid var(--amber);
+        border-radius: 50%;
+        width: 34px;
+        height: 34px;
+        flex: none;
+        display: grid;
+        place-items: center;
+      }
+      h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(26px, 3.6vw, 40px);
+        letter-spacing: -0.015em;
+        line-height: 1.05;
+      }
+      .sec-sub {
+        color: var(--paper-dim);
+        max-width: 680px;
+        margin: 14px 0 0 50px;
+      }
+      .pipe {
+        display: flex;
+        align-items: stretch;
+        flex-wrap: wrap;
+        gap: 0;
+        margin: 8px 0;
+      }
+      .stage {
+        flex: 1 1 0;
+        min-width: 120px;
+        background: linear-gradient(180deg, var(--panel-2), var(--panel));
+        border: 1px solid var(--line);
+        padding: 16px 14px;
+        position: relative;
+        border-radius: 3px;
+      }
+      .stage + .stage {
+        margin-left: 26px;
+      }
+      .stage + .stage::before {
+        content: "▸";
+        position: absolute;
+        left: -21px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--cyan);
+        font-size: 15px;
+      }
+      .stage .st-k {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--paper-mute);
+      }
+      .stage .st-t {
+        font-family: var(--disp);
+        font-weight: 600;
+        font-size: 17px;
+        margin-top: 4px;
+      }
+      .stage .st-d {
+        font-size: 12.5px;
+        color: var(--paper-dim);
+        margin-top: 6px;
+      }
+      .stage.src {
+        border-color: #36506e;
+      }
+      .stage.ir {
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 1px rgba(86, 182, 194, 0.25) inset;
+      }
+      .stage.out {
+        border-color: var(--amber);
+      }
+      .graph {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 22px;
+        margin-top: 8px;
+      }
+      .col-label {
+        font-family: var(--mono);
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--paper-mute);
+        padding-bottom: 10px;
+        margin-bottom: 4px;
+        border-bottom: 1px dashed var(--line);
+      }
+      .node {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--cyan);
+        border-radius: 3px;
+        padding: 13px 15px;
+        margin-bottom: 14px;
+      }
+      .node .nf {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--paper);
+        font-weight: 500;
+      }
+      .node .nd {
+        font-size: 12px;
+        color: var(--paper-dim);
+        margin-top: 5px;
+      }
+      .node.amber {
+        border-left-color: var(--amber);
+      }
+      .node.green {
+        border-left-color: var(--green);
+      }
+      .node.violet {
+        border-left-color: var(--violet);
+      }
+      .node .tag {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 2px;
+        margin-top: 9px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--paper-mute);
+      }
+      .tag.gen {
+        background: rgba(224, 166, 74, 0.14);
+        color: var(--amber-br);
+      }
+      .tag.hand {
+        background: rgba(86, 182, 194, 0.14);
+        color: var(--cyan-br);
+      }
+      .tag.edit {
+        background: rgba(127, 176, 105, 0.16);
+        color: var(--green);
+      }
+      .phases {
+        display: grid;
+        gap: 18px;
+      }
+      .phase {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        overflow: hidden;
+        background: var(--panel);
+      }
+      .phase .when {
+        background: var(--ink-2);
+        padding: 18px;
+        border-right: 1px solid var(--line);
+      }
+      .phase .when .wlabel {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 16px;
+      }
+      .phase .when .wfreq {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--amber);
+        margin-top: 6px;
+      }
+      .phase .body {
+        padding: 18px 20px;
+      }
+      .phase .body .cmd {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--cyan-br);
+        background: var(--ink-2);
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        padding: 9px 13px;
+        display: inline-block;
+        margin-bottom: 10px;
+      }
+      .phase .body p {
+        font-size: 13.5px;
+        color: var(--paper-dim);
+      }
+      .phase .body p code {
+        color: var(--paper);
+        background: rgba(255, 255, 255, 0.05);
+        padding: 1px 5px;
+        border-radius: 2px;
+        font-size: 12.5px;
+      }
+      .compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+      }
+      .card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 3px;
+        padding: 22px;
+      }
+      .card h3 {
+        font-family: var(--disp);
+        font-size: 20px;
+        margin-bottom: 10px;
+      }
+      .card.bad {
+        border-color: rgba(224, 108, 117, 0.45);
+      }
+      .card.good {
+        border-color: rgba(127, 176, 105, 0.45);
+      }
+      .card ul {
+        margin: 12px 0 0 18px;
+        color: var(--paper-dim);
+        font-size: 14px;
+      }
+      .card ul li {
+        margin-bottom: 6px;
+      }
+      footer {
+        padding: 40px 0 64px;
+        color: var(--paper-mute);
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+      @media (max-width: 860px) {
+        .graph,
+        .compare {
+          grid-template-columns: 1fr;
+        }
+        .phase {
+          grid-template-columns: 1fr;
+        }
+        .phase .when {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .stage + .stage {
+          margin-left: 0;
+          margin-top: 18px;
+        }
+        .stage + .stage::before {
+          content: "▾";
+          left: 50%;
+          top: -16px;
+          transform: translateX(-50%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <div class="kicker">Builder architecture · 2026-07-16</div>
+        <h1>Live Capsule <span class="em">Manifest</span> project</h1>
+        <p class="lede">
+          Capsule is a <strong>live, editable Manifest project</strong> — not a
+          detached assembled artifact. Domain changes happen in Capsule-owned
+          <code>.manifest</code> files and <code>manifest.config.yaml</code>,
+          then Builder regenerates only Builder-owned output.
+        </p>
+        <div class="meta-row">
+          <span class="chip"><b>initial</b> copy source + generate</span>
+          <span class="chip"><b>update</b> compile from Capsule</span>
+          <span class="chip"><b>migrate</b> import without regen</span>
+          <span class="chip"><b>no</b> implicit Convex deploy</span>
+        </div>
+      </div>
+    </header>
+
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="sec-num">01</div>
+          <div>
+            <h2>Correction</h2>
+            <p class="sec-sub">
+              Before: regenerate from an external IR dump. After: Capsule owns
+              the editable source of truth.
+            </p>
+          </div>
+        </div>
+        <div class="compare">
+          <div class="card bad">
+            <h3>Detached artifact (wrong)</h3>
+            <ul>
+              <li>IR read from <code>Manifest-source/generated/ir</code></li>
+              <li>Capsule held only projections + app glue</li>
+              <li>Domain edits required the external repo forever</li>
+              <li>Config/naming lived outside the app</li>
+            </ul>
+          </div>
+          <div class="card good">
+            <h3>Live Manifest project (required)</h3>
+            <ul>
+              <li>
+                Editable <code>.manifest</code> + config live inside Capsule
+              </li>
+              <li>Update compiles from Capsule only</li>
+              <li>Generated Convex/runtime files stay Builder-owned</li>
+              <li>UI/auth/env remain Capsule-owned</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="sec-num">02</div>
+          <div>
+            <h2>Initial generation pipeline</h2>
+            <p class="sec-sub">
+              Authoritative Manifest source is accepted once, copied in-project,
+              then compiled and projected.
+            </p>
+          </div>
+        </div>
+        <div class="pipe">
+          <div class="stage src">
+            <div class="st-k">Input</div>
+            <div class="st-t">Manifest-source</div>
+            <div class="st-d">
+              Authoritative .manifest + manifest.config.yaml
+            </div>
+          </div>
+          <div class="stage">
+            <div class="st-k">Copy</div>
+            <div class="st-t">Editable tree</div>
+            <div class="st-d">
+              Placed in Capsule; recorded as editableManifest
+            </div>
+          </div>
+          <div class="stage ir">
+            <div class="st-k">Compile</div>
+            <div class="st-t">compileProject</div>
+            <div class="st-d">
+              Manifest multi-compiler API via manifest-project
+            </div>
+          </div>
+          <div class="stage out">
+            <div class="st-k">Assemble</div>
+            <div class="st-t">Convex preset</div>
+            <div class="st-d">
+              resolveProjectionOptions → generated files only
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="sec-num">03</div>
+          <div>
+            <h2>Ownership map inside Capsule</h2>
+            <p class="sec-sub">
+              Three ownership lanes. Only the amber lane is replaceable by
+              update mode.
+            </p>
+          </div>
+        </div>
+        <div class="graph">
+          <div>
+            <div class="col-label">Capsule editable</div>
+            <div class="node green">
+              <div class="nf">src/**/*.manifest</div>
+              <div class="nd">
+                Domain source of truth for agents and humans.
+              </div>
+              <span class="tag edit">editable</span>
+            </div>
+            <div class="node green">
+              <div class="nf">manifest.config.yaml</div>
+              <div class="nd">
+                Naming, aliases, irregular plurals, projection options.
+              </div>
+              <span class="tag edit">editable</span>
+            </div>
+          </div>
+          <div>
+            <div class="col-label">Builder generated</div>
+            <div class="node amber">
+              <div class="nf">convex/**</div>
+              <div class="nd">
+                Schema, queries, mutations, companions from IR.
+              </div>
+              <span class="tag gen">generated</span>
+            </div>
+            <div class="node amber">
+              <div class="nf">wiring / zod / tests / PRESET.md</div>
+              <div class="nd">
+                Hashed in <code>.builder/ownership.json</code> files.
+              </div>
+              <span class="tag gen">generated</span>
+            </div>
+          </div>
+          <div>
+            <div class="col-label">Capsule application</div>
+            <div class="node violet">
+              <div class="nf">UI · routes · auth seams</div>
+              <div class="nd">Preserved across regeneration.</div>
+              <span class="tag hand">app-owned</span>
+            </div>
+            <div class="node violet">
+              <div class="nf">.env* · .convex/</div>
+              <div class="nd">Protected paths — never claimable.</div>
+              <span class="tag hand">protected</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="sec-head">
+          <div class="sec-num">04</div>
+          <div>
+            <h2>Commands</h2>
+            <p class="sec-sub">
+              Dry-run by default. Capsule is not modified unless
+              <code>--apply</code> is explicit.
+            </p>
+          </div>
+        </div>
+        <div class="phases">
+          <div class="phase">
+            <div class="when">
+              <div class="wlabel">Initial</div>
+              <div class="wfreq">once</div>
+            </div>
+            <div class="body">
+              <div class="cmd">
+                npm run project:generate:convex -- --mode initial
+                --manifest-source &lt;dir&gt; --target &lt;Capsule&gt; --apply
+              </div>
+              <p>
+                Copies editable Manifest files into the target, compiles from
+                those copies, writes generated ownership separately.
+              </p>
+            </div>
+          </div>
+          <div class="phase">
+            <div class="when">
+              <div class="wlabel">Update</div>
+              <div class="wfreq">ongoing</div>
+            </div>
+            <div class="body">
+              <div class="cmd">
+                npm run project:generate:convex -- --mode update --target
+                &lt;Capsule&gt; --apply
+              </div>
+              <p>
+                Compiles from Capsule’s own Manifest tree. No
+                <code>Manifest-source</code> dependency. Conflicts on modified
+                generated files.
+              </p>
+            </div>
+          </div>
+          <div class="phase">
+            <div class="when">
+              <div class="wlabel">Migrate</div>
+              <div class="wfreq">explicit</div>
+            </div>
+            <div class="body">
+              <div class="cmd">
+                npm run project:migrate:manifest-source -- --from
+                &lt;Manifest-source&gt; --target &lt;Capsule&gt; --apply
+              </div>
+              <p>
+                Imports editable source/config into an existing Capsule without
+                regenerating projections or overwriting app work.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        Builder docs · live-capsule-manifest-project.html · created 2026-07-16 ·
+        see also capsule-generation-ownership-map.html
+      </div>
+    </footer>
+  </body>
+</html>

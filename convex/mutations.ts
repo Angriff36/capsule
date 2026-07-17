@@ -64,6 +64,33 @@ async function __resolveRelation(
   return target;
 }
 
+async function __getCommandIdempotency(ctx: MutationCtx, key: string): Promise<any | undefined> {
+  const row = await ctx.db
+    .query("commandIdempotencyKeys")
+    .withIndex("by_key", (q) => q.eq("key", key))
+    .first();
+  return row?.result;
+}
+
+async function __setCommandIdempotency(
+  ctx: MutationCtx,
+  key: string,
+  command: string,
+  result: unknown,
+): Promise<void> {
+  const existing = await ctx.db
+    .query("commandIdempotencyKeys")
+    .withIndex("by_key", (q) => q.eq("key", key))
+    .first();
+  if (existing !== null) return;
+  await ctx.db.insert("commandIdempotencyKeys", {
+    key,
+    command,
+    result,
+    createdAt: Date.now(),
+  });
+}
+
 // Role hierarchy from IR (effective permissions after inheritance).
 const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = {
   "admin": [
@@ -501,9 +528,20 @@ export const AvailabilityWindow_declare = mutation({
     startsAt: v.number(),
     endsAt: v.number(),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runAvailabilityWindowDeclare,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runAvailabilityWindowDeclare(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "AvailabilityWindow_declare", __result);
+    }
+    return __result;
+  },
 });
 
 export const AvailabilityWindow_createViaDeclare = mutation({
@@ -511,9 +549,14 @@ export const AvailabilityWindow_createViaDeclare = mutation({
     personId: v.string(),
     startsAt: v.number(),
     endsAt: v.number(),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, startsAt, endsAt, notes } = args;
@@ -550,7 +593,11 @@ export const AvailabilityWindow_createViaDeclare = mutation({
     const docId = await ctx.db.insert("availabilityWindows", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, availabilityWindowId: docId, tenantId: doc.tenantId, personId: doc.personId, startsAt: doc.startsAt, endsAt: doc.endsAt, status: "active", _subject: { entity: "AvailabilityWindow", command: "declare", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "AvailabilityDeclared", entity: "AvailabilityWindow", entityId: docId, payload: { availabilityWindowId: docId, tenantId: doc.tenantId, personId: doc.personId, startsAt: doc.startsAt, endsAt: doc.endsAt, status: "active" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "AvailabilityWindow_createViaDeclare", __result);
+    }
+    return __result;
   },
 });
 
@@ -576,7 +623,7 @@ async function __runAvailabilityWindowWithdraw(ctx: MutationCtx, { docId, versio
         const __from = String(__cur);
         const __to = "withdrawn";
         const __allowed: Record<string, string[]> = { "active": ["withdrawn"], "withdrawn": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -601,9 +648,20 @@ async function __runAvailabilityWindowWithdraw(ctx: MutationCtx, { docId, versio
 export const AvailabilityWindow_withdraw = mutation({
   args: {
     docId: v.id("availabilityWindows"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runAvailabilityWindowWithdraw,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runAvailabilityWindowWithdraw(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "AvailabilityWindow_withdraw", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runClientArchive(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -626,7 +684,7 @@ async function __runClientArchive(ctx: MutationCtx, { docId, reason, version }: 
         const __from = String(__cur);
         const __to = "archived";
         const __allowed: Record<string, string[]> = { "active": ["archived"], "archived": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -654,9 +712,20 @@ export const Client_archive = mutation({
   args: {
     docId: v.id("clients"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runClientArchive,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runClientArchive(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_archive", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runClientAssignOwner(ctx: MutationCtx, { docId, assignedToId, version }: any, __creation = false) {
@@ -692,9 +761,20 @@ export const Client_assignOwner = mutation({
   args: {
     docId: v.id("clients"),
     assignedToId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runClientAssignOwner,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runClientAssignOwner(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_assignOwner", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runClientChangeBillingProfile(ctx: MutationCtx, { docId, paymentTermsDays, taxExempt, taxId, version }: any, __creation = false) {
@@ -736,9 +816,20 @@ export const Client_changeBillingProfile = mutation({
     paymentTermsDays: v.any(),
     taxExempt: v.boolean(),
     taxId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runClientChangeBillingProfile,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runClientChangeBillingProfile(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_changeBillingProfile", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runClientChangeContact(ctx: MutationCtx, { docId, email, phone, website, addressLine1, addressLine2, city, region, postalCode, countryCode, version }: any, __creation = false) {
@@ -791,9 +882,20 @@ export const Client_changeContact = mutation({
     region: v.optional(v.string()),
     postalCode: v.optional(v.string()),
     countryCode: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runClientChangeContact,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runClientChangeContact(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_changeContact", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runClientReactivate(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -815,7 +917,7 @@ async function __runClientReactivate(ctx: MutationCtx, { docId, version }: any, 
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["archived"], "archived": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -842,9 +944,20 @@ async function __runClientReactivate(ctx: MutationCtx, { docId, version }: any, 
 export const Client_reactivate = mutation({
   args: {
     docId: v.id("clients"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runClientReactivate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runClientReactivate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_reactivate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runClientRegister(ctx: MutationCtx, { docId, clientType, companyName, givenName, familyName, email, phone, website, addressLine1, addressLine2, city, region, postalCode, countryCode, taxId, taxExempt, paymentTermsDays, notes, assignedToId, version }: any, __creation = false) {
@@ -918,9 +1031,20 @@ export const Client_register = mutation({
     paymentTermsDays: v.optional(v.any()),
     notes: v.optional(v.string()),
     assignedToId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runClientRegister,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runClientRegister(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_register", __result);
+    }
+    return __result;
+  },
 });
 
 export const Client_createViaRegister = mutation({
@@ -942,9 +1066,14 @@ export const Client_createViaRegister = mutation({
     taxExempt: v.optional(v.boolean()),
     paymentTermsDays: v.optional(v.any()),
     notes: v.optional(v.string()),
-    assignedToId: v.optional(v.string())
+    assignedToId: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientType, companyName, givenName, familyName, email, phone, website, addressLine1, addressLine2, city, region, postalCode, countryCode, taxId, taxExempt, paymentTermsDays, notes, assignedToId } = args;
@@ -1007,7 +1136,11 @@ export const Client_createViaRegister = mutation({
     const docId = await ctx.db.insert("clients", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, clientId: docId, tenantId: doc.tenantId, clientType: doc.clientType, _subject: { entity: "Client", command: "register", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "ClientRegistered", entity: "Client", entityId: docId, payload: { clientId: docId, tenantId: doc.tenantId, clientType: doc.clientType }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Client_createViaRegister", __result);
+    }
+    return __result;
   },
 });
 
@@ -1066,9 +1199,20 @@ export const ClientContact_add = mutation({
     isPrimary: v.optional(v.boolean()),
     isBillingContact: v.optional(v.boolean()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runClientContactAdd,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runClientContactAdd(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_add", __result);
+    }
+    return __result;
+  },
 });
 
 export const ClientContact_createViaAdd = mutation({
@@ -1082,9 +1226,14 @@ export const ClientContact_createViaAdd = mutation({
     mobile: v.optional(v.string()),
     isPrimary: v.optional(v.boolean()),
     isBillingContact: v.optional(v.boolean()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientId, givenName, familyName, title, email, phone, mobile, isPrimary, isBillingContact, notes } = args;
@@ -1133,7 +1282,11 @@ export const ClientContact_createViaAdd = mutation({
     const docId = await ctx.db.insert("clientContacts", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, clientContactId: docId, tenantId: doc.tenantId, clientId: doc.clientId, isPrimary: ((doc.isPrimary != null) ? doc.isPrimary : false), isBillingContact: ((doc.isBillingContact != null) ? doc.isBillingContact : false), _subject: { entity: "ClientContact", command: "add", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "ClientContactAdded", entity: "ClientContact", entityId: docId, payload: { clientContactId: docId, tenantId: doc.tenantId, clientId: doc.clientId, isPrimary: ((doc.isPrimary != null) ? doc.isPrimary : false), isBillingContact: ((doc.isBillingContact != null) ? doc.isBillingContact : false) }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_createViaAdd", __result);
+    }
+    return __result;
   },
 });
 
@@ -1156,7 +1309,7 @@ async function __runClientContactRemove(ctx: MutationCtx, { docId, version }: an
         const __from = String(__cur);
         const __to = "removed";
         const __allowed: Record<string, string[]> = { "active": ["removed"], "removed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1181,9 +1334,20 @@ async function __runClientContactRemove(ctx: MutationCtx, { docId, version }: an
 export const ClientContact_remove = mutation({
   args: {
     docId: v.id("clientContacts"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runClientContactRemove,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runClientContactRemove(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_remove", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runClientContactSetPrimary(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -1217,9 +1381,20 @@ async function __runClientContactSetPrimary(ctx: MutationCtx, { docId, version }
 export const ClientContact_setPrimary = mutation({
   args: {
     docId: v.id("clientContacts"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runClientContactSetPrimary,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runClientContactSetPrimary(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_setPrimary", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runClientContactUpdateDetails(ctx: MutationCtx, { docId, givenName, familyName, title, email, phone, mobile, isBillingContact, notes, version }: any, __creation = false) {
@@ -1269,9 +1444,20 @@ export const ClientContact_updateDetails = mutation({
     mobile: v.optional(v.string()),
     isBillingContact: v.optional(v.boolean()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runClientContactUpdateDetails,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runClientContactUpdateDetails(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ClientContact_updateDetails", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runContractDraft(ctx: MutationCtx, { docId, eventId, clientId, title, contractNumber, documentUrl, expiresAt, notes, version }: any, __creation = false) {
@@ -1324,9 +1510,20 @@ export const Contract_draft = mutation({
     documentUrl: v.optional(v.string()),
     expiresAt: v.optional(v.number()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runContractDraft,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runContractDraft(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_draft", __result);
+    }
+    return __result;
+  },
 });
 
 export const Contract_createViaDraft = mutation({
@@ -1337,9 +1534,14 @@ export const Contract_createViaDraft = mutation({
     contractNumber: v.optional(v.string()),
     documentUrl: v.optional(v.string()),
     expiresAt: v.optional(v.number()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, clientId, title, contractNumber, documentUrl, expiresAt, notes } = args;
@@ -1384,7 +1586,11 @@ export const Contract_createViaDraft = mutation({
     const docId = await ctx.db.insert("contracts", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, contractId: docId, tenantId: doc.tenantId, eventId: doc.eventId, clientId: doc.clientId, title: doc.title, _subject: { entity: "Contract", command: "draft", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "ContractDrafted", entity: "Contract", entityId: docId, payload: { contractId: docId, tenantId: doc.tenantId, eventId: doc.eventId, clientId: doc.clientId, title: doc.title }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_createViaDraft", __result);
+    }
+    return __result;
   },
 });
 
@@ -1405,7 +1611,7 @@ async function __runContractExpire(ctx: MutationCtx, { docId, version }: any, __
         const __from = String(__cur);
         const __to = "expired";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1428,9 +1634,20 @@ async function __runContractExpire(ctx: MutationCtx, { docId, version }: any, __
 export const Contract_expire = mutation({
   args: {
     docId: v.id("contracts"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runContractExpire,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runContractExpire(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_expire", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runContractMarkViewed(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -1450,7 +1667,7 @@ async function __runContractMarkViewed(ctx: MutationCtx, { docId, version }: any
         const __from = String(__cur);
         const __to = "viewed";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1474,9 +1691,20 @@ async function __runContractMarkViewed(ctx: MutationCtx, { docId, version }: any
 export const Contract_markViewed = mutation({
   args: {
     docId: v.id("contracts"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runContractMarkViewed,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runContractMarkViewed(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_markViewed", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runContractMarkVoided(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -1497,7 +1725,7 @@ async function __runContractMarkVoided(ctx: MutationCtx, { docId, reason, versio
         const __from = String(__cur);
         const __to = "voided";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1523,9 +1751,20 @@ export const Contract_markVoided = mutation({
   args: {
     docId: v.id("contracts"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runContractMarkVoided,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runContractMarkVoided(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_markVoided", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runContractSend(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -1547,7 +1786,7 @@ async function __runContractSend(ctx: MutationCtx, { docId, version }: any, __cr
         const __from = String(__cur);
         const __to = "sent";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1571,9 +1810,20 @@ async function __runContractSend(ctx: MutationCtx, { docId, version }: any, __cr
 export const Contract_send = mutation({
   args: {
     docId: v.id("contracts"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runContractSend,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runContractSend(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_send", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runContractSign(ctx: MutationCtx, { docId, signedBy, version }: any, __creation = false) {
@@ -1595,7 +1845,7 @@ async function __runContractSign(ctx: MutationCtx, { docId, signedBy, version }:
         const __from = String(__cur);
         const __to = "signed";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "expired", "voided"], "viewed": ["signed", "expired", "voided"], "signed": [], "expired": [], "voided": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1621,9 +1871,20 @@ export const Contract_sign = mutation({
   args: {
     docId: v.id("contracts"),
     signedBy: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runContractSign,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runContractSign(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Contract_sign", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runDeliveryCancel(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -1647,7 +1908,7 @@ async function __runDeliveryCancel(ctx: MutationCtx, { docId, reason, version }:
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "scheduled": ["in_transit", "failed", "cancelled"], "in_transit": ["delivered", "failed", "cancelled"], "delivered": [], "failed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1674,9 +1935,20 @@ export const Delivery_cancel = mutation({
   args: {
     docId: v.id("deliveries"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDeliveryCancel,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDeliveryCancel(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_cancel", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runDeliveryConfirmDelivery(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -1701,7 +1973,7 @@ async function __runDeliveryConfirmDelivery(ctx: MutationCtx, { docId, version }
         const __from = String(__cur);
         const __to = "delivered";
         const __allowed: Record<string, string[]> = { "scheduled": ["in_transit", "failed", "cancelled"], "in_transit": ["delivered", "failed", "cancelled"], "delivered": [], "failed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1726,9 +1998,20 @@ async function __runDeliveryConfirmDelivery(ctx: MutationCtx, { docId, version }
 export const Delivery_confirmDelivery = mutation({
   args: {
     docId: v.id("deliveries"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDeliveryConfirmDelivery,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDeliveryConfirmDelivery(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_confirmDelivery", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runDeliveryMarkFailed(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -1753,7 +2036,7 @@ async function __runDeliveryMarkFailed(ctx: MutationCtx, { docId, reason, versio
         const __from = String(__cur);
         const __to = "failed";
         const __allowed: Record<string, string[]> = { "scheduled": ["in_transit", "failed", "cancelled"], "in_transit": ["delivered", "failed", "cancelled"], "delivered": [], "failed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1780,9 +2063,20 @@ export const Delivery_markFailed = mutation({
   args: {
     docId: v.id("deliveries"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDeliveryMarkFailed,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDeliveryMarkFailed(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_markFailed", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runDeliverySchedule(ctx: MutationCtx, { docId, packListId, eventId, destination, windowStartsAt, windowEndsAt, driverId, notes, version }: any, __creation = false) {
@@ -1839,9 +2133,20 @@ export const Delivery_schedule = mutation({
     windowEndsAt: v.number(),
     driverId: v.optional(v.string()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDeliverySchedule,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDeliverySchedule(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_schedule", __result);
+    }
+    return __result;
+  },
 });
 
 export const Delivery_createViaSchedule = mutation({
@@ -1852,9 +2157,14 @@ export const Delivery_createViaSchedule = mutation({
     windowStartsAt: v.number(),
     windowEndsAt: v.number(),
     driverId: v.optional(v.string()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { packListId, eventId, destination, windowStartsAt, windowEndsAt, driverId, notes } = args;
@@ -1902,7 +2212,11 @@ export const Delivery_createViaSchedule = mutation({
     const docId = await ctx.db.insert("deliveries", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, deliveryId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.eventId, driverId: ((doc.driverId != null) ? doc.driverId : doc.driverId), destination: doc.destination, windowStartsAt: doc.windowStartsAt, windowEndsAt: doc.windowEndsAt, status: "scheduled", _subject: { entity: "Delivery", command: "schedule", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "DeliveryScheduled", entity: "Delivery", entityId: docId, payload: { deliveryId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.eventId, driverId: ((doc.driverId != null) ? doc.driverId : doc.driverId), destination: doc.destination, windowStartsAt: doc.windowStartsAt, windowEndsAt: doc.windowEndsAt, status: "scheduled" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_createViaSchedule", __result);
+    }
+    return __result;
   },
 });
 
@@ -1929,7 +2243,7 @@ async function __runDeliveryStartTransit(ctx: MutationCtx, { docId, version }: a
         const __from = String(__cur);
         const __to = "in_transit";
         const __allowed: Record<string, string[]> = { "scheduled": ["in_transit", "failed", "cancelled"], "in_transit": ["delivered", "failed", "cancelled"], "delivered": [], "failed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -1954,9 +2268,20 @@ async function __runDeliveryStartTransit(ctx: MutationCtx, { docId, version }: a
 export const Delivery_startTransit = mutation({
   args: {
     docId: v.id("deliveries"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDeliveryStartTransit,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDeliveryStartTransit(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_startTransit", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runDishChangeRecipe(ctx: MutationCtx, { docId, recipeId, version }: any, __creation = false) {
@@ -1990,9 +2315,20 @@ export const Dish_changeRecipe = mutation({
   args: {
     docId: v.id("dishes"),
     recipeId: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDishChangeRecipe,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDishChangeRecipe(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_changeRecipe", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runDishClassifyAllergens(ctx: MutationCtx, { docId, allergenSummary, version }: any, __creation = false) {
@@ -2024,9 +2360,20 @@ export const Dish_classifyAllergens = mutation({
   args: {
     docId: v.id("dishes"),
     allergenSummary: v.array(v.any()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDishClassifyAllergens,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDishClassifyAllergens(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_classifyAllergens", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runDishIntroduce(ctx: MutationCtx, { docId, recipeId, name, portionSize, portionUnit, description, category, course, serviceStyle, dietaryTags, allergenSummary, version }: any, __creation = false) {
@@ -2079,9 +2426,20 @@ export const Dish_introduce = mutation({
     serviceStyle: v.optional(v.string()),
     dietaryTags: v.optional(v.array(v.string())),
     allergenSummary: v.optional(v.array(v.any())),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDishIntroduce,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDishIntroduce(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_introduce", __result);
+    }
+    return __result;
+  },
 });
 
 export const Dish_createViaIntroduce = mutation({
@@ -2095,9 +2453,14 @@ export const Dish_createViaIntroduce = mutation({
     course: v.optional(v.string()),
     serviceStyle: v.optional(v.string()),
     dietaryTags: v.optional(v.array(v.string())),
-    allergenSummary: v.optional(v.array(v.any()))
+    allergenSummary: v.optional(v.array(v.any())),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { recipeId, name, portionSize, portionUnit, description, category, course, serviceStyle, dietaryTags, allergenSummary } = args;
@@ -2142,7 +2505,11 @@ export const Dish_createViaIntroduce = mutation({
     const docId = await ctx.db.insert("dishes", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, dishId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, name: doc.name, portionSize: doc.portionSize, portionUnit: doc.portionUnit, allergenSummary: ((doc.allergenSummary != null) ? doc.allergenSummary : []), _subject: { entity: "Dish", command: "introduce", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "DishIntroduced", entity: "Dish", entityId: docId, payload: { dishId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, name: doc.name, portionSize: doc.portionSize, portionUnit: doc.portionUnit, allergenSummary: ((doc.allergenSummary != null) ? doc.allergenSummary : []) }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_createViaIntroduce", __result);
+    }
+    return __result;
   },
 });
 
@@ -2164,7 +2531,7 @@ async function __runDishReinstate(ctx: MutationCtx, { docId, version }: any, __c
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["retired"], "retired": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2189,9 +2556,20 @@ async function __runDishReinstate(ctx: MutationCtx, { docId, version }: any, __c
 export const Dish_reinstate = mutation({
   args: {
     docId: v.id("dishes"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDishReinstate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDishReinstate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_reinstate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runDishRetire(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -2213,7 +2591,7 @@ async function __runDishRetire(ctx: MutationCtx, { docId, reason, version }: any
         const __from = String(__cur);
         const __to = "retired";
         const __allowed: Record<string, string[]> = { "active": ["retired"], "retired": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2239,9 +2617,20 @@ export const Dish_retire = mutation({
   args: {
     docId: v.id("dishes"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDishRetire,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDishRetire(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_retire", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runDishReviseDetails(ctx: MutationCtx, { docId, name, description, category, course, serviceStyle, dietaryTags, version }: any, __creation = false) {
@@ -2284,9 +2673,20 @@ export const Dish_reviseDetails = mutation({
     course: v.optional(v.string()),
     serviceStyle: v.optional(v.string()),
     dietaryTags: v.optional(v.array(v.string())),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDishReviseDetails,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDishReviseDetails(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_reviseDetails", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runDishUpdatePortioning(ctx: MutationCtx, { docId, portionSize, portionUnit, version }: any, __creation = false) {
@@ -2323,9 +2723,20 @@ export const Dish_updatePortioning = mutation({
     docId: v.id("dishes"),
     portionSize: v.number(),
     portionUnit: v.any(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runDishUpdatePortioning,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runDishUpdatePortioning(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Dish_updatePortioning", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -2347,7 +2758,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
         const __from = String(__cur);
         const __to = "approved";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2377,9 +2788,20 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
 export const Event_approve = mutation({
   args: {
     docId: v.id("events"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventApprove,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventApprove(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_approve", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventAssignOwner(ctx: MutationCtx, { docId, assignedToId, version }: any, __creation = false) {
@@ -2413,9 +2835,20 @@ export const Event_assignOwner = mutation({
   args: {
     docId: v.id("events"),
     assignedToId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventAssignOwner,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventAssignOwner(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_assignOwner", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventBeginExecution(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -2441,7 +2874,7 @@ async function __runEventBeginExecution(ctx: MutationCtx, { docId, version }: an
         const __from = String(__cur);
         const __to = "executing";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2466,9 +2899,20 @@ async function __runEventBeginExecution(ctx: MutationCtx, { docId, version }: an
 export const Event_beginExecution = mutation({
   args: {
     docId: v.id("events"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventBeginExecution,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventBeginExecution(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_beginExecution", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventCancel(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -2491,7 +2935,7 @@ async function __runEventCancel(ctx: MutationCtx, { docId, reason, version }: an
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2543,9 +2987,20 @@ export const Event_cancel = mutation({
   args: {
     docId: v.id("events"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventCancel,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventCancel(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_cancel", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventChangeHeadcount(ctx: MutationCtx, { docId, newHeadcount, version }: any, __creation = false) {
@@ -2581,9 +3036,20 @@ export const Event_changeHeadcount = mutation({
   args: {
     docId: v.id("events"),
     newHeadcount: v.any(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventChangeHeadcount,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventChangeHeadcount(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changeHeadcount", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventChangePricing(ctx: MutationCtx, { docId, budgetAmount, quotedPrice, version }: any, __creation = false) {
@@ -2621,9 +3087,20 @@ export const Event_changePricing = mutation({
     docId: v.id("events"),
     budgetAmount: v.number(),
     quotedPrice: v.number(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventChangePricing,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventChangePricing(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changePricing", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventChangePrimaryContact(ctx: MutationCtx, { docId, primaryContactName, primaryContactEmail, primaryContactPhone, version }: any, __creation = false) {
@@ -2662,9 +3139,20 @@ export const Event_changePrimaryContact = mutation({
     primaryContactName: v.string(),
     primaryContactEmail: v.optional(v.string()),
     primaryContactPhone: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventChangePrimaryContact,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventChangePrimaryContact(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changePrimaryContact", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventChangeRequirements(ctx: MutationCtx, { docId, accessibilityNeeds, serviceRequirements, operationalRequirements, version }: any, __creation = false) {
@@ -2702,9 +3190,20 @@ export const Event_changeRequirements = mutation({
     accessibilityNeeds: v.optional(v.array(v.string())),
     serviceRequirements: v.optional(v.string()),
     operationalRequirements: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventChangeRequirements,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventChangeRequirements(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changeRequirements", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventChangeVenue(ctx: MutationCtx, { docId, venueId, venueName, venueAddress, version }: any, __creation = false) {
@@ -2742,9 +3241,20 @@ export const Event_changeVenue = mutation({
     venueId: v.optional(v.string()),
     venueName: v.optional(v.string()),
     venueAddress: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventChangeVenue,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventChangeVenue(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_changeVenue", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventCloseOut(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -2766,7 +3276,7 @@ async function __runEventCloseOut(ctx: MutationCtx, { docId, version }: any, __c
         const __from = String(__cur);
         const __to = "closed_out";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2791,9 +3301,20 @@ async function __runEventCloseOut(ctx: MutationCtx, { docId, version }: any, __c
 export const Event_closeOut = mutation({
   args: {
     docId: v.id("events"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventCloseOut,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventCloseOut(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_closeOut", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventComplete(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -2815,7 +3336,7 @@ async function __runEventComplete(ctx: MutationCtx, { docId, version }: any, __c
         const __from = String(__cur);
         const __to = "completed";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -2840,9 +3361,20 @@ async function __runEventComplete(ctx: MutationCtx, { docId, version }: any, __c
 export const Event_complete = mutation({
   args: {
     docId: v.id("events"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventComplete,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventComplete(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_complete", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventPlanEngagement(ctx: MutationCtx, { docId, clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, venueId, venueName, venueAddress, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId, version }: any, __creation = false) {
@@ -2918,9 +3450,20 @@ export const Event_planEngagement = mutation({
     serviceRequirements: v.optional(v.string()),
     operationalRequirements: v.optional(v.string()),
     assignedToId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventPlanEngagement,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventPlanEngagement(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_planEngagement", __result);
+    }
+    return __result;
+  },
 });
 
 export const Event_createViaPlanEngagement = mutation({
@@ -2942,9 +3485,14 @@ export const Event_createViaPlanEngagement = mutation({
     accessibilityNeeds: v.optional(v.array(v.string())),
     serviceRequirements: v.optional(v.string()),
     operationalRequirements: v.optional(v.string()),
-    assignedToId: v.optional(v.string())
+    assignedToId: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, venueId, venueName, venueAddress, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId } = args;
@@ -3011,7 +3559,11 @@ export const Event_createViaPlanEngagement = mutation({
     const docId = await ctx.db.insert("events", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, eventId: docId, tenantId: doc.tenantId, clientId: doc.clientId, venueId: doc.venueId, startsAt: doc.startsAt, endsAt: doc.endsAt, expectedHeadcount: doc.expectedHeadcount, _subject: { entity: "Event", command: "planEngagement", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventPlanned", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: doc.tenantId, clientId: doc.clientId, venueId: doc.venueId, startsAt: doc.startsAt, endsAt: doc.endsAt, expectedHeadcount: doc.expectedHeadcount }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_createViaPlanEngagement", __result);
+    }
+    return __result;
   },
 });
 
@@ -3049,9 +3601,20 @@ export const Event_reschedule = mutation({
     docId: v.id("events"),
     startsAt: v.number(),
     endsAt: v.number(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventReschedule,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventReschedule(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_reschedule", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventReturnToPlanning(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -3074,7 +3637,7 @@ async function __runEventReturnToPlanning(ctx: MutationCtx, { docId, reason, ver
         const __from = String(__cur);
         const __to = "planning";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3100,9 +3663,20 @@ export const Event_returnToPlanning = mutation({
   args: {
     docId: v.id("events"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventReturnToPlanning,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventReturnToPlanning(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_returnToPlanning", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventSubmitForApproval(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -3124,7 +3698,7 @@ async function __runEventSubmitForApproval(ctx: MutationCtx, { docId, version }:
         const __from = String(__cur);
         const __to = "pending_approval";
         const __allowed: Record<string, string[]> = { "planning": ["pending_approval", "cancelled"], "pending_approval": ["planning", "approved", "cancelled"], "approved": ["planning", "executing", "cancelled"], "executing": ["completed", "cancelled"], "completed": ["closed_out"], "cancelled": [], "closed_out": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'stage'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3148,9 +3722,20 @@ async function __runEventSubmitForApproval(ctx: MutationCtx, { docId, version }:
 export const Event_submitForApproval = mutation({
   args: {
     docId: v.id("events"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventSubmitForApproval,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventSubmitForApproval(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Event_submitForApproval", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventAllergenCheckRecord(ctx: MutationCtx, { docId, eventId, result, eventDishId, dishId, flaggedAllergens, notes, version }: any, __creation = false) {
@@ -3179,7 +3764,7 @@ async function __runEventAllergenCheckRecord(ctx: MutationCtx, { docId, eventId,
         const __from = String(__cur);
         const __to = "recorded";
         const __allowed: Record<string, string[]> = { "pending": ["recorded"], "recorded": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3216,9 +3801,20 @@ export const EventAllergenCheck_record = mutation({
     dishId: v.optional(v.string()),
     flaggedAllergens: v.optional(v.array(v.any())),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventAllergenCheckRecord,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventAllergenCheckRecord(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAllergenCheck_record", __result);
+    }
+    return __result;
+  },
 });
 
 export const EventAllergenCheck_createViaRecord = mutation({
@@ -3228,9 +3824,14 @@ export const EventAllergenCheck_createViaRecord = mutation({
     eventDishId: v.optional(v.string()),
     dishId: v.optional(v.string()),
     flaggedAllergens: v.optional(v.array(v.any())),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, result, eventDishId, dishId, flaggedAllergens, notes } = args;
@@ -3275,7 +3876,11 @@ export const EventAllergenCheck_createViaRecord = mutation({
     const docId = await ctx.db.insert("eventAllergenChecks", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, allergenCheckId: docId, tenantId: doc.tenantId, eventId: doc.eventId, eventDishId: ((doc.eventDishId != null) ? doc.eventDishId : doc.eventDishId), dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), result: doc.result, flaggedAllergens: doc.nextFlags, checkedById: user.id, status: "recorded", _subject: { entity: "EventAllergenCheck", command: "record", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventAllergenCheckRecorded", entity: "EventAllergenCheck", entityId: docId, payload: { allergenCheckId: docId, tenantId: doc.tenantId, eventId: doc.eventId, eventDishId: ((doc.eventDishId != null) ? doc.eventDishId : doc.eventDishId), dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), result: doc.result, flaggedAllergens: doc.nextFlags, checkedById: user.id, status: "recorded" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAllergenCheck_createViaRecord", __result);
+    }
+    return __result;
   },
 });
 
@@ -3331,9 +3936,20 @@ export const EventAssignment_assign = mutation({
     startsAt: v.optional(v.number()),
     endsAt: v.optional(v.number()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventAssignmentAssign,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventAssignmentAssign(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_assign", __result);
+    }
+    return __result;
+  },
 });
 
 export const EventAssignment_createViaAssign = mutation({
@@ -3343,9 +3959,14 @@ export const EventAssignment_createViaAssign = mutation({
     role: v.string(),
     startsAt: v.optional(v.number()),
     endsAt: v.optional(v.number()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, personId, role, startsAt, endsAt, notes } = args;
@@ -3391,7 +4012,11 @@ export const EventAssignment_createViaAssign = mutation({
     const docId = await ctx.db.insert("eventAssignments", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, eventAssignmentId: docId, tenantId: doc.tenantId, eventId: doc.eventId, personId: doc.personId, role: doc.role, startsAt: ((doc.startsAt != null) ? doc.startsAt : doc.startsAt), endsAt: ((doc.endsAt != null) ? doc.endsAt : doc.endsAt), status: "assigned", _subject: { entity: "EventAssignment", command: "assign", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventAssignmentAssigned", entity: "EventAssignment", entityId: docId, payload: { eventAssignmentId: docId, tenantId: doc.tenantId, eventId: doc.eventId, personId: doc.personId, role: doc.role, startsAt: ((doc.startsAt != null) ? doc.startsAt : doc.startsAt), endsAt: ((doc.endsAt != null) ? doc.endsAt : doc.endsAt), status: "assigned" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_createViaAssign", __result);
+    }
+    return __result;
   },
 });
 
@@ -3417,7 +4042,7 @@ async function __runEventAssignmentCheckIn(ctx: MutationCtx, { docId, version }:
         const __from = String(__cur);
         const __to = "checked_in";
         const __allowed: Record<string, string[]> = { "assigned": ["confirmed", "checked_in", "no_show", "unassigned"], "confirmed": ["checked_in", "no_show", "unassigned"], "checked_in": ["checked_out"], "checked_out": [], "no_show": [], "unassigned": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3442,9 +4067,20 @@ async function __runEventAssignmentCheckIn(ctx: MutationCtx, { docId, version }:
 export const EventAssignment_checkIn = mutation({
   args: {
     docId: v.id("eventAssignments"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventAssignmentCheckIn,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventAssignmentCheckIn(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_checkIn", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventAssignmentCheckOut(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -3469,7 +4105,7 @@ async function __runEventAssignmentCheckOut(ctx: MutationCtx, { docId, version }
         const __from = String(__cur);
         const __to = "checked_out";
         const __allowed: Record<string, string[]> = { "assigned": ["confirmed", "checked_in", "no_show", "unassigned"], "confirmed": ["checked_in", "no_show", "unassigned"], "checked_in": ["checked_out"], "checked_out": [], "no_show": [], "unassigned": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3494,9 +4130,20 @@ async function __runEventAssignmentCheckOut(ctx: MutationCtx, { docId, version }
 export const EventAssignment_checkOut = mutation({
   args: {
     docId: v.id("eventAssignments"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventAssignmentCheckOut,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventAssignmentCheckOut(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_checkOut", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventAssignmentConfirm(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -3521,7 +4168,7 @@ async function __runEventAssignmentConfirm(ctx: MutationCtx, { docId, version }:
         const __from = String(__cur);
         const __to = "confirmed";
         const __allowed: Record<string, string[]> = { "assigned": ["confirmed", "checked_in", "no_show", "unassigned"], "confirmed": ["checked_in", "no_show", "unassigned"], "checked_in": ["checked_out"], "checked_out": [], "no_show": [], "unassigned": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3546,9 +4193,20 @@ async function __runEventAssignmentConfirm(ctx: MutationCtx, { docId, version }:
 export const EventAssignment_confirm = mutation({
   args: {
     docId: v.id("eventAssignments"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventAssignmentConfirm,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventAssignmentConfirm(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_confirm", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventAssignmentMarkNoShow(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -3572,7 +4230,7 @@ async function __runEventAssignmentMarkNoShow(ctx: MutationCtx, { docId, version
         const __from = String(__cur);
         const __to = "no_show";
         const __allowed: Record<string, string[]> = { "assigned": ["confirmed", "checked_in", "no_show", "unassigned"], "confirmed": ["checked_in", "no_show", "unassigned"], "checked_in": ["checked_out"], "checked_out": [], "no_show": [], "unassigned": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3597,9 +4255,20 @@ async function __runEventAssignmentMarkNoShow(ctx: MutationCtx, { docId, version
 export const EventAssignment_markNoShow = mutation({
   args: {
     docId: v.id("eventAssignments"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventAssignmentMarkNoShow,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventAssignmentMarkNoShow(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_markNoShow", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventAssignmentUnassign(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -3623,7 +4292,7 @@ async function __runEventAssignmentUnassign(ctx: MutationCtx, { docId, version }
         const __from = String(__cur);
         const __to = "unassigned";
         const __allowed: Record<string, string[]> = { "assigned": ["confirmed", "checked_in", "no_show", "unassigned"], "confirmed": ["checked_in", "no_show", "unassigned"], "checked_in": ["checked_out"], "checked_out": [], "no_show": [], "unassigned": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3648,9 +4317,20 @@ async function __runEventAssignmentUnassign(ctx: MutationCtx, { docId, version }
 export const EventAssignment_unassign = mutation({
   args: {
     docId: v.id("eventAssignments"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventAssignmentUnassign,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventAssignmentUnassign(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventAssignment_unassign", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventCloseoutCapture(ctx: MutationCtx, { docId, eventId, actualRevenue, budgetedRevenue, revenueVariance, actualIngredientCost, actualWasteCost, actualLaborCost, actualVendorCost, budgetedCost, totalActualCost, costVariance, grossProfit, expectedHeadcount, actualHeadcount, unresolvedIssues, performanceNotes, notes, version }: any, __creation = false) {
@@ -3725,9 +4405,20 @@ export const EventCloseout_capture = mutation({
     unresolvedIssues: v.optional(v.string()),
     performanceNotes: v.optional(v.string()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventCloseoutCapture,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventCloseoutCapture(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventCloseout_capture", __result);
+    }
+    return __result;
+  },
 });
 
 export const EventCloseout_createViaCapture = mutation({
@@ -3748,9 +4439,14 @@ export const EventCloseout_createViaCapture = mutation({
     actualHeadcount: v.any(),
     unresolvedIssues: v.optional(v.string()),
     performanceNotes: v.optional(v.string()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, actualRevenue, budgetedRevenue, revenueVariance, actualIngredientCost, actualWasteCost, actualLaborCost, actualVendorCost, budgetedCost, totalActualCost, costVariance, grossProfit, expectedHeadcount, actualHeadcount, unresolvedIssues, performanceNotes, notes } = args;
@@ -3817,7 +4513,11 @@ export const EventCloseout_createViaCapture = mutation({
     const docId = await ctx.db.insert("eventCloseouts", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, closeoutId: docId, tenantId: doc.tenantId, eventId: doc.eventId, actualRevenue: doc.actualRevenue, totalActualCost: doc.totalActualCost, grossProfit: doc.grossProfit, actualHeadcount: doc.actualHeadcount, status: "draft", _subject: { entity: "EventCloseout", command: "capture", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventCloseoutCaptured", entity: "EventCloseout", entityId: docId, payload: { closeoutId: docId, tenantId: doc.tenantId, eventId: doc.eventId, actualRevenue: doc.actualRevenue, totalActualCost: doc.totalActualCost, grossProfit: doc.grossProfit, actualHeadcount: doc.actualHeadcount, status: "draft" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventCloseout_createViaCapture", __result);
+    }
+    return __result;
   },
 });
 
@@ -3840,7 +4540,7 @@ async function __runEventCloseoutFinalize(ctx: MutationCtx, { docId, version }: 
         const __from = String(__cur);
         const __to = "finalized";
         const __allowed: Record<string, string[]> = { "draft": ["finalized"], "finalized": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -3864,9 +4564,20 @@ async function __runEventCloseoutFinalize(ctx: MutationCtx, { docId, version }: 
 export const EventCloseout_finalize = mutation({
   args: {
     docId: v.id("eventCloseouts"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventCloseoutFinalize,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventCloseoutFinalize(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventCloseout_finalize", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventDishAdjustServings(ctx: MutationCtx, { docId, quantityServings, version }: any, __creation = false) {
@@ -3902,9 +4613,20 @@ export const EventDish_adjustServings = mutation({
   args: {
     docId: v.id("eventDishes"),
     quantityServings: v.any(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventDishAdjustServings,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventDishAdjustServings(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_adjustServings", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventDishChangeCourse(ctx: MutationCtx, { docId, course, serviceStyle, version }: any, __creation = false) {
@@ -3940,9 +4662,20 @@ export const EventDish_changeCourse = mutation({
     docId: v.id("eventDishes"),
     course: v.optional(v.string()),
     serviceStyle: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventDishChangeCourse,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventDishChangeCourse(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_changeCourse", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventDishRemove(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -3979,9 +4712,20 @@ export const EventDish_remove = mutation({
   args: {
     docId: v.id("eventDishes"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventDishRemove,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventDishRemove(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_remove", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventDishSelect(ctx: MutationCtx, { docId, eventId, dishId, quantityServings, course, serviceStyle, specialInstructions, version }: any, __creation = false) {
@@ -4028,9 +4772,20 @@ export const EventDish_select = mutation({
     course: v.optional(v.string()),
     serviceStyle: v.optional(v.string()),
     specialInstructions: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventDishSelect,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventDishSelect(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_select", __result);
+    }
+    return __result;
+  },
 });
 
 export const EventDish_createViaSelect = mutation({
@@ -4040,9 +4795,14 @@ export const EventDish_createViaSelect = mutation({
     quantityServings: v.any(),
     course: v.optional(v.string()),
     serviceStyle: v.optional(v.string()),
-    specialInstructions: v.optional(v.string())
+    specialInstructions: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, dishId, quantityServings, course, serviceStyle, specialInstructions } = args;
@@ -4080,7 +4840,11 @@ export const EventDish_createViaSelect = mutation({
     const docId = await ctx.db.insert("eventDishes", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, eventDishId: docId, tenantId: doc.tenantId, eventId: doc.eventId, dishId: doc.dishId, quantityServings: doc.quantityServings, course: doc.course, serviceStyle: doc.serviceStyle, _subject: { entity: "EventDish", command: "select", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventDishSelected", entity: "EventDish", entityId: docId, payload: { eventDishId: docId, tenantId: doc.tenantId, eventId: doc.eventId, dishId: doc.dishId, quantityServings: doc.quantityServings, course: doc.course, serviceStyle: doc.serviceStyle }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_createViaSelect", __result);
+    }
+    return __result;
   },
 });
 
@@ -4115,9 +4879,20 @@ export const EventDish_updateInstructions = mutation({
   args: {
     docId: v.id("eventDishes"),
     specialInstructions: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventDishUpdateInstructions,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventDishUpdateInstructions(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventDish_updateInstructions", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventGuestAssignTable(ctx: MutationCtx, { docId, tableAssignment, version }: any, __creation = false) {
@@ -4152,9 +4927,20 @@ export const EventGuest_assignTable = mutation({
   args: {
     docId: v.id("eventGuests"),
     tableAssignment: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventGuestAssignTable,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventGuestAssignTable(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_assignTable", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventGuestCheckIn(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -4189,9 +4975,20 @@ async function __runEventGuestCheckIn(ctx: MutationCtx, { docId, version }: any,
 export const EventGuest_checkIn = mutation({
   args: {
     docId: v.id("eventGuests"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventGuestCheckIn,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventGuestCheckIn(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_checkIn", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventGuestInvite(ctx: MutationCtx, { docId, eventId, name, email, phone, dietaryRestrictions, allergenRestrictions, accessibilityNeeds, specialMealRequired, version }: any, __creation = false) {
@@ -4213,7 +5010,7 @@ async function __runEventGuestInvite(ctx: MutationCtx, { docId, eventId, name, e
         const __from = String(__cur);
         const __to = "pending";
         const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4254,9 +5051,20 @@ export const EventGuest_invite = mutation({
     allergenRestrictions: v.optional(v.array(v.string())),
     accessibilityNeeds: v.optional(v.array(v.string())),
     specialMealRequired: v.optional(v.boolean()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventGuestInvite,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventGuestInvite(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_invite", __result);
+    }
+    return __result;
+  },
 });
 
 export const EventGuest_createViaInvite = mutation({
@@ -4268,9 +5076,14 @@ export const EventGuest_createViaInvite = mutation({
     dietaryRestrictions: v.optional(v.array(v.string())),
     allergenRestrictions: v.optional(v.array(v.string())),
     accessibilityNeeds: v.optional(v.array(v.string())),
-    specialMealRequired: v.optional(v.boolean())
+    specialMealRequired: v.optional(v.boolean()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, name, email, phone, dietaryRestrictions, allergenRestrictions, accessibilityNeeds, specialMealRequired } = args;
@@ -4312,7 +5125,11 @@ export const EventGuest_createViaInvite = mutation({
     const docId = await ctx.db.insert("eventGuests", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, guestId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: doc.name, _subject: { entity: "EventGuest", command: "invite", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventGuestInvited", entity: "EventGuest", entityId: docId, payload: { guestId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: doc.name }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_createViaInvite", __result);
+    }
+    return __result;
   },
 });
 
@@ -4334,7 +5151,7 @@ async function __runEventGuestRsvpConfirm(ctx: MutationCtx, { docId, version }: 
         const __from = String(__cur);
         const __to = "confirmed";
         const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4360,9 +5177,20 @@ async function __runEventGuestRsvpConfirm(ctx: MutationCtx, { docId, version }: 
 export const EventGuest_rsvpConfirm = mutation({
   args: {
     docId: v.id("eventGuests"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventGuestRsvpConfirm,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventGuestRsvpConfirm(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_rsvpConfirm", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventGuestRsvpDecline(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -4383,7 +5211,7 @@ async function __runEventGuestRsvpDecline(ctx: MutationCtx, { docId, reason, ver
         const __from = String(__cur);
         const __to = "declined";
         const __allowed: Record<string, string[]> = { "pending": ["confirmed", "declined"], "confirmed": ["confirmed", "declined"], "declined": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'rsvpStatus'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4410,9 +5238,20 @@ export const EventGuest_rsvpDecline = mutation({
   args: {
     docId: v.id("eventGuests"),
     reason: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventGuestRsvpDecline,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventGuestRsvpDecline(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_rsvpDecline", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runEventGuestWithdraw(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -4446,9 +5285,20 @@ export const EventGuest_withdraw = mutation({
   args: {
     docId: v.id("eventGuests"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runEventGuestWithdraw,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runEventGuestWithdraw(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "EventGuest_withdraw", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIncidentBeginInvestigation(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -4470,7 +5320,7 @@ async function __runIncidentBeginInvestigation(ctx: MutationCtx, { docId, versio
         const __from = String(__cur);
         const __to = "investigating";
         const __allowed: Record<string, string[]> = { "open": ["investigating", "resolved", "dismissed"], "investigating": ["resolved", "dismissed"], "resolved": [], "dismissed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4494,9 +5344,20 @@ async function __runIncidentBeginInvestigation(ctx: MutationCtx, { docId, versio
 export const Incident_beginInvestigation = mutation({
   args: {
     docId: v.id("incidents"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIncidentBeginInvestigation,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIncidentBeginInvestigation(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_beginInvestigation", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIncidentDismiss(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -4520,7 +5381,7 @@ async function __runIncidentDismiss(ctx: MutationCtx, { docId, reason, version }
         const __from = String(__cur);
         const __to = "dismissed";
         const __allowed: Record<string, string[]> = { "open": ["investigating", "resolved", "dismissed"], "investigating": ["resolved", "dismissed"], "resolved": [], "dismissed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4546,9 +5407,20 @@ export const Incident_dismiss = mutation({
   args: {
     docId: v.id("incidents"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIncidentDismiss,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIncidentDismiss(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_dismiss", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIncidentMarkResolved(ctx: MutationCtx, { docId, resolution, version }: any, __creation = false) {
@@ -4571,7 +5443,7 @@ async function __runIncidentMarkResolved(ctx: MutationCtx, { docId, resolution, 
         const __from = String(__cur);
         const __to = "resolved";
         const __allowed: Record<string, string[]> = { "open": ["investigating", "resolved", "dismissed"], "investigating": ["resolved", "dismissed"], "resolved": [], "dismissed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4597,9 +5469,20 @@ export const Incident_markResolved = mutation({
   args: {
     docId: v.id("incidents"),
     resolution: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIncidentMarkResolved,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIncidentMarkResolved(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_markResolved", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIncidentReport(ctx: MutationCtx, { docId, eventId, severity, category, description, prepTaskId, deliveryId, shiftId, version }: any, __creation = false) {
@@ -4654,9 +5537,20 @@ export const Incident_report = mutation({
     prepTaskId: v.optional(v.string()),
     deliveryId: v.optional(v.string()),
     shiftId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIncidentReport,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIncidentReport(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_report", __result);
+    }
+    return __result;
+  },
 });
 
 export const Incident_createViaReport = mutation({
@@ -4667,9 +5561,14 @@ export const Incident_createViaReport = mutation({
     description: v.string(),
     prepTaskId: v.optional(v.string()),
     deliveryId: v.optional(v.string()),
-    shiftId: v.optional(v.string())
+    shiftId: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, severity, category, description, prepTaskId, deliveryId, shiftId } = args;
@@ -4716,7 +5615,11 @@ export const Incident_createViaReport = mutation({
     const docId = await ctx.db.insert("incidents", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, incidentId: docId, tenantId: doc.tenantId, eventId: doc.eventId, severity: doc.severity, category: doc.category, reportedById: user.id, status: "open", _subject: { entity: "Incident", command: "report", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "IncidentReported", entity: "Incident", entityId: docId, payload: { incidentId: docId, tenantId: doc.tenantId, eventId: doc.eventId, severity: doc.severity, category: doc.category, reportedById: user.id, status: "open" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Incident_createViaReport", __result);
+    }
+    return __result;
   },
 });
 
@@ -4749,9 +5652,20 @@ export const Ingredient_classifyAllergens = mutation({
   args: {
     docId: v.id("ingredients"),
     allergens: v.array(v.any()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientClassifyAllergens,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientClassifyAllergens(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_classifyAllergens", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIngredientDiscontinue(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -4773,7 +5687,7 @@ async function __runIngredientDiscontinue(ctx: MutationCtx, { docId, reason, ver
         const __from = String(__cur);
         const __to = "discontinued";
         const __allowed: Record<string, string[]> = { "active": ["discontinued"], "discontinued": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4799,9 +5713,20 @@ export const Ingredient_discontinue = mutation({
   args: {
     docId: v.id("ingredients"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientDiscontinue,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientDiscontinue(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_discontinue", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIngredientIntroduce(ctx: MutationCtx, { docId, name, unit, costPerUnit, allergens, category, version }: any, __creation = false) {
@@ -4844,9 +5769,20 @@ export const Ingredient_introduce = mutation({
     costPerUnit: v.number(),
     allergens: v.optional(v.array(v.any())),
     category: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientIntroduce,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientIntroduce(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_introduce", __result);
+    }
+    return __result;
+  },
 });
 
 export const Ingredient_createViaIntroduce = mutation({
@@ -4855,9 +5791,14 @@ export const Ingredient_createViaIntroduce = mutation({
     unit: v.any(),
     costPerUnit: v.number(),
     allergens: v.optional(v.array(v.any())),
-    category: v.optional(v.string())
+    category: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, unit, costPerUnit, allergens, category } = args;
@@ -4892,7 +5833,11 @@ export const Ingredient_createViaIntroduce = mutation({
     const docId = await ctx.db.insert("ingredients", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, ingredientId: docId, tenantId: doc.tenantId, name: doc.name, unit: doc.unit, costPerUnit: doc.costPerUnit, allergens: ((doc.allergens != null) ? doc.allergens : []), _subject: { entity: "Ingredient", command: "introduce", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "IngredientIntroduced", entity: "Ingredient", entityId: docId, payload: { ingredientId: docId, tenantId: doc.tenantId, name: doc.name, unit: doc.unit, costPerUnit: doc.costPerUnit, allergens: ((doc.allergens != null) ? doc.allergens : []) }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_createViaIntroduce", __result);
+    }
+    return __result;
   },
 });
 
@@ -4914,7 +5859,7 @@ async function __runIngredientReinstate(ctx: MutationCtx, { docId, version }: an
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["discontinued"], "discontinued": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -4939,9 +5884,20 @@ async function __runIngredientReinstate(ctx: MutationCtx, { docId, version }: an
 export const Ingredient_reinstate = mutation({
   args: {
     docId: v.id("ingredients"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientReinstate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientReinstate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_reinstate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIngredientUpdateCosting(ctx: MutationCtx, { docId, costPerUnit, version }: any, __creation = false) {
@@ -4976,9 +5932,20 @@ export const Ingredient_updateCosting = mutation({
   args: {
     docId: v.id("ingredients"),
     costPerUnit: v.number(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientUpdateCosting,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientUpdateCosting(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_updateCosting", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIngredientUpdateDetails(ctx: MutationCtx, { docId, name, unit, category, version }: any, __creation = false) {
@@ -5015,9 +5982,20 @@ export const Ingredient_updateDetails = mutation({
     name: v.string(),
     unit: v.any(),
     category: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientUpdateDetails,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientUpdateDetails(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Ingredient_updateDetails", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIngredientDemandCalculate(ctx: MutationCtx, { docId, eventId, ingredientId, requiredQuantity, unit, servings, dishId, sourceRecipeLineQuantity, sourceBatchMultiplier, sourceYieldQuantity, version }: any, __creation = false) {
@@ -5049,7 +6027,7 @@ async function __runIngredientDemandCalculate(ctx: MutationCtx, { docId, eventId
         const __from = String(__cur);
         const __to = "calculated";
         const __allowed: Record<string, string[]> = { "pending": ["calculated"], "calculated": ["confirmed", "superseded"], "confirmed": ["fulfilled", "superseded"], "fulfilled": [], "superseded": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5091,9 +6069,20 @@ export const IngredientDemand_calculate = mutation({
     sourceRecipeLineQuantity: v.optional(v.number()),
     sourceBatchMultiplier: v.optional(v.number()),
     sourceYieldQuantity: v.optional(v.number()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientDemandCalculate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientDemandCalculate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_calculate", __result);
+    }
+    return __result;
+  },
 });
 
 export const IngredientDemand_createViaCalculate = mutation({
@@ -5106,9 +6095,14 @@ export const IngredientDemand_createViaCalculate = mutation({
     dishId: v.optional(v.string()),
     sourceRecipeLineQuantity: v.optional(v.number()),
     sourceBatchMultiplier: v.optional(v.number()),
-    sourceYieldQuantity: v.optional(v.number())
+    sourceYieldQuantity: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, ingredientId, requiredQuantity, unit, servings, dishId, sourceRecipeLineQuantity, sourceBatchMultiplier, sourceYieldQuantity } = args;
@@ -5162,7 +6156,11 @@ export const IngredientDemand_createViaCalculate = mutation({
     const docId = await ctx.db.insert("ingredientDemands", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, ingredientDemandId: docId, tenantId: doc.tenantId, eventId: doc.eventId, ingredientId: doc.ingredientId, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, servings: ((doc.servings != null) ? doc.servings : doc.servings), _subject: { entity: "IngredientDemand", command: "calculate", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "IngredientDemandCalculated", entity: "IngredientDemand", entityId: docId, payload: { ingredientDemandId: docId, tenantId: doc.tenantId, eventId: doc.eventId, ingredientId: doc.ingredientId, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, servings: ((doc.servings != null) ? doc.servings : doc.servings) }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_createViaCalculate", __result);
+    }
+    return __result;
   },
 });
 
@@ -5184,7 +6182,7 @@ async function __runIngredientDemandConfirm(ctx: MutationCtx, { docId, version }
         const __from = String(__cur);
         const __to = "confirmed";
         const __allowed: Record<string, string[]> = { "pending": ["calculated"], "calculated": ["confirmed", "superseded"], "confirmed": ["fulfilled", "superseded"], "fulfilled": [], "superseded": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5210,9 +6208,20 @@ async function __runIngredientDemandConfirm(ctx: MutationCtx, { docId, version }
 export const IngredientDemand_confirm = mutation({
   args: {
     docId: v.id("ingredientDemands"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientDemandConfirm,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientDemandConfirm(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_confirm", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIngredientDemandFulfill(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -5233,7 +6242,7 @@ async function __runIngredientDemandFulfill(ctx: MutationCtx, { docId, version }
         const __from = String(__cur);
         const __to = "fulfilled";
         const __allowed: Record<string, string[]> = { "pending": ["calculated"], "calculated": ["confirmed", "superseded"], "confirmed": ["fulfilled", "superseded"], "fulfilled": [], "superseded": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5257,9 +6266,20 @@ async function __runIngredientDemandFulfill(ctx: MutationCtx, { docId, version }
 export const IngredientDemand_fulfill = mutation({
   args: {
     docId: v.id("ingredientDemands"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientDemandFulfill,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientDemandFulfill(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_fulfill", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIngredientDemandRecalculate(ctx: MutationCtx, { docId, newQuantity, reason, version }: any, __creation = false) {
@@ -5297,9 +6317,20 @@ export const IngredientDemand_recalculate = mutation({
     docId: v.id("ingredientDemands"),
     newQuantity: v.number(),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientDemandRecalculate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientDemandRecalculate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_recalculate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runIngredientDemandSupersede(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -5323,7 +6354,7 @@ async function __runIngredientDemandSupersede(ctx: MutationCtx, { docId, reason,
         const __from = String(__cur);
         const __to = "superseded";
         const __allowed: Record<string, string[]> = { "pending": ["calculated"], "calculated": ["confirmed", "superseded"], "confirmed": ["fulfilled", "superseded"], "fulfilled": [], "superseded": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5349,9 +6380,20 @@ export const IngredientDemand_supersede = mutation({
   args: {
     docId: v.id("ingredientDemands"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runIngredientDemandSupersede,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runIngredientDemandSupersede(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "IngredientDemand_supersede", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInventoryItemAdjustQuantity(ctx: MutationCtx, { docId, delta, reason, version }: any, __creation = false) {
@@ -5388,9 +6430,20 @@ export const InventoryItem_adjustQuantity = mutation({
     docId: v.id("inventoryItems"),
     delta: v.number(),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryItemAdjustQuantity,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryItemAdjustQuantity(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_adjustQuantity", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInventoryItemOpen(ctx: MutationCtx, { docId, ingredientId, locationId, unit, quantityOnHand, parLevel, reorderThreshold, unitCost, version }: any, __creation = false) {
@@ -5442,9 +6495,20 @@ export const InventoryItem_open = mutation({
     parLevel: v.optional(v.number()),
     reorderThreshold: v.optional(v.number()),
     unitCost: v.optional(v.number()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryItemOpen,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryItemOpen(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_open", __result);
+    }
+    return __result;
+  },
 });
 
 export const InventoryItem_createViaOpen = mutation({
@@ -5455,9 +6519,14 @@ export const InventoryItem_createViaOpen = mutation({
     quantityOnHand: v.optional(v.number()),
     parLevel: v.optional(v.number()),
     reorderThreshold: v.optional(v.number()),
-    unitCost: v.optional(v.number())
+    unitCost: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { ingredientId, locationId, unit, quantityOnHand, parLevel, reorderThreshold, unitCost } = args;
@@ -5499,7 +6568,11 @@ export const InventoryItem_createViaOpen = mutation({
     const docId = await ctx.db.insert("inventoryItems", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, inventoryItemId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, previousQuantity: doc.previousQuantity, quantityOnHand: ((doc.quantityOnHand != null) ? doc.quantityOnHand : 0), unit: doc.unit, unitCost: ((doc.unitCost != null) ? doc.unitCost : 0), _subject: { entity: "InventoryItem", command: "open", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "InventoryItemOpened", entity: "InventoryItem", entityId: docId, payload: { inventoryItemId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, previousQuantity: doc.previousQuantity, quantityOnHand: ((doc.quantityOnHand != null) ? doc.quantityOnHand : 0), unit: doc.unit, unitCost: ((doc.unitCost != null) ? doc.unitCost : 0) }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_createViaOpen", __result);
+    }
+    return __result;
   },
 });
 
@@ -5538,9 +6611,20 @@ export const InventoryItem_receiveStock = mutation({
     docId: v.id("inventoryItems"),
     quantity: v.number(),
     unitCost: v.optional(v.number()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryItemReceiveStock,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryItemReceiveStock(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_receiveStock", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInventoryItemRecount(ctx: MutationCtx, { docId, actualQuantity, version }: any, __creation = false) {
@@ -5574,9 +6658,20 @@ export const InventoryItem_recount = mutation({
   args: {
     docId: v.id("inventoryItems"),
     actualQuantity: v.number(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryItemRecount,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryItemRecount(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_recount", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInventoryItemRemove(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -5612,9 +6707,20 @@ export const InventoryItem_remove = mutation({
   args: {
     docId: v.id("inventoryItems"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryItemRemove,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryItemRemove(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_remove", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInventoryItemTransferIn(ctx: MutationCtx, { docId, quantity, sourceLocationId, version }: any, __creation = false) {
@@ -5650,9 +6756,20 @@ export const InventoryItem_transferIn = mutation({
     docId: v.id("inventoryItems"),
     quantity: v.number(),
     sourceLocationId: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryItemTransferIn,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryItemTransferIn(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_transferIn", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInventoryItemTransferOut(ctx: MutationCtx, { docId, quantity, destinationLocationId, version }: any, __creation = false) {
@@ -5689,9 +6806,20 @@ export const InventoryItem_transferOut = mutation({
     docId: v.id("inventoryItems"),
     quantity: v.number(),
     destinationLocationId: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryItemTransferOut,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryItemTransferOut(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_transferOut", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInventoryItemUpdateLevels(ctx: MutationCtx, { docId, parLevel, reorderThreshold, unitCost, version }: any, __creation = false) {
@@ -5731,9 +6859,20 @@ export const InventoryItem_updateLevels = mutation({
     parLevel: v.number(),
     reorderThreshold: v.number(),
     unitCost: v.optional(v.number()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryItemUpdateLevels,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryItemUpdateLevels(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryItem_updateLevels", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInventoryReservationConsume(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -5755,7 +6894,7 @@ async function __runInventoryReservationConsume(ctx: MutationCtx, { docId, versi
         const __from = String(__cur);
         const __to = "consumed";
         const __allowed: Record<string, string[]> = { "pending": ["active"], "active": ["released", "consumed"], "released": [], "consumed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5779,9 +6918,20 @@ async function __runInventoryReservationConsume(ctx: MutationCtx, { docId, versi
 export const InventoryReservation_consume = mutation({
   args: {
     docId: v.id("inventoryReservations"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryReservationConsume,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryReservationConsume(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryReservation_consume", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInventoryReservationRelease(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -5804,7 +6954,7 @@ async function __runInventoryReservationRelease(ctx: MutationCtx, { docId, reaso
         const __from = String(__cur);
         const __to = "released";
         const __allowed: Record<string, string[]> = { "pending": ["active"], "active": ["released", "consumed"], "released": [], "consumed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5830,9 +6980,20 @@ export const InventoryReservation_release = mutation({
   args: {
     docId: v.id("inventoryReservations"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryReservationRelease,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryReservationRelease(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryReservation_release", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInventoryReservationReserve(ctx: MutationCtx, { docId, inventoryItemId, eventId, ingredientId, quantity, version }: any, __creation = false) {
@@ -5861,7 +7022,7 @@ async function __runInventoryReservationReserve(ctx: MutationCtx, { docId, inven
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "pending": ["active"], "active": ["released", "consumed"], "released": [], "consumed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5893,9 +7054,20 @@ export const InventoryReservation_reserve = mutation({
     eventId: v.string(),
     ingredientId: v.string(),
     quantity: v.number(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInventoryReservationReserve,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInventoryReservationReserve(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryReservation_reserve", __result);
+    }
+    return __result;
+  },
 });
 
 export const InventoryReservation_createViaReserve = mutation({
@@ -5903,9 +7075,14 @@ export const InventoryReservation_createViaReserve = mutation({
     inventoryItemId: v.string(),
     eventId: v.string(),
     ingredientId: v.string(),
-    quantity: v.number()
+    quantity: v.number(),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { inventoryItemId, eventId, ingredientId, quantity } = args;
@@ -5946,7 +7123,11 @@ export const InventoryReservation_createViaReserve = mutation({
     const docId = await ctx.db.insert("inventoryReservations", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, inventoryReservationId: docId, tenantId: doc.tenantId, inventoryItemId: doc.inventoryItemId, eventId: doc.eventId, ingredientId: doc.ingredientId, quantity: doc.quantity, _subject: { entity: "InventoryReservation", command: "reserve", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "InventoryReserved", entity: "InventoryReservation", entityId: docId, payload: { inventoryReservationId: docId, tenantId: doc.tenantId, inventoryItemId: doc.inventoryItemId, eventId: doc.eventId, ingredientId: doc.ingredientId, quantity: doc.quantity }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "InventoryReservation_createViaReserve", __result);
+    }
+    return __result;
   },
 });
 
@@ -5971,7 +7152,7 @@ async function __runInvoiceApplyPayment(ctx: MutationCtx, { docId, paymentAmount
         const __from = String(__cur);
         const __to = String(((nextDue === 0) ? "paid" : "partial"));
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -5999,9 +7180,20 @@ export const Invoice_applyPayment = mutation({
     docId: v.id("invoices"),
     paymentAmount: v.number(),
     paymentId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInvoiceApplyPayment,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInvoiceApplyPayment(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_applyPayment", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNumber, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, version }: any, __creation = false) {
@@ -6062,9 +7254,20 @@ export const Invoice_issue = mutation({
     paymentTermsDays: v.optional(v.any()),
     dueDate: v.optional(v.number()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInvoiceIssue,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInvoiceIssue(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_issue", __result);
+    }
+    return __result;
+  },
 });
 
 export const Invoice_createViaIssue = mutation({
@@ -6078,9 +7281,14 @@ export const Invoice_createViaIssue = mutation({
     eventId: v.optional(v.string()),
     paymentTermsDays: v.optional(v.any()),
     dueDate: v.optional(v.number()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientId, invoiceNumber, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes } = args;
@@ -6133,7 +7341,11 @@ export const Invoice_createViaIssue = mutation({
     const docId = await ctx.db.insert("invoices", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, invoiceId: docId, tenantId: doc.tenantId, clientId: doc.clientId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), invoiceNumber: doc.invoiceNumber, total: doc.total, amountDue: doc.total, _subject: { entity: "Invoice", command: "issue", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: doc.tenantId, clientId: doc.clientId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), invoiceNumber: doc.invoiceNumber, total: doc.total, amountDue: doc.total }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_createViaIssue", __result);
+    }
+    return __result;
   },
 });
 
@@ -6155,7 +7367,7 @@ async function __runInvoiceMarkOverdue(ctx: MutationCtx, { docId, version }: any
         const __from = String(__cur);
         const __to = "overdue";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6179,9 +7391,20 @@ async function __runInvoiceMarkOverdue(ctx: MutationCtx, { docId, version }: any
 export const Invoice_markOverdue = mutation({
   args: {
     docId: v.id("invoices"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInvoiceMarkOverdue,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInvoiceMarkOverdue(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_markOverdue", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInvoiceMarkViewed(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -6201,7 +7424,7 @@ async function __runInvoiceMarkViewed(ctx: MutationCtx, { docId, version }: any,
         const __from = String(__cur);
         const __to = "viewed";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6225,9 +7448,20 @@ async function __runInvoiceMarkViewed(ctx: MutationCtx, { docId, version }: any,
 export const Invoice_markViewed = mutation({
   args: {
     docId: v.id("invoices"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInvoiceMarkViewed,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInvoiceMarkViewed(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_markViewed", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInvoiceMarkVoided(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -6249,7 +7483,7 @@ async function __runInvoiceMarkVoided(ctx: MutationCtx, { docId, reason, version
         const __from = String(__cur);
         const __to = "voided";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6275,9 +7509,20 @@ export const Invoice_markVoided = mutation({
   args: {
     docId: v.id("invoices"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInvoiceMarkVoided,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInvoiceMarkVoided(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_markVoided", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInvoiceRecordRefund(ctx: MutationCtx, { docId, refundAmount, paymentId, version }: any, __creation = false) {
@@ -6302,7 +7547,7 @@ async function __runInvoiceRecordRefund(ctx: MutationCtx, { docId, refundAmount,
         const __from = String(__cur);
         const __to = "partial";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6330,9 +7575,20 @@ export const Invoice_recordRefund = mutation({
     docId: v.id("invoices"),
     refundAmount: v.number(),
     paymentId: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInvoiceRecordRefund,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInvoiceRecordRefund(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_recordRefund", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInvoiceSend(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -6354,7 +7610,7 @@ async function __runInvoiceSend(ctx: MutationCtx, { docId, version }: any, __cre
         const __from = String(__cur);
         const __to = "sent";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6378,9 +7634,20 @@ async function __runInvoiceSend(ctx: MutationCtx, { docId, version }: any, __cre
 export const Invoice_send = mutation({
   args: {
     docId: v.id("invoices"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInvoiceSend,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInvoiceSend(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_send", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runInvoiceWriteOff(ctx: MutationCtx, { docId, reason, writeOffAmount, version }: any, __creation = false) {
@@ -6403,7 +7670,7 @@ async function __runInvoiceWriteOff(ctx: MutationCtx, { docId, reason, writeOffA
         const __from = String(__cur);
         const __to = "written_off";
         const __allowed: Record<string, string[]> = { "draft": ["sent", "voided"], "sent": ["viewed", "overdue", "partial", "paid", "voided"], "viewed": ["overdue", "partial", "paid", "voided"], "overdue": ["partial", "paid", "written_off", "voided"], "partial": ["partial", "paid", "overdue", "written_off"], "paid": ["partial"], "voided": [], "written_off": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6431,9 +7698,20 @@ export const Invoice_writeOff = mutation({
     docId: v.id("invoices"),
     reason: v.string(),
     writeOffAmount: v.number(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runInvoiceWriteOff,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runInvoiceWriteOff(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Invoice_writeOff", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runMenuArchive(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -6455,7 +7733,7 @@ async function __runMenuArchive(ctx: MutationCtx, { docId, reason, version }: an
         const __from = String(__cur);
         const __to = "archived";
         const __allowed: Record<string, string[]> = { "draft": ["published", "archived"], "published": ["draft", "archived"], "archived": ["draft"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6481,9 +7759,20 @@ export const Menu_archive = mutation({
   args: {
     docId: v.id("menus"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runMenuArchive,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runMenuArchive(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_archive", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runMenuDraft(ctx: MutationCtx, { docId, name, description, category, isTemplate, basePrice, pricePerPerson, minGuests, maxGuests, version }: any, __creation = false) {
@@ -6533,9 +7822,20 @@ export const Menu_draft = mutation({
     pricePerPerson: v.optional(v.number()),
     minGuests: v.optional(v.any()),
     maxGuests: v.optional(v.any()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runMenuDraft,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runMenuDraft(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_draft", __result);
+    }
+    return __result;
+  },
 });
 
 export const Menu_createViaDraft = mutation({
@@ -6547,9 +7847,14 @@ export const Menu_createViaDraft = mutation({
     basePrice: v.optional(v.number()),
     pricePerPerson: v.optional(v.number()),
     minGuests: v.optional(v.any()),
-    maxGuests: v.optional(v.any())
+    maxGuests: v.optional(v.any()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, description, category, isTemplate, basePrice, pricePerPerson, minGuests, maxGuests } = args;
@@ -6591,7 +7896,11 @@ export const Menu_createViaDraft = mutation({
     const docId = await ctx.db.insert("menus", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, menuId: docId, tenantId: doc.tenantId, name: doc.name, isTemplate: ((doc.isTemplate != null) ? doc.isTemplate : false), _subject: { entity: "Menu", command: "draft", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "MenuDrafted", entity: "Menu", entityId: docId, payload: { menuId: docId, tenantId: doc.tenantId, name: doc.name, isTemplate: ((doc.isTemplate != null) ? doc.isTemplate : false) }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_createViaDraft", __result);
+    }
+    return __result;
   },
 });
 
@@ -6614,7 +7923,7 @@ async function __runMenuMarkPublished(ctx: MutationCtx, { docId, version }: any,
         const __from = String(__cur);
         const __to = "published";
         const __allowed: Record<string, string[]> = { "draft": ["published", "archived"], "published": ["draft", "archived"], "archived": ["draft"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6638,9 +7947,20 @@ async function __runMenuMarkPublished(ctx: MutationCtx, { docId, version }: any,
 export const Menu_markPublished = mutation({
   args: {
     docId: v.id("menus"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runMenuMarkPublished,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runMenuMarkPublished(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_markPublished", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runMenuRestore(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -6661,7 +7981,7 @@ async function __runMenuRestore(ctx: MutationCtx, { docId, version }: any, __cre
         const __from = String(__cur);
         const __to = "draft";
         const __allowed: Record<string, string[]> = { "draft": ["published", "archived"], "published": ["draft", "archived"], "archived": ["draft"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6687,9 +8007,20 @@ async function __runMenuRestore(ctx: MutationCtx, { docId, version }: any, __cre
 export const Menu_restore = mutation({
   args: {
     docId: v.id("menus"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runMenuRestore,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runMenuRestore(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_restore", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runMenuReviseDetails(ctx: MutationCtx, { docId, name, description, category, isTemplate, version }: any, __creation = false) {
@@ -6728,9 +8059,20 @@ export const Menu_reviseDetails = mutation({
     description: v.optional(v.string()),
     category: v.optional(v.string()),
     isTemplate: v.optional(v.boolean()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runMenuReviseDetails,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runMenuReviseDetails(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_reviseDetails", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runMenuUnpublish(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -6752,7 +8094,7 @@ async function __runMenuUnpublish(ctx: MutationCtx, { docId, reason, version }: 
         const __from = String(__cur);
         const __to = "draft";
         const __allowed: Record<string, string[]> = { "draft": ["published", "archived"], "published": ["draft", "archived"], "archived": ["draft"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6777,9 +8119,20 @@ export const Menu_unpublish = mutation({
   args: {
     docId: v.id("menus"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runMenuUnpublish,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runMenuUnpublish(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_unpublish", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runMenuUpdatePricing(ctx: MutationCtx, { docId, basePrice, pricePerPerson, minGuests, maxGuests, version }: any, __creation = false) {
@@ -6820,9 +8173,20 @@ export const Menu_updatePricing = mutation({
     pricePerPerson: v.number(),
     minGuests: v.any(),
     maxGuests: v.any(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runMenuUpdatePricing,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runMenuUpdatePricing(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Menu_updatePricing", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runOrganizationDeactivate(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -6841,7 +8205,7 @@ async function __runOrganizationDeactivate(ctx: MutationCtx, { docId, version }:
         const __from = String(__cur);
         const __to = "deactivated";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "deactivated"], "suspended": ["active", "deactivated"], "deactivated": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6865,9 +8229,20 @@ async function __runOrganizationDeactivate(ctx: MutationCtx, { docId, version }:
 export const Organization_deactivate = mutation({
   args: {
     docId: v.id("organizations"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runOrganizationDeactivate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runOrganizationDeactivate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_deactivate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runOrganizationReactivate(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -6887,7 +8262,7 @@ async function __runOrganizationReactivate(ctx: MutationCtx, { docId, version }:
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "deactivated"], "suspended": ["active", "deactivated"], "deactivated": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -6910,9 +8285,20 @@ async function __runOrganizationReactivate(ctx: MutationCtx, { docId, version }:
 export const Organization_reactivate = mutation({
   args: {
     docId: v.id("organizations"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runOrganizationReactivate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runOrganizationReactivate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_reactivate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runOrganizationRegister(ctx: MutationCtx, { docId, name, version }: any, __creation = false) {
@@ -6945,16 +8331,32 @@ export const Organization_register = mutation({
   args: {
     docId: v.id("organizations"),
     name: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runOrganizationRegister,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runOrganizationRegister(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_register", __result);
+    }
+    return __result;
+  },
 });
 
 export const Organization_createViaRegister = mutation({
   args: {
-    name: v.string()
+    name: v.string(),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name } = args;
@@ -6979,7 +8381,11 @@ export const Organization_createViaRegister = mutation({
     const docId = await ctx.db.insert("organizations", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, organizationId: docId, tenantId: doc.tenantId, name: doc.name, _subject: { entity: "Organization", command: "register", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "OrganizationRegistered", entity: "Organization", entityId: docId, payload: { organizationId: docId, tenantId: doc.tenantId, name: doc.name }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_createViaRegister", __result);
+    }
+    return __result;
   },
 });
 
@@ -7013,9 +8419,20 @@ export const Organization_rename = mutation({
   args: {
     docId: v.id("organizations"),
     name: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runOrganizationRename,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runOrganizationRename(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_rename", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runOrganizationSuspend(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -7035,7 +8452,7 @@ async function __runOrganizationSuspend(ctx: MutationCtx, { docId, reason, versi
         const __from = String(__cur);
         const __to = "suspended";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "deactivated"], "suspended": ["active", "deactivated"], "deactivated": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7059,9 +8476,20 @@ export const Organization_suspend = mutation({
   args: {
     docId: v.id("organizations"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runOrganizationSuspend,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runOrganizationSuspend(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Organization_suspend", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPackListCancel(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -7085,7 +8513,7 @@ async function __runPackListCancel(ctx: MutationCtx, { docId, reason, version }:
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "draft": ["packing", "cancelled"], "packing": ["packed", "cancelled"], "packed": ["loaded", "cancelled"], "loaded": ["dispatched", "cancelled"], "dispatched": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7112,9 +8540,20 @@ export const PackList_cancel = mutation({
   args: {
     docId: v.id("packLists"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPackListCancel,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPackListCancel(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_cancel", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPackListDispatch(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -7137,7 +8576,7 @@ async function __runPackListDispatch(ctx: MutationCtx, { docId, version }: any, 
         const __from = String(__cur);
         const __to = "dispatched";
         const __allowed: Record<string, string[]> = { "draft": ["packing", "cancelled"], "packing": ["packed", "cancelled"], "packed": ["loaded", "cancelled"], "loaded": ["dispatched", "cancelled"], "dispatched": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7162,9 +8601,20 @@ async function __runPackListDispatch(ctx: MutationCtx, { docId, version }: any, 
 export const PackList_dispatch = mutation({
   args: {
     docId: v.id("packLists"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPackListDispatch,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPackListDispatch(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_dispatch", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPackListMarkLoaded(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -7187,7 +8637,7 @@ async function __runPackListMarkLoaded(ctx: MutationCtx, { docId, version }: any
         const __from = String(__cur);
         const __to = "loaded";
         const __allowed: Record<string, string[]> = { "draft": ["packing", "cancelled"], "packing": ["packed", "cancelled"], "packed": ["loaded", "cancelled"], "loaded": ["dispatched", "cancelled"], "dispatched": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7212,9 +8662,20 @@ async function __runPackListMarkLoaded(ctx: MutationCtx, { docId, version }: any
 export const PackList_markLoaded = mutation({
   args: {
     docId: v.id("packLists"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPackListMarkLoaded,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPackListMarkLoaded(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_markLoaded", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPackListMarkPacked(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -7237,7 +8698,7 @@ async function __runPackListMarkPacked(ctx: MutationCtx, { docId, version }: any
         const __from = String(__cur);
         const __to = "packed";
         const __allowed: Record<string, string[]> = { "draft": ["packing", "cancelled"], "packing": ["packed", "cancelled"], "packed": ["loaded", "cancelled"], "loaded": ["dispatched", "cancelled"], "dispatched": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7262,9 +8723,20 @@ async function __runPackListMarkPacked(ctx: MutationCtx, { docId, version }: any
 export const PackList_markPacked = mutation({
   args: {
     docId: v.id("packLists"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPackListMarkPacked,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPackListMarkPacked(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_markPacked", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPackListOpen(ctx: MutationCtx, { docId, eventId, name, purpose, notes, version }: any, __creation = false) {
@@ -7310,9 +8782,20 @@ export const PackList_open = mutation({
     name: v.string(),
     purpose: v.optional(v.string()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPackListOpen,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPackListOpen(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_open", __result);
+    }
+    return __result;
+  },
 });
 
 export const PackList_createViaOpen = mutation({
@@ -7320,9 +8803,14 @@ export const PackList_createViaOpen = mutation({
     eventId: v.string(),
     name: v.string(),
     purpose: v.optional(v.string()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, name, purpose, notes } = args;
@@ -7359,7 +8847,11 @@ export const PackList_createViaOpen = mutation({
     const docId = await ctx.db.insert("packLists", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, packListId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: doc.name, purpose: ((doc.purpose != null) ? doc.purpose : doc.purpose), status: "draft", _subject: { entity: "PackList", command: "open", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PackListOpened", entity: "PackList", entityId: docId, payload: { packListId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: doc.name, purpose: ((doc.purpose != null) ? doc.purpose : doc.purpose), status: "draft" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_createViaOpen", __result);
+    }
+    return __result;
   },
 });
 
@@ -7383,7 +8875,7 @@ async function __runPackListStartPacking(ctx: MutationCtx, { docId, version }: a
         const __from = String(__cur);
         const __to = "packing";
         const __allowed: Record<string, string[]> = { "draft": ["packing", "cancelled"], "packing": ["packed", "cancelled"], "packed": ["loaded", "cancelled"], "loaded": ["dispatched", "cancelled"], "dispatched": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7408,9 +8900,20 @@ async function __runPackListStartPacking(ctx: MutationCtx, { docId, version }: a
 export const PackList_startPacking = mutation({
   args: {
     docId: v.id("packLists"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPackListStartPacking,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPackListStartPacking(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_startPacking", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPackListItemAddItem(ctx: MutationCtx, { docId, packListId, description, requiredQuantity, unit, dishId, productionBatchId, version }: any, __creation = false) {
@@ -7438,7 +8941,7 @@ async function __runPackListItemAddItem(ctx: MutationCtx, { docId, packListId, d
         const __from = String(__cur);
         const __to = "listed";
         const __allowed: Record<string, string[]> = { "pending": ["listed"], "listed": ["packed", "missing"], "packed": [], "missing": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7475,9 +8978,20 @@ export const PackListItem_addItem = mutation({
     unit: v.any(),
     dishId: v.optional(v.string()),
     productionBatchId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPackListItemAddItem,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPackListItemAddItem(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_addItem", __result);
+    }
+    return __result;
+  },
 });
 
 export const PackListItem_createViaAddItem = mutation({
@@ -7487,9 +9001,14 @@ export const PackListItem_createViaAddItem = mutation({
     requiredQuantity: v.number(),
     unit: v.any(),
     dishId: v.optional(v.string()),
-    productionBatchId: v.optional(v.string())
+    productionBatchId: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { packListId, description, requiredQuantity, unit, dishId, productionBatchId } = args;
@@ -7534,7 +9053,11 @@ export const PackListItem_createViaAddItem = mutation({
     const docId = await ctx.db.insert("packListItems", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, packListItemId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: __rel_packList.eventId, description: doc.description, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, status: "listed", _subject: { entity: "PackListItem", command: "addItem", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PackListItemAdded", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: __rel_packList.eventId, description: doc.description, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, status: "listed" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_createViaAddItem", __result);
+    }
+    return __result;
   },
 });
 
@@ -7573,9 +9096,20 @@ export const PackListItem_adjustQuantity = mutation({
   args: {
     docId: v.id("packListItems"),
     requiredQuantity: v.number(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPackListItemAdjustQuantity,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPackListItemAdjustQuantity(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_adjustQuantity", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPackListItemMarkMissing(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -7599,7 +9133,7 @@ async function __runPackListItemMarkMissing(ctx: MutationCtx, { docId, version }
         const __from = String(__cur);
         const __to = "missing";
         const __allowed: Record<string, string[]> = { "pending": ["listed"], "listed": ["packed", "missing"], "packed": [], "missing": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7623,9 +9157,20 @@ async function __runPackListItemMarkMissing(ctx: MutationCtx, { docId, version }
 export const PackListItem_markMissing = mutation({
   args: {
     docId: v.id("packListItems"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPackListItemMarkMissing,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPackListItemMarkMissing(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_markMissing", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPackListItemMarkPacked(ctx: MutationCtx, { docId, packedQuantity, version }: any, __creation = false) {
@@ -7652,7 +9197,7 @@ async function __runPackListItemMarkPacked(ctx: MutationCtx, { docId, packedQuan
         const __from = String(__cur);
         const __to = "packed";
         const __allowed: Record<string, string[]> = { "pending": ["listed"], "listed": ["packed", "missing"], "packed": [], "missing": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7678,9 +9223,20 @@ export const PackListItem_markPacked = mutation({
   args: {
     docId: v.id("packListItems"),
     packedQuantity: v.number(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPackListItemMarkPacked,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPackListItemMarkPacked(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PackListItem_markPacked", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPaymentBeginProcessing(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -7701,7 +9257,7 @@ async function __runPaymentBeginProcessing(ctx: MutationCtx, { docId, version }:
         const __from = String(__cur);
         const __to = "processing";
         const __allowed: Record<string, string[]> = { "pending": ["processing", "completed", "failed"], "processing": ["completed", "failed"], "completed": ["refunded"], "failed": [], "refunded": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7724,9 +9280,20 @@ async function __runPaymentBeginProcessing(ctx: MutationCtx, { docId, version }:
 export const Payment_beginProcessing = mutation({
   args: {
     docId: v.id("payments"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentBeginProcessing,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentBeginProcessing(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_beginProcessing", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPaymentFail(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -7748,7 +9315,7 @@ async function __runPaymentFail(ctx: MutationCtx, { docId, reason, version }: an
         const __from = String(__cur);
         const __to = "failed";
         const __allowed: Record<string, string[]> = { "pending": ["processing", "completed", "failed"], "processing": ["completed", "failed"], "completed": ["refunded"], "failed": [], "refunded": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7774,9 +9341,20 @@ export const Payment_fail = mutation({
   args: {
     docId: v.id("payments"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentFail,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentFail(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_fail", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPaymentRecord(ctx: MutationCtx, { docId, invoiceId, clientId, amount, method, eventId, paymentMethodId, notes, version }: any, __creation = false) {
@@ -7829,9 +9407,20 @@ export const Payment_record = mutation({
     eventId: v.optional(v.string()),
     paymentMethodId: v.optional(v.string()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentRecord,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentRecord(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_record", __result);
+    }
+    return __result;
+  },
 });
 
 export const Payment_createViaRecord = mutation({
@@ -7842,9 +9431,14 @@ export const Payment_createViaRecord = mutation({
     method: v.any(),
     eventId: v.optional(v.string()),
     paymentMethodId: v.optional(v.string()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { invoiceId, clientId, amount, method, eventId, paymentMethodId, notes } = args;
@@ -7889,7 +9483,11 @@ export const Payment_createViaRecord = mutation({
     const docId = await ctx.db.insert("payments", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, paymentId: docId, tenantId: doc.tenantId, invoiceId: doc.invoiceId, clientId: doc.clientId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), amount: doc.amount, method: doc.method, _subject: { entity: "Payment", command: "record", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PaymentRecorded", entity: "Payment", entityId: docId, payload: { paymentId: docId, tenantId: doc.tenantId, invoiceId: doc.invoiceId, clientId: doc.clientId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), amount: doc.amount, method: doc.method }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_createViaRecord", __result);
+    }
+    return __result;
   },
 });
 
@@ -7911,7 +9509,7 @@ async function __runPaymentRefund(ctx: MutationCtx, { docId, reason, version }: 
         const __from = String(__cur);
         const __to = "refunded";
         const __allowed: Record<string, string[]> = { "pending": ["processing", "completed", "failed"], "processing": ["completed", "failed"], "completed": ["refunded"], "failed": [], "refunded": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7937,9 +9535,20 @@ export const Payment_refund = mutation({
   args: {
     docId: v.id("payments"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentRefund,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentRefund(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_refund", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPaymentSettle(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -7960,7 +9569,7 @@ async function __runPaymentSettle(ctx: MutationCtx, { docId, version }: any, __c
         const __from = String(__cur);
         const __to = "completed";
         const __allowed: Record<string, string[]> = { "pending": ["processing", "completed", "failed"], "processing": ["completed", "failed"], "completed": ["refunded"], "failed": [], "refunded": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -7987,9 +9596,20 @@ async function __runPaymentSettle(ctx: MutationCtx, { docId, version }: any, __c
 export const Payment_settle = mutation({
   args: {
     docId: v.id("payments"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentSettle,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentSettle(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Payment_settle", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPaymentMethodClearDefault(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -8021,9 +9641,20 @@ async function __runPaymentMethodClearDefault(ctx: MutationCtx, { docId, version
 export const PaymentMethod_clearDefault = mutation({
   args: {
     docId: v.id("paymentMethods"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentMethodClearDefault,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentMethodClearDefault(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_clearDefault", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPaymentMethodExpire(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -8043,7 +9674,7 @@ async function __runPaymentMethodExpire(ctx: MutationCtx, { docId, version }: an
         const __from = String(__cur);
         const __to = "expired";
         const __allowed: Record<string, string[]> = { "active": ["expired", "invalid", "fraudulent", "removed"], "expired": ["active"], "invalid": [], "fraudulent": [], "removed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8067,9 +9698,20 @@ async function __runPaymentMethodExpire(ctx: MutationCtx, { docId, version }: an
 export const PaymentMethod_expire = mutation({
   args: {
     docId: v.id("paymentMethods"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentMethodExpire,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentMethodExpire(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_expire", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPaymentMethodInvalidate(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -8090,7 +9732,7 @@ async function __runPaymentMethodInvalidate(ctx: MutationCtx, { docId, reason, v
         const __from = String(__cur);
         const __to = "invalid";
         const __allowed: Record<string, string[]> = { "active": ["expired", "invalid", "fraudulent", "removed"], "expired": ["active"], "invalid": [], "fraudulent": [], "removed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8116,9 +9758,20 @@ export const PaymentMethod_invalidate = mutation({
   args: {
     docId: v.id("paymentMethods"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentMethodInvalidate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentMethodInvalidate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_invalidate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPaymentMethodMakeDefault(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -8150,9 +9803,20 @@ async function __runPaymentMethodMakeDefault(ctx: MutationCtx, { docId, version 
 export const PaymentMethod_makeDefault = mutation({
   args: {
     docId: v.id("paymentMethods"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentMethodMakeDefault,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentMethodMakeDefault(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_makeDefault", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPaymentMethodReactivate(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -8172,7 +9836,7 @@ async function __runPaymentMethodReactivate(ctx: MutationCtx, { docId, version }
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["expired", "invalid", "fraudulent", "removed"], "expired": ["active"], "invalid": [], "fraudulent": [], "removed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8196,9 +9860,20 @@ async function __runPaymentMethodReactivate(ctx: MutationCtx, { docId, version }
 export const PaymentMethod_reactivate = mutation({
   args: {
     docId: v.id("paymentMethods"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentMethodReactivate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentMethodReactivate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_reactivate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPaymentMethodRegister(ctx: MutationCtx, { docId, clientId, methodType, provider, lastFour, isDefault, notes, version }: any, __creation = false) {
@@ -8246,9 +9921,20 @@ export const PaymentMethod_register = mutation({
     lastFour: v.optional(v.string()),
     isDefault: v.optional(v.boolean()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentMethodRegister,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentMethodRegister(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_register", __result);
+    }
+    return __result;
+  },
 });
 
 export const PaymentMethod_createViaRegister = mutation({
@@ -8258,9 +9944,14 @@ export const PaymentMethod_createViaRegister = mutation({
     provider: v.optional(v.string()),
     lastFour: v.optional(v.string()),
     isDefault: v.optional(v.boolean()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientId, methodType, provider, lastFour, isDefault, notes } = args;
@@ -8300,7 +9991,11 @@ export const PaymentMethod_createViaRegister = mutation({
     const docId = await ctx.db.insert("paymentMethods", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, paymentMethodId: docId, tenantId: doc.tenantId, clientId: doc.clientId, methodType: doc.methodType, isDefault: ((doc.isDefault != null) ? doc.isDefault : false), _subject: { entity: "PaymentMethod", command: "register", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PaymentMethodRegistered", entity: "PaymentMethod", entityId: docId, payload: { paymentMethodId: docId, tenantId: doc.tenantId, clientId: doc.clientId, methodType: doc.methodType, isDefault: ((doc.isDefault != null) ? doc.isDefault : false) }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_createViaRegister", __result);
+    }
+    return __result;
   },
 });
 
@@ -8321,7 +10016,7 @@ async function __runPaymentMethodRemove(ctx: MutationCtx, { docId, version }: an
         const __from = String(__cur);
         const __to = "removed";
         const __allowed: Record<string, string[]> = { "active": ["expired", "invalid", "fraudulent", "removed"], "expired": ["active"], "invalid": [], "fraudulent": [], "removed": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8346,9 +10041,20 @@ async function __runPaymentMethodRemove(ctx: MutationCtx, { docId, version }: an
 export const PaymentMethod_remove = mutation({
   args: {
     docId: v.id("paymentMethods"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPaymentMethodRemove,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPaymentMethodRemove(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PaymentMethod_remove", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPayrollInputFinalize(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -8370,7 +10076,7 @@ async function __runPayrollInputFinalize(ctx: MutationCtx, { docId, version }: a
         const __from = String(__cur);
         const __to = "finalized";
         const __allowed: Record<string, string[]> = { "draft": ["prepared", "voided"], "prepared": ["finalized", "voided"], "finalized": ["voided"], "voided": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8397,9 +10103,20 @@ async function __runPayrollInputFinalize(ctx: MutationCtx, { docId, version }: a
 export const PayrollInput_finalize = mutation({
   args: {
     docId: v.id("payrollInputs"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPayrollInputFinalize,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPayrollInputFinalize(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PayrollInput_finalize", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPayrollInputMarkVoided(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -8421,7 +10138,7 @@ async function __runPayrollInputMarkVoided(ctx: MutationCtx, { docId, reason, ve
         const __from = String(__cur);
         const __to = "voided";
         const __allowed: Record<string, string[]> = { "draft": ["prepared", "voided"], "prepared": ["finalized", "voided"], "finalized": ["voided"], "voided": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8450,9 +10167,20 @@ export const PayrollInput_markVoided = mutation({
   args: {
     docId: v.id("payrollInputs"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPayrollInputMarkVoided,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPayrollInputMarkVoided(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PayrollInput_markVoided", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPayrollInputPrepare(ctx: MutationCtx, { docId, personId, periodStart, periodEnd, regularMinutes, overtimeMinutes, totalMinutes, eventId, shiftId, hourlyRate, overtimeRate, grossAmount, notes, version }: any, __creation = false) {
@@ -8483,7 +10211,7 @@ async function __runPayrollInputPrepare(ctx: MutationCtx, { docId, personId, per
         const __from = String(__cur);
         const __to = "prepared";
         const __allowed: Record<string, string[]> = { "draft": ["prepared", "voided"], "prepared": ["finalized", "voided"], "finalized": ["voided"], "voided": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8534,9 +10262,20 @@ export const PayrollInput_prepare = mutation({
     overtimeRate: v.optional(v.number()),
     grossAmount: v.optional(v.number()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPayrollInputPrepare,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPayrollInputPrepare(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PayrollInput_prepare", __result);
+    }
+    return __result;
+  },
 });
 
 export const PayrollInput_createViaPrepare = mutation({
@@ -8552,9 +10291,14 @@ export const PayrollInput_createViaPrepare = mutation({
     hourlyRate: v.optional(v.number()),
     overtimeRate: v.optional(v.number()),
     grossAmount: v.optional(v.number()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, periodStart, periodEnd, regularMinutes, overtimeMinutes, totalMinutes, eventId, shiftId, hourlyRate, overtimeRate, grossAmount, notes } = args;
@@ -8613,7 +10357,11 @@ export const PayrollInput_createViaPrepare = mutation({
     const docId = await ctx.db.insert("payrollInputs", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, payrollInputId: docId, tenantId: doc.tenantId, personId: doc.personId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), periodStart: doc.periodStart, periodEnd: doc.periodEnd, totalMinutes: doc.totalMinutes, status: "prepared", _subject: { entity: "PayrollInput", command: "prepare", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PayrollInputPrepared", entity: "PayrollInput", entityId: docId, payload: { payrollInputId: docId, tenantId: doc.tenantId, personId: doc.personId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), periodStart: doc.periodStart, periodEnd: doc.periodEnd, totalMinutes: doc.totalMinutes, status: "prepared" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PayrollInput_createViaPrepare", __result);
+    }
+    return __result;
   },
 });
 
@@ -8649,9 +10397,20 @@ export const Person_assignRole = mutation({
   args: {
     docId: v.id("people"),
     role: v.any(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPersonAssignRole,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPersonAssignRole(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_assignRole", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPersonCorrectIdentity(ctx: MutationCtx, { docId, givenName, familyName, phone, version }: any, __creation = false) {
@@ -8691,9 +10450,20 @@ export const Person_correctIdentity = mutation({
     givenName: v.string(),
     familyName: v.string(),
     phone: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPersonCorrectIdentity,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPersonCorrectIdentity(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_correctIdentity", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPersonDeactivate(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -8714,7 +10484,7 @@ async function __runPersonDeactivate(ctx: MutationCtx, { docId, version }: any, 
         const __from = String(__cur);
         const __to = "inactive";
         const __allowed: Record<string, string[]> = { "active": ["inactive", "terminated"], "inactive": ["active", "terminated"], "terminated": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8738,9 +10508,20 @@ async function __runPersonDeactivate(ctx: MutationCtx, { docId, version }: any, 
 export const Person_deactivate = mutation({
   args: {
     docId: v.id("people"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPersonDeactivate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPersonDeactivate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_deactivate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPersonHire(ctx: MutationCtx, { docId, givenName, familyName, email, phone, role, employmentType, employeeNumber, authSubjectId, version }: any, __creation = false) {
@@ -8792,9 +10573,20 @@ export const Person_hire = mutation({
     employmentType: v.optional(v.any()),
     employeeNumber: v.optional(v.string()),
     authSubjectId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPersonHire,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPersonHire(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_hire", __result);
+    }
+    return __result;
+  },
 });
 
 export const Person_createViaHire = mutation({
@@ -8806,9 +10598,14 @@ export const Person_createViaHire = mutation({
     role: v.optional(v.any()),
     employmentType: v.optional(v.any()),
     employeeNumber: v.optional(v.string()),
-    authSubjectId: v.optional(v.string())
+    authSubjectId: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { givenName, familyName, email, phone, role, employmentType, employeeNumber, authSubjectId } = args;
@@ -8851,7 +10648,11 @@ export const Person_createViaHire = mutation({
     const docId = await ctx.db.insert("people", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, personId: docId, tenantId: doc.tenantId, email: doc.email, role: doc.role, _subject: { entity: "Person", command: "hire", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonHired", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: doc.tenantId, email: doc.email, role: doc.role }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_createViaHire", __result);
+    }
+    return __result;
   },
 });
 
@@ -8873,7 +10674,7 @@ async function __runPersonReactivate(ctx: MutationCtx, { docId, version }: any, 
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["inactive", "terminated"], "inactive": ["active", "terminated"], "terminated": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8897,9 +10698,20 @@ async function __runPersonReactivate(ctx: MutationCtx, { docId, version }: any, 
 export const Person_reactivate = mutation({
   args: {
     docId: v.id("people"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPersonReactivate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPersonReactivate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_reactivate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPersonTerminate(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -8920,7 +10732,7 @@ async function __runPersonTerminate(ctx: MutationCtx, { docId, reason, version }
         const __from = String(__cur);
         const __to = "terminated";
         const __allowed: Record<string, string[]> = { "active": ["inactive", "terminated"], "inactive": ["active", "terminated"], "terminated": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8947,9 +10759,20 @@ export const Person_terminate = mutation({
   args: {
     docId: v.id("people"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPersonTerminate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPersonTerminate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Person_terminate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPrepTaskCancel(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -8972,7 +10795,7 @@ async function __runPrepTaskCancel(ctx: MutationCtx, { docId, reason, version }:
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -8998,9 +10821,20 @@ export const PrepTask_cancel = mutation({
   args: {
     docId: v.id("prepTasks"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPrepTaskCancel,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPrepTaskCancel(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_cancel", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPrepTaskClaim(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -9023,7 +10857,7 @@ async function __runPrepTaskClaim(ctx: MutationCtx, { docId, version }: any, __c
         const __from = String(__cur);
         const __to = "claimed";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9048,9 +10882,20 @@ async function __runPrepTaskClaim(ctx: MutationCtx, { docId, version }: any, __c
 export const PrepTask_claim = mutation({
   args: {
     docId: v.id("prepTasks"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPrepTaskClaim,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPrepTaskClaim(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_claim", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPrepTaskComplete(ctx: MutationCtx, { docId, completedQuantity, version }: any, __creation = false) {
@@ -9074,7 +10919,7 @@ async function __runPrepTaskComplete(ctx: MutationCtx, { docId, completedQuantit
         const __from = String(__cur);
         const __to = "completed";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9100,9 +10945,20 @@ export const PrepTask_complete = mutation({
   args: {
     docId: v.id("prepTasks"),
     completedQuantity: v.optional(v.number()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPrepTaskComplete,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPrepTaskComplete(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_complete", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPrepTaskMarkBlocked(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -9125,7 +10981,7 @@ async function __runPrepTaskMarkBlocked(ctx: MutationCtx, { docId, reason, versi
         const __from = String(__cur);
         const __to = "blocked";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9151,9 +11007,20 @@ export const PrepTask_markBlocked = mutation({
   args: {
     docId: v.id("prepTasks"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPrepTaskMarkBlocked,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPrepTaskMarkBlocked(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_markBlocked", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPrepTaskOpen(ctx: MutationCtx, { docId, eventId, ingredientId, quantity, unit, ingredientDemandId, dishId, recipeId, station, dueAt, notes, version }: any, __creation = false) {
@@ -9210,9 +11077,20 @@ export const PrepTask_open = mutation({
     station: v.optional(v.string()),
     dueAt: v.optional(v.number()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPrepTaskOpen,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPrepTaskOpen(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_open", __result);
+    }
+    return __result;
+  },
 });
 
 export const PrepTask_createViaOpen = mutation({
@@ -9226,9 +11104,14 @@ export const PrepTask_createViaOpen = mutation({
     recipeId: v.optional(v.string()),
     station: v.optional(v.string()),
     dueAt: v.optional(v.number()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { eventId, ingredientId, quantity, unit, ingredientDemandId, dishId, recipeId, station, dueAt, notes } = args;
@@ -9277,7 +11160,11 @@ export const PrepTask_createViaOpen = mutation({
     const docId = await ctx.db.insert("prepTasks", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, prepTaskId: docId, tenantId: doc.tenantId, eventId: doc.eventId, ingredientId: doc.ingredientId, ingredientDemandId: ((doc.ingredientDemandId != null) ? doc.ingredientDemandId : doc.ingredientDemandId), dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), recipeId: ((doc.recipeId != null) ? doc.recipeId : doc.recipeId), quantity: doc.quantity, unit: doc.unit, station: ((doc.station != null) ? doc.station : doc.station), dueAt: ((doc.dueAt != null) ? doc.dueAt : doc.dueAt), status: "pending", _subject: { entity: "PrepTask", command: "open", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PrepTaskOpened", entity: "PrepTask", entityId: docId, payload: { prepTaskId: docId, tenantId: doc.tenantId, eventId: doc.eventId, ingredientId: doc.ingredientId, ingredientDemandId: ((doc.ingredientDemandId != null) ? doc.ingredientDemandId : doc.ingredientDemandId), dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), recipeId: ((doc.recipeId != null) ? doc.recipeId : doc.recipeId), quantity: doc.quantity, unit: doc.unit, station: ((doc.station != null) ? doc.station : doc.station), dueAt: ((doc.dueAt != null) ? doc.dueAt : doc.dueAt), status: "pending" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_createViaOpen", __result);
+    }
+    return __result;
   },
 });
 
@@ -9302,7 +11189,7 @@ async function __runPrepTaskRelease(ctx: MutationCtx, { docId, version }: any, _
         const __from = String(__cur);
         const __to = "pending";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9327,9 +11214,20 @@ async function __runPrepTaskRelease(ctx: MutationCtx, { docId, version }: any, _
 export const PrepTask_release = mutation({
   args: {
     docId: v.id("prepTasks"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPrepTaskRelease,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPrepTaskRelease(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_release", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPrepTaskStart(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -9352,7 +11250,7 @@ async function __runPrepTaskStart(ctx: MutationCtx, { docId, version }: any, __c
         const __from = String(__cur);
         const __to = "in_progress";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9376,9 +11274,20 @@ async function __runPrepTaskStart(ctx: MutationCtx, { docId, version }: any, __c
 export const PrepTask_start = mutation({
   args: {
     docId: v.id("prepTasks"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPrepTaskStart,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPrepTaskStart(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_start", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPrepTaskUnblock(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -9401,7 +11310,7 @@ async function __runPrepTaskUnblock(ctx: MutationCtx, { docId, version }: any, _
         const __from = String(__cur);
         const __to = "pending";
         const __allowed: Record<string, string[]> = { "pending": ["claimed", "blocked", "cancelled"], "claimed": ["in_progress", "pending", "blocked", "cancelled"], "in_progress": ["completed", "blocked", "cancelled"], "blocked": ["pending", "cancelled"], "completed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9429,9 +11338,20 @@ async function __runPrepTaskUnblock(ctx: MutationCtx, { docId, version }: any, _
 export const PrepTask_unblock = mutation({
   args: {
     docId: v.id("prepTasks"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPrepTaskUnblock,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPrepTaskUnblock(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PrepTask_unblock", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runProductionBatchCancel(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -9454,7 +11374,7 @@ async function __runProductionBatchCancel(ctx: MutationCtx, { docId, reason, ver
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "planned": ["in_progress", "cancelled"], "in_progress": ["completed", "cancelled"], "completed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9480,9 +11400,20 @@ export const ProductionBatch_cancel = mutation({
   args: {
     docId: v.id("productionBatches"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runProductionBatchCancel,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runProductionBatchCancel(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_cancel", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runProductionBatchComplete(ctx: MutationCtx, { docId, actualYield, version }: any, __creation = false) {
@@ -9505,7 +11436,7 @@ async function __runProductionBatchComplete(ctx: MutationCtx, { docId, actualYie
         const __from = String(__cur);
         const __to = "completed";
         const __allowed: Record<string, string[]> = { "planned": ["in_progress", "cancelled"], "in_progress": ["completed", "cancelled"], "completed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9531,9 +11462,20 @@ export const ProductionBatch_complete = mutation({
   args: {
     docId: v.id("productionBatches"),
     actualYield: v.number(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runProductionBatchComplete,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runProductionBatchComplete(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_complete", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runProductionBatchPlan(ctx: MutationCtx, { docId, recipeId, plannedYield, yieldUnit, eventId, notes, version }: any, __creation = false) {
@@ -9580,9 +11522,20 @@ export const ProductionBatch_plan = mutation({
     yieldUnit: v.any(),
     eventId: v.optional(v.string()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runProductionBatchPlan,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runProductionBatchPlan(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_plan", __result);
+    }
+    return __result;
+  },
 });
 
 export const ProductionBatch_createViaPlan = mutation({
@@ -9591,9 +11544,14 @@ export const ProductionBatch_createViaPlan = mutation({
     plannedYield: v.number(),
     yieldUnit: v.any(),
     eventId: v.optional(v.string()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { recipeId, plannedYield, yieldUnit, eventId, notes } = args;
@@ -9632,7 +11590,11 @@ export const ProductionBatch_createViaPlan = mutation({
     const docId = await ctx.db.insert("productionBatches", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, productionBatchId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), plannedYield: doc.plannedYield, yieldUnit: doc.yieldUnit, status: "planned", _subject: { entity: "ProductionBatch", command: "plan", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "ProductionBatchPlanned", entity: "ProductionBatch", entityId: docId, payload: { productionBatchId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), plannedYield: doc.plannedYield, yieldUnit: doc.yieldUnit, status: "planned" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_createViaPlan", __result);
+    }
+    return __result;
   },
 });
 
@@ -9655,7 +11617,7 @@ async function __runProductionBatchStart(ctx: MutationCtx, { docId, version }: a
         const __from = String(__cur);
         const __to = "in_progress";
         const __allowed: Record<string, string[]> = { "planned": ["in_progress", "cancelled"], "in_progress": ["completed", "cancelled"], "completed": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9679,9 +11641,20 @@ async function __runProductionBatchStart(ctx: MutationCtx, { docId, version }: a
 export const ProductionBatch_start = mutation({
   args: {
     docId: v.id("productionBatches"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runProductionBatchStart,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runProductionBatchStart(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "ProductionBatch_start", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runProposalAccept(ctx: MutationCtx, { docId, eventId, version }: any, __creation = false) {
@@ -9702,7 +11675,7 @@ async function __runProposalAccept(ctx: MutationCtx, { docId, eventId, version }
         const __from = String(__cur);
         const __to = "accepted";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "accepted", "declined", "expired"], "viewed": ["accepted", "declined", "expired"], "accepted": [], "declined": [], "expired": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9728,9 +11701,20 @@ export const Proposal_accept = mutation({
   args: {
     docId: v.id("proposals"),
     eventId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runProposalAccept,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runProposalAccept(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_accept", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runProposalDecline(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -9750,7 +11734,7 @@ async function __runProposalDecline(ctx: MutationCtx, { docId, version }: any, _
         const __from = String(__cur);
         const __to = "declined";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "accepted", "declined", "expired"], "viewed": ["accepted", "declined", "expired"], "accepted": [], "declined": [], "expired": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9774,9 +11758,20 @@ async function __runProposalDecline(ctx: MutationCtx, { docId, version }: any, _
 export const Proposal_decline = mutation({
   args: {
     docId: v.id("proposals"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runProposalDecline,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runProposalDecline(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_decline", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runProposalDraft(ctx: MutationCtx, { docId, clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms, version }: any, __creation = false) {
@@ -9845,9 +11840,20 @@ export const Proposal_draft = mutation({
     expiresAt: v.optional(v.number()),
     notes: v.optional(v.string()),
     terms: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runProposalDraft,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runProposalDraft(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_draft", __result);
+    }
+    return __result;
+  },
 });
 
 export const Proposal_createViaDraft = mutation({
@@ -9866,9 +11872,14 @@ export const Proposal_createViaDraft = mutation({
     venueAddress: v.optional(v.string()),
     expiresAt: v.optional(v.number()),
     notes: v.optional(v.string()),
-    terms: v.optional(v.string())
+    terms: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms } = args;
@@ -9929,7 +11940,11 @@ export const Proposal_createViaDraft = mutation({
     const docId = await ctx.db.insert("proposals", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, proposalId: docId, tenantId: doc.tenantId, clientId: doc.clientId, title: doc.title, total: doc.total, _subject: { entity: "Proposal", command: "draft", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "ProposalDrafted", entity: "Proposal", entityId: docId, payload: { proposalId: docId, tenantId: doc.tenantId, clientId: doc.clientId, title: doc.title, total: doc.total }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_createViaDraft", __result);
+    }
+    return __result;
   },
 });
 
@@ -9950,7 +11965,7 @@ async function __runProposalExpire(ctx: MutationCtx, { docId, version }: any, __
         const __from = String(__cur);
         const __to = "expired";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "accepted", "declined", "expired"], "viewed": ["accepted", "declined", "expired"], "accepted": [], "declined": [], "expired": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -9974,9 +11989,20 @@ async function __runProposalExpire(ctx: MutationCtx, { docId, version }: any, __
 export const Proposal_expire = mutation({
   args: {
     docId: v.id("proposals"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runProposalExpire,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runProposalExpire(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_expire", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runProposalMarkViewed(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -9996,7 +12022,7 @@ async function __runProposalMarkViewed(ctx: MutationCtx, { docId, version }: any
         const __from = String(__cur);
         const __to = "viewed";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "accepted", "declined", "expired"], "viewed": ["accepted", "declined", "expired"], "accepted": [], "declined": [], "expired": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10020,9 +12046,20 @@ async function __runProposalMarkViewed(ctx: MutationCtx, { docId, version }: any
 export const Proposal_markViewed = mutation({
   args: {
     docId: v.id("proposals"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runProposalMarkViewed,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runProposalMarkViewed(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_markViewed", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runProposalSend(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -10046,7 +12083,7 @@ async function __runProposalSend(ctx: MutationCtx, { docId, version }: any, __cr
         const __from = String(__cur);
         const __to = "sent";
         const __allowed: Record<string, string[]> = { "draft": ["sent"], "sent": ["viewed", "accepted", "declined", "expired"], "viewed": ["accepted", "declined", "expired"], "accepted": [], "declined": [], "expired": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10070,9 +12107,20 @@ async function __runProposalSend(ctx: MutationCtx, { docId, version }: any, __cr
 export const Proposal_send = mutation({
   args: {
     docId: v.id("proposals"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runProposalSend,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runProposalSend(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Proposal_send", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPurchaseNeedCancel(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -10095,7 +12143,7 @@ async function __runPurchaseNeedCancel(ctx: MutationCtx, { docId, reason, versio
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "open": ["ordered", "cancelled"], "ordered": ["fulfilled", "cancelled"], "fulfilled": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10121,9 +12169,20 @@ export const PurchaseNeed_cancel = mutation({
   args: {
     docId: v.id("purchaseNeeds"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPurchaseNeedCancel,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPurchaseNeedCancel(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_cancel", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPurchaseNeedCreate(ctx: MutationCtx, args: any) {
@@ -10159,6 +12218,7 @@ async function __runPurchaseNeedCreate(ctx: MutationCtx, args: any) {
     const payload: Record<string, any> = { _id, id: _id, ...doc, result: { _id, id: _id, ...doc }, purchaseNeedId: _id, tenantId: doc.tenantId, eventId: doc.eventId, ingredientDemandId: doc.ingredientDemandId, ingredientId: doc.ingredientId, requiredQuantity: doc.requiredQuantity, unit: doc.unit, status: "open", _subject: { entity: "PurchaseNeed", command: "create", id: _id } };
     await ctx.db.insert("manifestEvents", { type: "PurchaseNeedOpened", entity: "PurchaseNeed", entityId: _id, payload: { purchaseNeedId: _id, tenantId: doc.tenantId, eventId: doc.eventId, ingredientDemandId: doc.ingredientDemandId, ingredientId: doc.ingredientId, requiredQuantity: doc.requiredQuantity, unit: doc.unit, status: "open" }, createdAt: Date.now() });
     return { _id, ...doc };
+
 }
 
 export const PurchaseNeed_create = mutation({
@@ -10177,9 +12237,20 @@ export const PurchaseNeed_create = mutation({
     cancelledAt: v.optional(v.union(v.number(), v.null())),
     cancellationReason: v.optional(v.union(v.string(), v.null())),
     createdAt: v.optional(v.number()),
-    updatedAt: v.optional(v.number())
+    updatedAt: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPurchaseNeedCreate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPurchaseNeedCreate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_create", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPurchaseNeedMarkFulfilled(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -10201,7 +12272,7 @@ async function __runPurchaseNeedMarkFulfilled(ctx: MutationCtx, { docId, version
         const __from = String(__cur);
         const __to = "fulfilled";
         const __allowed: Record<string, string[]> = { "open": ["ordered", "cancelled"], "ordered": ["fulfilled", "cancelled"], "fulfilled": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10225,9 +12296,20 @@ async function __runPurchaseNeedMarkFulfilled(ctx: MutationCtx, { docId, version
 export const PurchaseNeed_markFulfilled = mutation({
   args: {
     docId: v.id("purchaseNeeds"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPurchaseNeedMarkFulfilled,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPurchaseNeedMarkFulfilled(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_markFulfilled", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runPurchaseNeedMarkOrdered(ctx: MutationCtx, { docId, vendorOrderId, vendorOrderLineId, version }: any, __creation = false) {
@@ -10249,7 +12331,7 @@ async function __runPurchaseNeedMarkOrdered(ctx: MutationCtx, { docId, vendorOrd
         const __from = String(__cur);
         const __to = "ordered";
         const __allowed: Record<string, string[]> = { "open": ["ordered", "cancelled"], "ordered": ["fulfilled", "cancelled"], "fulfilled": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10277,9 +12359,20 @@ export const PurchaseNeed_markOrdered = mutation({
     docId: v.id("purchaseNeeds"),
     vendorOrderId: v.string(),
     vendorOrderLineId: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runPurchaseNeedMarkOrdered,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runPurchaseNeedMarkOrdered(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "PurchaseNeed_markOrdered", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runQualificationExpire(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -10304,7 +12397,7 @@ async function __runQualificationExpire(ctx: MutationCtx, { docId, version }: an
         const __from = String(__cur);
         const __to = "expired";
         const __allowed: Record<string, string[]> = { "active": ["expired", "revoked"], "expired": [], "revoked": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10329,9 +12422,20 @@ async function __runQualificationExpire(ctx: MutationCtx, { docId, version }: an
 export const Qualification_expire = mutation({
   args: {
     docId: v.id("qualifications"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runQualificationExpire,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runQualificationExpire(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Qualification_expire", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runQualificationGrant(ctx: MutationCtx, { docId, personId, name, issuedAt, certificationType, expiresAt, documentRef, notes, version }: any, __creation = false) {
@@ -10385,9 +12489,20 @@ export const Qualification_grant = mutation({
     expiresAt: v.optional(v.number()),
     documentRef: v.optional(v.string()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runQualificationGrant,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runQualificationGrant(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Qualification_grant", __result);
+    }
+    return __result;
+  },
 });
 
 export const Qualification_createViaGrant = mutation({
@@ -10398,9 +12513,14 @@ export const Qualification_createViaGrant = mutation({
     certificationType: v.optional(v.string()),
     expiresAt: v.optional(v.number()),
     documentRef: v.optional(v.string()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, name, issuedAt, certificationType, expiresAt, documentRef, notes } = args;
@@ -10445,7 +12565,11 @@ export const Qualification_createViaGrant = mutation({
     const docId = await ctx.db.insert("qualifications", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, qualificationId: docId, tenantId: doc.tenantId, personId: doc.personId, name: doc.name, certificationType: ((doc.certificationType != null) ? doc.certificationType : doc.certificationType), issuedAt: doc.issuedAt, expiresAt: ((doc.expiresAt != null) ? doc.expiresAt : doc.expiresAt), status: "active", _subject: { entity: "Qualification", command: "grant", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "QualificationGranted", entity: "Qualification", entityId: docId, payload: { qualificationId: docId, tenantId: doc.tenantId, personId: doc.personId, name: doc.name, certificationType: ((doc.certificationType != null) ? doc.certificationType : doc.certificationType), issuedAt: doc.issuedAt, expiresAt: ((doc.expiresAt != null) ? doc.expiresAt : doc.expiresAt), status: "active" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Qualification_createViaGrant", __result);
+    }
+    return __result;
   },
 });
 
@@ -10470,7 +12594,7 @@ async function __runQualificationRevoke(ctx: MutationCtx, { docId, notes, versio
         const __from = String(__cur);
         const __to = "revoked";
         const __allowed: Record<string, string[]> = { "active": ["expired", "revoked"], "expired": [], "revoked": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10497,9 +12621,20 @@ export const Qualification_revoke = mutation({
   args: {
     docId: v.id("qualifications"),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runQualificationRevoke,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runQualificationRevoke(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Qualification_revoke", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runQualityCheckFail(ctx: MutationCtx, { docId, notes, version }: any, __creation = false) {
@@ -10522,7 +12657,7 @@ async function __runQualityCheckFail(ctx: MutationCtx, { docId, notes, version }
         const __from = String(__cur);
         const __to = "failed";
         const __allowed: Record<string, string[]> = { "pending": ["passed", "failed"], "passed": ["pending"], "failed": ["pending"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10553,9 +12688,20 @@ export const QualityCheck_fail = mutation({
   args: {
     docId: v.id("qualityChecks"),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runQualityCheckFail,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runQualityCheckFail(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "QualityCheck_fail", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runQualityCheckOpen(ctx: MutationCtx, { docId, prepTaskId, productionBatchId, notes, version }: any, __creation = false) {
@@ -10596,18 +12742,34 @@ export const QualityCheck_open = mutation({
     prepTaskId: v.optional(v.string()),
     productionBatchId: v.optional(v.string()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runQualityCheckOpen,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runQualityCheckOpen(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "QualityCheck_open", __result);
+    }
+    return __result;
+  },
 });
 
 export const QualityCheck_createViaOpen = mutation({
   args: {
     prepTaskId: v.optional(v.string()),
     productionBatchId: v.optional(v.string()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { prepTaskId, productionBatchId, notes } = args;
@@ -10640,7 +12802,11 @@ export const QualityCheck_createViaOpen = mutation({
     const docId = await ctx.db.insert("qualityChecks", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, qualityCheckId: docId, tenantId: doc.tenantId, prepTaskId: ((doc.prepTaskId != null) ? doc.prepTaskId : doc.prepTaskId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), status: "pending", _subject: { entity: "QualityCheck", command: "open", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "QualityCheckOpened", entity: "QualityCheck", entityId: docId, payload: { qualityCheckId: docId, tenantId: doc.tenantId, prepTaskId: ((doc.prepTaskId != null) ? doc.prepTaskId : doc.prepTaskId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), status: "pending" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "QualityCheck_createViaOpen", __result);
+    }
+    return __result;
   },
 });
 
@@ -10664,7 +12830,7 @@ async function __runQualityCheckPass(ctx: MutationCtx, { docId, notes, version }
         const __from = String(__cur);
         const __to = "passed";
         const __allowed: Record<string, string[]> = { "pending": ["passed", "failed"], "passed": ["pending"], "failed": ["pending"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10692,9 +12858,20 @@ export const QualityCheck_pass = mutation({
   args: {
     docId: v.id("qualityChecks"),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runQualityCheckPass,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runQualityCheckPass(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "QualityCheck_pass", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runQualityCheckReinspect(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -10717,7 +12894,7 @@ async function __runQualityCheckReinspect(ctx: MutationCtx, { docId, version }: 
         const __from = String(__cur);
         const __to = "pending";
         const __allowed: Record<string, string[]> = { "pending": ["passed", "failed"], "passed": ["pending"], "failed": ["pending"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10743,9 +12920,20 @@ async function __runQualityCheckReinspect(ctx: MutationCtx, { docId, version }: 
 export const QualityCheck_reinspect = mutation({
   args: {
     docId: v.id("qualityChecks"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runQualityCheckReinspect,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runQualityCheckReinspect(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "QualityCheck_reinspect", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runRecipeDraft(ctx: MutationCtx, { docId, name, yieldQuantity, yieldUnit, batchMultiplier, category, cuisine, description, instructions, version }: any, __creation = false) {
@@ -10796,9 +12984,20 @@ export const Recipe_draft = mutation({
     cuisine: v.optional(v.string()),
     description: v.optional(v.string()),
     instructions: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runRecipeDraft,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runRecipeDraft(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Recipe_draft", __result);
+    }
+    return __result;
+  },
 });
 
 export const Recipe_createViaDraft = mutation({
@@ -10810,9 +13009,14 @@ export const Recipe_createViaDraft = mutation({
     category: v.optional(v.string()),
     cuisine: v.optional(v.string()),
     description: v.optional(v.string()),
-    instructions: v.optional(v.string())
+    instructions: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, yieldQuantity, yieldUnit, batchMultiplier, category, cuisine, description, instructions } = args;
@@ -10855,7 +13059,11 @@ export const Recipe_createViaDraft = mutation({
     const docId = await ctx.db.insert("recipes", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, recipeId: docId, tenantId: doc.tenantId, name: doc.name, yieldQuantity: doc.yieldQuantity, yieldUnit: doc.yieldUnit, batchMultiplier: ((doc.batchMultiplier != null) ? doc.batchMultiplier : 1), versionNumber: 1, _subject: { entity: "Recipe", command: "draft", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "RecipeDrafted", entity: "Recipe", entityId: docId, payload: { recipeId: docId, tenantId: doc.tenantId, name: doc.name, yieldQuantity: doc.yieldQuantity, yieldUnit: doc.yieldUnit, batchMultiplier: ((doc.batchMultiplier != null) ? doc.batchMultiplier : 1), versionNumber: 1 }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Recipe_createViaDraft", __result);
+    }
+    return __result;
   },
 });
 
@@ -10878,7 +13086,7 @@ async function __runRecipePublishVersion(ctx: MutationCtx, { docId, version }: a
         const __from = String(__cur);
         const __to = "published";
         const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10902,9 +13110,20 @@ async function __runRecipePublishVersion(ctx: MutationCtx, { docId, version }: a
 export const Recipe_publishVersion = mutation({
   args: {
     docId: v.id("recipes"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runRecipePublishVersion,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runRecipePublishVersion(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Recipe_publishVersion", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runRecipeRetire(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -10926,7 +13145,7 @@ async function __runRecipeRetire(ctx: MutationCtx, { docId, reason, version }: a
         const __from = String(__cur);
         const __to = "retired";
         const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -10952,9 +13171,20 @@ export const Recipe_retire = mutation({
   args: {
     docId: v.id("recipes"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runRecipeRetire,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runRecipeRetire(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Recipe_retire", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runRecipeRetract(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -10976,7 +13206,7 @@ async function __runRecipeRetract(ctx: MutationCtx, { docId, version }: any, __c
         const __from = String(__cur);
         const __to = "draft";
         const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -11001,9 +13231,20 @@ async function __runRecipeRetract(ctx: MutationCtx, { docId, version }: any, __c
 export const Recipe_retract = mutation({
   args: {
     docId: v.id("recipes"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runRecipeRetract,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runRecipeRetract(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Recipe_retract", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runRecipeReviseDraft(ctx: MutationCtx, { docId, name, yieldQuantity, yieldUnit, batchMultiplier, category, cuisine, description, instructions, version }: any, __creation = false) {
@@ -11052,9 +13293,20 @@ export const Recipe_reviseDraft = mutation({
     cuisine: v.optional(v.string()),
     description: v.optional(v.string()),
     instructions: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runRecipeReviseDraft,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runRecipeReviseDraft(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Recipe_reviseDraft", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runRecipeIngredientAdd(ctx: MutationCtx, { docId, recipeId, ingredientId, quantity, unit, sortOrder, prepNotes, version }: any, __creation = false) {
@@ -11098,9 +13350,20 @@ export const RecipeIngredient_add = mutation({
     unit: v.any(),
     sortOrder: v.optional(v.any()),
     prepNotes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runRecipeIngredientAdd,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runRecipeIngredientAdd(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "RecipeIngredient_add", __result);
+    }
+    return __result;
+  },
 });
 
 export const RecipeIngredient_createViaAdd = mutation({
@@ -11110,9 +13373,14 @@ export const RecipeIngredient_createViaAdd = mutation({
     quantity: v.number(),
     unit: v.any(),
     sortOrder: v.optional(v.any()),
-    prepNotes: v.optional(v.string())
+    prepNotes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { recipeId, ingredientId, quantity, unit, sortOrder, prepNotes } = args;
@@ -11147,7 +13415,11 @@ export const RecipeIngredient_createViaAdd = mutation({
     const docId = await ctx.db.insert("recipeIngredients", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, recipeIngredientId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, ingredientId: doc.ingredientId, quantity: doc.quantity, unit: doc.unit, _subject: { entity: "RecipeIngredient", command: "add", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "RecipeIngredientAdded", entity: "RecipeIngredient", entityId: docId, payload: { recipeIngredientId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, ingredientId: doc.ingredientId, quantity: doc.quantity, unit: doc.unit }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "RecipeIngredient_createViaAdd", __result);
+    }
+    return __result;
   },
 });
 
@@ -11185,9 +13457,20 @@ export const RecipeIngredient_adjustQuantity = mutation({
     docId: v.id("recipeIngredients"),
     quantity: v.number(),
     unit: v.any(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runRecipeIngredientAdjustQuantity,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runRecipeIngredientAdjustQuantity(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "RecipeIngredient_adjustQuantity", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runRecipeIngredientRemove(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -11220,9 +13503,20 @@ export const RecipeIngredient_remove = mutation({
   args: {
     docId: v.id("recipeIngredients"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runRecipeIngredientRemove,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runRecipeIngredientRemove(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "RecipeIngredient_remove", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runSavedReportDefinitionArchive(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -11246,7 +13540,7 @@ async function __runSavedReportDefinitionArchive(ctx: MutationCtx, { docId, vers
         const __from = String(__cur);
         const __to = "archived";
         const __allowed: Record<string, string[]> = { "active": ["archived"], "archived": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -11270,9 +13564,20 @@ async function __runSavedReportDefinitionArchive(ctx: MutationCtx, { docId, vers
 export const SavedReportDefinition_archive = mutation({
   args: {
     docId: v.id("savedReportDefinitions"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runSavedReportDefinitionArchive,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runSavedReportDefinitionArchive(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_archive", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runSavedReportDefinitionChangeSharing(ctx: MutationCtx, { docId, sharingScope, version }: any, __creation = false) {
@@ -11307,9 +13612,20 @@ export const SavedReportDefinition_changeSharing = mutation({
   args: {
     docId: v.id("savedReportDefinitions"),
     sharingScope: v.any(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runSavedReportDefinitionChangeSharing,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runSavedReportDefinitionChangeSharing(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_changeSharing", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runSavedReportDefinitionCreateDefinition(ctx: MutationCtx, { docId, name, subjectArea, chartType, definition, sharingScope, version }: any, __creation = false) {
@@ -11355,9 +13671,20 @@ export const SavedReportDefinition_createDefinition = mutation({
     chartType: v.string(),
     definition: v.any(),
     sharingScope: v.optional(v.any()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runSavedReportDefinitionCreateDefinition,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runSavedReportDefinitionCreateDefinition(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_createDefinition", __result);
+    }
+    return __result;
+  },
 });
 
 export const SavedReportDefinition_createViaCreateDefinition = mutation({
@@ -11366,9 +13693,14 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
     subjectArea: v.any(),
     chartType: v.string(),
     definition: v.any(),
-    sharingScope: v.optional(v.any())
+    sharingScope: v.optional(v.any()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, subjectArea, chartType, definition, sharingScope } = args;
@@ -11406,7 +13738,11 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
     const docId = await ctx.db.insert("savedReportDefinitions", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, savedReportDefinitionId: docId, tenantId: doc.tenantId, ownerId: user.id, name: doc.name, subjectArea: doc.subjectArea, chartType: doc.chartType, sharingScope: ((doc.sharingScope != null) ? doc.sharingScope : "owner_only"), status: "active", _subject: { entity: "SavedReportDefinition", command: "createDefinition", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "SavedReportDefinitionCreated", entity: "SavedReportDefinition", entityId: docId, payload: { savedReportDefinitionId: docId, tenantId: doc.tenantId, ownerId: user.id, name: doc.name, subjectArea: doc.subjectArea, chartType: doc.chartType, sharingScope: ((doc.sharingScope != null) ? doc.sharingScope : "owner_only"), status: "active" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_createViaCreateDefinition", __result);
+    }
+    return __result;
   },
 });
 
@@ -11443,9 +13779,20 @@ export const SavedReportDefinition_rename = mutation({
   args: {
     docId: v.id("savedReportDefinitions"),
     name: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runSavedReportDefinitionRename,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runSavedReportDefinitionRename(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_rename", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runSavedReportDefinitionRestore(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -11469,7 +13816,7 @@ async function __runSavedReportDefinitionRestore(ctx: MutationCtx, { docId, vers
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["archived"], "archived": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -11493,9 +13840,20 @@ async function __runSavedReportDefinitionRestore(ctx: MutationCtx, { docId, vers
 export const SavedReportDefinition_restore = mutation({
   args: {
     docId: v.id("savedReportDefinitions"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runSavedReportDefinitionRestore,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runSavedReportDefinitionRestore(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_restore", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runSavedReportDefinitionUpdateDefinition(ctx: MutationCtx, { docId, chartType, definition, subjectArea, version }: any, __creation = false) {
@@ -11535,9 +13893,20 @@ export const SavedReportDefinition_updateDefinition = mutation({
     chartType: v.optional(v.string()),
     definition: v.optional(v.any()),
     subjectArea: v.optional(v.any()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runSavedReportDefinitionUpdateDefinition,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runSavedReportDefinitionUpdateDefinition(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_updateDefinition", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runShiftCancel(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -11561,7 +13930,7 @@ async function __runShiftCancel(ctx: MutationCtx, { docId, reason, version }: an
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "scheduled": ["started", "cancelled", "no_show"], "started": ["completed", "cancelled", "no_show"], "completed": [], "cancelled": [], "no_show": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -11588,9 +13957,20 @@ export const Shift_cancel = mutation({
   args: {
     docId: v.id("shifts"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runShiftCancel,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runShiftCancel(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_cancel", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runShiftComplete(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -11615,7 +13995,7 @@ async function __runShiftComplete(ctx: MutationCtx, { docId, version }: any, __c
         const __from = String(__cur);
         const __to = "completed";
         const __allowed: Record<string, string[]> = { "scheduled": ["started", "cancelled", "no_show"], "started": ["completed", "cancelled", "no_show"], "completed": [], "cancelled": [], "no_show": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -11640,9 +14020,20 @@ async function __runShiftComplete(ctx: MutationCtx, { docId, version }: any, __c
 export const Shift_complete = mutation({
   args: {
     docId: v.id("shifts"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runShiftComplete,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runShiftComplete(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_complete", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runShiftMarkNoShow(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -11665,7 +14056,7 @@ async function __runShiftMarkNoShow(ctx: MutationCtx, { docId, version }: any, _
         const __from = String(__cur);
         const __to = "no_show";
         const __allowed: Record<string, string[]> = { "scheduled": ["started", "cancelled", "no_show"], "started": ["completed", "cancelled", "no_show"], "completed": [], "cancelled": [], "no_show": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -11690,9 +14081,20 @@ async function __runShiftMarkNoShow(ctx: MutationCtx, { docId, version }: any, _
 export const Shift_markNoShow = mutation({
   args: {
     docId: v.id("shifts"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runShiftMarkNoShow,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runShiftMarkNoShow(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_markNoShow", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runShiftSchedule(ctx: MutationCtx, { docId, personId, startsAt, endsAt, eventId, role, notes, version }: any, __creation = false) {
@@ -11744,9 +14146,20 @@ export const Shift_schedule = mutation({
     eventId: v.optional(v.string()),
     role: v.optional(v.string()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runShiftSchedule,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runShiftSchedule(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_schedule", __result);
+    }
+    return __result;
+  },
 });
 
 export const Shift_createViaSchedule = mutation({
@@ -11756,9 +14169,14 @@ export const Shift_createViaSchedule = mutation({
     endsAt: v.number(),
     eventId: v.optional(v.string()),
     role: v.optional(v.string()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, startsAt, endsAt, eventId, role, notes } = args;
@@ -11801,7 +14219,11 @@ export const Shift_createViaSchedule = mutation({
     const docId = await ctx.db.insert("shifts", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, shiftId: docId, tenantId: doc.tenantId, personId: doc.personId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), startsAt: doc.startsAt, endsAt: doc.endsAt, role: ((doc.role != null) ? doc.role : doc.role), status: "scheduled", _subject: { entity: "Shift", command: "schedule", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "ShiftScheduled", entity: "Shift", entityId: docId, payload: { shiftId: docId, tenantId: doc.tenantId, personId: doc.personId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), startsAt: doc.startsAt, endsAt: doc.endsAt, role: ((doc.role != null) ? doc.role : doc.role), status: "scheduled" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_createViaSchedule", __result);
+    }
+    return __result;
   },
 });
 
@@ -11827,7 +14249,7 @@ async function __runShiftStart(ctx: MutationCtx, { docId, version }: any, __crea
         const __from = String(__cur);
         const __to = "started";
         const __allowed: Record<string, string[]> = { "scheduled": ["started", "cancelled", "no_show"], "started": ["completed", "cancelled", "no_show"], "completed": [], "cancelled": [], "no_show": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -11852,9 +14274,20 @@ async function __runShiftStart(ctx: MutationCtx, { docId, version }: any, __crea
 export const Shift_start = mutation({
   args: {
     docId: v.id("shifts"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runShiftStart,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runShiftStart(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Shift_start", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runStorageLocationActivate(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -11875,7 +14308,7 @@ async function __runStorageLocationActivate(ctx: MutationCtx, { docId, version }
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["inactive"], "inactive": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -11900,9 +14333,20 @@ async function __runStorageLocationActivate(ctx: MutationCtx, { docId, version }
 export const StorageLocation_activate = mutation({
   args: {
     docId: v.id("storageLocations"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runStorageLocationActivate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runStorageLocationActivate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "StorageLocation_activate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runStorageLocationDeactivate(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -11925,7 +14369,7 @@ async function __runStorageLocationDeactivate(ctx: MutationCtx, { docId, reason,
         const __from = String(__cur);
         const __to = "inactive";
         const __allowed: Record<string, string[]> = { "active": ["inactive"], "inactive": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -11951,9 +14395,20 @@ export const StorageLocation_deactivate = mutation({
   args: {
     docId: v.id("storageLocations"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runStorageLocationDeactivate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runStorageLocationDeactivate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "StorageLocation_deactivate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runStorageLocationRegister(ctx: MutationCtx, { docId, name, locationType, temperatureZone, minTemperature, maxTemperature, temperatureUnit, version }: any, __creation = false) {
@@ -11997,9 +14452,20 @@ export const StorageLocation_register = mutation({
     minTemperature: v.optional(v.number()),
     maxTemperature: v.optional(v.number()),
     temperatureUnit: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runStorageLocationRegister,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runStorageLocationRegister(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "StorageLocation_register", __result);
+    }
+    return __result;
+  },
 });
 
 export const StorageLocation_createViaRegister = mutation({
@@ -12009,9 +14475,14 @@ export const StorageLocation_createViaRegister = mutation({
     temperatureZone: v.optional(v.string()),
     minTemperature: v.optional(v.number()),
     maxTemperature: v.optional(v.number()),
-    temperatureUnit: v.optional(v.string())
+    temperatureUnit: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, locationType, temperatureZone, minTemperature, maxTemperature, temperatureUnit } = args;
@@ -12047,7 +14518,11 @@ export const StorageLocation_createViaRegister = mutation({
     const docId = await ctx.db.insert("storageLocations", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, storageLocationId: docId, tenantId: doc.tenantId, name: doc.name, locationType: doc.locationType, temperatureZone: doc.temperatureZone, _subject: { entity: "StorageLocation", command: "register", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "StorageLocationRegistered", entity: "StorageLocation", entityId: docId, payload: { storageLocationId: docId, tenantId: doc.tenantId, name: doc.name, locationType: doc.locationType, temperatureZone: doc.temperatureZone }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "StorageLocation_createViaRegister", __result);
+    }
+    return __result;
   },
 });
 
@@ -12092,9 +14567,20 @@ export const StorageLocation_reviseDetails = mutation({
     minTemperature: v.optional(v.number()),
     maxTemperature: v.optional(v.number()),
     temperatureUnit: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runStorageLocationReviseDetails,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runStorageLocationReviseDetails(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "StorageLocation_reviseDetails", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runTimeRecordClockIn(ctx: MutationCtx, { docId, personId, shiftId, eventId, notes, version }: any, __creation = false) {
@@ -12143,9 +14629,20 @@ export const TimeRecord_clockIn = mutation({
     shiftId: v.optional(v.string()),
     eventId: v.optional(v.string()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runTimeRecordClockIn,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runTimeRecordClockIn(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeRecord_clockIn", __result);
+    }
+    return __result;
+  },
 });
 
 export const TimeRecord_createViaClockIn = mutation({
@@ -12153,9 +14650,14 @@ export const TimeRecord_createViaClockIn = mutation({
     personId: v.string(),
     shiftId: v.optional(v.string()),
     eventId: v.optional(v.string()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { personId, shiftId, eventId, notes } = args;
@@ -12196,7 +14698,11 @@ export const TimeRecord_createViaClockIn = mutation({
     const docId = await ctx.db.insert("timeRecords", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, timeRecordId: docId, tenantId: doc.tenantId, personId: doc.personId, shiftId: ((doc.shiftId != null) ? doc.shiftId : doc.shiftId), eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), clockInAt: doc.clockInAt, status: "open", _subject: { entity: "TimeRecord", command: "clockIn", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "TimeRecordClockedIn", entity: "TimeRecord", entityId: docId, payload: { timeRecordId: docId, tenantId: doc.tenantId, personId: doc.personId, shiftId: ((doc.shiftId != null) ? doc.shiftId : doc.shiftId), eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), clockInAt: doc.clockInAt, status: "open" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeRecord_createViaClockIn", __result);
+    }
+    return __result;
   },
 });
 
@@ -12223,7 +14729,7 @@ async function __runTimeRecordClockOut(ctx: MutationCtx, { docId, breakMinutes, 
         const __from = String(__cur);
         const __to = "closed";
         const __allowed: Record<string, string[]> = { "open": ["closed"], "closed": ["corrected"], "corrected": ["corrected"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -12252,9 +14758,20 @@ export const TimeRecord_clockOut = mutation({
     docId: v.id("timeRecords"),
     breakMinutes: v.optional(v.any()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runTimeRecordClockOut,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runTimeRecordClockOut(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeRecord_clockOut", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runTimeRecordCorrect(ctx: MutationCtx, { docId, clockInAt, clockOutAt, breakMinutes, notes, version }: any, __creation = false) {
@@ -12283,7 +14800,7 @@ async function __runTimeRecordCorrect(ctx: MutationCtx, { docId, clockInAt, cloc
         const __from = String(__cur);
         const __to = "corrected";
         const __allowed: Record<string, string[]> = { "open": ["closed"], "closed": ["corrected"], "corrected": ["corrected"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -12316,9 +14833,20 @@ export const TimeRecord_correct = mutation({
     clockOutAt: v.number(),
     breakMinutes: v.optional(v.any()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runTimeRecordCorrect,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runTimeRecordCorrect(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "TimeRecord_correct", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorOnboard(ctx: MutationCtx, { docId, name, email, phone, addressLine1, city, region, postalCode, countryCode, paymentTermsDays, notes, version }: any, __creation = false) {
@@ -12374,9 +14902,20 @@ export const Vendor_onboard = mutation({
     countryCode: v.optional(v.string()),
     paymentTermsDays: v.optional(v.any()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOnboard,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOnboard(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_onboard", __result);
+    }
+    return __result;
+  },
 });
 
 export const Vendor_createViaOnboard = mutation({
@@ -12390,9 +14929,14 @@ export const Vendor_createViaOnboard = mutation({
     postalCode: v.optional(v.string()),
     countryCode: v.optional(v.string()),
     paymentTermsDays: v.optional(v.any()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, email, phone, addressLine1, city, region, postalCode, countryCode, paymentTermsDays, notes } = args;
@@ -12439,7 +14983,11 @@ export const Vendor_createViaOnboard = mutation({
     const docId = await ctx.db.insert("vendors", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, vendorId: docId, tenantId: doc.tenantId, name: doc.name, paymentTermsDays: ((doc.paymentTermsDays != null) ? doc.paymentTermsDays : 30), _subject: { entity: "Vendor", command: "onboard", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "VendorOnboarded", entity: "Vendor", entityId: docId, payload: { vendorId: docId, tenantId: doc.tenantId, name: doc.name, paymentTermsDays: ((doc.paymentTermsDays != null) ? doc.paymentTermsDays : 30) }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_createViaOnboard", __result);
+    }
+    return __result;
   },
 });
 
@@ -12463,7 +15011,7 @@ async function __runVendorReinstate(ctx: MutationCtx, { docId, version }: any, _
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "terminated"], "suspended": ["active", "terminated"], "terminated": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -12489,9 +15037,20 @@ async function __runVendorReinstate(ctx: MutationCtx, { docId, version }: any, _
 export const Vendor_reinstate = mutation({
   args: {
     docId: v.id("vendors"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorReinstate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorReinstate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_reinstate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorSuspend(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -12515,7 +15074,7 @@ async function __runVendorSuspend(ctx: MutationCtx, { docId, reason, version }: 
         const __from = String(__cur);
         const __to = "suspended";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "terminated"], "suspended": ["active", "terminated"], "terminated": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -12542,9 +15101,20 @@ export const Vendor_suspend = mutation({
   args: {
     docId: v.id("vendors"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorSuspend,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorSuspend(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_suspend", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorTerminate(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -12568,7 +15138,7 @@ async function __runVendorTerminate(ctx: MutationCtx, { docId, reason, version }
         const __from = String(__cur);
         const __to = "terminated";
         const __allowed: Record<string, string[]> = { "active": ["suspended", "terminated"], "suspended": ["active", "terminated"], "terminated": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -12596,9 +15166,20 @@ export const Vendor_terminate = mutation({
   args: {
     docId: v.id("vendors"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorTerminate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorTerminate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_terminate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorUpdateDetails(ctx: MutationCtx, { docId, name, email, phone, addressLine1, city, region, postalCode, countryCode, paymentTermsDays, notes, version }: any, __creation = false) {
@@ -12654,9 +15235,20 @@ export const Vendor_updateDetails = mutation({
     countryCode: v.optional(v.string()),
     paymentTermsDays: v.optional(v.any()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorUpdateDetails,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorUpdateDetails(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Vendor_updateDetails", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorOrderCancel(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -12679,7 +15271,7 @@ async function __runVendorOrderCancel(ctx: MutationCtx, { docId, reason, version
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "draft": ["submitted", "cancelled"], "submitted": ["confirmed", "cancelled"], "confirmed": ["partially_received", "received", "cancelled"], "partially_received": ["received", "cancelled"], "received": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -12705,9 +15297,20 @@ export const VendorOrder_cancel = mutation({
   args: {
     docId: v.id("vendorOrders"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOrderCancel,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOrderCancel(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_cancel", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorOrderConfirm(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -12729,7 +15332,7 @@ async function __runVendorOrderConfirm(ctx: MutationCtx, { docId, version }: any
         const __from = String(__cur);
         const __to = "confirmed";
         const __allowed: Record<string, string[]> = { "draft": ["submitted", "cancelled"], "submitted": ["confirmed", "cancelled"], "confirmed": ["partially_received", "received", "cancelled"], "partially_received": ["received", "cancelled"], "received": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -12753,9 +15356,20 @@ async function __runVendorOrderConfirm(ctx: MutationCtx, { docId, version }: any
 export const VendorOrder_confirm = mutation({
   args: {
     docId: v.id("vendorOrders"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOrderConfirm,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOrderConfirm(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_confirm", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorOrderMarkPartiallyReceived(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -12777,7 +15391,7 @@ async function __runVendorOrderMarkPartiallyReceived(ctx: MutationCtx, { docId, 
         const __from = String(__cur);
         const __to = "partially_received";
         const __allowed: Record<string, string[]> = { "draft": ["submitted", "cancelled"], "submitted": ["confirmed", "cancelled"], "confirmed": ["partially_received", "received", "cancelled"], "partially_received": ["received", "cancelled"], "received": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -12800,9 +15414,20 @@ async function __runVendorOrderMarkPartiallyReceived(ctx: MutationCtx, { docId, 
 export const VendorOrder_markPartiallyReceived = mutation({
   args: {
     docId: v.id("vendorOrders"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOrderMarkPartiallyReceived,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOrderMarkPartiallyReceived(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_markPartiallyReceived", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorOrderMarkReceived(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -12824,7 +15449,7 @@ async function __runVendorOrderMarkReceived(ctx: MutationCtx, { docId, version }
         const __from = String(__cur);
         const __to = "received";
         const __allowed: Record<string, string[]> = { "draft": ["submitted", "cancelled"], "submitted": ["confirmed", "cancelled"], "confirmed": ["partially_received", "received", "cancelled"], "partially_received": ["received", "cancelled"], "received": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -12848,9 +15473,20 @@ async function __runVendorOrderMarkReceived(ctx: MutationCtx, { docId, version }
 export const VendorOrder_markReceived = mutation({
   args: {
     docId: v.id("vendorOrders"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOrderMarkReceived,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOrderMarkReceived(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_markReceived", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorOrderOpen(ctx: MutationCtx, { docId, vendorId, eventId, orderNumber, notes, version }: any, __creation = false) {
@@ -12894,9 +15530,20 @@ export const VendorOrder_open = mutation({
     eventId: v.optional(v.string()),
     orderNumber: v.optional(v.string()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOrderOpen,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOrderOpen(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_open", __result);
+    }
+    return __result;
+  },
 });
 
 export const VendorOrder_createViaOpen = mutation({
@@ -12904,9 +15551,14 @@ export const VendorOrder_createViaOpen = mutation({
     vendorId: v.string(),
     eventId: v.optional(v.string()),
     orderNumber: v.optional(v.string()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { vendorId, eventId, orderNumber, notes } = args;
@@ -12946,7 +15598,11 @@ export const VendorOrder_createViaOpen = mutation({
     const docId = await ctx.db.insert("vendorOrders", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, vendorOrderId: docId, tenantId: doc.tenantId, vendorId: doc.vendorId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), orderNumber: doc.orderNumber, status: "draft", _subject: { entity: "VendorOrder", command: "open", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "VendorOrderOpened", entity: "VendorOrder", entityId: docId, payload: { vendorOrderId: docId, tenantId: doc.tenantId, vendorId: doc.vendorId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), orderNumber: doc.orderNumber, status: "draft" }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_createViaOpen", __result);
+    }
+    return __result;
   },
 });
 
@@ -12969,7 +15625,7 @@ async function __runVendorOrderSubmit(ctx: MutationCtx, { docId, version }: any,
         const __from = String(__cur);
         const __to = "submitted";
         const __allowed: Record<string, string[]> = { "draft": ["submitted", "cancelled"], "submitted": ["confirmed", "cancelled"], "confirmed": ["partially_received", "received", "cancelled"], "partially_received": ["received", "cancelled"], "received": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -12993,9 +15649,20 @@ async function __runVendorOrderSubmit(ctx: MutationCtx, { docId, version }: any,
 export const VendorOrder_submit = mutation({
   args: {
     docId: v.id("vendorOrders"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOrderSubmit,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOrderSubmit(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_submit", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorOrderUpdateTotals(ctx: MutationCtx, { docId, subtotal, taxAmount, shippingAmount, version }: any, __creation = false) {
@@ -13036,9 +15703,20 @@ export const VendorOrder_updateTotals = mutation({
     subtotal: v.number(),
     taxAmount: v.number(),
     shippingAmount: v.number(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOrderUpdateTotals,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOrderUpdateTotals(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrder_updateTotals", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorOrderLineAddLine(ctx: MutationCtx, { docId, vendorOrderId, ingredientId, orderedQuantity, unit, unitCost, ingredientDemandId, locationId, version }: any, __creation = false) {
@@ -13069,7 +15747,7 @@ async function __runVendorOrderLineAddLine(ctx: MutationCtx, { docId, vendorOrde
         const __from = String(__cur);
         const __to = "added";
         const __allowed: Record<string, string[]> = { "pending": ["added", "cancelled"], "added": ["receiving", "complete", "cancelled"], "receiving": ["complete", "cancelled"], "complete": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -13113,9 +15791,20 @@ export const VendorOrderLine_addLine = mutation({
     unitCost: v.number(),
     ingredientDemandId: v.optional(v.string()),
     locationId: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOrderLineAddLine,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOrderLineAddLine(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_addLine", __result);
+    }
+    return __result;
+  },
 });
 
 export const VendorOrderLine_createViaAddLine = mutation({
@@ -13126,9 +15815,14 @@ export const VendorOrderLine_createViaAddLine = mutation({
     unit: v.any(),
     unitCost: v.number(),
     ingredientDemandId: v.optional(v.string()),
-    locationId: v.optional(v.string())
+    locationId: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { vendorOrderId, ingredientId, orderedQuantity, unit, unitCost, ingredientDemandId, locationId } = args;
@@ -13183,7 +15877,11 @@ export const VendorOrderLine_createViaAddLine = mutation({
     for (const __row of fanRows0) {
       await __runPurchaseNeedMarkOrdered(ctx, { docId: (__row as any)._id, vendorOrderId: payload.vendorOrderId, vendorOrderLineId: payload.vendorOrderLineId } as any);
     }
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_createViaAddLine", __result);
+    }
+    return __result;
   },
 });
 
@@ -13209,7 +15907,7 @@ async function __runVendorOrderLineCancelLine(ctx: MutationCtx, { docId, reason,
         const __from = String(__cur);
         const __to = "cancelled";
         const __allowed: Record<string, string[]> = { "pending": ["added", "cancelled"], "added": ["receiving", "complete", "cancelled"], "receiving": ["complete", "cancelled"], "complete": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -13235,9 +15933,20 @@ export const VendorOrderLine_cancelLine = mutation({
   args: {
     docId: v.id("vendorOrderLines"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOrderLineCancelLine,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOrderLineCancelLine(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_cancelLine", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quantity, locationId, discrepancyQuantity, discrepancyNotes, version }: any, __creation = false) {
@@ -13267,7 +15976,7 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
         const __from = String(__cur);
         const __to = String(nextStatus);
         const __allowed: Record<string, string[]> = { "pending": ["added", "cancelled"], "added": ["receiving", "complete", "cancelled"], "receiving": ["complete", "cancelled"], "complete": [], "cancelled": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -13299,9 +16008,20 @@ export const VendorOrderLine_recordReceipt = mutation({
     locationId: v.string(),
     discrepancyQuantity: v.optional(v.number()),
     discrepancyNotes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVendorOrderLineRecordReceipt,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVendorOrderLineRecordReceipt(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "VendorOrderLine_recordReceipt", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVenueActivate(ctx: MutationCtx, { docId, version }: any, __creation = false) {
@@ -13323,7 +16043,7 @@ async function __runVenueActivate(ctx: MutationCtx, { docId, version }: any, __c
         const __from = String(__cur);
         const __to = "active";
         const __allowed: Record<string, string[]> = { "active": ["inactive"], "inactive": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -13349,9 +16069,20 @@ async function __runVenueActivate(ctx: MutationCtx, { docId, version }: any, __c
 export const Venue_activate = mutation({
   args: {
     docId: v.id("venues"),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVenueActivate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVenueActivate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_activate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVenueChangeCapacity(ctx: MutationCtx, { docId, capacity, version }: any, __creation = false) {
@@ -13387,9 +16118,20 @@ export const Venue_changeCapacity = mutation({
   args: {
     docId: v.id("venues"),
     capacity: v.any(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVenueChangeCapacity,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVenueChangeCapacity(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_changeCapacity", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVenueDeactivate(ctx: MutationCtx, { docId, reason, version }: any, __creation = false) {
@@ -13412,7 +16154,7 @@ async function __runVenueDeactivate(ctx: MutationCtx, { docId, reason, version }
         const __from = String(__cur);
         const __to = "inactive";
         const __allowed: Record<string, string[]> = { "active": ["inactive"], "inactive": ["active"] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -13439,9 +16181,20 @@ export const Venue_deactivate = mutation({
   args: {
     docId: v.id("venues"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVenueDeactivate,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVenueDeactivate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_deactivate", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runVenueRegister(ctx: MutationCtx, { docId, name, venueType, capacity, addressLine1, addressLine2, city, region, postalCode, countryCode, contactName, contactEmail, contactPhone, accessNotes, cateringNotes, version }: any, __creation = false) {
@@ -13505,9 +16258,20 @@ export const Venue_register = mutation({
     contactPhone: v.optional(v.string()),
     accessNotes: v.optional(v.string()),
     cateringNotes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVenueRegister,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVenueRegister(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_register", __result);
+    }
+    return __result;
+  },
 });
 
 export const Venue_createViaRegister = mutation({
@@ -13525,9 +16289,14 @@ export const Venue_createViaRegister = mutation({
     contactEmail: v.optional(v.string()),
     contactPhone: v.optional(v.string()),
     accessNotes: v.optional(v.string()),
-    cateringNotes: v.optional(v.string())
+    cateringNotes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { name, venueType, capacity, addressLine1, addressLine2, city, region, postalCode, countryCode, contactName, contactEmail, contactPhone, accessNotes, cateringNotes } = args;
@@ -13582,7 +16351,11 @@ export const Venue_createViaRegister = mutation({
     const docId = await ctx.db.insert("venues", __storedDoc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, venueId: docId, tenantId: doc.tenantId, name: doc.name, venueType: doc.venueType, capacity: doc.capacity, _subject: { entity: "Venue", command: "register", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "VenueRegistered", entity: "Venue", entityId: docId, payload: { venueId: docId, tenantId: doc.tenantId, name: doc.name, venueType: doc.venueType, capacity: doc.capacity }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_createViaRegister", __result);
+    }
+    return __result;
   },
 });
 
@@ -13642,9 +16415,20 @@ export const Venue_updateDetails = mutation({
     contactPhone: v.optional(v.string()),
     accessNotes: v.optional(v.string()),
     cateringNotes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runVenueUpdateDetails,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runVenueUpdateDetails(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Venue_updateDetails", __result);
+    }
+    return __result;
+  },
 });
 
 async function __runWasteRecordRecord(ctx: MutationCtx, { docId, ingredientId, locationId, quantity, unit, reason, eventId, unitCost, notes, version }: any, __creation = false) {
@@ -13673,7 +16457,7 @@ async function __runWasteRecordRecord(ctx: MutationCtx, { docId, ingredientId, l
         const __from = String(__cur);
         const __to = "recorded";
         const __allowed: Record<string, string[]> = { "pending": ["recorded"], "recorded": ["voided"], "voided": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -13713,9 +16497,20 @@ export const WasteRecord_record = mutation({
     eventId: v.optional(v.string()),
     unitCost: v.optional(v.number()),
     notes: v.optional(v.string()),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runWasteRecordRecord,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runWasteRecordRecord(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "WasteRecord_record", __result);
+    }
+    return __result;
+  },
 });
 
 export const WasteRecord_createViaRecord = mutation({
@@ -13727,9 +16522,14 @@ export const WasteRecord_createViaRecord = mutation({
     reason: v.any(),
     eventId: v.optional(v.string()),
     unitCost: v.optional(v.number()),
-    notes: v.optional(v.string())
+    notes: v.optional(v.string()),
+    idempotencyKey: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const { ingredientId, locationId, quantity, unit, reason, eventId, unitCost, notes } = args;
@@ -13778,7 +16578,11 @@ export const WasteRecord_createViaRecord = mutation({
     const docId = await ctx.db.insert("wasteRecords", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, wasteRecordId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), quantity: doc.quantity, unit: doc.unit, reason: doc.reason, unitCost: ((doc.unitCost != null) ? doc.unitCost : doc.unitCost), _subject: { entity: "WasteRecord", command: "record", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "WasteRecorded", entity: "WasteRecord", entityId: docId, payload: { wasteRecordId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), quantity: doc.quantity, unit: doc.unit, reason: doc.reason, unitCost: ((doc.unitCost != null) ? doc.unitCost : doc.unitCost) }, createdAt: Date.now() });
-    return { docId };
+    const __result = { docId };
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "WasteRecord_createViaRecord", __result);
+    }
+    return __result;
   },
 });
 
@@ -13802,7 +16606,7 @@ async function __runWasteRecordVoidRecord(ctx: MutationCtx, { docId, reason, ver
         const __from = String(__cur);
         const __to = "voided";
         const __allowed: Record<string, string[]> = { "pending": ["recorded"], "recorded": ["voided"], "voided": [] };
-        if (!(__creation && __from === __to) && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
         }
@@ -13828,7 +16632,18 @@ export const WasteRecord_voidRecord = mutation({
   args: {
     docId: v.id("wasteRecords"),
     reason: v.string(),
-    version: v.optional(v.number())
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
   },
-  handler: __runWasteRecordVoidRecord,
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runWasteRecordVoidRecord(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "WasteRecord_voidRecord", __result);
+    }
+    return __result;
+  },
 });

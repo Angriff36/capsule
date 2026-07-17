@@ -4,14 +4,14 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
 
 ## Truth split
 
-| File                                                  | Owns                                               |
-| ----------------------------------------------------- | -------------------------------------------------- |
-| `CLAUDE.md`                                           | How to behave                                      |
-| `AGENTS.md`                                           | How to run / maintain                              |
-| `docs/architecture/*`, `docs/systems/*`               | What the system is                                 |
-| `docs/generation/manifest-builder.md`, `PRESET.md`    | How the repo is produced                           |
-| `docs/generation/2026-07-16-dx-proof-kit-boundary.md` | Proof-kit ownership + exact Manifest pin (Binding) |
-| `README.md`                                           | Human on-ramp + links                              |
+| File                                                  | Owns                                                  |
+| ----------------------------------------------------- | ----------------------------------------------------- |
+| `CLAUDE.md`                                           | How to behave                                         |
+| `AGENTS.md`                                           | How to run / maintain                                 |
+| `docs/architecture/*`, `docs/systems/*`               | What the system is                                    |
+| `docs/generation/manifest-builder.md`, `PRESET.md`    | How the repo is produced                              |
+| `docs/generation/2026-07-16-dx-proof-kit-boundary.md` | Proof-kit ownership + Manifest semver range (Binding) |
+| `README.md`                                           | Human on-ramp + links                                 |
 
 ## Boundaries
 

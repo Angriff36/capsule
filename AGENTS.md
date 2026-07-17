@@ -34,14 +34,29 @@ bun run build
 bun run baseline:decay   # monthly hygiene checks
 bun run check            # toolchain + typecheck + format:check + secrets + test:coverage + build + baseline:decay
 bun run codegen          # convex codegen
+bun run manifest:regen      # only regen entry — Builder apply when conflict-free
 bun run seed             # requires Convex URL
 ```
+
+Essential commands: [docs/commands.md](docs/commands.md). Full reference: [docs/operations/commands.md](docs/operations/commands.md).
 
 `bun run check` must pass before claiming work complete. CI runs the same script.
 
 ## Do not hand-edit
 
 `convex/{schema,queries,mutations,http,crons,sagas,computed}.ts`, `convex/_generated/**`, `schemas/**`, `wiring/**`, `src/generated/**`, `src/lib/manifest-convex-react.ts`, `scripts/seed-convex.ts`, generated contract tests, `diagrams/` companions.
+
+## Regeneration (one command)
+
+```bash
+bun run manifest:regen
+```
+
+Builder plans, applies when conflict-free, and updates `.builder/ownership.json` in one transaction. Optional flags after `--` (e.g. `--install`).
+
+Do **not** use `manifest generate`, `manifest:build`, or `place-manifest-convex-react.ts` — blocked or absent; they bypass ownership.
+
+`bun run check` verifies owned files still match the ownership ledger. Pre-commit rejects commits that touch owned paths without updating ownership.
 
 Import Convex API through `src/lib/api.ts`. Details: `docs/generation/manifest-builder.md`.
 

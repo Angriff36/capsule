@@ -1,20 +1,23 @@
 # Current Manifest projection status
 
-Authority: verified behavior of the generated CapsuleX artifacts in this checkout. Canonical product/domain intent remains in `C:/projects/Manifest-source`; this file records where the current projection succeeds or diverges.
+Authority: verified behavior of the generated CapsuleX artifacts in this checkout.
+~~Canonical product/domain intent remains in `C:/projects/Manifest-source`.~~
+
+> **Correction (2026-07-17):** Capsule is a live Manifest project — Builder update-mode regen compiles from this repo’s `src/**/*.manifest` + `manifest.config.yaml` (see `docs/generation/manifest-builder.md`). `Manifest-source` may still be used as an external sync/compare baseline; it is not required for regeneration after init.
 
 Verified **2026-07-16** against Manifest **3.6.12** and Builder preset `convex-application` **1.3.4**.
 
 ## Generated coverage
 
-| Evidence                                |                                     Current result |
-| --------------------------------------- | -------------------------------------------------: |
-| Canonical `.manifest` inputs            |   36/36 SHA-256 matches with `Manifest-source/src` |
-| Governed business entities              |    43 (plus TenantScoped and SoftDeletable mixins) |
-| Command capabilities / public mutations |                                          219 / 219 |
-| Public queries                          |                                                214 |
-| Internal event-log queries              |                                                  4 |
-| Relationships                           |                                                 99 |
-| Assembly verification                   | 20/20; complete; export allowed; 0 assembly errors |
+| Evidence                                  |                                                                                                                          Current result |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------: |
+| In-repo `.manifest` inputs (live project) | Present under `src/**/*.manifest`; 2026-07-16 snapshot: 36/36 SHA-256 matched `Manifest-source/src` (compare baseline, not regen input) |
+| Governed business entities                |                                                                                         43 (plus TenantScoped and SoftDeletable mixins) |
+| Command capabilities / public mutations   |                                                                                                                               219 / 219 |
+| Public queries                            |                                                                                                                                     214 |
+| Internal event-log queries                |                                                                                                                                       4 |
+| Relationships                             |                                                                                                                                      99 |
+| Assembly verification                     |                                                                                      20/20; complete; export allowed; 0 assembly errors |
 
 Current positive evidence:
 
