@@ -6,7 +6,7 @@
 # convex/lib/authContext.ts as the author seam (identity not inlined into
 # generated functions).
 
-src: src
+src: "src/**/*.manifest"
 output: generated/ir
 
 projections:
@@ -14,5 +14,6 @@ projections:
     output: convex
     options:
       authContextImport: ./lib/authContext
+      encryptionImport: ./lib/encryption
       policyMode: enforce
       includeTenantFilter: true

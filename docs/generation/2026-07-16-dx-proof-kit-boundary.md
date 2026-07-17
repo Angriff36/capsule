@@ -26,6 +26,10 @@
 
 ## Capsule pin
 
-**Published:** `@angriff36/manifest@3.6.14` (`[release] v3.6.14` / tag `v3.6.14`).
+**Published:** `@angriff36/manifest@3.6.17` (`[release] v3.6.17` / tag `v3.6.17`) — atomic initialization + createVia param locals + multi-file ownership re-attach.
 
-Capsule must pin the exact version `3.6.14` (no `^`).
+Capsule must pin the exact registry version (no `^`).
+
+~~**Published target:** `@angriff36/manifest@3.6.16` — createVia regen blocked by param scope + multi-file ownership loss.~~
+
+> **Correction (2026-07-16) @RYANSIGNED:** Consumable pin is **3.6.17**. Registry-only (`bun run check:manifest-registry`). Governed creation proofs: `tests/culinary-governed-creation.runtime.test.ts`.

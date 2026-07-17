@@ -24,8 +24,8 @@
     "dev:convex": "convex dev",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "manifest:build": "manifest build",
-    "manifest:compile": "manifest compile --merge",
+    "manifest:build": "manifest compile --merge -o generated/ir && manifest generate --all generated/ir/merged.ir.json && bun scripts/place-manifest-convex-react.ts",
+    "manifest:compile": "manifest compile --merge -o generated/ir",
     "prepare": "git config core.hooksPath .githooks",
     "proof:emit": "bun scripts/emit-proof-kit.ts",
     "secrets": "bun scripts/check-secrets.ts",
@@ -40,7 +40,7 @@
     "*.{ts,tsx,js,jsx,json,md,css,yml,yaml,html}": "prettier --write"
   },
   "dependencies": {
-    "@angriff36/manifest": "3.6.14",
+    "@angriff36/manifest": "3.6.17",
     "@clerk/react": "^6.12.4",
     "@fontsource-variable/archivo": "^5.2.5",
     "@fontsource/ibm-plex-mono": "^5.2.5",

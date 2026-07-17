@@ -48,7 +48,7 @@ Generated Convex surfaces import `getAuthContext` from `./lib/authContext`. That
 ## Authored Event integration
 
 - Use generated hooks from `src/lib/manifest-convex-react.ts` first, and import the generated Convex API only through the approved `src/lib/api.ts` seam.
-- Event creation currently uses `convex/lib/eventPlanning.ts` to allocate Client, Venue, Event, and EventGuest records, invoke their generated commands, and clean up rejected allocations. Keep policy, validation, lifecycle, encryption, tenant enforcement, events, and reactions in the generated command surface.
+- Event creation uses generated `createVia*` / `useCreate*` hooks directly (no authored `eventPlanning` allocation seam). Keep policy, validation, lifecycle, encryption, tenant enforcement, events, and reactions in the generated command surface.
 - Consume lifecycle availability from `src/generated/manifest-wiring-bindings.ts`; do not recreate transition tables in authored feature code.
 - Generated runtime behavior still needs focused reaction tests. Structural generation and typed wiring do not prove downstream reactions execute correctly.
 - `bun run check:event-manifest` enforces this authored Event boundary and is part of `bun run check`.
@@ -56,7 +56,7 @@ Generated Convex surfaces import `getAuthContext` from `./lib/authContext`. That
 ## Authored Culinary integration
 
 - Use generated hooks from `src/lib/manifest-convex-react.ts` first, including the governed `useCreate*` hooks for Ingredient, Recipe, RecipeIngredient, Dish, Menu, and EventDish.
-- Culinary creation needs no authored allocation seam. The generated `createVia*` mutations allocate the document, invoke the canonical command behavior, and clean up rejected allocations.
+- Culinary creation needs no authored allocation seam. Generated `createVia*` mutations construct one final document atomically (draft → checks → mutate → single persist); nothing is written on failure.
 - Keep validation, tenant enforcement, lifecycle, events, and reactions in generated runtime behavior. Consume lifecycle availability from `src/generated/manifest-wiring-bindings.ts`; do not recreate transition tables in authored Kitchen code.
 - Generated runtime behavior still requires focused reaction tests. Typed wiring and generated creation cleanup do not prove downstream demand or production reactions execute correctly.
 - `bun run check:culinary-manifest` enforces this authored Culinary boundary and is part of `bun run check`.

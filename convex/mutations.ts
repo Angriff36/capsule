@@ -485,25 +485,42 @@ export const AvailabilityWindow_createViaDeclare = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { personId, startsAt, endsAt, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      personId: args.personId,
-      startsAt: args.startsAt,
-      endsAt: args.endsAt,
-      notes: ((args.notes != null) ? args.notes : args.notes),
       status: "active",
-      declaredAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      endsAt: args.endsAt,
+      notes: args.notes,
+      personId: args.personId,
+      startsAt: args.startsAt
     };
-    const __storedSeed = await __encryptDoc(ctx, "AvailabilityWindow", ["notes"], __seed);
-    const docId = await ctx.db.insert("availabilityWindows", __storedSeed as any);
-    try {
-      await __runAvailabilityWindowDeclare(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read availability windows");
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write availability through commands");
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute availability commands");
+    if (!((__draft.declaredAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((user.id != null))) throw new Error("Guard 3 failed");
+    if (!(((personId === user.id) || checkRole(user.role, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!((personId === __draft.personId))) throw new Error("Declare personId must match the seeded person reference");
+    if (!((endsAt > startsAt))) throw new Error("Availability end must be after its start");
+    const doc: Record<string, any> = {
+      ...__draft,
+      personId: personId,
+      startsAt: startsAt,
+      endsAt: endsAt,
+      notes: ((notes != null) ? notes : __draft.notes),
+      declaredAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "AvailabilityWindow", ["notes"], doc);
+    const docId = await ctx.db.insert("availabilityWindows", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, availabilityWindowId: docId, tenantId: doc.tenantId, personId: doc.personId, startsAt: doc.startsAt, endsAt: doc.endsAt, status: "active", _subject: { entity: "AvailabilityWindow", command: "declare", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "AvailabilityDeclared", entity: "AvailabilityWindow", entityId: docId, payload: { availabilityWindowId: docId, tenantId: doc.tenantId, personId: doc.personId, startsAt: doc.startsAt, endsAt: doc.endsAt, status: "active" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -899,39 +916,68 @@ export const Client_createViaRegister = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { clientType, companyName, givenName, familyName, email, phone, website, addressLine1, addressLine2, city, region, postalCode, countryCode, taxId, taxExempt, paymentTermsDays, notes, assignedToId } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      clientType: args.clientType,
-      companyName: args.companyName,
-      givenName: args.givenName,
-      familyName: args.familyName,
-      email: args.email,
-      phone: args.phone,
-      website: args.website,
+      status: "active",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       addressLine1: args.addressLine1,
       addressLine2: args.addressLine2,
-      city: args.city,
-      region: args.region,
-      postalCode: args.postalCode,
-      countryCode: args.countryCode,
-      taxId: args.taxId,
-      taxExempt: ((args.taxExempt != null) ? args.taxExempt : false),
-      paymentTermsDays: ((args.paymentTermsDays != null) ? args.paymentTermsDays : 30),
-      notes: args.notes,
       assignedToId: args.assignedToId,
-      status: "active",
-      registeredAt: Date.now(),
-      version: 0
+      city: args.city,
+      clientType: args.clientType,
+      companyName: args.companyName,
+      countryCode: args.countryCode,
+      email: args.email,
+      familyName: args.familyName,
+      givenName: args.givenName,
+      notes: args.notes,
+      paymentTermsDays: args.paymentTermsDays,
+      phone: args.phone,
+      postalCode: args.postalCode,
+      region: args.region,
+      taxExempt: args.taxExempt,
+      taxId: args.taxId,
+      website: args.website
     };
-    const __storedSeed = await __encryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","taxId"], __seed);
-    const docId = await ctx.db.insert("clients", __storedSeed as any);
-    try {
-      await __runClientRegister(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read client accounts");
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write client accounts through commands");
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute client commands");
+    if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!(((((clientType === "company") && (companyName != null)) && (((companyName).trim()).length > 0)) || (((clientType === "person") && (givenName != null)) && (((givenName).trim()).length > 0))))) throw new Error("Company clients require a company name; person clients require a given name");
+    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Payment terms must be between 0 and 365 days");
+    if (!(((countryCode == null) || (((countryCode).trim()).length === 2)))) throw new Error("Country code must contain two characters");
+    const doc: Record<string, any> = {
+      ...__draft,
+      clientType: clientType,
+      companyName: companyName,
+      givenName: givenName,
+      familyName: familyName,
+      email: email,
+      phone: phone,
+      website: website,
+      addressLine1: addressLine1,
+      addressLine2: addressLine2,
+      city: city,
+      region: region,
+      postalCode: postalCode,
+      countryCode: countryCode,
+      taxId: taxId,
+      taxExempt: ((taxExempt != null) ? taxExempt : false),
+      paymentTermsDays: ((paymentTermsDays != null) ? paymentTermsDays : 30),
+      notes: notes,
+      assignedToId: assignedToId,
+      registeredAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","taxId"], doc);
+    const docId = await ctx.db.insert("clients", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, clientId: docId, tenantId: doc.tenantId, clientType: doc.clientType, _subject: { entity: "Client", command: "register", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "ClientRegistered", entity: "Client", entityId: docId, payload: { clientId: docId, tenantId: doc.tenantId, clientType: doc.clientType }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -1009,31 +1055,53 @@ export const ClientContact_createViaAdd = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { clientId, givenName, familyName, title, email, phone, mobile, isPrimary, isBillingContact, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      clientId: args.clientId,
-      givenName: args.givenName,
-      familyName: args.familyName,
-      title: args.title,
-      email: args.email,
-      phone: args.phone,
-      mobile: args.mobile,
-      isPrimary: ((args.isPrimary != null) ? args.isPrimary : false),
-      isBillingContact: ((args.isBillingContact != null) ? args.isBillingContact : false),
-      notes: args.notes,
       status: "active",
-      addedAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      clientId: args.clientId,
+      email: args.email,
+      familyName: args.familyName,
+      givenName: args.givenName,
+      isBillingContact: args.isBillingContact,
+      isPrimary: args.isPrimary,
+      mobile: args.mobile,
+      notes: args.notes,
+      phone: args.phone,
+      title: args.title
     };
-    const __storedSeed = await __encryptDoc(ctx, "ClientContact", ["email","phone","mobile"], __seed);
-    const docId = await ctx.db.insert("clientContacts", __storedSeed as any);
-    try {
-      await __runClientContactAdd(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read client contacts");
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write client contacts through commands");
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute client contact commands");
+    if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.client != null))) throw new Error("Guard 3 failed");
+    if (!((clientId === __draft.clientId))) throw new Error("Add clientId must match the seeded client reference");
+    if (!((((givenName).trim()).length > 0))) throw new Error("Contact given name is required");
+    const doc: Record<string, any> = {
+      ...__draft,
+      clientId: clientId,
+      givenName: givenName,
+      familyName: familyName,
+      title: title,
+      email: email,
+      phone: phone,
+      mobile: mobile,
+      isPrimary: ((isPrimary != null) ? isPrimary : false),
+      isBillingContact: ((isBillingContact != null) ? isBillingContact : false),
+      notes: notes,
+      addedAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "ClientContact", ["email","phone","mobile"], doc);
+    const docId = await ctx.db.insert("clientContacts", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, clientContactId: docId, tenantId: doc.tenantId, clientId: doc.clientId, isPrimary: ((doc.isPrimary != null) ? doc.isPrimary : false), isBillingContact: ((doc.isBillingContact != null) ? doc.isBillingContact : false), _subject: { entity: "ClientContact", command: "add", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "ClientContactAdded", entity: "ClientContact", entityId: docId, payload: { clientContactId: docId, tenantId: doc.tenantId, clientId: doc.clientId, isPrimary: ((doc.isPrimary != null) ? doc.isPrimary : false), isBillingContact: ((doc.isBillingContact != null) ? doc.isBillingContact : false) }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -1239,27 +1307,48 @@ export const Contract_createViaDraft = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { eventId, clientId, title, contractNumber, documentUrl, expiresAt, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      eventId: args.eventId,
+      status: "draft",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       clientId: args.clientId,
       contractNumber: args.contractNumber,
-      title: args.title,
       documentUrl: args.documentUrl,
+      eventId: args.eventId,
       expiresAt: args.expiresAt,
       notes: args.notes,
-      status: "draft",
-      draftedAt: Date.now(),
-      version: 0
+      title: args.title
     };
-    const docId = await ctx.db.insert("contracts", __seed as any);
-    try {
-      await __runContractDraft(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read contracts");
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write contracts through commands");
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute contract commands");
+    if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
+    if (!((__draft.client != null))) throw new Error("Guard 4 failed");
+    if (!((eventId === __draft.eventId))) throw new Error("Draft eventId must match the seeded event reference");
+    if (!((clientId === __draft.clientId))) throw new Error("Draft clientId must match the seeded client reference");
+    if (!((((title).trim()).length > 0))) throw new Error("Contract title is required");
+    const doc: Record<string, any> = {
+      ...__draft,
+      eventId: eventId,
+      clientId: clientId,
+      title: title,
+      contractNumber: contractNumber,
+      documentUrl: documentUrl,
+      expiresAt: expiresAt,
+      notes: notes,
+      draftedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("contracts", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, contractId: docId, tenantId: doc.tenantId, eventId: doc.eventId, clientId: doc.clientId, title: doc.title, _subject: { entity: "Contract", command: "draft", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "ContractDrafted", entity: "Contract", entityId: docId, payload: { contractId: docId, tenantId: doc.tenantId, eventId: doc.eventId, clientId: doc.clientId, title: doc.title }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -1729,28 +1818,51 @@ export const Delivery_createViaSchedule = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { packListId, eventId, destination, windowStartsAt, windowEndsAt, driverId, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      packListId: args.packListId,
-      eventId: args.eventId,
-      driverId: ((args.driverId != null) ? args.driverId : args.driverId),
-      destination: args.destination,
-      windowStartsAt: args.windowStartsAt,
-      windowEndsAt: args.windowEndsAt,
-      notes: ((args.notes != null) ? args.notes : args.notes),
       status: "scheduled",
-      scheduledAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      destination: args.destination,
+      driverId: args.driverId,
+      eventId: args.eventId,
+      notes: args.notes,
+      packListId: args.packListId,
+      windowEndsAt: args.windowEndsAt,
+      windowStartsAt: args.windowStartsAt
     };
-    const __storedSeed = await __encryptDoc(ctx, "Delivery", ["notes"], __seed);
-    const docId = await ctx.db.insert("deliveries", __storedSeed as any);
-    try {
-      await __runDeliverySchedule(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read deliveries");
+    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write deliveries through commands");
+    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute delivery commands");
+    if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "scheduled"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!(((__draft.packList != null) && (((__draft.packList.status === "packed") || (__draft.packList.status === "loaded")) || (__draft.packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
+    if (!((__draft.event != null))) throw new Error("Guard 4 failed");
+    if (!((packListId === __draft.packListId))) throw new Error("Schedule packListId must match the seeded pack list reference");
+    if (!((eventId === __draft.eventId))) throw new Error("Schedule eventId must match the seeded event reference");
+    if (!((((driverId == null) || (__draft.driverId == null)) || (driverId === __draft.driverId)))) throw new Error("Schedule driverId must match the seeded driver reference when provided");
+    if (!((((destination).trim()).length > 0))) throw new Error("Delivery destination is required");
+    if (!((windowEndsAt > windowStartsAt))) throw new Error("Delivery window end must be after its start");
+    const doc: Record<string, any> = {
+      ...__draft,
+      packListId: packListId,
+      eventId: eventId,
+      destination: destination,
+      windowStartsAt: windowStartsAt,
+      windowEndsAt: windowEndsAt,
+      driverId: ((driverId != null) ? driverId : __draft.driverId),
+      notes: ((notes != null) ? notes : __draft.notes),
+      scheduledAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "Delivery", ["notes"], doc);
+    const docId = await ctx.db.insert("deliveries", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, deliveryId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.eventId, driverId: ((doc.driverId != null) ? doc.driverId : doc.driverId), destination: doc.destination, windowStartsAt: doc.windowStartsAt, windowEndsAt: doc.windowEndsAt, status: "scheduled", _subject: { entity: "Delivery", command: "schedule", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "DeliveryScheduled", entity: "Delivery", entityId: docId, payload: { deliveryId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.eventId, driverId: ((doc.driverId != null) ? doc.driverId : doc.driverId), destination: doc.destination, windowStartsAt: doc.windowStartsAt, windowEndsAt: doc.windowEndsAt, status: "scheduled" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -1947,30 +2059,50 @@ export const Dish_createViaIntroduce = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { recipeId, name, portionSize, portionUnit, description, category, course, serviceStyle, dietaryTags, allergenSummary } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      recipeId: args.recipeId,
-      name: args.name,
-      description: args.description,
+      status: "active",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      allergenSummary: args.allergenSummary,
       category: args.category,
       course: args.course,
-      serviceStyle: args.serviceStyle,
+      description: args.description,
+      dietaryTags: args.dietaryTags,
+      name: args.name,
       portionSize: args.portionSize,
       portionUnit: args.portionUnit,
-      dietaryTags: ((args.dietaryTags != null) ? args.dietaryTags : []),
-      allergenSummary: ((args.allergenSummary != null) ? args.allergenSummary : []),
-      status: "active",
-      introducedAt: Date.now(),
-      version: 0
+      recipeId: args.recipeId,
+      serviceStyle: args.serviceStyle
     };
-    const docId = await ctx.db.insert("dishes", __seed as any);
-    try {
-      await __runDishIntroduce(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read dishes");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write dishes through commands");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute dish commands");
+    if (!((__draft.introducedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((((name).trim()).length > 0))) throw new Error("Dish name is required");
+    if (!((portionSize > 0))) throw new Error("Dish portion size must be positive");
+    const doc: Record<string, any> = {
+      ...__draft,
+      recipeId: recipeId,
+      name: name,
+      portionSize: portionSize,
+      portionUnit: portionUnit,
+      description: description,
+      category: category,
+      course: course,
+      serviceStyle: serviceStyle,
+      dietaryTags: ((dietaryTags != null) ? dietaryTags : []),
+      allergenSummary: ((allergenSummary != null) ? allergenSummary : []),
+      introducedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("dishes", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, dishId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, name: doc.name, portionSize: doc.portionSize, portionUnit: doc.portionUnit, allergenSummary: ((doc.allergenSummary != null) ? doc.allergenSummary : []), _subject: { entity: "Dish", command: "introduce", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "DishIntroduced", entity: "Dish", entityId: docId, payload: { dishId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, name: doc.name, portionSize: doc.portionSize, portionUnit: doc.portionUnit, allergenSummary: ((doc.allergenSummary != null) ? doc.allergenSummary : []) }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -2774,39 +2906,72 @@ export const Event_createViaPlanEngagement = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, venueId, venueName, venueAddress, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      clientId: args.clientId,
-      venueId: args.venueId,
-      assignedToId: args.assignedToId,
-      title: args.title,
-      eventType: args.eventType,
-      startsAt: args.startsAt,
-      endsAt: args.endsAt,
-      venueName: args.venueName,
-      venueAddress: args.venueAddress,
-      expectedHeadcount: args.expectedHeadcount,
-      primaryContactName: args.primaryContactName,
-      primaryContactEmail: args.primaryContactEmail,
-      primaryContactPhone: args.primaryContactPhone,
-      accessibilityNeeds: ((args.accessibilityNeeds != null) ? args.accessibilityNeeds : []),
-      serviceRequirements: args.serviceRequirements,
-      operationalRequirements: args.operationalRequirements,
-      budgetAmount: args.budgetAmount,
-      quotedPrice: args.quotedPrice,
       stage: "planning",
-      plannedAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      accessibilityNeeds: args.accessibilityNeeds,
+      assignedToId: args.assignedToId,
+      budgetAmount: args.budgetAmount,
+      clientId: args.clientId,
+      endsAt: args.endsAt,
+      eventType: args.eventType,
+      expectedHeadcount: args.expectedHeadcount,
+      operationalRequirements: args.operationalRequirements,
+      primaryContactEmail: args.primaryContactEmail,
+      primaryContactName: args.primaryContactName,
+      primaryContactPhone: args.primaryContactPhone,
+      quotedPrice: args.quotedPrice,
+      serviceRequirements: args.serviceRequirements,
+      startsAt: args.startsAt,
+      title: args.title,
+      venueAddress: args.venueAddress,
+      venueId: args.venueId,
+      venueName: args.venueName
     };
-    const __storedSeed = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __seed);
-    const docId = await ctx.db.insert("events", __storedSeed as any);
-    try {
-      await __runEventPlanEngagement(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may read events");
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may write events through commands");
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may execute event commands");
+    if (!((__draft.stage === "planning"))) throw new Error("Guard 0 failed");
+    if (!((__draft.plannedAt == null))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((((title).trim()).length > 0))) throw new Error("Event title is required");
+    if (!((((eventType).trim()).length > 0))) throw new Error("Event type is required");
+    if (!((endsAt > startsAt))) throw new Error("Event end must be after its start");
+    if (!(((expectedHeadcount >= 1) && (expectedHeadcount <= 100000)))) throw new Error("Headcount must be between 1 and 100000");
+    if (!((((primaryContactName).trim()).length > 0))) throw new Error("Primary contact name is required");
+    if (!(((budgetAmount >= 0) && (quotedPrice >= 0)))) throw new Error("Event pricing cannot be negative");
+    const doc: Record<string, any> = {
+      ...__draft,
+      clientId: clientId,
+      title: title,
+      eventType: eventType,
+      startsAt: startsAt,
+      endsAt: endsAt,
+      venueId: venueId,
+      venueName: venueName,
+      venueAddress: venueAddress,
+      expectedHeadcount: expectedHeadcount,
+      primaryContactName: primaryContactName,
+      primaryContactEmail: primaryContactEmail,
+      primaryContactPhone: primaryContactPhone,
+      accessibilityNeeds: ((accessibilityNeeds != null) ? accessibilityNeeds : []),
+      serviceRequirements: serviceRequirements,
+      operationalRequirements: operationalRequirements,
+      budgetAmount: budgetAmount,
+      quotedPrice: quotedPrice,
+      assignedToId: assignedToId,
+      plannedAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], doc);
+    const docId = await ctx.db.insert("events", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, eventId: docId, tenantId: doc.tenantId, clientId: doc.clientId, venueId: doc.venueId, startsAt: doc.startsAt, endsAt: doc.endsAt, expectedHeadcount: doc.expectedHeadcount, _subject: { entity: "Event", command: "planEngagement", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "EventPlanned", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: doc.tenantId, clientId: doc.clientId, venueId: doc.venueId, startsAt: doc.startsAt, endsAt: doc.endsAt, expectedHeadcount: doc.expectedHeadcount }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -3027,27 +3192,47 @@ export const EventAllergenCheck_createViaRecord = mutation({
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const __seed: Record<string, any> = {
+    const { eventId, result, eventDishId, dishId, flaggedAllergens, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      dishId: args.dishId,
+      eventDishId: args.eventDishId,
       eventId: args.eventId,
-      eventDishId: ((args.eventDishId != null) ? args.eventDishId : args.eventDishId),
-      dishId: ((args.dishId != null) ? args.dishId : args.dishId),
-      result: args.result,
-      flaggedAllergens: args.nextFlags,
-      notes: ((args.notes != null) ? args.notes : args.notes),
+      flaggedAllergens: args.flaggedAllergens,
+      notes: args.notes,
+      result: args.result
+    };
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may read event allergen checks");
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may write event allergen checks through commands");
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may execute event allergen check commands");
+    if (!((__draft.status === "pending"))) throw new Error("Guard 0 failed");
+    if (!((__draft.checkedAt == null))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
+    if (!((user.id != null))) throw new Error("Guard 4 failed");
+    if (!((eventId === __draft.eventId))) throw new Error("Record eventId must match the seeded event reference");
+    if (!((((eventDishId == null) || (__draft.eventDishId == null)) || (eventDishId === __draft.eventDishId)))) throw new Error("Record eventDishId must match the seeded event dish reference when provided");
+    if (!((((dishId == null) || (__draft.dishId == null)) || (dishId === __draft.dishId)))) throw new Error("Record dishId must match the seeded dish reference when provided");
+    if (!((((result === "pass") && ((flaggedAllergens == null) || ((flaggedAllergens).length === 0))) || (((result === "flagged") && (flaggedAllergens != null)) && ((flaggedAllergens).length > 0))))) throw new Error("Pass requires no flagged allergens; flagged requires at least one");
+    const doc: Record<string, any> = {
+      ...__draft,
+      eventId: eventId,
+      eventDishId: ((eventDishId != null) ? eventDishId : __draft.eventDishId),
+      dishId: ((dishId != null) ? dishId : __draft.dishId),
+      result: result,
+      flaggedAllergens: __draft.nextFlags,
+      notes: ((notes != null) ? notes : __draft.notes),
       checkedById: user.id,
       status: "recorded",
       checkedAt: Date.now(),
-      version: 0
+      version: 1,
     };
-    const docId = await ctx.db.insert("eventAllergenChecks", __seed as any);
-    try {
-      await __runEventAllergenCheckRecord(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    const docId = await ctx.db.insert("eventAllergenChecks", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, allergenCheckId: docId, tenantId: doc.tenantId, eventId: doc.eventId, eventDishId: ((doc.eventDishId != null) ? doc.eventDishId : doc.eventDishId), dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), result: doc.result, flaggedAllergens: doc.nextFlags, checkedById: user.id, status: "recorded", _subject: { entity: "EventAllergenCheck", command: "record", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "EventAllergenCheckRecorded", entity: "EventAllergenCheck", entityId: docId, payload: { allergenCheckId: docId, tenantId: doc.tenantId, eventId: doc.eventId, eventDishId: ((doc.eventDishId != null) ? doc.eventDishId : doc.eventDishId), dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), result: doc.result, flaggedAllergens: doc.nextFlags, checkedById: user.id, status: "recorded" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -3117,27 +3302,49 @@ export const EventAssignment_createViaAssign = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { eventId, personId, role, startsAt, endsAt, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
+      status: "assigned",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      endsAt: args.endsAt,
       eventId: args.eventId,
+      notes: args.notes,
       personId: args.personId,
       role: args.role,
-      startsAt: ((args.startsAt != null) ? args.startsAt : args.startsAt),
-      endsAt: ((args.endsAt != null) ? args.endsAt : args.endsAt),
-      notes: ((args.notes != null) ? args.notes : args.notes),
-      status: "assigned",
-      assignedAt: Date.now(),
-      version: 0
+      startsAt: args.startsAt
     };
-    const __storedSeed = await __encryptDoc(ctx, "EventAssignment", ["notes"], __seed);
-    const docId = await ctx.db.insert("eventAssignments", __storedSeed as any);
-    try {
-      await __runEventAssignmentAssign(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read event assignments");
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write event assignments through commands");
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute event assignment commands");
+    if (!((__draft.assignedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "assigned"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
+    if (!(((__draft.person != null) && (__draft.person.status === "active")))) throw new Error("Guard 4 failed");
+    if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Guard 5 failed");
+    if (!((eventId === __draft.eventId))) throw new Error("Assign eventId must match the seeded event reference");
+    if (!((personId === __draft.personId))) throw new Error("Assign personId must match the seeded person reference");
+    if (!((((role).trim()).length > 0))) throw new Error("Assignment role is required");
+    if (!((((startsAt == null) || (endsAt == null)) || (endsAt > startsAt)))) throw new Error("Assignment shift end must be after its start");
+    const doc: Record<string, any> = {
+      ...__draft,
+      eventId: eventId,
+      personId: personId,
+      role: role,
+      startsAt: ((startsAt != null) ? startsAt : __draft.startsAt),
+      endsAt: ((endsAt != null) ? endsAt : __draft.endsAt),
+      notes: ((notes != null) ? notes : __draft.notes),
+      assignedAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "EventAssignment", ["notes"], doc);
+    const docId = await ctx.db.insert("eventAssignments", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, eventAssignmentId: docId, tenantId: doc.tenantId, eventId: doc.eventId, personId: doc.personId, role: doc.role, startsAt: ((doc.startsAt != null) ? doc.startsAt : doc.startsAt), endsAt: ((doc.endsAt != null) ? doc.endsAt : doc.endsAt), status: "assigned", _subject: { entity: "EventAssignment", command: "assign", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "EventAssignmentAssigned", entity: "EventAssignment", entityId: docId, payload: { eventAssignmentId: docId, tenantId: doc.tenantId, eventId: doc.eventId, personId: doc.personId, role: doc.role, startsAt: ((doc.startsAt != null) ? doc.startsAt : doc.startsAt), endsAt: ((doc.endsAt != null) ? doc.endsAt : doc.endsAt), status: "assigned" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -3497,37 +3704,71 @@ export const EventCloseout_createViaCapture = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { eventId, actualRevenue, budgetedRevenue, revenueVariance, actualIngredientCost, actualWasteCost, actualLaborCost, actualVendorCost, budgetedCost, totalActualCost, costVariance, grossProfit, expectedHeadcount, actualHeadcount, unresolvedIssues, performanceNotes, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      eventId: args.eventId,
-      actualRevenue: args.actualRevenue,
-      budgetedRevenue: args.budgetedRevenue,
-      revenueVariance: args.revenueVariance,
-      actualIngredientCost: args.actualIngredientCost,
-      actualWasteCost: args.actualWasteCost,
-      actualLaborCost: args.actualLaborCost,
-      actualVendorCost: args.actualVendorCost,
-      budgetedCost: args.budgetedCost,
-      totalActualCost: args.totalActualCost,
-      costVariance: args.costVariance,
-      grossProfit: args.grossProfit,
-      expectedHeadcount: args.expectedHeadcount,
-      actualHeadcount: args.actualHeadcount,
-      unresolvedIssues: args.unresolvedIssues,
-      performanceNotes: args.performanceNotes,
-      notes: args.notes,
       status: "draft",
-      capturedAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      actualHeadcount: args.actualHeadcount,
+      actualIngredientCost: args.actualIngredientCost,
+      actualLaborCost: args.actualLaborCost,
+      actualRevenue: args.actualRevenue,
+      actualVendorCost: args.actualVendorCost,
+      actualWasteCost: args.actualWasteCost,
+      budgetedCost: args.budgetedCost,
+      budgetedRevenue: args.budgetedRevenue,
+      costVariance: args.costVariance,
+      eventId: args.eventId,
+      expectedHeadcount: args.expectedHeadcount,
+      grossProfit: args.grossProfit,
+      notes: args.notes,
+      performanceNotes: args.performanceNotes,
+      revenueVariance: args.revenueVariance,
+      totalActualCost: args.totalActualCost,
+      unresolvedIssues: args.unresolvedIssues
     };
-    const docId = await ctx.db.insert("eventCloseouts", __seed as any);
-    try {
-      await __runEventCloseoutCapture(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read event closeouts");
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write event closeouts through commands");
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute event closeout commands");
+    if (!((__draft.status === "draft"))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((__draft.event != null))) throw new Error("Guard 2 failed");
+    if (!((__draft.event.stage === "closed_out"))) throw new Error("Guard 3 failed");
+    if (!((eventId === __draft.eventId))) throw new Error("Capture eventId must match the seeded event reference");
+    if (!(((((((((actualRevenue >= 0) && (budgetedRevenue >= 0)) && (actualIngredientCost >= 0)) && (actualWasteCost >= 0)) && (actualLaborCost >= 0)) && (actualVendorCost >= 0)) && (budgetedCost >= 0)) && (totalActualCost >= 0)))) throw new Error("Closeout money amounts cannot be negative");
+    if (!((totalActualCost === (((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost)))) throw new Error("Total actual cost must equal ingredient plus waste plus labor plus vendor costs");
+    if (!((revenueVariance === (budgetedRevenue - actualRevenue)))) throw new Error("Revenue variance must equal budgeted revenue minus actual revenue");
+    if (!((costVariance === (budgetedCost - totalActualCost)))) throw new Error("Cost variance must equal budgeted cost minus total actual cost");
+    if (!((grossProfit === (actualRevenue - totalActualCost)))) throw new Error("Gross profit must equal actual revenue minus total actual cost");
+    if (!(((expectedHeadcount >= 0) && (actualHeadcount >= 0)))) throw new Error("Headcount values cannot be negative");
+    const doc: Record<string, any> = {
+      ...__draft,
+      eventId: eventId,
+      actualRevenue: actualRevenue,
+      budgetedRevenue: budgetedRevenue,
+      revenueVariance: revenueVariance,
+      actualIngredientCost: actualIngredientCost,
+      actualWasteCost: actualWasteCost,
+      actualLaborCost: actualLaborCost,
+      actualVendorCost: actualVendorCost,
+      budgetedCost: budgetedCost,
+      totalActualCost: totalActualCost,
+      costVariance: costVariance,
+      grossProfit: grossProfit,
+      expectedHeadcount: expectedHeadcount,
+      actualHeadcount: actualHeadcount,
+      unresolvedIssues: unresolvedIssues,
+      performanceNotes: performanceNotes,
+      notes: notes,
+      capturedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("eventCloseouts", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, closeoutId: docId, tenantId: doc.tenantId, eventId: doc.eventId, actualRevenue: doc.actualRevenue, totalActualCost: doc.totalActualCost, grossProfit: doc.grossProfit, actualHeadcount: doc.actualHeadcount, status: "draft", _subject: { entity: "EventCloseout", command: "capture", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "EventCloseoutCaptured", entity: "EventCloseout", entityId: docId, payload: { closeoutId: docId, tenantId: doc.tenantId, eventId: doc.eventId, actualRevenue: doc.actualRevenue, totalActualCost: doc.totalActualCost, grossProfit: doc.grossProfit, actualHeadcount: doc.actualHeadcount, status: "draft" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -3750,25 +3991,42 @@ export const EventDish_createViaSelect = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { eventId, dishId, quantityServings, course, serviceStyle, specialInstructions } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      eventId: args.eventId,
-      dishId: args.dishId,
-      quantityServings: args.quantityServings,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       course: args.course,
+      dishId: args.dishId,
+      eventId: args.eventId,
+      quantityServings: args.quantityServings,
       serviceStyle: args.serviceStyle,
-      specialInstructions: args.specialInstructions,
-      selectedAt: Date.now(),
-      version: 0
+      specialInstructions: args.specialInstructions
     };
-    const docId = await ctx.db.insert("eventDishes", __seed as any);
-    try {
-      await __runEventDishSelect(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may read event dish selections");
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may write event dish selections through commands");
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may execute event dish selection commands");
+    if (!((__draft.selectedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!(((__draft.event != null) && (((__draft.event.stage === "planning") || (__draft.event.stage === "pending_approval")) || (__draft.event.stage === "approved"))))) throw new Error("Guard 2 failed");
+    if (!((eventId === __draft.eventId))) throw new Error("Select eventId must match the seeded event reference");
+    if (!((quantityServings > 0))) throw new Error("Event dish servings must be positive");
+    const doc: Record<string, any> = {
+      ...__draft,
+      eventId: eventId,
+      dishId: dishId,
+      quantityServings: quantityServings,
+      course: course,
+      serviceStyle: serviceStyle,
+      specialInstructions: specialInstructions,
+      selectedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("eventDishes", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, eventDishId: docId, tenantId: doc.tenantId, eventId: doc.eventId, dishId: doc.dishId, quantityServings: doc.quantityServings, course: doc.course, serviceStyle: doc.serviceStyle, _subject: { entity: "EventDish", command: "select", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "EventDishSelected", entity: "EventDish", entityId: docId, payload: { eventDishId: docId, tenantId: doc.tenantId, eventId: doc.eventId, dishId: doc.dishId, quantityServings: doc.quantityServings, course: doc.course, serviceStyle: doc.serviceStyle }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -3959,29 +4217,46 @@ export const EventGuest_createViaInvite = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { eventId, name, email, phone, dietaryRestrictions, allergenRestrictions, accessibilityNeeds, specialMealRequired } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      accessibilityNeeds: args.accessibilityNeeds,
+      allergenRestrictions: args.allergenRestrictions,
+      dietaryRestrictions: args.dietaryRestrictions,
+      email: args.email,
       eventId: args.eventId,
       name: args.name,
-      email: args.email,
       phone: args.phone,
-      dietaryRestrictions: ((args.dietaryRestrictions != null) ? args.dietaryRestrictions : []),
-      allergenRestrictions: ((args.allergenRestrictions != null) ? args.allergenRestrictions : []),
-      accessibilityNeeds: ((args.accessibilityNeeds != null) ? args.accessibilityNeeds : []),
-      specialMealRequired: ((args.specialMealRequired != null) ? args.specialMealRequired : false),
+      specialMealRequired: args.specialMealRequired
+    };
+    if (!(checkRole(user.role, "eventAccess"))) throw new Error("Event staff may read guest attendance");
+    if (!(checkRole(user.role, "eventAccess"))) throw new Error("Event staff may write guest attendance through commands");
+    if (!(checkRole(user.role, "eventAccess"))) throw new Error("Event staff may execute guest attendance commands");
+    if (!((__draft.invitedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((((name).trim()).length > 0))) throw new Error("Guest name is required");
+    const doc: Record<string, any> = {
+      ...__draft,
+      eventId: eventId,
+      name: name,
+      email: email,
+      phone: phone,
+      dietaryRestrictions: ((dietaryRestrictions != null) ? dietaryRestrictions : []),
+      allergenRestrictions: ((allergenRestrictions != null) ? allergenRestrictions : []),
+      accessibilityNeeds: ((accessibilityNeeds != null) ? accessibilityNeeds : []),
+      specialMealRequired: ((specialMealRequired != null) ? specialMealRequired : false),
       rsvpStatus: "pending",
       invitedAt: Date.now(),
-      version: 0
+      version: 1,
     };
-    const __storedSeed = await __encryptDoc(ctx, "EventGuest", ["email","phone"], __seed);
-    const docId = await ctx.db.insert("eventGuests", __storedSeed as any);
-    try {
-      await __runEventGuestInvite(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    const __storedDoc = await __encryptDoc(ctx, "EventGuest", ["email","phone"], doc);
+    const docId = await ctx.db.insert("eventGuests", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, guestId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: doc.name, _subject: { entity: "EventGuest", command: "invite", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "EventGuestInvited", entity: "EventGuest", entityId: docId, payload: { guestId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: doc.name }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -4340,28 +4615,50 @@ export const Incident_createViaReport = mutation({
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const __seed: Record<string, any> = {
+    const { eventId, severity, category, description, prepTaskId, deliveryId, shiftId } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      eventId: args.eventId,
-      prepTaskId: ((args.prepTaskId != null) ? args.prepTaskId : args.prepTaskId),
-      deliveryId: ((args.deliveryId != null) ? args.deliveryId : args.deliveryId),
-      shiftId: ((args.shiftId != null) ? args.shiftId : args.shiftId),
-      severity: args.severity,
-      category: args.category,
-      description: args.description,
-      reportedById: user.id,
       status: "open",
-      reportedAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      category: args.category,
+      deliveryId: args.deliveryId,
+      description: args.description,
+      eventId: args.eventId,
+      prepTaskId: args.prepTaskId,
+      severity: args.severity,
+      shiftId: args.shiftId
     };
-    const docId = await ctx.db.insert("incidents", __seed as any);
-    try {
-      await __runIncidentReport(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may read incidents");
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may write incidents through commands");
+    if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may execute incident commands");
+    if (!((__draft.reportedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "open"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
+    if (!((user.id != null))) throw new Error("Guard 4 failed");
+    if (!((eventId === __draft.eventId))) throw new Error("Report eventId must match the seeded event reference");
+    if (!((((prepTaskId == null) || (__draft.prepTaskId == null)) || (prepTaskId === __draft.prepTaskId)))) throw new Error("Report prepTaskId must match the seeded prep task reference when provided");
+    if (!((((deliveryId == null) || (__draft.deliveryId == null)) || (deliveryId === __draft.deliveryId)))) throw new Error("Report deliveryId must match the seeded delivery reference when provided");
+    if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("Report shiftId must match the seeded shift reference when provided");
+    if (!((((description).trim()).length > 0))) throw new Error("Incident description is required");
+    const doc: Record<string, any> = {
+      ...__draft,
+      eventId: eventId,
+      prepTaskId: ((prepTaskId != null) ? prepTaskId : __draft.prepTaskId),
+      deliveryId: ((deliveryId != null) ? deliveryId : __draft.deliveryId),
+      shiftId: ((shiftId != null) ? shiftId : __draft.shiftId),
+      severity: severity,
+      category: category,
+      description: description,
+      reportedById: user.id,
+      reportedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("incidents", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, incidentId: docId, tenantId: doc.tenantId, eventId: doc.eventId, severity: doc.severity, category: doc.category, reportedById: user.id, status: "open", _subject: { entity: "Incident", command: "report", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "IncidentReported", entity: "Incident", entityId: docId, payload: { incidentId: docId, tenantId: doc.tenantId, eventId: doc.eventId, severity: doc.severity, category: doc.category, reportedById: user.id, status: "open" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -4504,25 +4801,40 @@ export const Ingredient_createViaIntroduce = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { name, unit, costPerUnit, allergens, category } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      name: args.name,
-      unit: args.unit,
-      allergens: ((args.allergens != null) ? args.allergens : []),
-      costPerUnit: args.costPerUnit,
-      category: args.category,
       status: "active",
-      introducedAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      allergens: args.allergens,
+      category: args.category,
+      costPerUnit: args.costPerUnit,
+      name: args.name,
+      unit: args.unit
     };
-    const docId = await ctx.db.insert("ingredients", __seed as any);
-    try {
-      await __runIngredientIntroduce(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read ingredients");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write ingredients through commands");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute ingredient commands");
+    if (!((__draft.introducedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((((name).trim()).length > 0))) throw new Error("Ingredient name is required");
+    if (!((costPerUnit >= 0))) throw new Error("Ingredient cost per unit cannot be negative");
+    const doc: Record<string, any> = {
+      ...__draft,
+      name: name,
+      unit: unit,
+      costPerUnit: costPerUnit,
+      allergens: ((allergens != null) ? allergens : []),
+      category: category,
+      introducedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("ingredients", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, ingredientId: docId, tenantId: doc.tenantId, name: doc.name, unit: doc.unit, costPerUnit: doc.costPerUnit, allergens: ((doc.allergens != null) ? doc.allergens : []), _subject: { entity: "Ingredient", command: "introduce", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "IngredientIntroduced", entity: "Ingredient", entityId: docId, payload: { ingredientId: docId, tenantId: doc.tenantId, name: doc.name, unit: doc.unit, costPerUnit: doc.costPerUnit, allergens: ((doc.allergens != null) ? doc.allergens : []) }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -4738,29 +5050,56 @@ export const IngredientDemand_createViaCalculate = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { eventId, ingredientId, requiredQuantity, unit, servings, dishId, sourceRecipeLineQuantity, sourceBatchMultiplier, sourceYieldQuantity } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      dishId: args.dishId,
       eventId: args.eventId,
       ingredientId: args.ingredientId,
       requiredQuantity: args.requiredQuantity,
-      unit: args.unit,
-      servings: ((args.servings != null) ? args.servings : args.servings),
-      dishId: ((args.dishId != null) ? args.dishId : args.dishId),
-      sourceRecipeLineQuantity: ((args.sourceRecipeLineQuantity != null) ? args.sourceRecipeLineQuantity : args.sourceRecipeLineQuantity),
-      sourceBatchMultiplier: ((args.sourceBatchMultiplier != null) ? args.sourceBatchMultiplier : args.sourceBatchMultiplier),
-      sourceYieldQuantity: ((args.sourceYieldQuantity != null) ? args.sourceYieldQuantity : args.sourceYieldQuantity),
+      servings: args.servings,
+      sourceBatchMultiplier: args.sourceBatchMultiplier,
+      sourceRecipeLineQuantity: args.sourceRecipeLineQuantity,
+      sourceYieldQuantity: args.sourceYieldQuantity,
+      unit: args.unit
+    };
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read ingredient demand");
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write ingredient demand through commands");
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute ingredient demand commands");
+    if (!((__draft.calculatedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
+    if (!(((__draft.ingredient != null) && (__draft.ingredient.status === "active")))) throw new Error("Guard 4 failed");
+    if (!((eventId === __draft.eventId))) throw new Error("Calculate eventId must match the seeded event reference");
+    if (!((ingredientId === __draft.ingredientId))) throw new Error("Calculate ingredientId must match the seeded ingredient reference");
+    if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
+    if (!(((servings == null) || (servings >= 0)))) throw new Error("Servings cannot be negative");
+    if (!(((sourceRecipeLineQuantity == null) || (sourceRecipeLineQuantity >= 0)))) throw new Error("Source recipe line quantity cannot be negative");
+    if (!(((sourceBatchMultiplier == null) || (sourceBatchMultiplier >= 0)))) throw new Error("Source batch multiplier cannot be negative");
+    if (!(((sourceYieldQuantity == null) || (sourceYieldQuantity > 0)))) throw new Error("Source yield quantity must be positive when provided");
+    const doc: Record<string, any> = {
+      ...__draft,
+      eventId: eventId,
+      ingredientId: ingredientId,
+      requiredQuantity: requiredQuantity,
+      unit: unit,
+      servings: ((servings != null) ? servings : __draft.servings),
+      dishId: ((dishId != null) ? dishId : __draft.dishId),
+      sourceRecipeLineQuantity: ((sourceRecipeLineQuantity != null) ? sourceRecipeLineQuantity : __draft.sourceRecipeLineQuantity),
+      sourceBatchMultiplier: ((sourceBatchMultiplier != null) ? sourceBatchMultiplier : __draft.sourceBatchMultiplier),
+      sourceYieldQuantity: ((sourceYieldQuantity != null) ? sourceYieldQuantity : __draft.sourceYieldQuantity),
       status: "calculated",
       calculatedAt: Date.now(),
-      version: 0
+      version: 1,
     };
-    const docId = await ctx.db.insert("ingredientDemands", __seed as any);
-    try {
-      await __runIngredientDemandCalculate(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    const docId = await ctx.db.insert("ingredientDemands", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, ingredientDemandId: docId, tenantId: doc.tenantId, eventId: doc.eventId, ingredientId: doc.ingredientId, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, servings: ((doc.servings != null) ? doc.servings : doc.servings), _subject: { entity: "IngredientDemand", command: "calculate", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "IngredientDemandCalculated", entity: "IngredientDemand", entityId: docId, payload: { ingredientDemandId: docId, tenantId: doc.tenantId, eventId: doc.eventId, ingredientId: doc.ingredientId, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, servings: ((doc.servings != null) ? doc.servings : doc.servings) }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -5057,26 +5396,47 @@ export const InventoryItem_createViaOpen = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { ingredientId, locationId, unit, quantityOnHand, parLevel, reorderThreshold, unitCost } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       ingredientId: args.ingredientId,
       locationId: args.locationId,
-      quantityOnHand: ((args.quantityOnHand != null) ? args.quantityOnHand : 0),
+      parLevel: args.parLevel,
+      quantityOnHand: args.quantityOnHand,
+      reorderThreshold: args.reorderThreshold,
       unit: args.unit,
-      parLevel: ((args.parLevel != null) ? args.parLevel : 0),
-      reorderThreshold: ((args.reorderThreshold != null) ? args.reorderThreshold : 0),
-      unitCost: ((args.unitCost != null) ? args.unitCost : 0),
-      stockedAt: Date.now(),
-      version: 0
+      unitCost: args.unitCost
     };
-    const docId = await ctx.db.insert("inventoryItems", __seed as any);
-    try {
-      await __runInventoryItemOpen(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read stock items");
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write stock items through commands");
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute stock item commands");
+    if (!((__draft.stockedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((ingredientId === __draft.ingredientId))) throw new Error("Open ingredientId must match the seeded ingredient reference");
+    if (!((locationId === __draft.locationId))) throw new Error("Open locationId must match the seeded location reference");
+    if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("Quantity on hand cannot be negative");
+    if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("Par level cannot be negative");
+    if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("Reorder threshold cannot be negative");
+    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Unit cost cannot be negative");
+    const doc: Record<string, any> = {
+      ...__draft,
+      ingredientId: ingredientId,
+      locationId: locationId,
+      unit: unit,
+      quantityOnHand: ((quantityOnHand != null) ? quantityOnHand : 0),
+      parLevel: ((parLevel != null) ? parLevel : 0),
+      reorderThreshold: ((reorderThreshold != null) ? reorderThreshold : 0),
+      unitCost: ((unitCost != null) ? unitCost : 0),
+      stockedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("inventoryItems", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, inventoryItemId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, previousQuantity: doc.previousQuantity, quantityOnHand: ((doc.quantityOnHand != null) ? doc.quantityOnHand : 0), unit: doc.unit, unitCost: ((doc.unitCost != null) ? doc.unitCost : 0), _subject: { entity: "InventoryItem", command: "open", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "InventoryItemOpened", entity: "InventoryItem", entityId: docId, payload: { inventoryItemId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, previousQuantity: doc.previousQuantity, quantityOnHand: ((doc.quantityOnHand != null) ? doc.quantityOnHand : 0), unit: doc.unit, unitCost: ((doc.unitCost != null) ? doc.unitCost : 0) }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -5482,24 +5842,43 @@ export const InventoryReservation_createViaReserve = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { inventoryItemId, eventId, ingredientId, quantity } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      inventoryItemId: args.inventoryItemId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       eventId: args.eventId,
       ingredientId: args.ingredientId,
-      quantity: args.quantity,
+      inventoryItemId: args.inventoryItemId,
+      quantity: args.quantity
+    };
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read inventory reservations");
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write inventory reservations through commands");
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute inventory reservation commands");
+    if (!((__draft.reservedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!(((__draft.event != null) && ((((__draft.event.stage === "planning") || (__draft.event.stage === "pending_approval")) || (__draft.event.stage === "approved")) || (__draft.event.stage === "executing"))))) throw new Error("Guard 3 failed");
+    if (!((((__draft.inventoryItem != null) && (__draft.inventoryItem.stockedAt != null)) && (__draft.inventoryItem.deletedAt == null)))) throw new Error("Guard 4 failed");
+    if (!((inventoryItemId === __draft.inventoryItemId))) throw new Error("Reserve inventoryItemId must match the seeded stock reference");
+    if (!((eventId === __draft.eventId))) throw new Error("Reserve eventId must match the seeded event reference");
+    if (!((ingredientId === __draft.inventoryItem.ingredientId))) throw new Error("Reserve ingredientId must match the stock ingredient");
+    if (!((quantity > 0))) throw new Error("Reservation quantity must be positive");
+    const doc: Record<string, any> = {
+      ...__draft,
+      inventoryItemId: inventoryItemId,
+      eventId: eventId,
+      ingredientId: ingredientId,
+      quantity: quantity,
       status: "active",
       reservedAt: Date.now(),
-      version: 0
+      version: 1,
     };
-    const docId = await ctx.db.insert("inventoryReservations", __seed as any);
-    try {
-      await __runInventoryReservationReserve(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    const docId = await ctx.db.insert("inventoryReservations", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, inventoryReservationId: docId, tenantId: doc.tenantId, inventoryItemId: doc.inventoryItemId, eventId: doc.eventId, ingredientId: doc.ingredientId, quantity: doc.quantity, _subject: { entity: "InventoryReservation", command: "reserve", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "InventoryReserved", entity: "InventoryReservation", entityId: docId, payload: { inventoryReservationId: docId, tenantId: doc.tenantId, inventoryItemId: doc.inventoryItemId, eventId: doc.eventId, ingredientId: doc.ingredientId, quantity: doc.quantity }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -5634,32 +6013,57 @@ export const Invoice_createViaIssue = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { clientId, invoiceNumber, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
+      status: "draft",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       clientId: args.clientId,
-      eventId: ((args.eventId != null) ? args.eventId : args.eventId),
+      discountAmount: args.discountAmount,
+      dueDate: args.dueDate,
+      eventId: args.eventId,
       invoiceNumber: args.invoiceNumber,
+      notes: args.notes,
+      paymentTermsDays: args.paymentTermsDays,
       subtotal: args.subtotal,
       taxAmount: args.taxAmount,
-      discountAmount: args.discountAmount,
-      total: args.total,
-      amountPaid: 0,
-      amountDue: args.total,
-      paymentTermsDays: ((args.paymentTermsDays != null) ? args.paymentTermsDays : 30),
-      dueDate: args.dueDate,
-      notes: args.notes,
-      status: "draft",
-      issuedAt: Date.now(),
-      version: 0
+      total: args.total
     };
-    const docId = await ctx.db.insert("invoices", __seed as any);
-    try {
-      await __runInvoiceIssue(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
+    if (!((__draft.issuedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.client != null))) throw new Error("Guard 3 failed");
+    if (!((clientId === __draft.clientId))) throw new Error("Issue clientId must match the seeded client reference");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Issue eventId must match the seeded event reference when both are set");
+    if (!((((invoiceNumber).trim()).length > 0))) throw new Error("Invoice number is required");
+    if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("Invoice money amounts cannot be negative");
+    if (!((total === ((subtotal + taxAmount) - discountAmount)))) throw new Error("Invoice total must equal subtotal plus tax minus discount");
+    const doc: Record<string, any> = {
+      ...__draft,
+      clientId: clientId,
+      eventId: ((eventId != null) ? eventId : __draft.eventId),
+      invoiceNumber: invoiceNumber,
+      subtotal: subtotal,
+      taxAmount: taxAmount,
+      discountAmount: discountAmount,
+      total: total,
+      amountPaid: 0,
+      amountDue: total,
+      paymentTermsDays: ((paymentTermsDays != null) ? paymentTermsDays : 30),
+      dueDate: dueDate,
+      notes: notes,
+      issuedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("invoices", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, invoiceId: docId, tenantId: doc.tenantId, clientId: doc.clientId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), invoiceNumber: doc.invoiceNumber, total: doc.total, amountDue: doc.total, _subject: { entity: "Invoice", command: "issue", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "InvoiceIssued", entity: "Invoice", entityId: docId, payload: { invoiceId: docId, tenantId: doc.tenantId, clientId: doc.clientId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), invoiceNumber: doc.invoiceNumber, total: doc.total, amountDue: doc.total }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -6077,28 +6481,47 @@ export const Menu_createViaDraft = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { name, description, category, isTemplate, basePrice, pricePerPerson, minGuests, maxGuests } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      name: args.name,
-      description: args.description,
-      category: args.category,
-      isTemplate: ((args.isTemplate != null) ? args.isTemplate : false),
-      basePrice: ((args.basePrice != null) ? args.basePrice : 0),
-      pricePerPerson: ((args.pricePerPerson != null) ? args.pricePerPerson : 0),
-      minGuests: ((args.minGuests != null) ? args.minGuests : 0),
-      maxGuests: ((args.maxGuests != null) ? args.maxGuests : 0),
       status: "draft",
-      draftedAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      basePrice: args.basePrice,
+      category: args.category,
+      description: args.description,
+      isTemplate: args.isTemplate,
+      maxGuests: args.maxGuests,
+      minGuests: args.minGuests,
+      name: args.name,
+      pricePerPerson: args.pricePerPerson
     };
-    const docId = await ctx.db.insert("menus", __seed as any);
-    try {
-      await __runMenuDraft(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read menus");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write menus through commands");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute menu commands");
+    if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((((name).trim()).length > 0))) throw new Error("Menu name is required");
+    if (!((((basePrice == null) || (basePrice >= 0)) && ((pricePerPerson == null) || (pricePerPerson >= 0))))) throw new Error("Menu pricing cannot be negative");
+    if (!(((((minGuests == null) || (minGuests >= 0)) && ((maxGuests == null) || (maxGuests >= 0))) && ((((minGuests == null) || (maxGuests == null)) || (maxGuests === 0)) || (maxGuests >= minGuests))))) throw new Error("Menu max guests must be zero (unlimited) or at least min guests");
+    const doc: Record<string, any> = {
+      ...__draft,
+      name: name,
+      description: description,
+      category: category,
+      isTemplate: ((isTemplate != null) ? isTemplate : false),
+      basePrice: ((basePrice != null) ? basePrice : 0),
+      pricePerPerson: ((pricePerPerson != null) ? pricePerPerson : 0),
+      minGuests: ((minGuests != null) ? minGuests : 0),
+      maxGuests: ((maxGuests != null) ? maxGuests : 0),
+      draftedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("menus", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, menuId: docId, tenantId: doc.tenantId, name: doc.name, isTemplate: ((doc.isTemplate != null) ? doc.isTemplate : false), _subject: { entity: "Menu", command: "draft", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "MenuDrafted", entity: "Menu", entityId: docId, payload: { menuId: docId, tenantId: doc.tenantId, name: doc.name, isTemplate: ((doc.isTemplate != null) ? doc.isTemplate : false) }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -6463,20 +6886,30 @@ export const Organization_createViaRegister = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { name } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      name: args.name,
       status: "active",
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      name: args.name
     };
-    const docId = await ctx.db.insert("organizations", __seed as any);
-    try {
-      await __runOrganizationRegister(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "staffAccess"))) throw new Error("Staff may read organization records");
+    if (!(checkRole(user.role, "manageAccess"))) throw new Error("Managers may write organization records");
+    if (!(checkRole(user.role, "manageAccess"))) throw new Error("Managers may execute organization commands");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!(checkRole(user.role, "adminAccess"))) throw new Error("Guard 1 failed");
+    if (!((((name).trim()).length > 0))) throw new Error("Organization name is required");
+    const doc: Record<string, any> = {
+      ...__draft,
+      name: name,
+      version: 1,
+    };
+    const docId = await ctx.db.insert("organizations", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, organizationId: docId, tenantId: doc.tenantId, name: doc.name, _subject: { entity: "Organization", command: "register", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "OrganizationRegistered", entity: "Organization", entityId: docId, payload: { organizationId: docId, tenantId: doc.tenantId, name: doc.name }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -6820,25 +7253,41 @@ export const PackList_createViaOpen = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { eventId, name, purpose, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
+      status: "draft",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       eventId: args.eventId,
       name: args.name,
-      purpose: ((args.purpose != null) ? args.purpose : args.purpose),
-      notes: ((args.notes != null) ? args.notes : args.notes),
-      status: "draft",
-      openedAt: Date.now(),
-      version: 0
+      notes: args.notes,
+      purpose: args.purpose
     };
-    const __storedSeed = await __encryptDoc(ctx, "PackList", ["notes"], __seed);
-    const docId = await ctx.db.insert("packLists", __storedSeed as any);
-    try {
-      await __runPackListOpen(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack lists");
+    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack lists through commands");
+    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list commands");
+    if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
+    if (!((eventId === __draft.eventId))) throw new Error("Open eventId must match the seeded event reference");
+    if (!((((name).trim()).length > 0))) throw new Error("Pack list name is required");
+    const doc: Record<string, any> = {
+      ...__draft,
+      eventId: eventId,
+      name: name,
+      purpose: ((purpose != null) ? purpose : __draft.purpose),
+      notes: ((notes != null) ? notes : __draft.notes),
+      openedAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "PackList", ["notes"], doc);
+    const docId = await ctx.db.insert("packLists", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, packListId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: doc.name, purpose: ((doc.purpose != null) ? doc.purpose : doc.purpose), status: "draft", _subject: { entity: "PackList", command: "open", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PackListOpened", entity: "PackList", entityId: docId, payload: { packListId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: doc.name, purpose: ((doc.purpose != null) ? doc.purpose : doc.purpose), status: "draft" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -6968,27 +7417,48 @@ export const PackListItem_createViaAddItem = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { packListId, description, requiredQuantity, unit, dishId, productionBatchId } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      packListId: args.packListId,
-      description: args.description,
-      dishId: ((args.dishId != null) ? args.dishId : args.dishId),
-      productionBatchId: ((args.productionBatchId != null) ? args.productionBatchId : args.productionBatchId),
-      requiredQuantity: args.requiredQuantity,
       packedQuantity: 0,
-      unit: args.unit,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      description: args.description,
+      dishId: args.dishId,
+      packListId: args.packListId,
+      productionBatchId: args.productionBatchId,
+      requiredQuantity: args.requiredQuantity,
+      unit: args.unit
+    };
+    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
+    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
+    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
+    if (!((__draft.listedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((((__draft.packList != null) && (__draft.packList.openedAt != null)) && ((__draft.packList.status === "draft") || (__draft.packList.status === "packing"))))) throw new Error("Guard 3 failed");
+    if (!((packListId === __draft.packListId))) throw new Error("Add item packListId must match the seeded pack list reference");
+    if (!((((dishId == null) || (__draft.dishId == null)) || (dishId === __draft.dishId)))) throw new Error("Add item dishId must match the seeded dish reference when provided");
+    if (!((((productionBatchId == null) || (__draft.productionBatchId == null)) || (productionBatchId === __draft.productionBatchId)))) throw new Error("Add item productionBatchId must match the seeded batch reference when provided");
+    if (!((((description).trim()).length > 0))) throw new Error("Pack item description is required");
+    if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
+    const doc: Record<string, any> = {
+      ...__draft,
+      packListId: packListId,
+      description: description,
+      dishId: ((dishId != null) ? dishId : __draft.dishId),
+      productionBatchId: ((productionBatchId != null) ? productionBatchId : __draft.productionBatchId),
+      requiredQuantity: requiredQuantity,
+      unit: unit,
       status: "listed",
       listedAt: Date.now(),
-      version: 0
+      version: 1,
     };
-    const docId = await ctx.db.insert("packListItems", __seed as any);
-    try {
-      await __runPackListItemAddItem(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    const docId = await ctx.db.insert("packListItems", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, packListItemId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.packList.eventId, description: doc.description, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, status: "listed", _subject: { entity: "PackListItem", command: "addItem", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PackListItemAdded", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.packList.eventId, description: doc.description, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, status: "listed" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -7295,27 +7765,48 @@ export const Payment_createViaRecord = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { invoiceId, clientId, amount, method, eventId, paymentMethodId, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      invoiceId: args.invoiceId,
-      clientId: args.clientId,
-      eventId: ((args.eventId != null) ? args.eventId : args.eventId),
-      amount: args.amount,
-      method: args.method,
       status: "pending",
-      paymentMethodId: args.paymentMethodId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      amount: args.amount,
+      clientId: args.clientId,
+      eventId: args.eventId,
+      invoiceId: args.invoiceId,
+      method: args.method,
       notes: args.notes,
-      recordedAt: Date.now(),
-      version: 0
+      paymentMethodId: args.paymentMethodId
     };
-    const docId = await ctx.db.insert("payments", __seed as any);
-    try {
-      await __runPaymentRecord(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read payments");
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write payments through commands");
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute payment commands");
+    if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.invoice != null))) throw new Error("Guard 3 failed");
+    if (!((__draft.client != null))) throw new Error("Guard 4 failed");
+    if (!((invoiceId === __draft.invoiceId))) throw new Error("Record invoiceId must match the seeded invoice reference");
+    if (!((clientId === __draft.clientId))) throw new Error("Record clientId must match the seeded client reference");
+    if (!((amount > 0))) throw new Error("Payment amount must be positive");
+    const doc: Record<string, any> = {
+      ...__draft,
+      invoiceId: invoiceId,
+      clientId: clientId,
+      eventId: ((eventId != null) ? eventId : __draft.eventId),
+      amount: amount,
+      method: method,
+      paymentMethodId: paymentMethodId,
+      notes: notes,
+      recordedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("payments", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, paymentId: docId, tenantId: doc.tenantId, invoiceId: doc.invoiceId, clientId: doc.clientId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), amount: doc.amount, method: doc.method, _subject: { entity: "Payment", command: "record", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PaymentRecorded", entity: "Payment", entityId: docId, payload: { paymentId: docId, tenantId: doc.tenantId, invoiceId: doc.invoiceId, clientId: doc.clientId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), amount: doc.amount, method: doc.method }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -7687,26 +8178,44 @@ export const PaymentMethod_createViaRegister = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { clientId, methodType, provider, lastFour, isDefault, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      clientId: args.clientId,
-      methodType: args.methodType,
-      provider: args.provider,
-      lastFour: args.lastFour,
-      isDefault: ((args.isDefault != null) ? args.isDefault : false),
       status: "active",
-      registeredAt: Date.now(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      clientId: args.clientId,
+      isDefault: args.isDefault,
+      lastFour: args.lastFour,
+      methodType: args.methodType,
       notes: args.notes,
-      version: 0
+      provider: args.provider
     };
-    const docId = await ctx.db.insert("paymentMethods", __seed as any);
-    try {
-      await __runPaymentMethodRegister(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read payment methods");
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write payment methods through commands");
+    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute payment method commands");
+    if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.client != null))) throw new Error("Guard 3 failed");
+    if (!((clientId === __draft.clientId))) throw new Error("Register clientId must match the seeded client reference");
+    if (!(((lastFour == null) || (((lastFour).trim()).length <= 4)))) throw new Error("Last-four hint must be at most four characters");
+    const doc: Record<string, any> = {
+      ...__draft,
+      clientId: clientId,
+      methodType: methodType,
+      provider: provider,
+      lastFour: lastFour,
+      isDefault: ((isDefault != null) ? isDefault : false),
+      notes: notes,
+      registeredAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("paymentMethods", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, paymentMethodId: docId, tenantId: doc.tenantId, clientId: doc.clientId, methodType: doc.methodType, isDefault: ((doc.isDefault != null) ? doc.isDefault : false), _subject: { entity: "PaymentMethod", command: "register", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PaymentMethodRegistered", entity: "PaymentMethod", entityId: docId, payload: { paymentMethodId: docId, tenantId: doc.tenantId, clientId: doc.clientId, methodType: doc.methodType, isDefault: ((doc.isDefault != null) ? doc.isDefault : false) }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -7961,33 +8470,62 @@ export const PayrollInput_createViaPrepare = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { personId, periodStart, periodEnd, regularMinutes, overtimeMinutes, totalMinutes, eventId, shiftId, hourlyRate, overtimeRate, grossAmount, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      personId: args.personId,
-      periodStart: args.periodStart,
-      periodEnd: args.periodEnd,
-      eventId: ((args.eventId != null) ? args.eventId : args.eventId),
-      shiftId: ((args.shiftId != null) ? args.shiftId : args.shiftId),
-      regularMinutes: args.regularMinutes,
-      overtimeMinutes: args.overtimeMinutes,
-      totalMinutes: args.totalMinutes,
-      hourlyRate: args.hourlyRate,
-      overtimeRate: args.overtimeRate,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      eventId: args.eventId,
       grossAmount: args.grossAmount,
+      hourlyRate: args.hourlyRate,
       notes: args.notes,
+      overtimeMinutes: args.overtimeMinutes,
+      overtimeRate: args.overtimeRate,
+      periodEnd: args.periodEnd,
+      periodStart: args.periodStart,
+      personId: args.personId,
+      regularMinutes: args.regularMinutes,
+      shiftId: args.shiftId,
+      totalMinutes: args.totalMinutes
+    };
+    if (!(checkRole(user.role, "financeManageAccess"))) throw new Error("Finance managers may read payroll inputs");
+    if (!(checkRole(user.role, "financeManageAccess"))) throw new Error("Finance managers may write payroll inputs through commands");
+    if (!(checkRole(user.role, "financeManageAccess"))) throw new Error("Finance managers may execute payroll input commands");
+    if (!((__draft.status === "draft"))) throw new Error("Guard 0 failed");
+    if (!((__draft.preparedAt == null))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.person != null))) throw new Error("Guard 3 failed");
+    if (!((personId === __draft.personId))) throw new Error("Prepare personId must match the seeded person reference");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Prepare eventId must match the seeded event reference when both are set");
+    if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("Prepare shiftId must match the seeded shift reference when both are set");
+    if (!((periodEnd >= periodStart))) throw new Error("Payroll period end must be at or after period start");
+    if (!((((regularMinutes >= 0) && (overtimeMinutes >= 0)) && (totalMinutes >= 0)))) throw new Error("Payroll minutes cannot be negative");
+    if (!((totalMinutes === (regularMinutes + overtimeMinutes)))) throw new Error("Total minutes must equal regular plus overtime");
+    if (!(((((hourlyRate == null) || (hourlyRate >= 0)) && ((overtimeRate == null) || (overtimeRate >= 0))) && ((grossAmount == null) || (grossAmount >= 0))))) throw new Error("Payroll rate and amount fields cannot be negative");
+    const doc: Record<string, any> = {
+      ...__draft,
+      personId: personId,
+      periodStart: periodStart,
+      periodEnd: periodEnd,
+      eventId: ((eventId != null) ? eventId : __draft.eventId),
+      shiftId: ((shiftId != null) ? shiftId : __draft.shiftId),
+      regularMinutes: regularMinutes,
+      overtimeMinutes: overtimeMinutes,
+      totalMinutes: totalMinutes,
+      hourlyRate: hourlyRate,
+      overtimeRate: overtimeRate,
+      grossAmount: grossAmount,
+      notes: notes,
       status: "prepared",
       preparedAt: Date.now(),
-      version: 0
+      version: 1,
     };
-    const __storedSeed = await __encryptDoc(ctx, "PayrollInput", ["hourlyRate","overtimeRate","grossAmount","notes"], __seed);
-    const docId = await ctx.db.insert("payrollInputs", __storedSeed as any);
-    try {
-      await __runPayrollInputPrepare(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    const __storedDoc = await __encryptDoc(ctx, "PayrollInput", ["hourlyRate","overtimeRate","grossAmount","notes"], doc);
+    const docId = await ctx.db.insert("payrollInputs", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, payrollInputId: docId, tenantId: doc.tenantId, personId: doc.personId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), periodStart: doc.periodStart, periodEnd: doc.periodEnd, totalMinutes: doc.totalMinutes, status: "prepared", _subject: { entity: "PayrollInput", command: "prepare", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PayrollInputPrepared", entity: "PayrollInput", entityId: docId, payload: { payrollInputId: docId, tenantId: doc.tenantId, personId: doc.personId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), periodStart: doc.periodStart, periodEnd: doc.periodEnd, totalMinutes: doc.totalMinutes, status: "prepared" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -8184,30 +8722,48 @@ export const Person_createViaHire = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { givenName, familyName, email, phone, role, employmentType, employeeNumber, authSubjectId } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      givenName: args.givenName,
-      familyName: args.familyName,
-      email: args.email,
-      phone: args.phone,
-      role: ((args.role != null) ? args.role : "staff"),
-      authSubjectId: args.authSubjectId,
-      employeeNumber: args.employeeNumber,
-      employmentType: ((args.employmentType != null) ? args.employmentType : "full_time"),
       status: "active",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      authSubjectId: args.authSubjectId,
+      email: args.email,
+      employeeNumber: args.employeeNumber,
+      employmentType: args.employmentType,
+      familyName: args.familyName,
+      givenName: args.givenName,
+      phone: args.phone,
+      role: args.role
+    };
+    if (!(checkRole(user.role, "staffAccess"))) throw new Error("Staff may read people");
+    if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Workforce managers may write people");
+    if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Workforce managers may execute people commands");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!((((givenName).trim()).length > 0))) throw new Error("Given name is required");
+    if (!((((familyName).trim()).length > 0))) throw new Error("Family name is required");
+    if (!((((email).trim()).length > 0))) throw new Error("Email is required");
+    const doc: Record<string, any> = {
+      ...__draft,
+      givenName: givenName,
+      familyName: familyName,
+      email: email,
+      phone: phone,
+      role: ((role != null) ? role : "staff"),
+      employmentType: ((employmentType != null) ? employmentType : "full_time"),
+      employeeNumber: employeeNumber,
+      authSubjectId: authSubjectId,
       hireDate: Date.now(),
       terminationDate: null,
-      version: 0
+      version: 1,
     };
-    const __storedSeed = await __encryptDoc(ctx, "Person", ["email","phone"], __seed);
-    const docId = await ctx.db.insert("people", __storedSeed as any);
-    try {
-      await __runPersonHire(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    const __storedDoc = await __encryptDoc(ctx, "Person", ["email","phone"], doc);
+    const docId = await ctx.db.insert("people", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, personId: docId, tenantId: doc.tenantId, email: doc.email, role: doc.role, _subject: { entity: "Person", command: "hire", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PersonHired", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: doc.tenantId, email: doc.email, role: doc.role }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -8586,29 +9142,54 @@ export const PrepTask_createViaOpen = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { eventId, ingredientId, quantity, unit, ingredientDemandId, dishId, recipeId, station, dueAt, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      eventId: args.eventId,
-      ingredientId: args.ingredientId,
-      ingredientDemandId: ((args.ingredientDemandId != null) ? args.ingredientDemandId : args.ingredientDemandId),
-      dishId: ((args.dishId != null) ? args.dishId : args.dishId),
-      recipeId: ((args.recipeId != null) ? args.recipeId : args.recipeId),
-      quantity: args.quantity,
-      unit: args.unit,
-      station: ((args.station != null) ? args.station : args.station),
-      dueAt: ((args.dueAt != null) ? args.dueAt : args.dueAt),
-      notes: ((args.notes != null) ? args.notes : args.notes),
       status: "pending",
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      dishId: args.dishId,
+      dueAt: args.dueAt,
+      eventId: args.eventId,
+      ingredientDemandId: args.ingredientDemandId,
+      ingredientId: args.ingredientId,
+      notes: args.notes,
+      quantity: args.quantity,
+      recipeId: args.recipeId,
+      station: args.station,
+      unit: args.unit
     };
-    const docId = await ctx.db.insert("prepTasks", __seed as any);
-    try {
-      await __runPrepTaskOpen(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read prep tasks");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write prep tasks through commands");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute prep task commands");
+    if (!((__draft.claimedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.eventId != null))) throw new Error("Guard 3 failed");
+    if (!((__draft.ingredientId != null))) throw new Error("Guard 4 failed");
+    if (!((eventId === __draft.eventId))) throw new Error("Open eventId must match the seeded event reference");
+    if (!((ingredientId === __draft.ingredientId))) throw new Error("Open ingredientId must match the seeded ingredient reference");
+    if (!((((ingredientDemandId == null) || (__draft.ingredientDemandId == null)) || (ingredientDemandId === __draft.ingredientDemandId)))) throw new Error("Open ingredientDemandId must match the seeded demand reference when provided");
+    if (!((quantity > 0))) throw new Error("Prep quantity must be positive");
+    const doc: Record<string, any> = {
+      ...__draft,
+      eventId: eventId,
+      ingredientId: ingredientId,
+      ingredientDemandId: ((ingredientDemandId != null) ? ingredientDemandId : __draft.ingredientDemandId),
+      dishId: ((dishId != null) ? dishId : __draft.dishId),
+      recipeId: ((recipeId != null) ? recipeId : __draft.recipeId),
+      quantity: quantity,
+      unit: unit,
+      station: ((station != null) ? station : __draft.station),
+      dueAt: ((dueAt != null) ? dueAt : __draft.dueAt),
+      notes: ((notes != null) ? notes : __draft.notes),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("prepTasks", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, prepTaskId: docId, tenantId: doc.tenantId, eventId: doc.eventId, ingredientId: doc.ingredientId, ingredientDemandId: ((doc.ingredientDemandId != null) ? doc.ingredientDemandId : doc.ingredientDemandId), dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), recipeId: ((doc.recipeId != null) ? doc.recipeId : doc.recipeId), quantity: doc.quantity, unit: doc.unit, station: ((doc.station != null) ? doc.station : doc.station), dueAt: ((doc.dueAt != null) ? doc.dueAt : doc.dueAt), status: "pending", _subject: { entity: "PrepTask", command: "open", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PrepTaskOpened", entity: "PrepTask", entityId: docId, payload: { prepTaskId: docId, tenantId: doc.tenantId, eventId: doc.eventId, ingredientId: doc.ingredientId, ingredientDemandId: ((doc.ingredientDemandId != null) ? doc.ingredientDemandId : doc.ingredientDemandId), dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), recipeId: ((doc.recipeId != null) ? doc.recipeId : doc.recipeId), quantity: doc.quantity, unit: doc.unit, station: ((doc.station != null) ? doc.station : doc.station), dueAt: ((doc.dueAt != null) ? doc.dueAt : doc.dueAt), status: "pending" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -8925,25 +9506,43 @@ export const ProductionBatch_createViaPlan = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { recipeId, plannedYield, yieldUnit, eventId, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      recipeId: args.recipeId,
-      eventId: ((args.eventId != null) ? args.eventId : args.eventId),
-      plannedYield: args.plannedYield,
-      yieldUnit: args.yieldUnit,
-      notes: ((args.notes != null) ? args.notes : args.notes),
       status: "planned",
-      plannedAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      eventId: args.eventId,
+      notes: args.notes,
+      plannedYield: args.plannedYield,
+      recipeId: args.recipeId,
+      yieldUnit: args.yieldUnit
     };
-    const docId = await ctx.db.insert("productionBatches", __seed as any);
-    try {
-      await __runProductionBatchPlan(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read production batches");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write production batches through commands");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute production batch commands");
+    if (!((__draft.plannedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "planned"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!(((__draft.recipe != null) && (__draft.recipe.status === "published")))) throw new Error("Guard 3 failed");
+    if (!((recipeId === __draft.recipeId))) throw new Error("Plan recipeId must match the seeded recipe reference");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Plan eventId must match the seeded event reference when provided");
+    if (!((plannedYield > 0))) throw new Error("Planned yield must be positive");
+    const doc: Record<string, any> = {
+      ...__draft,
+      recipeId: recipeId,
+      eventId: ((eventId != null) ? eventId : __draft.eventId),
+      plannedYield: plannedYield,
+      yieldUnit: yieldUnit,
+      notes: ((notes != null) ? notes : __draft.notes),
+      plannedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("productionBatches", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, productionBatchId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), plannedYield: doc.plannedYield, yieldUnit: doc.yieldUnit, status: "planned", _subject: { entity: "ProductionBatch", command: "plan", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "ProductionBatchPlanned", entity: "ProductionBatch", entityId: docId, payload: { productionBatchId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), plannedYield: doc.plannedYield, yieldUnit: doc.yieldUnit, status: "planned" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -9180,35 +9779,65 @@ export const Proposal_createViaDraft = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { clientId, title, subtotal, taxAmount, discountAmount, total, proposalNumber, eventDate, eventType, guestCount, venueName, venueAddress, expiresAt, notes, terms } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
+      status: "draft",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       clientId: args.clientId,
-      proposalNumber: args.proposalNumber,
-      title: args.title,
+      discountAmount: args.discountAmount,
       eventDate: args.eventDate,
       eventType: args.eventType,
-      guestCount: ((args.guestCount != null) ? args.guestCount : 0),
-      venueName: args.venueName,
-      venueAddress: args.venueAddress,
+      expiresAt: args.expiresAt,
+      guestCount: args.guestCount,
+      notes: args.notes,
+      proposalNumber: args.proposalNumber,
       subtotal: args.subtotal,
       taxAmount: args.taxAmount,
-      discountAmount: args.discountAmount,
-      total: args.total,
-      expiresAt: args.expiresAt,
-      notes: args.notes,
       terms: args.terms,
-      status: "draft",
-      draftedAt: Date.now(),
-      version: 0
+      title: args.title,
+      total: args.total,
+      venueAddress: args.venueAddress,
+      venueName: args.venueName
     };
-    const docId = await ctx.db.insert("proposals", __seed as any);
-    try {
-      await __runProposalDraft(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read proposals");
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write proposals through commands");
+    if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute proposal commands");
+    if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.client != null))) throw new Error("Guard 3 failed");
+    if (!((clientId === __draft.clientId))) throw new Error("Draft clientId must match the seeded client reference");
+    if (!((((title).trim()).length > 0))) throw new Error("Proposal title is required");
+    if (!(((guestCount == null) || (guestCount >= 0)))) throw new Error("Guest count cannot be negative");
+    if (!(((((subtotal >= 0) && (taxAmount >= 0)) && (discountAmount >= 0)) && (total >= 0)))) throw new Error("Proposal money amounts cannot be negative");
+    if (!((total === ((subtotal + taxAmount) - discountAmount)))) throw new Error("Proposal total must equal subtotal plus tax minus discount");
+    const doc: Record<string, any> = {
+      ...__draft,
+      clientId: clientId,
+      title: title,
+      proposalNumber: proposalNumber,
+      eventDate: eventDate,
+      eventType: eventType,
+      guestCount: ((guestCount != null) ? guestCount : 0),
+      venueName: venueName,
+      venueAddress: venueAddress,
+      subtotal: subtotal,
+      taxAmount: taxAmount,
+      discountAmount: discountAmount,
+      total: total,
+      expiresAt: expiresAt,
+      notes: notes,
+      terms: terms,
+      draftedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("proposals", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, proposalId: docId, tenantId: doc.tenantId, clientId: doc.clientId, title: doc.title, total: doc.total, _subject: { entity: "Proposal", command: "draft", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "ProposalDrafted", entity: "Proposal", entityId: docId, payload: { proposalId: docId, tenantId: doc.tenantId, clientId: doc.clientId, title: doc.title, total: doc.total }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -9679,28 +10308,49 @@ export const Qualification_createViaGrant = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { personId, name, issuedAt, certificationType, expiresAt, documentRef, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      personId: args.personId,
-      name: args.name,
-      certificationType: ((args.certificationType != null) ? args.certificationType : args.certificationType),
-      issuedAt: args.issuedAt,
-      expiresAt: ((args.expiresAt != null) ? args.expiresAt : args.expiresAt),
-      documentRef: ((args.documentRef != null) ? args.documentRef : args.documentRef),
-      notes: ((args.notes != null) ? args.notes : args.notes),
       status: "active",
-      grantedAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      certificationType: args.certificationType,
+      documentRef: args.documentRef,
+      expiresAt: args.expiresAt,
+      issuedAt: args.issuedAt,
+      name: args.name,
+      notes: args.notes,
+      personId: args.personId
     };
-    const __storedSeed = await __encryptDoc(ctx, "Qualification", ["notes"], __seed);
-    const docId = await ctx.db.insert("qualifications", __storedSeed as any);
-    try {
-      await __runQualificationGrant(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read qualifications");
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write qualifications through commands");
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute qualification commands");
+    if (!((__draft.grantedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!(((__draft.person != null) && (__draft.person.status === "active")))) throw new Error("Guard 3 failed");
+    if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Guard 4 failed");
+    if (!((personId === __draft.personId))) throw new Error("Grant personId must match the seeded person reference");
+    if (!((((name).trim()).length > 0))) throw new Error("Qualification name is required");
+    if (!(((expiresAt == null) || (expiresAt > issuedAt)))) throw new Error("Qualification expiry must be after issued date");
+    const doc: Record<string, any> = {
+      ...__draft,
+      personId: personId,
+      name: name,
+      certificationType: ((certificationType != null) ? certificationType : __draft.certificationType),
+      issuedAt: issuedAt,
+      expiresAt: ((expiresAt != null) ? expiresAt : __draft.expiresAt),
+      documentRef: ((documentRef != null) ? documentRef : __draft.documentRef),
+      notes: ((notes != null) ? notes : __draft.notes),
+      grantedAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "Qualification", ["notes"], doc);
+    const docId = await ctx.db.insert("qualifications", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, qualificationId: docId, tenantId: doc.tenantId, personId: doc.personId, name: doc.name, certificationType: ((doc.certificationType != null) ? doc.certificationType : doc.certificationType), issuedAt: doc.issuedAt, expiresAt: ((doc.expiresAt != null) ? doc.expiresAt : doc.expiresAt), status: "active", _subject: { entity: "Qualification", command: "grant", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "QualificationGranted", entity: "Qualification", entityId: docId, payload: { qualificationId: docId, tenantId: doc.tenantId, personId: doc.personId, name: doc.name, certificationType: ((doc.certificationType != null) ? doc.certificationType : doc.certificationType), issuedAt: doc.issuedAt, expiresAt: ((doc.expiresAt != null) ? doc.expiresAt : doc.expiresAt), status: "active" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -9813,30 +10463,6 @@ export const QualityCheck_fail = mutation({
   handler: __runQualityCheckFail,
 });
 
-export const QualityCheck_createViaOpen = mutation({
-  args: {
-    prepTaskId: v.optional(v.string()),
-    productionBatchId: v.optional(v.string()),
-    notes: v.optional(v.string())
-  },
-  handler: async (ctx, args: any) => {
-    const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
-      tenantId: __auth.tenantId,
-      status: "pending",
-      version: 0
-    };
-    const docId = await ctx.db.insert("qualityChecks", __seed as any);
-    try {
-      await __runQualityCheckOpen(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
-  },
-});
-
 async function __runQualityCheckOpen(ctx: MutationCtx, { docId, prepTaskId, productionBatchId, notes, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -9878,6 +10504,49 @@ export const QualityCheck_open = mutation({
     version: v.optional(v.number())
   },
   handler: __runQualityCheckOpen,
+});
+
+export const QualityCheck_createViaOpen = mutation({
+  args: {
+    prepTaskId: v.optional(v.string()),
+    productionBatchId: v.optional(v.string()),
+    notes: v.optional(v.string())
+  },
+  handler: async (ctx, args: any) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = __auth;
+    const { prepTaskId, productionBatchId, notes } = args;
+    const __draft: Record<string, any> = {
+      tenantId: __auth.tenantId,
+      status: "pending",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      notes: args.notes,
+      prepTaskId: args.prepTaskId,
+      productionBatchId: args.productionBatchId
+    };
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read quality checks");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write quality checks through commands");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute quality check commands");
+    if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!(((((prepTaskId != null) || (productionBatchId != null)) || (__draft.prepTaskId != null)) || (__draft.productionBatchId != null)))) throw new Error("Quality check must reference a PrepTask or ProductionBatch");
+    if (!((((prepTaskId == null) || (__draft.prepTaskId == null)) || (prepTaskId === __draft.prepTaskId)))) throw new Error("Open prepTaskId must match the seeded prep task reference when provided");
+    if (!((((productionBatchId == null) || (__draft.productionBatchId == null)) || (productionBatchId === __draft.productionBatchId)))) throw new Error("Open productionBatchId must match the seeded batch reference when provided");
+    const doc: Record<string, any> = {
+      ...__draft,
+      prepTaskId: ((prepTaskId != null) ? prepTaskId : __draft.prepTaskId),
+      productionBatchId: ((productionBatchId != null) ? productionBatchId : __draft.productionBatchId),
+      notes: ((notes != null) ? notes : __draft.notes),
+      openedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("qualityChecks", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, qualityCheckId: docId, tenantId: doc.tenantId, prepTaskId: ((doc.prepTaskId != null) ? doc.prepTaskId : doc.prepTaskId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), status: "pending", _subject: { entity: "QualityCheck", command: "open", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "QualityCheckOpened", entity: "QualityCheck", entityId: docId, payload: { qualityCheckId: docId, tenantId: doc.tenantId, prepTaskId: ((doc.prepTaskId != null) ? doc.prepTaskId : doc.prepTaskId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), status: "pending" }, createdAt: Date.now() });
+    return { docId };
+  },
 });
 
 async function __runQualityCheckPass(ctx: MutationCtx, { docId, notes, version }: any, __creation = false) {
@@ -10050,29 +10719,48 @@ export const Recipe_createViaDraft = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { name, yieldQuantity, yieldUnit, batchMultiplier, category, cuisine, description, instructions } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      name: args.name,
+      status: "draft",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      batchMultiplier: args.batchMultiplier,
       category: args.category,
       cuisine: args.cuisine,
       description: args.description,
       instructions: args.instructions,
-      versionNumber: 1,
+      name: args.name,
       yieldQuantity: args.yieldQuantity,
-      yieldUnit: args.yieldUnit,
-      batchMultiplier: ((args.batchMultiplier != null) ? args.batchMultiplier : 1),
-      status: "draft",
-      draftedAt: Date.now(),
-      version: 0
+      yieldUnit: args.yieldUnit
     };
-    const docId = await ctx.db.insert("recipes", __seed as any);
-    try {
-      await __runRecipeDraft(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read recipes");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write recipes through commands");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute recipe commands");
+    if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((((name).trim()).length > 0))) throw new Error("Recipe name is required");
+    if (!((yieldQuantity > 0))) throw new Error("Recipe yield quantity must be positive");
+    if (!(((batchMultiplier == null) || (batchMultiplier > 0)))) throw new Error("Recipe batch multiplier must be positive");
+    const doc: Record<string, any> = {
+      ...__draft,
+      name: name,
+      yieldQuantity: yieldQuantity,
+      yieldUnit: yieldUnit,
+      batchMultiplier: ((batchMultiplier != null) ? batchMultiplier : 1),
+      category: category,
+      cuisine: cuisine,
+      description: description,
+      instructions: instructions,
+      versionNumber: 1,
+      draftedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("recipes", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, recipeId: docId, tenantId: doc.tenantId, name: doc.name, yieldQuantity: doc.yieldQuantity, yieldUnit: doc.yieldUnit, batchMultiplier: ((doc.batchMultiplier != null) ? doc.batchMultiplier : 1), versionNumber: 1, _subject: { entity: "Recipe", command: "draft", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "RecipeDrafted", entity: "Recipe", entityId: docId, payload: { recipeId: docId, tenantId: doc.tenantId, name: doc.name, yieldQuantity: doc.yieldQuantity, yieldUnit: doc.yieldUnit, batchMultiplier: ((doc.batchMultiplier != null) ? doc.batchMultiplier : 1), versionNumber: 1 }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -10331,25 +11019,40 @@ export const RecipeIngredient_createViaAdd = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { recipeId, ingredientId, quantity, unit, sortOrder, prepNotes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      recipeId: args.recipeId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       ingredientId: args.ingredientId,
-      quantity: args.quantity,
-      unit: args.unit,
-      sortOrder: ((args.sortOrder != null) ? args.sortOrder : 0),
       prepNotes: args.prepNotes,
-      addedAt: Date.now(),
-      version: 0
+      quantity: args.quantity,
+      recipeId: args.recipeId,
+      sortOrder: args.sortOrder,
+      unit: args.unit
     };
-    const docId = await ctx.db.insert("recipeIngredients", __seed as any);
-    try {
-      await __runRecipeIngredientAdd(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read recipe ingredient lines");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write recipe ingredient lines through commands");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute recipe ingredient line commands");
+    if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((quantity > 0))) throw new Error("Recipe ingredient quantity must be positive");
+    const doc: Record<string, any> = {
+      ...__draft,
+      recipeId: recipeId,
+      ingredientId: ingredientId,
+      quantity: quantity,
+      unit: unit,
+      sortOrder: ((sortOrder != null) ? sortOrder : 0),
+      prepNotes: prepNotes,
+      addedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("recipeIngredients", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, recipeIngredientId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, ingredientId: doc.ingredientId, quantity: doc.quantity, unit: doc.unit, _subject: { entity: "RecipeIngredient", command: "add", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "RecipeIngredientAdded", entity: "RecipeIngredient", entityId: docId, payload: { recipeIngredientId: docId, tenantId: doc.tenantId, recipeId: doc.recipeId, ingredientId: doc.ingredientId, quantity: doc.quantity, unit: doc.unit }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -10573,26 +11276,42 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const __seed: Record<string, any> = {
+    const { name, subjectArea, chartType, definition, sharingScope } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      ownerId: user.id,
-      name: args.name,
-      subjectArea: args.subjectArea,
+      status: "active",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       chartType: args.chartType,
       definition: args.definition,
-      sharingScope: ((args.sharingScope != null) ? args.sharingScope : "owner_only"),
-      status: "active",
-      definedAt: Date.now(),
-      version: 0
+      name: args.name,
+      sharingScope: args.sharingScope,
+      subjectArea: args.subjectArea
     };
-    const docId = await ctx.db.insert("savedReportDefinitions", __seed as any);
-    try {
-      await __runSavedReportDefinitionCreateDefinition(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!((((__draft.ownerId === user.id) || (__draft.sharingScope !== "owner_only")) || checkRole(user.role, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
+    if (!(checkRole(user.role, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
+    if (!(checkRole(user.role, "staffAccess"))) throw new Error("Staff may execute saved report commands");
+    if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((user.id != null))) throw new Error("Guard 3 failed");
+    if (!((((name).trim()).length > 0))) throw new Error("Report name is required");
+    if (!((((chartType).trim()).length > 0))) throw new Error("Chart type is required");
+    const doc: Record<string, any> = {
+      ...__draft,
+      ownerId: user.id,
+      name: name,
+      subjectArea: subjectArea,
+      chartType: chartType,
+      definition: definition,
+      sharingScope: ((sharingScope != null) ? sharingScope : "owner_only"),
+      definedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("savedReportDefinitions", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, savedReportDefinitionId: docId, tenantId: doc.tenantId, ownerId: user.id, name: doc.name, subjectArea: doc.subjectArea, chartType: doc.chartType, sharingScope: ((doc.sharingScope != null) ? doc.sharingScope : "owner_only"), status: "active", _subject: { entity: "SavedReportDefinition", command: "createDefinition", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "SavedReportDefinitionCreated", entity: "SavedReportDefinition", entityId: docId, payload: { savedReportDefinitionId: docId, tenantId: doc.tenantId, ownerId: user.id, name: doc.name, subjectArea: doc.subjectArea, chartType: doc.chartType, sharingScope: ((doc.sharingScope != null) ? doc.sharingScope : "owner_only"), status: "active" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -10945,27 +11664,47 @@ export const Shift_createViaSchedule = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { personId, startsAt, endsAt, eventId, role, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      personId: args.personId,
-      eventId: ((args.eventId != null) ? args.eventId : args.eventId),
-      startsAt: args.startsAt,
-      endsAt: args.endsAt,
-      role: ((args.role != null) ? args.role : args.role),
-      notes: ((args.notes != null) ? args.notes : args.notes),
       status: "scheduled",
-      scheduledAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      endsAt: args.endsAt,
+      eventId: args.eventId,
+      notes: args.notes,
+      personId: args.personId,
+      role: args.role,
+      startsAt: args.startsAt
     };
-    const __storedSeed = await __encryptDoc(ctx, "Shift", ["notes"], __seed);
-    const docId = await ctx.db.insert("shifts", __storedSeed as any);
-    try {
-      await __runShiftSchedule(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read shifts");
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write shifts through commands");
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute shift commands");
+    if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "scheduled"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((__draft.person != null))) throw new Error("Guard 3 failed");
+    if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Guard 4 failed");
+    if (!((personId === __draft.personId))) throw new Error("Schedule personId must match the seeded person reference");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Schedule eventId must match the seeded event reference when provided");
+    if (!((endsAt > startsAt))) throw new Error("Shift end must be after its start");
+    const doc: Record<string, any> = {
+      ...__draft,
+      personId: personId,
+      eventId: ((eventId != null) ? eventId : __draft.eventId),
+      startsAt: startsAt,
+      endsAt: endsAt,
+      role: ((role != null) ? role : __draft.role),
+      notes: ((notes != null) ? notes : __draft.notes),
+      scheduledAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "Shift", ["notes"], doc);
+    const docId = await ctx.db.insert("shifts", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, shiftId: docId, tenantId: doc.tenantId, personId: doc.personId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), startsAt: doc.startsAt, endsAt: doc.endsAt, role: ((doc.role != null) ? doc.role : doc.role), status: "scheduled", _subject: { entity: "Shift", command: "schedule", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "ShiftScheduled", entity: "Shift", entityId: docId, payload: { shiftId: docId, tenantId: doc.tenantId, personId: doc.personId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), startsAt: doc.startsAt, endsAt: doc.endsAt, role: ((doc.role != null) ? doc.role : doc.role), status: "scheduled" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -11177,26 +11916,41 @@ export const StorageLocation_createViaRegister = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { name, locationType, temperatureZone, minTemperature, maxTemperature, temperatureUnit } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      name: args.name,
-      locationType: args.locationType,
-      temperatureZone: args.temperatureZone,
-      minTemperature: args.minTemperature,
-      maxTemperature: args.maxTemperature,
-      temperatureUnit: ((args.temperatureUnit != null) ? args.temperatureUnit : "F"),
       status: "active",
-      registeredAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      locationType: args.locationType,
+      maxTemperature: args.maxTemperature,
+      minTemperature: args.minTemperature,
+      name: args.name,
+      temperatureUnit: args.temperatureUnit,
+      temperatureZone: args.temperatureZone
     };
-    const docId = await ctx.db.insert("storageLocations", __seed as any);
-    try {
-      await __runStorageLocationRegister(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read storage locations");
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write storage locations through commands");
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute storage location commands");
+    if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((((name).trim()).length > 0))) throw new Error("Storage location name is required");
+    const doc: Record<string, any> = {
+      ...__draft,
+      name: name,
+      locationType: locationType,
+      temperatureZone: temperatureZone,
+      minTemperature: minTemperature,
+      maxTemperature: maxTemperature,
+      temperatureUnit: ((temperatureUnit != null) ? temperatureUnit : "F"),
+      registeredAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("storageLocations", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, storageLocationId: docId, tenantId: doc.tenantId, name: doc.name, locationType: doc.locationType, temperatureZone: doc.temperatureZone, _subject: { entity: "StorageLocation", command: "register", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "StorageLocationRegistered", entity: "StorageLocation", entityId: docId, payload: { storageLocationId: docId, tenantId: doc.tenantId, name: doc.name, locationType: doc.locationType, temperatureZone: doc.temperatureZone }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -11305,26 +12059,45 @@ export const TimeRecord_createViaClockIn = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { personId, shiftId, eventId, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      personId: args.personId,
-      shiftId: ((args.shiftId != null) ? args.shiftId : args.shiftId),
-      eventId: ((args.eventId != null) ? args.eventId : args.eventId),
-      clockInAt: Date.now(),
       breakMinutes: 0,
-      notes: ((args.notes != null) ? args.notes : args.notes),
       status: "open",
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      eventId: args.eventId,
+      notes: args.notes,
+      personId: args.personId,
+      shiftId: args.shiftId
     };
-    const __storedSeed = await __encryptDoc(ctx, "TimeRecord", ["notes"], __seed);
-    const docId = await ctx.db.insert("timeRecords", __storedSeed as any);
-    try {
-      await __runTimeRecordClockIn(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read time records");
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write time records through commands");
+    if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute time record commands");
+    if (!((__draft.clockInAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "open"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((user.id != null))) throw new Error("Guard 3 failed");
+    if (!(((personId === user.id) || checkRole(user.role, "workforceManageAccess")))) throw new Error("Guard 4 failed");
+    if (!(((__draft.person != null) && (__draft.person.status === "active")))) throw new Error("Guard 5 failed");
+    if (!((personId === __draft.personId))) throw new Error("Clock-in personId must match the seeded person reference");
+    if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("Clock-in shiftId must match the seeded shift reference when provided");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Clock-in eventId must match the seeded event reference when provided");
+    const doc: Record<string, any> = {
+      ...__draft,
+      personId: personId,
+      shiftId: ((shiftId != null) ? shiftId : __draft.shiftId),
+      eventId: ((eventId != null) ? eventId : __draft.eventId),
+      notes: ((notes != null) ? notes : __draft.notes),
+      clockInAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "TimeRecord", ["notes"], doc);
+    const docId = await ctx.db.insert("timeRecords", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, timeRecordId: docId, tenantId: doc.tenantId, personId: doc.personId, shiftId: ((doc.shiftId != null) ? doc.shiftId : doc.shiftId), eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), clockInAt: doc.clockInAt, status: "open", _subject: { entity: "TimeRecord", command: "clockIn", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "TimeRecordClockedIn", entity: "TimeRecord", entityId: docId, payload: { timeRecordId: docId, tenantId: doc.tenantId, personId: doc.personId, shiftId: ((doc.shiftId != null) ? doc.shiftId : doc.shiftId), eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), clockInAt: doc.clockInAt, status: "open" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -11522,31 +12295,52 @@ export const Vendor_createViaOnboard = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { name, email, phone, addressLine1, city, region, postalCode, countryCode, paymentTermsDays, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      name: args.name,
-      email: args.email,
-      phone: args.phone,
+      status: "active",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
       addressLine1: args.addressLine1,
       city: args.city,
-      region: args.region,
-      postalCode: args.postalCode,
       countryCode: args.countryCode,
-      paymentTermsDays: ((args.paymentTermsDays != null) ? args.paymentTermsDays : 30),
+      email: args.email,
+      name: args.name,
       notes: args.notes,
-      status: "active",
-      onboardedAt: Date.now(),
-      version: 0
+      paymentTermsDays: args.paymentTermsDays,
+      phone: args.phone,
+      postalCode: args.postalCode,
+      region: args.region
     };
-    const __storedSeed = await __encryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], __seed);
-    const docId = await ctx.db.insert("vendors", __storedSeed as any);
-    try {
-      await __runVendorOnboard(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may read vendors");
+    if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may write vendors through commands");
+    if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may execute vendor commands");
+    if (!((__draft.onboardedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((((name).trim()).length > 0))) throw new Error("Vendor name is required");
+    if (!(((paymentTermsDays == null) || ((paymentTermsDays >= 0) && (paymentTermsDays <= 365))))) throw new Error("Payment terms must be between 0 and 365 days");
+    if (!(((countryCode == null) || (((countryCode).trim()).length === 2)))) throw new Error("Country code must contain two characters");
+    const doc: Record<string, any> = {
+      ...__draft,
+      name: name,
+      email: email,
+      phone: phone,
+      addressLine1: addressLine1,
+      city: city,
+      region: region,
+      postalCode: postalCode,
+      countryCode: countryCode,
+      paymentTermsDays: ((paymentTermsDays != null) ? paymentTermsDays : 30),
+      notes: notes,
+      onboardedAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "Vendor", ["email","phone","addressLine1","city","region","postalCode","countryCode"], doc);
+    const docId = await ctx.db.insert("vendors", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, vendorId: docId, tenantId: doc.tenantId, name: doc.name, paymentTermsDays: ((doc.paymentTermsDays != null) ? doc.paymentTermsDays : 30), _subject: { entity: "Vendor", command: "onboard", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "VendorOnboarded", entity: "Vendor", entityId: docId, payload: { vendorId: docId, tenantId: doc.tenantId, name: doc.name, paymentTermsDays: ((doc.paymentTermsDays != null) ? doc.paymentTermsDays : 30) }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -12014,28 +12808,44 @@ export const VendorOrder_createViaOpen = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { vendorId, eventId, orderNumber, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      vendorId: args.vendorId,
-      eventId: ((args.eventId != null) ? args.eventId : args.eventId),
-      orderNumber: args.orderNumber,
       subtotal: 0,
       taxAmount: 0,
       shippingAmount: 0,
       totalAmount: 0,
-      notes: args.notes,
       status: "draft",
-      openedAt: Date.now(),
-      version: 0
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      eventId: args.eventId,
+      notes: args.notes,
+      orderNumber: args.orderNumber,
+      vendorId: args.vendorId
     };
-    const docId = await ctx.db.insert("vendorOrders", __seed as any);
-    try {
-      await __runVendorOrderOpen(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may read vendor orders");
+    if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may write vendor orders through commands");
+    if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may execute vendor order commands");
+    if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((((__draft.vendor != null) && (__draft.vendor.status === "active")) && (__draft.vendor.onboardedAt != null)))) throw new Error("Guard 3 failed");
+    if (!((vendorId === __draft.vendorId))) throw new Error("Open vendorId must match the seeded vendor reference");
+    if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Open eventId must match the seeded event reference when provided");
+    const doc: Record<string, any> = {
+      ...__draft,
+      vendorId: vendorId,
+      eventId: ((eventId != null) ? eventId : __draft.eventId),
+      orderNumber: orderNumber,
+      notes: notes,
+      openedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("vendorOrders", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, vendorOrderId: docId, tenantId: doc.tenantId, vendorId: doc.vendorId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), orderNumber: doc.orderNumber, status: "draft", _subject: { entity: "VendorOrder", command: "open", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "VendorOrderOpened", entity: "VendorOrder", entityId: docId, payload: { vendorOrderId: docId, tenantId: doc.tenantId, vendorId: doc.vendorId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), orderNumber: doc.orderNumber, status: "draft" }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -12216,28 +13026,57 @@ export const VendorOrderLine_createViaAddLine = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { vendorOrderId, ingredientId, orderedQuantity, unit, unitCost, ingredientDemandId, locationId } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      vendorOrderId: args.vendorOrderId,
-      ingredientId: args.ingredientId,
-      ingredientDemandId: ((args.ingredientDemandId != null) ? args.ingredientDemandId : args.ingredientDemandId),
-      locationId: ((args.locationId != null) ? args.locationId : args.locationId),
-      orderedQuantity: args.orderedQuantity,
       receivedQuantity: 0,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      ingredientDemandId: args.ingredientDemandId,
+      ingredientId: args.ingredientId,
+      locationId: args.locationId,
+      orderedQuantity: args.orderedQuantity,
       unit: args.unit,
       unitCost: args.unitCost,
+      vendorOrderId: args.vendorOrderId
+    };
+    if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may read vendor order lines");
+    if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may write vendor order lines through commands");
+    if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may execute vendor order line commands");
+    if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!((((__draft.vendorOrder != null) && (__draft.vendorOrder.status === "draft")) && (__draft.vendorOrder.openedAt != null)))) throw new Error("Guard 3 failed");
+    if (!(((__draft.ingredient != null) && (__draft.ingredient.status === "active")))) throw new Error("Guard 4 failed");
+    if (!((vendorOrderId === __draft.vendorOrderId))) throw new Error("Add line vendorOrderId must match the seeded order reference");
+    if (!((ingredientId === __draft.ingredientId))) throw new Error("Add line ingredientId must match the seeded ingredient reference");
+    if (!((((ingredientDemandId == null) || (__draft.ingredientDemandId == null)) || (ingredientDemandId === __draft.ingredientDemandId)))) throw new Error("Add line ingredientDemandId must match the seeded demand reference when provided");
+    if (!((((locationId == null) || (__draft.locationId == null)) || (locationId === __draft.locationId)))) throw new Error("Add line locationId must match the seeded location reference when provided");
+    if (!((orderedQuantity > 0))) throw new Error("Ordered quantity must be positive");
+    if (!((unitCost >= 0))) throw new Error("Unit cost cannot be negative");
+    const doc: Record<string, any> = {
+      ...__draft,
+      vendorOrderId: vendorOrderId,
+      ingredientId: ingredientId,
+      ingredientDemandId: ((ingredientDemandId != null) ? ingredientDemandId : __draft.ingredientDemandId),
+      locationId: ((locationId != null) ? locationId : __draft.locationId),
+      orderedQuantity: orderedQuantity,
+      unit: unit,
+      unitCost: unitCost,
       status: "added",
       addedAt: Date.now(),
-      version: 0
+      version: 1,
     };
-    const docId = await ctx.db.insert("vendorOrderLines", __seed as any);
-    try {
-      await __runVendorOrderLineAddLine(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
+    const docId = await ctx.db.insert("vendorOrderLines", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, vendorOrderLineId: docId, tenantId: doc.tenantId, vendorOrderId: doc.vendorOrderId, ingredientId: doc.ingredientId, ingredientDemandId: ((doc.ingredientDemandId != null) ? doc.ingredientDemandId : doc.ingredientDemandId), eventId: doc.vendorOrder.eventId, orderedQuantity: doc.orderedQuantity, unit: doc.unit, unitCost: doc.unitCost, _subject: { entity: "VendorOrderLine", command: "addLine", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "VendorOrderLineAdded", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: doc.tenantId, vendorOrderId: doc.vendorOrderId, ingredientId: doc.ingredientId, ingredientDemandId: ((doc.ingredientDemandId != null) ? doc.ingredientDemandId : doc.ingredientDemandId), eventId: doc.vendorOrder.eventId, orderedQuantity: doc.orderedQuantity, unit: doc.unit, unitCost: doc.unitCost }, createdAt: Date.now() });
+    // Reactions
+    const fanRows0 = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.ingredientDemandId)).collect();
+    for (const __row of fanRows0) {
+      await __runPurchaseNeedMarkOrdered(ctx, { docId: (__row as any)._id, vendorOrderId: payload.vendorOrderId, vendorOrderLineId: payload.vendorOrderLineId } as any);
     }
+    return { docId };
   },
 });
 
@@ -12581,35 +13420,60 @@ export const Venue_createViaRegister = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { name, venueType, capacity, addressLine1, addressLine2, city, region, postalCode, countryCode, contactName, contactEmail, contactPhone, accessNotes, cateringNotes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
-      name: args.name,
-      venueType: args.venueType,
+      status: "active",
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      accessNotes: args.accessNotes,
       addressLine1: args.addressLine1,
       addressLine2: args.addressLine2,
-      city: args.city,
-      region: args.region,
-      postalCode: args.postalCode,
-      countryCode: args.countryCode,
-      contactName: args.contactName,
-      contactEmail: args.contactEmail,
-      contactPhone: args.contactPhone,
-      accessNotes: args.accessNotes,
-      cateringNotes: args.cateringNotes,
       capacity: args.capacity,
-      status: "active",
-      registeredAt: Date.now(),
-      version: 0
+      cateringNotes: args.cateringNotes,
+      city: args.city,
+      contactEmail: args.contactEmail,
+      contactName: args.contactName,
+      contactPhone: args.contactPhone,
+      countryCode: args.countryCode,
+      name: args.name,
+      postalCode: args.postalCode,
+      region: args.region,
+      venueType: args.venueType
     };
-    const __storedSeed = await __encryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], __seed);
-    const docId = await ctx.db.insert("venues", __storedSeed as any);
-    try {
-      await __runVenueRegister(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "eventAccess"))) throw new Error("Event staff may read venues");
+    if (!(checkRole(user.role, "eventAccess"))) throw new Error("Event staff may write venues through commands");
+    if (!(checkRole(user.role, "eventAccess"))) throw new Error("Event staff may execute venue commands");
+    if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!(checkRole(user.role, "eventManageAccess"))) throw new Error("Guard 2 failed");
+    if (!((((name).trim()).length > 0))) throw new Error("Venue name is required");
+    if (!((capacity >= 0))) throw new Error("Venue capacity cannot be negative");
+    const doc: Record<string, any> = {
+      ...__draft,
+      name: name,
+      venueType: venueType,
+      capacity: capacity,
+      addressLine1: addressLine1,
+      addressLine2: addressLine2,
+      city: city,
+      region: region,
+      postalCode: postalCode,
+      countryCode: countryCode,
+      contactName: contactName,
+      contactEmail: contactEmail,
+      contactPhone: contactPhone,
+      accessNotes: accessNotes,
+      cateringNotes: cateringNotes,
+      registeredAt: Date.now(),
+      version: 1,
+    };
+    const __storedDoc = await __encryptDoc(ctx, "Venue", ["addressLine1","addressLine2","city","region","postalCode","countryCode","contactName","contactEmail","contactPhone"], doc);
+    const docId = await ctx.db.insert("venues", __storedDoc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, venueId: docId, tenantId: doc.tenantId, name: doc.name, venueType: doc.venueType, capacity: doc.capacity, _subject: { entity: "Venue", command: "register", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "VenueRegistered", entity: "Venue", entityId: docId, payload: { venueId: docId, tenantId: doc.tenantId, name: doc.name, venueType: doc.venueType, capacity: doc.capacity }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
@@ -12756,28 +13620,51 @@ export const WasteRecord_createViaRecord = mutation({
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const __seed: Record<string, any> = {
+    const user = __auth;
+    const { ingredientId, locationId, quantity, unit, reason, eventId, unitCost, notes } = args;
+    const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+      eventId: args.eventId,
       ingredientId: args.ingredientId,
       locationId: args.locationId,
-      eventId: ((args.eventId != null) ? args.eventId : args.eventId),
+      notes: args.notes,
       quantity: args.quantity,
-      unit: args.unit,
       reason: args.reason,
-      unitCost: ((args.unitCost != null) ? args.unitCost : args.unitCost),
-      status: "recorded",
-      notes: ((args.notes != null) ? args.notes : args.notes),
-      recordedAt: Date.now(),
-      version: 0
+      unit: args.unit,
+      unitCost: args.unitCost
     };
-    const docId = await ctx.db.insert("wasteRecords", __seed as any);
-    try {
-      await __runWasteRecordRecord(ctx, { ...args, docId }, true);
-      return { docId };
-    } catch (error) {
-      await ctx.db.delete(docId);
-      throw error;
-    }
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read waste records");
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write waste records through commands");
+    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute waste record commands");
+    if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
+    if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
+    if (!(((__draft.ingredient != null) && (__draft.ingredient.status === "active")))) throw new Error("Guard 3 failed");
+    if (!(((__draft.location != null) && (__draft.location.status === "active")))) throw new Error("Guard 4 failed");
+    if (!((ingredientId === __draft.ingredientId))) throw new Error("Record ingredientId must match the seeded ingredient reference");
+    if (!((locationId === __draft.locationId))) throw new Error("Record locationId must match the seeded location reference");
+    if (!((quantity > 0))) throw new Error("Waste quantity must be positive");
+    if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Waste unit cost cannot be negative");
+    const doc: Record<string, any> = {
+      ...__draft,
+      ingredientId: ingredientId,
+      locationId: locationId,
+      eventId: ((eventId != null) ? eventId : __draft.eventId),
+      quantity: quantity,
+      unit: unit,
+      reason: reason,
+      unitCost: ((unitCost != null) ? unitCost : __draft.unitCost),
+      notes: ((notes != null) ? notes : __draft.notes),
+      status: "recorded",
+      recordedAt: Date.now(),
+      version: 1,
+    };
+    const docId = await ctx.db.insert("wasteRecords", doc as any);
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, wasteRecordId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), quantity: doc.quantity, unit: doc.unit, reason: doc.reason, unitCost: ((doc.unitCost != null) ? doc.unitCost : doc.unitCost), _subject: { entity: "WasteRecord", command: "record", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "WasteRecorded", entity: "WasteRecord", entityId: docId, payload: { wasteRecordId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), quantity: doc.quantity, unit: doc.unit, reason: doc.reason, unitCost: ((doc.unitCost != null) ? doc.unitCost : doc.unitCost) }, createdAt: Date.now() });
+    return { docId };
   },
 });
 
