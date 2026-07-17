@@ -55,10 +55,16 @@ export function QualificationsPage() {
       await grant({
         personId: String(data.get("personId")),
         name: String(data.get("name")),
-        issuedAt: new Date(String(data.get("issuedAt"))).getTime(),
+        // Date-only inputs parse as local midnight ("T00:00:00"), not UTC,
+        // so the selected calendar day survives west-of-UTC time zones.
+        issuedAt: new Date(
+          `${String(data.get("issuedAt"))}T00:00:00`,
+        ).getTime(),
         certificationType:
           String(data.get("certificationType") || "") || undefined,
-        expiresAt: expiresRaw ? new Date(expiresRaw).getTime() : undefined,
+        expiresAt: expiresRaw
+          ? new Date(`${expiresRaw}T00:00:00`).getTime()
+          : undefined,
         documentRef: String(data.get("documentRef") || "") || undefined,
         notes: String(data.get("notes") || "") || undefined,
       });
@@ -209,6 +215,12 @@ export function QualificationsPage() {
                       <div className="supply-row-actions">
                         {policy
                           .qualificationActions(String(row.status))
+                          // Generated expire guards `expiresAt != null`; do
+                          // not offer an action that can never succeed.
+                          .filter(
+                            (action) =>
+                              action.key !== "expire" || row.expiresAt != null,
+                          )
                           .map((action) => (
                             <button
                               key={action.key}
