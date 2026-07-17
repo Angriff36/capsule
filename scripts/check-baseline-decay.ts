@@ -4,8 +4,12 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-/** Includes live-Manifest roots: `manifest.config.yaml` + `.builder/`. */
-const ROOT_CAP = 37;
+/**
+ * Includes live-Manifest roots (`manifest.config.yaml` + `.builder/`) and the
+ * durable loop-engineering roots (`loop-budget.md`, `loop-constraints.md`,
+ * `loop-ledger.json`) — see BASELINE.md § Root cap.
+ */
+const ROOT_CAP = 40;
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {

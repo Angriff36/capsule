@@ -49,7 +49,6 @@ export const NAV_AREAS: NavArea[] = [
     label: "Staff",
     group: "People",
     icon: UsersIcon,
-    planned: "Scheduling, availability, certifications and payroll.",
   },
   {
     path: "/clients",

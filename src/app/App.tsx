@@ -38,6 +38,21 @@ const PrepBoardPage = lazy(() =>
     default: module.PrepBoardPage,
   })),
 );
+const RosterPage = lazy(() =>
+  import("../features/workforce/RosterPage").then((module) => ({
+    default: module.RosterPage,
+  })),
+);
+const TimeSheetPage = lazy(() =>
+  import("../features/workforce/TimeSheetPage").then((module) => ({
+    default: module.TimeSheetPage,
+  })),
+);
+const QualificationsPage = lazy(() =>
+  import("../features/workforce/QualificationsPage").then((module) => ({
+    default: module.QualificationsPage,
+  })),
+);
 
 function SupplyRoute({ children }: { children: ReactNode }) {
   return <Suspense fallback={<TableSkeleton rows={8} />}>{children}</Suspense>;
@@ -140,6 +155,34 @@ export function App() {
               element={
                 <SupplyRoute>
                   <VendorOrderPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff"
+              element={<Navigate to="/staff/roster" replace />}
+            />
+            <Route
+              path="/staff/roster"
+              element={
+                <SupplyRoute>
+                  <RosterPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff/time"
+              element={
+                <SupplyRoute>
+                  <TimeSheetPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff/qualifications"
+              element={
+                <SupplyRoute>
+                  <QualificationsPage />
                 </SupplyRoute>
               }
             />

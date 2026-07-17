@@ -34,6 +34,9 @@ and the last green `bun run check` / CI run.
 ## Root cap
 
 ~~Aim ≤35 tracked root entries (excluding `node_modules` / `dist` / `graphify-out`).~~
-**Correction (2026-07-16):** Aim ≤37 — live Manifest project adds root
-`manifest.config.yaml` and `.builder/` (ownership). Still excludes
-`node_modules` / `dist` / `graphify-out`. Enforced by `bun run baseline:decay`.
+~~**Correction (2026-07-16):** Aim ≤37 — live Manifest project adds root
+`manifest.config.yaml` and `.builder/` (ownership).~~
+**Correction (2026-07-17):** Aim ≤40 — loop engineering adds durable root
+`loop-budget.md`, `loop-constraints.md`, and `loop-ledger.json` (daily-triage
+L1, commit 94a79c9). Still excludes `node_modules` / `dist` / `graphify-out`.
+Enforced by `bun run baseline:decay`.

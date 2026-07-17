@@ -1,0 +1,377 @@
+import { useState, type FormEvent } from "react";
+import {
+  useAvailabilityWindowWithdraw,
+  useCreateAvailabilityWindow,
+  useCreateTimeRecord,
+  useListAvailabilityWindow,
+  useListPerson,
+  useListTimeRecord,
+  useTimeRecordClockOut,
+  useTimeRecordCorrect,
+} from "../../lib/manifest-convex-react";
+import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
+import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
+import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+
+const policy = new WorkforceLifecyclePolicy();
+
+const toEpoch = (value: FormDataEntryValue | null) => {
+  const time = new Date(String(value)).getTime();
+  return Number.isFinite(time) ? time : Number.NaN;
+};
+
+export function TimeSheetPage() {
+  const records = useListTimeRecord();
+  const windows = useListAvailabilityWindow();
+  const people = useListPerson();
+  const clockIn = useCreateTimeRecord();
+  const clockOut = useTimeRecordClockOut();
+  const correct = useTimeRecordCorrect();
+  const declare = useCreateAvailabilityWindow();
+  const withdraw = useAvailabilityWindowWithdraw();
+  const [showForm, setShowForm] = useState<"clockIn" | "declare" | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [failure, setFailure] = useState<unknown>(null);
+
+  const activeRecords = (records ?? []).filter((row) => row.deletedAt == null);
+  const activeWindows = (windows ?? []).filter((row) => row.deletedAt == null);
+  const activePeople = (people ?? []).filter(
+    (person) => person.deletedAt == null && person.status === "active",
+  );
+  const personName = (id: string) => {
+    const person = people?.find((row) => row._id === id);
+    return person ? `${person.givenName} ${person.familyName}` : "Unknown";
+  };
+
+  const run = async (key: string, work: () => Promise<void>) => {
+    setFailure(null);
+    setBusy(key);
+    try {
+      await work();
+    } catch (error) {
+      setFailure(error);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const submitClockIn = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    void run("clock-in", async () => {
+      await clockIn({
+        personId: String(data.get("personId")),
+        notes: String(data.get("notes") || "") || undefined,
+      });
+      form.reset();
+      setShowForm(null);
+    });
+  };
+
+  const submitDeclare = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    void run("declare", async () => {
+      await declare({
+        personId: String(data.get("personId")),
+        startsAt: toEpoch(data.get("startsAt")),
+        endsAt: toEpoch(data.get("endsAt")),
+        notes: String(data.get("notes") || "") || undefined,
+      });
+      form.reset();
+      setShowForm(null);
+    });
+  };
+
+  const invokeTime = (row: any, key: string) => {
+    void run(`${row._id}:${key}`, async () => {
+      const args = { docId: row._id, version: row.version };
+      if (key === "clockOut") await clockOut(args);
+      if (key === "correct") {
+        const clockInRaw = window
+          .prompt("Corrected clock-in (e.g. 2026-07-17 08:00)")
+          ?.trim();
+        if (!clockInRaw) return;
+        const clockOutRaw = window
+          .prompt("Corrected clock-out (e.g. 2026-07-17 16:30)")
+          ?.trim();
+        if (!clockOutRaw) return;
+        const clockInAt = new Date(clockInRaw).getTime();
+        const clockOutAt = new Date(clockOutRaw).getTime();
+        await correct({ ...args, clockInAt, clockOutAt });
+      }
+    });
+  };
+
+  const withdrawWindow = (row: any) => {
+    void run(`${row._id}:withdraw`, async () => {
+      await withdraw({ docId: row._id, version: row.version });
+    });
+  };
+
+  const loading =
+    records === undefined || windows === undefined || people === undefined;
+
+  return (
+    <div className="operations-stage supply-stage">
+      <header className="supply-masthead">
+        <div>
+          <p className="eyebrow">Staff · Time</p>
+          <h1 className="display-title mt-2">Time sheet & availability</h1>
+          <p className="mt-3 max-w-160 text-ink-2">
+            Clock time against governed records with explicit correction
+            provenance, and keep availability as a declared/withdrawn ledger.
+          </p>
+        </div>
+        <div className="supply-row-actions">
+          <button
+            className="btn btn-primary"
+            onClick={() =>
+              setShowForm((value) => (value === "clockIn" ? null : "clockIn"))
+            }
+          >
+            {showForm === "clockIn" ? "Close form" : "Clock in"}
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={() =>
+              setShowForm((value) => (value === "declare" ? null : "declare"))
+            }
+          >
+            {showForm === "declare" ? "Close form" : "Declare availability"}
+          </button>
+        </div>
+      </header>
+      <WorkforceWorkspaceNav />
+      {failure ? <WorkforceFailureBanner error={failure} /> : null}
+
+      {showForm === "clockIn" ? (
+        <form className="supply-form" onSubmit={submitClockIn}>
+          <div className="supply-form-heading">
+            <div>
+              <p className="eyebrow">New governed time record</p>
+              <h2>Clock in</h2>
+            </div>
+            <button className="btn btn-primary" disabled={busy != null}>
+              {busy === "clock-in" ? "Clocking…" : "Clock in"}
+            </button>
+          </div>
+          <div className="supply-form-grid">
+            <label className="field-label">
+              Person
+              <select name="personId" className="input" required>
+                <option value="">Select person</option>
+                {activePeople.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.givenName} {item.familyName}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field-label">
+              Notes
+              <input name="notes" className="input" />
+            </label>
+          </div>
+        </form>
+      ) : null}
+
+      {showForm === "declare" ? (
+        <form className="supply-form" onSubmit={submitDeclare}>
+          <div className="supply-form-heading">
+            <div>
+              <p className="eyebrow">New availability window</p>
+              <h2>Declare availability</h2>
+            </div>
+            <button className="btn btn-primary" disabled={busy != null}>
+              {busy === "declare" ? "Declaring…" : "Declare"}
+            </button>
+          </div>
+          <div className="supply-form-grid">
+            <label className="field-label">
+              Person
+              <select name="personId" className="input" required>
+                <option value="">Select person</option>
+                {activePeople.map((item) => (
+                  <option key={item._id} value={item._id}>
+                    {item.givenName} {item.familyName}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field-label">
+              From
+              <input
+                name="startsAt"
+                className="input"
+                type="datetime-local"
+                required
+              />
+            </label>
+            <label className="field-label">
+              Until
+              <input
+                name="endsAt"
+                className="input"
+                type="datetime-local"
+                required
+              />
+            </label>
+            <label className="field-label">
+              Notes
+              <input name="notes" className="input" />
+            </label>
+          </div>
+        </form>
+      ) : null}
+
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">Attendance</p>
+            <h2>Time records</h2>
+          </div>
+          <span>{activeRecords.length} records</span>
+        </div>
+        {loading ? (
+          <TableSkeleton rows={5} />
+        ) : activeRecords.length === 0 ? (
+          <div className="document-empty">
+            <p>No time has been recorded.</p>
+            <span>Clock a person in to open a governed time record.</span>
+          </div>
+        ) : (
+          <div className="supply-table-wrap">
+            <table className="supply-table">
+              <thead>
+                <tr>
+                  <th>Person</th>
+                  <th>Clock in</th>
+                  <th>Clock out</th>
+                  <th>Break</th>
+                  <th>State</th>
+                  <th aria-label="Actions" />
+                </tr>
+              </thead>
+              <tbody>
+                {activeRecords.map((row) => (
+                  <tr key={row._id}>
+                    <td>
+                      <strong>{personName(row.personId)}</strong>
+                    </td>
+                    <td>
+                      {row.clockInAt
+                        ? new Date(row.clockInAt).toLocaleString()
+                        : "—"}
+                    </td>
+                    <td>
+                      {row.clockOutAt
+                        ? new Date(row.clockOutAt).toLocaleString()
+                        : "—"}
+                    </td>
+                    <td className="supply-number">
+                      {row.breakMinutes ?? 0} min
+                    </td>
+                    <td>
+                      <StatusChip status={String(row.status)} />
+                      {row.correctedAt ? <small>corrected</small> : null}
+                    </td>
+                    <td>
+                      <div className="supply-row-actions">
+                        {policy
+                          .timeActions(String(row.status))
+                          .map((action) => (
+                            <button
+                              key={action.key}
+                              className="btn btn-ghost btn-sm"
+                              disabled={busy != null}
+                              onClick={() => invokeTime(row, action.key)}
+                            >
+                              {busy === `${row._id}:${action.key}`
+                                ? "Working…"
+                                : action.label}
+                            </button>
+                          ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">Availability</p>
+            <h2>Availability windows</h2>
+          </div>
+          <span>{activeWindows.length} windows</span>
+        </div>
+        {loading ? (
+          <TableSkeleton rows={4} />
+        ) : activeWindows.length === 0 ? (
+          <div className="document-empty">
+            <p>No availability is declared.</p>
+            <span>Declare a window with a start and end time.</span>
+          </div>
+        ) : (
+          <div className="supply-table-wrap">
+            <table className="supply-table">
+              <thead>
+                <tr>
+                  <th>Person</th>
+                  <th>Window</th>
+                  <th>State</th>
+                  <th aria-label="Actions" />
+                </tr>
+              </thead>
+              <tbody>
+                {activeWindows.map((row) => (
+                  <tr key={row._id}>
+                    <td>
+                      <strong>{personName(row.personId)}</strong>
+                    </td>
+                    <td>
+                      {row.startsAt
+                        ? new Date(row.startsAt).toLocaleString()
+                        : "—"}{" "}
+                      →{" "}
+                      {row.endsAt ? new Date(row.endsAt).toLocaleString() : "—"}
+                    </td>
+                    <td>
+                      <StatusChip status={String(row.status)} />
+                    </td>
+                    <td>
+                      <div className="supply-row-actions">
+                        {policy
+                          .availabilityActions(String(row.status))
+                          .map((action) => (
+                            <button
+                              key={action.key}
+                              className="btn btn-ghost btn-sm"
+                              disabled={busy != null}
+                              onClick={() => withdrawWindow(row)}
+                            >
+                              {busy === `${row._id}:withdraw`
+                                ? "Working…"
+                                : action.label}
+                            </button>
+                          ))}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
