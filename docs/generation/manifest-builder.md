@@ -69,6 +69,13 @@ Generated Convex surfaces import `getAuthContext` from `./lib/authContext`. That
 - Generated runtime behavior still requires focused reaction tests. The authored UI explicitly does not claim demand-to-purchase, add-line-to-ordered, cancellation, or receipt-to-stock automation while the projection evidence remains open.
 - `bun run check:supply-manifest` enforces this authored boundary and is part of `bun run check`.
 
+## Authored Production and Quality integration
+
+- Use generated hooks from `src/lib/manifest-convex-react.ts`, including governed `useCreatePrepTask` and `useCreateQualityCheck` (open).
+- Production and Quality need no authored allocation seam. Consume lifecycle availability from `src/generated/manifest-wiring-bindings.ts`.
+- Runtime proof for failed quality blocking: `tests/proofs/quality-check-fail-block.runtime.test.ts`.
+- `bun run check:production-manifest` enforces this authored boundary and is part of `bun run check`.
+
 ## Hard rule
 
 If regeneration would clobber an author seam, **stop**. Preserve `convex/lib/**`, `convex/auth.config.ts`, and `convex/authStatus.ts`. Never “fix” generated output by hand — re-assemble or re-codegen from the authoritative source.

@@ -1327,9 +1327,9 @@ export function useQualityCheckReinspect() {
   return useMutation(api.mutations.QualityCheck_reinspect);
 }
 
-/** Governed creation hook for QualityCheck.fail. */
+/** Governed creation hook for QualityCheck.open. */
 export function useCreateQualityCheck() {
-  return useMutation(api.mutations.QualityCheck_createViaFail);
+  return useMutation(api.mutations.QualityCheck_createViaOpen);
 }
 
 /** Reactive list for Recipe. */

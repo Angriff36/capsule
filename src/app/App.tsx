@@ -33,6 +33,11 @@ const VendorOrderPage = lazy(() =>
     default: module.VendorOrderPage,
   })),
 );
+const PrepBoardPage = lazy(() =>
+  import("../features/production/PrepBoardPage").then((module) => ({
+    default: module.PrepBoardPage,
+  })),
+);
 
 function SupplyRoute({ children }: { children: ReactNode }) {
   return <Suspense fallback={<TableSkeleton rows={8} />}>{children}</Suspense>;
@@ -94,6 +99,14 @@ export function App() {
               element={<KitchenCatalogPage section="menus" />}
             />
             <Route path="/kitchen/event-menu" element={<EventMenuPage />} />
+            <Route
+              path="/kitchen/prep"
+              element={
+                <SupplyRoute>
+                  <PrepBoardPage />
+                </SupplyRoute>
+              }
+            />
             <Route
               path="/inventory"
               element={<Navigate to="/inventory/demand" replace />}

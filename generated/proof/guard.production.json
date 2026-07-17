@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "manifest-integration-guard/v1",
+  "versions": {
+    "manifestVersion": "3.6.13",
+    "projection": "convex",
+    "preset": {
+      "id": "convex-application",
+      "version": "1.3.4"
+    }
+  },
+  "featureRoots": [
+    "src/features/production"
+  ],
+  "convexLibRoot": "convex/lib",
+  "ownedTables": [
+    "eventAllergenChecks",
+    "incidents",
+    "prepTasks",
+    "productionBatches",
+    "qualityChecks"
+  ],
+  "forbidDirectConvexHooks": true,
+  "forbiddenImportPatterns": [
+    "(?:^|/)convex/(?:queries|mutations)(?:\\.|$|/)",
+    "(?:^|/)convex/_generated(?:/|$)",
+    "^convex/react$"
+  ],
+  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:pending|claimed|in_progress|blocked|completed|cancelled|passed|failed)[\"']",
+  "lifecyclePolicies": [
+    {
+      "pathSuffix": "/ProductionLifecyclePolicy.ts",
+      "bindingsImport": "../../generated/manifest-wiring-bindings\"",
+      "requiredSymbols": [
+        "PrepTaskClaimLifecycle",
+        "QualityCheckFailLifecycle"
+      ]
+    }
+  ],
+  "exceptions": []
+}

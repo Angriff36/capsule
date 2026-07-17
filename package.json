@@ -11,9 +11,10 @@
   "scripts": {
     "baseline:decay": "bun scripts/check-baseline-decay.ts",
     "build": "vite build",
-    "check": "bun run toolchain && bun run proof:emit && bun run check:proof && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
+    "check": "bun run toolchain && bun run proof:emit && bun run check:proof && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run check:production-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
     "check:culinary-manifest": "bun scripts/check-culinary-manifest-integration.ts",
     "check:event-manifest": "bun scripts/check-event-manifest-integration.ts",
+    "check:production-manifest": "bun scripts/check-production-manifest-integration.ts",
     "check:proof": "bun scripts/check-proof-registry.ts",
     "check:supply-manifest": "bun scripts/check-supply-manifest-integration.ts",
     "codegen": "convex codegen",
@@ -30,7 +31,7 @@
     "seed": "bun scripts/seed-convex.ts",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:proofs": "vitest run tests/proofs tests/proof-registry-gate.test.ts tests/supply-manifest-integration-guard.test.ts",
+    "test:proofs": "vitest run tests/proofs tests/proof-registry-gate.test.ts tests/supply-manifest-integration-guard.test.ts tests/production-manifest-integration-guard.test.ts",
     "toolchain": "bun scripts/check-toolchain.ts",
     "typecheck": "tsc --noEmit"
   },

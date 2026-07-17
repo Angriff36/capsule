@@ -31,7 +31,7 @@ Every slice must:
 | 8. Closeout and reporting         | Capture/finalize event closeout, prepare payroll inputs, save governed report definitions        | Closeout & reporting, all systems          | Stable upstream facts; aggregate capture behavior defined                     |
 | 9. Service desk integration       | Replace placeholder Home with role-shaped attention, upcoming services, and verified readiness   | All shipping systems                       | Only queryable/verified facts may appear; no fake KPIs                        |
 
-Current delivery status: Slice 1, Event planning foundation, Slice 2, Culinary planning, and the authored operator surfaces for Slice 3, Demand, stock, and purchasing, are shipped and documented in the owning system pages. Slice 3 keeps blocked automation and projected-number precision explicit; it does not mark the broader Slice 0 projection-safety backlog or downstream reactions complete.
+Current delivery status: Slice 1, Event planning foundation, Slice 2, Culinary planning, Slice 3 Demand/stock/purchasing authored surfaces, and Slice 4 Kitchen production and quality (prep board + QualityCheck fail→PrepTask block runtime proof) are shipped and documented in the owning system pages. Slice 3 keeps blocked automation and projected-number precision explicit; Slice 0 projection-safety backlog items beyond the proven reactions remain open.
 
 ## Slice composition rule
 

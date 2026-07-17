@@ -1,0 +1,71 @@
+import {
+  PrepTaskCancelLifecycle,
+  PrepTaskClaimLifecycle,
+  PrepTaskCompleteLifecycle,
+  PrepTaskMarkBlockedLifecycle,
+  PrepTaskReleaseLifecycle,
+  PrepTaskStartLifecycle,
+  PrepTaskUnblockLifecycle,
+  QualityCheckFailLifecycle,
+  QualityCheckPassLifecycle,
+  QualityCheckReinspectLifecycle,
+} from "../../generated/manifest-wiring-bindings";
+
+export interface ProductionAction<Key extends string = string> {
+  key: Key;
+  label: string;
+}
+
+type Lifecycle = readonly {
+  property: string;
+  from: string;
+  to: string;
+  proven: boolean;
+}[];
+
+function available<Key extends string>(
+  status: string,
+  actions: readonly (ProductionAction<Key> & { lifecycle: Lifecycle })[],
+): ProductionAction<Key>[] {
+  return actions
+    .filter((action) =>
+      action.lifecycle.some(
+        (transition) => transition.proven && transition.from === status,
+      ),
+    )
+    .map(({ key, label }) => ({ key, label }));
+}
+
+const PREP_ACTIONS = [
+  { key: "claim", label: "Claim", lifecycle: PrepTaskClaimLifecycle },
+  { key: "release", label: "Release", lifecycle: PrepTaskReleaseLifecycle },
+  { key: "start", label: "Start", lifecycle: PrepTaskStartLifecycle },
+  { key: "complete", label: "Complete", lifecycle: PrepTaskCompleteLifecycle },
+  {
+    key: "markBlocked",
+    label: "Block",
+    lifecycle: PrepTaskMarkBlockedLifecycle,
+  },
+  { key: "unblock", label: "Unblock", lifecycle: PrepTaskUnblockLifecycle },
+  { key: "cancel", label: "Cancel", lifecycle: PrepTaskCancelLifecycle },
+] as const;
+
+const QUALITY_ACTIONS = [
+  { key: "pass", label: "Pass", lifecycle: QualityCheckPassLifecycle },
+  { key: "fail", label: "Fail", lifecycle: QualityCheckFailLifecycle },
+  {
+    key: "reinspect",
+    label: "Reinspect",
+    lifecycle: QualityCheckReinspectLifecycle,
+  },
+] as const;
+
+export class ProductionLifecyclePolicy {
+  prepActions(status: string) {
+    return available(status, PREP_ACTIONS);
+  }
+
+  qualityActions(status: string) {
+    return available(status, QUALITY_ACTIONS);
+  }
+}

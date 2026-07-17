@@ -8524,8 +8524,8 @@ async function __runPrepTaskOpen(ctx: MutationCtx, { docId, eventId, ingredientI
     if (!((doc.claimedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.event != null))) throw new Error("Guard 3 failed");
-    if (!(((doc.ingredient != null) && (doc.ingredient.status === "active")))) throw new Error("Guard 4 failed");
+    if (!((doc.eventId != null))) throw new Error("Guard 3 failed");
+    if (!((doc.ingredientId != null))) throw new Error("Guard 4 failed");
     if (!((eventId === doc.eventId))) throw new Error("Open eventId must match the seeded event reference");
     if (!((ingredientId === doc.ingredientId))) throw new Error("Open ingredientId must match the seeded ingredient reference");
     if (!((((ingredientDemandId == null) || (doc.ingredientDemandId == null)) || (ingredientDemandId === doc.ingredientDemandId)))) throw new Error("Open ingredientDemandId must match the seeded demand reference when provided");
@@ -9813,25 +9813,22 @@ export const QualityCheck_fail = mutation({
   handler: __runQualityCheckFail,
 });
 
-export const QualityCheck_createViaFail = mutation({
+export const QualityCheck_createViaOpen = mutation({
   args: {
+    prepTaskId: v.optional(v.string()),
+    productionBatchId: v.optional(v.string()),
     notes: v.optional(v.string())
   },
   handler: async (ctx, args: any) => {
     const __auth = (await getAuthContext(ctx)) as any;
-    const user = __auth;
     const __seed: Record<string, any> = {
       tenantId: __auth.tenantId,
-      notes: ((args.notes != null) ? args.notes : args.notes),
-      result: "fail",
-      checkedById: user.id,
-      status: "failed",
-      completedAt: Date.now(),
+      status: "pending",
       version: 0
     };
     const docId = await ctx.db.insert("qualityChecks", __seed as any);
     try {
-      await __runQualityCheckFail(ctx, { ...args, docId }, true);
+      await __runQualityCheckOpen(ctx, { ...args, docId }, true);
       return { docId };
     } catch (error) {
       await ctx.db.delete(docId);

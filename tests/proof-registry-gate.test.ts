@@ -37,12 +37,19 @@ describe("proof registry gate", () => {
       installedPreset: appPkg.manifestPreset,
     });
     expect(issues).toEqual([]);
-    const reaction = registry.proofs.find((p) =>
+    const demandReaction = registry.proofs.find((p) =>
       p.id.includes("IngredientDemandConfirmed"),
     );
-    expect(reaction?.status).toBe("runtime_proven");
-    expect(reaction?.runtimeTest).toBe(
+    expect(demandReaction?.status).toBe("runtime_proven");
+    expect(demandReaction?.runtimeTest).toBe(
       "tests/proofs/ingredient-demand-confirm.runtime.test.ts",
+    );
+    const qualityReaction = registry.proofs.find((p) =>
+      p.id.includes("QualityCheckFailed"),
+    );
+    expect(qualityReaction?.status).toBe("runtime_proven");
+    expect(qualityReaction?.runtimeTest).toBe(
+      "tests/proofs/quality-check-fail-block.runtime.test.ts",
     );
   });
 

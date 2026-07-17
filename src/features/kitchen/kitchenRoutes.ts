@@ -1,7 +1,7 @@
 export type KitchenSection = "recipes" | "ingredients" | "dishes" | "menus";
 
 export const KITCHEN_SECTIONS: readonly {
-  key: KitchenSection | "event-menu";
+  key: KitchenSection | "event-menu" | "prep";
   label: string;
   path: string;
 }[] = [
@@ -10,6 +10,7 @@ export const KITCHEN_SECTIONS: readonly {
   { key: "dishes", label: "Dishes", path: "/kitchen/dishes" },
   { key: "menus", label: "Menus", path: "/kitchen/menus" },
   { key: "event-menu", label: "Event menu", path: "/kitchen/event-menu" },
+  { key: "prep", label: "Prep", path: "/kitchen/prep" },
 ] as const;
 
 export function recipePath(id: string) {

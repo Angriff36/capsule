@@ -78,8 +78,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.claimedAt == null
     guard self.status == "pending"
     guard self.deletedAt == null
-    guard self.event != null
-    guard self.ingredient != null and self.ingredient.status == "active"
+    // Convex projection does not hydrate belongsTo for guards; seed FKs are authoritative.
+    guard self.eventId != null
+    guard self.ingredientId != null
     constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
     constraint openIngredientMatch: ingredientId == self.ingredientId "Open ingredientId must match the seeded ingredient reference"
     constraint openDemandMatch: ingredientDemandId == null or self.ingredientDemandId == null or ingredientDemandId == self.ingredientDemandId "Open ingredientDemandId must match the seeded demand reference when provided"

@@ -1,5 +1,5 @@
 /**
- * Emit Manifest DX proof-kit artifacts for Capsule (catalog, registry, guard).
+ * Emit Manifest DX proof-kit artifacts for Capsule (catalog, registry, guards).
  * Derived from compiled IR — not hand-maintained inventories.
  */
 import { mkdirSync, writeFileSync, existsSync, readFileSync } from "node:fs";
@@ -20,8 +20,14 @@ const outDir = path.join(root, "generated", "proof");
 const irPath = path.join(root, "generated", "ir", "merged.ir.json");
 const require = createRequire(import.meta.url);
 
-const VERTICAL_ENTITIES = ["IngredientDemand", "PurchaseNeed"] as const;
-const RUNTIME_TEST = "tests/proofs/ingredient-demand-confirm.runtime.test.ts";
+const SUPPLY_ENTITIES = ["IngredientDemand", "PurchaseNeed"] as const;
+const PRODUCTION_ENTITIES = ["PrepTask", "QualityCheck"] as const;
+const CATALOG_ENTITIES = [...SUPPLY_ENTITIES, ...PRODUCTION_ENTITIES] as const;
+
+const DEMAND_RUNTIME_TEST =
+  "tests/proofs/ingredient-demand-confirm.runtime.test.ts";
+const QUALITY_RUNTIME_TEST =
+  "tests/proofs/quality-check-fail-block.runtime.test.ts";
 const STRUCTURAL_TEST = "tests/event-reaction-projection.test.ts";
 
 function compileIr(): void {
@@ -64,6 +70,26 @@ function presetVersions(): { id: string; version: string } {
   };
 }
 
+function requireReaction(
+  ir: IR,
+  event: string,
+  targetEntity: string,
+  targetCommand: string,
+) {
+  const reaction = (ir.reactions ?? []).find(
+    (r) =>
+      r.event === event &&
+      r.targetEntity === targetEntity &&
+      r.targetCommand === targetCommand,
+  );
+  if (!reaction) {
+    throw new Error(
+      `Expected ${event} → ${targetEntity}.${targetCommand} reaction in IR`,
+    );
+  }
+  return reaction;
+}
+
 export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
   if (!options?.skipCompile) compileIr();
   const ir = loadIr();
@@ -73,39 +99,61 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     preset: presetVersions(),
   };
 
-  const reaction = (ir.reactions ?? []).find(
-    (r) =>
-      r.event === "IngredientDemandConfirmed" &&
-      r.targetEntity === "PurchaseNeed" &&
-      r.targetCommand === "create",
+  const demandReaction = requireReaction(
+    ir,
+    "IngredientDemandConfirmed",
+    "PurchaseNeed",
+    "create",
   );
-  if (!reaction) {
-    throw new Error(
-      "Expected IngredientDemandConfirmed → PurchaseNeed.create reaction in IR",
-    );
-  }
-  const reactionId = reactionProofId(reaction);
+  const qualityReaction = requireReaction(
+    ir,
+    "QualityCheckFailed",
+    "PrepTask",
+    "markBlocked",
+  );
+  const demandReactionId = reactionProofId(demandReaction);
+  const qualityReactionId = reactionProofId(qualityReaction);
+  const runtimeProofIds = new Set([demandReactionId, qualityReactionId]);
+  const structuralProofIds = new Set([demandReactionId, qualityReactionId]);
 
   const catalog = emitCapabilityCatalog(ir, {
-    entityFilter: VERTICAL_ENTITIES,
+    entityFilter: CATALOG_ENTITIES,
     versions,
-    runtimeProofIds: new Set([reactionId]),
-    structuralProofIds: new Set([reactionId]),
+    runtimeProofIds,
+    structuralProofIds,
   });
 
   const registry = emitProofRegistry(ir, {
-    entityFilter: VERTICAL_ENTITIES,
+    entityFilter: CATALOG_ENTITIES,
     versions,
     testBindings: [
       {
-        proofId: reactionId,
+        proofId: demandReactionId,
         structuralTest: STRUCTURAL_TEST,
-        runtimeTest: RUNTIME_TEST,
+        runtimeTest: DEMAND_RUNTIME_TEST,
+      },
+      {
+        proofId: qualityReactionId,
+        structuralTest: STRUCTURAL_TEST,
+        runtimeTest: QUALITY_RUNTIME_TEST,
       },
     ],
   });
 
-  const lifecycleStates = [
+  const supplyCatalog = emitCapabilityCatalog(ir, {
+    entityFilter: SUPPLY_ENTITIES,
+    versions,
+    runtimeProofIds: new Set([demandReactionId]),
+    structuralProofIds: new Set([demandReactionId]),
+  });
+  const productionCatalog = emitCapabilityCatalog(ir, {
+    entityFilter: PRODUCTION_ENTITIES,
+    versions,
+    runtimeProofIds: new Set([qualityReactionId]),
+    structuralProofIds: new Set([qualityReactionId]),
+  });
+
+  const supplyLifecycleStates = [
     "pending",
     "calculated",
     "confirmed",
@@ -122,12 +170,22 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     "partially_received",
     "received",
   ];
+  const productionLifecycleStates = [
+    "pending",
+    "claimed",
+    "in_progress",
+    "blocked",
+    "completed",
+    "cancelled",
+    "passed",
+    "failed",
+  ];
 
-  const guard = emitIntegrationGuardConfig(catalog, {
+  const supplyGuard = emitIntegrationGuardConfig(supplyCatalog, {
     featureRoots: ["src/features/inventory"],
     convexLibRoot: "convex/lib",
     versions,
-    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:${lifecycleStates.join("|")})["']`,
+    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:${supplyLifecycleStates.join("|")})["']`,
     lifecyclePolicies: [
       {
         pathSuffix: "/SupplyLifecyclePolicy.ts",
@@ -148,6 +206,24 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     ],
   });
 
+  const productionGuard = emitIntegrationGuardConfig(productionCatalog, {
+    featureRoots: ["src/features/production"],
+    convexLibRoot: "convex/lib",
+    versions,
+    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:${productionLifecycleStates.join("|")})["']`,
+    lifecyclePolicies: [
+      {
+        pathSuffix: "/ProductionLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: [
+          "PrepTaskClaimLifecycle",
+          "QualityCheckFailLifecycle",
+        ],
+      },
+    ],
+    extraOwnedTables: ["productionBatches", "incidents", "eventAllergenChecks"],
+  });
+
   mkdirSync(outDir, { recursive: true });
   const write = (name: string, value: unknown) => {
     const text =
@@ -157,7 +233,8 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
 
   write("capability-catalog.json", catalog);
   write("proof-registry.json", registry);
-  write("guard.supply.json", guard);
+  write("guard.supply.json", supplyGuard);
+  write("guard.production.json", productionGuard);
   write("capability-catalog.md", formatCapabilityCatalogMarkdown(catalog));
 
   console.log(`Emitted proof-kit artifacts to ${outDir}`);
