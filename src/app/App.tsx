@@ -5,8 +5,11 @@ import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { HomePage } from "../features/home/HomePage";
 import { EventMenuPage } from "../features/kitchen/EventMenuPage";
+import { DishDetailPage } from "../features/kitchen/DishDetailPage";
+import { IngredientDetailPage } from "../features/kitchen/IngredientDetailPage";
 import { RecipeImportPage } from "../features/kitchen/import/RecipeImportPage";
 import { KitchenCatalogPage } from "../features/kitchen/KitchenCatalogPage";
+import { MenuDetailPage } from "../features/kitchen/MenuDetailPage";
 import { RecipeDetailPage } from "../features/kitchen/RecipeDetailPage";
 import { ErrorState, TableSkeleton } from "../ui/primitives";
 import { AuthGate } from "./AuthGate";
@@ -106,6 +109,12 @@ export function App() {
               element={<RecipeImportPage />}
             />
             <Route path="/kitchen/recipes/:id" element={<RecipeDetailPage />} />
+            <Route
+              path="/kitchen/ingredients/:id"
+              element={<IngredientDetailPage />}
+            />
+            <Route path="/kitchen/dishes/:id" element={<DishDetailPage />} />
+            <Route path="/kitchen/menus/:id" element={<MenuDetailPage />} />
             <Route
               path="/kitchen/ingredients"
               element={<KitchenCatalogPage section="ingredients" />}

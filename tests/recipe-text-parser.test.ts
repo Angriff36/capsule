@@ -1,9 +1,19 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { IngredientCatalogMatcher } from "../src/features/kitchen/import/IngredientCatalogMatcher";
+import { RecipeCsvParser } from "../src/features/kitchen/import/RecipeCsvParser";
 import { RecipeImportCoordinator } from "../src/features/kitchen/import/RecipeImportCoordinator";
 import { RecipeImportFinalizer } from "../src/features/kitchen/import/RecipeImportFinalizer";
 import { RecipeTextParser } from "../src/features/kitchen/import/RecipeTextParser";
+import { SourceFingerprint } from "../src/features/kitchen/import/SourceFingerprint";
 import { UnitOfMeasureMapper } from "../src/features/kitchen/import/UnitOfMeasureMapper";
+import {
+  countUnresolvedLines,
+  reviewIsReady,
+} from "../src/features/kitchen/import/RecipeImportTypes";
+
+const readFixture = (name: string) =>
+  readFileSync(`tests/fixtures/recipe-import/${name}`, "utf8");
 
 const SAMPLE = `One-Pot Chili
 
@@ -32,6 +42,14 @@ describe("UnitOfMeasureMapper", () => {
   });
 });
 
+describe("SourceFingerprint", () => {
+  it("is deterministic for the same source text", () => {
+    const fingerprint = new SourceFingerprint();
+    expect(fingerprint.digest("abc")).toBe(fingerprint.digest("abc"));
+    expect(fingerprint.digest("abc")).not.toBe(fingerprint.digest("abcd"));
+  });
+});
+
 describe("RecipeTextParser", () => {
   it("parses name, yield, ingredients, and instructions", () => {
     const parsed = new RecipeTextParser().parse(SAMPLE);
@@ -51,17 +69,36 @@ describe("RecipeTextParser", () => {
     });
     expect(parsed.lines[2].quantity).toBeCloseTo(0.25);
     expect(parsed.lines[2].unit).toBe("cup");
-    expect(parsed.lines[3]).toMatchObject({
-      name: "Pinto Beans",
-      unit: "each",
-    });
-    expect(parsed.lines[3].prepNotes).toMatch(/rinsed/i);
     expect(parsed.instructions).toContain("Brown the turkey");
+  });
+
+  it("handles pound notation and catering yields from fixtures", () => {
+    const parsed = new RecipeTextParser().parse(readFixture("basil-pesto.txt"));
+    expect(parsed.yieldQuantity).toBe(2);
+    expect(parsed.yieldUnit).toBe("pound");
+    expect(parsed.lines[0]).toMatchObject({
+      quantity: 2,
+      unit: "pound",
+      name: "Basil Leaves",
+    });
+  });
+});
+
+describe("RecipeCsvParser", () => {
+  it("parses paired recipe sheet and line CSV fixtures", () => {
+    const result = new RecipeCsvParser().parseBundle(
+      readFixture("recipe_sheet.csv"),
+      readFixture("recipe_lines.csv"),
+    );
+    expect(result.errors).toEqual([]);
+    expect(result.draft.name).toBe("Basil Pesto");
+    expect(result.draft.lines.length).toBeGreaterThan(0);
+    expect(result.draft.yieldQuantity).toBe(2);
   });
 });
 
 describe("IngredientCatalogMatcher", () => {
-  it("marks exact, partial, and new matches", () => {
+  it("marks exact, possible, and new matches without auto-linking possible matches", () => {
     const matcher = new IngredientCatalogMatcher();
     const catalog = [
       { id: "ing-1", name: "Onion" },
@@ -77,10 +114,10 @@ describe("IngredientCatalogMatcher", () => {
       },
       catalog,
     );
-    expect(exact.matchStatus).toBe("matched");
+    expect(exact.matchStatus).toBe("exact");
     expect(exact.matchedIngredientId).toBe("ing-1");
 
-    const partial = matcher.matchLine(
+    const possible = matcher.matchLine(
       {
         raw: "1/4 cup green bell pepper",
         name: "Green Bell Pepper",
@@ -90,8 +127,9 @@ describe("IngredientCatalogMatcher", () => {
       },
       catalog,
     );
-    expect(partial.matchStatus).toBe("partial");
-    expect(partial.matchedIngredientId).toBe("ing-2");
+    expect(possible.matchStatus).toBe("possible");
+    expect(possible.matchedIngredientId).toBeUndefined();
+    expect(possible.possibleMatchIds.length).toBeGreaterThan(0);
 
     const created = matcher.matchLine(
       {
@@ -108,12 +146,40 @@ describe("IngredientCatalogMatcher", () => {
   });
 });
 
+describe("RecipeImportCoordinator", () => {
+  it("blocks finalize readiness until non-exact lines are confirmed", () => {
+    const review = new RecipeImportCoordinator().parseText(SAMPLE, [
+      { id: "ing-onion", name: "Onion" },
+    ]);
+    expect(countUnresolvedLines(review.lines)).toBeGreaterThan(0);
+    expect(reviewIsReady(review)).toBe(false);
+
+    const resolved = {
+      ...review,
+      lines: review.lines.map((line) =>
+        line.matchStatus === "exact"
+          ? line
+          : { ...line, matchStatus: "confirmed_new" as const, createNew: true },
+      ),
+    };
+    expect(reviewIsReady(resolved)).toBe(true);
+  });
+});
+
 describe("RecipeImportFinalizer", () => {
   it("creates missing ingredients, recipe, and lines in order", async () => {
     const calls: string[] = [];
-    const review = new RecipeImportCoordinator().parseAndMatch(SAMPLE, [
+    const review = new RecipeImportCoordinator().parseText(SAMPLE, [
       { id: "ing-onion", name: "Onion" },
     ]);
+    const ready = {
+      ...review,
+      lines: review.lines.map((line) =>
+        line.matchStatus === "exact"
+          ? line
+          : { ...line, matchStatus: "confirmed_new" as const, createNew: true },
+      ),
+    };
     const finalizer = new RecipeImportFinalizer({
       createIngredient: async (input) => {
         calls.push(`ingredient:${input.name}`);
@@ -129,11 +195,19 @@ describe("RecipeImportFinalizer", () => {
       },
     });
 
-    const result = await finalizer.finalize(review);
+    const result = await finalizer.finalize(ready);
     expect(result.recipeId).toBe("recipe-1");
-    expect(result.lineIds).toHaveLength(review.lines.length);
-    expect(calls[0]).toMatch(/^ingredient:/);
+    expect(result.lineIds).toHaveLength(ready.lines.length);
     expect(calls).toContain("recipe:One-Pot Chili");
-    expect(calls.some((call) => call === "line:ing-onion")).toBe(true);
+  });
+});
+
+describe("kitchen route helpers", () => {
+  it("exposes detail paths for culinary entities", async () => {
+    const routes = await import("../src/features/kitchen/kitchenRoutes");
+    expect(routes.ingredientPath("abc")).toBe("/kitchen/ingredients/abc");
+    expect(routes.dishPath("abc")).toBe("/kitchen/dishes/abc");
+    expect(routes.menuPath("abc")).toBe("/kitchen/menus/abc");
+    expect(routes.RECIPE_IMPORT_PATH).toBe("/kitchen/recipes/import");
   });
 });

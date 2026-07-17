@@ -118,10 +118,7 @@ export class RecipeTextParser {
     const match =
       text.match(
         /\b(?:yield|serves|servings)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*([a-zA-Z#]+)?/i,
-      ) ??
-      text.match(
-        /\b(\d+(?:\.\d+)?)\s*(servings?|portions?|quarts?)\b/i,
-      );
+      ) ?? text.match(/\b(\d+(?:\.\d+)?)\s*(servings?|portions?|quarts?)\b/i);
     if (!match) {
       warnings.push("Yield not found; defaulting to 1 portion.");
       return { yieldQuantity: 1, yieldUnit: "portion" };
@@ -212,7 +209,10 @@ export class RecipeTextParser {
     const unitMatch = rest.match(
       /^([#A-Za-z½¼¾]+)\b(?:\s*\(([^)]+)\))?\s+(.*)$/u,
     );
-    if (unitMatch && (unitMatch[1] === "#" || this.units.isKnownAlias(unitMatch[1]))) {
+    if (
+      unitMatch &&
+      (unitMatch[1] === "#" || this.units.isKnownAlias(unitMatch[1]))
+    ) {
       unitRaw = unitMatch[1];
       unit = this.mapUnitAlias(unitMatch[1]);
       const parenthetical = unitMatch[2]?.trim();

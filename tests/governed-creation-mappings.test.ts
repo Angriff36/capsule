@@ -40,6 +40,8 @@ describe("governed creation mappings", () => {
       "Proposal_createViaDraft",
       "Qualification_createViaGrant",
       "QualityCheck_createViaOpen",
+      "RecipeImportLine_createViaStage",
+      "RecipeImport_createViaUpload",
       "RecipeIngredient_createViaAdd",
       "Recipe_createViaDraft",
       "SavedReportDefinition_createViaCreateDefinition",

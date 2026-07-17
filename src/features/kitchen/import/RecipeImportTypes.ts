@@ -1,11 +1,7 @@
 import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
 
 export type IngredientMatchStatus =
-  | "exact"
-  | "possible"
-  | "new"
-  | "confirmed_existing"
-  | "confirmed_new";
+  "exact" | "possible" | "new" | "confirmed_existing" | "confirmed_new";
 
 export type RecipeImportSourceKind = "pasted_text" | "text_file" | "csv_bundle";
 
@@ -68,7 +64,10 @@ export interface CatalogIngredient {
 }
 
 export function isLineResolved(line: ReviewIngredientLine): boolean {
-  if (line.matchStatus === "exact" || line.matchStatus === "confirmed_existing") {
+  if (
+    line.matchStatus === "exact" ||
+    line.matchStatus === "confirmed_existing"
+  ) {
     return Boolean(line.matchedIngredientId);
   }
   if (line.matchStatus === "confirmed_new") {
@@ -77,7 +76,9 @@ export function isLineResolved(line: ReviewIngredientLine): boolean {
   return false;
 }
 
-export function countUnresolvedLines(lines: readonly ReviewIngredientLine[]): number {
+export function countUnresolvedLines(
+  lines: readonly ReviewIngredientLine[],
+): number {
   return lines.filter((line) => !isLineResolved(line)).length;
 }
 

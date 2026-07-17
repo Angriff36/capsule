@@ -24,9 +24,13 @@ import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
 import {
   RECIPE_IMPORT_PATH,
+  dishPath,
+  ingredientPath,
+  menuPath,
   recipePath,
   type KitchenSection,
 } from "./kitchenRoutes";
+import { CulinaryEntityLink } from "./CulinaryEntityLink";
 
 const UNITS = [
   "each",
@@ -329,9 +333,55 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
                 <li key={item._id}>
                   {section === "recipes" ? (
                     <Link to={recipePath(item._id)}>{content}</Link>
+                  ) : section === "ingredients" ? (
+                    <div className="culinary-index-row">
+                      <CulinaryEntityLink kind="ingredient" id={item._id}>
+                        {content}
+                      </CulinaryEntityLink>
+                      <LifecycleButtons
+                        section={section}
+                        item={item}
+                        busy={busy}
+                        run={run}
+                        commands={{
+                          discontinueIngredient,
+                          reinstateIngredient,
+                          retireDish,
+                          reinstateDish,
+                          publishMenu,
+                          unpublishMenu,
+                          archiveMenu,
+                          restoreMenu,
+                        }}
+                      />
+                    </div>
+                  ) : section === "dishes" ? (
+                    <div className="culinary-index-row">
+                      <CulinaryEntityLink kind="dish" id={item._id}>
+                        {content}
+                      </CulinaryEntityLink>
+                      <LifecycleButtons
+                        section={section}
+                        item={item}
+                        busy={busy}
+                        run={run}
+                        commands={{
+                          discontinueIngredient,
+                          reinstateIngredient,
+                          retireDish,
+                          reinstateDish,
+                          publishMenu,
+                          unpublishMenu,
+                          archiveMenu,
+                          restoreMenu,
+                        }}
+                      />
+                    </div>
                   ) : (
                     <div className="culinary-index-row">
-                      {content}
+                      <CulinaryEntityLink kind="menu" id={item._id}>
+                        {content}
+                      </CulinaryEntityLink>
                       <LifecycleButtons
                         section={section}
                         item={item}

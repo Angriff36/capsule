@@ -1,5 +1,9 @@
 import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
-import type { RecipeImportReviewState } from "./RecipeImportTypes";
+import {
+  countUnresolvedLines,
+  isLineResolved,
+  type RecipeImportReviewState,
+} from "./RecipeImportTypes";
 
 export interface CreateIngredientInput {
   name: string;
@@ -62,6 +66,12 @@ export class RecipeImportFinalizer {
     if (review.lines.length === 0) {
       throw new Error("Add at least one ingredient line before saving");
     }
+    const unresolved = countUnresolvedLines(review.lines);
+    if (unresolved > 0) {
+      throw new Error(
+        `${unresolved} ingredient line${unresolved === 1 ? "" : "s"} still need review`,
+      );
+    }
 
     const createdIngredientIds: string[] = [];
     const ingredientIds: string[] = [];
@@ -70,7 +80,10 @@ export class RecipeImportFinalizer {
       if (line.quantity <= 0) {
         throw new Error(`Quantity must be positive for ${line.name}`);
       }
-      if (line.createNew || !line.matchedIngredientId) {
+      if (!isLineResolved(line)) {
+        throw new Error(`${line.name} is not resolved`);
+      }
+      if (line.createNew || line.matchStatus === "confirmed_new") {
         const created = await this.ports.createIngredient({
           name: line.name.trim(),
           unit: line.unit,
@@ -79,8 +92,10 @@ export class RecipeImportFinalizer {
         });
         createdIngredientIds.push(created.docId);
         ingredientIds.push(created.docId);
-      } else {
+      } else if (line.matchedIngredientId) {
         ingredientIds.push(line.matchedIngredientId);
+      } else {
+        throw new Error(`${line.name} is missing a matched ingredient`);
       }
     }
 
@@ -88,7 +103,9 @@ export class RecipeImportFinalizer {
       name,
       yieldQuantity: review.yieldQuantity,
       yieldUnit: review.yieldUnit,
-      batchMultiplier: 1,
+      batchMultiplier: review.batchMultiplier,
+      category: review.category?.trim() || undefined,
+      cuisine: review.cuisine?.trim() || undefined,
       description: review.description?.trim() || undefined,
       instructions: review.instructions?.trim() || undefined,
     });

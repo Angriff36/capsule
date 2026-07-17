@@ -1886,12 +1886,157 @@
   color: var(--color-ok);
 }
 
+.recipe-import-pane-review {
+  border-color: var(--color-accent-deep);
+  box-shadow: inset 0 0 0 1px
+    color-mix(in srgb, var(--color-accent) 18%, transparent);
+}
+
+.recipe-import-mode-switch,
+.recipe-import-mobile-tabs {
+  display: inline-flex;
+  gap: 0.35rem;
+}
+
+.recipe-import-mode-switch button,
+.recipe-import-mobile-tabs button {
+  border: 1px solid var(--color-line-2);
+  background: var(--color-inset);
+  padding: 0.35rem 0.65rem;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.recipe-import-mode-switch button.is-active,
+.recipe-import-mobile-tabs button.is-active {
+  border-color: var(--color-accent-deep);
+  background: var(--color-accent-soft);
+}
+
+.recipe-import-mobile-tabs {
+  display: none;
+  margin-top: 1rem;
+}
+
+.recipe-import-pane-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: auto;
+}
+
+.recipe-import-files {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.recipe-import-errors {
+  list-style: none;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--color-danger);
+  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
+  color: var(--color-danger);
+  font-size: 12px;
+}
+
+.recipe-import-unresolved {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-warn);
+  background: var(--color-warn-soft);
+}
+
+.recipe-import-status.is-exact,
+.recipe-import-status.is-confirmed_existing {
+  border-color: var(--color-ok);
+  background: var(--color-ok-soft);
+  color: var(--color-ok);
+}
+
+.recipe-import-status.is-possible {
+  border-color: var(--color-warn);
+  background: var(--color-warn-soft);
+  color: var(--color-warn);
+}
+
+.recipe-import-status.is-confirmed_new {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-deep);
+}
+
+.culinary-document-compact {
+  padding-top: 0.5rem;
+}
+
+.culinary-header-compact {
+  padding: 0.75rem 0 1rem;
+  border-bottom: 1px solid var(--color-line-2);
+}
+
+.culinary-title-compact {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 2.8vw, 2.6rem);
+  line-height: 1.05;
+  font-weight: 500;
+}
+
+.culinary-facts-compact {
+  margin-top: 0.85rem;
+}
+
+.culinary-lead {
+  margin-top: 0.75rem;
+  max-width: 48rem;
+  color: var(--color-ink-2);
+  line-height: 1.5;
+}
+
+.culinary-work-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.culinary-entity-link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (min-width: 960px) {
+  .culinary-work-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+
 @media (max-width: 1100px) {
   .recipe-import-split {
     grid-template-columns: 1fr;
   }
   .recipe-import-line-grid {
     grid-template-columns: 1fr 1fr;
+  }
+  .recipe-import-mobile-tabs {
+    display: inline-flex;
+  }
+  .recipe-import-mobile-hidden {
+    display: none;
   }
 }
 

@@ -1,6 +1,6 @@
 # Culinary
 
-> Owns the CapsuleX operator experience for Ingredient, Recipe, RecipeIngredient, Dish, Menu, and EventDish.
+> Owns the CapsuleX operator experience for Ingredient, Recipe, RecipeIngredient, Dish, Menu, EventDish, and governed recipe import.
 
 ## Purpose
 
@@ -8,12 +8,13 @@ Maintain the house culinary book and compose event service from governed ingredi
 
 ## Owned domain
 
-| Source                         | Entities                 |
-| ------------------------------ | ------------------------ |
-| `culinary/ingredient.manifest` | Ingredient               |
-| `culinary/recipe.manifest`     | Recipe, RecipeIngredient |
-| `culinary/dish.manifest`       | Dish                     |
-| `culinary/menu.manifest`       | Menu, EventDish          |
+| Source                            | Entities                       |
+| --------------------------------- | ------------------------------ |
+| `culinary/ingredient.manifest`    | Ingredient                     |
+| `culinary/recipe.manifest`        | Recipe, RecipeIngredient       |
+| `culinary/recipe-import.manifest` | RecipeImport, RecipeImportLine |
+| `culinary/dish.manifest`          | Dish                           |
+| `culinary/menu.manifest`          | Menu, EventDish                |
 
 ## Primary workspace
 
@@ -22,7 +23,7 @@ Use a **culinary book** rather than a dashboard:
 - sibling indexes for Recipes, Dishes, Ingredients, and Menus;
 - full-width detail documents with identity, lifecycle, quantities, costing, allergens, and linked usage;
 - an event menu composer that makes EventDish course, servings, service style, and instructions explicit;
-- a recipe import split workbench (`/kitchen/recipes/import`) that parses pasted text client-side, reviews matched/new ingredients, and finalizes only through generated `createVia` commands (no import entity in the IR).
+- a recipe import split workbench (`/kitchen/recipes/import`) that parses pasted text, `.txt` files, and paired CSV exports client-side, reviews matched/new ingredients, and finalizes through generated commands plus durable `RecipeImport` provenance when persisted.
 
 ## Core workflows
 
@@ -31,6 +32,7 @@ Use a **culinary book** rather than a dashboard:
 - Introduce/revise/portion/classify/retire/reinstate Dishes linked to recipes.
 - Draft/revise/price/publish/unpublish/archive/restore Menus.
 - Select a Dish for an Event and adjust servings, course, service style, and instructions.
+- Upload/import recipes with durable `RecipeImport` lifecycle and per-line resolution.
 
 ## Cross-system handoffs
 
@@ -42,34 +44,35 @@ Kitchen access governs normal work; costing and lifecycle commands may require h
 
 ### Recipe import ownership (binding)
 
-| Concern                                                                         | Owner                  | Location                                                                |
-| ------------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------- |
-| What a valid Recipe / Ingredient / RecipeIngredient is; create/lifecycle/policy | Manifest               | `src/culinary/*.manifest` → generated Convex commands                   |
-| Paste/upload, messy text parse, match confidence UI, review corrections         | Capsule                | `src/features/kitchen/import/**`                                        |
-| Persist after review                                                            | Manifest commands only | `useCreateIngredient` / `useCreateRecipe` / `useCreateRecipeIngredient` |
+| Concern                                                                    | Owner                  | Location                                                                |
+| -------------------------------------------------------------------------- | ---------------------- | ----------------------------------------------------------------------- |
+| What a valid Recipe / Ingredient / RecipeIngredient / RecipeImport is      | Manifest               | `src/culinary/*.manifest` → generated Convex commands                   |
+| Paste/upload, deterministic parse, match confidence UI, review corrections | Capsule                | `src/features/kitchen/import/**`                                        |
+| Persist after review                                                       | Manifest commands only | `useCreateIngredient` / `useCreateRecipe` / `useCreateRecipeIngredient` |
+| Durable import checkpoints and line resolution                             | Manifest               | `RecipeImport` / `RecipeImportLine` commands                            |
 
-Do **not** add Manifest commands like `parseRecipeText` / `matchIngredientNames` / `extractNutrition` — that would turn Manifest into a data-processing framework. New **business objects** (e.g. resumable `RecipeImport`, `NutritionProfile`, `IngredientReview`) belong in `.manifest` when product needs them; until then import drafts are Capsule session state only.
-
-Open product decisions: Recipe ingredient requirement before publish, derived Dish allergens, Menu↔Dish composition, closed vocabularies for course/service style, and whether a persisted `RecipeImport` entity is worth modeling.
+Do **not** add Manifest commands like `parseRecipeText` / `matchIngredientNames` / `extractNutrition` — parsing and matching stay authored TypeScript. OCR, URL scraping, and AI parsing remain out of scope.
 
 ## Current status
 
-All six entities have generated list/detail/index queries and command hooks. The authored `/kitchen` route family now provides:
+All culinary entities have generated list/detail/index queries and command hooks. The authored `/kitchen` route family now provides:
 
 - live Recipe, Ingredient, Dish, and Menu indexes with command-backed creation;
-- a Recipe working document for draft revision, lifecycle commands, ingredient lines, method, and Dish usage;
+- detail routes for Recipe, Ingredient, Dish, and Menu;
+- a compact Recipe working document for draft revision, lifecycle commands, ingredient lines, method, and Dish usage;
 - generated-metadata lifecycle offers for Recipe, Ingredient, Dish, and Menu;
 - an Event menu composer that selects, adjusts, and removes EventDish records;
-- a recipe import workbench at `/kitchen/recipes/import` (parse → review → finalize).
+- a recipe import workbench at `/kitchen/recipes/import` (paste/files → parse → review → finalize).
 
-Creation uses governed hooks generated by Manifest (`useCreateIngredient`, `useCreateRecipe`, `useCreateRecipeIngredient`, `useCreateDish`, `useCreateMenu`, and `useCreateEventDish`). No authored Culinary allocation seam is required.
+Creation uses governed hooks generated by Manifest (`useCreateIngredient`, `useCreateRecipe`, `useCreateRecipeIngredient`, `useCreateDish`, `useCreateMenu`, and `useCreateEventDish`). Import provenance uses `useCreateRecipeImport`, `useCreateRecipeImportLine`, and the generated RecipeImport lifecycle hooks.
 
-**Import proof:** `tests/proofs/recipe-import-finalize.runtime.test.ts` plus parser unit coverage in `tests/recipe-text-parser.test.ts`. Proof-kit marks `Recipe.draft`, `Ingredient.introduce`, and `RecipeIngredient.add` as `runtime_proven` via that runtime test.
+**Import proof:** `tests/proofs/recipe-import-finalize.runtime.test.ts` plus parser/fixture coverage in `tests/recipe-text-parser.test.ts`. Proof-kit marks `Recipe.draft`, `Ingredient.introduce`, and `RecipeIngredient.add` as `runtime_proven` via that runtime test.
 
-Menu↔Dish composition remains unmodeled and is not implied by the UI. EventDish is the current cross-system composition seam. Generated EventDish runtime behavior and downstream reactions still require focused runtime/reaction proof beyond the structural wiring tests. Dish/Menu bulk import is deferred.
+Menu↔Dish composition remains unmodeled and is not implied by the UI. EventDish is the current cross-system composition seam. Generated EventDish runtime behavior and downstream reactions still require focused runtime/reaction proof beyond the structural wiring tests. Dish/Menu bulk import beyond recipe import is deferred.
 
 ## References
 
 - Canonical: `C:/projects/Manifest-source/src/culinary`
 - Design: `DESIGN.md` → Recipe Book and culinary detail patterns
+- Import design: `docs/superpowers/specs/2026-07-17-culinary-recipe-import-design.md`
 - Read-only intent reference: Capsule-Pro Kitchen recipes/dishes/ingredients/menus

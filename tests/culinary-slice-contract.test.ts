@@ -7,10 +7,14 @@ describe("Culinary planning slice contract", () => {
   it("wires the Kitchen route family to authored culinary screens", () => {
     const app = read("src/app/App.tsx");
     expect(app).toContain('path="/kitchen/recipes"');
+    expect(app).toContain('path="/kitchen/recipes/import"');
     expect(app).toContain('path="/kitchen/recipes/:id"');
     expect(app).toContain('path="/kitchen/ingredients"');
+    expect(app).toContain('path="/kitchen/ingredients/:id"');
     expect(app).toContain('path="/kitchen/dishes"');
+    expect(app).toContain('path="/kitchen/dishes/:id"');
     expect(app).toContain('path="/kitchen/menus"');
+    expect(app).toContain('path="/kitchen/menus/:id"');
     expect(app).toContain('path="/kitchen/event-menu"');
     expect(app).not.toContain("KitchenRoutePlaceholder");
   });
@@ -18,7 +22,13 @@ describe("Culinary planning slice contract", () => {
   it("uses generated reads and command hooks in authored feature code", () => {
     const catalog = read("src/features/kitchen/KitchenCatalogPage.tsx");
     const recipe = read("src/features/kitchen/RecipeDetailPage.tsx");
+    const ingredient = read("src/features/kitchen/IngredientDetailPage.tsx");
+    const dish = read("src/features/kitchen/DishDetailPage.tsx");
+    const menu = read("src/features/kitchen/MenuDetailPage.tsx");
     const eventMenu = read("src/features/kitchen/EventMenuPage.tsx");
+    const recipeImport = read(
+      "src/features/kitchen/import/RecipeImportPage.tsx",
+    );
 
     for (const hook of [
       "useListIngredient",
@@ -35,6 +45,16 @@ describe("Culinary planning slice contract", () => {
       "useRecipeIngredientRemove",
     ]) {
       expect(recipe).toContain(hook);
+    }
+    expect(ingredient).toContain("useGetIngredient");
+    expect(dish).toContain("useGetDish");
+    expect(menu).toContain("useGetMenu");
+    for (const hook of [
+      "useCreateIngredient",
+      "useCreateRecipe",
+      "useCreateRecipeIngredient",
+    ]) {
+      expect(recipeImport).toContain(hook);
     }
     for (const hook of [
       "useListEvent",

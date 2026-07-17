@@ -108,7 +108,9 @@ export class IngredientCatalogMatcher {
       const hayForms = singularForms(item.name);
       if (
         needleForms.some((form) => hay.includes(form) || form.includes(hay)) ||
-        hayForms.some((form) => needleForms.some((needle) => needle.includes(form)))
+        hayForms.some((form) =>
+          needleForms.some((needle) => needle.includes(form)),
+        )
       ) {
         matches.push(item);
         continue;

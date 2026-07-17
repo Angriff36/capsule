@@ -64,10 +64,18 @@ describe("runtime proof: recipe import finalize", () => {
         unit: "teaspoon",
       },
     ];
-    const review = new RecipeImportCoordinator().parseAndMatch(SOURCE, catalog);
+    const review = new RecipeImportCoordinator().parseText(SOURCE, catalog);
     expect(
       review.lines.some((line) => line.matchedIngredientId === existing.docId),
     ).toBe(true);
+    const ready = {
+      ...review,
+      lines: review.lines.map((line) =>
+        line.matchStatus === "exact"
+          ? line
+          : { ...line, matchStatus: "confirmed_new" as const, createNew: true },
+      ),
+    };
 
     const asArgs = (input: object) => input as Record<string, unknown>;
     const finalizer = new RecipeImportFinalizer({
@@ -91,7 +99,7 @@ describe("runtime proof: recipe import finalize", () => {
         ) as Promise<{ docId: string }>,
     });
 
-    const saved = await finalizer.finalize(review);
+    const saved = await finalizer.finalize(ready);
     const snapshot = await kitchen.run(async (ctx) => {
       const recipe = await ctx.db.get(saved.recipeId as never);
       const ingredients = await ctx.db.query("ingredients").collect();
@@ -121,7 +129,15 @@ describe("runtime proof: recipe import finalize", () => {
       role: "workforce_staff",
       tenantId: "tenant-recipe-import-deny",
     });
-    const review = new RecipeImportCoordinator().parseAndMatch(SOURCE, []);
+    const review = new RecipeImportCoordinator().parseText(SOURCE, []);
+    const ready = {
+      ...review,
+      lines: review.lines.map((line) => ({
+        ...line,
+        matchStatus: "confirmed_new" as const,
+        createNew: true,
+      })),
+    };
     const asArgs = (input: object) => input as Record<string, unknown>;
     const finalizer = new RecipeImportFinalizer({
       createIngredient: (input) =>
@@ -144,6 +160,6 @@ describe("runtime proof: recipe import finalize", () => {
         ) as Promise<{ docId: string }>,
     });
 
-    await expect(finalizer.finalize(review)).rejects.toThrow(/Kitchen staff/i);
+    await expect(finalizer.finalize(ready)).rejects.toThrow(/Kitchen staff/i);
   });
 });

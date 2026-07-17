@@ -117,7 +117,10 @@ export class RecipeCsvParser {
         description: sheet[1]?.trim() || undefined,
         category: sheet[2]?.trim() || undefined,
         cuisine: sheet[3]?.trim() || undefined,
-        yieldQuantity: Number.isFinite(yieldQuantity) && yieldQuantity > 0 ? yieldQuantity : 1,
+        yieldQuantity:
+          Number.isFinite(yieldQuantity) && yieldQuantity > 0
+            ? yieldQuantity
+            : 1,
         yieldUnit,
         batchMultiplier:
           Number.isFinite(batchMultiplier) && batchMultiplier > 0

@@ -17,4 +17,20 @@ export function recipePath(id: string) {
   return `/kitchen/recipes/${id}`;
 }
 
+export function ingredientPath(id: string) {
+  return `/kitchen/ingredients/${id}`;
+}
+
+export function dishPath(id: string) {
+  return `/kitchen/dishes/${id}`;
+}
+
+export function menuPath(id: string) {
+  return `/kitchen/menus/${id}`;
+}
+
 export const RECIPE_IMPORT_PATH = "/kitchen/recipes/import";
+
+export function kitchenCatalogPath(section: KitchenSection) {
+  return `/kitchen/${section}`;
+}

@@ -14,6 +14,8 @@ const TABLES = [
   "ingredients",
   "recipes",
   "recipeIngredients",
+  "recipeImports",
+  "recipeImportLines",
   "dishes",
   "menus",
   "eventDishes",

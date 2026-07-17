@@ -14,6 +14,7 @@ import {
   useRecipeReviseDraft,
 } from "../../lib/manifest-convex-react";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
+import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -55,6 +56,7 @@ export function RecipeDetailPage() {
   const adjustLine = useRecipeIngredientAdjustQuantity();
   const removeLine = useRecipeIngredientRemove();
   const [editing, setEditing] = useState(false);
+  const [showLineForm, setShowLineForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
 
@@ -148,7 +150,7 @@ export function RecipeDetailPage() {
   };
 
   return (
-    <article className="culinary-document">
+    <article className="culinary-document culinary-document-compact">
       <Link
         to="/kitchen/recipes"
         className="text-[12px] text-ink-3 hover:text-ink"
@@ -161,9 +163,14 @@ export function RecipeDetailPage() {
           <CulinaryFailureBanner error={failure} />
         </div>
       ) : null}
-      <header className="culinary-header">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="eyebrow">Recipe · Edition {recipe.versionNumber}</p>
+      <header className="culinary-header-compact">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <p className="eyebrow">
+              Recipe · Edition {recipe.versionNumber} · {String(recipe.status)}
+            </p>
+            <h1 className="culinary-title-compact">{recipe.name}</h1>
+          </div>
           <div className="flex flex-wrap gap-2">
             {recipe.status === "draft" ? (
               <button
@@ -189,13 +196,10 @@ export function RecipeDetailPage() {
             ))}
           </div>
         </div>
-        <h1 className="culinary-title">{recipe.name}</h1>
         {recipe.description ? (
-          <p className="mt-6 max-w-180 font-display text-xl leading-relaxed text-ink-2">
-            {recipe.description}
-          </p>
+          <p className="culinary-lead">{recipe.description}</p>
         ) : null}
-        <dl className="culinary-facts">
+        <dl className="culinary-facts culinary-facts-compact">
           <div>
             <dt>Status</dt>
             <dd>
@@ -223,6 +227,158 @@ export function RecipeDetailPage() {
         </dl>
       </header>
 
+      <div className="culinary-work-grid">
+        <section className="culinary-section">
+          <div className="culinary-section-heading">
+            <h2>Composition</h2>
+            <span>{recipeLines.length} lines</span>
+          </div>
+          {recipeLines.length ? (
+            <ul className="ingredient-list">
+              {recipeLines.map((line) => (
+                <li key={line._id}>
+                  <strong>
+                    {line.quantity} {String(line.unit)}
+                  </strong>
+                  <span>
+                    <CulinaryEntityLink
+                      kind="ingredient"
+                      id={line.ingredientId}
+                    >
+                      {ingredientName(line.ingredientId)}
+                    </CulinaryEntityLink>
+                  </span>
+                  <span>{line.prepNotes || "No preparation note"}</span>
+                  <div className="culinary-line-actions">
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      disabled={busy != null}
+                      onClick={() => {
+                        const quantity = Number(
+                          window.prompt("Quantity", String(line.quantity)),
+                        );
+                        if (!Number.isFinite(quantity) || quantity <= 0) return;
+                        void run(`adjust:${line._id}`, async () => {
+                          await adjustLine({
+                            docId: line._id,
+                            quantity,
+                            unit: line.unit,
+                            version: line.version,
+                          });
+                        });
+                      }}
+                    >
+                      Adjust
+                    </button>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      disabled={busy != null}
+                      onClick={() => {
+                        const reason = window.prompt("Removal reason")?.trim();
+                        if (!reason) return;
+                        void run(`remove:${line._id}`, async () => {
+                          await removeLine({
+                            docId: line._id,
+                            reason,
+                            version: line.version,
+                          });
+                        });
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="document-empty">
+              <p>No ingredient lines yet.</p>
+              <span>
+                Publication remains governed by the generated Recipe command;
+                this screen does not invent an ingredient prerequisite.
+              </span>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => setShowLineForm((value) => !value)}
+          >
+            {showLineForm ? "Hide add line form" : "Add ingredient line"}
+          </button>
+
+          {showLineForm ? (
+            <form className="culinary-line-form" onSubmit={submitLine}>
+              <label className="field-label">
+                Ingredient
+                <select name="ingredientId" className="input" required>
+                  <option value="">Select ingredient</option>
+                  {(ingredients ?? [])
+                    .filter(
+                      (ingredient) =>
+                        ingredient.deletedAt == null &&
+                        ingredient.status === "active",
+                    )
+                    .map((ingredient) => (
+                      <option key={ingredient._id} value={ingredient._id}>
+                        {ingredient.name}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Quantity
+                <input
+                  name="quantity"
+                  type="number"
+                  min={0.01}
+                  step="0.01"
+                  defaultValue={1}
+                  className="input"
+                  required
+                />
+              </label>
+              <label className="field-label">
+                Unit
+                <select name="unit" className="input">
+                  {UNITS.map((unit) => (
+                    <option key={unit}>{unit}</option>
+                  ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Preparation note
+                <input name="prepNotes" className="input" />
+              </label>
+              <button
+                className="btn btn-primary self-end"
+                disabled={busy != null || !ingredients?.length}
+              >
+                {busy === "line" ? "Adding…" : "Add line"}
+              </button>
+            </form>
+          ) : null}
+        </section>
+
+        <section className="culinary-section">
+          <div className="culinary-section-heading">
+            <h2>Method</h2>
+          </div>
+          {recipe.instructions ? (
+            <div className="method-prose">{recipe.instructions}</div>
+          ) : (
+            <div className="document-empty">
+              <p>No method recorded.</p>
+              <span>
+                Edit this draft to capture the source-backed instructions.
+              </span>
+            </div>
+          )}
+        </section>
+      </div>
+
       {editing ? (
         <RecipeEditForm
           recipe={recipe}
@@ -230,139 +386,6 @@ export function RecipeDetailPage() {
           onSubmit={submitRevision}
         />
       ) : null}
-
-      <section className="culinary-section">
-        <div className="culinary-section-heading">
-          <h2>Composition</h2>
-          <span>{recipeLines.length} lines</span>
-        </div>
-        {recipeLines.length ? (
-          <ul className="ingredient-list">
-            {recipeLines.map((line) => (
-              <li key={line._id}>
-                <strong>
-                  {line.quantity} {String(line.unit)}
-                </strong>
-                <span>{ingredientName(line.ingredientId)}</span>
-                <span>{line.prepNotes || "No preparation note"}</span>
-                <div className="culinary-line-actions">
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    disabled={busy != null}
-                    onClick={() => {
-                      const quantity = Number(
-                        window.prompt("Quantity", String(line.quantity)),
-                      );
-                      if (!Number.isFinite(quantity) || quantity <= 0) return;
-                      void run(`adjust:${line._id}`, async () => {
-                        await adjustLine({
-                          docId: line._id,
-                          quantity,
-                          unit: line.unit,
-                          version: line.version,
-                        });
-                      });
-                    }}
-                  >
-                    Adjust
-                  </button>
-                  <button
-                    className="btn btn-ghost btn-sm"
-                    disabled={busy != null}
-                    onClick={() => {
-                      const reason = window.prompt("Removal reason")?.trim();
-                      if (!reason) return;
-                      void run(`remove:${line._id}`, async () => {
-                        await removeLine({
-                          docId: line._id,
-                          reason,
-                          version: line.version,
-                        });
-                      });
-                    }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="document-empty">
-            <p>No ingredient lines yet.</p>
-            <span>
-              Publication remains governed by the generated Recipe command; this
-              screen does not invent an ingredient prerequisite.
-            </span>
-          </div>
-        )}
-
-        <form className="culinary-line-form" onSubmit={submitLine}>
-          <label className="field-label">
-            Ingredient
-            <select name="ingredientId" className="input" required>
-              <option value="">Select ingredient</option>
-              {(ingredients ?? [])
-                .filter(
-                  (ingredient) =>
-                    ingredient.deletedAt == null &&
-                    ingredient.status === "active",
-                )
-                .map((ingredient) => (
-                  <option key={ingredient._id} value={ingredient._id}>
-                    {ingredient.name}
-                  </option>
-                ))}
-            </select>
-          </label>
-          <label className="field-label">
-            Quantity
-            <input
-              name="quantity"
-              type="number"
-              min={0.01}
-              step="0.01"
-              defaultValue={1}
-              className="input"
-              required
-            />
-          </label>
-          <label className="field-label">
-            Unit
-            <select name="unit" className="input">
-              {UNITS.map((unit) => (
-                <option key={unit}>{unit}</option>
-              ))}
-            </select>
-          </label>
-          <label className="field-label">
-            Preparation note
-            <input name="prepNotes" className="input" />
-          </label>
-          <button
-            className="btn btn-primary self-end"
-            disabled={busy != null || !ingredients?.length}
-          >
-            {busy === "line" ? "Adding…" : "Add line"}
-          </button>
-        </form>
-      </section>
-
-      <section className="culinary-section">
-        <div className="culinary-section-heading">
-          <h2>Method</h2>
-        </div>
-        {recipe.instructions ? (
-          <div className="method-prose">{recipe.instructions}</div>
-        ) : (
-          <div className="document-empty">
-            <p>No method recorded.</p>
-            <span>
-              Edit this draft to capture the source-backed instructions.
-            </span>
-          </div>
-        )}
-      </section>
 
       <section className="culinary-section">
         <div className="culinary-section-heading">
@@ -376,7 +399,9 @@ export function RecipeDetailPage() {
                 key={dish._id}
                 className="flex items-center justify-between border-b border-line py-3"
               >
-                <span className="font-display text-xl">{dish.name}</span>
+                <CulinaryEntityLink kind="dish" id={dish._id}>
+                  <span className="font-display text-xl">{dish.name}</span>
+                </CulinaryEntityLink>
                 <span className="font-mono text-[10px] text-ink-3">
                   {dish.portionSize} {String(dish.portionUnit)} · {dish.status}
                 </span>
