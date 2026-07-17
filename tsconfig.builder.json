@@ -10,5 +10,8 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "exclude": ["node_modules", "convex/_generated"]
+  "exclude": [
+    "node_modules",
+    "convex/_generated"
+  ]
 }

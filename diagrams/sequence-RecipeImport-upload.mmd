@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant RecipeImport as RecipeImport
+    participant EventBus
+    Client->>+RecipeImport: upload(sourceKind, rawSourceText, sourceByteCount, sourceFingerprint, sourceFilename)
+    Note over RecipeImport: Policies: recipeImportRead, recipeImportWrite, recipeImportExecute
+    Note over RecipeImport: Guards (2)
+    RecipeImport->>RecipeImport: guard[0]: self.uploadedAt == null
+    RecipeImport->>RecipeImport: guard[1]: self.deletedAt == null
+    RecipeImport->>RecipeImport: mutate.sourceKind
+    RecipeImport->>RecipeImport: mutate.sourceFilename
+    RecipeImport->>RecipeImport: mutate.rawSourceText
+    RecipeImport->>RecipeImport: mutate.sourceByteCount
+    RecipeImport->>RecipeImport: mutate.sourceFingerprint
+    RecipeImport->>RecipeImport: mutate.status
+    RecipeImport->>RecipeImport: mutate.uploadedAt
+    RecipeImport->>EventBus: emit RecipeImportUploaded on recipe_import.uploaded
+    RecipeImport-->>-Client: void

@@ -1,6 +1,13 @@
 import type { UnitOfMeasure } from "./UnitOfMeasureMapper";
 
-export type IngredientMatchStatus = "matched" | "partial" | "new";
+export type IngredientMatchStatus =
+  | "exact"
+  | "possible"
+  | "new"
+  | "confirmed_existing"
+  | "confirmed_new";
+
+export type RecipeImportSourceKind = "pasted_text" | "text_file" | "csv_bundle";
 
 export interface ParsedIngredientLine {
   raw: string;
@@ -14,8 +21,11 @@ export interface ParsedIngredientLine {
 export interface ParsedRecipeDraft {
   name: string;
   description?: string;
+  category?: string;
+  cuisine?: string;
   yieldQuantity: number;
   yieldUnit: UnitOfMeasure;
+  batchMultiplier?: number;
   instructions?: string;
   lines: ParsedIngredientLine[];
   warnings: string[];
@@ -25,18 +35,29 @@ export interface ReviewIngredientLine extends ParsedIngredientLine {
   matchStatus: IngredientMatchStatus;
   matchedIngredientId?: string;
   matchedIngredientName?: string;
+  possibleMatchIds: string[];
+  possibleMatchNames: string[];
   /** When true, finalize will call Ingredient_createViaIntroduce. */
   createNew: boolean;
+  /** Set when a durable RecipeImportLine row exists. */
+  importLineId?: string;
 }
 
 export interface RecipeImportReviewState {
+  importId?: string;
+  sourceKind: RecipeImportSourceKind;
+  sourceFilename?: string;
   name: string;
   description?: string;
+  category?: string;
+  cuisine?: string;
   yieldQuantity: number;
   yieldUnit: UnitOfMeasure;
+  batchMultiplier: number;
   instructions?: string;
   lines: ReviewIngredientLine[];
   warnings: string[];
+  errors: string[];
 }
 
 export interface CatalogIngredient {
@@ -44,4 +65,26 @@ export interface CatalogIngredient {
   name: string;
   unit?: string;
   deletedAt?: number | null;
+}
+
+export function isLineResolved(line: ReviewIngredientLine): boolean {
+  if (line.matchStatus === "exact" || line.matchStatus === "confirmed_existing") {
+    return Boolean(line.matchedIngredientId);
+  }
+  if (line.matchStatus === "confirmed_new") {
+    return line.createNew;
+  }
+  return false;
+}
+
+export function countUnresolvedLines(lines: readonly ReviewIngredientLine[]): number {
+  return lines.filter((line) => !isLineResolved(line)).length;
+}
+
+export function reviewIsReady(review: RecipeImportReviewState): boolean {
+  const name = review.name.trim();
+  if (!name || review.yieldQuantity <= 0 || review.lines.length === 0) {
+    return false;
+  }
+  return countUnresolvedLines(review.lines) === 0;
 }

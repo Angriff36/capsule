@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant RecipeImportLine as RecipeImportLine
+    participant EventBus
+    Client->>+RecipeImportLine: markNew()
+    Note over RecipeImportLine: Policies: recipeImportLineRead, recipeImportLineWrite, recipeImportLineExecute
+    Note over RecipeImportLine: Guards (2)
+    RecipeImportLine->>RecipeImportLine: guard[0]: self.resolvedAt == null
+    RecipeImportLine->>RecipeImportLine: guard[1]: self.deletedAt == null
+    RecipeImportLine->>RecipeImportLine: mutate.matchStatus
+    RecipeImportLine->>RecipeImportLine: mutate.matchedIngredientId
+    RecipeImportLine->>RecipeImportLine: mutate.possibleMatchIngredientIds
+    RecipeImportLine->>EventBus: emit RecipeImportLineMarkedNew on recipe_import_line.marked_new
+    RecipeImportLine-->>-Client: void

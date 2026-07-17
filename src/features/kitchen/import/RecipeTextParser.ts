@@ -23,6 +23,11 @@ const FRACTIONS: Record<string, number> = {
 export class RecipeTextParser {
   private readonly units = new UnitOfMeasureMapper();
 
+  mapUnitAlias(raw: string | undefined | null): UnitOfMeasure {
+    if (String(raw ?? "").trim() === "#") return "pound";
+    return this.units.map(raw);
+  }
+
   parse(source: string): ParsedRecipeDraft {
     const text = source.replace(/\r\n/g, "\n").trim();
     const warnings: string[] = [];
@@ -99,16 +104,30 @@ export class RecipeTextParser {
     text: string,
     warnings: string[],
   ): { yieldQuantity: number; yieldUnit: UnitOfMeasure } {
+    const poundYield =
+      text.match(/\b(?:yield|yields)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*#/i) ??
+      text.match(/\b(\d+(?:\.\d+)?)\s*#\s*(?:raw\s+weight)?/i);
+    if (poundYield) {
+      const quantity = Number(poundYield[1]);
+      return {
+        yieldQuantity: quantity > 0 ? quantity : 1,
+        yieldUnit: "pound",
+      };
+    }
+
     const match =
       text.match(
-        /\b(?:yield|serves|servings)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*([a-zA-Z]+)?/i,
-      ) ?? text.match(/\b(\d+(?:\.\d+)?)\s*(servings?|portions?)\b/i);
+        /\b(?:yield|serves|servings)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*([a-zA-Z#]+)?/i,
+      ) ??
+      text.match(
+        /\b(\d+(?:\.\d+)?)\s*(servings?|portions?|quarts?)\b/i,
+      );
     if (!match) {
       warnings.push("Yield not found; defaulting to 1 portion.");
       return { yieldQuantity: 1, yieldUnit: "portion" };
     }
     const quantity = Number(match[1]);
-    const unit = this.units.map(match[2] ?? "portion");
+    const unit = this.mapUnitAlias(match[2] ?? "portion");
     return {
       yieldQuantity: quantity > 0 ? quantity : 1,
       yieldUnit: unit,
@@ -155,6 +174,23 @@ export class RecipeTextParser {
     const cleaned = raw.replace(/^[-*•]\s*/, "").trim();
     if (!cleaned || this.isSectionHeader(cleaned)) return null;
 
+    const poundMatch = cleaned.match(
+      /^((?:\d+\s+)?\d+\/\d+|\d+(?:\.\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])\s*#\s*(.+)$/u,
+    );
+    if (poundMatch) {
+      const quantity = this.parseQuantity(poundMatch[1]);
+      const { name, prepNotes } = this.splitNameAndNotes(poundMatch[2].trim());
+      if (!name) return null;
+      return {
+        raw: cleaned,
+        name,
+        quantity: quantity > 0 ? quantity : 1,
+        unit: "pound",
+        unitRaw: "#",
+        prepNotes,
+      };
+    }
+
     const quantityMatch = cleaned.match(
       /^((?:\d+\s+)?\d+\/\d+|\d+(?:\.\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])\s+(.+)$/u,
     );
@@ -174,11 +210,11 @@ export class RecipeTextParser {
     let unit: UnitOfMeasure = "each";
 
     const unitMatch = rest.match(
-      /^([A-Za-z½¼¾]+)\b(?:\s*\(([^)]+)\))?\s+(.*)$/u,
+      /^([#A-Za-z½¼¾]+)\b(?:\s*\(([^)]+)\))?\s+(.*)$/u,
     );
-    if (unitMatch && this.units.isKnownAlias(unitMatch[1])) {
+    if (unitMatch && (unitMatch[1] === "#" || this.units.isKnownAlias(unitMatch[1]))) {
       unitRaw = unitMatch[1];
-      unit = this.units.map(unitMatch[1]);
+      unit = this.mapUnitAlias(unitMatch[1]);
       const parenthetical = unitMatch[2]?.trim();
       rest = unitMatch[3].trim();
       if (parenthetical) {
@@ -228,7 +264,7 @@ export class RecipeTextParser {
   }
 
   private looksLikeIngredient(line: string): boolean {
-    return /^(?:\d+|½|¼|¾|⅓|⅔)/u.test(line.replace(/^[-*•]\s*/, ""));
+    return /^(?:\d+|½|¼|¾|⅓|⅔|#)/u.test(line.replace(/^[-*•]\s*/, ""));
   }
 
   private isSectionHeader(line: string): boolean {

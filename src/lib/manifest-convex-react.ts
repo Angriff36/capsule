@@ -1372,6 +1372,136 @@ export function useCreateRecipe() {
   return useMutation(api.mutations.Recipe_createViaDraft);
 }
 
+/** Reactive list for RecipeImport. */
+export function useListRecipeImport() {
+  return useQuery(api.queries.listRecipeImport);
+}
+
+/** Reactive get-by-id for RecipeImport. Pass "skip" to suspend. */
+export function useGetRecipeImport(id: string | "skip") {
+  return useQuery(api.queries.getRecipeImport, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RecipeImport.approveReview. */
+export function useRecipeImportApproveReview() {
+  return useMutation(api.mutations.RecipeImport_approveReview);
+}
+
+/** Mutation hook for RecipeImport.beginFinalization. */
+export function useRecipeImportBeginFinalization() {
+  return useMutation(api.mutations.RecipeImport_beginFinalization);
+}
+
+/** Mutation hook for RecipeImport.beginReview. */
+export function useRecipeImportBeginReview() {
+  return useMutation(api.mutations.RecipeImport_beginReview);
+}
+
+/** Mutation hook for RecipeImport.cancel. */
+export function useRecipeImportCancel() {
+  return useMutation(api.mutations.RecipeImport_cancel);
+}
+
+/** Mutation hook for RecipeImport.complete. */
+export function useRecipeImportComplete() {
+  return useMutation(api.mutations.RecipeImport_complete);
+}
+
+/** Mutation hook for RecipeImport.markFailed. */
+export function useRecipeImportMarkFailed() {
+  return useMutation(api.mutations.RecipeImport_markFailed);
+}
+
+/** Mutation hook for RecipeImport.recordParse. */
+export function useRecipeImportRecordParse() {
+  return useMutation(api.mutations.RecipeImport_recordParse);
+}
+
+/** Mutation hook for RecipeImport.recordRecipe. */
+export function useRecipeImportRecordRecipe() {
+  return useMutation(api.mutations.RecipeImport_recordRecipe);
+}
+
+/** Mutation hook for RecipeImport.recordResolutionProgress. */
+export function useRecipeImportRecordResolutionProgress() {
+  return useMutation(api.mutations.RecipeImport_recordResolutionProgress);
+}
+
+/** Mutation hook for RecipeImport.resumeReview. */
+export function useRecipeImportResumeReview() {
+  return useMutation(api.mutations.RecipeImport_resumeReview);
+}
+
+/** Mutation hook for RecipeImport.upload. */
+export function useRecipeImportUpload() {
+  return useMutation(api.mutations.RecipeImport_upload);
+}
+
+/** Governed creation hook for RecipeImport.upload. */
+export function useCreateRecipeImport() {
+  return useMutation(api.mutations.RecipeImport_createViaUpload);
+}
+
+/** Reactive list for RecipeImportLine. */
+export function useListRecipeImportLine() {
+  return useQuery(api.queries.listRecipeImportLine);
+}
+
+/** Reactive get-by-id for RecipeImportLine. Pass "skip" to suspend. */
+export function useGetRecipeImportLine(id: string | "skip") {
+  return useQuery(api.queries.getRecipeImportLine, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RecipeImportLine.attachCreatedIngredient. */
+export function useRecipeImportLineAttachCreatedIngredient() {
+  return useMutation(api.mutations.RecipeImportLine_attachCreatedIngredient);
+}
+
+/** Mutation hook for RecipeImportLine.confirmExisting. */
+export function useRecipeImportLineConfirmExisting() {
+  return useMutation(api.mutations.RecipeImportLine_confirmExisting);
+}
+
+/** Mutation hook for RecipeImportLine.confirmNew. */
+export function useRecipeImportLineConfirmNew() {
+  return useMutation(api.mutations.RecipeImportLine_confirmNew);
+}
+
+/** Mutation hook for RecipeImportLine.discard. */
+export function useRecipeImportLineDiscard() {
+  return useMutation(api.mutations.RecipeImportLine_discard);
+}
+
+/** Mutation hook for RecipeImportLine.markNew. */
+export function useRecipeImportLineMarkNew() {
+  return useMutation(api.mutations.RecipeImportLine_markNew);
+}
+
+/** Mutation hook for RecipeImportLine.resetResolution. */
+export function useRecipeImportLineResetResolution() {
+  return useMutation(api.mutations.RecipeImportLine_resetResolution);
+}
+
+/** Mutation hook for RecipeImportLine.stage. */
+export function useRecipeImportLineStage() {
+  return useMutation(api.mutations.RecipeImportLine_stage);
+}
+
+/** Mutation hook for RecipeImportLine.suggestExactMatch. */
+export function useRecipeImportLineSuggestExactMatch() {
+  return useMutation(api.mutations.RecipeImportLine_suggestExactMatch);
+}
+
+/** Mutation hook for RecipeImportLine.suggestPossibleMatches. */
+export function useRecipeImportLineSuggestPossibleMatches() {
+  return useMutation(api.mutations.RecipeImportLine_suggestPossibleMatches);
+}
+
+/** Governed creation hook for RecipeImportLine.stage. */
+export function useCreateRecipeImportLine() {
+  return useMutation(api.mutations.RecipeImportLine_createViaStage);
+}
+
 /** Reactive list for RecipeIngredient. */
 export function useListRecipeIngredient() {
   return useQuery(api.queries.listRecipeIngredient);
@@ -1737,4 +1867,4 @@ export function useCreateWasteRecord() {
   return useMutation(api.mutations.WasteRecord_createViaRecord);
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 347 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 373 as const;

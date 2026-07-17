@@ -44,6 +44,8 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip Qualification: no create command in IR (2 rows unused)
   // skip QualityCheck: no create command in IR (2 rows unused)
   // skip Recipe: no create command in IR (2 rows unused)
+  // skip RecipeImport: no create command in IR (2 rows unused)
+  // skip RecipeImportLine: no create command in IR (2 rows unused)
   // skip RecipeIngredient: no create command in IR (2 rows unused)
   // skip SavedReportDefinition: no create command in IR (2 rows unused)
   // skip Shift: no create command in IR (2 rows unused)
@@ -224,6 +226,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "Recipe",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "RecipeImport",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "RecipeImportLine",
       "createMutation": null,
       "rowCount": 2
     },

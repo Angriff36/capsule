@@ -30,9 +30,7 @@ export async function getAuthContext(ctx: {
         ? normalizeRole(claims.role)
         : ANONYMOUS.role,
     tenantId:
-      typeof claims.tenantId === "string"
-        ? claims.tenantId
-        : ANONYMOUS.tenantId,
+      typeof claims.tenantId === "string" ? claims.tenantId : ANONYMOUS.tenantId,
   };
 }
 

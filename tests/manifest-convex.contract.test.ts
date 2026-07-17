@@ -532,6 +532,66 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Recipe_reviseDraft", () => {
     expect(typeof (mutations as any).Recipe_reviseDraft).toBe("function");
   });
+  it("exports mutation RecipeImport_approveReview", () => {
+    expect(typeof (mutations as any).RecipeImport_approveReview).toBe("function");
+  });
+  it("exports mutation RecipeImport_beginFinalization", () => {
+    expect(typeof (mutations as any).RecipeImport_beginFinalization).toBe("function");
+  });
+  it("exports mutation RecipeImport_beginReview", () => {
+    expect(typeof (mutations as any).RecipeImport_beginReview).toBe("function");
+  });
+  it("exports mutation RecipeImport_cancel", () => {
+    expect(typeof (mutations as any).RecipeImport_cancel).toBe("function");
+  });
+  it("exports mutation RecipeImport_complete", () => {
+    expect(typeof (mutations as any).RecipeImport_complete).toBe("function");
+  });
+  it("exports mutation RecipeImport_markFailed", () => {
+    expect(typeof (mutations as any).RecipeImport_markFailed).toBe("function");
+  });
+  it("exports mutation RecipeImport_recordParse", () => {
+    expect(typeof (mutations as any).RecipeImport_recordParse).toBe("function");
+  });
+  it("exports mutation RecipeImport_recordRecipe", () => {
+    expect(typeof (mutations as any).RecipeImport_recordRecipe).toBe("function");
+  });
+  it("exports mutation RecipeImport_recordResolutionProgress", () => {
+    expect(typeof (mutations as any).RecipeImport_recordResolutionProgress).toBe("function");
+  });
+  it("exports mutation RecipeImport_resumeReview", () => {
+    expect(typeof (mutations as any).RecipeImport_resumeReview).toBe("function");
+  });
+  it("exports mutation RecipeImport_upload", () => {
+    expect(typeof (mutations as any).RecipeImport_upload).toBe("function");
+  });
+  it("exports mutation RecipeImportLine_attachCreatedIngredient", () => {
+    expect(typeof (mutations as any).RecipeImportLine_attachCreatedIngredient).toBe("function");
+  });
+  it("exports mutation RecipeImportLine_confirmExisting", () => {
+    expect(typeof (mutations as any).RecipeImportLine_confirmExisting).toBe("function");
+  });
+  it("exports mutation RecipeImportLine_confirmNew", () => {
+    expect(typeof (mutations as any).RecipeImportLine_confirmNew).toBe("function");
+  });
+  it("exports mutation RecipeImportLine_discard", () => {
+    expect(typeof (mutations as any).RecipeImportLine_discard).toBe("function");
+  });
+  it("exports mutation RecipeImportLine_markNew", () => {
+    expect(typeof (mutations as any).RecipeImportLine_markNew).toBe("function");
+  });
+  it("exports mutation RecipeImportLine_resetResolution", () => {
+    expect(typeof (mutations as any).RecipeImportLine_resetResolution).toBe("function");
+  });
+  it("exports mutation RecipeImportLine_stage", () => {
+    expect(typeof (mutations as any).RecipeImportLine_stage).toBe("function");
+  });
+  it("exports mutation RecipeImportLine_suggestExactMatch", () => {
+    expect(typeof (mutations as any).RecipeImportLine_suggestExactMatch).toBe("function");
+  });
+  it("exports mutation RecipeImportLine_suggestPossibleMatches", () => {
+    expect(typeof (mutations as any).RecipeImportLine_suggestPossibleMatches).toBe("function");
+  });
   it("exports mutation RecipeIngredient_add", () => {
     expect(typeof (mutations as any).RecipeIngredient_add).toBe("function");
   });
@@ -663,4 +723,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 219 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 239 as const;

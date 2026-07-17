@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant RecipeImport as RecipeImport
+    participant EventBus
+    Client->>+RecipeImport: beginFinalization()
+    Note over RecipeImport: Policies: recipeImportRead, recipeImportWrite, recipeImportExecute
+    Note over RecipeImport: Guards (3)
+    RecipeImport->>RecipeImport: guard[0]: self.status == #quot;ready#quot;
+    RecipeImport->>RecipeImport: guard[1]: self.readyAt != null
+    RecipeImport->>RecipeImport: guard[2]: self.deletedAt == null
+    RecipeImport->>RecipeImport: mutate.status
+    RecipeImport->>RecipeImport: mutate.finalizationStartedAt
+    RecipeImport->>EventBus: emit RecipeImportFinalizationStarted on recipe_import.finalization_started
+    RecipeImport-->>-Client: void

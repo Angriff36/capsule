@@ -5,12 +5,26 @@ import type {
   ReviewIngredientLine,
 } from "./RecipeImportTypes";
 
+const PLURAL_SUFFIXES = ["ies", "es", "s"];
+
 function normalize(name: string): string {
   return name
     .toLowerCase()
     .replace(/[^a-z0-9\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function singularForms(name: string): string[] {
+  const base = normalize(name);
+  const forms = new Set<string>([base]);
+  for (const suffix of PLURAL_SUFFIXES) {
+    if (base.endsWith(suffix)) {
+      forms.add(base.slice(0, -suffix.length));
+    }
+  }
+  if (base.endsWith("s")) forms.add(base.slice(0, -1));
+  return [...forms];
 }
 
 function tokens(name: string): string[] {
@@ -21,7 +35,6 @@ function tokens(name: string): string[] {
 
 /**
  * Resolves parsed ingredient names against the live Ingredient catalog.
- * Matching is client-side only — Capsule has no generated full-text search.
  */
 export class IngredientCatalogMatcher {
   matchLine(
@@ -29,26 +42,39 @@ export class IngredientCatalogMatcher {
     catalog: readonly CatalogIngredient[],
   ): ReviewIngredientLine {
     const active = catalog.filter((item) => item.deletedAt == null);
-    const exact = active.find(
-      (item) => normalize(item.name) === normalize(line.name),
+    const exact = active.find((item) =>
+      singularForms(item.name).some((form) =>
+        singularForms(line.name).some((needle) => needle === form),
+      ),
     );
     if (exact) {
       return {
         ...line,
-        matchStatus: "matched",
+        matchStatus: "exact",
         matchedIngredientId: exact.id,
         matchedIngredientName: exact.name,
+        possibleMatchIds: [],
+        possibleMatchNames: [],
         createNew: false,
       };
     }
 
-    const partial = this.findPartial(line.name, active);
-    if (partial) {
+    const possible = this.findPossible(line.name, active);
+    if (possible.length === 1) {
       return {
         ...line,
-        matchStatus: "partial",
-        matchedIngredientId: partial.id,
-        matchedIngredientName: partial.name,
+        matchStatus: "possible",
+        possibleMatchIds: [possible[0].id],
+        possibleMatchNames: [possible[0].name],
+        createNew: false,
+      };
+    }
+    if (possible.length > 1) {
+      return {
+        ...line,
+        matchStatus: "possible",
+        possibleMatchIds: possible.map((item) => item.id),
+        possibleMatchNames: possible.map((item) => item.name),
         createNew: false,
       };
     }
@@ -56,6 +82,8 @@ export class IngredientCatalogMatcher {
     return {
       ...line,
       matchStatus: "new",
+      possibleMatchIds: [],
+      possibleMatchNames: [],
       createNew: true,
     };
   }
@@ -67,41 +95,45 @@ export class IngredientCatalogMatcher {
     return lines.map((line) => this.matchLine(line, catalog));
   }
 
-  private findPartial(
+  private findPossible(
     name: string,
     catalog: readonly CatalogIngredient[],
-  ): CatalogIngredient | undefined {
-    const needle = normalize(name);
+  ): CatalogIngredient[] {
+    const needleForms = singularForms(name);
     const needleTokens = tokens(name);
-    let best: { item: CatalogIngredient; score: number } | undefined;
+    const matches: CatalogIngredient[] = [];
 
     for (const item of catalog) {
       const hay = normalize(item.name);
-      if (hay.includes(needle) || needle.includes(hay)) {
-        const score = Math.min(hay.length, needle.length);
-        if (!best || score > best.score) best = { item, score };
+      const hayForms = singularForms(item.name);
+      if (
+        needleForms.some((form) => hay.includes(form) || form.includes(hay)) ||
+        hayForms.some((form) => needleForms.some((needle) => needle.includes(form)))
+      ) {
+        matches.push(item);
         continue;
       }
       const overlap = tokens(item.name).filter((token) =>
         needleTokens.includes(token),
       ).length;
-      if (overlap >= 2) {
-        const score = overlap * 10;
-        if (!best || score > best.score) best = { item, score };
-      }
+      if (overlap >= 2) matches.push(item);
     }
 
-    return best?.item;
+    return matches;
   }
 
   statusLabel(status: IngredientMatchStatus): string {
     switch (status) {
-      case "matched":
-        return "Matched";
-      case "partial":
-        return "Partial match";
+      case "exact":
+        return "Exact match";
+      case "possible":
+        return "Possible match";
       case "new":
-        return "New";
+        return "New ingredient";
+      case "confirmed_existing":
+        return "Confirmed existing";
+      case "confirmed_new":
+        return "Confirmed new";
     }
   }
 }

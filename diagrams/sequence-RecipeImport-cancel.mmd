@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant RecipeImport as RecipeImport
+    participant EventBus
+    Client->>+RecipeImport: cancel(reason)
+    Note over RecipeImport: Policies: recipeImportRead, recipeImportWrite, recipeImportExecute
+    Note over RecipeImport: Guards (2)
+    RecipeImport->>RecipeImport: guard[0]: self.status != #quot;completed#quot;
+    RecipeImport->>RecipeImport: guard[1]: self.deletedAt == null
+    RecipeImport->>RecipeImport: compute.previousStatus
+    RecipeImport->>RecipeImport: mutate.status
+    RecipeImport->>RecipeImport: mutate.cancelledAt
+    RecipeImport->>EventBus: emit RecipeImportCancelled on recipe_import.cancelled
+    RecipeImport-->>-Client: void

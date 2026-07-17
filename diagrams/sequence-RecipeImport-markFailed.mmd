@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant RecipeImport as RecipeImport
+    participant EventBus
+    Client->>+RecipeImport: markFailed(failureDetail, duringParsing)
+    Note over RecipeImport: Policies: recipeImportRead, recipeImportWrite, recipeImportExecute
+    Note over RecipeImport: Guards (3)
+    RecipeImport->>RecipeImport: guard[0]: self.status != #quot;completed#quot;
+    RecipeImport->>RecipeImport: guard[1]: self.status != #quot;cancelled#quot;
+    RecipeImport->>RecipeImport: guard[2]: self.deletedAt == null
+    RecipeImport->>RecipeImport: compute.previousStatus
+    RecipeImport->>RecipeImport: mutate.status
+    RecipeImport->>RecipeImport: mutate.failedAt
+    RecipeImport->>RecipeImport: mutate.parsingFailureDetail
+    RecipeImport->>RecipeImport: mutate.finalizationFailureDetail
+    RecipeImport->>EventBus: emit RecipeImportFailed on recipe_import.failed
+    RecipeImport-->>-Client: void

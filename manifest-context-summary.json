@@ -1,19 +1,19 @@
 {
   "$schema": "manifest-context/v1",
   "meta": {
-    "generatedAt": "2026-07-17T09:51:22.650Z",
+    "generatedAt": "2026-07-17T10:11:07.801Z",
     "compilerVersion": "3.6.21",
     "schemaVersion": "1.0",
-    "contentHash": "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:26f146885f0af70b3d05a99eeddcbf6930b37eaedfd137e4513487aaee09b73a:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:34d91d342d227dd2bcc42505fb227ebe592b8e69016fc3c4302a785b0bafc293:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:57838fb2d9616c87368b4801567e9f4543c8b46421fb392de2cd433acaba7d71:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:834dc5f77f8a7dc29f1a33828120aa41ccfc5bd48b45287f932df57171b58a6c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:99b2b59742684a90590085f7e9c94c22433ebd3552e4a171c4ba24b2b4fd669f:a46c5e97573d9352884f09685287d09a9ba8cd95baf49a11be8f3ca25f8fb2c2:a617c75b66c794a512c36efeb4c7321c500f1ec64b5052d6ee4845db5fbc3195:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d0bb8467f61bb15ed9285ad71803d6233449165a0df0e213d9dc4478925ba1aa:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:eeee3923b778a88047d8a9693e9f0e09b68344415eb7621a5d2978f9b8f6bc1b:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f:fc6fc169e43b78e91acac17a2e59653d28cefd387dc17ed332dbc1dc5b4e049a",
+    "contentHash": "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1530d9c6f057bee0173c2f81dba3ab67637cf26c537bfae568de10cd03d6d12a:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:26f146885f0af70b3d05a99eeddcbf6930b37eaedfd137e4513487aaee09b73a:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:34d91d342d227dd2bcc42505fb227ebe592b8e69016fc3c4302a785b0bafc293:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:57838fb2d9616c87368b4801567e9f4543c8b46421fb392de2cd433acaba7d71:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:834dc5f77f8a7dc29f1a33828120aa41ccfc5bd48b45287f932df57171b58a6c:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:99b2b59742684a90590085f7e9c94c22433ebd3552e4a171c4ba24b2b4fd669f:a46c5e97573d9352884f09685287d09a9ba8cd95baf49a11be8f3ca25f8fb2c2:a617c75b66c794a512c36efeb4c7321c500f1ec64b5052d6ee4845db5fbc3195:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:eeee3923b778a88047d8a9693e9f0e09b68344415eb7621a5d2978f9b8f6bc1b:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f:fc6fc169e43b78e91acac17a2e59653d28cefd387dc17ed332dbc1dc5b4e049a",
     "projection": "llm-context"
   },
   "domain": {
-    "entityCount": 45,
-    "commandCount": 219,
-    "policyCount": 129,
-    "constraintCount": 79,
-    "enumCount": 55,
-    "eventCount": 219,
+    "entityCount": 47,
+    "commandCount": 239,
+    "policyCount": 135,
+    "constraintCount": 87,
+    "enumCount": 58,
+    "eventCount": 239,
     "modules": [],
     "multiTenant": true
   },
@@ -7930,6 +7930,580 @@
           "from": "retired",
           "to": []
         }
+      ]
+    },
+    {
+      "name": "RecipeImport",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "sourceKind",
+          "type": "RecipeImportSourceKind",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "pasted_text"
+        },
+        {
+          "name": "sourceFilename",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "rawSourceText",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "sourceByteCount",
+          "type": "int",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "sourceFingerprint",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "parsedName",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedDescription",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedCategory",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedCuisine",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedInstructions",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedYieldQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedYieldUnit",
+          "type": "UnitOfMeasure | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedBatchMultiplier",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedLineCount",
+          "type": "int",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "resolvedLineCount",
+          "type": "int",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "status",
+          "type": "RecipeImportStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "uploaded"
+        },
+        {
+          "name": "parsingFailureDetail",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "finalizationFailureDetail",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "resultingRecipeId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "uploadedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "reviewStartedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "readyAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "finalizationStartedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "completedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "failedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "cancelledAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "lines",
+          "kind": "hasMany",
+          "target": "RecipeImportLine"
+        },
+        {
+          "name": "resultingRecipe",
+          "kind": "belongsTo",
+          "target": "Recipe",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "resultingRecipeId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "importSourcePresent",
+          "code": "importSourcePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Import source content is required",
+          "overrideable": false
+        },
+        {
+          "name": "importYieldPositive",
+          "code": "importYieldPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Parsed yield quantity must be positive when present",
+          "overrideable": false
+        },
+        {
+          "name": "importBatchPositive",
+          "code": "importBatchPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Parsed batch multiplier must be positive when present",
+          "overrideable": false
+        },
+        {
+          "name": "importLineCountsNonnegative",
+          "code": "importLineCountsNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Import line counts cannot be negative",
+          "overrideable": false
+        },
+        {
+          "name": "importResolvedWithinParsed",
+          "code": "importResolvedWithinParsed",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Resolved line count cannot exceed parsed line count",
+          "overrideable": false
+        },
+        {
+          "name": "importCompletionRequiresRecipe",
+          "code": "importCompletionRequiresRecipe",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Completed imports require a resulting recipe",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "approveReview",
+        "beginFinalization",
+        "beginReview",
+        "cancel",
+        "complete",
+        "markFailed",
+        "recordParse",
+        "recordRecipe",
+        "recordResolutionProgress",
+        "resumeReview",
+        "upload"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ],
+      "transitions": [
+        {
+          "property": "status",
+          "from": "uploaded",
+          "to": [
+            "parsed",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "parsed",
+          "to": [
+            "reviewing",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "reviewing",
+          "to": [
+            "ready",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "ready",
+          "to": [
+            "finalizing",
+            "reviewing",
+            "failed",
+            "cancelled"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "finalizing",
+          "to": [
+            "completed",
+            "failed",
+            "reviewing",
+            "cancelled"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "completed",
+          "to": []
+        },
+        {
+          "property": "status",
+          "from": "failed",
+          "to": [
+            "reviewing",
+            "cancelled"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "cancelled",
+          "to": []
+        }
+      ]
+    },
+    {
+      "name": "RecipeImportLine",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "importId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "sourceOrder",
+          "type": "int",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "sourceLine",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "parsedQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedUnit",
+          "type": "UnitOfMeasure | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "parsedIngredientName",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "preparationNote",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "matchStatus",
+          "type": "RecipeImportMatchStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "unresolved"
+        },
+        {
+          "name": "matchedIngredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "possibleMatchIngredientIds",
+          "type": "list<string>",
+          "required": false,
+          "modifiers": [],
+          "defaultValue": []
+        },
+        {
+          "name": "resolvedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "import",
+          "kind": "belongsTo",
+          "target": "RecipeImport",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "importId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "matchedIngredient",
+          "kind": "belongsTo",
+          "target": "Ingredient",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "matchedIngredientId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "lineMatchedIngredientAllowed",
+          "code": "lineMatchedIngredientAllowed",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Only exact or confirmed existing lines may carry a matched ingredient id",
+          "overrideable": false
+        },
+        {
+          "name": "lineConfirmedNewWithoutMatch",
+          "code": "lineConfirmedNewWithoutMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Confirmed new lines remain unmatched until ingredient creation succeeds",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "attachCreatedIngredient",
+        "confirmExisting",
+        "confirmNew",
+        "discard",
+        "markNew",
+        "resetResolution",
+        "stage",
+        "suggestExactMatch",
+        "suggestPossibleMatches"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
       ]
     },
     {
@@ -21140,6 +21714,1050 @@
       ]
     },
     {
+      "name": "approveReview",
+      "entity": "RecipeImport",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "readyAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportReviewApproved"
+      ]
+    },
+    {
+      "name": "beginFinalization",
+      "entity": "RecipeImport",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "finalizationStartedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportFinalizationStarted"
+      ]
+    },
+    {
+      "name": "beginReview",
+      "entity": "RecipeImport",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "reviewStartedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportReviewStarted"
+      ]
+    },
+    {
+      "name": "cancel",
+      "entity": "RecipeImport",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "cancelReasonPresent",
+          "code": "cancelReasonPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Cancellation reason is required"
+        }
+      ],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "target": "previousStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "cancelledAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportCancelled"
+      ]
+    },
+    {
+      "name": "complete",
+      "entity": "RecipeImport",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "completedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportCompleted"
+      ]
+    },
+    {
+      "name": "markFailed",
+      "entity": "RecipeImport",
+      "parameters": [
+        {
+          "name": "failureDetail",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "duringParsing",
+          "type": "boolean",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "failureDetailPresent",
+          "code": "failureDetailPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Failure detail is required"
+        }
+      ],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "target": "previousStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "failedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsingFailureDetail",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "finalizationFailureDetail",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportFailed"
+      ]
+    },
+    {
+      "name": "recordParse",
+      "entity": "RecipeImport",
+      "parameters": [
+        {
+          "name": "parsedName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "parsedLineCount",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "parsedDescription",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "parsedCategory",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "parsedCuisine",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "parsedInstructions",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "parsedYieldQuantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "parsedYieldUnit",
+          "type": "UnitOfMeasure",
+          "required": false
+        },
+        {
+          "name": "parsedBatchMultiplier",
+          "type": "decimal",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "parseNamePresent",
+          "code": "parseNamePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Parsed recipe name is required"
+        },
+        {
+          "name": "parseLineCountNonnegative",
+          "code": "parseLineCountNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Parsed line count cannot be negative"
+        },
+        {
+          "name": "parseYieldPositive",
+          "code": "parseYieldPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Parsed yield quantity must be positive when present"
+        },
+        {
+          "name": "parseBatchPositive",
+          "code": "parseBatchPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Parsed batch multiplier must be positive when present"
+        }
+      ],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "parsedName",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedDescription",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedCategory",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedCuisine",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedInstructions",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedYieldQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedYieldUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedBatchMultiplier",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedLineCount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolvedLineCount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportParsed"
+      ]
+    },
+    {
+      "name": "recordRecipe",
+      "entity": "RecipeImport",
+      "parameters": [
+        {
+          "name": "resultingRecipeId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "resultingRecipeId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportRecipeRecorded"
+      ]
+    },
+    {
+      "name": "recordResolutionProgress",
+      "entity": "RecipeImport",
+      "parameters": [
+        {
+          "name": "resolvedLineCount",
+          "type": "int",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "progressNonnegative",
+          "code": "progressNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Resolved line count cannot be negative"
+        },
+        {
+          "name": "progressWithinParsed",
+          "code": "progressWithinParsed",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Resolved line count cannot exceed parsed line count"
+        }
+      ],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "resolvedLineCount",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportResolutionProgressRecorded"
+      ]
+    },
+    {
+      "name": "resumeReview",
+      "entity": "RecipeImport",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "failedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "finalizationStartedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "finalizationFailureDetail",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportReviewResumed"
+      ]
+    },
+    {
+      "name": "upload",
+      "entity": "RecipeImport",
+      "parameters": [
+        {
+          "name": "sourceKind",
+          "type": "RecipeImportSourceKind",
+          "required": true
+        },
+        {
+          "name": "rawSourceText",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sourceByteCount",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "sourceFingerprint",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "sourceFilename",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "uploadSourcePresent",
+          "code": "uploadSourcePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Import source content is required"
+        },
+        {
+          "name": "uploadByteCountNonnegative",
+          "code": "uploadByteCountNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Source byte count cannot be negative"
+        },
+        {
+          "name": "uploadFingerprintPresent",
+          "code": "uploadFingerprintPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Source fingerprint is required"
+        }
+      ],
+      "policies": [
+        "recipeImportRead",
+        "recipeImportWrite",
+        "recipeImportExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "sourceKind",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceFilename",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "rawSourceText",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceByteCount",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceFingerprint",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "uploadedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportUploaded"
+      ]
+    },
+    {
+      "name": "attachCreatedIngredient",
+      "entity": "RecipeImportLine",
+      "parameters": [
+        {
+          "name": "matchedIngredientId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportLineRead",
+        "recipeImportLineWrite",
+        "recipeImportLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "matchedIngredientId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportLineCreatedIngredientAttached"
+      ]
+    },
+    {
+      "name": "confirmExisting",
+      "entity": "RecipeImportLine",
+      "parameters": [
+        {
+          "name": "matchedIngredientId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportLineRead",
+        "recipeImportLineWrite",
+        "recipeImportLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "matchStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "matchedIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolvedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportLineExistingConfirmed"
+      ]
+    },
+    {
+      "name": "confirmNew",
+      "entity": "RecipeImportLine",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportLineRead",
+        "recipeImportLineWrite",
+        "recipeImportLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "matchStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "matchedIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolvedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportLineNewConfirmed"
+      ]
+    },
+    {
+      "name": "discard",
+      "entity": "RecipeImportLine",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "discardReasonPresent",
+          "code": "discardReasonPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Discard reason is required"
+        }
+      ],
+      "policies": [
+        "recipeImportLineRead",
+        "recipeImportLineWrite",
+        "recipeImportLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportLineDiscarded"
+      ]
+    },
+    {
+      "name": "markNew",
+      "entity": "RecipeImportLine",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportLineRead",
+        "recipeImportLineWrite",
+        "recipeImportLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "matchStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "matchedIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "possibleMatchIngredientIds",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportLineMarkedNew"
+      ]
+    },
+    {
+      "name": "resetResolution",
+      "entity": "RecipeImportLine",
+      "parameters": [],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportLineRead",
+        "recipeImportLineWrite",
+        "recipeImportLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "matchStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "matchedIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "possibleMatchIngredientIds",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "resolvedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportLineResolutionReset"
+      ]
+    },
+    {
+      "name": "stage",
+      "entity": "RecipeImportLine",
+      "parameters": [
+        {
+          "name": "importId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "sourceOrder",
+          "type": "int",
+          "required": true
+        },
+        {
+          "name": "sourceLine",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "parsedQuantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "parsedUnit",
+          "type": "UnitOfMeasure",
+          "required": false
+        },
+        {
+          "name": "parsedIngredientName",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "preparationNote",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "stageImportMatch",
+          "code": "stageImportMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Stage importId must match the seeded import reference"
+        },
+        {
+          "name": "stageSourceLinePresent",
+          "code": "stageSourceLinePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Source line is required"
+        },
+        {
+          "name": "stageOrderNonnegative",
+          "code": "stageOrderNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Source order cannot be negative"
+        }
+      ],
+      "policies": [
+        "recipeImportLineRead",
+        "recipeImportLineWrite",
+        "recipeImportLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "importId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceOrder",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceLine",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "parsedIngredientName",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "preparationNote",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "matchStatus",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportLineStaged"
+      ]
+    },
+    {
+      "name": "suggestExactMatch",
+      "entity": "RecipeImportLine",
+      "parameters": [
+        {
+          "name": "matchedIngredientId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportLineRead",
+        "recipeImportLineWrite",
+        "recipeImportLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "matchStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "matchedIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "possibleMatchIngredientIds",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportLineExactMatchSuggested"
+      ]
+    },
+    {
+      "name": "suggestPossibleMatches",
+      "entity": "RecipeImportLine",
+      "parameters": [
+        {
+          "name": "possibleMatchIngredientIds",
+          "type": "list<string>",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "recipeImportLineRead",
+        "recipeImportLineWrite",
+        "recipeImportLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "matchStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "matchedIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "possibleMatchIngredientIds",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "RecipeImportLinePossibleMatchesSuggested"
+      ]
+    },
+    {
       "name": "add",
       "entity": "RecipeIngredient",
       "parameters": [
@@ -24902,6 +26520,48 @@
       "message": "Kitchen staff may execute recipe commands"
     },
     {
+      "name": "recipeImportExecute",
+      "entity": "RecipeImport",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may execute recipe import commands"
+    },
+    {
+      "name": "recipeImportLineExecute",
+      "entity": "RecipeImportLine",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may execute recipe import line commands"
+    },
+    {
+      "name": "recipeImportLineRead",
+      "entity": "RecipeImportLine",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may read recipe import lines"
+    },
+    {
+      "name": "recipeImportLineWrite",
+      "entity": "RecipeImportLine",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may write recipe import lines through commands"
+    },
+    {
+      "name": "recipeImportRead",
+      "entity": "RecipeImport",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may read recipe imports"
+    },
+    {
+      "name": "recipeImportWrite",
+      "entity": "RecipeImport",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may write recipe imports through commands"
+    },
+    {
       "name": "recipeIngredientExecute",
       "entity": "RecipeIngredient",
       "action": "execute",
@@ -25674,6 +27334,78 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Recipe batch multiplier must be positive",
+      "overrideable": false
+    },
+    {
+      "entity": "RecipeImport",
+      "name": "importSourcePresent",
+      "code": "importSourcePresent",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Import source content is required",
+      "overrideable": false
+    },
+    {
+      "entity": "RecipeImport",
+      "name": "importYieldPositive",
+      "code": "importYieldPositive",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Parsed yield quantity must be positive when present",
+      "overrideable": false
+    },
+    {
+      "entity": "RecipeImport",
+      "name": "importBatchPositive",
+      "code": "importBatchPositive",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Parsed batch multiplier must be positive when present",
+      "overrideable": false
+    },
+    {
+      "entity": "RecipeImport",
+      "name": "importLineCountsNonnegative",
+      "code": "importLineCountsNonnegative",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Import line counts cannot be negative",
+      "overrideable": false
+    },
+    {
+      "entity": "RecipeImport",
+      "name": "importResolvedWithinParsed",
+      "code": "importResolvedWithinParsed",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Resolved line count cannot exceed parsed line count",
+      "overrideable": false
+    },
+    {
+      "entity": "RecipeImport",
+      "name": "importCompletionRequiresRecipe",
+      "code": "importCompletionRequiresRecipe",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Completed imports require a resulting recipe",
+      "overrideable": false
+    },
+    {
+      "entity": "RecipeImportLine",
+      "name": "lineMatchedIngredientAllowed",
+      "code": "lineMatchedIngredientAllowed",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Only exact or confirmed existing lines may carry a matched ingredient id",
+      "overrideable": false
+    },
+    {
+      "entity": "RecipeImportLine",
+      "name": "lineConfirmedNewWithoutMatch",
+      "code": "lineConfirmedNewWithoutMatch",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Confirmed new lines remain unmatched until ingredient creation succeeds",
       "overrideable": false
     },
     {
@@ -26995,6 +28727,60 @@
       "name": "ingredientLines"
     },
     {
+      "source": "RecipeImport",
+      "target": "RecipeImportLine",
+      "kind": "hasMany",
+      "name": "lines"
+    },
+    {
+      "source": "RecipeImport",
+      "target": "Recipe",
+      "kind": "belongsTo",
+      "name": "resultingRecipe",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "resultingRecipeId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "RecipeImportLine",
+      "target": "RecipeImport",
+      "kind": "belongsTo",
+      "name": "import",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "importId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "RecipeImportLine",
+      "target": "Ingredient",
+      "kind": "belongsTo",
+      "name": "matchedIngredient",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "matchedIngredientId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "RecipeIngredient",
       "target": "Recipe",
       "kind": "belongsTo",
@@ -28012,6 +29798,72 @@
         },
         {
           "name": "failed"
+        }
+      ]
+    },
+    {
+      "name": "RecipeImportMatchStatus",
+      "values": [
+        {
+          "name": "unresolved"
+        },
+        {
+          "name": "exact"
+        },
+        {
+          "name": "possible"
+        },
+        {
+          "name": "new"
+        },
+        {
+          "name": "confirmed_existing"
+        },
+        {
+          "name": "confirmed_new"
+        }
+      ]
+    },
+    {
+      "name": "RecipeImportSourceKind",
+      "values": [
+        {
+          "name": "pasted_text"
+        },
+        {
+          "name": "text_file"
+        },
+        {
+          "name": "csv_bundle"
+        }
+      ]
+    },
+    {
+      "name": "RecipeImportStatus",
+      "values": [
+        {
+          "name": "uploaded"
+        },
+        {
+          "name": "parsed"
+        },
+        {
+          "name": "reviewing"
+        },
+        {
+          "name": "ready"
+        },
+        {
+          "name": "finalizing"
+        },
+        {
+          "name": "completed"
+        },
+        {
+          "name": "failed"
+        },
+        {
+          "name": "cancelled"
         }
       ]
     },
@@ -29176,6 +31028,106 @@
       "payload": "{recipeId: string, tenantId: string, name: string, yieldQuantity: decimal, yieldUnit: UnitOfMeasure, batchMultiplier: decimal, versionNumber: number}"
     },
     {
+      "name": "RecipeImportCancelled",
+      "channel": "recipe_import.cancelled",
+      "payload": "{recipeImportId: string, tenantId: string, previousStatus: RecipeImportStatus, reason: string}"
+    },
+    {
+      "name": "RecipeImportCompleted",
+      "channel": "recipe_import.completed",
+      "payload": "{recipeImportId: string, tenantId: string, resultingRecipeId: string}"
+    },
+    {
+      "name": "RecipeImportFailed",
+      "channel": "recipe_import.failed",
+      "payload": "{recipeImportId: string, tenantId: string, previousStatus: RecipeImportStatus, failureDetail: string}"
+    },
+    {
+      "name": "RecipeImportFinalizationStarted",
+      "channel": "recipe_import.finalization_started",
+      "payload": "{recipeImportId: string, tenantId: string}"
+    },
+    {
+      "name": "RecipeImportLineCreatedIngredientAttached",
+      "channel": "recipe_import_line.created_ingredient_attached",
+      "payload": "{recipeImportLineId: string, tenantId: string, importId: string, matchedIngredientId: string}"
+    },
+    {
+      "name": "RecipeImportLineDiscarded",
+      "channel": "recipe_import_line.discarded",
+      "payload": "{recipeImportLineId: string, tenantId: string, importId: string, reason: string}"
+    },
+    {
+      "name": "RecipeImportLineExactMatchSuggested",
+      "channel": "recipe_import_line.exact_match_suggested",
+      "payload": "{recipeImportLineId: string, tenantId: string, importId: string, matchedIngredientId: string}"
+    },
+    {
+      "name": "RecipeImportLineExistingConfirmed",
+      "channel": "recipe_import_line.existing_confirmed",
+      "payload": "{recipeImportLineId: string, tenantId: string, importId: string, matchedIngredientId: string}"
+    },
+    {
+      "name": "RecipeImportLineMarkedNew",
+      "channel": "recipe_import_line.marked_new",
+      "payload": "{recipeImportLineId: string, tenantId: string, importId: string}"
+    },
+    {
+      "name": "RecipeImportLineNewConfirmed",
+      "channel": "recipe_import_line.new_confirmed",
+      "payload": "{recipeImportLineId: string, tenantId: string, importId: string}"
+    },
+    {
+      "name": "RecipeImportLinePossibleMatchesSuggested",
+      "channel": "recipe_import_line.possible_matches_suggested",
+      "payload": "{recipeImportLineId: string, tenantId: string, importId: string, candidateCount: int}"
+    },
+    {
+      "name": "RecipeImportLineResolutionReset",
+      "channel": "recipe_import_line.resolution_reset",
+      "payload": "{recipeImportLineId: string, tenantId: string, importId: string}"
+    },
+    {
+      "name": "RecipeImportLineStaged",
+      "channel": "recipe_import_line.staged",
+      "payload": "{recipeImportLineId: string, tenantId: string, importId: string, sourceOrder: int}"
+    },
+    {
+      "name": "RecipeImportParsed",
+      "channel": "recipe_import.parsed",
+      "payload": "{recipeImportId: string, tenantId: string, parsedName: string, parsedLineCount: int}"
+    },
+    {
+      "name": "RecipeImportRecipeRecorded",
+      "channel": "recipe_import.recipe_recorded",
+      "payload": "{recipeImportId: string, tenantId: string, resultingRecipeId: string}"
+    },
+    {
+      "name": "RecipeImportResolutionProgressRecorded",
+      "channel": "recipe_import.resolution_progress_recorded",
+      "payload": "{recipeImportId: string, tenantId: string, resolvedLineCount: int, parsedLineCount: int}"
+    },
+    {
+      "name": "RecipeImportReviewApproved",
+      "channel": "recipe_import.review_approved",
+      "payload": "{recipeImportId: string, tenantId: string, parsedLineCount: int}"
+    },
+    {
+      "name": "RecipeImportReviewResumed",
+      "channel": "recipe_import.review_resumed",
+      "payload": "{recipeImportId: string, tenantId: string}"
+    },
+    {
+      "name": "RecipeImportReviewStarted",
+      "channel": "recipe_import.review_started",
+      "payload": "{recipeImportId: string, tenantId: string}"
+    },
+    {
+      "name": "RecipeImportUploaded",
+      "channel": "recipe_import.uploaded",
+      "payload": "{recipeImportId: string, tenantId: string, sourceKind: RecipeImportSourceKind, sourceByteCount: int, sourceFingerprint: string}"
+    },
+    {
       "name": "RecipeIngredientAdded",
       "channel": "recipe_ingredient.added",
       "payload": "{recipeIngredientId: string, tenantId: string, recipeId: string, ingredientId: string, quantity: decimal, unit: UnitOfMeasure}"
@@ -29537,6 +31489,14 @@
     },
     {
       "entity": "Recipe",
+      "target": "durable"
+    },
+    {
+      "entity": "RecipeImport",
+      "target": "durable"
+    },
+    {
+      "entity": "RecipeImportLine",
       "target": "durable"
     },
     {

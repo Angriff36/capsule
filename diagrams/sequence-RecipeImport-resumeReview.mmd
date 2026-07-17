@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant RecipeImport as RecipeImport
+    participant EventBus
+    Client->>+RecipeImport: resumeReview()
+    Note over RecipeImport: Policies: recipeImportRead, recipeImportWrite, recipeImportExecute
+    Note over RecipeImport: Guards (2)
+    RecipeImport->>RecipeImport: guard[0]: self.status == #quot;failed#quot; or self.status == #quot;finalizing#quot;
+    RecipeImport->>RecipeImport: guard[1]: self.deletedAt == null
+    RecipeImport->>RecipeImport: mutate.status
+    RecipeImport->>RecipeImport: mutate.failedAt
+    RecipeImport->>RecipeImport: mutate.finalizationStartedAt
+    RecipeImport->>RecipeImport: mutate.finalizationFailureDetail
+    RecipeImport->>EventBus: emit RecipeImportReviewResumed on recipe_import.review_resumed
+    RecipeImport-->>-Client: void

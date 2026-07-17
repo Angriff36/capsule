@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant RecipeImportLine as RecipeImportLine
+    participant EventBus
+    Client->>+RecipeImportLine: resetResolution()
+    Note over RecipeImportLine: Policies: recipeImportLineRead, recipeImportLineWrite, recipeImportLineExecute
+    Note over RecipeImportLine: Guards (1)
+    RecipeImportLine->>RecipeImportLine: guard[0]: self.deletedAt == null
+    RecipeImportLine->>RecipeImportLine: mutate.matchStatus
+    RecipeImportLine->>RecipeImportLine: mutate.matchedIngredientId
+    RecipeImportLine->>RecipeImportLine: mutate.possibleMatchIngredientIds
+    RecipeImportLine->>RecipeImportLine: mutate.resolvedAt
+    RecipeImportLine->>EventBus: emit RecipeImportLineResolutionReset on recipe_import_line.resolution_reset
+    RecipeImportLine-->>-Client: void

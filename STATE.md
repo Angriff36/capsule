@@ -1,26 +1,30 @@
 # Loop State — capsule
 
-Last run: 2026-07-17T05:05:59Z (manual first tick, L1 report-only)
+Last run: 2026-07-17T06:00:00Z (glm-tick, L1 report-only)
 
 ## High Priority (loop is acting or waiting on human)
 
-- **CI RED on main**: `check` job fails at `bun run proof:emit` —
+- **CI still RED on main, unchanged**: `check` job fails at `bun run proof:emit` —
   `emitCapsuleProofKit` throws at `scripts/emit-proof-kit.ts:94`
-  (runs 29550592283 @ 6bd3e83 and 29548513332 @ 4007aca, both ~13s fail-fast).
-  Started at or before the 3.6.14 pin commit. Human: run `bun run proof:emit`
-  locally against a clean checkout to reproduce. Effort guess: small-medium.
-- **All 6 open Dependabot PRs fail the same CI** — blocked behind the
-  proof:emit failure, not their own changes (typescript 7, vite 8,
-  react-router 7, react-dom, plugin-react, actions/checkout are separate
-  risk decisions once CI is green). Note: typescript 5.9→7.0 and vite 6→8
-  are majors — human-gate per safety.md regardless.
+  (latest push run 29550592283 @ 6bd3e83, ~12s fail-fast; no newer push to
+  main since — the 94a79c9 loop-setup commit didn't trigger a CI run).
+  Human: run `bun run proof:emit` locally against a clean checkout to
+  reproduce. Effort guess: small-medium. No action taken yet.
+- **All 6 open Dependabot PRs still fail the same CI**, blocked behind the
+  proof:emit failure, not their own changes (typescript 5.9→7.0,
+  vite 6.4→8.1, react-router-dom 6.30→7.18, react-dom, plugin-react 4.7→6.0,
+  actions/checkout 4→7). typescript, vite majors and actions/checkout major
+  are separate human-gated risk decisions once CI is green (safety.md).
 
 ## Watch List
 
-- Working tree carries ~36 uncommitted paths (human's in-flight convex/src
-  work) — normal, flag only if unchanged for days.
+- Working tree carries ~28 uncommitted paths (human's in-flight convex/src +
+  docs/task-plans work) — normal, flag only if unchanged for days.
+- `.claude/loop-tick-prompt.txt` and `.claude/loop-tick.cmd` are untracked
+  (not part of the 94a79c9 loop-setup commit) — cosmetic, human's call
+  whether to commit.
 - `actions/checkout@v4` + Node 20 deprecation warnings in CI — bump when
-  convenient.
+  convenient (PR #1 open, itself blocked behind proof:emit CI red).
 
 ## Recent Noise (ignored this run)
 
@@ -28,9 +32,7 @@ Last run: 2026-07-17T05:05:59Z (manual first tick, L1 report-only)
 
 ## Post-Run Critique
 
-- First tick ran manually as setup verification; cron takes over next
-  weekday tick (9:15–17:15 local, every 2h). `gh` visibility confirmed
-  working via settings.local.json allowlist.
+- Third consecutive tick with identical state — same CI failure, same PR set, no new commits to main. Triage cadence reduction recommended: only re-verify CI status (cheap gh run check) instead of full PR re-derivation until the proof:emit blocker is resolved. Current full sweeps are wasted tokens when the root cause is unchanged.
 
 ---
 

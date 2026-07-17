@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant RecipeImportLine as RecipeImportLine
+    participant EventBus
+    Client->>+RecipeImportLine: stage(importId, sourceOrder, sourceLine, parsedQuantity, parsedUnit, parsedIngredientName, preparationNote)
+    Note over RecipeImportLine: Policies: recipeImportLineRead, recipeImportLineWrite, recipeImportLineExecute
+    Note over RecipeImportLine: Guards (3)
+    RecipeImportLine->>RecipeImportLine: guard[0]: self.resolvedAt == null
+    RecipeImportLine->>RecipeImportLine: guard[1]: self.deletedAt == null
+    RecipeImportLine->>RecipeImportLine: guard[2]: self.import != null
+    RecipeImportLine->>RecipeImportLine: mutate.importId
+    RecipeImportLine->>RecipeImportLine: mutate.sourceOrder
+    RecipeImportLine->>RecipeImportLine: mutate.sourceLine
+    RecipeImportLine->>RecipeImportLine: mutate.parsedQuantity
+    RecipeImportLine->>RecipeImportLine: mutate.parsedUnit
+    RecipeImportLine->>RecipeImportLine: mutate.parsedIngredientName
+    RecipeImportLine->>RecipeImportLine: mutate.preparationNote
+    RecipeImportLine->>RecipeImportLine: mutate.matchStatus
+    RecipeImportLine->>EventBus: emit RecipeImportLineStaged on recipe_import_line.staged
+    RecipeImportLine-->>-Client: void

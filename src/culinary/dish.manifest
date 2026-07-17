@@ -2,6 +2,7 @@
 // Menu and EventDish live in menu.manifest (compile entry).
 
 use "./recipe.manifest"
+use "./recipe-import.manifest"
 
 enum DishStatus {
   active

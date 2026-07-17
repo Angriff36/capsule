@@ -1,0 +1,24 @@
+sequenceDiagram
+    participant Client
+    participant RecipeImport as RecipeImport
+    participant EventBus
+    Client->>+RecipeImport: recordParse(parsedName, parsedLineCount, parsedDescription, parsedCategory, parsedCuisine, parsedInstructions, parsedYieldQuantity, parsedYieldUnit, parsedBatchMultiplier)
+    Note over RecipeImport: Policies: recipeImportRead, recipeImportWrite, recipeImportExecute
+    Note over RecipeImport: Guards (3)
+    RecipeImport->>RecipeImport: guard[0]: self.status == #quot;uploaded#quot;
+    RecipeImport->>RecipeImport: guard[1]: self.uploadedAt != null
+    RecipeImport->>RecipeImport: guard[2]: self.deletedAt == null
+    RecipeImport->>RecipeImport: mutate.parsedName
+    RecipeImport->>RecipeImport: mutate.parsedDescription
+    RecipeImport->>RecipeImport: mutate.parsedCategory
+    RecipeImport->>RecipeImport: mutate.parsedCuisine
+    RecipeImport->>RecipeImport: mutate.parsedInstructions
+    RecipeImport->>RecipeImport: mutate.parsedYieldQuantity
+    RecipeImport->>RecipeImport: mutate.parsedYieldUnit
+    RecipeImport->>RecipeImport: mutate.parsedBatchMultiplier
+    RecipeImport->>RecipeImport: mutate.parsedLineCount
+    RecipeImport->>RecipeImport: mutate.resolvedLineCount
+    RecipeImport->>RecipeImport: mutate.status
+    RecipeImport->>RecipeImport: mutate.parsedAt
+    RecipeImport->>EventBus: emit RecipeImportParsed on recipe_import.parsed
+    RecipeImport-->>-Client: void

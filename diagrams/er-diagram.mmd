@@ -756,6 +756,62 @@ erDiagram
         datetime updatedAt
     }
     Recipe ||--o{ RecipeIngredient : "ingredientLines"
+    RecipeImport {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        RecipeImportSourceKind sourceKind "PK"
+        string sourceFilename "nullable"
+        string rawSourceText "PK"
+        int sourceByteCount "PK"
+        string sourceFingerprint "PK"
+        string parsedName "nullable"
+        string parsedDescription "nullable"
+        string parsedCategory "nullable"
+        string parsedCuisine "nullable"
+        string parsedInstructions "nullable"
+        decimal parsedYieldQuantity "nullable"
+        UnitOfMeasure parsedYieldUnit "nullable"
+        decimal parsedBatchMultiplier "nullable"
+        int parsedLineCount "PK"
+        int resolvedLineCount "PK"
+        RecipeImportStatus status "PK"
+        string parsingFailureDetail "nullable"
+        string finalizationFailureDetail "nullable"
+        uuid resultingRecipeId "nullable"
+        datetime uploadedAt "nullable"
+        datetime parsedAt "nullable"
+        datetime reviewStartedAt "nullable"
+        datetime readyAt "nullable"
+        datetime finalizationStartedAt "nullable"
+        datetime completedAt "nullable"
+        datetime failedAt "nullable"
+        datetime cancelledAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    RecipeImport ||--o{ RecipeImportLine : "lines"
+    RecipeImport }o--|| Recipe : "resultingRecipe"
+    RecipeImportLine {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid importId "PK"
+        int sourceOrder "PK"
+        string sourceLine "PK"
+        decimal parsedQuantity "nullable"
+        UnitOfMeasure parsedUnit "nullable"
+        string parsedIngredientName "nullable"
+        string preparationNote "nullable"
+        RecipeImportMatchStatus matchStatus "PK"
+        uuid matchedIngredientId "nullable"
+        list possibleMatchIngredientIds
+        datetime resolvedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    RecipeImportLine }o--|| RecipeImport : "import"
+    RecipeImportLine }o--|| Ingredient : "matchedIngredient"
     RecipeIngredient {
         uuid id "PK"
         string tenantId "PK"

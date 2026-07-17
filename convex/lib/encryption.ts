@@ -63,18 +63,12 @@ async function loadAesKey(): Promise<CryptoKey> {
       "CONVEX_FIELD_ENCRYPTION_KEY is required for encrypted Manifest fields",
     );
   }
-  const raw =
-    secret.length === 44
-      ? base64ToBytes(secret)
-      : new TextEncoder().encode(secret);
+  const raw = secret.length === 44 ? base64ToBytes(secret) : new TextEncoder().encode(secret);
   const material = raw.byteLength === 32 ? raw : await sha256(raw);
-  return crypto.subtle.importKey(
-    "raw",
-    toBufferSource(material),
-    "AES-GCM",
-    false,
-    ["encrypt", "decrypt"],
-  );
+  return crypto.subtle.importKey("raw", toBufferSource(material), "AES-GCM", false, [
+    "encrypt",
+    "decrypt",
+  ]);
 }
 
 async function sha256(bytes: Uint8Array): Promise<Uint8Array> {
@@ -84,10 +78,7 @@ async function sha256(bytes: Uint8Array): Promise<Uint8Array> {
 
 /** TS 5.9 + DOM lib: Uint8Array<ArrayBufferLike> is not BufferSource without a copy. */
 function toBufferSource(bytes: Uint8Array): ArrayBuffer {
-  return bytes.buffer.slice(
-    bytes.byteOffset,
-    bytes.byteOffset + bytes.byteLength,
-  ) as ArrayBuffer;
+  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
 }
 
 function bytesToBase64(bytes: Uint8Array): string {

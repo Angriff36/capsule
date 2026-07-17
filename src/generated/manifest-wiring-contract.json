@@ -3,7 +3,7 @@
   "meta": {
     "compilerVersion": "3.6.21",
     "schemaVersion": "1.0",
-    "contentHash": "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:26f146885f0af70b3d05a99eeddcbf6930b37eaedfd137e4513487aaee09b73a:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:34d91d342d227dd2bcc42505fb227ebe592b8e69016fc3c4302a785b0bafc293:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:57838fb2d9616c87368b4801567e9f4543c8b46421fb392de2cd433acaba7d71:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:834dc5f77f8a7dc29f1a33828120aa41ccfc5bd48b45287f932df57171b58a6c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:99b2b59742684a90590085f7e9c94c22433ebd3552e4a171c4ba24b2b4fd669f:a46c5e97573d9352884f09685287d09a9ba8cd95baf49a11be8f3ca25f8fb2c2:a617c75b66c794a512c36efeb4c7321c500f1ec64b5052d6ee4845db5fbc3195:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d0bb8467f61bb15ed9285ad71803d6233449165a0df0e213d9dc4478925ba1aa:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:eeee3923b778a88047d8a9693e9f0e09b68344415eb7621a5d2978f9b8f6bc1b:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f:fc6fc169e43b78e91acac17a2e59653d28cefd387dc17ed332dbc1dc5b4e049a",
+    "contentHash": "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1530d9c6f057bee0173c2f81dba3ab67637cf26c537bfae568de10cd03d6d12a:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:26f146885f0af70b3d05a99eeddcbf6930b37eaedfd137e4513487aaee09b73a:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:34d91d342d227dd2bcc42505fb227ebe592b8e69016fc3c4302a785b0bafc293:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:57838fb2d9616c87368b4801567e9f4543c8b46421fb392de2cd433acaba7d71:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:834dc5f77f8a7dc29f1a33828120aa41ccfc5bd48b45287f932df57171b58a6c:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:99b2b59742684a90590085f7e9c94c22433ebd3552e4a171c4ba24b2b4fd669f:a46c5e97573d9352884f09685287d09a9ba8cd95baf49a11be8f3ca25f8fb2c2:a617c75b66c794a512c36efeb4c7321c500f1ec64b5052d6ee4845db5fbc3195:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:eeee3923b778a88047d8a9693e9f0e09b68344415eb7621a5d2978f9b8f6bc1b:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f:fc6fc169e43b78e91acac17a2e59653d28cefd387dc17ed332dbc1dc5b4e049a",
     "projection": "wiring"
   },
   "capabilities": [
@@ -13614,6 +13614,1410 @@
           "kind": "entityDetail",
           "entity": "Recipe",
           "queryKeyHint": "queryKeys.recipe.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "approveReview",
+      "capabilityId": "RecipeImport.approveReview",
+      "route": "/api/manifest/RecipeImport/commands/approveReview",
+      "instanceCommand": true,
+      "parameters": [],
+      "clientParameterNames": [],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportReviewApproved"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [
+        {
+          "property": "status",
+          "from": "reviewing",
+          "to": "ready",
+          "proven": true
+        }
+      ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "beginFinalization",
+      "capabilityId": "RecipeImport.beginFinalization",
+      "route": "/api/manifest/RecipeImport/commands/beginFinalization",
+      "instanceCommand": true,
+      "parameters": [],
+      "clientParameterNames": [],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportFinalizationStarted"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [
+        {
+          "property": "status",
+          "from": "ready",
+          "to": "finalizing",
+          "proven": true
+        }
+      ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "beginReview",
+      "capabilityId": "RecipeImport.beginReview",
+      "route": "/api/manifest/RecipeImport/commands/beginReview",
+      "instanceCommand": true,
+      "parameters": [],
+      "clientParameterNames": [],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportReviewStarted"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [
+        {
+          "property": "status",
+          "from": "parsed",
+          "to": "reviewing",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "ready",
+          "to": "reviewing",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "finalizing",
+          "to": "reviewing",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "failed",
+          "to": "reviewing",
+          "proven": true
+        }
+      ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "cancel",
+      "capabilityId": "RecipeImport.cancel",
+      "route": "/api/manifest/RecipeImport/commands/cancel",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "reason",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "reason"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportCancelled"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [
+        {
+          "property": "status",
+          "from": "uploaded",
+          "to": "cancelled",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "parsed",
+          "to": "cancelled",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "reviewing",
+          "to": "cancelled",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "ready",
+          "to": "cancelled",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "finalizing",
+          "to": "cancelled",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "failed",
+          "to": "cancelled",
+          "proven": true
+        }
+      ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "complete",
+      "capabilityId": "RecipeImport.complete",
+      "route": "/api/manifest/RecipeImport/commands/complete",
+      "instanceCommand": true,
+      "parameters": [],
+      "clientParameterNames": [],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportCompleted"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [
+        {
+          "property": "status",
+          "from": "finalizing",
+          "to": "completed",
+          "proven": true
+        }
+      ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "markFailed",
+      "capabilityId": "RecipeImport.markFailed",
+      "route": "/api/manifest/RecipeImport/commands/markFailed",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "failureDetail",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "duringParsing",
+          "tsType": "boolean",
+          "irTypeName": "boolean",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "failureDetail",
+        "duringParsing"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportFailed"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [
+        {
+          "property": "status",
+          "from": "uploaded",
+          "to": "failed",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "parsed",
+          "to": "failed",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "reviewing",
+          "to": "failed",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "ready",
+          "to": "failed",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "finalizing",
+          "to": "failed",
+          "proven": true
+        }
+      ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "recordParse",
+      "capabilityId": "RecipeImport.recordParse",
+      "route": "/api/manifest/RecipeImport/commands/recordParse",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "parsedName",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedLineCount",
+          "tsType": "number",
+          "irTypeName": "int",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 0
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedDescription",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedCategory",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedCuisine",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedInstructions",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedYieldQuantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 1
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedYieldUnit",
+          "tsType": "\"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\"",
+          "irTypeName": "UnitOfMeasure",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "enumValues": [
+              "each",
+              "gram",
+              "kilogram",
+              "ounce",
+              "pound",
+              "milliliter",
+              "liter",
+              "teaspoon",
+              "tablespoon",
+              "cup",
+              "pint",
+              "quart",
+              "gallon",
+              "portion"
+            ]
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedBatchMultiplier",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 1
+          },
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "parsedName",
+        "parsedLineCount",
+        "parsedDescription",
+        "parsedCategory",
+        "parsedCuisine",
+        "parsedInstructions",
+        "parsedYieldQuantity",
+        "parsedYieldUnit",
+        "parsedBatchMultiplier"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportParsed"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [
+        {
+          "property": "status",
+          "from": "uploaded",
+          "to": "parsed",
+          "proven": true
+        }
+      ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "recordRecipe",
+      "capabilityId": "RecipeImport.recordRecipe",
+      "route": "/api/manifest/RecipeImport/commands/recordRecipe",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "resultingRecipeId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "resultingRecipeId"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportRecipeRecorded"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "recordResolutionProgress",
+      "capabilityId": "RecipeImport.recordResolutionProgress",
+      "route": "/api/manifest/RecipeImport/commands/recordResolutionProgress",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "resolvedLineCount",
+          "tsType": "number",
+          "irTypeName": "int",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 0
+          },
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "resolvedLineCount"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportResolutionProgressRecorded"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "resumeReview",
+      "capabilityId": "RecipeImport.resumeReview",
+      "route": "/api/manifest/RecipeImport/commands/resumeReview",
+      "instanceCommand": true,
+      "parameters": [],
+      "clientParameterNames": [],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportReviewResumed"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [
+        {
+          "property": "status",
+          "from": "parsed",
+          "to": "reviewing",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "ready",
+          "to": "reviewing",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "finalizing",
+          "to": "reviewing",
+          "proven": true
+        },
+        {
+          "property": "status",
+          "from": "failed",
+          "to": "reviewing",
+          "proven": true
+        }
+      ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImport",
+      "command": "upload",
+      "capabilityId": "RecipeImport.upload",
+      "route": "/api/manifest/RecipeImport/commands/upload",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "sourceKind",
+          "tsType": "\"pasted_text\" | \"text_file\" | \"csv_bundle\"",
+          "irTypeName": "RecipeImportSourceKind",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "enumValues": [
+              "pasted_text",
+              "text_file",
+              "csv_bundle"
+            ]
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "rawSourceText",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sourceByteCount",
+          "tsType": "number",
+          "irTypeName": "int",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 0
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sourceFingerprint",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sourceFilename",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "sourceKind",
+        "rawSourceText",
+        "sourceByteCount",
+        "sourceFingerprint",
+        "sourceFilename"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportUploaded"
+      ],
+      "affectedEntity": "RecipeImport",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImport",
+          "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImportLine",
+      "command": "attachCreatedIngredient",
+      "capabilityId": "RecipeImportLine.attachCreatedIngredient",
+      "route": "/api/manifest/RecipeImportLine/commands/attachCreatedIngredient",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "matchedIngredientId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "matchedIngredientId"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportLineCreatedIngredientAttached"
+      ],
+      "affectedEntity": "RecipeImportLine",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImportLine",
+      "command": "confirmExisting",
+      "capabilityId": "RecipeImportLine.confirmExisting",
+      "route": "/api/manifest/RecipeImportLine/commands/confirmExisting",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "matchedIngredientId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "matchedIngredientId"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportLineExistingConfirmed"
+      ],
+      "affectedEntity": "RecipeImportLine",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImportLine",
+      "command": "confirmNew",
+      "capabilityId": "RecipeImportLine.confirmNew",
+      "route": "/api/manifest/RecipeImportLine/commands/confirmNew",
+      "instanceCommand": true,
+      "parameters": [],
+      "clientParameterNames": [],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportLineNewConfirmed"
+      ],
+      "affectedEntity": "RecipeImportLine",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImportLine",
+      "command": "discard",
+      "capabilityId": "RecipeImportLine.discard",
+      "route": "/api/manifest/RecipeImportLine/commands/discard",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "reason",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "reason"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportLineDiscarded"
+      ],
+      "affectedEntity": "RecipeImportLine",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImportLine",
+      "command": "markNew",
+      "capabilityId": "RecipeImportLine.markNew",
+      "route": "/api/manifest/RecipeImportLine/commands/markNew",
+      "instanceCommand": true,
+      "parameters": [],
+      "clientParameterNames": [],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportLineMarkedNew"
+      ],
+      "affectedEntity": "RecipeImportLine",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImportLine",
+      "command": "resetResolution",
+      "capabilityId": "RecipeImportLine.resetResolution",
+      "route": "/api/manifest/RecipeImportLine/commands/resetResolution",
+      "instanceCommand": true,
+      "parameters": [],
+      "clientParameterNames": [],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportLineResolutionReset"
+      ],
+      "affectedEntity": "RecipeImportLine",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImportLine",
+      "command": "stage",
+      "capabilityId": "RecipeImportLine.stage",
+      "route": "/api/manifest/RecipeImportLine/commands/stage",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "importId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sourceOrder",
+          "tsType": "number",
+          "irTypeName": "int",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 0
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sourceLine",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedQuantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedUnit",
+          "tsType": "\"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\"",
+          "irTypeName": "UnitOfMeasure",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "enumValues": [
+              "each",
+              "gram",
+              "kilogram",
+              "ounce",
+              "pound",
+              "milliliter",
+              "liter",
+              "teaspoon",
+              "tablespoon",
+              "cup",
+              "pint",
+              "quart",
+              "gallon",
+              "portion"
+            ]
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "parsedIngredientName",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "preparationNote",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "importId",
+        "sourceOrder",
+        "sourceLine",
+        "parsedQuantity",
+        "parsedUnit",
+        "parsedIngredientName",
+        "preparationNote"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportLineStaged"
+      ],
+      "affectedEntity": "RecipeImportLine",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImportLine",
+      "command": "suggestExactMatch",
+      "capabilityId": "RecipeImportLine.suggestExactMatch",
+      "route": "/api/manifest/RecipeImportLine/commands/suggestExactMatch",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "matchedIngredientId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "matchedIngredientId"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportLineExactMatchSuggested"
+      ],
+      "affectedEntity": "RecipeImportLine",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeImportLine",
+      "command": "suggestPossibleMatches",
+      "capabilityId": "RecipeImportLine.suggestPossibleMatches",
+      "route": "/api/manifest/RecipeImportLine/commands/suggestPossibleMatches",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "possibleMatchIngredientIds",
+          "tsType": "string[]",
+          "irTypeName": "list",
+          "required": true,
+          "nullable": false,
+          "arrayElementType": "string",
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "possibleMatchIngredientIds"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeImportLinePossibleMatchesSuggested"
+      ],
+      "affectedEntity": "RecipeImportLine",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeImportLine",
+          "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
           "label": "entity detail"
         }
       ],

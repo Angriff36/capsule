@@ -6,7 +6,7 @@
  * trusted-context injection helpers, and invalidation metadata.
  */
 
-export const WIRING_CONTRACT_HASH = "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:26f146885f0af70b3d05a99eeddcbf6930b37eaedfd137e4513487aaee09b73a:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:34d91d342d227dd2bcc42505fb227ebe592b8e69016fc3c4302a785b0bafc293:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:57838fb2d9616c87368b4801567e9f4543c8b46421fb392de2cd433acaba7d71:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:834dc5f77f8a7dc29f1a33828120aa41ccfc5bd48b45287f932df57171b58a6c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:99b2b59742684a90590085f7e9c94c22433ebd3552e4a171c4ba24b2b4fd669f:a46c5e97573d9352884f09685287d09a9ba8cd95baf49a11be8f3ca25f8fb2c2:a617c75b66c794a512c36efeb4c7321c500f1ec64b5052d6ee4845db5fbc3195:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d0bb8467f61bb15ed9285ad71803d6233449165a0df0e213d9dc4478925ba1aa:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:eeee3923b778a88047d8a9693e9f0e09b68344415eb7621a5d2978f9b8f6bc1b:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f:fc6fc169e43b78e91acac17a2e59653d28cefd387dc17ed332dbc1dc5b4e049a";
+export const WIRING_CONTRACT_HASH = "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1530d9c6f057bee0173c2f81dba3ab67637cf26c537bfae568de10cd03d6d12a:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:26f146885f0af70b3d05a99eeddcbf6930b37eaedfd137e4513487aaee09b73a:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:34d91d342d227dd2bcc42505fb227ebe592b8e69016fc3c4302a785b0bafc293:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:57838fb2d9616c87368b4801567e9f4543c8b46421fb392de2cd433acaba7d71:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:834dc5f77f8a7dc29f1a33828120aa41ccfc5bd48b45287f932df57171b58a6c:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:99b2b59742684a90590085f7e9c94c22433ebd3552e4a171c4ba24b2b4fd669f:a46c5e97573d9352884f09685287d09a9ba8cd95baf49a11be8f3ca25f8fb2c2:a617c75b66c794a512c36efeb4c7321c500f1ec64b5052d6ee4845db5fbc3195:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:eeee3923b778a88047d8a9693e9f0e09b68344415eb7621a5d2978f9b8f6bc1b:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f:fc6fc169e43b78e91acac17a2e59653d28cefd387dc17ed332dbc1dc5b4e049a";
 
 // --- AvailabilityWindow.declare ---
 export interface AvailabilityWindowDeclareClientInput {
@@ -8678,6 +8678,988 @@ export const RecipeReviseDraftInvalidation = [
   }
 ] as const;
 
+// --- RecipeImport.approveReview ---
+export type RecipeImportApproveReviewClientInput = Record<string, never>;
+
+export const RecipeImportApproveReviewCapability = {
+  capabilityId: "RecipeImport.approveReview",
+  entity: "RecipeImport",
+  command: "approveReview",
+  route: "/api/manifest/RecipeImport/commands/approveReview",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["RecipeImportReviewApproved"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.approveReview.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportApproveReviewInput(client: RecipeImportApproveReviewClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.approveReview. */
+export const RecipeImportApproveReviewInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RecipeImport.approveReview. */
+export const RecipeImportApproveReviewLifecycle = [
+  {
+    "property": "status",
+    "from": "reviewing",
+    "to": "ready",
+    "proven": true
+  }
+] as const;
+
+// --- RecipeImport.beginFinalization ---
+export type RecipeImportBeginFinalizationClientInput = Record<string, never>;
+
+export const RecipeImportBeginFinalizationCapability = {
+  capabilityId: "RecipeImport.beginFinalization",
+  entity: "RecipeImport",
+  command: "beginFinalization",
+  route: "/api/manifest/RecipeImport/commands/beginFinalization",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["RecipeImportFinalizationStarted"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.beginFinalization.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportBeginFinalizationInput(client: RecipeImportBeginFinalizationClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.beginFinalization. */
+export const RecipeImportBeginFinalizationInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RecipeImport.beginFinalization. */
+export const RecipeImportBeginFinalizationLifecycle = [
+  {
+    "property": "status",
+    "from": "ready",
+    "to": "finalizing",
+    "proven": true
+  }
+] as const;
+
+// --- RecipeImport.beginReview ---
+export type RecipeImportBeginReviewClientInput = Record<string, never>;
+
+export const RecipeImportBeginReviewCapability = {
+  capabilityId: "RecipeImport.beginReview",
+  entity: "RecipeImport",
+  command: "beginReview",
+  route: "/api/manifest/RecipeImport/commands/beginReview",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["RecipeImportReviewStarted"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.beginReview.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportBeginReviewInput(client: RecipeImportBeginReviewClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.beginReview. */
+export const RecipeImportBeginReviewInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RecipeImport.beginReview. */
+export const RecipeImportBeginReviewLifecycle = [
+  {
+    "property": "status",
+    "from": "parsed",
+    "to": "reviewing",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "ready",
+    "to": "reviewing",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "finalizing",
+    "to": "reviewing",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "failed",
+    "to": "reviewing",
+    "proven": true
+  }
+] as const;
+
+// --- RecipeImport.cancel ---
+export interface RecipeImportCancelClientInput {
+  reason: string;
+}
+
+export const RecipeImportCancelCapability = {
+  capabilityId: "RecipeImport.cancel",
+  entity: "RecipeImport",
+  command: "cancel",
+  route: "/api/manifest/RecipeImport/commands/cancel",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["RecipeImportCancelled"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.cancel.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportCancelInput(client: RecipeImportCancelClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.cancel. */
+export const RecipeImportCancelInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RecipeImport.cancel. */
+export const RecipeImportCancelLifecycle = [
+  {
+    "property": "status",
+    "from": "uploaded",
+    "to": "cancelled",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "parsed",
+    "to": "cancelled",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "reviewing",
+    "to": "cancelled",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "ready",
+    "to": "cancelled",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "finalizing",
+    "to": "cancelled",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "failed",
+    "to": "cancelled",
+    "proven": true
+  }
+] as const;
+
+// --- RecipeImport.complete ---
+export type RecipeImportCompleteClientInput = Record<string, never>;
+
+export const RecipeImportCompleteCapability = {
+  capabilityId: "RecipeImport.complete",
+  entity: "RecipeImport",
+  command: "complete",
+  route: "/api/manifest/RecipeImport/commands/complete",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["RecipeImportCompleted"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.complete.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportCompleteInput(client: RecipeImportCompleteClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.complete. */
+export const RecipeImportCompleteInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RecipeImport.complete. */
+export const RecipeImportCompleteLifecycle = [
+  {
+    "property": "status",
+    "from": "finalizing",
+    "to": "completed",
+    "proven": true
+  }
+] as const;
+
+// --- RecipeImport.markFailed ---
+export interface RecipeImportMarkFailedClientInput {
+  failureDetail: string;
+  duringParsing?: boolean;
+}
+
+export const RecipeImportMarkFailedCapability = {
+  capabilityId: "RecipeImport.markFailed",
+  entity: "RecipeImport",
+  command: "markFailed",
+  route: "/api/manifest/RecipeImport/commands/markFailed",
+  instanceCommand: true,
+  clientParameterNames: ["failureDetail","duringParsing"],
+  serverParameterNames: [],
+  emits: ["RecipeImportFailed"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.markFailed.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportMarkFailedInput(client: RecipeImportMarkFailedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.markFailed. */
+export const RecipeImportMarkFailedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RecipeImport.markFailed. */
+export const RecipeImportMarkFailedLifecycle = [
+  {
+    "property": "status",
+    "from": "uploaded",
+    "to": "failed",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "parsed",
+    "to": "failed",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "reviewing",
+    "to": "failed",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "ready",
+    "to": "failed",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "finalizing",
+    "to": "failed",
+    "proven": true
+  }
+] as const;
+
+// --- RecipeImport.recordParse ---
+export interface RecipeImportRecordParseClientInput {
+  parsedName: string;
+  /** Bounds: 0..∞ */
+  parsedLineCount: number;
+  parsedDescription?: string;
+  parsedCategory?: string;
+  parsedCuisine?: string;
+  parsedInstructions?: string;
+  /** Bounds: 1..∞ */
+  parsedYieldQuantity?: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  parsedYieldUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+  /** Bounds: 1..∞ */
+  parsedBatchMultiplier?: number;
+}
+
+export const RecipeImportRecordParseCapability = {
+  capabilityId: "RecipeImport.recordParse",
+  entity: "RecipeImport",
+  command: "recordParse",
+  route: "/api/manifest/RecipeImport/commands/recordParse",
+  instanceCommand: true,
+  clientParameterNames: ["parsedName","parsedLineCount","parsedDescription","parsedCategory","parsedCuisine","parsedInstructions","parsedYieldQuantity","parsedYieldUnit","parsedBatchMultiplier"],
+  serverParameterNames: [],
+  emits: ["RecipeImportParsed"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.recordParse.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportRecordParseInput(client: RecipeImportRecordParseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.recordParse. */
+export const RecipeImportRecordParseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RecipeImport.recordParse. */
+export const RecipeImportRecordParseLifecycle = [
+  {
+    "property": "status",
+    "from": "uploaded",
+    "to": "parsed",
+    "proven": true
+  }
+] as const;
+
+// --- RecipeImport.recordRecipe ---
+export interface RecipeImportRecordRecipeClientInput {
+  resultingRecipeId: string;
+}
+
+export const RecipeImportRecordRecipeCapability = {
+  capabilityId: "RecipeImport.recordRecipe",
+  entity: "RecipeImport",
+  command: "recordRecipe",
+  route: "/api/manifest/RecipeImport/commands/recordRecipe",
+  instanceCommand: true,
+  clientParameterNames: ["resultingRecipeId"],
+  serverParameterNames: [],
+  emits: ["RecipeImportRecipeRecorded"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.recordRecipe.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportRecordRecipeInput(client: RecipeImportRecordRecipeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.recordRecipe. */
+export const RecipeImportRecordRecipeInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImport.recordResolutionProgress ---
+export interface RecipeImportRecordResolutionProgressClientInput {
+  /** Bounds: 0..∞ */
+  resolvedLineCount: number;
+}
+
+export const RecipeImportRecordResolutionProgressCapability = {
+  capabilityId: "RecipeImport.recordResolutionProgress",
+  entity: "RecipeImport",
+  command: "recordResolutionProgress",
+  route: "/api/manifest/RecipeImport/commands/recordResolutionProgress",
+  instanceCommand: true,
+  clientParameterNames: ["resolvedLineCount"],
+  serverParameterNames: [],
+  emits: ["RecipeImportResolutionProgressRecorded"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.recordResolutionProgress.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportRecordResolutionProgressInput(client: RecipeImportRecordResolutionProgressClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.recordResolutionProgress. */
+export const RecipeImportRecordResolutionProgressInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImport.resumeReview ---
+export type RecipeImportResumeReviewClientInput = Record<string, never>;
+
+export const RecipeImportResumeReviewCapability = {
+  capabilityId: "RecipeImport.resumeReview",
+  entity: "RecipeImport",
+  command: "resumeReview",
+  route: "/api/manifest/RecipeImport/commands/resumeReview",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["RecipeImportReviewResumed"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.resumeReview.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportResumeReviewInput(client: RecipeImportResumeReviewClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.resumeReview. */
+export const RecipeImportResumeReviewInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RecipeImport.resumeReview. */
+export const RecipeImportResumeReviewLifecycle = [
+  {
+    "property": "status",
+    "from": "parsed",
+    "to": "reviewing",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "ready",
+    "to": "reviewing",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "finalizing",
+    "to": "reviewing",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "failed",
+    "to": "reviewing",
+    "proven": true
+  }
+] as const;
+
+// --- RecipeImport.upload ---
+export interface RecipeImportUploadClientInput {
+  /** Allowed: "pasted_text" | "text_file" | "csv_bundle" */
+  sourceKind: "pasted_text" | "text_file" | "csv_bundle";
+  rawSourceText: string;
+  /** Bounds: 0..∞ */
+  sourceByteCount: number;
+  sourceFingerprint: string;
+  sourceFilename?: string;
+}
+
+export const RecipeImportUploadCapability = {
+  capabilityId: "RecipeImport.upload",
+  entity: "RecipeImport",
+  command: "upload",
+  route: "/api/manifest/RecipeImport/commands/upload",
+  instanceCommand: true,
+  clientParameterNames: ["sourceKind","rawSourceText","sourceByteCount","sourceFingerprint","sourceFilename"],
+  serverParameterNames: [],
+  emits: ["RecipeImportUploaded"],
+} as const;
+
+/**
+ * Build command input for RecipeImport.upload.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportUploadInput(client: RecipeImportUploadClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImport.upload. */
+export const RecipeImportUploadInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImport",
+    "queryKeyHint": "queryKeys.recipeImport.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImportLine.attachCreatedIngredient ---
+export interface RecipeImportLineAttachCreatedIngredientClientInput {
+  matchedIngredientId: string;
+}
+
+export const RecipeImportLineAttachCreatedIngredientCapability = {
+  capabilityId: "RecipeImportLine.attachCreatedIngredient",
+  entity: "RecipeImportLine",
+  command: "attachCreatedIngredient",
+  route: "/api/manifest/RecipeImportLine/commands/attachCreatedIngredient",
+  instanceCommand: true,
+  clientParameterNames: ["matchedIngredientId"],
+  serverParameterNames: [],
+  emits: ["RecipeImportLineCreatedIngredientAttached"],
+} as const;
+
+/**
+ * Build command input for RecipeImportLine.attachCreatedIngredient.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportLineAttachCreatedIngredientInput(client: RecipeImportLineAttachCreatedIngredientClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImportLine.attachCreatedIngredient. */
+export const RecipeImportLineAttachCreatedIngredientInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImportLine.confirmExisting ---
+export interface RecipeImportLineConfirmExistingClientInput {
+  matchedIngredientId: string;
+}
+
+export const RecipeImportLineConfirmExistingCapability = {
+  capabilityId: "RecipeImportLine.confirmExisting",
+  entity: "RecipeImportLine",
+  command: "confirmExisting",
+  route: "/api/manifest/RecipeImportLine/commands/confirmExisting",
+  instanceCommand: true,
+  clientParameterNames: ["matchedIngredientId"],
+  serverParameterNames: [],
+  emits: ["RecipeImportLineExistingConfirmed"],
+} as const;
+
+/**
+ * Build command input for RecipeImportLine.confirmExisting.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportLineConfirmExistingInput(client: RecipeImportLineConfirmExistingClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImportLine.confirmExisting. */
+export const RecipeImportLineConfirmExistingInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImportLine.confirmNew ---
+export type RecipeImportLineConfirmNewClientInput = Record<string, never>;
+
+export const RecipeImportLineConfirmNewCapability = {
+  capabilityId: "RecipeImportLine.confirmNew",
+  entity: "RecipeImportLine",
+  command: "confirmNew",
+  route: "/api/manifest/RecipeImportLine/commands/confirmNew",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["RecipeImportLineNewConfirmed"],
+} as const;
+
+/**
+ * Build command input for RecipeImportLine.confirmNew.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportLineConfirmNewInput(client: RecipeImportLineConfirmNewClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImportLine.confirmNew. */
+export const RecipeImportLineConfirmNewInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImportLine.discard ---
+export interface RecipeImportLineDiscardClientInput {
+  reason: string;
+}
+
+export const RecipeImportLineDiscardCapability = {
+  capabilityId: "RecipeImportLine.discard",
+  entity: "RecipeImportLine",
+  command: "discard",
+  route: "/api/manifest/RecipeImportLine/commands/discard",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["RecipeImportLineDiscarded"],
+} as const;
+
+/**
+ * Build command input for RecipeImportLine.discard.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportLineDiscardInput(client: RecipeImportLineDiscardClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImportLine.discard. */
+export const RecipeImportLineDiscardInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImportLine.markNew ---
+export type RecipeImportLineMarkNewClientInput = Record<string, never>;
+
+export const RecipeImportLineMarkNewCapability = {
+  capabilityId: "RecipeImportLine.markNew",
+  entity: "RecipeImportLine",
+  command: "markNew",
+  route: "/api/manifest/RecipeImportLine/commands/markNew",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["RecipeImportLineMarkedNew"],
+} as const;
+
+/**
+ * Build command input for RecipeImportLine.markNew.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportLineMarkNewInput(client: RecipeImportLineMarkNewClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImportLine.markNew. */
+export const RecipeImportLineMarkNewInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImportLine.resetResolution ---
+export type RecipeImportLineResetResolutionClientInput = Record<string, never>;
+
+export const RecipeImportLineResetResolutionCapability = {
+  capabilityId: "RecipeImportLine.resetResolution",
+  entity: "RecipeImportLine",
+  command: "resetResolution",
+  route: "/api/manifest/RecipeImportLine/commands/resetResolution",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["RecipeImportLineResolutionReset"],
+} as const;
+
+/**
+ * Build command input for RecipeImportLine.resetResolution.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportLineResetResolutionInput(client: RecipeImportLineResetResolutionClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImportLine.resetResolution. */
+export const RecipeImportLineResetResolutionInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImportLine.stage ---
+export interface RecipeImportLineStageClientInput {
+  importId: string;
+  /** Bounds: 0..∞ */
+  sourceOrder: number;
+  sourceLine: string;
+  parsedQuantity?: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  parsedUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+  parsedIngredientName?: string;
+  preparationNote?: string;
+}
+
+export const RecipeImportLineStageCapability = {
+  capabilityId: "RecipeImportLine.stage",
+  entity: "RecipeImportLine",
+  command: "stage",
+  route: "/api/manifest/RecipeImportLine/commands/stage",
+  instanceCommand: true,
+  clientParameterNames: ["importId","sourceOrder","sourceLine","parsedQuantity","parsedUnit","parsedIngredientName","preparationNote"],
+  serverParameterNames: [],
+  emits: ["RecipeImportLineStaged"],
+} as const;
+
+/**
+ * Build command input for RecipeImportLine.stage.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportLineStageInput(client: RecipeImportLineStageClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImportLine.stage. */
+export const RecipeImportLineStageInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImportLine.suggestExactMatch ---
+export interface RecipeImportLineSuggestExactMatchClientInput {
+  matchedIngredientId: string;
+}
+
+export const RecipeImportLineSuggestExactMatchCapability = {
+  capabilityId: "RecipeImportLine.suggestExactMatch",
+  entity: "RecipeImportLine",
+  command: "suggestExactMatch",
+  route: "/api/manifest/RecipeImportLine/commands/suggestExactMatch",
+  instanceCommand: true,
+  clientParameterNames: ["matchedIngredientId"],
+  serverParameterNames: [],
+  emits: ["RecipeImportLineExactMatchSuggested"],
+} as const;
+
+/**
+ * Build command input for RecipeImportLine.suggestExactMatch.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportLineSuggestExactMatchInput(client: RecipeImportLineSuggestExactMatchClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImportLine.suggestExactMatch. */
+export const RecipeImportLineSuggestExactMatchInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- RecipeImportLine.suggestPossibleMatches ---
+export interface RecipeImportLineSuggestPossibleMatchesClientInput {
+  possibleMatchIngredientIds: string[];
+}
+
+export const RecipeImportLineSuggestPossibleMatchesCapability = {
+  capabilityId: "RecipeImportLine.suggestPossibleMatches",
+  entity: "RecipeImportLine",
+  command: "suggestPossibleMatches",
+  route: "/api/manifest/RecipeImportLine/commands/suggestPossibleMatches",
+  instanceCommand: true,
+  clientParameterNames: ["possibleMatchIngredientIds"],
+  serverParameterNames: [],
+  emits: ["RecipeImportLinePossibleMatchesSuggested"],
+} as const;
+
+/**
+ * Build command input for RecipeImportLine.suggestPossibleMatches.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRecipeImportLineSuggestPossibleMatchesInput(client: RecipeImportLineSuggestPossibleMatchesClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RecipeImportLine.suggestPossibleMatches. */
+export const RecipeImportLineSuggestPossibleMatchesInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RecipeImportLine",
+    "queryKeyHint": "queryKeys.recipeImportLine.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- RecipeIngredient.add ---
 export interface RecipeIngredientAddClientInput {
   recipeId: string;
@@ -10982,6 +11964,26 @@ export const ALL_CAPABILITY_IDS = [
   "Recipe.retire",
   "Recipe.retract",
   "Recipe.reviseDraft",
+  "RecipeImport.approveReview",
+  "RecipeImport.beginFinalization",
+  "RecipeImport.beginReview",
+  "RecipeImport.cancel",
+  "RecipeImport.complete",
+  "RecipeImport.markFailed",
+  "RecipeImport.recordParse",
+  "RecipeImport.recordRecipe",
+  "RecipeImport.recordResolutionProgress",
+  "RecipeImport.resumeReview",
+  "RecipeImport.upload",
+  "RecipeImportLine.attachCreatedIngredient",
+  "RecipeImportLine.confirmExisting",
+  "RecipeImportLine.confirmNew",
+  "RecipeImportLine.discard",
+  "RecipeImportLine.markNew",
+  "RecipeImportLine.resetResolution",
+  "RecipeImportLine.stage",
+  "RecipeImportLine.suggestExactMatch",
+  "RecipeImportLine.suggestPossibleMatches",
   "RecipeIngredient.add",
   "RecipeIngredient.adjustQuantity",
   "RecipeIngredient.remove",
