@@ -17,3 +17,11 @@ pnpm-lock.yaml
 
 generated/ir/
 .tmp/
+
+# Claude Code local (per-machine) settings
+.claude/settings.local.json
+
+# Loop fix-attempt worktrees (loop-worktree tool)
+.loop-worktrees/
+.claude/scheduled_tasks.json
+.claude/scheduled_tasks.lock

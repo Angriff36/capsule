@@ -1,0 +1,6 @@
+{
+  "goal": "Keep capsule main healthy: triage CI, PRs, and issues; propose minimal fixes after L2 graduation",
+  "pattern": "daily-triage",
+  "level": "L1",
+  "attempts": []
+}
