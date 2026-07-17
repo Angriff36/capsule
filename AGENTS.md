@@ -45,6 +45,12 @@ bun run seed             # requires Convex URL
 
 Import Convex API through `src/lib/api.ts`. Details: `docs/generation/manifest-builder.md`.
 
+Proof-kit / integration-guard / Manifest pin work: read
+`docs/generation/2026-07-16-dx-proof-kit-boundary.md` first (Capsule twin of the
+Manifest binding plan). Exact registry pin only; thin feature-root wrappers over
+the Manifest guard engine — do not invent app-side guard logic or hand-maintained
+capability inventories.
+
 ## Secrets / env
 
 - Contract: `.env.example`

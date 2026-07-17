@@ -1,7 +1,7 @@
 # DX Proof Kit — dependency boundary
 
 **Created:** 2026-07-16  
-**Updated:** 2026-07-16  
+**Updated:** 2026-07-17  
 **Status:** Binding for Capsule consumption of published Manifest proof-kit + governed creation
 
 ## Ownership
@@ -26,7 +26,7 @@
 
 ## Capsule pin
 
-**Published:** `@angriff36/manifest@3.6.17` (`[release] v3.6.17` / tag `v3.6.17`) — atomic initialization + createVia param locals + multi-file ownership re-attach.
+~~**Published:** `@angriff36/manifest@3.6.17` (`[release] v3.6.17` / tag `v3.6.17`) — atomic initialization + createVia param locals + multi-file ownership re-attach.~~
 
 Capsule must pin the exact registry version (no `^`).
 
