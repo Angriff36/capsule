@@ -33,3 +33,11 @@ Capsule must pin the exact registry version (no `^`).
 ~~**Published target:** `@angriff36/manifest@3.6.16` — createVia regen blocked by param scope + multi-file ownership loss.~~
 
 > **Correction (2026-07-16) @RYANSIGNED:** Consumable pin is **3.6.17**. Registry-only (`bun run check:manifest-registry`). Governed creation proofs: `tests/culinary-governed-creation.runtime.test.ts`.
+
+> **Correction (2026-07-17):** Consumable pin is **3.6.20** — first release with
+> working relation resolution in command evaluation (guards, constraints,
+> actions, emit payloads) and pre-state draft defaults. 3.6.17 relation guards
+> throw unconditionally; 3.6.18/3.6.19 generate broken code (undefined
+> `__resolveRelation` / unresolved emit payloads) — never pin them. Proofs:
+> `tests/proofs/shift-lifecycle.runtime.test.ts`,
+> `tests/proofs/relation-guarded-creation.runtime.test.ts`.
