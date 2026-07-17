@@ -34,6 +34,36 @@ async function __decryptDoc(ctx: any, entity: string, fields: readonly string[],
   return out;
 }
 
+async function __resolveRelation(
+  ctx: any,
+  table: string,
+  localValues: readonly unknown[],
+  targetFields: readonly string[],
+  tenantField?: string,
+  tenantValue?: unknown,
+): Promise<any | null> {
+  if (localValues.some((value) => value == null)) return null;
+  const identityIndex = targetFields.indexOf("id");
+  let target: any | null;
+  if (identityIndex >= 0) {
+    target = await ctx.db.get(localValues[identityIndex] as any);
+  } else {
+    target = await ctx.db
+      .query(table)
+      .filter((q: any) =>
+        q.and(...targetFields.map((field, index) => q.eq(q.field(field), localValues[index]))),
+      )
+      .first();
+  }
+  if (!target) return null;
+  for (let index = 0; index < targetFields.length; index += 1) {
+    const field = targetFields[index] === "id" ? "_id" : targetFields[index];
+    if (target[field] !== localValues[index]) return null;
+  }
+  if (tenantField && target[tenantField] !== tenantValue) return null;
+  return target;
+}
+
 // Role hierarchy from IR (effective permissions after inheritance).
 const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = {
   "admin": [
@@ -988,13 +1018,14 @@ async function __runClientContactAdd(ctx: MutationCtx, { docId, clientId, givenN
     if (!__storedDoc) throw new Error("ClientContact not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("ClientContact not found");
     const doc = await __decryptDoc(ctx, "ClientContact", ["email","phone","mobile"], __storedDoc) as Record<string, any>;
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read client contacts");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write client contacts through commands");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute client contact commands");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.client != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 3 failed");
     if (!((clientId === doc.clientId))) throw new Error("Add clientId must match the seeded client reference");
     if (!((((givenName).trim()).length > 0))) throw new Error("Contact given name is required");
     if (version !== undefined && (doc as any).version !== version) {
@@ -1073,13 +1104,14 @@ export const ClientContact_createViaAdd = mutation({
       phone: args.phone,
       title: args.title
     };
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read client contacts");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write client contacts through commands");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute client contact commands");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.client != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 3 failed");
     if (!((clientId === __draft.clientId))) throw new Error("Add clientId must match the seeded client reference");
     if (!((((givenName).trim()).length > 0))) throw new Error("Contact given name is required");
     const doc: Record<string, any> = {
@@ -1248,14 +1280,16 @@ async function __runContractDraft(ctx: MutationCtx, { docId, eventId, clientId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Contract not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Contract not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read contracts");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write contracts through commands");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute contract commands");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.event != null))) throw new Error("Guard 3 failed");
-    if (!((doc.client != null))) throw new Error("Guard 4 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 4 failed");
     if (!((eventId === doc.eventId))) throw new Error("Draft eventId must match the seeded event reference");
     if (!((clientId === doc.clientId))) throw new Error("Draft clientId must match the seeded client reference");
     if (!((((title).trim()).length > 0))) throw new Error("Contract title is required");
@@ -1322,14 +1356,16 @@ export const Contract_createViaDraft = mutation({
       notes: args.notes,
       title: args.title
     };
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read contracts");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write contracts through commands");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute contract commands");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
-    if (!((__draft.client != null))) throw new Error("Guard 4 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 4 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Draft eventId must match the seeded event reference");
     if (!((clientId === __draft.clientId))) throw new Error("Draft clientId must match the seeded client reference");
     if (!((((title).trim()).length > 0))) throw new Error("Contract title is required");
@@ -1756,14 +1792,16 @@ async function __runDeliverySchedule(ctx: MutationCtx, { docId, packListId, even
     if (!__storedDoc) throw new Error("Delivery not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Delivery not found");
     const doc = await __decryptDoc(ctx, "Delivery", ["notes"], __storedDoc) as Record<string, any>;
+    const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read deliveries");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write deliveries through commands");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute delivery commands");
     if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.packList != null) && (((doc.packList.status === "packed") || (doc.packList.status === "loaded")) || (doc.packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
-    if (!((doc.event != null))) throw new Error("Guard 4 failed");
+    if (!(((__rel_packList != null) && (((__rel_packList.status === "packed") || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 4 failed");
     if (!((packListId === doc.packListId))) throw new Error("Schedule packListId must match the seeded pack list reference");
     if (!((eventId === doc.eventId))) throw new Error("Schedule eventId must match the seeded event reference");
     if (!((((driverId == null) || (doc.driverId == null)) || (driverId === doc.driverId)))) throw new Error("Schedule driverId must match the seeded driver reference when provided");
@@ -1833,14 +1871,16 @@ export const Delivery_createViaSchedule = mutation({
       windowEndsAt: args.windowEndsAt,
       windowStartsAt: args.windowStartsAt
     };
+    const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, __draft.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read deliveries");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write deliveries through commands");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute delivery commands");
     if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "scheduled"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__draft.packList != null) && (((__draft.packList.status === "packed") || (__draft.packList.status === "loaded")) || (__draft.packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
-    if (!((__draft.event != null))) throw new Error("Guard 4 failed");
+    if (!(((__rel_packList != null) && (((__rel_packList.status === "packed") || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 4 failed");
     if (!((packListId === __draft.packListId))) throw new Error("Schedule packListId must match the seeded pack list reference");
     if (!((eventId === __draft.eventId))) throw new Error("Schedule eventId must match the seeded event reference");
     if (!((((driverId == null) || (__draft.driverId == null)) || (driverId === __draft.driverId)))) throw new Error("Schedule driverId must match the seeded driver reference when provided");
@@ -3119,13 +3159,14 @@ async function __runEventAllergenCheckRecord(ctx: MutationCtx, { docId, eventId,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventAllergenCheck not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventAllergenCheck not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may read event allergen checks");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may write event allergen checks through commands");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may execute event allergen check commands");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
     if (!((doc.checkedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.event != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!((user.id != null))) throw new Error("Guard 4 failed");
     if (!((eventId === doc.eventId))) throw new Error("Record eventId must match the seeded event reference");
     if (!((((eventDishId == null) || (doc.eventDishId == null)) || (eventDishId === doc.eventDishId)))) throw new Error("Record eventDishId must match the seeded event dish reference when provided");
@@ -3197,6 +3238,7 @@ export const EventAllergenCheck_createViaRecord = mutation({
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      status: "pending",
       dishId: args.dishId,
       eventDishId: args.eventDishId,
       eventId: args.eventId,
@@ -3204,13 +3246,14 @@ export const EventAllergenCheck_createViaRecord = mutation({
       notes: args.notes,
       result: args.result
     };
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may read event allergen checks");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may write event allergen checks through commands");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may execute event allergen check commands");
     if (!((__draft.status === "pending"))) throw new Error("Guard 0 failed");
     if (!((__draft.checkedAt == null))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!((user.id != null))) throw new Error("Guard 4 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Record eventId must match the seeded event reference");
     if (!((((eventDishId == null) || (__draft.eventDishId == null)) || (eventDishId === __draft.eventDishId)))) throw new Error("Record eventDishId must match the seeded event dish reference when provided");
@@ -3243,14 +3286,16 @@ async function __runEventAssignmentAssign(ctx: MutationCtx, { docId, eventId, pe
     if (!__storedDoc) throw new Error("EventAssignment not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("EventAssignment not found");
     const doc = await __decryptDoc(ctx, "EventAssignment", ["notes"], __storedDoc) as Record<string, any>;
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read event assignments");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write event assignments through commands");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute event assignment commands");
     if (!((doc.assignedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "assigned"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.event != null))) throw new Error("Guard 3 failed");
-    if (!(((doc.person != null) && (doc.person.status === "active")))) throw new Error("Guard 4 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
+    if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 4 failed");
     if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Guard 5 failed");
     if (!((eventId === doc.eventId))) throw new Error("Assign eventId must match the seeded event reference");
     if (!((personId === doc.personId))) throw new Error("Assign personId must match the seeded person reference");
@@ -3316,14 +3361,16 @@ export const EventAssignment_createViaAssign = mutation({
       role: args.role,
       startsAt: args.startsAt
     };
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read event assignments");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write event assignments through commands");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute event assignment commands");
     if (!((__draft.assignedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "assigned"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
-    if (!(((__draft.person != null) && (__draft.person.status === "active")))) throw new Error("Guard 4 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
+    if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 4 failed");
     if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Guard 5 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Assign eventId must match the seeded event reference");
     if (!((personId === __draft.personId))) throw new Error("Assign personId must match the seeded person reference");
@@ -3612,13 +3659,14 @@ async function __runEventCloseoutCapture(ctx: MutationCtx, { docId, eventId, act
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventCloseout not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventCloseout not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read event closeouts");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write event closeouts through commands");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute event closeout commands");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((doc.event != null))) throw new Error("Guard 2 failed");
-    if (!((doc.event.stage === "closed_out"))) throw new Error("Guard 3 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 2 failed");
+    if (!((__rel_event.stage === "closed_out"))) throw new Error("Guard 3 failed");
     if (!((eventId === doc.eventId))) throw new Error("Capture eventId must match the seeded event reference");
     if (!(((((((((actualRevenue >= 0) && (budgetedRevenue >= 0)) && (actualIngredientCost >= 0)) && (actualWasteCost >= 0)) && (actualLaborCost >= 0)) && (actualVendorCost >= 0)) && (budgetedCost >= 0)) && (totalActualCost >= 0)))) throw new Error("Closeout money amounts cannot be negative");
     if (!((totalActualCost === (((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost)))) throw new Error("Total actual cost must equal ingredient plus waste plus labor plus vendor costs");
@@ -3729,13 +3777,14 @@ export const EventCloseout_createViaCapture = mutation({
       totalActualCost: args.totalActualCost,
       unresolvedIssues: args.unresolvedIssues
     };
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read event closeouts");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write event closeouts through commands");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute event closeout commands");
     if (!((__draft.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((__draft.event != null))) throw new Error("Guard 2 failed");
-    if (!((__draft.event.stage === "closed_out"))) throw new Error("Guard 3 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 2 failed");
+    if (!((__rel_event.stage === "closed_out"))) throw new Error("Guard 3 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Capture eventId must match the seeded event reference");
     if (!(((((((((actualRevenue >= 0) && (budgetedRevenue >= 0)) && (actualIngredientCost >= 0)) && (actualWasteCost >= 0)) && (actualLaborCost >= 0)) && (actualVendorCost >= 0)) && (budgetedCost >= 0)) && (totalActualCost >= 0)))) throw new Error("Closeout money amounts cannot be negative");
     if (!((totalActualCost === (((actualIngredientCost + actualWasteCost) + actualLaborCost) + actualVendorCost)))) throw new Error("Total actual cost must equal ingredient plus waste plus labor plus vendor costs");
@@ -3826,12 +3875,13 @@ async function __runEventDishAdjustServings(ctx: MutationCtx, { docId, quantityS
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventDish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may read event dish selections");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may write event dish selections through commands");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may execute event dish selection commands");
     if (!((doc.selectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((doc.event != null) && (((doc.event.stage === "planning") || (doc.event.stage === "pending_approval")) || (doc.event.stage === "approved"))))) throw new Error("Guard 2 failed");
+    if (!(((__rel_event != null) && (((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved"))))) throw new Error("Guard 2 failed");
     if (!((quantityServings > 0))) throw new Error("Event dish servings must be positive");
     const previousQuantityServings = doc.quantityServings;
     if (version !== undefined && (doc as any).version !== version) {
@@ -3863,12 +3913,13 @@ async function __runEventDishChangeCourse(ctx: MutationCtx, { docId, course, ser
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventDish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may read event dish selections");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may write event dish selections through commands");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may execute event dish selection commands");
     if (!((doc.selectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((doc.event != null) && (((doc.event.stage === "planning") || (doc.event.stage === "pending_approval")) || (doc.event.stage === "approved"))))) throw new Error("Guard 2 failed");
+    if (!(((__rel_event != null) && (((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved"))))) throw new Error("Guard 2 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -3900,12 +3951,13 @@ async function __runEventDishRemove(ctx: MutationCtx, { docId, reason, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventDish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may read event dish selections");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may write event dish selections through commands");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may execute event dish selection commands");
     if (!((doc.selectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((doc.event != null) && (((doc.event.stage === "planning") || (doc.event.stage === "pending_approval")) || (doc.event.stage === "approved"))))) throw new Error("Guard 2 failed");
+    if (!(((__rel_event != null) && (((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved"))))) throw new Error("Guard 2 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Removal reason is required");
     const previousQuantityServings = doc.quantityServings;
     if (version !== undefined && (doc as any).version !== version) {
@@ -3938,12 +3990,13 @@ async function __runEventDishSelect(ctx: MutationCtx, { docId, eventId, dishId, 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventDish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may read event dish selections");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may write event dish selections through commands");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may execute event dish selection commands");
     if (!((doc.selectedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((doc.event != null) && (((doc.event.stage === "planning") || (doc.event.stage === "pending_approval")) || (doc.event.stage === "approved"))))) throw new Error("Guard 2 failed");
+    if (!(((__rel_event != null) && (((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved"))))) throw new Error("Guard 2 failed");
     if (!((eventId === doc.eventId))) throw new Error("Select eventId must match the seeded event reference");
     if (!((quantityServings > 0))) throw new Error("Event dish servings must be positive");
     if (version !== undefined && (doc as any).version !== version) {
@@ -4004,12 +4057,13 @@ export const EventDish_createViaSelect = mutation({
       serviceStyle: args.serviceStyle,
       specialInstructions: args.specialInstructions
     };
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may read event dish selections");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may write event dish selections through commands");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may execute event dish selection commands");
     if (!((__draft.selectedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((__draft.event != null) && (((__draft.event.stage === "planning") || (__draft.event.stage === "pending_approval")) || (__draft.event.stage === "approved"))))) throw new Error("Guard 2 failed");
+    if (!(((__rel_event != null) && (((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved"))))) throw new Error("Guard 2 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Select eventId must match the seeded event reference");
     if (!((quantityServings > 0))) throw new Error("Event dish servings must be positive");
     const doc: Record<string, any> = {
@@ -4036,12 +4090,13 @@ async function __runEventDishUpdateInstructions(ctx: MutationCtx, { docId, speci
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventDish not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventDish not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may read event dish selections");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may write event dish selections through commands");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "salesAccess")))) throw new Error("Event and sales staff may execute event dish selection commands");
     if (!((doc.selectedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!(((doc.event != null) && (((doc.event.stage === "planning") || (doc.event.stage === "pending_approval")) || (doc.event.stage === "approved"))))) throw new Error("Guard 2 failed");
+    if (!(((__rel_event != null) && (((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved"))))) throw new Error("Guard 2 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -4223,6 +4278,7 @@ export const EventGuest_createViaInvite = mutation({
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      rsvpStatus: "pending",
       accessibilityNeeds: args.accessibilityNeeds,
       allergenRestrictions: args.allergenRestrictions,
       dietaryRestrictions: args.dietaryRestrictions,
@@ -4552,13 +4608,14 @@ async function __runIncidentReport(ctx: MutationCtx, { docId, eventId, severity,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Incident not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Incident not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may read incidents");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may write incidents through commands");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may execute incident commands");
     if (!((doc.reportedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "open"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.event != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!((user.id != null))) throw new Error("Guard 4 failed");
     if (!((eventId === doc.eventId))) throw new Error("Report eventId must match the seeded event reference");
     if (!((((prepTaskId == null) || (doc.prepTaskId == null)) || (prepTaskId === doc.prepTaskId)))) throw new Error("Report prepTaskId must match the seeded prep task reference when provided");
@@ -4629,13 +4686,14 @@ export const Incident_createViaReport = mutation({
       severity: args.severity,
       shiftId: args.shiftId
     };
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may read incidents");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may write incidents through commands");
     if (!((checkRole(user.role, "eventAccess") || checkRole(user.role, "kitchenAccess")))) throw new Error("Event and kitchen staff may execute incident commands");
     if (!((__draft.reportedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "open"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!((user.id != null))) throw new Error("Guard 4 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Report eventId must match the seeded event reference");
     if (!((((prepTaskId == null) || (__draft.prepTaskId == null)) || (prepTaskId === __draft.prepTaskId)))) throw new Error("Report prepTaskId must match the seeded prep task reference when provided");
@@ -4968,14 +5026,16 @@ async function __runIngredientDemandCalculate(ctx: MutationCtx, { docId, eventId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("IngredientDemand not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("IngredientDemand not found");
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read ingredient demand");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write ingredient demand through commands");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute ingredient demand commands");
     if (!((doc.calculatedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.event != null))) throw new Error("Guard 3 failed");
-    if (!(((doc.ingredient != null) && (doc.ingredient.status === "active")))) throw new Error("Guard 4 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
+    if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 4 failed");
     if (!((eventId === doc.eventId))) throw new Error("Calculate eventId must match the seeded event reference");
     if (!((ingredientId === doc.ingredientId))) throw new Error("Calculate ingredientId must match the seeded ingredient reference");
     if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
@@ -5056,6 +5116,7 @@ export const IngredientDemand_createViaCalculate = mutation({
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      status: "pending",
       dishId: args.dishId,
       eventId: args.eventId,
       ingredientId: args.ingredientId,
@@ -5066,14 +5127,16 @@ export const IngredientDemand_createViaCalculate = mutation({
       sourceYieldQuantity: args.sourceYieldQuantity,
       unit: args.unit
     };
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, __draft.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read ingredient demand");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write ingredient demand through commands");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute ingredient demand commands");
     if (!((__draft.calculatedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
-    if (!(((__draft.ingredient != null) && (__draft.ingredient.status === "active")))) throw new Error("Guard 4 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
+    if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 4 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Calculate eventId must match the seeded event reference");
     if (!((ingredientId === __draft.ingredientId))) throw new Error("Calculate ingredientId must match the seeded ingredient reference");
     if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
@@ -5778,17 +5841,19 @@ async function __runInventoryReservationReserve(ctx: MutationCtx, { docId, inven
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryReservation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryReservation not found");
+    const __rel_inventoryItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, doc.inventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read inventory reservations");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write inventory reservations through commands");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute inventory reservation commands");
     if (!((doc.reservedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.event != null) && ((((doc.event.stage === "planning") || (doc.event.stage === "pending_approval")) || (doc.event.stage === "approved")) || (doc.event.stage === "executing"))))) throw new Error("Guard 3 failed");
-    if (!((((doc.inventoryItem != null) && (doc.inventoryItem.stockedAt != null)) && (doc.inventoryItem.deletedAt == null)))) throw new Error("Guard 4 failed");
+    if (!(((__rel_event != null) && ((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
+    if (!((((__rel_inventoryItem != null) && (__rel_inventoryItem.stockedAt != null)) && (__rel_inventoryItem.deletedAt == null)))) throw new Error("Guard 4 failed");
     if (!((inventoryItemId === doc.inventoryItemId))) throw new Error("Reserve inventoryItemId must match the seeded stock reference");
     if (!((eventId === doc.eventId))) throw new Error("Reserve eventId must match the seeded event reference");
-    if (!((ingredientId === doc.inventoryItem.ingredientId))) throw new Error("Reserve ingredientId must match the stock ingredient");
+    if (!((ingredientId === __rel_inventoryItem.ingredientId))) throw new Error("Reserve ingredientId must match the stock ingredient");
     if (!((quantity > 0))) throw new Error("Reservation quantity must be positive");
     {
       const __cur = doc.status;
@@ -5848,22 +5913,25 @@ export const InventoryReservation_createViaReserve = mutation({
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      status: "pending",
       eventId: args.eventId,
       ingredientId: args.ingredientId,
       inventoryItemId: args.inventoryItemId,
       quantity: args.quantity
     };
+    const __rel_inventoryItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, __draft.inventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read inventory reservations");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write inventory reservations through commands");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute inventory reservation commands");
     if (!((__draft.reservedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__draft.event != null) && ((((__draft.event.stage === "planning") || (__draft.event.stage === "pending_approval")) || (__draft.event.stage === "approved")) || (__draft.event.stage === "executing"))))) throw new Error("Guard 3 failed");
-    if (!((((__draft.inventoryItem != null) && (__draft.inventoryItem.stockedAt != null)) && (__draft.inventoryItem.deletedAt == null)))) throw new Error("Guard 4 failed");
+    if (!(((__rel_event != null) && ((((__rel_event.stage === "planning") || (__rel_event.stage === "pending_approval")) || (__rel_event.stage === "approved")) || (__rel_event.stage === "executing"))))) throw new Error("Guard 3 failed");
+    if (!((((__rel_inventoryItem != null) && (__rel_inventoryItem.stockedAt != null)) && (__rel_inventoryItem.deletedAt == null)))) throw new Error("Guard 4 failed");
     if (!((inventoryItemId === __draft.inventoryItemId))) throw new Error("Reserve inventoryItemId must match the seeded stock reference");
     if (!((eventId === __draft.eventId))) throw new Error("Reserve eventId must match the seeded event reference");
-    if (!((ingredientId === __draft.inventoryItem.ingredientId))) throw new Error("Reserve ingredientId must match the stock ingredient");
+    if (!((ingredientId === __rel_inventoryItem.ingredientId))) throw new Error("Reserve ingredientId must match the stock ingredient");
     if (!((quantity > 0))) throw new Error("Reservation quantity must be positive");
     const doc: Record<string, any> = {
       ...__draft,
@@ -5942,13 +6010,14 @@ async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNum
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
     if (!((doc.issuedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.client != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 3 failed");
     if (!((clientId === doc.clientId))) throw new Error("Issue clientId must match the seeded client reference");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Issue eventId must match the seeded event reference when both are set");
     if (!((((invoiceNumber).trim()).length > 0))) throw new Error("Invoice number is required");
@@ -6031,13 +6100,14 @@ export const Invoice_createViaIssue = mutation({
       taxAmount: args.taxAmount,
       total: args.total
     };
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
     if (!((__draft.issuedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.client != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 3 failed");
     if (!((clientId === __draft.clientId))) throw new Error("Issue clientId must match the seeded client reference");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Issue eventId must match the seeded event reference when both are set");
     if (!((((invoiceNumber).trim()).length > 0))) throw new Error("Invoice number is required");
@@ -7204,13 +7274,14 @@ async function __runPackListOpen(ctx: MutationCtx, { docId, eventId, name, purpo
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack lists");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack lists through commands");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list commands");
     if (!((doc.openedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.event != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!((eventId === doc.eventId))) throw new Error("Open eventId must match the seeded event reference");
     if (!((((name).trim()).length > 0))) throw new Error("Pack list name is required");
     if (version !== undefined && (doc as any).version !== version) {
@@ -7265,13 +7336,14 @@ export const PackList_createViaOpen = mutation({
       notes: args.notes,
       purpose: args.purpose
     };
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack lists");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack lists through commands");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list commands");
     if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.event != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Open eventId must match the seeded event reference");
     if (!((((name).trim()).length > 0))) throw new Error("Pack list name is required");
     const doc: Record<string, any> = {
@@ -7347,13 +7419,14 @@ async function __runPackListItemAddItem(ctx: MutationCtx, { docId, packListId, d
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PackListItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
+    const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
     if (!((doc.listedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((doc.packList != null) && (doc.packList.openedAt != null)) && ((doc.packList.status === "draft") || (doc.packList.status === "packing"))))) throw new Error("Guard 3 failed");
+    if (!((((__rel_packList != null) && (__rel_packList.openedAt != null)) && ((__rel_packList.status === "draft") || (__rel_packList.status === "packing"))))) throw new Error("Guard 3 failed");
     if (!((packListId === doc.packListId))) throw new Error("Add item packListId must match the seeded pack list reference");
     if (!((((dishId == null) || (doc.dishId == null)) || (dishId === doc.dishId)))) throw new Error("Add item dishId must match the seeded dish reference when provided");
     if (!((((productionBatchId == null) || (doc.productionBatchId == null)) || (productionBatchId === doc.productionBatchId)))) throw new Error("Add item productionBatchId must match the seeded batch reference when provided");
@@ -7387,8 +7460,9 @@ async function __runPackListItemAddItem(ctx: MutationCtx, { docId, packListId, d
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListItemId: docId, tenantId: __after.tenantId, packListId: packListId, eventId: __after.packList.eventId, description: description, dishId: ((dishId != null) ? dishId : __after.dishId), productionBatchId: ((productionBatchId != null) ? productionBatchId : __after.productionBatchId), requiredQuantity: requiredQuantity, unit: unit, status: "listed", _subject: { entity: "PackListItem", command: "addItem", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "PackListItemAdded", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: __after.tenantId, packListId: packListId, eventId: __after.packList.eventId, description: description, dishId: ((dishId != null) ? dishId : __after.dishId), productionBatchId: ((productionBatchId != null) ? productionBatchId : __after.productionBatchId), requiredQuantity: requiredQuantity, unit: unit, status: "listed" }, createdAt: Date.now() });
+    const __rel_packList__post = await __resolveRelation(ctx, "packLists", [__auth.tenantId, __after.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListItemId: docId, tenantId: __after.tenantId, packListId: packListId, eventId: __rel_packList__post.eventId, description: description, dishId: ((dishId != null) ? dishId : __after.dishId), productionBatchId: ((productionBatchId != null) ? productionBatchId : __after.productionBatchId), requiredQuantity: requiredQuantity, unit: unit, status: "listed", _subject: { entity: "PackListItem", command: "addItem", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PackListItemAdded", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: __after.tenantId, packListId: packListId, eventId: __rel_packList__post.eventId, description: description, dishId: ((dishId != null) ? dishId : __after.dishId), productionBatchId: ((productionBatchId != null) ? productionBatchId : __after.productionBatchId), requiredQuantity: requiredQuantity, unit: unit, status: "listed" }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -7424,6 +7498,7 @@ export const PackListItem_createViaAddItem = mutation({
       packedQuantity: 0,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      status: "pending",
       description: args.description,
       dishId: args.dishId,
       packListId: args.packListId,
@@ -7431,13 +7506,14 @@ export const PackListItem_createViaAddItem = mutation({
       requiredQuantity: args.requiredQuantity,
       unit: args.unit
     };
+    const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, __draft.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
     if (!((__draft.listedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((__draft.packList != null) && (__draft.packList.openedAt != null)) && ((__draft.packList.status === "draft") || (__draft.packList.status === "packing"))))) throw new Error("Guard 3 failed");
+    if (!((((__rel_packList != null) && (__rel_packList.openedAt != null)) && ((__rel_packList.status === "draft") || (__rel_packList.status === "packing"))))) throw new Error("Guard 3 failed");
     if (!((packListId === __draft.packListId))) throw new Error("Add item packListId must match the seeded pack list reference");
     if (!((((dishId == null) || (__draft.dishId == null)) || (dishId === __draft.dishId)))) throw new Error("Add item dishId must match the seeded dish reference when provided");
     if (!((((productionBatchId == null) || (__draft.productionBatchId == null)) || (productionBatchId === __draft.productionBatchId)))) throw new Error("Add item productionBatchId must match the seeded batch reference when provided");
@@ -7456,8 +7532,8 @@ export const PackListItem_createViaAddItem = mutation({
       version: 1,
     };
     const docId = await ctx.db.insert("packListItems", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, packListItemId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.packList.eventId, description: doc.description, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, status: "listed", _subject: { entity: "PackListItem", command: "addItem", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "PackListItemAdded", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.packList.eventId, description: doc.description, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, status: "listed" }, createdAt: Date.now() });
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, packListItemId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: __rel_packList.eventId, description: doc.description, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, status: "listed", _subject: { entity: "PackListItem", command: "addItem", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PackListItemAdded", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: __rel_packList.eventId, description: doc.description, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), productionBatchId: ((doc.productionBatchId != null) ? doc.productionBatchId : doc.productionBatchId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, status: "listed" }, createdAt: Date.now() });
     return { docId };
   },
 });
@@ -7468,13 +7544,14 @@ async function __runPackListItemAdjustQuantity(ctx: MutationCtx, { docId, requir
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PackListItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
+    const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
     if (!((doc.status === "listed"))) throw new Error("Guard 0 failed");
     if (!((doc.listedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.packList != null) && ((doc.packList.status === "draft") || (doc.packList.status === "packing"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_packList != null) && ((__rel_packList.status === "draft") || (__rel_packList.status === "packing"))))) throw new Error("Guard 3 failed");
     if (!((requiredQuantity > 0))) throw new Error("Required quantity must be positive");
     if (!((requiredQuantity >= doc.packedQuantity))) throw new Error("Required quantity cannot be below packed quantity");
     const previousRequired = doc.requiredQuantity;
@@ -7487,8 +7564,8 @@ async function __runPackListItemAdjustQuantity(ctx: MutationCtx, { docId, requir
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __after.packList.eventId, description: __after.description, previousRequiredQuantity: previousRequired, requiredQuantity: requiredQuantity, packedQuantity: __after.packedQuantity, unit: __after.unit, status: __after.status, _subject: { entity: "PackListItem", command: "adjustQuantity", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "PackListItemQuantityAdjusted", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __after.packList.eventId, description: __after.description, previousRequiredQuantity: previousRequired, requiredQuantity: requiredQuantity, packedQuantity: __after.packedQuantity, unit: __after.unit, status: __after.status }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __rel_packList.eventId, description: __after.description, previousRequiredQuantity: previousRequired, requiredQuantity: requiredQuantity, packedQuantity: __after.packedQuantity, unit: __after.unit, status: __after.status, _subject: { entity: "PackListItem", command: "adjustQuantity", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PackListItemQuantityAdjusted", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __rel_packList.eventId, description: __after.description, previousRequiredQuantity: previousRequired, requiredQuantity: requiredQuantity, packedQuantity: __after.packedQuantity, unit: __after.unit, status: __after.status }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -7507,13 +7584,14 @@ async function __runPackListItemMarkMissing(ctx: MutationCtx, { docId, version }
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PackListItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
+    const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
     if (!((doc.status === "listed"))) throw new Error("Guard 0 failed");
     if (!((doc.listedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.packList != null) && (doc.packList.status === "packing")))) throw new Error("Guard 3 failed");
+    if (!(((__rel_packList != null) && (__rel_packList.status === "packing")))) throw new Error("Guard 3 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -7537,8 +7615,8 @@ async function __runPackListItemMarkMissing(ctx: MutationCtx, { docId, version }
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __after.packList.eventId, description: __after.description, previousStatus: previousStatus, status: "missing", requiredQuantity: __after.requiredQuantity, packedQuantity: __after.packedQuantity, unit: __after.unit, _subject: { entity: "PackListItem", command: "markMissing", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "PackListItemMissing", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __after.packList.eventId, description: __after.description, previousStatus: previousStatus, status: "missing", requiredQuantity: __after.requiredQuantity, packedQuantity: __after.packedQuantity, unit: __after.unit }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __rel_packList.eventId, description: __after.description, previousStatus: previousStatus, status: "missing", requiredQuantity: __after.requiredQuantity, packedQuantity: __after.packedQuantity, unit: __after.unit, _subject: { entity: "PackListItem", command: "markMissing", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PackListItemMissing", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __rel_packList.eventId, description: __after.description, previousStatus: previousStatus, status: "missing", requiredQuantity: __after.requiredQuantity, packedQuantity: __after.packedQuantity, unit: __after.unit }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -7556,13 +7634,14 @@ async function __runPackListItemMarkPacked(ctx: MutationCtx, { docId, packedQuan
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PackListItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PackListItem not found");
+    const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, doc.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack list items");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack list items through commands");
     if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list item commands");
     if (!((doc.status === "listed"))) throw new Error("Guard 0 failed");
     if (!((doc.listedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.packList != null) && (doc.packList.status === "packing")))) throw new Error("Guard 3 failed");
+    if (!(((__rel_packList != null) && (__rel_packList.status === "packing")))) throw new Error("Guard 3 failed");
     if (!((packedQuantity > 0))) throw new Error("Packed quantity must be positive");
     if (!((packedQuantity <= doc.requiredQuantity))) throw new Error("Packed quantity cannot exceed required quantity");
     const previousStatus = doc.status;
@@ -7590,8 +7669,8 @@ async function __runPackListItemMarkPacked(ctx: MutationCtx, { docId, packedQuan
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __after.packList.eventId, description: __after.description, previousStatus: previousStatus, status: "packed", previousPackedQuantity: previousPacked, packedQuantity: packedQuantity, requiredQuantity: __after.requiredQuantity, unit: __after.unit, _subject: { entity: "PackListItem", command: "markPacked", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "PackListItemPacked", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __after.packList.eventId, description: __after.description, previousStatus: previousStatus, status: "packed", previousPackedQuantity: previousPacked, packedQuantity: packedQuantity, requiredQuantity: __after.requiredQuantity, unit: __after.unit }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __rel_packList.eventId, description: __after.description, previousStatus: previousStatus, status: "packed", previousPackedQuantity: previousPacked, packedQuantity: packedQuantity, requiredQuantity: __after.requiredQuantity, unit: __after.unit, _subject: { entity: "PackListItem", command: "markPacked", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PackListItemPacked", entity: "PackListItem", entityId: docId, payload: { packListItemId: docId, tenantId: __after.tenantId, packListId: __after.packListId, eventId: __rel_packList.eventId, description: __after.description, previousStatus: previousStatus, status: "packed", previousPackedQuantity: previousPacked, packedQuantity: packedQuantity, requiredQuantity: __after.requiredQuantity, unit: __after.unit }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -7706,14 +7785,16 @@ async function __runPaymentRecord(ctx: MutationCtx, { docId, invoiceId, clientId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Payment not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Payment not found");
+    const __rel_invoice = await __resolveRelation(ctx, "invoices", [__auth.tenantId, doc.invoiceId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read payments");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write payments through commands");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute payment commands");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.invoice != null))) throw new Error("Guard 3 failed");
-    if (!((doc.client != null))) throw new Error("Guard 4 failed");
+    if (!((__rel_invoice != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 4 failed");
     if (!((invoiceId === doc.invoiceId))) throw new Error("Record invoiceId must match the seeded invoice reference");
     if (!((clientId === doc.clientId))) throw new Error("Record clientId must match the seeded client reference");
     if (!((amount > 0))) throw new Error("Payment amount must be positive");
@@ -7780,14 +7861,16 @@ export const Payment_createViaRecord = mutation({
       notes: args.notes,
       paymentMethodId: args.paymentMethodId
     };
+    const __rel_invoice = await __resolveRelation(ctx, "invoices", [__auth.tenantId, __draft.invoiceId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read payments");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write payments through commands");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute payment commands");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.invoice != null))) throw new Error("Guard 3 failed");
-    if (!((__draft.client != null))) throw new Error("Guard 4 failed");
+    if (!((__rel_invoice != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 4 failed");
     if (!((invoiceId === __draft.invoiceId))) throw new Error("Record invoiceId must match the seeded invoice reference");
     if (!((clientId === __draft.clientId))) throw new Error("Record clientId must match the seeded client reference");
     if (!((amount > 0))) throw new Error("Payment amount must be positive");
@@ -8124,13 +8207,14 @@ async function __runPaymentMethodRegister(ctx: MutationCtx, { docId, clientId, m
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("PaymentMethod not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("PaymentMethod not found");
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read payment methods");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write payment methods through commands");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute payment method commands");
     if (!((doc.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.client != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 3 failed");
     if (!((clientId === doc.clientId))) throw new Error("Register clientId must match the seeded client reference");
     if (!(((lastFour == null) || (((lastFour).trim()).length <= 4)))) throw new Error("Last-four hint must be at most four characters");
     if (version !== undefined && (doc as any).version !== version) {
@@ -8192,13 +8276,14 @@ export const PaymentMethod_createViaRegister = mutation({
       notes: args.notes,
       provider: args.provider
     };
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read payment methods");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write payment methods through commands");
     if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute payment method commands");
     if (!((__draft.registeredAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.client != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 3 failed");
     if (!((clientId === __draft.clientId))) throw new Error("Register clientId must match the seeded client reference");
     if (!(((lastFour == null) || (((lastFour).trim()).length <= 4)))) throw new Error("Last-four hint must be at most four characters");
     const doc: Record<string, any> = {
@@ -8377,13 +8462,14 @@ async function __runPayrollInputPrepare(ctx: MutationCtx, { docId, personId, per
     if (!__storedDoc) throw new Error("PayrollInput not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PayrollInput not found");
     const doc = await __decryptDoc(ctx, "PayrollInput", ["hourlyRate","overtimeRate","grossAmount","notes"], __storedDoc) as Record<string, any>;
+    const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "financeManageAccess"))) throw new Error("Finance managers may read payroll inputs");
     if (!(checkRole(user.role, "financeManageAccess"))) throw new Error("Finance managers may write payroll inputs through commands");
     if (!(checkRole(user.role, "financeManageAccess"))) throw new Error("Finance managers may execute payroll input commands");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.preparedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.person != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_person != null))) throw new Error("Guard 3 failed");
     if (!((personId === doc.personId))) throw new Error("Prepare personId must match the seeded person reference");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Prepare eventId must match the seeded event reference when both are set");
     if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("Prepare shiftId must match the seeded shift reference when both are set");
@@ -8476,6 +8562,7 @@ export const PayrollInput_createViaPrepare = mutation({
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      status: "draft",
       eventId: args.eventId,
       grossAmount: args.grossAmount,
       hourlyRate: args.hourlyRate,
@@ -8489,13 +8576,14 @@ export const PayrollInput_createViaPrepare = mutation({
       shiftId: args.shiftId,
       totalMinutes: args.totalMinutes
     };
+    const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "financeManageAccess"))) throw new Error("Finance managers may read payroll inputs");
     if (!(checkRole(user.role, "financeManageAccess"))) throw new Error("Finance managers may write payroll inputs through commands");
     if (!(checkRole(user.role, "financeManageAccess"))) throw new Error("Finance managers may execute payroll input commands");
     if (!((__draft.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((__draft.preparedAt == null))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.person != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_person != null))) throw new Error("Guard 3 failed");
     if (!((personId === __draft.personId))) throw new Error("Prepare personId must match the seeded person reference");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Prepare eventId must match the seeded event reference when both are set");
     if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("Prepare shiftId must match the seeded shift reference when both are set");
@@ -9454,13 +9542,14 @@ async function __runProductionBatchPlan(ctx: MutationCtx, { docId, recipeId, pla
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("ProductionBatch not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("ProductionBatch not found");
+    const __rel_recipe = await __resolveRelation(ctx, "recipes", [__auth.tenantId, doc.recipeId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read production batches");
     if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write production batches through commands");
     if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute production batch commands");
     if (!((doc.plannedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "planned"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.recipe != null) && (doc.recipe.status === "published")))) throw new Error("Guard 3 failed");
+    if (!(((__rel_recipe != null) && (__rel_recipe.status === "published")))) throw new Error("Guard 3 failed");
     if (!((recipeId === doc.recipeId))) throw new Error("Plan recipeId must match the seeded recipe reference");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Plan eventId must match the seeded event reference when provided");
     if (!((plannedYield > 0))) throw new Error("Planned yield must be positive");
@@ -9519,13 +9608,14 @@ export const ProductionBatch_createViaPlan = mutation({
       recipeId: args.recipeId,
       yieldUnit: args.yieldUnit
     };
+    const __rel_recipe = await __resolveRelation(ctx, "recipes", [__auth.tenantId, __draft.recipeId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read production batches");
     if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write production batches through commands");
     if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute production batch commands");
     if (!((__draft.plannedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "planned"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__draft.recipe != null) && (__draft.recipe.status === "published")))) throw new Error("Guard 3 failed");
+    if (!(((__rel_recipe != null) && (__rel_recipe.status === "published")))) throw new Error("Guard 3 failed");
     if (!((recipeId === __draft.recipeId))) throw new Error("Plan recipeId must match the seeded recipe reference");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Plan eventId must match the seeded event reference when provided");
     if (!((plannedYield > 0))) throw new Error("Planned yield must be positive");
@@ -9695,13 +9785,14 @@ async function __runProposalDraft(ctx: MutationCtx, { docId, clientId, title, su
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Proposal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read proposals");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write proposals through commands");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute proposal commands");
     if (!((doc.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.client != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 3 failed");
     if (!((clientId === doc.clientId))) throw new Error("Draft clientId must match the seeded client reference");
     if (!((((title).trim()).length > 0))) throw new Error("Proposal title is required");
     if (!(((guestCount == null) || (guestCount >= 0)))) throw new Error("Guest count cannot be negative");
@@ -9802,13 +9893,14 @@ export const Proposal_createViaDraft = mutation({
       venueAddress: args.venueAddress,
       venueName: args.venueName
     };
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read proposals");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write proposals through commands");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute proposal commands");
     if (!((__draft.draftedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.client != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_client != null))) throw new Error("Guard 3 failed");
     if (!((clientId === __draft.clientId))) throw new Error("Draft clientId must match the seeded client reference");
     if (!((((title).trim()).length > 0))) throw new Error("Proposal title is required");
     if (!(((guestCount == null) || (guestCount >= 0)))) throw new Error("Guest count cannot be negative");
@@ -9939,13 +10031,14 @@ async function __runProposalSend(ctx: MutationCtx, { docId, version }: any, __cr
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Proposal not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Proposal not found");
+    const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, doc.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may read proposals");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may write proposals through commands");
     if (!(checkRole(user.role, "salesAccess"))) throw new Error("Sales staff may execute proposal commands");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.draftedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.client != null) && (doc.client.status === "active")))) throw new Error("Guard 3 failed");
+    if (!(((__rel_client != null) && (__rel_client.status === "active")))) throw new Error("Guard 3 failed");
     if (!((((doc.title).trim()).length > 0))) throw new Error("Proposal title is required before send");
     {
       const __cur = doc.status;
@@ -10248,13 +10341,14 @@ async function __runQualificationGrant(ctx: MutationCtx, { docId, personId, name
     if (!__storedDoc) throw new Error("Qualification not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Qualification not found");
     const doc = await __decryptDoc(ctx, "Qualification", ["notes"], __storedDoc) as Record<string, any>;
+    const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read qualifications");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write qualifications through commands");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute qualification commands");
     if (!((doc.grantedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.person != null) && (doc.person.status === "active")))) throw new Error("Guard 3 failed");
+    if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 3 failed");
     if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Guard 4 failed");
     if (!((personId === doc.personId))) throw new Error("Grant personId must match the seeded person reference");
     if (!((((name).trim()).length > 0))) throw new Error("Qualification name is required");
@@ -10323,13 +10417,14 @@ export const Qualification_createViaGrant = mutation({
       notes: args.notes,
       personId: args.personId
     };
+    const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read qualifications");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write qualifications through commands");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute qualification commands");
     if (!((__draft.grantedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__draft.person != null) && (__draft.person.status === "active")))) throw new Error("Guard 3 failed");
+    if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 3 failed");
     if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Guard 4 failed");
     if (!((personId === __draft.personId))) throw new Error("Grant personId must match the seeded person reference");
     if (!((((name).trim()).length > 0))) throw new Error("Qualification name is required");
@@ -11607,13 +11702,14 @@ async function __runShiftSchedule(ctx: MutationCtx, { docId, personId, startsAt,
     if (!__storedDoc) throw new Error("Shift not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Shift not found");
     const doc = await __decryptDoc(ctx, "Shift", ["notes"], __storedDoc) as Record<string, any>;
+    const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read shifts");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write shifts through commands");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute shift commands");
     if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((doc.person != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_person != null))) throw new Error("Guard 3 failed");
     if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Guard 4 failed");
     if (!((personId === doc.personId))) throw new Error("Schedule personId must match the seeded person reference");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Schedule eventId must match the seeded event reference when provided");
@@ -11678,13 +11774,14 @@ export const Shift_createViaSchedule = mutation({
       role: args.role,
       startsAt: args.startsAt
     };
+    const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read shifts");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write shifts through commands");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute shift commands");
     if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "scheduled"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__draft.person != null))) throw new Error("Guard 3 failed");
+    if (!((__rel_person != null))) throw new Error("Guard 3 failed");
     if (!(checkRole(user.role, "workforceManageAccess"))) throw new Error("Guard 4 failed");
     if (!((personId === __draft.personId))) throw new Error("Schedule personId must match the seeded person reference");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Schedule eventId must match the seeded event reference when provided");
@@ -12007,6 +12104,7 @@ async function __runTimeRecordClockIn(ctx: MutationCtx, { docId, personId, shift
     if (!__storedDoc) throw new Error("TimeRecord not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("TimeRecord not found");
     const doc = await __decryptDoc(ctx, "TimeRecord", ["notes"], __storedDoc) as Record<string, any>;
+    const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, doc.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read time records");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write time records through commands");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute time record commands");
@@ -12015,7 +12113,7 @@ async function __runTimeRecordClockIn(ctx: MutationCtx, { docId, personId, shift
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!(((personId === user.id) || checkRole(user.role, "workforceManageAccess")))) throw new Error("Guard 4 failed");
-    if (!(((doc.person != null) && (doc.person.status === "active")))) throw new Error("Guard 5 failed");
+    if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 5 failed");
     if (!((personId === doc.personId))) throw new Error("Clock-in personId must match the seeded person reference");
     if (!((((shiftId == null) || (doc.shiftId == null)) || (shiftId === doc.shiftId)))) throw new Error("Clock-in shiftId must match the seeded shift reference when provided");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Clock-in eventId must match the seeded event reference when provided");
@@ -12072,6 +12170,7 @@ export const TimeRecord_createViaClockIn = mutation({
       personId: args.personId,
       shiftId: args.shiftId
     };
+    const __rel_person = await __resolveRelation(ctx, "people", [__auth.tenantId, __draft.personId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may read time records");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may write time records through commands");
     if (!(checkRole(user.role, "workforceAccess"))) throw new Error("Workforce staff may execute time record commands");
@@ -12080,7 +12179,7 @@ export const TimeRecord_createViaClockIn = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
     if (!((user.id != null))) throw new Error("Guard 3 failed");
     if (!(((personId === user.id) || checkRole(user.role, "workforceManageAccess")))) throw new Error("Guard 4 failed");
-    if (!(((__draft.person != null) && (__draft.person.status === "active")))) throw new Error("Guard 5 failed");
+    if (!(((__rel_person != null) && (__rel_person.status === "active")))) throw new Error("Guard 5 failed");
     if (!((personId === __draft.personId))) throw new Error("Clock-in personId must match the seeded person reference");
     if (!((((shiftId == null) || (__draft.shiftId == null)) || (shiftId === __draft.shiftId)))) throw new Error("Clock-in shiftId must match the seeded shift reference when provided");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Clock-in eventId must match the seeded event reference when provided");
@@ -12760,13 +12859,14 @@ async function __runVendorOrderOpen(ctx: MutationCtx, { docId, vendorId, eventId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VendorOrder not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
+    const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, doc.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may read vendor orders");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may write vendor orders through commands");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may execute vendor order commands");
     if (!((doc.openedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((doc.vendor != null) && (doc.vendor.status === "active")) && (doc.vendor.onboardedAt != null)))) throw new Error("Guard 3 failed");
+    if (!((((__rel_vendor != null) && (__rel_vendor.status === "active")) && (__rel_vendor.onboardedAt != null)))) throw new Error("Guard 3 failed");
     if (!((vendorId === doc.vendorId))) throw new Error("Open vendorId must match the seeded vendor reference");
     if (!((((eventId == null) || (doc.eventId == null)) || (eventId === doc.eventId)))) throw new Error("Open eventId must match the seeded event reference when provided");
     if (version !== undefined && (doc as any).version !== version) {
@@ -12824,13 +12924,14 @@ export const VendorOrder_createViaOpen = mutation({
       orderNumber: args.orderNumber,
       vendorId: args.vendorId
     };
+    const __rel_vendor = await __resolveRelation(ctx, "vendors", [__auth.tenantId, __draft.vendorId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may read vendor orders");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may write vendor orders through commands");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may execute vendor order commands");
     if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((__draft.vendor != null) && (__draft.vendor.status === "active")) && (__draft.vendor.onboardedAt != null)))) throw new Error("Guard 3 failed");
+    if (!((((__rel_vendor != null) && (__rel_vendor.status === "active")) && (__rel_vendor.onboardedAt != null)))) throw new Error("Guard 3 failed");
     if (!((vendorId === __draft.vendorId))) throw new Error("Open vendorId must match the seeded vendor reference");
     if (!((((eventId == null) || (__draft.eventId == null)) || (eventId === __draft.eventId)))) throw new Error("Open eventId must match the seeded event reference when provided");
     const doc: Record<string, any> = {
@@ -12946,14 +13047,16 @@ async function __runVendorOrderLineAddLine(ctx: MutationCtx, { docId, vendorOrde
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VendorOrderLine not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrderLine not found");
+    const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may read vendor order lines");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may write vendor order lines through commands");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may execute vendor order line commands");
     if (!((doc.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((doc.vendorOrder != null) && (doc.vendorOrder.status === "draft")) && (doc.vendorOrder.openedAt != null)))) throw new Error("Guard 3 failed");
-    if (!(((doc.ingredient != null) && (doc.ingredient.status === "active")))) throw new Error("Guard 4 failed");
+    if (!((((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")) && (__rel_vendorOrder.openedAt != null)))) throw new Error("Guard 3 failed");
+    if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 4 failed");
     if (!((vendorOrderId === doc.vendorOrderId))) throw new Error("Add line vendorOrderId must match the seeded order reference");
     if (!((ingredientId === doc.ingredientId))) throw new Error("Add line ingredientId must match the seeded ingredient reference");
     if (!((((ingredientDemandId == null) || (doc.ingredientDemandId == null)) || (ingredientDemandId === doc.ingredientDemandId)))) throw new Error("Add line ingredientDemandId must match the seeded demand reference when provided");
@@ -12989,8 +13092,9 @@ async function __runVendorOrderLineAddLine(ctx: MutationCtx, { docId, vendorOrde
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: vendorOrderId, ingredientId: ingredientId, ingredientDemandId: ((ingredientDemandId != null) ? ingredientDemandId : __after.ingredientDemandId), eventId: __after.vendorOrder.eventId, orderedQuantity: orderedQuantity, unit: unit, unitCost: unitCost, _subject: { entity: "VendorOrderLine", command: "addLine", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "VendorOrderLineAdded", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: vendorOrderId, ingredientId: ingredientId, ingredientDemandId: ((ingredientDemandId != null) ? ingredientDemandId : __after.ingredientDemandId), eventId: __after.vendorOrder.eventId, orderedQuantity: orderedQuantity, unit: unit, unitCost: unitCost }, createdAt: Date.now() });
+    const __rel_vendorOrder__post = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, __after.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: vendorOrderId, ingredientId: ingredientId, ingredientDemandId: ((ingredientDemandId != null) ? ingredientDemandId : __after.ingredientDemandId), eventId: __rel_vendorOrder__post.eventId, orderedQuantity: orderedQuantity, unit: unit, unitCost: unitCost, _subject: { entity: "VendorOrderLine", command: "addLine", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "VendorOrderLineAdded", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: vendorOrderId, ingredientId: ingredientId, ingredientDemandId: ((ingredientDemandId != null) ? ingredientDemandId : __after.ingredientDemandId), eventId: __rel_vendorOrder__post.eventId, orderedQuantity: orderedQuantity, unit: unit, unitCost: unitCost }, createdAt: Date.now() });
     // Reactions
     const fanRows0 = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.ingredientDemandId)).collect();
     for (const __row of fanRows0) {
@@ -13033,6 +13137,7 @@ export const VendorOrderLine_createViaAddLine = mutation({
       receivedQuantity: 0,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      status: "pending",
       ingredientDemandId: args.ingredientDemandId,
       ingredientId: args.ingredientId,
       locationId: args.locationId,
@@ -13041,14 +13146,16 @@ export const VendorOrderLine_createViaAddLine = mutation({
       unitCost: args.unitCost,
       vendorOrderId: args.vendorOrderId
     };
+    const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, __draft.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, __draft.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may read vendor order lines");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may write vendor order lines through commands");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may execute vendor order line commands");
     if (!((__draft.addedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((((__draft.vendorOrder != null) && (__draft.vendorOrder.status === "draft")) && (__draft.vendorOrder.openedAt != null)))) throw new Error("Guard 3 failed");
-    if (!(((__draft.ingredient != null) && (__draft.ingredient.status === "active")))) throw new Error("Guard 4 failed");
+    if (!((((__rel_vendorOrder != null) && (__rel_vendorOrder.status === "draft")) && (__rel_vendorOrder.openedAt != null)))) throw new Error("Guard 3 failed");
+    if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 4 failed");
     if (!((vendorOrderId === __draft.vendorOrderId))) throw new Error("Add line vendorOrderId must match the seeded order reference");
     if (!((ingredientId === __draft.ingredientId))) throw new Error("Add line ingredientId must match the seeded ingredient reference");
     if (!((((ingredientDemandId == null) || (__draft.ingredientDemandId == null)) || (ingredientDemandId === __draft.ingredientDemandId)))) throw new Error("Add line ingredientDemandId must match the seeded demand reference when provided");
@@ -13069,8 +13176,8 @@ export const VendorOrderLine_createViaAddLine = mutation({
       version: 1,
     };
     const docId = await ctx.db.insert("vendorOrderLines", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, vendorOrderLineId: docId, tenantId: doc.tenantId, vendorOrderId: doc.vendorOrderId, ingredientId: doc.ingredientId, ingredientDemandId: ((doc.ingredientDemandId != null) ? doc.ingredientDemandId : doc.ingredientDemandId), eventId: doc.vendorOrder.eventId, orderedQuantity: doc.orderedQuantity, unit: doc.unit, unitCost: doc.unitCost, _subject: { entity: "VendorOrderLine", command: "addLine", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "VendorOrderLineAdded", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: doc.tenantId, vendorOrderId: doc.vendorOrderId, ingredientId: doc.ingredientId, ingredientDemandId: ((doc.ingredientDemandId != null) ? doc.ingredientDemandId : doc.ingredientDemandId), eventId: doc.vendorOrder.eventId, orderedQuantity: doc.orderedQuantity, unit: doc.unit, unitCost: doc.unitCost }, createdAt: Date.now() });
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, vendorOrderLineId: docId, tenantId: doc.tenantId, vendorOrderId: doc.vendorOrderId, ingredientId: doc.ingredientId, ingredientDemandId: ((doc.ingredientDemandId != null) ? doc.ingredientDemandId : doc.ingredientDemandId), eventId: __rel_vendorOrder.eventId, orderedQuantity: doc.orderedQuantity, unit: doc.unit, unitCost: doc.unitCost, _subject: { entity: "VendorOrderLine", command: "addLine", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "VendorOrderLineAdded", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: doc.tenantId, vendorOrderId: doc.vendorOrderId, ingredientId: doc.ingredientId, ingredientDemandId: ((doc.ingredientDemandId != null) ? doc.ingredientDemandId : doc.ingredientDemandId), eventId: __rel_vendorOrder.eventId, orderedQuantity: doc.orderedQuantity, unit: doc.unit, unitCost: doc.unitCost }, createdAt: Date.now() });
     // Reactions
     const fanRows0 = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.ingredientDemandId)).collect();
     for (const __row of fanRows0) {
@@ -13086,13 +13193,14 @@ async function __runVendorOrderLineCancelLine(ctx: MutationCtx, { docId, reason,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VendorOrderLine not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrderLine not found");
+    const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may read vendor order lines");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may write vendor order lines through commands");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may execute vendor order line commands");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "added") || (doc.status === "receiving")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.vendorOrder != null) && (((doc.vendorOrder.status === "draft") || (doc.vendorOrder.status === "submitted")) || (doc.vendorOrder.status === "confirmed"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_vendorOrder != null) && (((__rel_vendorOrder.status === "draft") || (__rel_vendorOrder.status === "submitted")) || (__rel_vendorOrder.status === "confirmed"))))) throw new Error("Guard 3 failed");
     if (!(checkRole(user.role, "inventoryManageAccess"))) throw new Error("Guard 4 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Cancellation reason is required");
     {
@@ -13118,8 +13226,8 @@ async function __runVendorOrderLineCancelLine(ctx: MutationCtx, { docId, reason,
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __after.vendorOrder.eventId, orderedQuantity: __after.orderedQuantity, receivedQuantity: __after.receivedQuantity, unit: __after.unit, reason: reason, _subject: { entity: "VendorOrderLine", command: "cancelLine", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "VendorOrderLineCancelled", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __after.vendorOrder.eventId, orderedQuantity: __after.orderedQuantity, receivedQuantity: __after.receivedQuantity, unit: __after.unit, reason: reason }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __rel_vendorOrder.eventId, orderedQuantity: __after.orderedQuantity, receivedQuantity: __after.receivedQuantity, unit: __after.unit, reason: reason, _subject: { entity: "VendorOrderLine", command: "cancelLine", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "VendorOrderLineCancelled", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __rel_vendorOrder.eventId, orderedQuantity: __after.orderedQuantity, receivedQuantity: __after.receivedQuantity, unit: __after.unit, reason: reason }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -13138,13 +13246,14 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("VendorOrderLine not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrderLine not found");
+    const __rel_vendorOrder = await __resolveRelation(ctx, "vendorOrders", [__auth.tenantId, doc.vendorOrderId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may read vendor order lines");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may write vendor order lines through commands");
     if (!(checkRole(user.role, "procurementAccess"))) throw new Error("Procurement staff may execute vendor order line commands");
     if (!((doc.addedAt != null))) throw new Error("Guard 0 failed");
     if (!(((doc.status === "added") || (doc.status === "receiving")))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.vendorOrder != null) && ((doc.vendorOrder.status === "confirmed") || (doc.vendorOrder.status === "partially_received"))))) throw new Error("Guard 3 failed");
+    if (!(((__rel_vendorOrder != null) && ((__rel_vendorOrder.status === "confirmed") || (__rel_vendorOrder.status === "partially_received"))))) throw new Error("Guard 3 failed");
     if (!(((doc.locationId == null) || (locationId === doc.locationId)))) throw new Error("Receipt locationId must match the seeded location when one was pre-set");
     if (!((quantity > 0))) throw new Error("Received quantity must be positive");
     if (!(((doc.receivedQuantity + quantity) <= doc.orderedQuantity))) throw new Error("Received quantity cannot exceed ordered quantity");
@@ -13178,8 +13287,8 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __after.vendorOrder.eventId, locationId: locationId, previousReceivedQuantity: previousReceived, receivedQuantity: nextReceived, receiptQuantity: quantity, orderedQuantity: __after.orderedQuantity, unit: __after.unit, unitCost: __after.unitCost, discrepancyQuantity: ((discrepancyQuantity != null) ? discrepancyQuantity : __after.discrepancyQuantity), _subject: { entity: "VendorOrderLine", command: "recordReceipt", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "VendorOrderLineReceived", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __after.vendorOrder.eventId, locationId: locationId, previousReceivedQuantity: previousReceived, receivedQuantity: nextReceived, receiptQuantity: quantity, orderedQuantity: __after.orderedQuantity, unit: __after.unit, unitCost: __after.unitCost, discrepancyQuantity: ((discrepancyQuantity != null) ? discrepancyQuantity : __after.discrepancyQuantity) }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __rel_vendorOrder.eventId, locationId: locationId, previousReceivedQuantity: previousReceived, receivedQuantity: nextReceived, receiptQuantity: quantity, orderedQuantity: __after.orderedQuantity, unit: __after.unit, unitCost: __after.unitCost, discrepancyQuantity: ((discrepancyQuantity != null) ? discrepancyQuantity : __after.discrepancyQuantity), _subject: { entity: "VendorOrderLine", command: "recordReceipt", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "VendorOrderLineReceived", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __rel_vendorOrder.eventId, locationId: locationId, previousReceivedQuantity: previousReceived, receivedQuantity: nextReceived, receiptQuantity: quantity, orderedQuantity: __after.orderedQuantity, unit: __after.unit, unitCost: __after.unitCost, discrepancyQuantity: ((discrepancyQuantity != null) ? discrepancyQuantity : __after.discrepancyQuantity) }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -13544,14 +13653,16 @@ async function __runWasteRecordRecord(ctx: MutationCtx, { docId, ingredientId, l
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("WasteRecord not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("WasteRecord not found");
+    const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_location = await __resolveRelation(ctx, "storageLocations", [__auth.tenantId, doc.locationId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read waste records");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write waste records through commands");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute waste record commands");
     if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.ingredient != null) && (doc.ingredient.status === "active")))) throw new Error("Guard 3 failed");
-    if (!(((doc.location != null) && (doc.location.status === "active")))) throw new Error("Guard 4 failed");
+    if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 3 failed");
+    if (!(((__rel_location != null) && (__rel_location.status === "active")))) throw new Error("Guard 4 failed");
     if (!((ingredientId === doc.ingredientId))) throw new Error("Record ingredientId must match the seeded ingredient reference");
     if (!((locationId === doc.locationId))) throw new Error("Record locationId must match the seeded location reference");
     if (!((quantity > 0))) throw new Error("Waste quantity must be positive");
@@ -13626,6 +13737,7 @@ export const WasteRecord_createViaRecord = mutation({
       tenantId: __auth.tenantId,
       createdAt: Date.now(),
       updatedAt: Date.now(),
+      status: "pending",
       eventId: args.eventId,
       ingredientId: args.ingredientId,
       locationId: args.locationId,
@@ -13635,14 +13747,16 @@ export const WasteRecord_createViaRecord = mutation({
       unit: args.unit,
       unitCost: args.unitCost
     };
+    const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, __draft.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    const __rel_location = await __resolveRelation(ctx, "storageLocations", [__auth.tenantId, __draft.locationId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read waste records");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write waste records through commands");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute waste record commands");
     if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__draft.ingredient != null) && (__draft.ingredient.status === "active")))) throw new Error("Guard 3 failed");
-    if (!(((__draft.location != null) && (__draft.location.status === "active")))) throw new Error("Guard 4 failed");
+    if (!(((__rel_ingredient != null) && (__rel_ingredient.status === "active")))) throw new Error("Guard 3 failed");
+    if (!(((__rel_location != null) && (__rel_location.status === "active")))) throw new Error("Guard 4 failed");
     if (!((ingredientId === __draft.ingredientId))) throw new Error("Record ingredientId must match the seeded ingredient reference");
     if (!((locationId === __draft.locationId))) throw new Error("Record locationId must match the seeded location reference");
     if (!((quantity > 0))) throw new Error("Waste quantity must be positive");

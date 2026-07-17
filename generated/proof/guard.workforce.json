@@ -9,15 +9,16 @@
     }
   },
   "featureRoots": [
-    "src/features/production"
+    "src/features/workforce"
   ],
   "convexLibRoot": "convex/lib",
   "ownedTables": [
-    "eventAllergenChecks",
-    "incidents",
-    "prepTasks",
-    "productionBatches",
-    "qualityChecks"
+    "availabilityWindows",
+    "eventAssignments",
+    "payrollInputs",
+    "qualifications",
+    "shifts",
+    "timeRecords"
   ],
   "forbidDirectConvexHooks": true,
   "forbiddenImportPatterns": [
@@ -25,14 +26,14 @@
     "(?:^|/)convex/_generated(?:/|$)",
     "^convex/react$"
   ],
-  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:pending|claimed|in_progress|blocked|completed|cancelled|passed|failed)[\"']",
+  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:assigned|confirmed|checked_in|checked_out|no_show|unassigned|scheduled|started|completed|cancelled|active|withdrawn|open|closed|corrected|expired|revoked)[\"']",
   "lifecyclePolicies": [
     {
-      "pathSuffix": "/ProductionLifecyclePolicy.ts",
+      "pathSuffix": "/WorkforceLifecyclePolicy.ts",
       "bindingsImport": "../../generated/manifest-wiring-bindings\"",
       "requiredSymbols": [
-        "PrepTaskClaimLifecycle",
-        "QualityCheckFailLifecycle"
+        "ShiftStartLifecycle",
+        "EventAssignmentCheckInLifecycle"
       ]
     }
   ],

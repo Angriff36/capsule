@@ -22,7 +22,18 @@ const require = createRequire(import.meta.url);
 
 const SUPPLY_ENTITIES = ["IngredientDemand", "PurchaseNeed"] as const;
 const PRODUCTION_ENTITIES = ["PrepTask", "QualityCheck"] as const;
-const CATALOG_ENTITIES = [...SUPPLY_ENTITIES, ...PRODUCTION_ENTITIES] as const;
+const WORKFORCE_ENTITIES = [
+  "EventAssignment",
+  "Shift",
+  "AvailabilityWindow",
+  "TimeRecord",
+  "Qualification",
+] as const;
+const CATALOG_ENTITIES = [
+  ...SUPPLY_ENTITIES,
+  ...PRODUCTION_ENTITIES,
+  ...WORKFORCE_ENTITIES,
+] as const;
 
 const DEMAND_RUNTIME_TEST =
   "tests/proofs/ingredient-demand-confirm.runtime.test.ts";
@@ -206,6 +217,51 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     ],
   });
 
+  const workforceCatalog = emitCapabilityCatalog(ir, {
+    entityFilter: WORKFORCE_ENTITIES,
+    versions,
+    runtimeProofIds: new Set(),
+    structuralProofIds: new Set(),
+  });
+  // Workforce has no cross-entity reactions in the IR; its runtime proof is
+  // the governed createVia + command lifecycle (tests/proofs/shift-lifecycle).
+  const workforceLifecycleStates = [
+    "assigned",
+    "confirmed",
+    "checked_in",
+    "checked_out",
+    "no_show",
+    "unassigned",
+    "scheduled",
+    "started",
+    "completed",
+    "cancelled",
+    "active",
+    "withdrawn",
+    "open",
+    "closed",
+    "corrected",
+    "expired",
+    "revoked",
+  ];
+  const workforceGuard = emitIntegrationGuardConfig(workforceCatalog, {
+    featureRoots: ["src/features/workforce"],
+    convexLibRoot: "convex/lib",
+    versions,
+    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:${workforceLifecycleStates.join("|")})["']`,
+    lifecyclePolicies: [
+      {
+        pathSuffix: "/WorkforceLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: [
+          "ShiftStartLifecycle",
+          "EventAssignmentCheckInLifecycle",
+        ],
+      },
+    ],
+    extraOwnedTables: ["payrollInputs"],
+  });
+
   const productionGuard = emitIntegrationGuardConfig(productionCatalog, {
     featureRoots: ["src/features/production"],
     convexLibRoot: "convex/lib",
@@ -235,6 +291,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
   write("proof-registry.json", registry);
   write("guard.supply.json", supplyGuard);
   write("guard.production.json", productionGuard);
+  write("guard.workforce.json", workforceGuard);
   write("capability-catalog.md", formatCapabilityCatalogMarkdown(catalog));
 
   console.log(`Emitted proof-kit artifacts to ${outDir}`);
