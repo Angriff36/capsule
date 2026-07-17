@@ -11,9 +11,10 @@
   "scripts": {
     "baseline:decay": "bun scripts/check-baseline-decay.ts",
     "build": "vite build",
-    "check": "bun run toolchain && bun run proof:emit && bun run check:proof && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run check:production-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
+    "check": "bun run toolchain && bun run proof:emit && bun run check:proof && bun run check:manifest-registry && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run check:production-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
     "check:culinary-manifest": "bun scripts/check-culinary-manifest-integration.ts",
     "check:event-manifest": "bun scripts/check-event-manifest-integration.ts",
+    "check:manifest-registry": "bun scripts/check-manifest-registry-pin.ts",
     "check:production-manifest": "bun scripts/check-production-manifest-integration.ts",
     "check:proof": "bun scripts/check-proof-registry.ts",
     "check:supply-manifest": "bun scripts/check-supply-manifest-integration.ts",
@@ -39,7 +40,7 @@
     "*.{ts,tsx,js,jsx,json,md,css,yml,yaml,html}": "prettier --write"
   },
   "dependencies": {
-    "@angriff36/manifest": "3.6.13",
+    "@angriff36/manifest": "3.6.14",
     "@clerk/react": "^6.12.4",
     "@fontsource-variable/archivo": "^5.2.5",
     "@fontsource/ibm-plex-mono": "^5.2.5",

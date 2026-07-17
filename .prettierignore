@@ -23,6 +23,7 @@ graphify-out/
 .artifacts/
 .convex/
 node_modules/
+node_modules.old*/
 bun.lock
 package-lock.json
 *.min.js
