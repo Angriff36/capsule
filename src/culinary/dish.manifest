@@ -1,5 +1,6 @@
-// Capsule culinary Dish — served item built from a published Recipe.
-// Menu and EventDish live in menu.manifest (compile entry).
+// Capsule culinary Dish — finished served product.
+// A Dish is NOT a Recipe. It may compose many Recipes via DishRecipe.
+// Menu: menu.manifest. MenuDish: menu-dish.manifest. EventDish: event-dish.manifest.
 
 use "./recipe.manifest"
 use "./recipe-import.manifest"
@@ -14,7 +15,6 @@ entity Dish mixin TenantScoped, SoftDeletable {
   timestamps
   versionProperty version: number
 
-  property required recipeId: uuid
   property required searchable name: string = ""
   property description: string?
   property category: string?
@@ -23,15 +23,16 @@ entity Dish mixin TenantScoped, SoftDeletable {
   property required portionSize: decimal(10, 2) = 1
   property required portionUnit: UnitOfMeasure = "portion"
   property dietaryTags: list<string> = []
-  // Stored summary: multi-hop Ingredient allergen aggregation via Recipe is
-  // not expressible as a single computed (OD010). Commands maintain this list.
+  // Stored summary: multi-hop Ingredient allergen aggregation via DishRecipe
+  // → Recipe is not expressible as a single computed (D056 / Q10; was OD010).
+  // Commands (or an orchestrator calling classifyAllergens) maintain this list.
   property allergenSummary: list<AllergenCode> = []
   property required status: DishStatus = "active"
   property introducedAt: datetime?
   property retiredAt: datetime?
   property retirementReason: string?
 
-  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+  hasMany recipeLines: DishRecipe
 
   computed isActive: boolean = self.status == "active"
   computed isRetired: boolean = self.status == "retired"
@@ -47,7 +48,6 @@ entity Dish mixin TenantScoped, SoftDeletable {
   default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish commands"
 
   command introduce(
-    recipeId: uuid,
     name: string,
     portionSize: decimal(10, 2),
     portionUnit: UnitOfMeasure,
@@ -62,7 +62,6 @@ entity Dish mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint introduceDishName: length(trim(name)) > 0 "Dish name is required"
     constraint introduceDishPortion: portionSize > 0 "Dish portion size must be positive"
-    mutate recipeId = recipeId
     mutate name = name
     mutate portionSize = portionSize
     mutate portionUnit = portionUnit
@@ -76,7 +75,6 @@ entity Dish mixin TenantScoped, SoftDeletable {
     emit DishIntroduced {
       dishId: self.id
       tenantId: self.tenantId
-      recipeId: recipeId
       name: name
       portionSize: portionSize
       portionUnit: portionUnit
@@ -105,20 +103,6 @@ entity Dish mixin TenantScoped, SoftDeletable {
       dishId: self.id
       tenantId: self.tenantId
       name: name
-    }
-  }
-
-  command changeRecipe(recipeId: uuid) {
-    guard self.status == "active"
-    guard self.deletedAt == null
-    guard roleAllows(user.role, "kitchenManageAccess")
-    compute previousRecipeId = self.recipeId
-    mutate recipeId = recipeId
-    emit DishRecipeChanged {
-      dishId: self.id
-      tenantId: self.tenantId
-      previousRecipeId: previousRecipeId
-      recipeId: recipeId
     }
   }
 
@@ -182,10 +166,73 @@ entity Dish mixin TenantScoped, SoftDeletable {
   store Dish in durable
 }
 
+// Dish ↔ Recipe composition line. One Dish may include many Recipes
+// (e.g. Caesar salad → dressing recipe + crouton recipe).
+entity DishRecipe mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required dishId: uuid
+  property required recipeId: uuid
+  property required sortOrder: int = 0
+  property role: string?
+  property attachedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+
+  default policy dishRecipeRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish recipe composition"
+  default policy dishRecipeWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish recipe composition through commands"
+  default policy dishRecipeExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish recipe composition commands"
+
+  command attach(
+    dishId: uuid,
+    recipeId: uuid,
+    optional sortOrder: number,
+    optional role: string
+  ) {
+    guard self.attachedAt == null
+    guard self.deletedAt == null
+    guard self.dish != null and self.dish.status == "active"
+    constraint attachDishMatch: dishId == self.dishId "Attach dishId must match the seeded dish reference"
+    mutate dishId = dishId
+    mutate recipeId = recipeId
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate role = role
+    mutate attachedAt = now()
+    emit DishRecipeAttached {
+      dishRecipeId: self.id
+      tenantId: self.tenantId
+      dishId: dishId
+      recipeId: recipeId
+      sortOrder: sortOrder != null ? sortOrder : 0
+      role: role
+    }
+  }
+
+  command detach(reason: string) {
+    guard self.attachedAt != null
+    guard self.deletedAt == null
+    constraint detachReason: length(trim(reason)) > 0 "Detach reason is required"
+    mutate deletedAt = now()
+    mutate removedAt = now()
+    emit DishRecipeDetached {
+      dishRecipeId: self.id
+      tenantId: self.tenantId
+      dishId: self.dishId
+      recipeId: self.recipeId
+      reason: reason
+    }
+  }
+
+  store DishRecipe in durable
+}
+
 event DishIntroduced: "dish.introduced" {
   dishId: string
   tenantId: string
-  recipeId: string
   name: string
   portionSize: decimal(10, 2)
   portionUnit: UnitOfMeasure
@@ -196,13 +243,6 @@ event DishDetailsRevised: "dish.details_revised" {
   dishId: string
   tenantId: string
   name: string
-}
-
-event DishRecipeChanged: "dish.recipe_changed" {
-  dishId: string
-  tenantId: string
-  previousRecipeId: string
-  recipeId: string
 }
 
 event DishPortioningUpdated: "dish.portioning_updated" {
@@ -229,4 +269,21 @@ event DishRetired: "dish.retired" {
 event DishReinstated: "dish.reinstated" {
   dishId: string
   tenantId: string
+}
+
+event DishRecipeAttached: "dish_recipe.attached" {
+  dishRecipeId: string
+  tenantId: string
+  dishId: string
+  recipeId: string
+  sortOrder: number
+  role: string?
+}
+
+event DishRecipeDetached: "dish_recipe.detached" {
+  dishRecipeId: string
+  tenantId: string
+  dishId: string
+  recipeId: string
+  reason: string
 }

@@ -1,0 +1,184 @@
+// Capsule culinary EventDish — a Dish on an Event with servings.
+// PrepTasks belong to EventDish (not bare Event). See production/task.manifest.
+
+use "./menu-dish.manifest"
+
+// One plate line on an event. Removing a line soft-deletes THAT row.
+// Re-adding the same Dish is a NEW EventDish row (new id) via addToEvent — not
+// resurrecting the deleted line.
+entity EventDish mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required dishId: uuid
+  property required quantityServings: int = 1
+  property course: string?
+  property serviceStyle: string?
+  property specialInstructions: string?
+  property addedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+
+  // Zero servings = 86'd / not serving; remove() is the other path.
+  constraint eventDishServingsNonnegative: self.addedAt == null or self.quantityServings >= 0 "Event dish servings cannot be negative"
+
+  // Read: any staff on this tenant. Write/execute: managers+.
+  default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dishes"
+  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") "Managers may write event dishes through commands"
+  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") "Managers may execute event dish commands"
+
+  // Add this dish to the event (create).
+  command addToEvent(
+    eventId: uuid,
+    dishId: uuid,
+    quantityServings: number,
+    optional course: string,
+    optional serviceStyle: string,
+    optional specialInstructions: string
+  ) {
+    // This row is already live — don't double-add the same id.
+    // To put the same Dish back after remove: allocate a NEW EventDish and call addToEvent.
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    // Live event only — includes executing (86/swap mid-service). Not cancelled/done.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    // Seed check: createVia pre-writes eventId on the row; the arg must match
+    // that seed. Fails only on buggy/mismatched API calls — not a business "can't move dishes" rule.
+    constraint addToEventEventMatch: eventId == self.eventId "addToEvent eventId must match the seeded event reference"
+    constraint addToEventServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
+    mutate eventId = eventId
+    mutate dishId = dishId
+    mutate quantityServings = quantityServings
+    mutate course = course
+    mutate serviceStyle = serviceStyle
+    mutate specialInstructions = specialInstructions
+    mutate addedAt = now()
+    emit EventDishAdded {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      dishId: dishId
+      quantityServings: quantityServings
+      course: course
+      serviceStyle: serviceStyle
+    }
+  }
+
+  command adjustServings(quantityServings: number) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    // Live event + post-event correction. Zero = 86 without deleting the line.
+    // Refunds are Invoice/Payment — not this field. Cancelled stays locked.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
+    constraint adjustServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
+    compute previousQuantityServings = self.quantityServings
+    mutate quantityServings = quantityServings
+    emit EventDishServingsAdjusted {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      previousQuantityServings: previousQuantityServings
+      quantityServings: quantityServings
+    }
+  }
+
+  command changeCourse(optional course: string, optional serviceStyle: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    mutate course = course
+    mutate serviceStyle = serviceStyle
+    emit EventDishCourseChanged {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      course: course
+      serviceStyle: serviceStyle
+    }
+  }
+
+  command updateInstructions(optional specialInstructions: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    // Notes are allowed through executing — kitchen/service still needs them.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    mutate specialInstructions = specialInstructions
+    emit EventDishInstructionsUpdated {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+    }
+  }
+
+  command remove(reason: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    // Includes executing — ran out / pull from service. Not after the event is done/cancelled.
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    constraint removeEventDishReason: length(trim(reason)) > 0 "Removal reason is required"
+    compute previousQuantityServings = self.quantityServings
+    mutate deletedAt = now()
+    mutate removedAt = now()
+    emit EventDishRemoved {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      previousQuantityServings: previousQuantityServings
+      reason: reason
+    }
+  }
+
+  store EventDish in durable
+}
+
+event EventDishAdded: "event_dish.added" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  quantityServings: number
+  course: string?
+  serviceStyle: string?
+}
+
+event EventDishServingsAdjusted: "event_dish.servings_adjusted" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  previousQuantityServings: number
+  quantityServings: number
+}
+
+event EventDishCourseChanged: "event_dish.course_changed" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  course: string?
+  serviceStyle: string?
+}
+
+event EventDishInstructionsUpdated: "event_dish.instructions_updated" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+}
+
+event EventDishRemoved: "event_dish.removed" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  previousQuantityServings: number
+  reason: string
+}

@@ -1,4 +1,5 @@
-// Capsule culinary recipes — Recipe (with folded version/yield) and RecipeIngredient.
+// Capsule culinary recipes — Recipe, RecipeStep (method), RecipeIngredient (BOM).
+// A Recipe is a make-formula, not a finished Dish. Dishes compose Recipes via DishRecipe.
 
 use "./ingredient.manifest"
 
@@ -28,6 +29,7 @@ entity Recipe mixin TenantScoped, SoftDeletable {
   property retiredAt: datetime?
   property retirementReason: string?
 
+  hasMany steps: RecipeStep
   hasMany ingredientLines: RecipeIngredient
 
   computed isPublished: boolean = self.status == "published"
@@ -254,6 +256,87 @@ entity RecipeIngredient mixin TenantScoped, SoftDeletable {
   store RecipeIngredient in durable
 }
 
+// Ordered method step on a Recipe (e.g. "Combine oil with anchovies").
+entity RecipeStep mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required recipeId: uuid
+  property required searchable instruction: string = ""
+  property required sortOrder: int = 0
+  property durationMinutes: int?
+  property addedAt: datetime?
+
+  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+
+  constraint stepInstructionComplete: self.addedAt == null or length(trim(self.instruction)) > 0 "Recipe steps require an instruction"
+
+  default policy recipeStepRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read recipe steps"
+  default policy recipeStepWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write recipe steps through commands"
+  default policy recipeStepExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute recipe step commands"
+
+  command add(
+    recipeId: uuid,
+    instruction: string,
+    optional sortOrder: number,
+    optional durationMinutes: number
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    constraint addStepInstruction: length(trim(instruction)) > 0 "Recipe step instruction is required"
+    constraint addStepDuration: durationMinutes == null or durationMinutes >= 0 "Recipe step duration cannot be negative"
+    mutate recipeId = recipeId
+    mutate instruction = instruction
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate durationMinutes = durationMinutes
+    mutate addedAt = now()
+    emit RecipeStepAdded {
+      recipeStepId: self.id
+      tenantId: self.tenantId
+      recipeId: recipeId
+      instruction: instruction
+      sortOrder: sortOrder != null ? sortOrder : 0
+    }
+  }
+
+  command revise(
+    instruction: string,
+    optional sortOrder: number,
+    optional durationMinutes: number
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint reviseStepInstruction: length(trim(instruction)) > 0 "Recipe step instruction is required"
+    constraint reviseStepDuration: durationMinutes == null or durationMinutes >= 0 "Recipe step duration cannot be negative"
+    mutate instruction = instruction
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    mutate durationMinutes = durationMinutes
+    emit RecipeStepRevised {
+      recipeStepId: self.id
+      tenantId: self.tenantId
+      recipeId: self.recipeId
+      instruction: instruction
+      sortOrder: sortOrder != null ? sortOrder : self.sortOrder
+    }
+  }
+
+  command remove(reason: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint removeStepReason: length(trim(reason)) > 0 "Removal reason is required"
+    mutate deletedAt = now()
+    emit RecipeStepRemoved {
+      recipeStepId: self.id
+      tenantId: self.tenantId
+      recipeId: self.recipeId
+      reason: reason
+    }
+  }
+
+  store RecipeStep in durable
+}
+
 event RecipeDrafted: "recipe.drafted" {
   recipeId: string
   tenantId: string
@@ -322,5 +405,28 @@ event RecipeIngredientRemoved: "recipe_ingredient.removed" {
   ingredientId: string
   quantity: decimal(10, 4)
   unit: UnitOfMeasure
+  reason: string
+}
+
+event RecipeStepAdded: "recipe_step.added" {
+  recipeStepId: string
+  tenantId: string
+  recipeId: string
+  instruction: string
+  sortOrder: number
+}
+
+event RecipeStepRevised: "recipe_step.revised" {
+  recipeStepId: string
+  tenantId: string
+  recipeId: string
+  instruction: string
+  sortOrder: number
+}
+
+event RecipeStepRemoved: "recipe_step.removed" {
+  recipeStepId: string
+  tenantId: string
+  recipeId: string
   reason: string
 }

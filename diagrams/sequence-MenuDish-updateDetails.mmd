@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant MenuDish as MenuDish
+    participant EventBus
+    Client->>+MenuDish: updateDetails(sortOrder, course, serviceStyle, specialInstructions)
+    Note over MenuDish: Policies: menuDishRead, menuDishWrite, menuDishExecute
+    Note over MenuDish: Guards (3)
+    MenuDish->>MenuDish: guard[0]: self.addedAt != null
+    MenuDish->>MenuDish: guard[1]: self.deletedAt == null
+    MenuDish->>MenuDish: guard[2]: self.menu != null and self.menu.status == #quot;draft#quot;
+    MenuDish->>MenuDish: mutate.sortOrder
+    MenuDish->>MenuDish: mutate.course
+    MenuDish->>MenuDish: mutate.serviceStyle
+    MenuDish->>MenuDish: mutate.specialInstructions
+    MenuDish->>EventBus: emit MenuDishDetailsUpdated on menu_dish.details_updated
+    MenuDish-->>-Client: void

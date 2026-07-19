@@ -17,19 +17,19 @@
       "sha256": "075f3e463eb1092530df76b0dd6a25a12277c68308d39a78e06e859d59cae07e"
     },
     "convex/mutations.ts": {
-      "sha256": "25373f4139a6c5afbf2c74ba8f1c21fca5dfea201d90ecf805008d84885f640b"
+      "sha256": "df4ae2375a6e847310b12020bd4db6a547907f9d42f8cebfc51a970d06245dee"
     },
     "convex/queries.ts": {
-      "sha256": "a3f5a9cdadbb12b66c0d6c650deebdf0b9c4ec42f6ce0e08eb3ca3433400da2b"
+      "sha256": "a4706e0fbb0bc9734955e13b63f34ce89b937cad5cb93928f825ded2bc5ab920"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "cdce7a31cef00e2d7ec18c3ea94d7c31e3fe38a52bf9dab6b500b07f0bd13d6c"
+      "sha256": "0e81f3781bac8bb0efa6a1ef57243ebdde9522584badc2de43ba546b7b75c69e"
     },
     "diagrams/er-diagram.mmd": {
-      "sha256": "b0b22018dec944bb3f9e63db683332e40357274d0a763ee3674bf561419acf3e"
+      "sha256": "bfb996e4f292de6f554650022d778c2ffd30515d82ccb0d46b811d2de360e670"
     },
     "diagrams/sequence-AvailabilityWindow-declare.mmd": {
       "sha256": "062a7fad8a40b57ef333df41817fa587bdcc5424a92aad0d41bbc23e84b6314f"
@@ -100,14 +100,11 @@
     "diagrams/sequence-Delivery-startTransit.mmd": {
       "sha256": "94d24c9cfc93bb2557ae3e5b15a98beef327cd14757528f9cdf1072817e0f7a1"
     },
-    "diagrams/sequence-Dish-changeRecipe.mmd": {
-      "sha256": "a601928044b387f4da80c073e1e819a0180082a0bcd8b05d51c382f0b291f32b"
-    },
     "diagrams/sequence-Dish-classifyAllergens.mmd": {
       "sha256": "d3c689079b67169ec27adc5afbac1d240191cea37f2e5043b5cab879b1ad63f5"
     },
     "diagrams/sequence-Dish-introduce.mmd": {
-      "sha256": "98588eef9ede5a0f9ef64d07fc58918f4a007e8f124938f6c2f0d424b2761e00"
+      "sha256": "927801f094ada648e843aa2b0bb339a0609c2dd6ec43c1d3def6f33f8731e75d"
     },
     "diagrams/sequence-Dish-reinstate.mmd": {
       "sha256": "89ac903880e4f1c55c5e7ca00d320e2121411c98199b68c94b274ef89a2ac82a"
@@ -120,6 +117,12 @@
     },
     "diagrams/sequence-Dish-updatePortioning.mmd": {
       "sha256": "9497e9cbe5824db87da36f92b34b4c768544f5edd8dbed6b5a3d9993fbd12f88"
+    },
+    "diagrams/sequence-DishRecipe-attach.mmd": {
+      "sha256": "c6ae0bacab115338d445fbfe699a857c69e98f7492ed86cfee96c3078bc0cae2"
+    },
+    "diagrams/sequence-DishRecipe-detach.mmd": {
+      "sha256": "238ed36d5819597ec91b9702e2876f101a8b44bc392552ed83e784a47b1bbcdc"
     },
     "diagrams/sequence-Event-approve.mmd": {
       "sha256": "99e64fbbd0a96c2ce2a56d759a78d72b091417a204ddd6051110ac0c86ee686a"
@@ -193,20 +196,20 @@
     "diagrams/sequence-EventCloseout-finalize.mmd": {
       "sha256": "a91facb1686fd47eb90373789812bc356a9769f4e65e525551f062c145844d78"
     },
+    "diagrams/sequence-EventDish-addToEvent.mmd": {
+      "sha256": "99019ca3840b40668f54ab262c12f69798d135fc656948fef9b6805151765140"
+    },
     "diagrams/sequence-EventDish-adjustServings.mmd": {
-      "sha256": "e2d9bf9adf02b9300279cc0eff97a8c8c95ec459be98d41c9a751fcda0f2fce5"
+      "sha256": "e593807c284cb5ba23bd825cb319a623676e0f87f1fd1662d156b0fe7650eb72"
     },
     "diagrams/sequence-EventDish-changeCourse.mmd": {
-      "sha256": "386c46c4ee3e041310606e5067fac77ba69ee0d6ab861acc1ae246042540b3de"
+      "sha256": "40543d962d0345c4efa7f7ad135d200307ee66e37ea76ffabde4f6845fead0b0"
     },
     "diagrams/sequence-EventDish-remove.mmd": {
-      "sha256": "5df14a4e98659a12af1e7e4533219d09d8338622a39a8a8f2127db11d621b78d"
-    },
-    "diagrams/sequence-EventDish-select.mmd": {
-      "sha256": "960729c69355cfd74156da0826ea378fc22b5a8b62fefb63a1d98be2aafeec7a"
+      "sha256": "266bc9d5a04d0ad18d4456da00648a9e1ca4769b1940d904f55a4c82817e712d"
     },
     "diagrams/sequence-EventDish-updateInstructions.mmd": {
-      "sha256": "7e0b5bb25f9e6e6901e02676ecf6e44ad50596c67808e60fdacec2dda5418483"
+      "sha256": "540321d972b3fa7a87eb26896756d976b0fcbf951d9dd4b90b83661ce01d3640"
     },
     "diagrams/sequence-EventGuest-assignTable.mmd": {
       "sha256": "dd0a8e6776c4aff461a33f299ac99752b3da5ea6cc0ad359e65f0f57626652d1"
@@ -349,6 +352,15 @@
     "diagrams/sequence-Menu-updatePricing.mmd": {
       "sha256": "7eb26ddbbbcd1c3d465d66e85f26776a437d1ae4a662d30959a8089fbfe69d1b"
     },
+    "diagrams/sequence-MenuDish-add.mmd": {
+      "sha256": "9a01d7d24626c2864dda7abccc85151b192802335b351fe7a8690c08cbb3f7b8"
+    },
+    "diagrams/sequence-MenuDish-remove.mmd": {
+      "sha256": "cb7c91a73feb1dcd042328d990fdaae541b9940df2b68246dcd8c24ca514f6b3"
+    },
+    "diagrams/sequence-MenuDish-updateDetails.mmd": {
+      "sha256": "6ec6679b1ee9a7bb51bb8547e296878986d38d723bba5f3e9d8ae0f64d04c669"
+    },
     "diagrams/sequence-Organization-deactivate.mmd": {
       "sha256": "078bfe8aa6915cc775910ce5fe7b92b93c0d5e1a58c88c422adb705fc9a95af2"
     },
@@ -470,7 +482,7 @@
       "sha256": "35165ef8f1ee3a01673536f3bd7e7a5de50998cb6d1d7ad8d491603845567402"
     },
     "diagrams/sequence-PrepTask-open.mmd": {
-      "sha256": "6ecc6d3653f568b148438b585b939048c5f67045e3e215a58c23be5a0d21f896"
+      "sha256": "68d5e71d6e98b2a2e3c1bc10d4ad7080ccc9fe65f2cfec18c0d5875f78d93498"
     },
     "diagrams/sequence-PrepTask-release.mmd": {
       "sha256": "67bd6ba2cc2c460480fadbe6f41c672788a522dd9b0a48855ee5c9b57c831a6c"
@@ -511,11 +523,17 @@
     "diagrams/sequence-Proposal-send.mmd": {
       "sha256": "deea417e9feffcd17de85c26cb4660c6d2175e23168730f0cd2c5a2c298da93d"
     },
+    "diagrams/sequence-PurchaseNeed-assignToDraft.mmd": {
+      "sha256": "a1462233401469bdd7c2ada97a89b70be75582504591e3b84de430da2e0386c0"
+    },
     "diagrams/sequence-PurchaseNeed-cancel.mmd": {
       "sha256": "1207d4b5ef29abb754ac75133e5cb33aa973661ee230c81efde7036e9b4de9d5"
     },
     "diagrams/sequence-PurchaseNeed-create.mmd": {
       "sha256": "6adf742141caa6429636a706972b18c1fa0994f75f35e74c0edbab5047be109b"
+    },
+    "diagrams/sequence-PurchaseNeed-markDraftOrdered.mmd": {
+      "sha256": "0136acd0d718b413fc2f526fdce0beb96a27567aada8e81d4a077df81990805f"
     },
     "diagrams/sequence-PurchaseNeed-markFulfilled.mmd": {
       "sha256": "e600b4e5c28ca82f90b4bebcb78f5ffef9eba04ce0af000a289f2471f06de2b8"
@@ -628,6 +646,15 @@
     "diagrams/sequence-RecipeIngredient-remove.mmd": {
       "sha256": "60d4b6d520b11bd4e156eb9110a11e8ac37928d49674ba1cabad2375a974696b"
     },
+    "diagrams/sequence-RecipeStep-add.mmd": {
+      "sha256": "044c85626db33fa3b9ee8272ff5343aa1ae7dec3319aca397e5a60d2a35d622b"
+    },
+    "diagrams/sequence-RecipeStep-remove.mmd": {
+      "sha256": "01ac904a73c87ba20f84cc445c9ed41937d25f2a107bc68b1f5a45bbfc151fa4"
+    },
+    "diagrams/sequence-RecipeStep-revise.mmd": {
+      "sha256": "94644ad723df78bd1b9ae9979e96e610de14a7ab85dade4a6529cd2519a363ae"
+    },
     "diagrams/sequence-SavedReportDefinition-archive.mmd": {
       "sha256": "02ecf31bb171bfc0da8192370d2e77ddcaf826317b5d636c42dccc7e9d042201"
     },
@@ -710,7 +737,7 @@
       "sha256": "6e7db7b3a5665eeb63ffc0b5fef0131e934d1b1e6783cfa3c46c62860384df13"
     },
     "diagrams/sequence-VendorOrder-open.mmd": {
-      "sha256": "a19abdfa78ea36aee0c37c20691177440143bd9f93db98a83af8ddf09879722e"
+      "sha256": "61f2a27e03b7488445559a36d07d5dfce2ab5d905a4ec4dc3e754f20530c089a"
     },
     "diagrams/sequence-VendorOrder-submit.mmd": {
       "sha256": "9d9f4455d4dd90a9d8afd5da79b5ed5287d8060227a4b33b54da1f751227a18a"
@@ -749,667 +776,44 @@
       "sha256": "6ec1d4bf6b8feb50bb63ceb03beea870516f5a352dea13b2771b4e489e7c525f"
     },
     "manifest-context-summary.json": {
-      "sha256": "881aa1436d9ccb9786e7a162214fa340a73da102f193baf3954963604f94b39d"
+      "sha256": "91648416d9278fa4ad8f893804d609c644224691404581eaa90814bd3121c211"
     },
     "package.json": {
-      "sha256": "61545f2ff4a24bddd0e64076d50b0e48ed7c989e4458a468003dae7172707ff0"
+      "sha256": "f14c2b829c3204119a8c2b9b77783c470f774a471ddc835d70d73c6277536b66"
     },
     "PRESET.md": {
-      "sha256": "1de230fef70a3130497a37ecdfe2a53cbd4740eaa2ab44b3ffeba5f895f13a49"
-    },
-    "schemas/accept.schema.ts": {
-      "sha256": "2e4ca6b1c2d9631fee0c0c37863f50dc5ab5eeb3cbc86ab7be49a83513c9b6b2"
-    },
-    "schemas/activate.schema.ts": {
-      "sha256": "9d5aa9ca58b011fa191ab2e04bbe538a34ddb8ba156ce0cd93315e261f54ed7c"
-    },
-    "schemas/add.schema.ts": {
-      "sha256": "26bc4b806f174cc5dafcd3dcc2d5963067b1df0cb7eadc84393828134e87e15f"
-    },
-    "schemas/addItem.schema.ts": {
-      "sha256": "f6ef11cd8c351f4b103307a867be8d738ea0c0c9de45d96c8ce1be31828a4538"
-    },
-    "schemas/addLine.schema.ts": {
-      "sha256": "b9a058fa3b6749c6e0e7aa0b94cfbda0c90295dd52dec47fe5cd0042dbdf06ab"
-    },
-    "schemas/adjustQuantity.schema.ts": {
-      "sha256": "657f4ee63237b489da7e8ca49e5ff6412bbf0655c0677e810b49857044acceb6"
-    },
-    "schemas/adjustServings.schema.ts": {
-      "sha256": "86d6d967aa0c7f8bb7f58596b7c2449362f15eb0c1ca7266a14687eac702dc47"
-    },
-    "schemas/applyPayment.schema.ts": {
-      "sha256": "265d97ca0d8d6eb6035cc1b919f25e229d0129a7142155d8931b80e3d3da06f9"
-    },
-    "schemas/approve.schema.ts": {
-      "sha256": "eae14dbc28646741fe185feab5943369f7a3b80db3a3678e5418050dc5d5e24b"
-    },
-    "schemas/approveReview.schema.ts": {
-      "sha256": "37a83ec2559ab2cef02facd21f1608e2b7c99b07e26dfcac2fccfea1fe6a9000"
-    },
-    "schemas/archive.schema.ts": {
-      "sha256": "f0ef714ebcd71be4adf8b06a9475c2ae1c38da54f43bdd48f0f42389719fa695"
-    },
-    "schemas/assign.schema.ts": {
-      "sha256": "687a9fee33afaedf44c156eed8b4e13b19aa87aa6a094e57058beb0cbc9ad753"
-    },
-    "schemas/assignOwner.schema.ts": {
-      "sha256": "9181471a4900285da1e6a98fa295485b50eb03ae10f8a84079e641bc2f22f622"
-    },
-    "schemas/assignRole.schema.ts": {
-      "sha256": "7153cfde2a003708105bab6ee6b126db02061a104d461626deab00c2f4adb3f8"
-    },
-    "schemas/assignTable.schema.ts": {
-      "sha256": "201d02133c5e27fa9f84db2463e7a5b5b179849b415fa03760161cca81a6e1e8"
-    },
-    "schemas/attachCreatedIngredient.schema.ts": {
-      "sha256": "5ec81be5405b9855be032f4d55dc75f11773f642bd78b75ba01f73410e137de9"
-    },
-    "schemas/AvailabilityWindow.schema.ts": {
-      "sha256": "1177d1bc9e946802f7b67c39ba48950658316df679cab90d45992c88eeb6bcca"
-    },
-    "schemas/beginExecution.schema.ts": {
-      "sha256": "f6a09efcb2bed91340173a7dec5b85ca7485d397b93b7bdb2b7118dcf1f15c98"
-    },
-    "schemas/beginFinalization.schema.ts": {
-      "sha256": "a9bb2e02e273cf9c83a9b6574d9076be50f0ab6118ded7d770dfb3c2a98fbba4"
-    },
-    "schemas/beginInvestigation.schema.ts": {
-      "sha256": "8f9f9080a343c0b8a376b3ecb62e3c73156b7a6e3644768f631ed1a57a948e23"
-    },
-    "schemas/beginProcessing.schema.ts": {
-      "sha256": "168c358b1cd38624c8b18411728ae89cf0917c86b6ab29afd63ad4ae173e15ef"
-    },
-    "schemas/beginReview.schema.ts": {
-      "sha256": "3c24685ccd200ffe9ddd53e9b57b82d10322fe58b0b4dc630b1855f26e9a48a2"
-    },
-    "schemas/calculate.schema.ts": {
-      "sha256": "b7e518ad29d57380e57078213a6bdb0325ce7c08a5aa03c72d7ee4083a94966b"
-    },
-    "schemas/cancel.schema.ts": {
-      "sha256": "486d1ef6cbd251ace15a28070588fd11ef87829a26ed4dd60d948ebc4d09ac8d"
-    },
-    "schemas/cancelLine.schema.ts": {
-      "sha256": "5f97243b12198c75392e93dfedf6caf56d1801da2a3f344429381c8bedb8c466"
-    },
-    "schemas/capture.schema.ts": {
-      "sha256": "4de9ee654d74841a8e24b809c1716710dd56ebc7d799eac5b85ea9d3ed678652"
-    },
-    "schemas/changeBillingProfile.schema.ts": {
-      "sha256": "5d55985ab7baf7a86d270af6526500334c56dd18eec953207f4982fb840481d2"
-    },
-    "schemas/changeCapacity.schema.ts": {
-      "sha256": "fd8c6168ea36cbb2438440b7abf9d6950ad9ff5c469a79a0bd198a04b58d49b1"
-    },
-    "schemas/changeContact.schema.ts": {
-      "sha256": "f041967e90bb1556bc6b26c3df220aec90f3eaa706a1741bfe3e83be2a330a51"
-    },
-    "schemas/changeCourse.schema.ts": {
-      "sha256": "f8032f410115de3e5f8102cb412d534b389f3dba2412dd0751813ffef95776d2"
-    },
-    "schemas/changeHeadcount.schema.ts": {
-      "sha256": "b38d3198d5939e9f922cd552648417cd12e47292f3ca14759c75073f40ec4ca1"
-    },
-    "schemas/changePricing.schema.ts": {
-      "sha256": "17724b895e50cc5d5db0330f670d3087d6422643b156334c35e14c602437dfc0"
-    },
-    "schemas/changePrimaryContact.schema.ts": {
-      "sha256": "58fd46b3fb6c337937ab0dc8176c5ad76662f3a292569f0987b3b959c9452486"
-    },
-    "schemas/changeRecipe.schema.ts": {
-      "sha256": "2feafce9b44cbaf869ede375f3be1320ff96887852fa1e28ad20490f44ed86ac"
-    },
-    "schemas/changeRequirements.schema.ts": {
-      "sha256": "bcdafebbceae4c59f0b8356bbdd4d68972ecc8b8c7d374b7b5e7709b1368d8fb"
-    },
-    "schemas/changeSharing.schema.ts": {
-      "sha256": "ccc2d7b80e8b359ef32f8955b913ee2a72c056f0513b377ff1bb2a3bfcf9a7f9"
-    },
-    "schemas/changeVenue.schema.ts": {
-      "sha256": "b71dfce4a7442d233bc97a72e707ad12417bcbb0ff87089f95293aec258dc839"
-    },
-    "schemas/checkIn.schema.ts": {
-      "sha256": "c8e536eda362ad5cc30b990c90613928dd8472ed82bcf656ad75d65507441944"
-    },
-    "schemas/checkOut.schema.ts": {
-      "sha256": "136b806396bd24c0e3b7a91200d98e2c14f2040bb6d6112f0e598278ac5974b4"
-    },
-    "schemas/claim.schema.ts": {
-      "sha256": "6ad211905ca1e2d10c69c6cbde9abb793867075f3b656f8f7ff6417657f38b1e"
-    },
-    "schemas/classifyAllergens.schema.ts": {
-      "sha256": "2b363f41d7970b548746ab5fd68022f9dc341c48019d5c1e17b8657b8a928666"
-    },
-    "schemas/clearDefault.schema.ts": {
-      "sha256": "5dfc78aa4651207616819133288f3244dbd2ada55d96ab3fbe17194d885ce9c2"
-    },
-    "schemas/Client.schema.ts": {
-      "sha256": "9beb1cf72532e65eba0b9404b0f4279b4f415fd7ed78cc9113d7c96698e2a7aa"
-    },
-    "schemas/ClientContact.schema.ts": {
-      "sha256": "93d479972dc7323995e9251eb28b4c26d7c1d0f3cedb14bf0af8b104ccd542f9"
-    },
-    "schemas/clockIn.schema.ts": {
-      "sha256": "29679af8df93cab0c8bb87848a6e2f53f5f411ec7e65f8e03ddc9e7348e4cac4"
-    },
-    "schemas/clockOut.schema.ts": {
-      "sha256": "7221b3d64e52491b30458410ec407be768c637523a90969bca5e2ab20b8ebd07"
-    },
-    "schemas/closeOut.schema.ts": {
-      "sha256": "32e44cdf0461a07f45bc39b2782f8c1fd191148858843e8f324186d404502e9c"
-    },
-    "schemas/complete.schema.ts": {
-      "sha256": "20c9caea9a9de4be69400c4d690139fdc30f70cd4be58a46497edc1fdfcf2249"
-    },
-    "schemas/confirm.schema.ts": {
-      "sha256": "3803b9310abef2e45b23d8a7d74851de61bda7ad7b4e4377bef2370fd570fc7c"
-    },
-    "schemas/confirmDelivery.schema.ts": {
-      "sha256": "ca7982115339641d4f203993f47f243de4dd4d23e629421c67ea6eb292c411c0"
-    },
-    "schemas/confirmExisting.schema.ts": {
-      "sha256": "3cd78ce71c611275e4d599c0a9ead4c0d20e44347b5b506af8d95491812bf053"
-    },
-    "schemas/confirmNew.schema.ts": {
-      "sha256": "c97612d09e6cf19b70e8f5b27cdab5b1328d46d2ef3e3afa89c355264a302892"
-    },
-    "schemas/consume.schema.ts": {
-      "sha256": "3a4784eee6f55dc875c1a80d234e9f5de0d95f6a069c51a45d1ffb0a2b350ee3"
-    },
-    "schemas/Contract.schema.ts": {
-      "sha256": "05e036d2818f50553163674df2e36ce4ab6664984c5c4acd4f3fe93d60932fda"
-    },
-    "schemas/correct.schema.ts": {
-      "sha256": "eb5bda6fa0e73a44e14d0037a18fedc0dd93fa2923ccbeb9507f9c127aa3b2e6"
-    },
-    "schemas/correctIdentity.schema.ts": {
-      "sha256": "2437b79411e310cc1ed9c855b0f9a63621c91e1b6d6a4b20ab61b0ecedda53c2"
-    },
-    "schemas/create.schema.ts": {
-      "sha256": "40c042cf439c9d8acd1fae62c10f976d4eebb20062591b5d78ebe973c1de8a27"
-    },
-    "schemas/createDefinition.schema.ts": {
-      "sha256": "cc75af886535ba8501c036132554be975e29508aad7ecab958dcddd45a17a074"
-    },
-    "schemas/deactivate.schema.ts": {
-      "sha256": "8e7630cc401bd40e148198c3c4d677cb45366441a890f5ee297af5ab7d710901"
-    },
-    "schemas/declare.schema.ts": {
-      "sha256": "c13c7681f1ccbf86f60bc9074427610a8b2a32753f8b0b4b95df6b12e6d1e2d9"
-    },
-    "schemas/decline.schema.ts": {
-      "sha256": "44ab9ed2c5f4c49548c183b87ffae603f0da732bf5657f12815ed8c6fa1dafdf"
-    },
-    "schemas/Delivery.schema.ts": {
-      "sha256": "85186fd7576742d4abbcce614ffe57d3692b0037fe894cfc26b7e3a5bbe3c658"
-    },
-    "schemas/discard.schema.ts": {
-      "sha256": "17642d12e5661ae777211f961dca29705f253fca428d01ded141440d15bce5d7"
-    },
-    "schemas/discontinue.schema.ts": {
-      "sha256": "d208d827b486a355a954b537323c95c89e5a63cad156bdbebefdbe6cb5a59cb0"
-    },
-    "schemas/Dish.schema.ts": {
-      "sha256": "276958582a5fd0119c881d81c2288db7ef5814c9c6492529b4d2533dbf6125cf"
-    },
-    "schemas/dismiss.schema.ts": {
-      "sha256": "8d869170a54233a862326bbb033eea08543616ffab936f8eae97d4c2f42bf5d5"
-    },
-    "schemas/dispatch.schema.ts": {
-      "sha256": "35da3ee0e9d61d6f8124d2e9ebe3c5aebab250f2c2ebc06caed9ae9ba71d63f9"
-    },
-    "schemas/draft.schema.ts": {
-      "sha256": "877f99a980bcfb2d9c7273c8fd976d4c126579034e5d5e555d58c9470d8ea7db"
-    },
-    "schemas/Event.schema.ts": {
-      "sha256": "143a20e2e3edb3993c3a8b5f8a4af39bff30bf1915ba6bc01807538b3500b202"
-    },
-    "schemas/EventAllergenCheck.schema.ts": {
-      "sha256": "0756e1a8a89611508fe6dc7b177e221115dff35290736dc4af6185253072728f"
-    },
-    "schemas/EventAssignment.schema.ts": {
-      "sha256": "ac12051ff4d2055b49369af191cbb6097a85478ff7373e3752f4b19619de59f2"
-    },
-    "schemas/EventCloseout.schema.ts": {
-      "sha256": "f62e8a3df0d137b31ad9fa04c70b3e6a025163d3a9d281d85ed4492594eabd37"
-    },
-    "schemas/EventDish.schema.ts": {
-      "sha256": "93621af3767383edeaf6009f89fa75c4ed7ee03f8986411e3f1b505ac6075e39"
-    },
-    "schemas/EventGuest.schema.ts": {
-      "sha256": "7e68da28008808636e6590c3844cf43a0252444fa017f5f25592e15e0a0f114b"
-    },
-    "schemas/expire.schema.ts": {
-      "sha256": "a92107af90798f034b4dddb6fcf1bf0d9c4674da0665d49efeb52d5efd139312"
-    },
-    "schemas/fail.schema.ts": {
-      "sha256": "3c164af7707c2161c5d10ddbe9349ed54cb150eab4238bde21f19b6017054f40"
-    },
-    "schemas/finalize.schema.ts": {
-      "sha256": "0c474fcb48ed873428b8eeac83dd9876660f98a300a26cff4b5c87a25f32d369"
-    },
-    "schemas/fulfill.schema.ts": {
-      "sha256": "7b929d7472e9bb42a78cc2b0c386582c0917c8271b0bf18c65d1563752231432"
-    },
-    "schemas/grant.schema.ts": {
-      "sha256": "fe28bc81d8c771aa71a26af0badd426e1bb5b46de6561fdcbee417c0fadb9f4c"
-    },
-    "schemas/hire.schema.ts": {
-      "sha256": "a51810289bbe23ab7a222cc1ca5e52b6096eb74da963381bd51ee6a879479627"
-    },
-    "schemas/Incident.schema.ts": {
-      "sha256": "209a5ef654877a67c6aeff0266b035745b63d4f6bf9435e21334e919d0098988"
-    },
-    "schemas/Ingredient.schema.ts": {
-      "sha256": "97c917bd8bdcd9974a1f949d306c4bf5e42da2f4f79c07c8540cb45785c696c8"
-    },
-    "schemas/IngredientDemand.schema.ts": {
-      "sha256": "6370edbfd21fe1ef9b7e575a46e9223c4a9f3d54e010168f05da920975d5baaf"
-    },
-    "schemas/introduce.schema.ts": {
-      "sha256": "2e1b94e752b6a3fd078fe91961454b1684d881b3004d1da64652eb355aed7161"
-    },
-    "schemas/invalidate.schema.ts": {
-      "sha256": "a5d8d304b63b8d4ca5a64ae27099d5daa84b8185ef794e8bc9d7896661ca1aa7"
-    },
-    "schemas/InventoryItem.schema.ts": {
-      "sha256": "74d636eee6cb95c2fc8cbc1eb9d9316254c7b44a216bb396178d4927c34ed2ae"
-    },
-    "schemas/InventoryReservation.schema.ts": {
-      "sha256": "560ed5fdcf906e5039d6b021e02132f3c866a61cdf6733daf9883033705ce77d"
-    },
-    "schemas/invite.schema.ts": {
-      "sha256": "4ad5dc5f82870b28146b1fa39c8055ade83437d0c2922be31df8cbede8dcc2be"
-    },
-    "schemas/Invoice.schema.ts": {
-      "sha256": "e663bbeb8bc92f58be1788cd8a777d4db0d28846214f87b79aa1b678b69ca142"
-    },
-    "schemas/issue.schema.ts": {
-      "sha256": "6165998998db5bb3c40e7c988fc0ec5aecd5378c7ae473120b6fcfec54662457"
-    },
-    "schemas/makeDefault.schema.ts": {
-      "sha256": "eb41669a1cf963735434451fcdee112cd3a9702f4aae44e8aede9a8b161be309"
+      "sha256": "d6a4c74ee34c02ed5af5166190a8dab595f6d195bf1d13b6706262c0f4501585"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "30ed37d83954fb27f3c52d3ac5a38a64cabc957deab2e87cd5ee9950b48f31aa"
-    },
-    "schemas/markBlocked.schema.ts": {
-      "sha256": "07ec9026dfeaf648cd90242f10cc7bcadabe917f5ae412ebb05e19de95f94656"
-    },
-    "schemas/markFailed.schema.ts": {
-      "sha256": "bfcf6034f357d639abee330f1599b230d6965b81ae2a7b31642b11516b5ee148"
-    },
-    "schemas/markFulfilled.schema.ts": {
-      "sha256": "d49a3d7574683d92fd6b185442cacf097a96e1105e6b6ba685244a08f92e6cb8"
-    },
-    "schemas/markLoaded.schema.ts": {
-      "sha256": "1c2c53c21b919aa235ad0dd186e7040cf7c8f33a95910320912616743c03bdab"
-    },
-    "schemas/markMissing.schema.ts": {
-      "sha256": "d19c57c097abec8064853584df84cda6b2a7df7c69fb023e31a26e5be975828d"
-    },
-    "schemas/markNew.schema.ts": {
-      "sha256": "23e5feaaa92f533d9a5cc501388da8a0d44cc17776d154565a675e582d27d99b"
-    },
-    "schemas/markNoShow.schema.ts": {
-      "sha256": "b9204459865a42c304956c3e82239a1c80b6a9609b25323e8f0b16896dfdd17b"
-    },
-    "schemas/markOrdered.schema.ts": {
-      "sha256": "0efc46355b3421cdc791feb1473072fbcff74b08e3b6c6946f8535a56237587e"
-    },
-    "schemas/markOverdue.schema.ts": {
-      "sha256": "b8104765a04dda882d8dcad8635695ec0ddb78fa39c0c159fce68f2e6ecfdb28"
-    },
-    "schemas/markPacked.schema.ts": {
-      "sha256": "abad279c56768f993351ffd82989f1a6f6c349a6dd65ac35b42ec68a83fbc3e1"
-    },
-    "schemas/markPartiallyReceived.schema.ts": {
-      "sha256": "536e39e3b4ad5fd5c75bb9bfc8d0d8649d2b9817c8a870b448a4c3668fd766cf"
-    },
-    "schemas/markPublished.schema.ts": {
-      "sha256": "d64c74b916767338266f2ea03b3c15b83aa856b46aafd47094a41eca0898295c"
-    },
-    "schemas/markReceived.schema.ts": {
-      "sha256": "3b8764c492a5e46c5e38215487b723f28a9838df7b8ce7a95eb537a92045105a"
-    },
-    "schemas/markResolved.schema.ts": {
-      "sha256": "792003a1ac45e549230d5a8a0259bc7ae9dafa40b000de2d921a67fdf880a093"
-    },
-    "schemas/markViewed.schema.ts": {
-      "sha256": "900beda03b2f043889df54840f904d73f8d694e2e9933fa8a2f1d783a5e1d7fb"
-    },
-    "schemas/markVoided.schema.ts": {
-      "sha256": "e563ee6ad4e8d7758f0773331958b3094b364cc61c54d573b15757889709e487"
-    },
-    "schemas/Menu.schema.ts": {
-      "sha256": "3667e1e5d4eda344508493ada5bba66b2dbf2513f2db269c6e91262d7bc0dec9"
-    },
-    "schemas/onboard.schema.ts": {
-      "sha256": "5869e3924a2fb915dec8af76be8cabb64fd15cd012f44910a653d1a69627102a"
-    },
-    "schemas/open.schema.ts": {
-      "sha256": "ca0ae64cf5000f03fc2d3130b7ddcea353617ba814027a5d67074895325b5f16"
-    },
-    "schemas/Organization.schema.ts": {
-      "sha256": "eb9b78a5c3f1fd9aed8d125957382696385d578af617a00a4a96bf32800e4747"
-    },
-    "schemas/PackList.schema.ts": {
-      "sha256": "1fa295c7b290fd954a9de9bb419291e1a30e1532fb52b1b42d9ed7105689a948"
-    },
-    "schemas/PackListItem.schema.ts": {
-      "sha256": "bd76c3f717578f3d2a146148fb5dfed61d60138f6e4d37816cb351af4258da3e"
-    },
-    "schemas/pass.schema.ts": {
-      "sha256": "3f2a07b8ef4f1b7ee55f8c570011e663049598bd6f8232cbaaaeb0a02644f7bf"
-    },
-    "schemas/Payment.schema.ts": {
-      "sha256": "d960e025506ccb935e4b5ecfd59bd4de468475c658665cbdd77a9b9dd731c929"
-    },
-    "schemas/PaymentMethod.schema.ts": {
-      "sha256": "17920170b56ff8cac033f786f9097af45f20b0854925eeb773b57a072cc882ba"
-    },
-    "schemas/PayrollInput.schema.ts": {
-      "sha256": "b929e0384003b16183b6d9c9d0166120da90614ad9d073908f649dd0f5f99c5a"
-    },
-    "schemas/Person.schema.ts": {
-      "sha256": "33fbf1833183119b0591701d19768c6c5d6ce95f54cb9544d799ba11cfcce1a6"
-    },
-    "schemas/plan.schema.ts": {
-      "sha256": "34eb72031b80aed300caf25c9368bb5d81ff918da4aa77f6e0a36e6ac647fa38"
-    },
-    "schemas/planEngagement.schema.ts": {
-      "sha256": "29e4982903449a03f35554d1341363eeab1633961cac3daf03ce91f273631efc"
-    },
-    "schemas/prepare.schema.ts": {
-      "sha256": "1abbc6fd2af7792a23d5c899d42ef10cd1f95aeeb97444d94bd637f02c88d413"
-    },
-    "schemas/PrepTask.schema.ts": {
-      "sha256": "22de713e8573cd9f58d0ae275be1b870e0fa3fa1b22dfd98ffa0f94e6726f43f"
-    },
-    "schemas/ProductionBatch.schema.ts": {
-      "sha256": "82581fc0c3c5073fa2337793c80d28ecb2b7e6159def830e9f0751125ac0262b"
-    },
-    "schemas/Proposal.schema.ts": {
-      "sha256": "7da7ad7cf17d7e224748a6809cbf35707e86661811904aad0617ac6bf18a5053"
-    },
-    "schemas/publishVersion.schema.ts": {
-      "sha256": "0385c0b204a80492b2c0b5677a46c8a71f4b3af0aa20607f863952f581c10768"
-    },
-    "schemas/PurchaseNeed.schema.ts": {
-      "sha256": "bdf4e47de9440f4bbcdde46abaf3e8e80afe827c8b1ff857997ee6e98254463f"
-    },
-    "schemas/Qualification.schema.ts": {
-      "sha256": "f50ef215e84c62ef985265f7820855de3f1e8130c4d03283d8871caed7aeeb8b"
-    },
-    "schemas/QualityCheck.schema.ts": {
-      "sha256": "ad2130d379d01955f3b781c8842f0ee40bf5b7fe6d3567212d43434c3aaaa866"
-    },
-    "schemas/reactivate.schema.ts": {
-      "sha256": "9b4baf4f61ae8e37bde89ccb12a9f3e03bbe13c5b382c14c021fc4932806c036"
-    },
-    "schemas/recalculate.schema.ts": {
-      "sha256": "87e9b94bbe6d12a9d8beddb74497c65bfb6d7b80a3f56d658a3bfeca521cce79"
-    },
-    "schemas/receiveStock.schema.ts": {
-      "sha256": "afbbb34c5ec7e4836d304ac61e0a8111fceedcfdab0fdd1367fceab2c3511b91"
-    },
-    "schemas/Recipe.schema.ts": {
-      "sha256": "b9cd73815f5dfbb48c30e6b498ff4d51945ea958d9447f17d2654d2c0c350601"
-    },
-    "schemas/RecipeImport.schema.ts": {
-      "sha256": "e887d4e1da909130d61acad2c3aac5ad42f95f0a20605b7810886d23a0b497e7"
-    },
-    "schemas/RecipeImportLine.schema.ts": {
-      "sha256": "664c3019294acd696dc64676bc3f4f51dcaf955470083830b5aee615c3c4cfb3"
-    },
-    "schemas/RecipeIngredient.schema.ts": {
-      "sha256": "36b0e9e8a4bbf6198bc3a15081d922ac346df855e1c959e1b0addd0da790608b"
-    },
-    "schemas/record.schema.ts": {
-      "sha256": "37f35ea21f0b3c86052853caf8c8694efa146e5644d23194c62331aecdb3e2bb"
-    },
-    "schemas/recordParse.schema.ts": {
-      "sha256": "76159d7e20100eb6b12182f9f319d1ddcf6cc35f463f335792dcc9e1aae56a30"
-    },
-    "schemas/recordReceipt.schema.ts": {
-      "sha256": "5e6e430d08de1e611b515f323fa248a33b7a03d89eaee65a227fc0c7317330ab"
-    },
-    "schemas/recordRecipe.schema.ts": {
-      "sha256": "8002e55500aca7a23ce94ec519d09953c3208b625a6646eec63dbf7fef58734b"
-    },
-    "schemas/recordRefund.schema.ts": {
-      "sha256": "fab995890f683d789038b9d6384ed110fc778d4e5350862c7126570448f96794"
-    },
-    "schemas/recordResolutionProgress.schema.ts": {
-      "sha256": "e376a938a8795807269f72cd76e0016e7ac92bf55ce676a5cedb75790d652efa"
-    },
-    "schemas/recount.schema.ts": {
-      "sha256": "d7d597014a850121868c5aaa76f6d9d6eb78111930ab3501b1bf581f23414219"
-    },
-    "schemas/refund.schema.ts": {
-      "sha256": "e96428ae7c6f7f497521f290fca505fdf232c4d5747f146bf4a72791e08d1e0e"
-    },
-    "schemas/register.schema.ts": {
-      "sha256": "e02bd474849ca0e7469e908f0d39c15ef157b70f8e49135122e6912d3f0a1c36"
-    },
-    "schemas/reinspect.schema.ts": {
-      "sha256": "6096e0def91d8a8a05a1de8dd980cf9218b296207bccb788f861ac1424ef89c6"
-    },
-    "schemas/reinstate.schema.ts": {
-      "sha256": "fcacff485fc6ab3c01d7b82199b3e205b58962e523dfa9b37a3a83eb038ef648"
-    },
-    "schemas/release.schema.ts": {
-      "sha256": "ed2f7dfc0bf8b24472baae5873992a9402a4bd15fc055bbba13f7e0820f4a394"
-    },
-    "schemas/remove.schema.ts": {
-      "sha256": "bf5fe8534fd825385005c5530127140dc6b9db499553e33dc563cd00ffea7b4e"
-    },
-    "schemas/rename.schema.ts": {
-      "sha256": "acf9e6464886f28bc973db8f3907ba8e2c0354c3b39a7409bffb4b491c1938b7"
-    },
-    "schemas/report.schema.ts": {
-      "sha256": "b3ba0bb064a3c4d6ba046cb779f931faa5cd1bb3787e5ea816f04add11fe7fc2"
-    },
-    "schemas/reschedule.schema.ts": {
-      "sha256": "14faf0035ce6c23b3e0484c062c19f31687af097edc8e5ce87e9f752c0286423"
-    },
-    "schemas/reserve.schema.ts": {
-      "sha256": "b17906fe77afc8e08a85c8e437753fa812ff3f50445f56665329559ae90c3a17"
-    },
-    "schemas/resetResolution.schema.ts": {
-      "sha256": "a35c6d37e0a12203eedaeab5f492ee6aa210d0521b4f437bde698b7cec578bde"
-    },
-    "schemas/restore.schema.ts": {
-      "sha256": "b9c2cc8059310c6fca0a54f072b8402c1af4073a52ccd97527363d6fbddc8a35"
-    },
-    "schemas/resumeReview.schema.ts": {
-      "sha256": "7bff9da825eebe3374e39c686c3976d51d09066738bd03eee92f03dcf2681b46"
-    },
-    "schemas/retire.schema.ts": {
-      "sha256": "237e87910427fdb22889025bafe23385b619492359da6253ca955c23d1cceaf0"
-    },
-    "schemas/retract.schema.ts": {
-      "sha256": "53a3240139b414e62d03cb439cee3cf5504f00308c48acf9fb4cf8439aa41744"
-    },
-    "schemas/returnToPlanning.schema.ts": {
-      "sha256": "1de3de9eef1327ef6573cbe4bd6493914d08e62b0861c2514548f6a8f0186e3e"
-    },
-    "schemas/reviseDetails.schema.ts": {
-      "sha256": "5b689169b66dc06887dca312820cbfea306bae61eaa3a908543593341fabe53a"
-    },
-    "schemas/reviseDraft.schema.ts": {
-      "sha256": "7cce4807d53f94c58976b8e4a9468ab7b576722aaac24cb222fa92937a73dc84"
-    },
-    "schemas/revoke.schema.ts": {
-      "sha256": "21685204a3bbb4f2810bf3cd29b61ac764aa3ba79350acce05b9dc06d2957ac8"
-    },
-    "schemas/rsvpConfirm.schema.ts": {
-      "sha256": "589af10f4754856a135816cd74b6de593c7f899827de99a7a4e9d1658741ceda"
-    },
-    "schemas/rsvpDecline.schema.ts": {
-      "sha256": "1db00312337dea6ee1d4bfb4f500ada18a4876b2571f2309913f793c731442c9"
-    },
-    "schemas/SavedReportDefinition.schema.ts": {
-      "sha256": "651e3ceefb3ff26934a16b85eeb59278939303568537db08a126bfeb52803809"
-    },
-    "schemas/schedule.schema.ts": {
-      "sha256": "179558cc284677249c11688ccf2f2fa62afd833889c27dd25e99705db4de1813"
-    },
-    "schemas/select.schema.ts": {
-      "sha256": "3207cf202fac63c07e0d4345ee5cb5ac26566dcdb5c93397ad82528594361059"
-    },
-    "schemas/send.schema.ts": {
-      "sha256": "0fdb6ef8c99408dce536afca5a2ac47459f9fbe13a7e1ffdb91491cb7d2d3b4d"
-    },
-    "schemas/setPrimary.schema.ts": {
-      "sha256": "e6c8dd8d71221b9fb33d5f2b4f84fba83694a5f08b70ff7ae198bad26f84998c"
-    },
-    "schemas/settle.schema.ts": {
-      "sha256": "a8aa14ebfed6b97bf27b67e9fff797228e11aca3769436b0b0a3b6bc78ace974"
-    },
-    "schemas/Shift.schema.ts": {
-      "sha256": "2ca027da48e5cfbeaa5f575b90a2384a5bca85edfc901fb95cdee87094123602"
-    },
-    "schemas/sign.schema.ts": {
-      "sha256": "ab8ecf31004f26a372524dbb335775dc4456f6eac0e61df0e8819b898ea4f664"
-    },
-    "schemas/SoftDeletable.schema.ts": {
-      "sha256": "d6d6baa8ded7a18e8ba2702b21c28fce5486e6ba913ddac3930c0c963b2df04d"
-    },
-    "schemas/stage.schema.ts": {
-      "sha256": "15795dfc472b2ec0a4404289b514275961e7d122a0d2a9c976e769f67cf1a193"
-    },
-    "schemas/start.schema.ts": {
-      "sha256": "e09e036fdca3377fad264ebc40879fa2db38828b56c4058f2837435c339ee9ba"
-    },
-    "schemas/startPacking.schema.ts": {
-      "sha256": "4e9f4cdd5430e03cc88fcb9b51521592c20db114bee83eef365106238a251075"
-    },
-    "schemas/startTransit.schema.ts": {
-      "sha256": "af34d4ccc036ae6211dda37a0abcb8ca798190f73b1d015f1d6e27d0305adb1d"
-    },
-    "schemas/StorageLocation.schema.ts": {
-      "sha256": "95ccd35d124461e5b528be4c9aecd89e9a8e81728cab9dd94e5a0f8180dbfc03"
-    },
-    "schemas/submit.schema.ts": {
-      "sha256": "0d65ea32434602f6073449b7af6e75122442e294b8f1422139efa1c0be9a9999"
-    },
-    "schemas/submitForApproval.schema.ts": {
-      "sha256": "43e708b74dd9accfec3bf764d3686b3b229c7fcdc58e4ab42f224f5208e36cee"
-    },
-    "schemas/suggestExactMatch.schema.ts": {
-      "sha256": "27ebe0c495d4dc06e8d21514fb30c68b36c02b116176970c297384d6d63230e0"
-    },
-    "schemas/suggestPossibleMatches.schema.ts": {
-      "sha256": "873b9c0c34471c5bbe9072f550579628159c76001b81211958bf69984fcf150a"
-    },
-    "schemas/supersede.schema.ts": {
-      "sha256": "848a5d7580dcabdc2477e1490b97bb60ff8985053afcb976a11d9379a8de7809"
-    },
-    "schemas/suspend.schema.ts": {
-      "sha256": "e75dd4ae31353c33567bbb97ec86ce35c00bbe04a19b8607027e595954122e6f"
-    },
-    "schemas/TenantScoped.schema.ts": {
-      "sha256": "284c7ff1ce921222003c12624e9ccf6c36cd6b5e7163624eca4ded686cd5c490"
-    },
-    "schemas/terminate.schema.ts": {
-      "sha256": "4f0b24df087736fa510b6a6e0d8da020b767f23ace3f0339109a2aa39cb28f6c"
-    },
-    "schemas/TimeRecord.schema.ts": {
-      "sha256": "17fce04f122908be280b1f78e6880d4a051a65229ba1a5cd2dd79a7aa11cf07b"
-    },
-    "schemas/transferIn.schema.ts": {
-      "sha256": "aec6cee0ecddeeb3506fd8f54f7508f26e435382e38547fb039bf4824aa1c44e"
-    },
-    "schemas/transferOut.schema.ts": {
-      "sha256": "1397aba87eef5b56ada1725a39ef6bb067568ba40cb69b2a2a212351bf2cd183"
-    },
-    "schemas/unassign.schema.ts": {
-      "sha256": "1923ef6ca14108c054eabb36cdb9b6e8c318a15308f32eab560c03eaedea23f3"
-    },
-    "schemas/unblock.schema.ts": {
-      "sha256": "bd72f25972f943b4173137b66ffa4ad0c6d5d9386c77226a9eca105b6e8ed6c6"
-    },
-    "schemas/unpublish.schema.ts": {
-      "sha256": "31e415c8400dcda19070838cad94418a080bba7bbbf4bea81519c129d8b5299e"
-    },
-    "schemas/updateCosting.schema.ts": {
-      "sha256": "a9337207ec4f9c35d26d41548dae6762084f2e2fb4bf46b81043a148e424fc85"
-    },
-    "schemas/updateDefinition.schema.ts": {
-      "sha256": "b0b8deb0d10281430689d687f2e38c7246a841995f2a1e66143bbeeca96afaae"
-    },
-    "schemas/updateDetails.schema.ts": {
-      "sha256": "7e7a79e3219da75bd7ce2728e3f477834990e4f0d60402154f586e24aae239a6"
-    },
-    "schemas/updateInstructions.schema.ts": {
-      "sha256": "726cac4c297e19b8eeb108d8f6ba0b38e5fd50298b368c2d76cc2a900c7dab59"
-    },
-    "schemas/updateLevels.schema.ts": {
-      "sha256": "ef889961a1ce8e8b67ce226adad05fe8011e003f0abf668caa2721a439456bec"
-    },
-    "schemas/updatePortioning.schema.ts": {
-      "sha256": "a3cb1a843a9071dcda972084741078614ada5b2e185daf534d102122d4b6800a"
-    },
-    "schemas/updatePricing.schema.ts": {
-      "sha256": "1964b3485d0d75c3b3aa5410c0b017664dcf24f19177b6c9b7053247a1ee3469"
-    },
-    "schemas/updateTotals.schema.ts": {
-      "sha256": "4e8d8885780b18760dcf39d1d794ad445032426ec3f4f96694ca607af3a67fff"
-    },
-    "schemas/upload.schema.ts": {
-      "sha256": "6d87fd91bbbcf8bea29a933daf813acd89003a75d1f8066609df711007bcf590"
-    },
-    "schemas/Vendor.schema.ts": {
-      "sha256": "35c9efaaa6a443168ff9138bd53418c70d1bea2a23e814a391fe21c46c12a326"
-    },
-    "schemas/VendorOrder.schema.ts": {
-      "sha256": "8c8bd33d53d23507878866ffa13aac17a36b78a58ce86cf54135ce92fd37bb25"
-    },
-    "schemas/VendorOrderLine.schema.ts": {
-      "sha256": "c56120bf82fbd0acbbee466d150e2e7c97286197316ffd7955218f50a0f12562"
-    },
-    "schemas/Venue.schema.ts": {
-      "sha256": "edebeba0da0ba2e31598421a7a67cf572dc9e72318d9473347479c1a0c6b8bc6"
-    },
-    "schemas/voidRecord.schema.ts": {
-      "sha256": "283a586a57b347d3e8262dd3cee9a12a7055b3913e9733817bf4e2050e8cebe9"
-    },
-    "schemas/WasteRecord.schema.ts": {
-      "sha256": "da074426462e6bb489c91d2f19cd7a5659d9772186ec054d709c1f14d10225e2"
-    },
-    "schemas/withdraw.schema.ts": {
-      "sha256": "22a11627712fc643d0d657518a06d2e960c42b59881930f36a84bbb74c8d620f"
-    },
-    "schemas/writeOff.schema.ts": {
-      "sha256": "5ff1a350c77ed83269d445269eaac225f380b7ade5c0f936b392d83b59c9a481"
+      "sha256": "6976dea37908e07b67a24b47e76320532b7d26bf83489fbd88979a0db05ba7e9"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "72f0f5723f3e7e0dd3b2a52429ce5eaad2cefc6643b81088353562484228178d"
+      "sha256": "850c913debb44970804b8de42e010b4ff0e59b3cf13f38eca75efc5a6b0cd2f3"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "1e80736b386051258670489e6d6c8d61120bb55419770ad57e6bac583c98647b"
+      "sha256": "6a654e44cee14a462b88d8db1d5cb16866ba9b6193af2ce223393df109b5009e"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "5810a14887e117b8cd5fac0e78454615d07f30a1a09422fa7fc47ca330c3712c"
+      "sha256": "8b798f157aaf0e7238d484e20a37504f8cfc7bf9d086de552efec361cd990ecc"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "e89d8c20cf64e21369f5a43ab30491d0ff2c2892207838902f8f2c9c0999bf81"
+      "sha256": "0ea149097f12d94dcac3c7edc698d32bebce4ca61c8689d65203afb1cef1f02f"
     },
     "tests/manifest-convex.contract.test.ts": {
-      "sha256": "07a0e1a88305c8a7876d553702fcdb061e384a52bcf43dd3005752f103258ebc"
+      "sha256": "e9ff5e245708b6ba115a23742cbdfd03a0a636fbb9c6e40ab602c91d09037fed"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "3f376143b305f726107d31a62f03f6f5325bc7c5aae311daa24530202cb77e4a"
+      "sha256": "d209993262372f7227ef7589b3793ead8c57e738e95ec830e0b8440f1f04bacc"
     }
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "^3.6.21",
-      "convex": "^1.0.0"
+      "@angriff36/manifest": "^3.6.24",
+      "convex": "^1.0.0",
+      "zod": "^3.23.0"
     },
     "devDependencies": {
       "typescript": "^5.9.3",
@@ -1428,7 +832,9 @@
     "paths": [
       "manifest.config.yaml",
       "src/culinary/dish.manifest",
+      "src/culinary/event-dish.manifest",
       "src/culinary/ingredient.manifest",
+      "src/culinary/menu-dish.manifest",
       "src/culinary/menu.manifest",
       "src/culinary/recipe-import.manifest",
       "src/culinary/recipe.manifest",

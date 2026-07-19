@@ -12,6 +12,10 @@ import { recipePath } from "../kitchenRoutes";
 import { RecipeImportCoordinator } from "./RecipeImportCoordinator";
 import { RecipeImportFinalizer } from "./RecipeImportFinalizer";
 import {
+  ImportSourceReadinessChecker,
+  type ImportSourceMode,
+} from "./ImportSourceReadiness";
+import {
   RecipeImportReviewPane,
   RecipeImportSourcePane,
 } from "./RecipeImportPanes";
@@ -22,9 +26,9 @@ import {
 } from "./RecipeImportTypes";
 
 const coordinator = new RecipeImportCoordinator();
+const sourceReadiness = new ImportSourceReadinessChecker();
 
 type MobilePane = "source" | "review";
-type SourceMode = "paste" | "files";
 
 export function RecipeImportPage() {
   const navigate = useNavigate();
@@ -34,15 +38,18 @@ export function RecipeImportPage() {
   const createRecipe = useCreateRecipe();
   const createRecipeIngredient = useCreateRecipeIngredient();
   const [mobilePane, setMobilePane] = useState<MobilePane>("source");
-  const [sourceMode, setSourceMode] = useState<SourceMode>("paste");
+  const [sourceMode, setSourceMode] = useState<ImportSourceMode>("paste");
   const [source, setSource] = useState("");
   const [sheetCsv, setSheetCsv] = useState("");
   const [linesCsv, setLinesCsv] = useState("");
   const [sheetFilename, setSheetFilename] = useState<string>();
   const [linesFilename, setLinesFilename] = useState<string>();
+  const [textFilename, setTextFilename] = useState<string>();
+  const [fileLoading, setFileLoading] = useState(false);
   const [review, setReview] = useState<RecipeImportReviewState | null>(null);
   const [parsing, setParsing] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [sourceHint, setSourceHint] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [statusMessage, setStatusMessage] = useState("");
 
@@ -60,6 +67,35 @@ export function RecipeImportPage() {
   );
 
   const unresolvedCount = review ? countUnresolvedLines(review.lines) : 0;
+  const readiness = useMemo(
+    () =>
+      sourceReadiness.evaluate({
+        mode: sourceMode,
+        source,
+        sheetCsv,
+        linesCsv,
+        fileLoading,
+        textFilename,
+      }),
+    [sourceMode, source, sheetCsv, linesCsv, fileLoading, textFilename],
+  );
+  const fileStatus = useMemo(
+    () =>
+      sourceReadiness.fileStatusLabel({
+        mode: sourceMode,
+        source,
+        sheetCsv,
+        linesCsv,
+        fileLoading,
+        textFilename,
+      }),
+    [sourceMode, source, sheetCsv, linesCsv, fileLoading, textFilename],
+  );
+  const displayHint =
+    sourceHint ??
+    (!readiness.ready && (sheetCsv || linesCsv || source.trim())
+      ? readiness.message
+      : null);
 
   const announce = (message: string) => {
     setStatusMessage(message);
@@ -68,10 +104,16 @@ export function RecipeImportPage() {
   const parseSource = () => {
     if (parsing || busy) return;
     setFailure(null);
+    if (!readiness.ready) {
+      setSourceHint(readiness.message ?? "Add source input before parsing.");
+      announce(readiness.message ?? "Add source input before parsing.");
+      return;
+    }
+    setSourceHint(null);
     setParsing(true);
     try {
       let next: RecipeImportReviewState;
-      if (sourceMode === "files" && sheetCsv && linesCsv) {
+      if (readiness.kind === "csv_bundle") {
         next = coordinator.parseCsvBundle(
           sheetCsv,
           linesCsv,
@@ -79,14 +121,14 @@ export function RecipeImportPage() {
           sheetFilename,
           linesFilename,
         );
-      } else if (source.trim()) {
-        next = coordinator.parseText(
+      } else if (readiness.kind === "text_file") {
+        next = coordinator.parseTextFile(
           source,
+          textFilename ?? "recipe.txt",
           catalog,
-          sourceMode === "files" ? "text_file" : "pasted_text",
         );
       } else {
-        throw new Error("Paste recipe text or choose files before parsing.");
+        next = coordinator.parseText(source, catalog, "pasted_text");
       }
       setReview(next);
       setMobilePane("review");
@@ -98,6 +140,22 @@ export function RecipeImportPage() {
       announce("Parsing failed.");
     } finally {
       setParsing(false);
+    }
+  };
+
+  const loadFile = async (
+    file: File,
+    apply: (text: string, filename: string) => void,
+  ) => {
+    setFailure(null);
+    setSourceHint(null);
+    setFileLoading(true);
+    try {
+      apply(await file.text(), file.name);
+    } catch {
+      setSourceHint(`Could not read ${file.name}. Try another file.`);
+    } finally {
+      setFileLoading(false);
     }
   };
 
@@ -202,17 +260,36 @@ export function RecipeImportPage() {
             linesCsv={linesCsv}
             sheetFilename={sheetFilename}
             linesFilename={linesFilename}
+            textFilename={textFilename}
             parsing={parsing}
-            onModeChange={setSourceMode}
-            onSourceChange={setSource}
+            fileLoading={fileLoading}
+            canParse={readiness.ready}
+            sourceHint={displayHint}
+            fileStatus={fileStatus}
+            onModeChange={(mode) => {
+              setSourceMode(mode);
+              setSourceHint(null);
+            }}
+            onSourceChange={(value) => {
+              setSource(value);
+              setSourceHint(null);
+            }}
             onSheetChange={(value, filename) => {
               setSheetCsv(value);
               setSheetFilename(filename);
+              setSourceHint(null);
             }}
             onLinesChange={(value, filename) => {
               setLinesCsv(value);
               setLinesFilename(filename);
+              setSourceHint(null);
             }}
+            onTextFileChange={(value, filename) => {
+              setSource(value);
+              setTextFilename(filename);
+              setSourceHint(null);
+            }}
+            onLoadFile={(file, apply) => void loadFile(file, apply)}
             onParse={parseSource}
           />
         </div>

@@ -16,6 +16,9 @@ const FRACTIONS: Record<string, number> = {
   "⅞": 0.875,
 };
 
+const QUANTITY_TOKEN =
+  "(?:(?:\\d+\\s+)?\\d+\\/\\d+|\\d+(?:\\.\\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])";
+
 /**
  * Deterministic plain-text recipe parser for the culinary import workbench.
  * Does not invent Manifest entities — only structures text for createVia review.
@@ -93,7 +96,11 @@ export class RecipeTextParser {
         continue;
       }
       if (this.isSectionHeader(line) || this.looksLikeIngredient(line)) break;
-      if (/^(yield|serves|servings|prep|preparation|cook)\b/i.test(line)) break;
+      if (
+        /^(yields?|makes|serves|servings|prep|preparation|cook)\b/i.test(line)
+      ) {
+        break;
+      }
       body.push(line);
     }
     const description = body.join(" ").trim();
@@ -105,10 +112,17 @@ export class RecipeTextParser {
     warnings: string[],
   ): { yieldQuantity: number; yieldUnit: UnitOfMeasure } {
     const poundYield =
-      text.match(/\b(?:yield|yields)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*#/i) ??
-      text.match(/\b(\d+(?:\.\d+)?)\s*#\s*(?:raw\s+weight)?/i);
+      text.match(
+        new RegExp(
+          `\\b(?:yields?|makes)\\s*[:\\-]?\\s*(${QUANTITY_TOKEN})\\s*#`,
+          "iu",
+        ),
+      ) ??
+      text.match(
+        new RegExp(`\\b(${QUANTITY_TOKEN})\\s*#\\s*(?:raw\\s+weight)?`, "iu"),
+      );
     if (poundYield) {
-      const quantity = Number(poundYield[1]);
+      const quantity = this.parseQuantity(poundYield[1]);
       return {
         yieldQuantity: quantity > 0 ? quantity : 1,
         yieldUnit: "pound",
@@ -117,13 +131,22 @@ export class RecipeTextParser {
 
     const match =
       text.match(
-        /\b(?:yield|serves|servings)\s*[:\-]?\s*(\d+(?:\.\d+)?)\s*([a-zA-Z#]+)?/i,
-      ) ?? text.match(/\b(\d+(?:\.\d+)?)\s*(servings?|portions?|quarts?)\b/i);
+        new RegExp(
+          `\\b(?:yields?|makes|serves|servings)\\s*[:\\-]?\\s*(${QUANTITY_TOKEN})\\s*([A-Za-z#]+)?`,
+          "iu",
+        ),
+      ) ??
+      text.match(
+        new RegExp(
+          `\\b(${QUANTITY_TOKEN})\\s*(servings?|portions?|quarts?|qts?|gallons?|gals?|cups?|pints?|pts?|pounds?|lbs?)\\b`,
+          "iu",
+        ),
+      );
     if (!match) {
       warnings.push("Yield not found; defaulting to 1 portion.");
       return { yieldQuantity: 1, yieldUnit: "portion" };
     }
-    const quantity = Number(match[1]);
+    const quantity = this.parseQuantity(match[1]);
     const unit = this.mapUnitAlias(match[2] ?? "portion");
     return {
       yieldQuantity: quantity > 0 ? quantity : 1,
@@ -145,10 +168,9 @@ export class RecipeTextParser {
         if (block.length) break;
         continue;
       }
+      if (this.isInstructionSectionHeader(line)) break;
+      if (this.isMethodStepLine(line)) break;
       if (this.isSectionHeader(line) && !this.looksLikeIngredient(line)) break;
-      if (/^(instructions?|method|directions?|steps?)\s*:?\s*$/i.test(line)) {
-        break;
-      }
       block.push(line.replace(/^[-*•]\s*/, "").trim());
     }
     return block.filter(Boolean);
@@ -156,23 +178,44 @@ export class RecipeTextParser {
 
   private extractInstructions(lines: string[]): string | undefined {
     const start = lines.findIndex((line) =>
-      /^(instructions?|method|directions?|steps?)\s*:?\s*$/i.test(line),
+      this.isInstructionSectionHeader(line),
     );
-    if (start < 0) return undefined;
-    const body = lines
-      .slice(start + 1)
+    if (start >= 0) {
+      const body = lines
+        .slice(start + 1)
+        .filter((line) => line.length > 0)
+        .join("\n")
+        .trim();
+      return body || undefined;
+    }
+
+    // Recipes that omit METHOD but append numbered steps after ingredients.
+    const ingredientStart = lines.findIndex((line) =>
+      /^(ingredients?|components?)\s*:?\s*$/i.test(line),
+    );
+    if (ingredientStart < 0) return undefined;
+    let stepStart = -1;
+    for (let i = ingredientStart + 1; i < lines.length; i += 1) {
+      if (this.isMethodStepLine(lines[i])) {
+        stepStart = i;
+        break;
+      }
+    }
+    if (stepStart < 0) return undefined;
+    return lines
+      .slice(stepStart)
       .filter((line) => line.length > 0)
       .join("\n")
       .trim();
-    return body || undefined;
   }
 
   parseIngredientLine(raw: string): ParsedIngredientLine | null {
     const cleaned = raw.replace(/^[-*•]\s*/, "").trim();
     if (!cleaned || this.isSectionHeader(cleaned)) return null;
+    if (this.isMethodStepLine(cleaned)) return null;
 
     const poundMatch = cleaned.match(
-      /^((?:\d+\s+)?\d+\/\d+|\d+(?:\.\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])\s*#\s*(.+)$/u,
+      new RegExp(`^(${QUANTITY_TOKEN})\\s*#\\s*(.+)$`, "u"),
     );
     if (poundMatch) {
       const quantity = this.parseQuantity(poundMatch[1]);
@@ -189,7 +232,7 @@ export class RecipeTextParser {
     }
 
     const quantityMatch = cleaned.match(
-      /^((?:\d+\s+)?\d+\/\d+|\d+(?:\.\d+)?|[½¼¾⅓⅔⅛⅜⅝⅞])\s+(.+)$/u,
+      new RegExp(`^(${QUANTITY_TOKEN})\\s+(.+)$`, "u"),
     );
     if (!quantityMatch) {
       return {
@@ -235,6 +278,17 @@ export class RecipeTextParser {
     };
   }
 
+  /**
+   * Numbered/lettered procedure lines ("1. Blend…", "2) Heat…", "a. Pulse…").
+   * Culinary ingredient lines use "1 cup …" / "1/4 C …", never "1. …".
+   */
+  isMethodStepLine(line: string): boolean {
+    const cleaned = line.replace(/^[-*•]\s*/, "").trim();
+    if (/^\d+[.)]\s+\S/.test(cleaned)) return true;
+    if (/^[a-z][.)]\s+\S/i.test(cleaned)) return true;
+    return false;
+  }
+
   private splitNameAndNotes(rest: string): {
     name: string;
     prepNotes?: string;
@@ -264,11 +318,20 @@ export class RecipeTextParser {
   }
 
   private looksLikeIngredient(line: string): boolean {
-    return /^(?:\d+|½|¼|¾|⅓|⅔|#)/u.test(line.replace(/^[-*•]\s*/, ""));
+    const cleaned = line.replace(/^[-*•]\s*/, "").trim();
+    if (this.isMethodStepLine(cleaned)) return false;
+    if (this.isInstructionSectionHeader(cleaned)) return false;
+    return new RegExp(`^(?:${QUANTITY_TOKEN}|#)`, "u").test(cleaned);
+  }
+
+  private isInstructionSectionHeader(line: string): boolean {
+    return /^(instructions?|method|directions?|steps?|procedure)\s*:?\s*$/i.test(
+      line,
+    );
   }
 
   private isSectionHeader(line: string): boolean {
-    return /^(ingredients?|components?|instructions?|method|directions?|steps?|yield|serves|servings|preparation|prep(?:\s*time)?|cook(?:\s*time)?)\b/i.test(
+    return /^(ingredients?|components?|instructions?|method|directions?|steps?|procedure|yields?|makes|serves|servings|preparation|prep(?:\s*time)?|cook(?:\s*time)?)\b/i.test(
       line,
     );
   }

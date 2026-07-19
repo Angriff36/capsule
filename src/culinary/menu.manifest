@@ -1,5 +1,6 @@
-// Capsule culinary menu and event dish selection.
-// Compile entry: reaches Dish (dish.manifest) and culinary building blocks.
+// Capsule culinary Menu — named curated offering with pricing lifecycle.
+// MenuDish lines: menu-dish.manifest. Event selection: event-dish.manifest.
+// Compile entry reaches Dish (dish.manifest) and culinary building blocks.
 
 use "./dish.manifest"
 
@@ -9,8 +10,7 @@ enum MenuStatus {
   archived
 }
 
-// Named curated offering. MenuDish (M:N Menu↔Dish lines) is deferred — the
-// 3-entity cap keeps EventDish for demand-driving event selection (D018).
+// Named curated offering. Dish membership is MenuDish (see menu-dish.manifest).
 entity Menu mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -182,131 +182,6 @@ entity Menu mixin TenantScoped, SoftDeletable {
   store Menu in durable
 }
 
-// Event-selected dish with servings — drives later demand recalculation.
-entity EventDish mixin TenantScoped, SoftDeletable {
-  key [tenantId, id]
-  timestamps
-  versionProperty version: number
-
-  property required eventId: uuid
-  property required dishId: uuid
-  property required quantityServings: int = 1
-  property course: string?
-  property serviceStyle: string?
-  property specialInstructions: string?
-  property selectedAt: datetime?
-  property removedAt: datetime?
-
-  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
-  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
-
-  constraint eventDishServingsPositive: self.selectedAt == null or self.quantityServings > 0 "Event dish servings must be positive"
-
-  default policy eventDishRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read event dish selections"
-  default policy eventDishWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may write event dish selections through commands"
-  default policy eventDishExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may execute event dish selection commands"
-
-  command select(
-    eventId: uuid,
-    dishId: uuid,
-    quantityServings: number,
-    optional course: string,
-    optional serviceStyle: string,
-    optional specialInstructions: string
-  ) {
-    guard self.selectedAt == null
-    guard self.deletedAt == null
-    // Stage check uses belongsTo traversal (semantics.md relationship
-    // resolution in guard expressions). Seed eventId before select so the
-    // parent Event resolves; param must match the seeded FK.
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved")
-    constraint selectEventMatch: eventId == self.eventId "Select eventId must match the seeded event reference"
-    constraint selectServingsPositive: quantityServings > 0 "Event dish servings must be positive"
-    mutate eventId = eventId
-    mutate dishId = dishId
-    mutate quantityServings = quantityServings
-    mutate course = course
-    mutate serviceStyle = serviceStyle
-    mutate specialInstructions = specialInstructions
-    mutate selectedAt = now()
-    emit EventDishSelected {
-      eventDishId: self.id
-      tenantId: self.tenantId
-      eventId: eventId
-      dishId: dishId
-      quantityServings: quantityServings
-      course: course
-      serviceStyle: serviceStyle
-    }
-  }
-
-  command adjustServings(quantityServings: number) {
-    guard self.selectedAt != null
-    guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved")
-    constraint adjustServingsPositive: quantityServings > 0 "Event dish servings must be positive"
-    compute previousQuantityServings = self.quantityServings
-    mutate quantityServings = quantityServings
-    emit EventDishServingsAdjusted {
-      eventDishId: self.id
-      tenantId: self.tenantId
-      eventId: self.eventId
-      dishId: self.dishId
-      previousQuantityServings: previousQuantityServings
-      quantityServings: quantityServings
-    }
-  }
-
-  command changeCourse(optional course: string, optional serviceStyle: string) {
-    guard self.selectedAt != null
-    guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved")
-    mutate course = course
-    mutate serviceStyle = serviceStyle
-    emit EventDishCourseChanged {
-      eventDishId: self.id
-      tenantId: self.tenantId
-      eventId: self.eventId
-      dishId: self.dishId
-      course: course
-      serviceStyle: serviceStyle
-    }
-  }
-
-  command updateInstructions(optional specialInstructions: string) {
-    guard self.selectedAt != null
-    guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved")
-    mutate specialInstructions = specialInstructions
-    emit EventDishInstructionsUpdated {
-      eventDishId: self.id
-      tenantId: self.tenantId
-      eventId: self.eventId
-      dishId: self.dishId
-    }
-  }
-
-  command remove(reason: string) {
-    guard self.selectedAt != null
-    guard self.deletedAt == null
-    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved")
-    constraint removeEventDishReason: length(trim(reason)) > 0 "Removal reason is required"
-    compute previousQuantityServings = self.quantityServings
-    mutate deletedAt = now()
-    mutate removedAt = now()
-    emit EventDishRemoved {
-      eventDishId: self.id
-      tenantId: self.tenantId
-      eventId: self.eventId
-      dishId: self.dishId
-      previousQuantityServings: previousQuantityServings
-      reason: reason
-    }
-  }
-
-  store EventDish in durable
-}
-
 event MenuDrafted: "menu.drafted" {
   menuId: string
   tenantId: string
@@ -350,48 +225,4 @@ event MenuArchived: "menu.archived" {
 event MenuRestored: "menu.restored" {
   menuId: string
   tenantId: string
-}
-
-event EventDishSelected: "event_dish.selected" {
-  eventDishId: string
-  tenantId: string
-  eventId: string
-  dishId: string
-  quantityServings: number
-  course: string?
-  serviceStyle: string?
-}
-
-event EventDishServingsAdjusted: "event_dish.servings_adjusted" {
-  eventDishId: string
-  tenantId: string
-  eventId: string
-  dishId: string
-  previousQuantityServings: number
-  quantityServings: number
-}
-
-event EventDishCourseChanged: "event_dish.course_changed" {
-  eventDishId: string
-  tenantId: string
-  eventId: string
-  dishId: string
-  course: string?
-  serviceStyle: string?
-}
-
-event EventDishInstructionsUpdated: "event_dish.instructions_updated" {
-  eventDishId: string
-  tenantId: string
-  eventId: string
-  dishId: string
-}
-
-event EventDishRemoved: "event_dish.removed" {
-  eventDishId: string
-  tenantId: string
-  eventId: string
-  dishId: string
-  previousQuantityServings: number
-  reason: string
 }

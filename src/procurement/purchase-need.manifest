@@ -103,6 +103,49 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // A range-generated draft links each contributing demand to its combined
+  // order line but deliberately leaves it open until the buyer submits.
+  command assignToDraft(vendorOrderId: uuid, vendorOrderLineId: uuid) {
+    guard self.status == "open"
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    constraint assignDraftUnlinked: self.vendorOrderId == null and self.vendorOrderLineId == null "Purchase need is already linked to an order line"
+    mutate vendorOrderId = vendorOrderId
+    mutate vendorOrderLineId = vendorOrderLineId
+    emit PurchaseNeedDraftAssigned {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      vendorOrderId: vendorOrderId
+      vendorOrderLineId: vendorOrderLineId
+      status: "open"
+    }
+  }
+
+  command markDraftOrdered() {
+    guard self.status == "open"
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    guard self.vendorOrderId != null and self.vendorOrderLineId != null
+    guard self.vendorOrder != null and self.vendorOrder.status == "submitted"
+    compute previousStatus = self.status
+    mutate status = "ordered"
+    mutate orderedAt = now()
+    emit PurchaseNeedOrdered {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      vendorOrderId: self.vendorOrderId
+      vendorOrderLineId: self.vendorOrderLineId
+      previousStatus: previousStatus
+      status: "ordered"
+    }
+  }
+
   // Receiving automation stays deferred (OD019); fulfilment is an explicit
   // procurement acknowledgement until line-received targeting is product-defined.
   command markFulfilled() {
@@ -170,6 +213,17 @@ event PurchaseNeedOrdered: "purchase_need.ordered" {
   status: PurchaseNeedStatus
 }
 
+event PurchaseNeedDraftAssigned: "purchase_need.draft_assigned" {
+  purchaseNeedId: string
+  tenantId: string
+  eventId: string
+  ingredientDemandId: string
+  ingredientId: string
+  vendorOrderId: string
+  vendorOrderLineId: string
+  status: PurchaseNeedStatus
+}
+
 event PurchaseNeedFulfilled: "purchase_need.fulfilled" {
   purchaseNeedId: string
   tenantId: string
@@ -216,13 +270,10 @@ on IngredientDemandConfirmed run PurchaseNeed.create
     unit: payload.unit
   }
 
-// Procurement adds a demand-linked line to a vendor order → the need is ordered.
-on VendorOrderLineAdded fanOut PurchaseNeed where ingredientDemandId = payload.ingredientDemandId
-  run markOrdered
-  params {
-    vendorOrderId: payload.vendorOrderId,
-    vendorOrderLineId: payload.vendorOrderLineId
-  }
+// A range-generated order keeps its linked needs open while it is a draft.
+// Submission, not line creation, is the point at which procurement is ordered.
+on VendorOrderSubmitted fanOut PurchaseNeed where vendorOrderId = payload.vendorOrderId
+  run markDraftOrdered
 
 // Event cancellation stops open purchasing work (product definition § 3 /
 // interconnection requirements: cancellation stops inappropriate downstream work).

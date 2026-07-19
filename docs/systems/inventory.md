@@ -46,7 +46,7 @@ The authored `/inventory` workspace now ships these routes:
 
 Inventory and inventory-management roles are enforced by generated commands. Lifecycle actions are offered from generated transition metadata, and rejected policy, guard, constraint, or concurrency outcomes remain visible in the authored failure banner.
 
-Search and exact decimal precision remain degraded. The stock book shows on-hand and active reservation facts separately and does not invent an aggregate shortage rule. Demand→purchase and receipt→stock automation are not claimed; operators use explicit generated commands until focused reaction tests prove those paths.
+Search and exact decimal precision remain degraded. The stock book shows on-hand and active reservation facts separately and does not invent an aggregate shortage rule. Procurement users can deliberately generate a draft vendor order from open purchase needs in a last-seven-days, upcoming-seven-days, or custom inclusive event-date range; matching ingredient/unit quantities combine while each demand remains linked. Draft generation does not submit the order or mark a need ordered. Receipt-to-stock automation is not claimed.
 
 Proof: `tests/supply-slice-contract.test.ts`, `tests/supply-lifecycle-policy.test.ts`, `tests/supply-manifest-integration-guard.test.ts`, and `bun run check:supply-manifest`.
 

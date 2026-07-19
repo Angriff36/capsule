@@ -4,6 +4,7 @@ import {
   useCreateRecipeIngredient,
   useGetRecipe,
   useListDish,
+  useListDishRecipe,
   useListIngredient,
   useListRecipeIngredient,
   useRecipeIngredientAdjustQuantity,
@@ -48,6 +49,7 @@ export function RecipeDetailPage() {
   const ingredients = useListIngredient();
   const lines = useListRecipeIngredient();
   const dishes = useListDish();
+  const dishRecipes = useListDishRecipe();
   const revise = useRecipeReviseDraft();
   const publish = useRecipePublishVersion();
   const retract = useRecipeRetract();
@@ -80,8 +82,13 @@ export function RecipeDetailPage() {
   const recipeLines = (lines ?? [])
     .filter((line) => line.deletedAt == null && line.recipeId === recipe._id)
     .sort((a, b) => a.sortOrder - b.sortOrder);
+  const recipeDishIds = new Set(
+    (dishRecipes ?? [])
+      .filter((line) => line.deletedAt == null && line.recipeId === recipe._id)
+      .map((line) => line.dishId),
+  );
   const recipeDishes = (dishes ?? []).filter(
-    (dish) => dish.deletedAt == null && dish.recipeId === recipe._id,
+    (dish) => dish.deletedAt == null && recipeDishIds.has(dish._id),
   );
   const actions = policy.recipeActions(String(recipe.status));
   const ingredientName = (ingredientId: string) =>

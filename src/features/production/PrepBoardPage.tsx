@@ -2,7 +2,9 @@ import { useState, type FormEvent } from "react";
 import {
   useCreatePrepTask,
   useCreateQualityCheck,
+  useListDish,
   useListEvent,
+  useListEventDish,
   useListIngredient,
   useListPrepTask,
   useListQualityCheck,
@@ -55,6 +57,8 @@ export function PrepBoardPage() {
   const tasks = useListPrepTask();
   const checks = useListQualityCheck();
   const events = useListEvent();
+  const eventDishes = useListEventDish();
+  const dishes = useListDish();
   const ingredients = useListIngredient();
   const createTask = useCreatePrepTask();
   const claim = usePrepTaskClaim();
@@ -82,9 +86,19 @@ export function PrepBoardPage() {
   );
   const eventName = (id: string) =>
     events?.find((event) => event._id === id)?.title ?? "Unknown event";
-  const ingredientName = (id: string) =>
-    ingredients?.find((ingredient) => ingredient._id === id)?.name ??
-    "Unknown ingredient";
+  const dishName = (id: string) =>
+    dishes?.find((dish) => dish._id === id)?.name ?? "Unknown dish";
+  const eventDishLabel = (eventDishId: string) => {
+    const entry = eventDishes?.find((row) => row._id === eventDishId);
+    if (!entry) return "Unknown event dish";
+    return `${eventName(entry.eventId)} · ${dishName(entry.dishId)}`;
+  };
+  const taskLabel = (task: { name?: string; ingredientId?: string | null }) =>
+    task.name?.trim() ||
+    (task.ingredientId
+      ? (ingredients?.find((ingredient) => ingredient._id === task.ingredientId)
+          ?.name ?? "Prep task")
+      : "Prep task");
   const checksForTask = (taskId: string) =>
     activeChecks.filter((check) => check.prepTaskId === taskId);
   const blockedTaskCount = activeTasks.filter(
@@ -105,6 +119,8 @@ export function PrepBoardPage() {
   const isLoading =
     tasks === undefined ||
     events === undefined ||
+    eventDishes === undefined ||
+    dishes === undefined ||
     ingredients === undefined ||
     checks === undefined;
 
@@ -133,11 +149,16 @@ export function PrepBoardPage() {
     void run(
       "create-task",
       async () => {
+        const eventDishId = String(data.get("eventDishId"));
+        const eventDish = eventDishes?.find((row) => row._id === eventDishId);
+        if (!eventDish) throw new Error("Select an event dish");
         await createTask({
-          eventId: String(data.get("eventId")),
-          ingredientId: String(data.get("ingredientId")),
+          eventDishId,
+          eventId: eventDish.eventId,
+          name: String(data.get("name") ?? "").trim(),
           quantity: Number(data.get("quantity")),
           unit: String(data.get("unit")) as (typeof UNITS)[number],
+          ingredientId: String(data.get("ingredientId") || "") || undefined,
           station: String(data.get("station") || "") || undefined,
           notes: String(data.get("notes") || "") || undefined,
         });
@@ -317,22 +338,33 @@ export function PrepBoardPage() {
           </div>
           <div className="supply-form-grid">
             <label className="field-label">
-              Event / service
-              <select name="eventId" className="input" required>
-                <option value="">Select event</option>
-                {(events ?? [])
-                  .filter((item) => item.deletedAt == null)
+              Event dish
+              <select name="eventDishId" className="input" required>
+                <option value="">Select event dish</option>
+                {(eventDishes ?? [])
+                  .filter(
+                    (item) => item.deletedAt == null && item.addedAt != null,
+                  )
                   .map((item) => (
                     <option key={item._id} value={item._id}>
-                      {item.title}
+                      {eventDishLabel(item._id)}
                     </option>
                   ))}
               </select>
             </label>
             <label className="field-label">
-              Prep item / ingredient
-              <select name="ingredientId" className="input" required>
-                <option value="">Select ingredient</option>
+              Prep task
+              <input
+                name="name"
+                className="input"
+                required
+                placeholder="e.g. Portion caesar dressing"
+              />
+            </label>
+            <label className="field-label">
+              Ingredient (optional)
+              <select name="ingredientId" className="input">
+                <option value="">None</option>
                 {(ingredients ?? [])
                   .filter(
                     (item) =>
@@ -461,7 +493,8 @@ export function PrepBoardPage() {
                         <small>{task.eventId.slice(-8)}</small>
                       </td>
                       <td>
-                        <strong>{ingredientName(task.ingredientId)}</strong>
+                        <strong>{taskLabel(task)}</strong>
+                        <small>{eventDishLabel(task.eventDishId)}</small>
                         {task.notes ? <small>{task.notes}</small> : null}
                       </td>
                       <td className="supply-number">
@@ -476,7 +509,7 @@ export function PrepBoardPage() {
                       <td>
                         <div
                           className="supply-row-actions"
-                          aria-label={`Quality actions for ${ingredientName(task.ingredientId)}`}
+                          aria-label={`Quality actions for ${taskLabel(task)}`}
                         >
                           {linked.length === 0 ? (
                             <button
@@ -524,7 +557,7 @@ export function PrepBoardPage() {
                       <td>
                         <div
                           className="supply-row-actions"
-                          aria-label={`Prep actions for ${ingredientName(task.ingredientId)}`}
+                          aria-label={`Prep actions for ${taskLabel(task)}`}
                         >
                           {actions.map((action) => (
                             <button
@@ -569,7 +602,7 @@ export function PrepBoardPage() {
               busy={
                 busy === `${reasonRequest.task._id}:${reasonRequest.action}`
               }
-              taskName={ingredientName(reasonRequest.task.ingredientId)}
+              taskName={taskLabel(reasonRequest.task)}
               onCancel={() => setReasonRequest(null)}
               onSubmit={submitReason}
             />

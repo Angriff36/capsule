@@ -1,0 +1,127 @@
+// Capsule culinary MenuDish — Dish lines on a Menu (catalog composition).
+// Compile via menu.manifest.
+
+use "./menu.manifest"
+
+// Menu ↔ Dish membership. Required for priced/curated offerings — not deferred.
+entity MenuDish mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required menuId: uuid
+  property required dishId: uuid
+  property required sortOrder: int = 0
+  property course: string?
+  property serviceStyle: string?
+  property specialInstructions: string?
+  property addedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo menu: Menu fields [tenantId, menuId] references [tenantId, id]
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+
+  default policy menuDishRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read menu dish lines"
+  default policy menuDishWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write menu dish lines through commands"
+  default policy menuDishExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute menu dish line commands"
+
+  command add(
+    menuId: uuid,
+    dishId: uuid,
+    optional sortOrder: number,
+    optional course: string,
+    optional serviceStyle: string,
+    optional specialInstructions: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard self.menu != null and self.menu.status == "draft"
+    constraint addMenuMatch: menuId == self.menuId "Add menuId must match the seeded menu reference"
+    mutate menuId = menuId
+    mutate dishId = dishId
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate course = course
+    mutate serviceStyle = serviceStyle
+    mutate specialInstructions = specialInstructions
+    mutate addedAt = now()
+    emit MenuDishAdded {
+      menuDishId: self.id
+      tenantId: self.tenantId
+      menuId: menuId
+      dishId: dishId
+      sortOrder: sortOrder != null ? sortOrder : 0
+      course: course
+      serviceStyle: serviceStyle
+    }
+  }
+
+  command updateDetails(
+    optional sortOrder: number,
+    optional course: string,
+    optional serviceStyle: string,
+    optional specialInstructions: string
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.menu != null and self.menu.status == "draft"
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    mutate course = course
+    mutate serviceStyle = serviceStyle
+    mutate specialInstructions = specialInstructions
+    emit MenuDishDetailsUpdated {
+      menuDishId: self.id
+      tenantId: self.tenantId
+      menuId: self.menuId
+      dishId: self.dishId
+      sortOrder: sortOrder != null ? sortOrder : self.sortOrder
+      course: course
+      serviceStyle: serviceStyle
+    }
+  }
+
+  command remove(reason: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.menu != null and (self.menu.status == "draft" or self.menu.status == "published")
+    constraint removeMenuDishReason: length(trim(reason)) > 0 "Removal reason is required"
+    mutate deletedAt = now()
+    mutate removedAt = now()
+    emit MenuDishRemoved {
+      menuDishId: self.id
+      tenantId: self.tenantId
+      menuId: self.menuId
+      dishId: self.dishId
+      reason: reason
+    }
+  }
+
+  store MenuDish in durable
+}
+
+event MenuDishAdded: "menu_dish.added" {
+  menuDishId: string
+  tenantId: string
+  menuId: string
+  dishId: string
+  sortOrder: number
+  course: string?
+  serviceStyle: string?
+}
+
+event MenuDishDetailsUpdated: "menu_dish.details_updated" {
+  menuDishId: string
+  tenantId: string
+  menuId: string
+  dishId: string
+  sortOrder: number
+  course: string?
+  serviceStyle: string?
+}
+
+event MenuDishRemoved: "menu_dish.removed" {
+  menuDishId: string
+  tenantId: string
+  menuId: string
+  dishId: string
+  reason: string
+}

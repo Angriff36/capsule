@@ -1,6 +1,7 @@
 // Capsule execution & quality — EventAllergenCheck (human event-time
 // verification). Automated guest-restriction × dish-allergen matching is
-// deferred (OD008/OD010/OD043). Compile chain continues via closeout entry.
+// deferred (OD008/OD043; OD010 → D056 orchestrator path). Compile chain
+// continues via closeout entry.
 
 use "../finance/closeout.manifest"
 

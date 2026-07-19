@@ -77,7 +77,7 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
     };
   }
   if (
-    /required|must be|cannot be|between|after its start|two characters|Invalid argument/i.test(
+    /required|must be|cannot be|between|after its start|two characters|Invalid argument|before parsing|Reading the selected file/i.test(
       detail,
     )
   ) {

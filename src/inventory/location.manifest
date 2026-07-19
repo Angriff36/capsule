@@ -2,6 +2,8 @@
 // stock.manifest (compile entry).
 
 use "../culinary/menu.manifest"
+use "../culinary/menu-dish.manifest"
+use "../culinary/event-dish.manifest"
 
 enum StorageLocationStatus {
   active

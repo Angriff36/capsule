@@ -1,0 +1,10 @@
+#!/bin/sh
+# Regeneration is a local gate (owner policy 2026-07-19): Builder-owned output
+# must be regenerated and current BEFORE anything reaches GitHub — CI has no
+# Builder checkout and cannot regenerate. Blocks the push when the Builder
+# plan shows pending changes or conflicts.
+bun scripts/manifest-regen-check.ts || {
+  echo ""
+  echo "pre-push blocked: Builder output is stale or conflicted (see above)."
+  exit 1
+}

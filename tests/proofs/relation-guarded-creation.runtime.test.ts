@@ -100,7 +100,6 @@ async function seedDish(proof: Proof, tenantId: string) {
     kitchen,
     api.mutations.Dish_createViaIntroduce,
     {
-      recipeId: recipe.docId,
       name: "Relation proof lentil plate",
       portionSize: 1,
       portionUnit: "portion",
@@ -135,20 +134,20 @@ beforeAll(() => {
 });
 
 describe("relation-guarded governed creation", () => {
-  it("creates EventDish through EventDish_createViaSelect", async () => {
+  it("creates EventDish through EventDish_createViaAddToEvent", async () => {
     const proof = harness();
     const eventId = await seedEvent(proof, S.tenantA);
     const dishId = await seedDish(proof, S.tenantA);
-    const eventStaff = asRole(
+    const eventManager = asRole(
       proof,
       S.tenantA,
-      "event_staff",
-      "event-menu-staff",
+      "event_manager",
+      "event-menu-manager",
     );
 
     const result = (await proof.executeCommand(
-      eventStaff,
-      api.mutations.EventDish_createViaSelect,
+      eventManager,
+      api.mutations.EventDish_createViaAddToEvent,
       {
         eventId,
         dishId,
@@ -159,7 +158,7 @@ describe("relation-guarded governed creation", () => {
     )) as { docId: string };
 
     expect(result.docId).toEqual(expect.any(String));
-    const row = (await eventStaff.run((ctx) =>
+    const row = (await eventManager.run((ctx) =>
       ctx.db.get(result.docId as never),
     )) as Record<string, unknown> | null;
     expect(row).toMatchObject({
@@ -169,12 +168,12 @@ describe("relation-guarded governed creation", () => {
       dishId,
       quantityServings: 40,
     });
-    expect(row?.selectedAt).toEqual(expect.any(Number));
+    expect(row?.addedAt).toEqual(expect.any(Number));
     expect(row?.removedAt).toBeUndefined();
     expect(row?.event).toBeUndefined();
     expect(row?.dish).toBeUndefined();
-    await proof.expectEvent(eventStaff, {
-      type: "EventDishSelected",
+    await proof.expectEvent(eventManager, {
+      type: "EventDishAdded",
       tenantId: S.tenantA,
       predicate: (payload) =>
         payload.eventDishId === result.docId &&

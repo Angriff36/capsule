@@ -30,6 +30,17 @@ bun run dev
 
 ---
 
+## Agent MCP (IDE → Capsule commands)
+
+```bash
+# .env.local: CONVEX_URL + CAPSULE_AGENT_JWT (Clerk JWT with role + tenantId)
+bun run agent:mcp
+```
+
+Setup and Cursor config: [generation/capsule-agent-mcp.md](./generation/capsule-agent-mcp.md).
+
+---
+
 ## Change domain → regenerate
 
 Edit `src/**/*.manifest` and/or `manifest.config.yaml`, then:

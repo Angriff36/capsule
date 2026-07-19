@@ -154,7 +154,6 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         return;
       } else if (section === "dishes") {
         await createDish({
-          recipeId: String(data.get("recipeId")),
           name: String(data.get("name") ?? "").trim(),
           portionSize: Number(data.get("portionSize")),
           portionUnit: String(
@@ -564,19 +563,6 @@ function CreateForm({
         ) : null}
         {section === "dishes" ? (
           <>
-            <label className="field-label">
-              Recipe
-              <select name="recipeId" className="input" required>
-                <option value="">Select recipe</option>
-                {recipes
-                  .filter((recipe) => recipe.deletedAt == null)
-                  .map((recipe) => (
-                    <option key={recipe._id} value={recipe._id}>
-                      {recipe.name}
-                    </option>
-                  ))}
-              </select>
-            </label>
             <label className="field-label">
               Portion size
               <input

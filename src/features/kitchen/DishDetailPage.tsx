@@ -4,9 +4,10 @@ import {
   useDishReinstate,
   useDishRetire,
   useGetDish,
-  useGetRecipe,
+  useListDishRecipe,
   useListEventDish,
   useListEvent,
+  useListRecipe,
 } from "../../lib/manifest-convex-react";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
@@ -20,7 +21,8 @@ const policy = new CulinaryLifecyclePolicy();
 export function DishDetailPage() {
   const { id } = useParams();
   const dish = useGetDish(id ?? "skip");
-  const recipe = useGetRecipe(dish?.recipeId ?? "skip");
+  const dishRecipes = useListDishRecipe();
+  const recipes = useListRecipe();
   const events = useListEvent();
   const eventDishes = useListEventDish();
   const retire = useDishRetire();
@@ -54,6 +56,15 @@ export function DishDetailPage() {
       event: (events ?? []).find((event) => event._id === entry.eventId),
     }))
     .filter((row) => row.event && row.event.deletedAt == null);
+
+  const composedRecipes = (dishRecipes ?? [])
+    .filter((line) => line.deletedAt == null && line.dishId === dish._id)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
+    .map((line) => ({
+      line,
+      recipe: (recipes ?? []).find((recipe) => recipe._id === line.recipeId),
+    }))
+    .filter((row) => row.recipe && row.recipe.deletedAt == null);
 
   const actions = policy.dishActions(String(dish.status));
 
@@ -137,16 +148,8 @@ export function DishDetailPage() {
             <dd>{dish.serviceStyle || "—"}</dd>
           </div>
           <div>
-            <dt>Recipe</dt>
-            <dd>
-              {recipe && recipe.deletedAt == null ? (
-                <CulinaryEntityLink kind="recipe" id={recipe._id}>
-                  {recipe.name}
-                </CulinaryEntityLink>
-              ) : (
-                "Unavailable"
-              )}
-            </dd>
+            <dt>Recipes</dt>
+            <dd>{composedRecipes.length || "None attached"}</dd>
           </div>
         </dl>
       </header>
@@ -154,6 +157,34 @@ export function DishDetailPage() {
       {dish.description ? (
         <p className="culinary-lead">{dish.description}</p>
       ) : null}
+
+      <section className="culinary-section">
+        <div className="culinary-section-heading">
+          <h2>Recipe composition</h2>
+          <span>{composedRecipes.length} recipes</span>
+        </div>
+        {composedRecipes.length ? (
+          <ul className="dish-uses">
+            {composedRecipes.map(({ line, recipe }) => (
+              <li
+                key={line._id}
+                className="flex items-center justify-between border-b border-line py-3"
+              >
+                <CulinaryEntityLink kind="recipe" id={recipe!._id}>
+                  {recipe!.name}
+                </CulinaryEntityLink>
+                <span className="font-mono text-[10px] text-ink-3">
+                  {line.role || "component"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <div className="document-empty">
+            <p>No recipes attached. A dish can include many recipes.</p>
+          </div>
+        )}
+      </section>
 
       <section className="culinary-section">
         <div className="culinary-section-heading">

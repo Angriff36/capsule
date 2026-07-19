@@ -9,6 +9,9 @@
     "bun": ">=1.3.4"
   },
   "scripts": {
+    "agent:enter-recipe": "bun scripts/capsule-enter-recipe.ts",
+    "agent:mcp": "bun scripts/capsule-mcp.ts",
+    "agent:mint-jwt": "bun scripts/capsule-mint-agent-jwt.ts",
     "baseline:decay": "bun scripts/check-baseline-decay.ts",
     "build": "vite build",
     "check": "bun run toolchain && bun scripts/builder-regen-guard.ts --check-ownership && bun run proof:emit && bun run check:proof && bun run check:manifest-registry && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run check:production-manifest && bun run check:workforce-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
@@ -28,6 +31,7 @@
     "manifest:build": "manifest build",
     "manifest:compile": "manifest compile --merge",
     "manifest:regen": "bun scripts/manifest-regen.ts",
+    "manifest:regen:check": "bun scripts/manifest-regen-check.ts",
     "prepare": "git config core.hooksPath .githooks",
     "proof:emit": "bun scripts/emit-proof-kit.ts",
     "secrets": "bun scripts/check-secrets.ts",
@@ -42,19 +46,22 @@
     "*.{ts,tsx,js,jsx,json,md,css,yml,yaml,html}": "prettier --write"
   },
   "dependencies": {
-    "@angriff36/manifest": "^3.6.21",
+    "@angriff36/manifest": "3.6.24",
+    "@clerk/backend": "^3.11.7",
     "@clerk/react": "^6.12.4",
     "@fontsource-variable/archivo": "^5.2.5",
     "@fontsource/ibm-plex-mono": "^5.2.5",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "convex": "^1.27.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "react-router-dom": "^6.30.0"
+    "react-router-dom": "^6.30.0",
+    "zod": "3.25.76"
   },
   "devDependencies": {
-    "@angriff36/manifest-builder": "file:../builder",
     "@edge-runtime/vm": "^5.0.0",
     "@tailwindcss/vite": "^4.3.3",
+    "@types/node": "^26.1.1",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.5.0",

@@ -37,6 +37,8 @@ describe("Demand, stock, and purchasing slice contract", () => {
       "useListPurchaseNeed",
       "useCreateVendor",
       "useCreateVendorOrder",
+      "useCreateVendorOrderLine",
+      "usePurchaseNeedAssignToDraft",
     ]) {
       expect(purchasing).toContain(hook);
     }
@@ -47,6 +49,8 @@ describe("Demand, stock, and purchasing slice contract", () => {
     ]) {
       expect(order).toContain(hook);
     }
+    expect(purchasing).toContain("Generate prep-list draft");
+    expect(order).toContain("vendorOrderLineId === line._id");
   });
 
   it("uses only generated client surfaces and makes blocked automation explicit", () => {

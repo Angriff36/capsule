@@ -1,19 +1,28 @@
+import type { ImportSourceMode } from "./ImportSourceReadiness";
 import type { RecipeImportReviewState } from "./RecipeImportTypes";
 
-type SourceMode = "paste" | "files";
-
 export interface RecipeImportSourcePaneProps {
-  mode: SourceMode;
+  mode: ImportSourceMode;
   source: string;
   sheetCsv: string;
   linesCsv: string;
   sheetFilename?: string;
   linesFilename?: string;
+  textFilename?: string;
   parsing: boolean;
-  onModeChange: (mode: SourceMode) => void;
+  fileLoading: boolean;
+  canParse: boolean;
+  sourceHint?: string | null;
+  fileStatus?: string | null;
+  onModeChange: (mode: ImportSourceMode) => void;
   onSourceChange: (value: string) => void;
   onSheetChange: (value: string, filename?: string) => void;
   onLinesChange: (value: string, filename?: string) => void;
+  onTextFileChange: (value: string, filename: string) => void;
+  onLoadFile: (
+    file: File,
+    apply: (text: string, filename: string) => void,
+  ) => void;
   onParse: () => void;
 }
 
@@ -24,11 +33,18 @@ export function RecipeImportSourcePane({
   linesCsv,
   sheetFilename,
   linesFilename,
+  textFilename,
   parsing,
+  fileLoading,
+  canParse,
+  sourceHint,
+  fileStatus,
   onModeChange,
   onSourceChange,
   onSheetChange,
   onLinesChange,
+  onTextFileChange,
+  onLoadFile,
   onParse,
 }: RecipeImportSourcePaneProps) {
   return (
@@ -82,10 +98,13 @@ export function RecipeImportSourcePane({
             <input
               type="file"
               accept=".csv,text/csv"
+              disabled={fileLoading}
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (!file) return;
-                void file.text().then((text) => onSheetChange(text, file.name));
+                onLoadFile(file, (text, filename) =>
+                  onSheetChange(text, filename),
+                );
               }}
             />
             {sheetFilename ? (
@@ -99,10 +118,13 @@ export function RecipeImportSourcePane({
             <input
               type="file"
               accept=".csv,text/csv"
+              disabled={fileLoading}
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (!file) return;
-                void file.text().then((text) => onLinesChange(text, file.name));
+                onLoadFile(file, (text, filename) =>
+                  onLinesChange(text, filename),
+                );
               }}
             />
             {linesFilename ? (
@@ -116,32 +138,42 @@ export function RecipeImportSourcePane({
             <input
               type="file"
               accept=".txt,text/plain"
+              disabled={fileLoading}
               onChange={(event) => {
                 const file = event.target.files?.[0];
                 if (!file) return;
-                void file.text().then((text) => onSourceChange(text));
+                onLoadFile(file, (text, filename) =>
+                  onTextFileChange(text, filename),
+                );
               }}
             />
+            {textFilename ? (
+              <span className="font-mono text-[11px] text-ink-3">
+                {textFilename}
+              </span>
+            ) : null}
           </label>
-          {sheetCsv || linesCsv ? (
-            <p className="font-mono text-[11px] text-ink-3">
-              CSV bundle loaded
-              {sheetCsv ? ` · sheet ${sheetCsv.split("\n").length} rows` : ""}
-              {linesCsv ? ` · lines ${linesCsv.split("\n").length} rows` : ""}
-            </p>
+          {fileStatus ? (
+            <p className="font-mono text-[11px] text-ink-3">{fileStatus}</p>
           ) : null}
         </div>
       )}
+
+      {sourceHint ? (
+        <p className="recipe-import-source-hint" role="status">
+          {sourceHint}
+        </p>
+      ) : null}
 
       <div className="recipe-import-pane-actions">
         <button
           type="button"
           className="btn btn-primary"
-          disabled={parsing}
-          aria-busy={parsing}
+          disabled={parsing || fileLoading || !canParse}
+          aria-busy={parsing || fileLoading}
           onClick={onParse}
         >
-          {parsing ? "Parsing…" : "Parse"}
+          {fileLoading ? "Reading file…" : parsing ? "Parsing…" : "Parse"}
         </button>
       </div>
     </section>

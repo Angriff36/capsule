@@ -28,8 +28,9 @@
 - Recipe commands: draft, revise draft, publish version, retract, retire; RecipeIngredient supports add, adjust quantity, remove.
 - Dish commands: introduce, revise details, change recipe, update portioning, classify allergens, retire, reinstate.
 - Menu commands: draft, revise details, update pricing, publish, unpublish, archive, restore.
-- EventDish is the modeled event composition record: select, adjust servings, change course/service style, update instructions, remove. There is no canonical Menu↔Dish entity or command, so the UI must not invent one.
-- EventDish writes are guarded to Event stages planning, pending approval, or approved.
+- EventDish is the modeled event composition record: `addToEvent`, adjust servings, change course/service style, update instructions, remove. MenuDish exists for catalog menus; EventDish is the event composition handoff.
+- ~~EventDish writes are guarded to Event stages planning, pending approval, or approved.~~
+  > **Correction (2026-07-19):** EventDish add/remove/course/instructions allowed through **executing** (86/swap mid-service); servings may be `0`. See `docs/architecture/domain-gating-restraint.md`.
 
 ## Technical Decisions
 
@@ -62,14 +63,15 @@
 - Generated React hooks already cover list/get plus commands for Ingredient, Recipe, RecipeIngredient, Dish, Menu, and EventDish.
 - Generated bindings export typed client inputs and lifecycle arrays such as `RecipePublishVersionLifecycle`, `RecipeRetireLifecycle`, `MenuMarkPublishedLifecycle`, and `MenuUnpublishLifecycle`; authored UI should consume these rather than restating transition rules.
 - Manifest creation commands are instance commands, so the authored slice likely needs the same narrow allocation/action seam used by Event: allocate the minimum document shape, invoke the generated command, and delete the allocation if the command rejects.
-- `EventDish` must be allocated with its parent `eventId` before the generated `select` command so parent-stage policy can run against the real event.
+- `EventDish` must be allocated with its parent `eventId` before `addToEvent` (or use `EventDish_createViaAddToEvent`) so parent-stage policy can run against the real event.
 - Generated command bodies insert domain events and accept preallocated `docId` values; allocation is not performed by those generated mutations.
-- Source truth does not define Menu-to-Dish membership. Do not invent that relation; the concrete composition handoff is EventDish.
+- ~~Source truth does not define Menu-to-Dish membership.~~
+  > **Correction (2026-07-19):** `MenuDish` models catalog menu membership; EventDish remains the event composition handoff.
 - Recipe publication does not currently require ingredient lines in Manifest source. The UI must not add that local policy.
 
 ## Allocation requirements
 
-- Generated create-like mutations (`Ingredient_introduce`, `Recipe_draft`, `RecipeIngredient_add`, `Dish_introduce`, `Menu_draft`, `EventDish_select`) all require a valid preallocated `docId` and fail if the row does not exist.
+- Generated create-like mutations (`Ingredient_introduce`, `Recipe_draft`, `RecipeIngredient_add`, `Dish_introduce`, `Menu_draft`, `EventDish_addToEvent`) all require a valid preallocated `docId` and fail if the row does not exist.
 - The authored allocation seam must seed schema-valid neutral values only:
   - Ingredient: name, unit, cost, active status.
   - Recipe: name, yield, batch multiplier, draft status, version number.

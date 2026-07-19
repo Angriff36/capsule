@@ -48,7 +48,6 @@ describe("culinary governed creation", () => {
       actor,
       api.mutations.Dish_createViaIntroduce,
       {
-        recipeId: recipe.docId,
         name: "Seasoned vegetables",
         portionSize: 1,
         portionUnit: "portion",

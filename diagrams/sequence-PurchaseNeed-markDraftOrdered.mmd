@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant PurchaseNeed as PurchaseNeed
+    participant EventBus
+    Client->>+PurchaseNeed: markDraftOrdered()
+    Note over PurchaseNeed: Policies: purchaseNeedRead, purchaseNeedWrite, purchaseNeedExecute
+    Note over PurchaseNeed: Guards (5)
+    PurchaseNeed->>PurchaseNeed: guard[0]: self.status == #quot;open#quot;
+    PurchaseNeed->>PurchaseNeed: guard[1]: self.openedAt != null
+    PurchaseNeed->>PurchaseNeed: guard[2]: self.deletedAt == null
+    PurchaseNeed->>PurchaseNeed: guard[3]: self.vendorOrderId != null and self.vendorOrderLineId != ...
+    PurchaseNeed->>PurchaseNeed: guard[4]: self.vendorOrder != null and self.vendorOrder.status == #quot;...
+    PurchaseNeed->>PurchaseNeed: compute.previousStatus
+    PurchaseNeed->>PurchaseNeed: mutate.status
+    PurchaseNeed->>PurchaseNeed: mutate.orderedAt
+    PurchaseNeed->>EventBus: emit PurchaseNeedOrdered on purchase_need.ordered
+    PurchaseNeed-->>-Client: void

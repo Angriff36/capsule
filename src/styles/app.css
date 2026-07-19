@@ -693,6 +693,13 @@
     gap: 1.4rem;
     padding: 1.2rem 0;
   }
+  /* Link wraps the row cells — must not become a single grid item or names ellipsis to "K…". */
+  .culinary-index-row > .culinary-entity-link {
+    display: contents;
+  }
+  .culinary-index-row:hover {
+    background: var(--color-inset);
+  }
   .culinary-row-actions {
     display: flex;
     grid-column: 2 / -1;
@@ -1884,6 +1891,15 @@
   border-color: var(--color-ok);
   background: var(--color-ok-soft);
   color: var(--color-ok);
+}
+
+.recipe-import-source-hint {
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--color-warn);
+  background: var(--color-warn-soft);
+  color: var(--color-ink-2);
+  font-size: 12px;
 }
 
 .recipe-import-pane-review {

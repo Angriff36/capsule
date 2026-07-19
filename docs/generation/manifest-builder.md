@@ -14,21 +14,23 @@ Current preset: `convex-application` **v1.3.4** (`package.json` → `manifestPre
 
 ## Authoritative generators
 
-| Tool                                                | Produces                                                                                          |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| Manifest / `@angriff36/manifest` + Builder assemble | Convex surfaces, schemas, wiring, seed script, client wiring, contract tests, diagrams companions |
-| Convex codegen (`bun run codegen`)                  | `convex/_generated/**`                                                                            |
+| Tool                                                | Produces                                                                                                            |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Manifest / `@angriff36/manifest` + Builder assemble | Convex surfaces, Zod companion (`schemas/**`), wiring, seed script, client wiring, contract tests, mermaid diagrams |
+| Convex codegen (`bun run codegen`)                  | `convex/_generated/**`                                                                                              |
 
 ## Generated — do not hand-edit
 
-- `convex/schema.ts`, `convex/queries.ts`, `convex/mutations.ts`
+- `convex/schema.ts` (**DB schema**), `convex/queries.ts`, `convex/mutations.ts`
 - `convex/http.ts`, `convex/crons.ts`, `convex/sagas.ts`, `convex/computed.ts`
 - `convex/_generated/**`
-- `schemas/**`, `wiring/**`
+- `schemas/**` (**Zod companions**, not Convex — see [boundaries.md](../architecture/boundaries.md)), `wiring/**`
 - `src/generated/**`, `src/lib/manifest-convex-react.ts`
 - `scripts/seed-convex.ts`
-- Generated contract tests (e.g. `tests/manifest-convex.contract.test.ts`)
-- `diagrams/` companions from the docs-diagrams pack
+- Generated contract tests (e.g. `tests/manifest-convex.contract.test.ts`) — CI smoke that named mutations/queries export; not domain proofs
+- `diagrams/` mermaid companions from the docs-diagrams pack — owned regen noise today; not author docs
+
+**Synced-validation (preset ≥ 1.3.5):** Builder emits only `zod.schemas` → `schemas/manifest-schemas.ts`, passes `zodParamsImport: true` into `convex.react`, and adds a `zod` dependency. Hooks call `ParamsSchema.parse` before mutations. Requires a Manifest release that implements `zodParamsImport` + assembly checks `synced-validation.bundle` / `synced-validation.react-wired`.
 
 ## Author seams — safe to edit
 
@@ -86,13 +88,13 @@ Builder stores SHA-256 digests in `.builder/ownership.json`. Regen compares **re
 
 Common failure modes (any agent, any session):
 
-| Symptom                                                     | Typical cause                                                                                                     |
-| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `owned-file-modified` on `convex/mutations.ts`              | Manifest bump + mutations committed without `--apply` refreshing ownership (e.g. consumed 3.6.20 output manually) |
-| `owned-file-modified` on `authContext.ts` / `encryption.ts` | Ownership ledger records wrong digest — ledger updated without matching file, or seam customized without adopt    |
-| `owned-file-modified` on `manifest-convex-react.ts`         | Hand-edited hook target instead of fixing initialization command selection in `.manifest` + regen                 |
-| `package.json` pin/script conflicts                         | `ownership.package` still records old Builder pins while app intentionally diverged                               |
-| `owned-file-missing` on `tsconfig.builder.json`             | File deleted locally; ownership still claims it                                                                   |
+| Symptom                                                     | Typical cause                                                                                                                                                |
+| ----------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `owned-file-modified` on `convex/mutations.ts`              | Manifest bump + mutations committed without `--apply` refreshing ownership (e.g. consumed 3.6.20 output manually)                                            |
+| `owned-file-modified` on `authContext.ts` / `encryption.ts` | Prettier/`lint-staged` reformatted Builder-owned seams (not in `.prettierignore`); or ledger updated without matching file; or seam customized without adopt |
+| `owned-file-modified` on `manifest-convex-react.ts`         | Hand-edited hook target instead of fixing initialization command selection in `.manifest` + regen                                                            |
+| `package.json` pin/script conflicts                         | `ownership.package` still records old Builder pins while app intentionally diverged                                                                          |
+| `owned-file-missing` on `tsconfig.builder.json`             | File deleted locally; ownership still claims it                                                                                                              |
 
 **Recovery (current disk state is truth):**
 

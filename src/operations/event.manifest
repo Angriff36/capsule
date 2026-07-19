@@ -1,5 +1,5 @@
 // Capsule client engagement, venue, event, and guest-attendance lifecycle.
-// EventDish is authored in src/culinary/menu.manifest (culinary/menu slice).
+// EventDish is authored in src/culinary/event-dish.manifest (culinary slice).
 
 use "../identity/person.manifest"
 

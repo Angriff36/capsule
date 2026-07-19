@@ -1,4 +1,5 @@
-// Capsule production — PrepTask (claim/start/complete + block for quality).
+// Capsule production — PrepTask under EventDish (claim/start/complete + block).
+// Hierarchy: Event → EventDish → PrepTask → optional Recipe (make-formula).
 // Station is an open string property (Station entity deferred). Compile chain
 // continues via batch.manifest → prep.manifest (entry).
 
@@ -13,18 +14,19 @@ enum PrepTaskStatus {
   cancelled
 }
 
-// Event-scoped prep/production work item for one Ingredient (optional demand/
-// dish/recipe provenance). Claim sets assignee from acting user.id — never a
-// client-supplied userId (semantics.md § User-Facing Boundary).
+// Prep work line for one EventDish (e.g. "chop romaine", "portion caesar dressing").
+// Optional recipeId links a MAKE line to its Recipe (dressing, brine, sauce…).
+// eventId is denormalized from EventDish for Event readiness / EventCancelled fan-out.
 entity PrepTask mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
   versionProperty version: number
 
+  property required eventDishId: uuid
   property required eventId: uuid
-  property required ingredientId: uuid
+  property required searchable name: string = ""
+  property ingredientId: uuid?
   property ingredientDemandId: uuid?
-  property dishId: uuid?
   property recipeId: uuid?
   property required quantity: decimal(12, 4) = 0
   property completedQuantity: decimal(12, 4)?
@@ -42,13 +44,14 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   property blockedAt: datetime?
   property blockReason: string?
 
+  belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
-  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
   belongsTo assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
 
+  constraint prepNameComplete: self.claimedAt == null or length(trim(self.name)) > 0 "Prep tasks require a name once opened"
   constraint prepQuantityPositive: self.claimedAt == null or self.quantity > 0 "Prep quantity must be positive once opened"
   constraint prepCompletedNonnegative: self.completedQuantity == null or self.completedQuantity >= 0 "Completed quantity cannot be negative"
 
@@ -64,12 +67,13 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   default policy prepTaskExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute prep task commands"
 
   command open(
+    eventDishId: uuid,
     eventId: uuid,
-    ingredientId: uuid,
+    name: string,
     quantity: decimal(12, 4),
     unit: UnitOfMeasure,
+    optional ingredientId: uuid,
     optional ingredientDemandId: uuid,
-    optional dishId: uuid,
     optional recipeId: uuid,
     optional station: string,
     optional dueAt: datetime,
@@ -79,16 +83,19 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "pending"
     guard self.deletedAt == null
     // Convex projection does not hydrate belongsTo for guards; seed FKs are authoritative.
+    // eventDishId + eventId are command params so createViaOpen can seed both parents.
+    guard self.eventDishId != null
     guard self.eventId != null
-    guard self.ingredientId != null
+    constraint openEventDishMatch: eventDishId == self.eventDishId "Open eventDishId must match the seeded event dish reference"
     constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
-    constraint openIngredientMatch: ingredientId == self.ingredientId "Open ingredientId must match the seeded ingredient reference"
-    constraint openDemandMatch: ingredientDemandId == null or self.ingredientDemandId == null or ingredientDemandId == self.ingredientDemandId "Open ingredientDemandId must match the seeded demand reference when provided"
+    constraint openEventAlign: self.eventDish == null or eventId == self.eventDish.eventId "PrepTask eventId must match EventDish.eventId"
+    constraint openNameRequired: length(trim(name)) > 0 "Prep task name is required"
     constraint openQuantityPositive: quantity > 0 "Prep quantity must be positive"
+    mutate eventDishId = eventDishId
     mutate eventId = eventId
-    mutate ingredientId = ingredientId
+    mutate name = name
+    mutate ingredientId = ingredientId != null ? ingredientId : self.ingredientId
     mutate ingredientDemandId = ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
-    mutate dishId = dishId != null ? dishId : self.dishId
     mutate recipeId = recipeId != null ? recipeId : self.recipeId
     mutate quantity = quantity
     mutate unit = unit
@@ -98,10 +105,11 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     emit PrepTaskOpened {
       prepTaskId: self.id
       tenantId: self.tenantId
+      eventDishId: eventDishId
       eventId: eventId
-      ingredientId: ingredientId
+      name: name
+      ingredientId: ingredientId != null ? ingredientId : self.ingredientId
       ingredientDemandId: ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
-      dishId: dishId != null ? dishId : self.dishId
       recipeId: recipeId != null ? recipeId : self.recipeId
       quantity: quantity
       unit: unit
@@ -123,8 +131,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     emit PrepTaskClaimed {
       prepTaskId: self.id
       tenantId: self.tenantId
+      eventDishId: self.eventDishId
       eventId: self.eventId
-      ingredientId: self.ingredientId
+      name: self.name
       assignedToId: user.id
       quantity: self.quantity
       unit: self.unit
@@ -146,8 +155,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     emit PrepTaskReleased {
       prepTaskId: self.id
       tenantId: self.tenantId
+      eventDishId: self.eventDishId
       eventId: self.eventId
-      ingredientId: self.ingredientId
+      name: self.name
       previousAssignedToId: previousAssignee
       quantity: self.quantity
       unit: self.unit
@@ -167,8 +177,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     emit PrepTaskStarted {
       prepTaskId: self.id
       tenantId: self.tenantId
+      eventDishId: self.eventDishId
       eventId: self.eventId
-      ingredientId: self.ingredientId
+      name: self.name
       assignedToId: self.assignedToId
       quantity: self.quantity
       unit: self.unit
@@ -190,8 +201,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     emit PrepTaskCompleted {
       prepTaskId: self.id
       tenantId: self.tenantId
+      eventDishId: self.eventDishId
       eventId: self.eventId
-      ingredientId: self.ingredientId
+      name: self.name
       assignedToId: self.assignedToId
       quantity: self.quantity
       completedQuantity: nextCompleted
@@ -213,8 +225,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     emit PrepTaskBlocked {
       prepTaskId: self.id
       tenantId: self.tenantId
+      eventDishId: self.eventDishId
       eventId: self.eventId
-      ingredientId: self.ingredientId
+      name: self.name
       quantity: self.quantity
       unit: self.unit
       previousStatus: previousStatus
@@ -238,8 +251,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     emit PrepTaskUnblocked {
       prepTaskId: self.id
       tenantId: self.tenantId
+      eventDishId: self.eventDishId
       eventId: self.eventId
-      ingredientId: self.ingredientId
+      name: self.name
       quantity: self.quantity
       unit: self.unit
       previousStatus: previousStatus
@@ -259,8 +273,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     emit PrepTaskCancelled {
       prepTaskId: self.id
       tenantId: self.tenantId
+      eventDishId: self.eventDishId
       eventId: self.eventId
-      ingredientId: self.ingredientId
+      name: self.name
       quantity: self.quantity
       unit: self.unit
       previousStatus: previousStatus
@@ -275,10 +290,11 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
 event PrepTaskOpened: "prep_task.opened" {
   prepTaskId: string
   tenantId: string
+  eventDishId: string
   eventId: string
-  ingredientId: string
+  name: string
+  ingredientId: string?
   ingredientDemandId: string?
-  dishId: string?
   recipeId: string?
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
@@ -290,8 +306,9 @@ event PrepTaskOpened: "prep_task.opened" {
 event PrepTaskClaimed: "prep_task.claimed" {
   prepTaskId: string
   tenantId: string
+  eventDishId: string
   eventId: string
-  ingredientId: string
+  name: string
   assignedToId: string
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
@@ -302,8 +319,9 @@ event PrepTaskClaimed: "prep_task.claimed" {
 event PrepTaskReleased: "prep_task.released" {
   prepTaskId: string
   tenantId: string
+  eventDishId: string
   eventId: string
-  ingredientId: string
+  name: string
   previousAssignedToId: string?
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
@@ -314,8 +332,9 @@ event PrepTaskReleased: "prep_task.released" {
 event PrepTaskStarted: "prep_task.started" {
   prepTaskId: string
   tenantId: string
+  eventDishId: string
   eventId: string
-  ingredientId: string
+  name: string
   assignedToId: string?
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
@@ -326,8 +345,9 @@ event PrepTaskStarted: "prep_task.started" {
 event PrepTaskCompleted: "prep_task.completed" {
   prepTaskId: string
   tenantId: string
+  eventDishId: string
   eventId: string
-  ingredientId: string
+  name: string
   assignedToId: string?
   quantity: decimal(12, 4)
   completedQuantity: decimal(12, 4)
@@ -339,8 +359,9 @@ event PrepTaskCompleted: "prep_task.completed" {
 event PrepTaskBlocked: "prep_task.blocked" {
   prepTaskId: string
   tenantId: string
+  eventDishId: string
   eventId: string
-  ingredientId: string
+  name: string
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
   previousStatus: PrepTaskStatus
@@ -351,8 +372,9 @@ event PrepTaskBlocked: "prep_task.blocked" {
 event PrepTaskUnblocked: "prep_task.unblocked" {
   prepTaskId: string
   tenantId: string
+  eventDishId: string
   eventId: string
-  ingredientId: string
+  name: string
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
   previousStatus: PrepTaskStatus
@@ -362,8 +384,9 @@ event PrepTaskUnblocked: "prep_task.unblocked" {
 event PrepTaskCancelled: "prep_task.cancelled" {
   prepTaskId: string
   tenantId: string
+  eventDishId: string
   eventId: string
-  ingredientId: string
+  name: string
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
   previousStatus: PrepTaskStatus
@@ -373,5 +396,10 @@ event PrepTaskCancelled: "prep_task.cancelled" {
 
 // EventCancelled → cancel open prep work for that event.
 on EventCancelled fanOut PrepTask where eventId = payload.eventId
+  run cancel
+  params { reason: payload.reason }
+
+// EventDishRemoved → cancel prep lines for that event dish.
+on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
   run cancel
   params { reason: payload.reason }

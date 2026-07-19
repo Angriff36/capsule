@@ -1,4 +1,4 @@
-# convex-application v1.3.4
+# convex-application v1.3.5
 
 Assembled by Builder from Manifest-published Convex application proofs.
 Status: **complete** (`verifyConvexApplicationAssembly` passed).

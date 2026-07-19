@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant PurchaseNeed as PurchaseNeed
+    participant EventBus
+    Client->>+PurchaseNeed: assignToDraft(vendorOrderId, vendorOrderLineId)
+    Note over PurchaseNeed: Policies: purchaseNeedRead, purchaseNeedWrite, purchaseNeedExecute
+    Note over PurchaseNeed: Guards (3)
+    PurchaseNeed->>PurchaseNeed: guard[0]: self.status == #quot;open#quot;
+    PurchaseNeed->>PurchaseNeed: guard[1]: self.openedAt != null
+    PurchaseNeed->>PurchaseNeed: guard[2]: self.deletedAt == null
+    PurchaseNeed->>PurchaseNeed: mutate.vendorOrderId
+    PurchaseNeed->>PurchaseNeed: mutate.vendorOrderLineId
+    PurchaseNeed->>EventBus: emit PurchaseNeedDraftAssigned on purchase_need.draft_assigned
+    PurchaseNeed-->>-Client: void

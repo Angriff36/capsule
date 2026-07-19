@@ -1,9 +1,9 @@
 {
   "$schema": "manifest-wiring-contract/v1",
   "meta": {
-    "compilerVersion": "3.6.21",
+    "compilerVersion": "3.6.24",
     "schemaVersion": "1.0",
-    "contentHash": "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1530d9c6f057bee0173c2f81dba3ab67637cf26c537bfae568de10cd03d6d12a:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:26f146885f0af70b3d05a99eeddcbf6930b37eaedfd137e4513487aaee09b73a:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:34d91d342d227dd2bcc42505fb227ebe592b8e69016fc3c4302a785b0bafc293:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:57838fb2d9616c87368b4801567e9f4543c8b46421fb392de2cd433acaba7d71:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:834dc5f77f8a7dc29f1a33828120aa41ccfc5bd48b45287f932df57171b58a6c:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:99b2b59742684a90590085f7e9c94c22433ebd3552e4a171c4ba24b2b4fd669f:a46c5e97573d9352884f09685287d09a9ba8cd95baf49a11be8f3ca25f8fb2c2:a617c75b66c794a512c36efeb4c7321c500f1ec64b5052d6ee4845db5fbc3195:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:eeee3923b778a88047d8a9693e9f0e09b68344415eb7621a5d2978f9b8f6bc1b:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f:fc6fc169e43b78e91acac17a2e59653d28cefd387dc17ed332dbc1dc5b4e049a",
+    "contentHash": "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:28c985d9ef8a52f4c42e51700b40aeedec2804793893d9e50033e0e1eb61fc1a:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:728e61c032fe46367413548d0842c84d372b976db2ce834510b96157d0a2557b:7a1df129c67a2078408d953496bc407cbeb1b9b0a380949db99617f9a49efc9f:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:870a8d351c294034e14611cdb8d44a851f4985fb246a6ff1f1eff26105d5170c:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:9e32b3a907507588d9a813328d43ea85d61feefc1a41b32b59e72ee41c2356bd:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c31bf476c50cabe3d77f4682e5548a0d72703008c7796b1e663955d44fd1282b:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f",
     "projection": "wiring"
   },
   "capabilities": [
@@ -1935,61 +1935,6 @@
     },
     {
       "entity": "Dish",
-      "command": "changeRecipe",
-      "capabilityId": "Dish.changeRecipe",
-      "route": "/api/manifest/Dish/commands/changeRecipe",
-      "instanceCommand": true,
-      "parameters": [
-        {
-          "name": "recipeId",
-          "tsType": "string",
-          "irTypeName": "uuid",
-          "required": true,
-          "nullable": false,
-          "ownership": "client",
-          "constraints": {},
-          "hasRuntimeGuards": true
-        }
-      ],
-      "clientParameterNames": [
-        "recipeId"
-      ],
-      "serverParameterNames": [],
-      "returnTsType": "unknown",
-      "emits": [
-        "DishRecipeChanged"
-      ],
-      "affectedEntity": "Dish",
-      "lifecycleTransitions": [],
-      "invalidation": [
-        {
-          "kind": "entityList",
-          "entity": "Dish",
-          "queryKeyHint": "queryKeys.dish.lists()",
-          "label": "entity list"
-        },
-        {
-          "kind": "entityDetail",
-          "entity": "Dish",
-          "queryKeyHint": "queryKeys.dish.detail(id)",
-          "label": "entity detail"
-        }
-      ],
-      "resultStates": {
-        "success": true,
-        "errors": [
-          "policy_denial",
-          "guard_failure",
-          "constraint_block",
-          "concurrency_conflict",
-          "missing_required_parameter",
-          "missing_trusted_context",
-          "unknown"
-        ]
-      }
-    },
-    {
-      "entity": "Dish",
       "command": "classifyAllergens",
       "capabilityId": "Dish.classifyAllergens",
       "route": "/api/manifest/Dish/commands/classifyAllergens",
@@ -2051,16 +1996,6 @@
       "route": "/api/manifest/Dish/commands/introduce",
       "instanceCommand": true,
       "parameters": [
-        {
-          "name": "recipeId",
-          "tsType": "string",
-          "irTypeName": "uuid",
-          "required": true,
-          "nullable": false,
-          "ownership": "client",
-          "constraints": {},
-          "hasRuntimeGuards": true
-        },
         {
           "name": "name",
           "tsType": "string",
@@ -2174,7 +2109,6 @@
         }
       ],
       "clientParameterNames": [
-        "recipeId",
         "name",
         "portionSize",
         "portionUnit",
@@ -2510,6 +2444,149 @@
           "kind": "entityDetail",
           "entity": "Dish",
           "queryKeyHint": "queryKeys.dish.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "DishRecipe",
+      "command": "attach",
+      "capabilityId": "DishRecipe.attach",
+      "route": "/api/manifest/DishRecipe/commands/attach",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "dishId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "recipeId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sortOrder",
+          "tsType": "number",
+          "irTypeName": "number",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "role",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "dishId",
+        "recipeId",
+        "sortOrder",
+        "role"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "DishRecipeAttached"
+      ],
+      "affectedEntity": "DishRecipe",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "DishRecipe",
+          "queryKeyHint": "queryKeys.dishRecipe.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "DishRecipe",
+          "queryKeyHint": "queryKeys.dishRecipe.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "DishRecipe",
+      "command": "detach",
+      "capabilityId": "DishRecipe.detach",
+      "route": "/api/manifest/DishRecipe/commands/detach",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "reason",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "reason"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "DishRecipeDetached"
+      ],
+      "affectedEntity": "DishRecipe",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "DishRecipe",
+          "queryKeyHint": "queryKeys.dishRecipe.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "DishRecipe",
+          "queryKeyHint": "queryKeys.dishRecipe.detail(id)",
           "label": "entity detail"
         }
       ],
@@ -4467,6 +4544,118 @@
     },
     {
       "entity": "EventDish",
+      "command": "addToEvent",
+      "capabilityId": "EventDish.addToEvent",
+      "route": "/api/manifest/EventDish/commands/addToEvent",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "eventId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "dishId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "quantityServings",
+          "tsType": "number",
+          "irTypeName": "number",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 0
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "course",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "serviceStyle",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "specialInstructions",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "eventId",
+        "dishId",
+        "quantityServings",
+        "course",
+        "serviceStyle",
+        "specialInstructions"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "EventDishAdded"
+      ],
+      "affectedEntity": "EventDish",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "EventDish",
+          "queryKeyHint": "queryKeys.eventDish.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "EventDish",
+          "queryKeyHint": "queryKeys.eventDish.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "EventDish",
       "command": "adjustServings",
       "capabilityId": "EventDish.adjustServings",
       "route": "/api/manifest/EventDish/commands/adjustServings",
@@ -4480,7 +4669,7 @@
           "nullable": false,
           "ownership": "client",
           "constraints": {
-            "min": 1
+            "min": 0
           },
           "hasRuntimeGuards": true
         }
@@ -4613,118 +4802,6 @@
       "returnTsType": "unknown",
       "emits": [
         "EventDishRemoved"
-      ],
-      "affectedEntity": "EventDish",
-      "lifecycleTransitions": [],
-      "invalidation": [
-        {
-          "kind": "entityList",
-          "entity": "EventDish",
-          "queryKeyHint": "queryKeys.eventDish.lists()",
-          "label": "entity list"
-        },
-        {
-          "kind": "entityDetail",
-          "entity": "EventDish",
-          "queryKeyHint": "queryKeys.eventDish.detail(id)",
-          "label": "entity detail"
-        }
-      ],
-      "resultStates": {
-        "success": true,
-        "errors": [
-          "policy_denial",
-          "guard_failure",
-          "constraint_block",
-          "concurrency_conflict",
-          "missing_required_parameter",
-          "missing_trusted_context",
-          "unknown"
-        ]
-      }
-    },
-    {
-      "entity": "EventDish",
-      "command": "select",
-      "capabilityId": "EventDish.select",
-      "route": "/api/manifest/EventDish/commands/select",
-      "instanceCommand": true,
-      "parameters": [
-        {
-          "name": "eventId",
-          "tsType": "string",
-          "irTypeName": "uuid",
-          "required": true,
-          "nullable": false,
-          "ownership": "client",
-          "constraints": {},
-          "hasRuntimeGuards": true
-        },
-        {
-          "name": "dishId",
-          "tsType": "string",
-          "irTypeName": "uuid",
-          "required": true,
-          "nullable": false,
-          "ownership": "client",
-          "constraints": {},
-          "hasRuntimeGuards": true
-        },
-        {
-          "name": "quantityServings",
-          "tsType": "number",
-          "irTypeName": "number",
-          "required": true,
-          "nullable": false,
-          "ownership": "client",
-          "constraints": {
-            "min": 1
-          },
-          "hasRuntimeGuards": true
-        },
-        {
-          "name": "course",
-          "tsType": "string",
-          "irTypeName": "string",
-          "required": false,
-          "nullable": false,
-          "ownership": "client",
-          "constraints": {},
-          "hasRuntimeGuards": true
-        },
-        {
-          "name": "serviceStyle",
-          "tsType": "string",
-          "irTypeName": "string",
-          "required": false,
-          "nullable": false,
-          "ownership": "client",
-          "constraints": {},
-          "hasRuntimeGuards": true
-        },
-        {
-          "name": "specialInstructions",
-          "tsType": "string",
-          "irTypeName": "string",
-          "required": false,
-          "nullable": false,
-          "ownership": "client",
-          "constraints": {},
-          "hasRuntimeGuards": true
-        }
-      ],
-      "clientParameterNames": [
-        "eventId",
-        "dishId",
-        "quantityServings",
-        "course",
-        "serviceStyle",
-        "specialInstructions"
-      ],
-      "serverParameterNames": [],
-      "returnTsType": "unknown",
-      "emits": [
-        "EventDishSelected"
       ],
       "affectedEntity": "EventDish",
       "lifecycleTransitions": [],
@@ -8426,6 +8503,259 @@
       }
     },
     {
+      "entity": "MenuDish",
+      "command": "add",
+      "capabilityId": "MenuDish.add",
+      "route": "/api/manifest/MenuDish/commands/add",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "menuId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "dishId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sortOrder",
+          "tsType": "number",
+          "irTypeName": "number",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "course",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "serviceStyle",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "specialInstructions",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "menuId",
+        "dishId",
+        "sortOrder",
+        "course",
+        "serviceStyle",
+        "specialInstructions"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "MenuDishAdded"
+      ],
+      "affectedEntity": "MenuDish",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "MenuDish",
+          "queryKeyHint": "queryKeys.menuDish.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "MenuDish",
+          "queryKeyHint": "queryKeys.menuDish.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "MenuDish",
+      "command": "remove",
+      "capabilityId": "MenuDish.remove",
+      "route": "/api/manifest/MenuDish/commands/remove",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "reason",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "reason"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "MenuDishRemoved"
+      ],
+      "affectedEntity": "MenuDish",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "MenuDish",
+          "queryKeyHint": "queryKeys.menuDish.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "MenuDish",
+          "queryKeyHint": "queryKeys.menuDish.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "MenuDish",
+      "command": "updateDetails",
+      "capabilityId": "MenuDish.updateDetails",
+      "route": "/api/manifest/MenuDish/commands/updateDetails",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "sortOrder",
+          "tsType": "number",
+          "irTypeName": "number",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "course",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "serviceStyle",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "specialInstructions",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "sortOrder",
+        "course",
+        "serviceStyle",
+        "specialInstructions"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "MenuDishDetailsUpdated"
+      ],
+      "affectedEntity": "MenuDish",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "MenuDish",
+          "queryKeyHint": "queryKeys.menuDish.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "MenuDish",
+          "queryKeyHint": "queryKeys.menuDish.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
       "entity": "Organization",
       "command": "deactivate",
       "capabilityId": "Organization.deactivate",
@@ -11233,6 +11563,16 @@
       "instanceCommand": true,
       "parameters": [
         {
+          "name": "eventDishId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
           "name": "eventId",
           "tsType": "string",
           "irTypeName": "uuid",
@@ -11243,9 +11583,9 @@
           "hasRuntimeGuards": true
         },
         {
-          "name": "ingredientId",
+          "name": "name",
           "tsType": "string",
-          "irTypeName": "uuid",
+          "irTypeName": "string",
           "required": true,
           "nullable": false,
           "ownership": "client",
@@ -11292,7 +11632,7 @@
           "hasRuntimeGuards": true
         },
         {
-          "name": "ingredientDemandId",
+          "name": "ingredientId",
           "tsType": "string",
           "irTypeName": "uuid",
           "required": false,
@@ -11302,7 +11642,7 @@
           "hasRuntimeGuards": true
         },
         {
-          "name": "dishId",
+          "name": "ingredientDemandId",
           "tsType": "string",
           "irTypeName": "uuid",
           "required": false,
@@ -11355,12 +11695,13 @@
         }
       ],
       "clientParameterNames": [
+        "eventDishId",
         "eventId",
-        "ingredientId",
+        "name",
         "quantity",
         "unit",
+        "ingredientId",
         "ingredientDemandId",
-        "dishId",
         "recipeId",
         "station",
         "dueAt",
@@ -12359,6 +12700,72 @@
     },
     {
       "entity": "PurchaseNeed",
+      "command": "assignToDraft",
+      "capabilityId": "PurchaseNeed.assignToDraft",
+      "route": "/api/manifest/PurchaseNeed/commands/assignToDraft",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "vendorOrderId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "vendorOrderLineId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "vendorOrderId",
+        "vendorOrderLineId"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "PurchaseNeedDraftAssigned"
+      ],
+      "affectedEntity": "PurchaseNeed",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "PurchaseNeed",
+          "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "PurchaseNeed",
+          "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "PurchaseNeed",
       "command": "cancel",
       "capabilityId": "PurchaseNeed.cancel",
       "route": "/api/manifest/PurchaseNeed/commands/cancel",
@@ -12516,6 +12923,55 @@
       ],
       "affectedEntity": "PurchaseNeed",
       "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "PurchaseNeed",
+          "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "PurchaseNeed",
+          "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "PurchaseNeed",
+      "command": "markDraftOrdered",
+      "capabilityId": "PurchaseNeed.markDraftOrdered",
+      "route": "/api/manifest/PurchaseNeed/commands/markDraftOrdered",
+      "instanceCommand": true,
+      "parameters": [],
+      "clientParameterNames": [],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "PurchaseNeedOrdered"
+      ],
+      "affectedEntity": "PurchaseNeed",
+      "lifecycleTransitions": [
+        {
+          "property": "status",
+          "from": "open",
+          "to": "ordered",
+          "proven": true
+        }
+      ],
       "invalidation": [
         {
           "kind": "entityList",
@@ -15304,6 +15760,230 @@
       }
     },
     {
+      "entity": "RecipeStep",
+      "command": "add",
+      "capabilityId": "RecipeStep.add",
+      "route": "/api/manifest/RecipeStep/commands/add",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "recipeId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "instruction",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sortOrder",
+          "tsType": "number",
+          "irTypeName": "number",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "durationMinutes",
+          "tsType": "number",
+          "irTypeName": "number",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 0
+          },
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "recipeId",
+        "instruction",
+        "sortOrder",
+        "durationMinutes"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeStepAdded"
+      ],
+      "affectedEntity": "RecipeStep",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeStep",
+          "queryKeyHint": "queryKeys.recipeStep.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeStep",
+          "queryKeyHint": "queryKeys.recipeStep.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeStep",
+      "command": "remove",
+      "capabilityId": "RecipeStep.remove",
+      "route": "/api/manifest/RecipeStep/commands/remove",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "reason",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "reason"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeStepRemoved"
+      ],
+      "affectedEntity": "RecipeStep",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeStep",
+          "queryKeyHint": "queryKeys.recipeStep.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeStep",
+          "queryKeyHint": "queryKeys.recipeStep.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "RecipeStep",
+      "command": "revise",
+      "capabilityId": "RecipeStep.revise",
+      "route": "/api/manifest/RecipeStep/commands/revise",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "instruction",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sortOrder",
+          "tsType": "number",
+          "irTypeName": "number",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "durationMinutes",
+          "tsType": "number",
+          "irTypeName": "number",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 0
+          },
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "instruction",
+        "sortOrder",
+        "durationMinutes"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "RecipeStepRevised"
+      ],
+      "affectedEntity": "RecipeStep",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "RecipeStep",
+          "queryKeyHint": "queryKeys.recipeStep.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "RecipeStep",
+          "queryKeyHint": "queryKeys.recipeStep.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
       "entity": "SavedReportDefinition",
       "command": "archive",
       "capabilityId": "SavedReportDefinition.archive",
@@ -17413,6 +18093,30 @@
           "hasRuntimeGuards": true
         },
         {
+          "name": "sourceRangeStart",
+          "tsType": "string",
+          "irTypeName": "datetime",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "dateLike": true
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sourceRangeEnd",
+          "tsType": "string",
+          "irTypeName": "datetime",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "dateLike": true
+          },
+          "hasRuntimeGuards": true
+        },
+        {
           "name": "orderNumber",
           "tsType": "string",
           "irTypeName": "string",
@@ -17436,6 +18140,8 @@
       "clientParameterNames": [
         "vendorId",
         "eventId",
+        "sourceRangeStart",
+        "sourceRangeEnd",
         "orderNumber",
         "notes"
       ],

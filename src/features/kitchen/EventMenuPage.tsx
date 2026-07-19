@@ -43,7 +43,7 @@ export function EventMenuPage() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    void run("select", async () => {
+    void run("addToEvent", async () => {
       await createEventDish({
         eventId,
         dishId: String(data.get("dishId")),
@@ -65,8 +65,8 @@ export function EventMenuPage() {
           <p className="eyebrow">Culinary book · Cross-system handoff</p>
           <h1 className="display-title mt-2">Event menu</h1>
           <p className="mt-3 max-w-150 text-ink-2">
-            Select service dishes for a real event. The generated EventDish
-            command decides whether the event stage permits the change.
+            Add dishes to a real event. Managers can add, adjust, zero servings
+            (86), or remove through planning and executing.
           </p>
         </div>
       </header>

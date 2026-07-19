@@ -39,6 +39,10 @@ describe("UnitOfMeasureMapper", () => {
     expect(mapper.map("tsp")).toBe("teaspoon");
     expect(mapper.map("cans")).toBe("each");
     expect(mapper.map("servings")).toBe("portion");
+    expect(mapper.map("C")).toBe("cup");
+    expect(mapper.map("qts")).toBe("quart");
+    expect(mapper.map("gals")).toBe("gallon");
+    expect(mapper.isKnownAlias("C")).toBe(true);
   });
 });
 
@@ -80,6 +84,43 @@ describe("RecipeTextParser", () => {
       quantity: 2,
       unit: "pound",
       name: "Basil Leaves",
+    });
+  });
+
+  it("does not treat numbered method steps as ingredients", () => {
+    const parsed = new RecipeTextParser().parse(
+      readFixture("basil-pesto-numbered-steps.txt"),
+    );
+    expect(parsed.yieldQuantity).toBe(2);
+    expect(parsed.yieldUnit).toBe("quart");
+    expect(parsed.lines.map((line) => line.name)).toEqual([
+      "Basil Leaves",
+      "Olive Oil",
+      "Parmesan",
+    ]);
+    expect(parsed.lines.some((line) => /blend/i.test(line.name))).toBe(false);
+    expect(parsed.instructions).toContain("Blend all ingredients");
+  });
+
+  it("maps C / qts / gallons yield and unit aliases", () => {
+    const parser = new RecipeTextParser();
+    expect(parser.mapUnitAlias("C")).toBe("cup");
+    expect(parser.mapUnitAlias("qts")).toBe("quart");
+    expect(parser.mapUnitAlias("gals")).toBe("gallon");
+    const gallons = parser.parse(
+      "Batch Sauce\n\nYield: 5 gallons\n\nIngredients:\n1 cup salt\n",
+    );
+    expect(gallons.yieldQuantity).toBe(5);
+    expect(gallons.yieldUnit).toBe("gallon");
+    const quarterCup = parser.parse(
+      "Butter\n\nMakes 1/4 C\n\nIngredients:\n1/4 C honey\n",
+    );
+    expect(quarterCup.yieldQuantity).toBeCloseTo(0.25);
+    expect(quarterCup.yieldUnit).toBe("cup");
+    expect(quarterCup.lines[0]).toMatchObject({
+      name: "Honey",
+      unit: "cup",
+      quantity: 0.25,
     });
   });
 });

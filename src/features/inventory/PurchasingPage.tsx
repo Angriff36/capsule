@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   useCreateVendor,
   useCreateVendorOrder,
+  useCreateVendorOrderLine,
   useListEvent,
   useListIngredient,
   useListPurchaseNeed,
@@ -10,6 +11,7 @@ import {
   useListVendorOrder,
   useListVendorOrderLine,
   usePurchaseNeedCancel,
+  usePurchaseNeedAssignToDraft,
   usePurchaseNeedMarkFulfilled,
   usePurchaseNeedMarkOrdered,
 } from "../../lib/manifest-convex-react";
@@ -17,8 +19,21 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
+import { PrepPurchaseDraftCoordinator } from "./PrepPurchaseDraftCoordinator";
 
 const policy = new SupplyLifecyclePolicy();
+
+function isoDate(value: Date) {
+  return value.toISOString().slice(0, 10);
+}
+
+function startOfDay(value: string) {
+  return new Date(`${value}T00:00:00`).getTime();
+}
+
+function endOfDay(value: string) {
+  return new Date(`${value}T23:59:59.999`).getTime();
+}
 
 export function PurchasingPage() {
   const needs = useListPurchaseNeed();
@@ -29,12 +44,18 @@ export function PurchasingPage() {
   const events = useListEvent();
   const createVendor = useCreateVendor();
   const createOrder = useCreateVendorOrder();
+  const createOrderLine = useCreateVendorOrderLine();
+  const assignNeedToDraft = usePurchaseNeedAssignToDraft();
   const markOrdered = usePurchaseNeedMarkOrdered();
   const markFulfilled = usePurchaseNeedMarkFulfilled();
   const cancelNeed = usePurchaseNeedCancel();
-  const [form, setForm] = useState<"vendor" | "order" | null>(null);
+  const [form, setForm] = useState<"vendor" | "order" | "prepDraft" | null>(
+    null,
+  );
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const [generatedOrderId, setGeneratedOrderId] = useState<string | null>(null);
+  const [draftRange, setDraftRange] = useState({ start: "", end: "" });
 
   const activeNeeds = (needs ?? []).filter((item) => item.deletedAt == null);
   const activeVendors = (vendors ?? []).filter(
@@ -82,7 +103,7 @@ export function PurchasingPage() {
           paymentTermsDays: Number(data.get("paymentTermsDays")),
           notes: String(data.get("notes") ?? "").trim() || undefined,
         });
-      } else {
+      } else if (current === "order") {
         await createOrder({
           vendorId: String(data.get("vendorId")),
           eventId: String(data.get("eventId")) || undefined,
@@ -90,6 +111,41 @@ export function PurchasingPage() {
             String(data.get("orderNumber") ?? "").trim() || undefined,
           notes: String(data.get("notes") ?? "").trim() || undefined,
         });
+      } else {
+        const rangeStart = startOfDay(String(data.get("rangeStart") ?? ""));
+        const rangeEnd = endOfDay(String(data.get("rangeEnd") ?? ""));
+        if (!Number.isFinite(rangeStart) || !Number.isFinite(rangeEnd)) {
+          throw new Error("Select both dates for the purchase draft range.");
+        }
+        const coordinator = new PrepPurchaseDraftCoordinator({
+          openOrder: (input) =>
+            createOrder(input) as Promise<{ docId: string }>,
+          addLine: (input) =>
+            createOrderLine(input) as Promise<{ docId: string }>,
+          assignNeedToDraft: (input) =>
+            assignNeedToDraft(input as Parameters<typeof assignNeedToDraft>[0]),
+        });
+        const result = await coordinator.generate({
+          vendorId: String(data.get("vendorId")),
+          rangeStart,
+          rangeEnd,
+          needs: activeNeeds.map((need) => ({
+            id: need._id,
+            version: need.version,
+            eventId: need.eventId,
+            ingredientId: need.ingredientId,
+            requiredQuantity: Number(need.requiredQuantity),
+            unit: String(need.unit),
+            status: String(need.status),
+            deletedAt: need.deletedAt,
+          })),
+          events: (events ?? []).map((item) => ({
+            id: item._id,
+            startsAt: item.startsAt,
+            deletedAt: item.deletedAt,
+          })),
+        });
+        setGeneratedOrderId(result.orderId);
       }
       element.reset();
       setForm(null);
@@ -136,6 +192,12 @@ export function PurchasingPage() {
           <button className="btn btn-primary" onClick={() => setForm("order")}>
             Open order
           </button>
+          <button
+            className="btn btn-primary"
+            onClick={() => setForm("prepDraft")}
+          >
+            Generate prep-list draft
+          </button>
         </div>
       </header>
       <InventoryWorkspaceNav />
@@ -154,7 +216,11 @@ export function PurchasingPage() {
             <div>
               <p className="eyebrow">Governed procurement command</p>
               <h2>
-                {form === "vendor" ? "Onboard vendor" : "Open vendor order"}
+                {form === "vendor"
+                  ? "Onboard vendor"
+                  : form === "order"
+                    ? "Open vendor order"
+                    : "Generate prep-list draft"}
               </h2>
             </div>
             <div className="supply-row-actions">
@@ -201,7 +267,7 @@ export function PurchasingPage() {
                   <textarea name="notes" className="input min-h-20 py-2" />
                 </label>
               </>
-            ) : (
+            ) : form === "order" ? (
               <>
                 <label className="field-label">
                   Vendor
@@ -238,9 +304,109 @@ export function PurchasingPage() {
                   <textarea name="notes" className="input min-h-20 py-2" />
                 </label>
               </>
+            ) : (
+              <>
+                <label className="field-label">
+                  Vendor
+                  <select name="vendorId" className="input" required>
+                    <option value="">Select vendor</option>
+                    {activeVendors
+                      .filter((item) => item.status === "active")
+                      .map((item) => (
+                        <option key={item._id} value={item._id}>
+                          {item.name}
+                        </option>
+                      ))}
+                  </select>
+                </label>
+                <div className="field-label">
+                  Quick range
+                  <div className="supply-row-actions">
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => {
+                        const today = new Date();
+                        const start = new Date(today);
+                        start.setDate(today.getDate() - 7);
+                        setDraftRange({
+                          start: isoDate(start),
+                          end: isoDate(today),
+                        });
+                      }}
+                    >
+                      Last 7 days
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => {
+                        const today = new Date();
+                        const end = new Date(today);
+                        end.setDate(today.getDate() + 7);
+                        setDraftRange({
+                          start: isoDate(today),
+                          end: isoDate(end),
+                        });
+                      }}
+                    >
+                      Upcoming 7 days
+                    </button>
+                  </div>
+                </div>
+                <label className="field-label">
+                  From
+                  <input
+                    name="rangeStart"
+                    type="date"
+                    className="input"
+                    required
+                    value={draftRange.start}
+                    onChange={(event) =>
+                      setDraftRange((range) => ({
+                        ...range,
+                        start: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label className="field-label">
+                  Through
+                  <input
+                    name="rangeEnd"
+                    type="date"
+                    className="input"
+                    required
+                    value={draftRange.end}
+                    onChange={(event) =>
+                      setDraftRange((range) => ({
+                        ...range,
+                        end: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <p className="supply-span-2 text-[12px] text-ink-2">
+                  Combines open prep-list purchase needs across every event in
+                  the selected inclusive range. The generated order remains a
+                  draft until you submit it.
+                </p>
+              </>
             )}
           </div>
         </form>
+      ) : null}
+
+      {generatedOrderId ? (
+        <div className="card border-success/40 px-4 py-3" role="status">
+          <p className="font-semibold text-success">Purchase draft generated</p>
+          <Link
+            className="text-link"
+            to={`/inventory/orders/${generatedOrderId}`}
+          >
+            Open the combined order draft →
+          </Link>
+        </div>
       ) : null}
 
       <div className="supply-split">

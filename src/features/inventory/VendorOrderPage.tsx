@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import {
   useCreateVendorOrderLine,
   useGetVendorOrder,
+  useListEvent,
   useListIngredient,
   useListPurchaseNeed,
   useListStorageLocation,
@@ -29,6 +30,7 @@ export function VendorOrderPage() {
   const vendors = useListVendor();
   const lines = useListVendorOrderLine();
   const needs = useListPurchaseNeed();
+  const events = useListEvent();
   const ingredients = useListIngredient();
   const locations = useListStorageLocation();
   const createLine = useCreateVendorOrderLine();
@@ -67,6 +69,8 @@ export function VendorOrderPage() {
   const ingredientName = (ingredientId: string) =>
     ingredients?.find((item) => item._id === ingredientId)?.name ??
     "Unknown ingredient";
+  const eventName = (eventId: string) =>
+    events?.find((item) => item._id === eventId)?.title ?? "Unknown event";
   const locationName = (locationId?: string | null) =>
     locations?.find((item) => item._id === locationId)?.name ?? "Unassigned";
 
@@ -309,6 +313,7 @@ export function VendorOrderPage() {
         </div>
         {lines === undefined ||
         needs === undefined ||
+        events === undefined ||
         ingredients === undefined ||
         locations === undefined ? (
           <TableSkeleton rows={6} />
@@ -322,8 +327,9 @@ export function VendorOrderPage() {
         ) : (
           <ul>
             {orderLines.map((line) => {
-              const need = needs?.find(
-                (item) => item.ingredientDemandId === line.ingredientDemandId,
+              const lineNeeds = needs.filter(
+                (item) =>
+                  item.deletedAt == null && item.vendorOrderLineId === line._id,
               );
               return (
                 <li key={line._id}>
@@ -331,10 +337,16 @@ export function VendorOrderPage() {
                     <div>
                       <strong>{ingredientName(line.ingredientId)}</strong>
                       <span>
-                        {need
-                          ? `Need ${need._id.slice(-8)} · event ${need.eventId.slice(-8)}`
+                        {lineNeeds.length
+                          ? `${lineNeeds.length} contributing purchase need${lineNeeds.length === 1 ? "" : "s"}`
                           : "No PurchaseNeed link"}
                       </span>
+                      {lineNeeds.map((need) => (
+                        <small key={need._id}>
+                          {eventName(need.eventId)} · {need.requiredQuantity}{" "}
+                          {need.unit}
+                        </small>
+                      ))}
                     </div>
                     <div className="order-line-quantity">
                       <strong>

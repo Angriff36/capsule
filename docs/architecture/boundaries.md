@@ -29,6 +29,29 @@
 | `scripts/seed-convex.ts`                                         | Manifest Builder           |
 | Contract tests / `diagrams/` companions                          | Manifest Builder           |
 
+### Convex schema vs `schemas/**` (do not confuse)
+
+| Path                          | What it is                                                                                                        |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `convex/schema.ts`            | **Real Convex DB schema** (tables, indexes, `v.*` validators). Runtime authority.                                 |
+| `schemas/manifest-schemas.ts` | **Bundled Zod companion** (synced-validation). Not Convex. Wired into `manifest-convex-react` hooks via `.parse`. |
+
+**Plain English — what Zod is for:** Convex already checks args on the server. The Zod bundle is a client checklist from the same Manifest model so hooks reject bad input *before* the mutation runs.
+
+**Synced-validation (Builder preset ≥ 1.3.5 + Manifest `zodParamsImport`):** Emit **only** `schemas/manifest-schemas.ts`. React hooks parse command params. Per-command microfiles are not assembled (legacy dumps deleted on next ownership-aware regen).
+
+**Benefit when wired:** client parse rejects bad shapes before the network; hooks stay aligned with Manifest command params. Does **not** replace server guards/policies.
+
+### What must stay in git vs companion noise
+
+| Keep tracked (CI / runtime)                                   | Today tracked because ownership, low product value                          |
+| ------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Authored `tests/**`                                           | `diagrams/**` mermaid companions                                            |
+| `tests/manifest-convex.contract.test.ts` (export smoke)       | Legacy `schemas/*.schema.ts` microfiles (removed after regen on new preset) |
+| `convex/schema.ts` + surfaces + `schemas/manifest-schemas.ts` |                                                                             |
+
+Untracking diagrams is still a companion packaging change. Do not delete owned paths without `.builder/ownership.json` via regen.
+
 If a Builder regenerate would overwrite an author seam, **stop**. Preserve the seam; never “fix” generated output by hand.
 
 Full assembly rules: [manifest-builder](../generation/manifest-builder.md). Receipt: [`PRESET.md`](../../PRESET.md).

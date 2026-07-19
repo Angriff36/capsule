@@ -30,9 +30,11 @@ enum WasteRecordStatus {
 // Materialized required quantity of one Ingredient for one Event.
 // Prep-list derivation (recipe line × batch × servings / yield) lands via
 // later reactions; this entity stores the governed result and its inputs.
-// Shortage vs on-hand/reservations is deferred (OD015) — no hasMany edges
-// from this entity to InventoryItem / InventoryReservation for aggregate
-// computeds (builtins.md aggregates over hasMany only).
+// Shortage vs on-hand/reservations is deferred (D056 / Q10; was OD015) —
+// no hasMany edges from this entity to InventoryItem / InventoryReservation
+// for aggregate computeds (builtins.md aggregates over hasMany only).
+// Until edges + (if needed) multi-hop math land, derive shortage outside
+// Manifest and feed governed commands.
 entity IngredientDemand mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   unique [tenantId, eventId, ingredientId]

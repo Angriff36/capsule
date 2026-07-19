@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant RecipeStep as RecipeStep
+    participant EventBus
+    Client->>+RecipeStep: add(recipeId, instruction, sortOrder, durationMinutes)
+    Note over RecipeStep: Policies: recipeStepRead, recipeStepWrite, recipeStepExecute
+    Note over RecipeStep: Guards (2)
+    RecipeStep->>RecipeStep: guard[0]: self.addedAt == null
+    RecipeStep->>RecipeStep: guard[1]: self.deletedAt == null
+    RecipeStep->>RecipeStep: mutate.recipeId
+    RecipeStep->>RecipeStep: mutate.instruction
+    RecipeStep->>RecipeStep: mutate.sortOrder
+    RecipeStep->>RecipeStep: mutate.durationMinutes
+    RecipeStep->>RecipeStep: mutate.addedAt
+    RecipeStep->>EventBus: emit RecipeStepAdded on recipe_step.added
+    RecipeStep-->>-Client: void

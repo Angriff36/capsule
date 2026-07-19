@@ -15,6 +15,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip Contract: no create command in IR (2 rows unused)
   // skip Delivery: no create command in IR (2 rows unused)
   // skip Dish: no create command in IR (2 rows unused)
+  // skip DishRecipe: no create command in IR (2 rows unused)
   // skip Event: no create command in IR (2 rows unused)
   // skip EventAllergenCheck: no create command in IR (2 rows unused)
   // skip EventAssignment: no create command in IR (2 rows unused)
@@ -28,6 +29,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip InventoryReservation: no create command in IR (2 rows unused)
   // skip Invoice: no create command in IR (2 rows unused)
   // skip Menu: no create command in IR (2 rows unused)
+  // skip MenuDish: no create command in IR (2 rows unused)
   // skip Organization: no create command in IR (2 rows unused)
   // skip PackList: no create command in IR (2 rows unused)
   // skip PackListItem: no create command in IR (2 rows unused)
@@ -47,6 +49,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip RecipeImport: no create command in IR (2 rows unused)
   // skip RecipeImportLine: no create command in IR (2 rows unused)
   // skip RecipeIngredient: no create command in IR (2 rows unused)
+  // skip RecipeStep: no create command in IR (2 rows unused)
   // skip SavedReportDefinition: no create command in IR (2 rows unused)
   // skip Shift: no create command in IR (2 rows unused)
   // skip SoftDeletable: not a Convex-persistent store (2 rows unused)
@@ -91,6 +94,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "Dish",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "DishRecipe",
       "createMutation": null,
       "rowCount": 2
     },
@@ -156,6 +164,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "Menu",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "MenuDish",
       "createMutation": null,
       "rowCount": 2
     },
@@ -241,6 +254,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "RecipeIngredient",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "RecipeStep",
       "createMutation": null,
       "rowCount": 2
     },

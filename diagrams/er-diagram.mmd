@@ -118,7 +118,6 @@ erDiagram
         uuid id "PK"
         string tenantId "PK"
         datetime deletedAt "nullable"
-        uuid recipeId "PK"
         string name "PK"
         string description "nullable"
         string category "nullable"
@@ -135,7 +134,22 @@ erDiagram
         datetime createdAt
         datetime updatedAt
     }
-    Dish }o--|| Recipe : "recipe"
+    Dish ||--o{ DishRecipe : "recipeLines"
+    DishRecipe {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid dishId "PK"
+        uuid recipeId "PK"
+        int sortOrder "PK"
+        string role "nullable"
+        datetime attachedAt "nullable"
+        datetime removedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    DishRecipe }o--|| Dish : "dish"
+    DishRecipe }o--|| Recipe : "recipe"
     Event {
         uuid id "PK"
         string tenantId "PK"
@@ -257,7 +271,7 @@ erDiagram
         string course "nullable"
         string serviceStyle "nullable"
         string specialInstructions "nullable"
-        datetime selectedAt "nullable"
+        datetime addedAt "nullable"
         datetime removedAt "nullable"
         datetime createdAt
         datetime updatedAt
@@ -446,6 +460,23 @@ erDiagram
         datetime createdAt
         datetime updatedAt
     }
+    MenuDish {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid menuId "PK"
+        uuid dishId "PK"
+        int sortOrder "PK"
+        string course "nullable"
+        string serviceStyle "nullable"
+        string specialInstructions "nullable"
+        datetime addedAt "nullable"
+        datetime removedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    MenuDish }o--|| Menu : "menu"
+    MenuDish }o--|| Dish : "dish"
     Organization {
         uuid id "PK"
         string tenantId "PK"
@@ -590,10 +621,11 @@ erDiagram
         uuid id "PK"
         string tenantId "PK"
         datetime deletedAt "nullable"
+        uuid eventDishId "PK"
         uuid eventId "PK"
-        uuid ingredientId "PK"
+        string name "PK"
+        uuid ingredientId "nullable"
         uuid ingredientDemandId "nullable"
-        uuid dishId "nullable"
         uuid recipeId "nullable"
         decimal quantity "PK"
         decimal completedQuantity "nullable"
@@ -613,10 +645,10 @@ erDiagram
         datetime createdAt
         datetime updatedAt
     }
+    PrepTask }o--|| EventDish : "eventDish"
     PrepTask }o--|| Event : "event"
     PrepTask }o--|| Ingredient : "ingredient"
     PrepTask }o--|| IngredientDemand : "ingredientDemand"
-    PrepTask }o--|| Dish : "dish"
     PrepTask }o--|| Recipe : "recipe"
     PrepTask }o--|| Person : "assignedTo"
     ProductionBatch {
@@ -755,6 +787,7 @@ erDiagram
         datetime createdAt
         datetime updatedAt
     }
+    Recipe ||--o{ RecipeStep : "steps"
     Recipe ||--o{ RecipeIngredient : "ingredientLines"
     RecipeImport {
         uuid id "PK"
@@ -828,6 +861,19 @@ erDiagram
     }
     RecipeIngredient }o--|| Recipe : "recipe"
     RecipeIngredient }o--|| Ingredient : "ingredient"
+    RecipeStep {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid recipeId "PK"
+        string instruction "PK"
+        int sortOrder "PK"
+        int durationMinutes "nullable"
+        datetime addedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    RecipeStep }o--|| Recipe : "recipe"
     SavedReportDefinition {
         uuid id "PK"
         string tenantId "PK"
@@ -941,6 +987,8 @@ erDiagram
         datetime deletedAt "nullable"
         uuid vendorId "PK"
         uuid eventId "nullable"
+        datetime sourceRangeStart "nullable"
+        datetime sourceRangeEnd "nullable"
         string orderNumber "nullable"
         money subtotal "PK"
         money taxAmount "PK"

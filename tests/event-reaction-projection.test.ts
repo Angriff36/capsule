@@ -41,10 +41,12 @@ describe("Event lifecycle reaction projection", () => {
         "IngredientDemand_confirm",
         "__runPurchaseNeedCreate",
       ],
+      // Submission, not line creation, marks demand-linked needs ordered
+      // (owner design decision 2026-07-19 — drafts keep needs open).
       [
-        "__runVendorOrderLineAddLine",
-        "VendorOrderLine_addLine",
-        "__runPurchaseNeedMarkOrdered",
+        "__runVendorOrderSubmit",
+        "VendorOrder_submit",
+        "__runPurchaseNeedMarkDraftOrdered",
       ],
     ] as const;
 

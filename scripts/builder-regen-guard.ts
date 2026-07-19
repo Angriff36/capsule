@@ -167,6 +167,8 @@ export class BuilderRegenGuard {
     const result = spawnSync("git", ["show", `:${rel}`], {
       cwd: this.root,
       encoding: "utf8",
+      // Owned Convex surfaces (mutations.ts) exceed Node's 1 MiB default.
+      maxBuffer: 32 * 1024 * 1024,
     });
     if (result.status !== 0 || !result.stdout) {
       throw new Error(`git show :${rel} failed`);
