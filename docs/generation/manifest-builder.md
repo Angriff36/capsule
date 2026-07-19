@@ -10,7 +10,7 @@ CapsuleX is **assembled**, not hand-grown end-to-end:
 
 **Manifest IR → Builder `convex-application` preset → this repo.**
 
-Current preset: `convex-application` **v1.3.4** (`package.json` → `manifestPreset`, status complete in `PRESET.md`).
+Current preset: `convex-application` **v1.3.5** (`package.json` → `manifestPreset`, status complete in `PRESET.md`).
 
 ## Authoritative generators
 

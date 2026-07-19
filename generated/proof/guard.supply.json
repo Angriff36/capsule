@@ -1,11 +1,11 @@
 {
   "schemaVersion": "manifest-integration-guard/v1",
   "versions": {
-    "manifestVersion": "3.6.22",
+    "manifestVersion": "3.6.24",
     "projection": "convex",
     "preset": {
       "id": "convex-application",
-      "version": "1.3.4"
+      "version": "1.3.5"
     }
   },
   "featureRoots": [

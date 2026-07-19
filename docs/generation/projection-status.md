@@ -5,7 +5,9 @@ Authority: verified behavior of the generated CapsuleX artifacts in this checkou
 
 > **Correction (2026-07-17):** Capsule is a live Manifest project — Builder update-mode regen compiles from this repo’s `src/**/*.manifest` + `manifest.config.yaml` (see `docs/generation/manifest-builder.md`). `Manifest-source` may still be used as an external sync/compare baseline; it is not required for regeneration after init.
 
-Verified **2026-07-16** against Manifest **3.6.12** and Builder preset `convex-application` **1.3.4**.
+~~Verified **2026-07-16** against Manifest **3.6.12** and Builder preset `convex-application` **1.3.4**.~~
+
+> **Correction (2026-07-19):** Verified against Manifest **3.6.24** and Builder preset `convex-application` **1.3.5** (`package.json` → `manifestPreset`, `PRESET.md`).
 
 ## Generated coverage
 
