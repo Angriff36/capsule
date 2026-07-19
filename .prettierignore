@@ -1,5 +1,6 @@
 # Generated / Manifest assembly (do not reformat)
 convex/_generated/
+convex/lib/
 convex/schema.ts
 convex/queries.ts
 convex/mutations.ts
@@ -16,6 +17,8 @@ tests/manifest-convex.contract.test.ts
 diagrams/
 ASSEMBLY_REPORT.json
 manifest-context-summary.json
+PRESET.md
+tsconfig.builder.json
 
 # Build / tooling noise
 dist/
@@ -32,3 +35,7 @@ package-lock.json
 generated/ir/
 
 generated/proof/
+
+# Docs keep author formatting - prettier is for code only (policy 2026-07-19)
+*.md
+*.mdx
