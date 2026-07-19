@@ -7,7 +7,7 @@
 | Loop                         | Max runs/day | Max tokens/day     | Max sub-agent spawns/run |
 | ---------------------------- | ------------ | ------------------ | ------------------------ |
 | Triage ticks (L1)            | 6            | 400k               | 0                        |
-| Dispatch + verify (L2 — OFF) | 0            | 0 until graduation | 2                        |
+| Fix + verify (L2 away mode)  | 5 (1/tick)   | worker-plan tokens (GLM/MiniMax, not Anthropic) | 0                        |
 
 Expected L1 spend: ~5k/tick no-op, ~50k/tick full triage → 30–300k/day.
 

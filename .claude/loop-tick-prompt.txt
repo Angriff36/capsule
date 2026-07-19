@@ -1,1 +1,18 @@
-Capsule Daily Triage L1 tick (loop-engineering daily-triage pattern). You are the tick runner (GLM/MiniMax worker session) — Fable is the overseer and never runs ticks. If STATE.md contains loop-pause-all, exit immediately. Otherwise: run the loop-budget skill (start check), then loop-constraints, then loop-triage. Update STATE.md, prune resolved items, append a JSON entry to loop-run-log.md with source "glm-tick" (or "minimax-tick" if you are MiniMax-M3). Report-only: never edit source, tests, or config; never git add/commit/stash (the human works in this checkout); no fix PRs; no sub-agents.
+Capsule loop tick — L2 STANDING (draft-PR fix powers permanent per human decision 2026-07-19). You are the tick runner (GLM/MiniMax worker session); Fable never runs ticks. Read loop-constraints.md FIRST and obey it over anything here.
+
+1. If STATE.md contains loop-pause-all, exit immediately.
+2. Run the loop-budget start check, then loop-constraints, then loop-triage: update STATE.md, prune resolved items, append a JSON entry to loop-run-log.md with source "glm-tick" (or "minimax-tick").
+3. Fix flow — at most ONE attempt per tick. Pick the top High Priority item that is OUTSIDE the denylist (never Builder-owned files per .builder/ownership.json, never generated/**, .builder/**, *.manifest, manifest.config.yaml, convex/schema.ts, .env*, auth/payments/billing). Check loop-ledger.json: 3 prior failures on the item -> escalate in STATE.md instead.
+   a. git worktree add .loop-worktrees/<run-id> -b loop/<run-id> main  (run-id like fix-YYYYMMDDTHHMM)
+   b. Smallest possible fix INSIDE that worktree only (minimal-fix skill).
+   c. Verify in the worktree: bun install if needed, bun run typecheck, the focused test, and for the proof-kit item bun run proof:emit.
+   d. Codex gate: git diff main | codex exec -s read-only -c model="gpt-5.6-sol" "Review this diff against the fix target. Find reasons to REJECT: wrong scope, unrelated edits, denylist paths, disabled tests, symptom-fixes.  Also: ensure the change does NOT add tedium for app users via guardrails/policies that barely matter (catering app, not a bank) - changes should REDUCE user tedium, not multiply policy denials; flag any new guard/policy/approval/validation that blocks a reasonable user action without a proportionate real-world reason. Verdict: APPROVE or REJECT with reasons."
+   e. Tests fail or REJECT -> append a failure entry (item, error) to loop-ledger.json, record in STATE.md, stop. Leave the worktree in place.
+   f. APPROVE -> commit in the worktree, git push origin loop/<run-id>, gh pr create --draft with the verification evidence (commands + results + Codex verdict) in the body. Record PR URL in STATE.md and a success entry in loop-ledger.json.
+4. NEVER: push main, merge, mark PRs ready, close PRs, edit the main checkout (state files excepted), convex deploy / bun run deploy, bun run manifest:regen (applies Builder output).
+Standing escalation (human-owned, SKIP as fix target): GitHub CI red = file:../builder dep in Builder-owned package.json; human runs bun run manifest:regen. Local proof:emit/typecheck pass.
+
+
+
+
+

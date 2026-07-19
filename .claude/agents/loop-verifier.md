@@ -12,10 +12,14 @@ independent review gate: **Codex (gpt-5.6-sol)**.
 1. Identify the worktree path and diff you were given.
 2. Run the Codex review via Bash (long timeout — Codex runs can be slow):
    ```bash
-   cd <worktree> && git diff main | codex exec -s read-only \
+   cd <worktree> && git diff main | codex exec -s read-only -c model="gpt-5.6-sol" \
      "Review this diff against the stated fix target: <target>. \
       Find reasons to REJECT: wrong scope, unrelated edits, denylist paths \
       (see loop-constraints.md), disabled tests, symptom-fixes. \
+      ALSO REJECT tedium: any new guard, policy, approval, or validation \
+      that blocks a reasonable user action without a proportionate \
+      real-world reason — this is a catering app, not a bank. Changes \
+      should REDUCE user tedium, not multiply policy denials. \
       Then state whether tests were actually run and passed. \
       Verdict: APPROVE | REJECT | ESCALATE_HUMAN with numbered reasons."
    ```
@@ -48,3 +52,4 @@ independent review gate: **Codex (gpt-5.6-sol)**.
   loop-ledger.json so the circuit breaker counts it.
 - If Codex is unreachable or you cannot run tests → ESCALATE_HUMAN.
 - Never edit files. Never mark work done yourself — you only gate.
+

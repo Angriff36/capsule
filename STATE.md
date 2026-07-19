@@ -1,39 +1,28 @@
 # Loop State — capsule
 
-Last run: 2026-07-17T06:00:00Z (glm-tick, L1 report-only)
+Last run: 2026-07-19T23:00:00Z (glm-tick, L2 no-op - all targets escalated or denylist-blocked)
 
 ## High Priority (loop is acting or waiting on human)
 
-- **CI still RED on main, unchanged**: `check` job fails at `bun run proof:emit` —
-  `emitCapsuleProofKit` throws at `scripts/emit-proof-kit.ts:94`
-  (latest push run 29550592283 @ 6bd3e83, ~12s fail-fast; no newer push to
-  main since — the 94a79c9 loop-setup commit didn't trigger a CI run).
-  Human: run `bun run proof:emit` locally against a clean checkout to
-  reproduce. Effort guess: small-medium. No action taken yet.
-- **All 6 open Dependabot PRs still fail the same CI**, blocked behind the
-  proof:emit failure, not their own changes (typescript 5.9→7.0,
-  vite 6.4→8.1, react-router-dom 6.30→7.18, react-dom, plugin-react 4.7→6.0,
-  actions/checkout 4→7). typescript, vite majors and actions/checkout major
-  are separate human-gated risk decisions once CI is green (safety.md).
+- **CI BROKEN - Builder ownership drift on main AND all 6 Dependabot PRs**: `package.json` digest
+  mismatch in `.builder/ownership.json` after human's manual sync of manifestPreset (commit 87fb200).
+  `bun run manifest:regen` required to update ownership ledger. **ESCALATED**: Fix attempt REJECTED -
+  `package.json` is Builder-owned per `.builder/ownership.json` denylist. **Human action required**:
+  Run Builder in update mode (`bun run manifest:regen`) to reconcile digest. Blocks main branch CI
+  (10/10 runs failing) and all 6 Dependabot PRs. NOTE: Prior bun install local dependency issue is
+  RESOLVED - bun install now succeeds in CI.
+- **All 6 Dependabot PRs blocked**: typescript 5.9→7.0, vite 6.4→8.1, react-router-dom 6.30→7.18,
+  react-dom, @vitejs/plugin-react 4.7→6.0, actions/checkout 4→7. majors require human risk decision (safety.md).
+  Blocked behind CI red - once ownership fixed, these require human decision on major version upgrades.
 
 ## Watch List
 
-- Working tree carries ~28 uncommitted paths (human's in-flight convex/src +
-  docs/task-plans work) — normal, flag only if unchanged for days.
-- `.claude/loop-tick-prompt.txt` and `.claude/loop-tick.cmd` are untracked
-  (not part of the 94a79c9 loop-setup commit) — cosmetic, human's call
-  whether to commit.
-- `actions/checkout@v4` + Node 20 deprecation warnings in CI — bump when
-  convenient (PR #1 open, itself blocked behind proof:emit CI red).
+- Working tree carries ~15 uncommitted paths (loop state files, agent configs, docs) — human's in-flight
+  work on loop system, normal.
+- `actions/checkout@v4` + Node 20 deprecation warnings — bump when convenient (PR #1 open, blocked behind CI red).
 
 ## Recent Noise (ignored this run)
 
 - Dependabot Updates workflow runs (green, bot traffic).
-
-## Post-Run Critique
-
-- Third consecutive tick with identical state — same CI failure, same PR set, no new commits to main. Triage cadence reduction recommended: only re-verify CI status (cheap gh run check) instead of full PR re-derivation until the proof:emit blocker is resolved. Current full sweeps are wasted tokens when the root cause is unchanged.
-
----
-
-Architecture: `LOOP.md`. Constraints: `loop-constraints.md`. Budget: `loop-budget.md`. Safety: `docs/safety.md`.
+- RESOLVED: bun install local dependency issue (was blocking CI 2026-07-17, now fixed).
+- RESOLVED: scripts/emit-proof-kit.ts:94 error (local run succeeds, was blocking earlier).

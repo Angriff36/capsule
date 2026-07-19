@@ -1,6 +1,28 @@
 {
   "goal": "Keep capsule main healthy: triage CI, PRs, and issues; propose minimal fixes after L2 graduation",
   "pattern": "daily-triage",
-  "level": "L1",
-  "attempts": []
+  "level": "L2",
+  "attempts": [
+    {
+      "item": "scripts/emit-proof-kit.ts throws at line 94",
+      "runId": "fix-20260717T0600",
+      "timestamp": "2026-07-17T09:21:00Z",
+      "verdict": "REJECT",
+      "reason": "Codex rejected: symptom-fix that comments out relationships, leaves Event internally inconsistent (isReadyForExecution and beginExecution still reference removed hasMany fields), removes capability surface without replacement, proof artifacts only update IR hashes without demonstrating validity"
+    },
+    {
+      "item": "Investigation: scripts/emit-proof-kit.ts:94 error appears outdated",
+      "runId": "investigation-20260717T1030",
+      "timestamp": "2026-07-17T10:35:00Z",
+      "verdict": "OBSOLETE",
+      "reason": "Local bun run proof:emit succeeds. Actual CI failure is during bun install --frozen_lockfile: 'ENOENT: failed opening cache/package/version dir for package @angriff36/manifest-builder' (local file dependency file:../builder doesn't exist in CI). The reported proof:emit error appears to have been fixed by recent commits (Manifest 3.6.21 regen, recipe import workspace). New issue identified requiring different fix approach."
+    },
+    {
+      "item": "Remove @angriff36/manifest-builder local dependency from package.json",
+      "runId": "fix-20260717T1205",
+      "timestamp": "2026-07-17T12:00:00Z",
+      "verdict": "REJECT",
+      "reason": "Codex rejected: package.json is Builder-owned per .builder/ownership.json, direct edit violates repository ownership policy. This is not a hand-fix item - requires Builder update-mode regen. Escalating to human to run bun run manifest:regen with Builder in update mode."
+    }
+  ]
 }

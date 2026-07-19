@@ -5,19 +5,34 @@
 
 ## Phase
 
-- L1 report-only: NEVER edit source code, tests, or config. Triage + state files only.
-- The only files the loop may write: STATE.md, loop-run-log.md, loop-budget.md, loop-ledger.json.
+- **L2 STANDING (human decision 2026-07-19)** — draft-PR fix powers are
+  permanent, not away-mode-bounded. Triage runs every tick; additionally at
+  most ONE fix attempt per tick, only on items outside the denylist below.
+- Check `loop-ledger.json` before any attempt: 3 failures on an item →
+  escalate in STATE.md, do not retry.
+- The `file:../builder` dependency was REMOVED 2026-07-19 (it broke CI's
+  bun install). Builder is now a local tool (`scripts/manifest-regen.ts`
+  resolves the sibling ../builder checkout); regen freshness is enforced by
+  `bun run manifest:regen:check` in `.githooks/pre-push`. KNOWN NOISE until
+  Manifest PR #54 ships in a release: projections stamp timestamps, so the
+  check reports ~212 phantom "stale" modifications — do not treat that as an
+  actionable finding.
 
 ## Git
 
 - The human works in this checkout; the tree often carries in-flight changes.
-- NEVER `git add`, commit, stash, checkout, or reset anything — the human
-  commits the loop's state files along with their own work.
-- Read-only git commands (log, status, diff, branch) are fine.
+- In the MAIN checkout: NEVER `git add`, commit, stash, checkout, or reset —
+  the loop writes only STATE.md, loop-run-log.md, loop-budget.md,
+  loop-ledger.json there. Read-only git commands are fine.
+- Code edits happen ONLY inside a fresh worktree:
+  `git worktree add .loop-worktrees/<run-id> -b loop/<run-id> main`.
+  add/commit inside that worktree is allowed.
 
 ## Push & Merge
 
-- Never push, merge, close PRs, or create PRs without human approval.
+- Push ONLY `loop/*` branches (`git push origin loop/<run-id>`).
+- PRs must be created with `gh pr create --draft`, verification evidence in
+  the body. NEVER push main, merge, mark PRs ready, or close PRs.
 
 ## Paths (L2 denylist — enforced from day one)
 
@@ -29,6 +44,12 @@
   `place-manifest-convex-react.ts`.
 - Never edit `.builder/**`, `src/**/*.manifest`, or `manifest.config.yaml` —
   editable Manifest source is human-only
+- Formatting policy (human-approved 2026-07-19): Prettier is a normal CI gate
+  but is for CODE only — it must never touch generated trees OR doc files
+  (`*.md`/`*.mdx` are in `.prettierignore` alongside the generated
+  exclusions; extend the ignore file rather than reformatting). `.manifest`
+  sources are formatted ONLY by the Manifest CLI's own formatter
+  (`npx manifest fmt`), run whenever `.manifest` files change.
 - Never edit auth, payments, or billing code without human approval
 
 ## Code (applies at L2)
@@ -52,3 +73,4 @@
 
 - At 80% of daily cap: report-only for the rest of the day.
 - `loop-pause-all` in STATE.md: exit immediately.
+
