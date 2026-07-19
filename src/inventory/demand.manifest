@@ -30,11 +30,6 @@ enum WasteRecordStatus {
 // Materialized required quantity of one Ingredient for one Event.
 // Prep-list derivation (recipe line × batch × servings / yield) lands via
 // later reactions; this entity stores the governed result and its inputs.
-// Shortage vs on-hand/reservations is deferred (D056 / Q10; was OD015) —
-// no hasMany edges from this entity to InventoryItem / InventoryReservation
-// for aggregate computeds (builtins.md aggregates over hasMany only).
-// Until edges + (if needed) multi-hop math land, derive shortage outside
-// Manifest and feed governed commands.
 entity IngredientDemand mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   unique [tenantId, eventId, ingredientId]
@@ -61,6 +56,9 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+
+  // Available stock = sum of Ingredient.stockLines on-hand; clamp at zero.
+  computed shortageQuantity: decimal(12, 4) = self.requiredQuantity - sum(self.ingredient.stockLines, (s) => s.quantityOnHand) > 0 ? self.requiredQuantity - sum(self.ingredient.stockLines, (s) => s.quantityOnHand) : 0
 
   constraint demandQuantityNonnegative: self.calculatedAt == null or self.requiredQuantity > 0 "Required quantity must be positive once calculated"
 
@@ -374,3 +372,11 @@ event WasteVoided: "waste_record.voided" {
   unit: UnitOfMeasure
   reason: string
 }
+
+// Proportional rescale from Event.expectedHeadcount old/new (payload fields).
+on EventHeadcountChanged fanOut IngredientDemand where eventId = payload.eventId
+  run recalculate
+  params {
+    newQuantity: self.requiredQuantity * (payload.newHeadcount / payload.previousHeadcount),
+    reason: "headcount_changed"
+  }

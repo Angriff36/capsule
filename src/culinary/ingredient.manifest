@@ -54,6 +54,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   property discontinuationReason: string?
 
   hasMany recipeLines: RecipeIngredient
+  hasMany stockLines: InventoryItem
 
   computed isActive: boolean = self.status == "active"
   computed isDiscontinued: boolean = self.status == "discontinued"
