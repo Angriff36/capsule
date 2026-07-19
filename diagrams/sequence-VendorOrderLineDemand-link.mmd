@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant VendorOrderLineDemand as VendorOrderLineDemand
+    participant EventBus
+    Client->>+VendorOrderLineDemand: link(vendorOrderLineId, ingredientDemandId, contributionQuantity, unit)
+    Note over VendorOrderLineDemand: Policies: vendorOrderLineDemandRead, vendorOrderLineDemandWrite, vendorOrderLineDemandExecute
+    Note over VendorOrderLineDemand: Guards (4)
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[0]: self.linkedAt == null
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[1]: self.deletedAt == null
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[2]: self.vendorOrderLine != null and self.vendorOrderLine.ven...
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[3]: self.ingredientDemand != null
+    VendorOrderLineDemand->>VendorOrderLineDemand: mutate.vendorOrderLineId
+    VendorOrderLineDemand->>VendorOrderLineDemand: mutate.ingredientDemandId
+    VendorOrderLineDemand->>VendorOrderLineDemand: mutate.contributionQuantity
+    VendorOrderLineDemand->>VendorOrderLineDemand: mutate.unit
+    VendorOrderLineDemand->>VendorOrderLineDemand: mutate.linkedAt
+    VendorOrderLineDemand->>EventBus: emit VendorOrderLineDemandLinked on vendor_order_line_demand.linked
+    VendorOrderLineDemand-->>-Client: void

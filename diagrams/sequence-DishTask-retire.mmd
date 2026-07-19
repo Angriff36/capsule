@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant DishTask as DishTask
+    participant EventBus
+    Client->>+DishTask: retire(reason)
+    Note over DishTask: Policies: dishTaskRead, dishTaskWrite, dishTaskExecute
+    Note over DishTask: Guards (2)
+    DishTask->>DishTask: guard[0]: self.status == #quot;active#quot;
+    DishTask->>DishTask: guard[1]: self.deletedAt == null
+    DishTask->>DishTask: mutate.retiredAt
+    DishTask->>DishTask: mutate.retirementReason
+    DishTask->>DishTask: mutate.status
+    DishTask->>EventBus: emit DishTaskRetired
+    DishTask-->>-Client: void

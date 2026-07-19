@@ -12,12 +12,42 @@ export function computeClient(doc: Record<string, any>): Record<string, any> {
   };
 }
 
+/** Preload nested relations for Dish computeds (mutates doc in place). */
+export async function hydrateComputedRelationsForDish(ctx: any, doc: Record<string, any>): Promise<void> {
+  const docId = doc._id;
+  (doc as any).recipeLines = await ctx.db.query("dishRecipes").withIndex("by_dishId", (q: any) => q.eq("dishId", docId)).collect();
+  for (const __agg0 of ((doc as any).recipeLines ?? []) as any[]) {
+    {
+      const __fk = (__agg0 as any).recipeId;
+      (__agg0 as any).recipe = __fk != null ? await ctx.db.get(__fk as any) : null;
+    }
+    if ((__agg0 as any).recipe) {
+      (__agg0 as any).recipe.ingredientLines = await ctx.db.query("recipeIngredients").withIndex("by_recipeId", (q: any) => q.eq("recipeId", (__agg0 as any).recipe._id)).collect();
+      for (const __agg1 of ((__agg0 as any).recipe.ingredientLines ?? []) as any[]) {
+        {
+          const __fk = (__agg1 as any).ingredientId;
+          (__agg1 as any).ingredient = __fk != null ? await ctx.db.get(__fk as any) : null;
+        }
+      }
+    }
+  }
+}
+
 /** Self-only computed fields for Dish. Pass the stored document. */
 export function computeDish(doc: Record<string, any>): Record<string, any> {
   return {
+    allergenSummary: Array.from(new Set((((doc.recipeLines) ?? []).flatMap((line: Record<string, any>) => (((line.recipe.ingredientLines) ?? []).flatMap((ri: Record<string, any>) => (ri.ingredient.allergens))))) ?? [])),
     isActive: (doc.status === "active"),
     isRetired: (doc.status === "retired"),
   };
+}
+
+/** Preload nested relations for Event computeds (mutates doc in place). */
+export async function hydrateComputedRelationsForEvent(ctx: any, doc: Record<string, any>): Promise<void> {
+  const docId = doc._id;
+  (doc as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
+  (doc as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
+  (doc as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
 }
 
 /** Self-only computed fields for Event. Pass the stored document. */

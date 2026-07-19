@@ -29,6 +29,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
   property retirementReason: string?
 
   hasMany recipeLines: DishRecipe
+  hasMany prepTasks: DishTask
 
   // Multi-hop union: DishRecipe → Recipe → RecipeIngredient → Ingredient.allergens
   computed allergenSummary: list<AllergenCode> = unique_of(flat_map(self.recipeLines, (line) => flat_map(line.recipe.ingredientLines, (ri) => ri.ingredient.allergens)))
@@ -212,6 +213,147 @@ entity DishRecipe mixin TenantScoped, SoftDeletable {
   }
 
   store DishRecipe in durable
+}
+
+enum DishTaskStatus {
+  active
+  retired
+}
+
+// Reusable work instruction for preparing or serving a Dish. This is a
+// template only; Event-specific work is represented by PrepTask.
+entity DishTask mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required dishId: uuid
+  property required searchable name: string = ""
+  property required category: string = "finish_at_event"
+  property required taskType: string = "manual"
+  property defaultQuantity: decimal(12, 4)?
+  property defaultUnit: UnitOfMeasure?
+  property sortOrder: int = 0
+  property recipeId: uuid?
+  property ingredientId: uuid?
+  property instructions: string?
+  property required status: DishTaskStatus = "active"
+  property activeAt: datetime?
+  property retiredAt: datetime?
+  property retirementReason: string?
+
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+
+  constraint dishTaskNameComplete: self.status == "retired" or length(trim(self.name)) > 0 "Dish task name is required"
+  constraint dishTaskQuantityPositive: self.defaultQuantity == null or self.defaultQuantity > 0 "Dish task quantity must be positive"
+  constraint dishTaskSortNonnegative: self.sortOrder >= 0 "Dish task sort order cannot be negative"
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  default policy dishTaskRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish task templates"
+  default policy dishTaskWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish task templates through commands"
+  default policy dishTaskExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish task template commands"
+
+  command add(
+    dishId: uuid,
+    name: string,
+    optional category: string,
+    optional taskType: string,
+    optional defaultQuantity: decimal(12, 4),
+    optional defaultUnit: UnitOfMeasure,
+    optional sortOrder: number,
+    optional recipeId: uuid,
+    optional ingredientId: uuid,
+    optional instructions: string
+  ) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard self.dish != null and self.dish.status == "active"
+    constraint addDishMatch: dishId == self.dishId "Dish task dishId must match the seeded Dish reference"
+    constraint addNamePresent: length(trim(name)) > 0 "Dish task name is required"
+    constraint addQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "Dish task quantity must be positive"
+    constraint addSortNonnegative: sortOrder == null or sortOrder >= 0 "Dish task sort order cannot be negative"
+    mutate dishId = dishId
+    mutate name = name
+    mutate category = category != null ? category : "finish_at_event"
+    mutate taskType = taskType != null ? taskType : "manual"
+    mutate defaultQuantity = defaultQuantity
+    mutate defaultUnit = defaultUnit
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate recipeId = recipeId
+    mutate ingredientId = ingredientId
+    mutate instructions = instructions
+    mutate activeAt = now()
+    emit DishTaskAdded {
+      dishTaskId: self.id
+      tenantId: self.tenantId
+      dishId: dishId
+      name: name
+      category: category != null ? category : "finish_at_event"
+      taskType: taskType != null ? taskType : "manual"
+      recipeId: recipeId
+      ingredientId: ingredientId
+      defaultQuantity: defaultQuantity
+      defaultUnit: defaultUnit
+      sortOrder: sortOrder != null ? sortOrder : 0
+    }
+  }
+
+  command revise(
+    name: string,
+    optional category: string,
+    optional taskType: string,
+    optional defaultQuantity: decimal(12, 4),
+    optional defaultUnit: UnitOfMeasure,
+    optional sortOrder: number,
+    optional recipeId: uuid,
+    optional ingredientId: uuid,
+    optional instructions: string
+  ) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard self.dish != null and self.dish.status == "active"
+    constraint reviseNamePresent: length(trim(name)) > 0 "Dish task name is required"
+    constraint reviseQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "Dish task quantity must be positive"
+    constraint reviseSortNonnegative: sortOrder == null or sortOrder >= 0 "Dish task sort order cannot be negative"
+    mutate name = name
+    mutate category = category != null ? category : self.category
+    mutate taskType = taskType != null ? taskType : self.taskType
+    mutate defaultQuantity = defaultQuantity
+    mutate defaultUnit = defaultUnit
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    mutate recipeId = recipeId
+    mutate ingredientId = ingredientId
+    mutate instructions = instructions
+    emit DishTaskRevised {
+      dishTaskId: self.id
+      tenantId: self.tenantId
+      dishId: self.dishId
+      name: name
+      category: self.category
+      taskType: self.taskType
+    }
+  }
+
+  command retire(reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint retireReasonPresent: length(trim(reason)) > 0 "Dish task retirement reason is required"
+    mutate retiredAt = now()
+    mutate retirementReason = reason
+    mutate status = "retired"
+    emit DishTaskRetired {
+      dishTaskId: self.id
+      tenantId: self.tenantId
+      dishId: self.dishId
+      reason: reason
+    }
+  }
+
+  store DishTask in durable
 }
 
 event DishIntroduced: "dish.introduced" {

@@ -148,7 +148,6 @@ export const DishSchema = z.object({
   portionSize: z.number().default(1),
   portionUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("portion"),
   dietaryTags: z.array(z.string()).optional().default([]),
-  allergenSummary: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional().default([]),
   status: z.enum(["active", "retired"]).default("active"),
   introducedAt: z.coerce.date().nullable().optional(),
   retiredAt: z.coerce.date().nullable().optional(),
@@ -159,6 +158,7 @@ export const DishSchema = z.object({
 
 // Computed: Dish
 export const DishComputedSchema = DishSchema.extend({
+  allergenSummary: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])),
   isActive: z.boolean(),
   isRetired: z.boolean(),
 });
@@ -182,6 +182,31 @@ export const DishRecipeSchema = z.object({
 });
 
 export type DishRecipe = z.infer<typeof DishRecipeSchema>;
+
+// Entity: DishTask
+export const DishTaskSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  dishId: z.string().uuid(),
+  name: z.string().default(""),
+  category: z.string().default("finish_at_event"),
+  taskType: z.string().default("manual"),
+  defaultQuantity: z.number().nullable().optional(),
+  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).nullable().optional(),
+  sortOrder: z.number().int().min(0).optional().default(0),
+  recipeId: z.string().uuid().nullable().optional(),
+  ingredientId: z.string().uuid().nullable().optional(),
+  instructions: z.string().nullable().optional(),
+  status: z.enum(["active", "retired"]).default("active"),
+  activeAt: z.coerce.date().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  retirementReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type DishTask = z.infer<typeof DishTaskSchema>;
 
 // Entity: Event
 export const EventSchema = z.object({
@@ -740,9 +765,15 @@ export const PrepTaskSchema = z.object({
   eventDishId: z.string().uuid(),
   eventId: z.string().uuid(),
   name: z.string().default(""),
+  dishTaskId: z.string().uuid().nullable().optional(),
   ingredientId: z.string().uuid().nullable().optional(),
   ingredientDemandId: z.string().uuid().nullable().optional(),
+  dishId: z.string().uuid().nullable().optional(),
   recipeId: z.string().uuid().nullable().optional(),
+  category: z.string().default("finish_at_event"),
+  taskType: z.string().default("manual"),
+  specialInstructions: z.string().nullable().optional(),
+  isGenerated: z.boolean().default(true),
   quantity: z.number().default(0),
   completedQuantity: z.number().nullable().optional(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
@@ -1212,6 +1243,23 @@ export const VendorOrderLineComputedSchema = VendorOrderLineSchema.extend({
 export type VendorOrderLine = z.infer<typeof VendorOrderLineSchema>;
 export type VendorOrderLineWithComputed = z.infer<typeof VendorOrderLineComputedSchema>;
 
+// Entity: VendorOrderLineDemand
+export const VendorOrderLineDemandSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  vendorOrderLineId: z.string().uuid(),
+  ingredientDemandId: z.string().uuid(),
+  contributionQuantity: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  linkedAt: z.coerce.date().nullable().optional(),
+  removedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type VendorOrderLineDemand = z.infer<typeof VendorOrderLineDemandSchema>;
+
 // Entity: Venue
 export const VenueSchema = z.object({
   id: z.string().uuid(),
@@ -1477,13 +1525,6 @@ export const DeliveryStartTransitParamsSchema = z.object({});
 
 export type DeliveryStartTransitParams = z.infer<typeof DeliveryStartTransitParamsSchema>;
 
-// Command: classifyAllergens on Dish
-export const DishClassifyAllergensParamsSchema = z.object({
-  allergenSummary: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])),
-});
-
-export type DishClassifyAllergensParams = z.infer<typeof DishClassifyAllergensParamsSchema>;
-
 // Command: introduce on Dish
 export const DishIntroduceParamsSchema = z.object({
   name: z.string(),
@@ -1494,7 +1535,6 @@ export const DishIntroduceParamsSchema = z.object({
   course: z.string().optional(),
   serviceStyle: z.string().optional(),
   dietaryTags: z.array(z.string()).optional(),
-  allergenSummary: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional(),
 });
 
 export type DishIntroduceParams = z.infer<typeof DishIntroduceParamsSchema>;
@@ -1547,6 +1587,44 @@ export const DishRecipeDetachParamsSchema = z.object({
 });
 
 export type DishRecipeDetachParams = z.infer<typeof DishRecipeDetachParamsSchema>;
+
+// Command: add on DishTask
+export const DishTaskAddParamsSchema = z.object({
+  dishId: z.string().uuid(),
+  name: z.string(),
+  category: z.string().optional(),
+  taskType: z.string().optional(),
+  defaultQuantity: z.number().optional(),
+  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).optional(),
+  sortOrder: z.number().optional(),
+  recipeId: z.string().uuid().optional(),
+  ingredientId: z.string().uuid().optional(),
+  instructions: z.string().optional(),
+});
+
+export type DishTaskAddParams = z.infer<typeof DishTaskAddParamsSchema>;
+
+// Command: retire on DishTask
+export const DishTaskRetireParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type DishTaskRetireParams = z.infer<typeof DishTaskRetireParamsSchema>;
+
+// Command: revise on DishTask
+export const DishTaskReviseParamsSchema = z.object({
+  name: z.string(),
+  category: z.string().optional(),
+  taskType: z.string().optional(),
+  defaultQuantity: z.number().optional(),
+  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).optional(),
+  sortOrder: z.number().optional(),
+  recipeId: z.string().uuid().optional(),
+  ingredientId: z.string().uuid().optional(),
+  instructions: z.string().optional(),
+});
+
+export type DishTaskReviseParams = z.infer<typeof DishTaskReviseParamsSchema>;
 
 // Command: approve on Event
 export const EventApproveParamsSchema = z.object({});
@@ -2481,6 +2559,12 @@ export const PrepTaskOpenParamsSchema = z.object({
   ingredientId: z.string().uuid().optional(),
   ingredientDemandId: z.string().uuid().optional(),
   recipeId: z.string().uuid().optional(),
+  dishTaskId: z.string().uuid().optional(),
+  dishId: z.string().uuid().optional(),
+  category: z.string().optional(),
+  taskType: z.string().optional(),
+  specialInstructions: z.string().optional(),
+  isGenerated: z.boolean().optional(),
   station: z.string().optional(),
   dueAt: z.coerce.date().optional(),
   notes: z.string().optional(),
@@ -2492,6 +2576,20 @@ export type PrepTaskOpenParams = z.infer<typeof PrepTaskOpenParamsSchema>;
 export const PrepTaskReleaseParamsSchema = z.object({});
 
 export type PrepTaskReleaseParams = z.infer<typeof PrepTaskReleaseParamsSchema>;
+
+// Command: revise on PrepTask
+export const PrepTaskReviseParamsSchema = z.object({
+  name: z.string().optional(),
+  quantity: z.number().optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).optional(),
+  category: z.string().optional(),
+  taskType: z.string().optional(),
+  specialInstructions: z.string().optional(),
+  ingredientId: z.string().uuid().optional(),
+  recipeId: z.string().uuid().optional(),
+});
+
+export type PrepTaskReviseParams = z.infer<typeof PrepTaskReviseParamsSchema>;
 
 // Command: start on PrepTask
 export const PrepTaskStartParamsSchema = z.object({});
@@ -3189,6 +3287,30 @@ export const VendorOrderLineRecordReceiptParamsSchema = z.object({
 });
 
 export type VendorOrderLineRecordReceiptParams = z.infer<typeof VendorOrderLineRecordReceiptParamsSchema>;
+
+// Command: link on VendorOrderLineDemand
+export const VendorOrderLineDemandLinkParamsSchema = z.object({
+  vendorOrderLineId: z.string().uuid(),
+  ingredientDemandId: z.string().uuid(),
+  contributionQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+});
+
+export type VendorOrderLineDemandLinkParams = z.infer<typeof VendorOrderLineDemandLinkParamsSchema>;
+
+// Command: retire on VendorOrderLineDemand
+export const VendorOrderLineDemandRetireParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type VendorOrderLineDemandRetireParams = z.infer<typeof VendorOrderLineDemandRetireParamsSchema>;
+
+// Command: revise on VendorOrderLineDemand
+export const VendorOrderLineDemandReviseParamsSchema = z.object({
+  contributionQuantity: z.number(),
+});
+
+export type VendorOrderLineDemandReviseParams = z.infer<typeof VendorOrderLineDemandReviseParamsSchema>;
 
 // Command: activate on Venue
 export const VenueActivateParamsSchema = z.object({});

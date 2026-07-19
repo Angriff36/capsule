@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Client
+    participant VendorOrderLineDemand as VendorOrderLineDemand
+    participant EventBus
+    Client->>+VendorOrderLineDemand: revise(contributionQuantity)
+    Note over VendorOrderLineDemand: Policies: vendorOrderLineDemandRead, vendorOrderLineDemandWrite, vendorOrderLineDemandExecute
+    Note over VendorOrderLineDemand: Guards (3)
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[0]: self.linkedAt != null
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[1]: self.deletedAt == null
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[2]: self.vendorOrderLine != null and self.vendorOrderLine.ven...
+    VendorOrderLineDemand->>VendorOrderLineDemand: mutate.contributionQuantity
+    VendorOrderLineDemand->>EventBus: emit VendorOrderLineDemandRevised on vendor_order_line_demand.revised
+    VendorOrderLineDemand-->>-Client: void

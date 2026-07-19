@@ -16,6 +16,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip Delivery: no create command in IR (2 rows unused)
   // skip Dish: no create command in IR (2 rows unused)
   // skip DishRecipe: no create command in IR (2 rows unused)
+  // skip DishTask: no create command in IR (2 rows unused)
   // skip Event: no create command in IR (2 rows unused)
   // skip EventAllergenCheck: no create command in IR (2 rows unused)
   // skip EventAssignment: no create command in IR (2 rows unused)
@@ -59,6 +60,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip Vendor: no create command in IR (2 rows unused)
   // skip VendorOrder: no create command in IR (2 rows unused)
   // skip VendorOrderLine: no create command in IR (2 rows unused)
+  // skip VendorOrderLineDemand: no create command in IR (2 rows unused)
   // skip Venue: no create command in IR (2 rows unused)
   // skip WasteRecord: no create command in IR (2 rows unused)
 }
@@ -99,6 +101,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "DishRecipe",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "DishTask",
       "createMutation": null,
       "rowCount": 2
     },
@@ -304,6 +311,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "VendorOrderLine",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "VendorOrderLineDemand",
       "createMutation": null,
       "rowCount": 2
     },

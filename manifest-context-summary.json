@@ -1,18 +1,18 @@
 {
   "$schema": "manifest-context/v1",
   "meta": {
-    "compilerVersion": "3.6.24",
+    "compilerVersion": "3.6.26",
     "schemaVersion": "1.0",
-    "contentHash": "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:28c985d9ef8a52f4c42e51700b40aeedec2804793893d9e50033e0e1eb61fc1a:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:728e61c032fe46367413548d0842c84d372b976db2ce834510b96157d0a2557b:7a1df129c67a2078408d953496bc407cbeb1b9b0a380949db99617f9a49efc9f:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:870a8d351c294034e14611cdb8d44a851f4985fb246a6ff1f1eff26105d5170c:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:9e32b3a907507588d9a813328d43ea85d61feefc1a41b32b59e72ee41c2356bd:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c31bf476c50cabe3d77f4682e5548a0d72703008c7796b1e663955d44fd1282b:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f",
+    "contentHash": "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:16f5b86fa64677653383a3565cc55ae5abd29b5f0ab299becbd63a2a989ea054:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3056fdf936078daac78d5183e5b6e52c8e17c1df3fb66975c64cb3da60499d80:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:728e61c032fe46367413548d0842c84d372b976db2ce834510b96157d0a2557b:7a61dae4c0f63ff0a5a443d31f47689ee975289e92dd8228657dc3508cf3cc31:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:9e32b3a907507588d9a813328d43ea85d61feefc1a41b32b59e72ee41c2356bd:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:ac9d03bb9e8daeddd2c6b051de31356de429211ce7519d1ce0b901773add63ea:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c31bf476c50cabe3d77f4682e5548a0d72703008c7796b1e663955d44fd1282b:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f",
     "projection": "llm-context"
   },
   "domain": {
-    "entityCount": 50,
-    "commandCount": 248,
-    "policyCount": 144,
-    "constraintCount": 91,
-    "enumCount": 58,
-    "eventCount": 247,
+    "entityCount": 52,
+    "commandCount": 254,
+    "policyCount": 150,
+    "constraintCount": 95,
+    "enumCount": 59,
+    "eventCount": 250,
     "modules": [],
     "multiTenant": true
   },
@@ -1244,13 +1244,6 @@
           "defaultValue": []
         },
         {
-          "name": "allergenSummary",
-          "type": "list<AllergenCode>",
-          "required": false,
-          "modifiers": [],
-          "defaultValue": []
-        },
-        {
           "name": "status",
           "type": "DishStatus",
           "required": true,
@@ -1296,6 +1289,18 @@
       ],
       "computedProperties": [
         {
+          "name": "allergenSummary",
+          "type": "list<AllergenCode>",
+          "expression": "[omitted]",
+          "dependencies": [
+            "unique_of",
+            "flat_map",
+            "recipeLines",
+            "line",
+            "ri"
+          ]
+        },
+        {
           "name": "isActive",
           "type": "boolean",
           "expression": "[omitted]",
@@ -1317,6 +1322,11 @@
           "name": "recipeLines",
           "kind": "hasMany",
           "target": "DishRecipe"
+        },
+        {
+          "name": "prepTasks",
+          "kind": "hasMany",
+          "target": "DishTask"
         }
       ],
       "constraints": [
@@ -1338,7 +1348,6 @@
         }
       ],
       "commands": [
-        "classifyAllergens",
         "introduce",
         "reinstate",
         "retire",
@@ -1495,6 +1504,250 @@
       "key": [
         "tenantId",
         "id"
+      ]
+    },
+    {
+      "name": "DishTask",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "dishId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required",
+            "searchable"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "finish_at_event"
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "manual"
+        },
+        {
+          "name": "defaultQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "defaultUnit",
+          "type": "UnitOfMeasure | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "sortOrder",
+          "type": "int",
+          "required": false,
+          "modifiers": [],
+          "defaultValue": 0
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "instructions",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "status",
+          "type": "DishTaskStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "active"
+        },
+        {
+          "name": "activeAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "retiredAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "retirementReason",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "dish",
+          "kind": "belongsTo",
+          "target": "Dish",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "dishId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "recipe",
+          "kind": "belongsTo",
+          "target": "Recipe",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "recipeId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "ingredient",
+          "kind": "belongsTo",
+          "target": "Ingredient",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "ingredientId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "dishTaskNameComplete",
+          "code": "dishTaskNameComplete",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task name is required",
+          "overrideable": false
+        },
+        {
+          "name": "dishTaskQuantityPositive",
+          "code": "dishTaskQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task quantity must be positive",
+          "overrideable": false
+        },
+        {
+          "name": "dishTaskSortNonnegative",
+          "code": "dishTaskSortNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task sort order cannot be negative",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "add",
+        "retire",
+        "revise"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ],
+      "transitions": [
+        {
+          "property": "status",
+          "from": "active",
+          "to": [
+            "retired"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "retired",
+          "to": [
+            "active"
+          ]
+        }
       ]
     },
     {
@@ -3445,6 +3698,11 @@
           "name": "recipeLines",
           "kind": "hasMany",
           "target": "RecipeIngredient"
+        },
+        {
+          "name": "stockLines",
+          "kind": "hasMany",
+          "target": "InventoryItem"
         }
       ],
       "constraints": [
@@ -6484,6 +6742,12 @@
           "defaultValue": ""
         },
         {
+          "name": "dishTaskId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "ingredientId",
           "type": "uuid | null",
           "required": false,
@@ -6496,10 +6760,49 @@
           "modifiers": []
         },
         {
+          "name": "dishId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "recipeId",
           "type": "uuid | null",
           "required": false,
           "modifiers": []
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "finish_at_event"
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "manual"
+        },
+        {
+          "name": "specialInstructions",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "isGenerated",
+          "type": "boolean",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": true
         },
         {
           "name": "quantity",
@@ -6650,6 +6953,36 @@
           }
         },
         {
+          "name": "dishTask",
+          "kind": "belongsTo",
+          "target": "DishTask",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "dishTaskId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "dish",
+          "kind": "belongsTo",
+          "target": "Dish",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "dishId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
           "name": "ingredient",
           "kind": "belongsTo",
           "target": "Ingredient",
@@ -6743,6 +7076,7 @@
         "markBlocked",
         "open",
         "release",
+        "revise",
         "start",
         "unblock"
       ],
@@ -10321,7 +10655,7 @@
           "code": "orderSourceRangeComplete",
           "severity": "block",
           "expression": "[omitted]",
-          "message": "Purchase draft date range requires both a start and end",
+          "message": "Order source range requires both a start and end",
           "overrideable": false
         },
         {
@@ -10329,7 +10663,7 @@
           "code": "orderSourceRangeOrdered",
           "severity": "block",
           "expression": "[omitted]",
-          "message": "Purchase draft date range end must not precede its start",
+          "message": "Order source range end must not precede its start",
           "overrideable": false
         }
       ],
@@ -10619,6 +10953,11 @@
               "id"
             ]
           }
+        },
+        {
+          "name": "demandLinks",
+          "kind": "hasMany",
+          "target": "VendorOrderLineDemand"
         }
       ],
       "constraints": [
@@ -10701,6 +11040,149 @@
           "from": "cancelled",
           "to": []
         }
+      ]
+    },
+    {
+      "name": "VendorOrderLineDemand",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "vendorOrderLineId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "ingredientDemandId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "contributionQuantity",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "each"
+        },
+        {
+          "name": "linkedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "removedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "vendorOrderLine",
+          "kind": "belongsTo",
+          "target": "VendorOrderLine",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "vendorOrderLineId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "ingredientDemand",
+          "kind": "belongsTo",
+          "target": "IngredientDemand",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "ingredientDemandId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "demandLinkQuantityPositive",
+          "code": "demandLinkQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link contribution must be positive",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "link",
+        "retire",
+        "revise"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
       ]
     },
     {
@@ -12780,37 +13262,6 @@
       ]
     },
     {
-      "name": "classifyAllergens",
-      "entity": "Dish",
-      "parameters": [
-        {
-          "name": "allergenSummary",
-          "type": "list<AllergenCode>",
-          "required": true
-        }
-      ],
-      "guards": [
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [],
-      "policies": [
-        "dishRead",
-        "dishWrite",
-        "dishExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "allergenSummary",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "DishAllergensClassified"
-      ]
-    },
-    {
       "name": "introduce",
       "entity": "Dish",
       "parameters": [
@@ -12852,11 +13303,6 @@
         {
           "name": "dietaryTags",
           "type": "list<string>",
-          "required": false
-        },
-        {
-          "name": "allergenSummary",
-          "type": "list<AllergenCode>",
           "required": false
         }
       ],
@@ -12924,11 +13370,6 @@
         {
           "kind": "mutate",
           "target": "dietaryTags",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "allergenSummary",
           "expression": "[omitted]"
         },
         {
@@ -13292,6 +13733,345 @@
       ],
       "emits": [
         "DishRecipeDetached"
+      ]
+    },
+    {
+      "name": "add",
+      "entity": "DishTask",
+      "parameters": [
+        {
+          "name": "dishId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "defaultQuantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "defaultUnit",
+          "type": "UnitOfMeasure",
+          "required": false
+        },
+        {
+          "name": "sortOrder",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "instructions",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "addDishMatch",
+          "code": "addDishMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task dishId must match the seeded Dish reference"
+        },
+        {
+          "name": "addNamePresent",
+          "code": "addNamePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task name is required"
+        },
+        {
+          "name": "addQuantityPositive",
+          "code": "addQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task quantity must be positive"
+        },
+        {
+          "name": "addSortNonnegative",
+          "code": "addSortNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task sort order cannot be negative"
+        }
+      ],
+      "policies": [
+        "dishTaskRead",
+        "dishTaskWrite",
+        "dishTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "dishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "taskType",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "defaultQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "defaultUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sortOrder",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recipeId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "instructions",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "activeAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishTaskAdded"
+      ]
+    },
+    {
+      "name": "retire",
+      "entity": "DishTask",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "retireReasonPresent",
+          "code": "retireReasonPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task retirement reason is required"
+        }
+      ],
+      "policies": [
+        "dishTaskRead",
+        "dishTaskWrite",
+        "dishTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "retiredAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "retirementReason",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishTaskRetired"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "DishTask",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "defaultQuantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "defaultUnit",
+          "type": "UnitOfMeasure",
+          "required": false
+        },
+        {
+          "name": "sortOrder",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "instructions",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseNamePresent",
+          "code": "reviseNamePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task name is required"
+        },
+        {
+          "name": "reviseQuantityPositive",
+          "code": "reviseQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task quantity must be positive"
+        },
+        {
+          "name": "reviseSortNonnegative",
+          "code": "reviseSortNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task sort order cannot be negative"
+        }
+      ],
+      "policies": [
+        "dishTaskRead",
+        "dishTaskWrite",
+        "dishTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "taskType",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "defaultQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "defaultUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sortOrder",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recipeId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "instructions",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishTaskRevised"
       ]
     },
     {
@@ -20498,6 +21278,36 @@
           "required": false
         },
         {
+          "name": "dishTaskId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "dishId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "specialInstructions",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "isGenerated",
+          "type": "boolean",
+          "required": false
+        },
+        {
           "name": "station",
           "type": "string",
           "required": false
@@ -20595,6 +21405,36 @@
         },
         {
           "kind": "mutate",
+          "target": "dishTaskId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "taskType",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "specialInstructions",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "isGenerated",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
           "target": "quantity",
           "expression": "[omitted]"
         },
@@ -20668,6 +21508,127 @@
       ],
       "emits": [
         "PrepTaskReleased"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "PrepTask",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "specialInstructions",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseNamePresent",
+          "code": "reviseNamePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Prep task name cannot be blank"
+        },
+        {
+          "name": "reviseQuantityPositive",
+          "code": "reviseQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Prep quantity must be positive"
+        }
+      ],
+      "policies": [
+        "prepTaskRead",
+        "prepTaskWrite",
+        "prepTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "taskType",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "specialInstructions",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recipeId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "isGenerated",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PrepTaskRevised"
       ]
     },
     {
@@ -25716,14 +26677,14 @@
           "code": "openSourceRangeComplete",
           "severity": "block",
           "expression": "[omitted]",
-          "message": "Purchase draft date range requires both a start and end"
+          "message": "Open source range requires both a start and end"
         },
         {
           "name": "openSourceRangeOrdered",
           "code": "openSourceRangeOrdered",
           "severity": "block",
           "expression": "[omitted]",
-          "message": "Purchase draft date range end must not precede its start"
+          "message": "Open source range end must not precede its start"
         }
       ],
       "policies": [
@@ -26197,6 +27158,181 @@
       ],
       "emits": [
         "VendorOrderLineReceived"
+      ]
+    },
+    {
+      "name": "link",
+      "entity": "VendorOrderLineDemand",
+      "parameters": [
+        {
+          "name": "vendorOrderLineId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "ingredientDemandId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "contributionQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "linkLineMatch",
+          "code": "linkLineMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link vendorOrderLineId must match the seeded line reference"
+        },
+        {
+          "name": "linkDemandMatch",
+          "code": "linkDemandMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link ingredientDemandId must match the seeded demand reference"
+        },
+        {
+          "name": "linkQuantityPositive",
+          "code": "linkQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link contribution must be positive"
+        }
+      ],
+      "policies": [
+        "vendorOrderLineDemandRead",
+        "vendorOrderLineDemandWrite",
+        "vendorOrderLineDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "vendorOrderLineId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientDemandId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "contributionQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "linkedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VendorOrderLineDemandLinked"
+      ]
+    },
+    {
+      "name": "retire",
+      "entity": "VendorOrderLineDemand",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "retireReasonPresent",
+          "code": "retireReasonPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link retirement reason is required"
+        }
+      ],
+      "policies": [
+        "vendorOrderLineDemandRead",
+        "vendorOrderLineDemandWrite",
+        "vendorOrderLineDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "removedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VendorOrderLineDemandRetired"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "VendorOrderLineDemand",
+      "parameters": [
+        {
+          "name": "contributionQuantity",
+          "type": "decimal",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseQuantityPositive",
+          "code": "reviseQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link contribution must be positive"
+        }
+      ],
+      "policies": [
+        "vendorOrderLineDemandRead",
+        "vendorOrderLineDemandWrite",
+        "vendorOrderLineDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "contributionQuantity",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VendorOrderLineDemandRevised"
       ]
     },
     {
@@ -27028,6 +28164,27 @@
       "message": "Kitchen staff may write dish recipe composition through commands"
     },
     {
+      "name": "dishTaskExecute",
+      "entity": "DishTask",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may execute dish task template commands"
+    },
+    {
+      "name": "dishTaskRead",
+      "entity": "DishTask",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may read dish task templates"
+    },
+    {
+      "name": "dishTaskWrite",
+      "entity": "DishTask",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may write dish task templates through commands"
+    },
+    {
       "name": "dishWrite",
       "entity": "Dish",
       "action": "write",
@@ -27784,6 +28941,27 @@
       "message": "Procurement staff may execute vendor order commands"
     },
     {
+      "name": "vendorOrderLineDemandExecute",
+      "entity": "VendorOrderLineDemand",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"procurementAccess\")",
+      "message": "Procurement staff may execute order demand link commands"
+    },
+    {
+      "name": "vendorOrderLineDemandRead",
+      "entity": "VendorOrderLineDemand",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"procurementAccess\")",
+      "message": "Procurement staff may read order demand links"
+    },
+    {
+      "name": "vendorOrderLineDemandWrite",
+      "entity": "VendorOrderLineDemand",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"procurementAccess\")",
+      "message": "Procurement staff may write order demand links through commands"
+    },
+    {
       "name": "vendorOrderLineExecute",
       "entity": "VendorOrderLine",
       "action": "execute",
@@ -27955,6 +29133,33 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Dish portion size must be positive",
+      "overrideable": false
+    },
+    {
+      "entity": "DishTask",
+      "name": "dishTaskNameComplete",
+      "code": "dishTaskNameComplete",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Dish task name is required",
+      "overrideable": false
+    },
+    {
+      "entity": "DishTask",
+      "name": "dishTaskQuantityPositive",
+      "code": "dishTaskQuantityPositive",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Dish task quantity must be positive",
+      "overrideable": false
+    },
+    {
+      "entity": "DishTask",
+      "name": "dishTaskSortNonnegative",
+      "code": "dishTaskSortNonnegative",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Dish task sort order cannot be negative",
       "overrideable": false
     },
     {
@@ -28611,7 +29816,7 @@
       "code": "orderSourceRangeComplete",
       "severity": "block",
       "expression": "[omitted]",
-      "message": "Purchase draft date range requires both a start and end",
+      "message": "Order source range requires both a start and end",
       "overrideable": false
     },
     {
@@ -28620,7 +29825,7 @@
       "code": "orderSourceRangeOrdered",
       "severity": "block",
       "expression": "[omitted]",
-      "message": "Purchase draft date range end must not precede its start",
+      "message": "Order source range end must not precede its start",
       "overrideable": false
     },
     {
@@ -28657,6 +29862,15 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Unit cost cannot be negative",
+      "overrideable": false
+    },
+    {
+      "entity": "VendorOrderLineDemand",
+      "name": "demandLinkQuantityPositive",
+      "code": "demandLinkQuantityPositive",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Demand link contribution must be positive",
       "overrideable": false
     },
     {
@@ -28838,6 +30052,12 @@
       "name": "recipeLines"
     },
     {
+      "source": "Dish",
+      "target": "DishTask",
+      "kind": "hasMany",
+      "name": "prepTasks"
+    },
+    {
       "source": "DishRecipe",
       "target": "Dish",
       "kind": "belongsTo",
@@ -28862,6 +30082,54 @@
         "fields": [
           "tenantId",
           "recipeId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DishTask",
+      "target": "Dish",
+      "kind": "belongsTo",
+      "name": "dish",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "dishId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DishTask",
+      "target": "Recipe",
+      "kind": "belongsTo",
+      "name": "recipe",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "recipeId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DishTask",
+      "target": "Ingredient",
+      "kind": "belongsTo",
+      "name": "ingredient",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "ingredientId"
         ],
         "references": [
           "tenantId",
@@ -29192,6 +30460,12 @@
       "target": "RecipeIngredient",
       "kind": "hasMany",
       "name": "recipeLines"
+    },
+    {
+      "source": "Ingredient",
+      "target": "InventoryItem",
+      "kind": "hasMany",
+      "name": "stockLines"
     },
     {
       "source": "IngredientDemand",
@@ -29620,6 +30894,38 @@
         "fields": [
           "tenantId",
           "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "PrepTask",
+      "target": "DishTask",
+      "kind": "belongsTo",
+      "name": "dishTask",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "dishTaskId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "PrepTask",
+      "target": "Dish",
+      "kind": "belongsTo",
+      "name": "dish",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "dishId"
         ],
         "references": [
           "tenantId",
@@ -30218,6 +31524,44 @@
       }
     },
     {
+      "source": "VendorOrderLine",
+      "target": "VendorOrderLineDemand",
+      "kind": "hasMany",
+      "name": "demandLinks"
+    },
+    {
+      "source": "VendorOrderLineDemand",
+      "target": "VendorOrderLine",
+      "kind": "belongsTo",
+      "name": "vendorOrderLine",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "vendorOrderLineId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "VendorOrderLineDemand",
+      "target": "IngredientDemand",
+      "kind": "belongsTo",
+      "name": "ingredientDemand",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "ingredientDemandId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "Venue",
       "target": "Event",
       "kind": "hasMany",
@@ -30465,6 +31809,17 @@
     },
     {
       "name": "DishStatus",
+      "values": [
+        {
+          "name": "active"
+        },
+        {
+          "name": "retired"
+        }
+      ]
+    },
+    {
+      "name": "DishTaskStatus",
       "values": [
         {
           "name": "active"
@@ -31479,11 +32834,6 @@
       "payload": "{deliveryId: string, tenantId: string, packListId: string, eventId: string, driverId: string | null, previousStatus: DeliveryStatus, status: DeliveryStatus, departedAt: datetime | null}"
     },
     {
-      "name": "DishAllergensClassified",
-      "channel": "dish.allergens_classified",
-      "payload": "{dishId: string, tenantId: string, allergenSummary: list<AllergenCode>}"
-    },
-    {
       "name": "DishDetailsRevised",
       "channel": "dish.details_revised",
       "payload": "{dishId: string, tenantId: string, name: string}"
@@ -31491,7 +32841,7 @@
     {
       "name": "DishIntroduced",
       "channel": "dish.introduced",
-      "payload": "{dishId: string, tenantId: string, name: string, portionSize: decimal, portionUnit: UnitOfMeasure, allergenSummary: list<AllergenCode>}"
+      "payload": "{dishId: string, tenantId: string, name: string, portionSize: decimal, portionUnit: UnitOfMeasure}"
     },
     {
       "name": "DishPortioningUpdated",
@@ -32116,12 +33466,17 @@
     {
       "name": "PrepTaskOpened",
       "channel": "prep_task.opened",
-      "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, ingredientId: string | null, ingredientDemandId: string | null, recipeId: string | null, quantity: decimal, unit: UnitOfMeasure, station: string | null, dueAt: datetime | null, status: PrepTaskStatus}"
+      "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, ingredientId: string | null, ingredientDemandId: string | null, dishId: string | null, recipeId: string | null, dishTaskId: string | null, category: string, taskType: string, specialInstructions: string | null, isGenerated: boolean, quantity: decimal, unit: UnitOfMeasure, station: string | null, dueAt: datetime | null, status: PrepTaskStatus}"
     },
     {
       "name": "PrepTaskReleased",
       "channel": "prep_task.released",
       "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, previousAssignedToId: string | null, quantity: decimal, unit: UnitOfMeasure, previousStatus: PrepTaskStatus, status: PrepTaskStatus}"
+    },
+    {
+      "name": "PrepTaskRevised",
+      "channel": "prep_task.revised",
+      "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, quantity: decimal, unit: UnitOfMeasure, category: string, taskType: string, specialInstructions: string | null}"
     },
     {
       "name": "PrepTaskStarted",
@@ -32519,6 +33874,21 @@
       "payload": "{vendorOrderLineId: string, tenantId: string, vendorOrderId: string, ingredientId: string, ingredientDemandId: string | null, eventId: string | null, orderedQuantity: decimal, receivedQuantity: decimal, unit: UnitOfMeasure, reason: string}"
     },
     {
+      "name": "VendorOrderLineDemandLinked",
+      "channel": "vendor_order_line_demand.linked",
+      "payload": "{vendorOrderLineDemandId: string, tenantId: string, vendorOrderLineId: string, ingredientDemandId: string, contributionQuantity: decimal, unit: UnitOfMeasure}"
+    },
+    {
+      "name": "VendorOrderLineDemandRetired",
+      "channel": "vendor_order_line_demand.retired",
+      "payload": "{vendorOrderLineDemandId: string, tenantId: string, vendorOrderLineId: string, ingredientDemandId: string, reason: string}"
+    },
+    {
+      "name": "VendorOrderLineDemandRevised",
+      "channel": "vendor_order_line_demand.revised",
+      "payload": "{vendorOrderLineDemandId: string, tenantId: string, vendorOrderLineId: string, ingredientDemandId: string, contributionQuantity: decimal, unit: UnitOfMeasure}"
+    },
+    {
       "name": "VendorOrderLineReceived",
       "channel": "vendor_order_line.received",
       "payload": "{vendorOrderLineId: string, tenantId: string, vendorOrderId: string, ingredientId: string, ingredientDemandId: string | null, eventId: string | null, locationId: string, previousReceivedQuantity: decimal, receivedQuantity: decimal, receiptQuantity: decimal, orderedQuantity: decimal, unit: UnitOfMeasure, unitCost: money, discrepancyQuantity: decimal | null}"
@@ -32626,6 +33996,10 @@
     },
     {
       "entity": "DishRecipe",
+      "target": "durable"
+    },
+    {
+      "entity": "DishTask",
       "target": "durable"
     },
     {
@@ -32782,6 +34156,10 @@
     },
     {
       "entity": "VendorOrderLine",
+      "target": "durable"
+    },
+    {
+      "entity": "VendorOrderLineDemand",
       "target": "durable"
     },
     {

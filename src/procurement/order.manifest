@@ -54,8 +54,8 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   hasMany lines: VendorOrderLine
 
   constraint orderMoneyNonnegative: self.subtotal >= 0 and self.taxAmount >= 0 and self.shippingAmount >= 0 and self.totalAmount >= 0 "Order money amounts cannot be negative"
-  constraint orderSourceRangeComplete: (self.sourceRangeStart == null and self.sourceRangeEnd == null) or (self.sourceRangeStart != null and self.sourceRangeEnd != null) "Purchase draft date range requires both a start and end"
-  constraint orderSourceRangeOrdered: self.sourceRangeStart == null or self.sourceRangeEnd == null or self.sourceRangeStart <= self.sourceRangeEnd "Purchase draft date range end must not precede its start"
+  constraint orderSourceRangeComplete: (self.sourceRangeStart == null and self.sourceRangeEnd == null) or (self.sourceRangeStart != null and self.sourceRangeEnd != null) "Order source range requires both a start and end"
+  constraint orderSourceRangeOrdered: self.sourceRangeStart == null or self.sourceRangeEnd == null or self.sourceRangeStart <= self.sourceRangeEnd "Order source range end must not precede its start"
 
   transition status from "draft" to ["submitted", "cancelled"]
   transition status from "submitted" to ["confirmed", "cancelled"]
@@ -82,8 +82,8 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     guard self.vendor != null and self.vendor.status == "active" and self.vendor.onboardedAt != null
     constraint openVendorMatch: vendorId == self.vendorId "Open vendorId must match the seeded vendor reference"
     constraint openEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Open eventId must match the seeded event reference when provided"
-    constraint openSourceRangeComplete: (sourceRangeStart == null and sourceRangeEnd == null) or (sourceRangeStart != null and sourceRangeEnd != null) "Purchase draft date range requires both a start and end"
-    constraint openSourceRangeOrdered: sourceRangeStart == null or sourceRangeEnd == null or sourceRangeStart <= sourceRangeEnd "Purchase draft date range end must not precede its start"
+    constraint openSourceRangeComplete: (sourceRangeStart == null and sourceRangeEnd == null) or (sourceRangeStart != null and sourceRangeEnd != null) "Open source range requires both a start and end"
+    constraint openSourceRangeOrdered: sourceRangeStart == null or sourceRangeEnd == null or sourceRangeStart <= sourceRangeEnd "Open source range end must not precede its start"
     mutate vendorId = vendorId
     mutate eventId = eventId != null ? eventId : self.eventId
     mutate sourceRangeStart = sourceRangeStart != null ? sourceRangeStart : self.sourceRangeStart
@@ -253,6 +253,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
+  hasMany demandLinks: VendorOrderLineDemand
 
   computed lineTotal: money(12, 2) = self.orderedQuantity * self.unitCost
   computed remainingQuantity: decimal(12, 4) = self.orderedQuantity - self.receivedQuantity
@@ -382,6 +383,92 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   store VendorOrderLine in durable
 }
 
+// Provenance contribution from one IngredientDemand to an aggregated weekly
+// VendorOrderLine. Several Events may contribute to the same order line.
+entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required vendorOrderLineId: uuid
+  property required ingredientDemandId: uuid
+  property required contributionQuantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property linkedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
+  belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
+
+  constraint demandLinkQuantityPositive: self.linkedAt == null or self.contributionQuantity > 0 "Demand link contribution must be positive"
+
+  default policy vendorOrderLineDemandRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read order demand links"
+  default policy vendorOrderLineDemandWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write order demand links through commands"
+  default policy vendorOrderLineDemandExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute order demand link commands"
+
+  command link(
+    vendorOrderLineId: uuid,
+    ingredientDemandId: uuid,
+    contributionQuantity: decimal(12, 4),
+    unit: UnitOfMeasure
+  ) {
+    guard self.linkedAt == null
+    guard self.deletedAt == null
+    guard self.vendorOrderLine != null and self.vendorOrderLine.vendorOrder != null and self.vendorOrderLine.vendorOrder.status == "draft"
+    guard self.ingredientDemand != null
+    constraint linkLineMatch: vendorOrderLineId == self.vendorOrderLineId "Demand link vendorOrderLineId must match the seeded line reference"
+    constraint linkDemandMatch: ingredientDemandId == self.ingredientDemandId "Demand link ingredientDemandId must match the seeded demand reference"
+    constraint linkQuantityPositive: contributionQuantity > 0 "Demand link contribution must be positive"
+    mutate vendorOrderLineId = vendorOrderLineId
+    mutate ingredientDemandId = ingredientDemandId
+    mutate contributionQuantity = contributionQuantity
+    mutate unit = unit
+    mutate linkedAt = now()
+    emit VendorOrderLineDemandLinked {
+      vendorOrderLineDemandId: self.id
+      tenantId: self.tenantId
+      vendorOrderLineId: vendorOrderLineId
+      ingredientDemandId: ingredientDemandId
+      contributionQuantity: contributionQuantity
+      unit: unit
+    }
+  }
+
+  command revise(contributionQuantity: decimal(12, 4)) {
+    guard self.linkedAt != null
+    guard self.deletedAt == null
+    guard self.vendorOrderLine != null and self.vendorOrderLine.vendorOrder != null and self.vendorOrderLine.vendorOrder.status == "draft"
+    constraint reviseQuantityPositive: contributionQuantity > 0 "Demand link contribution must be positive"
+    mutate contributionQuantity = contributionQuantity
+    emit VendorOrderLineDemandRevised {
+      vendorOrderLineDemandId: self.id
+      tenantId: self.tenantId
+      vendorOrderLineId: self.vendorOrderLineId
+      ingredientDemandId: self.ingredientDemandId
+      contributionQuantity: contributionQuantity
+      unit: self.unit
+    }
+  }
+
+  command retire(reason: string) {
+    guard self.linkedAt != null
+    guard self.deletedAt == null
+    guard self.vendorOrderLine != null and self.vendorOrderLine.vendorOrder != null and self.vendorOrderLine.vendorOrder.status == "draft"
+    constraint retireReasonPresent: length(trim(reason)) > 0 "Demand link retirement reason is required"
+    mutate removedAt = now()
+    mutate deletedAt = now()
+    emit VendorOrderLineDemandRetired {
+      vendorOrderLineDemandId: self.id
+      tenantId: self.tenantId
+      vendorOrderLineId: self.vendorOrderLineId
+      ingredientDemandId: self.ingredientDemandId
+      reason: reason
+    }
+  }
+
+  store VendorOrderLineDemand in durable
+}
+
 event VendorOrderOpened: "vendor_order.opened" {
   vendorOrderId: string
   tenantId: string
@@ -495,5 +582,31 @@ event VendorOrderLineCancelled: "vendor_order_line.cancelled" {
   orderedQuantity: decimal(12, 4)
   receivedQuantity: decimal(12, 4)
   unit: UnitOfMeasure
+  reason: string
+}
+
+event VendorOrderLineDemandLinked: "vendor_order_line_demand.linked" {
+  vendorOrderLineDemandId: string
+  tenantId: string
+  vendorOrderLineId: string
+  ingredientDemandId: string
+  contributionQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event VendorOrderLineDemandRevised: "vendor_order_line_demand.revised" {
+  vendorOrderLineDemandId: string
+  tenantId: string
+  vendorOrderLineId: string
+  ingredientDemandId: string
+  contributionQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event VendorOrderLineDemandRetired: "vendor_order_line_demand.retired" {
+  vendorOrderLineDemandId: string
+  tenantId: string
+  vendorOrderLineId: string
+  ingredientDemandId: string
   reason: string
 }

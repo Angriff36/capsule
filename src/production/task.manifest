@@ -25,9 +25,15 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   property required eventDishId: uuid
   property required eventId: uuid
   property required searchable name: string = ""
+  property dishTaskId: uuid?
   property ingredientId: uuid?
   property ingredientDemandId: uuid?
+  property dishId: uuid?
   property recipeId: uuid?
+  property required category: string = "finish_at_event"
+  property required taskType: string = "manual"
+  property specialInstructions: string?
+  property required isGenerated: boolean = true
   property required quantity: decimal(12, 4) = 0
   property completedQuantity: decimal(12, 4)?
   property required unit: UnitOfMeasure = "each"
@@ -46,6 +52,8 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
 
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo dishTask: DishTask fields [tenantId, dishTaskId] references [tenantId, id]
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
   belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
@@ -75,6 +83,12 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     optional ingredientId: uuid,
     optional ingredientDemandId: uuid,
     optional recipeId: uuid,
+    optional dishTaskId: uuid,
+    optional dishId: uuid,
+    optional category: string,
+    optional taskType: string,
+    optional specialInstructions: string,
+    optional isGenerated: boolean,
     optional station: string,
     optional dueAt: datetime,
     optional notes: string
@@ -97,6 +111,12 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate ingredientId = ingredientId != null ? ingredientId : self.ingredientId
     mutate ingredientDemandId = ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
     mutate recipeId = recipeId != null ? recipeId : self.recipeId
+    mutate dishTaskId = dishTaskId != null ? dishTaskId : self.dishTaskId
+    mutate dishId = dishId != null ? dishId : self.dishId
+    mutate category = category != null ? category : self.category
+    mutate taskType = taskType != null ? taskType : self.taskType
+    mutate specialInstructions = specialInstructions != null ? specialInstructions : self.specialInstructions
+    mutate isGenerated = isGenerated != null ? isGenerated : self.isGenerated
     mutate quantity = quantity
     mutate unit = unit
     mutate station = station != null ? station : self.station
@@ -111,11 +131,54 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
       ingredientId: ingredientId != null ? ingredientId : self.ingredientId
       ingredientDemandId: ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
       recipeId: recipeId != null ? recipeId : self.recipeId
+      dishTaskId: dishTaskId != null ? dishTaskId : self.dishTaskId
+      dishId: dishId != null ? dishId : self.dishId
+      category: category != null ? category : self.category
+      taskType: taskType != null ? taskType : self.taskType
+      specialInstructions: specialInstructions != null ? specialInstructions : self.specialInstructions
+      isGenerated: isGenerated != null ? isGenerated : self.isGenerated
       quantity: quantity
       unit: unit
       station: station != null ? station : self.station
       dueAt: dueAt != null ? dueAt : self.dueAt
       status: "pending"
+    }
+  }
+
+  command revise(
+    optional name: string,
+    optional quantity: decimal(12, 4),
+    optional unit: UnitOfMeasure,
+    optional category: string,
+    optional taskType: string,
+    optional specialInstructions: string,
+    optional ingredientId: uuid,
+    optional recipeId: uuid
+  ) {
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    constraint reviseNamePresent: name == null or length(trim(name)) > 0 "Prep task name cannot be blank"
+    constraint reviseQuantityPositive: quantity == null or quantity > 0 "Prep quantity must be positive"
+    mutate name = name != null ? name : self.name
+    mutate quantity = quantity != null ? quantity : self.quantity
+    mutate unit = unit != null ? unit : self.unit
+    mutate category = category != null ? category : self.category
+    mutate taskType = taskType != null ? taskType : self.taskType
+    mutate specialInstructions = specialInstructions != null ? specialInstructions : self.specialInstructions
+    mutate ingredientId = ingredientId != null ? ingredientId : self.ingredientId
+    mutate recipeId = recipeId != null ? recipeId : self.recipeId
+    mutate isGenerated = false
+    emit PrepTaskRevised {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      name: name != null ? name : self.name
+      quantity: quantity != null ? quantity : self.quantity
+      unit: unit != null ? unit : self.unit
+      category: category != null ? category : self.category
+      taskType: taskType != null ? taskType : self.taskType
+      specialInstructions: specialInstructions != null ? specialInstructions : self.specialInstructions
     }
   }
 
@@ -295,12 +358,31 @@ event PrepTaskOpened: "prep_task.opened" {
   name: string
   ingredientId: string?
   ingredientDemandId: string?
+  dishId: string?
   recipeId: string?
+  dishTaskId: string?
+  category: string
+  taskType: string
+  specialInstructions: string?
+  isGenerated: boolean
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
   station: string?
   dueAt: datetime?
   status: PrepTaskStatus
+}
+
+event PrepTaskRevised: "prep_task.revised" {
+  prepTaskId: string
+  tenantId: string
+  eventDishId: string
+  eventId: string
+  name: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  category: string
+  taskType: string
+  specialInstructions: string?
 }
 
 event PrepTaskClaimed: "prep_task.claimed" {

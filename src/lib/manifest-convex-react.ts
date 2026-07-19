@@ -25,13 +25,15 @@ import {
   DeliveryMarkFailedParamsSchema,
   DeliveryScheduleParamsSchema,
   DeliveryStartTransitParamsSchema,
-  DishClassifyAllergensParamsSchema,
   DishIntroduceParamsSchema,
   DishRecipeAttachParamsSchema,
   DishRecipeDetachParamsSchema,
   DishReinstateParamsSchema,
   DishRetireParamsSchema,
   DishReviseDetailsParamsSchema,
+  DishTaskAddParamsSchema,
+  DishTaskRetireParamsSchema,
+  DishTaskReviseParamsSchema,
   DishUpdatePortioningParamsSchema,
   EventAllergenCheckRecordParamsSchema,
   EventApproveParamsSchema,
@@ -154,6 +156,7 @@ import {
   PrepTaskMarkBlockedParamsSchema,
   PrepTaskOpenParamsSchema,
   PrepTaskReleaseParamsSchema,
+  PrepTaskReviseParamsSchema,
   PrepTaskStartParamsSchema,
   PrepTaskUnblockParamsSchema,
   ProductionBatchCancelParamsSchema,
@@ -233,6 +236,9 @@ import {
   VendorOrderConfirmParamsSchema,
   VendorOrderLineAddLineParamsSchema,
   VendorOrderLineCancelLineParamsSchema,
+  VendorOrderLineDemandLinkParamsSchema,
+  VendorOrderLineDemandRetireParamsSchema,
+  VendorOrderLineDemandReviseParamsSchema,
   VendorOrderLineRecordReceiptParamsSchema,
   VendorOrderMarkPartiallyReceivedParamsSchema,
   VendorOrderMarkReceivedParamsSchema,
@@ -605,16 +611,6 @@ export function useGetDish(id: string | "skip") {
   return useQuery(api.queries.getDish, id === "skip" ? "skip" : { id: id as any });
 }
 
-/** Mutation hook for Dish.classifyAllergens. */
-export function useDishClassifyAllergens() {
-  const mutate = useMutation(api.mutations.Dish_classifyAllergens);
-  return (args: any) => {
-    const { docId, version, idempotencyKey, ...params } = args ?? {};
-    const parsed = DishClassifyAllergensParamsSchema.parse(params) as Record<string, unknown>;
-    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
-  };
-}
-
 /** Mutation hook for Dish.introduce. */
 export function useDishIntroduce() {
   const mutate = useMutation(api.mutations.Dish_introduce);
@@ -712,6 +708,57 @@ export function useCreateDishRecipe() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = DishRecipeAttachParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for DishTask. */
+export function useListDishTask() {
+  return useQuery(api.queries.listDishTask);
+}
+
+/** Reactive get-by-id for DishTask. Pass "skip" to suspend. */
+export function useGetDishTask(id: string | "skip") {
+  return useQuery(api.queries.getDishTask, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for DishTask.add. */
+export function useDishTaskAdd() {
+  const mutate = useMutation(api.mutations.DishTask_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishTaskAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DishTask.retire. */
+export function useDishTaskRetire() {
+  const mutate = useMutation(api.mutations.DishTask_retire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishTaskRetireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for DishTask.revise. */
+export function useDishTaskRevise() {
+  const mutate = useMutation(api.mutations.DishTask_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishTaskReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for DishTask.add. */
+export function useCreateDishTask() {
+  const mutate = useMutation(api.mutations.DishTask_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = DishTaskAddParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -2378,6 +2425,16 @@ export function usePrepTaskRelease() {
   };
 }
 
+/** Mutation hook for PrepTask.revise. */
+export function usePrepTaskRevise() {
+  const mutate = useMutation(api.mutations.PrepTask_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PrepTask.start. */
 export function usePrepTaskStart() {
   const mutate = useMutation(api.mutations.PrepTask_start);
@@ -3625,6 +3682,57 @@ export function useCreateVendorOrderLine() {
   };
 }
 
+/** Reactive list for VendorOrderLineDemand. */
+export function useListVendorOrderLineDemand() {
+  return useQuery(api.queries.listVendorOrderLineDemand);
+}
+
+/** Reactive get-by-id for VendorOrderLineDemand. Pass "skip" to suspend. */
+export function useGetVendorOrderLineDemand(id: string | "skip") {
+  return useQuery(api.queries.getVendorOrderLineDemand, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for VendorOrderLineDemand.link. */
+export function useVendorOrderLineDemandLink() {
+  const mutate = useMutation(api.mutations.VendorOrderLineDemand_link);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderLineDemandLinkParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VendorOrderLineDemand.retire. */
+export function useVendorOrderLineDemandRetire() {
+  const mutate = useMutation(api.mutations.VendorOrderLineDemand_retire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderLineDemandRetireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VendorOrderLineDemand.revise. */
+export function useVendorOrderLineDemandRevise() {
+  const mutate = useMutation(api.mutations.VendorOrderLineDemand_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderLineDemandReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for VendorOrderLineDemand.link. */
+export function useCreateVendorOrderLineDemand() {
+  const mutate = useMutation(api.mutations.VendorOrderLineDemand_createViaLink);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderLineDemandLinkParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for Venue. */
 export function useListVenue() {
   return useQuery(api.queries.listVenue);
@@ -3737,4 +3845,4 @@ export function useCreateWasteRecord() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 391 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 403 as const;

@@ -75,10 +75,32 @@ async function seedPendingQualityOnPrep(
       allergens: [],
       version: 0,
     });
-    const prepTaskId = await ctx.db.insert("prepTasks", {
+    const dishId = await ctx.db.insert("dishes", {
+      tenantId,
+      name: "Quality Proof Dish",
+      portionSize: 1,
+      portionUnit: "portion",
+      dietaryTags: [],
+      status: "active",
+      version: 0,
+    });
+    const eventDishId = await ctx.db.insert("eventDishes", {
       tenantId,
       eventId,
+      dishId,
+      quantityServings: 10,
+      version: 0,
+    });
+    const prepTaskId = await ctx.db.insert("prepTasks", {
+      tenantId,
+      eventDishId,
+      eventId,
+      dishId,
       ingredientId,
+      name: "Proof prep",
+      category: "mise",
+      taskType: "prep",
+      isGenerated: false,
       quantity: S.quantity,
       unit: S.unit,
       station: S.station,

@@ -6,7 +6,7 @@
  * trusted-context injection helpers, and invalidation metadata.
  */
 
-export const WIRING_CONTRACT_HASH = "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:28c985d9ef8a52f4c42e51700b40aeedec2804793893d9e50033e0e1eb61fc1a:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:728e61c032fe46367413548d0842c84d372b976db2ce834510b96157d0a2557b:7a1df129c67a2078408d953496bc407cbeb1b9b0a380949db99617f9a49efc9f:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:870a8d351c294034e14611cdb8d44a851f4985fb246a6ff1f1eff26105d5170c:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:9e32b3a907507588d9a813328d43ea85d61feefc1a41b32b59e72ee41c2356bd:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c31bf476c50cabe3d77f4682e5548a0d72703008c7796b1e663955d44fd1282b:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f";
+export const WIRING_CONTRACT_HASH = "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:16f5b86fa64677653383a3565cc55ae5abd29b5f0ab299becbd63a2a989ea054:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3056fdf936078daac78d5183e5b6e52c8e17c1df3fb66975c64cb3da60499d80:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:728e61c032fe46367413548d0842c84d372b976db2ce834510b96157d0a2557b:7a61dae4c0f63ff0a5a443d31f47689ee975289e92dd8228657dc3508cf3cc31:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:9e32b3a907507588d9a813328d43ea85d61feefc1a41b32b59e72ee41c2356bd:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:ac9d03bb9e8daeddd2c6b051de31356de429211ce7519d1ce0b901773add63ea:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c31bf476c50cabe3d77f4682e5548a0d72703008c7796b1e663955d44fd1282b:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f";
 
 // --- AvailabilityWindow.declare ---
 export interface AvailabilityWindowDeclareClientInput {
@@ -1129,46 +1129,6 @@ export const DeliveryStartTransitLifecycle = [
   }
 ] as const;
 
-// --- Dish.classifyAllergens ---
-export interface DishClassifyAllergensClientInput {
-  allergenSummary: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[];
-}
-
-export const DishClassifyAllergensCapability = {
-  capabilityId: "Dish.classifyAllergens",
-  entity: "Dish",
-  command: "classifyAllergens",
-  route: "/api/manifest/Dish/commands/classifyAllergens",
-  instanceCommand: true,
-  clientParameterNames: ["allergenSummary"],
-  serverParameterNames: [],
-  emits: ["DishAllergensClassified"],
-} as const;
-
-/**
- * Build command input for Dish.classifyAllergens.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindDishClassifyAllergensInput(client: DishClassifyAllergensClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful Dish.classifyAllergens. */
-export const DishClassifyAllergensInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "Dish",
-    "queryKeyHint": "queryKeys.dish.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "Dish",
-    "queryKeyHint": "queryKeys.dish.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
 // --- Dish.introduce ---
 export interface DishIntroduceClientInput {
   name: string;
@@ -1181,7 +1141,6 @@ export interface DishIntroduceClientInput {
   course?: string;
   serviceStyle?: string;
   dietaryTags?: string[];
-  allergenSummary?: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[];
 }
 
 export const DishIntroduceCapability = {
@@ -1190,7 +1149,7 @@ export const DishIntroduceCapability = {
   command: "introduce",
   route: "/api/manifest/Dish/commands/introduce",
   instanceCommand: true,
-  clientParameterNames: ["name","portionSize","portionUnit","description","category","course","serviceStyle","dietaryTags","allergenSummary"],
+  clientParameterNames: ["name","portionSize","portionUnit","description","category","course","serviceStyle","dietaryTags"],
   serverParameterNames: [],
   emits: ["DishIntroduced"],
 } as const;
@@ -1484,6 +1443,159 @@ export const DishRecipeDetachInvalidation = [
     "kind": "entityDetail",
     "entity": "DishRecipe",
     "queryKeyHint": "queryKeys.dishRecipe.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- DishTask.add ---
+export interface DishTaskAddClientInput {
+  dishId: string;
+  name: string;
+  category?: string;
+  taskType?: string;
+  /** Bounds: 1..∞ */
+  defaultQuantity?: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  defaultUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+  /** Bounds: 0..∞ */
+  sortOrder?: number;
+  recipeId?: string;
+  ingredientId?: string;
+  instructions?: string;
+}
+
+export const DishTaskAddCapability = {
+  capabilityId: "DishTask.add",
+  entity: "DishTask",
+  command: "add",
+  route: "/api/manifest/DishTask/commands/add",
+  instanceCommand: true,
+  clientParameterNames: ["dishId","name","category","taskType","defaultQuantity","defaultUnit","sortOrder","recipeId","ingredientId","instructions"],
+  serverParameterNames: [],
+  emits: ["DishTaskAdded"],
+} as const;
+
+/**
+ * Build command input for DishTask.add.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishTaskAddInput(client: DishTaskAddClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DishTask.add. */
+export const DishTaskAddInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- DishTask.retire ---
+export interface DishTaskRetireClientInput {
+  reason: string;
+}
+
+export const DishTaskRetireCapability = {
+  capabilityId: "DishTask.retire",
+  entity: "DishTask",
+  command: "retire",
+  route: "/api/manifest/DishTask/commands/retire",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["DishTaskRetired"],
+} as const;
+
+/**
+ * Build command input for DishTask.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishTaskRetireInput(client: DishTaskRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DishTask.retire. */
+export const DishTaskRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for DishTask.retire. */
+export const DishTaskRetireLifecycle = [
+  {
+    "property": "status",
+    "from": "active",
+    "to": "retired",
+    "proven": true
+  }
+] as const;
+
+// --- DishTask.revise ---
+export interface DishTaskReviseClientInput {
+  name: string;
+  category?: string;
+  taskType?: string;
+  /** Bounds: 1..∞ */
+  defaultQuantity?: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  defaultUnit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+  /** Bounds: 0..∞ */
+  sortOrder?: number;
+  recipeId?: string;
+  ingredientId?: string;
+  instructions?: string;
+}
+
+export const DishTaskReviseCapability = {
+  capabilityId: "DishTask.revise",
+  entity: "DishTask",
+  command: "revise",
+  route: "/api/manifest/DishTask/commands/revise",
+  instanceCommand: true,
+  clientParameterNames: ["name","category","taskType","defaultQuantity","defaultUnit","sortOrder","recipeId","ingredientId","instructions"],
+  serverParameterNames: [],
+  emits: ["DishTaskRevised"],
+} as const;
+
+/**
+ * Build command input for DishTask.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishTaskReviseInput(client: DishTaskReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful DishTask.revise. */
+export const DishTaskReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "DishTask",
+    "queryKeyHint": "queryKeys.dishTask.detail(id)",
     "label": "entity detail"
   }
 ] as const;
@@ -7339,6 +7451,12 @@ export interface PrepTaskOpenClientInput {
   ingredientId?: string;
   ingredientDemandId?: string;
   recipeId?: string;
+  dishTaskId?: string;
+  dishId?: string;
+  category?: string;
+  taskType?: string;
+  specialInstructions?: string;
+  isGenerated?: boolean;
   station?: string;
   dueAt?: string;
   notes?: string;
@@ -7350,7 +7468,7 @@ export const PrepTaskOpenCapability = {
   command: "open",
   route: "/api/manifest/PrepTask/commands/open",
   instanceCommand: true,
-  clientParameterNames: ["eventDishId","eventId","name","quantity","unit","ingredientId","ingredientDemandId","recipeId","station","dueAt","notes"],
+  clientParameterNames: ["eventDishId","eventId","name","quantity","unit","ingredientId","ingredientDemandId","recipeId","dishTaskId","dishId","category","taskType","specialInstructions","isGenerated","station","dueAt","notes"],
   serverParameterNames: [],
   emits: ["PrepTaskOpened"],
 } as const;
@@ -7430,6 +7548,55 @@ export const PrepTaskReleaseLifecycle = [
     "from": "blocked",
     "to": "pending",
     "proven": true
+  }
+] as const;
+
+// --- PrepTask.revise ---
+export interface PrepTaskReviseClientInput {
+  name?: string;
+  /** Bounds: 1..∞ */
+  quantity?: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  unit?: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+  category?: string;
+  taskType?: string;
+  specialInstructions?: string;
+  ingredientId?: string;
+  recipeId?: string;
+}
+
+export const PrepTaskReviseCapability = {
+  capabilityId: "PrepTask.revise",
+  entity: "PrepTask",
+  command: "revise",
+  route: "/api/manifest/PrepTask/commands/revise",
+  instanceCommand: true,
+  clientParameterNames: ["name","quantity","unit","category","taskType","specialInstructions","ingredientId","recipeId"],
+  serverParameterNames: [],
+  emits: ["PrepTaskRevised"],
+} as const;
+
+/**
+ * Build command input for PrepTask.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPrepTaskReviseInput(client: PrepTaskReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PrepTask.revise. */
+export const PrepTaskReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTask",
+    "queryKeyHint": "queryKeys.prepTask.detail(id)",
+    "label": "entity detail"
   }
 ] as const;
 
@@ -11817,6 +11984,132 @@ export const VendorOrderLineRecordReceiptInvalidation = [
   }
 ] as const;
 
+// --- VendorOrderLineDemand.link ---
+export interface VendorOrderLineDemandLinkClientInput {
+  vendorOrderLineId: string;
+  ingredientDemandId: string;
+  /** Bounds: 1..∞ */
+  contributionQuantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+}
+
+export const VendorOrderLineDemandLinkCapability = {
+  capabilityId: "VendorOrderLineDemand.link",
+  entity: "VendorOrderLineDemand",
+  command: "link",
+  route: "/api/manifest/VendorOrderLineDemand/commands/link",
+  instanceCommand: true,
+  clientParameterNames: ["vendorOrderLineId","ingredientDemandId","contributionQuantity","unit"],
+  serverParameterNames: [],
+  emits: ["VendorOrderLineDemandLinked"],
+} as const;
+
+/**
+ * Build command input for VendorOrderLineDemand.link.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorOrderLineDemandLinkInput(client: VendorOrderLineDemandLinkClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorOrderLineDemand.link. */
+export const VendorOrderLineDemandLinkInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- VendorOrderLineDemand.retire ---
+export interface VendorOrderLineDemandRetireClientInput {
+  reason: string;
+}
+
+export const VendorOrderLineDemandRetireCapability = {
+  capabilityId: "VendorOrderLineDemand.retire",
+  entity: "VendorOrderLineDemand",
+  command: "retire",
+  route: "/api/manifest/VendorOrderLineDemand/commands/retire",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["VendorOrderLineDemandRetired"],
+} as const;
+
+/**
+ * Build command input for VendorOrderLineDemand.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorOrderLineDemandRetireInput(client: VendorOrderLineDemandRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorOrderLineDemand.retire. */
+export const VendorOrderLineDemandRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- VendorOrderLineDemand.revise ---
+export interface VendorOrderLineDemandReviseClientInput {
+  /** Bounds: 1..∞ */
+  contributionQuantity: number;
+}
+
+export const VendorOrderLineDemandReviseCapability = {
+  capabilityId: "VendorOrderLineDemand.revise",
+  entity: "VendorOrderLineDemand",
+  command: "revise",
+  route: "/api/manifest/VendorOrderLineDemand/commands/revise",
+  instanceCommand: true,
+  clientParameterNames: ["contributionQuantity"],
+  serverParameterNames: [],
+  emits: ["VendorOrderLineDemandRevised"],
+} as const;
+
+/**
+ * Build command input for VendorOrderLineDemand.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorOrderLineDemandReviseInput(client: VendorOrderLineDemandReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorOrderLineDemand.revise. */
+export const VendorOrderLineDemandReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLineDemand",
+    "queryKeyHint": "queryKeys.vendorOrderLineDemand.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- Venue.activate ---
 export type VenueActivateClientInput = Record<string, never>;
 
@@ -12200,7 +12493,6 @@ export const ALL_CAPABILITY_IDS = [
   "Delivery.markFailed",
   "Delivery.schedule",
   "Delivery.startTransit",
-  "Dish.classifyAllergens",
   "Dish.introduce",
   "Dish.reinstate",
   "Dish.retire",
@@ -12208,6 +12500,9 @@ export const ALL_CAPABILITY_IDS = [
   "Dish.updatePortioning",
   "DishRecipe.attach",
   "DishRecipe.detach",
+  "DishTask.add",
+  "DishTask.retire",
+  "DishTask.revise",
   "Event.approve",
   "Event.assignOwner",
   "Event.beginExecution",
@@ -12329,6 +12624,7 @@ export const ALL_CAPABILITY_IDS = [
   "PrepTask.markBlocked",
   "PrepTask.open",
   "PrepTask.release",
+  "PrepTask.revise",
   "PrepTask.start",
   "PrepTask.unblock",
   "ProductionBatch.cancel",
@@ -12418,6 +12714,9 @@ export const ALL_CAPABILITY_IDS = [
   "VendorOrderLine.addLine",
   "VendorOrderLine.cancelLine",
   "VendorOrderLine.recordReceipt",
+  "VendorOrderLineDemand.link",
+  "VendorOrderLineDemand.retire",
+  "VendorOrderLineDemand.revise",
   "Venue.activate",
   "Venue.changeCapacity",
   "Venue.deactivate",
