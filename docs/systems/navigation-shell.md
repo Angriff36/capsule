@@ -14,7 +14,7 @@
 
 - `NAV_AREAS` defines primary rail entries (Operate / People / Business / System).
 - Areas with `planned` render `PlannedAreaPage` instead of a feature module.
-- Shipping Operate routes: Home (role-shaped attention ledger), Events, Kitchen, Inventory, Logistics. People/Business: Staff, Clients, Finance (invoices, payments, closeout, payroll). Reports and Facilities/Admin remain planned.
+- Shipping Operate routes: Home (role-shaped attention ledger), Events, Kitchen, Inventory, Logistics. People/Business: Staff, Clients, Finance (invoices, payments, closeout, payroll), Reports (saved definitions). Facilities/Admin remain planned.
 - Home (`/`) lists only queryable facts (upcoming services + open prep/packs/invoices/closeouts). No invented KPIs. [`index.md`](index.md) is the authority for which systems belong in CapsuleX.
 
 ## Target information architecture

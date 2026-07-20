@@ -14,17 +14,19 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
 | `finance/payroll-input.manifest`                               | PayrollInput          |
 | `insights/report.manifest`                                     | SavedReportDefinition |
 
-## Primary workspace (Slice 8 + 8b)
+## Primary workspace (Slice 8 + 8b + reports)
 
 | Route               | Outcome                                                              |
 | ------------------- | -------------------------------------------------------------------- |
 | `/finance/closeout` | Capture reconciled numbers for a closed-out event; finalize folio    |
 | `/finance/payroll`  | Prepare person/period payroll rollup; finalize or void               |
+| `/reports`          | Save/rename/share/archive/restore report definitions                 |
 
 **User outcomes proven**
 
 1. Event → `closed_out` → EventCloseout.capture → finalize
 2. Person.hire → PayrollInput.prepare → finalize (finance managers; opaque person ids)
+3. SavedReportDefinition.createDefinition → archive → restore (staffAccess)
 
 ## Core workflows (shipped vs deferred)
 
@@ -32,10 +34,11 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
 
 - EventCloseout capture/finalize
 - PayrollInput prepare/finalize/void (`financeManageAccess`)
+- SavedReportDefinition library on `/reports` (create, rename, share, archive, restore)
 
 **Deferred**
 
-- SavedReportDefinition library and result rendering (`/reports` remains planned)
+- Chart/result rendering for saved definitions (library stores config only)
 - Automatic aggregation from operational facts into closeout/payroll numbers
 - PayrollInput `hourlyRate` / `overtimeRate` / `grossAmount` entry — Manifest encrypts
   private money to ciphertext while Convex schema still declares `number` (proven insert
@@ -49,7 +52,8 @@ Event lifecycle owns `closeOut`; EventCloseout stores the reconciliation fact. P
 
 - Closeout runtime: `tests/proofs/event-closeout-lifecycle.runtime.test.ts`
 - Payroll runtime: `tests/proofs/payroll-input-lifecycle.runtime.test.ts`
-- Routes/lifecycle: `tests/finance-routes.test.ts`
+- Reports runtime: `tests/proofs/saved-report-definition-lifecycle.runtime.test.ts`
+- Routes/lifecycle: `tests/finance-routes.test.ts`, `tests/reports-routes.test.ts`
 - Guards: `bun run check:closeout-manifest`, `bun run check:payroll-manifest`
 
 ## References

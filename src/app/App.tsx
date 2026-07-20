@@ -97,6 +97,11 @@ const PayrollPage = lazy(() =>
     default: module.PayrollPage,
   })),
 );
+const ReportsPage = lazy(() =>
+  import("../features/reports/ReportsPage").then((module) => ({
+    default: module.ReportsPage,
+  })),
+);
 const ClientsPage = lazy(() =>
   import("../features/clients/ClientsPage").then((module) => ({
     default: module.ClientsPage,
@@ -332,6 +337,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <PayrollPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <SupplyRoute>
+                  <ReportsPage />
                 </SupplyRoute>
               }
             />

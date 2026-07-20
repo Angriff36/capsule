@@ -66,7 +66,6 @@ export const NAV_AREAS: NavArea[] = [
     label: "Reports",
     group: "Business",
     icon: ChartIcon,
-    planned: "Event reports and operational summaries.",
   },
   {
     path: "/facilities",

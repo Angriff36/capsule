@@ -250,7 +250,7 @@ export function PayrollPage() {
       </section>
 
       <p className="mt-4 text-[12px] text-ink-3">
-        Saved report definitions remain deferred on{" "}
+        Saved report definitions live under{" "}
         <Link className="text-link" to="/reports">
           Reports
         </Link>
