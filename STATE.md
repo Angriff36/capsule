@@ -1,9 +1,12 @@
 # Loop State — capsule
 
-Last run: 2026-07-20T14:30:00Z (vertical-slice: Slice 9 Home service desk)
+Last run: 2026-07-20T14:45:00Z (vertical-slice: SavedReportDefinition /reports)
 
 ## High Priority (loop is acting or waiting on human)
 
+- **SavedReportDefinition `/reports` shipped locally (`bb2ffae`) — not pushed**:
+  create → rename/share → archive → restore library (chart render deferred).
+  Push only when human authorizes.
 - **Slice 9 Home service desk shipped locally (`f2ec316`) — not pushed**: `/`
   attention ledger + upcoming services from queryable lists; role from
   `authStatus`. Push only when human authorizes.
@@ -29,7 +32,7 @@ Last run: 2026-07-20T14:30:00Z (vertical-slice: Slice 9 Home service desk)
 
 - Working tree may still carry unrelated WIP — normal scale.
 - `actions/checkout@v4` + Node 20 deprecation warnings — bump when convenient (blocked behind CI red).
-- Next after Slice 9: SavedReportDefinition/`/reports` or PaymentMethod UI thin unit.
+- Next after reports: PaymentMethod UI thin unit (Slice 7 deferred).
 
 ## Recent Noise (ignored this run)
 
