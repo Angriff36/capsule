@@ -4,8 +4,8 @@ Last run: 2026-07-20T13:20:00Z (vertical-slice: Slice 7 Commercial and billing t
 
 ## High Priority (loop is acting or waiting on human)
 
-- **Slice 7 shipped locally — not pushed**: `/finance` invoices + payments (issue→send→record→settle).
-  Push only when human authorizes. Commit hash filled after commit.
+- **Slice 7 shipped locally (`aff6960`) — not pushed**: `/finance` invoices + payments
+  (issue→send→record→settle). Push only when human authorizes.
 - **Auth unblock 2026-07-20**: Local Convex stuck on schema validation — dishes still had stored
   `allergenSummary` after it was converted to computed. Restored stored `property allergenSummary`
   + `classifyAllergens` in `src/culinary/dish.manifest`, `bun run manifest:regen`, restarted
