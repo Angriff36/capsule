@@ -7,13 +7,28 @@ describe("WorkspaceMembershipPolicy", () => {
 
   it("requires both role and tenant before the shell unlocks", () => {
     expect(
-      policy.isReady({ authenticated: true, hasRole: true, hasTenant: true }),
+      policy.isReady({
+        authenticated: true,
+        hasRole: true,
+        hasTenant: true,
+        role: "staff",
+      }),
     ).toBe(true);
     expect(
-      policy.isReady({ authenticated: true, hasRole: true, hasTenant: false }),
+      policy.isReady({
+        authenticated: true,
+        hasRole: true,
+        hasTenant: false,
+        role: "staff",
+      }),
     ).toBe(false);
     expect(
-      policy.isReady({ authenticated: true, hasRole: false, hasTenant: true }),
+      policy.isReady({
+        authenticated: true,
+        hasRole: false,
+        hasTenant: true,
+        role: "anonymous",
+      }),
     ).toBe(false);
   });
 
@@ -23,6 +38,7 @@ describe("WorkspaceMembershipPolicy", () => {
         authenticated: true,
         hasRole: false,
         hasTenant: false,
+        role: "anonymous",
       }),
     ).toContain("workspace");
     expect(
@@ -30,6 +46,7 @@ describe("WorkspaceMembershipPolicy", () => {
         authenticated: true,
         hasRole: false,
         hasTenant: false,
+        role: "anonymous",
       }),
     ).toContain("role");
   });

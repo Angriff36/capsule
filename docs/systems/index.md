@@ -26,7 +26,7 @@ Current generated boundary: **43 governed business entities**, **219 command cap
 | System owner                                             | Scope                                                        | Status                                                                 |
 | -------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------- |
 | [Authentication](auth.md)                                | Clerk session, membership, trusted Convex auth context       | Shipping                                                               |
-| [Navigation shell](navigation-shell.md)                  | Shell, command palette, route catalog, responsive navigation | Shipping shell; route catalog still reflects Capsule-V2 legacy scope   |
+| [Navigation shell](navigation-shell.md)                  | Shell, command palette, route catalog, Home service desk     | Shipping; Home is role-shaped attention over queryable facts           |
 | [Manifest generation](../generation/manifest-builder.md) | Assembly and generated/authored boundary                     | Shipping                                                               |
 | Projection status                                        | Current generated capability and blockers                    | Not a public completion authority until its evidence page is published |
 
