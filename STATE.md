@@ -4,7 +4,7 @@ Last run: 2026-07-20T15:00:00Z (cross-slice: Client/Contract → Invoice issue d
 
 ## High Priority (loop is acting or waiting on human)
 
-- **Client/Contract → Invoice deep link shipped locally — not pushed**:
+- **Client/Contract → Invoice deep link shipped locally (`680e0d6`) — not pushed**:
   `/finance/invoices?issue=1&clientId=&eventId=`; signed contracts stay visible
   for billing. Push only when human authorizes.
 - **PaymentMethod UI shipped locally (`9119692`) — not pushed**: `/finance/payment-methods`
@@ -38,8 +38,8 @@ Last run: 2026-07-20T15:00:00Z (cross-slice: Client/Contract → Invoice issue d
 
 - Working tree may still carry unrelated WIP — normal scale.
 - `actions/checkout@v4` + Node 20 deprecation warnings — bump when convenient (blocked behind CI red).
-- Next after PaymentMethod: OD035/OD038 automation still deferred; pick next incomplete
-  cross-slice connection (e.g. Event→Invoice, proposal→event handoff copy, or chart render).
+- Next: Event dossier → Invoice deep link (blocked earlier by EventDetail WIP —
+  revisit when WIP lands); OD035/OD038 automation; report chart render.
 
 ## Recent Noise (ignored this run)
 
