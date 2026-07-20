@@ -73,6 +73,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Delivery_startTransit", () => {
     expect(typeof (mutations as any).Delivery_startTransit).toBe("function");
   });
+  it("exports mutation Dish_classifyAllergens", () => {
+    expect(typeof (mutations as any).Dish_classifyAllergens).toBe("function");
+  });
   it("exports mutation Dish_introduce", () => {
     expect(typeof (mutations as any).Dish_introduce).toBe("function");
   });
@@ -385,6 +388,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation PackListItem_markPacked", () => {
     expect(typeof (mutations as any).PackListItem_markPacked).toBe("function");
   });
+  it("exports mutation PackListItem_refreshGenerated", () => {
+    expect(typeof (mutations as any).PackListItem_refreshGenerated).toBe("function");
+  });
   it("exports mutation Payment_beginProcessing", () => {
     expect(typeof (mutations as any).Payment_beginProcessing).toBe("function");
   });
@@ -462,6 +468,9 @@ describe("Manifest Convex contract", () => {
   });
   it("exports mutation PrepTask_open", () => {
     expect(typeof (mutations as any).PrepTask_open).toBe("function");
+  });
+  it("exports mutation PrepTask_refreshGenerated", () => {
+    expect(typeof (mutations as any).PrepTask_refreshGenerated).toBe("function");
   });
   it("exports mutation PrepTask_release", () => {
     expect(typeof (mutations as any).PrepTask_release).toBe("function");
@@ -736,6 +745,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation VendorOrderLine_recordReceipt", () => {
     expect(typeof (mutations as any).VendorOrderLine_recordReceipt).toBe("function");
   });
+  it("exports mutation VendorOrderLine_reviseQuantity", () => {
+    expect(typeof (mutations as any).VendorOrderLine_reviseQuantity).toBe("function");
+  });
   it("exports mutation VendorOrderLineDemand_link", () => {
     expect(typeof (mutations as any).VendorOrderLineDemand_link).toBe("function");
   });
@@ -768,4 +780,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 254 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 258 as const;

@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client
+    participant Dish as Dish
+    participant EventBus
+    Client->>+Dish: classifyAllergens(allergenSummary)
+    Note over Dish: Policies: dishRead, dishWrite, dishExecute
+    Note over Dish: Guards (2)
+    Dish->>Dish: guard[0]: self.status == #quot;active#quot;
+    Dish->>Dish: guard[1]: self.deletedAt == null
+    Dish->>Dish: mutate.allergenSummary
+    Dish->>EventBus: emit DishAllergensClassified on dish.allergens_classified
+    Dish-->>-Client: void

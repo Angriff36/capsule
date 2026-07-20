@@ -24,9 +24,7 @@ describe("EventLifecyclePolicy", () => {
 
   it("humanizes guard failures for the detail screen", () => {
     const detail = policy.humanizeCommandError("Guard 0 failed");
-    expect(detail).toBe(
-      "One of this action's requirements was not met. No changes were saved.",
-    );
+    expect(detail).toBe("No changes were saved. Guard 0 failed.");
     expect(detail).not.toMatch(/lifecycle|refresh|stage/i);
   });
 });

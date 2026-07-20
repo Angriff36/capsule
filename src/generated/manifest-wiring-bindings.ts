@@ -6,7 +6,7 @@
  * trusted-context injection helpers, and invalidation metadata.
  */
 
-export const WIRING_CONTRACT_HASH = "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:16f5b86fa64677653383a3565cc55ae5abd29b5f0ab299becbd63a2a989ea054:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:728e61c032fe46367413548d0842c84d372b976db2ce834510b96157d0a2557b:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:912275cde11d5e8a1d08152b4e4a7b9ce259359101cbccb87198e639e3cda783:9e32b3a907507588d9a813328d43ea85d61feefc1a41b32b59e72ee41c2356bd:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:bec4ea7d565af9b27b85ec557a71c3c29a6908d41fe7eb90630c4229d930bac6:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d05949bc5ad00cd3eaf2e235a94dd8801ffbfce1dbd084f6bf7799b506cbadbb:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:d6910e1f58113618897b7fccf4dcbc6efd0fd1f39f05ac403e6a7f7c9a701a9f:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f";
+export const WIRING_CONTRACT_HASH = "0418609823cc581c4807e29385bcba0390816488350fac71c8522ca6529e7824:0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:16f5b86fa64677653383a3565cc55ae5abd29b5f0ab299becbd63a2a989ea054:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5351917c1d988382d27a9e6277171f3fb8096a32ef5a9341d2bbf9b222fcef47:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:6a60de19fa21e314590a79d5c721aa690946b2a1b33e3a4fc1bba2dad8aff529:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:912275cde11d5e8a1d08152b4e4a7b9ce259359101cbccb87198e639e3cda783:9e32b3a907507588d9a813328d43ea85d61feefc1a41b32b59e72ee41c2356bd:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:bec4ea7d565af9b27b85ec557a71c3c29a6908d41fe7eb90630c4229d930bac6:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:d6910e1f58113618897b7fccf4dcbc6efd0fd1f39f05ac403e6a7f7c9a701a9f:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f";
 
 // --- AvailabilityWindow.declare ---
 export interface AvailabilityWindowDeclareClientInput {
@@ -1129,6 +1129,46 @@ export const DeliveryStartTransitLifecycle = [
   }
 ] as const;
 
+// --- Dish.classifyAllergens ---
+export interface DishClassifyAllergensClientInput {
+  allergenSummary: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[];
+}
+
+export const DishClassifyAllergensCapability = {
+  capabilityId: "Dish.classifyAllergens",
+  entity: "Dish",
+  command: "classifyAllergens",
+  route: "/api/manifest/Dish/commands/classifyAllergens",
+  instanceCommand: true,
+  clientParameterNames: ["allergenSummary"],
+  serverParameterNames: [],
+  emits: ["DishAllergensClassified"],
+} as const;
+
+/**
+ * Build command input for Dish.classifyAllergens.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishClassifyAllergensInput(client: DishClassifyAllergensClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Dish.classifyAllergens. */
+export const DishClassifyAllergensInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- Dish.introduce ---
 export interface DishIntroduceClientInput {
   name: string;
@@ -1141,6 +1181,7 @@ export interface DishIntroduceClientInput {
   course?: string;
   serviceStyle?: string;
   dietaryTags?: string[];
+  allergenSummary?: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[];
 }
 
 export const DishIntroduceCapability = {
@@ -1149,7 +1190,7 @@ export const DishIntroduceCapability = {
   command: "introduce",
   route: "/api/manifest/Dish/commands/introduce",
   instanceCommand: true,
-  clientParameterNames: ["name","portionSize","portionUnit","description","category","course","serviceStyle","dietaryTags"],
+  clientParameterNames: ["name","portionSize","portionUnit","description","category","course","serviceStyle","dietaryTags","allergenSummary"],
   serverParameterNames: [],
   emits: ["DishIntroduced"],
 } as const;
@@ -5988,6 +6029,9 @@ export interface PackListItemAddItemClientInput {
   unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
   dishId?: string;
   productionBatchId?: string;
+  eventDishId?: string;
+  prepTaskId?: string;
+  isGenerated?: boolean;
 }
 
 export const PackListItemAddItemCapability = {
@@ -5996,7 +6040,7 @@ export const PackListItemAddItemCapability = {
   command: "addItem",
   route: "/api/manifest/PackListItem/commands/addItem",
   instanceCommand: true,
-  clientParameterNames: ["packListId","description","requiredQuantity","unit","dishId","productionBatchId"],
+  clientParameterNames: ["packListId","description","requiredQuantity","unit","dishId","productionBatchId","eventDishId","prepTaskId","isGenerated"],
   serverParameterNames: [],
   emits: ["PackListItemAdded"],
 } as const;
@@ -6172,6 +6216,48 @@ export const PackListItemMarkPackedLifecycle = [
     "from": "listed",
     "to": "packed",
     "proven": true
+  }
+] as const;
+
+// --- PackListItem.refreshGenerated ---
+export interface PackListItemRefreshGeneratedClientInput {
+  /** Bounds: 1..∞ */
+  requiredQuantity: number;
+  description?: string;
+}
+
+export const PackListItemRefreshGeneratedCapability = {
+  capabilityId: "PackListItem.refreshGenerated",
+  entity: "PackListItem",
+  command: "refreshGenerated",
+  route: "/api/manifest/PackListItem/commands/refreshGenerated",
+  instanceCommand: true,
+  clientParameterNames: ["requiredQuantity","description"],
+  serverParameterNames: [],
+  emits: ["PackListItemGeneratedRefreshed"],
+} as const;
+
+/**
+ * Build command input for PackListItem.refreshGenerated.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPackListItemRefreshGeneratedInput(client: PackListItemRefreshGeneratedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PackListItem.refreshGenerated. */
+export const PackListItemRefreshGeneratedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PackListItem",
+    "queryKeyHint": "queryKeys.packListItem.detail(id)",
+    "label": "entity detail"
   }
 ] as const;
 
@@ -12578,6 +12664,7 @@ export const ALL_CAPABILITY_IDS = [
   "Delivery.markFailed",
   "Delivery.schedule",
   "Delivery.startTransit",
+  "Dish.classifyAllergens",
   "Dish.introduce",
   "Dish.reinstate",
   "Dish.retire",
@@ -12682,6 +12769,7 @@ export const ALL_CAPABILITY_IDS = [
   "PackListItem.adjustQuantity",
   "PackListItem.markMissing",
   "PackListItem.markPacked",
+  "PackListItem.refreshGenerated",
   "Payment.beginProcessing",
   "Payment.fail",
   "Payment.record",

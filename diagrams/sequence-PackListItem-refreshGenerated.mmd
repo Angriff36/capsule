@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant PackListItem as PackListItem
+    participant EventBus
+    Client->>+PackListItem: refreshGenerated(requiredQuantity, description)
+    Note over PackListItem: Policies: packListItemRead, packListItemWrite, packListItemExecute
+    Note over PackListItem: Guards (5)
+    PackListItem->>PackListItem: guard[0]: self.status == #quot;listed#quot;
+    PackListItem->>PackListItem: guard[1]: self.listedAt != null
+    PackListItem->>PackListItem: guard[2]: self.deletedAt == null
+    PackListItem->>PackListItem: guard[3]: self.isGenerated == true
+    PackListItem->>PackListItem: guard[4]: self.packList != null and self.packList.status == #quot;draft#quot;...
+    PackListItem->>PackListItem: mutate.requiredQuantity
+    PackListItem->>PackListItem: mutate.description
+    PackListItem->>EventBus: emit PackListItemGeneratedRefreshed on pack_list_item.generated_refreshed
+    PackListItem-->>-Client: void

@@ -213,13 +213,21 @@ export class EventSeamContract {
       throw new Error("useGetEvent must pass { id } to match getEvent args");
     }
     const ui = this.sources.read("src/features/events/EventDetailPage.tsx");
-    if (!ui.includes("docId: event._id")) {
+    const revisePanels = this.sources.read(
+      "src/features/events/EventDetailRevisePanels.tsx",
+    );
+    if (!ui.includes("docId: event._id") && !revisePanels.includes("docId:")) {
       throw new Error(
         "EventDetailPage reschedule must pass docId matching mutation args",
       );
     }
-    if (!ui.includes("startsAt:") || !ui.includes("endsAt:")) {
-      throw new Error("EventDetailPage reschedule must pass startsAt/endsAt");
+    if (
+      !revisePanels.includes("startsAt:") ||
+      !revisePanels.includes("endsAt:")
+    ) {
+      throw new Error(
+        "EventDetailRevisePanels reschedule must pass startsAt/endsAt",
+      );
     }
     const mutation = this.sources.read("convex/mutations.ts");
     const reschedule = this.sources.sliceBetween(

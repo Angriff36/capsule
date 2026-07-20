@@ -25,6 +25,7 @@ import {
   DeliveryMarkFailedParamsSchema,
   DeliveryScheduleParamsSchema,
   DeliveryStartTransitParamsSchema,
+  DishClassifyAllergensParamsSchema,
   DishIntroduceParamsSchema,
   DishRecipeAttachParamsSchema,
   DishRecipeDetachParamsSchema,
@@ -125,6 +126,7 @@ import {
   PackListItemAdjustQuantityParamsSchema,
   PackListItemMarkMissingParamsSchema,
   PackListItemMarkPackedParamsSchema,
+  PackListItemRefreshGeneratedParamsSchema,
   PackListMarkLoadedParamsSchema,
   PackListMarkPackedParamsSchema,
   PackListOpenParamsSchema,
@@ -611,6 +613,16 @@ export function useListDish() {
 /** Reactive get-by-id for Dish. Pass "skip" to suspend. */
 export function useGetDish(id: string | "skip") {
   return useQuery(api.queries.getDish, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for Dish.classifyAllergens. */
+export function useDishClassifyAllergens() {
+  const mutate = useMutation(api.mutations.Dish_classifyAllergens);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishClassifyAllergensParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
 }
 
 /** Mutation hook for Dish.introduce. */
@@ -2048,6 +2060,16 @@ export function usePackListItemMarkPacked() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PackListItemMarkPackedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PackListItem.refreshGenerated. */
+export function usePackListItemRefreshGenerated() {
+  const mutate = useMutation(api.mutations.PackListItem_refreshGenerated);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PackListItemRefreshGeneratedParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -3867,4 +3889,4 @@ export function useCreateWasteRecord() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 405 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 407 as const;

@@ -148,6 +148,7 @@ export const DishSchema = z.object({
   portionSize: z.number().default(1),
   portionUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("portion"),
   dietaryTags: z.array(z.string()).optional().default([]),
+  allergenSummary: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional().default([]),
   status: z.enum(["active", "retired"]).default("active"),
   introducedAt: z.coerce.date().nullable().optional(),
   retiredAt: z.coerce.date().nullable().optional(),
@@ -158,7 +159,6 @@ export const DishSchema = z.object({
 
 // Computed: Dish
 export const DishComputedSchema = DishSchema.extend({
-  allergenSummary: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])),
   isActive: z.boolean(),
   isRetired: z.boolean(),
 });
@@ -640,6 +640,9 @@ export const PackListItemSchema = z.object({
   description: z.string().default(""),
   dishId: z.string().uuid().nullable().optional(),
   productionBatchId: z.string().uuid().nullable().optional(),
+  eventDishId: z.string().uuid().nullable().optional(),
+  prepTaskId: z.string().uuid().nullable().optional(),
+  isGenerated: z.boolean().default(false),
   requiredQuantity: z.number().default(0),
   packedQuantity: z.number().min(0).default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
@@ -1525,6 +1528,13 @@ export const DeliveryStartTransitParamsSchema = z.object({});
 
 export type DeliveryStartTransitParams = z.infer<typeof DeliveryStartTransitParamsSchema>;
 
+// Command: classifyAllergens on Dish
+export const DishClassifyAllergensParamsSchema = z.object({
+  allergenSummary: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])),
+});
+
+export type DishClassifyAllergensParams = z.infer<typeof DishClassifyAllergensParamsSchema>;
+
 // Command: introduce on Dish
 export const DishIntroduceParamsSchema = z.object({
   name: z.string(),
@@ -1535,6 +1545,7 @@ export const DishIntroduceParamsSchema = z.object({
   course: z.string().optional(),
   serviceStyle: z.string().optional(),
   dietaryTags: z.array(z.string()).optional(),
+  allergenSummary: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional(),
 });
 
 export type DishIntroduceParams = z.infer<typeof DishIntroduceParamsSchema>;
@@ -2342,6 +2353,9 @@ export const PackListItemAddItemParamsSchema = z.object({
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   dishId: z.string().min(1).optional(),
   productionBatchId: z.string().min(1).optional(),
+  eventDishId: z.string().min(1).optional(),
+  prepTaskId: z.string().min(1).optional(),
+  isGenerated: z.boolean().optional(),
 });
 
 export type PackListItemAddItemParams = z.infer<typeof PackListItemAddItemParamsSchema>;
@@ -2364,6 +2378,14 @@ export const PackListItemMarkPackedParamsSchema = z.object({
 });
 
 export type PackListItemMarkPackedParams = z.infer<typeof PackListItemMarkPackedParamsSchema>;
+
+// Command: refreshGenerated on PackListItem
+export const PackListItemRefreshGeneratedParamsSchema = z.object({
+  requiredQuantity: z.number(),
+  description: z.string().optional(),
+});
+
+export type PackListItemRefreshGeneratedParams = z.infer<typeof PackListItemRefreshGeneratedParamsSchema>;
 
 // Command: beginProcessing on Payment
 export const PaymentBeginProcessingParamsSchema = z.object({});
