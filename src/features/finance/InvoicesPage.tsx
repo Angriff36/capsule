@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   useCreateInvoice,
   useInvoiceMarkOverdue,
@@ -41,6 +41,10 @@ const clientLabel = (row: {
 };
 
 export function InvoicesPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const prefillClientId = searchParams.get("clientId")?.trim() || "";
+  const prefillEventId = searchParams.get("eventId")?.trim() || "";
+  const openFromLink = searchParams.get("issue") === "1";
   const invoices = useListInvoice();
   const clients = useListClient();
   const events = useListEvent();
@@ -50,7 +54,7 @@ export function InvoicesPage() {
   const markOverdue = useInvoiceMarkOverdue();
   const markVoided = useInvoiceMarkVoided();
   const writeOff = useInvoiceWriteOff();
-  const [showIssue, setShowIssue] = useState(false);
+  const [showIssue, setShowIssue] = useState(openFromLink);
   const [showClosed, setShowClosed] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -61,12 +65,33 @@ export function InvoicesPage() {
     (row) => row.deletedAt == null && String(row.status) !== "archived",
   );
   const activeRows = (invoices ?? []).filter((row) => row.deletedAt == null);
+  const scopedRows =
+    !prefillClientId && !prefillEventId
+      ? activeRows
+      : activeRows.filter((row) => {
+          if (prefillClientId && String(row.clientId) !== prefillClientId) {
+            return false;
+          }
+          if (prefillEventId && String(row.eventId ?? "") !== prefillEventId) {
+            return false;
+          }
+          return true;
+        });
   const visibleRows = showClosed
-    ? activeRows
-    : activeRows.filter(
+    ? scopedRows
+    : scopedRows.filter(
         (row) =>
           !["paid", "voided", "written_off"].includes(String(row.status)),
       );
+
+  const clearIssuePrefill = () => {
+    if (!openFromLink && !prefillClientId && !prefillEventId) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete("issue");
+    next.delete("clientId");
+    next.delete("eventId");
+    setSearchParams(next, { replace: true });
+  };
 
   const nameForClient = (id: string) => {
     const client = clients?.find((row) => row._id === id);
@@ -126,6 +151,7 @@ export function InvoicesPage() {
       });
       form.reset();
       setShowIssue(false);
+      clearIssuePrefill();
       setNotice("Invoice issued. Send it when ready for payment.");
     });
   };
@@ -194,8 +220,8 @@ export function InvoicesPage() {
           <p className="eyebrow">Finance · Invoices</p>
           <h1 className="display-title mt-2">Client invoices</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Issue an invoice against a client, send it for payment, then record
-            and settle payments on the Payments board.
+            Issue an invoice against a client (and optional event), send it for
+            payment, then record and settle payments on the Payments board.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -209,13 +235,33 @@ export function InvoicesPage() {
           <button
             className="btn btn-primary"
             type="button"
-            onClick={() => setShowIssue((value) => !value)}
+            onClick={() => {
+              if (showIssue) clearIssuePrefill();
+              setShowIssue((value) => !value);
+            }}
           >
             {showIssue ? "Close form" : "Issue invoice"}
           </button>
         </div>
       </header>
       <FinanceWorkspaceNav />
+      {prefillClientId || prefillEventId ? (
+        <p className="mt-3 text-[13px] text-ink-2" role="status">
+          Showing invoices
+          {prefillClientId ? " for the linked client" : ""}
+          {prefillEventId ? " tied to the linked event" : ""}.{" "}
+          <button
+            type="button"
+            className="text-link"
+            onClick={() => {
+              clearIssuePrefill();
+              setShowIssue(false);
+            }}
+          >
+            Clear filter
+          </button>
+        </p>
+      ) : null}
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-[13px] text-ink-2" role="status">
@@ -230,6 +276,8 @@ export function InvoicesPage() {
           events={events ?? []}
           busy={busy === "issue-invoice"}
           onSubmit={submitIssue}
+          defaultClientId={prefillClientId}
+          defaultEventId={prefillEventId}
         />
       ) : null}
 

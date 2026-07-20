@@ -10,11 +10,13 @@ import {
   useGetClient,
   useListClientContact,
   useListContract,
+  useListInvoice,
   useListProposal,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
+import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { ClientContactsPanel } from "./ClientContactsPanel";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -34,6 +36,7 @@ export function ClientDetailPage() {
   const contacts = useListClientContact();
   const proposals = useListProposal();
   const contracts = useListContract();
+  const invoices = useListInvoice();
   const createContact = useCreateClientContact();
   const setPrimary = useClientContactSetPrimary();
   const removeContact = useClientContactRemove();
@@ -59,7 +62,8 @@ export function ClientDetailPage() {
     client === undefined ||
     contacts === undefined ||
     proposals === undefined ||
-    contracts === undefined
+    contracts === undefined ||
+    invoices === undefined
   ) {
     return (
       <div className="operations-stage supply-stage">
@@ -89,6 +93,9 @@ export function ClientDetailPage() {
   );
   const clientContracts = contracts.filter(
     (row) => row.deletedAt == null && row.clientId === client._id,
+  );
+  const clientInvoices = invoices.filter(
+    (row) => row.deletedAt == null && String(row.clientId) === client._id,
   );
   const actions = policy.clientActions(String(client.status));
 
@@ -206,6 +213,12 @@ export function ClientDetailPage() {
               {action.label}
             </button>
           ))}
+          <Link
+            className="btn btn-ghost"
+            to={FINANCE_ROUTES.issueInvoice({ clientId: client._id })}
+          >
+            Issue invoice
+          </Link>
           <button
             className="btn btn-primary"
             type="button"
@@ -293,6 +306,40 @@ export function ClientDetailPage() {
           </Link>
           .
         </p>
+      </section>
+
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">Billing</p>
+            <h2>Invoices</h2>
+          </div>
+          <span>{clientInvoices.length}</span>
+        </div>
+        {clientInvoices.length === 0 ? (
+          <p className="text-[13px] text-ink-2">
+            No invoices yet.{" "}
+            <Link
+              className="text-link"
+              to={FINANCE_ROUTES.issueInvoice({ clientId: client._id })}
+            >
+              Issue an invoice
+            </Link>{" "}
+            for this account.
+          </p>
+        ) : (
+          <p className="text-[13px] text-ink-2">
+            {clientInvoices.length} invoice
+            {clientInvoices.length === 1 ? "" : "s"} — open the{" "}
+            <Link
+              className="text-link"
+              to={`${FINANCE_ROUTES.invoices}?clientId=${encodeURIComponent(client._id)}`}
+            >
+              finance ledger
+            </Link>{" "}
+            filtered to this client.
+          </p>
+        )}
       </section>
     </div>
   );

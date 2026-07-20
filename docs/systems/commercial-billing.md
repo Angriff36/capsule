@@ -35,7 +35,7 @@ Carry a client from contact and offer through agreement, invoice, payment, refun
 | Route                | Outcome                                                        |
 | -------------------- | -------------------------------------------------------------- |
 | `/clients`           | List + register clients; hide archived by default              |
-| `/clients/:id`       | Account detail, contacts, archive/reactivate, account channels |
+| `/clients/:id`       | Account detail, contacts, archive/reactivate, Issue invoice deep link |
 | `/clients/proposals` | Draft → send → mark viewed → accept/decline/expire             |
 | `/clients/contracts` | Draft against Event → send → mark viewed → sign/expire/void    |
 
@@ -55,6 +55,7 @@ Roles: finance staff/managers (`financeAccess`) own invoice and payment commands
 - Record / begin processing / settle / fail / refund Payments
 - Payment settlement applies to Invoice via generated reaction
 - Register / make-default / clear-default / expire / reactivate / invalidate / remove PaymentMethods; pick stored method when recording a payment
+- Client account and signed Contract deep-link into `/finance/invoices?issue=1` with clientId/eventId prefill
 
 **Still deferred (honest gaps)**
 

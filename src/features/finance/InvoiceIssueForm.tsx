@@ -28,11 +28,15 @@ export function InvoiceIssueForm({
   events,
   busy,
   onSubmit,
+  defaultClientId = "",
+  defaultEventId = "",
 }: {
   clients: ClientOption[];
   events: EventOption[];
   busy: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  defaultClientId?: string;
+  defaultEventId?: string;
 }) {
   if (clients.length === 0) {
     return (
@@ -51,6 +55,16 @@ export function InvoiceIssueForm({
     );
   }
 
+  const clientDefault =
+    defaultClientId && clients.some((row) => row._id === defaultClientId)
+      ? defaultClientId
+      : "";
+  const eventDefault =
+    defaultEventId &&
+    events.some((row) => row._id === defaultEventId && row.deletedAt == null)
+      ? defaultEventId
+      : "";
+
   return (
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
@@ -61,7 +75,7 @@ export function InvoiceIssueForm({
       </div>
       <label>
         Client
-        <select name="clientId" required defaultValue="">
+        <select name="clientId" required defaultValue={clientDefault}>
           <option value="" disabled>
             Select client
           </option>
@@ -78,7 +92,7 @@ export function InvoiceIssueForm({
       </label>
       <label>
         Event (optional)
-        <select name="eventId" defaultValue="">
+        <select name="eventId" defaultValue={eventDefault}>
           <option value="">No linked event</option>
           {events
             .filter((row) => row.deletedAt == null)

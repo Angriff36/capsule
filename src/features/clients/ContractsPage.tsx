@@ -14,6 +14,7 @@ import {
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
+import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
@@ -50,10 +51,11 @@ export function ContractsPage() {
       !["cancelled", "completed", "closed"].includes(String(row.stage)),
   );
   const activeRows = (contracts ?? []).filter((row) => row.deletedAt == null);
+  // Keep signed contracts visible — operators issue invoices from them.
   const visibleRows = showTerminal
     ? activeRows
     : activeRows.filter(
-        (row) => !["signed", "expired", "voided"].includes(String(row.status)),
+        (row) => !["expired", "voided"].includes(String(row.status)),
       );
 
   const run = async (key: string, work: () => Promise<void>) => {
@@ -169,7 +171,7 @@ export function ContractsPage() {
             type="button"
             onClick={() => setShowTerminal((value) => !value)}
           >
-            {showTerminal ? "Hide closed" : "Show closed"}
+            {showTerminal ? "Hide expired/voided" : "Show expired/voided"}
           </button>
           <button
             className="btn btn-primary"
@@ -308,6 +310,17 @@ export function ContractsPage() {
                           {action.label}
                         </button>
                       ))}
+                    {String(row.status) === "signed" ? (
+                      <Link
+                        className="btn btn-ghost"
+                        to={FINANCE_ROUTES.issueInvoice({
+                          clientId: String(row.clientId),
+                          eventId: String(row.eventId),
+                        })}
+                      >
+                        Issue invoice
+                      </Link>
+                    ) : null}
                   </td>
                 </tr>
               ))}

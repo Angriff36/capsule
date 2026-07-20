@@ -40,6 +40,21 @@ describe("Clients CRM routes and lifecycle bindings", () => {
     expect(app).toContain("ContractsPage");
   });
 
+  it("deep-links Client and signed Contract into invoice issue", () => {
+    const detail = readFileSync(
+      path.join(process.cwd(), "src/features/clients/ClientDetailPage.tsx"),
+      "utf8",
+    );
+    const contracts = readFileSync(
+      path.join(process.cwd(), "src/features/clients/ContractsPage.tsx"),
+      "utf8",
+    );
+    expect(detail).toContain("FINANCE_ROUTES.issueInvoice");
+    expect(detail).toContain("useListInvoice");
+    expect(contracts).toContain("FINANCE_ROUTES.issueInvoice");
+    expect(contracts).toContain('=== "signed"');
+  });
+
   it("derives CRM actions from generated lifecycle metadata", () => {
     const policy = new CrmLifecyclePolicy();
     expect(policy.clientActions("active").map((a) => a.key)).toEqual(

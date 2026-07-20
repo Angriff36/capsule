@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { FINANCE_SECTIONS } from "../src/features/finance/financeRoutes";
+import {
+  FINANCE_ROUTES,
+  FINANCE_SECTIONS,
+  InvoiceIssueLinkBuilder,
+} from "../src/features/finance/financeRoutes";
 import { CloseoutLifecyclePolicy } from "../src/features/finance/CloseoutLifecyclePolicy";
 import { CommercialLifecyclePolicy } from "../src/features/finance/CommercialLifecyclePolicy";
 import { PaymentMethodLifecyclePolicy } from "../src/features/finance/PaymentMethodLifecyclePolicy";
@@ -23,6 +27,19 @@ describe("Finance routes and lifecycle bindings", () => {
       "/finance/closeout",
       "/finance/payroll",
     ]);
+  });
+
+  it("builds Client/Event → Invoice issue deep links", () => {
+    const builder = new InvoiceIssueLinkBuilder();
+    expect(builder.build({ clientId: "client_1" })).toBe(
+      "/finance/invoices?issue=1&clientId=client_1",
+    );
+    expect(builder.build({ clientId: "client_1", eventId: "event_1" })).toBe(
+      "/finance/invoices?issue=1&clientId=client_1&eventId=event_1",
+    );
+    expect(FINANCE_ROUTES.issueInvoice({ eventId: "event_9" })).toContain(
+      "eventId=event_9",
+    );
   });
 
   it("wires finance routes in App.tsx", () => {
