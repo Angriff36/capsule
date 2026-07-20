@@ -42,6 +42,16 @@ describe("Finance routes and lifecycle bindings", () => {
     );
   });
 
+  it("links invoice detail back to Client and Event sources", () => {
+    const detail = readFileSync(
+      path.join(process.cwd(), "src/features/finance/InvoiceDetailPage.tsx"),
+      "utf8",
+    );
+    expect(detail).toContain("CLIENTS_ROUTES.detail");
+    expect(detail).toContain("useListEvent");
+    expect(detail).toContain("/events/${linkedEvent._id}");
+  });
+
   it("wires finance routes in App.tsx", () => {
     const app = readFileSync(
       path.join(process.cwd(), "src/app/App.tsx"),

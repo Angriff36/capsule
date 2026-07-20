@@ -24,7 +24,7 @@ Carry a client from contact and offer through agreement, invoice, payment, refun
 | Route                         | Outcome                                                              |
 | ----------------------------- | -------------------------------------------------------------------- |
 | `/finance/invoices`           | List + issue invoices; send / void / overdue actions                 |
-| `/finance/invoices/:id`       | Invoice detail, balance, related payments                            |
+| `/finance/invoices/:id`       | Invoice detail, Client/Event backlinks, balance, related payments    |
 | `/finance/payments`           | Record payment (optional stored method); begin processing / settle / fail |
 | `/finance/payment-methods`    | Register / default / expire / reactivate / invalidate / remove methods |
 

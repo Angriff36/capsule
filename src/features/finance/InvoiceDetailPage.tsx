@@ -8,10 +8,13 @@ import {
   useInvoiceSend,
   useInvoiceWriteOff,
   useListClient,
+  useListEvent,
   useListPayment,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
+import { clientDisplayName } from "../events/clientName";
 import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
@@ -23,6 +26,7 @@ export function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const invoice = useGetInvoice(id ?? "skip");
   const clients = useListClient();
+  const events = useListEvent();
   const payments = useListPayment();
   const send = useInvoiceSend();
   const markViewed = useInvoiceMarkViewed();
@@ -46,6 +50,7 @@ export function InvoiceDetailPage() {
   if (
     invoice === undefined ||
     clients === undefined ||
+    events === undefined ||
     payments === undefined
   ) {
     return (
@@ -65,7 +70,11 @@ export function InvoiceDetailPage() {
     );
   }
 
-  const client = clients.find((row) => row._id === invoice.clientId);
+  const clientName = clientDisplayName(String(invoice.clientId), clients);
+  const linkedEvent =
+    invoice.eventId != null
+      ? events.find((row) => row._id === invoice.eventId)
+      : undefined;
   const relatedPayments = payments.filter(
     (row) => row.deletedAt == null && row.invoiceId === invoice._id,
   );
@@ -147,13 +156,21 @@ export function InvoiceDetailPage() {
             {invoice.invoiceNumber || "Untitled invoice"}
           </h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            {client
-              ? String(
-                  client.displayName ||
-                    client.companyName ||
-                    `${client.givenName ?? ""} ${client.familyName ?? ""}`.trim(),
-                )
-              : "Unknown client"}{" "}
+            <Link
+              className="text-link"
+              to={CLIENTS_ROUTES.detail(String(invoice.clientId))}
+            >
+              {clientName}
+            </Link>
+            {linkedEvent ? (
+              <>
+                {" "}
+                ·{" "}
+                <Link className="text-link" to={`/events/${linkedEvent._id}`}>
+                  {String(linkedEvent.title || "Linked event")}
+                </Link>
+              </>
+            ) : null}{" "}
             ·{" "}
             {Number(invoice.amountDue ?? 0).toLocaleString(undefined, {
               style: "currency",
@@ -177,6 +194,39 @@ export function InvoiceDetailPage() {
         </p>
       ) : null}
       {host}
+
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">Source</p>
+            <h2>Linked records</h2>
+          </div>
+        </div>
+        <p className="text-[13px] text-ink-2">
+          Client:{" "}
+          <Link
+            className="text-link"
+            to={CLIENTS_ROUTES.detail(String(invoice.clientId))}
+          >
+            {clientName}
+          </Link>
+          {invoice.eventId ? (
+            <>
+              {" "}
+              · Event:{" "}
+              {linkedEvent ? (
+                <Link className="text-link" to={`/events/${linkedEvent._id}`}>
+                  {String(linkedEvent.title || linkedEvent._id)}
+                </Link>
+              ) : (
+                <span>linked event unavailable</span>
+              )}
+            </>
+          ) : (
+            <> · No event linked on this invoice</>
+          )}
+        </p>
+      </section>
 
       <section className="working-ledger">
         <div className="ledger-heading">
