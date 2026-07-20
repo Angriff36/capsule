@@ -4,8 +4,8 @@ Last run: 2026-07-20T13:20:00Z (vertical-slice: Slice 7b Clients CRM)
 
 ## High Priority (loop is acting or waiting on human)
 
-- **Slice 7b Clients CRM shipped locally — not pushed**: `/clients` accounts,
-  contacts, proposals, contracts. Push only when human authorizes.
+- **Slice 7b Clients CRM shipped locally (`800ca7d`) — not pushed**: `/clients`
+  accounts, contacts, proposals, contracts. Push only when human authorizes.
 - **`bun run check` blocked by pre-existing Builder ownership conflicts** (not
   Slice 7b): `convex/queries.ts` owned-file-modified + two app-owned diagram
   paths. Human must clear WIP hand-edits / untracked diagrams before
