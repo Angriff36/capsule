@@ -1,9 +1,12 @@
 # Loop State — capsule
 
-Last run: 2026-07-20T14:45:00Z (vertical-slice: SavedReportDefinition /reports)
+Last run: 2026-07-20T14:55:00Z (vertical-slice: PaymentMethod /finance/payment-methods)
 
 ## High Priority (loop is acting or waiting on human)
 
+- **PaymentMethod UI shipped locally (`9119692`) — not pushed**: `/finance/payment-methods`
+  register→default→expire→reactivate; PaymentsPage can link `paymentMethodId`.
+  Push only when human authorizes.
 - **SavedReportDefinition `/reports` shipped locally (`bb2ffae`) — not pushed**:
   create → rename/share → archive → restore library (chart render deferred).
   Push only when human authorizes.
@@ -32,7 +35,8 @@ Last run: 2026-07-20T14:45:00Z (vertical-slice: SavedReportDefinition /reports)
 
 - Working tree may still carry unrelated WIP — normal scale.
 - `actions/checkout@v4` + Node 20 deprecation warnings — bump when convenient (blocked behind CI red).
-- Next after reports: PaymentMethod UI thin unit (Slice 7 deferred).
+- Next after PaymentMethod: OD035/OD038 automation still deferred; pick next incomplete
+  cross-slice connection (e.g. Event→Invoice, proposal→event handoff copy, or chart render).
 
 ## Recent Noise (ignored this run)
 
