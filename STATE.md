@@ -1,9 +1,12 @@
 # Loop State — capsule
 
-Last run: 2026-07-20T14:55:00Z (vertical-slice: PaymentMethod /finance/payment-methods)
+Last run: 2026-07-20T15:00:00Z (cross-slice: Client/Contract → Invoice issue deep link)
 
 ## High Priority (loop is acting or waiting on human)
 
+- **Client/Contract → Invoice deep link shipped locally — not pushed**:
+  `/finance/invoices?issue=1&clientId=&eventId=`; signed contracts stay visible
+  for billing. Push only when human authorizes.
 - **PaymentMethod UI shipped locally (`9119692`) — not pushed**: `/finance/payment-methods`
   register→default→expire→reactivate; PaymentsPage can link `paymentMethodId`.
   Push only when human authorizes.
