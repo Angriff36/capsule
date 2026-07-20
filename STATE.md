@@ -1,17 +1,17 @@
 # Loop State — capsule
 
-Last run: 2026-07-20T13:40:00Z (vertical-slice: Slice 8 EventCloseout)
+Last run: 2026-07-20T14:00:00Z (vertical-slice: Slice 8b PayrollInput)
 
 ## High Priority (loop is acting or waiting on human)
 
+- **Slice 8b PayrollInput shipped locally — not pushed**: `/finance/payroll`
+  prepare→finalize (minutes; encrypted money rates deferred). Push when authorized.
 - **Slice 8 EventCloseout shipped locally (`3a7d5c6`) — not pushed**: `/finance/closeout`
   capture→finalize. Push only when human authorizes.
-- **Slice 7b Clients CRM shipped locally (`800ca7d`) — not pushed**: `/clients`
-  accounts, contacts, proposals, contracts. Push only when human authorizes.
-- **`bun run check` blocked by pre-existing Builder ownership conflicts** (not
-  Slice 7b): `convex/queries.ts` owned-file-modified + two app-owned diagram
-  paths. Human must clear WIP hand-edits / untracked diagrams before
-  `bun run manifest:regen` can apply.
+- **Slice 7b Clients CRM shipped locally (`800ca7d` + gate fix `37afcf8`) —
+  not pushed**: `/clients` accounts, contacts, proposals, contracts.
+  Ownership drift cleared; `bun run check` green. Push only when human
+  authorizes.
 - **Auth unblock 2026-07-20**: Local Convex stuck on schema validation — dishes still had stored
   `allergenSummary` after it was converted to computed. Restored stored `property allergenSummary`
   + `classifyAllergens` in `src/culinary/dish.manifest`, `bun run manifest:regen`, restarted
@@ -24,9 +24,9 @@ Last run: 2026-07-20T13:40:00Z (vertical-slice: Slice 8 EventCloseout)
 
 ## Watch List
 
-- Working tree carries human in-flight work plus Slice 7b CRM files — normal scale.
+- Working tree may still carry unrelated WIP — normal scale.
 - `actions/checkout@v4` + Node 20 deprecation warnings — bump when convenient (blocked behind CI red).
-- Next roadmap slice after 7b: Slice 8 Closeout and reporting (or PaymentMethod UI thin unit).
+- Next roadmap after Slice 8: PaymentMethod UI thin unit or Slice 9 service desk.
 
 ## Recent Noise (ignored this run)
 

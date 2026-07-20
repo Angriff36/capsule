@@ -218,6 +218,20 @@
 ### Reactions
 - `PaymentSettled->Invoice.applyPayment` → Invoice.applyPayment (runtime=`runtime_proven`)
 
+## PayrollInput
+
+- Table: `payrollInputs`
+- List: `listPayrollInput`
+- Detail: `getPayrollInput`
+- Create: `PayrollInput_createViaPrepare` / `useCreatePayrollInput`
+- Proof: structural=`generated` runtime=`declared`
+- Capabilities: `financeManageAccess`
+
+### Commands
+- `PayrollInput_finalize` emits PayrollInputFinalized
+- `PayrollInput_markVoided` emits PayrollInputVoided
+- `PayrollInput_prepare` emits PayrollInputPrepared
+
 ## PrepTask
 
 - Table: `prepTasks`

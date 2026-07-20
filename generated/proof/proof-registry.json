@@ -1126,6 +1126,53 @@
       }
     },
     {
+      "id": "PayrollInput.finalize",
+      "kind": "command",
+      "entity": "PayrollInput",
+      "command": "finalize",
+      "runtimeTest": "tests/proofs/payroll-input-lifecycle.runtime.test.ts",
+      "status": "runtime_proven",
+      "versions": {
+        "manifestVersion": "3.6.29",
+        "projection": "convex",
+        "preset": {
+          "id": "convex-application",
+          "version": "1.3.5"
+        }
+      }
+    },
+    {
+      "id": "PayrollInput.markVoided",
+      "kind": "command",
+      "entity": "PayrollInput",
+      "command": "markVoided",
+      "status": "generated",
+      "versions": {
+        "manifestVersion": "3.6.29",
+        "projection": "convex",
+        "preset": {
+          "id": "convex-application",
+          "version": "1.3.5"
+        }
+      }
+    },
+    {
+      "id": "PayrollInput.prepare",
+      "kind": "command",
+      "entity": "PayrollInput",
+      "command": "prepare",
+      "runtimeTest": "tests/proofs/payroll-input-lifecycle.runtime.test.ts",
+      "status": "runtime_proven",
+      "versions": {
+        "manifestVersion": "3.6.29",
+        "projection": "convex",
+        "preset": {
+          "id": "convex-application",
+          "version": "1.3.5"
+        }
+      }
+    },
+    {
       "id": "PrepTask.cancel",
       "kind": "command",
       "entity": "PrepTask",

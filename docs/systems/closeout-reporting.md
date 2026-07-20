@@ -14,41 +14,43 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
 | `finance/payroll-input.manifest`                               | PayrollInput          |
 | `insights/report.manifest`                                     | SavedReportDefinition |
 
-## Primary workspace (Slice 8 thin unit)
+## Primary workspace (Slice 8 + 8b)
 
-Shipped under **`/finance/closeout`**:
+| Route               | Outcome                                                              |
+| ------------------- | -------------------------------------------------------------------- |
+| `/finance/closeout` | Capture reconciled numbers for a closed-out event; finalize folio    |
+| `/finance/payroll`  | Prepare person/period payroll rollup; finalize or void               |
 
-| Route                | Outcome                                                         |
-| -------------------- | --------------------------------------------------------------- |
-| `/finance/closeout`  | Capture reconciled numbers for a closed-out event; finalize folio |
+**User outcomes proven**
 
-**User outcome proven:** Walk an Event to `closed_out`, capture an EventCloseout draft with consistent money/headcount fields, then finalize (finance manager) to freeze the fact.
-
-Roles: `financeAccess` for capture/read; `financeManageAccess` required for finalize.
+1. Event → `closed_out` → EventCloseout.capture → finalize
+2. Person.hire → PayrollInput.prepare → finalize (finance managers; opaque person ids)
 
 ## Core workflows (shipped vs deferred)
 
 **Shipped**
 
-- Capture EventCloseout (createViaCapture) for events in `closed_out`
-- Finalize draft closeouts (immutable afterward)
-- List draft vs finalized; hide finalized by default
+- EventCloseout capture/finalize
+- PayrollInput prepare/finalize/void (`financeManageAccess`)
 
 **Deferred**
 
-- PayrollInput prepare/finalize/void UI
 - SavedReportDefinition library and result rendering (`/reports` remains planned)
-- Automatic aggregation from operational facts (operators enter reconciled numbers)
+- Automatic aggregation from operational facts into closeout/payroll numbers
+- PayrollInput `hourlyRate` / `overtimeRate` / `grossAmount` entry — Manifest encrypts
+  private money to ciphertext while Convex schema still declares `number` (proven insert
+  failure); minutes + optional notes ship without those fields
 
 ## Cross-system handoffs
 
-Event lifecycle owns `closeOut`; EventCloseout stores the reconciliation fact. Capture requires `event.stage == closed_out`. Automatic closeout aggregation is not defined.
+Event lifecycle owns `closeOut`; EventCloseout stores the reconciliation fact. PayrollInput is finance-owned and optionally links Event/Shift. Person list uses `staffAccess` (finance managers have it).
 
 ## Proof
 
-- Runtime: `tests/proofs/event-closeout-lifecycle.runtime.test.ts`
+- Closeout runtime: `tests/proofs/event-closeout-lifecycle.runtime.test.ts`
+- Payroll runtime: `tests/proofs/payroll-input-lifecycle.runtime.test.ts`
 - Routes/lifecycle: `tests/finance-routes.test.ts`
-- Integration guard: `bun run check:closeout-manifest`
+- Guards: `bun run check:closeout-manifest`, `bun run check:payroll-manifest`
 
 ## References
 

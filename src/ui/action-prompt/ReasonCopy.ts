@@ -122,6 +122,15 @@ export const ReasonCopy = {
     placeholder: "e.g. Event cancelled after payment",
     confirmLabel: "Refund payment",
   },
+  voidPayrollInput: {
+    title: "Void payroll input",
+    description:
+      "Voiding removes this rollup from the export set. Prepare a new input if needed.",
+    label: "Void reason",
+    placeholder: "e.g. Wrong period or incorrect minutes",
+    confirmLabel: "Void payroll input",
+  },
+
   archiveClient: {
     title: "Archive client",
     description:

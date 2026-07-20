@@ -32,6 +32,7 @@ const WORKFORCE_ENTITIES = [
 const LOGISTICS_ENTITIES = ["PackList", "PackListItem", "Delivery"] as const;
 const COMMERCIAL_ENTITIES = ["Invoice", "Payment"] as const;
 const CLOSEOUT_ENTITIES = ["EventCloseout"] as const;
+const PAYROLL_ENTITIES = ["PayrollInput"] as const;
 const CULINARY_ENTITIES = [
   "Ingredient",
   "Recipe",
@@ -46,6 +47,7 @@ const CATALOG_ENTITIES = [
   ...LOGISTICS_ENTITIES,
   ...COMMERCIAL_ENTITIES,
   ...CLOSEOUT_ENTITIES,
+  ...PAYROLL_ENTITIES,
   ...CULINARY_ENTITIES,
 ] as const;
 
@@ -60,6 +62,8 @@ const COMMERCIAL_RUNTIME_TEST =
   "tests/proofs/invoice-payment-lifecycle.runtime.test.ts";
 const CLOSEOUT_RUNTIME_TEST =
   "tests/proofs/event-closeout-lifecycle.runtime.test.ts";
+const PAYROLL_RUNTIME_TEST =
+  "tests/proofs/payroll-input-lifecycle.runtime.test.ts";
 const RECIPE_IMPORT_RUNTIME_TEST =
   "tests/proofs/recipe-import-finalize.runtime.test.ts";
 const STRUCTURAL_TEST = "tests/event-reaction-projection.test.ts";
@@ -85,6 +89,10 @@ const COMMERCIAL_RUNTIME_PROOF_IDS = [
 const CLOSEOUT_RUNTIME_PROOF_IDS = [
   "EventCloseout.capture",
   "EventCloseout.finalize",
+] as const;
+const PAYROLL_RUNTIME_PROOF_IDS = [
+  "PayrollInput.prepare",
+  "PayrollInput.finalize",
 ] as const;
 const RECIPE_IMPORT_PROOF_IDS = [
   "Recipe.draft",
@@ -190,6 +198,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     ...LOGISTICS_RUNTIME_PROOF_IDS,
     ...COMMERCIAL_RUNTIME_PROOF_IDS,
     ...CLOSEOUT_RUNTIME_PROOF_IDS,
+    ...PAYROLL_RUNTIME_PROOF_IDS,
     ...RECIPE_IMPORT_PROOF_IDS,
   ]);
   const structuralProofIds = new Set([
@@ -239,6 +248,10 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
       ...CLOSEOUT_RUNTIME_PROOF_IDS.map((proofId) => ({
         proofId,
         runtimeTest: CLOSEOUT_RUNTIME_TEST,
+      })),
+      ...PAYROLL_RUNTIME_PROOF_IDS.map((proofId) => ({
+        proofId,
+        runtimeTest: PAYROLL_RUNTIME_TEST,
       })),
       ...RECIPE_IMPORT_PROOF_IDS.map((proofId) => ({
         proofId,
@@ -454,6 +467,14 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
         bindingsImport: '../../generated/manifest-wiring-bindings"',
         requiredSymbols: ["EventCloseoutFinalizeLifecycle"],
       },
+      {
+        pathSuffix: "/PayrollLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: [
+          "PayrollInputFinalizeLifecycle",
+          "PayrollInputMarkVoidedLifecycle",
+        ],
+      },
     ],
   });
 
@@ -492,6 +513,30 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
   write("guard.logistics.json", logisticsGuard);
   write("guard.commercial.json", commercialGuard);
   write("guard.closeout.json", closeoutGuard);
+
+  const payrollCatalog = emitCapabilityCatalog(ir, {
+    entityFilter: PAYROLL_ENTITIES,
+    versions,
+    runtimeProofIds: new Set(PAYROLL_RUNTIME_PROOF_IDS),
+    structuralProofIds: new Set(),
+  });
+  const payrollGuard = emitIntegrationGuardConfig(payrollCatalog, {
+    featureRoots: ["src/features/finance"],
+    convexLibRoot: "convex/lib",
+    versions,
+    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:draft|prepared|finalized|voided)["']`,
+    lifecyclePolicies: [
+      {
+        pathSuffix: "/PayrollLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: [
+          "PayrollInputFinalizeLifecycle",
+          "PayrollInputMarkVoidedLifecycle",
+        ],
+      },
+    ],
+  });
+  write("guard.payroll.json", payrollGuard);
   write("capability-catalog.md", formatCapabilityCatalogMarkdown(catalog));
 
   console.log(`Emitted proof-kit artifacts to ${outDir}`);

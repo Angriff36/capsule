@@ -1632,6 +1632,107 @@
       "runtimeProofStatus": "runtime_proven"
     },
     {
+      "entity": "PayrollInput",
+      "table": "payrollInputs",
+      "listOperation": "listPayrollInput",
+      "detailOperation": "getPayrollInput",
+      "allocatingCreate": {
+        "command": "prepare",
+        "mutation": "PayrollInput_createViaPrepare",
+        "useCreateAlias": "useCreatePayrollInput"
+      },
+      "commands": [
+        {
+          "name": "finalize",
+          "mutation": "PayrollInput_finalize",
+          "inputs": [],
+          "emits": [
+            "PayrollInputFinalized"
+          ],
+          "requiredCapabilities": [
+            "financeManageAccess"
+          ],
+          "allocating": false
+        },
+        {
+          "name": "markVoided",
+          "mutation": "PayrollInput_markVoided",
+          "inputs": [
+            "reason"
+          ],
+          "emits": [
+            "PayrollInputVoided"
+          ],
+          "requiredCapabilities": [
+            "financeManageAccess"
+          ],
+          "allocating": false
+        },
+        {
+          "name": "prepare",
+          "mutation": "PayrollInput_prepare",
+          "inputs": [
+            "personId",
+            "periodStart",
+            "periodEnd",
+            "regularMinutes",
+            "overtimeMinutes",
+            "totalMinutes",
+            "eventId",
+            "shiftId",
+            "hourlyRate",
+            "overtimeRate",
+            "grossAmount",
+            "notes"
+          ],
+          "emits": [
+            "PayrollInputPrepared"
+          ],
+          "requiredCapabilities": [
+            "financeManageAccess"
+          ],
+          "allocating": true,
+          "useCreateAlias": "useCreatePayrollInput"
+        }
+      ],
+      "lifecycle": [
+        {
+          "property": "status",
+          "from": "draft",
+          "to": [
+            "prepared",
+            "voided"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "prepared",
+          "to": [
+            "finalized",
+            "voided"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "finalized",
+          "to": [
+            "voided"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "voided",
+          "to": []
+        }
+      ],
+      "reactions": [],
+      "requiredRolesOrCapabilities": [
+        "financeManageAccess"
+      ],
+      "structuralProofStatus": "generated",
+      "runtimeProofStatus": "declared"
+    },
+    {
       "entity": "PrepTask",
       "table": "prepTasks",
       "listOperation": "listPrepTask",

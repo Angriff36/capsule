@@ -13,8 +13,7 @@
   ],
   "convexLibRoot": "convex/lib",
   "ownedTables": [
-    "invoices",
-    "payments"
+    "payrollInputs"
   ],
   "forbidDirectConvexHooks": true,
   "forbiddenImportPatterns": [
@@ -22,23 +21,8 @@
     "(?:^|/)convex/_generated(?:/|$)",
     "^convex/react$"
   ],
-  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:draft|sent|viewed|overdue|partial|paid|voided|written_off|pending|processing|completed|failed|refunded)[\"']",
+  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:draft|prepared|finalized|voided)[\"']",
   "lifecyclePolicies": [
-    {
-      "pathSuffix": "/CommercialLifecyclePolicy.ts",
-      "bindingsImport": "../../generated/manifest-wiring-bindings\"",
-      "requiredSymbols": [
-        "InvoiceSendLifecycle",
-        "PaymentSettleLifecycle"
-      ]
-    },
-    {
-      "pathSuffix": "/CloseoutLifecyclePolicy.ts",
-      "bindingsImport": "../../generated/manifest-wiring-bindings\"",
-      "requiredSymbols": [
-        "EventCloseoutFinalizeLifecycle"
-      ]
-    },
     {
       "pathSuffix": "/PayrollLifecyclePolicy.ts",
       "bindingsImport": "../../generated/manifest-wiring-bindings\"",
