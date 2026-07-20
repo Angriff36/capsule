@@ -46,8 +46,8 @@ export function CloseoutPage() {
       !closedOutEventIds.has(event._id),
   );
 
-  const eventTitle = (id: string) =>
-    events?.find((event) => event._id === id)?.title ?? "Unknown event";
+  const eventFor = (id: string) => events?.find((event) => event._id === id);
+  const eventTitle = (id: string) => eventFor(id)?.title ?? "Unknown event";
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -175,53 +175,77 @@ export function CloseoutPage() {
                 </tr>
               </thead>
               <tbody>
-                {visibleRows.map((row) => (
-                  <tr key={row._id}>
-                    <td>
-                      <strong>{eventTitle(String(row.eventId))}</strong>
-                      <small>
-                        Revenue{" "}
-                        {Number(row.actualRevenue ?? 0).toLocaleString(
+                {visibleRows.map((row) => {
+                  const event = eventFor(String(row.eventId));
+                  return (
+                    <tr key={row._id}>
+                      <td>
+                        <Link
+                          className="text-link"
+                          to={`/events/${String(row.eventId)}`}
+                        >
+                          <strong>{eventTitle(String(row.eventId))}</strong>
+                        </Link>
+                        <small>
+                          Revenue{" "}
+                          {Number(row.actualRevenue ?? 0).toLocaleString(
+                            undefined,
+                            { style: "currency", currency: "USD" },
+                          )}
+                        </small>
+                      </td>
+                      <td>
+                        {Number(row.grossProfit ?? 0).toLocaleString(
                           undefined,
-                          { style: "currency", currency: "USD" },
+                          {
+                            style: "currency",
+                            currency: "USD",
+                          },
                         )}
-                      </small>
-                    </td>
-                    <td>
-                      {Number(row.grossProfit ?? 0).toLocaleString(undefined, {
-                        style: "currency",
-                        currency: "USD",
-                      })}
-                    </td>
-                    <td>
-                      {row.actualHeadcount}/{row.expectedHeadcount}
-                    </td>
-                    <td>
-                      <StatusChip status={String(row.status)} />
-                    </td>
-                    <td>
-                      <div className="supply-row-actions">
-                        {policy
-                          .closeoutActions(String(row.status), row.capturedAt)
-                          .map((action) => (
-                            <button
-                              key={action.key}
+                      </td>
+                      <td>
+                        {row.actualHeadcount}/{row.expectedHeadcount}
+                      </td>
+                      <td>
+                        <StatusChip status={String(row.status)} />
+                      </td>
+                      <td>
+                        <div className="supply-row-actions">
+                          {policy
+                            .closeoutActions(String(row.status), row.capturedAt)
+                            .map((action) => (
+                              <button
+                                key={action.key}
+                                className="btn btn-ghost btn-sm"
+                                disabled={busy != null}
+                                onClick={() => invokeFinalize(row)}
+                              >
+                                {busy === `${row._id}:${action.key}`
+                                  ? "Working…"
+                                  : action.label}
+                              </button>
+                            ))}
+                          {event?.clientId ? (
+                            <Link
                               className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
-                              onClick={() => invokeFinalize(row)}
+                              to={FINANCE_ROUTES.issueInvoice({
+                                clientId: String(event.clientId),
+                                eventId: String(row.eventId),
+                              })}
                             >
-                              {busy === `${row._id}:${action.key}`
-                                ? "Working…"
-                                : action.label}
-                            </button>
-                          ))}
-                        {String(row.status) === "finalized" ? (
-                          <span className="text-[12px] text-ink-3">Frozen</span>
-                        ) : null}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                              Issue invoice
+                            </Link>
+                          ) : null}
+                          {String(row.status) === "finalized" ? (
+                            <span className="text-[12px] text-ink-3">
+                              Frozen
+                            </span>
+                          ) : null}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

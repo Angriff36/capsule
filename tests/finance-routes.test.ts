@@ -52,6 +52,15 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(detail).toContain("/events/${linkedEvent._id}");
   });
 
+  it("deep-links EventCloseout rows into invoice issue", () => {
+    const closeout = readFileSync(
+      path.join(process.cwd(), "src/features/finance/CloseoutPage.tsx"),
+      "utf8",
+    );
+    expect(closeout).toContain("FINANCE_ROUTES.issueInvoice");
+    expect(closeout).toContain("Issue invoice");
+  });
+
   it("wires finance routes in App.tsx", () => {
     const app = readFileSync(
       path.join(process.cwd(), "src/app/App.tsx"),
