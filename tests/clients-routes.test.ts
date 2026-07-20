@@ -55,6 +55,26 @@ describe("Clients CRM routes and lifecycle bindings", () => {
     expect(contracts).toContain('=== "signed"');
   });
 
+  it("deep-links accepted Proposal into Event create with client prefill", () => {
+    const proposals = readFileSync(
+      path.join(process.cwd(), "src/features/clients/ProposalsPage.tsx"),
+      "utf8",
+    );
+    const create = readFileSync(
+      path.join(process.cwd(), "src/features/events/EventCreatePage.tsx"),
+      "utf8",
+    );
+    const routes = readFileSync(
+      path.join(process.cwd(), "src/features/events/eventRoutes.ts"),
+      "utf8",
+    );
+    expect(proposals).toContain("eventCreatePath");
+    expect(proposals).toContain('=== "accepted"');
+    expect(create).toContain("useSearchParams");
+    expect(create).toContain('searchParams.get("clientId")');
+    expect(routes).toContain("EventCreateLinkBuilder");
+  });
+
   it("derives CRM actions from generated lifecycle metadata", () => {
     const policy = new CrmLifecyclePolicy();
     expect(policy.clientActions("active").map((a) => a.key)).toEqual(

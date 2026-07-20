@@ -56,6 +56,7 @@ Roles: finance staff/managers (`financeAccess`) own invoice and payment commands
 - Payment settlement applies to Invoice via generated reaction
 - Register / make-default / clear-default / expire / reactivate / invalidate / remove PaymentMethods; pick stored method when recording a payment
 - Client account and signed Contract deep-link into `/finance/invoices?issue=1` with clientId/eventId prefill
+- Accepted Proposal deep-links into `/events/new?clientId=` (manual Event create; OD035 still not automated)
 
 **Still deferred (honest gaps)**
 

@@ -13,6 +13,7 @@ import {
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
+import { eventCreatePath } from "../events/eventRoutes";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
@@ -48,11 +49,11 @@ export function ProposalsPage() {
       String(row.status) === "active",
   );
   const activeRows = (proposals ?? []).filter((row) => row.deletedAt == null);
+  // Keep accepted proposals visible — operators create the Event from them.
   const visibleRows = showTerminal
     ? activeRows
     : activeRows.filter(
-        (row) =>
-          !["accepted", "declined", "expired"].includes(String(row.status)),
+        (row) => !["declined", "expired"].includes(String(row.status)),
       );
 
   const run = async (key: string, work: () => Promise<void>) => {
@@ -125,7 +126,7 @@ export function ProposalsPage() {
         void run(`${row._id}:accept`, async () => {
           await accept({ docId: row._id, version: row.version });
           setNotice(
-            "Proposal accepted. Create the Event from Events if one is not linked yet.",
+            "Proposal accepted. Use Create Event on the row to continue planning.",
           );
         });
         return;
@@ -173,7 +174,7 @@ export function ProposalsPage() {
             type="button"
             onClick={() => setShowTerminal((value) => !value)}
           >
-            {showTerminal ? "Hide closed" : "Show closed"}
+            {showTerminal ? "Hide declined/expired" : "Show declined/expired"}
           </button>
           <button
             className="btn btn-primary"
@@ -341,6 +342,16 @@ export function ProposalsPage() {
                           {action.label}
                         </button>
                       ))}
+                    {String(row.status) === "accepted" ? (
+                      <Link
+                        className="btn btn-ghost"
+                        to={eventCreatePath({
+                          clientId: String(row.clientId),
+                        })}
+                      >
+                        Create Event
+                      </Link>
+                    ) : null}
                   </td>
                 </tr>
               ))}
