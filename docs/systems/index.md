@@ -17,7 +17,7 @@ Current generated boundary: **43 governed business entities**, **219 command cap
 | Workforce                     | EventAssignment, Shift, AvailabilityWindow, TimeRecord, Qualification               | `/staff`                                | Shipping roster, time, qualifications + shift lifecycle proof      |
 | [Logistics](logistics.md)     | PackList, PackListItem, Delivery                                                    | `/logistics`                            | Shipping pack lists, load sheet, deliveries + lifecycle proof      |
 | Commercial & billing          | ClientContact, Proposal, Contract, Invoice, Payment, PaymentMethod                  | `/clients`, `/finance`                  | Generated; planned UI; payment reaction blocker                    |
-| Closeout & reporting          | EventCloseout, PayrollInput, SavedReportDefinition                                  | `/finance/closeout`, `/reports`         | Generated; planned UI                                              |
+| Closeout & reporting          | EventCloseout, PayrollInput, SavedReportDefinition                                  | `/finance/closeout`, `/reports`         | Closeout capture/finalize shipped; payroll + reports deferred      |
 
 `TenantScoped` and `SoftDeletable` are source mixins, not operator systems or standalone workspaces.
 

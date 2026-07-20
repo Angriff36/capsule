@@ -401,6 +401,38 @@
       }
     },
     {
+      "id": "EventCloseout.capture",
+      "kind": "command",
+      "entity": "EventCloseout",
+      "command": "capture",
+      "runtimeTest": "tests/proofs/event-closeout-lifecycle.runtime.test.ts",
+      "status": "runtime_proven",
+      "versions": {
+        "manifestVersion": "3.6.29",
+        "projection": "convex",
+        "preset": {
+          "id": "convex-application",
+          "version": "1.3.5"
+        }
+      }
+    },
+    {
+      "id": "EventCloseout.finalize",
+      "kind": "command",
+      "entity": "EventCloseout",
+      "command": "finalize",
+      "runtimeTest": "tests/proofs/event-closeout-lifecycle.runtime.test.ts",
+      "status": "runtime_proven",
+      "versions": {
+        "manifestVersion": "3.6.29",
+        "projection": "convex",
+        "preset": {
+          "id": "convex-application",
+          "version": "1.3.5"
+        }
+      }
+    },
+    {
       "id": "EventDishRemoved->PrepTask.cancel",
       "kind": "reaction",
       "entity": "PrepTask",

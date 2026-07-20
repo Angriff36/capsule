@@ -14,7 +14,8 @@
     "agent:mint-jwt": "bun scripts/capsule-mint-agent-jwt.ts",
     "baseline:decay": "bun scripts/check-baseline-decay.ts",
     "build": "vite build",
-    "check": "bun run toolchain && bun scripts/builder-regen-guard.ts --check-ownership && bun run proof:emit && bun run check:proof && bun run check:manifest-registry && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run check:production-manifest && bun run check:workforce-manifest && bun run check:logistics-manifest && bun run check:commercial-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
+    "check": "bun run toolchain && bun scripts/builder-regen-guard.ts --check-ownership && bun run proof:emit && bun run check:proof && bun run check:manifest-registry && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run check:production-manifest && bun run check:workforce-manifest && bun run check:logistics-manifest && bun run check:commercial-manifest && bun run check:closeout-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
+    "check:closeout-manifest": "bun scripts/check-closeout-manifest-integration.ts",
     "check:commercial-manifest": "bun scripts/check-commercial-manifest-integration.ts",
     "check:culinary-manifest": "bun scripts/check-culinary-manifest-integration.ts",
     "check:event-manifest": "bun scripts/check-event-manifest-integration.ts",
@@ -40,7 +41,7 @@
     "seed": "bun scripts/seed-convex.ts",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:proofs": "vitest run tests/proofs tests/proof-registry-gate.test.ts tests/supply-manifest-integration-guard.test.ts tests/production-manifest-integration-guard.test.ts tests/workforce-manifest-integration-guard.test.ts tests/logistics-manifest-integration-guard.test.ts tests/commercial-manifest-integration-guard.test.ts tests/finance-routes.test.ts",
+    "test:proofs": "vitest run tests/proofs tests/proof-registry-gate.test.ts tests/supply-manifest-integration-guard.test.ts tests/production-manifest-integration-guard.test.ts tests/workforce-manifest-integration-guard.test.ts tests/logistics-manifest-integration-guard.test.ts tests/commercial-manifest-integration-guard.test.ts tests/closeout-manifest-integration-guard.test.ts tests/finance-routes.test.ts",
     "toolchain": "bun scripts/check-toolchain.ts",
     "typecheck": "tsc --noEmit"
   },

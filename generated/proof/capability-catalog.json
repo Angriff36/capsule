@@ -485,6 +485,82 @@
       "runtimeProofStatus": "declared"
     },
     {
+      "entity": "EventCloseout",
+      "table": "eventCloseouts",
+      "listOperation": "listEventCloseout",
+      "detailOperation": "getEventCloseout",
+      "allocatingCreate": {
+        "command": "capture",
+        "mutation": "EventCloseout_createViaCapture",
+        "useCreateAlias": "useCreateEventCloseout"
+      },
+      "commands": [
+        {
+          "name": "capture",
+          "mutation": "EventCloseout_capture",
+          "inputs": [
+            "eventId",
+            "actualRevenue",
+            "budgetedRevenue",
+            "revenueVariance",
+            "actualIngredientCost",
+            "actualWasteCost",
+            "actualLaborCost",
+            "actualVendorCost",
+            "budgetedCost",
+            "totalActualCost",
+            "costVariance",
+            "grossProfit",
+            "expectedHeadcount",
+            "actualHeadcount",
+            "unresolvedIssues",
+            "performanceNotes",
+            "notes"
+          ],
+          "emits": [
+            "EventCloseoutCaptured"
+          ],
+          "requiredCapabilities": [
+            "financeAccess"
+          ],
+          "allocating": true,
+          "useCreateAlias": "useCreateEventCloseout"
+        },
+        {
+          "name": "finalize",
+          "mutation": "EventCloseout_finalize",
+          "inputs": [],
+          "emits": [
+            "EventCloseoutFinalized"
+          ],
+          "requiredCapabilities": [
+            "financeAccess"
+          ],
+          "allocating": false
+        }
+      ],
+      "lifecycle": [
+        {
+          "property": "status",
+          "from": "draft",
+          "to": [
+            "finalized"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "finalized",
+          "to": []
+        }
+      ],
+      "reactions": [],
+      "requiredRolesOrCapabilities": [
+        "financeAccess"
+      ],
+      "structuralProofStatus": "generated",
+      "runtimeProofStatus": "declared"
+    },
+    {
       "entity": "Ingredient",
       "table": "ingredients",
       "listOperation": "listIngredient",

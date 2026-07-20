@@ -14,35 +14,43 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
 | `finance/payroll-input.manifest`                               | PayrollInput          |
 | `insights/report.manifest`                                     | SavedReportDefinition |
 
-## Primary workspace
+## Primary workspace (Slice 8 thin unit)
 
-Use a **reconciliation folio**:
+Shipped under **`/finance/closeout`**:
 
-- Event closeout compares captured planned/actual financial and operational facts, unresolved issues, and notes before finalization;
-- PayrollInput is a private ruled worksheet by Person/period with regular, overtime, total minutes, rates, and optional Event/Shift attribution;
-- Reports is a library of governed saved definitions and a result workspace projected from live facts—not a collection of ornamental charts.
+| Route                | Outcome                                                         |
+| -------------------- | --------------------------------------------------------------- |
+| `/finance/closeout`  | Capture reconciled numbers for a closed-out event; finalize folio |
 
-## Core workflows
+**User outcome proven:** Walk an Event to `closed_out`, capture an EventCloseout draft with consistent money/headcount fields, then finalize (finance manager) to freeze the fact.
 
-- Capture and finalize an immutable EventCloseout point-in-time fact.
-- Prepare, finalize, or void PayrollInput.
-- Create, rename, update, share, archive, or restore SavedReportDefinitions.
-- Navigate from closeout/report results to owning operational records for correction before finalization.
+Roles: `financeAccess` for capture/read; `financeManageAccess` required for finalize.
+
+## Core workflows (shipped vs deferred)
+
+**Shipped**
+
+- Capture EventCloseout (createViaCapture) for events in `closed_out`
+- Finalize draft closeouts (immutable afterward)
+- List draft vs finalized; hide finalized by default
+
+**Deferred**
+
+- PayrollInput prepare/finalize/void UI
+- SavedReportDefinition library and result rendering (`/reports` remains planned)
+- Automatic aggregation from operational facts (operators enter reconciled numbers)
 
 ## Cross-system handoffs
 
-Event lifecycle owns `closeOut`; EventCloseout stores the reconciliation fact. PayrollInput derives from Person/Shift/TimeRecord context but is finance-owned. Report results derive from governed facts across all systems. Automatic closeout aggregation is not yet defined.
+Event lifecycle owns `closeOut`; EventCloseout stores the reconciliation fact. Capture requires `event.stage == closed_out`. Automatic closeout aggregation is not defined.
 
-## States and permissions
+## Proof
 
-Closeout finalization and payroll facts are finance-manage work; payroll rates/amounts and notes are sensitive. Report sharing must follow the saved definition's governed scope. Exact money/decimal behavior remains a release gate.
-
-## Current status
-
-Generated queries and commands exist. No authored closeout, payroll, or report workspace exists. Reporting data execution/rendering is not implied by the SavedReportDefinition entity and must be designed against a real query/projection path.
+- Runtime: `tests/proofs/event-closeout-lifecycle.runtime.test.ts`
+- Routes/lifecycle: `tests/finance-routes.test.ts`
+- Integration guard: `bun run check:closeout-manifest`
 
 ## References
 
-- Canonical: `C:/projects/Manifest-source/src/finance`, `C:/projects/Manifest-source/src/insights/report.manifest`
 - Related owner: [workforce.md](workforce.md)
-- Read-only intent reference: Capsule-Pro accounting, payroll, and analytics areas
+- Implementation sequence: [implementation-plan.md](../product/implementation-plan.md)

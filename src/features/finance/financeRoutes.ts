@@ -1,6 +1,7 @@
 export const FINANCE_SECTIONS = [
   { key: "invoices", label: "Invoices", path: "/finance/invoices" },
   { key: "payments", label: "Payments", path: "/finance/payments" },
+  { key: "closeout", label: "Closeout", path: "/finance/closeout" },
 ] as const;
 
 export type FinanceSection = (typeof FINANCE_SECTIONS)[number]["key"];
@@ -10,4 +11,5 @@ export const FINANCE_ROUTES = {
   invoices: "/finance/invoices",
   invoiceDetail: (id: string) => `/finance/invoices/${id}`,
   payments: "/finance/payments",
+  closeout: "/finance/closeout",
 } as const;

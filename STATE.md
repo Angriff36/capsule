@@ -1,9 +1,11 @@
 # Loop State — capsule
 
-Last run: 2026-07-20T13:20:00Z (vertical-slice: Slice 7b Clients CRM)
+Last run: 2026-07-20T13:40:00Z (vertical-slice: Slice 8 EventCloseout)
 
 ## High Priority (loop is acting or waiting on human)
 
+- **Slice 8 EventCloseout shipped locally — not pushed**: `/finance/closeout`
+  capture→finalize. Push only when human authorizes. Commit hash filled after commit.
 - **Slice 7b Clients CRM shipped locally (`800ca7d`) — not pushed**: `/clients`
   accounts, contacts, proposals, contracts. Push only when human authorizes.
 - **`bun run check` blocked by pre-existing Builder ownership conflicts** (not

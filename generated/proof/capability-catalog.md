@@ -72,6 +72,19 @@
 - `EventAssignment_markNoShow` emits EventAssignmentNoShowMarked
 - `EventAssignment_unassign` emits EventAssignmentUnassigned
 
+## EventCloseout
+
+- Table: `eventCloseouts`
+- List: `listEventCloseout`
+- Detail: `getEventCloseout`
+- Create: `EventCloseout_createViaCapture` / `useCreateEventCloseout`
+- Proof: structural=`generated` runtime=`declared`
+- Capabilities: `financeAccess`
+
+### Commands
+- `EventCloseout_capture` emits EventCloseoutCaptured
+- `EventCloseout_finalize` emits EventCloseoutFinalized
+
 ## Ingredient
 
 - Table: `ingredients`
