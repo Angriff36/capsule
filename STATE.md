@@ -1,11 +1,15 @@
 # Loop State — capsule
 
-Last run: 2026-07-20T13:20:00Z (vertical-slice: Slice 7 Commercial and billing thin unit)
+Last run: 2026-07-20T13:20:00Z (vertical-slice: Slice 7b Clients CRM)
 
 ## High Priority (loop is acting or waiting on human)
 
-- **Slice 7 shipped locally (`aff6960`) — not pushed**: `/finance` invoices + payments
-  (issue→send→record→settle). Push only when human authorizes.
+- **Slice 7b Clients CRM shipped locally — not pushed**: `/clients` accounts,
+  contacts, proposals, contracts. Push only when human authorizes.
+- **`bun run check` blocked by pre-existing Builder ownership conflicts** (not
+  Slice 7b): `convex/queries.ts` owned-file-modified + two app-owned diagram
+  paths. Human must clear WIP hand-edits / untracked diagrams before
+  `bun run manifest:regen` can apply.
 - **Auth unblock 2026-07-20**: Local Convex stuck on schema validation — dishes still had stored
   `allergenSummary` after it was converted to computed. Restored stored `property allergenSummary`
   + `classifyAllergens` in `src/culinary/dish.manifest`, `bun run manifest:regen`, restarted
@@ -18,12 +22,11 @@ Last run: 2026-07-20T13:20:00Z (vertical-slice: Slice 7 Commercial and billing t
 
 ## Watch List
 
-- Working tree carries ~72 modified + ~20 untracked paths — human's in-flight work (event prep coordinator,
-  stock book tables, diagram docs), normal scale.
+- Working tree carries human in-flight work plus Slice 7b CRM files — normal scale.
 - `actions/checkout@v4` + Node 20 deprecation warnings — bump when convenient (blocked behind CI red).
+- Next roadmap slice after 7b: Slice 8 Closeout and reporting (or PaymentMethod UI thin unit).
 
 ## Recent Noise (ignored this run)
 
-- GitHub CI API returned 503 during triage — cannot verify current CI status this tick.
+- Prior manifest-ralph-minimax wake loop stopped (new loop forbids re-arming gate sweeps).
 - Prior issues RESOLVED: bun install local dependency, Builder ownership drift (resolved by recent commits).
-- Prior issue RESOLVED: scripts/emit-proof-kit.ts:94 error (local run succeeds, was blocking earlier).

@@ -122,6 +122,36 @@ export const ReasonCopy = {
     placeholder: "e.g. Event cancelled after payment",
     confirmLabel: "Refund payment",
   },
+  archiveClient: {
+    title: "Archive client",
+    description:
+      "Archived clients leave the active sales list. You can reactivate later.",
+    label: "Archive reason",
+    placeholder: "e.g. Account inactive / lost",
+    confirmLabel: "Archive client",
+  },
+  voidContract: {
+    title: "Void contract",
+    description: "Voiding stops the agreement before signature.",
+    label: "Void reason",
+    placeholder: "e.g. Terms renegotiated",
+    confirmLabel: "Void contract",
+  },
+  signContract: {
+    title: "Record signature",
+    description:
+      "Enter the signer name. Event confirmation stays a separate Events step.",
+    label: "Signed by",
+    placeholder: "e.g. Jordan Lee",
+    confirmLabel: "Mark signed",
+  },
+  removeContact: {
+    title: "Remove contact",
+    description: "Record why this contact is leaving the client roster.",
+    label: "Removal reason",
+    placeholder: "e.g. Left the company",
+    confirmLabel: "Remove contact",
+  },
 
   supersedeDemand: {
     title: "Supersede demand",

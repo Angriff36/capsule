@@ -54,7 +54,6 @@ export const NAV_AREAS: NavArea[] = [
     label: "Clients & CRM",
     group: "People",
     icon: ContactIcon,
-    planned: "Clients, leads, deals and interactions.",
   },
   {
     path: "/finance",

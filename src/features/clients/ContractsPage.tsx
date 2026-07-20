@@ -1,0 +1,320 @@
+import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
+import {
+  useContractExpire,
+  useContractMarkViewed,
+  useContractMarkVoided,
+  useContractSend,
+  useContractSign,
+  useCreateContract,
+  useListClient,
+  useListContract,
+  useListEvent,
+} from "../../lib/manifest-convex-react";
+import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
+import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { clientDisplayName } from "../events/clientName";
+import { CLIENTS_ROUTES } from "./clientsRoutes";
+import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
+import { CrmFailureBanner } from "./CrmFailureBanner";
+import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
+
+const policy = new CrmLifecyclePolicy();
+
+export function ContractsPage() {
+  const contracts = useListContract();
+  const clients = useListClient();
+  const events = useListEvent();
+  const createContract = useCreateContract();
+  const send = useContractSend();
+  const markViewed = useContractMarkViewed();
+  const sign = useContractSign();
+  const expire = useContractExpire();
+  const markVoided = useContractMarkVoided();
+  const [showDraft, setShowDraft] = useState(false);
+  const [showTerminal, setShowTerminal] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [failure, setFailure] = useState<unknown>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const { prompt, host } = useActionPrompt(busy != null);
+
+  const activeClients = (clients ?? []).filter(
+    (row) =>
+      row.deletedAt == null &&
+      row.registeredAt != null &&
+      String(row.status) === "active",
+  );
+  const draftableEvents = (events ?? []).filter(
+    (row) =>
+      row.deletedAt == null &&
+      !["cancelled", "completed", "closed"].includes(String(row.stage)),
+  );
+  const activeRows = (contracts ?? []).filter((row) => row.deletedAt == null);
+  const visibleRows = showTerminal
+    ? activeRows
+    : activeRows.filter(
+        (row) => !["signed", "expired", "voided"].includes(String(row.status)),
+      );
+
+  const run = async (key: string, work: () => Promise<void>) => {
+    setFailure(null);
+    setNotice(null);
+    setBusy(key);
+    try {
+      await work();
+    } catch (error) {
+      setFailure(error);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const submitDraft = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    const eventId = String(data.get("eventId") || "").trim();
+    const clientId = String(data.get("clientId") || "").trim();
+    const title = String(data.get("title") || "").trim();
+    const eventRow = events?.find((row) => row._id === eventId);
+    if (!eventId || !clientId || !title) {
+      setFailure(new Error("Event, client, and title are required."));
+      return;
+    }
+    if (eventRow && eventRow.clientId !== clientId) {
+      setFailure(new Error("Selected client must own the selected event."));
+      return;
+    }
+    void run("draft-contract", async () => {
+      await createContract({
+        eventId,
+        clientId,
+        title,
+        notes: String(data.get("notes") || "").trim() || undefined,
+        documentUrl: String(data.get("documentUrl") || "").trim() || undefined,
+      });
+      form.reset();
+      setShowDraft(false);
+      setNotice(
+        "Contract drafted. Send it, mark viewed, then record signature.",
+      );
+    });
+  };
+
+  const invoke = (
+    row: { _id: string; version: number; status: unknown },
+    key: string,
+  ) => {
+    void (async () => {
+      if (key === "sign") {
+        const signedBy = await prompt.askReason({
+          ...ReasonCopy.signContract,
+        });
+        if (!signedBy) return;
+        void run(`${row._id}:sign`, async () => {
+          await sign({
+            docId: row._id,
+            version: row.version,
+            signedBy,
+          });
+          setNotice(
+            "Contract signed. Confirm the Event from Events if confirmation is still pending.",
+          );
+        });
+        return;
+      }
+      if (key === "void") {
+        const reason = await prompt.askReason({
+          ...ReasonCopy.voidContract,
+          tone: "danger",
+        });
+        if (!reason) return;
+        void run(`${row._id}:void`, async () => {
+          await markVoided({
+            docId: row._id,
+            version: row.version,
+            reason,
+          });
+          setNotice("Contract voided.");
+        });
+        return;
+      }
+      void run(`${row._id}:${key}`, async () => {
+        const args = { docId: row._id, version: row.version };
+        if (key === "send") await send(args);
+        if (key === "markViewed") await markViewed(args);
+        if (key === "expire") await expire(args);
+        setNotice(`Contract updated (${key}).`);
+      });
+    })();
+  };
+
+  const loading =
+    contracts === undefined || clients === undefined || events === undefined;
+
+  return (
+    <div className="operations-stage supply-stage">
+      <header className="supply-masthead">
+        <div>
+          <p className="eyebrow">Clients · Contracts</p>
+          <h1 className="display-title mt-2">Client contracts</h1>
+          <p className="mt-3 max-w-160 text-ink-2">
+            Draft a contract against an existing Event, send it, mark viewed,
+            then record the signature. Signing does not auto-confirm the Event.
+          </p>
+        </div>
+        <div className="supply-row-actions">
+          <button
+            className="btn btn-ghost"
+            type="button"
+            onClick={() => setShowTerminal((value) => !value)}
+          >
+            {showTerminal ? "Hide closed" : "Show closed"}
+          </button>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={() => setShowDraft((value) => !value)}
+          >
+            {showDraft ? "Close form" : "Draft contract"}
+          </button>
+        </div>
+      </header>
+      <ClientsWorkspaceNav />
+      {failure ? <CrmFailureBanner error={failure} /> : null}
+      {notice ? (
+        <p className="mt-3 text-[13px] text-ink-2" role="status">
+          {notice}
+        </p>
+      ) : null}
+      {host}
+
+      {showDraft ? (
+        <form className="supply-form" onSubmit={submitDraft}>
+          <div className="supply-form-heading">
+            <div>
+              <p className="eyebrow">Draft</p>
+              <h2>New contract</h2>
+            </div>
+          </div>
+          {activeClients.length === 0 || draftableEvents.length === 0 ? (
+            <p className="text-[13px] text-ink-2">
+              Need an active client and an open Event.{" "}
+              <Link className="text-link" to={CLIENTS_ROUTES.root}>
+                Clients
+              </Link>{" "}
+              ·{" "}
+              <Link className="text-link" to="/events">
+                Events
+              </Link>
+              .
+            </p>
+          ) : (
+            <>
+              <label>
+                Event
+                <select name="eventId" required defaultValue="">
+                  <option value="" disabled>
+                    Select event
+                  </option>
+                  {draftableEvents.map((row) => (
+                    <option key={row._id} value={row._id}>
+                      {row.name || row._id} (
+                      {clientDisplayName(row.clientId, clients)})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Client
+                <select name="clientId" required defaultValue="">
+                  <option value="" disabled>
+                    Select client
+                  </option>
+                  {activeClients.map((row) => (
+                    <option key={row._id} value={row._id}>
+                      {clientDisplayName(row._id, clients)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Title
+                <input name="title" required />
+              </label>
+              <label>
+                Document URL
+                <input name="documentUrl" />
+              </label>
+              <label>
+                Notes
+                <textarea name="notes" rows={2} />
+              </label>
+              <button
+                className="btn btn-primary"
+                type="submit"
+                disabled={busy === "draft-contract"}
+              >
+                Draft contract
+              </button>
+            </>
+          )}
+        </form>
+      ) : null}
+
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">Agreements</p>
+            <h2>Contracts</h2>
+          </div>
+          <span>{visibleRows.length}</span>
+        </div>
+        {loading ? (
+          <TableSkeleton rows={5} />
+        ) : visibleRows.length === 0 ? (
+          <div className="document-empty">
+            <p>No open contracts.</p>
+          </div>
+        ) : (
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Client</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {visibleRows.map((row) => (
+                <tr key={row._id}>
+                  <td>{row.title}</td>
+                  <td>{clientDisplayName(row.clientId, clients)}</td>
+                  <td>
+                    <StatusChip status={String(row.status)} />
+                  </td>
+                  <td className="supply-row-actions">
+                    {policy
+                      .contractActions(String(row.status))
+                      .map((action) => (
+                        <button
+                          key={action.key}
+                          className="btn btn-ghost"
+                          type="button"
+                          disabled={busy != null}
+                          onClick={() => invoke(row, action.key)}
+                        >
+                          {action.label}
+                        </button>
+                      ))}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
+    </div>
+  );
+}

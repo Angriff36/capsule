@@ -87,6 +87,26 @@ const PaymentsPage = lazy(() =>
     default: module.PaymentsPage,
   })),
 );
+const ClientsPage = lazy(() =>
+  import("../features/clients/ClientsPage").then((module) => ({
+    default: module.ClientsPage,
+  })),
+);
+const ClientDetailPage = lazy(() =>
+  import("../features/clients/ClientDetailPage").then((module) => ({
+    default: module.ClientDetailPage,
+  })),
+);
+const ProposalsPage = lazy(() =>
+  import("../features/clients/ProposalsPage").then((module) => ({
+    default: module.ProposalsPage,
+  })),
+);
+const ContractsPage = lazy(() =>
+  import("../features/clients/ContractsPage").then((module) => ({
+    default: module.ContractsPage,
+  })),
+);
 
 function SupplyRoute({ children }: { children: ReactNode }) {
   return <Suspense fallback={<TableSkeleton rows={8} />}>{children}</Suspense>;
@@ -286,6 +306,38 @@ export function App() {
               element={
                 <SupplyRoute>
                   <PaymentsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients"
+              element={
+                <SupplyRoute>
+                  <ClientsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/proposals"
+              element={
+                <SupplyRoute>
+                  <ProposalsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/contracts"
+              element={
+                <SupplyRoute>
+                  <ContractsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/:id"
+              element={
+                <SupplyRoute>
+                  <ClientDetailPage />
                 </SupplyRoute>
               }
             />

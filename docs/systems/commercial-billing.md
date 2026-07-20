@@ -17,33 +17,48 @@ Carry a client from contact and offer through agreement, invoice, payment, refun
 | `sales/payment.manifest`                                | Payment       |
 | `sales/payment-method.manifest`                         | PaymentMethod |
 
-## Primary workspace (Slice 7 thin unit)
+## Primary workspaces (Slice 7)
 
-Shipped operator routes under **`/finance`**:
+### Finance (`/finance`)
 
-| Route                    | Outcome                                              |
-| ------------------------ | ---------------------------------------------------- |
-| `/finance/invoices`      | List + issue invoices; send / void / overdue actions |
-| `/finance/invoices/:id`  | Invoice detail, balance, related payments            |
-| `/finance/payments`      | Record payment; begin processing / settle / fail     |
+| Route                   | Outcome                                              |
+| ----------------------- | ---------------------------------------------------- |
+| `/finance/invoices`     | List + issue invoices; send / void / overdue actions |
+| `/finance/invoices/:id` | Invoice detail, balance, related payments            |
+| `/finance/payments`     | Record payment; begin processing / settle / fail     |
 
 **User outcome proven:** Issue invoice → send → record payment → settle → `PaymentSettled` applies `Invoice.applyPayment` so the invoice becomes `paid`.
 
-Roles: finance staff/managers (`financeAccess`) own invoice and payment commands. Sales still registers clients; finance may **read** clients for billing pickers (`clientRead` includes `financeAccess`).
+### Clients CRM (`/clients`) — Slice 7b
+
+| Route                | Outcome                                                        |
+| -------------------- | -------------------------------------------------------------- |
+| `/clients`           | List + register clients; hide archived by default              |
+| `/clients/:id`       | Account detail, contacts, archive/reactivate, account channels |
+| `/clients/proposals` | Draft → send → mark viewed → accept/decline/expire             |
+| `/clients/contracts` | Draft against Event → send → mark viewed → sign/expire/void    |
+
+**User outcome proven (structural):** sales can register a Client, add ClientContacts, draft/send/accept a Proposal, and draft/send/sign a Contract against an existing Event. ProposalAccepted does **not** mint an Event; ContractSigned does **not** confirm one — UI copy makes those Events follow-ups explicit.
+
+Roles: finance staff/managers (`financeAccess`) own invoice and payment commands. Sales (`salesAccess` / `salesManageAccess` for archive) owns Client / ClientContact / Proposal / Contract. Finance may **read** clients for billing pickers (`clientRead` includes `financeAccess`).
 
 ## Core workflows (shipped vs deferred)
 
-**Shipped in this slice**
+**Shipped**
 
+- Register / archive / reactivate Clients; change account contact channels
+- Add / set-primary / remove ClientContacts
+- Draft / send / mark viewed / accept / decline / expire Proposals
+- Draft / send / mark viewed / sign / expire / void Contracts (requires Event)
 - Issue / send / mark viewed / mark overdue / void / write off Invoices
 - Record / begin processing / settle / fail / refund Payments
 - Payment settlement applies to Invoice via generated reaction
 
 **Still deferred (honest gaps)**
 
-- ClientContact / Proposal / Contract authored CRM workspace (`/clients` remains planned)
 - PaymentMethod register/default/expire UI
-- Proposal acceptance → Event creation and Contract signing → confirmation remain manual follow-ups
+- Lead / ClientInteraction / ProposalLineItem (OD037)
+- Automated ProposalAccepted → Event.create and ContractSigned → Event.confirm (Manifest OD035/OD038)
 
 ## Cross-system handoffs
 
@@ -51,12 +66,12 @@ Commercial documents link to Client and optional Event. Settled Payment applies 
 
 ## States and permissions
 
-Sales roles own client registration and CRM documents; finance roles own billing/payment. Sensitive contact and payment hints must respect encryption/private contracts.
+Sales roles own client registration and CRM documents; finance roles own billing/payment. Sensitive contact and payment hints must respect encryption/private contracts. Archive/reactivate require `salesManageAccess`.
 
 ## Proof
 
 - Runtime: `tests/proofs/invoice-payment-lifecycle.runtime.test.ts`
-- Routes/lifecycle: `tests/finance-routes.test.ts`
+- Routes/lifecycle: `tests/finance-routes.test.ts`, `tests/clients-routes.test.ts`
 - Integration guard: `tests/commercial-manifest-integration-guard.test.ts` (`bun run check:commercial-manifest`)
 - Opaque FK Zod regression: Invoice/Payment schemas accept Convex document ids (`z.string().min(1)`)
 
