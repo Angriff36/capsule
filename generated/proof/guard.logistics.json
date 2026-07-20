@@ -9,16 +9,13 @@
     }
   },
   "featureRoots": [
-    "src/features/workforce"
+    "src/features/logistics"
   ],
   "convexLibRoot": "convex/lib",
   "ownedTables": [
-    "availabilityWindows",
-    "eventAssignments",
-    "payrollInputs",
-    "qualifications",
-    "shifts",
-    "timeRecords"
+    "deliveries",
+    "packListItems",
+    "packLists"
   ],
   "forbidDirectConvexHooks": true,
   "forbiddenImportPatterns": [
@@ -26,14 +23,14 @@
     "(?:^|/)convex/_generated(?:/|$)",
     "^convex/react$"
   ],
-  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:assigned|confirmed|checked_in|checked_out|no_show|unassigned|scheduled|started|completed|cancelled|active|withdrawn|open|closed|corrected|expired|revoked)[\"']",
+  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:draft|packing|packed|loaded|dispatched|cancelled|pending|listed|missing|scheduled|in_transit|delivered|failed)[\"']",
   "lifecyclePolicies": [
     {
-      "pathSuffix": "/WorkforceLifecyclePolicy.ts",
+      "pathSuffix": "/LogisticsLifecyclePolicy.ts",
       "bindingsImport": "../../generated/manifest-wiring-bindings\"",
       "requiredSymbols": [
-        "ShiftStartLifecycle",
-        "EventAssignmentCheckInLifecycle"
+        "PackListStartPackingLifecycle",
+        "DeliveryConfirmDeliveryLifecycle"
       ]
     }
   ],

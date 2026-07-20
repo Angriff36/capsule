@@ -29,6 +29,7 @@ const WORKFORCE_ENTITIES = [
   "TimeRecord",
   "Qualification",
 ] as const;
+const LOGISTICS_ENTITIES = ["PackList", "PackListItem", "Delivery"] as const;
 const CULINARY_ENTITIES = [
   "Ingredient",
   "Recipe",
@@ -40,6 +41,7 @@ const CATALOG_ENTITIES = [
   ...SUPPLY_ENTITIES,
   ...PRODUCTION_ENTITIES,
   ...WORKFORCE_ENTITIES,
+  ...LOGISTICS_ENTITIES,
   ...CULINARY_ENTITIES,
 ] as const;
 
@@ -48,6 +50,8 @@ const DEMAND_RUNTIME_TEST =
 const QUALITY_RUNTIME_TEST =
   "tests/proofs/quality-check-fail-block.runtime.test.ts";
 const SHIFT_RUNTIME_TEST = "tests/proofs/shift-lifecycle.runtime.test.ts";
+const LOGISTICS_RUNTIME_TEST =
+  "tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts";
 const RECIPE_IMPORT_RUNTIME_TEST =
   "tests/proofs/recipe-import-finalize.runtime.test.ts";
 const STRUCTURAL_TEST = "tests/event-reaction-projection.test.ts";
@@ -55,6 +59,14 @@ const SHIFT_RUNTIME_PROOF_IDS = [
   "Shift.schedule",
   "Shift.start",
   "Shift.complete",
+] as const;
+const LOGISTICS_RUNTIME_PROOF_IDS = [
+  "PackList.open",
+  "PackList.startPacking",
+  "PackList.markPacked",
+  "Delivery.schedule",
+  "Delivery.startTransit",
+  "Delivery.confirmDelivery",
 ] as const;
 const RECIPE_IMPORT_PROOF_IDS = [
   "Recipe.draft",
@@ -149,6 +161,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     demandReactionId,
     qualityReactionId,
     ...SHIFT_RUNTIME_PROOF_IDS,
+    ...LOGISTICS_RUNTIME_PROOF_IDS,
     ...RECIPE_IMPORT_PROOF_IDS,
   ]);
   const structuralProofIds = new Set([demandReactionId, qualityReactionId]);
@@ -177,6 +190,10 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
       ...SHIFT_RUNTIME_PROOF_IDS.map((proofId) => ({
         proofId,
         runtimeTest: SHIFT_RUNTIME_TEST,
+      })),
+      ...LOGISTICS_RUNTIME_PROOF_IDS.map((proofId) => ({
+        proofId,
+        runtimeTest: LOGISTICS_RUNTIME_TEST,
       })),
       ...RECIPE_IMPORT_PROOF_IDS.map((proofId) => ({
         proofId,
@@ -314,6 +331,44 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     extraOwnedTables: ["productionBatches", "incidents", "eventAllergenChecks"],
   });
 
+  const logisticsCatalog = emitCapabilityCatalog(ir, {
+    entityFilter: LOGISTICS_ENTITIES,
+    versions,
+    runtimeProofIds: new Set(LOGISTICS_RUNTIME_PROOF_IDS),
+    structuralProofIds: new Set(),
+  });
+  const logisticsLifecycleStates = [
+    "draft",
+    "packing",
+    "packed",
+    "loaded",
+    "dispatched",
+    "cancelled",
+    "pending",
+    "listed",
+    "missing",
+    "scheduled",
+    "in_transit",
+    "delivered",
+    "failed",
+  ];
+  const logisticsGuard = emitIntegrationGuardConfig(logisticsCatalog, {
+    featureRoots: ["src/features/logistics"],
+    convexLibRoot: "convex/lib",
+    versions,
+    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:${logisticsLifecycleStates.join("|")})["']`,
+    lifecyclePolicies: [
+      {
+        pathSuffix: "/LogisticsLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: [
+          "PackListStartPackingLifecycle",
+          "DeliveryConfirmDeliveryLifecycle",
+        ],
+      },
+    ],
+  });
+
   mkdirSync(outDir, { recursive: true });
   const write = (name: string, value: unknown) => {
     const text =
@@ -326,6 +381,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
   write("guard.supply.json", supplyGuard);
   write("guard.production.json", productionGuard);
   write("guard.workforce.json", workforceGuard);
+  write("guard.logistics.json", logisticsGuard);
   write("capability-catalog.md", formatCapabilityCatalogMarkdown(catalog));
 
   console.log(`Emitted proof-kit artifacts to ${outDir}`);

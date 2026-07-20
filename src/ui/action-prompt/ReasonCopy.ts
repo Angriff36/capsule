@@ -1,0 +1,110 @@
+/** Shared vocabulary for lifecycle reason prompts across workspaces. */
+export const ReasonCopy = {
+  retireRecipe: {
+    title: "Retire recipe",
+    description: "Record why this recipe is leaving the active book.",
+    label: "Retirement reason",
+    placeholder: "e.g. Replaced by seasonal revision",
+    confirmLabel: "Retire recipe",
+  },
+  retireDish: {
+    title: "Retire dish",
+    description:
+      "You can restore this dish later from the catalog or detail page.",
+    label: "Retirement reason",
+    placeholder: "e.g. No longer on the house menu",
+    confirmLabel: "Retire dish",
+  },
+  retireDishBulk: (count: number) => ({
+    title: `Retire ${count} dish${count === 1 ? "" : "es"}`,
+    description:
+      "Selected dishes leave the active catalog. You can restore them later.",
+    confirmLabel: `Retire ${count} dish${count === 1 ? "" : "es"}`,
+  }),
+  discontinueIngredient: {
+    title: "Discontinue ingredient",
+    description:
+      "Explain why this ingredient should leave the active pantry list.",
+    label: "Discontinuation reason",
+    placeholder: "e.g. Supplier no longer stocks this item",
+    confirmLabel: "Discontinue",
+  },
+  archiveMenu: {
+    title: "Archive menu",
+    description: "Archived menus leave the publishable set until restored.",
+    label: "Archive reason",
+    placeholder: "e.g. Season ended",
+    confirmLabel: "Archive menu",
+  },
+  unpublishMenu: {
+    title: "Return menu to draft",
+    description: "Explain why this menu should leave published status.",
+    label: "Return-to-draft reason",
+    placeholder: "e.g. Pricing revision in progress",
+    confirmLabel: "Return to draft",
+  },
+  removeLine: {
+    title: "Remove line",
+    description: "Record why this line is being removed.",
+    label: "Removal reason",
+    placeholder: "e.g. Menu revision removed this item",
+    confirmLabel: "Remove",
+  },
+  cancelNeed: {
+    title: "Cancel purchase need",
+    description: "Record why this need is leaving the open queue.",
+    label: "Cancellation reason",
+    placeholder: "e.g. Covered by existing stock",
+    confirmLabel: "Cancel need",
+  },
+  cancelOrder: {
+    title: "Cancel vendor order",
+    description: "Record why this order is being cancelled.",
+    label: "Cancellation reason",
+    placeholder: "e.g. Duplicate draft",
+    confirmLabel: "Cancel order",
+  },
+  cancelShift: {
+    title: "Cancel shift",
+    description: "Record why this shift is being cancelled.",
+    label: "Cancellation reason",
+    placeholder: "e.g. Event headcount reduced",
+    confirmLabel: "Cancel shift",
+  },
+  cancelPackList: {
+    title: "Cancel pack list",
+    description:
+      "Record why this pack list is leaving the active dispatch trace.",
+    label: "Cancellation reason",
+    placeholder: "e.g. Event cancelled or consolidated into another list",
+    confirmLabel: "Cancel pack list",
+  },
+  cancelDelivery: {
+    title: "Cancel delivery",
+    description: "Record why this delivery will not run.",
+    label: "Cancellation reason",
+    placeholder: "e.g. Client pickup arranged instead",
+    confirmLabel: "Cancel delivery",
+  },
+  failDelivery: {
+    title: "Mark delivery failed",
+    description: "Record why transit or handoff failed.",
+    label: "Failure reason",
+    placeholder: "e.g. Venue closed on arrival",
+    confirmLabel: "Mark failed",
+  },
+  supersedeDemand: {
+    title: "Supersede demand",
+    description: "Explain what replaces this demand signal.",
+    label: "Supersede reason",
+    placeholder: "e.g. Regenerated after menu change",
+    confirmLabel: "Supersede",
+  },
+  releaseReservation: {
+    title: "Release reservation",
+    description: "Record why reserved stock is being released.",
+    label: "Release reason",
+    placeholder: "e.g. Event cancelled",
+    confirmLabel: "Release",
+  },
+} as const;

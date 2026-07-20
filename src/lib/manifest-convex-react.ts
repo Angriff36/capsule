@@ -155,6 +155,7 @@ import {
   PrepTaskCompleteParamsSchema,
   PrepTaskMarkBlockedParamsSchema,
   PrepTaskOpenParamsSchema,
+  PrepTaskRefreshGeneratedParamsSchema,
   PrepTaskReleaseParamsSchema,
   PrepTaskReviseParamsSchema,
   PrepTaskStartParamsSchema,
@@ -240,6 +241,7 @@ import {
   VendorOrderLineDemandRetireParamsSchema,
   VendorOrderLineDemandReviseParamsSchema,
   VendorOrderLineRecordReceiptParamsSchema,
+  VendorOrderLineReviseQuantityParamsSchema,
   VendorOrderMarkPartiallyReceivedParamsSchema,
   VendorOrderMarkReceivedParamsSchema,
   VendorOrderOpenParamsSchema,
@@ -2415,6 +2417,16 @@ export function usePrepTaskOpen() {
   };
 }
 
+/** Mutation hook for PrepTask.refreshGenerated. */
+export function usePrepTaskRefreshGenerated() {
+  const mutate = useMutation(api.mutations.PrepTask_refreshGenerated);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskRefreshGeneratedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PrepTask.release. */
 export function usePrepTaskRelease() {
   const mutate = useMutation(api.mutations.PrepTask_release);
@@ -3671,6 +3683,16 @@ export function useVendorOrderLineRecordReceipt() {
   };
 }
 
+/** Mutation hook for VendorOrderLine.reviseQuantity. */
+export function useVendorOrderLineReviseQuantity() {
+  const mutate = useMutation(api.mutations.VendorOrderLine_reviseQuantity);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderLineReviseQuantityParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for VendorOrderLine.addLine. */
 export function useCreateVendorOrderLine() {
   const mutate = useMutation(api.mutations.VendorOrderLine_createViaAddLine);
@@ -3845,4 +3867,4 @@ export function useCreateWasteRecord() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 403 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 405 as const;

@@ -42,7 +42,6 @@ export const NAV_AREAS: NavArea[] = [
     label: "Logistics",
     group: "Operate",
     icon: TruckIcon,
-    planned: "Shipments, routes, drivers and vehicles.",
   },
   {
     path: "/staff",

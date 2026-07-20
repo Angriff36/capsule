@@ -57,6 +57,21 @@ const QualificationsPage = lazy(() =>
     default: module.QualificationsPage,
   })),
 );
+const PackListsPage = lazy(() =>
+  import("../features/logistics/PackListsPage").then((module) => ({
+    default: module.PackListsPage,
+  })),
+);
+const PackListDetailPage = lazy(() =>
+  import("../features/logistics/PackListDetailPage").then((module) => ({
+    default: module.PackListDetailPage,
+  })),
+);
+const DeliveriesPage = lazy(() =>
+  import("../features/logistics/DeliveriesPage").then((module) => ({
+    default: module.DeliveriesPage,
+  })),
+);
 
 function SupplyRoute({ children }: { children: ReactNode }) {
   return <Suspense fallback={<TableSkeleton rows={8} />}>{children}</Suspense>;
@@ -75,8 +90,11 @@ class AppErrorBoundary extends Component<
       return (
         <div className="mx-auto mt-16 max-w-120">
           <ErrorState
-            title="Something went wrong"
-            detail={this.state.error.message}
+            title="This screen failed to render"
+            detail={
+              this.state.error.message ||
+              "Reload the page. If it keeps failing, check the browser console for the component stack."
+            }
             onRetry={() => window.location.reload()}
           />
         </div>
@@ -197,6 +215,34 @@ export function App() {
               element={
                 <SupplyRoute>
                   <QualificationsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics"
+              element={<Navigate to="/logistics/packs" replace />}
+            />
+            <Route
+              path="/logistics/packs"
+              element={
+                <SupplyRoute>
+                  <PackListsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/packs/:id"
+              element={
+                <SupplyRoute>
+                  <PackListDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/deliveries"
+              element={
+                <SupplyRoute>
+                  <DeliveriesPage />
                 </SupplyRoute>
               }
             />

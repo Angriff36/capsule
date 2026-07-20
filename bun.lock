@@ -5,7 +5,7 @@
     "": {
       "name": "capsule",
       "dependencies": {
-        "@angriff36/manifest": "3.6.26",
+        "@angriff36/manifest": "3.6.29",
         "@clerk/backend": "^3.11.7",
         "@clerk/react": "^6.12.4",
         "@fontsource-variable/archivo": "^5.2.5",
@@ -39,7 +39,7 @@
   "packages": {
     "@ampproject/remapping": ["@ampproject/remapping@2.3.0", "", { "dependencies": { "@jridgewell/gen-mapping": "^0.3.5", "@jridgewell/trace-mapping": "^0.3.24" } }, "sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw=="],
 
-    "@angriff36/manifest": ["@angriff36/manifest@3.6.26", "", { "dependencies": { "@modelcontextprotocol/sdk": "^1.29.0", "@msgpack/msgpack": "^3.1.3", "@types/pg": "^8.20.0", "ajv": "^8.20.0", "chalk": "^5.6.2", "commander": "^12.1.0", "glob": "^10.5.0", "inquirer": "^9.3.8", "jiti": "^2.7.0", "js-yaml": "^4.3.0", "ora": "^8.2.0", "pg": "^8.22.0", "typescript": "^5.9.3", "vscode-languageserver": "^9.0.1", "vscode-languageserver-textdocument": "^1.0.12", "zod": "^3.25.76" }, "peerDependencies": { "@libsql/client": ">=0.14", "@supabase/supabase-js": "^2", "convex": ">=1.32.0", "convex-test": ">=0.0.43", "ioredis": "^5", "mongodb": "^6" }, "optionalPeers": ["@libsql/client", "@supabase/supabase-js", "convex", "convex-test", "ioredis", "mongodb"], "bin": { "manifest": "packages/cli/dist/index.js", "manifest-mcp": "packages/mcp-server/bin/manifest-mcp.js", "manifest-lsp": "packages/lsp-server/bin/manifest-lsp.js" } }, "sha512-6bNRFqdlK31sSBTas86R/kihH+qPpTIpRQEjrhErwvxKFPO54pf5by0QJnBoZ8lWKcNP2yLMUCoTFWDbGDifBg=="],
+    "@angriff36/manifest": ["@angriff36/manifest@3.6.29", "", { "dependencies": { "@modelcontextprotocol/sdk": "^1.29.0", "@msgpack/msgpack": "^3.1.3", "@types/pg": "^8.20.0", "ajv": "^8.20.0", "chalk": "^5.6.2", "commander": "^12.1.0", "glob": "^10.5.0", "inquirer": "^9.3.8", "jiti": "^2.7.0", "js-yaml": "^4.3.0", "ora": "^8.2.0", "pg": "^8.22.0", "typescript": "^5.9.3", "vscode-languageserver": "^9.0.1", "vscode-languageserver-textdocument": "^1.0.12", "zod": "^3.25.76" }, "peerDependencies": { "@libsql/client": ">=0.14", "@supabase/supabase-js": "^2", "convex": ">=1.32.0", "convex-test": ">=0.0.43", "ioredis": "^5", "mongodb": "^6" }, "optionalPeers": ["@libsql/client", "@supabase/supabase-js", "convex", "convex-test", "ioredis", "mongodb"], "bin": { "manifest": "packages/cli/dist/index.js", "manifest-mcp": "packages/mcp-server/bin/manifest-mcp.js", "manifest-lsp": "packages/lsp-server/bin/manifest-lsp.js" } }, "sha512-/6srys8EwlkINj5VzOBkrmXSSFx1VRbWhq8NT2LZYqkbNNjsWULD/E36aoZBgDz5ZMfdT4YZtR7PBbAVSkjtRA=="],
 
     "@babel/code-frame": ["@babel/code-frame@7.29.7", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.29.7", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha512-Aup7aUOfpbAUg2ROOJN6Iw5f9DMBlzu0mIkm/malLQFN/YQgO48wCj0Kxa3sEHJvPVFg7siR+qRInwXd2qhQKw=="],
 

@@ -8,7 +8,14 @@ describe("NavigationCatalog", () => {
   it("exposes shipped operator workspaces in the shell", () => {
     const paths = catalog.availableAreas().map((a) => a.path);
     expect(paths).toEqual(
-      expect.arrayContaining(["/", "/events", "/kitchen", "/inventory"]),
+      expect.arrayContaining([
+        "/",
+        "/events",
+        "/kitchen",
+        "/inventory",
+        "/logistics",
+        "/staff",
+      ]),
     );
   });
 
@@ -16,6 +23,8 @@ describe("NavigationCatalog", () => {
     const planned = catalog.plannedAreas().map((a) => a.path);
     expect(planned).toEqual(expect.arrayContaining(["/admin", "/finance"]));
     expect(planned).not.toContain("/inventory");
+    expect(planned).not.toContain("/logistics");
+    expect(planned).not.toContain("/staff");
   });
 
   it("resolves area from pathname prefixes", () => {
