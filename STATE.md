@@ -1,9 +1,12 @@
 # Loop State — capsule
 
-Last run: 2026-07-20T14:00:00Z (vertical-slice: Slice 8b PayrollInput)
+Last run: 2026-07-20T14:30:00Z (vertical-slice: Slice 9 Home service desk)
 
 ## High Priority (loop is acting or waiting on human)
 
+- **Slice 9 Home service desk shipped locally (`f2ec316`) — not pushed**: `/`
+  attention ledger + upcoming services from queryable lists; role from
+  `authStatus`. Push only when human authorizes.
 - **Slice 8b PayrollInput shipped locally (`17a6b60`) — not pushed**: `/finance/payroll`
   prepare→finalize (minutes; encrypted money rates deferred). Push when authorized.
 - **Slice 8 EventCloseout shipped locally (`3a7d5c6`) — not pushed**: `/finance/closeout`
@@ -26,7 +29,7 @@ Last run: 2026-07-20T14:00:00Z (vertical-slice: Slice 8b PayrollInput)
 
 - Working tree may still carry unrelated WIP — normal scale.
 - `actions/checkout@v4` + Node 20 deprecation warnings — bump when convenient (blocked behind CI red).
-- Next roadmap after Slice 8: PaymentMethod UI thin unit or Slice 9 service desk.
+- Next after Slice 9: SavedReportDefinition/`/reports` or PaymentMethod UI thin unit.
 
 ## Recent Noise (ignored this run)
 
