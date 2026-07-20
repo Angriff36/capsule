@@ -21,13 +21,14 @@ Carry a client from contact and offer through agreement, invoice, payment, refun
 
 ### Finance (`/finance`)
 
-| Route                   | Outcome                                              |
-| ----------------------- | ---------------------------------------------------- |
-| `/finance/invoices`     | List + issue invoices; send / void / overdue actions |
-| `/finance/invoices/:id` | Invoice detail, balance, related payments            |
-| `/finance/payments`     | Record payment; begin processing / settle / fail     |
+| Route                         | Outcome                                                              |
+| ----------------------------- | -------------------------------------------------------------------- |
+| `/finance/invoices`           | List + issue invoices; send / void / overdue actions                 |
+| `/finance/invoices/:id`       | Invoice detail, balance, related payments                            |
+| `/finance/payments`           | Record payment (optional stored method); begin processing / settle / fail |
+| `/finance/payment-methods`    | Register / default / expire / reactivate / invalidate / remove methods |
 
-**User outcome proven:** Issue invoice → send → record payment → settle → `PaymentSettled` applies `Invoice.applyPayment` so the invoice becomes `paid`.
+**User outcome proven:** Issue invoice → send → record payment → settle → `PaymentSettled` applies `Invoice.applyPayment` so the invoice becomes `paid`. PaymentMethod register → default → expire → reactivate → link `paymentMethodId` on Payment.record.
 
 ### Clients CRM (`/clients`) — Slice 7b
 
@@ -53,10 +54,10 @@ Roles: finance staff/managers (`financeAccess`) own invoice and payment commands
 - Issue / send / mark viewed / mark overdue / void / write off Invoices
 - Record / begin processing / settle / fail / refund Payments
 - Payment settlement applies to Invoice via generated reaction
+- Register / make-default / clear-default / expire / reactivate / invalidate / remove PaymentMethods; pick stored method when recording a payment
 
 **Still deferred (honest gaps)**
 
-- PaymentMethod register/default/expire UI
 - Lead / ClientInteraction / ProposalLineItem (OD037)
 - Automated ProposalAccepted → Event.create and ContractSigned → Event.confirm (Manifest OD035/OD038)
 
@@ -70,7 +71,7 @@ Sales roles own client registration and CRM documents; finance roles own billing
 
 ## Proof
 
-- Runtime: `tests/proofs/invoice-payment-lifecycle.runtime.test.ts`
+- Runtime: `tests/proofs/invoice-payment-lifecycle.runtime.test.ts`, `tests/proofs/payment-method-lifecycle.runtime.test.ts`
 - Routes/lifecycle: `tests/finance-routes.test.ts`, `tests/clients-routes.test.ts`
 - Integration guard: `tests/commercial-manifest-integration-guard.test.ts` (`bun run check:commercial-manifest`)
 - Opaque FK Zod regression: Invoice/Payment schemas accept Convex document ids (`z.string().min(1)`)

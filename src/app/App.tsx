@@ -87,6 +87,11 @@ const PaymentsPage = lazy(() =>
     default: module.PaymentsPage,
   })),
 );
+const PaymentMethodsPage = lazy(() =>
+  import("../features/finance/PaymentMethodsPage").then((module) => ({
+    default: module.PaymentMethodsPage,
+  })),
+);
 const CloseoutPage = lazy(() =>
   import("../features/finance/CloseoutPage").then((module) => ({
     default: module.CloseoutPage,
@@ -321,6 +326,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <PaymentsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/payment-methods"
+              element={
+                <SupplyRoute>
+                  <PaymentMethodsPage />
                 </SupplyRoute>
               }
             />

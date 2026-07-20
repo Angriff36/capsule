@@ -16,7 +16,7 @@ Current generated boundary: **43 governed business entities**, **219 command cap
 | Production & quality          | PrepTask, ProductionBatch, QualityCheck, Incident, EventAllergenCheck               | `/kitchen/prep`                         | Shipping prep board + quality fail→block proof                     |
 | Workforce                     | EventAssignment, Shift, AvailabilityWindow, TimeRecord, Qualification               | `/staff`                                | Shipping roster, time, qualifications + shift lifecycle proof      |
 | [Logistics](logistics.md)     | PackList, PackListItem, Delivery                                                    | `/logistics`                            | Shipping pack lists, load sheet, deliveries + lifecycle proof      |
-| Commercial & billing          | ClientContact, Proposal, Contract, Invoice, Payment, PaymentMethod                  | `/clients`, `/finance`                  | Generated; planned UI; payment reaction blocker                    |
+| Commercial & billing          | ClientContact, Proposal, Contract, Invoice, Payment, PaymentMethod                  | `/clients`, `/finance`                  | Slice 7 shipped; OD035/OD038 automation deferred                   |
 | Closeout & reporting          | EventCloseout, PayrollInput, SavedReportDefinition                                  | `/finance/closeout`, `/finance/payroll`, `/reports` | Closeout + payroll + report library shipped; chart render deferred |
 
 `TenantScoped` and `SoftDeletable` are source mixins, not operator systems or standalone workspaces.

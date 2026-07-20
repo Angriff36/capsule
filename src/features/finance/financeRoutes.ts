@@ -1,6 +1,11 @@
 export const FINANCE_SECTIONS = [
   { key: "invoices", label: "Invoices", path: "/finance/invoices" },
   { key: "payments", label: "Payments", path: "/finance/payments" },
+  {
+    key: "paymentMethods",
+    label: "Payment methods",
+    path: "/finance/payment-methods",
+  },
   { key: "closeout", label: "Closeout", path: "/finance/closeout" },
   { key: "payroll", label: "Payroll", path: "/finance/payroll" },
 ] as const;
@@ -12,6 +17,7 @@ export const FINANCE_ROUTES = {
   invoices: "/finance/invoices",
   invoiceDetail: (id: string) => `/finance/invoices/${id}`,
   payments: "/finance/payments",
+  paymentMethods: "/finance/payment-methods",
   closeout: "/finance/closeout",
   payroll: "/finance/payroll",
 } as const;

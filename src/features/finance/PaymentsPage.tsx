@@ -4,6 +4,7 @@ import {
   useCreatePayment,
   useListInvoice,
   useListPayment,
+  useListPaymentMethod,
   usePaymentBeginProcessing,
   usePaymentFail,
   usePaymentRefund,
@@ -26,6 +27,7 @@ const money = (value: FormDataEntryValue | null) => {
 export function PaymentsPage() {
   const payments = useListPayment();
   const invoices = useListInvoice();
+  const paymentMethods = useListPaymentMethod();
   const createPayment = useCreatePayment();
   const beginProcessing = usePaymentBeginProcessing();
   const settle = usePaymentSettle();
@@ -33,6 +35,7 @@ export function PaymentsPage() {
   const refund = usePaymentRefund();
   const [showRecord, setShowRecord] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -57,6 +60,18 @@ export function PaymentsPage() {
     return invoice?.invoiceNumber || "Unknown invoice";
   };
 
+  const selectedInvoice = invoices?.find(
+    (row) => row._id === selectedInvoiceId,
+  );
+  const clientMethods = (paymentMethods ?? []).filter(
+    (row) =>
+      row.deletedAt == null &&
+      row.registeredAt != null &&
+      String(row.status) === "active" &&
+      selectedInvoice != null &&
+      String(row.clientId) === String(selectedInvoice.clientId),
+  );
+
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
     setNotice(null);
@@ -77,14 +92,32 @@ export function PaymentsPage() {
     const invoiceId = String(data.get("invoiceId") || "").trim();
     const invoice = invoices?.find((row) => row._id === invoiceId);
     const amount = money(data.get("amount"));
-    const method = String(data.get("method") || "card") as
-      "card" | "check" | "cash" | "ach" | "other";
+    const paymentMethodId = String(data.get("paymentMethodId") || "").trim();
+    const selectedMethod = paymentMethods?.find(
+      (row) => row._id === paymentMethodId,
+    );
+    const method = (
+      selectedMethod
+        ? String(selectedMethod.methodType)
+        : String(data.get("method") || "card")
+    ) as "card" | "check" | "cash" | "ach" | "other";
     if (!invoice) {
       setFailure(new Error("Select a sent invoice with a balance due."));
       return;
     }
     if (!(amount > 0)) {
       setFailure(new Error("Payment amount must be positive."));
+      return;
+    }
+    if (
+      paymentMethodId &&
+      (!selectedMethod ||
+        String(selectedMethod.clientId) !== String(invoice.clientId) ||
+        String(selectedMethod.status) !== "active")
+    ) {
+      setFailure(
+        new Error("Select an active payment method for this invoice's client."),
+      );
       return;
     }
     void run("record-payment", async () => {
@@ -94,9 +127,11 @@ export function PaymentsPage() {
         amount,
         method,
         eventId: invoice.eventId || undefined,
+        paymentMethodId: paymentMethodId || undefined,
         notes: String(data.get("notes") || "").trim() || undefined,
       });
       form.reset();
+      setSelectedInvoiceId("");
       setShowRecord(false);
       setNotice("Payment recorded. Settle it to apply the balance.");
     });
@@ -144,7 +179,10 @@ export function PaymentsPage() {
     })();
   };
 
-  const loading = payments === undefined || invoices === undefined;
+  const loading =
+    payments === undefined ||
+    invoices === undefined ||
+    paymentMethods === undefined;
 
   return (
     <div className="operations-stage supply-stage">
@@ -203,7 +241,12 @@ export function PaymentsPage() {
             <>
               <label>
                 Invoice
-                <select name="invoiceId" required defaultValue="">
+                <select
+                  name="invoiceId"
+                  required
+                  value={selectedInvoiceId}
+                  onChange={(event) => setSelectedInvoiceId(event.target.value)}
+                >
                   <option value="" disabled>
                     Select invoice
                   </option>
@@ -221,6 +264,31 @@ export function PaymentsPage() {
                   ))}
                 </select>
               </label>
+              <label>
+                Stored payment method
+                <select name="paymentMethodId" defaultValue="">
+                  <option value="">None — use method kind below</option>
+                  {clientMethods.map((method) => (
+                    <option key={method._id} value={method._id}>
+                      {String(method.methodType)}
+                      {method.lastFour ? ` ····${String(method.lastFour)}` : ""}
+                      {method.isDefault ? " (default)" : ""}
+                    </option>
+                  ))}
+                </select>
+                {selectedInvoiceId && clientMethods.length === 0 ? (
+                  <small className="text-ink-2">
+                    No active methods for this client.{" "}
+                    <Link
+                      className="text-link"
+                      to={FINANCE_ROUTES.paymentMethods}
+                    >
+                      Register one
+                    </Link>
+                    .
+                  </small>
+                ) : null}
+              </label>
               <div className="supply-form-grid">
                 <label>
                   Amount
@@ -233,7 +301,7 @@ export function PaymentsPage() {
                   />
                 </label>
                 <label>
-                  Method
+                  Method kind
                   <select name="method" defaultValue="card">
                     <option value="card">Card</option>
                     <option value="check">Check</option>
