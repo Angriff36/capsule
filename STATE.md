@@ -4,7 +4,7 @@ Last run: 2026-07-20T14:00:00Z (vertical-slice: Slice 8b PayrollInput)
 
 ## High Priority (loop is acting or waiting on human)
 
-- **Slice 8b PayrollInput shipped locally — not pushed**: `/finance/payroll`
+- **Slice 8b PayrollInput shipped locally (`17a6b60`) — not pushed**: `/finance/payroll`
   prepare→finalize (minutes; encrypted money rates deferred). Push when authorized.
 - **Slice 8 EventCloseout shipped locally (`3a7d5c6`) — not pushed**: `/finance/closeout`
   capture→finalize. Push only when human authorizes.
