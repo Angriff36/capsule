@@ -17,37 +17,50 @@ Carry a client from contact and offer through agreement, invoice, payment, refun
 | `sales/payment.manifest`                                | Payment       |
 | `sales/payment-method.manifest`                         | PaymentMethod |
 
-## Primary workspace
+## Primary workspace (Slice 7 thin unit)
 
-Use a **client dossier and document pipeline**:
+Shipped operator routes under **`/finance`**:
 
-- Client context is stable while Contacts, Proposals, Contracts, Invoices, Payments, and PaymentMethods appear as distinct ruled sections;
-- each document has one strong identity/status header, amounts in tabular rhythm, legal lifecycle actions, and Event linkage;
-- “send,” “viewed,” “accept/sign,” “settle,” “refund,” “void,” and “write off” remain explicit governed transitions rather than decorative activity.
+| Route                    | Outcome                                              |
+| ------------------------ | ---------------------------------------------------- |
+| `/finance/invoices`      | List + issue invoices; send / void / overdue actions |
+| `/finance/invoices/:id`  | Invoice detail, balance, related payments            |
+| `/finance/payments`      | Record payment; begin processing / settle / fail     |
 
-## Core workflows
+**User outcome proven:** Issue invoice → send → record payment → settle → `PaymentSettled` applies `Invoice.applyPayment` so the invoice becomes `paid`.
 
-- Add/update/select/remove ClientContacts.
-- Draft/send/view/accept/decline/expire Proposals.
-- Draft/send/view/sign/expire/void Contracts.
-- Issue/send/view/apply payment/refund/overdue/void/write off Invoices.
-- Record/process/settle/fail/refund Payments.
-- Register/default/expire/reactivate/invalidate/remove PaymentMethods.
+Roles: finance staff/managers (`financeAccess`) own invoice and payment commands. Sales still registers clients; finance may **read** clients for billing pickers (`clientRead` includes `financeAccess`).
+
+## Core workflows (shipped vs deferred)
+
+**Shipped in this slice**
+
+- Issue / send / mark viewed / mark overdue / void / write off Invoices
+- Record / begin processing / settle / fail / refund Payments
+- Payment settlement applies to Invoice via generated reaction
+
+**Still deferred (honest gaps)**
+
+- ClientContact / Proposal / Contract authored CRM workspace (`/clients` remains planned)
+- PaymentMethod register/default/expire UI
+- Proposal acceptance → Event creation and Contract signing → confirmation remain manual follow-ups
 
 ## Cross-system handoffs
 
-Commercial documents link to Client and optional/required Event according to their canonical model. Settled Payment should apply to Invoice. Event cancellation should void eligible unpaid invoices. Proposal acceptance cannot currently create an Event, and Contract signing cannot confirm one; the UI must make those follow-up steps explicit rather than imply automation.
+Commercial documents link to Client and optional Event. Settled Payment applies to Invoice. Event cancellation voids eligible unpaid invoices (generated fan-out). Proposal acceptance cannot currently create an Event, and Contract signing cannot confirm one; the UI must make those follow-up steps explicit rather than imply automation.
 
 ## States and permissions
 
-Sales roles own contacts/offers/agreements; finance roles own billing/payment. Sensitive contact and payment hints must respect encryption/private contracts. Exact currency behavior must be verified before money-changing workflows ship.
+Sales roles own client registration and CRM documents; finance roles own billing/payment. Sensitive contact and payment hints must respect encryption/private contracts.
 
-## Current status
+## Proof
 
-Generated queries and commands exist. No authored `/clients` or `/finance` commercial workspace exists. Manifest 3.6.12 output structurally dispatches Payment settlement through the governed Invoice command and Event cancellation through governed fan-out runners. Those consequences still require authenticated Convex runtime tests before the commercial workflow can be called end-to-end verified; exact currency behavior remains a separate release requirement.
+- Runtime: `tests/proofs/invoice-payment-lifecycle.runtime.test.ts`
+- Routes/lifecycle: `tests/finance-routes.test.ts`
+- Integration guard: `tests/commercial-manifest-integration-guard.test.ts` (`bun run check:commercial-manifest`)
+- Opaque FK Zod regression: Invoice/Payment schemas accept Convex document ids (`z.string().min(1)`)
 
 ## References
 
-- Canonical: `C:/projects/Manifest-source/src/sales`
 - Projection evidence: [projection-status.md](../generation/projection-status.md)
-- Read-only intent reference: Capsule-Pro CRM, proposals, contracts, invoices, and payments
+- Implementation sequence: [implementation-plan.md](../product/implementation-plan.md)

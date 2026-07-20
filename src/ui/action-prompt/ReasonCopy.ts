@@ -93,6 +93,36 @@ export const ReasonCopy = {
     placeholder: "e.g. Venue closed on arrival",
     confirmLabel: "Mark failed",
   },
+  voidInvoice: {
+    title: "Void invoice",
+    description: "Voiding stops collection. Paid invoices cannot be voided.",
+    label: "Void reason",
+    placeholder: "e.g. Issued to the wrong client",
+    confirmLabel: "Void invoice",
+  },
+  writeOffInvoice: {
+    title: "Write off invoice",
+    description:
+      "Writes off the remaining amount due. Use only when the balance will not be collected.",
+    label: "Write-off reason",
+    placeholder: "e.g. Client insolvency",
+    confirmLabel: "Write off",
+  },
+  failPayment: {
+    title: "Mark payment failed",
+    description: "Record why this payment did not clear.",
+    label: "Failure reason",
+    placeholder: "e.g. Card declined",
+    confirmLabel: "Mark failed",
+  },
+  refundPayment: {
+    title: "Refund payment",
+    description: "Records a refund against a settled payment.",
+    label: "Refund reason",
+    placeholder: "e.g. Event cancelled after payment",
+    confirmLabel: "Refund payment",
+  },
+
   supersedeDemand: {
     title: "Supersede demand",
     description: "Explain what replaces this demand signal.",

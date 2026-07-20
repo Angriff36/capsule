@@ -30,6 +30,7 @@ const WORKFORCE_ENTITIES = [
   "Qualification",
 ] as const;
 const LOGISTICS_ENTITIES = ["PackList", "PackListItem", "Delivery"] as const;
+const COMMERCIAL_ENTITIES = ["Invoice", "Payment"] as const;
 const CULINARY_ENTITIES = [
   "Ingredient",
   "Recipe",
@@ -42,6 +43,7 @@ const CATALOG_ENTITIES = [
   ...PRODUCTION_ENTITIES,
   ...WORKFORCE_ENTITIES,
   ...LOGISTICS_ENTITIES,
+  ...COMMERCIAL_ENTITIES,
   ...CULINARY_ENTITIES,
 ] as const;
 
@@ -52,6 +54,8 @@ const QUALITY_RUNTIME_TEST =
 const SHIFT_RUNTIME_TEST = "tests/proofs/shift-lifecycle.runtime.test.ts";
 const LOGISTICS_RUNTIME_TEST =
   "tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts";
+const COMMERCIAL_RUNTIME_TEST =
+  "tests/proofs/invoice-payment-lifecycle.runtime.test.ts";
 const RECIPE_IMPORT_RUNTIME_TEST =
   "tests/proofs/recipe-import-finalize.runtime.test.ts";
 const STRUCTURAL_TEST = "tests/event-reaction-projection.test.ts";
@@ -67,6 +71,12 @@ const LOGISTICS_RUNTIME_PROOF_IDS = [
   "Delivery.schedule",
   "Delivery.startTransit",
   "Delivery.confirmDelivery",
+] as const;
+const COMMERCIAL_RUNTIME_PROOF_IDS = [
+  "Invoice.issue",
+  "Invoice.send",
+  "Payment.record",
+  "Payment.settle",
 ] as const;
 const RECIPE_IMPORT_PROOF_IDS = [
   "Recipe.draft",
@@ -155,16 +165,29 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     "PrepTask",
     "markBlocked",
   );
+  const paymentReaction = requireReaction(
+    ir,
+    "PaymentSettled",
+    "Invoice",
+    "applyPayment",
+  );
   const demandReactionId = reactionProofId(demandReaction);
   const qualityReactionId = reactionProofId(qualityReaction);
+  const paymentReactionId = reactionProofId(paymentReaction);
   const runtimeProofIds = new Set<string>([
     demandReactionId,
     qualityReactionId,
+    paymentReactionId,
     ...SHIFT_RUNTIME_PROOF_IDS,
     ...LOGISTICS_RUNTIME_PROOF_IDS,
+    ...COMMERCIAL_RUNTIME_PROOF_IDS,
     ...RECIPE_IMPORT_PROOF_IDS,
   ]);
-  const structuralProofIds = new Set([demandReactionId, qualityReactionId]);
+  const structuralProofIds = new Set([
+    demandReactionId,
+    qualityReactionId,
+    paymentReactionId,
+  ]);
 
   const catalog = emitCapabilityCatalog(ir, {
     entityFilter: CATALOG_ENTITIES,
@@ -187,6 +210,11 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
         structuralTest: STRUCTURAL_TEST,
         runtimeTest: QUALITY_RUNTIME_TEST,
       },
+      {
+        proofId: paymentReactionId,
+        structuralTest: STRUCTURAL_TEST,
+        runtimeTest: COMMERCIAL_RUNTIME_TEST,
+      },
       ...SHIFT_RUNTIME_PROOF_IDS.map((proofId) => ({
         proofId,
         runtimeTest: SHIFT_RUNTIME_TEST,
@@ -194,6 +222,10 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
       ...LOGISTICS_RUNTIME_PROOF_IDS.map((proofId) => ({
         proofId,
         runtimeTest: LOGISTICS_RUNTIME_TEST,
+      })),
+      ...COMMERCIAL_RUNTIME_PROOF_IDS.map((proofId) => ({
+        proofId,
+        runtimeTest: COMMERCIAL_RUNTIME_TEST,
       })),
       ...RECIPE_IMPORT_PROOF_IDS.map((proofId) => ({
         proofId,
@@ -369,6 +401,44 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     ],
   });
 
+  const commercialCatalog = emitCapabilityCatalog(ir, {
+    entityFilter: COMMERCIAL_ENTITIES,
+    versions,
+    runtimeProofIds: new Set([
+      paymentReactionId,
+      ...COMMERCIAL_RUNTIME_PROOF_IDS,
+    ]),
+    structuralProofIds: new Set([paymentReactionId]),
+  });
+  const commercialLifecycleStates = [
+    "draft",
+    "sent",
+    "viewed",
+    "overdue",
+    "partial",
+    "paid",
+    "voided",
+    "written_off",
+    "pending",
+    "processing",
+    "completed",
+    "failed",
+    "refunded",
+  ];
+  const commercialGuard = emitIntegrationGuardConfig(commercialCatalog, {
+    featureRoots: ["src/features/finance"],
+    convexLibRoot: "convex/lib",
+    versions,
+    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:${commercialLifecycleStates.join("|")})["']`,
+    lifecyclePolicies: [
+      {
+        pathSuffix: "/CommercialLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: ["InvoiceSendLifecycle", "PaymentSettleLifecycle"],
+      },
+    ],
+  });
+
   mkdirSync(outDir, { recursive: true });
   const write = (name: string, value: unknown) => {
     const text =
@@ -382,6 +452,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
   write("guard.production.json", productionGuard);
   write("guard.workforce.json", workforceGuard);
   write("guard.logistics.json", logisticsGuard);
+  write("guard.commercial.json", commercialGuard);
   write("capability-catalog.md", formatCapabilityCatalogMarkdown(catalog));
 
   console.log(`Emitted proof-kit artifacts to ${outDir}`);

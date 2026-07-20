@@ -15,13 +15,15 @@ describe("NavigationCatalog", () => {
         "/inventory",
         "/logistics",
         "/staff",
+        "/finance",
       ]),
     );
   });
 
   it("keeps unshipped systems in planned areas", () => {
     const planned = catalog.plannedAreas().map((a) => a.path);
-    expect(planned).toEqual(expect.arrayContaining(["/admin", "/finance"]));
+    expect(planned).toEqual(expect.arrayContaining(["/admin"]));
+    expect(planned).not.toContain("/finance");
     expect(planned).not.toContain("/inventory");
     expect(planned).not.toContain("/logistics");
     expect(planned).not.toContain("/staff");

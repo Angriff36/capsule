@@ -72,6 +72,21 @@ const DeliveriesPage = lazy(() =>
     default: module.DeliveriesPage,
   })),
 );
+const InvoicesPage = lazy(() =>
+  import("../features/finance/InvoicesPage").then((module) => ({
+    default: module.InvoicesPage,
+  })),
+);
+const InvoiceDetailPage = lazy(() =>
+  import("../features/finance/InvoiceDetailPage").then((module) => ({
+    default: module.InvoiceDetailPage,
+  })),
+);
+const PaymentsPage = lazy(() =>
+  import("../features/finance/PaymentsPage").then((module) => ({
+    default: module.PaymentsPage,
+  })),
+);
 
 function SupplyRoute({ children }: { children: ReactNode }) {
   return <Suspense fallback={<TableSkeleton rows={8} />}>{children}</Suspense>;
@@ -243,6 +258,34 @@ export function App() {
               element={
                 <SupplyRoute>
                   <DeliveriesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance"
+              element={<Navigate to="/finance/invoices" replace />}
+            />
+            <Route
+              path="/finance/invoices"
+              element={
+                <SupplyRoute>
+                  <InvoicesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/invoices/:id"
+              element={
+                <SupplyRoute>
+                  <InvoiceDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/payments"
+              element={
+                <SupplyRoute>
+                  <PaymentsPage />
                 </SupplyRoute>
               }
             />

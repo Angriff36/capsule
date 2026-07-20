@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "manifest-integration-guard/v1",
+  "versions": {
+    "manifestVersion": "3.6.29",
+    "projection": "convex",
+    "preset": {
+      "id": "convex-application",
+      "version": "1.3.5"
+    }
+  },
+  "featureRoots": [
+    "src/features/finance"
+  ],
+  "convexLibRoot": "convex/lib",
+  "ownedTables": [
+    "invoices",
+    "payments"
+  ],
+  "forbidDirectConvexHooks": true,
+  "forbiddenImportPatterns": [
+    "(?:^|/)convex/(?:queries|mutations)(?:\\.|$|/)",
+    "(?:^|/)convex/_generated(?:/|$)",
+    "^convex/react$"
+  ],
+  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:draft|sent|viewed|overdue|partial|paid|voided|written_off|pending|processing|completed|failed|refunded)[\"']",
+  "lifecyclePolicies": [
+    {
+      "pathSuffix": "/CommercialLifecyclePolicy.ts",
+      "bindingsImport": "../../generated/manifest-wiring-bindings\"",
+      "requiredSymbols": [
+        "InvoiceSendLifecycle",
+        "PaymentSettleLifecycle"
+      ]
+    }
+  ],
+  "exceptions": []
+}

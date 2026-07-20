@@ -61,7 +61,6 @@ export const NAV_AREAS: NavArea[] = [
     label: "Finance",
     group: "Business",
     icon: CoinsIcon,
-    planned: "Invoices, payments, budgets and profitability.",
   },
   {
     path: "/reports",

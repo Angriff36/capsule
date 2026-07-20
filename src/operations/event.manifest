@@ -92,7 +92,7 @@ entity Client mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["archived"]
   transition status from "archived" to ["active"]
 
-  default policy clientRead read: roleAllows(user.role, "salesAccess") "Sales staff may read client accounts"
+  default policy clientRead read: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "financeAccess") "Sales and finance may read client accounts for CRM and billing"
   // Write policies gate command mutation (semantics.md § policy enforcement:
   // "enforced only at command execution"; no separate store-level write gate).
   // Staff tier here; manager-only commands carry explicit roleAllows guards.

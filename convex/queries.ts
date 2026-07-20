@@ -488,7 +488,7 @@ export const listClient = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("clientRead", "Client", () => checkRole(user.role, "salesAccess"))) return [];
+    if (!__allowsRead("clientRead", "Client", () => (checkRole(user.role, "salesAccess") || checkRole(user.role, "financeAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("clients").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -506,7 +506,7 @@ export const getClient = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("clientRead", "Client", () => checkRole(user.role, "salesAccess"))) return null;
+    if (!__allowsRead("clientRead", "Client", () => (checkRole(user.role, "salesAccess") || checkRole(user.role, "financeAccess")))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -525,7 +525,7 @@ export const listClientByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("clientRead", "Client", () => checkRole(user.role, "salesAccess"))) return [];
+    if (!__allowsRead("clientRead", "Client", () => (checkRole(user.role, "salesAccess") || checkRole(user.role, "financeAccess")))) return [];
     let rows = await ctx.db.query("clients").withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Client", ["email","phone","addressLine1","addressLine2","city","region","postalCode","countryCode","taxId"], row)));
@@ -542,7 +542,7 @@ export const listClientByAssignedToId = query({
   handler: async (ctx, { assignedToId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("clientRead", "Client", () => checkRole(user.role, "salesAccess"))) return [];
+    if (!__allowsRead("clientRead", "Client", () => (checkRole(user.role, "salesAccess") || checkRole(user.role, "financeAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("clients").withIndex("by_assignedToId", (q) => q.eq("assignedToId", assignedToId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
