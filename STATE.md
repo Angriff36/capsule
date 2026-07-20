@@ -1,6 +1,6 @@
 # Loop State — capsule
 
-Last run: 2026-07-20T15:00:00Z (cross-slice: Client/Contract → Invoice issue deep link)
+Last run: 2026-07-20T14:55:00Z (vertical-slice wake: PaymentMethod — already shipped)
 
 ## High Priority (loop is acting or waiting on human)
 
@@ -38,8 +38,10 @@ Last run: 2026-07-20T15:00:00Z (cross-slice: Client/Contract → Invoice issue d
 
 - Working tree may still carry unrelated WIP — normal scale.
 - `actions/checkout@v4` + Node 20 deprecation warnings — bump when convenient (blocked behind CI red).
-- Next: Event dossier → Invoice deep link (blocked earlier by EventDetail WIP —
-  revisit when WIP lands); OD035/OD038 automation; report chart render.
+- Vertical-slice PaymentMethod wake was a no-op (`9119692` already shipped;
+  proofs green). Loop not re-armed for OD035/OD038 or chart render (deferred).
+- Next candidate when EventDetail WIP settles: Event dossier → Invoice deep link.
+  Otherwise await human pick of a new thin unit.
 
 ## Recent Noise (ignored this run)
 
