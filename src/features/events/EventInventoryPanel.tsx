@@ -1,11 +1,16 @@
 import { useMemo, useState } from "react";
 import {
   useCreateInventoryReservation,
+  useIngredientDemandConfirm,
+  useIngredientDemandFulfill,
+  useInventoryReservationConsume,
   useListIngredient,
   useListIngredientDemand,
   useListInventoryItem,
   useListInventoryReservation,
+  useListStorageLocation,
 } from "../../lib/manifest-convex-react";
+import { EventStockIssueCoordinator } from "./EventStockIssueCoordinator";
 import {
   EventStockReservationCoordinator,
   type EventStockReservationCreated,
@@ -33,10 +38,15 @@ export function EventInventoryPanel({
   const items = useListInventoryItem();
   const reservations = useListInventoryReservation();
   const ingredients = useListIngredient();
+  const locations = useListStorageLocation();
   const createReservation = useCreateInventoryReservation();
+  const consumeReservation = useInventoryReservationConsume();
+  const confirmDemand = useIngredientDemandConfirm();
+  const fulfillDemand = useIngredientDemandFulfill();
   const [created, setCreated] = useState<EventStockReservationCreated[]>([]);
   const [shortages, setShortages] = useState<EventStockShortage[]>([]);
   const [ran, setRan] = useState(false);
+  const [lastIssue, setLastIssue] = useState<string | null>(null);
 
   const eligible = ELIGIBLE_STAGES.has(eventStage);
   const eventDemands = useMemo(
@@ -55,14 +65,26 @@ export function EventInventoryPanel({
         (reservation) =>
           reservation.eventId === eventId &&
           reservation.deletedAt == null &&
-          reservation.status === "active",
+          (reservation.status === "active" ||
+            reservation.status === "consumed"),
       ),
     [reservations, eventId],
+  );
+  const activeReservations = eventReservations.filter(
+    (reservation) => reservation.status === "active",
   );
 
   const ingredientName = (ingredientId: string) =>
     ingredients?.find((ingredient) => ingredient._id === ingredientId)?.name ??
     ingredientId;
+  const locationName = (inventoryItemId: string) => {
+    const item = items?.find((row) => row._id === inventoryItemId);
+    if (!item) return "—";
+    return (
+      locations?.find((location) => location._id === item.locationId)?.name ??
+      item.locationId
+    );
+  };
 
   const reserveStock = () => {
     if (
@@ -122,6 +144,66 @@ export function EventInventoryPanel({
     })();
   };
 
+  const issueStock = (reservationId: string) => {
+    if (
+      !eligible ||
+      demands === undefined ||
+      items === undefined ||
+      reservations === undefined
+    ) {
+      return;
+    }
+    onBusy(true);
+    onError(null);
+    void (async () => {
+      try {
+        const result = await new EventStockIssueCoordinator({
+          consumeReservation: (input) => consumeReservation(input),
+          confirmDemand: (input) => confirmDemand(input),
+          fulfillDemand: (input) => fulfillDemand(input),
+        }).issue({
+          eventId,
+          reservationId,
+          reservations: (reservations ?? []).map((reservation) => ({
+            id: reservation._id,
+            inventoryItemId: reservation.inventoryItemId,
+            eventId: reservation.eventId,
+            ingredientId: reservation.ingredientId,
+            quantity: Number(reservation.quantity),
+            status: String(reservation.status),
+            version: reservation.version,
+            deletedAt: reservation.deletedAt,
+          })),
+          demands: eventDemands.map((demand) => ({
+            id: demand._id,
+            eventId: demand.eventId,
+            ingredientId: demand.ingredientId,
+            requiredQuantity: Number(demand.requiredQuantity),
+            unit: String(demand.unit),
+            status: String(demand.status),
+            version: demand.version,
+            deletedAt: demand.deletedAt,
+          })),
+          items: (items ?? []).map((item) => ({
+            id: item._id,
+            quantityOnHand: Number(item.quantityOnHand),
+            locationId: item.locationId,
+            unit: String(item.unit),
+          })),
+        });
+        setLastIssue(
+          result.fulfilledDemandId
+            ? `Issued ${result.consumedQuantity}; demand fulfilled.`
+            : `Issued ${result.consumedQuantity}; demand still open (${result.consumedForIngredient} consumed so far).`,
+        );
+      } catch (error) {
+        onError(error);
+      } finally {
+        onBusy(false);
+      }
+    })();
+  };
+
   if (
     !eligible &&
     eventDemands.length === 0 &&
@@ -139,8 +221,8 @@ export function EventInventoryPanel({
             Stock reservations
           </h2>
           <p className="mt-1 text-[12px] text-ink-3">
-            Reserve available stock against this event&apos;s ingredient demand.
-            Shortages stay visible for purchasing follow-up.
+            Reserve available stock, then issue holds when product leaves
+            storage for the event.
           </p>
         </div>
         {eligible ? (
@@ -182,7 +264,7 @@ export function EventInventoryPanel({
             </thead>
             <tbody>
               {eventDemands.map((demand) => {
-                const reserved = eventReservations
+                const reserved = activeReservations
                   .filter(
                     (reservation) =>
                       reservation.ingredientId === demand.ingredientId,
@@ -210,6 +292,62 @@ export function EventInventoryPanel({
           </table>
         </div>
       )}
+
+      {eventReservations.length > 0 ? (
+        <div className="space-y-2 border-t border-line/60 pt-3">
+          <p className="text-[12px] font-medium text-ink">Event holds</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-[13px]">
+              <thead className="text-[11px] uppercase tracking-wide text-ink-3">
+                <tr>
+                  <th className="py-1 pr-3 font-medium">Ingredient</th>
+                  <th className="py-1 pr-3 font-medium">Location</th>
+                  <th className="py-1 pr-3 font-medium">Qty</th>
+                  <th className="py-1 pr-3 font-medium">Status</th>
+                  <th className="py-1 font-medium">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {eventReservations.map((reservation) => (
+                  <tr key={reservation._id} className="border-t border-line/60">
+                    <td className="py-2 pr-3">
+                      {ingredientName(reservation.ingredientId)}
+                    </td>
+                    <td className="py-2 pr-3">
+                      {locationName(reservation.inventoryItemId)}
+                    </td>
+                    <td className="py-2 pr-3 font-mono">
+                      {Number(reservation.quantity)}
+                    </td>
+                    <td className="py-2 pr-3">{String(reservation.status)}</td>
+                    <td className="py-2">
+                      {eligible && reservation.status === "active" ? (
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-sm"
+                          disabled={
+                            busy ||
+                            items === undefined ||
+                            reservations === undefined
+                          }
+                          onClick={() => issueStock(reservation._id)}
+                        >
+                          Issue stock
+                        </button>
+                      ) : (
+                        <span className="text-[12px] text-ink-3">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {lastIssue ? (
+            <p className="text-[12px] text-ink-2">{lastIssue}</p>
+          ) : null}
+        </div>
+      ) : null}
 
       {ran ? (
         <div className="space-y-2 border-t border-line/60 pt-3 text-[13px]">
