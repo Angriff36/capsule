@@ -406,6 +406,105 @@ describe("S8: Vendor order totals", () => {
     expect((vendorDoc as { openOrderCount?: number }).openOrderCount).toBe(2);
   });
 
+  it("soft-deleted orders are excluded from counts and totals", async () => {
+    const proof = harness();
+    const procurement = proof.asRole({
+      subject: "vendor-totals-soft-delete",
+      role: "procurement_staff",
+      tenantId: S.tenantId,
+    });
+
+    const vendor = (await proof.executeCommand(
+      procurement,
+      api.mutations.Vendor_createViaOnboard,
+      {
+        name: "Soft-Delete Test Vendor",
+        paymentTermsDays: 30,
+      },
+    )) as { docId: string };
+
+    // Create 2 orders with amounts
+    const order1 = (await proof.executeCommand(
+      procurement,
+      api.mutations.VendorOrder_createViaOpen,
+      {
+        vendorId: vendor.docId,
+      },
+    )) as { docId: string };
+
+    const order2 = (await proof.executeCommand(
+      procurement,
+      api.mutations.VendorOrder_createViaOpen,
+      {
+        vendorId: vendor.docId,
+      },
+    )) as { docId: string };
+
+    // Set amounts
+    await proof.executeCommand(
+      procurement,
+      api.mutations.VendorOrder_updateTotals,
+      {
+        docId: order1.docId,
+        subtotal: 1000,
+        taxAmount: 0,
+        shippingAmount: 0,
+        version: 1,
+      },
+    );
+    await proof.executeCommand(
+      procurement,
+      api.mutations.VendorOrder_updateTotals,
+      {
+        docId: order2.docId,
+        subtotal: 2000,
+        taxAmount: 0,
+        shippingAmount: 0,
+        version: 1,
+      },
+    );
+
+    // Submit both
+    const order1Updated = await procurement.run(async (ctx) =>
+      ctx.db.get(order1.docId as never),
+    );
+    const order2Updated = await procurement.run(async (ctx) =>
+      ctx.db.get(order2.docId as never),
+    );
+
+    await proof.executeCommand(procurement, api.mutations.VendorOrder_submit, {
+      docId: order1.docId,
+      version: (order1Updated as { version?: number }).version,
+    });
+    await proof.executeCommand(procurement, api.mutations.VendorOrder_submit, {
+      docId: order2.docId,
+      version: (order2Updated as { version?: number }).version,
+    });
+
+    // Soft-delete order1 (cancel sets deletedAt)
+    const manager = proof.asRole({
+      subject: "vendor-totals-soft-delete-manager",
+      role: "inventory_manager",
+      tenantId: S.tenantId,
+    });
+    await proof.executeCommand(manager, api.mutations.VendorOrder_cancel, {
+      docId: order1.docId,
+      version: (order1Updated as { version?: number }).version! + 1,
+      reason: "Test soft-delete",
+    });
+
+    const vendorDoc = await procurement.run(async (ctx) => {
+      const doc = await ctx.db.get(vendor.docId as never);
+      await hydrateComputedRelationsForVendor(ctx, doc as never);
+      return { ...doc, ...computeVendor(doc as never) };
+    });
+    // Only order2 (submitted, not deleted) should count
+    expect((vendorDoc as { openOrderCount?: number }).openOrderCount).toBe(1);
+    expect((vendorDoc as { outstandingTotal?: number }).outstandingTotal).toBe(
+      2000,
+    );
+  });
+
   it("draft orders count toward openOrderCount but not outstandingTotal", async () => {
     const proof = harness();
     const procurement = proof.asRole({

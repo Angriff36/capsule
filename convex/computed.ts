@@ -116,8 +116,8 @@ export async function hydrateComputedRelationsForVendor(ctx: any, doc: Record<st
 /** Self-only computed fields for Vendor. Pass the stored document. */
 export function computeVendor(doc: Record<string, any>): Record<string, any> {
   return {
-    openOrderCount: ((doc.orders) ?? []).filter((o: Doc<"vendorOrders">) => (((((o.status === "draft") || (o.status === "submitted")) || (o.status === "confirmed")) || (o.status === "partially_received")))).length,
-    outstandingTotal: ((doc.orders) ?? []).map((o: Doc<"vendorOrders">) => (((((o.status === "submitted") || (o.status === "confirmed")) || (o.status === "partially_received")) ? o.totalAmount : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0),
+    openOrderCount: ((doc.orders) ?? []).filter((o: Doc<"vendorOrders">) => (((o.deletedAt == null) && ((((o.status === "draft") || (o.status === "submitted")) || (o.status === "confirmed")) || (o.status === "partially_received"))))).length,
+    outstandingTotal: ((doc.orders) ?? []).map((o: Doc<"vendorOrders">) => ((((o.deletedAt == null) && (((o.status === "submitted") || (o.status === "confirmed")) || (o.status === "partially_received"))) ? o.totalAmount : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0),
   };
 }
 
