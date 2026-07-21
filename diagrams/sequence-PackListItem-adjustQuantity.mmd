@@ -11,5 +11,6 @@ sequenceDiagram
     PackListItem->>PackListItem: guard[3]: self.packList != null and self.packList.status == #quot;draft#quot;...
     PackListItem->>PackListItem: compute.previousRequired
     PackListItem->>PackListItem: mutate.requiredQuantity
+    PackListItem->>PackListItem: mutate.isGenerated
     PackListItem->>EventBus: emit PackListItemQuantityAdjusted on pack_list_item.quantity_adjusted
     PackListItem-->>-Client: void

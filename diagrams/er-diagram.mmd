@@ -126,6 +126,7 @@ erDiagram
         decimal portionSize "PK"
         UnitOfMeasure portionUnit "PK"
         list dietaryTags
+        list allergenSummary
         DishStatus status "PK"
         datetime introducedAt "nullable"
         datetime retiredAt "nullable"
@@ -540,6 +541,9 @@ erDiagram
         string description "PK"
         uuid dishId "nullable"
         uuid productionBatchId "nullable"
+        uuid eventDishId "nullable"
+        uuid prepTaskId "nullable"
+        boolean isGenerated "PK"
         decimal requiredQuantity "PK"
         decimal packedQuantity "PK"
         UnitOfMeasure unit "PK"
@@ -553,6 +557,8 @@ erDiagram
     PackListItem }o--|| PackList : "packList"
     PackListItem }o--|| Dish : "dish"
     PackListItem }o--|| ProductionBatch : "productionBatch"
+    PackListItem }o--|| EventDish : "eventDish"
+    PackListItem }o--|| PrepTask : "prepTask"
     Payment {
         uuid id "PK"
         string tenantId "PK"
@@ -1115,6 +1121,7 @@ erDiagram
         uuid ingredientId "PK"
         uuid locationId "PK"
         uuid eventId "nullable"
+        uuid inventoryItemId "nullable"
         decimal quantity "PK"
         UnitOfMeasure unit "PK"
         WasteReason reason "PK"
@@ -1130,3 +1137,4 @@ erDiagram
     WasteRecord }o--|| Ingredient : "ingredient"
     WasteRecord }o--|| StorageLocation : "location"
     WasteRecord }o--|| Event : "event"
+    WasteRecord }o--|| InventoryItem : "inventoryItem"

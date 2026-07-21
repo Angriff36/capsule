@@ -481,6 +481,8 @@ export const InventoryItemComputedSchema = InventoryItemSchema.extend({
   isBelowPar: z.boolean(),
   isBelowReorder: z.boolean(),
   inventoryValue: z.number(),
+  totalReserved: z.number(),
+  availableQuantity: z.number(),
 });
 
 export type InventoryItem = z.infer<typeof InventoryItemSchema>;
@@ -1306,6 +1308,7 @@ export const WasteRecordSchema = z.object({
   ingredientId: z.string().uuid(),
   locationId: z.string().uuid(),
   eventId: z.string().uuid().nullable().optional(),
+  inventoryItemId: z.string().uuid().nullable().optional(),
   quantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
   reason: z.enum(["spoilage", "prep_error", "overproduction", "other"]).default("other"),
@@ -3416,6 +3419,7 @@ export const WasteRecordRecordParamsSchema = z.object({
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   reason: z.enum(["spoilage", "prep_error", "overproduction", "other"]),
   eventId: z.string().min(1).optional(),
+  inventoryItemId: z.string().min(1).optional(),
   unitCost: z.number().optional(),
   notes: z.string().optional(),
 });

@@ -17,11 +17,11 @@
     "check": "bun run toolchain && bun scripts/builder-regen-guard.ts --check-ownership && bun run proof:emit && bun run check:proof && bun run check:manifest-registry && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run check:production-manifest && bun run check:workforce-manifest && bun run check:logistics-manifest && bun run check:commercial-manifest && bun run check:closeout-manifest && bun run check:payroll-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
     "check:closeout-manifest": "bun scripts/check-closeout-manifest-integration.ts",
     "check:commercial-manifest": "bun scripts/check-commercial-manifest-integration.ts",
-    "check:payroll-manifest": "bun scripts/check-payroll-manifest-integration.ts",
     "check:culinary-manifest": "bun scripts/check-culinary-manifest-integration.ts",
     "check:event-manifest": "bun scripts/check-event-manifest-integration.ts",
     "check:logistics-manifest": "bun scripts/check-logistics-manifest-integration.ts",
     "check:manifest-registry": "bun scripts/check-manifest-registry-pin.ts",
+    "check:payroll-manifest": "bun scripts/check-payroll-manifest-integration.ts",
     "check:production-manifest": "bun scripts/check-production-manifest-integration.ts",
     "check:proof": "bun scripts/check-proof-registry.ts",
     "check:supply-manifest": "bun scripts/check-supply-manifest-integration.ts",
@@ -50,7 +50,7 @@
     "*.{ts,tsx,js,jsx,json,md,css,yml,yaml,html}": "prettier --write"
   },
   "dependencies": {
-    "@angriff36/manifest": "3.6.29",
+    "@angriff36/manifest": "3.6.33",
     "@clerk/backend": "^3.11.7",
     "@clerk/react": "^6.12.4",
     "@fontsource-variable/archivo": "^5.2.5",

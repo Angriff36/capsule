@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant PackListItem as PackListItem
     participant EventBus
-    Client->>+PackListItem: addItem(packListId, description, requiredQuantity, unit, dishId, productionBatchId)
+    Client->>+PackListItem: addItem(packListId, description, requiredQuantity, unit, dishId, productionBatchId, eventDishId, prepTaskId, isGenerated)
     Note over PackListItem: Policies: packListItemRead, packListItemWrite, packListItemExecute
     Note over PackListItem: Guards (4)
     PackListItem->>PackListItem: guard[0]: self.listedAt == null
@@ -13,6 +13,9 @@ sequenceDiagram
     PackListItem->>PackListItem: mutate.description
     PackListItem->>PackListItem: mutate.dishId
     PackListItem->>PackListItem: mutate.productionBatchId
+    PackListItem->>PackListItem: mutate.eventDishId
+    PackListItem->>PackListItem: mutate.prepTaskId
+    PackListItem->>PackListItem: mutate.isGenerated
     PackListItem->>PackListItem: mutate.requiredQuantity
     PackListItem->>PackListItem: mutate.unit
     PackListItem->>PackListItem: mutate.status

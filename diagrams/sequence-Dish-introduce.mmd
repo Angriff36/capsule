@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant Dish as Dish
     participant EventBus
-    Client->>+Dish: introduce(name, portionSize, portionUnit, description, category, course, serviceStyle, dietaryTags)
+    Client->>+Dish: introduce(name, portionSize, portionUnit, description, category, course, serviceStyle, dietaryTags, allergenSummary)
     Note over Dish: Policies: dishRead, dishWrite, dishExecute
     Note over Dish: Guards (2)
     Dish->>Dish: guard[0]: self.introducedAt == null
@@ -15,6 +15,7 @@ sequenceDiagram
     Dish->>Dish: mutate.course
     Dish->>Dish: mutate.serviceStyle
     Dish->>Dish: mutate.dietaryTags
+    Dish->>Dish: mutate.allergenSummary
     Dish->>Dish: mutate.introducedAt
     Dish->>EventBus: emit DishIntroduced on dish.introduced
     Dish-->>-Client: void

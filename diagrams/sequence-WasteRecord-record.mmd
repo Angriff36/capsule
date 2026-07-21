@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant WasteRecord as WasteRecord
     participant EventBus
-    Client->>+WasteRecord: record(ingredientId, locationId, quantity, unit, reason, eventId, unitCost, notes)
+    Client->>+WasteRecord: record(ingredientId, locationId, quantity, unit, reason, eventId, inventoryItemId, unitCost, notes)
     Note over WasteRecord: Policies: wasteRecordRead, wasteRecordWrite, wasteRecordExecute
     Note over WasteRecord: Guards (5)
     WasteRecord->>WasteRecord: guard[0]: self.recordedAt == null
@@ -13,6 +13,7 @@ sequenceDiagram
     WasteRecord->>WasteRecord: mutate.ingredientId
     WasteRecord->>WasteRecord: mutate.locationId
     WasteRecord->>WasteRecord: mutate.eventId
+    WasteRecord->>WasteRecord: mutate.inventoryItemId
     WasteRecord->>WasteRecord: mutate.quantity
     WasteRecord->>WasteRecord: mutate.unit
     WasteRecord->>WasteRecord: mutate.reason

@@ -1172,6 +1172,7 @@ export default defineSchema({
     ingredientId: v.id("ingredients"),
     locationId: v.id("storageLocations"),
     eventId: v.optional(v.union(v.id("events"), v.null())),
+    inventoryItemId: v.optional(v.union(v.id("inventoryItems"), v.null())),
     quantity: v.number(),
     unit: v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion")),
     reason: v.union(v.literal("spoilage"), v.literal("prep_error"), v.literal("overproduction"), v.literal("other")),
@@ -1188,7 +1189,8 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_ingredientId", ["ingredientId"])
     .index("by_locationId", ["locationId"])
-    .index("by_eventId", ["eventId"]),
+    .index("by_eventId", ["eventId"])
+    .index("by_inventoryItemId", ["inventoryItemId"]),
   manifestEvents: defineTable({
     type: v.string(),
     entity: v.string(),

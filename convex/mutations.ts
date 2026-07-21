@@ -3768,6 +3768,12 @@ async function __runEventComplete(ctx: MutationCtx, { docId, version }: any, __c
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "complete", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventCompleted", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: __after.tenantId }, createdAt: Date.now() });
+    // Reactions
+    const fanRows0 = await ctx.db.query("inventoryReservations").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    for (const __row of fanRows0) {
+      const target = __row;
+      await __runInventoryReservationRelease(ctx, { docId: (__row as any)._id, reason: "Event completed" } as any);
+    }
     return { ...doc, ...updates };
 }
 
@@ -7147,12 +7153,14 @@ async function __runInventoryItemRemove(ctx: MutationCtx, { docId, reason, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
+    (doc as any).reservations = await ctx.db.query("inventoryReservations").withIndex("by_inventoryItemId", (q: any) => q.eq("inventoryItemId", docId)).collect();
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read stock items");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write stock items through commands");
     if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute stock item commands");
     if (!((doc.stockedAt != null))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user.role, "inventoryManageAccess"))) throw new Error("Guard 2 failed");
+    if (!((((doc.reservations) ?? []).filter((r: Doc<"inventoryReservations">) => ((r.status === "active"))).length === 0))) throw new Error("Guard 3 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Removal reason is required");
     const previousQuantity = doc.quantityOnHand;
     if (version !== undefined && (doc as any).version !== version) {
@@ -7348,9 +7356,9 @@ async function __runInventoryReservationConsume(ctx: MutationCtx, { docId, versi
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryReservation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryReservation not found");
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read inventory reservations");
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write inventory reservations through commands");
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute inventory reservation commands");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may read inventory reservations");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may write inventory reservations through commands");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may execute reservation commands");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.reservedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -7379,6 +7387,9 @@ async function __runInventoryReservationConsume(ctx: MutationCtx, { docId, versi
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, inventoryReservationId: docId, tenantId: __after.tenantId, inventoryItemId: __after.inventoryItemId, eventId: __after.eventId, ingredientId: __after.ingredientId, previousQuantity: previousQuantity, quantity: __after.quantity, _subject: { entity: "InventoryReservation", command: "consume", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "InventoryReservationConsumed", entity: "InventoryReservation", entityId: docId, payload: { inventoryReservationId: docId, tenantId: __after.tenantId, inventoryItemId: __after.inventoryItemId, eventId: __after.eventId, ingredientId: __after.ingredientId, previousQuantity: previousQuantity, quantity: __after.quantity }, createdAt: Date.now() });
+    // Reactions
+    const reactionTarget0 = payload.inventoryItemId;
+    if (reactionTarget0) await __runInventoryItemAdjustQuantity(ctx, { docId: reactionTarget0, delta: (0 - payload.quantity), reason: "Reservation consumed" } as any);
     return { ...doc, ...updates };
 }
 
@@ -7407,9 +7418,9 @@ async function __runInventoryReservationRelease(ctx: MutationCtx, { docId, reaso
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryReservation not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryReservation not found");
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read inventory reservations");
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write inventory reservations through commands");
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute inventory reservation commands");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may read inventory reservations");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may write inventory reservations through commands");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may execute reservation commands");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.reservedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -7479,9 +7490,9 @@ async function __runInventoryReservationReserve(ctx: MutationCtx, { docId, inven
       const __fk = ((doc as any) as any).inventoryItemId;
       ((doc as any) as any).inventoryItem = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read inventory reservations");
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write inventory reservations through commands");
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute inventory reservation commands");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may read inventory reservations");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may write inventory reservations through commands");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may execute reservation commands");
     if (!((doc.reservedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -7573,9 +7584,9 @@ export const InventoryReservation_createViaReserve = mutation({
     };
     const __rel_inventoryItem = await __resolveRelation(ctx, "inventoryItems", [__auth.tenantId, __draft.inventoryItemId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may read inventory reservations");
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may write inventory reservations through commands");
-    if (!(checkRole(user.role, "inventoryAccess"))) throw new Error("Inventory staff may execute inventory reservation commands");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may read inventory reservations");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may write inventory reservations through commands");
+    if (!((checkRole(user.role, "inventoryAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Inventory staff or event managers may execute reservation commands");
     if (!((__draft.reservedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "pending"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -19332,7 +19343,7 @@ export const Venue_updateDetails = mutation({
   },
 });
 
-async function __runWasteRecordRecord(ctx: MutationCtx, { docId, ingredientId, locationId, quantity, unit, reason, eventId, unitCost, notes, version }: any, __creation = false) {
+async function __runWasteRecordRecord(ctx: MutationCtx, { docId, ingredientId, locationId, quantity, unit, reason, eventId, inventoryItemId, unitCost, notes, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
@@ -19358,6 +19369,7 @@ async function __runWasteRecordRecord(ctx: MutationCtx, { docId, ingredientId, l
     if (!(((__rel_location != null) && (__rel_location.status === "active")))) throw new Error("Guard 4 failed");
     if (!((ingredientId === doc.ingredientId))) throw new Error("Record ingredientId must match the seeded ingredient reference");
     if (!((locationId === doc.locationId))) throw new Error("Record locationId must match the seeded location reference");
+    if (!((((inventoryItemId == null) || (doc.inventoryItemId == null)) || (inventoryItemId === doc.inventoryItemId)))) throw new Error("Record inventoryItemId must match the seeded stock reference when provided");
     if (!((quantity > 0))) throw new Error("Waste quantity must be positive");
     if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Waste unit cost cannot be negative");
     {
@@ -19379,6 +19391,7 @@ async function __runWasteRecordRecord(ctx: MutationCtx, { docId, ingredientId, l
       ingredientId: ingredientId,
       locationId: locationId,
       eventId: ((eventId != null) ? eventId : doc.eventId),
+      inventoryItemId: ((inventoryItemId != null) ? inventoryItemId : doc.inventoryItemId),
       quantity: quantity,
       unit: unit,
       reason: reason,
@@ -19390,8 +19403,11 @@ async function __runWasteRecordRecord(ctx: MutationCtx, { docId, ingredientId, l
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, wasteRecordId: docId, tenantId: __after.tenantId, ingredientId: ingredientId, locationId: locationId, eventId: ((eventId != null) ? eventId : __after.eventId), quantity: quantity, unit: unit, reason: reason, unitCost: ((unitCost != null) ? unitCost : __after.unitCost), _subject: { entity: "WasteRecord", command: "record", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "WasteRecorded", entity: "WasteRecord", entityId: docId, payload: { wasteRecordId: docId, tenantId: __after.tenantId, ingredientId: ingredientId, locationId: locationId, eventId: ((eventId != null) ? eventId : __after.eventId), quantity: quantity, unit: unit, reason: reason, unitCost: ((unitCost != null) ? unitCost : __after.unitCost) }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, wasteRecordId: docId, tenantId: __after.tenantId, ingredientId: ingredientId, locationId: locationId, eventId: ((eventId != null) ? eventId : __after.eventId), inventoryItemId: ((inventoryItemId != null) ? inventoryItemId : __after.inventoryItemId), quantity: quantity, unit: unit, reason: reason, unitCost: ((unitCost != null) ? unitCost : __after.unitCost), _subject: { entity: "WasteRecord", command: "record", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "WasteRecorded", entity: "WasteRecord", entityId: docId, payload: { wasteRecordId: docId, tenantId: __after.tenantId, ingredientId: ingredientId, locationId: locationId, eventId: ((eventId != null) ? eventId : __after.eventId), inventoryItemId: ((inventoryItemId != null) ? inventoryItemId : __after.inventoryItemId), quantity: quantity, unit: unit, reason: reason, unitCost: ((unitCost != null) ? unitCost : __after.unitCost) }, createdAt: Date.now() });
+    // Reactions
+    const reactionTarget0 = payload.inventoryItemId;
+    if (reactionTarget0) await __runInventoryItemAdjustQuantity(ctx, { docId: reactionTarget0, delta: (0 - payload.quantity), reason: "Waste" } as any);
     return { ...doc, ...updates };
 }
 
@@ -19404,6 +19420,7 @@ export const WasteRecord_record = mutation({
     unit: v.any(),
     reason: v.any(),
     eventId: v.optional(v.string()),
+    inventoryItemId: v.optional(v.string()),
     unitCost: v.optional(v.number()),
     notes: v.optional(v.string()),
     version: v.optional(v.number()),
@@ -19430,6 +19447,7 @@ export const WasteRecord_createViaRecord = mutation({
     unit: v.any(),
     reason: v.any(),
     eventId: v.optional(v.string()),
+    inventoryItemId: v.optional(v.string()),
     unitCost: v.optional(v.number()),
     notes: v.optional(v.string()),
     idempotencyKey: v.optional(v.string())
@@ -19441,7 +19459,7 @@ export const WasteRecord_createViaRecord = mutation({
     }
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
-    const { ingredientId, locationId, quantity, unit, reason, eventId, unitCost, notes } = args;
+    const { ingredientId, locationId, quantity, unit, reason, eventId, inventoryItemId, unitCost, notes } = args;
     const __draft: Record<string, any> = {
       tenantId: __auth.tenantId,
       unitCost: args.unitCost !== undefined ? args.unitCost : 0,
@@ -19450,6 +19468,7 @@ export const WasteRecord_createViaRecord = mutation({
       status: "pending",
       eventId: args.eventId,
       ingredientId: args.ingredientId,
+      inventoryItemId: args.inventoryItemId,
       locationId: args.locationId,
       notes: args.notes,
       quantity: args.quantity,
@@ -19468,6 +19487,7 @@ export const WasteRecord_createViaRecord = mutation({
     if (!(((__rel_location != null) && (__rel_location.status === "active")))) throw new Error("Guard 4 failed");
     if (!((ingredientId === __draft.ingredientId))) throw new Error("Record ingredientId must match the seeded ingredient reference");
     if (!((locationId === __draft.locationId))) throw new Error("Record locationId must match the seeded location reference");
+    if (!((((inventoryItemId == null) || (__draft.inventoryItemId == null)) || (inventoryItemId === __draft.inventoryItemId)))) throw new Error("Record inventoryItemId must match the seeded stock reference when provided");
     if (!((quantity > 0))) throw new Error("Waste quantity must be positive");
     if (!(((unitCost == null) || (unitCost >= 0)))) throw new Error("Waste unit cost cannot be negative");
     const doc: Record<string, any> = {
@@ -19475,6 +19495,7 @@ export const WasteRecord_createViaRecord = mutation({
       ingredientId: ingredientId,
       locationId: locationId,
       eventId: ((eventId != null) ? eventId : __draft.eventId),
+      inventoryItemId: ((inventoryItemId != null) ? inventoryItemId : __draft.inventoryItemId),
       quantity: quantity,
       unit: unit,
       reason: reason,
@@ -19485,8 +19506,11 @@ export const WasteRecord_createViaRecord = mutation({
       version: 1,
     };
     const docId = await ctx.db.insert("wasteRecords", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, wasteRecordId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), quantity: doc.quantity, unit: doc.unit, reason: doc.reason, unitCost: ((doc.unitCost != null) ? doc.unitCost : doc.unitCost), _subject: { entity: "WasteRecord", command: "record", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "WasteRecorded", entity: "WasteRecord", entityId: docId, payload: { wasteRecordId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), quantity: doc.quantity, unit: doc.unit, reason: doc.reason, unitCost: ((doc.unitCost != null) ? doc.unitCost : doc.unitCost) }, createdAt: Date.now() });
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, wasteRecordId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), inventoryItemId: ((doc.inventoryItemId != null) ? doc.inventoryItemId : doc.inventoryItemId), quantity: doc.quantity, unit: doc.unit, reason: doc.reason, unitCost: ((doc.unitCost != null) ? doc.unitCost : doc.unitCost), _subject: { entity: "WasteRecord", command: "record", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "WasteRecorded", entity: "WasteRecord", entityId: docId, payload: { wasteRecordId: docId, tenantId: doc.tenantId, ingredientId: doc.ingredientId, locationId: doc.locationId, eventId: ((doc.eventId != null) ? doc.eventId : doc.eventId), inventoryItemId: ((doc.inventoryItemId != null) ? doc.inventoryItemId : doc.inventoryItemId), quantity: doc.quantity, unit: doc.unit, reason: doc.reason, unitCost: ((doc.unitCost != null) ? doc.unitCost : doc.unitCost) }, createdAt: Date.now() });
+    // Reactions
+    const reactionTarget0 = payload.inventoryItemId;
+    if (reactionTarget0) await __runInventoryItemAdjustQuantity(ctx, { docId: reactionTarget0, delta: (0 - payload.quantity), reason: "Waste" } as any);
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
       await __setCommandIdempotency(ctx, args.idempotencyKey, "WasteRecord_createViaRecord", __result);
@@ -19532,8 +19556,11 @@ async function __runWasteRecordVoidRecord(ctx: MutationCtx, { docId, reason, ver
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, wasteRecordId: docId, tenantId: __after.tenantId, ingredientId: __after.ingredientId, locationId: __after.locationId, eventId: __after.eventId, quantity: __after.quantity, unit: __after.unit, reason: reason, _subject: { entity: "WasteRecord", command: "voidRecord", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "WasteVoided", entity: "WasteRecord", entityId: docId, payload: { wasteRecordId: docId, tenantId: __after.tenantId, ingredientId: __after.ingredientId, locationId: __after.locationId, eventId: __after.eventId, quantity: __after.quantity, unit: __after.unit, reason: reason }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, wasteRecordId: docId, tenantId: __after.tenantId, ingredientId: __after.ingredientId, locationId: __after.locationId, eventId: __after.eventId, inventoryItemId: __after.inventoryItemId, quantity: __after.quantity, unit: __after.unit, reason: reason, _subject: { entity: "WasteRecord", command: "voidRecord", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "WasteVoided", entity: "WasteRecord", entityId: docId, payload: { wasteRecordId: docId, tenantId: __after.tenantId, ingredientId: __after.ingredientId, locationId: __after.locationId, eventId: __after.eventId, inventoryItemId: __after.inventoryItemId, quantity: __after.quantity, unit: __after.unit, reason: reason }, createdAt: Date.now() });
+    // Reactions
+    const reactionTarget0 = payload.inventoryItemId;
+    if (reactionTarget0) await __runInventoryItemAdjustQuantity(ctx, { docId: reactionTarget0, delta: payload.quantity, reason: payload.reason } as any);
     return { ...doc, ...updates };
 }
 
