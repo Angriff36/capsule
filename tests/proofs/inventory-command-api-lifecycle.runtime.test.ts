@@ -137,53 +137,65 @@ describe("runtime proof: inventory command API lifecycle", () => {
       activeAfterReconcile.map((row: any) => Number(row.quantity)),
     ).toEqual([S.increasedDemand - S.initialDemand, S.initialDemand]);
 
+    // Reactions land asynchronously, so a version captured from a row
+    // snapshot can go stale before its dispatch. On VERSION_MISMATCH,
+    // re-read THAT row's version and retry the single command once —
+    // idempotent-safe, unlike retrying a whole multi-command issue().
+    const dispatchFresh = async (
+      entity: "InventoryReservation" | "IngredientDemand",
+      command: string,
+      docId: string,
+      version: number | undefined,
+    ) => {
+      try {
+        await dispatchCommand(inventory, entity, command, { docId, version });
+      } catch (error) {
+        if (!String(error).includes("VERSION_MISMATCH")) throw error;
+        const rows = await loadRows(inventory, eventId);
+        const pool =
+          entity === "InventoryReservation" ? rows.reservations : rows.demands;
+        const row = pool.find((r: any) => String(r._id) === docId);
+        await dispatchCommand(inventory, entity, command, {
+          docId,
+          version: row?.version,
+        });
+      }
+    };
     const issueCoordinator = new EventStockIssueCoordinator({
       consumeReservation: async (input) => {
-        await dispatchCommand(inventory, "InventoryReservation", "consume", {
-          docId: input.docId,
-          version: input.version,
-        });
+        await dispatchFresh(
+          "InventoryReservation",
+          "consume",
+          input.docId,
+          input.version,
+        );
       },
       confirmDemand: async (input) => {
-        await dispatchCommand(inventory, "IngredientDemand", "confirm", {
-          docId: input.docId,
-          version: input.version,
-        });
+        await dispatchFresh(
+          "IngredientDemand",
+          "confirm",
+          input.docId,
+          input.version,
+        );
       },
       fulfillDemand: async (input) => {
-        await dispatchCommand(inventory, "IngredientDemand", "fulfill", {
-          docId: input.docId,
-          version: input.version,
-        });
+        await dispatchFresh(
+          "IngredientDemand",
+          "fulfill",
+          input.docId,
+          input.version,
+        );
       },
     });
 
-    // Reactions from reconcile land asynchronously; a row version read before
-    // they settle goes stale (VERSION_MISMATCH, platform-timing dependent).
-    // Mirror production behavior: re-query and retry once on conflict.
-    const issueWithFreshRows = async (reservationId: string) => {
-      for (let attempt = 0; ; attempt++) {
-        const rows = await loadRows(inventory, eventId);
-        try {
-          return {
-            result: await issueCoordinator.issue({
-              eventId,
-              reservationId,
-              reservations: mapReservations(rows.reservations),
-              demands: mapDemands(rows.demands),
-              items: mapItems(rows.items),
-            }),
-          };
-        } catch (error) {
-          if (attempt >= 1 || !String(error).includes("VERSION_MISMATCH"))
-            throw error;
-        }
-      }
-    };
-
-    const { result: firstIssue } = await issueWithFreshRows(
-      String(activeAfterReconcile[0]._id),
-    );
+    const freshFirst = await loadRows(inventory, eventId);
+    const firstIssue = await issueCoordinator.issue({
+      eventId,
+      reservationId: String(activeAfterReconcile[0]._id),
+      reservations: mapReservations(freshFirst.reservations),
+      demands: mapDemands(freshFirst.demands),
+      items: mapItems(freshFirst.items),
+    });
     expect(firstIssue.fulfilledDemandId).toBeNull();
     expect(firstIssue.demandPreserved).toBe(true);
     expect(firstIssue.stockAdjustment.quantityOnHand).toBe(
@@ -207,9 +219,14 @@ describe("runtime proof: inventory command API lifecycle", () => {
     );
     expect(remainingActive).toBeTruthy();
 
-    const { result: secondIssue } = await issueWithFreshRows(
-      String(remainingActive!._id),
-    );
+    const freshSecond = await loadRows(inventory, eventId);
+    const secondIssue = await issueCoordinator.issue({
+      eventId,
+      reservationId: String(remainingActive!._id),
+      reservations: mapReservations(freshSecond.reservations),
+      demands: mapDemands(freshSecond.demands),
+      items: mapItems(freshSecond.items),
+    });
     expect(secondIssue.fulfilledDemandId).toBe(demandId);
     expect(secondIssue.demandPreserved).toBe(false);
 
