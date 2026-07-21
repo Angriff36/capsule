@@ -594,6 +594,7 @@ export default defineSchema({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),
     eventId: v.id("events"),
+    activeEventId: v.optional(v.union(v.string(), v.null())),
     name: v.string(),
     purpose: v.optional(v.union(v.string(), v.null())),
     notes: v.optional(v.union(v.string(), v.null())),

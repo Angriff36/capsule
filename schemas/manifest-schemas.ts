@@ -664,6 +664,7 @@ export const PackListSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   eventId: z.string().uuid(),
+  activeEventId: z.string().uuid().nullable().optional(),
   name: z.string().default(""),
   purpose: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),

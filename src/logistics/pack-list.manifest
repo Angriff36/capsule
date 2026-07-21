@@ -27,6 +27,11 @@ entity PackList mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property required eventId: uuid
+  // Reaction natural key: equals eventId while the list is live, null once
+  // terminal (cancelled/dispatched). The EventApproved match uses THIS field
+  // so terminal lists never match and approval takes the else-create path
+  // (match supports ANDed equality only - no status != filters). Issue #12.
+  property activeEventId: uuid?
   property required searchable name: string = ""
   property purpose: string?
   property encrypted notes: string?
@@ -71,6 +76,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
     constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
     constraint openNamePresent: length(trim(name)) > 0 or length(trim(self.name)) > 0 "Pack list name is required"
     mutate eventId = eventId
+    mutate activeEventId = eventId
     mutate name = length(trim(self.name)) > 0 ? self.name : name
     mutate purpose = purpose != null ? purpose : self.purpose
     mutate notes = notes != null ? notes : self.notes
@@ -147,6 +153,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     compute previousStatus = self.status
     mutate status = "dispatched"
+    mutate activeEventId = null
     mutate dispatchedAt = now()
     emit PackListDispatched {
       packListId: self.id
@@ -166,6 +173,7 @@ entity PackList mixin TenantScoped, SoftDeletable {
     constraint cancelPackListReason: length(trim(reason)) > 0 "Cancellation reason is required"
     compute previousStatus = self.status
     mutate status = "cancelled"
+    mutate activeEventId = null
     mutate cancelledAt = now()
     mutate cancellationReason = reason
     emit PackListCancelled {
@@ -453,7 +461,7 @@ event PackListItemQuantityAdjusted: "pack_list_item.quantity_adjusted" {
 
 // Vision cascade: approved event ensures one PackList draft (match else create).
 on EventApproved run PackList.open
-  match eventId = payload.eventId
+  match eventId = payload.eventId, activeEventId = payload.eventId
   else create
   params {
     eventId: payload.eventId
