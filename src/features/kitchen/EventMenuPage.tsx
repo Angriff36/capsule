@@ -1,26 +1,57 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import {
+  useCreateIngredientDemand,
+  useCreatePrepTask,
   useCreateEventDish,
   useEventDishAdjustServings,
   useEventDishRemove,
+  useIngredientDemandConfirm,
+  useIngredientDemandRecalculate,
+  useIngredientDemandSupersede,
   useListDish,
+  useListDishRecipe,
+  useListDishTask,
   useListEvent,
   useListEventDish,
+  useListIngredient,
+  useListIngredientDemand,
+  useListPrepTask,
+  useListRecipe,
+  useListRecipeIngredient,
+  usePrepTaskRefreshGenerated,
 } from "../../lib/manifest-convex-react";
+import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
+import { EventMenuRecipeDemandSync } from "./EventMenuRecipeDemandSync";
+import { EventPrepCoordinator } from "./EventPrepCoordinator";
 import { KitchenBookNav } from "./KitchenBookNav";
 
 export function EventMenuPage() {
   const events = useListEvent();
   const dishes = useListDish();
   const eventDishes = useListEventDish();
+  const dishTasks = useListDishTask();
+  const dishRecipes = useListDishRecipe();
+  const recipes = useListRecipe();
+  const recipeIngredients = useListRecipeIngredient();
+  const prepTasks = useListPrepTask();
+  const ingredients = useListIngredient();
+  const demands = useListIngredientDemand();
   const createEventDish = useCreateEventDish();
+  const createPrepTask = useCreatePrepTask();
+  const createDemand = useCreateIngredientDemand();
+  const confirmDemand = useIngredientDemandConfirm();
+  const recalculateDemand = useIngredientDemandRecalculate();
+  const supersedeDemand = useIngredientDemandSupersede();
+  const refreshGeneratedTask = usePrepTaskRefreshGenerated();
   const adjustServings = useEventDishAdjustServings();
   const removeDish = useEventDishRemove();
   const [eventId, setEventId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt(busy != null);
 
   const selectedEvent = events?.find((event) => event._id === eventId);
   const selections = (eventDishes ?? []).filter(
@@ -39,20 +70,132 @@ export function EventMenuPage() {
       setBusy(null);
     }
   };
+  const coordinator = () => {
+    if (
+      dishTasks === undefined ||
+      prepTasks === undefined ||
+      ingredients === undefined ||
+      demands === undefined ||
+      dishRecipes === undefined ||
+      recipes === undefined ||
+      recipeIngredients === undefined
+    ) {
+      throw new Error("Prep templates and demand data are still loading");
+    }
+    return new EventPrepCoordinator({
+      createDemand: (input) => createDemand(input),
+      confirmDemand: (input) => confirmDemand(input),
+      recalculateDemand: (input) => recalculateDemand(input),
+      supersedeDemand: (input) => supersedeDemand(input),
+      createTask: (input) => createPrepTask(input),
+      refreshGeneratedTask: (input) => refreshGeneratedTask(input),
+    });
+  };
+  const syncRecipeDemands = async (override?: {
+    id: string;
+    eventId: string;
+    dishId: string;
+    quantityServings: number;
+    specialInstructions?: string | null;
+  }) => {
+    const prep = coordinator();
+    const sync = new EventMenuRecipeDemandSync(prep, {
+      dishRecipes: dishRecipes ?? [],
+      recipes: recipes ?? [],
+      recipeIngredients: recipeIngredients ?? [],
+      demands: demands ?? [],
+    });
+    await sync.forEventDishes({
+      eventId,
+      eventDishes: EventMenuRecipeDemandSync.activeEventDishes(
+        eventId,
+        eventDishes ?? [],
+        override,
+      ),
+    });
+  };
+  const syncPrepForDish = async (eventDish: {
+    id: string;
+    eventId: string;
+    dishId: string;
+    quantityServings: number;
+    specialInstructions?: string | null;
+  }) => {
+    const prep = coordinator();
+    await prep.sync({
+      eventDish,
+      templates: (dishTasks ?? []).map((task) => ({
+        id: task._id,
+        dishId: task.dishId,
+        name: task.name,
+        defaultQuantity: task.defaultQuantity,
+        defaultUnit: (task.defaultUnit ??
+          ingredients?.find(
+            (ingredient) => ingredient._id === task.ingredientId,
+          )?.unit ??
+          "portion") as never,
+        category: task.category,
+        taskType: task.taskType,
+        sortOrder: task.sortOrder,
+        recipeId: task.recipeId,
+        ingredientId: task.ingredientId,
+        instructions: task.instructions,
+        status: task.status,
+      })),
+      tasks: (prepTasks ?? []).map((task) => ({
+        id: task._id,
+        eventDishId: task.eventDishId,
+        eventId: task.eventId,
+        dishId: task.dishId,
+        dishTaskId: task.dishTaskId,
+        name: task.name,
+        quantity: Number(task.quantity),
+        unit: task.unit as never,
+        ingredientId: task.ingredientId,
+        ingredientDemandId: task.ingredientDemandId,
+        recipeId: task.recipeId,
+        specialInstructions: task.specialInstructions,
+        isGenerated: task.isGenerated,
+        status: task.status,
+        version: task.version,
+        deletedAt: task.deletedAt,
+      })),
+      demands: (demands ?? []).map((demand) => ({
+        id: demand._id,
+        eventId: demand.eventId,
+        ingredientId: demand.ingredientId,
+        requiredQuantity: Number(demand.requiredQuantity),
+        unit: demand.unit as never,
+        status: demand.status,
+        version: demand.version,
+      })),
+      skipDemand: true,
+    });
+    await syncRecipeDemands(eventDish);
+  };
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
     void run("addToEvent", async () => {
-      await createEventDish({
+      const quantityServings = Number(data.get("quantityServings"));
+      const specialInstructions =
+        String(data.get("specialInstructions") ?? "").trim() || undefined;
+      const created = (await createEventDish({
         eventId,
         dishId: String(data.get("dishId")),
-        quantityServings: Number(data.get("quantityServings")),
+        quantityServings,
         course: String(data.get("course") ?? "").trim() || undefined,
         serviceStyle:
           String(data.get("serviceStyle") ?? "").trim() || undefined,
-        specialInstructions:
-          String(data.get("specialInstructions") ?? "").trim() || undefined,
+        specialInstructions,
+      })) as { docId: string };
+      await syncPrepForDish({
+        id: created.docId,
+        eventId,
+        dishId: String(data.get("dishId")),
+        quantityServings,
+        specialInstructions,
       });
       form.reset();
     });
@@ -76,6 +219,7 @@ export function EventMenuPage() {
           <CulinaryFailureBanner error={failure} />
         </div>
       ) : null}
+      {host}
       <div className="event-menu-layout">
         <section>
           <div className="culinary-section-heading">
@@ -84,6 +228,7 @@ export function EventMenuPage() {
           <label className="field-label mt-5">
             Event
             <select
+              id="event-menu-event"
               className="input"
               value={eventId}
               onChange={(event) => setEventId(event.target.value)}
@@ -130,7 +275,12 @@ export function EventMenuPage() {
             <div className="culinary-create-grid">
               <label className="field-label sm:col-span-2">
                 Dish
-                <select name="dishId" className="input" required>
+                <select
+                  id="event-menu-dish"
+                  name="dishId"
+                  className="input"
+                  required
+                >
                   <option value="">Select dish</option>
                   {(dishes ?? [])
                     .filter(
@@ -186,6 +336,20 @@ export function EventMenuPage() {
             <div className="document-empty">
               <p>Choose an event.</p>
               <span>Its selected dishes will appear here.</span>
+              <div className="mt-3 flex flex-wrap justify-center gap-2">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() =>
+                    document.getElementById("event-menu-event")?.focus()
+                  }
+                >
+                  Select event
+                </button>
+                <Link to="/events" className="btn btn-ghost btn-sm">
+                  Open events
+                </Link>
+              </div>
             </div>
           ) : selections.length === 0 ? (
             <div className="document-empty">
@@ -194,6 +358,17 @@ export function EventMenuPage() {
                 Add the first service dish through the generated selection
                 command.
               </span>
+              <div className="mt-3 flex justify-center">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() =>
+                    document.getElementById("event-menu-dish")?.focus()
+                  }
+                >
+                  Choose a dish
+                </button>
+              </div>
             </div>
           ) : (
             <ul className="event-dish-list">
@@ -212,20 +387,44 @@ export function EventMenuPage() {
                       className="btn btn-ghost btn-sm"
                       disabled={busy != null}
                       onClick={() => {
-                        const quantity = Number(
-                          window.prompt(
-                            "Servings",
-                            String(selection.quantityServings),
-                          ),
-                        );
-                        if (!Number.isFinite(quantity) || quantity <= 0) return;
-                        void run(`adjust:${selection._id}`, async () => {
-                          await adjustServings({
-                            docId: selection._id,
-                            quantityServings: quantity,
-                            version: selection.version,
+                        void (async () => {
+                          const values = await prompt.askFields({
+                            title: "Adjust servings",
+                            description:
+                              "Enter the new serving count for this event dish.",
+                            fields: [
+                              {
+                                name: "quantityServings",
+                                label: "Servings",
+                                defaultValue: String(
+                                  selection.quantityServings,
+                                ),
+                                inputType: "number",
+                                required: true,
+                              },
+                            ],
+                            confirmLabel: "Save servings",
                           });
-                        });
+                          if (!values) return;
+                          const quantity = Number(values.quantityServings);
+                          if (!Number.isFinite(quantity) || quantity <= 0)
+                            return;
+                          void run(`adjust:${selection._id}`, async () => {
+                            await adjustServings({
+                              docId: selection._id,
+                              quantityServings: quantity,
+                              version: selection.version,
+                            });
+                            await syncPrepForDish({
+                              id: selection._id,
+                              eventId: selection.eventId,
+                              dishId: selection.dishId,
+                              quantityServings: quantity,
+                              specialInstructions:
+                                selection.specialInstructions,
+                            });
+                          });
+                        })();
                       }}
                     >
                       Adjust
@@ -234,15 +433,30 @@ export function EventMenuPage() {
                       className="btn btn-ghost btn-sm"
                       disabled={busy != null}
                       onClick={() => {
-                        const reason = window.prompt("Removal reason")?.trim();
-                        if (!reason) return;
-                        void run(`remove:${selection._id}`, async () => {
-                          await removeDish({
-                            docId: selection._id,
-                            reason,
-                            version: selection.version,
+                        void (async () => {
+                          const reason = await prompt.askReason({
+                            ...ReasonCopy.removeLine,
+                            title: "Remove event dish",
+                            description:
+                              "Record why this dish is leaving the event menu.",
+                            confirmLabel: "Remove dish",
+                            tone: "danger",
                           });
-                        });
+                          if (!reason) return;
+                          void run(`remove:${selection._id}`, async () => {
+                            await removeDish({
+                              docId: selection._id,
+                              reason,
+                              version: selection.version,
+                            });
+                            await syncRecipeDemands({
+                              id: selection._id,
+                              eventId: selection.eventId,
+                              dishId: selection.dishId,
+                              quantityServings: 0,
+                            });
+                          });
+                        })();
                       }}
                     >
                       Remove
