@@ -10,6 +10,8 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
 | `AGENTS.md`                                                  | How to run / maintain                                                    |
 | `docs/architecture/*`, `docs/systems/*`                      | What the system is                                                       |
 | `docs/architecture/domain-gating-restraint.md`               | Don’t overgate domain policies/guards (Binding for agents)               |
+| `docs/architecture/no-invented-deferrals.md`                 | Don’t invent “deferred” / MCP allowlists (Binding for agents)            |
+| `docs/architecture/escalate-blockers-to-github.md`           | Blockers → GitHub issues same session; no silent ignore (Binding)        |
 | `docs/generation/manifest-builder.md`, `PRESET.md`           | How the repo is produced                                                 |
 | `docs/generation/2026-07-16-dx-proof-kit-boundary.md`        | Proof-kit ownership + Manifest semver range (Binding)                    |
 | `docs/generation/2026-07-17-command-api-surface-boundary.md` | Command API / webhook direction / no separate AI API (Binding)           |
@@ -29,12 +31,19 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
 
 - Prefer small, single-responsibility files (OOP/SRP). Split before a file approaches ~400 lines.
 - No drive-by refactors unrelated to the task.
-- Do not weaken TypeScript strictness, delete failing tests, or remove gates to go green.
+- Do **not** create, add, or expand tests unless the owner asks. Run existing
+  tests/gates when verifying; never delete failing tests or remove gates to go green.
+- Do not weaken TypeScript strictness.
 - Do not add tools that are not wired into `bun run check` / CI.
 - Do not invent a second package manager lockfile (`package-lock.json` is rejected).
 - Domain policies/guards: do **not** overgate. Follow
   `docs/architecture/domain-gating-restraint.md` (live ops must stay correctable;
   specialty read caps and freeze-at-executing are usually wrong).
+- Do **not** invent deferrals, “out of scope,” or tiny allowlists. Follow
+  `docs/architecture/no-invented-deferrals.md`. Not built ≠ owner-deferred.
+- Do **not** silently ignore product/tooling blockers. Follow
+  `docs/architecture/escalate-blockers-to-github.md` — open a GitHub issue in
+  `Angriff36/capsule` the same session; workarounds are not escalation.
 
 ## Process
 
@@ -133,7 +142,19 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-[Emergency bridge — running bridge was not updated]
-Files: STATE.md (edit), loop-run-log.md (edit)
+[pre-compact bridge — saved before context compaction]
+Files (12):
+  loop-ledger.json (edit)
+  PRODUCT-BACKLOG.md (edit)
+  .loop-worktrees/prod-20260721T1535-S3-yield-variance/src/production/batch.manifest (edit)
+  .loop-worktrees/prod-20260721T1535-S3-yield-variance/tests/proofs/production-batch-yield-computeds.runtime.test.ts (create)
+  .loop-worktrees/prod-20260721T1540-S6-attendance-counts/src/operations/event.manifest (edit)
+  .loop-worktrees/prod-20260721T1540-S6-attendance-counts/tests/proofs/event-attendance-counts.runtime.test.ts (create)
+  loop-ledger.json (create)
+  .loop-worktrees/prod-20260721T1545-S8-vendor-totals/src/procurement/vendor.manifest (edit)
+  .loop-worktrees/prod-20260721T1545-S8-vendor-totals/tests/proofs/vendor-order-totals.runtime.test.ts (create)
+  .loop-worktrees/prod-20260721T1550-S9-invoice-total-paid/src/sales/invoice-core.manifest (edit)
+  .loop-worktrees/prod-20260721T1550-S9-invoice-total-paid/tests/proofs/invoice-total-paid.runtime.test.ts (create)
+  .loop-worktrees/prod-20260721T1555-S7-packlist-access/src/logistics/pack-list.manifest (edit)
 
 # === END COGNILAYER ===

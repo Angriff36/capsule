@@ -4,19 +4,20 @@ Catering / event ops app: Vite + React, Convex, Clerk. Assembled from Manifest p
 
 ## Directory ownership
 
-| Path                                                             | Role                                                     |
-| ---------------------------------------------------------------- | -------------------------------------------------------- |
-| `src/app/**`, `src/features/**`, `src/ui/**`                     | Authored UI                                              |
-| `src/agent/**`, `scripts/capsule-mcp.ts`                         | Authored agent command bridge (MCP → Convex mutations)   |
-| `convex/lib/**`, `convex/auth.config.ts`, `convex/authStatus.ts` | Author Convex seams                                      |
-| `convex/{schema,queries,mutations,http,crons,sagas,computed}.ts` | Generated — do not edit                                  |
-| `convex/_generated/**`                                           | Convex codegen — do not edit                             |
-| `src/generated/**`, `src/lib/manifest-convex-react.ts`           | Manifest client wiring — do not edit                     |
-| `schemas/`, `wiring/`, `scripts/seed-convex.ts`                  | Manifest assembly — do not edit                          |
-| `tests/`                                                         | Vitest (authored policy/seam + generated contract tests) |
-| `docs/`                                                          | Architecture / systems / generation truth                |
-| `diagrams/`                                                      | Manifest docs-diagrams companion                         |
-| `.artifacts/`, `graphify-out/`                                   | Ignored scratch only                                     |
+| Path                                                             | Role                                                                  |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------- |
+| `src/app/**`, `src/features/**`, `src/ui/**`                     | Authored UI                                                           |
+| `src/app.manifest`, `src/**/*.manifest`                          | Authored Manifest domain (root entry + modules; no daisy-chain `use`) |
+| `src/agent/**`, `scripts/capsule-mcp.ts`                         | Authored agent command bridge (MCP → Convex mutations)                |
+| `convex/lib/**`, `convex/auth.config.ts`, `convex/authStatus.ts` | Author Convex seams                                                   |
+| `convex/{schema,queries,mutations,http,crons,sagas,computed}.ts` | Generated — do not edit                                               |
+| `convex/_generated/**`                                           | Convex codegen — do not edit                                          |
+| `src/generated/**`, `src/lib/manifest-convex-react.ts`           | Manifest client wiring — do not edit                                  |
+| `schemas/`, `wiring/`, `scripts/seed-convex.ts`                  | Manifest assembly — do not edit                                       |
+| `tests/`                                                         | Vitest (authored policy/seam + generated contract tests)              |
+| `docs/`                                                          | Architecture / systems / generation truth                             |
+| `diagrams/`                                                      | Manifest docs-diagrams companion                                      |
+| `.artifacts/`, `graphify-out/`                                   | Ignored scratch only                                                  |
 
 ## Commands
 
@@ -39,7 +40,10 @@ bun run manifest:regen      # only regen entry — Builder apply when conflict-f
 bun run seed             # requires Convex URL
 bun run agent:mint-jwt   # write CAPSULE_AGENT_JWT (UI session + org first)
 bun run agent:enter-recipe -- <recipe.txt>
-bun run agent:mcp        # Capsule command MCP (needs CAPSULE_AGENT_JWT)
+bun run agent:llm-tools  # dump Anthropic/OpenAI defs or --call snake tool (JWT for --call)
+bun run agent:mcp        # Capsule MCP stdio host for Cursor (idle in a TTY is expected; needs CAPSULE_AGENT_JWT)
+bun run agent:mcp:verify # stdio tools/list proof (AC snake tools incl. recipe_draft)
+bun run agent:mcp:verify -- --live # same path + durable recipe_draft write
 ```
 
 Essential commands: [docs/commands.md](docs/commands.md). Full reference: [docs/operations/commands.md](docs/operations/commands.md).
@@ -48,12 +52,33 @@ Agent MCP setup: [docs/generation/capsule-agent-mcp.md](docs/generation/capsule-
 
 `bun run check` must pass before claiming work complete. CI runs the same script.
 
+## Tests (agents)
+
+Do **not** create, add, or expand tests unless the owner asks. Run existing
+`bun run test` / `bun run test:proofs` / `bun run check` gates when verifying.
+Never disable or delete failing tests to go green.
+
 ## Domain gating (agents)
 
 Before adding or tightening policies/guards/constraints in `src/**/*.manifest`,
 read [docs/architecture/domain-gating-restraint.md](docs/architecture/domain-gating-restraint.md).
 Agents overgate by default — freeze mid-service edits, invent specialty read
 roles, block 86/swap paths. Gate on real harm only.
+
+## No invented deferrals (agents)
+
+Do not write “deferred,” “out of scope,” or shrink MCP/UI to a tiny allowlist
+unless the owner said so. Read
+[docs/architecture/no-invented-deferrals.md](docs/architecture/no-invented-deferrals.md).
+Not built ≠ owner-deferred. AC minimum ≠ product ceiling.
+
+## Escalate blockers to GitHub (agents)
+
+Do not silently ignore schema drift, broken command paths, stale MCP catalogs,
+auth remint gaps, or idempotency traps. Open a GitHub issue in
+`Angriff36/capsule` in the same session. Read
+[docs/architecture/escalate-blockers-to-github.md](docs/architecture/escalate-blockers-to-github.md).
+Workarounds are temporary bridges — they do not replace the issue.
 
 ## Do not hand-edit
 
