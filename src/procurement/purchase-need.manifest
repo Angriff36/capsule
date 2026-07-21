@@ -249,17 +249,16 @@ event PurchaseNeedCancelled: "purchase_need.cancelled" {
 // Confirmation → purchasing-order flow.
 // ---------------------------------------------------------------------------
 
-// Event confirmed (approved) → confirm every calculated IngredientDemand for
-// the event (the dish-derived prep/purchase list). Demands not in "calculated"
-// are deliberately skipped by confirm's guards (same skip pattern as the
-// EventCancelled → Invoice.markVoided fan-out).
-on EventApproved fanOut IngredientDemand where eventId = payload.eventId
-  run confirm
-
-// Prep-list line confirmed (directly by inventory staff, or via the event
-// approval fan-out above) → open the purchase need. `resolve null` is the
-// Manifest 3.6.3 form of the reaction-wired create path (parser requires a
-// resolve clause; null instanceId routes to runtime create).
+// ~~EventApproved fanOut IngredientDemand.confirm~~ (removed 2026-07-20)
+// Manifest fan-out runs confirm through full guards; non-calculated rows
+// (pending / already confirmed / fulfilled / superseded) throw "Guard 0
+// failed" and roll back Event.approve. Capsule previously assumed guard
+// failure meant "skip" — that is not Manifest semantics. Inventory staff
+// confirm demands explicitly; Event.approve must not depend on demand status.
+//
+// Prep-list line confirmed by inventory staff → open the purchase need.
+// `resolve null` is the Manifest 3.6.3 form of the reaction-wired create path
+// (parser requires a resolve clause; null instanceId routes to runtime create).
 on IngredientDemandConfirmed run PurchaseNeed.create
   resolve null
   params {

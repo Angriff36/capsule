@@ -5,7 +5,10 @@
 use "./payment.manifest"
 
 // Event cancellation voids unpaid invoices still in draft/sent/viewed/overdue.
-// Paid and partial invoices are deliberately skipped (markVoided amountPaid guard).
+// ~~Paid/partial invoices are skipped by markVoided's amountPaid guard.~~
+// Correction (2026-07-20): Manifest fan-out does not skip on guard failure —
+// a paid invoice in the set aborts the whole Event.cancel transaction. Prefer
+// confirming unpaid-only selection before relying on this cascade in ops.
 on EventCancelled fanOut Invoice where eventId = payload.eventId
   run markVoided
   params { reason: payload.reason }

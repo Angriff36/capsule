@@ -3183,12 +3183,6 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, expectedHeadcount: __after.expectedHeadcount, startsAt: __after.startsAt, endsAt: __after.endsAt, _subject: { entity: "Event", command: "approve", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventApproved", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: __after.tenantId, expectedHeadcount: __after.expectedHeadcount, startsAt: __after.startsAt, endsAt: __after.endsAt }, createdAt: Date.now() });
-    // Reactions
-    const fanRows0 = await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
-    for (const __row of fanRows0) {
-      const target = __row;
-      await __runIngredientDemandConfirm(ctx, { docId: (__row as any)._id } as any);
-    }
     return { ...doc, ...updates };
 }
 

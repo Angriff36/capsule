@@ -12,23 +12,26 @@ function runnerBlock(source: string, runner: string, exported: string): string {
 }
 
 describe("Event lifecycle reaction projection", () => {
-  it("keeps approval and cancellation fan-out payload access flat", () => {
+  it("keeps cancellation fan-out payload access flat", () => {
+    const mutations = readFileSync("convex/mutations.ts", "utf8");
+    const cancel = runnerBlock(mutations, "__runEventCancel", "Event_cancel");
+    expect(cancel).toContain("payload.reason");
+    expect(cancel).not.toContain("payload.payload");
+  });
+
+  it("does not fanOut IngredientDemand.confirm from Event.approve", () => {
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     const approve = runnerBlock(
       mutations,
       "__runEventApprove",
       "Event_approve",
     );
-    const cancel = runnerBlock(mutations, "__runEventCancel", "Event_cancel");
-    expect(approve).toContain("payload.eventId");
-    expect(cancel).toContain("payload.reason");
-    expect(`${approve}\n${cancel}`).not.toContain("payload.payload");
+    expect(approve).not.toContain("__runIngredientDemandConfirm");
   });
 
   it("dispatches the known reaction paths through governed command runners", () => {
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     const paths = [
-      ["__runEventApprove", "Event_approve", "__runIngredientDemandConfirm"],
       ["__runEventCancel", "Event_cancel", "__runInvoiceMarkVoided"],
       ["__runPaymentSettle", "Payment_settle", "__runInvoiceApplyPayment"],
       [
