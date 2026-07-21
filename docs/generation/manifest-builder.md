@@ -54,6 +54,19 @@ from those in-project files (no external `Manifest-source` IR after init).
 
 Recovery when ownership digests are stale (no file rewrites): `builder adopt ownership --apply`, then `bun run manifest:regen`.
 
+### Pre-push “Circular dependency” mentioning `.loop-worktrees/…`
+
+`bun scripts/manifest-regen-check.ts` (`.githooks/pre-push`) compiles every
+`.manifest` under the Capsule tree via sibling Builder `ManifestSourceTree`.
+Agent worktrees live in gitignored `.loop-worktrees/` and must **not** be
+walked — otherwise duplicate graphs compile as one program and Manifest reports
+a false circular dependency.
+
+Builder owns the skip: `entry.name === '.loop-worktrees'` in
+`../builder/src/lib/manifest-project/manifestSourceTree.ts` (`listFiles`).
+If pre-push fails with paths under `.loop-worktrees/`, restore that skip in the
+local Builder checkout (do not delete worktrees as the “fix”).
+
 ### Local Convex: “Could not find public function” after a schema reshape
 
 Symptom: client calls a generated query (e.g. `queries:listDishRecipe`) that exists in
