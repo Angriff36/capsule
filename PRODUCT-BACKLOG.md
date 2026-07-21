@@ -23,6 +23,9 @@ what the Manifest runtime supports, e.g. `self.person.authSubjectId ==
 user.id`), regen, and add/adjust tests proving a worker can clock in/out on
 their own record and cannot on someone else's. Canonical port: YES
 (Manifest-source has the same defect, recorded as OD052 there).
+ESCALATED: 3 attempts blocked by worktree regen tooling failure (STATE.md).
+Fix is ready in .loop-worktrees/prod-20260721T0426-OD052-timerecord-identity/src/workforce/time.manifest
+plus tests. Human must run regen to complete.
 
 ### 2. OD054 — Qualification.expire() allows early expiry — open
 
@@ -31,8 +34,22 @@ their own record and cannot on someone else's. Canonical port: YES
 only at/after the deadline; `revoke()` is the early-termination command).
 Regen + scenario/test coverage: expire before deadline denied, at/after
 deadline succeeds. Canonical port: YES (OD054 in Manifest-source).
+ESCALATED: 3 attempts blocked by proven tooling failure (same as OD052/OD055/OD056).
+Fix is ready in .loop-worktrees/prod-20260721T0500-OD054-qualification-expire/src/workforce/time.manifest
+plus tests. Human must run regen to complete.
 
-### 3. OD055 — multiple default PaymentMethods possible — blocked: tooling failure (2026-07-21)
+### 3. OD054 — Qualification.expire() allows early expiry — blocked: tooling failure (2026-07-21, 2nd attempt)
+
+`src/workforce/time.manifest` `command expire()` has no deadline guard: add
+`guard self.expiresAt == null or now() >= self.expiresAt` semantics (expire
+only at/after the deadline; `revoke()` is the early-termination command).
+Regen + scenario/test coverage: expire before deadline denied, at/after
+deadline succeeds. Canonical port: YES (OD054 in Manifest-source).
+ESCALATED: 2 attempts blocked by proven tooling failure (same as OD052/OD055).
+Fix ready in .loop-worktrees/prod-20260721T0431-OD054-qualification-expire-deadline/src/workforce/time.manifest
+plus tests. Human must run regen to complete.
+
+### 4. OD055 — multiple default PaymentMethods possible — blocked: tooling failure (2026-07-21, 2nd attempt)
 
 `src/sales/payment-method.manifest` `makeDefault()` sets only the bound row;
 nothing clears the previous default. A default is definitionally exclusive.
@@ -41,13 +58,17 @@ other rows for the same client, or constraint) — do NOT hand-roll it in app
 code. Regen + tests: making B default un-defaults A. Canonical port: YES
 (OD055 in Manifest-source).
 
-### 4. OD056 — SavedReport owner identity mismatch — open
+### 4. OD056 — SavedReport owner identity mismatch — blocked: tooling failure (2026-07-21)
 
 `src/insights/report.manifest` L80 `mutate ownerId = user.id` stores the auth
 subject into a Person FK (`ref owner: Person references [tenantId, id]`).
 Same identity rule as item 1: resolve the Person via `authSubjectId ==
 user.id`. Fix define + the owner-scoped read policy consistently. Regen +
 tests. Canonical port: YES (OD056 in Manifest-source).
+ESCALATED: 1 attempt blocked by proven tooling failure (same as OD052/OD054/OD055).
+Command guards fixed (5 locations), read policy could not traverse relationships (Builder limitation).
+Fix ready in .loop-worktrees/prod-20260721T0434-OD056-savedreport-identity/src/insights/report.manifest
+plus tests. Human must run regen to complete.
 
 ### 5. S1 — InventoryItem reservations subtract from available — open
 
