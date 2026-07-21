@@ -104,7 +104,17 @@ function compileIr(): void {
   mkdirSync(path.dirname(irPath), { recursive: true });
   const result = spawnSync(
     "bunx",
-    ["manifest", "compile", "-g", "src/**/*.manifest", "--merge", "-o", irPath],
+    // Glob stays quoted so POSIX shells (CI) pass it to the CLI instead of
+    // pre-expanding into a mangled -g arg (CI saw "Found 1 file(s)").
+    [
+      "manifest",
+      "compile",
+      "-g",
+      '"src/**/*.manifest"',
+      "--merge",
+      "-o",
+      irPath,
+    ],
     { cwd: root, encoding: "utf8", shell: true },
   );
   if (result.status !== 0) {
