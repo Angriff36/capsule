@@ -75,7 +75,7 @@ client-supplied personId, with working owner-scoped reads, and proper guard
 logic that doesn't fail open. Worktree preserved at
 .loop-worktrees/prod-20260721T1852-OD056-saved-report-owner. 1/3 failures.
 
-### 5. S1 — InventoryItem reservations subtract from available — open
+### 5. S1 — InventoryItem reservations subtract from available — in-pr #28
 
 In `src/inventory/stock.manifest`: add `computed totalReserved` (sum of
 active reservations' quantity), `computed availableQuantity =
@@ -90,6 +90,8 @@ NOTE 2026-07-21 (overseer): tooling failures resolved (see item 1); strikes
 cleared. Ledger note from last attempt: the manifest changes may ALREADY be on
 main (computed at stock.manifest ~L41-42, reaction ~L483-488) — verify before
 re-authoring; test draft salvaged in `.loop-worktrees/_salvage-20260721/`.
+NOTE 2026-07-22 (product-loop): Manifest changes verified on main. Test added
+to verify aggregation behavior; Codex APPROVED. PR #28.
 
 ### 6. S2 — Client.outstandingBalance over hasMany invoices — open
 
