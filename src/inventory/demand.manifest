@@ -70,9 +70,9 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   transition status from "fulfilled" to []
   transition status from "superseded" to []
 
-  default policy ingredientDemandRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read ingredient demand"
-  default policy ingredientDemandWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write ingredient demand through commands"
-  default policy ingredientDemandExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute ingredient demand commands"
+  default policy ingredientDemandRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may read ingredient demand"
+  default policy ingredientDemandWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may write ingredient demand through commands"
+  default policy ingredientDemandExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may execute ingredient demand commands"
 
   command calculate(
     eventId: uuid,
@@ -199,7 +199,8 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
 }
 
 // Recorded loss of ingredient stock at a storage location. Optional Event
-// provenance when the loss is event-linked. Stock decrement reaction deferred.
+// provenance when the loss is event-linked. Optional inventoryItemId drives
+// on-hand decrement and void restore.
 entity WasteRecord mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -208,6 +209,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
   property required ingredientId: uuid
   property required locationId: uuid
   property eventId: uuid?
+  property inventoryItemId: uuid?
   property required quantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
   property required reason: WasteReason = "other"
@@ -221,6 +223,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo inventoryItem: InventoryItem fields [tenantId, inventoryItemId] references [tenantId, id]
 
   computed costImpact: money(12, 2) = self.quantity * self.unitCost
 
@@ -242,6 +245,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     unit: UnitOfMeasure,
     reason: WasteReason,
     optional eventId: uuid,
+    optional inventoryItemId: uuid,
     optional unitCost: money(12, 2),
     optional notes: string
   ) {
@@ -252,11 +256,13 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     guard self.location != null and self.location.status == "active"
     constraint recordIngredientMatch: ingredientId == self.ingredientId "Record ingredientId must match the seeded ingredient reference"
     constraint recordLocationMatch: locationId == self.locationId "Record locationId must match the seeded location reference"
+    constraint recordStockMatch: inventoryItemId == null or self.inventoryItemId == null or inventoryItemId == self.inventoryItemId "Record inventoryItemId must match the seeded stock reference when provided"
     constraint recordQuantityPositive: quantity > 0 "Waste quantity must be positive"
     constraint recordCostNonnegative: unitCost == null or unitCost >= 0 "Waste unit cost cannot be negative"
     mutate ingredientId = ingredientId
     mutate locationId = locationId
     mutate eventId = eventId != null ? eventId : self.eventId
+    mutate inventoryItemId = inventoryItemId != null ? inventoryItemId : self.inventoryItemId
     mutate quantity = quantity
     mutate unit = unit
     mutate reason = reason
@@ -270,6 +276,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
       ingredientId: ingredientId
       locationId: locationId
       eventId: eventId != null ? eventId : self.eventId
+      inventoryItemId: inventoryItemId != null ? inventoryItemId : self.inventoryItemId
       quantity: quantity
       unit: unit
       reason: reason
@@ -292,6 +299,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
       ingredientId: self.ingredientId
       locationId: self.locationId
       eventId: self.eventId
+      inventoryItemId: self.inventoryItemId
       quantity: self.quantity
       unit: self.unit
       reason: reason
@@ -358,6 +366,7 @@ event WasteRecorded: "waste_record.recorded" {
   ingredientId: string
   locationId: string
   eventId: string?
+  inventoryItemId: string?
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
   reason: WasteReason
@@ -370,7 +379,25 @@ event WasteVoided: "waste_record.voided" {
   ingredientId: string
   locationId: string
   eventId: string?
+  inventoryItemId: string?
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
   reason: string
 }
+
+// Waste decrements on-hand when a stock target is tied. Literal reason
+// because WasteRecorded.reason is WasteReason enum, not string.
+on WasteRecorded run InventoryItem.adjustQuantity
+  resolve payload.inventoryItemId
+  params {
+    delta: 0 - payload.quantity,
+    reason: "Waste"
+  }
+
+// Void restores the quantity WasteRecorded decremented (adjustQuantity).
+on WasteVoided run InventoryItem.adjustQuantity
+  resolve payload.inventoryItemId
+  params {
+    delta: payload.quantity,
+    reason: payload.reason
+  }

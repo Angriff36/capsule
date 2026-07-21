@@ -37,6 +37,9 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   computed isBelowPar: boolean = self.parLevel > 0 and self.quantityOnHand < self.parLevel
   computed isBelowReorder: boolean = self.reorderThreshold > 0 and self.quantityOnHand < self.reorderThreshold
   computed inventoryValue: money(12, 2) = self.quantityOnHand * self.unitCost
+  // Free stock for display; over-reservation hard gate stays orchestrator (Convex sum multi-hop).
+  computed totalReserved: decimal(12, 4) = sum(self.reservations, (r) => r.status == "active" ? r.quantity : 0)
+  computed availableQuantity: decimal(12, 4) = self.quantityOnHand - self.totalReserved
 
   constraint stockNonnegative: self.stockedAt == null or self.quantityOnHand >= 0 "Quantity on hand cannot be negative"
   constraint stockParNonnegative: self.parLevel >= 0 "Par level cannot be negative"
@@ -215,6 +218,8 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     guard self.stockedAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "inventoryManageAccess")
+    // Release/consume active holds before decommissioning the stock line.
+    guard count_of(self.reservations, (r) => r.status == "active") == 0
     constraint removeStockReason: length(trim(reason)) > 0 "Removal reason is required"
     compute previousQuantity = self.quantityOnHand
     mutate deletedAt = now()
@@ -262,9 +267,10 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
   transition status from "released" to []
   transition status from "consumed" to []
 
-  default policy inventoryReservationRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read inventory reservations"
-  default policy inventoryReservationWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write inventory reservations through commands"
-  default policy inventoryReservationExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute inventory reservation commands"
+  // Event managers need read+execute so EventCancelled/Completed fanOut can see rows.
+  default policy inventoryReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may read inventory reservations"
+  default policy inventoryReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may write inventory reservations through commands"
+  default policy inventoryReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "eventManageAccess") "Inventory staff or event managers may execute reservation commands"
 
   command reserve(
     inventoryItemId: uuid,
@@ -467,3 +473,16 @@ event InventoryReservationConsumed: "inventory_reservation.consumed" {
 on EventCancelled fanOut InventoryReservation where eventId = payload.eventId
   run release
   params { reason: payload.reason }
+
+// Completing an event frees remaining active holds (same release command).
+on EventCompleted fanOut InventoryReservation where eventId = payload.eventId
+  run release
+  params { reason: "Event completed" }
+
+// Consuming a reservation decrements on-hand (release stays status-only).
+on InventoryReservationConsumed run InventoryItem.adjustQuantity
+  resolve payload.inventoryItemId
+  params {
+    delta: 0 - payload.quantity,
+    reason: "Reservation consumed"
+  }
