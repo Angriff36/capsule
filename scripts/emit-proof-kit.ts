@@ -102,15 +102,23 @@ const RECIPE_IMPORT_PROOF_IDS = [
 
 function compileIr(): void {
   mkdirSync(path.dirname(irPath), { recursive: true });
-  const result = spawnSync(
-    "bunx",
-    ["manifest", "compile", "-g", "src/**/*.manifest", "--merge", "-o", irPath],
-    { cwd: root, encoding: "utf8", shell: true },
-  );
+  // Config-driven merge (`manifest.config.yaml` src glob). Do NOT use
+  // `shell: true` + `-g src/**/*.manifest`: Linux bash expands the glob and
+  // Commander then treats one .manifest path as the sole source → "Found 1
+  // file" / unknown PrepTask|PackList|Delivery (CI failure on every PR).
+  const result = spawnSync("bunx", ["manifest", "compile", "--all"], {
+    cwd: root,
+    encoding: "utf8",
+  });
   if (result.status !== 0) {
     console.error(result.stdout);
     console.error(result.stderr);
     throw new Error("manifest compile (merge) failed");
+  }
+  if (!existsSync(irPath)) {
+    throw new Error(
+      `manifest compile --all did not write ${irPath} (check manifest.config.yaml output)`,
+    );
   }
 }
 

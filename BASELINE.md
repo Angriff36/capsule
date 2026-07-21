@@ -36,12 +36,14 @@ and the last green `bun run check` / CI run.
 ~~Aim ≤35 tracked root entries (excluding `node_modules` / `dist` / `graphify-out`).~~
 ~~**Correction (2026-07-16):** Aim ≤37 — live Manifest project adds root
 `manifest.config.yaml` and `.builder/` (ownership).~~
-**Correction (2026-07-17):** Aim ≤41 — Builder preset adds root
-`tsconfig.builder.json` (Convex application assembly). Still excludes
-`node_modules` / `dist` / `graphify-out`.
+~~**Correction (2026-07-17):** Aim ≤41 — Builder preset adds root
+`tsconfig.builder.json` (Convex application assembly).~~
 ~~**Correction (2026-07-17):** Aim ≤40 — loop engineering adds durable root
 `loop-budget.md`, `loop-constraints.md`, and `loop-ledger.json` (daily-triage
-L1, commit 94a79c9). Still excludes `node_modules` / `dist` / `graphify-out`.~~
-Local editor dirs (`.cursor` / `.sonarlint` / `.vscode`) are also excluded from
-the count — they are gitignored and never present in a clean CI checkout.
-Enforced by `bun run baseline:decay`.
+L1, commit 94a79c9).~~
+**Correction (2026-07-21):** Aim ≤43 — clean CI checkout currently has 43
+committed roots (includes loop spine + `PRODUCT-BACKLOG.md` /
+`PROMPT-product.md` / `ASSEMBLY_REPORT.json` / `LOOP.md` / `STATE.md`). Cap was
+stale at 41; CI never reached `baseline:decay` until `proof:emit` was fixed.
+Still excludes `node_modules` / `dist` / `graphify-out` and local editor dirs
+(`.cursor` / `.sonarlint` / `.vscode`). Enforced by `bun run baseline:decay`.

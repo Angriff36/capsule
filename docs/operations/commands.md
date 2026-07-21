@@ -138,6 +138,10 @@ Preview without applying: `builder generate convex --dry-run`
 bun run proof:emit                # compile IR + emit generated/proof/*
 ```
 
+Uses `manifest compile --all` (reads `manifest.config.yaml` `src` glob). Do not
+reintroduce `shell: true` + `-g src/**/*.manifest` — Linux bash expands the
+glob and merge compile collapses to one file (CI “unknown entity” false alarm).
+
 ### Convex codegen only
 
 Regenerates `convex/_generated/**` from existing `convex/` sources (after Builder apply).

@@ -130,7 +130,8 @@ export class EventStockIssueCoordinator {
           docId: demand.id,
           version,
         });
-        version += 1;
+        // confirm (+1) then PurchaseNeedOpened → IngredientDemand.markReleased (+1)
+        version += 2;
       }
       await this.ports.fulfillDemand({
         docId: demand.id,
