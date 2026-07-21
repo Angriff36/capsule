@@ -11,7 +11,7 @@ whether the change needs porting to canonical Manifest-source.
 
 ## Queue
 
-### 1. OD052 — fix TimeRecord self-service identity (HIGH-SCRUTINY: auth) — open
+### 1. OD052 — fix TimeRecord self-service identity (HIGH-SCRUTINY: auth) — in-pr #27
 
 `src/workforce/time.manifest` L67 + L97 guard `personId == user.id`, but
 `user.id` is the auth subject and Person's auth link is `Person.authSubjectId`
@@ -28,7 +28,7 @@ fixed (untracked builder-manifest-pin.ts → 03885eb; EOL phantom conflicts →
 2f30419 + PR #26). Strikes cleared; salvaged draft diffs in
 `.loop-worktrees/_salvage-20260721/`.
 
-### 2. OD054 — Qualification.expire() allows early expiry — open
+### 2. OD054 — Qualification.expire() allows early expiry — blocked: Codex rejected (1/3)
 
 `src/workforce/time.manifest` `command expire()` has no deadline guard: add
 `guard self.expiresAt == null or now() >= self.expiresAt` semantics (expire
@@ -37,9 +37,15 @@ Regen + scenario/test coverage: expire before deadline denied, at/after
 deadline succeeds. Canonical port: YES (OD054 in Manifest-source).
 NOTE 2026-07-21 (overseer): tooling failures resolved (see item 1); strikes
 cleared; salvaged draft diffs in `.loop-worktrees/_salvage-20260721/`.
+BLOCKED 2026-07-21T17:00: Codex rejected: (1) Test uses past deadline proving now() >
+expiresAt, not equality boundary now() >= expiresAt. (2) UI still offers 'Expire'
+before deadline - users hit guard rejection instead of being directed to
+'Revoke'. Fix ready in worktree prod-20260721T1700-OD054-qualification-expire-guard
+(passed typecheck + tests), but requires UI changes to unblock (hide/disable
+'Expire' until Date.now() >= expiresAt). 1/3 failures.
 
 
-### 4. OD055 — multiple default PaymentMethods possible — open
+### 4. OD055 — multiple default PaymentMethods possible — blocked: Manifest platform limitation
 
 `src/sales/payment-method.manifest` `makeDefault()` sets only the bound row;
 nothing clears the previous default. A default is definitionally exclusive.
@@ -47,8 +53,12 @@ Investigate the Manifest-native mechanism (event + fanOut reaction clearing
 other rows for the same client, or constraint) — do NOT hand-roll it in app
 code. Regen + tests: making B default un-defaults A. Canonical port: YES
 (OD055 in Manifest-source).
+BLOCKED 2026-07-21T18:00: Manifest platform limitation: fanOut reactions don't
+support != in where clauses and run after all mutations, making cross-row
+exclusivity impossible without Builder platform changes. Worktree preserved at
+.loop-worktrees/prod-20260721T1800-OD055-payment-method-default. 1/3 failures.
 
-### 4. OD056 — SavedReport owner identity mismatch — open
+### 4. OD056 — SavedReport owner identity mismatch — blocked: Codex rejected (1/3)
 
 `src/insights/report.manifest` L80 `mutate ownerId = user.id` stores the auth
 subject into a Person FK (`ref owner: Person references [tenantId, id]`).
@@ -59,6 +69,11 @@ NOTE 2026-07-21 (overseer): tooling failures resolved (see item 1); strikes
 cleared; salvaged draft diffs in `.loop-worktrees/_salvage-20260721/`.
 Prior finding to reuse: command guards fixable in 5 locations; read policy
 could not traverse relationships (possible Builder limitation — verify).
+BLOCKED 2026-07-21T18:52: Codex rejected implementation requiring different
+pattern that properly resolves Person.authSubjectId for identity checks without
+client-supplied personId, with working owner-scoped reads, and proper guard
+logic that doesn't fail open. Worktree preserved at
+.loop-worktrees/prod-20260721T1852-OD056-saved-report-owner. 1/3 failures.
 
 ### 5. S1 — InventoryItem reservations subtract from available — open
 
