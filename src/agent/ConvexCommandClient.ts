@@ -2,6 +2,7 @@ import { ConvexHttpClient } from "convex/browser";
 import type { FunctionReference } from "convex/server";
 import { api } from "../lib/api";
 import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
+import { CapsuleCommandArgsNormalizer } from "./CapsuleCommandArgsNormalizer";
 import { CapsuleCommandCatalog } from "./CapsuleCommandCatalog";
 import type {
   CapsuleCommandExecutor,
@@ -12,18 +13,23 @@ type AnyMutationRef = FunctionReference<"mutation">;
 
 /**
  * Live executor: ConvexHttpClient + Clerk JWT → same api.mutations.* as the UI.
+ * Auth/URL resolve lazily so MCP tool discovery can succeed before a write.
+ * JWT is refreshed on every execute (Clerk session tokens expire in ~60s).
  */
 export class ConvexCommandClient implements CapsuleCommandExecutor {
-  private readonly client: ConvexHttpClient;
+  private client: ConvexHttpClient | null = null;
+  private readonly auth: CapsuleAgentAuthManager;
   private readonly catalog: CapsuleCommandCatalog;
+  private readonly argsNormalizer: CapsuleCommandArgsNormalizer;
 
   constructor(
     auth: CapsuleAgentAuthManager = new CapsuleAgentAuthManager(),
     catalog: CapsuleCommandCatalog = new CapsuleCommandCatalog(),
+    argsNormalizer: CapsuleCommandArgsNormalizer = new CapsuleCommandArgsNormalizer(),
   ) {
+    this.auth = auth;
     this.catalog = catalog;
-    this.client = new ConvexHttpClient(auth.resolveConvexUrl());
-    this.client.setAuth(auth.requireJwt());
+    this.argsNormalizer = argsNormalizer;
   }
 
   async execute(invocation: CapsuleCommandInvocation): Promise<unknown> {
@@ -38,12 +44,26 @@ export class ConvexCommandClient implements CapsuleCommandExecutor {
         `Generated API missing mutation '${descriptor.mutationName}'.`,
       );
     }
+    const normalized = this.argsNormalizer.normalize(
+      descriptor,
+      invocation.args,
+    );
     const args = {
-      ...invocation.args,
+      ...normalized,
       ...(invocation.idempotencyKey
         ? { idempotencyKey: invocation.idempotencyKey }
         : {}),
     };
-    return this.client.mutation(ref, args);
+    const client = await this.resolveClient();
+    return client.mutation(ref, args);
+  }
+
+  private async resolveClient(): Promise<ConvexHttpClient> {
+    if (!this.client) {
+      this.client = new ConvexHttpClient(this.auth.resolveConvexUrl());
+    }
+    const jwt = await this.auth.resolveJwt();
+    this.client.setAuth(jwt);
+    return this.client;
   }
 }

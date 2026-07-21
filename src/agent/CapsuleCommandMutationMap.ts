@@ -1,27 +1,11 @@
-/**
- * Maps wiring capabilityIds to Convex createVia / command mutation exports.
- * Keep in sync with generated `api.mutations` — regenerate awareness only;
- * do not invent alternate write paths.
- */
-export const CAPABILITY_TO_MUTATION: Readonly<Record<string, string>> = {
-  "Ingredient.introduce": "Ingredient_createViaIntroduce",
-  "Recipe.draft": "Recipe_createViaDraft",
-  "RecipeIngredient.add": "RecipeIngredient_createViaAdd",
-  "RecipeImport.upload": "RecipeImport_createViaUpload",
-  "Dish.introduce": "Dish_createViaIntroduce",
-  "DishRecipe.attach": "DishRecipe_createViaAttach",
-  "Menu.draft": "Menu_createViaDraft",
-  "PrepTask.open": "PrepTask_createViaOpen",
-  "PrepTask.refreshGenerated": "PrepTask_refreshGenerated",
-  "IngredientDemand.calculate": "IngredientDemand_createViaCalculate",
-  "IngredientDemand.confirm": "IngredientDemand_confirm",
-  "IngredientDemand.recalculate": "IngredientDemand_recalculate",
-  "IngredientDemand.supersede": "IngredientDemand_supersede",
-  "Event.planEngagement": "Event_createViaPlanEngagement",
-  "EventDish.addToEvent": "EventDish_createViaAddToEvent",
-};
+import { CapsuleCapabilityMutationResolver } from "./CapsuleCapabilityMutationResolver";
 
-/** Capabilities the product AC expects agents to discover and execute. */
+const resolver = new CapsuleCapabilityMutationResolver();
+
+/**
+ * North-star demo / AC proof set (recipe → event path). Not an MCP ceiling —
+ * the catalog exposes every wiring capability that resolves to a Convex mutation.
+ */
 export const AGENT_AC_CAPABILITY_IDS: readonly string[] = [
   "Ingredient.introduce",
   "Recipe.draft",
@@ -29,6 +13,7 @@ export const AGENT_AC_CAPABILITY_IDS: readonly string[] = [
   "RecipeImport.upload",
   "Dish.introduce",
   "DishRecipe.attach",
+  "DishTask.add",
   "Menu.draft",
   "PrepTask.open",
   "PrepTask.refreshGenerated",
@@ -36,17 +21,16 @@ export const AGENT_AC_CAPABILITY_IDS: readonly string[] = [
   "IngredientDemand.confirm",
   "IngredientDemand.recalculate",
   "IngredientDemand.supersede",
+  "Client.register",
+  "Vendor.onboard",
+  "WeeklyPurchasingConfig.configure",
   "Event.planEngagement",
   "EventDish.addToEvent",
+  "Event.submitForApproval",
+  "Event.approve",
 ];
 
+/** Resolve wiring capabilityId → generated Convex mutation export name. */
 export function mutationNameForCapability(capabilityId: string): string {
-  const name = CAPABILITY_TO_MUTATION[capabilityId];
-  if (!name) {
-    throw new Error(
-      `No Convex mutation mapping for capability '${capabilityId}'. ` +
-        `Agents may only call mapped governed commands.`,
-    );
-  }
-  return name;
+  return resolver.resolve(capabilityId);
 }
