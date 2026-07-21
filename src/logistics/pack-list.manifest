@@ -117,6 +117,9 @@ entity PackList mixin TenantScoped, SoftDeletable {
       previousStatus: previousStatus
       status: "packed"
       packedAt: self.packedAt
+      destination: self.event != null and self.event.venueAddress != null and length(trim(self.event.venueAddress)) > 0 ? self.event.venueAddress : (self.event != null and self.event.venueName != null and length(trim(self.event.venueName)) > 0 ? self.event.venueName : "Event site")
+      windowStartsAt: self.event != null ? self.event.startsAt : now()
+      windowEndsAt: self.event != null ? self.event.endsAt : now()
     }
   }
 
@@ -360,6 +363,9 @@ event PackListPacked: "pack_list.packed" {
   previousStatus: PackListStatus
   status: PackListStatus
   packedAt: datetime?
+  destination: string
+  windowStartsAt: datetime
+  windowEndsAt: datetime
 }
 
 event PackListLoaded: "pack_list.loaded" {

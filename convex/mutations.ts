@@ -1906,9 +1906,9 @@ async function __runDeliveryCancel(ctx: MutationCtx, { docId, reason, version }:
     if (!__storedDoc) throw new Error("Delivery not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Delivery not found");
     const doc = await __decryptDoc(ctx, "Delivery", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read deliveries");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write deliveries through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute delivery commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write deliveries through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute delivery commands");
     if (!(((doc.status === "scheduled") || (doc.status === "in_transit")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user.role, "logisticsManageAccess"))) throw new Error("Guard 2 failed");
@@ -1970,9 +1970,9 @@ async function __runDeliveryConfirmDelivery(ctx: MutationCtx, { docId, version }
     if (!__storedDoc) throw new Error("Delivery not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Delivery not found");
     const doc = await __decryptDoc(ctx, "Delivery", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read deliveries");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write deliveries through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute delivery commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write deliveries through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute delivery commands");
     if (!((doc.status === "in_transit"))) throw new Error("Guard 0 failed");
     if (!((doc.departedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -2033,9 +2033,9 @@ async function __runDeliveryMarkFailed(ctx: MutationCtx, { docId, reason, versio
     if (!__storedDoc) throw new Error("Delivery not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Delivery not found");
     const doc = await __decryptDoc(ctx, "Delivery", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read deliveries");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write deliveries through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute delivery commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write deliveries through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute delivery commands");
     if (!(((doc.status === "scheduled") || (doc.status === "in_transit")))) throw new Error("Guard 0 failed");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -2108,38 +2108,38 @@ async function __runDeliverySchedule(ctx: MutationCtx, { docId, packListId, even
       const __fk = ((doc as any) as any).eventId;
       ((doc as any) as any).event = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read deliveries");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write deliveries through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute delivery commands");
-    if (!((doc.scheduledAt == null))) throw new Error("Guard 0 failed");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write deliveries through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute delivery commands");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 1 failed");
-    if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__rel_packList != null) && (((__rel_packList.status === "packed") || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
-    if (!((__rel_event != null))) throw new Error("Guard 4 failed");
+    if (!(((__rel_packList != null) && (((__rel_packList.status === "packed") || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 2 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
+    if (!(((doc.scheduledAt == null) || (doc.packListId === packListId)))) throw new Error("Guard 4 failed");
     if (!((packListId === doc.packListId))) throw new Error("Schedule packListId must match the seeded pack list reference");
     if (!((eventId === doc.eventId))) throw new Error("Schedule eventId must match the seeded event reference");
     if (!((((driverId == null) || (doc.driverId == null)) || (driverId === doc.driverId)))) throw new Error("Schedule driverId must match the seeded driver reference when provided");
-    if (!((((destination).trim()).length > 0))) throw new Error("Delivery destination is required");
-    if (!((windowEndsAt > windowStartsAt))) throw new Error("Delivery window end must be after its start");
+    if (!(((((destination).trim()).length > 0) || (((doc.destination).trim()).length > 0)))) throw new Error("Delivery destination is required");
+    if (!(((doc.scheduledAt != null) || (windowEndsAt > windowStartsAt)))) throw new Error("Delivery window end must be after its start");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       packListId: packListId,
       eventId: eventId,
-      destination: destination,
-      windowStartsAt: windowStartsAt,
-      windowEndsAt: windowEndsAt,
+      destination: ((((doc.destination).trim()).length > 0) ? doc.destination : destination),
+      windowStartsAt: ((doc.windowStartsAt != null) ? doc.windowStartsAt : windowStartsAt),
+      windowEndsAt: ((doc.windowEndsAt != null) ? doc.windowEndsAt : windowEndsAt),
       driverId: ((driverId != null) ? driverId : doc.driverId),
       notes: ((notes != null) ? notes : doc.notes),
-      scheduledAt: Date.now(),
+      scheduledAt: ((doc.scheduledAt != null) ? doc.scheduledAt : Date.now()),
       version: ((doc as any).version ?? 0) + 1
     };
     const __storedUpdates = await __encryptDoc(ctx, "Delivery", ["notes"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, deliveryId: docId, tenantId: __after.tenantId, packListId: packListId, eventId: eventId, driverId: ((driverId != null) ? driverId : __after.driverId), destination: destination, windowStartsAt: windowStartsAt, windowEndsAt: windowEndsAt, status: "scheduled", _subject: { entity: "Delivery", command: "schedule", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "DeliveryScheduled", entity: "Delivery", entityId: docId, payload: { deliveryId: docId, tenantId: __after.tenantId, packListId: packListId, eventId: eventId, driverId: ((driverId != null) ? driverId : __after.driverId), destination: destination, windowStartsAt: windowStartsAt, windowEndsAt: windowEndsAt, status: "scheduled" }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, deliveryId: docId, tenantId: __after.tenantId, packListId: packListId, eventId: eventId, driverId: ((driverId != null) ? driverId : __after.driverId), destination: ((((__after.destination).trim()).length > 0) ? __after.destination : destination), windowStartsAt: ((__after.windowStartsAt != null) ? __after.windowStartsAt : windowStartsAt), windowEndsAt: ((__after.windowEndsAt != null) ? __after.windowEndsAt : windowEndsAt), status: "scheduled", _subject: { entity: "Delivery", command: "schedule", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "DeliveryScheduled", entity: "Delivery", entityId: docId, payload: { deliveryId: docId, tenantId: __after.tenantId, packListId: packListId, eventId: eventId, driverId: ((driverId != null) ? driverId : __after.driverId), destination: ((((__after.destination).trim()).length > 0) ? __after.destination : destination), windowStartsAt: ((__after.windowStartsAt != null) ? __after.windowStartsAt : windowStartsAt), windowEndsAt: ((__after.windowEndsAt != null) ? __after.windowEndsAt : windowEndsAt), status: "scheduled" }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -2203,35 +2203,35 @@ export const Delivery_createViaSchedule = mutation({
     };
     const __rel_packList = await __resolveRelation(ctx, "packLists", [__auth.tenantId, __draft.packListId], ["tenantId","id"], "tenantId", __auth.tenantId);
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read deliveries");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write deliveries through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute delivery commands");
-    if (!((__draft.scheduledAt == null))) throw new Error("Guard 0 failed");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write deliveries through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute delivery commands");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "scheduled"))) throw new Error("Guard 1 failed");
-    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((__rel_packList != null) && (((__rel_packList.status === "packed") || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 3 failed");
-    if (!((__rel_event != null))) throw new Error("Guard 4 failed");
+    if (!(((__rel_packList != null) && (((__rel_packList.status === "packed") || (__rel_packList.status === "loaded")) || (__rel_packList.status === "dispatched"))))) throw new Error("Guard 2 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
+    if (!(((__draft.scheduledAt == null) || (__draft.packListId === packListId)))) throw new Error("Guard 4 failed");
     if (!((packListId === __draft.packListId))) throw new Error("Schedule packListId must match the seeded pack list reference");
     if (!((eventId === __draft.eventId))) throw new Error("Schedule eventId must match the seeded event reference");
     if (!((((driverId == null) || (__draft.driverId == null)) || (driverId === __draft.driverId)))) throw new Error("Schedule driverId must match the seeded driver reference when provided");
-    if (!((((destination).trim()).length > 0))) throw new Error("Delivery destination is required");
-    if (!((windowEndsAt > windowStartsAt))) throw new Error("Delivery window end must be after its start");
+    if (!(((((destination).trim()).length > 0) || (((__draft.destination).trim()).length > 0)))) throw new Error("Delivery destination is required");
+    if (!(((__draft.scheduledAt != null) || (windowEndsAt > windowStartsAt)))) throw new Error("Delivery window end must be after its start");
     const doc: Record<string, any> = {
       ...__draft,
       packListId: packListId,
       eventId: eventId,
-      destination: destination,
-      windowStartsAt: windowStartsAt,
-      windowEndsAt: windowEndsAt,
+      destination: ((((__draft.destination).trim()).length > 0) ? __draft.destination : destination),
+      windowStartsAt: ((__draft.windowStartsAt != null) ? __draft.windowStartsAt : windowStartsAt),
+      windowEndsAt: ((__draft.windowEndsAt != null) ? __draft.windowEndsAt : windowEndsAt),
       driverId: ((driverId != null) ? driverId : __draft.driverId),
       notes: ((notes != null) ? notes : __draft.notes),
-      scheduledAt: Date.now(),
+      scheduledAt: ((__draft.scheduledAt != null) ? __draft.scheduledAt : Date.now()),
       version: 1,
     };
     const __storedDoc = await __encryptDoc(ctx, "Delivery", ["notes"], doc);
     const docId = await ctx.db.insert("deliveries", __storedDoc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, deliveryId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.eventId, driverId: ((doc.driverId != null) ? doc.driverId : doc.driverId), destination: doc.destination, windowStartsAt: doc.windowStartsAt, windowEndsAt: doc.windowEndsAt, status: "scheduled", _subject: { entity: "Delivery", command: "schedule", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "DeliveryScheduled", entity: "Delivery", entityId: docId, payload: { deliveryId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.eventId, driverId: ((doc.driverId != null) ? doc.driverId : doc.driverId), destination: doc.destination, windowStartsAt: doc.windowStartsAt, windowEndsAt: doc.windowEndsAt, status: "scheduled" }, createdAt: Date.now() });
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, deliveryId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.eventId, driverId: ((doc.driverId != null) ? doc.driverId : doc.driverId), destination: ((((doc.destination).trim()).length > 0) ? doc.destination : doc.destination), windowStartsAt: ((doc.windowStartsAt != null) ? doc.windowStartsAt : doc.windowStartsAt), windowEndsAt: ((doc.windowEndsAt != null) ? doc.windowEndsAt : doc.windowEndsAt), status: "scheduled", _subject: { entity: "Delivery", command: "schedule", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "DeliveryScheduled", entity: "Delivery", entityId: docId, payload: { deliveryId: docId, tenantId: doc.tenantId, packListId: doc.packListId, eventId: doc.eventId, driverId: ((doc.driverId != null) ? doc.driverId : doc.driverId), destination: ((((doc.destination).trim()).length > 0) ? doc.destination : doc.destination), windowStartsAt: ((doc.windowStartsAt != null) ? doc.windowStartsAt : doc.windowStartsAt), windowEndsAt: ((doc.windowEndsAt != null) ? doc.windowEndsAt : doc.windowEndsAt), status: "scheduled" }, createdAt: Date.now() });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
       await __setCommandIdempotency(ctx, args.idempotencyKey, "Delivery_createViaSchedule", __result);
@@ -2247,9 +2247,9 @@ async function __runDeliveryStartTransit(ctx: MutationCtx, { docId, version }: a
     if (!__storedDoc) throw new Error("Delivery not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("Delivery not found");
     const doc = await __decryptDoc(ctx, "Delivery", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read deliveries");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write deliveries through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute delivery commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read deliveries");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write deliveries through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute delivery commands");
     if (!((doc.status === "scheduled"))) throw new Error("Guard 0 failed");
     if (!((doc.scheduledAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.driverId != null))) throw new Error("Guard 2 failed");
@@ -10289,6 +10289,7 @@ async function __runPackListMarkPacked(ctx: MutationCtx, { docId, version }: any
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
+    const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, doc.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read pack lists");
     if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write pack lists through commands");
     if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list commands");
@@ -10319,8 +10320,30 @@ async function __runPackListMarkPacked(ctx: MutationCtx, { docId, version }: any
     const __storedUpdates = await __encryptDoc(ctx, "PackList", ["notes"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListId: docId, tenantId: __after.tenantId, eventId: __after.eventId, name: __after.name, previousStatus: previousStatus, status: "packed", packedAt: __after.packedAt, _subject: { entity: "PackList", command: "markPacked", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "PackListPacked", entity: "PackList", entityId: docId, payload: { packListId: docId, tenantId: __after.tenantId, eventId: __after.eventId, name: __after.name, previousStatus: previousStatus, status: "packed", packedAt: __after.packedAt }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListId: docId, tenantId: __after.tenantId, eventId: __after.eventId, name: __after.name, previousStatus: previousStatus, status: "packed", packedAt: __after.packedAt, destination: ((((__rel_event != null) && (__rel_event.venueAddress != null)) && (((__rel_event.venueAddress).trim()).length > 0)) ? __rel_event.venueAddress : ((((__rel_event != null) && (__rel_event.venueName != null)) && (((__rel_event.venueName).trim()).length > 0)) ? __rel_event.venueName : "Event site")), windowStartsAt: ((__rel_event != null) ? __rel_event.startsAt : Date.now()), windowEndsAt: ((__rel_event != null) ? __rel_event.endsAt : Date.now()), _subject: { entity: "PackList", command: "markPacked", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PackListPacked", entity: "PackList", entityId: docId, payload: { packListId: docId, tenantId: __after.tenantId, eventId: __after.eventId, name: __after.name, previousStatus: previousStatus, status: "packed", packedAt: __after.packedAt, destination: ((((__rel_event != null) && (__rel_event.venueAddress != null)) && (((__rel_event.venueAddress).trim()).length > 0)) ? __rel_event.venueAddress : ((((__rel_event != null) && (__rel_event.venueName != null)) && (((__rel_event.venueName).trim()).length > 0)) ? __rel_event.venueName : "Event site")), windowStartsAt: ((__rel_event != null) ? __rel_event.startsAt : Date.now()), windowEndsAt: ((__rel_event != null) ? __rel_event.endsAt : Date.now()) }, createdAt: Date.now() });
+    // Reactions
+    const __match0_raw = await ctx.db.query("deliveries").withIndex("by_packListId", (q) => q.eq("packListId", payload.packListId)).collect();
+    const __match0_rows = __match0_raw.filter((d) => (d as any).packListId === payload.packListId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
+    const __match0_id = __match0_rows.length > 0 ? (__match0_rows[0] as any)._id : null;
+    if (__match0_id) {
+      await __runDeliverySchedule(ctx, { docId: __match0_id, packListId: payload.packListId, eventId: payload.eventId, destination: payload.destination, windowStartsAt: payload.windowStartsAt, windowEndsAt: payload.windowEndsAt } as any);
+    } else {
+      const __elseArgs: Record<string, any> = { packListId: payload.packListId, eventId: payload.eventId, destination: payload.destination, windowStartsAt: payload.windowStartsAt, windowEndsAt: payload.windowEndsAt };
+      const __elseDoc: Record<string, any> = {
+        tenantId: __auth.tenantId,
+        destination: "",
+        status: "scheduled",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        version: 0,
+      };
+      for (const __k of ["deletedAt","packListId","eventId","driverId","destination","windowStartsAt","windowEndsAt","notes","status","scheduledAt","departedAt","deliveredAt","failedAt","failureReason","cancelledAt","cancellationReason","createdAt","updatedAt"] as string[]) {
+        if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
+      }
+      const __elseId = await ctx.db.insert("deliveries", __elseDoc as any);
+      await __runDeliverySchedule(ctx, { docId: __elseId, ...__elseArgs } as any);
+    }
     return { ...doc, ...updates };
 }
 

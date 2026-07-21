@@ -171,29 +171,47 @@ describe("runtime proof: PackList → Delivery lifecycle", () => {
     );
     expect(packed).toMatchObject({ status: "packed", version: 3 });
 
-    const delivery = (await proof.executeCommand(
+    // PackListPacked reaction match-else-creates Delivery.schedule.
+    const autoDeliveries = await logistics.run(async (ctx) =>
+      (await ctx.db.query("deliveries").collect()).filter(
+        (row) =>
+          (row as { deletedAt?: number | null }).deletedAt == null &&
+          (row as { packListId?: string }).packListId === pack.docId,
+      ),
+    );
+    expect(autoDeliveries).toHaveLength(1);
+    const deliveryId = (autoDeliveries[0] as { _id: string })._id;
+    const deliveryVersion = (autoDeliveries[0] as { version?: number }).version;
+
+    // Attach driver for transit (cascade schedule leaves driver unset).
+    const afterDriver = (await proof.executeCommand(
       logistics,
-      api.mutations.Delivery_createViaSchedule,
+      api.mutations.Delivery_schedule,
       {
+        docId: deliveryId,
         packListId: pack.docId,
         eventId,
-        destination: "Venue loading dock",
+        destination: "unused — keeps cascade destination",
         windowStartsAt: S.windowStartsAt,
         windowEndsAt: S.windowEndsAt,
         driverId,
+        version: deliveryVersion,
       },
-    )) as { docId: string };
+    )) as { version: number };
 
     await proof.executeCommand(logistics, api.mutations.Delivery_startTransit, {
-      docId: delivery.docId,
-      version: 1,
+      docId: deliveryId,
+      version: afterDriver.version,
     });
     const confirmed = (await proof.executeCommand(
       logistics,
       api.mutations.Delivery_confirmDelivery,
-      { docId: delivery.docId, version: 2 },
+      { docId: deliveryId, version: afterDriver.version + 1 },
     )) as { status: string; version: number };
-    expect(confirmed).toMatchObject({ status: "delivered", version: 3 });
+    expect(confirmed).toMatchObject({
+      status: "delivered",
+      version: afterDriver.version + 2,
+    });
   });
 
   it("denies kitchen staff and leaves no partial pack list", async () => {
