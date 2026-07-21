@@ -23,10 +23,12 @@
 - The `file:../builder` dependency was REMOVED 2026-07-19 (it broke CI's
   bun install). Builder is now a local tool (`scripts/manifest-regen.ts`
   resolves the sibling ../builder checkout); regen freshness is enforced by
-  `bun run manifest:regen:check` in `.githooks/pre-push`. KNOWN NOISE until
-  Manifest PR #54 ships in a release: projections stamp timestamps, so the
-  check reports ~212 phantom "stale" modifications — do not treat that as an
-  actionable finding.
+  `bun run manifest:regen:check` in `.githooks/pre-push`. The "phantom
+  stale/modified" mystery is SOLVED (2026-07-21, proven): git converted
+  Builder's LF output to CRLF on every fresh checkout/worktree, so Builder's
+  byte-hash ownership check saw ~290 "modified" files. Fixed permanently by
+  `.gitattributes` (eol=lf on Builder-owned trees) — ships in PR #14. After
+  #14 merges, regen conflicts in a clean worktree are REAL findings again.
 
 ## Git
 
@@ -55,6 +57,9 @@
   the worktree AND run `bun run manifest:regen` inside that worktree so
   source + generated output land together in one reviewable PR. (Regen in
   the MAIN checkout stays forbidden — it would stomp human WIP.)
+- Never leave `*.manifest` under `.artifacts/` (or other non-`src/` scratch
+  dirs) in a worktree. Builder/manifest globs pick them up; relative `use`
+  paths then resolve to e.g. `/.artifacts/workforce/...` and regen dies.
 - Manifest-source (C:\Projects\Manifest-source) is canonical for the domain
   model: a PR that edits capsule `.manifest` files must say in its body
   whether the change needs porting to canonical (or came from it).
@@ -80,9 +85,11 @@
   so; `loop-worktree cleanup` sweeps them. `active` is never swept.
 - One logical fix per worktree/PR (reviewability), smallest diff that truly
   fixes it — but as many worktrees/PRs per tick as the queue and budget allow.
-- Focused verification first: `bun run typecheck`, then the focused test via
-  `bun run test` (vitest). Never run the full `bun run check` gate unless the
-  change warrants it. Never disable tests to go green.
+- Focused verification first: `bun run typecheck`, then any **existing**
+  focused tests via `bun run test` (vitest). Never invent new test files
+  unless the backlog item or owner explicitly asks. Never run the full
+  `bun run check` gate unless the change warrants it. Never disable tests
+  to go green.
 - Max 3 attempts per item, enforced via loop-ledger.json + `loop-context --check`.
 - `convex deploy` / `bun run deploy` are forbidden.
 
