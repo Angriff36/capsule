@@ -20,7 +20,11 @@ architecture). Run `loop-constraints` first if it has not run this tick.
 - Working tree: `git status --short` (human's in-flight work — report scale only, NEVER touch)
 - CI: `gh run list --limit 10` (note failures on main; workflows: ci.yml, baseline-decay.yml)
 - Open PRs: `gh pr list --limit 15`
-- Open issues: `gh issue list --limit 15` (if issues enabled)
+- Open issues: `gh issue list --limit 15` — issues are a first-class work
+  intake (2026-07-21): a defect/fix-shaped issue becomes a High Priority queue
+  item ("issue #N: <title>"); a feature/product-shaped issue gets APPENDED to
+  `PRODUCT-BACKLOG.md` as a new numbered item instead (note "from issue #N").
+  Fix PRs for an issue must say "Fixes #N" in the body so the merge closes it.
 - `loop-run-log.md` last entries (spend + prior outcomes)
 
 ## Output — update STATE.md sections
