@@ -2,7 +2,7 @@
 source_of_truth: true
 created: 2026-07-19
 updated: 2026-07-21
-# Correction 2026-07-21: Capsule pins Manifest 3.6.40; event→weekly purchasing is Manifest-owned — see § Implementation boundary.
+# Correction 2026-07-21: Capsule pins Manifest 3.6.41; event→weekly purchasing is Manifest-owned — see § Implementation boundary.
 ---
 
 # Event prep and weekly inventory order workflow
@@ -63,7 +63,7 @@ EventDish + headcount
 
 ## Implementation boundary
 
-> **Correction (2026-07-21):** Manifest owns recalculation, BOM expansion, shortage consolidation, weekly draft ensure/reconcile (`src/procurement/event-purchasing.manifest` + related demand/order/purchase-need commands). Pin `@angriff36/manifest` **`3.6.40`** (exact — requires `sum(Entity where … of field)`, single-target and fanOut `match … else create`, and Convex else-create allocate). Host `PrepPurchaseDraftCoordinator` and `EventRecipeDemandReconciler` / `EventMenuRecipeDemandSync` are removed. UI “Generate prep-list draft” / “Create need” / demand-confirm theater controls are removed. PrepTask template sync may still use `EventPrepCoordinator` (with `skipDemand`); recipe→demand→weekly draft is Manifest-owned.
+> **Correction (2026-07-21):** Manifest owns recalculation, BOM expansion, shortage consolidation, weekly draft ensure/reconcile (`src/procurement/event-purchasing.manifest` + related demand/order/purchase-need commands). Pin `@angriff36/manifest` **`3.6.41`** (exact — requires `sum(Entity where … of field)`, single-target and fanOut `match … else create`, Convex else-create allocate, and fanOut soft-delete source exclusion so headcount cascades skip retired EventDish rows). Host `PrepPurchaseDraftCoordinator` and `EventRecipeDemandReconciler` / `EventMenuRecipeDemandSync` are removed. UI “Generate prep-list draft” / “Create need” / demand-confirm theater controls are removed. PrepTask template sync may still use `EventPrepCoordinator` (with `skipDemand`); recipe→demand→weekly draft is Manifest-owned.
 >
 > Proof: `tests/proofs/event-weekly-purchasing.runtime.test.ts`.
 

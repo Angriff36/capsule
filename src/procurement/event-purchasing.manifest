@@ -1,6 +1,6 @@
 // Manifest-owned event → weekly purchasing workflow.
 // Replaces host EventRecipeDemandReconciler + PrepPurchaseDraftCoordinator.
-// Requires @angriff36/manifest ≥ 3.6.39 (sum + match else create + fanOut match).
+// Requires @angriff36/manifest ≥ 3.6.41 (sum + match else create + fanOut soft-delete skip).
 
 use "./purchase-need.manifest"
 use "../culinary/event-dish.manifest"

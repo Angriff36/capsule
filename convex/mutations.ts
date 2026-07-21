@@ -3198,12 +3198,12 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, expectedHeadcount: __after.expectedHeadcount, startsAt: __after.startsAt, endsAt: __after.endsAt, _subject: { entity: "Event", command: "approve", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventApproved", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: __after.tenantId, expectedHeadcount: __after.expectedHeadcount, startsAt: __after.startsAt, endsAt: __after.endsAt }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const fanRows0 = (await ctx.db.query("ingredientDemands").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       await __runIngredientDemandEnsurePurchaseEligible(ctx, { docId: (__row as any)._id } as any);
     }
-    const fanRows1 = await ctx.db.query("ingredientDemands").withIndex("by_purchaseEligibleEventId", (q) => q.eq("purchaseEligibleEventId", payload.eventId)).collect();
+    const fanRows1 = (await ctx.db.query("ingredientDemands").withIndex("by_purchaseEligibleEventId", (q) => q.eq("purchaseEligibleEventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows1) {
       const target = __row;
       await __runPurchaseNeedCreate(ctx, { eventId: __row.eventId, ingredientDemandId: (__row as any)._id, ingredientId: __row.ingredientId, requiredQuantity: __row.requiredQuantity, unit: __row.unit, purchasingWeekStart: __row.purchasingWeekStart } as any);
@@ -3382,32 +3382,32 @@ async function __runEventCancel(ctx: MutationCtx, { docId, reason, version }: an
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, clientId: __after.clientId, reason: reason, _subject: { entity: "Event", command: "cancel", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventCancelled", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: __after.tenantId, clientId: __after.clientId, reason: reason }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("deliveries").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const fanRows0 = (await ctx.db.query("deliveries").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       await __runDeliveryCancel(ctx, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows1 = await ctx.db.query("inventoryReservations").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const fanRows1 = (await ctx.db.query("inventoryReservations").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows1) {
       const target = __row;
       await __runInventoryReservationRelease(ctx, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows2 = await ctx.db.query("invoices").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const fanRows2 = (await ctx.db.query("invoices").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows2) {
       const target = __row;
       await __runInvoiceMarkVoided(ctx, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows3 = await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const fanRows3 = (await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows3) {
       const target = __row;
       await __runPackListCancel(ctx, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows4 = await ctx.db.query("prepTasks").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const fanRows4 = (await ctx.db.query("prepTasks").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows4) {
       const target = __row;
       await __runPrepTaskCancel(ctx, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows5 = await ctx.db.query("purchaseNeeds").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const fanRows5 = (await ctx.db.query("purchaseNeeds").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows5) {
       const target = __row;
       await __runPurchaseNeedCancel(ctx, { docId: (__row as any)._id, reason: payload.reason } as any);
@@ -3462,7 +3462,7 @@ async function __runEventChangeHeadcount(ctx: MutationCtx, { docId, newHeadcount
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, previousHeadcount: previousHeadcount, newHeadcount: newHeadcount, _subject: { entity: "Event", command: "changeHeadcount", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventHeadcountChanged", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: __after.tenantId, previousHeadcount: previousHeadcount, newHeadcount: newHeadcount }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("eventDishes").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const fanRows0 = (await ctx.db.query("eventDishes").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       await __runEventDishAdjustServings(ctx, { docId: (__row as any)._id, quantityServings: payload.newHeadcount } as any);
@@ -3794,7 +3794,7 @@ async function __runEventComplete(ctx: MutationCtx, { docId, version }: any, __c
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventId: docId, tenantId: __after.tenantId, _subject: { entity: "Event", command: "complete", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventCompleted", entity: "Event", entityId: docId, payload: { eventId: docId, tenantId: __after.tenantId }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("inventoryReservations").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const fanRows0 = (await ctx.db.query("inventoryReservations").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       await __runInventoryReservationRelease(ctx, { docId: (__row as any)._id, reason: "Event completed" } as any);
@@ -5082,7 +5082,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventDishId: docId, tenantId: __after.tenantId, eventId: eventId, dishId: dishId, quantityServings: quantityServings, purchasingWeekStart: __rel_event__post.purchasingWeekStart, course: course, serviceStyle: serviceStyle, _subject: { entity: "EventDish", command: "addToEvent", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventDishAdded", entity: "EventDish", entityId: docId, payload: { eventDishId: docId, tenantId: __after.tenantId, eventId: eventId, dishId: dishId, quantityServings: quantityServings, purchasingWeekStart: __rel_event__post.purchasingWeekStart, course: course, serviceStyle: serviceStyle }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("dishRecipes").withIndex("by_dishId", (q) => q.eq("dishId", payload.dishId)).collect();
+    const fanRows0 = (await ctx.db.query("dishRecipes").withIndex("by_dishId", (q) => q.eq("dishId", payload.dishId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       const __fanMatch0_raw = await ctx.db.query("eventDishRecipeSeeds").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
@@ -5190,7 +5190,7 @@ export const EventDish_createViaAddToEvent = mutation({
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, eventDishId: docId, tenantId: doc.tenantId, eventId: doc.eventId, dishId: doc.dishId, quantityServings: doc.quantityServings, purchasingWeekStart: __rel_event.purchasingWeekStart, course: doc.course, serviceStyle: doc.serviceStyle, _subject: { entity: "EventDish", command: "addToEvent", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventDishAdded", entity: "EventDish", entityId: docId, payload: { eventDishId: docId, tenantId: doc.tenantId, eventId: doc.eventId, dishId: doc.dishId, quantityServings: doc.quantityServings, purchasingWeekStart: __rel_event.purchasingWeekStart, course: doc.course, serviceStyle: doc.serviceStyle }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("dishRecipes").withIndex("by_dishId", (q) => q.eq("dishId", payload.dishId)).collect();
+    const fanRows0 = (await ctx.db.query("dishRecipes").withIndex("by_dishId", (q) => q.eq("dishId", payload.dishId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       const __fanMatch0_raw = await ctx.db.query("eventDishRecipeSeeds").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
@@ -5255,7 +5255,7 @@ async function __runEventDishAdjustServings(ctx: MutationCtx, { docId, quantityS
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventDishId: docId, tenantId: __after.tenantId, eventId: __after.eventId, dishId: __after.dishId, previousQuantityServings: previousQuantityServings, quantityServings: quantityServings, _subject: { entity: "EventDish", command: "adjustServings", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventDishServingsAdjusted", entity: "EventDish", entityId: docId, payload: { eventDishId: docId, tenantId: __after.tenantId, eventId: __after.eventId, dishId: __after.dishId, previousQuantityServings: previousQuantityServings, quantityServings: quantityServings }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("eventIngredientContributions").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
+    const fanRows0 = (await ctx.db.query("eventIngredientContributions").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       await __runEventIngredientContributionRevise(ctx, { docId: (__row as any)._id, quantity: ((__row.quantity / __row.servings) * payload.quantityServings), servings: payload.quantityServings } as any);
@@ -5368,12 +5368,12 @@ async function __runEventDishRemove(ctx: MutationCtx, { docId, reason, version }
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, eventDishId: docId, tenantId: __after.tenantId, eventId: __after.eventId, dishId: __after.dishId, previousQuantityServings: previousQuantityServings, reason: reason, _subject: { entity: "EventDish", command: "remove", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventDishRemoved", entity: "EventDish", entityId: docId, payload: { eventDishId: docId, tenantId: __after.tenantId, eventId: __after.eventId, dishId: __after.dishId, previousQuantityServings: previousQuantityServings, reason: reason }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("eventIngredientContributions").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
+    const fanRows0 = (await ctx.db.query("eventIngredientContributions").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       await __runEventIngredientContributionRetire(ctx, { docId: (__row as any)._id, reason: payload.reason } as any);
     }
-    const fanRows1 = await ctx.db.query("prepTasks").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
+    const fanRows1 = (await ctx.db.query("prepTasks").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows1) {
       const target = __row;
       await __runPrepTaskCancel(ctx, { docId: (__row as any)._id, reason: payload.reason } as any);
@@ -5479,7 +5479,7 @@ async function __runEventDishRecipeSeedSeed(ctx: MutationCtx, { docId, eventId, 
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, seedId: docId, tenantId: __after.tenantId, eventId: eventId, eventDishId: eventDishId, dishId: dishId, recipeId: recipeId, servings: servings, yieldQuantity: yieldQuantity, batchMultiplier: batchMultiplier, purchasingWeekStart: purchasingWeekStart, _subject: { entity: "EventDishRecipeSeed", command: "seed", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventDishRecipeSeeded", entity: "EventDishRecipeSeed", entityId: docId, payload: { seedId: docId, tenantId: __after.tenantId, eventId: eventId, eventDishId: eventDishId, dishId: dishId, recipeId: recipeId, servings: servings, yieldQuantity: yieldQuantity, batchMultiplier: batchMultiplier, purchasingWeekStart: purchasingWeekStart }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("recipeIngredients").withIndex("by_recipeId", (q) => q.eq("recipeId", payload.recipeId)).collect();
+    const fanRows0 = (await ctx.db.query("recipeIngredients").withIndex("by_recipeId", (q) => q.eq("recipeId", payload.recipeId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       const __fanMatch0_raw = await ctx.db.query("eventIngredientContributions").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
@@ -5586,7 +5586,7 @@ export const EventDishRecipeSeed_createViaSeed = mutation({
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, seedId: docId, tenantId: doc.tenantId, eventId: doc.eventId, eventDishId: doc.eventDishId, dishId: doc.dishId, recipeId: doc.recipeId, servings: doc.servings, yieldQuantity: doc.yieldQuantity, batchMultiplier: doc.batchMultiplier, purchasingWeekStart: doc.purchasingWeekStart, _subject: { entity: "EventDishRecipeSeed", command: "seed", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "EventDishRecipeSeeded", entity: "EventDishRecipeSeed", entityId: docId, payload: { seedId: docId, tenantId: doc.tenantId, eventId: doc.eventId, eventDishId: doc.eventDishId, dishId: doc.dishId, recipeId: doc.recipeId, servings: doc.servings, yieldQuantity: doc.yieldQuantity, batchMultiplier: doc.batchMultiplier, purchasingWeekStart: doc.purchasingWeekStart }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("recipeIngredients").withIndex("by_recipeId", (q) => q.eq("recipeId", payload.recipeId)).collect();
+    const fanRows0 = (await ctx.db.query("recipeIngredients").withIndex("by_recipeId", (q) => q.eq("recipeId", payload.recipeId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       const __fanMatch0_raw = await ctx.db.query("eventIngredientContributions").withIndex("by_eventDishId", (q) => q.eq("eventDishId", payload.eventDishId)).collect();
@@ -7172,7 +7172,7 @@ async function __runIngredientDemandCalculate(ctx: MutationCtx, { docId, eventId
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, ingredientDemandId: docId, tenantId: __after.tenantId, eventId: eventId, ingredientId: ingredientId, dishId: ((dishId != null) ? dishId : __after.dishId), requiredQuantity: requiredQuantity, unit: unit, servings: ((servings != null) ? servings : __after.servings), _subject: { entity: "IngredientDemand", command: "calculate", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "IngredientDemandCalculated", entity: "IngredientDemand", entityId: docId, payload: { ingredientDemandId: docId, tenantId: __after.tenantId, eventId: eventId, ingredientId: ingredientId, dishId: ((dishId != null) ? dishId : __after.dishId), requiredQuantity: requiredQuantity, unit: unit, servings: ((servings != null) ? servings : __after.servings) }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.ingredientDemandId)).collect();
+    const fanRows0 = (await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.ingredientDemandId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       await __runPurchaseNeedReviseRequired(ctx, { docId: (__row as any)._id, requiredQuantity: payload.requiredQuantity } as any);
@@ -7281,7 +7281,7 @@ export const IngredientDemand_createViaCalculate = mutation({
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, ingredientDemandId: docId, tenantId: doc.tenantId, eventId: doc.eventId, ingredientId: doc.ingredientId, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, servings: ((doc.servings != null) ? doc.servings : doc.servings), _subject: { entity: "IngredientDemand", command: "calculate", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "IngredientDemandCalculated", entity: "IngredientDemand", entityId: docId, payload: { ingredientDemandId: docId, tenantId: doc.tenantId, eventId: doc.eventId, ingredientId: doc.ingredientId, dishId: ((doc.dishId != null) ? doc.dishId : doc.dishId), requiredQuantity: doc.requiredQuantity, unit: doc.unit, servings: ((doc.servings != null) ? doc.servings : doc.servings) }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.ingredientDemandId)).collect();
+    const fanRows0 = (await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.ingredientDemandId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       await __runPurchaseNeedReviseRequired(ctx, { docId: (__row as any)._id, requiredQuantity: payload.requiredQuantity } as any);
@@ -7672,7 +7672,7 @@ async function __runIngredientDemandSyncFromContributions(ctx: MutationCtx, { do
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, ingredientDemandId: docId, tenantId: __after.tenantId, eventId: eventId, ingredientId: ingredientId, dishId: __after.dishId, requiredQuantity: nextQuantity, unit: unit, servings: __after.servings, _subject: { entity: "IngredientDemand", command: "syncFromContributions", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "IngredientDemandCalculated", entity: "IngredientDemand", entityId: docId, payload: { ingredientDemandId: docId, tenantId: __after.tenantId, eventId: eventId, ingredientId: ingredientId, dishId: __after.dishId, requiredQuantity: nextQuantity, unit: unit, servings: __after.servings }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.ingredientDemandId)).collect();
+    const fanRows0 = (await ctx.db.query("purchaseNeeds").withIndex("by_ingredientDemandId", (q) => q.eq("ingredientDemandId", payload.ingredientDemandId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       await __runPurchaseNeedReviseRequired(ctx, { docId: (__row as any)._id, requiredQuantity: payload.requiredQuantity } as any);
@@ -19234,7 +19234,7 @@ async function __runVendorOrderSubmit(ctx: MutationCtx, { docId, version }: any,
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderId: docId, tenantId: __after.tenantId, vendorId: __after.vendorId, eventId: __after.eventId, previousStatus: previousStatus, status: "submitted", totalAmount: __after.totalAmount, _subject: { entity: "VendorOrder", command: "submit", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "VendorOrderSubmitted", entity: "VendorOrder", entityId: docId, payload: { vendorOrderId: docId, tenantId: __after.tenantId, vendorId: __after.vendorId, eventId: __after.eventId, previousStatus: previousStatus, status: "submitted", totalAmount: __after.totalAmount }, createdAt: Date.now() });
     // Reactions
-    const fanRows0 = await ctx.db.query("purchaseNeeds").withIndex("by_vendorOrderId", (q) => q.eq("vendorOrderId", payload.vendorOrderId)).collect();
+    const fanRows0 = (await ctx.db.query("purchaseNeeds").withIndex("by_vendorOrderId", (q) => q.eq("vendorOrderId", payload.vendorOrderId)).collect()).filter((d) => (d as any).deletedAt == null);
     for (const __row of fanRows0) {
       const target = __row;
       await __runPurchaseNeedMarkDraftOrdered(ctx, { docId: (__row as any)._id } as any);
