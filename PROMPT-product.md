@@ -49,6 +49,20 @@ test-verified, Codex-reviewed, and ships as a draft PR the human approves.
    entry to `loop-run-log.md` with `"source":"product-loop"`.
 9. Exit. Do not start a second item in the same iteration.
 
+## Context discipline (you have a finite window — a blown window = failed run)
+
+- NEVER let long command output into context. Redirect:
+  `bun run manifest:regen > .regen.log 2>&1` then read ONLY the last ~20
+  lines. Same for `bun install`, typecheck, and test runs — tail on failure,
+  exit code on success.
+- NEVER read generated files (`generated/**`, `src/generated/**`,
+  `convex/_generated/**`, schemas) into context — trust regen + typecheck.
+- Read only the specific source files the backlog item names, plus their
+  direct neighbors when patterns are needed. No repo-wide exploration.
+- If an investigation would need more than ~3 file reads beyond the named
+  files, record what you learned in the backlog item and finish with the
+  smallest defensible implementation instead of continuing to read.
+
 ## Autonomy contract (HEADLESS — ending with a question = failed run)
 
 - Never ask what to work on. Never end with a question.
