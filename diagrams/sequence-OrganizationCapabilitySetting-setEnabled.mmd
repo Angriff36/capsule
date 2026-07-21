@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant Client
+    participant OrganizationCapabilitySetting as OrganizationCapabilitySetting
+    Client->>+OrganizationCapabilitySetting: setEnabled(enabled, updatedBy)
+    Note over OrganizationCapabilitySetting: Policies: capabilitySettingRead, capabilitySettingWrite, capabilitySettingExecute
+    Note over OrganizationCapabilitySetting: Guards (2)
+    OrganizationCapabilitySetting->>OrganizationCapabilitySetting: guard[0]: self.deletedAt == null
+    OrganizationCapabilitySetting->>OrganizationCapabilitySetting: guard[1]: roleAllows(user.role, #quot;adminAccess#quot;)
+    OrganizationCapabilitySetting->>OrganizationCapabilitySetting: mutate.enabled
+    OrganizationCapabilitySetting->>OrganizationCapabilitySetting: mutate.updatedBy
+    OrganizationCapabilitySetting-->>-Client: void

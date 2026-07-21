@@ -1,9 +1,33 @@
 // Capsule closeout & finance — EventCloseout immutable snapshot fact.
 // Folds EventProfitability-style totals into stored capture fields (no
-// silent recalculate). Cross-domain aggregation is a command-supplied
-// parameter set (OD041); not a reaction from EventClosedOut.
+// silent recalculate). OD041: capture still takes an explicit parameter
+// set — EventClosedOut only seeds a draft with budget/headcount from the
+// event and zero actuals so finance can re-capture reconciled numbers.
 
 use "../sales/invoice.manifest"
+
+// Vision cascade: closing an event ensures one draft EventCloseout exists
+// (match else create). Actuals start at zero; finance re-runs capture with
+// reconciled totals before finalize.
+on EventClosedOut run EventCloseout.capture
+  match eventId = payload.eventId
+  else create
+  params {
+    eventId: payload.eventId
+    actualRevenue: 0
+    budgetedRevenue: payload.quotedPrice != null ? payload.quotedPrice : 0
+    revenueVariance: payload.quotedPrice != null ? payload.quotedPrice : 0
+    actualIngredientCost: 0
+    actualWasteCost: 0
+    actualLaborCost: 0
+    actualVendorCost: 0
+    budgetedCost: payload.budgetAmount != null ? payload.budgetAmount : 0
+    totalActualCost: 0
+    costVariance: payload.budgetAmount != null ? payload.budgetAmount : 0
+    grossProfit: 0
+    expectedHeadcount: payload.expectedHeadcount
+    actualHeadcount: 0
+  }
 
 enum EventCloseoutStatus {
   draft

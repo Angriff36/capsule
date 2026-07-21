@@ -386,6 +386,12 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Organization_suspend", () => {
     expect(typeof (mutations as any).Organization_suspend).toBe("function");
   });
+  it("exports mutation OrganizationCapabilitySetting_register", () => {
+    expect(typeof (mutations as any).OrganizationCapabilitySetting_register).toBe("function");
+  });
+  it("exports mutation OrganizationCapabilitySetting_setEnabled", () => {
+    expect(typeof (mutations as any).OrganizationCapabilitySetting_setEnabled).toBe("function");
+  });
   it("exports mutation PackList_cancel", () => {
     expect(typeof (mutations as any).PackList_cancel).toBe("function");
   });
@@ -820,4 +826,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 271 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 273 as const;

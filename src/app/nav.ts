@@ -79,7 +79,6 @@ export const NAV_AREAS: NavArea[] = [
     label: "Administration",
     group: "System",
     icon: GearIcon,
-    planned: "Users, roles, API keys and tenant settings.",
   },
 ];
 

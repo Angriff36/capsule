@@ -4,6 +4,34 @@
 
 use "./shift.manifest"
 
+// Vision cascade: when an event has an owner (assignedToId), ensure one lead
+// EventAssignment. fanOut Person where id = assignedToId is a no-op when the
+// owner is unset — approve must not invent staff.
+on EventApproved fanOut Person where id = payload.assignedToId
+  run EventAssignment.assign
+  match eventId = payload.eventId, personId = self.id
+  else create
+  params {
+    eventId: payload.eventId
+    personId: self.id
+    role: "event_lead"
+    startsAt: payload.startsAt
+    endsAt: payload.endsAt
+  }
+
+// Same seed when the owner is set/changed via Event.assignOwner.
+on EventOwnerAssigned fanOut Person where id = payload.assignedToId
+  run EventAssignment.assign
+  match eventId = payload.eventId, personId = self.id
+  else create
+  params {
+    eventId: payload.eventId
+    personId: self.id
+    role: "event_lead"
+    startsAt: payload.startsAt
+    endsAt: payload.endsAt
+  }
+
 enum EventAssignmentStatus {
   assigned
   confirmed

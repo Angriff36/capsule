@@ -657,6 +657,8 @@ entity Event mixin TenantScoped, SoftDeletable {
       eventId: self.id
       tenantId: self.tenantId
       assignedToId: assignedToId
+      startsAt: self.startsAt
+      endsAt: self.endsAt
     }
   }
 
@@ -694,9 +696,12 @@ entity Event mixin TenantScoped, SoftDeletable {
     emit EventApproved {
       eventId: self.id
       tenantId: self.tenantId
+      clientId: self.clientId
       expectedHeadcount: self.expectedHeadcount
       startsAt: self.startsAt
       endsAt: self.endsAt
+      quotedPrice: self.quotedPrice
+      assignedToId: self.assignedToId
     }
   }
 
@@ -753,6 +758,9 @@ entity Event mixin TenantScoped, SoftDeletable {
       eventId: self.id
       tenantId: self.tenantId
       clientId: self.clientId
+      expectedHeadcount: self.expectedHeadcount
+      quotedPrice: self.quotedPrice
+      budgetAmount: self.budgetAmount
     }
   }
 
@@ -1020,6 +1028,8 @@ event EventOwnerAssigned: "event.owner_assigned" {
   eventId: string
   tenantId: string
   assignedToId: string?
+  startsAt: datetime
+  endsAt: datetime
 }
 
 event EventSubmittedForApproval: "event.submitted_for_approval" {
@@ -1036,9 +1046,12 @@ event EventReturnedToPlanning: "event.returned_to_planning" {
 event EventApproved: "event.approved" {
   eventId: string
   tenantId: string
+  clientId: string
   expectedHeadcount: number
   startsAt: datetime
   endsAt: datetime
+  quotedPrice: money(12, 2)
+  assignedToId: string?
 }
 
 event EventExecutionStarted: "event.execution_started" {
@@ -1062,6 +1075,9 @@ event EventClosedOut: "event.closed_out" {
   eventId: string
   tenantId: string
   clientId: string
+  expectedHeadcount: number
+  quotedPrice: money(12, 2)?
+  budgetAmount: money(12, 2)?
 }
 
 event EventGuestInvited: "event_guest.invited" {

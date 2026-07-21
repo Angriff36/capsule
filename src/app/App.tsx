@@ -127,6 +127,11 @@ const ContractsPage = lazy(() =>
     default: module.ContractsPage,
   })),
 );
+const PermissionsPage = lazy(() =>
+  import("../features/admin/PermissionsPage").then((module) => ({
+    default: module.PermissionsPage,
+  })),
+);
 
 function SupplyRoute({ children }: { children: ReactNode }) {
   return <Suspense fallback={<TableSkeleton rows={8} />}>{children}</Suspense>;
@@ -390,6 +395,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ClientDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin"
+              element={
+                <SupplyRoute>
+                  <PermissionsPage />
                 </SupplyRoute>
               }
             />

@@ -34,6 +34,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip Menu: no create command in IR (2 rows unused)
   // skip MenuDish: no create command in IR (2 rows unused)
   // skip Organization: no create command in IR (2 rows unused)
+  // skip OrganizationCapabilitySetting: no create command in IR (2 rows unused)
   // skip PackList: no create command in IR (2 rows unused)
   // skip PackListItem: no create command in IR (2 rows unused)
   // skip Payment: no create command in IR (2 rows unused)
@@ -194,6 +195,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "Organization",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "OrganizationCapabilitySetting",
       "createMutation": null,
       "rowCount": 2
     },

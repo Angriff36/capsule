@@ -123,6 +123,8 @@ import {
   MenuReviseDetailsParamsSchema,
   MenuUnpublishParamsSchema,
   MenuUpdatePricingParamsSchema,
+  OrganizationCapabilitySettingRegisterParamsSchema,
+  OrganizationCapabilitySettingSetEnabledParamsSchema,
   OrganizationDeactivateParamsSchema,
   OrganizationReactivateParamsSchema,
   OrganizationRegisterParamsSchema,
@@ -2062,6 +2064,47 @@ export function useCreateOrganization() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = OrganizationRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for OrganizationCapabilitySetting. */
+export function useListOrganizationCapabilitySetting() {
+  return useQuery(api.queries.listOrganizationCapabilitySetting);
+}
+
+/** Reactive get-by-id for OrganizationCapabilitySetting. Pass "skip" to suspend. */
+export function useGetOrganizationCapabilitySetting(id: string | "skip") {
+  return useQuery(api.queries.getOrganizationCapabilitySetting, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for OrganizationCapabilitySetting.register. */
+export function useOrganizationCapabilitySettingRegister() {
+  const mutate = useMutation(api.mutations.OrganizationCapabilitySetting_register);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationCapabilitySettingRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for OrganizationCapabilitySetting.setEnabled. */
+export function useOrganizationCapabilitySettingSetEnabled() {
+  const mutate = useMutation(api.mutations.OrganizationCapabilitySetting_setEnabled);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationCapabilitySettingSetEnabledParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for OrganizationCapabilitySetting.register. */
+export function useCreateOrganizationCapabilitySetting() {
+  const mutate = useMutation(api.mutations.OrganizationCapabilitySetting_createViaRegister);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationCapabilitySettingRegisterParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -4084,4 +4127,4 @@ export function useCreateWeeklyPurchasingConfig() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 428 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 433 as const;

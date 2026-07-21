@@ -556,6 +556,16 @@ erDiagram
         datetime createdAt
         datetime updatedAt
     }
+    OrganizationCapabilitySetting {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        OrganizationCapability capability "PK"
+        boolean enabled "PK"
+        string updatedBy "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
     PackList {
         uuid id "PK"
         string tenantId "PK"

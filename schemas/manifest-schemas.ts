@@ -658,6 +658,20 @@ export const OrganizationComputedSchema = OrganizationSchema.extend({
 export type Organization = z.infer<typeof OrganizationSchema>;
 export type OrganizationWithComputed = z.infer<typeof OrganizationComputedSchema>;
 
+// Entity: OrganizationCapabilitySetting
+export const OrganizationCapabilitySettingSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  capability: z.enum(["kitchen", "inventory", "procurement", "events", "sales", "logistics", "workforce", "finance", "reports", "administration"]),
+  enabled: z.boolean().default(true),
+  updatedBy: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type OrganizationCapabilitySetting = z.infer<typeof OrganizationCapabilitySettingSchema>;
+
 // Entity: PackList
 export const PackListSchema = z.object({
   id: z.string().uuid(),
@@ -2446,6 +2460,23 @@ export const OrganizationSuspendParamsSchema = z.object({
 });
 
 export type OrganizationSuspendParams = z.infer<typeof OrganizationSuspendParamsSchema>;
+
+// Command: register on OrganizationCapabilitySetting
+export const OrganizationCapabilitySettingRegisterParamsSchema = z.object({
+  capability: z.enum(["kitchen", "inventory", "procurement", "events", "sales", "logistics", "workforce", "finance", "reports", "administration"]),
+  enabled: z.boolean(),
+  updatedBy: z.string().optional(),
+});
+
+export type OrganizationCapabilitySettingRegisterParams = z.infer<typeof OrganizationCapabilitySettingRegisterParamsSchema>;
+
+// Command: setEnabled on OrganizationCapabilitySetting
+export const OrganizationCapabilitySettingSetEnabledParamsSchema = z.object({
+  enabled: z.boolean(),
+  updatedBy: z.string().optional(),
+});
+
+export type OrganizationCapabilitySettingSetEnabledParams = z.infer<typeof OrganizationCapabilitySettingSetEnabledParamsSchema>;
 
 // Command: cancel on PackList
 export const PackListCancelParamsSchema = z.object({

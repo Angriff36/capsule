@@ -4,6 +4,7 @@ created: 2026-07-19
 updated: 2026-07-21
 # Correction 2026-07-21: Capsule pins Manifest 3.6.41; event→weekly purchasing is Manifest-owned — see § Implementation boundary.
 # Correction 2026-07-21: Visual SoT for Dish vs Recipe vs DishTask is work/list*.jpg and work/recipes/*.jpg — see § What the kitchen actually needs.
+# Correction 2026-07-21: Event.approve also opens PackList + plans ProductionBatch; Delivery on PackListPacked — see § Demand and the weekly order form.
 ---
 
 # Event prep and weekly inventory order workflow
@@ -61,6 +62,15 @@ When the Event is **approved**:
 3. `WeeklyPurchasingConfig.routeNeed` ensures one shared `VendorOrder` DRAFT for the purchasing week + default vendor
 4. Lines consolidate identical ingredients; on-hand stock reduces the ordered quantity once across the week
 5. Needs stay `open` until the buyer submits the draft — approval never auto-submits
+6. Manifest also `PackList.open` (match `eventId` + `activeEventId`, else create) and fanOut `ProductionBatch.plan` per `EventDishRecipeSeed` (MCP-proved 2026-07-21 on local Convex after #8/#10/#11/#14)
+7. Manifest `Invoice.issue` (match `eventId`, else create) from `quotedPrice` / `clientId` on the expanded `EventApproved` payload — remains draft until finance sends
+8. `Delivery.schedule` is **not** on approve — it runs on `PackListPacked` after pack
+9. After the event is completed and **closed out**, Manifest seeds `EventCloseout.capture`
+   (match `eventId`, else create): budget/headcount from the event, actuals zeroed
+   for finance to re-capture before finalize
+10. If the event has an **owner** (`assignedToId` on plan or Assign owner), Manifest
+    seeds `EventAssignment.assign` as role `event_lead` (fanOut `Person` — no-op when
+    owner is unset; also on `EventOwnerAssigned`)
 
 Headcount or dish changes revise contributions and reconcile the same draft (idempotent; no duplicate quantities).
 
@@ -70,6 +80,10 @@ EventDish + headcount
   -> IngredientDemand (calculated)
   -> (on approve) PurchaseNeed
   -> Weekly VendorOrder DRAFT + consolidated VendorOrderLine
+  -> (on approve) PackList draft + ProductionBatch plan(s) + Invoice (quotedPrice)
+  -> (on PackList.markPacked) Delivery schedule
+  -> (on Event.closeOut) EventCloseout draft (budget seed, zero actuals)
+  -> (on approve / assignOwner, if owner set) EventAssignment event_lead
 ```
 
 ## Implementation boundary

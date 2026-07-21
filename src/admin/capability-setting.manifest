@@ -1,0 +1,39 @@
+enum OrganizationCapability {
+  kitchen
+  inventory
+  procurement
+  events
+  sales
+  logistics
+  workforce
+  finance
+  reports
+  administration
+}
+
+entity OrganizationCapabilitySetting mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+  property required capability: OrganizationCapability
+  property required enabled: boolean = true
+  property updatedBy: string?
+  default policy capabilitySettingRead read: user.id != null "Authenticated staff may read capability settings"
+  default policy capabilitySettingWrite write: user.id != null "Authenticated staff may write capability settings"
+  default policy capabilitySettingExecute execute: user.id != null "Authenticated staff may execute capability setting commands"
+  command register(capability: OrganizationCapability, enabled: boolean, optional updatedBy: string) {
+    guard self.deletedAt == null
+    guard self.capability == null
+    guard roleAllows(user.role, "adminAccess")
+    mutate capability = capability
+    mutate enabled = enabled
+    mutate updatedBy = updatedBy
+  }
+  command setEnabled(enabled: boolean, optional updatedBy: string) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    mutate enabled = enabled
+    mutate updatedBy = updatedBy
+  }
+  store OrganizationCapabilitySetting in durable
+}

@@ -4,6 +4,21 @@
 
 use "./payment.manifest"
 
+// Vision cascade: approved event ensures one Invoice issued from quoted price
+// (match else create). Remains draft until finance sends — issue sets issuedAt.
+on EventApproved run Invoice.issue
+  match eventId = payload.eventId
+  else create
+  params {
+    clientId: payload.clientId
+    eventId: payload.eventId
+    invoiceNumber: payload.eventId
+    subtotal: payload.quotedPrice
+    taxAmount: 0
+    discountAmount: 0
+    total: payload.quotedPrice
+  }
+
 // Event cancellation voids unpaid invoices still in draft/sent/viewed/overdue.
 // ~~Paid/partial invoices are skipped by markVoided's amountPaid guard.~~
 // Correction (2026-07-20): Manifest fan-out does not skip on guard failure —

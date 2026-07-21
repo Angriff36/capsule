@@ -1,0 +1,115 @@
+import { useMemo, useState } from "react";
+import { useQuery } from "convex/react";
+import { api } from "../../lib/api";
+import {
+  useCreateOrganizationCapabilitySetting,
+  useListOrganizationCapabilitySetting,
+  useOrganizationCapabilitySettingSetEnabled,
+} from "../../lib/manifest-convex-react";
+import { ErrorState, PageHeader, Section } from "../../ui/primitives";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+
+const CAPABILITIES = [
+  ["kitchen", "Kitchen", "Recipes, dishes, menus, and prep work."],
+  ["inventory", "Inventory", "Stock, locations, demand, and waste."],
+  ["procurement", "Procurement", "Vendors, purchase needs, and orders."],
+  ["events", "Events", "Bookings, execution, staffing, and closeout."],
+  ["sales", "Sales", "Clients, proposals, contracts, and pricing."],
+  ["logistics", "Logistics", "Pack lists, deliveries, and dispatch."],
+  ["workforce", "Workforce", "Roster, shifts, time, and qualifications."],
+  ["finance", "Finance", "Invoices, payments, payroll, and reports."],
+  ["reports", "Reports", "Saved reports and operational analysis."],
+  ["administration", "Administration", "Organization and permission settings."],
+] as const;
+const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
+
+export function PermissionsPage() {
+  const authStatus = useQuery(api.authStatus.getAuthStatus, {});
+  const rows = useListOrganizationCapabilitySetting();
+  const createSetting = useCreateOrganizationCapabilitySetting();
+  const setEnabled = useOrganizationCapabilitySettingSetEnabled();
+  const [saving, setSaving] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const settings = useMemo(
+    () => new Map((rows ?? []).map((row) => [row.capability, row])),
+    [rows],
+  );
+  const canEdit = ADMIN_ROLES.has(authStatus?.role ?? "");
+
+  if (authStatus === undefined || rows === undefined) {
+    return (
+      <QueryLoadState
+        loadingTooLong={false}
+        title="Loading permissions"
+        detail="Reading organization settings."
+      />
+    );
+  }
+
+  async function toggle(
+    capability: (typeof CAPABILITIES)[number][0],
+    enabled: boolean,
+  ) {
+    if (!canEdit) return;
+    setSaving(capability);
+    setError(null);
+    try {
+      const existing = settings.get(capability);
+      if (existing) await setEnabled({ docId: existing._id, enabled });
+      else await createSetting({ capability, enabled });
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "Could not save this setting.",
+      );
+    } finally {
+      setSaving(null);
+    }
+  }
+
+  return (
+    <div className="operations-stage space-y-6">
+      <PageHeader
+        title="Permissions"
+        lead="These switches apply to everyone in this organization. Everything starts allowed."
+      />
+      {!canEdit && (
+        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-[13px] text-warn">
+          Only an organization admin can change these settings.
+        </div>
+      )}
+      {error && <ErrorState title="Permission change failed" detail={error} />}
+      <Section title="Organization access">
+        <div className="divide-y divide-line">
+          {CAPABILITIES.map(([id, label, detail]) => {
+            const enabled = settings.get(id)?.enabled ?? true;
+            const busy = saving === id;
+            return (
+              <div
+                key={id}
+                className="flex items-center justify-between gap-4 px-4 py-4"
+              >
+                <div>
+                  <p className="font-medium text-ink">{label}</p>
+                  <p className="mt-1 text-[12px] text-ink-3">{detail}</p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-label={`${label} permission`}
+                  aria-checked={enabled}
+                  disabled={!canEdit || busy}
+                  onClick={() => void toggle(id, !enabled)}
+                  className={`relative h-7 w-12 rounded-full border transition ${enabled ? "border-ok bg-ok" : "border-line-2 bg-inset"} disabled:cursor-not-allowed disabled:opacity-50`}
+                >
+                  <span
+                    className={`absolute top-0.5 h-6 w-6 rounded-full bg-white shadow transition ${enabled ? "left-[23px]" : "left-0.5"}`}
+                  />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      </Section>
+    </div>
+  );
+}
