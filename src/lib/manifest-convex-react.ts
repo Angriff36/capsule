@@ -134,7 +134,6 @@ import {
   PackListItemAdjustQuantityParamsSchema,
   PackListItemMarkMissingParamsSchema,
   PackListItemMarkPackedParamsSchema,
-  PackListItemRefreshGeneratedParamsSchema,
   PackListMarkLoadedParamsSchema,
   PackListMarkPackedParamsSchema,
   PackListOpenParamsSchema,
@@ -2199,16 +2198,6 @@ export function usePackListItemMarkPacked() {
   };
 }
 
-/** Mutation hook for PackListItem.refreshGenerated. */
-export function usePackListItemRefreshGenerated() {
-  const mutate = useMutation(api.mutations.PackListItem_refreshGenerated);
-  return (args: any) => {
-    const { docId, version, idempotencyKey, ...params } = args ?? {};
-    const parsed = PackListItemRefreshGeneratedParamsSchema.parse(params) as Record<string, unknown>;
-    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
-  };
-}
-
 /** Governed creation hook for PackListItem.addItem. */
 export function useCreatePackListItem() {
   const mutate = useMutation(api.mutations.PackListItem_createViaAddItem);
@@ -4095,4 +4084,4 @@ export function useCreateWeeklyPurchasingConfig() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 429 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 428 as const;
