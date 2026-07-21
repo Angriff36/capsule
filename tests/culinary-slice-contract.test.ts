@@ -26,6 +26,8 @@ describe("Culinary planning slice contract", () => {
     const dish = read("src/features/kitchen/DishDetailPage.tsx");
     const menu = read("src/features/kitchen/MenuDetailPage.tsx");
     const eventMenu = read("src/features/kitchen/EventMenuPage.tsx");
+    expect(catalog).toContain("selectedDishIds");
+    expect(catalog).toContain("showDeletedDishes");
     const recipeImport = read(
       "src/features/kitchen/import/RecipeImportPage.tsx",
     );
@@ -48,6 +50,19 @@ describe("Culinary planning slice contract", () => {
     }
     expect(ingredient).toContain("useGetIngredient");
     expect(dish).toContain("useGetDish");
+    for (const hook of [
+      "useListDishTask",
+      "useListIngredient",
+      "useCreateDishTask",
+      "useDishTaskRevise",
+      "useDishTaskRetire",
+    ]) {
+      expect(dish).toContain(hook);
+    }
+    expect(dish).toContain('name="ingredientId"');
+    expect(dish).toContain('name="recipeId"');
+    expect(dish).toContain('ingredientId: optional(data.get("ingredientId"))');
+    expect(dish).toContain('recipeId: optional(data.get("recipeId"))');
     expect(menu).toContain("useGetMenu");
     for (const hook of [
       "useCreateIngredient",
@@ -61,9 +76,16 @@ describe("Culinary planning slice contract", () => {
       "useListEventDish",
       "useEventDishAdjustServings",
       "useEventDishRemove",
+      "useListDishTask",
+      "useListPrepTask",
+      "useListIngredientDemand",
+      "useCreatePrepTask",
+      "useCreateIngredientDemand",
+      "usePrepTaskRefreshGenerated",
     ]) {
       expect(eventMenu).toContain(hook);
     }
+    expect(eventMenu).toContain("EventMenuSyncController");
   });
 
   it("uses governed generated creation hooks without an authored allocation seam", () => {

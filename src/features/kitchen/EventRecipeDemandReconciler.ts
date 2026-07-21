@@ -145,6 +145,13 @@ export class EventRecipeDemandReconciler {
       created,
       recalculated,
       superseded,
+      targets: [...groups.values()].map((group) => ({
+        eventId: group.eventId,
+        ingredientId: group.ingredientId,
+        unit: group.unit,
+        requiredQuantity: group.requiredQuantity,
+        status: "calculated" as const,
+      })),
     };
   }
 

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreateIngredientDemand,
+  useCreateInventoryReservation,
   useCreatePrepTask,
   useCreateEventDish,
   useEventDishAdjustServings,
@@ -9,6 +10,7 @@ import {
   useIngredientDemandConfirm,
   useIngredientDemandRecalculate,
   useIngredientDemandSupersede,
+  useInventoryReservationRelease,
   useListDish,
   useListDishRecipe,
   useListDishTask,
@@ -16,16 +18,19 @@ import {
   useListEventDish,
   useListIngredient,
   useListIngredientDemand,
+  useListInventoryItem,
+  useListInventoryReservation,
   useListPrepTask,
   useListRecipe,
   useListRecipeIngredient,
   usePrepTaskRefreshGenerated,
 } from "../../lib/manifest-convex-react";
+import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
-import { EventMenuRecipeDemandSync } from "./EventMenuRecipeDemandSync";
-import { EventPrepCoordinator } from "./EventPrepCoordinator";
+import { EventMenuStockShortageBanner } from "./EventMenuStockShortageBanner";
+import { EventMenuSyncController } from "./EventMenuSyncController";
 import { KitchenBookNav } from "./KitchenBookNav";
 
 export function EventMenuPage() {
@@ -39,9 +44,13 @@ export function EventMenuPage() {
   const prepTasks = useListPrepTask();
   const ingredients = useListIngredient();
   const demands = useListIngredientDemand();
+  const inventoryItems = useListInventoryItem();
+  const inventoryReservations = useListInventoryReservation();
   const createEventDish = useCreateEventDish();
   const createPrepTask = useCreatePrepTask();
   const createDemand = useCreateIngredientDemand();
+  const createReservation = useCreateInventoryReservation();
+  const releaseReservation = useInventoryReservationRelease();
   const confirmDemand = useIngredientDemandConfirm();
   const recalculateDemand = useIngredientDemandRecalculate();
   const supersedeDemand = useIngredientDemandSupersede();
@@ -51,6 +60,9 @@ export function EventMenuPage() {
   const [eventId, setEventId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
+    [],
+  );
   const { prompt, host } = useActionPrompt(busy != null);
 
   const selectedEvent = events?.find((event) => event._id === eventId);
@@ -70,109 +82,35 @@ export function EventMenuPage() {
       setBusy(null);
     }
   };
-  const coordinator = () => {
-    if (
-      dishTasks === undefined ||
-      prepTasks === undefined ||
-      ingredients === undefined ||
-      demands === undefined ||
-      dishRecipes === undefined ||
-      recipes === undefined ||
-      recipeIngredients === undefined
-    ) {
-      throw new Error("Prep templates and demand data are still loading");
-    }
-    return new EventPrepCoordinator({
-      createDemand: (input) => createDemand(input),
-      confirmDemand: (input) => confirmDemand(input),
-      recalculateDemand: (input) => recalculateDemand(input),
-      supersedeDemand: (input) => supersedeDemand(input),
-      createTask: (input) => createPrepTask(input),
-      refreshGeneratedTask: (input) => refreshGeneratedTask(input),
-    });
-  };
-  const syncRecipeDemands = async (override?: {
-    id: string;
-    eventId: string;
-    dishId: string;
-    quantityServings: number;
-    specialInstructions?: string | null;
-  }) => {
-    const prep = coordinator();
-    const sync = new EventMenuRecipeDemandSync(prep, {
-      dishRecipes: dishRecipes ?? [],
-      recipes: recipes ?? [],
-      recipeIngredients: recipeIngredients ?? [],
-      demands: demands ?? [],
-    });
-    await sync.forEventDishes({
-      eventId,
-      eventDishes: EventMenuRecipeDemandSync.activeEventDishes(
-        eventId,
-        eventDishes ?? [],
-        override,
-      ),
-    });
-  };
-  const syncPrepForDish = async (eventDish: {
-    id: string;
-    eventId: string;
-    dishId: string;
-    quantityServings: number;
-    specialInstructions?: string | null;
-  }) => {
-    const prep = coordinator();
-    await prep.sync({
-      eventDish,
-      templates: (dishTasks ?? []).map((task) => ({
-        id: task._id,
-        dishId: task.dishId,
-        name: task.name,
-        defaultQuantity: task.defaultQuantity,
-        defaultUnit: (task.defaultUnit ??
-          ingredients?.find(
-            (ingredient) => ingredient._id === task.ingredientId,
-          )?.unit ??
-          "portion") as never,
-        category: task.category,
-        taskType: task.taskType,
-        sortOrder: task.sortOrder,
-        recipeId: task.recipeId,
-        ingredientId: task.ingredientId,
-        instructions: task.instructions,
-        status: task.status,
-      })),
-      tasks: (prepTasks ?? []).map((task) => ({
-        id: task._id,
-        eventDishId: task.eventDishId,
-        eventId: task.eventId,
-        dishId: task.dishId,
-        dishTaskId: task.dishTaskId,
-        name: task.name,
-        quantity: Number(task.quantity),
-        unit: task.unit as never,
-        ingredientId: task.ingredientId,
-        ingredientDemandId: task.ingredientDemandId,
-        recipeId: task.recipeId,
-        specialInstructions: task.specialInstructions,
-        isGenerated: task.isGenerated,
-        status: task.status,
-        version: task.version,
-        deletedAt: task.deletedAt,
-      })),
-      demands: (demands ?? []).map((demand) => ({
-        id: demand._id,
-        eventId: demand.eventId,
-        ingredientId: demand.ingredientId,
-        requiredQuantity: Number(demand.requiredQuantity),
-        unit: demand.unit as never,
-        status: demand.status,
-        version: demand.version,
-      })),
-      skipDemand: true,
-    });
-    await syncRecipeDemands(eventDish);
-  };
+  const menuSync = () =>
+    new EventMenuSyncController(
+      {
+        createDemand: (input) => createDemand(input),
+        confirmDemand: (input) => confirmDemand(input),
+        recalculateDemand: (input) => recalculateDemand(input),
+        supersedeDemand: (input) => supersedeDemand(input),
+        createTask: ((input: never) => createPrepTask(input)) as never,
+        refreshGeneratedTask: ((input: never) =>
+          refreshGeneratedTask(input)) as never,
+        createReservation: async (input) => {
+          const doc = (await createReservation(input)) as { docId: string };
+          return { docId: doc.docId };
+        },
+        releaseReservation: (input) => releaseReservation(input),
+      },
+      EventMenuSyncController.requireCatalogs({
+        dishTasks: dishTasks as never,
+        prepTasks: prepTasks as never,
+        ingredients: ingredients as never,
+        demands: demands as never,
+        dishRecipes: dishRecipes as never,
+        recipes: recipes as never,
+        recipeIngredients: recipeIngredients as never,
+        eventDishes: eventDishes as never,
+        inventoryItems: inventoryItems as never,
+        inventoryReservations: inventoryReservations as never,
+      }),
+    );
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
@@ -190,13 +128,14 @@ export function EventMenuPage() {
           String(data.get("serviceStyle") ?? "").trim() || undefined,
         specialInstructions,
       })) as { docId: string };
-      await syncPrepForDish({
+      const shortages = await menuSync().syncPrepForDish({
         id: created.docId,
         eventId,
         dishId: String(data.get("dishId")),
         quantityServings,
         specialInstructions,
       });
+      setStockShortages(shortages);
       form.reset();
     });
   };
@@ -219,6 +158,14 @@ export function EventMenuPage() {
           <CulinaryFailureBanner error={failure} />
         </div>
       ) : null}
+      <EventMenuStockShortageBanner
+        shortages={stockShortages}
+        ingredientName={(ingredientId) =>
+          ingredients?.find((ingredient) => ingredient._id === ingredientId)
+            ?.name ?? ingredientId
+        }
+        onDismiss={() => setStockShortages([])}
+      />
       {host}
       <div className="event-menu-layout">
         <section>
@@ -415,7 +362,7 @@ export function EventMenuPage() {
                               quantityServings: quantity,
                               version: selection.version,
                             });
-                            await syncPrepForDish({
+                            const shortages = await menuSync().syncPrepForDish({
                               id: selection._id,
                               eventId: selection.eventId,
                               dishId: selection.dishId,
@@ -423,6 +370,7 @@ export function EventMenuPage() {
                               specialInstructions:
                                 selection.specialInstructions,
                             });
+                            setStockShortages(shortages);
                           });
                         })();
                       }}
@@ -449,12 +397,14 @@ export function EventMenuPage() {
                               reason,
                               version: selection.version,
                             });
-                            await syncRecipeDemands({
-                              id: selection._id,
-                              eventId: selection.eventId,
-                              dishId: selection.dishId,
-                              quantityServings: 0,
-                            });
+                            const shortages =
+                              await menuSync().syncRecipeDemands(eventId, {
+                                id: selection._id,
+                                eventId: selection.eventId,
+                                dishId: selection.dishId,
+                                quantityServings: 0,
+                              });
+                            setStockShortages(shortages);
                           });
                         })();
                       }}

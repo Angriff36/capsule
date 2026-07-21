@@ -107,6 +107,7 @@ export function EventInventoryPanel({
             ingredientId: reservation.ingredientId,
             quantity: Number(reservation.quantity),
             status: String(reservation.status),
+            version: reservation.version,
             deletedAt: reservation.deletedAt,
           })),
         });
