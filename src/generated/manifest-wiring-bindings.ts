@@ -6,7 +6,7 @@
  * trusted-context injection helpers, and invalidation metadata.
  */
 
-export const WIRING_CONTRACT_HASH = "0418609823cc581c4807e29385bcba0390816488350fac71c8522ca6529e7824:0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:16f5b86fa64677653383a3565cc55ae5abd29b5f0ab299becbd63a2a989ea054:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:33d4d2785d45b54a41664cd7f7619db35c422ba75508e4fc45e3d26bea96042a:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:46867b01b878e36ec13d445c9c59195a4d593b1f85eecf98aaa3960786131e6d:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:4ec30ef9959ec632fb5733d0a27d6a3f36f0f267cd6b591b4de471a8303ee8f0:5351917c1d988382d27a9e6277171f3fb8096a32ef5a9341d2bbf9b222fcef47:57f308c480c711e9710797f6fccdab6f0bb270f703a03242f23ca03d89c86559:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:6a60de19fa21e314590a79d5c721aa690946b2a1b33e3a4fc1bba2dad8aff529:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:d6910e1f58113618897b7fccf4dcbc6efd0fd1f39f05ac403e6a7f7c9a701a9f:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:ea95ffd054e7a6711602dd2e1d4d1523c49d05e14503100d6b96f2e6dc909f5d";
+export const WIRING_CONTRACT_HASH = "0418609823cc581c4807e29385bcba0390816488350fac71c8522ca6529e7824:0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:33d4d2785d45b54a41664cd7f7619db35c422ba75508e4fc45e3d26bea96042a:3ab18f80440f7b17dd279810d252f487d5b77c5b93a3a0549ded2cfe546237d4:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:46867b01b878e36ec13d445c9c59195a4d593b1f85eecf98aaa3960786131e6d:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5a0cea365867f6047ba8a5442020de61432d3cb2a279d197d6378afa046f46d8:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:5ec1dab5824cab5560ca99e12a1c91b3fed30258913626ce02ded8ecfd421fa8:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:b4b8109a62b1882a1ab79a3f32a0e996b7a92c3a356a9df68bcb51b7566cc355:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c481269f88ada8b405a26741315811fd1904d2def1602cfb4dd276f745bd6578:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccb3757ff8aa9cdd9a84cbfdf97aebbba82cf6529a9855a12169e622532f2b72:cdfef54ea3c18cb709a1b706a6712b6bbe2ab70b34887f7e6f46dd99c23e6bef:ce6c8c2338527b6902932ba1343b5ba5ab1d9fb646854150818441a400957161:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f8444d8a8a114f5edaa2c8882c00aa74c8bfe088209a5414f4658f4032a5742f";
 
 // --- AvailabilityWindow.declare ---
 export interface AvailabilityWindowDeclareClientInput {
@@ -1409,6 +1409,10 @@ export const DishUpdatePortioningInvalidation = [
 export interface DishRecipeAttachClientInput {
   dishId: string;
   recipeId: string;
+  /** Bounds: 1..∞ */
+  yieldQuantity: number;
+  /** Bounds: 1..∞ */
+  batchMultiplier?: number;
   sortOrder?: number;
   role?: string;
 }
@@ -1419,7 +1423,7 @@ export const DishRecipeAttachCapability = {
   command: "attach",
   route: "/api/manifest/DishRecipe/commands/attach",
   instanceCommand: true,
-  clientParameterNames: ["dishId","recipeId","sortOrder","role"],
+  clientParameterNames: ["dishId","recipeId","yieldQuantity","batchMultiplier","sortOrder","role"],
   serverParameterNames: [],
   emits: ["DishRecipeAttached"],
 } as const;
@@ -3042,6 +3046,53 @@ export const EventDishUpdateInstructionsInvalidation = [
   }
 ] as const;
 
+// --- EventDishRecipeSeed.seed ---
+export interface EventDishRecipeSeedSeedClientInput {
+  eventId: string;
+  eventDishId: string;
+  dishId: string;
+  recipeId: string;
+  servings: number;
+  yieldQuantity: number;
+  batchMultiplier: number;
+  purchasingWeekStart?: string;
+}
+
+export const EventDishRecipeSeedSeedCapability = {
+  capabilityId: "EventDishRecipeSeed.seed",
+  entity: "EventDishRecipeSeed",
+  command: "seed",
+  route: "/api/manifest/EventDishRecipeSeed/commands/seed",
+  instanceCommand: true,
+  clientParameterNames: ["eventId","eventDishId","dishId","recipeId","servings","yieldQuantity","batchMultiplier","purchasingWeekStart"],
+  serverParameterNames: [],
+  emits: ["EventDishRecipeSeeded"],
+} as const;
+
+/**
+ * Build command input for EventDishRecipeSeed.seed.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventDishRecipeSeedSeedInput(client: EventDishRecipeSeedSeedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventDishRecipeSeed.seed. */
+export const EventDishRecipeSeedSeedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventDishRecipeSeed",
+    "queryKeyHint": "queryKeys.eventDishRecipeSeed.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDishRecipeSeed",
+    "queryKeyHint": "queryKeys.eventDishRecipeSeed.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- EventGuest.assignTable ---
 export interface EventGuestAssignTableClientInput {
   tableAssignment: string;
@@ -3313,6 +3364,139 @@ export const EventGuestWithdrawInvalidation = [
     "kind": "entityDetail",
     "entity": "EventGuest",
     "queryKeyHint": "queryKeys.eventGuest.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- EventIngredientContribution.record ---
+export interface EventIngredientContributionRecordClientInput {
+  eventId: string;
+  eventDishId: string;
+  dishId: string;
+  recipeId: string;
+  ingredientId: string;
+  /** Bounds: 1..∞ */
+  quantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+  /** Bounds: 0..∞ */
+  servings: number;
+  purchasingWeekStart?: string;
+}
+
+export const EventIngredientContributionRecordCapability = {
+  capabilityId: "EventIngredientContribution.record",
+  entity: "EventIngredientContribution",
+  command: "record",
+  route: "/api/manifest/EventIngredientContribution/commands/record",
+  instanceCommand: true,
+  clientParameterNames: ["eventId","eventDishId","dishId","recipeId","ingredientId","quantity","unit","servings","purchasingWeekStart"],
+  serverParameterNames: [],
+  emits: ["EventIngredientContributionRecorded"],
+} as const;
+
+/**
+ * Build command input for EventIngredientContribution.record.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventIngredientContributionRecordInput(client: EventIngredientContributionRecordClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventIngredientContribution.record. */
+export const EventIngredientContributionRecordInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- EventIngredientContribution.retire ---
+export interface EventIngredientContributionRetireClientInput {
+  reason: string;
+}
+
+export const EventIngredientContributionRetireCapability = {
+  capabilityId: "EventIngredientContribution.retire",
+  entity: "EventIngredientContribution",
+  command: "retire",
+  route: "/api/manifest/EventIngredientContribution/commands/retire",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["EventIngredientContributionRecorded"],
+} as const;
+
+/**
+ * Build command input for EventIngredientContribution.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventIngredientContributionRetireInput(client: EventIngredientContributionRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventIngredientContribution.retire. */
+export const EventIngredientContributionRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- EventIngredientContribution.revise ---
+export interface EventIngredientContributionReviseClientInput {
+  /** Bounds: 1..∞ */
+  quantity: number;
+  servings: number;
+}
+
+export const EventIngredientContributionReviseCapability = {
+  capabilityId: "EventIngredientContribution.revise",
+  entity: "EventIngredientContribution",
+  command: "revise",
+  route: "/api/manifest/EventIngredientContribution/commands/revise",
+  instanceCommand: true,
+  clientParameterNames: ["quantity","servings"],
+  serverParameterNames: [],
+  emits: ["EventIngredientContributionRecorded"],
+} as const;
+
+/**
+ * Build command input for EventIngredientContribution.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventIngredientContributionReviseInput(client: EventIngredientContributionReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventIngredientContribution.revise. */
+export const EventIngredientContributionReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventIngredientContribution",
+    "queryKeyHint": "queryKeys.eventIngredientContribution.detail(id)",
     "label": "entity detail"
   }
 ] as const;
@@ -3624,6 +3808,7 @@ export interface IngredientIntroduceClientInput {
   costPerUnit: number;
   allergens?: ("milk" | "eggs" | "fish" | "crustacean_shellfish" | "tree_nuts" | "peanuts" | "wheat" | "soybeans" | "sesame")[];
   category?: string;
+  preferredVendorId?: string;
 }
 
 export const IngredientIntroduceCapability = {
@@ -3632,7 +3817,7 @@ export const IngredientIntroduceCapability = {
   command: "introduce",
   route: "/api/manifest/Ingredient/commands/introduce",
   instanceCommand: true,
-  clientParameterNames: ["name","unit","costPerUnit","allergens","category"],
+  clientParameterNames: ["name","unit","costPerUnit","allergens","category","preferredVendorId"],
   serverParameterNames: [],
   emits: ["IngredientIntroduced"],
 } as const;
@@ -3706,6 +3891,46 @@ export const IngredientReinstateLifecycle = [
     "from": "discontinued",
     "to": "active",
     "proven": true
+  }
+] as const;
+
+// --- Ingredient.setPreferredVendor ---
+export interface IngredientSetPreferredVendorClientInput {
+  preferredVendorId?: string;
+}
+
+export const IngredientSetPreferredVendorCapability = {
+  capabilityId: "Ingredient.setPreferredVendor",
+  entity: "Ingredient",
+  command: "setPreferredVendor",
+  route: "/api/manifest/Ingredient/commands/setPreferredVendor",
+  instanceCommand: true,
+  clientParameterNames: ["preferredVendorId"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for Ingredient.setPreferredVendor.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIngredientSetPreferredVendorInput(client: IngredientSetPreferredVendorClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Ingredient.setPreferredVendor. */
+export const IngredientSetPreferredVendorInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "label": "entity detail"
   }
 ] as const;
 
@@ -4124,6 +4349,51 @@ export const IngredientDemandSupersedeLifecycle = [
     "from": "confirmed",
     "to": "superseded",
     "proven": true
+  }
+] as const;
+
+// --- IngredientDemand.syncFromContributions ---
+export interface IngredientDemandSyncFromContributionsClientInput {
+  eventId: string;
+  ingredientId: string;
+  requiredQuantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+  purchasingWeekStart?: string;
+}
+
+export const IngredientDemandSyncFromContributionsCapability = {
+  capabilityId: "IngredientDemand.syncFromContributions",
+  entity: "IngredientDemand",
+  command: "syncFromContributions",
+  route: "/api/manifest/IngredientDemand/commands/syncFromContributions",
+  instanceCommand: true,
+  clientParameterNames: ["eventId","ingredientId","requiredQuantity","unit","purchasingWeekStart"],
+  serverParameterNames: [],
+  emits: ["IngredientDemandCalculated"],
+} as const;
+
+/**
+ * Build command input for IngredientDemand.syncFromContributions.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIngredientDemandSyncFromContributionsInput(client: IngredientDemandSyncFromContributionsClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful IngredientDemand.syncFromContributions. */
+export const IngredientDemandSyncFromContributionsInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "IngredientDemand",
+    "queryKeyHint": "queryKeys.ingredientDemand.detail(id)",
+    "label": "entity detail"
   }
 ] as const;
 
@@ -8532,6 +8802,7 @@ export interface PurchaseNeedCreateClientInput {
   requiredQuantity: number;
   /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
   unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+  purchasingWeekStart?: string;
 }
 
 export const PurchaseNeedCreateCapability = {
@@ -8540,7 +8811,7 @@ export const PurchaseNeedCreateCapability = {
   command: "create",
   route: "/api/manifest/PurchaseNeed/commands/create",
   instanceCommand: false,
-  clientParameterNames: ["eventId","ingredientDemandId","ingredientId","requiredQuantity","unit"],
+  clientParameterNames: ["eventId","ingredientDemandId","ingredientId","requiredQuantity","unit","purchasingWeekStart"],
   serverParameterNames: [],
   emits: ["PurchaseNeedOpened"],
 } as const;
@@ -8713,6 +8984,47 @@ export const PurchaseNeedMarkOrderedLifecycle = [
     "from": "open",
     "to": "ordered",
     "proven": true
+  }
+] as const;
+
+// --- PurchaseNeed.reviseRequired ---
+export interface PurchaseNeedReviseRequiredClientInput {
+  /** Bounds: 1..∞ */
+  requiredQuantity: number;
+}
+
+export const PurchaseNeedReviseRequiredCapability = {
+  capabilityId: "PurchaseNeed.reviseRequired",
+  entity: "PurchaseNeed",
+  command: "reviseRequired",
+  route: "/api/manifest/PurchaseNeed/commands/reviseRequired",
+  instanceCommand: true,
+  clientParameterNames: ["requiredQuantity"],
+  serverParameterNames: [],
+  emits: ["PurchaseNeedOpened"],
+} as const;
+
+/**
+ * Build command input for PurchaseNeed.reviseRequired.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPurchaseNeedReviseRequiredInput(client: PurchaseNeedReviseRequiredClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PurchaseNeed.reviseRequired. */
+export const PurchaseNeedReviseRequiredInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PurchaseNeed",
+    "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+    "label": "entity detail"
   }
 ] as const;
 
@@ -11782,6 +12094,56 @@ export const VendorOrderConfirmLifecycle = [
   }
 ] as const;
 
+// --- VendorOrder.ensureWeeklyDraft ---
+export interface VendorOrderEnsureWeeklyDraftClientInput {
+  vendorId: string;
+  /** Must not be "". */
+  sourceRangeStart: string & { readonly __nonEmpty?: true };
+  /** Must not be "". */
+  sourceRangeEnd: string & { readonly __nonEmpty?: true };
+  purchaseNeedId: string;
+  ingredientDemandId: string;
+  ingredientId: string;
+  requiredQuantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+}
+
+export const VendorOrderEnsureWeeklyDraftCapability = {
+  capabilityId: "VendorOrder.ensureWeeklyDraft",
+  entity: "VendorOrder",
+  command: "ensureWeeklyDraft",
+  route: "/api/manifest/VendorOrder/commands/ensureWeeklyDraft",
+  instanceCommand: true,
+  clientParameterNames: ["vendorId","sourceRangeStart","sourceRangeEnd","purchaseNeedId","ingredientDemandId","ingredientId","requiredQuantity","unit"],
+  serverParameterNames: [],
+  emits: ["VendorOrderWeeklyDraftEnsured"],
+} as const;
+
+/**
+ * Build command input for VendorOrder.ensureWeeklyDraft.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorOrderEnsureWeeklyDraftInput(client: VendorOrderEnsureWeeklyDraftClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorOrder.ensureWeeklyDraft. */
+export const VendorOrderEnsureWeeklyDraftInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrder",
+    "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- VendorOrder.markPartiallyReceived ---
 export type VendorOrderMarkPartiallyReceivedClientInput = Record<string, never>;
 
@@ -12140,6 +12502,56 @@ export const VendorOrderLineCancelLineLifecycle = [
     "from": "receiving",
     "to": "cancelled",
     "proven": true
+  }
+] as const;
+
+// --- VendorOrderLine.ensureWeeklyLine ---
+export interface VendorOrderLineEnsureWeeklyLineClientInput {
+  vendorOrderId: string;
+  ingredientId: string;
+  weekNeed: number;
+  onHand: number;
+  /** Bounds: 1..∞ */
+  contributionQuantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+  unitCost: number;
+  purchaseNeedId: string;
+  ingredientDemandId: string;
+}
+
+export const VendorOrderLineEnsureWeeklyLineCapability = {
+  capabilityId: "VendorOrderLine.ensureWeeklyLine",
+  entity: "VendorOrderLine",
+  command: "ensureWeeklyLine",
+  route: "/api/manifest/VendorOrderLine/commands/ensureWeeklyLine",
+  instanceCommand: true,
+  clientParameterNames: ["vendorOrderId","ingredientId","weekNeed","onHand","contributionQuantity","unit","unitCost","purchaseNeedId","ingredientDemandId"],
+  serverParameterNames: [],
+  emits: ["VendorOrderLineWeeklyEnsured"],
+} as const;
+
+/**
+ * Build command input for VendorOrderLine.ensureWeeklyLine.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVendorOrderLineEnsureWeeklyLineInput(client: VendorOrderLineEnsureWeeklyLineClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VendorOrderLine.ensureWeeklyLine. */
+export const VendorOrderLineEnsureWeeklyLineInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VendorOrderLine",
+    "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+    "label": "entity detail"
   }
 ] as const;
 
@@ -12717,6 +13129,94 @@ export const WasteRecordVoidRecordLifecycle = [
   }
 ] as const;
 
+// --- WeeklyPurchasingConfig.configure ---
+export interface WeeklyPurchasingConfigConfigureClientInput {
+  defaultVendorId: string;
+}
+
+export const WeeklyPurchasingConfigConfigureCapability = {
+  capabilityId: "WeeklyPurchasingConfig.configure",
+  entity: "WeeklyPurchasingConfig",
+  command: "configure",
+  route: "/api/manifest/WeeklyPurchasingConfig/commands/configure",
+  instanceCommand: true,
+  clientParameterNames: ["defaultVendorId"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for WeeklyPurchasingConfig.configure.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindWeeklyPurchasingConfigConfigureInput(client: WeeklyPurchasingConfigConfigureClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful WeeklyPurchasingConfig.configure. */
+export const WeeklyPurchasingConfigConfigureInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "WeeklyPurchasingConfig",
+    "queryKeyHint": "queryKeys.weeklyPurchasingConfig.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "WeeklyPurchasingConfig",
+    "queryKeyHint": "queryKeys.weeklyPurchasingConfig.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- WeeklyPurchasingConfig.routeNeed ---
+export interface WeeklyPurchasingConfigRouteNeedClientInput {
+  purchaseNeedId: string;
+  eventId: string;
+  ingredientDemandId: string;
+  ingredientId: string;
+  requiredQuantity: number;
+  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
+  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
+  /** Must not be "". */
+  purchasingWeekStart: string & { readonly __nonEmpty?: true };
+}
+
+export const WeeklyPurchasingConfigRouteNeedCapability = {
+  capabilityId: "WeeklyPurchasingConfig.routeNeed",
+  entity: "WeeklyPurchasingConfig",
+  command: "routeNeed",
+  route: "/api/manifest/WeeklyPurchasingConfig/commands/routeNeed",
+  instanceCommand: true,
+  clientParameterNames: ["purchaseNeedId","eventId","ingredientDemandId","ingredientId","requiredQuantity","unit","purchasingWeekStart"],
+  serverParameterNames: [],
+  emits: ["PurchaseNeedReadyForWeeklyDraft"],
+} as const;
+
+/**
+ * Build command input for WeeklyPurchasingConfig.routeNeed.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindWeeklyPurchasingConfigRouteNeedInput(client: WeeklyPurchasingConfigRouteNeedClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful WeeklyPurchasingConfig.routeNeed. */
+export const WeeklyPurchasingConfigRouteNeedInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "WeeklyPurchasingConfig",
+    "queryKeyHint": "queryKeys.weeklyPurchasingConfig.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "WeeklyPurchasingConfig",
+    "queryKeyHint": "queryKeys.weeklyPurchasingConfig.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 /** All capability ids in this contract (sorted). */
 export const ALL_CAPABILITY_IDS = [
   "AvailabilityWindow.declare",
@@ -12782,12 +13282,16 @@ export const ALL_CAPABILITY_IDS = [
   "EventDish.changeCourse",
   "EventDish.remove",
   "EventDish.updateInstructions",
+  "EventDishRecipeSeed.seed",
   "EventGuest.assignTable",
   "EventGuest.checkIn",
   "EventGuest.invite",
   "EventGuest.rsvpConfirm",
   "EventGuest.rsvpDecline",
   "EventGuest.withdraw",
+  "EventIngredientContribution.record",
+  "EventIngredientContribution.retire",
+  "EventIngredientContribution.revise",
   "Incident.beginInvestigation",
   "Incident.dismiss",
   "Incident.markResolved",
@@ -12796,6 +13300,7 @@ export const ALL_CAPABILITY_IDS = [
   "Ingredient.discontinue",
   "Ingredient.introduce",
   "Ingredient.reinstate",
+  "Ingredient.setPreferredVendor",
   "Ingredient.updateCosting",
   "Ingredient.updateDetails",
   "IngredientDemand.calculate",
@@ -12805,6 +13310,7 @@ export const ALL_CAPABILITY_IDS = [
   "IngredientDemand.markReleased",
   "IngredientDemand.recalculate",
   "IngredientDemand.supersede",
+  "IngredientDemand.syncFromContributions",
   "InventoryItem.adjustQuantity",
   "InventoryItem.open",
   "InventoryItem.receiveStock",
@@ -12897,6 +13403,7 @@ export const ALL_CAPABILITY_IDS = [
   "PurchaseNeed.markDraftOrdered",
   "PurchaseNeed.markFulfilled",
   "PurchaseNeed.markOrdered",
+  "PurchaseNeed.reviseRequired",
   "Qualification.expire",
   "Qualification.grant",
   "Qualification.revoke",
@@ -12960,6 +13467,7 @@ export const ALL_CAPABILITY_IDS = [
   "Vendor.updateDetails",
   "VendorOrder.cancel",
   "VendorOrder.confirm",
+  "VendorOrder.ensureWeeklyDraft",
   "VendorOrder.markPartiallyReceived",
   "VendorOrder.markReceived",
   "VendorOrder.open",
@@ -12967,6 +13475,7 @@ export const ALL_CAPABILITY_IDS = [
   "VendorOrder.updateTotals",
   "VendorOrderLine.addLine",
   "VendorOrderLine.cancelLine",
+  "VendorOrderLine.ensureWeeklyLine",
   "VendorOrderLine.recordReceipt",
   "VendorOrderLine.reviseQuantity",
   "VendorOrderLineDemand.link",
@@ -12978,5 +13487,7 @@ export const ALL_CAPABILITY_IDS = [
   "Venue.register",
   "Venue.updateDetails",
   "WasteRecord.record",
-  "WasteRecord.voidRecord"
+  "WasteRecord.voidRecord",
+  "WeeklyPurchasingConfig.configure",
+  "WeeklyPurchasingConfig.routeNeed"
 ] as const;

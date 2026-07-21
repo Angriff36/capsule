@@ -177,6 +177,8 @@ export class CapsuleDocumentEnterCoordinator {
         args: {
           dishId,
           recipeId: saved.recipeId,
+          yieldQuantity: ready.yieldQuantity,
+          batchMultiplier: ready.batchMultiplier ?? 1,
           sortOrder: 0,
         },
         idempotencyKey: keys.forCapability("DishRecipe.attach", "link"),

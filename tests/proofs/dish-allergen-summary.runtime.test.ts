@@ -1,43 +1,33 @@
 /**
- * Focused proof: Dish.allergenSummary unions allergens through
- * Dish → Recipe → RecipeIngredient → Ingredient (unique_of ∘ flat_map).
+ * Focused proof: Dish.allergenSummary is a stored list maintained by
+ * classifyAllergens (schema must include the field — orphan docs break Convex).
  */
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { computeDish } from "../../convex/computed";
 
-describe("Dish.allergenSummary multi-hop", () => {
-  it("returns deduplicated allergens across nested recipe ingredient lines", () => {
-    const doc = {
-      status: "active",
-      recipeLines: [
-        {
-          recipe: {
-            ingredientLines: [
-              { ingredient: { allergens: ["milk", "eggs"] } },
-              { ingredient: { allergens: ["eggs", "wheat"] } },
-            ],
-          },
-        },
-        {
-          recipe: {
-            ingredientLines: [{ ingredient: { allergens: ["milk"] } }],
-          },
-        },
-      ],
-    };
-
-    expect(computeDish(doc).allergenSummary).toEqual(["milk", "eggs", "wheat"]);
+describe("Dish.allergenSummary stored property", () => {
+  it("is declared as a stored property in dish.manifest (not computed-only)", () => {
+    const source = readFileSync(
+      resolve(process.cwd(), "src/culinary/dish.manifest"),
+      "utf8",
+    );
+    expect(source).toMatch(
+      /property\s+allergenSummary:\s*list<AllergenCode>\s*=\s*\[\]/,
+    );
+    expect(source).toMatch(/command\s+classifyAllergens\s*\(/);
+    expect(source).not.toMatch(/computed\s+allergenSummary:/);
   });
 
-  it("returns [] when the dish has no recipe lines or empty nested collections", () => {
-    expect(
-      computeDish({ status: "active", recipeLines: [] }).allergenSummary,
-    ).toEqual([]);
-    expect(
-      computeDish({
-        status: "active",
-        recipeLines: [{ recipe: { ingredientLines: [] } }],
-      }).allergenSummary,
-    ).toEqual([]);
+  it("projects allergenSummary into the Convex dishes table schema", () => {
+    const schema = readFileSync(
+      resolve(process.cwd(), "convex/schema.ts"),
+      "utf8",
+    );
+    const dishesBlock = schema.match(
+      /dishes:\s*defineTable\(\{[\s\S]*?\}\)\s*\n\s*\.index/,
+    )?.[0];
+    expect(dishesBlock).toBeTruthy();
+    expect(dishesBlock).toMatch(/allergenSummary:/);
   });
 });

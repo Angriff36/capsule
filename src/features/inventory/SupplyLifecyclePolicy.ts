@@ -14,6 +14,9 @@ import {
   VendorOrderSubmitLifecycle,
 } from "../../generated/manifest-wiring-bindings";
 
+/** Retained for supply integration guard + API; ledger UI does not offer Confirm. */
+void IngredientDemandConfirmLifecycle;
+
 export interface SupplyAction<Key extends string = string> {
   key: Key;
   label: string;
@@ -39,12 +42,9 @@ function available<Key extends string>(
     .map(({ key, label }) => ({ key, label }));
 }
 
+// Confirm theater removed from the ledger UI — Event.approve foreach-creates
+// PurchaseNeed. Manifest IngredientDemand.confirm remains for API/manual paths.
 const DEMAND_ACTIONS = [
-  {
-    key: "confirm",
-    label: "Confirm",
-    lifecycle: IngredientDemandConfirmLifecycle,
-  },
   {
     key: "fulfill",
     label: "Fulfill",

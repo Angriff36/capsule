@@ -4,10 +4,12 @@ sequenceDiagram
     participant EventBus
     Client->>+PurchaseNeed: assignToDraft(vendorOrderId, vendorOrderLineId)
     Note over PurchaseNeed: Policies: purchaseNeedRead, purchaseNeedWrite, purchaseNeedExecute
-    Note over PurchaseNeed: Guards (3)
+    Note over PurchaseNeed: Guards (5)
     PurchaseNeed->>PurchaseNeed: guard[0]: self.status == #quot;open#quot;
     PurchaseNeed->>PurchaseNeed: guard[1]: self.openedAt != null
     PurchaseNeed->>PurchaseNeed: guard[2]: self.deletedAt == null
+    PurchaseNeed->>PurchaseNeed: guard[3]: self.vendorOrderId == null or self.vendorOrderId == vendo...
+    PurchaseNeed->>PurchaseNeed: guard[4]: self.vendorOrderLineId == null or self.vendorOrderLineId ...
     PurchaseNeed->>PurchaseNeed: mutate.vendorOrderId
     PurchaseNeed->>PurchaseNeed: mutate.vendorOrderLineId
     PurchaseNeed->>EventBus: emit PurchaseNeedDraftAssigned on purchase_need.draft_assigned

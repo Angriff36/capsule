@@ -1,0 +1,372 @@
+// Manifest-owned event → weekly purchasing workflow.
+// Replaces host EventRecipeDemandReconciler + PrepPurchaseDraftCoordinator.
+// Requires @angriff36/manifest ≥ 3.6.39 (sum + match else create + fanOut match).
+
+use "./purchase-need.manifest"
+use "../culinary/event-dish.manifest"
+use "../culinary/dish.manifest"
+use "../culinary/recipe.manifest"
+use "../inventory/demand.manifest"
+
+// Tenant purchasing defaults — seed/E2E must create one row per tenant before approve.
+entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId]
+  timestamps
+  versionProperty version: number
+
+  property required defaultVendorId: uuid
+  property configuredAt: datetime?
+
+  belongsTo defaultVendor: Vendor fields [tenantId, defaultVendorId] references [tenantId, id]
+
+  default policy weeklyPurchasingConfigRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read weekly purchasing config"
+  default policy weeklyPurchasingConfigWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write weekly purchasing config"
+  default policy weeklyPurchasingConfigExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute weekly purchasing config"
+
+  command configure(defaultVendorId: uuid) {
+    guard self.configuredAt == null
+    guard self.deletedAt == null
+    guard self.defaultVendor != null and self.defaultVendor.status == "active"
+    mutate defaultVendorId = defaultVendorId
+    mutate configuredAt = now()
+  }
+
+  command routeNeed(
+    purchaseNeedId: uuid,
+    eventId: uuid,
+    ingredientDemandId: uuid,
+    ingredientId: uuid,
+    requiredQuantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    purchasingWeekStart: datetime
+  ) {
+    guard self.configuredAt != null
+    guard self.deletedAt == null
+    emit PurchaseNeedReadyForWeeklyDraft {
+      purchaseNeedId: purchaseNeedId
+      tenantId: self.tenantId
+      eventId: eventId
+      ingredientDemandId: ingredientDemandId
+      ingredientId: ingredientId
+      requiredQuantity: requiredQuantity
+      unit: unit
+      purchasingWeekStart: purchasingWeekStart
+      vendorId: self.defaultVendorId
+    }
+  }
+
+  store WeeklyPurchasingConfig in durable
+}
+
+entity EventDishRecipeSeed mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, eventDishId, recipeId]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property indexed required eventDishId: uuid
+  property required dishId: uuid
+  property indexed required recipeId: uuid
+  property required servings: decimal(12, 4) = 0
+  property required yieldQuantity: decimal(10, 2) = 1
+  property required batchMultiplier: decimal(10, 4) = 1
+  property purchasingWeekStart: datetime?
+  property seededAt: datetime?
+
+  belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
+
+  command seed(
+    eventId: uuid,
+    eventDishId: uuid,
+    dishId: uuid,
+    recipeId: uuid,
+    servings: decimal(12, 4),
+    yieldQuantity: decimal(10, 2),
+    batchMultiplier: decimal(10, 4),
+    optional purchasingWeekStart: datetime
+  ) {
+    guard self.seededAt == null
+    guard self.deletedAt == null
+    mutate eventId = eventId
+    mutate eventDishId = eventDishId
+    mutate dishId = dishId
+    mutate recipeId = recipeId
+    mutate servings = servings
+    mutate yieldQuantity = yieldQuantity
+    mutate batchMultiplier = batchMultiplier
+    mutate purchasingWeekStart = purchasingWeekStart
+    mutate seededAt = now()
+    emit EventDishRecipeSeeded {
+      seedId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      eventDishId: eventDishId
+      dishId: dishId
+      recipeId: recipeId
+      servings: servings
+      yieldQuantity: yieldQuantity
+      batchMultiplier: batchMultiplier
+      purchasingWeekStart: purchasingWeekStart
+    }
+  }
+
+  store EventDishRecipeSeed in durable
+}
+
+entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, eventDishId, ingredientId, unit]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required eventDishId: uuid
+  property required dishId: uuid
+  property required recipeId: uuid
+  property required ingredientId: uuid
+  property required quantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required servings: decimal(12, 4) = 0
+  property purchasingWeekStart: datetime?
+  property recordedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+
+  default policy eventIngredientContributionRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory and managers may read event ingredient contributions"
+  default policy eventIngredientContributionWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory and managers may write event ingredient contributions"
+  default policy eventIngredientContributionExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory and managers may execute event ingredient contributions"
+
+  command record(
+    eventId: uuid,
+    eventDishId: uuid,
+    dishId: uuid,
+    recipeId: uuid,
+    ingredientId: uuid,
+    quantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    servings: decimal(12, 4),
+    optional purchasingWeekStart: datetime
+  ) {
+    guard self.deletedAt == null
+    constraint recordQuantityPositive: quantity > 0 "Contribution quantity must be positive"
+    constraint recordServingsNonnegative: servings >= 0 "Contribution servings cannot be negative"
+    mutate eventId = eventId
+    mutate eventDishId = eventDishId
+    mutate dishId = dishId
+    mutate recipeId = recipeId
+    mutate ingredientId = ingredientId
+    mutate quantity = quantity
+    mutate unit = unit
+    mutate servings = servings
+    mutate purchasingWeekStart = purchasingWeekStart
+    mutate recordedAt = now()
+    emit EventIngredientContributionRecorded {
+      contributionId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      eventDishId: eventDishId
+      ingredientId: ingredientId
+      quantity: quantity
+      unit: unit
+      purchasingWeekStart: purchasingWeekStart
+    }
+  }
+
+  command revise(quantity: decimal(12, 4), servings: decimal(12, 4)) {
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    constraint reviseQuantityPositive: quantity > 0 "Contribution quantity must be positive"
+    mutate quantity = quantity
+    mutate servings = servings
+    emit EventIngredientContributionRecorded {
+      contributionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      eventDishId: self.eventDishId
+      ingredientId: self.ingredientId
+      quantity: quantity
+      unit: self.unit
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
+  command retire(reason: string) {
+    guard self.recordedAt != null
+    guard self.deletedAt == null
+    constraint retireReason: length(trim(reason)) > 0 "Retire reason is required"
+    mutate deletedAt = now()
+    mutate quantity = 0
+    emit EventIngredientContributionRecorded {
+      contributionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      eventDishId: self.eventDishId
+      ingredientId: self.ingredientId
+      quantity: 0
+      unit: self.unit
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
+  store EventIngredientContribution in durable
+}
+
+event EventDishRecipeSeeded: "event_dish_recipe.seeded" {
+  seedId: string
+  tenantId: string
+  eventId: string
+  eventDishId: string
+  dishId: string
+  recipeId: string
+  servings: number
+  yieldQuantity: number
+  batchMultiplier: number
+  purchasingWeekStart: datetime?
+}
+
+event EventIngredientContributionRecorded: "event_ingredient_contribution.recorded" {
+  contributionId: string
+  tenantId: string
+  eventId: string
+  eventDishId: string
+  ingredientId: string
+  quantity: number
+  unit: UnitOfMeasure
+  purchasingWeekStart: datetime?
+}
+
+event PurchaseNeedReadyForWeeklyDraft: "purchase_need.ready_for_weekly_draft" {
+  purchaseNeedId: string
+  tenantId: string
+  eventId: string
+  ingredientDemandId: string
+  ingredientId: string
+  requiredQuantity: number
+  unit: UnitOfMeasure
+  purchasingWeekStart: datetime
+  vendorId: string
+}
+
+on EventDishAdded fanOut DishRecipe where dishId = payload.dishId
+  run EventDishRecipeSeed.seed
+  match eventDishId = payload.eventDishId, recipeId = self.recipeId
+  else create
+  params {
+    eventId: payload.eventId
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    recipeId: self.recipeId
+    servings: payload.quantityServings
+    yieldQuantity: self.yieldQuantity
+    batchMultiplier: self.batchMultiplier
+    purchasingWeekStart: payload.purchasingWeekStart
+  }
+
+on EventDishRecipeSeeded fanOut RecipeIngredient where recipeId = payload.recipeId
+  run EventIngredientContribution.record
+  match eventDishId = payload.eventDishId, ingredientId = self.ingredientId, unit = self.unit
+  else create
+  params {
+    eventId: payload.eventId
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    recipeId: payload.recipeId
+    ingredientId: self.ingredientId
+    quantity: (self.quantity * payload.batchMultiplier * payload.servings) / payload.yieldQuantity
+    unit: self.unit
+    servings: payload.servings
+    purchasingWeekStart: payload.purchasingWeekStart
+  }
+
+on EventDishServingsAdjusted fanOut EventIngredientContribution where eventDishId = payload.eventDishId
+  run revise
+  params {
+    quantity: (self.quantity / self.servings) * payload.quantityServings
+    servings: payload.quantityServings
+  }
+
+on EventHeadcountChanged fanOut EventDish where eventId = payload.eventId
+  run adjustServings
+  params { quantityServings: payload.newHeadcount }
+
+on EventDishRemoved fanOut EventIngredientContribution where eventDishId = payload.eventDishId
+  run retire
+  params { reason: payload.reason }
+
+on EventIngredientContributionRecorded run IngredientDemand.syncFromContributions
+  match eventId = payload.eventId, ingredientId = payload.ingredientId
+  else create
+  params {
+    eventId: payload.eventId
+    ingredientId: payload.ingredientId
+    requiredQuantity: sum(EventIngredientContribution where eventId == payload.eventId, ingredientId == payload.ingredientId, of quantity)
+    unit: payload.unit
+    purchasingWeekStart: payload.purchasingWeekStart
+  }
+
+on IngredientDemandCalculated fanOut PurchaseNeed where ingredientDemandId = payload.ingredientDemandId
+  run reviseRequired
+  params { requiredQuantity: payload.requiredQuantity }
+
+on PurchaseNeedOpened run WeeklyPurchasingConfig.routeNeed
+  match tenantId = payload.tenantId
+  params {
+    purchaseNeedId: payload.purchaseNeedId
+    eventId: payload.eventId
+    ingredientDemandId: payload.ingredientDemandId
+    ingredientId: payload.ingredientId
+    requiredQuantity: payload.requiredQuantity
+    unit: payload.unit
+    purchasingWeekStart: payload.purchasingWeekStart
+  }
+
+on PurchaseNeedReadyForWeeklyDraft run VendorOrder.ensureWeeklyDraft
+  match vendorId = payload.vendorId, sourceRangeStart = payload.purchasingWeekStart, status = "draft"
+  else create
+  params {
+    vendorId: payload.vendorId
+    sourceRangeStart: payload.purchasingWeekStart
+    sourceRangeEnd: payload.purchasingWeekStart
+    purchaseNeedId: payload.purchaseNeedId
+    ingredientDemandId: payload.ingredientDemandId
+    ingredientId: payload.ingredientId
+    requiredQuantity: payload.requiredQuantity
+    unit: payload.unit
+  }
+
+on VendorOrderWeeklyDraftEnsured run VendorOrderLine.ensureWeeklyLine
+  match vendorOrderId = payload.vendorOrderId, ingredientId = payload.ingredientId, unit = payload.unit
+  else create
+  params {
+    vendorOrderId: payload.vendorOrderId
+    ingredientId: payload.ingredientId
+    weekNeed: sum(PurchaseNeed where ingredientId == payload.ingredientId, purchasingWeekStart == payload.purchasingWeekStart, status == "open", of requiredQuantity)
+    onHand: sum(InventoryItem where ingredientId == payload.ingredientId, of quantityOnHand)
+    contributionQuantity: payload.requiredQuantity
+    unit: payload.unit
+    unitCost: 0
+    purchaseNeedId: payload.purchaseNeedId
+    ingredientDemandId: payload.ingredientDemandId
+  }
+
+on VendorOrderLineWeeklyEnsured run VendorOrderLineDemand.link
+  match vendorOrderLineId = payload.vendorOrderLineId, ingredientDemandId = payload.ingredientDemandId
+  else create
+  params {
+    vendorOrderLineId: payload.vendorOrderLineId
+    ingredientDemandId: payload.ingredientDemandId
+    vendorOrderId: payload.vendorOrderId
+    contributionQuantity: payload.contributionQuantity
+    unit: payload.unit
+  }
+
+on VendorOrderLineWeeklyEnsured run PurchaseNeed.assignToDraft
+  resolve payload.purchaseNeedId
+  params {
+    vendorOrderId: payload.vendorOrderId
+    vendorOrderLineId: payload.vendorOrderLineId
+  }

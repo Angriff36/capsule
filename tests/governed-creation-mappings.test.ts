@@ -20,8 +20,10 @@ describe("governed creation mappings", () => {
       "EventAllergenCheck_createViaRecord",
       "EventAssignment_createViaAssign",
       "EventCloseout_createViaCapture",
+      "EventDishRecipeSeed_createViaSeed",
       "EventDish_createViaAddToEvent",
       "EventGuest_createViaInvite",
+      "EventIngredientContribution_createViaRecord",
       "Event_createViaPlanEngagement",
       "Incident_createViaReport",
       "IngredientDemand_createViaCalculate",
@@ -58,6 +60,7 @@ describe("governed creation mappings", () => {
       "Vendor_createViaOnboard",
       "Venue_createViaRegister",
       "WasteRecord_createViaRecord",
+      "WeeklyPurchasingConfig_createViaConfigure",
     ]);
     expect(mutations).not.toContain("QualityCheck_createViaFail");
   });

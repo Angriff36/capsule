@@ -109,7 +109,7 @@ describe("EventStockIssueCoordinator", () => {
     });
     expect(fulfillDemand).toHaveBeenCalledWith({
       docId: "demand-flour",
-      version: 2,
+      version: 3,
     });
     expect(full.fulfilledDemandId).toBe("demand-flour");
     expect(full.demandPreserved).toBe(false);

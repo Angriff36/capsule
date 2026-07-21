@@ -19,7 +19,7 @@ describe("Event lifecycle reaction projection", () => {
     expect(cancel).not.toContain("payload.payload");
   });
 
-  it("does not fanOut IngredientDemand.confirm from Event.approve", () => {
+  it("Event.approve foreach-creates PurchaseNeed; markReleased chains from PurchaseNeedOpened", () => {
     const mutations = readFileSync("convex/mutations.ts", "utf8");
     const approve = runnerBlock(
       mutations,
@@ -27,6 +27,21 @@ describe("Event lifecycle reaction projection", () => {
       "Event_approve",
     );
     expect(approve).not.toContain("__runIngredientDemandConfirm");
+    expect(approve).toContain("__runIngredientDemandEnsurePurchaseEligible");
+    expect(approve).toContain("__runPurchaseNeedCreate");
+    expect(approve).not.toContain("__runIngredientDemandMarkReleased");
+    expect(approve).toContain("purchaseEligibleEventId");
+    // Compat repair must precede create so legacy null eligibility is visible.
+    expect(
+      approve.indexOf("__runIngredientDemandEnsurePurchaseEligible"),
+    ).toBeLessThan(approve.indexOf("__runPurchaseNeedCreate"));
+
+    const createNeed = runnerBlock(
+      mutations,
+      "__runPurchaseNeedCreate",
+      "PurchaseNeed_create",
+    );
+    expect(createNeed).toContain("__runIngredientDemandMarkReleased");
   });
 
   it("dispatches the known reaction paths through governed command runners", () => {

@@ -123,8 +123,8 @@ export function PurchasingQueueSplit({
           <div className="document-empty">
             <p>No purchase needs are open.</p>
             <span>
-              Approve an event with calculated demand, or confirm demand in the
-              ledger, to open needs here.
+              Approve an event with calculated recipe demand to open needs here
+              (weekly draft is maintained automatically).
             </span>
             <div className="mt-3 flex justify-center gap-2">
               <Link to="/events" className="btn btn-primary btn-sm">

@@ -6,7 +6,6 @@ describe("SupplyLifecyclePolicy", () => {
 
   it("derives demand and reservation offers from generated metadata", () => {
     expect(policy.demandActions("calculated").map((item) => item.key)).toEqual([
-      "confirm",
       "supersede",
     ]);
     expect(policy.demandActions("confirmed").map((item) => item.key)).toEqual([

@@ -59,6 +59,7 @@ import {
   EventDishAddToEventParamsSchema,
   EventDishAdjustServingsParamsSchema,
   EventDishChangeCourseParamsSchema,
+  EventDishRecipeSeedSeedParamsSchema,
   EventDishRemoveParamsSchema,
   EventDishUpdateInstructionsParamsSchema,
   EventGuestAssignTableParamsSchema,
@@ -67,6 +68,9 @@ import {
   EventGuestRsvpConfirmParamsSchema,
   EventGuestRsvpDeclineParamsSchema,
   EventGuestWithdrawParamsSchema,
+  EventIngredientContributionRecordParamsSchema,
+  EventIngredientContributionRetireParamsSchema,
+  EventIngredientContributionReviseParamsSchema,
   EventPlanEngagementParamsSchema,
   EventRescheduleParamsSchema,
   EventReturnToPlanningParamsSchema,
@@ -83,9 +87,11 @@ import {
   IngredientDemandMarkReleasedParamsSchema,
   IngredientDemandRecalculateParamsSchema,
   IngredientDemandSupersedeParamsSchema,
+  IngredientDemandSyncFromContributionsParamsSchema,
   IngredientDiscontinueParamsSchema,
   IngredientIntroduceParamsSchema,
   IngredientReinstateParamsSchema,
+  IngredientSetPreferredVendorParamsSchema,
   IngredientUpdateCostingParamsSchema,
   IngredientUpdateDetailsParamsSchema,
   InventoryItemAdjustQuantityParamsSchema,
@@ -180,6 +186,7 @@ import {
   PurchaseNeedMarkDraftOrderedParamsSchema,
   PurchaseNeedMarkFulfilledParamsSchema,
   PurchaseNeedMarkOrderedParamsSchema,
+  PurchaseNeedReviseRequiredParamsSchema,
   QualificationExpireParamsSchema,
   QualificationGrantParamsSchema,
   QualificationRevokeParamsSchema,
@@ -239,11 +246,13 @@ import {
   VendorOnboardParamsSchema,
   VendorOrderCancelParamsSchema,
   VendorOrderConfirmParamsSchema,
+  VendorOrderEnsureWeeklyDraftParamsSchema,
   VendorOrderLineAddLineParamsSchema,
   VendorOrderLineCancelLineParamsSchema,
   VendorOrderLineDemandLinkParamsSchema,
   VendorOrderLineDemandRetireParamsSchema,
   VendorOrderLineDemandReviseParamsSchema,
+  VendorOrderLineEnsureWeeklyLineParamsSchema,
   VendorOrderLineRecordReceiptParamsSchema,
   VendorOrderLineReviseQuantityParamsSchema,
   VendorOrderMarkPartiallyReceivedParamsSchema,
@@ -262,6 +271,8 @@ import {
   VenueUpdateDetailsParamsSchema,
   WasteRecordRecordParamsSchema,
   WasteRecordVoidRecordParamsSchema,
+  WeeklyPurchasingConfigConfigureParamsSchema,
+  WeeklyPurchasingConfigRouteNeedParamsSchema,
 } from "../../schemas/manifest-schemas";
 
 function __convexArgsFromZod(parsed: Record<string, unknown>): Record<string, unknown> {
@@ -1175,6 +1186,37 @@ export function useCreateEventDish() {
   };
 }
 
+/** Reactive list for EventDishRecipeSeed. */
+export function useListEventDishRecipeSeed() {
+  return useQuery(api.queries.listEventDishRecipeSeed);
+}
+
+/** Reactive get-by-id for EventDishRecipeSeed. Pass "skip" to suspend. */
+export function useGetEventDishRecipeSeed(id: string | "skip") {
+  return useQuery(api.queries.getEventDishRecipeSeed, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for EventDishRecipeSeed.seed. */
+export function useEventDishRecipeSeedSeed() {
+  const mutate = useMutation(api.mutations.EventDishRecipeSeed_seed);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventDishRecipeSeedSeedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EventDishRecipeSeed.seed. */
+export function useCreateEventDishRecipeSeed() {
+  const mutate = useMutation(api.mutations.EventDishRecipeSeed_createViaSeed);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EventDishRecipeSeedSeedParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for EventGuest. */
 export function useListEventGuest() {
   return useQuery(api.queries.listEventGuest);
@@ -1251,6 +1293,57 @@ export function useCreateEventGuest() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = EventGuestInviteParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for EventIngredientContribution. */
+export function useListEventIngredientContribution() {
+  return useQuery(api.queries.listEventIngredientContribution);
+}
+
+/** Reactive get-by-id for EventIngredientContribution. Pass "skip" to suspend. */
+export function useGetEventIngredientContribution(id: string | "skip") {
+  return useQuery(api.queries.getEventIngredientContribution, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for EventIngredientContribution.record. */
+export function useEventIngredientContributionRecord() {
+  const mutate = useMutation(api.mutations.EventIngredientContribution_record);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventIngredientContributionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventIngredientContribution.retire. */
+export function useEventIngredientContributionRetire() {
+  const mutate = useMutation(api.mutations.EventIngredientContribution_retire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventIngredientContributionRetireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventIngredientContribution.revise. */
+export function useEventIngredientContributionRevise() {
+  const mutate = useMutation(api.mutations.EventIngredientContribution_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventIngredientContributionReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EventIngredientContribution.record. */
+export function useCreateEventIngredientContribution() {
+  const mutate = useMutation(api.mutations.EventIngredientContribution_createViaRecord);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EventIngredientContributionRecordParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -1367,6 +1460,16 @@ export function useIngredientReinstate() {
   };
 }
 
+/** Mutation hook for Ingredient.setPreferredVendor. */
+export function useIngredientSetPreferredVendor() {
+  const mutate = useMutation(api.mutations.Ingredient_setPreferredVendor);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IngredientSetPreferredVendorParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Ingredient.updateCosting. */
 export function useIngredientUpdateCosting() {
   const mutate = useMutation(api.mutations.Ingredient_updateCosting);
@@ -1474,6 +1577,16 @@ export function useIngredientDemandSupersede() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = IngredientDemandSupersedeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for IngredientDemand.syncFromContributions. */
+export function useIngredientDemandSyncFromContributions() {
+  const mutate = useMutation(api.mutations.IngredientDemand_syncFromContributions);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IngredientDemandSyncFromContributionsParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -2734,6 +2847,16 @@ export function usePurchaseNeedMarkOrdered() {
   };
 }
 
+/** Mutation hook for PurchaseNeed.reviseRequired. */
+export function usePurchaseNeedReviseRequired() {
+  const mutate = useMutation(api.mutations.PurchaseNeed_reviseRequired);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PurchaseNeedReviseRequiredParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Reactive list for Qualification. */
 export function useListQualification() {
   return useQuery(api.queries.listQualification);
@@ -3626,6 +3749,16 @@ export function useVendorOrderConfirm() {
   };
 }
 
+/** Mutation hook for VendorOrder.ensureWeeklyDraft. */
+export function useVendorOrderEnsureWeeklyDraft() {
+  const mutate = useMutation(api.mutations.VendorOrder_ensureWeeklyDraft);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderEnsureWeeklyDraftParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for VendorOrder.markPartiallyReceived. */
 export function useVendorOrderMarkPartiallyReceived() {
   const mutate = useMutation(api.mutations.VendorOrder_markPartiallyReceived);
@@ -3713,6 +3846,16 @@ export function useVendorOrderLineCancelLine() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = VendorOrderLineCancelLineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VendorOrderLine.ensureWeeklyLine. */
+export function useVendorOrderLineEnsureWeeklyLine() {
+  const mutate = useMutation(api.mutations.VendorOrderLine_ensureWeeklyLine);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderLineEnsureWeeklyLineParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -3911,4 +4054,45 @@ export function useCreateWasteRecord() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 409 as const;
+/** Reactive list for WeeklyPurchasingConfig. */
+export function useListWeeklyPurchasingConfig() {
+  return useQuery(api.queries.listWeeklyPurchasingConfig);
+}
+
+/** Reactive get-by-id for WeeklyPurchasingConfig. Pass "skip" to suspend. */
+export function useGetWeeklyPurchasingConfig(id: string | "skip") {
+  return useQuery(api.queries.getWeeklyPurchasingConfig, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for WeeklyPurchasingConfig.configure. */
+export function useWeeklyPurchasingConfigConfigure() {
+  const mutate = useMutation(api.mutations.WeeklyPurchasingConfig_configure);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = WeeklyPurchasingConfigConfigureParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for WeeklyPurchasingConfig.routeNeed. */
+export function useWeeklyPurchasingConfigRouteNeed() {
+  const mutate = useMutation(api.mutations.WeeklyPurchasingConfig_routeNeed);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = WeeklyPurchasingConfigRouteNeedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for WeeklyPurchasingConfig.configure. */
+export function useCreateWeeklyPurchasingConfig() {
+  const mutate = useMutation(api.mutations.WeeklyPurchasingConfig_createViaConfigure);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = WeeklyPurchasingConfigConfigureParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 429 as const;

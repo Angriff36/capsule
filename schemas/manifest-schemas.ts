@@ -174,6 +174,8 @@ export const DishRecipeSchema = z.object({
   dishId: z.string().uuid(),
   recipeId: z.string().uuid(),
   sortOrder: z.number().int().default(0),
+  yieldQuantity: z.number().default(1),
+  batchMultiplier: z.number().default(1),
   role: z.string().nullable().optional(),
   attachedAt: z.coerce.date().nullable().optional(),
   removedAt: z.coerce.date().nullable().optional(),
@@ -220,6 +222,7 @@ export const EventSchema = z.object({
   eventType: z.string().default(""),
   startsAt: z.coerce.date().nullable().optional(),
   endsAt: z.coerce.date().nullable().optional(),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
   venueName: z.string().nullable().optional(),
   venueAddress: z.string().nullable().optional(),
   expectedHeadcount: z.number().int().default(0),
@@ -336,6 +339,7 @@ export const EventDishSchema = z.object({
   eventId: z.string().uuid(),
   dishId: z.string().uuid(),
   quantityServings: z.number().int().default(1),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
   course: z.string().nullable().optional(),
   serviceStyle: z.string().nullable().optional(),
   specialInstructions: z.string().nullable().optional(),
@@ -346,6 +350,26 @@ export const EventDishSchema = z.object({
 });
 
 export type EventDish = z.infer<typeof EventDishSchema>;
+
+// Entity: EventDishRecipeSeed
+export const EventDishRecipeSeedSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  eventDishId: z.string().uuid(),
+  dishId: z.string().uuid(),
+  recipeId: z.string().uuid(),
+  servings: z.number().default(0),
+  yieldQuantity: z.number().default(1),
+  batchMultiplier: z.number().default(1),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
+  seededAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventDishRecipeSeed = z.infer<typeof EventDishRecipeSeedSchema>;
 
 // Entity: EventGuest
 export const EventGuestSchema = z.object({
@@ -377,6 +401,27 @@ export const EventGuestComputedSchema = EventGuestSchema.extend({
 
 export type EventGuest = z.infer<typeof EventGuestSchema>;
 export type EventGuestWithComputed = z.infer<typeof EventGuestComputedSchema>;
+
+// Entity: EventIngredientContribution
+export const EventIngredientContributionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  eventDishId: z.string().uuid(),
+  dishId: z.string().uuid(),
+  recipeId: z.string().uuid(),
+  ingredientId: z.string().uuid(),
+  quantity: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  servings: z.number().default(0),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventIngredientContribution = z.infer<typeof EventIngredientContributionSchema>;
 
 // Entity: Incident
 export const IncidentSchema = z.object({
@@ -414,6 +459,7 @@ export const IngredientSchema = z.object({
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional().default([]),
   costPerUnit: z.number().min(0).default(0),
   category: z.string().nullable().optional(),
+  preferredVendorId: z.string().uuid().nullable().optional(),
   status: z.enum(["active", "discontinued"]).default("active"),
   introducedAt: z.coerce.date().nullable().optional(),
   discontinuedAt: z.coerce.date().nullable().optional(),
@@ -447,6 +493,7 @@ export const IngredientDemandSchema = z.object({
   sourceYieldQuantity: z.number().nullable().optional(),
   status: z.enum(["pending", "calculated", "confirmed", "fulfilled", "superseded"]).default("pending"),
   purchaseEligibleEventId: z.string().uuid().nullable().optional(),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
   calculatedAt: z.coerce.date().nullable().optional(),
   confirmedAt: z.coerce.date().nullable().optional(),
   fulfilledAt: z.coerce.date().nullable().optional(),
@@ -868,6 +915,7 @@ export const PurchaseNeedSchema = z.object({
   ingredientId: z.string().uuid(),
   requiredQuantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
   vendorOrderId: z.string().uuid().nullable().optional(),
   vendorOrderLineId: z.string().uuid().nullable().optional(),
   status: z.enum(["open", "ordered", "fulfilled", "cancelled"]).default("open"),
@@ -1332,6 +1380,19 @@ export const WasteRecordComputedSchema = WasteRecordSchema.extend({
 export type WasteRecord = z.infer<typeof WasteRecordSchema>;
 export type WasteRecordWithComputed = z.infer<typeof WasteRecordComputedSchema>;
 
+// Entity: WeeklyPurchasingConfig
+export const WeeklyPurchasingConfigSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  defaultVendorId: z.string().uuid(),
+  configuredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type WeeklyPurchasingConfig = z.infer<typeof WeeklyPurchasingConfigSchema>;
+
 // Command: declare on AvailabilityWindow
 export const AvailabilityWindowDeclareParamsSchema = z.object({
   personId: z.string().min(1),
@@ -1591,6 +1652,8 @@ export type DishUpdatePortioningParams = z.infer<typeof DishUpdatePortioningPara
 export const DishRecipeAttachParamsSchema = z.object({
   dishId: z.string().min(1),
   recipeId: z.string().min(1),
+  yieldQuantity: z.number(),
+  batchMultiplier: z.number().optional(),
   sortOrder: z.number().optional(),
   role: z.string().optional(),
 });
@@ -1880,6 +1943,20 @@ export const EventDishUpdateInstructionsParamsSchema = z.object({
 
 export type EventDishUpdateInstructionsParams = z.infer<typeof EventDishUpdateInstructionsParamsSchema>;
 
+// Command: seed on EventDishRecipeSeed
+export const EventDishRecipeSeedSeedParamsSchema = z.object({
+  eventId: z.string().min(1),
+  eventDishId: z.string().min(1),
+  dishId: z.string().min(1),
+  recipeId: z.string().min(1),
+  servings: z.number(),
+  yieldQuantity: z.number(),
+  batchMultiplier: z.number(),
+  purchasingWeekStart: z.coerce.date().optional(),
+});
+
+export type EventDishRecipeSeedSeedParams = z.infer<typeof EventDishRecipeSeedSeedParamsSchema>;
+
 // Command: assignTable on EventGuest
 export const EventGuestAssignTableParamsSchema = z.object({
   tableAssignment: z.string(),
@@ -1924,6 +2001,36 @@ export const EventGuestWithdrawParamsSchema = z.object({
 });
 
 export type EventGuestWithdrawParams = z.infer<typeof EventGuestWithdrawParamsSchema>;
+
+// Command: record on EventIngredientContribution
+export const EventIngredientContributionRecordParamsSchema = z.object({
+  eventId: z.string().min(1),
+  eventDishId: z.string().min(1),
+  dishId: z.string().min(1),
+  recipeId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  quantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  servings: z.number(),
+  purchasingWeekStart: z.coerce.date().optional(),
+});
+
+export type EventIngredientContributionRecordParams = z.infer<typeof EventIngredientContributionRecordParamsSchema>;
+
+// Command: retire on EventIngredientContribution
+export const EventIngredientContributionRetireParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type EventIngredientContributionRetireParams = z.infer<typeof EventIngredientContributionRetireParamsSchema>;
+
+// Command: revise on EventIngredientContribution
+export const EventIngredientContributionReviseParamsSchema = z.object({
+  quantity: z.number(),
+  servings: z.number(),
+});
+
+export type EventIngredientContributionReviseParams = z.infer<typeof EventIngredientContributionReviseParamsSchema>;
 
 // Command: beginInvestigation on Incident
 export const IncidentBeginInvestigationParamsSchema = z.object({});
@@ -1978,6 +2085,7 @@ export const IngredientIntroduceParamsSchema = z.object({
   costPerUnit: z.number(),
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional(),
   category: z.string().optional(),
+  preferredVendorId: z.string().uuid().optional(),
 });
 
 export type IngredientIntroduceParams = z.infer<typeof IngredientIntroduceParamsSchema>;
@@ -1986,6 +2094,13 @@ export type IngredientIntroduceParams = z.infer<typeof IngredientIntroduceParams
 export const IngredientReinstateParamsSchema = z.object({});
 
 export type IngredientReinstateParams = z.infer<typeof IngredientReinstateParamsSchema>;
+
+// Command: setPreferredVendor on Ingredient
+export const IngredientSetPreferredVendorParamsSchema = z.object({
+  preferredVendorId: z.string().uuid().optional(),
+});
+
+export type IngredientSetPreferredVendorParams = z.infer<typeof IngredientSetPreferredVendorParamsSchema>;
 
 // Command: updateCosting on Ingredient
 export const IngredientUpdateCostingParamsSchema = z.object({
@@ -2052,6 +2167,17 @@ export const IngredientDemandSupersedeParamsSchema = z.object({
 });
 
 export type IngredientDemandSupersedeParams = z.infer<typeof IngredientDemandSupersedeParamsSchema>;
+
+// Command: syncFromContributions on IngredientDemand
+export const IngredientDemandSyncFromContributionsParamsSchema = z.object({
+  eventId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  requiredQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  purchasingWeekStart: z.coerce.date().optional(),
+});
+
+export type IngredientDemandSyncFromContributionsParams = z.infer<typeof IngredientDemandSyncFromContributionsParamsSchema>;
 
 // Command: adjustQuantity on InventoryItem
 export const InventoryItemAdjustQuantityParamsSchema = z.object({
@@ -2746,6 +2872,7 @@ export const PurchaseNeedCreateParamsSchema = z.object({
   ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  purchasingWeekStart: z.coerce.date().optional(),
 });
 
 export type PurchaseNeedCreateParams = z.infer<typeof PurchaseNeedCreateParamsSchema>;
@@ -2767,6 +2894,13 @@ export const PurchaseNeedMarkOrderedParamsSchema = z.object({
 });
 
 export type PurchaseNeedMarkOrderedParams = z.infer<typeof PurchaseNeedMarkOrderedParamsSchema>;
+
+// Command: reviseRequired on PurchaseNeed
+export const PurchaseNeedReviseRequiredParamsSchema = z.object({
+  requiredQuantity: z.number(),
+});
+
+export type PurchaseNeedReviseRequiredParams = z.infer<typeof PurchaseNeedReviseRequiredParamsSchema>;
 
 // Command: expire on Qualification
 export const QualificationExpireParamsSchema = z.object({});
@@ -3267,6 +3401,20 @@ export const VendorOrderConfirmParamsSchema = z.object({});
 
 export type VendorOrderConfirmParams = z.infer<typeof VendorOrderConfirmParamsSchema>;
 
+// Command: ensureWeeklyDraft on VendorOrder
+export const VendorOrderEnsureWeeklyDraftParamsSchema = z.object({
+  vendorId: z.string().min(1),
+  sourceRangeStart: z.coerce.date(),
+  sourceRangeEnd: z.coerce.date(),
+  purchaseNeedId: z.string().uuid(),
+  ingredientDemandId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  requiredQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+});
+
+export type VendorOrderEnsureWeeklyDraftParams = z.infer<typeof VendorOrderEnsureWeeklyDraftParamsSchema>;
+
 // Command: markPartiallyReceived on VendorOrder
 export const VendorOrderMarkPartiallyReceivedParamsSchema = z.object({});
 
@@ -3322,6 +3470,21 @@ export const VendorOrderLineCancelLineParamsSchema = z.object({
 });
 
 export type VendorOrderLineCancelLineParams = z.infer<typeof VendorOrderLineCancelLineParamsSchema>;
+
+// Command: ensureWeeklyLine on VendorOrderLine
+export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({
+  vendorOrderId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  weekNeed: z.number(),
+  onHand: z.number(),
+  contributionQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  unitCost: z.number(),
+  purchaseNeedId: z.string().uuid(),
+  ingredientDemandId: z.string().min(1),
+});
+
+export type VendorOrderLineEnsureWeeklyLineParams = z.infer<typeof VendorOrderLineEnsureWeeklyLineParamsSchema>;
 
 // Command: recordReceipt on VendorOrderLine
 export const VendorOrderLineRecordReceiptParamsSchema = z.object({
@@ -3445,3 +3608,23 @@ export const WasteRecordVoidRecordParamsSchema = z.object({
 });
 
 export type WasteRecordVoidRecordParams = z.infer<typeof WasteRecordVoidRecordParamsSchema>;
+
+// Command: configure on WeeklyPurchasingConfig
+export const WeeklyPurchasingConfigConfigureParamsSchema = z.object({
+  defaultVendorId: z.string().min(1),
+});
+
+export type WeeklyPurchasingConfigConfigureParams = z.infer<typeof WeeklyPurchasingConfigConfigureParamsSchema>;
+
+// Command: routeNeed on WeeklyPurchasingConfig
+export const WeeklyPurchasingConfigRouteNeedParamsSchema = z.object({
+  purchaseNeedId: z.string().uuid(),
+  eventId: z.string().min(1),
+  ingredientDemandId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  requiredQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  purchasingWeekStart: z.coerce.date(),
+});
+
+export type WeeklyPurchasingConfigRouteNeedParams = z.infer<typeof WeeklyPurchasingConfigRouteNeedParamsSchema>;

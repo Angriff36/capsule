@@ -1,10 +1,8 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreateVendor,
   useCreateVendorOrder,
-  useCreateVendorOrderLine,
-  useCreateVendorOrderLineDemand,
   useListEvent,
   useListIngredient,
   useListPurchaseNeed,
@@ -13,23 +11,16 @@ import {
   useListVendorOrderLine,
   useListVendorOrderLineDemand,
   usePurchaseNeedCancel,
-  usePurchaseNeedAssignToDraft,
   usePurchaseNeedMarkFulfilled,
   usePurchaseNeedMarkOrdered,
-  useVendorOrderCancel,
-  useVendorOrderLineCancelLine,
-  useVendorOrderLineDemandRetire,
-  useVendorOrderLineReviseQuantity,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { PurchasingCommandForm } from "./PurchasingCommandForm";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
-import { endOfDay, startOfDay } from "./PurchasingFormHelpers";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
-import { PrepPurchaseDraftCoordinator } from "./PrepPurchaseDraftCoordinator";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -43,26 +34,15 @@ export function PurchasingPage() {
   const events = useListEvent();
   const createVendor = useCreateVendor();
   const createOrder = useCreateVendorOrder();
-  const createOrderLine = useCreateVendorOrderLine();
-  const createDemandLink = useCreateVendorOrderLineDemand();
-  const reviseOrderLine = useVendorOrderLineReviseQuantity();
-  const cancelOrder = useVendorOrderCancel();
-  const cancelOrderLine = useVendorOrderLineCancelLine();
-  const retireDemandLink = useVendorOrderLineDemandRetire();
-  const assignNeedToDraft = usePurchaseNeedAssignToDraft();
   const markOrdered = usePurchaseNeedMarkOrdered();
   const markFulfilled = usePurchaseNeedMarkFulfilled();
   const cancelNeed = usePurchaseNeedCancel();
-  const [form, setForm] = useState<"vendor" | "order" | "prepDraft" | null>(
-    null,
-  );
+  const [form, setForm] = useState<"vendor" | "order" | null>(null);
   const [selectedNeedIds, setSelectedNeedIds] = useState<Set<string>>(
     () => new Set(),
   );
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
-  const [generatedOrderId, setGeneratedOrderId] = useState<string | null>(null);
-  const [draftRange, setDraftRange] = useState({ start: "", end: "" });
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeNeeds = (needs ?? []).filter((item) => item.deletedAt == null);
@@ -70,6 +50,14 @@ export function PurchasingPage() {
     (item) => item.deletedAt == null,
   );
   const activeOrders = (orders ?? []).filter((item) => item.deletedAt == null);
+  const weeklyDrafts = useMemo(
+    () =>
+      activeOrders.filter(
+        (order) =>
+          String(order.status) === "draft" && order.sourceRangeStart != null,
+      ),
+    [activeOrders],
+  );
   const ingredientName = (id: string) =>
     ingredients?.find((item) => item._id === id)?.name ?? "Unknown ingredient";
   const eventName = (id: string) =>
@@ -122,7 +110,7 @@ export function PurchasingPage() {
           paymentTermsDays: Number(data.get("paymentTermsDays")),
           notes: String(data.get("notes") ?? "").trim() || undefined,
         });
-      } else if (current === "order") {
+      } else {
         await createOrder({
           vendorId: String(data.get("vendorId")),
           eventId: String(data.get("eventId")) || undefined,
@@ -130,85 +118,6 @@ export function PurchasingPage() {
             String(data.get("orderNumber") ?? "").trim() || undefined,
           notes: String(data.get("notes") ?? "").trim() || undefined,
         });
-      } else {
-        if (
-          orders === undefined ||
-          lines === undefined ||
-          demandLinks === undefined
-        ) {
-          throw new Error(
-            "Purchasing data is still loading. Try again shortly.",
-          );
-        }
-        const rangeStart = startOfDay(String(data.get("rangeStart") ?? ""));
-        const rangeEnd = endOfDay(String(data.get("rangeEnd") ?? ""));
-        if (!Number.isFinite(rangeStart) || !Number.isFinite(rangeEnd)) {
-          throw new Error("Select both dates for the purchase draft range.");
-        }
-        const coordinator = new PrepPurchaseDraftCoordinator({
-          openOrder: (input) =>
-            createOrder(input) as Promise<{ docId: string }>,
-          addLine: (input) =>
-            createOrderLine(input) as Promise<{ docId: string }>,
-          reviseLine: (input) => reviseOrderLine(input),
-          linkDemand: (input) => createDemandLink(input),
-          assignNeedToDraft: (input) =>
-            assignNeedToDraft(input as Parameters<typeof assignNeedToDraft>[0]),
-          cancelOrder: (input) => cancelOrder(input),
-          cancelLine: (input) => cancelOrderLine(input),
-          retireDemandLink: (input) => retireDemandLink(input),
-        });
-        const result = await coordinator.generate({
-          vendorId: String(data.get("vendorId")),
-          rangeStart,
-          rangeEnd,
-          needs: activeNeeds.map((need) => ({
-            id: need._id,
-            version: need.version,
-            eventId: need.eventId,
-            ingredientDemandId: need.ingredientDemandId,
-            ingredientId: need.ingredientId,
-            requiredQuantity: Number(need.requiredQuantity),
-            unit: String(need.unit),
-            status: String(need.status),
-            vendorOrderId: need.vendorOrderId,
-            vendorOrderLineId: need.vendorOrderLineId,
-            deletedAt: need.deletedAt,
-          })),
-          events: (events ?? []).map((item) => ({
-            id: item._id,
-            startsAt: item.startsAt,
-            deletedAt: item.deletedAt,
-          })),
-          orders: activeOrders.map((order) => ({
-            id: order._id,
-            vendorId: order.vendorId,
-            sourceRangeStart: order.sourceRangeStart,
-            sourceRangeEnd: order.sourceRangeEnd,
-            status: order.status,
-            deletedAt: order.deletedAt,
-          })),
-          lines: (lines ?? []).map((line) => ({
-            id: line._id,
-            vendorOrderId: line.vendorOrderId,
-            ingredientId: line.ingredientId,
-            orderedQuantity: Number(line.orderedQuantity),
-            unit: String(line.unit),
-            status: line.status,
-            version: line.version,
-            deletedAt: line.deletedAt,
-          })),
-          demandLinks: (demandLinks ?? []).map((link) => ({
-            id: link._id,
-            vendorOrderLineId: link.vendorOrderLineId,
-            ingredientDemandId: link.ingredientDemandId,
-            contributionQuantity: Number(link.contributionQuantity),
-            unit: String(link.unit),
-            version: link.version,
-            deletedAt: link.deletedAt,
-          })),
-        });
-        setGeneratedOrderId(result.orderId);
       }
       element.reset();
       setForm(null);
@@ -237,7 +146,7 @@ export function PurchasingPage() {
         if (key === "markOrdered") {
           const line = linkedLine(need);
           if (!line)
-            throw new Error("Add an order line linked to this demand first.");
+            throw new Error("This need is not linked to a weekly draft line.");
           await markOrdered({
             ...args,
             vendorOrderId: line.vendorOrderId,
@@ -278,35 +187,28 @@ export function PurchasingPage() {
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Procurement · Purchase queue</p>
-          <h1 className="display-title mt-2">What must be bought</h1>
+          <h1 className="display-title mt-2">Weekly purchasing drafts</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Keep each order line tied to its demand, event, and vendor from
-            request through receipt.
+            Approved events automatically maintain a shared weekly draft. Review
+            quantities, adjust if needed, then submit.
           </p>
         </div>
         <div className="supply-masthead-actions">
           <button className="btn btn-ghost" onClick={() => setForm("vendor")}>
             Onboard vendor
           </button>
-          <button className="btn btn-primary" onClick={() => setForm("order")}>
-            Open order
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() => setForm("prepDraft")}
-          >
-            Generate prep-list draft
+          <button className="btn btn-ghost" onClick={() => setForm("order")}>
+            Open ad-hoc order
           </button>
         </div>
       </header>
       <InventoryWorkspaceNav />
       <aside className="supply-degraded" role="note">
-        <strong>Weekly draft from approved events</strong>
+        <strong>Automatic weekly draft</strong>
         <span>
-          Event approve opens PurchaseNeeds for calculated demand. Generate a
-          prep-list draft for a vendor and date range to combine those open
-          needs into one VendorOrder. Needs stay open until you submit the draft
-          — then they mark ordered.
+          Add dishes, set headcount, approve the event — Manifest consolidates
+          ingredient shortages into one DRAFT VendorOrder for the purchasing
+          week. Approval never auto-submits.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -317,24 +219,75 @@ export function PurchasingPage() {
           busy={busy != null}
           activeVendors={activeVendors}
           events={events}
-          draftRange={draftRange}
-          setDraftRange={setDraftRange}
           onCancel={() => setForm(null)}
           onSubmit={submit}
         />
       ) : null}
 
-      {generatedOrderId ? (
-        <div className="card border-success/40 px-4 py-3" role="status">
-          <p className="font-semibold text-success">Purchase draft generated</p>
-          <Link
-            className="text-link"
-            to={`/inventory/orders/${generatedOrderId}`}
-          >
-            Open the combined order draft →
-          </Link>
+      <section className="working-ledger mt-6">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">This week</p>
+            <h2>Auto-maintained drafts</h2>
+          </div>
+          <span>{weeklyDrafts.length} drafts</span>
         </div>
-      ) : null}
+        {orders === undefined || vendors === undefined ? (
+          <TableSkeleton rows={3} />
+        ) : weeklyDrafts.length === 0 ? (
+          <div className="document-empty">
+            <p>No weekly drafts yet.</p>
+            <span>
+              Approve an event with dish demand after configuring a default
+              vendor — the draft appears here.
+            </span>
+          </div>
+        ) : (
+          <div className="supply-table-wrap">
+            <table className="supply-table">
+              <thead>
+                <tr>
+                  <th>Week start</th>
+                  <th>Vendor</th>
+                  <th>Total</th>
+                  <th>State</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {weeklyDrafts.map((order) => (
+                  <tr key={order._id}>
+                    <td>
+                      <strong>
+                        {order.sourceRangeStart
+                          ? new Date(
+                              order.sourceRangeStart,
+                            ).toLocaleDateString()
+                          : "—"}
+                      </strong>
+                    </td>
+                    <td>{vendorName(order.vendorId)}</td>
+                    <td className="supply-number">
+                      ${Number(order.totalAmount).toFixed(2)}
+                    </td>
+                    <td>
+                      <StatusChip status={String(order.status)} />
+                    </td>
+                    <td>
+                      <Link
+                        className="text-link"
+                        to={`/inventory/orders/${order._id}`}
+                      >
+                        Review &amp; submit →
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       <PurchasingQueueSplit
         needsLoading={
@@ -364,7 +317,7 @@ export function PurchasingPage() {
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Order folios</p>
-            <h2>Vendor orders</h2>
+            <h2>All vendor orders</h2>
           </div>
           <span>{activeOrders.length} orders</span>
         </div>
@@ -373,22 +326,7 @@ export function PurchasingPage() {
         ) : activeOrders.length === 0 ? (
           <div className="document-empty">
             <p>No vendor orders are open.</p>
-            <span>Open one against an active vendor.</span>
-            <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                disabled={!activeVendors.length}
-                title={
-                  activeVendors.length
-                    ? undefined
-                    : "Onboard a vendor before opening an order"
-                }
-                onClick={() => setForm("order")}
-              >
-                Open vendor order
-              </button>
-            </div>
+            <span>Weekly drafts appear after event approval.</span>
           </div>
         ) : (
           <div className="supply-table-wrap">
@@ -415,7 +353,7 @@ export function PurchasingPage() {
                     <td>
                       {order.eventId
                         ? eventName(order.eventId)
-                        : "General stock"}
+                        : "Weekly / general"}
                     </td>
                     <td className="supply-number">
                       ${Number(order.totalAmount).toFixed(2)}

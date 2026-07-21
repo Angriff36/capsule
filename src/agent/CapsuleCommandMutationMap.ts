@@ -12,6 +12,11 @@ export const CAPABILITY_TO_MUTATION: Readonly<Record<string, string>> = {
   "DishRecipe.attach": "DishRecipe_createViaAttach",
   "Menu.draft": "Menu_createViaDraft",
   "PrepTask.open": "PrepTask_createViaOpen",
+  "PrepTask.refreshGenerated": "PrepTask_refreshGenerated",
+  "IngredientDemand.calculate": "IngredientDemand_createViaCalculate",
+  "IngredientDemand.confirm": "IngredientDemand_confirm",
+  "IngredientDemand.recalculate": "IngredientDemand_recalculate",
+  "IngredientDemand.supersede": "IngredientDemand_supersede",
   "Event.planEngagement": "Event_createViaPlanEngagement",
   "EventDish.addToEvent": "EventDish_createViaAddToEvent",
 };
@@ -26,6 +31,11 @@ export const AGENT_AC_CAPABILITY_IDS: readonly string[] = [
   "DishRecipe.attach",
   "Menu.draft",
   "PrepTask.open",
+  "PrepTask.refreshGenerated",
+  "IngredientDemand.calculate",
+  "IngredientDemand.confirm",
+  "IngredientDemand.recalculate",
+  "IngredientDemand.supersede",
   "Event.planEngagement",
   "EventDish.addToEvent",
 ];

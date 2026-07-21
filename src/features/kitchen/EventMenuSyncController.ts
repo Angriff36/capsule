@@ -1,5 +1,4 @@
 import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
-import { EventMenuRecipeDemandSync } from "./EventMenuRecipeDemandSync";
 import { EventMenuReservationSync } from "./EventMenuReservationSync";
 import { EventPrepCoordinator } from "./EventPrepCoordinator";
 
@@ -45,6 +44,7 @@ type DemandRow = {
   unit: string;
   status: string;
   version: number;
+  deletedAt?: number | null;
 };
 
 type IngredientRow = {
@@ -118,34 +118,6 @@ type Catalogs = {
 };
 
 type Ports = {
-  createDemand: (input: {
-    eventId: string;
-    ingredientId: string;
-    requiredQuantity: number;
-    unit: string;
-    servings?: number;
-    dishId?: string;
-    sourceRecipeLineQuantity?: number;
-    sourceBatchMultiplier?: number;
-    sourceYieldQuantity?: number;
-    idempotencyKey?: string;
-  }) => Promise<{ docId: string }>;
-  confirmDemand: (input: {
-    docId: string;
-    version: number;
-    idempotencyKey?: string;
-  }) => Promise<unknown>;
-  recalculateDemand: (input: {
-    docId: string;
-    version: number;
-    newQuantity: number;
-    reason: string;
-  }) => Promise<unknown>;
-  supersedeDemand: (input: {
-    docId: string;
-    version: number;
-    reason: string;
-  }) => Promise<unknown>;
   // Convex mutation hooks are loosely typed at the call site.
   createTask: (input: never) => Promise<{ docId: string }>;
   refreshGeneratedTask: (input: never) => Promise<unknown>;
@@ -212,28 +184,30 @@ export class EventMenuSyncController {
 
   async syncRecipeDemands(
     eventId: string,
-    override?: EventDishOverride,
+    _override?: EventDishOverride,
   ): Promise<EventStockShortage[]> {
-    const prep = this.prepCoordinator();
-    const demandResult = await new EventMenuRecipeDemandSync(prep, {
-      dishRecipes: this.catalogs.dishRecipes,
-      recipes: this.catalogs.recipes,
-      recipeIngredients: this.catalogs.recipeIngredients,
-      demands: this.catalogs.demands,
-    }).forEventDishes({
-      eventId,
-      eventDishes: EventMenuRecipeDemandSync.activeEventDishes(
-        eventId,
-        this.catalogs.eventDishes,
-        override,
-      ),
-    });
+    // IngredientDemand is Manifest-owned (EventDish → contributions → sync).
+    // Host only reconciles inventory reservations from live demand rows.
+    const demandTargets = this.catalogs.demands
+      .filter(
+        (demand) =>
+          demand.eventId === eventId &&
+          demand.deletedAt == null &&
+          demand.status !== "superseded",
+      )
+      .map((demand) => ({
+        eventId: demand.eventId,
+        ingredientId: demand.ingredientId,
+        unit: String(demand.unit),
+        requiredQuantity: Number(demand.requiredQuantity),
+        status: String(demand.status) as "calculated",
+      }));
     const reservationResult = await new EventMenuReservationSync({
       createReservation: this.ports.createReservation,
       releaseReservation: this.ports.releaseReservation,
     }).afterDemandChange({
       eventId,
-      demandTargets: demandResult.targets,
+      demandTargets,
       items: this.catalogs.inventoryItems.map((item) => ({
         id: item._id,
         ingredientId: item.ingredientId,
@@ -314,10 +288,6 @@ export class EventMenuSyncController {
 
   private prepCoordinator() {
     return new EventPrepCoordinator({
-      createDemand: this.ports.createDemand as never,
-      confirmDemand: this.ports.confirmDemand,
-      recalculateDemand: this.ports.recalculateDemand,
-      supersedeDemand: this.ports.supersedeDemand,
       createTask: this.ports.createTask as never,
       refreshGeneratedTask: this.ports.refreshGeneratedTask as never,
     });

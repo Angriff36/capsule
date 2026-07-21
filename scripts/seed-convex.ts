@@ -22,7 +22,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip EventAssignment: no create command in IR (2 rows unused)
   // skip EventCloseout: no create command in IR (2 rows unused)
   // skip EventDish: no create command in IR (2 rows unused)
+  // skip EventDishRecipeSeed: no create command in IR (2 rows unused)
   // skip EventGuest: no create command in IR (2 rows unused)
+  // skip EventIngredientContribution: no create command in IR (2 rows unused)
   // skip Incident: no create command in IR (2 rows unused)
   // skip Ingredient: no create command in IR (2 rows unused)
   // skip IngredientDemand: no create command in IR (2 rows unused)
@@ -42,8 +44,8 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip ProductionBatch: no create command in IR (2 rows unused)
   // skip Proposal: no create command in IR (2 rows unused)
   // PurchaseNeed → api.mutations.PurchaseNeed_create
-  await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-1", "ingredientDemandId": "ingredientDemandId-purchase-need-1", "ingredientId": "ingredientId-purchase-need-1", "requiredQuantity": 1, "unit": "demo-unit-1" } as any);
-  await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-2", "ingredientDemandId": "ingredientDemandId-purchase-need-2", "ingredientId": "ingredientId-purchase-need-2", "requiredQuantity": 2, "unit": "demo-unit-2" } as any);
+  await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-1", "ingredientDemandId": "ingredientDemandId-purchase-need-1", "ingredientId": "ingredientId-purchase-need-1", "requiredQuantity": 1, "unit": "demo-unit-1", "purchasingWeekStart": 1767268800000 } as any);
+  await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-2", "ingredientDemandId": "ingredientDemandId-purchase-need-2", "ingredientId": "ingredientId-purchase-need-2", "requiredQuantity": 2, "unit": "demo-unit-2", "purchasingWeekStart": 1767355200000 } as any);
   // skip Qualification: no create command in IR (2 rows unused)
   // skip QualityCheck: no create command in IR (2 rows unused)
   // skip Recipe: no create command in IR (2 rows unused)
@@ -63,6 +65,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip VendorOrderLineDemand: no create command in IR (2 rows unused)
   // skip Venue: no create command in IR (2 rows unused)
   // skip WasteRecord: no create command in IR (2 rows unused)
+  // skip WeeklyPurchasingConfig: no create command in IR (2 rows unused)
 }
 
 export const MANIFEST_CONVEX_SEED_BINDING = {
@@ -135,7 +138,17 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "EventDishRecipeSeed",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "EventGuest",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "EventIngredientContribution",
       "createMutation": null,
       "rowCount": 2
     },
@@ -326,6 +339,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "WasteRecord",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "WeeklyPurchasingConfig",
       "createMutation": null,
       "rowCount": 2
     }

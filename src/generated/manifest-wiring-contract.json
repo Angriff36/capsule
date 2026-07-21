@@ -1,9 +1,9 @@
 {
   "$schema": "manifest-wiring-contract/v1",
   "meta": {
-    "compilerVersion": "3.6.37",
+    "compilerVersion": "3.6.40",
     "schemaVersion": "1.0",
-    "contentHash": "0418609823cc581c4807e29385bcba0390816488350fac71c8522ca6529e7824:0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:16f5b86fa64677653383a3565cc55ae5abd29b5f0ab299becbd63a2a989ea054:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:33d4d2785d45b54a41664cd7f7619db35c422ba75508e4fc45e3d26bea96042a:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:46867b01b878e36ec13d445c9c59195a4d593b1f85eecf98aaa3960786131e6d:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:4ec30ef9959ec632fb5733d0a27d6a3f36f0f267cd6b591b4de471a8303ee8f0:5351917c1d988382d27a9e6277171f3fb8096a32ef5a9341d2bbf9b222fcef47:57f308c480c711e9710797f6fccdab6f0bb270f703a03242f23ca03d89c86559:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:6a60de19fa21e314590a79d5c721aa690946b2a1b33e3a4fc1bba2dad8aff529:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:d6910e1f58113618897b7fccf4dcbc6efd0fd1f39f05ac403e6a7f7c9a701a9f:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:ea95ffd054e7a6711602dd2e1d4d1523c49d05e14503100d6b96f2e6dc909f5d",
+    "contentHash": "0418609823cc581c4807e29385bcba0390816488350fac71c8522ca6529e7824:0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:33d4d2785d45b54a41664cd7f7619db35c422ba75508e4fc45e3d26bea96042a:3ab18f80440f7b17dd279810d252f487d5b77c5b93a3a0549ded2cfe546237d4:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:46867b01b878e36ec13d445c9c59195a4d593b1f85eecf98aaa3960786131e6d:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5a0cea365867f6047ba8a5442020de61432d3cb2a279d197d6378afa046f46d8:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:5ec1dab5824cab5560ca99e12a1c91b3fed30258913626ce02ded8ecfd421fa8:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:b4b8109a62b1882a1ab79a3f32a0e996b7a92c3a356a9df68bcb51b7566cc355:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c481269f88ada8b405a26741315811fd1904d2def1602cfb4dd276f745bd6578:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccb3757ff8aa9cdd9a84cbfdf97aebbba82cf6529a9855a12169e622532f2b72:cdfef54ea3c18cb709a1b706a6712b6bbe2ab70b34887f7e6f46dd99c23e6bef:ce6c8c2338527b6902932ba1343b5ba5ab1d9fb646854150818441a400957161:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f8444d8a8a114f5edaa2c8882c00aa74c8bfe088209a5414f4658f4032a5742f",
     "projection": "wiring"
   },
   "capabilities": [
@@ -2488,6 +2488,30 @@
           "hasRuntimeGuards": true
         },
         {
+          "name": "yieldQuantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 1
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "batchMultiplier",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 1
+          },
+          "hasRuntimeGuards": true
+        },
+        {
           "name": "sortOrder",
           "tsType": "number",
           "irTypeName": "number",
@@ -2511,6 +2535,8 @@
       "clientParameterNames": [
         "dishId",
         "recipeId",
+        "yieldQuantity",
+        "batchMultiplier",
         "sortOrder",
         "role"
       ],
@@ -5289,6 +5315,140 @@
       }
     },
     {
+      "entity": "EventDishRecipeSeed",
+      "command": "seed",
+      "capabilityId": "EventDishRecipeSeed.seed",
+      "route": "/api/manifest/EventDishRecipeSeed/commands/seed",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "eventId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "eventDishId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "dishId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "recipeId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "servings",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "yieldQuantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "batchMultiplier",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "purchasingWeekStart",
+          "tsType": "string",
+          "irTypeName": "datetime",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "dateLike": true
+          },
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "eventId",
+        "eventDishId",
+        "dishId",
+        "recipeId",
+        "servings",
+        "yieldQuantity",
+        "batchMultiplier",
+        "purchasingWeekStart"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "EventDishRecipeSeeded"
+      ],
+      "affectedEntity": "EventDishRecipeSeed",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "EventDishRecipeSeed",
+          "queryKeyHint": "queryKeys.eventDishRecipeSeed.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "EventDishRecipeSeed",
+          "queryKeyHint": "queryKeys.eventDishRecipeSeed.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
       "entity": "EventGuest",
       "command": "assignTable",
       "capabilityId": "EventGuest.assignTable",
@@ -5682,6 +5842,295 @@
           "kind": "entityDetail",
           "entity": "EventGuest",
           "queryKeyHint": "queryKeys.eventGuest.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "EventIngredientContribution",
+      "command": "record",
+      "capabilityId": "EventIngredientContribution.record",
+      "route": "/api/manifest/EventIngredientContribution/commands/record",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "eventId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "eventDishId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "dishId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "recipeId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "ingredientId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "quantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 1
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "unit",
+          "tsType": "\"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\"",
+          "irTypeName": "UnitOfMeasure",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "enumValues": [
+              "each",
+              "gram",
+              "kilogram",
+              "ounce",
+              "pound",
+              "milliliter",
+              "liter",
+              "teaspoon",
+              "tablespoon",
+              "cup",
+              "pint",
+              "quart",
+              "gallon",
+              "portion"
+            ]
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "servings",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 0
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "purchasingWeekStart",
+          "tsType": "string",
+          "irTypeName": "datetime",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "dateLike": true
+          },
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "eventId",
+        "eventDishId",
+        "dishId",
+        "recipeId",
+        "ingredientId",
+        "quantity",
+        "unit",
+        "servings",
+        "purchasingWeekStart"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "EventIngredientContributionRecorded"
+      ],
+      "affectedEntity": "EventIngredientContribution",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "EventIngredientContribution",
+          "queryKeyHint": "queryKeys.eventIngredientContribution.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "EventIngredientContribution",
+          "queryKeyHint": "queryKeys.eventIngredientContribution.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "EventIngredientContribution",
+      "command": "retire",
+      "capabilityId": "EventIngredientContribution.retire",
+      "route": "/api/manifest/EventIngredientContribution/commands/retire",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "reason",
+          "tsType": "string",
+          "irTypeName": "string",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "reason"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "EventIngredientContributionRecorded"
+      ],
+      "affectedEntity": "EventIngredientContribution",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "EventIngredientContribution",
+          "queryKeyHint": "queryKeys.eventIngredientContribution.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "EventIngredientContribution",
+          "queryKeyHint": "queryKeys.eventIngredientContribution.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "EventIngredientContribution",
+      "command": "revise",
+      "capabilityId": "EventIngredientContribution.revise",
+      "route": "/api/manifest/EventIngredientContribution/commands/revise",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "quantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 1
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "servings",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "quantity",
+        "servings"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "EventIngredientContributionRecorded"
+      ],
+      "affectedEntity": "EventIngredientContribution",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "EventIngredientContribution",
+          "queryKeyHint": "queryKeys.eventIngredientContribution.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "EventIngredientContribution",
+          "queryKeyHint": "queryKeys.eventIngredientContribution.detail(id)",
           "label": "entity detail"
         }
       ],
@@ -6213,6 +6662,16 @@
           "ownership": "client",
           "constraints": {},
           "hasRuntimeGuards": true
+        },
+        {
+          "name": "preferredVendorId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
         }
       ],
       "clientParameterNames": [
@@ -6220,7 +6679,8 @@
         "unit",
         "costPerUnit",
         "allergens",
-        "category"
+        "category",
+        "preferredVendorId"
       ],
       "serverParameterNames": [],
       "returnTsType": "unknown",
@@ -6278,6 +6738,59 @@
           "proven": true
         }
       ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "Ingredient",
+          "queryKeyHint": "queryKeys.ingredient.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "Ingredient",
+          "queryKeyHint": "queryKeys.ingredient.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "Ingredient",
+      "command": "setPreferredVendor",
+      "capabilityId": "Ingredient.setPreferredVendor",
+      "route": "/api/manifest/Ingredient/commands/setPreferredVendor",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "preferredVendorId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "preferredVendorId"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [],
+      "affectedEntity": "Ingredient",
+      "lifecycleTransitions": [],
       "invalidation": [
         {
           "kind": "entityList",
@@ -6922,6 +7435,124 @@
           "proven": true
         }
       ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "IngredientDemand",
+          "queryKeyHint": "queryKeys.ingredientDemand.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "IngredientDemand",
+          "queryKeyHint": "queryKeys.ingredientDemand.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "IngredientDemand",
+      "command": "syncFromContributions",
+      "capabilityId": "IngredientDemand.syncFromContributions",
+      "route": "/api/manifest/IngredientDemand/commands/syncFromContributions",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "eventId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "ingredientId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "requiredQuantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "unit",
+          "tsType": "\"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\"",
+          "irTypeName": "UnitOfMeasure",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "enumValues": [
+              "each",
+              "gram",
+              "kilogram",
+              "ounce",
+              "pound",
+              "milliliter",
+              "liter",
+              "teaspoon",
+              "tablespoon",
+              "cup",
+              "pint",
+              "quart",
+              "gallon",
+              "portion"
+            ]
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "purchasingWeekStart",
+          "tsType": "string",
+          "irTypeName": "datetime",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "dateLike": true
+          },
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "eventId",
+        "ingredientId",
+        "requiredQuantity",
+        "unit",
+        "purchasingWeekStart"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "IngredientDemandCalculated"
+      ],
+      "affectedEntity": "IngredientDemand",
+      "lifecycleTransitions": [],
       "invalidation": [
         {
           "kind": "entityList",
@@ -13776,6 +14407,18 @@
             ]
           },
           "hasRuntimeGuards": true
+        },
+        {
+          "name": "purchasingWeekStart",
+          "tsType": "string",
+          "irTypeName": "datetime",
+          "required": false,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "dateLike": true
+          },
+          "hasRuntimeGuards": true
         }
       ],
       "clientParameterNames": [
@@ -13783,7 +14426,8 @@
         "ingredientDemandId",
         "ingredientId",
         "requiredQuantity",
-        "unit"
+        "unit",
+        "purchasingWeekStart"
       ],
       "serverParameterNames": [],
       "returnTsType": "unknown",
@@ -13963,6 +14607,63 @@
           "proven": true
         }
       ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "PurchaseNeed",
+          "queryKeyHint": "queryKeys.purchaseNeed.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "PurchaseNeed",
+          "queryKeyHint": "queryKeys.purchaseNeed.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "PurchaseNeed",
+      "command": "reviseRequired",
+      "capabilityId": "PurchaseNeed.reviseRequired",
+      "route": "/api/manifest/PurchaseNeed/commands/reviseRequired",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "requiredQuantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 1
+          },
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "requiredQuantity"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "PurchaseNeedOpened"
+      ],
+      "affectedEntity": "PurchaseNeed",
+      "lifecycleTransitions": [],
       "invalidation": [
         {
           "kind": "entityList",
@@ -18832,6 +19533,161 @@
     },
     {
       "entity": "VendorOrder",
+      "command": "ensureWeeklyDraft",
+      "capabilityId": "VendorOrder.ensureWeeklyDraft",
+      "route": "/api/manifest/VendorOrder/commands/ensureWeeklyDraft",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "vendorId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sourceRangeStart",
+          "tsType": "string",
+          "irTypeName": "datetime",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "dateLike": true,
+            "rejectEmptyString": true
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "sourceRangeEnd",
+          "tsType": "string",
+          "irTypeName": "datetime",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "dateLike": true,
+            "rejectEmptyString": true
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "purchaseNeedId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "ingredientDemandId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "ingredientId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "requiredQuantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "unit",
+          "tsType": "\"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\"",
+          "irTypeName": "UnitOfMeasure",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "enumValues": [
+              "each",
+              "gram",
+              "kilogram",
+              "ounce",
+              "pound",
+              "milliliter",
+              "liter",
+              "teaspoon",
+              "tablespoon",
+              "cup",
+              "pint",
+              "quart",
+              "gallon",
+              "portion"
+            ]
+          },
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "vendorId",
+        "sourceRangeStart",
+        "sourceRangeEnd",
+        "purchaseNeedId",
+        "ingredientDemandId",
+        "ingredientId",
+        "requiredQuantity",
+        "unit"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "VendorOrderWeeklyDraftEnsured"
+      ],
+      "affectedEntity": "VendorOrder",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "VendorOrder",
+          "queryKeyHint": "queryKeys.vendorOrder.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "VendorOrder",
+          "queryKeyHint": "queryKeys.vendorOrder.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "VendorOrder",
       "command": "markPartiallyReceived",
       "capabilityId": "VendorOrder.markPartiallyReceived",
       "route": "/api/manifest/VendorOrder/commands/markPartiallyReceived",
@@ -19376,6 +20232,168 @@
           "proven": true
         }
       ],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "VendorOrderLine",
+          "queryKeyHint": "queryKeys.vendorOrderLine.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "VendorOrderLine",
+          "queryKeyHint": "queryKeys.vendorOrderLine.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "VendorOrderLine",
+      "command": "ensureWeeklyLine",
+      "capabilityId": "VendorOrderLine.ensureWeeklyLine",
+      "route": "/api/manifest/VendorOrderLine/commands/ensureWeeklyLine",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "vendorOrderId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "ingredientId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "weekNeed",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "onHand",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "contributionQuantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "min": 1
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "unit",
+          "tsType": "\"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\"",
+          "irTypeName": "UnitOfMeasure",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "enumValues": [
+              "each",
+              "gram",
+              "kilogram",
+              "ounce",
+              "pound",
+              "milliliter",
+              "liter",
+              "teaspoon",
+              "tablespoon",
+              "cup",
+              "pint",
+              "quart",
+              "gallon",
+              "portion"
+            ]
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "unitCost",
+          "tsType": "number",
+          "irTypeName": "money",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "purchaseNeedId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "ingredientDemandId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "vendorOrderId",
+        "ingredientId",
+        "weekNeed",
+        "onHand",
+        "contributionQuantity",
+        "unit",
+        "unitCost",
+        "purchaseNeedId",
+        "ingredientDemandId"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "VendorOrderLineWeeklyEnsured"
+      ],
+      "affectedEntity": "VendorOrderLine",
+      "lifecycleTransitions": [],
       "invalidation": [
         {
           "kind": "entityList",
@@ -20592,6 +21610,200 @@
           "kind": "entityDetail",
           "entity": "WasteRecord",
           "queryKeyHint": "queryKeys.wasteRecord.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "WeeklyPurchasingConfig",
+      "command": "configure",
+      "capabilityId": "WeeklyPurchasingConfig.configure",
+      "route": "/api/manifest/WeeklyPurchasingConfig/commands/configure",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "defaultVendorId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "defaultVendorId"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [],
+      "affectedEntity": "WeeklyPurchasingConfig",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "WeeklyPurchasingConfig",
+          "queryKeyHint": "queryKeys.weeklyPurchasingConfig.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "WeeklyPurchasingConfig",
+          "queryKeyHint": "queryKeys.weeklyPurchasingConfig.detail(id)",
+          "label": "entity detail"
+        }
+      ],
+      "resultStates": {
+        "success": true,
+        "errors": [
+          "policy_denial",
+          "guard_failure",
+          "constraint_block",
+          "concurrency_conflict",
+          "missing_required_parameter",
+          "missing_trusted_context",
+          "unknown"
+        ]
+      }
+    },
+    {
+      "entity": "WeeklyPurchasingConfig",
+      "command": "routeNeed",
+      "capabilityId": "WeeklyPurchasingConfig.routeNeed",
+      "route": "/api/manifest/WeeklyPurchasingConfig/commands/routeNeed",
+      "instanceCommand": true,
+      "parameters": [
+        {
+          "name": "purchaseNeedId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "eventId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "ingredientDemandId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "ingredientId",
+          "tsType": "string",
+          "irTypeName": "uuid",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "requiredQuantity",
+          "tsType": "number",
+          "irTypeName": "decimal",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {},
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "unit",
+          "tsType": "\"each\" | \"gram\" | \"kilogram\" | \"ounce\" | \"pound\" | \"milliliter\" | \"liter\" | \"teaspoon\" | \"tablespoon\" | \"cup\" | \"pint\" | \"quart\" | \"gallon\" | \"portion\"",
+          "irTypeName": "UnitOfMeasure",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "enumValues": [
+              "each",
+              "gram",
+              "kilogram",
+              "ounce",
+              "pound",
+              "milliliter",
+              "liter",
+              "teaspoon",
+              "tablespoon",
+              "cup",
+              "pint",
+              "quart",
+              "gallon",
+              "portion"
+            ]
+          },
+          "hasRuntimeGuards": true
+        },
+        {
+          "name": "purchasingWeekStart",
+          "tsType": "string",
+          "irTypeName": "datetime",
+          "required": true,
+          "nullable": false,
+          "ownership": "client",
+          "constraints": {
+            "dateLike": true,
+            "rejectEmptyString": true
+          },
+          "hasRuntimeGuards": true
+        }
+      ],
+      "clientParameterNames": [
+        "purchaseNeedId",
+        "eventId",
+        "ingredientDemandId",
+        "ingredientId",
+        "requiredQuantity",
+        "unit",
+        "purchasingWeekStart"
+      ],
+      "serverParameterNames": [],
+      "returnTsType": "unknown",
+      "emits": [
+        "PurchaseNeedReadyForWeeklyDraft"
+      ],
+      "affectedEntity": "WeeklyPurchasingConfig",
+      "lifecycleTransitions": [],
+      "invalidation": [
+        {
+          "kind": "entityList",
+          "entity": "WeeklyPurchasingConfig",
+          "queryKeyHint": "queryKeys.weeklyPurchasingConfig.lists()",
+          "label": "entity list"
+        },
+        {
+          "kind": "entityDetail",
+          "entity": "WeeklyPurchasingConfig",
+          "queryKeyHint": "queryKeys.weeklyPurchasingConfig.detail(id)",
           "label": "entity detail"
         }
       ],

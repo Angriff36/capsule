@@ -21,10 +21,11 @@ describe("Demand, stock, and purchasing slice contract", () => {
     for (const hook of [
       "useListIngredientDemand",
       "useCreateIngredientDemand",
-      "usePurchaseNeedCreate",
     ]) {
       expect(demand).toContain(hook);
     }
+    expect(demand).not.toContain("usePurchaseNeedCreate");
+    expect(demand).not.toContain("Create need →");
     for (const hook of [
       "useListInventoryItem",
       "useCreateInventoryItem",
@@ -37,11 +38,12 @@ describe("Demand, stock, and purchasing slice contract", () => {
       "useListPurchaseNeed",
       "useCreateVendor",
       "useCreateVendorOrder",
-      "useCreateVendorOrderLine",
-      "usePurchaseNeedAssignToDraft",
+      "useListVendorOrder",
     ]) {
       expect(purchasing).toContain(hook);
     }
+    expect(purchasing).not.toContain("useCreateVendorOrderLine");
+    expect(purchasing).not.toContain("usePurchaseNeedAssignToDraft");
     for (const hook of [
       "useGetVendorOrder",
       "useCreateVendorOrderLine",
@@ -49,11 +51,13 @@ describe("Demand, stock, and purchasing slice contract", () => {
     ]) {
       expect(order).toContain(hook);
     }
-    expect(purchasing).toContain("Generate prep-list draft");
+    expect(purchasing).toContain("Auto-maintained drafts");
+    expect(purchasing).not.toContain("Generate prep-list draft");
+    expect(purchasing).not.toContain("PrepPurchaseDraftCoordinator");
     expect(order).toContain("vendorOrderLineId === line._id");
   });
 
-  it("uses only generated client surfaces and makes blocked automation explicit", () => {
+  it("uses only generated client surfaces and states approve→purchase handoff", () => {
     for (const file of [
       "DemandLedgerPage.tsx",
       "StockBookPage.tsx",
@@ -66,7 +70,7 @@ describe("Demand, stock, and purchasing slice contract", () => {
       expect(source).not.toContain("useMutation(");
     }
     expect(read("src/features/inventory/DemandLedgerPage.tsx")).toContain(
-      "Automatic purchase creation is unavailable",
+      "Approve releases purchasing",
     );
     expect(read("src/features/inventory/VendorOrderPage.tsx")).toContain(
       "Receiving does not automatically update stock",

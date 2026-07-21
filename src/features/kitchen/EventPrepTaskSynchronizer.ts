@@ -240,13 +240,8 @@ export class EventPrepTaskSynchronizer {
       );
       if (existing) {
         demandIds.set(this.demandKey(group), existing.id);
-        if (existing.status === "calculated" && this.ports.confirmDemand) {
-          await this.ports.confirmDemand({
-            docId: existing.id,
-            version: existing.version,
-            idempotencyKey: `event-prep-confirm:${existing.id}`,
-          });
-        }
+        // Leave status calculated — Event.approve foreach-creates PurchaseNeed
+        // and markReleased. Do not auto-confirm (confirm theater removed).
         if (
           existing.requiredQuantity !== group.requiredQuantity &&
           this.ports.recalculateDemand
@@ -268,13 +263,6 @@ export class EventPrepTaskSynchronizer {
         demandInput.idempotencyKey = `event-prep-demand:${group.eventId}:${group.ingredientId}:${group.unit}`;
         const created = await this.ports.createDemand(demandInput);
         demandIds.set(this.demandKey(group), created.docId);
-        if (this.ports.confirmDemand) {
-          await this.ports.confirmDemand({
-            docId: created.docId,
-            version: 1,
-            idempotencyKey: `event-prep-confirm:${created.docId}`,
-          });
-        }
       }
     }
     return demandIds;

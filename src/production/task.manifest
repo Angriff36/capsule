@@ -4,6 +4,7 @@
 // continues via batch.manifest → prep.manifest (entry).
 
 use "../procurement/purchase-need.manifest"
+use "../procurement/event-purchasing.manifest"
 
 enum PrepTaskStatus {
   pending
@@ -70,9 +71,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   transition status from "completed" to []
   transition status from "cancelled" to []
 
-  default policy prepTaskRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read prep tasks"
-  default policy prepTaskWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write prep tasks through commands"
-  default policy prepTaskExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute prep task commands"
+  default policy prepTaskRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may read prep tasks"
+  default policy prepTaskWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may write prep tasks through commands"
+  default policy prepTaskExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may execute prep task commands"
 
   command open(
     eventDishId: uuid,
@@ -178,6 +179,27 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
       unit: unit != null ? unit : self.unit
       category: category != null ? category : self.category
       taskType: taskType != null ? taskType : self.taskType
+      specialInstructions: specialInstructions != null ? specialInstructions : self.specialInstructions
+    }
+  }
+
+  command refreshGenerated(
+    quantity: decimal(12, 4),
+    optional specialInstructions: string
+  ) {
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    guard self.isGenerated == true
+    constraint refreshQuantityPositive: quantity > 0 "Generated prep task quantity must be positive"
+    mutate quantity = quantity
+    mutate specialInstructions = specialInstructions != null ? specialInstructions : self.specialInstructions
+    emit PrepTaskGeneratedRefreshed {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      quantity: quantity
+      unit: self.unit
       specialInstructions: specialInstructions != null ? specialInstructions : self.specialInstructions
     }
   }
@@ -382,6 +404,16 @@ event PrepTaskRevised: "prep_task.revised" {
   unit: UnitOfMeasure
   category: string
   taskType: string
+  specialInstructions: string?
+}
+
+event PrepTaskGeneratedRefreshed: "prep_task.generated_refreshed" {
+  prepTaskId: string
+  tenantId: string
+  eventDishId: string
+  eventId: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
   specialInstructions: string?
 }
 

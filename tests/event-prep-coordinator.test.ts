@@ -82,7 +82,8 @@ describe("EventPrepCoordinator", () => {
     });
 
     expect(createDemand).toHaveBeenCalledTimes(2);
-    expect(confirmDemand).toHaveBeenCalledTimes(2);
+    // Confirm theater removed — Event.approve releases purchase needs.
+    expect(confirmDemand).not.toHaveBeenCalled();
     expect(createDemand).toHaveBeenCalledWith(
       expect.objectContaining({
         eventId: "event-1",
@@ -169,38 +170,32 @@ describe("EventPrepCoordinator", () => {
     expect(createTask).not.toHaveBeenCalled();
   });
 
-  it("reconciles event demand after a dish is removed", async () => {
-    const recalculateDemand = vi.fn().mockResolvedValue(undefined);
-    const supersedeDemand = vi.fn().mockResolvedValue(undefined);
+  it("skipDemand links prep tasks to existing Manifest-owned demand only", async () => {
+    const createDemand = vi.fn();
+    const createTask = vi.fn().mockResolvedValue({ docId: "prep-1" });
     const coordinator = new EventPrepCoordinator({
-      recalculateDemand,
-      supersedeDemand,
+      createDemand,
+      createTask,
     });
 
-    await coordinator.reconcileEventDemands({
-      eventId: "event-1",
-      tasks: [
-        task({
-          id: "prep-remaining",
-          ingredientId: "ingredient-romaine",
-          quantity: 40,
-        }),
-      ],
-      demands: [
-        demand(),
-        demand({
-          id: "demand-removed",
-          ingredientId: "ingredient-croutons",
-          requiredQuantity: 20,
-        }),
-      ],
+    await coordinator.sync({
+      eventDish: {
+        id: "event-dish-1",
+        eventId: "event-1",
+        dishId: "dish-salad",
+        quantityServings: 40,
+      },
+      templates: [template({ ingredientId: "ingredient-romaine" })],
+      tasks: [],
+      demands: [demand()],
+      skipDemand: true,
     });
 
-    expect(recalculateDemand).not.toHaveBeenCalled();
-    expect(supersedeDemand).toHaveBeenCalledWith({
-      docId: "demand-removed",
-      version: 1,
-      reason: "All prep tasks for this ingredient were removed from the event",
-    });
+    expect(createDemand).not.toHaveBeenCalled();
+    expect(createTask).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ingredientDemandId: "demand-romaine",
+      }),
+    );
   });
 });

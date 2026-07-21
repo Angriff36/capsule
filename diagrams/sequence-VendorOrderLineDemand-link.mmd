@@ -5,11 +5,11 @@ sequenceDiagram
     Client->>+VendorOrderLineDemand: link(vendorOrderLineId, ingredientDemandId, vendorOrderId, contributionQuantity, unit)
     Note over VendorOrderLineDemand: Policies: vendorOrderLineDemandRead, vendorOrderLineDemandWrite, vendorOrderLineDemandExecute
     Note over VendorOrderLineDemand: Guards (5)
-    VendorOrderLineDemand->>VendorOrderLineDemand: guard[0]: self.linkedAt == null
-    VendorOrderLineDemand->>VendorOrderLineDemand: guard[1]: self.deletedAt == null
-    VendorOrderLineDemand->>VendorOrderLineDemand: guard[2]: self.vendorOrderLine != null
-    VendorOrderLineDemand->>VendorOrderLineDemand: guard[3]: self.vendorOrder != null and self.vendorOrder.status == #quot;...
-    VendorOrderLineDemand->>VendorOrderLineDemand: guard[4]: self.ingredientDemand != null
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[0]: self.deletedAt == null
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[1]: self.vendorOrderLine != null
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[2]: self.vendorOrder != null and self.vendorOrder.status == #quot;...
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[3]: self.ingredientDemand != null
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[4]: self.linkedAt == null or self.vendorOrderLineId == vendor...
     VendorOrderLineDemand->>VendorOrderLineDemand: mutate.vendorOrderLineId
     VendorOrderLineDemand->>VendorOrderLineDemand: mutate.ingredientDemandId
     VendorOrderLineDemand->>VendorOrderLineDemand: mutate.vendorOrderId

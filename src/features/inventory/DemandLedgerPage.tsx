@@ -1,15 +1,14 @@
 import { useState, type FormEvent } from "react";
 import {
   useCreateIngredientDemand,
-  useIngredientDemandConfirm,
   useIngredientDemandFulfill,
   useIngredientDemandSupersede,
   useListEvent,
   useListIngredient,
   useListIngredientDemand,
   useListPurchaseNeed,
-  usePurchaseNeedCreate,
 } from "../../lib/manifest-convex-react";
+import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
@@ -40,13 +39,12 @@ export function DemandLedgerPage() {
   const ingredients = useListIngredient();
   const purchaseNeeds = useListPurchaseNeed();
   const createDemand = useCreateIngredientDemand();
-  const confirmDemand = useIngredientDemandConfirm();
   const fulfillDemand = useIngredientDemandFulfill();
   const supersedeDemand = useIngredientDemandSupersede();
-  const createPurchaseNeed = usePurchaseNeedCreate();
   const [showCreate, setShowCreate] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt(busy != null);
 
   const activeDemands = (demands ?? []).filter(
     (demand) => demand.deletedAt == null,
@@ -90,28 +88,27 @@ export function DemandLedgerPage() {
   };
 
   const invokeDemandAction = (demand: any, key: string) => {
-    void run(`${demand._id}:${key}`, async () => {
-      const args = { docId: demand._id, version: demand.version };
-      if (key === "confirm") await confirmDemand(args);
-      if (key === "fulfill") await fulfillDemand(args);
+    void (async () => {
       if (key === "supersede") {
-        const reason = window.prompt("Supersede reason")?.trim();
+        const reason = await prompt.askReason({
+          ...ReasonCopy.supersedeDemand,
+          tone: "danger",
+        });
         if (!reason) return;
-        await supersedeDemand({ ...args, reason });
+        void run(`${demand._id}:${key}`, async () => {
+          await supersedeDemand({
+            docId: demand._id,
+            version: demand.version,
+            reason,
+          });
+        });
+        return;
       }
-    });
-  };
-
-  const createNeed = (demand: any) => {
-    void run(`${demand._id}:need`, async () => {
-      await createPurchaseNeed({
-        eventId: demand.eventId,
-        ingredientDemandId: demand._id,
-        ingredientId: demand.ingredientId,
-        requiredQuantity: demand.requiredQuantity,
-        unit: demand.unit,
+      void run(`${demand._id}:${key}`, async () => {
+        const args = { docId: demand._id, version: demand.version };
+        if (key === "fulfill") await fulfillDemand(args);
       });
-    });
+    })();
   };
 
   return (
@@ -135,14 +132,15 @@ export function DemandLedgerPage() {
       <InventoryWorkspaceNav />
 
       <aside className="supply-degraded" role="note">
-        <strong>Manual governed handoff</strong>
+        <strong>Approve releases purchasing</strong>
         <span>
-          Automatic purchase creation is unavailable while the generated
-          reaction path remains unverified. Create a PurchaseNeed explicitly
-          from a confirmed demand below.
+          Dish and headcount changes recalculate demand automatically. Event
+          approval opens PurchaseNeeds and maintains the shared weekly draft —
+          no manual create-need step.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
+      {host}
 
       {showCreate ? (
         <form className="supply-form" onSubmit={submitDemand}>
@@ -224,6 +222,15 @@ export function DemandLedgerPage() {
           <div className="document-empty">
             <p>No ingredient demand has been calculated.</p>
             <span>Begin with an event and an active ingredient.</span>
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setShowCreate(true)}
+              >
+                Calculate demand
+              </button>
+            </div>
           </div>
         ) : (
           <div className="supply-table-wrap">
@@ -258,19 +265,9 @@ export function DemandLedgerPage() {
                       <td>
                         {need ? (
                           <StatusChip status={String(need.status)} />
-                        ) : demand.status === "confirmed" ? (
-                          <button
-                            className="text-link"
-                            disabled={busy != null}
-                            onClick={() => createNeed(demand)}
-                          >
-                            {busy === `${demand._id}:need`
-                              ? "Creating…"
-                              : "Create need →"}
-                          </button>
                         ) : (
                           <span className="supply-muted">
-                            Await confirmation
+                            Opens on Event approve
                           </span>
                         )}
                       </td>

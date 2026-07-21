@@ -9,5 +9,6 @@ sequenceDiagram
     Event->>Event: guard[1]: self.deletedAt == null
     Event->>Event: mutate.startsAt
     Event->>Event: mutate.endsAt
+    Event->>Event: mutate.purchasingWeekStart
     Event->>EventBus: emit EventScheduleChanged on event.schedule_changed
     Event-->>-Client: void

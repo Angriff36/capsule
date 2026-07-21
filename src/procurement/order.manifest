@@ -64,9 +64,11 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   transition status from "received" to []
   transition status from "cancelled" to []
 
-  default policy vendorOrderRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor orders"
-  default policy vendorOrderWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write vendor orders through commands"
-  default policy vendorOrderExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute vendor order commands"
+  // manageAccess: Event.approve reaction chain ensures the weekly DRAFT.
+  // procurementAccess: day-to-day purchasing. Submit stays a buyer action.
+  default policy vendorOrderRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read vendor orders"
+  default policy vendorOrderWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write vendor orders through commands"
+  default policy vendorOrderExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute vendor order commands"
 
   command open(
     vendorId: uuid,
@@ -100,6 +102,37 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
       sourceRangeEnd: sourceRangeEnd != null ? sourceRangeEnd : self.sourceRangeEnd
       orderNumber: orderNumber
       status: "draft"
+    }
+  }
+
+  // Manifest weekly draft ensure (match else create from PurchaseNeedReadyForWeeklyDraft).
+  command ensureWeeklyDraft(
+    vendorId: uuid,
+    sourceRangeStart: datetime,
+    sourceRangeEnd: datetime,
+    purchaseNeedId: uuid,
+    ingredientDemandId: uuid,
+    ingredientId: uuid,
+    requiredQuantity: decimal(12, 4),
+    unit: UnitOfMeasure
+  ) {
+    guard self.deletedAt == null
+    guard self.status == "draft"
+    guard self.vendor != null and self.vendor.status == "active" and self.vendor.onboardedAt != null
+    mutate vendorId = vendorId
+    mutate sourceRangeStart = sourceRangeStart
+    mutate sourceRangeEnd = sourceRangeEnd
+    mutate openedAt = self.openedAt == null ? now() : self.openedAt
+    emit VendorOrderWeeklyDraftEnsured {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: vendorId
+      purchasingWeekStart: sourceRangeStart
+      purchaseNeedId: purchaseNeedId
+      ingredientDemandId: ingredientDemandId
+      ingredientId: ingredientId
+      requiredQuantity: requiredQuantity
+      unit: unit
     }
   }
 
@@ -271,9 +304,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   transition status from "complete" to []
   transition status from "cancelled" to []
 
-  default policy vendorOrderLineRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor order lines"
-  default policy vendorOrderLineWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write vendor order lines through commands"
-  default policy vendorOrderLineExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute vendor order line commands"
+  default policy vendorOrderLineRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read vendor order lines"
+  default policy vendorOrderLineWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write vendor order lines through commands"
+  default policy vendorOrderLineExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute vendor order line commands"
 
   command addLine(
     vendorOrderId: uuid,
@@ -314,6 +347,45 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       orderedQuantity: orderedQuantity
       unit: unit
       unitCost: unitCost
+    }
+  }
+
+  // Weekly draft line ensure: create or revise consolidated shortage quantity.
+  // weekNeed / onHand are reaction-param sums (command-body sum() is not projected).
+  command ensureWeeklyLine(
+    vendorOrderId: uuid,
+    ingredientId: uuid,
+    weekNeed: decimal(12, 4),
+    onHand: decimal(12, 4),
+    contributionQuantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    unitCost: money(12, 2),
+    purchaseNeedId: uuid,
+    ingredientDemandId: uuid
+  ) {
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
+    guard self.ingredient != null and self.ingredient.status == "active"
+    constraint ensureContributionPositive: contributionQuantity > 0 "Contribution quantity must be positive"
+    compute orderQty = max(0.0001, weekNeed - onHand)
+    mutate vendorOrderId = vendorOrderId
+    mutate ingredientId = ingredientId
+    mutate ingredientDemandId = ingredientDemandId
+    mutate orderedQuantity = orderQty
+    mutate unit = unit
+    mutate unitCost = unitCost
+    mutate status = self.addedAt == null ? "added" : self.status
+    mutate addedAt = self.addedAt == null ? now() : self.addedAt
+    emit VendorOrderLineWeeklyEnsured {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: vendorOrderId
+      purchaseNeedId: purchaseNeedId
+      ingredientDemandId: ingredientDemandId
+      ingredientId: ingredientId
+      orderedQuantity: orderQty
+      contributionQuantity: contributionQuantity
+      unit: unit
     }
   }
 
@@ -432,9 +504,9 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
 
   constraint demandLinkQuantityPositive: self.linkedAt == null or self.contributionQuantity > 0 "Demand link contribution must be positive"
 
-  default policy vendorOrderLineDemandRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read order demand links"
-  default policy vendorOrderLineDemandWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write order demand links through commands"
-  default policy vendorOrderLineDemandExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute order demand link commands"
+  default policy vendorOrderLineDemandRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read order demand links"
+  default policy vendorOrderLineDemandWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write order demand links through commands"
+  default policy vendorOrderLineDemandExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute order demand link commands"
 
   command link(
     vendorOrderLineId: uuid,
@@ -443,14 +515,15 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
     contributionQuantity: decimal(12, 4),
     unit: UnitOfMeasure
   ) {
-    guard self.linkedAt == null
     guard self.deletedAt == null
     guard self.vendorOrderLine != null
     guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     guard self.ingredientDemand != null
-    constraint linkLineMatch: vendorOrderLineId == self.vendorOrderLineId "Demand link vendorOrderLineId must match the seeded line reference"
-    constraint linkDemandMatch: ingredientDemandId == self.ingredientDemandId "Demand link ingredientDemandId must match the seeded demand reference"
-    constraint linkOrderMatch: vendorOrderId == self.vendorOrderId "Demand link vendorOrderId must match the seeded order reference"
+    // First link or idempotent revise of the same demand→line contribution.
+    guard self.linkedAt == null or (self.vendorOrderLineId == vendorOrderLineId and self.ingredientDemandId == ingredientDemandId)
+    constraint linkLineMatch: self.linkedAt == null or vendorOrderLineId == self.vendorOrderLineId "Demand link vendorOrderLineId must match the seeded line reference"
+    constraint linkDemandMatch: self.linkedAt == null or ingredientDemandId == self.ingredientDemandId "Demand link ingredientDemandId must match the seeded demand reference"
+    constraint linkOrderMatch: self.linkedAt == null or vendorOrderId == self.vendorOrderId "Demand link vendorOrderId must match the seeded order reference"
     constraint linkOrderOwnsLine: vendorOrderId == self.vendorOrderLine.vendorOrderId "Demand link vendorOrderId must own the vendor order line"
     constraint linkQuantityPositive: contributionQuantity > 0 "Demand link contribution must be positive"
     mutate vendorOrderLineId = vendorOrderLineId
@@ -458,7 +531,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
     mutate vendorOrderId = vendorOrderId
     mutate contributionQuantity = contributionQuantity
     mutate unit = unit
-    mutate linkedAt = now()
+    mutate linkedAt = self.linkedAt == null ? now() : self.linkedAt
     emit VendorOrderLineDemandLinked {
       vendorOrderLineDemandId: self.id
       tenantId: self.tenantId
@@ -502,6 +575,30 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
   }
 
   store VendorOrderLineDemand in durable
+}
+
+event VendorOrderWeeklyDraftEnsured: "vendor_order.weekly_draft_ensured" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  purchasingWeekStart: datetime
+  purchaseNeedId: string
+  ingredientDemandId: string
+  ingredientId: string
+  requiredQuantity: number
+  unit: UnitOfMeasure
+}
+
+event VendorOrderLineWeeklyEnsured: "vendor_order_line.weekly_ensured" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  purchaseNeedId: string
+  ingredientDemandId: string
+  ingredientId: string
+  orderedQuantity: number
+  contributionQuantity: number
+  unit: UnitOfMeasure
 }
 
 event VendorOrderOpened: "vendor_order.opened" {

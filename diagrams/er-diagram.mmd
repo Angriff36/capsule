@@ -143,6 +143,8 @@ erDiagram
         uuid dishId "PK"
         uuid recipeId "PK"
         int sortOrder "PK"
+        decimal yieldQuantity "PK"
+        decimal batchMultiplier "PK"
         string role "nullable"
         datetime attachedAt "nullable"
         datetime removedAt "nullable"
@@ -186,6 +188,7 @@ erDiagram
         string eventType "PK"
         datetime startsAt "nullable"
         datetime endsAt "nullable"
+        datetime purchasingWeekStart "nullable"
         string venueName "nullable"
         string venueAddress "nullable"
         int expectedHeadcount "PK"
@@ -293,6 +296,7 @@ erDiagram
         uuid eventId "PK"
         uuid dishId "PK"
         int quantityServings "PK"
+        datetime purchasingWeekStart "nullable"
         string course "nullable"
         string serviceStyle "nullable"
         string specialInstructions "nullable"
@@ -303,6 +307,23 @@ erDiagram
     }
     EventDish }o--|| Event : "event"
     EventDish }o--|| Dish : "dish"
+    EventDishRecipeSeed {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid eventId "PK"
+        uuid eventDishId "PK"
+        uuid dishId "PK"
+        uuid recipeId "PK"
+        decimal servings "PK"
+        decimal yieldQuantity "PK"
+        decimal batchMultiplier "PK"
+        datetime purchasingWeekStart "nullable"
+        datetime seededAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    EventDishRecipeSeed }o--|| EventDish : "eventDish"
     EventGuest {
         uuid id "PK"
         string tenantId "PK"
@@ -325,6 +346,26 @@ erDiagram
         datetime updatedAt
     }
     EventGuest }o--|| Event : "event"
+    EventIngredientContribution {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid eventId "PK"
+        uuid eventDishId "PK"
+        uuid dishId "PK"
+        uuid recipeId "PK"
+        uuid ingredientId "PK"
+        decimal quantity "PK"
+        UnitOfMeasure unit "PK"
+        decimal servings "PK"
+        datetime purchasingWeekStart "nullable"
+        datetime recordedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    EventIngredientContribution }o--|| Event : "event"
+    EventIngredientContribution }o--|| EventDish : "eventDish"
+    EventIngredientContribution }o--|| Ingredient : "ingredient"
     Incident {
         uuid id "PK"
         string tenantId "PK"
@@ -361,6 +402,7 @@ erDiagram
         list allergens
         money costPerUnit "PK"
         string category "nullable"
+        uuid preferredVendorId "nullable"
         IngredientStatus status "PK"
         datetime introducedAt "nullable"
         datetime discontinuedAt "nullable"
@@ -385,6 +427,7 @@ erDiagram
         decimal sourceYieldQuantity "nullable"
         IngredientDemandStatus status "PK"
         uuid purchaseEligibleEventId "nullable"
+        datetime purchasingWeekStart "nullable"
         datetime calculatedAt "nullable"
         datetime confirmedAt "nullable"
         datetime fulfilledAt "nullable"
@@ -753,6 +796,7 @@ erDiagram
         uuid ingredientId "PK"
         decimal requiredQuantity "PK"
         UnitOfMeasure unit "PK"
+        datetime purchasingWeekStart "nullable"
         uuid vendorOrderId "nullable"
         uuid vendorOrderLineId "nullable"
         PurchaseNeedStatus status "PK"
@@ -1141,3 +1185,13 @@ erDiagram
     WasteRecord }o--|| StorageLocation : "location"
     WasteRecord }o--|| Event : "event"
     WasteRecord }o--|| InventoryItem : "inventoryItem"
+    WeeklyPurchasingConfig {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid defaultVendorId "PK"
+        datetime configuredAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    WeeklyPurchasingConfig }o--|| Vendor : "defaultVendor"

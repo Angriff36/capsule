@@ -17,7 +17,8 @@ describe("CapsuleCommandCatalog", () => {
         mutationNameForCapability(item.capabilityId),
       );
       expect(item.route).toContain("/api/manifest/");
-      expect(item.clientParameterNames.length).toBeGreaterThan(0);
+      expect(item.command).not.toBe("");
+      expect(item.emits.length).toBeGreaterThan(0);
     }
   });
 

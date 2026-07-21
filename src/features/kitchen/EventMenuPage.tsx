@@ -1,15 +1,11 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
-  useCreateIngredientDemand,
   useCreateInventoryReservation,
   useCreatePrepTask,
   useCreateEventDish,
   useEventDishAdjustServings,
   useEventDishRemove,
-  useIngredientDemandConfirm,
-  useIngredientDemandRecalculate,
-  useIngredientDemandSupersede,
   useInventoryReservationRelease,
   useListDish,
   useListDishRecipe,
@@ -48,12 +44,8 @@ export function EventMenuPage() {
   const inventoryReservations = useListInventoryReservation();
   const createEventDish = useCreateEventDish();
   const createPrepTask = useCreatePrepTask();
-  const createDemand = useCreateIngredientDemand();
   const createReservation = useCreateInventoryReservation();
   const releaseReservation = useInventoryReservationRelease();
-  const confirmDemand = useIngredientDemandConfirm();
-  const recalculateDemand = useIngredientDemandRecalculate();
-  const supersedeDemand = useIngredientDemandSupersede();
   const refreshGeneratedTask = usePrepTaskRefreshGenerated();
   const adjustServings = useEventDishAdjustServings();
   const removeDish = useEventDishRemove();
@@ -85,10 +77,6 @@ export function EventMenuPage() {
   const menuSync = () =>
     new EventMenuSyncController(
       {
-        createDemand: (input) => createDemand(input),
-        confirmDemand: (input) => confirmDemand(input),
-        recalculateDemand: (input) => recalculateDemand(input),
-        supersedeDemand: (input) => supersedeDemand(input),
         createTask: ((input: never) => createPrepTask(input)) as never,
         refreshGeneratedTask: ((input: never) =>
           refreshGeneratedTask(input)) as never,

@@ -23,6 +23,10 @@ entity Dish mixin TenantScoped, SoftDeletable {
   property required portionSize: decimal(10, 2) = 1
   property required portionUnit: UnitOfMeasure = "portion"
   property dietaryTags: list<string> = []
+  // Stored on Dish so Convex schema matches existing documents. Multi-hop
+  // Ingredient aggregation is maintained via classifyAllergens (not computed),
+  // because dropping this property leaves orphan fields that fail schema validation.
+  property allergenSummary: list<AllergenCode> = []
   property required status: DishStatus = "active"
   property introducedAt: datetime?
   property retiredAt: datetime?
@@ -31,8 +35,6 @@ entity Dish mixin TenantScoped, SoftDeletable {
   hasMany recipeLines: DishRecipe
   hasMany prepTasks: DishTask
 
-  // Multi-hop union: DishRecipe → Recipe → RecipeIngredient → Ingredient.allergens
-  computed allergenSummary: list<AllergenCode> = unique_of(flat_map(self.recipeLines, (line) => flat_map(line.recipe.ingredientLines, (ri) => ri.ingredient.allergens)))
   computed isActive: boolean = self.status == "active"
   computed isRetired: boolean = self.status == "retired"
 
@@ -54,7 +56,8 @@ entity Dish mixin TenantScoped, SoftDeletable {
     optional category: string,
     optional course: string,
     optional serviceStyle: string,
-    optional dietaryTags: list<string>
+    optional dietaryTags: list<string>,
+    optional allergenSummary: list<AllergenCode>
   ) {
     guard self.introducedAt == null
     guard self.deletedAt == null
@@ -68,6 +71,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
     mutate course = course
     mutate serviceStyle = serviceStyle
     mutate dietaryTags = dietaryTags != null ? dietaryTags : []
+    mutate allergenSummary = allergenSummary != null ? allergenSummary : []
     mutate introducedAt = now()
     emit DishIntroduced {
       dishId: self.id
@@ -75,6 +79,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
       name: name
       portionSize: portionSize
       portionUnit: portionUnit
+      allergenSummary: allergenSummary != null ? allergenSummary : []
     }
   }
 
@@ -120,10 +125,21 @@ entity Dish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command classifyAllergens(allergenSummary: list<AllergenCode>) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate allergenSummary = allergenSummary
+    emit DishAllergensClassified {
+      dishId: self.id
+      tenantId: self.tenantId
+      allergenSummary: allergenSummary
+    }
+  }
+
   command retire(reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
-    guard roleAllows(user.role, "kitchenManageAccess")
+    guard roleAllows(user.role, "kitchenAccess")
     constraint retireDishReason: length(trim(reason)) > 0 "Retirement reason is required"
     mutate status = "retired"
     mutate retiredAt = now()
@@ -138,7 +154,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
   command reinstate() {
     guard self.status == "retired"
     guard self.deletedAt == null
-    guard roleAllows(user.role, "kitchenManageAccess")
+    guard roleAllows(user.role, "kitchenAccess")
     mutate status = "active"
     mutate retiredAt = null
     mutate retirementReason = null
@@ -161,6 +177,10 @@ entity DishRecipe mixin TenantScoped, SoftDeletable {
   property required dishId: uuid
   property required recipeId: uuid
   property required sortOrder: int = 0
+  // Snapshot of Recipe yield/batch at attach so EventDish→BOM reactions can
+  // compute quantities without nested relation hydration on fanOut rows.
+  property required yieldQuantity: decimal(10, 2) = 1
+  property required batchMultiplier: decimal(10, 4) = 1
   property role: string?
   property attachedAt: datetime?
   property removedAt: datetime?
@@ -175,6 +195,8 @@ entity DishRecipe mixin TenantScoped, SoftDeletable {
   command attach(
     dishId: uuid,
     recipeId: uuid,
+    yieldQuantity: decimal(10, 2),
+    optional batchMultiplier: decimal(10, 4),
     optional sortOrder: number,
     optional role: string
   ) {
@@ -182,8 +204,12 @@ entity DishRecipe mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.dish != null and self.dish.status == "active"
     constraint attachDishMatch: dishId == self.dishId "Attach dishId must match the seeded dish reference"
+    constraint attachYieldPositive: yieldQuantity > 0 "Attached recipe yield must be positive"
+    constraint attachBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Attached recipe batch multiplier must be positive"
     mutate dishId = dishId
     mutate recipeId = recipeId
+    mutate yieldQuantity = yieldQuantity
+    mutate batchMultiplier = batchMultiplier != null ? batchMultiplier : 1
     mutate sortOrder = sortOrder != null ? sortOrder : 0
     mutate role = role
     mutate attachedAt = now()
@@ -192,6 +218,8 @@ entity DishRecipe mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       dishId: dishId
       recipeId: recipeId
+      yieldQuantity: yieldQuantity
+      batchMultiplier: batchMultiplier != null ? batchMultiplier : 1
       sortOrder: sortOrder != null ? sortOrder : 0
       role: role
     }
@@ -362,6 +390,7 @@ event DishIntroduced: "dish.introduced" {
   name: string
   portionSize: decimal(10, 2)
   portionUnit: UnitOfMeasure
+  allergenSummary: list<AllergenCode>
 }
 
 event DishDetailsRevised: "dish.details_revised" {
@@ -377,6 +406,12 @@ event DishPortioningUpdated: "dish.portioning_updated" {
   previousPortionUnit: UnitOfMeasure
   portionSize: decimal(10, 2)
   portionUnit: UnitOfMeasure
+}
+
+event DishAllergensClassified: "dish.allergens_classified" {
+  dishId: string
+  tenantId: string
+  allergenSummary: list<AllergenCode>
 }
 
 event DishRetired: "dish.retired" {
@@ -395,6 +430,8 @@ event DishRecipeAttached: "dish_recipe.attached" {
   tenantId: string
   dishId: string
   recipeId: string
+  yieldQuantity: number
+  batchMultiplier: number
   sortOrder: number
   role: string?
 }

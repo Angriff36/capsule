@@ -1,9 +1,3 @@
-import {
-  EventRecipeDemandReconciler,
-  type EventRecipe,
-  type EventRecipeIngredientLine,
-  type EventRecipeLink,
-} from "./EventRecipeDemandReconciler";
 import { EventPrepTaskSynchronizer } from "./EventPrepTaskSynchronizer";
 
 export type EventPrepUnit =
@@ -138,91 +132,18 @@ type SyncInput = {
   templates: readonly EventPrepDishTask[];
   tasks: readonly EventPrepTask[];
   demands: readonly EventPrepDemand[];
-  /** When true, only materialize prep tasks; recipe reconcile owns demand. */
+  /**
+   * When true, only materialize PrepTask rows.
+   * Recipe → IngredientDemand is Manifest-owned (event-purchasing.manifest).
+   */
   skipDemand?: boolean;
 };
 
+/** Host prep-task materialization only — not purchasing / recipe demand. */
 export class EventPrepCoordinator {
   constructor(private readonly ports: Ports) {}
 
   async sync(input: SyncInput) {
     return new EventPrepTaskSynchronizer(this.ports).sync(input);
-  }
-
-  /**
-   * EventDish add / servings adjust / remove → IngredientDemand via recipe BOM.
-   * Aggregate key: eventId + ingredientId + unit.
-   */
-  async reconcileRecipeDemands(input: {
-    eventId: string;
-    eventDishes: readonly EventPrepDish[];
-    dishRecipes: readonly EventRecipeLink[];
-    recipes: readonly EventRecipe[];
-    recipeIngredients: readonly EventRecipeIngredientLine[];
-    demands: readonly EventPrepDemand[];
-  }) {
-    if (
-      !this.ports.createDemand ||
-      !this.ports.recalculateDemand ||
-      !this.ports.supersedeDemand
-    ) {
-      throw new Error(
-        "Recipe demand reconcile requires createDemand, recalculateDemand, and supersedeDemand",
-      );
-    }
-    return new EventRecipeDemandReconciler({
-      createDemand: this.ports.createDemand,
-      recalculateDemand: this.ports.recalculateDemand,
-      supersedeDemand: this.ports.supersedeDemand,
-    }).reconcile(input);
-  }
-
-  async reconcileEventDemands(input: {
-    eventId: string;
-    tasks: readonly EventPrepTask[];
-    demands: readonly EventPrepDemand[];
-  }) {
-    const groups = new Map<string, number>();
-    for (const task of input.tasks) {
-      if (
-        task.eventId !== input.eventId ||
-        task.deletedAt != null ||
-        task.status === "cancelled" ||
-        task.status === "completed" ||
-        !task.ingredientId
-      ) {
-        continue;
-      }
-      const key = `${task.eventId}:${task.ingredientId}:${task.unit}`;
-      groups.set(key, (groups.get(key) ?? 0) + task.quantity);
-    }
-
-    for (const demand of input.demands) {
-      if (demand.eventId !== input.eventId || demand.status === "superseded") {
-        continue;
-      }
-      const key = `${demand.eventId}:${demand.ingredientId}:${demand.unit}`;
-      const quantity = groups.get(key);
-      if (quantity == null || quantity <= 0) {
-        if (this.ports.supersedeDemand) {
-          await this.ports.supersedeDemand({
-            docId: demand.id,
-            version: demand.version,
-            reason:
-              "All prep tasks for this ingredient were removed from the event",
-          });
-        }
-      } else if (
-        quantity !== demand.requiredQuantity &&
-        this.ports.recalculateDemand
-      ) {
-        await this.ports.recalculateDemand({
-          docId: demand.id,
-          version: demand.version,
-          newQuantity: quantity,
-          reason: "Event prep tasks changed",
-        });
-      }
-    }
   }
 }

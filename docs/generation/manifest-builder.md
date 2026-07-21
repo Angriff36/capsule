@@ -48,11 +48,35 @@ Capsule is a **live Manifest project**: editable `.manifest` sources and
 from those in-project files (no external `Manifest-source` IR after init).
 
 1. Edit domain meaning in `src/**/*.manifest` and/or `manifest.config.yaml`.
-2. `bun run manifest:regen` — Builder plans and applies when conflict-free; updates `.builder/ownership.json` in the same transaction. Preview only: `builder generate convex --dry-run`.
+2. `bun run manifest:regen` — syncs Capsule's exact `@angriff36/manifest` pin into the sibling Builder checkout (so projection code matches Capsule, no PAT), then Builder plans/applies when conflict-free and updates `.builder/ownership.json` in the same transaction. Preview only: `builder generate convex --dry-run`.
 3. `bun run codegen` / `bun run dev:convex` as needed.
 4. UI consumes APIs through generated hooks via `src/lib/api.ts`.
 
 Recovery when ownership digests are stale (no file rewrites): `builder adopt ownership --apply`, then `bun run manifest:regen`.
+
+### Local Convex: “Could not find public function” after a schema reshape
+
+Symptom: client calls a generated query (e.g. `queries:listDishRecipe`) that exists in
+`convex/queries.ts`, but `bun run dev:convex` logs `Schema validation failed` and never
+finishes the push. Root cause is almost always **stale local documents** that still have
+removed fields (or lack newly required ones) — not a missing export.
+
+Example (2026-07-19): Dish dropped direct `recipeId` for `DishRecipe` joins; local `dishes`
+rows still carried `recipeId`, so every push failed and new queries never registered.
+
+Fix local data (do not hand-edit generated schema long-term):
+
+1. Inspect: `bunx convex data <table> --format jsonArray`
+2. Export/transform/import cleaned rows (`bunx convex import --table … --replace -y …`),
+   migrating values into join tables when needed.
+3. Confirm push: `.artifacts/convex.stderr.log` shows `Convex functions ready!` with no
+   following `Schema validation failed`.
+4. Confirm registration: `bunx convex function-spec` lists the query identifier.
+
+Chicken-and-egg (import rejected because the **deployed** schema still requires a removed
+field): briefly push with `defineSchema(tables, { schemaValidation: false })`, import the
+cleaned data, then restore default validation and push again. Prefer regenerating schema
+afterward so the temp flag does not linger.
 
 ## Why generated files change (and where fixes belong)
 
@@ -157,3 +181,13 @@ for (const [p,{sha256:expected}] of Object.entries(o.files)) {
 If regeneration would clobber an author seam, **stop**. Preserve `convex/lib/**`, `convex/auth.config.ts`, and `convex/authStatus.ts`. Never “fix” generated output by hand — re-assemble or re-codegen from the authoritative source.
 
 **Ownership invariant:** any commit touching Builder-owned generated paths must include `.builder/ownership.json` from the same `bun run manifest:regen` transaction.
+
+## Event prep and weekly inventory order workflow
+
+The source contract for DishTask templates, EventDish-owned PrepTask rows,
+IngredientDemand provenance, and weekly draft VendorOrder reconciliation is
+documented in [event-prep-and-weekly-order-workflow.md](../event-prep-and-weekly-order-workflow.md).
+Edit the `.manifest` sources and regenerate owned projections; do not hand-edit
+Convex output. The current Manifest compiler does not support child-creating
+reactions, so the Capsule orchestrator owns generated-row reconciliation while
+the Manifest events and commands remain the domain contract.
