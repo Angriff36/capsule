@@ -93,7 +93,7 @@ re-authoring; test draft salvaged in `.loop-worktrees/_salvage-20260721/`.
 NOTE 2026-07-22 (product-loop): Manifest changes verified on main. Test added
 to verify aggregation behavior; Codex APPROVED. PR #28.
 
-### 6. S2 — Client.outstandingBalance over hasMany invoices — open
+### 6. S2 — Client.outstandingBalance over hasMany invoices — in-pr #31
 
 `Client` lives in `src/operations/event.manifest`. Add `hasMany invoices:
 Invoice` + `computed outstandingBalance` where draft/paid/voided/written_off
@@ -104,7 +104,7 @@ InvoiceStatus enum in `src/sales/invoice-core.manifest`). Optional
 NOTE 2026-07-21 (overseer): tooling failures resolved (see item 1); strikes
 cleared; salvaged draft diffs (manifest + test) in `.loop-worktrees/_salvage-20260721/`.
 
-### 7. S3 — ProductionBatch yield variance computeds — open
+### 7. S3 — ProductionBatch yield variance computeds — in-pr #33
 
 `src/production/batch.manifest`: `yieldVariance` (actual − planned),
 `varianceRatio` ((actual−planned)/planned; ratio NOT percent),
@@ -113,7 +113,7 @@ Regen + test: plan 100 complete 110 → 10 / 0.1 / 1.1. Canonical port: YES (S3)
 NOTE 2026-07-21 (overseer): tooling failures resolved (see item 1); strikes
 cleared; salvaged draft diffs in `.loop-worktrees/_salvage-20260721/`.
 
-### 8. S6 — Event attendance derived counts — open
+### 8. S6 — Event attendance derived counts — blocked: Codex rejected (1/3)
 
 `src/operations/event.manifest`: `confirmedCount` / `declinedCount` /
 `checkedInCount` / `pendingCount` as count_of over `self.guests`. Read-only —

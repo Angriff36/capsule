@@ -19,6 +19,21 @@ Append one entry per run. Prune entries older than 30 days.
 
 ## Recent Runs
 
+```json
+{
+  "run_id": "2026-07-21T21:36:00Z",
+  "pattern": "product-loop",
+  "duration_s": 120,
+  "items_attempted": 1,
+  "actions_taken": 0,
+  "escalations": 0,
+  "rejections": 1,
+  "tokens_estimate": 85000,
+  "outcome": "blocked",
+  "details": "S6 attendance counts blocked by Manifest platform limitations (computed over hasMany not in generated schema; hydration doesn't filter soft-deletes). Same pattern as S2's first rejection. Test correctly uses helpers but requires Builder platform changes to ship. 1/3 failures."
+}
+```
+
 <!-- Loop appends below this line -->
 
 {"run_id":"2026-07-17T05:05:59Z","pattern":"daily-triage","source":"manual-first-tick","duration_s":120,"items_found":3,"actions_taken":0,"escalations":1,"tokens_estimate":15000,"outcome":"report-only","notes":"First tick (setup verification). CI RED on main: proof:emit fails in scripts/emit-proof-kit.ts:94. 6 dependabot PRs open, all failing same CI. Issues disabled or empty."}
@@ -57,3 +72,7 @@ Append one entry per run. Prune entries older than 30 days.
 {"run_id":"2026-07-22T06:00:00Z","pattern":"daily-triage","source":"glm-tick","duration_s":120,"items_found":12,"actions_taken":0,"escalations":0,"tokens_estimate":15000,"outcome":"report-only","notes":"Triage complete: CI GREEN on main. PR #27 (OD052) failing - HIGH-SCRUTINY auth work needs immediate fix (1/3 failures). Issues #21, #20, #17 pruned (already fixed/obsolete). PR #26 ready to merge (resolves worktree isolation). Schema drift items (#24, #22, #15) blocked until #26 merges. MCP catalog (#16) ESCALATED. Queue-drain mode: proceeding to fix OD052 CI failure."}
 {"run_id":"2026-07-22T06:30:00Z","pattern":"daily-triage","source":"glm-tick","duration_s":1800,"items_found":12,"actions_taken":1,"escalations":0,"tokens_estimate":95000,"outcome":"fix-blocked","notes":"OD052 fix attempt: Codex REJECTED initial attempt (bundled wrong-scope agent-catalog refactor). Reverted to OD052-only fix (TimeRecord authSubjectId resolution), updated docs, Codex APPROVED. Fix BLOCKED by pre-push hook requiring Builder in worktree. Branch loop/prod-20260721T1600-OD052-timerecord-identity at 7821fb0 ready for human push after PR #26 merges. 1/3 failures on OD052. Continuing queue-drain."}
 {"run_id":"2026-07-21T19:45:00Z","pattern":"daily-triage","source":"glm-tick","duration_s":180,"items_found":12,"actions_taken":2,"escalations":0,"tokens_estimate":45000,"outcome":"fix-proposed","notes":"Queue-drain tick: OD052 PR #27 and S1 PR #28 both failing CI (agent catalog tests). Root cause: both branches created before commit 0226af6 added 20 missing agent modules. Fixed by rebasing both branches onto current main and force-pushing. CI now expected to pass. OD056 (1/3 failures) remains - needs correct Person.authSubjectId resolution pattern. Regen items (#24, #22, #15) now attemptable after PR #26 CRLF fix merged. Next tick: verify CI passes, then attempt OD056 fix or schema drift regen items."}
+{"source":"product-loop","runId":"prod-20260721T1545-S3-yield-variance","timestamp":"2026-07-21T15:45:00Z","item":"S3 — ProductionBatch yield variance computeds","status":"in-pr #33","verdict":"SUCCESS","evidence":"manifest:regen exit 0, typecheck exit 0, test pass (yieldVariance=10, varianceRatio=0.1, fulfillmentRatio=1.1), commit d1f9e70, branch loop/prod-20260721T1545-S3-yield-variance pushed, PR #33 draft created"}
+{"run_id":"2026-07-21T21:25:00Z","pattern":"daily-triage","source":"glm-tick","duration_s":900,"items_found":8,"actions_taken":0,"escalations":2,"tokens_estimate":65000,"outcome":"escalated","notes":"Queue-drain tick: All fixable items blocked on product decisions. issue #32 (cascade auth policy) diagnosed - Event.approve→Invoice.issue runs under caller role vs Finance role; blocks PRs #27/#28/#31. issue #24 (savedReportDefinitions ownership) - 3rd entity with Person FK pattern after OD052/OD056; needs coordinated fix. PR #7 (actions/checkout v6) CI fails due to #32. Schema drift items (#22, #15) likely need same ownership pattern fix. Loop awaits human product decisions."}
+{"run_id":"2026-07-21T21:35:00Z","pattern":"daily-triage","source":"glm-tick","duration_s":1200,"items_found":8,"actions_taken":0,"escalations":2,"tokens_estimate":75000,"outcome":"report-only","notes":"Queue-drain complete: issues #22 and #15 diagnosed as same wiring drift as #32 (contentHash metadata, not actual schema drift), pruned. All schema drift items resolved by manifest:regen. Remaining blockers require product decisions: issue #32 (cascade auth policy), issue #24 (coordinated ownership pattern). All PRs blocked on #32 CI failures. Loop awaits human decisions on cascade authorization and ownership patterns."}
+
