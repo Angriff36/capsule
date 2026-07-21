@@ -1,0 +1,17 @@
+# Builder-owned generated output must check out byte-identical to the commit
+# (LF). Builder hashes raw disk bytes against .builder/ownership.json; CRLF
+# conversion on checkout made every fresh worktree/clone read as "modified"
+# (290 phantom conflicts, regen refused). Proven 2026-07-21.
+convex/** text eol=lf
+generated/** text eol=lf
+src/generated/** text eol=lf
+schemas/** text eol=lf
+diagrams/** text eol=lf
+wiring/** text eol=lf
+scripts/seed-convex.ts text eol=lf
+src/lib/manifest-convex-react.ts text eol=lf
+tests/manifest-convex.contract.test.ts text eol=lf
+manifest-context-summary.json text eol=lf
+PRESET.md text eol=lf
+tsconfig.builder.json text eol=lf
+.builder/** text eol=lf

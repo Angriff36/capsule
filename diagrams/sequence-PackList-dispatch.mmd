@@ -10,6 +10,7 @@ sequenceDiagram
     PackList->>PackList: guard[2]: self.deletedAt == null
     PackList->>PackList: compute.previousStatus
     PackList->>PackList: mutate.status
+    PackList->>PackList: mutate.activeEventId
     PackList->>PackList: mutate.dispatchedAt
     PackList->>EventBus: emit PackListDispatched on pack_list.dispatched
     PackList-->>-Client: void

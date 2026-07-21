@@ -33,7 +33,7 @@ export function computeEvent(doc: Record<string, any>): Record<string, any> {
   return {
     isTerminal: ((doc.stage === "cancelled") || (doc.stage === "closed_out")),
     isEditable: (((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved")),
-    isReadyForExecution: (((((doc.prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && (((doc.packLists) ?? []).filter((p: Doc<"packLists">) => (((p.status !== "dispatched") && (p.status !== "cancelled")))).length === 0)) && (((doc.deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0)),
+    isReadyForExecution: (((((doc.prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && (((doc.packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && (((doc.deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0)),
   };
 }
 
