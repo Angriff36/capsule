@@ -21,8 +21,21 @@ Last run: 2026-07-21T19:45:00Z (queue-drain tick: OD052 & S1 rebased onto main, 
 - Needs correct pattern: resolve Person.authSubjectId for identity checks
 - Worktree preserved at .loop-worktrees/prod-20260721T1852-OD056-saved-report-owner
 
-**CORRECTION (overseer 2026-07-22, verified via gh): PR #26 is NOT merged — it
-is OPEN, CI green, awaiting HUMAN merge. Do not report it merged.**
+**PR #26 MERGED by human 2026-07-21T20:39Z (verified via gh). Human also
+enabled repo AUTO-MERGE: green PRs now land without manual review — treat CI
+green as the final gate and keep Codex review verdicts in PR bodies. Local
+main has origin merged back in (4f5190f).**
+
+**MAIN CI IS RED — issue #32 (overseer 2026-07-22, verified in clean
+worktrees): committed wiring drifted from committed manifests; after faithful
+regen the cascade-approve feature (cee67e3) still runs invoice reads under the
+CALLER's role → ~10 event/closeout proofs throw "Finance staff may read
+invoices"; plus governed-creation-mappings 53≠52 and navigation-catalog
+/facilities≠/admin. This is a PRODUCT decision (cascade authorization
+context), not a test-tweak — do NOT paper over by editing tests. Hold
+manifest-touching pushes/rebases until #32 resolves; PR #27 was updated with
+main merged in (fixes #29/#30 CI noise) and will stay red only on #32's
+failures.**
 - Pre-push from worktrees was actually fixed by repairing `BUILDER_DIR`: both
   `.claude/product-loop.cmd` and `.claude/loop-tick.cmd` contained a literal
   backspace byte (`C:\Projects<BS>uilder`); fixed, plus user-level

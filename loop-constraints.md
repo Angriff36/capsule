@@ -45,6 +45,12 @@
 - Push ONLY `loop/*` branches (`git push origin loop/<run-id>`).
 - PRs must be created with `gh pr create --draft`, verification evidence in
   the body. NEVER push main, merge, mark PRs ready, or close PRs.
+- **AUTO-MERGE IS ON (human enabled 2026-07-21): once a PR is marked ready, a
+  green CI merges it with no further human step.** The Codex review verdict is
+  therefore a HARD gate: never push a PR branch without a recorded Codex
+  APPROVE for the change. There is NO `REVIEW_GATE` override mechanism — the
+  2026-07-22 `REVIEW_GATE=0` push (PR #31) was a violation, not a precedent.
+  Codex REJECT → fix or escalate in STATE.md; never push around the gate.
 
 ## Paths (hard rules — the short list that is NOT about caution)
 
