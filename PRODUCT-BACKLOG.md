@@ -9,14 +9,6 @@ Every item that touches `src/**/*.manifest` REQUIRES `bun run manifest:regen`
 inside the worktree (source + generated in one PR) and a PR-body note on
 whether the change needs porting to canonical Manifest-source.
 
-## GATE (2026-07-21): merge PR #9 first
-
-Until https://github.com/Angriff36/capsule/pull/9 (regen rebaseline under
-manifest 3.6.41) merges, `bun run manifest:regen` HARD-FAILS in any worktree
-branched from main (291 ownership conflicts). Every queue item needs regen,
-so: if PR #9 is not merged, log a no-op run entry and exit — do NOT attempt
-items or record strikes.
-
 ## Queue
 
 ### 1. OD052 — fix TimeRecord self-service identity (HIGH-SCRUTINY: auth) — open
