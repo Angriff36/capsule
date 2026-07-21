@@ -1,14 +1,30 @@
 # Copy-paste prompt: enter a recipe into Capsule
 
 **Created:** 2026-07-17  
-**Updated:** 2026-07-17 — preview-first; never auto-create unmatched ingredients
+**Updated:** 2026-07-21 — look at `work/` photos first; Dish ≠ Recipe
 
 Paste this into an IDE agent chat in the Capsule repo:
 
 ---
 
-Enter recipes into Capsule using governed commands only (no UI, no direct DB
-writes). **Preview first. Do not write until the preview lines look correct.**
+**Before entering anything, open the photos in `work/`:**
+
+- `work/list3.jpg`, `work/list4.jpg`, `work/list5.jpg` — production sheets.
+  Bold ALL-CAPS lines are **Dishes** (menu items). Indented lines under each
+  dish are **DishTask** prep/portion lines with quantities. “MAKE X (DRIVE
+  RECIPE)” / “(RECIPE)” points at a separate Recipe sheet.
+- `work/recipes/*.jpg` (e.g. basil pesto, macaroni salad, lemonade concentrate)
+  — those are **Recipes** (component formulas with ingredients + method).
+
+Do **not** create a Recipe titled the same as a Dish. Do **not** invent
+“batch formula” renames. A Dish’s ingredients/prep live on DishTask lines
+(`dishtask_add`). A Recipe is only for reusable make-formulas.
+
+Enter **recipe sheets** with Capsule MCP / governed commands only (no UI, no
+direct DB writes). Prefer MCP (`preview_recipe_document` →
+`enter_recipe_document`, or first-class snake tools). **Preview first. Do not
+write until the preview lines look correct.** Entering a recipe does **not**
+create a Dish (default).
 
 Working directory: `C:/Projects/capsule`
 
@@ -33,6 +49,10 @@ bun run agent:enter-recipe -- path/to/recipe.txt --approve-new
 6. Report preview summary (`exactMatchCount`, `unresolvedLineCount`,
    `wouldCreateIfApproved`) before asking to approve. If preview is wrong, stop.
 7. Do not invent REST CRUD or edit generated `convex/mutations.ts`.
+
+To add a **Dish with prep/ingredient lines** (production sheet shape): use
+`dish_introduce` then `dishtask_add` for each line (optional `ingredientId` /
+`recipeId`). See `docs/event-prep-and-weekly-order-workflow.md`.
 
 ---
 

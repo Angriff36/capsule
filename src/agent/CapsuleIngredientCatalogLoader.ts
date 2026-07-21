@@ -12,17 +12,18 @@ interface IngredientRow {
 
 /**
  * Loads the live Ingredient catalog for agent preview/match (same query as UI).
+ * JWT remints on every load (Clerk session tokens expire in ~60s).
  */
 export class CapsuleIngredientCatalogLoader {
-  private readonly client: ConvexHttpClient;
+  private client: ConvexHttpClient | null = null;
 
-  constructor(auth: CapsuleAgentAuthManager = new CapsuleAgentAuthManager()) {
-    this.client = new ConvexHttpClient(auth.resolveConvexUrl());
-    this.client.setAuth(auth.requireJwt());
-  }
+  constructor(
+    private readonly auth: CapsuleAgentAuthManager = new CapsuleAgentAuthManager(),
+  ) {}
 
   async load(): Promise<CatalogIngredient[]> {
-    const rows = (await this.client.query(
+    const client = await this.resolveClient();
+    const rows = (await client.query(
       api.queries.listIngredient,
       {},
     )) as IngredientRow[];
@@ -32,5 +33,13 @@ export class CapsuleIngredientCatalogLoader {
       unit: row.unit,
       deletedAt: row.deletedAt ?? null,
     }));
+  }
+
+  private async resolveClient(): Promise<ConvexHttpClient> {
+    if (!this.client) {
+      this.client = new ConvexHttpClient(this.auth.resolveConvexUrl());
+    }
+    this.client.setAuth(await this.auth.resolveJwt());
+    return this.client;
   }
 }

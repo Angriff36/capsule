@@ -3,11 +3,22 @@ source_of_truth: true
 created: 2026-07-19
 updated: 2026-07-21
 # Correction 2026-07-21: Capsule pins Manifest 3.6.41; event→weekly purchasing is Manifest-owned — see § Implementation boundary.
+# Correction 2026-07-21: Visual SoT for Dish vs Recipe vs DishTask is work/list*.jpg and work/recipes/*.jpg — see § What the kitchen actually needs.
 ---
 
 # Event prep and weekly inventory order workflow
 
 ## What the kitchen actually needs
+
+**Visual source of truth:** photos in `work/` (not agent invention).
+
+- `work/list3.jpg`, `work/list4.jpg`, `work/list5.jpg` — production sheets.
+  The bold ALL-CAPS menu lines are **Dishes**. Under each dish are prep /
+  portion lines with quantities (those are **DishTask** templates). Lines like
+  “MAKE HUCKLEBERRY BBQ SAUCE” or “MAKE HONEY CINNAMON BUTTER (RECIPE)” point
+  at a separate **Recipe**, they are not the dish itself.
+- `work/recipes/*.jpg` — component formula sheets (pesto, brine, sauce,
+  concentrate). Those are **Recipes** with ingredients + method.
 
 A Dish is a reusable finished offering. It has reusable DishTask templates such as:
 
@@ -16,7 +27,7 @@ A Dish is a reusable finished offering. It has reusable DishTask templates such 
 - Portion Caesar dressing
 - Make a component when that component is not already available
 
-A Recipe is a reusable formula. It has RecipeIngredients and ordered RecipeSteps for making a component. A Recipe is not rewritten when an Event needs a different amount.
+A Recipe is a reusable formula. It has RecipeIngredients and ordered RecipeSteps for making a component. A Recipe is not rewritten when an Event needs a different amount. Never name a Recipe the same as its Dish and pretend that is “full ingredients.”
 
 A Menu only groups Dishes. It does not own prep work.
 
@@ -68,5 +79,9 @@ EventDish + headcount
 > Proof: `tests/proofs/event-weekly-purchasing.runtime.test.ts`.
 
 - Configure one `WeeklyPurchasingConfig` per tenant (default vendor) before approve routes needs.
+  Manifest declares `unique [tenantId]`, but `WeeklyPurchasingConfig_createViaConfigure`
+  currently inserts without enforcing that uniqueness — repeated configure calls can leave
+  multiple live config rows and ambiguous `routeNeed` vendors. Do not soft-ignore configure
+  failures; treat multi-config as a data defect until createVia guards/unique are fixed.
 - `purchasingWeekStart` is denormalized from Event plan/reschedule (`startsAt`) onto EventDish / contribution / demand / need.
 - demand.manifest remains authoritative for IngredientDemand lifecycle commands.

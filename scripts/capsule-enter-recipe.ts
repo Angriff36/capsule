@@ -16,10 +16,13 @@ import { ConvexCommandClient } from "../src/agent/ConvexCommandClient";
 function usage(): never {
   console.error(`Usage:
   bun run agent:enter-recipe -- --preview <path-to-recipe.txt>
-  bun run agent:enter-recipe -- <path-to-recipe.txt> --approve-new [--no-dish]
+  bun run agent:enter-recipe -- <path-to-recipe.txt> --approve-new [--with-dish]
 
 Preview never writes. Loads live Ingredient catalog for exact/possible matches.
-Enter without --approve-new only succeeds when every line exactly matches.`);
+Enter without --approve-new only succeeds when every line exactly matches.
+Recipe sheets create Recipes only (default). --with-dish is opt-in and rare —
+Dishes come from production sheets with DishTask lines (work/list*.jpg), not
+from renaming a recipe title.`);
   process.exit(2);
 }
 
@@ -30,7 +33,7 @@ async function main(): Promise<void> {
   }
   const preview = args.includes("--preview");
   const approveNew = args.includes("--approve-new");
-  const noDish = args.includes("--no-dish");
+  const withDish = args.includes("--with-dish");
   const pathArg = args.find((a) => !a.startsWith("--"));
   if (!pathArg) usage();
 
@@ -102,7 +105,7 @@ async function main(): Promise<void> {
   const result = await coordinator.enterFromText({
     sourceText,
     catalog,
-    introduceDish: !noDish,
+    introduceDish: withDish,
     approveUnresolvedAsNew: approveNew,
   });
 

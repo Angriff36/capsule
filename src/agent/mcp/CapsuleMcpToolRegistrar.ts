@@ -6,17 +6,14 @@ import { CapsuleDocumentEnterCoordinator } from "../CapsuleDocumentEnterCoordina
 import { CapsuleEventPrepCoordinator } from "../CapsuleEventPrepCoordinator";
 import { CapsuleIngredientCatalogLoader } from "../CapsuleIngredientCatalogLoader";
 import { CapsuleLiveEventPrepStateLoader } from "../CapsuleLiveEventPrepStateLoader";
-
-function textResult(value: unknown) {
-  return {
-    content: [{ type: "text" as const, text: JSON.stringify(value, null, 2) }],
-  };
-}
+import { CapsuleMcpTextResult } from "./CapsuleMcpTextResult";
 
 /**
  * Registers Capsule product command tools (not Manifest authoring MCP).
  */
 export class CapsuleMcpToolRegistrar {
+  private readonly text = new CapsuleMcpTextResult();
+
   constructor(
     private readonly catalog: CapsuleCommandCatalog,
     private readonly executor: CapsuleCommandExecutor,
@@ -25,25 +22,44 @@ export class CapsuleMcpToolRegistrar {
   register(server: McpServer): void {
     server.tool(
       "list_capsule_commands",
-      "List Capsule governed kitchen/ops commands agents may execute (from Manifest wiring contract).",
+      "List Capsule governed kitchen/ops commands. Each entry has uiImplemented; gaps mean backend-only (no Capsule screen yet).",
       {},
-      async () => textResult({ commands: this.catalog.list() }),
+      async () => {
+        const commands = this.catalog.list();
+        const uiGaps = this.catalog.uiGaps();
+        return this.text.format(
+          {
+            commands,
+            uiGaps,
+            uiGapWarning:
+              uiGaps.length > 0
+                ? "Some listed commands have NO Capsule UI — see uiGaps and red banner above."
+                : null,
+          },
+          { warnCapabilityIds: uiGaps },
+        );
+      },
     );
 
     server.tool(
       "describe_capsule_command",
-      "Describe one Capsule capability: params, Convex mutation name, emits.",
+      "Describe one Capsule capability: params, Convex mutation, emits, uiImplemented.",
       {
         capabilityId: z
           .string()
           .describe("e.g. Ingredient.introduce, Recipe.draft"),
       },
-      async ({ capabilityId }) => textResult(this.catalog.get(capabilityId)),
+      async ({ capabilityId }) => {
+        const descriptor = this.catalog.get(capabilityId);
+        return this.text.format(descriptor, {
+          warnCapabilityIds: [capabilityId],
+        });
+      },
     );
 
     server.tool(
       "execute_capsule_command",
-      "Execute a governed Capsule command via the same Convex mutation the UI uses. Pass idempotencyKey for safe retries.",
+      "Execute a governed Capsule command via Convex. Allowed even without UI — if uiImplemented is false, warn the human loudly.",
       {
         capabilityId: z.string(),
         args: z
@@ -57,13 +73,21 @@ export class CapsuleMcpToolRegistrar {
           args,
           idempotencyKey,
         });
-        return textResult({ ok: true, capabilityId, result });
+        return this.text.format(
+          {
+            ok: true,
+            capabilityId,
+            uiImplemented: this.catalog.get(capabilityId).uiImplemented,
+            result,
+          },
+          { warnCapabilityIds: [capabilityId] },
+        );
       },
     );
 
     server.tool(
       "add_event_dish_and_sync_prep",
-      "Add a Dish to an Event, then reconcile its generated PrepTasks and IngredientDemand through the same governed commands as the Event menu. Does not create or submit a purchase order.",
+      "Add a Dish to an Event, then materialize PrepTasks from active DishTask templates (host sync). IngredientDemand is Manifest-owned on EventDish.addToEvent (this tool sets skipDemand). Does not create or submit a purchase order.",
       {
         eventId: z.string(),
         dishId: z.string(),
@@ -78,7 +102,7 @@ export class CapsuleMcpToolRegistrar {
           this.executor,
           new CapsuleLiveEventPrepStateLoader(),
         );
-        return textResult({
+        return this.text.format({
           ok: true,
           result: await coordinator.addDishAndSync(input),
         });
@@ -95,7 +119,7 @@ export class CapsuleMcpToolRegistrar {
         const catalog = await new CapsuleIngredientCatalogLoader().load();
         const coordinator = new CapsuleDocumentEnterCoordinator(this.executor);
         const preview = coordinator.previewFromText({ sourceText, catalog });
-        return textResult({
+        return this.text.format({
           ok: true,
           mode: "preview",
           catalogSize: catalog.length,
@@ -135,7 +159,9 @@ export class CapsuleMcpToolRegistrar {
         introduceDish: z
           .boolean()
           .optional()
-          .describe("Default true — also Dish.introduce for the recipe"),
+          .describe(
+            "Default false. Recipe sheets are Recipes (work/recipes). Dishes are production-sheet menu items with DishTask lines (work/list*.jpg). Opt-in only — do not invent a Dish from a recipe title.",
+          ),
         dishPortionSize: z.number().optional(),
         dishPortionUnit: z.string().optional(),
       },
@@ -150,7 +176,11 @@ export class CapsuleMcpToolRegistrar {
           dishPortionUnit: args.dishPortionUnit,
           approveUnresolvedAsNew: args.approveUnresolvedAsNew === true,
         });
-        return textResult({ ok: true, catalogSize: catalog.length, result });
+        return this.text.format({
+          ok: true,
+          catalogSize: catalog.length,
+          result,
+        });
       },
     );
   }

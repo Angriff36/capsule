@@ -10,6 +10,7 @@ import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
 
 type QueryClient = {
   query(reference: unknown, args: Record<string, never>): Promise<unknown>;
+  setAuth?: (token: string) => void;
 };
 
 function rows(value: unknown): Array<Record<string, unknown>> {
@@ -19,28 +20,27 @@ function rows(value: unknown): Array<Record<string, unknown>> {
 /**
  * Reads the same tenant-scoped state used by the Event menu before reconciling
  * an EventDish into generated prep tasks and ingredient demand.
+ * Live path remints JWT on every load (Clerk session tokens expire in ~60s).
  */
 export class CapsuleLiveEventPrepStateLoader implements CapsuleEventPrepStateLoader {
-  private readonly client: QueryClient;
+  private readonly injectedClient: QueryClient | null;
+  private liveClient: ConvexHttpClient | null = null;
+  private readonly auth: CapsuleAgentAuthManager;
 
   constructor(
     client?: QueryClient,
     auth: CapsuleAgentAuthManager = new CapsuleAgentAuthManager(),
   ) {
-    if (client) {
-      this.client = client;
-      return;
-    }
-    const live = new ConvexHttpClient(auth.resolveConvexUrl());
-    live.setAuth(auth.requireJwt());
-    this.client = live as unknown as QueryClient;
+    this.injectedClient = client ?? null;
+    this.auth = auth;
   }
 
   async load(input: { eventId: string; dishId: string }) {
+    const client = await this.resolveClient();
     const [templateRows, taskRows, demandRows] = await Promise.all([
-      this.client.query(api.queries.listDishTask, {}),
-      this.client.query(api.queries.listPrepTask, {}),
-      this.client.query(api.queries.listIngredientDemand, {}),
+      client.query(api.queries.listDishTask, {}),
+      client.query(api.queries.listPrepTask, {}),
+      client.query(api.queries.listIngredientDemand, {}),
     ]);
     const templates = rows(templateRows)
       .filter((row) => row.dishId === input.dishId)
@@ -101,5 +101,16 @@ export class CapsuleLiveEventPrepStateLoader implements CapsuleEventPrepStateLoa
           }) satisfies EventPrepDemand,
       );
     return { templates, tasks, demands };
+  }
+
+  private async resolveClient(): Promise<QueryClient> {
+    if (this.injectedClient) {
+      return this.injectedClient;
+    }
+    if (!this.liveClient) {
+      this.liveClient = new ConvexHttpClient(this.auth.resolveConvexUrl());
+    }
+    this.liveClient.setAuth(await this.auth.resolveJwt());
+    return this.liveClient as unknown as QueryClient;
   }
 }

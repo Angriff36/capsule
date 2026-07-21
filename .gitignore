@@ -31,3 +31,7 @@ generated/ir/
 .claude/scheduled_tasks.json
 .claude/scheduled_tasks.lock
 .claude/loop-tick.log
+
+# Local kitchen reference (photos/CSVs; may include large binaries)
+work/
+
