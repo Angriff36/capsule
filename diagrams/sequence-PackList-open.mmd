@@ -10,6 +10,7 @@ sequenceDiagram
     PackList->>PackList: guard[2]: self.event != null
     PackList->>PackList: guard[3]: self.openedAt == null or self.eventId == eventId
     PackList->>PackList: mutate.eventId
+    PackList->>PackList: mutate.activeEventId
     PackList->>PackList: mutate.name
     PackList->>PackList: mutate.purpose
     PackList->>PackList: mutate.notes

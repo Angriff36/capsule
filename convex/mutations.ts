@@ -3204,7 +3204,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
       await __runIngredientDemandEnsurePurchaseEligible(ctx, { docId: (__row as any)._id } as any);
     }
     const __match1_raw = await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
-    const __match1_rows = __match1_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
+    const __match1_rows = __match1_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).activeEventId === payload.eventId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
     const __match1_id = __match1_rows.length > 0 ? (__match1_rows[0] as any)._id : null;
     if (__match1_id) {
       await __runPackListOpen(ctx, { docId: __match1_id, eventId: payload.eventId, name: "Event pack list" } as any);
@@ -3218,7 +3218,7 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
         updatedAt: Date.now(),
         version: 0,
       };
-      for (const __k of ["deletedAt","eventId","name","purpose","notes","status","openedAt","packingStartedAt","packedAt","loadedAt","dispatchedAt","cancelledAt","cancellationReason","createdAt","updatedAt"] as string[]) {
+      for (const __k of ["deletedAt","eventId","activeEventId","name","purpose","notes","status","openedAt","packingStartedAt","packedAt","loadedAt","dispatchedAt","cancelledAt","cancellationReason","createdAt","updatedAt"] as string[]) {
         if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
       }
       const __elseId = await ctx.db.insert("packLists", __elseDoc as any);
@@ -3340,7 +3340,7 @@ async function __runEventBeginExecution(ctx: MutationCtx, { docId, version }: an
     if (!((doc.stage === "approved"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user.role, "eventAccess"))) throw new Error("Guard 2 failed");
-    if (!((((((doc.prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && (((doc.packLists) ?? []).filter((p: Doc<"packLists">) => (((p.status !== "dispatched") && (p.status !== "cancelled")))).length === 0)) && (((doc.deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0)))) throw new Error("Guard 3 failed");
+    if (!((((((doc.prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && (((doc.packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && (((doc.deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0)))) throw new Error("Guard 3 failed");
     {
       const __cur = doc.stage;
       if (__cur !== undefined) {
@@ -10128,6 +10128,7 @@ async function __runPackListCancel(ctx: MutationCtx, { docId, reason, version }:
     }
     const updates = {
       status: "cancelled",
+      activeEventId: null,
       cancelledAt: Date.now(),
       cancellationReason: reason,
       version: ((doc as any).version ?? 0) + 1
@@ -10191,6 +10192,7 @@ async function __runPackListDispatch(ctx: MutationCtx, { docId, version }: any, 
     }
     const updates = {
       status: "dispatched",
+      activeEventId: null,
       dispatchedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -10392,6 +10394,7 @@ async function __runPackListOpen(ctx: MutationCtx, { docId, eventId, name, purpo
     }
     const updates = {
       eventId: eventId,
+      activeEventId: eventId,
       name: ((((doc.name).trim()).length > 0) ? doc.name : name),
       purpose: ((purpose != null) ? purpose : doc.purpose),
       notes: ((notes != null) ? notes : doc.notes),
@@ -10468,6 +10471,7 @@ export const PackList_createViaOpen = mutation({
     const doc: Record<string, any> = {
       ...__draft,
       eventId: eventId,
+      activeEventId: eventId,
       name: ((((__draft.name).trim()).length > 0) ? __draft.name : name),
       purpose: ((purpose != null) ? purpose : __draft.purpose),
       notes: ((notes != null) ? notes : __draft.notes),
