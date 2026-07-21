@@ -1,5 +1,15 @@
 # LOOP.md — capsule loop configuration
 
+## Loops in this repo (2026-07-21)
+
+1. **Hygiene tick** (`capsule-loop-tick`, every 2h 9:15-17:15): triage scan ->
+   STATE.md queue -> queue-drain fix flow. Prompt: `.claude/loop-tick-prompt.txt`.
+2. **Product loop** (`capsule-product-loop`, 4-iteration shifts at 9:00/13:00/
+   17:00): works `PRODUCT-BACKLOG.md` top-down, one item -> one draft PR per
+   iteration. Prompt: `PROMPT-product.md`. Runner: `.claude/product-loop.cmd`.
+   Backlog = OD-defect fixes + evolution-plan slices; human merges + reorders.
+   Kill: delete the task, or `loop-pause-all` in STATE.md (stops both loops).
+
 Architecture per [loop-engineering](https://github.com/cobusgreyling/loop-engineering).
 Ported from the retired capsule-pro loop 2026-07-16 (13 clean L1 ticks there).
 **Current phase: L2 standing (draft PRs; human decision 2026-07-19 — see loop-constraints.md).**
