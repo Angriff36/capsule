@@ -44,6 +44,7 @@ erDiagram
     }
     Client }o--|| Person : "assignedTo"
     Client ||--o{ Event : "events"
+    Client ||--o{ Invoice : "invoices"
     ClientContact {
         uuid id "PK"
         string tenantId "PK"

@@ -80,9 +80,12 @@ entity Client mixin TenantScoped, SoftDeletable {
 
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
   hasMany events: Event
+  hasMany invoices: Invoice
 
   computed displayName: string = self.clientType == "company" ? self.companyName : self.givenName + " " + self.familyName
   computed isArchived: boolean = self.status == "archived"
+  computed outstandingBalance: money(12, 2) = sum(self.invoices, (i) => i.status == "sent" or i.status == "viewed" or i.status == "overdue" or i.status == "partial" ? i.amountDue : 0)
+  computed overdueBalance: money(12, 2) = sum(self.invoices, (i) => i.status == "overdue" ? i.amountDue : 0)
 
   // registeredAt gates the invariant while register applies field mutations.
   constraint clientIdentityComplete: self.registeredAt == null or (self.clientType == "company" and self.companyName != null and length(trim(self.companyName)) > 0) or (self.clientType == "person" and self.givenName != null and length(trim(self.givenName)) > 0) "Company clients require a company name; person clients require a given name"

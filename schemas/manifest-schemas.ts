@@ -54,6 +54,8 @@ export const ClientSchema = z.object({
 export const ClientComputedSchema = ClientSchema.extend({
   displayName: z.string(),
   isArchived: z.boolean(),
+  outstandingBalance: z.number(),
+  overdueBalance: z.number(),
 });
 
 export type Client = z.infer<typeof ClientSchema>;

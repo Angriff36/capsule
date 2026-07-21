@@ -4,11 +4,19 @@
 
 import type { Doc } from "./_generated/dataModel";
 
+/** Preload nested relations for Client computeds (mutates doc in place). */
+export async function hydrateComputedRelationsForClient(ctx: any, doc: Record<string, any>): Promise<void> {
+  const docId = doc._id;
+  (doc as any).invoices = await ctx.db.query("invoices").withIndex("by_clientId", (q: any) => q.eq("clientId", docId)).collect();
+}
+
 /** Self-only computed fields for Client. Pass the stored document. */
 export function computeClient(doc: Record<string, any>): Record<string, any> {
   return {
     displayName: ((doc.clientType === "company") ? doc.companyName : ((doc.givenName + " ") + doc.familyName)),
     isArchived: (doc.status === "archived"),
+    outstandingBalance: ((doc.invoices) ?? []).map((i: Doc<"invoices">) => ((((((i.status === "sent") || (i.status === "viewed")) || (i.status === "overdue")) || (i.status === "partial")) ? i.amountDue : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0),
+    overdueBalance: ((doc.invoices) ?? []).map((i: Doc<"invoices">) => (((i.status === "overdue") ? i.amountDue : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0),
   };
 }
 
