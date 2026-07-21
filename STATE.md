@@ -2,6 +2,23 @@
 
 Last run: 2026-07-20T21:05:00Z (triage: CI GREEN on main, no actionable items)
 
+**2026-07-21 overseer intervention (Fable)**: the "systemic Builder tooling
+failure" that blocked all 8 product-loop items is RESOLVED — root cause was
+worktrees branched from a pre-2f30419 base (CRLF checkout vs LF ownership
+hashes), not a Builder limitation. Residual package.json phantom staleness
+fixed via .gitattributes in PR #26 (Codex APPROVE; fresh-worktree
+regen:check exit 0 verified). product-loop.cmd BUILDER_DIR had a literal
+backspace byte — fixed. Backlog items reset to open, strikes cleared, stale
+worktrees pruned (uncommitted diffs salvaged to
+`.loop-worktrees/_salvage-20260721/`). Product loop re-triggered manually.
+Second blocker found and fixed: 904ace6 (fix(agent)) referenced ~20 src/agent
+modules that were never git-added — every fresh worktree failed typecheck
+(TS2307), and PR CI inherited the breakage. Completed the commit by adding the
+src/agent WIP (verified: scratch worktree from main + those files → tsc exit
+0). NOTE for human: local main is ahead of origin and 904ace6 was red on CI
+until the completion commit — push when ready. PR #26 rebased onto origin/main
+so it carries only the .gitattributes fix.
+
 ## High Priority (queue-drain rules 2026-07-21: attempt everything reviewable; one worktree + draft PR per item)
 
 - **ATTEMPT: Dependabot major upgrades — one worktree + draft PR each, in this
