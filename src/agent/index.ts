@@ -22,7 +22,10 @@ export type {
 } from "./CapsuleDocumentEnterCoordinator";
 export { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
 export { CapsuleRecipeStatusLoader } from "./CapsuleRecipeStatusLoader";
-export type { CapsuleRecipeLifecycleStatus } from "./CapsuleRecipeStatusLoader";
+export type {
+  CapsuleRecipeLifecycleStatus,
+  CapsuleRecipeStatusReader,
+} from "./CapsuleRecipeStatusLoader";
 export {
   AGENT_AC_CAPABILITY_IDS,
   mutationNameForCapability,

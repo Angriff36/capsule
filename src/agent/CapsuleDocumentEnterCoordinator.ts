@@ -7,7 +7,10 @@ import {
 } from "../features/kitchen/import/RecipeImportTypes";
 import type { CapsuleCommandExecutor } from "./CapsuleCommandExecutor";
 import { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
-import { CapsuleRecipeStatusLoader } from "./CapsuleRecipeStatusLoader";
+import {
+  CapsuleRecipeStatusLoader,
+  type CapsuleRecipeStatusReader,
+} from "./CapsuleRecipeStatusLoader";
 
 export interface CapsuleDocumentEnterOptions {
   sourceText: string;
@@ -64,7 +67,7 @@ export class CapsuleDocumentEnterCoordinator {
 
   constructor(
     private readonly executor: CapsuleCommandExecutor,
-    private readonly recipeStatusLoader: CapsuleRecipeStatusLoader = new CapsuleRecipeStatusLoader(),
+    private readonly recipeStatusLoader: CapsuleRecipeStatusReader = new CapsuleRecipeStatusLoader(),
   ) {}
 
   previewFromText(options: {

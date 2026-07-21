@@ -5,11 +5,17 @@ import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
 export type CapsuleRecipeLifecycleStatus =
   "draft" | "published" | "retired" | "missing";
 
+/** Port for document-enter recipe lifecycle checks (HTTP or harness-backed). */
+export interface CapsuleRecipeStatusReader {
+  loadStatus(recipeId: string): Promise<CapsuleRecipeLifecycleStatus>;
+}
+
 /**
  * Reads Recipe.status for document-enter idempotency recovery.
  * Document-hash keys must not reuse retired recipes after a wipe.
+ * Live Convex HTTP path — proofs must inject a harness-backed reader instead.
  */
-export class CapsuleRecipeStatusLoader {
+export class CapsuleRecipeStatusLoader implements CapsuleRecipeStatusReader {
   private client: ConvexHttpClient | null = null;
 
   constructor(

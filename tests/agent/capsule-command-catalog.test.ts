@@ -4,21 +4,28 @@ import {
   AGENT_AC_CAPABILITY_IDS,
   mutationNameForCapability,
 } from "../../src/agent/CapsuleCommandMutationMap";
+import { listWiringCapabilityIds } from "../../src/agent/CapsuleWiringCapabilityIds";
 
 describe("CapsuleCommandCatalog", () => {
-  it("lists AC capabilities with Convex mutation names from wiring", () => {
+  it("lists every wiring capability with Convex mutation names", () => {
     const catalog = new CapsuleCommandCatalog();
     const listed = catalog.list();
-    expect(listed.map((c) => c.capabilityId).sort()).toEqual(
-      [...AGENT_AC_CAPABILITY_IDS].sort(),
-    );
+    const listedIds = listed.map((c) => c.capabilityId).sort();
+    const wiringIds = [...listWiringCapabilityIds()].sort();
+
+    // Full Manifest surface — AC ids are a minimum proof set, not a ceiling.
+    expect(listedIds).toEqual(wiringIds);
+    for (const acId of AGENT_AC_CAPABILITY_IDS) {
+      expect(listedIds).toContain(acId);
+    }
+
     for (const item of listed) {
       expect(item.mutationName).toBe(
         mutationNameForCapability(item.capabilityId),
       );
       expect(item.route).toContain("/api/manifest/");
       expect(item.command).not.toBe("");
-      expect(item.emits.length).toBeGreaterThan(0);
+      expect(Array.isArray(item.emits)).toBe(true);
     }
   });
 

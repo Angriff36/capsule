@@ -14,6 +14,10 @@ import type {
   CapsuleCommandInvocation,
 } from "../../src/agent/CapsuleCommandExecutor";
 import { CapsuleDocumentEnterCoordinator } from "../../src/agent/CapsuleDocumentEnterCoordinator";
+import type {
+  CapsuleRecipeLifecycleStatus,
+  CapsuleRecipeStatusReader,
+} from "../../src/agent/CapsuleRecipeStatusLoader";
 import { modules } from "./convex-test-modules";
 
 const SOURCE = readFileSync(
@@ -63,6 +67,39 @@ class ProofCommandExecutor implements CapsuleCommandExecutor {
   }
 }
 
+/** Harness-backed status reader — never hits live Convex HTTP/OIDC. */
+class ProofRecipeStatusReader implements CapsuleRecipeStatusReader {
+  constructor(private readonly session: RoleSession) {}
+
+  async loadStatus(recipeId: string): Promise<CapsuleRecipeLifecycleStatus> {
+    return this.session.run(async (ctx) => {
+      const row = await ctx.db.get(recipeId as never);
+      if (!row || (row as { deletedAt?: number | null }).deletedAt != null) {
+        return "missing";
+      }
+      const status = (row as { status?: string }).status;
+      if (
+        status === "draft" ||
+        status === "published" ||
+        status === "retired"
+      ) {
+        return status;
+      }
+      return "missing";
+    });
+  }
+}
+
+function enterCoordinator(
+  proof: ProofHarness,
+  session: RoleSession,
+): CapsuleDocumentEnterCoordinator {
+  return new CapsuleDocumentEnterCoordinator(
+    new ProofCommandExecutor(proof, session),
+    new ProofRecipeStatusReader(session),
+  );
+}
+
 beforeAll(() => {
   if (!process.env.CONVEX_FIELD_ENCRYPTION_KEY) {
     process.env.CONVEX_FIELD_ENCRYPTION_KEY =
@@ -78,8 +115,7 @@ describe("runtime proof: agent document enter", () => {
       role: "kitchen_manager",
       tenantId: "tenant-agent-enter",
     });
-    const executor = new ProofCommandExecutor(proof, kitchen);
-    const coordinator = new CapsuleDocumentEnterCoordinator(executor);
+    const coordinator = enterCoordinator(proof, kitchen);
 
     const preview = coordinator.previewFromText({ sourceText: SOURCE });
     expect(preview.unresolvedLineCount).toBeGreaterThan(0);
@@ -90,6 +126,7 @@ describe("runtime proof: agent document enter", () => {
     const first = await coordinator.enterFromText({
       sourceText: SOURCE,
       approveUnresolvedAsNew: true,
+      introduceDish: true,
     });
     expect(first.recipeId).toBeTruthy();
     expect(first.dishId).toBeTruthy();
@@ -131,6 +168,7 @@ describe("runtime proof: agent document enter", () => {
     const second = await coordinator.enterFromText({
       sourceText: SOURCE,
       approveUnresolvedAsNew: true,
+      introduceDish: true,
     });
     expect(second.recipeId).toBe(first.recipeId);
     expect(second.dishId).toBe(first.dishId);
@@ -154,9 +192,7 @@ describe("runtime proof: agent document enter", () => {
       role: "workforce_staff",
       tenantId: "tenant-agent-deny",
     });
-    const coordinator = new CapsuleDocumentEnterCoordinator(
-      new ProofCommandExecutor(proof, outsider),
-    );
+    const coordinator = enterCoordinator(proof, outsider);
     await expect(
       coordinator.enterFromText({
         sourceText: SOURCE,
