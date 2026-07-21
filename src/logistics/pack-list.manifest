@@ -51,34 +51,37 @@ entity PackList mixin TenantScoped, SoftDeletable {
   transition status from "dispatched" to []
   transition status from "cancelled" to []
 
-  default policy packListRead read: roleAllows(user.role, "logisticsAccess") "Logistics staff may read pack lists"
-  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") "Logistics staff may write pack lists through commands"
-  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") "Logistics staff may execute pack list commands"
+  // manageAccess: Event.approve (event_manager) reaction-opens PackList;
+  // logisticsAccess: packing staff. Same cascade pattern as PurchaseNeed.
+  default policy packListRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read pack lists"
+  default policy packListWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write pack lists through commands"
+  default policy packListExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute pack list commands"
 
+  // Idempotent open: Event.approve reaction may re-fire; do not fail or duplicate.
   command open(
     eventId: uuid,
     name: string,
     optional purpose: string,
     optional notes: string
   ) {
-    guard self.openedAt == null
-    guard self.status == "draft"
     guard self.deletedAt == null
+    guard self.status != "cancelled" and self.status != "dispatched"
     guard self.event != null
+    guard self.openedAt == null or self.eventId == eventId
     constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
-    constraint openNamePresent: length(trim(name)) > 0 "Pack list name is required"
+    constraint openNamePresent: length(trim(name)) > 0 or length(trim(self.name)) > 0 "Pack list name is required"
     mutate eventId = eventId
-    mutate name = name
+    mutate name = length(trim(self.name)) > 0 ? self.name : name
     mutate purpose = purpose != null ? purpose : self.purpose
     mutate notes = notes != null ? notes : self.notes
-    mutate openedAt = now()
+    mutate openedAt = self.openedAt != null ? self.openedAt : now()
     emit PackListOpened {
       packListId: self.id
       tenantId: self.tenantId
       eventId: eventId
-      name: name
+      name: length(trim(self.name)) > 0 ? self.name : name
       purpose: purpose != null ? purpose : self.purpose
-      status: "draft"
+      status: self.status
     }
   }
 
@@ -441,3 +444,12 @@ event PackListItemQuantityAdjusted: "pack_list_item.quantity_adjusted" {
   unit: UnitOfMeasure
   status: PackListItemStatus
 }
+
+// Vision cascade: approved event ensures one PackList draft (match else create).
+on EventApproved run PackList.open
+  match eventId = payload.eventId
+  else create
+  params {
+    eventId: payload.eventId
+    name: "Event pack list"
+  }

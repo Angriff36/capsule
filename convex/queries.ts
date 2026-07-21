@@ -2256,7 +2256,7 @@ export const listPackList = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packListRead", "PackList", () => checkRole(user.role, "logisticsAccess"))) return [];
+    if (!__allowsRead("packListRead", "PackList", () => (checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("packLists").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -2270,7 +2270,7 @@ export const getPackList = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packListRead", "PackList", () => checkRole(user.role, "logisticsAccess"))) return null;
+    if (!__allowsRead("packListRead", "PackList", () => (checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -2287,7 +2287,7 @@ export const listPackListByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packListRead", "PackList", () => checkRole(user.role, "logisticsAccess"))) return [];
+    if (!__allowsRead("packListRead", "PackList", () => (checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) return [];
     let rows = await ctx.db.query("packLists").withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "PackList", ["notes"], row)));
@@ -2300,7 +2300,7 @@ export const listPackListByEventId = query({
   handler: async (ctx, { eventId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("packListRead", "PackList", () => checkRole(user.role, "logisticsAccess"))) return [];
+    if (!__allowsRead("packListRead", "PackList", () => (checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", eventId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
