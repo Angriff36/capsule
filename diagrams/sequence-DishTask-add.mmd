@@ -1,0 +1,23 @@
+sequenceDiagram
+    participant Client
+    participant DishTask as DishTask
+    participant EventBus
+    Client->>+DishTask: add(dishId, name, category, taskType, defaultQuantity, defaultUnit, sortOrder, recipeId, ingredientId, instructions)
+    Note over DishTask: Policies: dishTaskRead, dishTaskWrite, dishTaskExecute
+    Note over DishTask: Guards (3)
+    DishTask->>DishTask: guard[0]: self.status == #quot;active#quot;
+    DishTask->>DishTask: guard[1]: self.deletedAt == null
+    DishTask->>DishTask: guard[2]: self.dish != null and self.dish.status == #quot;active#quot;
+    DishTask->>DishTask: mutate.dishId
+    DishTask->>DishTask: mutate.name
+    DishTask->>DishTask: mutate.category
+    DishTask->>DishTask: mutate.taskType
+    DishTask->>DishTask: mutate.defaultQuantity
+    DishTask->>DishTask: mutate.defaultUnit
+    DishTask->>DishTask: mutate.sortOrder
+    DishTask->>DishTask: mutate.recipeId
+    DishTask->>DishTask: mutate.ingredientId
+    DishTask->>DishTask: mutate.instructions
+    DishTask->>DishTask: mutate.activeAt
+    DishTask->>EventBus: emit DishTaskAdded
+    DishTask-->>-Client: void

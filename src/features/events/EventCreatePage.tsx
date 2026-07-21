@@ -1,18 +1,19 @@
 import { useState, type FormEvent } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc, Id } from "../../lib/api";
-import { useListClient, useListVenue } from "../../lib/manifest-convex-react";
-import { ArrowLeftIcon } from "../../ui/icons";
-import { PageHeader, Section, Skeleton } from "../../ui/primitives";
-import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
-import { FailureBanner } from "./FailureBanner";
-import { eventDetailPath } from "./eventRoutes";
 import {
   useCreateClient,
   useCreateEvent,
   useCreateVenue,
+  useListClient,
+  useListVenue,
 } from "../../lib/manifest-convex-react";
+import { ArrowLeftIcon } from "../../ui/icons";
+import { PageHeader, Section, Skeleton } from "../../ui/primitives";
+import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
+import { FailureBanner } from "./FailureBanner";
+import { eventDetailPath } from "./eventRoutes";
 
 const VENUE_TYPES = [
   ["client_site", "Client site"],
@@ -53,12 +54,14 @@ function venueAddress(venue: Doc<"venues"> | undefined): string | undefined {
 
 export function EventCreatePage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const prefillClientId = searchParams.get("clientId")?.trim() || "";
   const clients = useListClient();
   const venues = useListVenue();
   const createClient = useCreateClient();
   const createVenue = useCreateVenue();
   const createEvent = useCreateEvent();
-  const [clientId, setClientId] = useState("");
+  const [clientId, setClientId] = useState(prefillClientId);
   const [venueId, setVenueId] = useState("");
   const [showClient, setShowClient] = useState(false);
   const [showVenue, setShowVenue] = useState(false);

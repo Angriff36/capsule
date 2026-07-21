@@ -1,0 +1,38 @@
+{
+  "schemaVersion": "manifest-integration-guard/v1",
+  "versions": {
+    "manifestVersion": "3.6.41",
+    "projection": "convex",
+    "preset": {
+      "id": "convex-application",
+      "version": "1.3.5"
+    }
+  },
+  "featureRoots": [
+    "src/features/logistics"
+  ],
+  "convexLibRoot": "convex/lib",
+  "ownedTables": [
+    "deliveries",
+    "packListItems",
+    "packLists"
+  ],
+  "forbidDirectConvexHooks": true,
+  "forbiddenImportPatterns": [
+    "(?:^|/)convex/(?:queries|mutations)(?:\\.|$|/)",
+    "(?:^|/)convex/_generated(?:/|$)",
+    "^convex/react$"
+  ],
+  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:draft|packing|packed|loaded|dispatched|cancelled|pending|listed|missing|scheduled|in_transit|delivered|failed)[\"']",
+  "lifecyclePolicies": [
+    {
+      "pathSuffix": "/LogisticsLifecyclePolicy.ts",
+      "bindingsImport": "../../generated/manifest-wiring-bindings\"",
+      "requiredSymbols": [
+        "PackListStartPackingLifecycle",
+        "DeliveryConfirmDeliveryLifecycle"
+      ]
+    }
+  ],
+  "exceptions": []
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": "manifest-integration-guard/v1",
+  "versions": {
+    "manifestVersion": "3.6.41",
+    "projection": "convex",
+    "preset": {
+      "id": "convex-application",
+      "version": "1.3.5"
+    }
+  },
+  "featureRoots": [
+    "src/features/finance"
+  ],
+  "convexLibRoot": "convex/lib",
+  "ownedTables": [
+    "payrollInputs"
+  ],
+  "forbidDirectConvexHooks": true,
+  "forbiddenImportPatterns": [
+    "(?:^|/)convex/(?:queries|mutations)(?:\\.|$|/)",
+    "(?:^|/)convex/_generated(?:/|$)",
+    "^convex/react$"
+  ],
+  "lifecycleLiteralPattern": "\\b(?:from|to)\\s*:\\s*[\"'](?:draft|prepared|finalized|voided)[\"']",
+  "lifecyclePolicies": [
+    {
+      "pathSuffix": "/PayrollLifecyclePolicy.ts",
+      "bindingsImport": "../../generated/manifest-wiring-bindings\"",
+      "requiredSymbols": [
+        "PayrollInputFinalizeLifecycle",
+        "PayrollInputMarkVoidedLifecycle"
+      ]
+    }
+  ],
+  "exceptions": []
+}

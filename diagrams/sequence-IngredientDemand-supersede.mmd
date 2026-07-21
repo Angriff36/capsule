@@ -13,5 +13,6 @@ sequenceDiagram
     IngredientDemand->>IngredientDemand: mutate.status
     IngredientDemand->>IngredientDemand: mutate.supersededAt
     IngredientDemand->>IngredientDemand: mutate.supersedeReason
+    IngredientDemand->>IngredientDemand: mutate.purchaseEligibleEventId
     IngredientDemand->>EventBus: emit IngredientDemandSuperseded on ingredient_demand.superseded
     IngredientDemand-->>-Client: void

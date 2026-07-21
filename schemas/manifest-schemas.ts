@@ -174,6 +174,8 @@ export const DishRecipeSchema = z.object({
   dishId: z.string().uuid(),
   recipeId: z.string().uuid(),
   sortOrder: z.number().int().default(0),
+  yieldQuantity: z.number().default(1),
+  batchMultiplier: z.number().default(1),
   role: z.string().nullable().optional(),
   attachedAt: z.coerce.date().nullable().optional(),
   removedAt: z.coerce.date().nullable().optional(),
@@ -182,6 +184,31 @@ export const DishRecipeSchema = z.object({
 });
 
 export type DishRecipe = z.infer<typeof DishRecipeSchema>;
+
+// Entity: DishTask
+export const DishTaskSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  dishId: z.string().uuid(),
+  name: z.string().default(""),
+  category: z.string().default("finish_at_event"),
+  taskType: z.string().default("manual"),
+  defaultQuantity: z.number().nullable().optional(),
+  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).nullable().optional(),
+  sortOrder: z.number().int().min(0).optional().default(0),
+  recipeId: z.string().uuid().nullable().optional(),
+  ingredientId: z.string().uuid().nullable().optional(),
+  instructions: z.string().nullable().optional(),
+  status: z.enum(["active", "retired"]).default("active"),
+  activeAt: z.coerce.date().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  retirementReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type DishTask = z.infer<typeof DishTaskSchema>;
 
 // Entity: Event
 export const EventSchema = z.object({
@@ -195,6 +222,7 @@ export const EventSchema = z.object({
   eventType: z.string().default(""),
   startsAt: z.coerce.date().nullable().optional(),
   endsAt: z.coerce.date().nullable().optional(),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
   venueName: z.string().nullable().optional(),
   venueAddress: z.string().nullable().optional(),
   expectedHeadcount: z.number().int().default(0),
@@ -311,6 +339,7 @@ export const EventDishSchema = z.object({
   eventId: z.string().uuid(),
   dishId: z.string().uuid(),
   quantityServings: z.number().int().default(1),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
   course: z.string().nullable().optional(),
   serviceStyle: z.string().nullable().optional(),
   specialInstructions: z.string().nullable().optional(),
@@ -321,6 +350,26 @@ export const EventDishSchema = z.object({
 });
 
 export type EventDish = z.infer<typeof EventDishSchema>;
+
+// Entity: EventDishRecipeSeed
+export const EventDishRecipeSeedSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  eventDishId: z.string().uuid(),
+  dishId: z.string().uuid(),
+  recipeId: z.string().uuid(),
+  servings: z.number().default(0),
+  yieldQuantity: z.number().default(1),
+  batchMultiplier: z.number().default(1),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
+  seededAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventDishRecipeSeed = z.infer<typeof EventDishRecipeSeedSchema>;
 
 // Entity: EventGuest
 export const EventGuestSchema = z.object({
@@ -352,6 +401,27 @@ export const EventGuestComputedSchema = EventGuestSchema.extend({
 
 export type EventGuest = z.infer<typeof EventGuestSchema>;
 export type EventGuestWithComputed = z.infer<typeof EventGuestComputedSchema>;
+
+// Entity: EventIngredientContribution
+export const EventIngredientContributionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  eventDishId: z.string().uuid(),
+  dishId: z.string().uuid(),
+  recipeId: z.string().uuid(),
+  ingredientId: z.string().uuid(),
+  quantity: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  servings: z.number().default(0),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventIngredientContribution = z.infer<typeof EventIngredientContributionSchema>;
 
 // Entity: Incident
 export const IncidentSchema = z.object({
@@ -389,6 +459,7 @@ export const IngredientSchema = z.object({
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional().default([]),
   costPerUnit: z.number().min(0).default(0),
   category: z.string().nullable().optional(),
+  preferredVendorId: z.string().uuid().nullable().optional(),
   status: z.enum(["active", "discontinued"]).default("active"),
   introducedAt: z.coerce.date().nullable().optional(),
   discontinuedAt: z.coerce.date().nullable().optional(),
@@ -421,6 +492,8 @@ export const IngredientDemandSchema = z.object({
   sourceBatchMultiplier: z.number().nullable().optional(),
   sourceYieldQuantity: z.number().nullable().optional(),
   status: z.enum(["pending", "calculated", "confirmed", "fulfilled", "superseded"]).default("pending"),
+  purchaseEligibleEventId: z.string().uuid().nullable().optional(),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
   calculatedAt: z.coerce.date().nullable().optional(),
   confirmedAt: z.coerce.date().nullable().optional(),
   fulfilledAt: z.coerce.date().nullable().optional(),
@@ -456,6 +529,8 @@ export const InventoryItemComputedSchema = InventoryItemSchema.extend({
   isBelowPar: z.boolean(),
   isBelowReorder: z.boolean(),
   inventoryValue: z.number(),
+  totalReserved: z.number(),
+  availableQuantity: z.number(),
 });
 
 export type InventoryItem = z.infer<typeof InventoryItemSchema>;
@@ -740,9 +815,15 @@ export const PrepTaskSchema = z.object({
   eventDishId: z.string().uuid(),
   eventId: z.string().uuid(),
   name: z.string().default(""),
+  dishTaskId: z.string().uuid().nullable().optional(),
   ingredientId: z.string().uuid().nullable().optional(),
   ingredientDemandId: z.string().uuid().nullable().optional(),
+  dishId: z.string().uuid().nullable().optional(),
   recipeId: z.string().uuid().nullable().optional(),
+  category: z.string().default("finish_at_event"),
+  taskType: z.string().default("manual"),
+  specialInstructions: z.string().nullable().optional(),
+  isGenerated: z.boolean().default(true),
   quantity: z.number().default(0),
   completedQuantity: z.number().nullable().optional(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
@@ -831,6 +912,7 @@ export const PurchaseNeedSchema = z.object({
   ingredientId: z.string().uuid(),
   requiredQuantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  purchasingWeekStart: z.coerce.date().nullable().optional(),
   vendorOrderId: z.string().uuid().nullable().optional(),
   vendorOrderLineId: z.string().uuid().nullable().optional(),
   status: z.enum(["open", "ordered", "fulfilled", "cancelled"]).default("open"),
@@ -1212,6 +1294,24 @@ export const VendorOrderLineComputedSchema = VendorOrderLineSchema.extend({
 export type VendorOrderLine = z.infer<typeof VendorOrderLineSchema>;
 export type VendorOrderLineWithComputed = z.infer<typeof VendorOrderLineComputedSchema>;
 
+// Entity: VendorOrderLineDemand
+export const VendorOrderLineDemandSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  vendorOrderLineId: z.string().uuid(),
+  ingredientDemandId: z.string().uuid(),
+  vendorOrderId: z.string().uuid(),
+  contributionQuantity: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  linkedAt: z.coerce.date().nullable().optional(),
+  removedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type VendorOrderLineDemand = z.infer<typeof VendorOrderLineDemandSchema>;
+
 // Entity: Venue
 export const VenueSchema = z.object({
   id: z.string().uuid(),
@@ -1255,6 +1355,7 @@ export const WasteRecordSchema = z.object({
   ingredientId: z.string().uuid(),
   locationId: z.string().uuid(),
   eventId: z.string().uuid().nullable().optional(),
+  inventoryItemId: z.string().uuid().nullable().optional(),
   quantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
   reason: z.enum(["spoilage", "prep_error", "overproduction", "other"]).default("other"),
@@ -1276,9 +1377,22 @@ export const WasteRecordComputedSchema = WasteRecordSchema.extend({
 export type WasteRecord = z.infer<typeof WasteRecordSchema>;
 export type WasteRecordWithComputed = z.infer<typeof WasteRecordComputedSchema>;
 
+// Entity: WeeklyPurchasingConfig
+export const WeeklyPurchasingConfigSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  defaultVendorId: z.string().uuid(),
+  configuredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type WeeklyPurchasingConfig = z.infer<typeof WeeklyPurchasingConfigSchema>;
+
 // Command: declare on AvailabilityWindow
 export const AvailabilityWindowDeclareParamsSchema = z.object({
-  personId: z.string().uuid(),
+  personId: z.string().min(1),
   startsAt: z.coerce.date(),
   endsAt: z.coerce.date(),
   notes: z.string().optional(),
@@ -1300,7 +1414,7 @@ export type ClientArchiveParams = z.infer<typeof ClientArchiveParamsSchema>;
 
 // Command: assignOwner on Client
 export const ClientAssignOwnerParamsSchema = z.object({
-  assignedToId: z.string().uuid().optional(),
+  assignedToId: z.string().min(1).optional(),
 });
 
 export type ClientAssignOwnerParams = z.infer<typeof ClientAssignOwnerParamsSchema>;
@@ -1353,14 +1467,14 @@ export const ClientRegisterParamsSchema = z.object({
   taxExempt: z.boolean().optional(),
   paymentTermsDays: z.number().optional(),
   notes: z.string().optional(),
-  assignedToId: z.string().uuid().optional(),
+  assignedToId: z.string().min(1).optional(),
 });
 
 export type ClientRegisterParams = z.infer<typeof ClientRegisterParamsSchema>;
 
 // Command: add on ClientContact
 export const ClientContactAddParamsSchema = z.object({
-  clientId: z.string().uuid(),
+  clientId: z.string().min(1),
   givenName: z.string(),
   familyName: z.string().optional(),
   title: z.string().optional(),
@@ -1400,8 +1514,8 @@ export type ClientContactUpdateDetailsParams = z.infer<typeof ClientContactUpdat
 
 // Command: draft on Contract
 export const ContractDraftParamsSchema = z.object({
-  eventId: z.string().uuid(),
-  clientId: z.string().uuid(),
+  eventId: z.string().min(1),
+  clientId: z.string().min(1),
   title: z.string(),
   contractNumber: z.string().optional(),
   documentUrl: z.string().optional(),
@@ -1461,12 +1575,12 @@ export type DeliveryMarkFailedParams = z.infer<typeof DeliveryMarkFailedParamsSc
 
 // Command: schedule on Delivery
 export const DeliveryScheduleParamsSchema = z.object({
-  packListId: z.string().uuid(),
-  eventId: z.string().uuid(),
+  packListId: z.string().min(1),
+  eventId: z.string().min(1),
   destination: z.string(),
   windowStartsAt: z.coerce.date(),
   windowEndsAt: z.coerce.date(),
-  driverId: z.string().uuid().optional(),
+  driverId: z.string().min(1).optional(),
   notes: z.string().optional(),
 });
 
@@ -1533,8 +1647,10 @@ export type DishUpdatePortioningParams = z.infer<typeof DishUpdatePortioningPara
 
 // Command: attach on DishRecipe
 export const DishRecipeAttachParamsSchema = z.object({
-  dishId: z.string().uuid(),
-  recipeId: z.string().uuid(),
+  dishId: z.string().min(1),
+  recipeId: z.string().min(1),
+  yieldQuantity: z.number(),
+  batchMultiplier: z.number().optional(),
   sortOrder: z.number().optional(),
   role: z.string().optional(),
 });
@@ -1548,6 +1664,44 @@ export const DishRecipeDetachParamsSchema = z.object({
 
 export type DishRecipeDetachParams = z.infer<typeof DishRecipeDetachParamsSchema>;
 
+// Command: add on DishTask
+export const DishTaskAddParamsSchema = z.object({
+  dishId: z.string().min(1),
+  name: z.string(),
+  category: z.string().optional(),
+  taskType: z.string().optional(),
+  defaultQuantity: z.number().optional(),
+  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).optional(),
+  sortOrder: z.number().optional(),
+  recipeId: z.string().min(1).optional(),
+  ingredientId: z.string().min(1).optional(),
+  instructions: z.string().optional(),
+});
+
+export type DishTaskAddParams = z.infer<typeof DishTaskAddParamsSchema>;
+
+// Command: retire on DishTask
+export const DishTaskRetireParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type DishTaskRetireParams = z.infer<typeof DishTaskRetireParamsSchema>;
+
+// Command: revise on DishTask
+export const DishTaskReviseParamsSchema = z.object({
+  name: z.string(),
+  category: z.string().optional(),
+  taskType: z.string().optional(),
+  defaultQuantity: z.number().optional(),
+  defaultUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).optional(),
+  sortOrder: z.number().optional(),
+  recipeId: z.string().min(1).optional(),
+  ingredientId: z.string().min(1).optional(),
+  instructions: z.string().optional(),
+});
+
+export type DishTaskReviseParams = z.infer<typeof DishTaskReviseParamsSchema>;
+
 // Command: approve on Event
 export const EventApproveParamsSchema = z.object({});
 
@@ -1555,7 +1709,7 @@ export type EventApproveParams = z.infer<typeof EventApproveParamsSchema>;
 
 // Command: assignOwner on Event
 export const EventAssignOwnerParamsSchema = z.object({
-  assignedToId: z.string().uuid().optional(),
+  assignedToId: z.string().min(1).optional(),
 });
 
 export type EventAssignOwnerParams = z.infer<typeof EventAssignOwnerParamsSchema>;
@@ -1607,7 +1761,7 @@ export type EventChangeRequirementsParams = z.infer<typeof EventChangeRequiremen
 
 // Command: changeVenue on Event
 export const EventChangeVenueParamsSchema = z.object({
-  venueId: z.string().uuid().optional(),
+  venueId: z.string().min(1).optional(),
   venueName: z.string().optional(),
   venueAddress: z.string().optional(),
 });
@@ -1626,7 +1780,7 @@ export type EventCompleteParams = z.infer<typeof EventCompleteParamsSchema>;
 
 // Command: planEngagement on Event
 export const EventPlanEngagementParamsSchema = z.object({
-  clientId: z.string().uuid(),
+  clientId: z.string().min(1),
   title: z.string(),
   eventType: z.string(),
   startsAt: z.coerce.date(),
@@ -1635,7 +1789,7 @@ export const EventPlanEngagementParamsSchema = z.object({
   primaryContactName: z.string(),
   budgetAmount: z.number(),
   quotedPrice: z.number(),
-  venueId: z.string().uuid().optional(),
+  venueId: z.string().min(1).optional(),
   venueName: z.string().optional(),
   venueAddress: z.string().optional(),
   primaryContactEmail: z.string().optional(),
@@ -1643,7 +1797,7 @@ export const EventPlanEngagementParamsSchema = z.object({
   accessibilityNeeds: z.array(z.string()).optional(),
   serviceRequirements: z.string().optional(),
   operationalRequirements: z.string().optional(),
-  assignedToId: z.string().uuid().optional(),
+  assignedToId: z.string().min(1).optional(),
 });
 
 export type EventPlanEngagementParams = z.infer<typeof EventPlanEngagementParamsSchema>;
@@ -1670,10 +1824,10 @@ export type EventSubmitForApprovalParams = z.infer<typeof EventSubmitForApproval
 
 // Command: record on EventAllergenCheck
 export const EventAllergenCheckRecordParamsSchema = z.object({
-  eventId: z.string().uuid(),
+  eventId: z.string().min(1),
   result: z.enum(["pass", "flagged"]),
-  eventDishId: z.string().uuid().optional(),
-  dishId: z.string().uuid().optional(),
+  eventDishId: z.string().min(1).optional(),
+  dishId: z.string().min(1).optional(),
   flaggedAllergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional(),
   notes: z.string().optional(),
 });
@@ -1682,8 +1836,8 @@ export type EventAllergenCheckRecordParams = z.infer<typeof EventAllergenCheckRe
 
 // Command: assign on EventAssignment
 export const EventAssignmentAssignParamsSchema = z.object({
-  eventId: z.string().uuid(),
-  personId: z.string().uuid(),
+  eventId: z.string().min(1),
+  personId: z.string().min(1),
   role: z.string(),
   startsAt: z.coerce.date().optional(),
   endsAt: z.coerce.date().optional(),
@@ -1719,7 +1873,7 @@ export type EventAssignmentUnassignParams = z.infer<typeof EventAssignmentUnassi
 
 // Command: capture on EventCloseout
 export const EventCloseoutCaptureParamsSchema = z.object({
-  eventId: z.string().uuid(),
+  eventId: z.string().min(1),
   actualRevenue: z.number(),
   budgetedRevenue: z.number(),
   revenueVariance: z.number(),
@@ -1747,8 +1901,8 @@ export type EventCloseoutFinalizeParams = z.infer<typeof EventCloseoutFinalizePa
 
 // Command: addToEvent on EventDish
 export const EventDishAddToEventParamsSchema = z.object({
-  eventId: z.string().uuid(),
-  dishId: z.string().uuid(),
+  eventId: z.string().min(1),
+  dishId: z.string().min(1),
   quantityServings: z.number(),
   course: z.string().optional(),
   serviceStyle: z.string().optional(),
@@ -1786,6 +1940,20 @@ export const EventDishUpdateInstructionsParamsSchema = z.object({
 
 export type EventDishUpdateInstructionsParams = z.infer<typeof EventDishUpdateInstructionsParamsSchema>;
 
+// Command: seed on EventDishRecipeSeed
+export const EventDishRecipeSeedSeedParamsSchema = z.object({
+  eventId: z.string().min(1),
+  eventDishId: z.string().min(1),
+  dishId: z.string().min(1),
+  recipeId: z.string().min(1),
+  servings: z.number(),
+  yieldQuantity: z.number(),
+  batchMultiplier: z.number(),
+  purchasingWeekStart: z.coerce.date().optional(),
+});
+
+export type EventDishRecipeSeedSeedParams = z.infer<typeof EventDishRecipeSeedSeedParamsSchema>;
+
 // Command: assignTable on EventGuest
 export const EventGuestAssignTableParamsSchema = z.object({
   tableAssignment: z.string(),
@@ -1800,7 +1968,7 @@ export type EventGuestCheckInParams = z.infer<typeof EventGuestCheckInParamsSche
 
 // Command: invite on EventGuest
 export const EventGuestInviteParamsSchema = z.object({
-  eventId: z.string().uuid(),
+  eventId: z.string().min(1),
   name: z.string(),
   email: z.string().optional(),
   phone: z.string().optional(),
@@ -1831,6 +1999,36 @@ export const EventGuestWithdrawParamsSchema = z.object({
 
 export type EventGuestWithdrawParams = z.infer<typeof EventGuestWithdrawParamsSchema>;
 
+// Command: record on EventIngredientContribution
+export const EventIngredientContributionRecordParamsSchema = z.object({
+  eventId: z.string().min(1),
+  eventDishId: z.string().min(1),
+  dishId: z.string().min(1),
+  recipeId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  quantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  servings: z.number(),
+  purchasingWeekStart: z.coerce.date().optional(),
+});
+
+export type EventIngredientContributionRecordParams = z.infer<typeof EventIngredientContributionRecordParamsSchema>;
+
+// Command: retire on EventIngredientContribution
+export const EventIngredientContributionRetireParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type EventIngredientContributionRetireParams = z.infer<typeof EventIngredientContributionRetireParamsSchema>;
+
+// Command: revise on EventIngredientContribution
+export const EventIngredientContributionReviseParamsSchema = z.object({
+  quantity: z.number(),
+  servings: z.number(),
+});
+
+export type EventIngredientContributionReviseParams = z.infer<typeof EventIngredientContributionReviseParamsSchema>;
+
 // Command: beginInvestigation on Incident
 export const IncidentBeginInvestigationParamsSchema = z.object({});
 
@@ -1852,13 +2050,13 @@ export type IncidentMarkResolvedParams = z.infer<typeof IncidentMarkResolvedPara
 
 // Command: report on Incident
 export const IncidentReportParamsSchema = z.object({
-  eventId: z.string().uuid(),
+  eventId: z.string().min(1),
   severity: z.enum(["low", "medium", "high", "critical"]),
   category: z.enum(["food_safety", "injury", "equipment", "service", "other"]),
   description: z.string(),
-  prepTaskId: z.string().uuid().optional(),
-  deliveryId: z.string().uuid().optional(),
-  shiftId: z.string().uuid().optional(),
+  prepTaskId: z.string().min(1).optional(),
+  deliveryId: z.string().min(1).optional(),
+  shiftId: z.string().min(1).optional(),
 });
 
 export type IncidentReportParams = z.infer<typeof IncidentReportParamsSchema>;
@@ -1884,6 +2082,7 @@ export const IngredientIntroduceParamsSchema = z.object({
   costPerUnit: z.number(),
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional(),
   category: z.string().optional(),
+  preferredVendorId: z.string().uuid().optional(),
 });
 
 export type IngredientIntroduceParams = z.infer<typeof IngredientIntroduceParamsSchema>;
@@ -1892,6 +2091,13 @@ export type IngredientIntroduceParams = z.infer<typeof IngredientIntroduceParams
 export const IngredientReinstateParamsSchema = z.object({});
 
 export type IngredientReinstateParams = z.infer<typeof IngredientReinstateParamsSchema>;
+
+// Command: setPreferredVendor on Ingredient
+export const IngredientSetPreferredVendorParamsSchema = z.object({
+  preferredVendorId: z.string().uuid().optional(),
+});
+
+export type IngredientSetPreferredVendorParams = z.infer<typeof IngredientSetPreferredVendorParamsSchema>;
 
 // Command: updateCosting on Ingredient
 export const IngredientUpdateCostingParamsSchema = z.object({
@@ -1911,12 +2117,12 @@ export type IngredientUpdateDetailsParams = z.infer<typeof IngredientUpdateDetai
 
 // Command: calculate on IngredientDemand
 export const IngredientDemandCalculateParamsSchema = z.object({
-  eventId: z.string().uuid(),
-  ingredientId: z.string().uuid(),
+  eventId: z.string().min(1),
+  ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   servings: z.number().optional(),
-  dishId: z.string().uuid().optional(),
+  dishId: z.string().min(1).optional(),
   sourceRecipeLineQuantity: z.number().optional(),
   sourceBatchMultiplier: z.number().optional(),
   sourceYieldQuantity: z.number().optional(),
@@ -1929,10 +2135,20 @@ export const IngredientDemandConfirmParamsSchema = z.object({});
 
 export type IngredientDemandConfirmParams = z.infer<typeof IngredientDemandConfirmParamsSchema>;
 
+// Command: ensurePurchaseEligible on IngredientDemand
+export const IngredientDemandEnsurePurchaseEligibleParamsSchema = z.object({});
+
+export type IngredientDemandEnsurePurchaseEligibleParams = z.infer<typeof IngredientDemandEnsurePurchaseEligibleParamsSchema>;
+
 // Command: fulfill on IngredientDemand
 export const IngredientDemandFulfillParamsSchema = z.object({});
 
 export type IngredientDemandFulfillParams = z.infer<typeof IngredientDemandFulfillParamsSchema>;
+
+// Command: markReleased on IngredientDemand
+export const IngredientDemandMarkReleasedParamsSchema = z.object({});
+
+export type IngredientDemandMarkReleasedParams = z.infer<typeof IngredientDemandMarkReleasedParamsSchema>;
 
 // Command: recalculate on IngredientDemand
 export const IngredientDemandRecalculateParamsSchema = z.object({
@@ -1949,6 +2165,17 @@ export const IngredientDemandSupersedeParamsSchema = z.object({
 
 export type IngredientDemandSupersedeParams = z.infer<typeof IngredientDemandSupersedeParamsSchema>;
 
+// Command: syncFromContributions on IngredientDemand
+export const IngredientDemandSyncFromContributionsParamsSchema = z.object({
+  eventId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  requiredQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  purchasingWeekStart: z.coerce.date().optional(),
+});
+
+export type IngredientDemandSyncFromContributionsParams = z.infer<typeof IngredientDemandSyncFromContributionsParamsSchema>;
+
 // Command: adjustQuantity on InventoryItem
 export const InventoryItemAdjustQuantityParamsSchema = z.object({
   delta: z.number(),
@@ -1959,8 +2186,8 @@ export type InventoryItemAdjustQuantityParams = z.infer<typeof InventoryItemAdju
 
 // Command: open on InventoryItem
 export const InventoryItemOpenParamsSchema = z.object({
-  ingredientId: z.string().uuid(),
-  locationId: z.string().uuid(),
+  ingredientId: z.string().min(1),
+  locationId: z.string().min(1),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   quantityOnHand: z.number().optional(),
   parLevel: z.number().optional(),
@@ -2031,9 +2258,9 @@ export type InventoryReservationReleaseParams = z.infer<typeof InventoryReservat
 
 // Command: reserve on InventoryReservation
 export const InventoryReservationReserveParamsSchema = z.object({
-  inventoryItemId: z.string().uuid(),
-  eventId: z.string().uuid(),
-  ingredientId: z.string().uuid(),
+  inventoryItemId: z.string().min(1),
+  eventId: z.string().min(1),
+  ingredientId: z.string().min(1),
   quantity: z.number(),
 });
 
@@ -2049,13 +2276,13 @@ export type InvoiceApplyPaymentParams = z.infer<typeof InvoiceApplyPaymentParams
 
 // Command: issue on Invoice
 export const InvoiceIssueParamsSchema = z.object({
-  clientId: z.string().uuid(),
+  clientId: z.string().min(1),
   invoiceNumber: z.string(),
   subtotal: z.number(),
   taxAmount: z.number(),
   discountAmount: z.number(),
   total: z.number(),
-  eventId: z.string().uuid().optional(),
+  eventId: z.string().min(1).optional(),
   paymentTermsDays: z.number().optional(),
   dueDate: z.coerce.date().optional(),
   notes: z.string().optional(),
@@ -2161,8 +2388,8 @@ export type MenuUpdatePricingParams = z.infer<typeof MenuUpdatePricingParamsSche
 
 // Command: add on MenuDish
 export const MenuDishAddParamsSchema = z.object({
-  menuId: z.string().uuid(),
-  dishId: z.string().uuid(),
+  menuId: z.string().min(1),
+  dishId: z.string().min(1),
   sortOrder: z.number().optional(),
   course: z.string().optional(),
   serviceStyle: z.string().optional(),
@@ -2243,7 +2470,7 @@ export type PackListMarkPackedParams = z.infer<typeof PackListMarkPackedParamsSc
 
 // Command: open on PackList
 export const PackListOpenParamsSchema = z.object({
-  eventId: z.string().uuid(),
+  eventId: z.string().min(1),
   name: z.string(),
   purpose: z.string().optional(),
   notes: z.string().optional(),
@@ -2258,12 +2485,12 @@ export type PackListStartPackingParams = z.infer<typeof PackListStartPackingPara
 
 // Command: addItem on PackListItem
 export const PackListItemAddItemParamsSchema = z.object({
-  packListId: z.string().uuid(),
+  packListId: z.string().min(1),
   description: z.string(),
   requiredQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
-  dishId: z.string().uuid().optional(),
-  productionBatchId: z.string().uuid().optional(),
+  dishId: z.string().min(1).optional(),
+  productionBatchId: z.string().min(1).optional(),
 });
 
 export type PackListItemAddItemParams = z.infer<typeof PackListItemAddItemParamsSchema>;
@@ -2301,12 +2528,12 @@ export type PaymentFailParams = z.infer<typeof PaymentFailParamsSchema>;
 
 // Command: record on Payment
 export const PaymentRecordParamsSchema = z.object({
-  invoiceId: z.string().uuid(),
-  clientId: z.string().uuid(),
+  invoiceId: z.string().min(1),
+  clientId: z.string().min(1),
   amount: z.number(),
   method: z.enum(["card", "check", "cash", "ach", "other"]),
-  eventId: z.string().uuid().optional(),
-  paymentMethodId: z.string().uuid().optional(),
+  eventId: z.string().min(1).optional(),
+  paymentMethodId: z.string().min(1).optional(),
   notes: z.string().optional(),
 });
 
@@ -2353,7 +2580,7 @@ export type PaymentMethodReactivateParams = z.infer<typeof PaymentMethodReactiva
 
 // Command: register on PaymentMethod
 export const PaymentMethodRegisterParamsSchema = z.object({
-  clientId: z.string().uuid(),
+  clientId: z.string().min(1),
   methodType: z.enum(["card", "check", "cash", "ach", "other"]),
   provider: z.string().optional(),
   lastFour: z.string().optional(),
@@ -2382,14 +2609,14 @@ export type PayrollInputMarkVoidedParams = z.infer<typeof PayrollInputMarkVoided
 
 // Command: prepare on PayrollInput
 export const PayrollInputPrepareParamsSchema = z.object({
-  personId: z.string().uuid(),
+  personId: z.string().min(1),
   periodStart: z.coerce.date(),
   periodEnd: z.coerce.date(),
   regularMinutes: z.number(),
   overtimeMinutes: z.number(),
   totalMinutes: z.number(),
-  eventId: z.string().uuid().optional(),
-  shiftId: z.string().uuid().optional(),
+  eventId: z.string().min(1).optional(),
+  shiftId: z.string().min(1).optional(),
   hourlyRate: z.number().optional(),
   overtimeRate: z.number().optional(),
   grossAmount: z.number().optional(),
@@ -2473,14 +2700,20 @@ export type PrepTaskMarkBlockedParams = z.infer<typeof PrepTaskMarkBlockedParams
 
 // Command: open on PrepTask
 export const PrepTaskOpenParamsSchema = z.object({
-  eventDishId: z.string().uuid(),
-  eventId: z.string().uuid(),
+  eventDishId: z.string().min(1),
+  eventId: z.string().min(1),
   name: z.string(),
   quantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
-  ingredientId: z.string().uuid().optional(),
-  ingredientDemandId: z.string().uuid().optional(),
-  recipeId: z.string().uuid().optional(),
+  ingredientId: z.string().min(1).optional(),
+  ingredientDemandId: z.string().min(1).optional(),
+  recipeId: z.string().min(1).optional(),
+  dishTaskId: z.string().min(1).optional(),
+  dishId: z.string().min(1).optional(),
+  category: z.string().optional(),
+  taskType: z.string().optional(),
+  specialInstructions: z.string().optional(),
+  isGenerated: z.boolean().optional(),
   station: z.string().optional(),
   dueAt: z.coerce.date().optional(),
   notes: z.string().optional(),
@@ -2488,10 +2721,32 @@ export const PrepTaskOpenParamsSchema = z.object({
 
 export type PrepTaskOpenParams = z.infer<typeof PrepTaskOpenParamsSchema>;
 
+// Command: refreshGenerated on PrepTask
+export const PrepTaskRefreshGeneratedParamsSchema = z.object({
+  quantity: z.number(),
+  specialInstructions: z.string().optional(),
+});
+
+export type PrepTaskRefreshGeneratedParams = z.infer<typeof PrepTaskRefreshGeneratedParamsSchema>;
+
 // Command: release on PrepTask
 export const PrepTaskReleaseParamsSchema = z.object({});
 
 export type PrepTaskReleaseParams = z.infer<typeof PrepTaskReleaseParamsSchema>;
+
+// Command: revise on PrepTask
+export const PrepTaskReviseParamsSchema = z.object({
+  name: z.string().optional(),
+  quantity: z.number().optional(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).optional(),
+  category: z.string().optional(),
+  taskType: z.string().optional(),
+  specialInstructions: z.string().optional(),
+  ingredientId: z.string().min(1).optional(),
+  recipeId: z.string().min(1).optional(),
+});
+
+export type PrepTaskReviseParams = z.infer<typeof PrepTaskReviseParamsSchema>;
 
 // Command: start on PrepTask
 export const PrepTaskStartParamsSchema = z.object({});
@@ -2519,10 +2774,10 @@ export type ProductionBatchCompleteParams = z.infer<typeof ProductionBatchComple
 
 // Command: plan on ProductionBatch
 export const ProductionBatchPlanParamsSchema = z.object({
-  recipeId: z.string().uuid(),
+  recipeId: z.string().min(1),
   plannedYield: z.number(),
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
-  eventId: z.string().uuid().optional(),
+  eventId: z.string().min(1).optional(),
   notes: z.string().optional(),
 });
 
@@ -2535,7 +2790,7 @@ export type ProductionBatchStartParams = z.infer<typeof ProductionBatchStartPara
 
 // Command: accept on Proposal
 export const ProposalAcceptParamsSchema = z.object({
-  eventId: z.string().uuid().optional(),
+  eventId: z.string().min(1).optional(),
 });
 
 export type ProposalAcceptParams = z.infer<typeof ProposalAcceptParamsSchema>;
@@ -2547,7 +2802,7 @@ export type ProposalDeclineParams = z.infer<typeof ProposalDeclineParamsSchema>;
 
 // Command: draft on Proposal
 export const ProposalDraftParamsSchema = z.object({
-  clientId: z.string().uuid(),
+  clientId: z.string().min(1),
   title: z.string(),
   subtotal: z.number(),
   taxAmount: z.number(),
@@ -2583,8 +2838,8 @@ export type ProposalSendParams = z.infer<typeof ProposalSendParamsSchema>;
 
 // Command: assignToDraft on PurchaseNeed
 export const PurchaseNeedAssignToDraftParamsSchema = z.object({
-  vendorOrderId: z.string().uuid(),
-  vendorOrderLineId: z.string().uuid(),
+  vendorOrderId: z.string().min(1),
+  vendorOrderLineId: z.string().min(1),
 });
 
 export type PurchaseNeedAssignToDraftParams = z.infer<typeof PurchaseNeedAssignToDraftParamsSchema>;
@@ -2598,11 +2853,12 @@ export type PurchaseNeedCancelParams = z.infer<typeof PurchaseNeedCancelParamsSc
 
 // Command: create on PurchaseNeed
 export const PurchaseNeedCreateParamsSchema = z.object({
-  eventId: z.string().uuid(),
-  ingredientDemandId: z.string().uuid(),
-  ingredientId: z.string().uuid(),
+  eventId: z.string().min(1),
+  ingredientDemandId: z.string().min(1),
+  ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  purchasingWeekStart: z.coerce.date().optional(),
 });
 
 export type PurchaseNeedCreateParams = z.infer<typeof PurchaseNeedCreateParamsSchema>;
@@ -2619,11 +2875,18 @@ export type PurchaseNeedMarkFulfilledParams = z.infer<typeof PurchaseNeedMarkFul
 
 // Command: markOrdered on PurchaseNeed
 export const PurchaseNeedMarkOrderedParamsSchema = z.object({
-  vendorOrderId: z.string().uuid(),
-  vendorOrderLineId: z.string().uuid(),
+  vendorOrderId: z.string().min(1),
+  vendorOrderLineId: z.string().min(1),
 });
 
 export type PurchaseNeedMarkOrderedParams = z.infer<typeof PurchaseNeedMarkOrderedParamsSchema>;
+
+// Command: reviseRequired on PurchaseNeed
+export const PurchaseNeedReviseRequiredParamsSchema = z.object({
+  requiredQuantity: z.number(),
+});
+
+export type PurchaseNeedReviseRequiredParams = z.infer<typeof PurchaseNeedReviseRequiredParamsSchema>;
 
 // Command: expire on Qualification
 export const QualificationExpireParamsSchema = z.object({});
@@ -2632,7 +2895,7 @@ export type QualificationExpireParams = z.infer<typeof QualificationExpireParams
 
 // Command: grant on Qualification
 export const QualificationGrantParamsSchema = z.object({
-  personId: z.string().uuid(),
+  personId: z.string().min(1),
   name: z.string(),
   issuedAt: z.coerce.date(),
   certificationType: z.string().optional(),
@@ -2659,8 +2922,8 @@ export type QualityCheckFailParams = z.infer<typeof QualityCheckFailParamsSchema
 
 // Command: open on QualityCheck
 export const QualityCheckOpenParamsSchema = z.object({
-  prepTaskId: z.string().uuid().optional(),
-  productionBatchId: z.string().uuid().optional(),
+  prepTaskId: z.string().min(1).optional(),
+  productionBatchId: z.string().min(1).optional(),
   notes: z.string().optional(),
 });
 
@@ -2775,7 +3038,7 @@ export type RecipeImportRecordParseParams = z.infer<typeof RecipeImportRecordPar
 
 // Command: recordRecipe on RecipeImport
 export const RecipeImportRecordRecipeParamsSchema = z.object({
-  resultingRecipeId: z.string().uuid(),
+  resultingRecipeId: z.string().min(1),
 });
 
 export type RecipeImportRecordRecipeParams = z.infer<typeof RecipeImportRecordRecipeParamsSchema>;
@@ -2805,14 +3068,14 @@ export type RecipeImportUploadParams = z.infer<typeof RecipeImportUploadParamsSc
 
 // Command: attachCreatedIngredient on RecipeImportLine
 export const RecipeImportLineAttachCreatedIngredientParamsSchema = z.object({
-  matchedIngredientId: z.string().uuid(),
+  matchedIngredientId: z.string().min(1),
 });
 
 export type RecipeImportLineAttachCreatedIngredientParams = z.infer<typeof RecipeImportLineAttachCreatedIngredientParamsSchema>;
 
 // Command: confirmExisting on RecipeImportLine
 export const RecipeImportLineConfirmExistingParamsSchema = z.object({
-  matchedIngredientId: z.string().uuid(),
+  matchedIngredientId: z.string().min(1),
 });
 
 export type RecipeImportLineConfirmExistingParams = z.infer<typeof RecipeImportLineConfirmExistingParamsSchema>;
@@ -2841,7 +3104,7 @@ export type RecipeImportLineResetResolutionParams = z.infer<typeof RecipeImportL
 
 // Command: stage on RecipeImportLine
 export const RecipeImportLineStageParamsSchema = z.object({
-  importId: z.string().uuid(),
+  importId: z.string().min(1),
   sourceOrder: z.number().int(),
   sourceLine: z.string(),
   parsedQuantity: z.number().optional(),
@@ -2854,7 +3117,7 @@ export type RecipeImportLineStageParams = z.infer<typeof RecipeImportLineStagePa
 
 // Command: suggestExactMatch on RecipeImportLine
 export const RecipeImportLineSuggestExactMatchParamsSchema = z.object({
-  matchedIngredientId: z.string().uuid(),
+  matchedIngredientId: z.string().min(1),
 });
 
 export type RecipeImportLineSuggestExactMatchParams = z.infer<typeof RecipeImportLineSuggestExactMatchParamsSchema>;
@@ -2868,8 +3131,8 @@ export type RecipeImportLineSuggestPossibleMatchesParams = z.infer<typeof Recipe
 
 // Command: add on RecipeIngredient
 export const RecipeIngredientAddParamsSchema = z.object({
-  recipeId: z.string().uuid(),
-  ingredientId: z.string().uuid(),
+  recipeId: z.string().min(1),
+  ingredientId: z.string().min(1),
   quantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   sortOrder: z.number().optional(),
@@ -2895,7 +3158,7 @@ export type RecipeIngredientRemoveParams = z.infer<typeof RecipeIngredientRemove
 
 // Command: add on RecipeStep
 export const RecipeStepAddParamsSchema = z.object({
-  recipeId: z.string().uuid(),
+  recipeId: z.string().min(1),
   instruction: z.string(),
   sortOrder: z.number().optional(),
   durationMinutes: z.number().optional(),
@@ -2982,10 +3245,10 @@ export type ShiftMarkNoShowParams = z.infer<typeof ShiftMarkNoShowParamsSchema>;
 
 // Command: schedule on Shift
 export const ShiftScheduleParamsSchema = z.object({
-  personId: z.string().uuid(),
+  personId: z.string().min(1),
   startsAt: z.coerce.date(),
   endsAt: z.coerce.date(),
-  eventId: z.string().uuid().optional(),
+  eventId: z.string().min(1).optional(),
   role: z.string().optional(),
   notes: z.string().optional(),
 });
@@ -3035,9 +3298,9 @@ export type StorageLocationReviseDetailsParams = z.infer<typeof StorageLocationR
 
 // Command: clockIn on TimeRecord
 export const TimeRecordClockInParamsSchema = z.object({
-  personId: z.string().uuid(),
-  shiftId: z.string().uuid().optional(),
-  eventId: z.string().uuid().optional(),
+  personId: z.string().min(1),
+  shiftId: z.string().min(1).optional(),
+  eventId: z.string().min(1).optional(),
   notes: z.string().optional(),
 });
 
@@ -3124,6 +3387,20 @@ export const VendorOrderConfirmParamsSchema = z.object({});
 
 export type VendorOrderConfirmParams = z.infer<typeof VendorOrderConfirmParamsSchema>;
 
+// Command: ensureWeeklyDraft on VendorOrder
+export const VendorOrderEnsureWeeklyDraftParamsSchema = z.object({
+  vendorId: z.string().min(1),
+  sourceRangeStart: z.coerce.date(),
+  sourceRangeEnd: z.coerce.date(),
+  purchaseNeedId: z.string().uuid(),
+  ingredientDemandId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  requiredQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+});
+
+export type VendorOrderEnsureWeeklyDraftParams = z.infer<typeof VendorOrderEnsureWeeklyDraftParamsSchema>;
+
 // Command: markPartiallyReceived on VendorOrder
 export const VendorOrderMarkPartiallyReceivedParamsSchema = z.object({});
 
@@ -3136,8 +3413,8 @@ export type VendorOrderMarkReceivedParams = z.infer<typeof VendorOrderMarkReceiv
 
 // Command: open on VendorOrder
 export const VendorOrderOpenParamsSchema = z.object({
-  vendorId: z.string().uuid(),
-  eventId: z.string().uuid().optional(),
+  vendorId: z.string().min(1),
+  eventId: z.string().min(1).optional(),
   sourceRangeStart: z.coerce.date().optional(),
   sourceRangeEnd: z.coerce.date().optional(),
   orderNumber: z.string().optional(),
@@ -3162,13 +3439,13 @@ export type VendorOrderUpdateTotalsParams = z.infer<typeof VendorOrderUpdateTota
 
 // Command: addLine on VendorOrderLine
 export const VendorOrderLineAddLineParamsSchema = z.object({
-  vendorOrderId: z.string().uuid(),
-  ingredientId: z.string().uuid(),
+  vendorOrderId: z.string().min(1),
+  ingredientId: z.string().min(1),
   orderedQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   unitCost: z.number(),
-  ingredientDemandId: z.string().uuid().optional(),
-  locationId: z.string().uuid().optional(),
+  ingredientDemandId: z.string().min(1).optional(),
+  locationId: z.string().min(1).optional(),
 });
 
 export type VendorOrderLineAddLineParams = z.infer<typeof VendorOrderLineAddLineParamsSchema>;
@@ -3180,15 +3457,63 @@ export const VendorOrderLineCancelLineParamsSchema = z.object({
 
 export type VendorOrderLineCancelLineParams = z.infer<typeof VendorOrderLineCancelLineParamsSchema>;
 
+// Command: ensureWeeklyLine on VendorOrderLine
+export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({
+  vendorOrderId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  weekNeed: z.number(),
+  onHand: z.number(),
+  contributionQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  unitCost: z.number(),
+  purchaseNeedId: z.string().uuid(),
+  ingredientDemandId: z.string().min(1),
+});
+
+export type VendorOrderLineEnsureWeeklyLineParams = z.infer<typeof VendorOrderLineEnsureWeeklyLineParamsSchema>;
+
 // Command: recordReceipt on VendorOrderLine
 export const VendorOrderLineRecordReceiptParamsSchema = z.object({
   quantity: z.number(),
-  locationId: z.string().uuid(),
+  locationId: z.string().min(1),
   discrepancyQuantity: z.number().optional(),
   discrepancyNotes: z.string().optional(),
 });
 
 export type VendorOrderLineRecordReceiptParams = z.infer<typeof VendorOrderLineRecordReceiptParamsSchema>;
+
+// Command: reviseQuantity on VendorOrderLine
+export const VendorOrderLineReviseQuantityParamsSchema = z.object({
+  orderedQuantity: z.number(),
+  unitCost: z.number().optional(),
+});
+
+export type VendorOrderLineReviseQuantityParams = z.infer<typeof VendorOrderLineReviseQuantityParamsSchema>;
+
+// Command: link on VendorOrderLineDemand
+export const VendorOrderLineDemandLinkParamsSchema = z.object({
+  vendorOrderLineId: z.string().min(1),
+  ingredientDemandId: z.string().min(1),
+  vendorOrderId: z.string().min(1),
+  contributionQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+});
+
+export type VendorOrderLineDemandLinkParams = z.infer<typeof VendorOrderLineDemandLinkParamsSchema>;
+
+// Command: retire on VendorOrderLineDemand
+export const VendorOrderLineDemandRetireParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type VendorOrderLineDemandRetireParams = z.infer<typeof VendorOrderLineDemandRetireParamsSchema>;
+
+// Command: revise on VendorOrderLineDemand
+export const VendorOrderLineDemandReviseParamsSchema = z.object({
+  contributionQuantity: z.number(),
+});
+
+export type VendorOrderLineDemandReviseParams = z.infer<typeof VendorOrderLineDemandReviseParamsSchema>;
 
 // Command: activate on Venue
 export const VenueActivateParamsSchema = z.object({});
@@ -3250,12 +3575,13 @@ export type VenueUpdateDetailsParams = z.infer<typeof VenueUpdateDetailsParamsSc
 
 // Command: record on WasteRecord
 export const WasteRecordRecordParamsSchema = z.object({
-  ingredientId: z.string().uuid(),
-  locationId: z.string().uuid(),
+  ingredientId: z.string().min(1),
+  locationId: z.string().min(1),
   quantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   reason: z.enum(["spoilage", "prep_error", "overproduction", "other"]),
-  eventId: z.string().uuid().optional(),
+  eventId: z.string().min(1).optional(),
+  inventoryItemId: z.string().min(1).optional(),
   unitCost: z.number().optional(),
   notes: z.string().optional(),
 });
@@ -3268,3 +3594,23 @@ export const WasteRecordVoidRecordParamsSchema = z.object({
 });
 
 export type WasteRecordVoidRecordParams = z.infer<typeof WasteRecordVoidRecordParamsSchema>;
+
+// Command: configure on WeeklyPurchasingConfig
+export const WeeklyPurchasingConfigConfigureParamsSchema = z.object({
+  defaultVendorId: z.string().min(1),
+});
+
+export type WeeklyPurchasingConfigConfigureParams = z.infer<typeof WeeklyPurchasingConfigConfigureParamsSchema>;
+
+// Command: routeNeed on WeeklyPurchasingConfig
+export const WeeklyPurchasingConfigRouteNeedParamsSchema = z.object({
+  purchaseNeedId: z.string().uuid(),
+  eventId: z.string().min(1),
+  ingredientDemandId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  requiredQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  purchasingWeekStart: z.coerce.date(),
+});
+
+export type WeeklyPurchasingConfigRouteNeedParams = z.infer<typeof WeeklyPurchasingConfigRouteNeedParamsSchema>;

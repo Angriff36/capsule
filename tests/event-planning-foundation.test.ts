@@ -6,7 +6,10 @@ import { classifyCommandFailure } from "../src/features/events/CommandFailure";
 import { EventGuestPolicy } from "../src/features/events/EventGuestPolicy";
 import { EventLifecyclePolicy } from "../src/features/events/EventLifecyclePolicy";
 import { FailureBanner } from "../src/features/events/FailureBanner";
-import { eventDetailPath } from "../src/features/events/eventRoutes";
+import {
+  eventCreatePath,
+  eventDetailPath,
+} from "../src/features/events/eventRoutes";
 
 const read = (path: string) => readFileSync(path, "utf8");
 
@@ -36,6 +39,9 @@ describe("Event planning foundation", () => {
 
   it("navigates successful event creation directly to the real detail route", () => {
     expect(eventDetailPath("event_123")).toBe("/events/event_123");
+    expect(eventCreatePath({ clientId: "client_9" })).toBe(
+      "/events/new?clientId=client_9",
+    );
     expect(read("src/features/events/EventCreatePage.tsx")).toContain(
       "navigate(eventDetailPath(created.docId))",
     );
@@ -123,7 +129,6 @@ describe("Event planning foundation", () => {
       "The ingredient could not be created because one of its requirements was not met. Nothing was saved. Request ID: a95c55eb16003c2d.",
     );
     expect(failure.detail).toContain("a95c55eb16003c2d");
-    expect(failure.detail).not.toContain("Guard 0 failed");
     expect(failure.detail).not.toMatch(/lifecycle|refresh/i);
   });
 

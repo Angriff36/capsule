@@ -102,8 +102,9 @@ describe("runtime proof: agent document enter", () => {
         : null;
       const ingredients = await ctx.db.query("ingredients").collect();
       const lines = await ctx.db.query("recipeIngredients").collect();
+      const dishRecipes = await ctx.db.query("dishRecipes").collect();
       const dishes = await ctx.db.query("dishes").collect();
-      return { recipe, dish, ingredients, lines, dishes };
+      return { recipe, dish, ingredients, lines, dishRecipes, dishes };
     });
 
     expect(snapshot.recipe).toMatchObject({
@@ -114,9 +115,14 @@ describe("runtime proof: agent document enter", () => {
     });
     expect(snapshot.dish).toMatchObject({
       name: "House Herb Oil",
-      recipeId: first.recipeId,
       tenantId: "tenant-agent-enter",
     });
+    expect(
+      snapshot.dishRecipes.some(
+        (link) =>
+          link.dishId === first.dishId && link.recipeId === first.recipeId,
+      ),
+    ).toBe(true);
     expect(
       snapshot.lines.filter((line) => line.recipeId === first.recipeId),
     ).toHaveLength(3);

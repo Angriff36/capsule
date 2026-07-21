@@ -61,9 +61,17 @@ describe("Culinary planning slice contract", () => {
       "useListEventDish",
       "useEventDishAdjustServings",
       "useEventDishRemove",
+      "useListDishTask",
+      "useListPrepTask",
+      "useListIngredientDemand",
+      "useCreatePrepTask",
+      "usePrepTaskRefreshGenerated",
     ]) {
       expect(eventMenu).toContain(hook);
     }
+    // Recipe → IngredientDemand is Manifest-owned; menu UI does not create demand.
+    expect(eventMenu).not.toContain("useCreateIngredientDemand");
+    expect(eventMenu).toContain("EventMenuSyncController");
   });
 
   it("uses governed generated creation hooks without an authored allocation seam", () => {

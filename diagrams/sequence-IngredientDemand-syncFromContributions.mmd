@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant IngredientDemand as IngredientDemand
+    participant EventBus
+    Client->>+IngredientDemand: syncFromContributions(eventId, ingredientId, requiredQuantity, unit, purchasingWeekStart)
+    Note over IngredientDemand: Policies: ingredientDemandRead, ingredientDemandWrite, ingredientDemandExecute
+    Note over IngredientDemand: Guards (2)
+    IngredientDemand->>IngredientDemand: guard[0]: self.deletedAt == null
+    IngredientDemand->>IngredientDemand: guard[1]: self.status == #quot;pending#quot; or self.status == #quot;calculated#quot; o...
+    IngredientDemand->>IngredientDemand: compute.nextQuantity
+    IngredientDemand->>IngredientDemand: compute.previousStatus
+    IngredientDemand->>IngredientDemand: mutate.eventId
+    IngredientDemand->>IngredientDemand: mutate.ingredientId
+    IngredientDemand->>IngredientDemand: mutate.requiredQuantity
+    IngredientDemand->>IngredientDemand: mutate.unit
+    IngredientDemand->>IngredientDemand: mutate.purchasingWeekStart
+    IngredientDemand->>IngredientDemand: mutate.status
+    IngredientDemand->>IngredientDemand: mutate.calculatedAt
+    IngredientDemand->>IngredientDemand: mutate.purchaseEligibleEventId
+    IngredientDemand->>EventBus: emit IngredientDemandCalculated on ingredient_demand.calculated
+    IngredientDemand-->>-Client: void

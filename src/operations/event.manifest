@@ -92,7 +92,7 @@ entity Client mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["archived"]
   transition status from "archived" to ["active"]
 
-  default policy clientRead read: roleAllows(user.role, "salesAccess") "Sales staff may read client accounts"
+  default policy clientRead read: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "financeAccess") "Sales and finance may read client accounts for CRM and billing"
   // Write policies gate command mutation (semantics.md § policy enforcement:
   // "enforced only at command execution"; no separate store-level write gate).
   // Staff tier here; manager-only commands carry explicit roleAllows guards.
@@ -426,6 +426,10 @@ entity Event mixin TenantScoped, SoftDeletable {
   property required eventType: string = ""
   property startsAt: datetime?
   property endsAt: datetime?
+  // Purchasing week bucket key for weekly VendorOrder draft consolidation.
+  // Set with startsAt on plan/reschedule; align multiple events to the same
+  // week start so they share one draft (UTC Monday midnight recommended).
+  property purchasingWeekStart: datetime?
   property venueName: string?
   property venueAddress: string?
   property required expectedHeadcount: int = 0
@@ -520,6 +524,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate eventType = eventType
     mutate startsAt = startsAt
     mutate endsAt = endsAt
+    mutate purchasingWeekStart = startsAt
     mutate venueId = venueId
     mutate venueName = venueName
     mutate venueAddress = venueAddress
@@ -551,6 +556,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     constraint scheduleDates: endsAt > startsAt "Event end must be after its start"
     mutate startsAt = startsAt
     mutate endsAt = endsAt
+    mutate purchasingWeekStart = startsAt
     emit EventScheduleChanged {
       eventId: self.id
       tenantId: self.tenantId

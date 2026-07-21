@@ -17,6 +17,9 @@ import {
   useVendorOrderSubmit,
   useVendorOrderUpdateTotals,
 } from "../../lib/manifest-convex-react";
+import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
+import { QueryLoadState } from "../../ui/QueryLoadState";
+import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
@@ -45,17 +48,34 @@ export function VendorOrderPage() {
   const [receivingLineId, setReceivingLineId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt(busy != null);
+  const { loadingTooLong } = useSlowQuery(order);
 
   if (!id)
     return (
       <ErrorState title="Order not found" detail="No order id was provided." />
     );
-  if (order === undefined) return <TableSkeleton rows={8} />;
+  if (order === undefined) {
+    return (
+      <div className="operations-stage supply-stage order-folio">
+        <Link className="text-link" to="/inventory/purchasing">
+          ← Purchase queue
+        </Link>
+        <InventoryWorkspaceNav />
+        <QueryLoadState
+          title="Order data is not loading"
+          detail="The workspace did not return this vendor order. Check the session or backend connection, then retry."
+          loadingTooLong={loadingTooLong}
+        />
+      </div>
+    );
+  }
   if (order === null)
     return (
       <ErrorState
         title="Order not found"
         detail="This order is unavailable in the current workspace."
+        onRetry={() => window.location.reload()}
       />
     );
 
@@ -132,41 +152,82 @@ export function VendorOrderPage() {
   };
 
   const invokeOrderAction = (key: string) => {
-    void run(`order:${key}`, async () => {
-      const args = { docId: order._id, version: order.version };
-      if (key === "submit") await submitOrder(args);
-      if (key === "confirm") await confirmOrder(args);
-      if (key === "markPartiallyReceived") await markPartial(args);
-      if (key === "markReceived") await markReceived(args);
+    void (async () => {
       if (key === "cancel") {
-        const reason = window.prompt("Cancellation reason")?.trim();
+        const reason = await prompt.askReason({
+          ...ReasonCopy.cancelOrder,
+          tone: "danger",
+        });
         if (!reason) return;
-        await cancelOrder({ ...args, reason });
+        void run(`order:${key}`, async () => {
+          await cancelOrder({
+            docId: order._id,
+            version: order.version,
+            reason,
+          });
+        });
+        return;
       }
-    });
+      void run(`order:${key}`, async () => {
+        const args = { docId: order._id, version: order.version };
+        if (key === "submit") await submitOrder(args);
+        if (key === "confirm") await confirmOrder(args);
+        if (key === "markPartiallyReceived") await markPartial(args);
+        if (key === "markReceived") await markReceived(args);
+      });
+    })();
   };
 
   const reviseTotals = () => {
-    const subtotal = Number(window.prompt("Subtotal", String(order.subtotal)));
-    const taxAmount = Number(window.prompt("Tax", String(order.taxAmount)));
-    const shippingAmount = Number(
-      window.prompt("Shipping", String(order.shippingAmount)),
-    );
-    if (
-      ![subtotal, taxAmount, shippingAmount].every(
-        (value) => Number.isFinite(value) && value >= 0,
-      )
-    )
-      return;
-    void run("order:totals", async () => {
-      await updateTotals({
-        docId: order._id,
-        version: order.version,
-        subtotal,
-        taxAmount,
-        shippingAmount,
+    void (async () => {
+      const values = await prompt.askFields({
+        title: "Revise order totals",
+        description: "Update subtotal, tax, and shipping for this order.",
+        fields: [
+          {
+            name: "subtotal",
+            label: "Subtotal",
+            defaultValue: String(order.subtotal),
+            inputType: "number",
+            required: true,
+          },
+          {
+            name: "taxAmount",
+            label: "Tax",
+            defaultValue: String(order.taxAmount),
+            inputType: "number",
+            required: true,
+          },
+          {
+            name: "shippingAmount",
+            label: "Shipping",
+            defaultValue: String(order.shippingAmount),
+            inputType: "number",
+            required: true,
+          },
+        ],
+        confirmLabel: "Save totals",
       });
-    });
+      if (!values) return;
+      const subtotal = Number(values.subtotal);
+      const taxAmount = Number(values.taxAmount);
+      const shippingAmount = Number(values.shippingAmount);
+      if (
+        ![subtotal, taxAmount, shippingAmount].every(
+          (value) => Number.isFinite(value) && value >= 0,
+        )
+      )
+        return;
+      void run("order:totals", async () => {
+        await updateTotals({
+          docId: order._id,
+          version: order.version,
+          subtotal,
+          taxAmount,
+          shippingAmount,
+        });
+      });
+    })();
   };
 
   return (
@@ -203,6 +264,7 @@ export function VendorOrderPage() {
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
+      {host}
 
       <section className="order-controls">
         <div className="supply-row-actions">

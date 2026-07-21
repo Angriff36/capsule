@@ -20,6 +20,14 @@ export function computeDish(doc: Record<string, any>): Record<string, any> {
   };
 }
 
+/** Preload nested relations for Event computeds (mutates doc in place). */
+export async function hydrateComputedRelationsForEvent(ctx: any, doc: Record<string, any>): Promise<void> {
+  const docId = doc._id;
+  (doc as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
+  (doc as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
+  (doc as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
+}
+
 /** Self-only computed fields for Event. Pass the stored document. */
 export function computeEvent(doc: Record<string, any>): Record<string, any> {
   return {
@@ -44,12 +52,20 @@ export function computeIngredient(doc: Record<string, any>): Record<string, any>
   };
 }
 
+/** Preload nested relations for InventoryItem computeds (mutates doc in place). */
+export async function hydrateComputedRelationsForInventoryItem(ctx: any, doc: Record<string, any>): Promise<void> {
+  const docId = doc._id;
+  (doc as any).reservations = await ctx.db.query("inventoryReservations").withIndex("by_inventoryItemId", (q: any) => q.eq("inventoryItemId", docId)).collect();
+}
+
 /** Self-only computed fields for InventoryItem. Pass the stored document. */
 export function computeInventoryItem(doc: Record<string, any>): Record<string, any> {
   return {
     isBelowPar: ((doc.parLevel > 0) && (doc.quantityOnHand < doc.parLevel)),
     isBelowReorder: ((doc.reorderThreshold > 0) && (doc.quantityOnHand < doc.reorderThreshold)),
     inventoryValue: (doc.quantityOnHand * doc.unitCost),
+    totalReserved: ((doc.reservations) ?? []).map((r: Doc<"inventoryReservations">) => (((r.status === "active") ? r.quantity : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0),
+    availableQuantity: (doc.quantityOnHand - doc.totalReserved),
   };
 }
 

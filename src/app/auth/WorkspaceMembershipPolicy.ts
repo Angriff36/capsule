@@ -2,6 +2,8 @@ export interface AuthStatusSnapshot {
   authenticated: boolean;
   hasRole: boolean;
   hasTenant: boolean;
+  /** Normalized operational role from auth context (e.g. kitchen_staff). */
+  role?: string;
 }
 
 /** Decides whether signed-in claims are enough to enter the workspace shell. */

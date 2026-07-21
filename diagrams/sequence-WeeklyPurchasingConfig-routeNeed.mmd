@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant Client
+    participant WeeklyPurchasingConfig as WeeklyPurchasingConfig
+    participant EventBus
+    Client->>+WeeklyPurchasingConfig: routeNeed(purchaseNeedId, eventId, ingredientDemandId, ingredientId, requiredQuantity, unit, purchasingWeekStart)
+    Note over WeeklyPurchasingConfig: Policies: weeklyPurchasingConfigRead, weeklyPurchasingConfigWrite, weeklyPurchasingConfigExecute
+    Note over WeeklyPurchasingConfig: Guards (2)
+    WeeklyPurchasingConfig->>WeeklyPurchasingConfig: guard[0]: self.configuredAt != null
+    WeeklyPurchasingConfig->>WeeklyPurchasingConfig: guard[1]: self.deletedAt == null
+    WeeklyPurchasingConfig->>EventBus: emit PurchaseNeedReadyForWeeklyDraft on purchase_need.ready_for_weekly_draft
+    WeeklyPurchasingConfig-->>-Client: void

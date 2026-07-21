@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant PrepTask as PrepTask
     participant EventBus
-    Client->>+PrepTask: open(eventDishId, eventId, name, quantity, unit, ingredientId, ingredientDemandId, recipeId, station, dueAt, notes)
+    Client->>+PrepTask: open(eventDishId, eventId, name, quantity, unit, ingredientId, ingredientDemandId, recipeId, dishTaskId, dishId, category, taskType, specialInstructions, isGenerated, station, dueAt, notes)
     Note over PrepTask: Policies: prepTaskRead, prepTaskWrite, prepTaskExecute
     Note over PrepTask: Guards (5)
     PrepTask->>PrepTask: guard[0]: self.claimedAt == null
@@ -16,6 +16,12 @@ sequenceDiagram
     PrepTask->>PrepTask: mutate.ingredientId
     PrepTask->>PrepTask: mutate.ingredientDemandId
     PrepTask->>PrepTask: mutate.recipeId
+    PrepTask->>PrepTask: mutate.dishTaskId
+    PrepTask->>PrepTask: mutate.dishId
+    PrepTask->>PrepTask: mutate.category
+    PrepTask->>PrepTask: mutate.taskType
+    PrepTask->>PrepTask: mutate.specialInstructions
+    PrepTask->>PrepTask: mutate.isGenerated
     PrepTask->>PrepTask: mutate.quantity
     PrepTask->>PrepTask: mutate.unit
     PrepTask->>PrepTask: mutate.station

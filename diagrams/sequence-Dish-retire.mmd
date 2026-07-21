@@ -7,7 +7,7 @@ sequenceDiagram
     Note over Dish: Guards (3)
     Dish->>Dish: guard[0]: self.status == #quot;active#quot;
     Dish->>Dish: guard[1]: self.deletedAt == null
-    Dish->>Dish: guard[2]: roleAllows(user.role, #quot;kitchenManageAccess#quot;)
+    Dish->>Dish: guard[2]: roleAllows(user.role, #quot;kitchenAccess#quot;)
     Dish->>Dish: mutate.status
     Dish->>Dish: mutate.retiredAt
     Dish->>Dish: mutate.retirementReason

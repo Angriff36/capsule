@@ -1,10 +1,10 @@
 # Manifest capability catalog
 
 - Schema: `manifest-capability-catalog/v1`
-- Manifest: `3.6.24`
+- Manifest: `3.6.41`
 - Projection: `convex`
 - Preset: `convex-application@1.3.5`
-- IR hash: `0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:28c985d9ef8a52f4c42e51700b40aeedec2804793893d9e50033e0e1eb61fc1a:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:728e61c032fe46367413548d0842c84d372b976db2ce834510b96157d0a2557b:7a1df129c67a2078408d953496bc407cbeb1b9b0a380949db99617f9a49efc9f:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:870a8d351c294034e14611cdb8d44a851f4985fb246a6ff1f1eff26105d5170c:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:9e32b3a907507588d9a813328d43ea85d61feefc1a41b32b59e72ee41c2356bd:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c31bf476c50cabe3d77f4682e5548a0d72703008c7796b1e663955d44fd1282b:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f`
+- IR hash: `153be5b9b94014082c2ecf3f789a56a5f5341623eb666b714a7044232174a257:1ab6083e1a469f8aaf08104169ae3d9a1ca53a91770df4a6ef4e57bfa05c6a10:1e506668fbefd709f384af429ccf3b970daf7143b943b29219c7229605c90f97:21d57d616e827ed9eba8950af310277f2eb66471f5fba0eb3107b6da20518a15:317bb23515379f8c3797f3065e69af8d8ea35f013bcf07410205891f51cb2b71:444a34406a1be59e2318e52618f06e2c024cc5f4b8539eaad99e8688068b5ba0:44817c0e4d994b4f9eaaec0ff77a7354d8c429d3ff64ed2ed697a04afa1ecc61:4b3a8bb3b8a0100eb0c02aea49d373e01fa7f0e403a9d707dc9dc9766112663f:5111ecb9c8543db2375be26fff8638deafdd1c5aeebe5eb098383347a0252960:521cdeef965c39fc3dcb888dfe409087134b9e4fb88195a97285eee2d187fd29:61fee74be61813476c9563e3efbd2e0bb8567052cdc4a9ecdae853f68c6c6a3a:77766fdde34e6bfb38efd3184bf84bf99af350cfcdf58cabbbd913f0a73037b8:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:7b55a406b8fcf935714eb9636512d7c46b73211747ffbb1dd39628d50f256e68:827f770b97190c87315c820e96bd13d93fbc66a3fe633a257a0f0938f73543d6:8d3397fc8c4a274927af3f654a36b9318b077aaca2262d574e8325b167c138fb:91013449fb5b6d6f2dcd45746d7b46bbda19031e1d6da873e2d4e9c02821c560:91fd78bcaab65af1e80ac79531842df3f3bc3ae121aedb26189b0c93850883ea:952203740dd05c52a2ee55ca78f80b811be3bb48449b03126e87f3171ef3179d:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:96ee313de3f29c419df911bc0b8e5f39b5fde7e44ab2e1921fff9af829f6bfb9:99966b159339ed3d6cc1a24f287d64c5be13db08bbf07c6fb855b352c9c256e4:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:a55d023b26a6299c99c87138658384e8f97eb636a0cabeeb80ff159c6a9d1c45:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:b42238d427001b39dbfbd3becd1f66b96f676331afc164c7ccd1209349510271:baf09f81826c20997d670f15d16728a5ff0aa7dc6a9972bb005ceead8bf7433f:bca45b4a706c571e4061fb9a8131be61278b265eea1cf2f4381f27e5a1d638df:c91413f626012769224ca1ab08abe6469f993619bc17a22e6bcd686926832d79:cd648a831023e2befe3dc8a1d9e9e58dc11b27477ee7df4156733631bed767eb:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:dcc4e69c9df237e5972ba749c7e1e76525f0d181301b8d8c2b437cf8eaede1dd:e2230c0ce31b04ea452a5349be34a5841703e415f46c8d0e2f7f1afb914a1761:e542220c6e01b1cde78d80d483bde5d7be7c513aa50cb188a1b61852a2e9d441:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f22810fa49283ef6682ac632621533b3b2d72d92f59e7f47285a2881d1b7ecaf:f688898cf4c0c68871d41e91b8f5999fcde4faf80d7703a080841d3e90649720:fdc28fad241416ceed92a345c3acf5b15954417bb2bda3075aff77e7beebeb45`
 
 ## AvailabilityWindow
 
@@ -18,6 +18,25 @@
 ### Commands
 - `AvailabilityWindow_declare` emits AvailabilityDeclared
 - `AvailabilityWindow_withdraw` emits AvailabilityWithdrawn
+
+## Delivery
+
+- Table: `deliveries`
+- List: `listDelivery`
+- Detail: `getDelivery`
+- Create: `Delivery_createViaSchedule` / `useCreateDelivery`
+- Proof: structural=`generated` runtime=`declared`
+- Capabilities: `logisticsAccess`
+
+### Commands
+- `Delivery_cancel` emits DeliveryCancelled
+- `Delivery_confirmDelivery` emits DeliveryConfirmed
+- `Delivery_markFailed` emits DeliveryFailed
+- `Delivery_schedule` emits DeliveryScheduled
+- `Delivery_startTransit` emits DeliveryTransitStarted
+
+### Reactions
+- `EventCancelled->Delivery.cancel` → Delivery.cancel (runtime=`declared`)
 
 ## Dish
 
@@ -53,6 +72,19 @@
 - `EventAssignment_markNoShow` emits EventAssignmentNoShowMarked
 - `EventAssignment_unassign` emits EventAssignmentUnassigned
 
+## EventCloseout
+
+- Table: `eventCloseouts`
+- List: `listEventCloseout`
+- Detail: `getEventCloseout`
+- Create: `EventCloseout_createViaCapture` / `useCreateEventCloseout`
+- Proof: structural=`generated` runtime=`declared`
+- Capabilities: `financeAccess`
+
+### Commands
+- `EventCloseout_capture` emits EventCloseoutCaptured
+- `EventCloseout_finalize` emits EventCloseoutFinalized
+
 ## Ingredient
 
 - Table: `ingredients`
@@ -67,6 +99,7 @@
 - `Ingredient_discontinue` emits IngredientDiscontinued
 - `Ingredient_introduce` emits IngredientIntroduced
 - `Ingredient_reinstate` emits IngredientReinstated
+- `Ingredient_setPreferredVendor`
 - `Ingredient_updateCosting` emits IngredientCostingUpdated
 - `Ingredient_updateDetails` emits IngredientDetailsUpdated
 
@@ -77,18 +110,47 @@
 - Detail: `getIngredientDemand`
 - Create: `IngredientDemand_createViaCalculate` / `useCreateIngredientDemand`
 - Proof: structural=`generated` runtime=`runtime_proven`
-- Capabilities: `inventoryAccess`
+- Capabilities: `inventoryAccess`, `manageAccess`
 
 ### Commands
 - `IngredientDemand_calculate` emits IngredientDemandCalculated
 - `IngredientDemand_confirm` emits IngredientDemandConfirmed
+- `IngredientDemand_ensurePurchaseEligible`
 - `IngredientDemand_fulfill` emits IngredientDemandFulfilled
+- `IngredientDemand_markReleased` emits IngredientDemandReleased
 - `IngredientDemand_recalculate` emits IngredientDemandRecalculated
 - `IngredientDemand_supersede` emits IngredientDemandSuperseded
+- `IngredientDemand_syncFromContributions` emits IngredientDemandCalculated
 
 ### Reactions
-- `EventApproved->IngredientDemand.confirm` → IngredientDemand.confirm (runtime=`declared`)
+- `EventApproved->IngredientDemand.ensurePurchaseEligible` → IngredientDemand.ensurePurchaseEligible (runtime=`declared`)
+- `EventIngredientContributionRecorded->IngredientDemand.syncFromContributions` → IngredientDemand.syncFromContributions (runtime=`declared`)
+- `IngredientDemandCalculated->PurchaseNeed.reviseRequired` → PurchaseNeed.reviseRequired (runtime=`declared`)
 - `IngredientDemandConfirmed->PurchaseNeed.create` → PurchaseNeed.create (runtime=`runtime_proven`)
+- `PurchaseNeedOpened->IngredientDemand.markReleased` → IngredientDemand.markReleased (runtime=`declared`)
+
+## Invoice
+
+- Table: `invoices`
+- List: `listInvoice`
+- Detail: `getInvoice`
+- Create: `Invoice_createViaIssue` / `useCreateInvoice`
+- Proof: structural=`generated` runtime=`runtime_proven`
+- Capabilities: `financeAccess`
+
+### Commands
+- `Invoice_applyPayment` emits InvoicePaymentApplied
+- `Invoice_issue` emits InvoiceIssued
+- `Invoice_markOverdue` emits InvoiceMarkedOverdue
+- `Invoice_markViewed` emits InvoiceViewed
+- `Invoice_markVoided` emits InvoiceVoided
+- `Invoice_recordRefund` emits InvoiceRefundRecorded
+- `Invoice_send` emits InvoiceSent
+- `Invoice_writeOff` emits InvoiceWrittenOff
+
+### Reactions
+- `EventCancelled->Invoice.markVoided` → Invoice.markVoided (runtime=`declared`)
+- `PaymentSettled->Invoice.applyPayment` → Invoice.applyPayment (runtime=`runtime_proven`)
 
 ## Menu
 
@@ -108,6 +170,74 @@
 - `Menu_unpublish` emits MenuUnpublished
 - `Menu_updatePricing` emits MenuPricingUpdated
 
+## PackList
+
+- Table: `packLists`
+- List: `listPackList`
+- Detail: `getPackList`
+- Create: `PackList_createViaOpen` / `useCreatePackList`
+- Proof: structural=`generated` runtime=`declared`
+- Capabilities: `logisticsAccess`
+
+### Commands
+- `PackList_cancel` emits PackListCancelled
+- `PackList_dispatch` emits PackListDispatched
+- `PackList_markLoaded` emits PackListLoaded
+- `PackList_markPacked` emits PackListPacked
+- `PackList_open` emits PackListOpened
+- `PackList_startPacking` emits PackListPackingStarted
+
+### Reactions
+- `EventCancelled->PackList.cancel` → PackList.cancel (runtime=`declared`)
+
+## PackListItem
+
+- Table: `packListItems`
+- List: `listPackListItem`
+- Detail: `getPackListItem`
+- Create: `PackListItem_createViaAddItem` / `useCreatePackListItem`
+- Proof: structural=`generated` runtime=`declared`
+- Capabilities: `logisticsAccess`
+
+### Commands
+- `PackListItem_addItem` emits PackListItemAdded
+- `PackListItem_adjustQuantity` emits PackListItemQuantityAdjusted
+- `PackListItem_markMissing` emits PackListItemMissing
+- `PackListItem_markPacked` emits PackListItemPacked
+
+## Payment
+
+- Table: `payments`
+- List: `listPayment`
+- Detail: `getPayment`
+- Create: `Payment_createViaRecord` / `useCreatePayment`
+- Proof: structural=`generated` runtime=`runtime_proven`
+- Capabilities: `financeAccess`
+
+### Commands
+- `Payment_beginProcessing` emits PaymentProcessingStarted
+- `Payment_fail` emits PaymentFailed
+- `Payment_record` emits PaymentRecorded
+- `Payment_refund` emits PaymentRefunded
+- `Payment_settle` emits PaymentSettled
+
+### Reactions
+- `PaymentSettled->Invoice.applyPayment` → Invoice.applyPayment (runtime=`runtime_proven`)
+
+## PayrollInput
+
+- Table: `payrollInputs`
+- List: `listPayrollInput`
+- Detail: `getPayrollInput`
+- Create: `PayrollInput_createViaPrepare` / `useCreatePayrollInput`
+- Proof: structural=`generated` runtime=`declared`
+- Capabilities: `financeManageAccess`
+
+### Commands
+- `PayrollInput_finalize` emits PayrollInputFinalized
+- `PayrollInput_markVoided` emits PayrollInputVoided
+- `PayrollInput_prepare` emits PayrollInputPrepared
+
 ## PrepTask
 
 - Table: `prepTasks`
@@ -115,7 +245,7 @@
 - Detail: `getPrepTask`
 - Create: `PrepTask_createViaOpen` / `useCreatePrepTask`
 - Proof: structural=`generated` runtime=`runtime_proven`
-- Capabilities: `kitchenAccess`
+- Capabilities: `kitchenAccess`, `manageAccess`
 
 ### Commands
 - `PrepTask_cancel` emits PrepTaskCancelled
@@ -123,7 +253,9 @@
 - `PrepTask_complete` emits PrepTaskCompleted
 - `PrepTask_markBlocked` emits PrepTaskBlocked
 - `PrepTask_open` emits PrepTaskOpened
+- `PrepTask_refreshGenerated` emits PrepTaskGeneratedRefreshed
 - `PrepTask_release` emits PrepTaskReleased
+- `PrepTask_revise` emits PrepTaskRevised
 - `PrepTask_start` emits PrepTaskStarted
 - `PrepTask_unblock` emits PrepTaskUnblocked
 
@@ -139,7 +271,7 @@
 - Detail: `getPurchaseNeed`
 - Create: `PurchaseNeed_create` / `useCreatePurchaseNeed`
 - Proof: structural=`generated` runtime=`runtime_proven`
-- Capabilities: `inventoryAccess`
+- Capabilities: `inventoryAccess`, `manageAccess`
 
 ### Commands
 - `PurchaseNeed_assignToDraft` emits PurchaseNeedDraftAssigned
@@ -148,10 +280,16 @@
 - `PurchaseNeed_markDraftOrdered` emits PurchaseNeedOrdered
 - `PurchaseNeed_markFulfilled` emits PurchaseNeedFulfilled
 - `PurchaseNeed_markOrdered` emits PurchaseNeedOrdered
+- `PurchaseNeed_reviseRequired` emits PurchaseNeedOpened
 
 ### Reactions
+- `EventApproved->PurchaseNeed.create` → PurchaseNeed.create (runtime=`declared`)
 - `EventCancelled->PurchaseNeed.cancel` → PurchaseNeed.cancel (runtime=`declared`)
+- `IngredientDemandCalculated->PurchaseNeed.reviseRequired` → PurchaseNeed.reviseRequired (runtime=`declared`)
 - `IngredientDemandConfirmed->PurchaseNeed.create` → PurchaseNeed.create (runtime=`runtime_proven`)
+- `PurchaseNeedOpened->IngredientDemand.markReleased` → IngredientDemand.markReleased (runtime=`declared`)
+- `PurchaseNeedOpened->WeeklyPurchasingConfig.routeNeed` → WeeklyPurchasingConfig.routeNeed (runtime=`declared`)
+- `VendorOrderLineWeeklyEnsured->PurchaseNeed.assignToDraft` → PurchaseNeed.assignToDraft (runtime=`declared`)
 - `VendorOrderSubmitted->PurchaseNeed.markDraftOrdered` → PurchaseNeed.markDraftOrdered (runtime=`declared`)
 
 ## Qualification

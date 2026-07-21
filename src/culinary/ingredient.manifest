@@ -48,12 +48,15 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   property allergens: list<AllergenCode> = []
   property required costPerUnit: money(12, 2) = 0
   property category: string?
+  // Preferred vendor for automatic weekly draft consolidation (Manifest reactions).
+  property preferredVendorId: uuid?
   property required status: IngredientStatus = "active"
   property introducedAt: datetime?
   property discontinuedAt: datetime?
   property discontinuationReason: string?
 
   hasMany recipeLines: RecipeIngredient
+  hasMany stockLines: InventoryItem
 
   computed isActive: boolean = self.status == "active"
   computed isDiscontinued: boolean = self.status == "discontinued"
@@ -73,7 +76,8 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     unit: UnitOfMeasure,
     costPerUnit: money(12, 2),
     optional allergens: list<AllergenCode>,
-    optional category: string
+    optional category: string,
+    optional preferredVendorId: uuid
   ) {
     guard self.introducedAt == null
     guard self.deletedAt == null
@@ -84,6 +88,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     mutate costPerUnit = costPerUnit
     mutate allergens = allergens != null ? allergens : []
     mutate category = category
+    mutate preferredVendorId = preferredVendorId
     mutate introducedAt = now()
     emit IngredientIntroduced {
       ingredientId: self.id
@@ -93,6 +98,12 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
       costPerUnit: costPerUnit
       allergens: allergens != null ? allergens : []
     }
+  }
+
+  command setPreferredVendor(optional preferredVendorId: uuid) {
+    guard self.introducedAt != null
+    guard self.deletedAt == null
+    mutate preferredVendorId = preferredVendorId
   }
 
   command updateDetails(

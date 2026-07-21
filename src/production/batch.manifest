@@ -39,10 +39,12 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
   transition status from "completed" to []
   transition status from "cancelled" to []
 
-  default policy productionBatchRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read production batches"
-  default policy productionBatchWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write production batches through commands"
-  default policy productionBatchExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute production batch commands"
+  // manageAccess: Event.approve cascade (event_manager) must plan batches.
+  default policy productionBatchRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may read production batches"
+  default policy productionBatchWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may write production batches through commands"
+  default policy productionBatchExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and managers may execute production batch commands"
 
+  // Idempotent plan: Event.approve fanOut may re-fire; do not fail or duplicate.
   command plan(
     recipeId: uuid,
     plannedYield: decimal(12, 4),
@@ -50,26 +52,26 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     optional eventId: uuid,
     optional notes: string
   ) {
-    guard self.plannedAt == null
-    guard self.status == "planned"
     guard self.deletedAt == null
-    guard self.recipe != null and self.recipe.status == "published"
+    guard self.status == "planned"
+    guard self.plannedAt == null or self.recipeId == recipeId
+    guard self.plannedAt != null or (self.recipe != null and self.recipe.status == "published")
     constraint planRecipeMatch: recipeId == self.recipeId "Plan recipeId must match the seeded recipe reference"
     constraint planEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Plan eventId must match the seeded event reference when provided"
-    constraint planYieldPositive: plannedYield > 0 "Planned yield must be positive"
+    constraint planYieldPositive: plannedYield > 0 or self.plannedYield > 0 "Planned yield must be positive"
     mutate recipeId = recipeId
     mutate eventId = eventId != null ? eventId : self.eventId
-    mutate plannedYield = plannedYield
-    mutate yieldUnit = yieldUnit
+    mutate plannedYield = self.plannedAt != null ? self.plannedYield : plannedYield
+    mutate yieldUnit = self.plannedAt != null ? self.yieldUnit : yieldUnit
     mutate notes = notes != null ? notes : self.notes
-    mutate plannedAt = now()
+    mutate plannedAt = self.plannedAt != null ? self.plannedAt : now()
     emit ProductionBatchPlanned {
       productionBatchId: self.id
       tenantId: self.tenantId
       recipeId: recipeId
       eventId: eventId != null ? eventId : self.eventId
-      plannedYield: plannedYield
-      yieldUnit: yieldUnit
+      plannedYield: self.plannedAt != null ? self.plannedYield : plannedYield
+      yieldUnit: self.plannedAt != null ? self.yieldUnit : yieldUnit
       status: "planned"
     }
   }
@@ -186,3 +188,15 @@ event ProductionBatchCancelled: "production_batch.cancelled" {
   status: ProductionBatchStatus
   reason: string
 }
+
+// Vision cascade: approved event plans one ProductionBatch per seeded dish recipe.
+on EventApproved fanOut EventDishRecipeSeed where eventId = payload.eventId
+  run ProductionBatch.plan
+  match eventId = payload.eventId, recipeId = self.recipeId
+  else create
+  params {
+    recipeId: self.recipeId
+    plannedYield: self.servings
+    yieldUnit: "portion"
+    eventId: payload.eventId
+  }

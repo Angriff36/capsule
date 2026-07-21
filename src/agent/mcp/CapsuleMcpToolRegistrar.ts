@@ -3,7 +3,9 @@ import { z } from "zod";
 import { CapsuleCommandCatalog } from "../CapsuleCommandCatalog";
 import type { CapsuleCommandExecutor } from "../CapsuleCommandExecutor";
 import { CapsuleDocumentEnterCoordinator } from "../CapsuleDocumentEnterCoordinator";
+import { CapsuleEventPrepCoordinator } from "../CapsuleEventPrepCoordinator";
 import { CapsuleIngredientCatalogLoader } from "../CapsuleIngredientCatalogLoader";
+import { CapsuleLiveEventPrepStateLoader } from "../CapsuleLiveEventPrepStateLoader";
 
 function textResult(value: unknown) {
   return {
@@ -56,6 +58,30 @@ export class CapsuleMcpToolRegistrar {
           idempotencyKey,
         });
         return textResult({ ok: true, capabilityId, result });
+      },
+    );
+
+    server.tool(
+      "add_event_dish_and_sync_prep",
+      "Add a Dish to an Event, then reconcile its generated PrepTasks and IngredientDemand through the same governed commands as the Event menu. Does not create or submit a purchase order.",
+      {
+        eventId: z.string(),
+        dishId: z.string(),
+        quantityServings: z.number().nonnegative(),
+        course: z.string().optional(),
+        serviceStyle: z.string().optional(),
+        specialInstructions: z.string().optional(),
+        idempotencyKey: z.string().optional(),
+      },
+      async (input) => {
+        const coordinator = new CapsuleEventPrepCoordinator(
+          this.executor,
+          new CapsuleLiveEventPrepStateLoader(),
+        );
+        return textResult({
+          ok: true,
+          result: await coordinator.addDishAndSync(input),
+        });
       },
     );
 

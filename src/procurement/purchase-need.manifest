@@ -29,6 +29,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   property required ingredientId: uuid
   property required requiredQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
+  property purchasingWeekStart: datetime?
   property vendorOrderId: uuid?
   property vendorOrderLineId: uuid?
   property required status: PurchaseNeedStatus = "open"
@@ -51,9 +52,11 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
   transition status from "fulfilled" to []
   transition status from "cancelled" to []
 
-  default policy purchaseNeedRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read purchase needs"
-  default policy purchaseNeedWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write purchase needs through commands"
-  default policy purchaseNeedExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute purchase need commands"
+  // manageAccess: Event.approve (event_manager) foreach-creates PurchaseNeed;
+  // inventoryAccess: purchasing staff. Do not invent a specialty "approve-only" cap.
+  default policy purchaseNeedRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may read purchase needs"
+  default policy purchaseNeedWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may write purchase needs through commands"
+  default policy purchaseNeedExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and managers may execute purchase need commands"
 
   // Reserved runtime create name — required for the reaction-wired create path
   // (semantics.md § Manual parent id on create; PROMPT trap 3 correction).
@@ -63,11 +66,15 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     ingredientDemandId: uuid,
     ingredientId: uuid,
     requiredQuantity: decimal(12, 4),
-    unit: UnitOfMeasure
+    unit: UnitOfMeasure,
+    optional purchasingWeekStart: datetime
   ) {
     guard self.openedAt == null
     guard self.deletedAt == null
     constraint createNeedQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    // Full event requirement — weekly line applies on-hand once across consolidated needs.
+    mutate requiredQuantity = requiredQuantity
+    mutate purchasingWeekStart = purchasingWeekStart
     mutate openedAt = now()
     emit PurchaseNeedOpened {
       purchaseNeedId: self.id
@@ -77,6 +84,7 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
       ingredientId: ingredientId
       requiredQuantity: requiredQuantity
       unit: unit
+      purchasingWeekStart: purchasingWeekStart
       status: "open"
     }
   }
@@ -109,7 +117,9 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
     guard self.status == "open"
     guard self.openedAt != null
     guard self.deletedAt == null
-    constraint assignDraftUnlinked: self.vendorOrderId == null and self.vendorOrderLineId == null "Purchase need is already linked to an order line"
+    // Idempotent: same draft line re-assign is a no-op; different line is blocked.
+    guard self.vendorOrderId == null or (self.vendorOrderId == vendorOrderId and self.vendorOrderLineId == vendorOrderLineId)
+    guard self.vendorOrderLineId == null or self.vendorOrderLineId == vendorOrderLineId
     mutate vendorOrderId = vendorOrderId
     mutate vendorOrderLineId = vendorOrderLineId
     emit PurchaseNeedDraftAssigned {
@@ -120,6 +130,26 @@ entity PurchaseNeed mixin TenantScoped, SoftDeletable {
       ingredientId: self.ingredientId
       vendorOrderId: vendorOrderId
       vendorOrderLineId: vendorOrderLineId
+      status: "open"
+    }
+  }
+
+  // Post-approve demand reconcile: revise open need quantity; weekly line re-ensures.
+  command reviseRequired(requiredQuantity: decimal(12, 4)) {
+    guard self.status == "open"
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    constraint reviseNeedQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
+    mutate requiredQuantity = requiredQuantity
+    emit PurchaseNeedOpened {
+      purchaseNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientDemandId: self.ingredientDemandId
+      ingredientId: self.ingredientId
+      requiredQuantity: requiredQuantity
+      unit: self.unit
+      purchasingWeekStart: self.purchasingWeekStart
       status: "open"
     }
   }
@@ -198,6 +228,7 @@ event PurchaseNeedOpened: "purchase_need.opened" {
   ingredientId: string
   requiredQuantity: decimal(12, 4)
   unit: UnitOfMeasure
+  purchasingWeekStart: datetime?
   status: PurchaseNeedStatus
 }
 
@@ -246,20 +277,37 @@ event PurchaseNeedCancelled: "purchase_need.cancelled" {
 }
 
 // ---------------------------------------------------------------------------
-// Confirmation → purchasing-order flow.
+// Event approve / confirmation → purchasing-order flow.
 // ---------------------------------------------------------------------------
 
-// Event confirmed (approved) → confirm every calculated IngredientDemand for
-// the event (the dish-derived prep/purchase list). Demands not in "calculated"
-// are deliberately skipped by confirm's guards (same skip pattern as the
-// EventCancelled → Invoice.markVoided fan-out).
+// Compat first: restore purchaseEligibleEventId on calculated rows that predate
+// the field (or lost it). Soft mutate — must stay BEFORE PurchaseNeed.create so
+// the create fanOut can see repaired eligibility in the same approve transaction.
 on EventApproved fanOut IngredientDemand where eventId = payload.eventId
-  run confirm
+  run IngredientDemand.ensurePurchaseEligible
 
-// Prep-list line confirmed (directly by inventory staff, or via the event
-// approval fan-out above) → open the purchase need. `resolve null` is the
-// Manifest 3.6.3 form of the reaction-wired create path (parser requires a
-// resolve clause; null instanceId routes to runtime create).
+// Event.approve → foreach-create PurchaseNeed for calculated demands that are
+// still purchase-eligible (Manifest ≥3.6.36 cross-entity fanOut). Matching on
+// purchaseEligibleEventId (not bare eventId) skips pending/superseded/already
+// released rows so a guard failure cannot roll back approve.
+// markReleased is chained from PurchaseNeedOpened (not a second EventApproved
+// fanOut) so projection reaction order cannot clear eligibility before create.
+on EventApproved fanOut IngredientDemand where purchaseEligibleEventId = payload.eventId
+  run PurchaseNeed.create
+  params {
+    eventId: self.eventId
+    ingredientDemandId: self.id
+    ingredientId: self.ingredientId
+    requiredQuantity: self.requiredQuantity
+    unit: self.unit
+    purchasingWeekStart: self.purchasingWeekStart
+  }
+
+on PurchaseNeedOpened run IngredientDemand.markReleased
+  resolve payload.ingredientDemandId
+
+// Manual Demand Ledger confirm (before approve) still opens a purchase need.
+// `resolve null` is the reaction-wired create path (null instanceId → create).
 on IngredientDemandConfirmed run PurchaseNeed.create
   resolve null
   params {

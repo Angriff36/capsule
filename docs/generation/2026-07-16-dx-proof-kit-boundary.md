@@ -37,3 +37,10 @@
 > **Correction (2026-07-16) @RYANSIGNED:** Consumable pin is **3.6.17**. Registry-only (`bun run check:manifest-registry`). Governed creation proofs: `tests/culinary-governed-creation.runtime.test.ts`.
 
 > **Correction (2026-07-17):** Consumable range is **`^3.6.21`** (lock resolves to **3.6.21+**). Includes Convex command idempotency (`idempotencyKey`, `commandIdempotencyKeys`). Floor remains 3.6.20 for relation-resolution fixes; never allow 3.6.17–3.6.19. Proofs: `tests/proofs/shift-lifecycle.runtime.test.ts`, `tests/proofs/relation-guarded-creation.runtime.test.ts`.
+
+> **Correction (2026-07-20):** Capsule pinned exact registry **`3.6.33`** (authenticated Convex command HTTP dispatcher: selected init→`createVia*`, instance `docId`/`version`). Registry-only; no `file:` / `.tgz`.
+>
+> ~~3.6.30 omitted `docId` on instance command HTTP args.~~
+> ~~3.6.31/3.6.32 either omitted createVia routing or over-routed peer commands to phantom createVia* exports.~~
+
+> **Correction (2026-07-21):** Capsule pins exact registry **`3.6.37`** (fan-out foreach-create + `self.id`→`_id` in fanOut params + Event.approve → PurchaseNeed release). Exact pin required so `scripts/builder-manifest-pin.ts` syncs the sibling Builder checkout before `manifest:regen` (caret ranges are skipped and silently use a stale projection). Registry-only; no `file:` / `.tgz`. npm `3.6.35` was an empty cut; `3.6.36` foreach-create rendered `__row.id` (broken on Convex) — use **3.6.37+**.

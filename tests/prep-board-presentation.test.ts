@@ -8,6 +8,8 @@ const manifest = vi.hoisted(() => ({
   tasks: [] as any[] | undefined,
   checks: [] as any[] | undefined,
   events: [] as any[] | undefined,
+  eventDishes: [] as any[] | undefined,
+  dishes: [] as any[] | undefined,
   ingredients: [] as any[] | undefined,
   command: vi.fn(async () => undefined),
 }));
@@ -16,6 +18,8 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useListPrepTask: () => manifest.tasks,
   useListQualityCheck: () => manifest.checks,
   useListEvent: () => manifest.events,
+  useListEventDish: () => manifest.eventDishes,
+  useListDish: () => manifest.dishes,
   useListIngredient: () => manifest.ingredients,
   useCreatePrepTask: () => manifest.command,
   useCreateQualityCheck: () => manifest.command,

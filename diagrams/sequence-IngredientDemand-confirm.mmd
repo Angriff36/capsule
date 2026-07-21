@@ -10,5 +10,6 @@ sequenceDiagram
     IngredientDemand->>IngredientDemand: guard[2]: self.deletedAt == null
     IngredientDemand->>IngredientDemand: mutate.status
     IngredientDemand->>IngredientDemand: mutate.confirmedAt
+    IngredientDemand->>IngredientDemand: mutate.purchaseEligibleEventId
     IngredientDemand->>EventBus: emit IngredientDemandConfirmed on ingredient_demand.confirmed
     IngredientDemand-->>-Client: void

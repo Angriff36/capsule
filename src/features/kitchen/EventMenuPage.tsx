@@ -1,26 +1,61 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import {
+  useCreateInventoryReservation,
+  useCreatePrepTask,
   useCreateEventDish,
   useEventDishAdjustServings,
   useEventDishRemove,
+  useInventoryReservationRelease,
   useListDish,
+  useListDishRecipe,
+  useListDishTask,
   useListEvent,
   useListEventDish,
+  useListIngredient,
+  useListIngredientDemand,
+  useListInventoryItem,
+  useListInventoryReservation,
+  useListPrepTask,
+  useListRecipe,
+  useListRecipeIngredient,
+  usePrepTaskRefreshGenerated,
 } from "../../lib/manifest-convex-react";
+import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
+import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
+import { EventMenuStockShortageBanner } from "./EventMenuStockShortageBanner";
+import { EventMenuSyncController } from "./EventMenuSyncController";
 import { KitchenBookNav } from "./KitchenBookNav";
 
 export function EventMenuPage() {
   const events = useListEvent();
   const dishes = useListDish();
   const eventDishes = useListEventDish();
+  const dishTasks = useListDishTask();
+  const dishRecipes = useListDishRecipe();
+  const recipes = useListRecipe();
+  const recipeIngredients = useListRecipeIngredient();
+  const prepTasks = useListPrepTask();
+  const ingredients = useListIngredient();
+  const demands = useListIngredientDemand();
+  const inventoryItems = useListInventoryItem();
+  const inventoryReservations = useListInventoryReservation();
   const createEventDish = useCreateEventDish();
+  const createPrepTask = useCreatePrepTask();
+  const createReservation = useCreateInventoryReservation();
+  const releaseReservation = useInventoryReservationRelease();
+  const refreshGeneratedTask = usePrepTaskRefreshGenerated();
   const adjustServings = useEventDishAdjustServings();
   const removeDish = useEventDishRemove();
   const [eventId, setEventId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
+    [],
+  );
+  const { prompt, host } = useActionPrompt(busy != null);
 
   const selectedEvent = events?.find((event) => event._id === eventId);
   const selections = (eventDishes ?? []).filter(
@@ -39,21 +74,56 @@ export function EventMenuPage() {
       setBusy(null);
     }
   };
+  const menuSync = () =>
+    new EventMenuSyncController(
+      {
+        createTask: ((input: never) => createPrepTask(input)) as never,
+        refreshGeneratedTask: ((input: never) =>
+          refreshGeneratedTask(input)) as never,
+        createReservation: async (input) => {
+          const doc = (await createReservation(input)) as { docId: string };
+          return { docId: doc.docId };
+        },
+        releaseReservation: (input) => releaseReservation(input),
+      },
+      EventMenuSyncController.requireCatalogs({
+        dishTasks: dishTasks as never,
+        prepTasks: prepTasks as never,
+        ingredients: ingredients as never,
+        demands: demands as never,
+        dishRecipes: dishRecipes as never,
+        recipes: recipes as never,
+        recipeIngredients: recipeIngredients as never,
+        eventDishes: eventDishes as never,
+        inventoryItems: inventoryItems as never,
+        inventoryReservations: inventoryReservations as never,
+      }),
+    );
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
     void run("addToEvent", async () => {
-      await createEventDish({
+      const quantityServings = Number(data.get("quantityServings"));
+      const specialInstructions =
+        String(data.get("specialInstructions") ?? "").trim() || undefined;
+      const created = (await createEventDish({
         eventId,
         dishId: String(data.get("dishId")),
-        quantityServings: Number(data.get("quantityServings")),
+        quantityServings,
         course: String(data.get("course") ?? "").trim() || undefined,
         serviceStyle:
           String(data.get("serviceStyle") ?? "").trim() || undefined,
-        specialInstructions:
-          String(data.get("specialInstructions") ?? "").trim() || undefined,
+        specialInstructions,
+      })) as { docId: string };
+      const shortages = await menuSync().syncPrepForDish({
+        id: created.docId,
+        eventId,
+        dishId: String(data.get("dishId")),
+        quantityServings,
+        specialInstructions,
       });
+      setStockShortages(shortages);
       form.reset();
     });
   };
@@ -76,6 +146,15 @@ export function EventMenuPage() {
           <CulinaryFailureBanner error={failure} />
         </div>
       ) : null}
+      <EventMenuStockShortageBanner
+        shortages={stockShortages}
+        ingredientName={(ingredientId) =>
+          ingredients?.find((ingredient) => ingredient._id === ingredientId)
+            ?.name ?? ingredientId
+        }
+        onDismiss={() => setStockShortages([])}
+      />
+      {host}
       <div className="event-menu-layout">
         <section>
           <div className="culinary-section-heading">
@@ -84,6 +163,7 @@ export function EventMenuPage() {
           <label className="field-label mt-5">
             Event
             <select
+              id="event-menu-event"
               className="input"
               value={eventId}
               onChange={(event) => setEventId(event.target.value)}
@@ -130,7 +210,12 @@ export function EventMenuPage() {
             <div className="culinary-create-grid">
               <label className="field-label sm:col-span-2">
                 Dish
-                <select name="dishId" className="input" required>
+                <select
+                  id="event-menu-dish"
+                  name="dishId"
+                  className="input"
+                  required
+                >
                   <option value="">Select dish</option>
                   {(dishes ?? [])
                     .filter(
@@ -186,6 +271,20 @@ export function EventMenuPage() {
             <div className="document-empty">
               <p>Choose an event.</p>
               <span>Its selected dishes will appear here.</span>
+              <div className="mt-3 flex flex-wrap justify-center gap-2">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() =>
+                    document.getElementById("event-menu-event")?.focus()
+                  }
+                >
+                  Select event
+                </button>
+                <Link to="/events" className="btn btn-ghost btn-sm">
+                  Open events
+                </Link>
+              </div>
             </div>
           ) : selections.length === 0 ? (
             <div className="document-empty">
@@ -194,6 +293,17 @@ export function EventMenuPage() {
                 Add the first service dish through the generated selection
                 command.
               </span>
+              <div className="mt-3 flex justify-center">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() =>
+                    document.getElementById("event-menu-dish")?.focus()
+                  }
+                >
+                  Choose a dish
+                </button>
+              </div>
             </div>
           ) : (
             <ul className="event-dish-list">
@@ -212,20 +322,45 @@ export function EventMenuPage() {
                       className="btn btn-ghost btn-sm"
                       disabled={busy != null}
                       onClick={() => {
-                        const quantity = Number(
-                          window.prompt(
-                            "Servings",
-                            String(selection.quantityServings),
-                          ),
-                        );
-                        if (!Number.isFinite(quantity) || quantity <= 0) return;
-                        void run(`adjust:${selection._id}`, async () => {
-                          await adjustServings({
-                            docId: selection._id,
-                            quantityServings: quantity,
-                            version: selection.version,
+                        void (async () => {
+                          const values = await prompt.askFields({
+                            title: "Adjust servings",
+                            description:
+                              "Enter the new serving count for this event dish.",
+                            fields: [
+                              {
+                                name: "quantityServings",
+                                label: "Servings",
+                                defaultValue: String(
+                                  selection.quantityServings,
+                                ),
+                                inputType: "number",
+                                required: true,
+                              },
+                            ],
+                            confirmLabel: "Save servings",
                           });
-                        });
+                          if (!values) return;
+                          const quantity = Number(values.quantityServings);
+                          if (!Number.isFinite(quantity) || quantity <= 0)
+                            return;
+                          void run(`adjust:${selection._id}`, async () => {
+                            await adjustServings({
+                              docId: selection._id,
+                              quantityServings: quantity,
+                              version: selection.version,
+                            });
+                            const shortages = await menuSync().syncPrepForDish({
+                              id: selection._id,
+                              eventId: selection.eventId,
+                              dishId: selection.dishId,
+                              quantityServings: quantity,
+                              specialInstructions:
+                                selection.specialInstructions,
+                            });
+                            setStockShortages(shortages);
+                          });
+                        })();
                       }}
                     >
                       Adjust
@@ -234,15 +369,32 @@ export function EventMenuPage() {
                       className="btn btn-ghost btn-sm"
                       disabled={busy != null}
                       onClick={() => {
-                        const reason = window.prompt("Removal reason")?.trim();
-                        if (!reason) return;
-                        void run(`remove:${selection._id}`, async () => {
-                          await removeDish({
-                            docId: selection._id,
-                            reason,
-                            version: selection.version,
+                        void (async () => {
+                          const reason = await prompt.askReason({
+                            ...ReasonCopy.removeLine,
+                            title: "Remove event dish",
+                            description:
+                              "Record why this dish is leaving the event menu.",
+                            confirmLabel: "Remove dish",
+                            tone: "danger",
                           });
-                        });
+                          if (!reason) return;
+                          void run(`remove:${selection._id}`, async () => {
+                            await removeDish({
+                              docId: selection._id,
+                              reason,
+                              version: selection.version,
+                            });
+                            const shortages =
+                              await menuSync().syncRecipeDemands(eventId, {
+                                id: selection._id,
+                                eventId: selection.eventId,
+                                dishId: selection.dishId,
+                                quantityServings: 0,
+                              });
+                            setStockShortages(shortages);
+                          });
+                        })();
                       }}
                     >
                       Remove

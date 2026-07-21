@@ -2,13 +2,13 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "931313d5935eeafa6e2a526ec739f02357ca25a4413dbb0eaa7076fd8a8b1be2"
+      "sha256": "879a840942e5c12d2d25b577b5b60a91834910823d21b84c741d6814224fe7a8"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
     },
     "convex/http.ts": {
-      "sha256": "02dc048145e05beac87cc146e27f419348e00d777507401457a35ce1f4d944e1"
+      "sha256": "b7327c2928c589a2f2505ef255dadcd1542ddccbfe4a44ba30fa26d17e418477"
     },
     "convex/lib/authContext.ts": {
       "sha256": "7c726bab0da4120297b4503561513c6c33b17f2b24bf9b0061fb83b5e0151ff4"
@@ -17,19 +17,19 @@
       "sha256": "075f3e463eb1092530df76b0dd6a25a12277c68308d39a78e06e859d59cae07e"
     },
     "convex/mutations.ts": {
-      "sha256": "df4ae2375a6e847310b12020bd4db6a547907f9d42f8cebfc51a970d06245dee"
+      "sha256": "2f8fcb0020e32d4d4479e3a4a6169674e1205fa20f669d491f979d186cec9bc7"
     },
     "convex/queries.ts": {
-      "sha256": "a4706e0fbb0bc9734955e13b63f34ce89b937cad5cb93928f825ded2bc5ab920"
+      "sha256": "e55f98b45d5dc25bea4968fcec853f9148cb6aca8bbf199ff68b60153205dc28"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "0e81f3781bac8bb0efa6a1ef57243ebdde9522584badc2de43ba546b7b75c69e"
+      "sha256": "a421250efcf59cdab74eb3697edbbf05ce3778e3b3e08da8aa2ba2687fb856af"
     },
     "diagrams/er-diagram.mmd": {
-      "sha256": "bfb996e4f292de6f554650022d778c2ffd30515d82ccb0d46b811d2de360e670"
+      "sha256": "e943ec8462a7aee870d11c851b6a5c23e4f740ed2b74abb83ed463af93ad194f"
     },
     "diagrams/sequence-AvailabilityWindow-declare.mmd": {
       "sha256": "062a7fad8a40b57ef333df41817fa587bdcc5424a92aad0d41bbc23e84b6314f"
@@ -107,10 +107,10 @@
       "sha256": "927801f094ada648e843aa2b0bb339a0609c2dd6ec43c1d3def6f33f8731e75d"
     },
     "diagrams/sequence-Dish-reinstate.mmd": {
-      "sha256": "89ac903880e4f1c55c5e7ca00d320e2121411c98199b68c94b274ef89a2ac82a"
+      "sha256": "d690e373bc5a766bbbc675dbe6495845b8e45506f1cca1f4b921243158445e4f"
     },
     "diagrams/sequence-Dish-retire.mmd": {
-      "sha256": "192be4eee7ad8c59b45404e6c858445b4e75d2ab5f0e09502d9b16f9ab133918"
+      "sha256": "72d7f6db674770cfb3c41aee1b64b748bc6a00b104edefee7e2681f4a97b0e87"
     },
     "diagrams/sequence-Dish-reviseDetails.mmd": {
       "sha256": "00e0dee38bbd42e42110ed11c4ff9838229f91c14c73f0fa5f5667740e8444dd"
@@ -119,10 +119,19 @@
       "sha256": "9497e9cbe5824db87da36f92b34b4c768544f5edd8dbed6b5a3d9993fbd12f88"
     },
     "diagrams/sequence-DishRecipe-attach.mmd": {
-      "sha256": "c6ae0bacab115338d445fbfe699a857c69e98f7492ed86cfee96c3078bc0cae2"
+      "sha256": "cf160dc749e0c93fa2315b2c9a8f201a7bc6fbd7f241497af30f99e56257cb6e"
     },
     "diagrams/sequence-DishRecipe-detach.mmd": {
       "sha256": "238ed36d5819597ec91b9702e2876f101a8b44bc392552ed83e784a47b1bbcdc"
+    },
+    "diagrams/sequence-DishTask-add.mmd": {
+      "sha256": "683556e79d058170ccd3788328b6f8cd8cdc839dae6acdff1311ee1a83549376"
+    },
+    "diagrams/sequence-DishTask-retire.mmd": {
+      "sha256": "b18c96dfc5e1e9125b75025047a0bd77beca2682e99490819f28190d36856a74"
+    },
+    "diagrams/sequence-DishTask-revise.mmd": {
+      "sha256": "16c9eb39ca17a2dd9a2a95811bb57527002d779d6571c4786b3b012ea76d8750"
     },
     "diagrams/sequence-Event-approve.mmd": {
       "sha256": "99e64fbbd0a96c2ce2a56d759a78d72b091417a204ddd6051110ac0c86ee686a"
@@ -158,10 +167,10 @@
       "sha256": "d68381a6a1ffba316c2c276420f66ccff4b76fd9add927e75fe3a9af74bb6844"
     },
     "diagrams/sequence-Event-planEngagement.mmd": {
-      "sha256": "191dd39f1b87364f7eed56448adf6722da7cb8c34a020ca1d63e5226a9036565"
+      "sha256": "3781fb9a3dfd3898b35f153e0945a3a2f7c7cd749cf3e6976bd444497f5b128f"
     },
     "diagrams/sequence-Event-reschedule.mmd": {
-      "sha256": "ae2a8d82a116f102c0d4c4244c9453c34ea8830eb3421e235471ff74e656f658"
+      "sha256": "a252309b58dd4a0f9acf625126aaa0fb61511a434d9d0756ff77b538e005ca0a"
     },
     "diagrams/sequence-Event-returnToPlanning.mmd": {
       "sha256": "258a3f75a199beccd0d81cdd24a078c82be3b539dbad4d272433a5ba9fba06c1"
@@ -197,7 +206,7 @@
       "sha256": "a91facb1686fd47eb90373789812bc356a9769f4e65e525551f062c145844d78"
     },
     "diagrams/sequence-EventDish-addToEvent.mmd": {
-      "sha256": "99019ca3840b40668f54ab262c12f69798d135fc656948fef9b6805151765140"
+      "sha256": "02c7953b7531fd693dc0044d00e46a045e9a36884868abfe78bad025b09042d6"
     },
     "diagrams/sequence-EventDish-adjustServings.mmd": {
       "sha256": "e593807c284cb5ba23bd825cb319a623676e0f87f1fd1662d156b0fe7650eb72"
@@ -210,6 +219,9 @@
     },
     "diagrams/sequence-EventDish-updateInstructions.mmd": {
       "sha256": "540321d972b3fa7a87eb26896756d976b0fcbf951d9dd4b90b83661ce01d3640"
+    },
+    "diagrams/sequence-EventDishRecipeSeed-seed.mmd": {
+      "sha256": "2ba4bb0da32b1c9bea61b08aec4653ef1618d16df0d24688539240eb2262805e"
     },
     "diagrams/sequence-EventGuest-assignTable.mmd": {
       "sha256": "dd0a8e6776c4aff461a33f299ac99752b3da5ea6cc0ad359e65f0f57626652d1"
@@ -228,6 +240,15 @@
     },
     "diagrams/sequence-EventGuest-withdraw.mmd": {
       "sha256": "1265afe422d2726df9b12b58968664bd8da2bd2eb14fde73f493efbe57bab341"
+    },
+    "diagrams/sequence-EventIngredientContribution-record.mmd": {
+      "sha256": "495c065bcc0c601f1c42b85494037ee4e3db5ff818bbd4fdb7709286dd8105ea"
+    },
+    "diagrams/sequence-EventIngredientContribution-retire.mmd": {
+      "sha256": "c76eccd34078a7ca8df6e4a501fbc2d73fd3379a6ea9233e6d086dfbfd1e14b5"
+    },
+    "diagrams/sequence-EventIngredientContribution-revise.mmd": {
+      "sha256": "93e41085dae68ca9f24350836cf93cbc41dc2c45bfaa1d7d919cb7b65dbab55a"
     },
     "diagrams/sequence-Incident-beginInvestigation.mmd": {
       "sha256": "723b165706fe81defddde6a3dbb8bfe02bf2984c21132c93e5fb81614056ba21"
@@ -248,10 +269,13 @@
       "sha256": "b0047e4ab67056b8225ded8084ba16d4c472353ffc2b40111e27b0f02951a912"
     },
     "diagrams/sequence-Ingredient-introduce.mmd": {
-      "sha256": "6703f8cc07a25508748ddf40f9890c9a8fa4edb4314b955825bea047007a9477"
+      "sha256": "6cb4a8eb881a698dd18bd68b1c116e9af61d2d3c28454b5e4f96f75e970a0252"
     },
     "diagrams/sequence-Ingredient-reinstate.mmd": {
       "sha256": "1e57dbe5bd179802f4ad1ca07b62084dcab0fb44a0b35a98dc42ad4403d87004"
+    },
+    "diagrams/sequence-Ingredient-setPreferredVendor.mmd": {
+      "sha256": "32d2a21568a65d2f91f9929fd67a767ff3aa6a070d6064f36e1dabfffc7dbfae"
     },
     "diagrams/sequence-Ingredient-updateCosting.mmd": {
       "sha256": "258a523420cea385d21e170712d11ef310f68f1b7ed02019153ee25e871a571c"
@@ -260,19 +284,28 @@
       "sha256": "e24fe232b1711e3fc1377b3adc52ea3da3f0e52f218340be85bc57b70fe39459"
     },
     "diagrams/sequence-IngredientDemand-calculate.mmd": {
-      "sha256": "9f4f66ab766296a9745ec4fba67ddaa67ef1c74556de22b0ec810890cecaa7e5"
+      "sha256": "fc3ddda6877f05df563934842186983bdf9f32e999d6517831d9ea0cd9a702ac"
     },
     "diagrams/sequence-IngredientDemand-confirm.mmd": {
-      "sha256": "c25d635a36cc1fd7e646742a2164c8cf0349bd249b0e044bc22b4a5afe4a5d1e"
+      "sha256": "2ccf5d60ae985572b6bd6a87c517dbd763b1e20022e56bff411f686487ea2082"
+    },
+    "diagrams/sequence-IngredientDemand-ensurePurchaseEligible.mmd": {
+      "sha256": "8cfc819db878eb5727acb8c8696263473ae2dc29fd7d682995d0aaa4faff84fc"
     },
     "diagrams/sequence-IngredientDemand-fulfill.mmd": {
-      "sha256": "8053861282756245d951b51672f3028559855255ba3fc087c8f0cc358c023a0b"
+      "sha256": "bb3b90245249f917038383fef187ec9176d23a7449fbf4d5059784d36794d49e"
+    },
+    "diagrams/sequence-IngredientDemand-markReleased.mmd": {
+      "sha256": "856aeae8d446da6ebb5861e324f62f83d22e8b520d52e6c401f3f3bf0e2d420f"
     },
     "diagrams/sequence-IngredientDemand-recalculate.mmd": {
       "sha256": "6b6749728abfcf39183e37b210c2feb82a95c170864e9dbe1a8197be8daa31d5"
     },
     "diagrams/sequence-IngredientDemand-supersede.mmd": {
-      "sha256": "8dca50f49fcdd28627602db92d921af530f1faed9d05857d6b7077c338c18577"
+      "sha256": "603249aeea09d10bb93b0d908949f422c9948ff89138b87a2400cdc8142f506c"
+    },
+    "diagrams/sequence-IngredientDemand-syncFromContributions.mmd": {
+      "sha256": "77e00bb35f0e7526563c9d3971b0ba1ebc9463fdcf45b81f1804253156743fc0"
     },
     "diagrams/sequence-InventoryItem-adjustQuantity.mmd": {
       "sha256": "d946dd0b76ebb72c1afdef9b4b73c779dee7c5d184de94b25fb8bee5eb0fd0b1"
@@ -287,7 +320,7 @@
       "sha256": "8535e438b4775a9c2caf69afb2676feca2acaba37135a0f83e4955e2099a8bfe"
     },
     "diagrams/sequence-InventoryItem-remove.mmd": {
-      "sha256": "23ee3d816f496cd2d34342aa59d7c6f8d611744db1efc9061384363a65edc8e2"
+      "sha256": "dc585bdcf155e5aed79d0c1ea08944829187749cf3d31f2111267fcef4a35386"
     },
     "diagrams/sequence-InventoryItem-transferIn.mmd": {
       "sha256": "101523c6c65321c4d654bd109e70093db095da385c58cdff4e0a0fa9a5eabfcb"
@@ -482,10 +515,16 @@
       "sha256": "35165ef8f1ee3a01673536f3bd7e7a5de50998cb6d1d7ad8d491603845567402"
     },
     "diagrams/sequence-PrepTask-open.mmd": {
-      "sha256": "68d5e71d6e98b2a2e3c1bc10d4ad7080ccc9fe65f2cfec18c0d5875f78d93498"
+      "sha256": "b39b3fdd38ffd98c59ef91d438febaeabf4189ebfd5c443b31df877cfbf9ea75"
+    },
+    "diagrams/sequence-PrepTask-refreshGenerated.mmd": {
+      "sha256": "62274491ce223665962a7a5ae0f968bafc1cf80b417f9243f808c52d7d7e5a98"
     },
     "diagrams/sequence-PrepTask-release.mmd": {
       "sha256": "67bd6ba2cc2c460480fadbe6f41c672788a522dd9b0a48855ee5c9b57c831a6c"
+    },
+    "diagrams/sequence-PrepTask-revise.mmd": {
+      "sha256": "8d0f3ad5f44d1a68995bdab5483fbbf6c117c6d9f644dbb1304cbf10415d6e64"
     },
     "diagrams/sequence-PrepTask-start.mmd": {
       "sha256": "d72d0797bbdbb69920ff9ea88893ea2c80ddf7a995b925282e1c23ae5e3f30c0"
@@ -500,7 +539,7 @@
       "sha256": "205d9c3ab87320ceafc4453f39e25f44a66bfb8c08828bc1263db53e3ee4b8eb"
     },
     "diagrams/sequence-ProductionBatch-plan.mmd": {
-      "sha256": "f9578d6b0181c4dc322e345003325f081ea831c0b4110db87ebbdaa52acbfc30"
+      "sha256": "284fe4a7ad57c43a54e7efebc7d5595914c167a5f68863f5b3e0d3e201307288"
     },
     "diagrams/sequence-ProductionBatch-start.mmd": {
       "sha256": "4c76d7c32a0a8e0784fa2cdc1f3564da805bdee4b646125840984f29ad602938"
@@ -524,13 +563,13 @@
       "sha256": "deea417e9feffcd17de85c26cb4660c6d2175e23168730f0cd2c5a2c298da93d"
     },
     "diagrams/sequence-PurchaseNeed-assignToDraft.mmd": {
-      "sha256": "a1462233401469bdd7c2ada97a89b70be75582504591e3b84de430da2e0386c0"
+      "sha256": "9b1e322f7e23165773d26b78b3698285777ffb6bfe24cf820497bba8a719d7f5"
     },
     "diagrams/sequence-PurchaseNeed-cancel.mmd": {
       "sha256": "1207d4b5ef29abb754ac75133e5cb33aa973661ee230c81efde7036e9b4de9d5"
     },
     "diagrams/sequence-PurchaseNeed-create.mmd": {
-      "sha256": "6adf742141caa6429636a706972b18c1fa0994f75f35e74c0edbab5047be109b"
+      "sha256": "d625a30cfe4fbddc4a38fcf1175dc4757c1e4ef38a54f0d0070dd4a3c8cd3d68"
     },
     "diagrams/sequence-PurchaseNeed-markDraftOrdered.mmd": {
       "sha256": "0136acd0d718b413fc2f526fdce0beb96a27567aada8e81d4a077df81990805f"
@@ -540,6 +579,9 @@
     },
     "diagrams/sequence-PurchaseNeed-markOrdered.mmd": {
       "sha256": "aecc6f792ea3a3d5f178af915ca41277bca664318f01cec75f1910a768cef5e9"
+    },
+    "diagrams/sequence-PurchaseNeed-reviseRequired.mmd": {
+      "sha256": "3dfe3c6250c79246702547b99d4df2ec92fd8a7cfe57711da8b606358eb114f4"
     },
     "diagrams/sequence-Qualification-expire.mmd": {
       "sha256": "df38eff99c4a73c269ff79064300ef9fdfad57521166d6cb1ad489f80c4b0714"
@@ -725,10 +767,13 @@
       "sha256": "1f30f1cc9af92edc2f7377b2b2983a2ceffde7130f131005ad80ec0d11965f44"
     },
     "diagrams/sequence-VendorOrder-cancel.mmd": {
-      "sha256": "40464ea33f5f3dbe53cc494c377536721ed98785560e6a6037463720c30a474a"
+      "sha256": "973dc513032d22eb149e449ba766a1734fcbff397673bed4602255165e59d269"
     },
     "diagrams/sequence-VendorOrder-confirm.mmd": {
       "sha256": "0be199141695f619b246464ba9c98dca43da3cef4ab3819a4d80c020f9a0e3e2"
+    },
+    "diagrams/sequence-VendorOrder-ensureWeeklyDraft.mmd": {
+      "sha256": "76741546e66057443cc30c677fcb3363eefb9cfd1592b1a1cf3adc06dbfa4fb8"
     },
     "diagrams/sequence-VendorOrder-markPartiallyReceived.mmd": {
       "sha256": "3db3a6044fce57990ca1a3b4547f3ed557de82a7b00a31124ff861a40541b44f"
@@ -749,10 +794,25 @@
       "sha256": "e4cb4ad7e4e4d5c46682d54abc1746b71d49953218b18743908a8e3182c1b641"
     },
     "diagrams/sequence-VendorOrderLine-cancelLine.mmd": {
-      "sha256": "69698c7e93ed5f9957c6a580321503f54f89f2b459a4cc2c4afb7b9600d0548c"
+      "sha256": "25eee96825cfd3cc888c0b25615b78511067fe98794596b18b8c7e12a8d7b651"
+    },
+    "diagrams/sequence-VendorOrderLine-ensureWeeklyLine.mmd": {
+      "sha256": "610b592870ccfe3fbc2efe6c34270c415482a6f323096ae1f84f463e0116deda"
     },
     "diagrams/sequence-VendorOrderLine-recordReceipt.mmd": {
       "sha256": "e17858175dc5b40db36fbaf3b35fd5bf62da4a6ac1aea0c60c10538155ac271e"
+    },
+    "diagrams/sequence-VendorOrderLine-reviseQuantity.mmd": {
+      "sha256": "51627e4e6014cf4e6b4f5d8104f3d7567b7c659f9aab86d4b83fb4d96be03cd0"
+    },
+    "diagrams/sequence-VendorOrderLineDemand-link.mmd": {
+      "sha256": "2b5ece0996cdbf365bdad33e95c672e4c8f18bd53ce1c92628742ea215622689"
+    },
+    "diagrams/sequence-VendorOrderLineDemand-retire.mmd": {
+      "sha256": "5dec7006d8f94a274d4afbe7b5d69716a8637fa1190c7f366c7abfb33514c670"
+    },
+    "diagrams/sequence-VendorOrderLineDemand-revise.mmd": {
+      "sha256": "255597c76b255f99ee6403b83761b7381f62d79965cc2f526a0c694b309c5a7b"
     },
     "diagrams/sequence-Venue-activate.mmd": {
       "sha256": "a37333b67854d1eb586d16ecbd145528d25ac1506bbb9d4bda8f12e3a8176683"
@@ -770,48 +830,54 @@
       "sha256": "6c6fc764eae04a4034977c6a440cb45c1ca2ed5ddafdc98614f7eb21b33cba9f"
     },
     "diagrams/sequence-WasteRecord-record.mmd": {
-      "sha256": "a5d2eacf4eb561a7d6a5f9f69c109ea388f057f86644435f793e338da1e46439"
+      "sha256": "1ec939322ccaea4fa58a0dc281e3130764e5ee02616a8fd0f5f862c2bd7ccb34"
     },
     "diagrams/sequence-WasteRecord-voidRecord.mmd": {
       "sha256": "6ec1d4bf6b8feb50bb63ceb03beea870516f5a352dea13b2771b4e489e7c525f"
     },
+    "diagrams/sequence-WeeklyPurchasingConfig-configure.mmd": {
+      "sha256": "2c44119eda1d9e54a629ee4f1d4909b8fa6ff0d57bf0d9523b101128a44557c3"
+    },
+    "diagrams/sequence-WeeklyPurchasingConfig-routeNeed.mmd": {
+      "sha256": "cd928fd6c3a0b07f62de709c125e7abd923866430b962bf0f4cfe88a6acbca91"
+    },
     "manifest-context-summary.json": {
-      "sha256": "91648416d9278fa4ad8f893804d609c644224691404581eaa90814bd3121c211"
+      "sha256": "51ad2c4aabcc2f62073b632d0d3ce9c9c36f0a6e8ffa598c378f8f71f22ff98f"
     },
     "package.json": {
-      "sha256": "a798ffaea8d94a2a9c0cef44a4566eac82c17aadba6bc10abd77c2b254b55384"
+      "sha256": "7e473f5663af5ee8b406f88f8027c8e893630e4dfc35de2903b2c506886fa866"
     },
     "PRESET.md": {
       "sha256": "d6a4c74ee34c02ed5af5166190a8dab595f6d195bf1d13b6706262c0f4501585"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "6976dea37908e07b67a24b47e76320532b7d26bf83489fbd88979a0db05ba7e9"
+      "sha256": "01ef05afc4c303c8a7cc6016fcd666993c1c4f8c32f1bec2975ddac1efe433f9"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "850c913debb44970804b8de42e010b4ff0e59b3cf13f38eca75efc5a6b0cd2f3"
+      "sha256": "ff9e4a366900cb4687edead6ff6bda6fc2320f84899703bc88b80a6eff9764ac"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "6a654e44cee14a462b88d8db1d5cb16866ba9b6193af2ce223393df109b5009e"
+      "sha256": "59bf72870b290da6db199e3522e02448021706959701cf40abb2807039b0bc00"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "8b798f157aaf0e7238d484e20a37504f8cfc7bf9d086de552efec361cd990ecc"
+      "sha256": "f3656db15759f51bfef30c5b67ef9459b42b5a021b86c3dca1ded5e9e982da43"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "0ea149097f12d94dcac3c7edc698d32bebce4ca61c8689d65203afb1cef1f02f"
+      "sha256": "97b3a447366efce649adcbb37825a51f191e763656eeb66ad7594c56b54a7d92"
     },
     "tests/manifest-convex.contract.test.ts": {
-      "sha256": "e9ff5e245708b6ba115a23742cbdfd03a0a636fbb9c6e40ab602c91d09037fed"
+      "sha256": "d052f8272c5f133a9f0df06bdb796506d972bc0b5e9f00506bee34cf1f2e60fe"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "d209993262372f7227ef7589b3793ead8c57e738e95ec830e0b8440f1f04bacc"
+      "sha256": "185d8e87328233ec2f5982107d0612f26b40c4e171ff4397bf12dbedccb5d00c"
     }
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "^3.6.24",
+      "@angriff36/manifest": "^3.6.41",
       "convex": "^1.0.0",
       "zod": "^3.23.0"
     },
@@ -851,6 +917,7 @@
       "src/logistics/pack-list.manifest",
       "src/logistics/packing.manifest",
       "src/operations/event.manifest",
+      "src/procurement/event-purchasing.manifest",
       "src/procurement/order.manifest",
       "src/procurement/purchase-need.manifest",
       "src/procurement/vendor.manifest",

@@ -1,0 +1,264 @@
+import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
+import {
+  useCreateEventCloseout,
+  useEventCloseoutFinalize,
+  useListEvent,
+  useListEventCloseout,
+} from "../../lib/manifest-convex-react";
+import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  CloseoutCaptureForm,
+  CloseoutCapturePayloadBuilder,
+} from "./CloseoutCaptureForm";
+import { CloseoutLifecyclePolicy } from "./CloseoutLifecyclePolicy";
+import { FinanceFailureBanner } from "./FinanceFailureBanner";
+import { FINANCE_ROUTES } from "./financeRoutes";
+import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+
+const policy = new CloseoutLifecyclePolicy();
+const payloadBuilder = new CloseoutCapturePayloadBuilder();
+
+export function CloseoutPage() {
+  const closeouts = useListEventCloseout();
+  const events = useListEvent();
+  const createCloseout = useCreateEventCloseout();
+  const finalize = useEventCloseoutFinalize();
+  const [showCapture, setShowCapture] = useState(false);
+  const [showFinalized, setShowFinalized] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [failure, setFailure] = useState<unknown>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+
+  const activeCloseouts = (closeouts ?? []).filter(
+    (row) => row.deletedAt == null,
+  );
+  const visibleRows = showFinalized
+    ? activeCloseouts
+    : activeCloseouts.filter((row) => String(row.status) !== "finalized");
+  const closedOutEventIds = new Set(
+    activeCloseouts.map((row) => String(row.eventId)),
+  );
+  const capturableEvents = (events ?? []).filter(
+    (event) =>
+      event.deletedAt == null &&
+      String(event.stage) === "closed_out" &&
+      !closedOutEventIds.has(event._id),
+  );
+
+  const eventFor = (id: string) => events?.find((event) => event._id === id);
+  const eventTitle = (id: string) => eventFor(id)?.title ?? "Unknown event";
+
+  const run = async (key: string, work: () => Promise<void>) => {
+    setFailure(null);
+    setNotice(null);
+    setBusy(key);
+    try {
+      await work();
+    } catch (error) {
+      setFailure(error);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const submitCapture = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+    try {
+      const payload = payloadBuilder.fromForm(new FormData(form));
+      void run("capture-closeout", async () => {
+        await createCloseout(payload);
+        form.reset();
+        setShowCapture(false);
+        setNotice(
+          "Closeout captured as draft. Finalize when numbers are final.",
+        );
+      });
+    } catch (error) {
+      setFailure(error);
+    }
+  };
+
+  const invokeFinalize = (row: { _id: string; version: number }) => {
+    void run(`${row._id}:finalize`, async () => {
+      await finalize({ docId: row._id, version: row.version });
+      setNotice("Closeout finalized. Numbers are frozen.");
+    });
+  };
+
+  const loading = closeouts === undefined || events === undefined;
+
+  return (
+    <div className="operations-stage supply-stage">
+      <header className="supply-masthead">
+        <div>
+          <p className="eyebrow">Finance · Closeout</p>
+          <h1 className="display-title mt-2">Event closeouts</h1>
+          <p className="mt-3 max-w-160 text-ink-2">
+            Capture reconciled revenue, cost, and headcount for a closed-out
+            event, then finalize to freeze the folio.
+          </p>
+        </div>
+        <div className="supply-row-actions">
+          <button
+            className="btn btn-ghost"
+            type="button"
+            onClick={() => setShowFinalized((value) => !value)}
+          >
+            {showFinalized ? "Hide finalized" : "Show finalized"}
+          </button>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={() => setShowCapture((value) => !value)}
+          >
+            {showCapture ? "Close form" : "Capture closeout"}
+          </button>
+        </div>
+      </header>
+      <FinanceWorkspaceNav />
+      {failure ? <FinanceFailureBanner error={failure} /> : null}
+      {notice ? (
+        <p className="mt-3 text-[13px] text-ink-2" role="status">
+          {notice}
+        </p>
+      ) : null}
+
+      {showCapture ? (
+        <CloseoutCaptureForm
+          events={capturableEvents}
+          busy={busy === "capture-closeout"}
+          onSubmit={submitCapture}
+        />
+      ) : null}
+
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">Reconciliation</p>
+            <h2>Closeout folios</h2>
+          </div>
+          <span>{visibleRows.length} closeouts</span>
+        </div>
+        {loading ? (
+          <TableSkeleton rows={5} />
+        ) : visibleRows.length === 0 ? (
+          <div className="document-empty">
+            <p>No open closeouts.</p>
+            <span>
+              Capture numbers after an event reaches closed-out stage.{" "}
+              <Link className="text-link" to="/events">
+                Open Events
+              </Link>
+            </span>
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setShowCapture(true)}
+              >
+                Capture closeout
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="supply-table-wrap">
+            <table className="supply-table">
+              <thead>
+                <tr>
+                  <th>Event</th>
+                  <th>Gross profit</th>
+                  <th>Headcount</th>
+                  <th>State</th>
+                  <th aria-label="Actions" />
+                </tr>
+              </thead>
+              <tbody>
+                {visibleRows.map((row) => {
+                  const event = eventFor(String(row.eventId));
+                  return (
+                    <tr key={row._id}>
+                      <td>
+                        <Link
+                          className="text-link"
+                          to={`/events/${String(row.eventId)}`}
+                        >
+                          <strong>{eventTitle(String(row.eventId))}</strong>
+                        </Link>
+                        <small>
+                          Revenue{" "}
+                          {Number(row.actualRevenue ?? 0).toLocaleString(
+                            undefined,
+                            { style: "currency", currency: "USD" },
+                          )}
+                        </small>
+                      </td>
+                      <td>
+                        {Number(row.grossProfit ?? 0).toLocaleString(
+                          undefined,
+                          {
+                            style: "currency",
+                            currency: "USD",
+                          },
+                        )}
+                      </td>
+                      <td>
+                        {row.actualHeadcount}/{row.expectedHeadcount}
+                      </td>
+                      <td>
+                        <StatusChip status={String(row.status)} />
+                      </td>
+                      <td>
+                        <div className="supply-row-actions">
+                          {policy
+                            .closeoutActions(String(row.status), row.capturedAt)
+                            .map((action) => (
+                              <button
+                                key={action.key}
+                                className="btn btn-ghost btn-sm"
+                                disabled={busy != null}
+                                onClick={() => invokeFinalize(row)}
+                              >
+                                {busy === `${row._id}:${action.key}`
+                                  ? "Working…"
+                                  : action.label}
+                              </button>
+                            ))}
+                          {event?.clientId ? (
+                            <Link
+                              className="btn btn-ghost btn-sm"
+                              to={FINANCE_ROUTES.issueInvoice({
+                                clientId: String(event.clientId),
+                                eventId: String(row.eventId),
+                              })}
+                            >
+                              Issue invoice
+                            </Link>
+                          ) : null}
+                          {String(row.status) === "finalized" ? (
+                            <span className="text-[12px] text-ink-3">
+                              Frozen
+                            </span>
+                          ) : null}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <p className="mt-4 text-[12px] text-ink-3">
+        Payroll inputs and saved report definitions remain deferred. Use{" "}
+        <Link className="text-link" to={FINANCE_ROUTES.invoices}>
+          Invoices
+        </Link>{" "}
+        for billing collection.
+      </p>
+    </div>
+  );
+}

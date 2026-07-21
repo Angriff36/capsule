@@ -57,6 +57,76 @@ const QualificationsPage = lazy(() =>
     default: module.QualificationsPage,
   })),
 );
+const PackListsPage = lazy(() =>
+  import("../features/logistics/PackListsPage").then((module) => ({
+    default: module.PackListsPage,
+  })),
+);
+const PackListDetailPage = lazy(() =>
+  import("../features/logistics/PackListDetailPage").then((module) => ({
+    default: module.PackListDetailPage,
+  })),
+);
+const DeliveriesPage = lazy(() =>
+  import("../features/logistics/DeliveriesPage").then((module) => ({
+    default: module.DeliveriesPage,
+  })),
+);
+const InvoicesPage = lazy(() =>
+  import("../features/finance/InvoicesPage").then((module) => ({
+    default: module.InvoicesPage,
+  })),
+);
+const InvoiceDetailPage = lazy(() =>
+  import("../features/finance/InvoiceDetailPage").then((module) => ({
+    default: module.InvoiceDetailPage,
+  })),
+);
+const PaymentsPage = lazy(() =>
+  import("../features/finance/PaymentsPage").then((module) => ({
+    default: module.PaymentsPage,
+  })),
+);
+const PaymentMethodsPage = lazy(() =>
+  import("../features/finance/PaymentMethodsPage").then((module) => ({
+    default: module.PaymentMethodsPage,
+  })),
+);
+const CloseoutPage = lazy(() =>
+  import("../features/finance/CloseoutPage").then((module) => ({
+    default: module.CloseoutPage,
+  })),
+);
+const PayrollPage = lazy(() =>
+  import("../features/finance/PayrollPage").then((module) => ({
+    default: module.PayrollPage,
+  })),
+);
+const ReportsPage = lazy(() =>
+  import("../features/reports/ReportsPage").then((module) => ({
+    default: module.ReportsPage,
+  })),
+);
+const ClientsPage = lazy(() =>
+  import("../features/clients/ClientsPage").then((module) => ({
+    default: module.ClientsPage,
+  })),
+);
+const ClientDetailPage = lazy(() =>
+  import("../features/clients/ClientDetailPage").then((module) => ({
+    default: module.ClientDetailPage,
+  })),
+);
+const ProposalsPage = lazy(() =>
+  import("../features/clients/ProposalsPage").then((module) => ({
+    default: module.ProposalsPage,
+  })),
+);
+const ContractsPage = lazy(() =>
+  import("../features/clients/ContractsPage").then((module) => ({
+    default: module.ContractsPage,
+  })),
+);
 
 function SupplyRoute({ children }: { children: ReactNode }) {
   return <Suspense fallback={<TableSkeleton rows={8} />}>{children}</Suspense>;
@@ -75,8 +145,11 @@ class AppErrorBoundary extends Component<
       return (
         <div className="mx-auto mt-16 max-w-120">
           <ErrorState
-            title="Something went wrong"
-            detail={this.state.error.message}
+            title="This screen failed to render"
+            detail={
+              this.state.error.message ||
+              "Reload the page. If it keeps failing, check the browser console for the component stack."
+            }
             onRetry={() => window.location.reload()}
           />
         </div>
@@ -197,6 +270,126 @@ export function App() {
               element={
                 <SupplyRoute>
                   <QualificationsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics"
+              element={<Navigate to="/logistics/packs" replace />}
+            />
+            <Route
+              path="/logistics/packs"
+              element={
+                <SupplyRoute>
+                  <PackListsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/packs/:id"
+              element={
+                <SupplyRoute>
+                  <PackListDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/deliveries"
+              element={
+                <SupplyRoute>
+                  <DeliveriesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance"
+              element={<Navigate to="/finance/invoices" replace />}
+            />
+            <Route
+              path="/finance/invoices"
+              element={
+                <SupplyRoute>
+                  <InvoicesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/invoices/:id"
+              element={
+                <SupplyRoute>
+                  <InvoiceDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/payments"
+              element={
+                <SupplyRoute>
+                  <PaymentsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/payment-methods"
+              element={
+                <SupplyRoute>
+                  <PaymentMethodsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/closeout"
+              element={
+                <SupplyRoute>
+                  <CloseoutPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/payroll"
+              element={
+                <SupplyRoute>
+                  <PayrollPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/reports"
+              element={
+                <SupplyRoute>
+                  <ReportsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients"
+              element={
+                <SupplyRoute>
+                  <ClientsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/proposals"
+              element={
+                <SupplyRoute>
+                  <ProposalsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/contracts"
+              element={
+                <SupplyRoute>
+                  <ContractsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/:id"
+              element={
+                <SupplyRoute>
+                  <ClientDetailPage />
                 </SupplyRoute>
               }
             />

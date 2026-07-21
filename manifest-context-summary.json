@@ -1,18 +1,18 @@
 {
   "$schema": "manifest-context/v1",
   "meta": {
-    "compilerVersion": "3.6.24",
+    "compilerVersion": "3.6.41",
     "schemaVersion": "1.0",
-    "contentHash": "0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:28c985d9ef8a52f4c42e51700b40aeedec2804793893d9e50033e0e1eb61fc1a:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:728e61c032fe46367413548d0842c84d372b976db2ce834510b96157d0a2557b:7a1df129c67a2078408d953496bc407cbeb1b9b0a380949db99617f9a49efc9f:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:870a8d351c294034e14611cdb8d44a851f4985fb246a6ff1f1eff26105d5170c:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:8cb557ab62cbc859dc156f98eca50a0f95809e2065991debfa207a3f7585bba7:9e32b3a907507588d9a813328d43ea85d61feefc1a41b32b59e72ee41c2356bd:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c31bf476c50cabe3d77f4682e5548a0d72703008c7796b1e663955d44fd1282b:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d12bfae4193927591fa0009cb283e0afb124230d008bc18fc1090f536dc86bd5:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f17ecc5a823c4120e3ad70967af44f604b10b3565b2b8034448a1ae9c9245f3f",
+    "contentHash": "153be5b9b94014082c2ecf3f789a56a5f5341623eb666b714a7044232174a257:1ab6083e1a469f8aaf08104169ae3d9a1ca53a91770df4a6ef4e57bfa05c6a10:1e506668fbefd709f384af429ccf3b970daf7143b943b29219c7229605c90f97:21d57d616e827ed9eba8950af310277f2eb66471f5fba0eb3107b6da20518a15:317bb23515379f8c3797f3065e69af8d8ea35f013bcf07410205891f51cb2b71:444a34406a1be59e2318e52618f06e2c024cc5f4b8539eaad99e8688068b5ba0:44817c0e4d994b4f9eaaec0ff77a7354d8c429d3ff64ed2ed697a04afa1ecc61:4b3a8bb3b8a0100eb0c02aea49d373e01fa7f0e403a9d707dc9dc9766112663f:5111ecb9c8543db2375be26fff8638deafdd1c5aeebe5eb098383347a0252960:521cdeef965c39fc3dcb888dfe409087134b9e4fb88195a97285eee2d187fd29:61fee74be61813476c9563e3efbd2e0bb8567052cdc4a9ecdae853f68c6c6a3a:77766fdde34e6bfb38efd3184bf84bf99af350cfcdf58cabbbd913f0a73037b8:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:7b55a406b8fcf935714eb9636512d7c46b73211747ffbb1dd39628d50f256e68:827f770b97190c87315c820e96bd13d93fbc66a3fe633a257a0f0938f73543d6:8d3397fc8c4a274927af3f654a36b9318b077aaca2262d574e8325b167c138fb:91013449fb5b6d6f2dcd45746d7b46bbda19031e1d6da873e2d4e9c02821c560:91fd78bcaab65af1e80ac79531842df3f3bc3ae121aedb26189b0c93850883ea:952203740dd05c52a2ee55ca78f80b811be3bb48449b03126e87f3171ef3179d:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:96ee313de3f29c419df911bc0b8e5f39b5fde7e44ab2e1921fff9af829f6bfb9:99966b159339ed3d6cc1a24f287d64c5be13db08bbf07c6fb855b352c9c256e4:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:a55d023b26a6299c99c87138658384e8f97eb636a0cabeeb80ff159c6a9d1c45:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:b42238d427001b39dbfbd3becd1f66b96f676331afc164c7ccd1209349510271:baf09f81826c20997d670f15d16728a5ff0aa7dc6a9972bb005ceead8bf7433f:bca45b4a706c571e4061fb9a8131be61278b265eea1cf2f4381f27e5a1d638df:c91413f626012769224ca1ab08abe6469f993619bc17a22e6bcd686926832d79:cd648a831023e2befe3dc8a1d9e9e58dc11b27477ee7df4156733631bed767eb:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:dcc4e69c9df237e5972ba749c7e1e76525f0d181301b8d8c2b437cf8eaede1dd:e2230c0ce31b04ea452a5349be34a5841703e415f46c8d0e2f7f1afb914a1761:e542220c6e01b1cde78d80d483bde5d7be7c513aa50cb188a1b61852a2e9d441:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f22810fa49283ef6682ac632621533b3b2d72d92f59e7f47285a2881d1b7ecaf:f688898cf4c0c68871d41e91b8f5999fcde4faf80d7703a080841d3e90649720:fdc28fad241416ceed92a345c3acf5b15954417bb2bda3075aff77e7beebeb45",
     "projection": "llm-context"
   },
   "domain": {
-    "entityCount": 50,
-    "commandCount": 248,
-    "policyCount": 144,
-    "constraintCount": 91,
-    "enumCount": 58,
-    "eventCount": 247,
+    "entityCount": 55,
+    "commandCount": 270,
+    "policyCount": 156,
+    "constraintCount": 95,
+    "enumCount": 59,
+    "eventCount": 259,
     "modules": [],
     "multiTenant": true
   },
@@ -1317,6 +1317,11 @@
           "name": "recipeLines",
           "kind": "hasMany",
           "target": "DishRecipe"
+        },
+        {
+          "name": "prepTasks",
+          "kind": "hasMany",
+          "target": "DishTask"
         }
       ],
       "constraints": [
@@ -1419,6 +1424,24 @@
           "defaultValue": 0
         },
         {
+          "name": "yieldQuantity",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 1
+        },
+        {
+          "name": "batchMultiplier",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 1
+        },
+        {
           "name": "role",
           "type": "string | null",
           "required": false,
@@ -1498,6 +1521,250 @@
       ]
     },
     {
+      "name": "DishTask",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "dishId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required",
+            "searchable"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "finish_at_event"
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "manual"
+        },
+        {
+          "name": "defaultQuantity",
+          "type": "decimal | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "defaultUnit",
+          "type": "UnitOfMeasure | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "sortOrder",
+          "type": "int",
+          "required": false,
+          "modifiers": [],
+          "defaultValue": 0
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "instructions",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "status",
+          "type": "DishTaskStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "active"
+        },
+        {
+          "name": "activeAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "retiredAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "retirementReason",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "dish",
+          "kind": "belongsTo",
+          "target": "Dish",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "dishId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "recipe",
+          "kind": "belongsTo",
+          "target": "Recipe",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "recipeId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "ingredient",
+          "kind": "belongsTo",
+          "target": "Ingredient",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "ingredientId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "dishTaskNameComplete",
+          "code": "dishTaskNameComplete",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task name is required",
+          "overrideable": false
+        },
+        {
+          "name": "dishTaskQuantityPositive",
+          "code": "dishTaskQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task quantity must be positive",
+          "overrideable": false
+        },
+        {
+          "name": "dishTaskSortNonnegative",
+          "code": "dishTaskSortNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task sort order cannot be negative",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "add",
+        "retire",
+        "revise"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ],
+      "transitions": [
+        {
+          "property": "status",
+          "from": "active",
+          "to": [
+            "retired"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "retired",
+          "to": [
+            "active"
+          ]
+        }
+      ]
+    },
+    {
       "name": "Event",
       "properties": [
         {
@@ -1570,6 +1837,12 @@
         },
         {
           "name": "endsAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "purchasingWeekStart",
           "type": "datetime | null",
           "required": false,
           "modifiers": []
@@ -2713,6 +2986,12 @@
           "defaultValue": 1
         },
         {
+          "name": "purchasingWeekStart",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "course",
           "type": "string | null",
           "required": false,
@@ -2808,6 +3087,150 @@
         "changeCourse",
         "remove",
         "updateInstructions"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "EventDishRecipeSeed",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "eventDishId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "dishId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "servings",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "yieldQuantity",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 1
+        },
+        {
+          "name": "batchMultiplier",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 1
+        },
+        {
+          "name": "purchasingWeekStart",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "seededAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "eventDish",
+          "kind": "belongsTo",
+          "target": "EventDish",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventDishId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [],
+      "commands": [
+        "seed"
       ],
       "policies": [],
       "key": [
@@ -3033,6 +3456,188 @@
           "from": "declined",
           "to": []
         }
+      ]
+    },
+    {
+      "name": "EventIngredientContribution",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "eventDishId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "dishId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "each"
+        },
+        {
+          "name": "servings",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "purchasingWeekStart",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "recordedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "eventDish",
+          "kind": "belongsTo",
+          "target": "EventDish",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventDishId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "ingredient",
+          "kind": "belongsTo",
+          "target": "Ingredient",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "ingredientId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [],
+      "commands": [
+        "record",
+        "retire",
+        "revise"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
       ]
     },
     {
@@ -3379,6 +3984,12 @@
           "modifiers": []
         },
         {
+          "name": "preferredVendorId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "status",
           "type": "IngredientStatus",
           "required": true,
@@ -3445,6 +4056,11 @@
           "name": "recipeLines",
           "kind": "hasMany",
           "target": "RecipeIngredient"
+        },
+        {
+          "name": "stockLines",
+          "kind": "hasMany",
+          "target": "InventoryItem"
         }
       ],
       "constraints": [
@@ -3470,6 +4086,7 @@
         "discontinue",
         "introduce",
         "reinstate",
+        "setPreferredVendor",
         "updateCosting",
         "updateDetails"
       ],
@@ -3595,6 +4212,20 @@
           "defaultValue": "pending"
         },
         {
+          "name": "purchaseEligibleEventId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": [
+            "indexed"
+          ]
+        },
+        {
+          "name": "purchasingWeekStart",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "calculatedAt",
           "type": "datetime | null",
           "required": false,
@@ -3708,9 +4339,12 @@
       "commands": [
         "calculate",
         "confirm",
+        "ensurePurchaseEligible",
         "fulfill",
+        "markReleased",
         "recalculate",
-        "supersede"
+        "supersede",
+        "syncFromContributions"
       ],
       "policies": [],
       "key": [
@@ -3895,6 +4529,25 @@
           "dependencies": [
             "quantityOnHand",
             "unitCost"
+          ]
+        },
+        {
+          "name": "totalReserved",
+          "type": "decimal",
+          "expression": "[omitted]",
+          "dependencies": [
+            "sum",
+            "reservations",
+            "r"
+          ]
+        },
+        {
+          "name": "availableQuantity",
+          "type": "decimal",
+          "expression": "[omitted]",
+          "dependencies": [
+            "quantityOnHand",
+            "totalReserved"
           ]
         }
       ],
@@ -6484,6 +7137,12 @@
           "defaultValue": ""
         },
         {
+          "name": "dishTaskId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "ingredientId",
           "type": "uuid | null",
           "required": false,
@@ -6496,10 +7155,49 @@
           "modifiers": []
         },
         {
+          "name": "dishId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "recipeId",
           "type": "uuid | null",
           "required": false,
           "modifiers": []
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "finish_at_event"
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "manual"
+        },
+        {
+          "name": "specialInstructions",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "isGenerated",
+          "type": "boolean",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": true
         },
         {
           "name": "quantity",
@@ -6650,6 +7348,36 @@
           }
         },
         {
+          "name": "dishTask",
+          "kind": "belongsTo",
+          "target": "DishTask",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "dishTaskId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "dish",
+          "kind": "belongsTo",
+          "target": "Dish",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "dishId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
           "name": "ingredient",
           "kind": "belongsTo",
           "target": "Ingredient",
@@ -6742,7 +7470,9 @@
         "complete",
         "markBlocked",
         "open",
+        "refreshGenerated",
         "release",
+        "revise",
         "start",
         "unblock"
       ],
@@ -7401,6 +8131,12 @@
           "defaultValue": "each"
         },
         {
+          "name": "purchasingWeekStart",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "vendorOrderId",
           "type": "uuid | null",
           "required": false,
@@ -7562,7 +8298,8 @@
         "create",
         "markDraftOrdered",
         "markFulfilled",
-        "markOrdered"
+        "markOrdered",
+        "reviseRequired"
       ],
       "policies": [],
       "key": [
@@ -10321,7 +11058,7 @@
           "code": "orderSourceRangeComplete",
           "severity": "block",
           "expression": "[omitted]",
-          "message": "Purchase draft date range requires both a start and end",
+          "message": "Order source range requires both a start and end",
           "overrideable": false
         },
         {
@@ -10329,13 +11066,14 @@
           "code": "orderSourceRangeOrdered",
           "severity": "block",
           "expression": "[omitted]",
-          "message": "Purchase draft date range end must not precede its start",
+          "message": "Order source range end must not precede its start",
           "overrideable": false
         }
       ],
       "commands": [
         "cancel",
         "confirm",
+        "ensureWeeklyDraft",
         "markPartiallyReceived",
         "markReceived",
         "open",
@@ -10619,6 +11357,11 @@
               "id"
             ]
           }
+        },
+        {
+          "name": "demandLinks",
+          "kind": "hasMany",
+          "target": "VendorOrderLineDemand"
         }
       ],
       "constraints": [
@@ -10658,7 +11401,9 @@
       "commands": [
         "addLine",
         "cancelLine",
-        "recordReceipt"
+        "ensureWeeklyLine",
+        "recordReceipt",
+        "reviseQuantity"
       ],
       "policies": [],
       "key": [
@@ -10701,6 +11446,172 @@
           "from": "cancelled",
           "to": []
         }
+      ]
+    },
+    {
+      "name": "VendorOrderLineDemand",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "vendorOrderLineId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "ingredientDemandId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "vendorOrderId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "contributionQuantity",
+          "type": "decimal",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 0
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "each"
+        },
+        {
+          "name": "linkedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "removedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "vendorOrderLine",
+          "kind": "belongsTo",
+          "target": "VendorOrderLine",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "vendorOrderLineId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "ingredientDemand",
+          "kind": "belongsTo",
+          "target": "IngredientDemand",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "ingredientDemandId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "vendorOrder",
+          "kind": "belongsTo",
+          "target": "VendorOrder",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "vendorOrderId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "demandLinkQuantityPositive",
+          "code": "demandLinkQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link contribution must be positive",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "link",
+        "retire",
+        "revise"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
       ]
     },
     {
@@ -10998,6 +11909,12 @@
           "modifiers": []
         },
         {
+          "name": "inventoryItemId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "quantity",
           "type": "decimal",
           "required": true,
@@ -11139,6 +12056,21 @@
               "id"
             ]
           }
+        },
+        {
+          "name": "inventoryItem",
+          "kind": "belongsTo",
+          "target": "InventoryItem",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "inventoryItemId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
         }
       ],
       "constraints": [
@@ -11188,6 +12120,92 @@
           "from": "voided",
           "to": []
         }
+      ]
+    },
+    {
+      "name": "WeeklyPurchasingConfig",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "defaultVendorId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "configuredAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "defaultVendor",
+          "kind": "belongsTo",
+          "target": "Vendor",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "defaultVendorId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [],
+      "commands": [
+        "configure",
+        "routeNeed"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
       ]
     }
   ],
@@ -13190,6 +14208,16 @@
           "required": true
         },
         {
+          "name": "yieldQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "batchMultiplier",
+          "type": "decimal",
+          "required": false
+        },
+        {
           "name": "sortOrder",
           "type": "number",
           "required": false
@@ -13212,6 +14240,20 @@
           "severity": "block",
           "expression": "[omitted]",
           "message": "Attach dishId must match the seeded dish reference"
+        },
+        {
+          "name": "attachYieldPositive",
+          "code": "attachYieldPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Attached recipe yield must be positive"
+        },
+        {
+          "name": "attachBatchPositive",
+          "code": "attachBatchPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Attached recipe batch multiplier must be positive"
         }
       ],
       "policies": [
@@ -13228,6 +14270,16 @@
         {
           "kind": "mutate",
           "target": "recipeId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "yieldQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "batchMultiplier",
           "expression": "[omitted]"
         },
         {
@@ -13292,6 +14344,345 @@
       ],
       "emits": [
         "DishRecipeDetached"
+      ]
+    },
+    {
+      "name": "add",
+      "entity": "DishTask",
+      "parameters": [
+        {
+          "name": "dishId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "defaultQuantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "defaultUnit",
+          "type": "UnitOfMeasure",
+          "required": false
+        },
+        {
+          "name": "sortOrder",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "instructions",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "addDishMatch",
+          "code": "addDishMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task dishId must match the seeded Dish reference"
+        },
+        {
+          "name": "addNamePresent",
+          "code": "addNamePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task name is required"
+        },
+        {
+          "name": "addQuantityPositive",
+          "code": "addQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task quantity must be positive"
+        },
+        {
+          "name": "addSortNonnegative",
+          "code": "addSortNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task sort order cannot be negative"
+        }
+      ],
+      "policies": [
+        "dishTaskRead",
+        "dishTaskWrite",
+        "dishTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "dishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "taskType",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "defaultQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "defaultUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sortOrder",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recipeId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "instructions",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "activeAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishTaskAdded"
+      ]
+    },
+    {
+      "name": "retire",
+      "entity": "DishTask",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "retireReasonPresent",
+          "code": "retireReasonPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task retirement reason is required"
+        }
+      ],
+      "policies": [
+        "dishTaskRead",
+        "dishTaskWrite",
+        "dishTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "retiredAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "retirementReason",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishTaskRetired"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "DishTask",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "defaultQuantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "defaultUnit",
+          "type": "UnitOfMeasure",
+          "required": false
+        },
+        {
+          "name": "sortOrder",
+          "type": "number",
+          "required": false
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "instructions",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseNamePresent",
+          "code": "reviseNamePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task name is required"
+        },
+        {
+          "name": "reviseQuantityPositive",
+          "code": "reviseQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task quantity must be positive"
+        },
+        {
+          "name": "reviseSortNonnegative",
+          "code": "reviseSortNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Dish task sort order cannot be negative"
+        }
+      ],
+      "policies": [
+        "dishTaskRead",
+        "dishTaskWrite",
+        "dishTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "taskType",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "defaultQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "defaultUnit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sortOrder",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recipeId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "instructions",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishTaskRevised"
       ]
     },
     {
@@ -13932,6 +15323,11 @@
         },
         {
           "kind": "mutate",
+          "target": "purchasingWeekStart",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
           "target": "venueId",
           "expression": "[omitted]"
         },
@@ -14047,6 +15443,11 @@
         {
           "kind": "mutate",
           "target": "endsAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchasingWeekStart",
           "expression": "[omitted]"
         }
       ],
@@ -14924,6 +16325,11 @@
         },
         {
           "kind": "mutate",
+          "target": "purchasingWeekStart",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
           "target": "course",
           "expression": "[omitted]"
         },
@@ -15114,6 +16520,108 @@
       ],
       "emits": [
         "EventDishInstructionsUpdated"
+      ]
+    },
+    {
+      "name": "seed",
+      "entity": "EventDishRecipeSeed",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "eventDishId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "dishId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "servings",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "yieldQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "batchMultiplier",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "purchasingWeekStart",
+          "type": "datetime",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "eventDishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recipeId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "servings",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "yieldQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "batchMultiplier",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchasingWeekStart",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "seededAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventDishRecipeSeeded"
       ]
     },
     {
@@ -15417,6 +16925,229 @@
       ],
       "emits": [
         "EventGuestWithdrawn"
+      ]
+    },
+    {
+      "name": "record",
+      "entity": "EventIngredientContribution",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "eventDishId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "dishId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        },
+        {
+          "name": "servings",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "purchasingWeekStart",
+          "type": "datetime",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "recordQuantityPositive",
+          "code": "recordQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Contribution quantity must be positive"
+        },
+        {
+          "name": "recordServingsNonnegative",
+          "code": "recordServingsNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Contribution servings cannot be negative"
+        }
+      ],
+      "policies": [
+        "eventIngredientContributionRead",
+        "eventIngredientContributionWrite",
+        "eventIngredientContributionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "eventDishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recipeId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "servings",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchasingWeekStart",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recordedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventIngredientContributionRecorded"
+      ]
+    },
+    {
+      "name": "retire",
+      "entity": "EventIngredientContribution",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "retireReason",
+          "code": "retireReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Retire reason is required"
+        }
+      ],
+      "policies": [
+        "eventIngredientContributionRead",
+        "eventIngredientContributionWrite",
+        "eventIngredientContributionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventIngredientContributionRecorded"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "EventIngredientContribution",
+      "parameters": [
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "servings",
+          "type": "decimal",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseQuantityPositive",
+          "code": "reviseQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Contribution quantity must be positive"
+        }
+      ],
+      "policies": [
+        "eventIngredientContributionRead",
+        "eventIngredientContributionWrite",
+        "eventIngredientContributionExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "servings",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventIngredientContributionRecorded"
       ]
     },
     {
@@ -15815,6 +17546,11 @@
           "name": "category",
           "type": "string",
           "required": false
+        },
+        {
+          "name": "preferredVendorId",
+          "type": "uuid",
+          "required": false
         }
       ],
       "guards": [
@@ -15870,6 +17606,11 @@
         },
         {
           "kind": "mutate",
+          "target": "preferredVendorId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
           "target": "introducedAt",
           "expression": "[omitted]"
         }
@@ -15913,6 +17654,35 @@
       "emits": [
         "IngredientReinstated"
       ]
+    },
+    {
+      "name": "setPreferredVendor",
+      "entity": "Ingredient",
+      "parameters": [
+        {
+          "name": "preferredVendorId",
+          "type": "uuid",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "ingredientRead",
+        "ingredientWrite",
+        "ingredientExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "preferredVendorId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
     },
     {
       "name": "updateCosting",
@@ -16186,6 +17956,11 @@
           "kind": "mutate",
           "target": "calculatedAt",
           "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
         }
       ],
       "emits": [
@@ -16217,11 +17992,38 @@
           "kind": "mutate",
           "target": "confirmedAt",
           "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
         }
       ],
       "emits": [
         "IngredientDemandConfirmed"
       ]
+    },
+    {
+      "name": "ensurePurchaseEligible",
+      "entity": "IngredientDemand",
+      "parameters": [],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "ingredientDemandRead",
+        "ingredientDemandWrite",
+        "ingredientDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
     },
     {
       "name": "fulfill",
@@ -16248,10 +18050,51 @@
           "kind": "mutate",
           "target": "fulfilledAt",
           "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
         }
       ],
       "emits": [
         "IngredientDemandFulfilled"
+      ]
+    },
+    {
+      "name": "markReleased",
+      "entity": "IngredientDemand",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "ingredientDemandRead",
+        "ingredientDemandWrite",
+        "ingredientDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "confirmedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "IngredientDemandReleased"
       ]
     },
     {
@@ -16366,10 +18209,111 @@
           "kind": "mutate",
           "target": "supersedeReason",
           "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
         }
       ],
       "emits": [
         "IngredientDemandSuperseded"
+      ]
+    },
+    {
+      "name": "syncFromContributions",
+      "entity": "IngredientDemand",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "requiredQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        },
+        {
+          "name": "purchasingWeekStart",
+          "type": "datetime",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "ingredientDemandRead",
+        "ingredientDemandWrite",
+        "ingredientDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "target": "nextQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "compute",
+          "target": "previousStatus",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "requiredQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchasingWeekStart",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "calculatedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "IngredientDemandCalculated"
       ]
     },
     {
@@ -16698,6 +18642,7 @@
         }
       ],
       "guards": [
+        "[omitted]",
         "[omitted]",
         "[omitted]",
         "[omitted]"
@@ -20498,6 +22443,36 @@
           "required": false
         },
         {
+          "name": "dishTaskId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "dishId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "specialInstructions",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "isGenerated",
+          "type": "boolean",
+          "required": false
+        },
+        {
           "name": "station",
           "type": "string",
           "required": false
@@ -20595,6 +22570,36 @@
         },
         {
           "kind": "mutate",
+          "target": "dishTaskId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "dishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "taskType",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "specialInstructions",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "isGenerated",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
           "target": "quantity",
           "expression": "[omitted]"
         },
@@ -20621,6 +22626,56 @@
       ],
       "emits": [
         "PrepTaskOpened"
+      ]
+    },
+    {
+      "name": "refreshGenerated",
+      "entity": "PrepTask",
+      "parameters": [
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "specialInstructions",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "refreshQuantityPositive",
+          "code": "refreshQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Generated prep task quantity must be positive"
+        }
+      ],
+      "policies": [
+        "prepTaskRead",
+        "prepTaskWrite",
+        "prepTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "specialInstructions",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PrepTaskGeneratedRefreshed"
       ]
     },
     {
@@ -20668,6 +22723,127 @@
       ],
       "emits": [
         "PrepTaskReleased"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "PrepTask",
+      "parameters": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "quantity",
+          "type": "decimal",
+          "required": false
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "taskType",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "specialInstructions",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": false
+        },
+        {
+          "name": "recipeId",
+          "type": "uuid",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseNamePresent",
+          "code": "reviseNamePresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Prep task name cannot be blank"
+        },
+        {
+          "name": "reviseQuantityPositive",
+          "code": "reviseQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Prep quantity must be positive"
+        }
+      ],
+      "policies": [
+        "prepTaskRead",
+        "prepTaskWrite",
+        "prepTaskExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "name",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "quantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "taskType",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "specialInstructions",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "recipeId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "isGenerated",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PrepTaskRevised"
       ]
     },
     {
@@ -21414,17 +23590,11 @@
       "guards": [
         "[omitted]",
         "[omitted]",
+        "[omitted]",
+        "[omitted]",
         "[omitted]"
       ],
-      "constraints": [
-        {
-          "name": "assignDraftUnlinked",
-          "code": "assignDraftUnlinked",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Purchase need is already linked to an order line"
-        }
-      ],
+      "constraints": [],
       "policies": [
         "purchaseNeedRead",
         "purchaseNeedWrite",
@@ -21529,6 +23699,11 @@
           "name": "unit",
           "type": "UnitOfMeasure",
           "required": true
+        },
+        {
+          "name": "purchasingWeekStart",
+          "type": "datetime",
+          "required": false
         }
       ],
       "guards": [
@@ -21550,6 +23725,16 @@
         "purchaseNeedExecute"
       ],
       "actions": [
+        {
+          "kind": "mutate",
+          "target": "requiredQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchasingWeekStart",
+          "expression": "[omitted]"
+        },
         {
           "kind": "mutate",
           "target": "openedAt",
@@ -21689,6 +23874,46 @@
       ],
       "emits": [
         "PurchaseNeedOrdered"
+      ]
+    },
+    {
+      "name": "reviseRequired",
+      "entity": "PurchaseNeed",
+      "parameters": [
+        {
+          "name": "requiredQuantity",
+          "type": "decimal",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseNeedQuantityPositive",
+          "code": "reviseNeedQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Required quantity must be positive"
+        }
+      ],
+      "policies": [
+        "purchaseNeedRead",
+        "purchaseNeedWrite",
+        "purchaseNeedExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "requiredQuantity",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "PurchaseNeedOpened"
       ]
     },
     {
@@ -25589,6 +27814,88 @@
       ]
     },
     {
+      "name": "ensureWeeklyDraft",
+      "entity": "VendorOrder",
+      "parameters": [
+        {
+          "name": "vendorId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "sourceRangeStart",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "sourceRangeEnd",
+          "type": "datetime",
+          "required": true
+        },
+        {
+          "name": "purchaseNeedId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "ingredientDemandId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "requiredQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "vendorOrderRead",
+        "vendorOrderWrite",
+        "vendorOrderExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "vendorId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceRangeStart",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "sourceRangeEnd",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "openedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VendorOrderWeeklyDraftEnsured"
+      ]
+    },
+    {
       "name": "markPartiallyReceived",
       "entity": "VendorOrder",
       "parameters": [],
@@ -25716,14 +28023,14 @@
           "code": "openSourceRangeComplete",
           "severity": "block",
           "expression": "[omitted]",
-          "message": "Purchase draft date range requires both a start and end"
+          "message": "Open source range requires both a start and end"
         },
         {
           "name": "openSourceRangeOrdered",
           "code": "openSourceRangeOrdered",
           "severity": "block",
           "expression": "[omitted]",
-          "message": "Purchase draft date range end must not precede its start"
+          "message": "Open source range end must not precede its start"
         }
       ],
       "policies": [
@@ -26083,6 +28390,126 @@
       ]
     },
     {
+      "name": "ensureWeeklyLine",
+      "entity": "VendorOrderLine",
+      "parameters": [
+        {
+          "name": "vendorOrderId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "weekNeed",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "onHand",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "contributionQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        },
+        {
+          "name": "unitCost",
+          "type": "money",
+          "required": true
+        },
+        {
+          "name": "purchaseNeedId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "ingredientDemandId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "ensureContributionPositive",
+          "code": "ensureContributionPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Contribution quantity must be positive"
+        }
+      ],
+      "policies": [
+        "vendorOrderLineRead",
+        "vendorOrderLineWrite",
+        "vendorOrderLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "compute",
+          "target": "orderQty",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "vendorOrderId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientDemandId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "orderedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unitCost",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "addedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VendorOrderLineWeeklyEnsured"
+      ]
+    },
+    {
       "name": "recordReceipt",
       "entity": "VendorOrderLine",
       "parameters": [
@@ -26197,6 +28624,263 @@
       ],
       "emits": [
         "VendorOrderLineReceived"
+      ]
+    },
+    {
+      "name": "reviseQuantity",
+      "entity": "VendorOrderLine",
+      "parameters": [
+        {
+          "name": "orderedQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unitCost",
+          "type": "money",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseLineQuantityPositive",
+          "code": "reviseLineQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Ordered quantity must be positive"
+        },
+        {
+          "name": "reviseLineCostNonnegative",
+          "code": "reviseLineCostNonnegative",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Unit cost cannot be negative"
+        }
+      ],
+      "policies": [
+        "vendorOrderLineRead",
+        "vendorOrderLineWrite",
+        "vendorOrderLineExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "orderedQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unitCost",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VendorOrderLineQuantityRevised"
+      ]
+    },
+    {
+      "name": "link",
+      "entity": "VendorOrderLineDemand",
+      "parameters": [
+        {
+          "name": "vendorOrderLineId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "ingredientDemandId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "vendorOrderId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "contributionQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "linkLineMatch",
+          "code": "linkLineMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link vendorOrderLineId must match the seeded line reference"
+        },
+        {
+          "name": "linkDemandMatch",
+          "code": "linkDemandMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link ingredientDemandId must match the seeded demand reference"
+        },
+        {
+          "name": "linkOrderMatch",
+          "code": "linkOrderMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link vendorOrderId must match the seeded order reference"
+        },
+        {
+          "name": "linkOrderOwnsLine",
+          "code": "linkOrderOwnsLine",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link vendorOrderId must own the vendor order line"
+        },
+        {
+          "name": "linkQuantityPositive",
+          "code": "linkQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link contribution must be positive"
+        }
+      ],
+      "policies": [
+        "vendorOrderLineDemandRead",
+        "vendorOrderLineDemandWrite",
+        "vendorOrderLineDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "vendorOrderLineId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "ingredientDemandId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "vendorOrderId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "contributionQuantity",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "unit",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "linkedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VendorOrderLineDemandLinked"
+      ]
+    },
+    {
+      "name": "retire",
+      "entity": "VendorOrderLineDemand",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "retireReasonPresent",
+          "code": "retireReasonPresent",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link retirement reason is required"
+        }
+      ],
+      "policies": [
+        "vendorOrderLineDemandRead",
+        "vendorOrderLineDemandWrite",
+        "vendorOrderLineDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "removedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VendorOrderLineDemandRetired"
+      ]
+    },
+    {
+      "name": "revise",
+      "entity": "VendorOrderLineDemand",
+      "parameters": [
+        {
+          "name": "contributionQuantity",
+          "type": "decimal",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "reviseQuantityPositive",
+          "code": "reviseQuantityPositive",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link contribution must be positive"
+        }
+      ],
+      "policies": [
+        "vendorOrderLineDemandRead",
+        "vendorOrderLineDemandWrite",
+        "vendorOrderLineDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "contributionQuantity",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "VendorOrderLineDemandRevised"
       ]
     },
     {
@@ -26705,6 +29389,11 @@
           "required": false
         },
         {
+          "name": "inventoryItemId",
+          "type": "uuid",
+          "required": false
+        },
+        {
           "name": "unitCost",
           "type": "money",
           "required": false
@@ -26736,6 +29425,13 @@
           "severity": "block",
           "expression": "[omitted]",
           "message": "Record locationId must match the seeded location reference"
+        },
+        {
+          "name": "recordStockMatch",
+          "code": "recordStockMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Record inventoryItemId must match the seeded stock reference when provided"
         },
         {
           "name": "recordQuantityPositive",
@@ -26771,6 +29467,11 @@
         {
           "kind": "mutate",
           "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "inventoryItemId",
           "expression": "[omitted]"
         },
         {
@@ -26863,6 +29564,96 @@
       "emits": [
         "WasteVoided"
       ]
+    },
+    {
+      "name": "configure",
+      "entity": "WeeklyPurchasingConfig",
+      "parameters": [
+        {
+          "name": "defaultVendorId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "weeklyPurchasingConfigRead",
+        "weeklyPurchasingConfigWrite",
+        "weeklyPurchasingConfigExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "defaultVendorId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "configuredAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
+    },
+    {
+      "name": "routeNeed",
+      "entity": "WeeklyPurchasingConfig",
+      "parameters": [
+        {
+          "name": "purchaseNeedId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "ingredientDemandId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "ingredientId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "requiredQuantity",
+          "type": "decimal",
+          "required": true
+        },
+        {
+          "name": "unit",
+          "type": "UnitOfMeasure",
+          "required": true
+        },
+        {
+          "name": "purchasingWeekStart",
+          "type": "datetime",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "weeklyPurchasingConfigRead",
+        "weeklyPurchasingConfigWrite",
+        "weeklyPurchasingConfigExecute"
+      ],
+      "actions": [],
+      "emits": [
+        "PurchaseNeedReadyForWeeklyDraft"
+      ]
     }
   ],
   "policies": [
@@ -26940,8 +29731,8 @@
       "name": "clientRead",
       "entity": "Client",
       "action": "read",
-      "expression": "roleAllows(user.role, \"salesAccess\")",
-      "message": "Sales staff may read client accounts"
+      "expression": "roleAllows(user.role, \"salesAccess\") or roleAllows(user.role, \"financeAccess\")",
+      "message": "Sales and finance may read client accounts for CRM and billing"
     },
     {
       "name": "clientWrite",
@@ -27026,6 +29817,27 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"kitchenAccess\")",
       "message": "Kitchen staff may write dish recipe composition through commands"
+    },
+    {
+      "name": "dishTaskExecute",
+      "entity": "DishTask",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may execute dish task template commands"
+    },
+    {
+      "name": "dishTaskRead",
+      "entity": "DishTask",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may read dish task templates"
+    },
+    {
+      "name": "dishTaskWrite",
+      "entity": "DishTask",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"kitchenAccess\")",
+      "message": "Kitchen staff may write dish task templates through commands"
     },
     {
       "name": "dishWrite",
@@ -27126,6 +29938,27 @@
       "message": "Event staff may write guest attendance through commands"
     },
     {
+      "name": "eventIngredientContributionExecute",
+      "entity": "EventIngredientContribution",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory and managers may execute event ingredient contributions"
+    },
+    {
+      "name": "eventIngredientContributionRead",
+      "entity": "EventIngredientContribution",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory and managers may read event ingredient contributions"
+    },
+    {
+      "name": "eventIngredientContributionWrite",
+      "entity": "EventIngredientContribution",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory and managers may write event ingredient contributions"
+    },
+    {
       "name": "eventRead",
       "entity": "Event",
       "action": "read",
@@ -27164,22 +29997,22 @@
       "name": "ingredientDemandExecute",
       "entity": "IngredientDemand",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may execute ingredient demand commands"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory staff and event managers may execute ingredient demand commands"
     },
     {
       "name": "ingredientDemandRead",
       "entity": "IngredientDemand",
       "action": "read",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may read ingredient demand"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory staff and event managers may read ingredient demand"
     },
     {
       "name": "ingredientDemandWrite",
       "entity": "IngredientDemand",
       "action": "write",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may write ingredient demand through commands"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory staff and event managers may write ingredient demand through commands"
     },
     {
       "name": "ingredientExecute",
@@ -27227,22 +30060,22 @@
       "name": "inventoryReservationExecute",
       "entity": "InventoryReservation",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may execute inventory reservation commands"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"eventManageAccess\")",
+      "message": "Inventory staff or event managers may execute reservation commands"
     },
     {
       "name": "inventoryReservationRead",
       "entity": "InventoryReservation",
       "action": "read",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may read inventory reservations"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"eventManageAccess\")",
+      "message": "Inventory staff or event managers may read inventory reservations"
     },
     {
       "name": "inventoryReservationWrite",
       "entity": "InventoryReservation",
       "action": "write",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may write inventory reservations through commands"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"eventManageAccess\")",
+      "message": "Inventory staff or event managers may write inventory reservations through commands"
     },
     {
       "name": "invoiceExecute",
@@ -27458,43 +30291,43 @@
       "name": "prepTaskExecute",
       "entity": "PrepTask",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"kitchenAccess\")",
-      "message": "Kitchen staff may execute prep task commands"
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen and event managers may execute prep task commands"
     },
     {
       "name": "prepTaskRead",
       "entity": "PrepTask",
       "action": "read",
-      "expression": "roleAllows(user.role, \"kitchenAccess\")",
-      "message": "Kitchen staff may read prep tasks"
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen and event managers may read prep tasks"
     },
     {
       "name": "prepTaskWrite",
       "entity": "PrepTask",
       "action": "write",
-      "expression": "roleAllows(user.role, \"kitchenAccess\")",
-      "message": "Kitchen staff may write prep tasks through commands"
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen and event managers may write prep tasks through commands"
     },
     {
       "name": "productionBatchExecute",
       "entity": "ProductionBatch",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"kitchenAccess\")",
-      "message": "Kitchen staff may execute production batch commands"
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may execute production batch commands"
     },
     {
       "name": "productionBatchRead",
       "entity": "ProductionBatch",
       "action": "read",
-      "expression": "roleAllows(user.role, \"kitchenAccess\")",
-      "message": "Kitchen staff may read production batches"
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may read production batches"
     },
     {
       "name": "productionBatchWrite",
       "entity": "ProductionBatch",
       "action": "write",
-      "expression": "roleAllows(user.role, \"kitchenAccess\")",
-      "message": "Kitchen staff may write production batches through commands"
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may write production batches through commands"
     },
     {
       "name": "proposalExecute",
@@ -27521,22 +30354,22 @@
       "name": "purchaseNeedExecute",
       "entity": "PurchaseNeed",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may execute purchase need commands"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory staff and managers may execute purchase need commands"
     },
     {
       "name": "purchaseNeedRead",
       "entity": "PurchaseNeed",
       "action": "read",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may read purchase needs"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory staff and managers may read purchase needs"
     },
     {
       "name": "purchaseNeedWrite",
       "entity": "PurchaseNeed",
       "action": "write",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may write purchase needs through commands"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory staff and managers may write purchase needs through commands"
     },
     {
       "name": "qualificationExecute",
@@ -27780,43 +30613,64 @@
       "name": "vendorOrderExecute",
       "entity": "VendorOrder",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"procurementAccess\")",
-      "message": "Procurement staff may execute vendor order commands"
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may execute vendor order commands"
+    },
+    {
+      "name": "vendorOrderLineDemandExecute",
+      "entity": "VendorOrderLineDemand",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may execute order demand link commands"
+    },
+    {
+      "name": "vendorOrderLineDemandRead",
+      "entity": "VendorOrderLineDemand",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may read order demand links"
+    },
+    {
+      "name": "vendorOrderLineDemandWrite",
+      "entity": "VendorOrderLineDemand",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may write order demand links through commands"
     },
     {
       "name": "vendorOrderLineExecute",
       "entity": "VendorOrderLine",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"procurementAccess\")",
-      "message": "Procurement staff may execute vendor order line commands"
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may execute vendor order line commands"
     },
     {
       "name": "vendorOrderLineRead",
       "entity": "VendorOrderLine",
       "action": "read",
-      "expression": "roleAllows(user.role, \"procurementAccess\")",
-      "message": "Procurement staff may read vendor order lines"
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may read vendor order lines"
     },
     {
       "name": "vendorOrderLineWrite",
       "entity": "VendorOrderLine",
       "action": "write",
-      "expression": "roleAllows(user.role, \"procurementAccess\")",
-      "message": "Procurement staff may write vendor order lines through commands"
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may write vendor order lines through commands"
     },
     {
       "name": "vendorOrderRead",
       "entity": "VendorOrder",
       "action": "read",
-      "expression": "roleAllows(user.role, \"procurementAccess\")",
-      "message": "Procurement staff may read vendor orders"
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may read vendor orders"
     },
     {
       "name": "vendorOrderWrite",
       "entity": "VendorOrder",
       "action": "write",
-      "expression": "roleAllows(user.role, \"procurementAccess\")",
-      "message": "Procurement staff may write vendor orders through commands"
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may write vendor orders through commands"
     },
     {
       "name": "vendorRead",
@@ -27873,6 +30727,27 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"inventoryAccess\")",
       "message": "Inventory staff may write waste records through commands"
+    },
+    {
+      "name": "weeklyPurchasingConfigExecute",
+      "entity": "WeeklyPurchasingConfig",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may execute weekly purchasing config"
+    },
+    {
+      "name": "weeklyPurchasingConfigRead",
+      "entity": "WeeklyPurchasingConfig",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may read weekly purchasing config"
+    },
+    {
+      "name": "weeklyPurchasingConfigWrite",
+      "entity": "WeeklyPurchasingConfig",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Procurement and managers may write weekly purchasing config"
     }
   ],
   "constraints": [
@@ -27955,6 +30830,33 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Dish portion size must be positive",
+      "overrideable": false
+    },
+    {
+      "entity": "DishTask",
+      "name": "dishTaskNameComplete",
+      "code": "dishTaskNameComplete",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Dish task name is required",
+      "overrideable": false
+    },
+    {
+      "entity": "DishTask",
+      "name": "dishTaskQuantityPositive",
+      "code": "dishTaskQuantityPositive",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Dish task quantity must be positive",
+      "overrideable": false
+    },
+    {
+      "entity": "DishTask",
+      "name": "dishTaskSortNonnegative",
+      "code": "dishTaskSortNonnegative",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Dish task sort order cannot be negative",
       "overrideable": false
     },
     {
@@ -28611,7 +31513,7 @@
       "code": "orderSourceRangeComplete",
       "severity": "block",
       "expression": "[omitted]",
-      "message": "Purchase draft date range requires both a start and end",
+      "message": "Order source range requires both a start and end",
       "overrideable": false
     },
     {
@@ -28620,7 +31522,7 @@
       "code": "orderSourceRangeOrdered",
       "severity": "block",
       "expression": "[omitted]",
-      "message": "Purchase draft date range end must not precede its start",
+      "message": "Order source range end must not precede its start",
       "overrideable": false
     },
     {
@@ -28657,6 +31559,15 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Unit cost cannot be negative",
+      "overrideable": false
+    },
+    {
+      "entity": "VendorOrderLineDemand",
+      "name": "demandLinkQuantityPositive",
+      "code": "demandLinkQuantityPositive",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Demand link contribution must be positive",
       "overrideable": false
     },
     {
@@ -28838,6 +31749,12 @@
       "name": "recipeLines"
     },
     {
+      "source": "Dish",
+      "target": "DishTask",
+      "kind": "hasMany",
+      "name": "prepTasks"
+    },
+    {
       "source": "DishRecipe",
       "target": "Dish",
       "kind": "belongsTo",
@@ -28862,6 +31779,54 @@
         "fields": [
           "tenantId",
           "recipeId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DishTask",
+      "target": "Dish",
+      "kind": "belongsTo",
+      "name": "dish",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "dishId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DishTask",
+      "target": "Recipe",
+      "kind": "belongsTo",
+      "name": "recipe",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "recipeId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "DishTask",
+      "target": "Ingredient",
+      "kind": "belongsTo",
+      "name": "ingredient",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "ingredientId"
         ],
         "references": [
           "tenantId",
@@ -29092,6 +32057,22 @@
       }
     },
     {
+      "source": "EventDishRecipeSeed",
+      "target": "EventDish",
+      "kind": "belongsTo",
+      "name": "eventDish",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventDishId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "EventGuest",
       "target": "Event",
       "kind": "belongsTo",
@@ -29100,6 +32081,54 @@
         "fields": [
           "tenantId",
           "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventIngredientContribution",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventIngredientContribution",
+      "target": "EventDish",
+      "kind": "belongsTo",
+      "name": "eventDish",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventDishId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventIngredientContribution",
+      "target": "Ingredient",
+      "kind": "belongsTo",
+      "name": "ingredient",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "ingredientId"
         ],
         "references": [
           "tenantId",
@@ -29192,6 +32221,12 @@
       "target": "RecipeIngredient",
       "kind": "hasMany",
       "name": "recipeLines"
+    },
+    {
+      "source": "Ingredient",
+      "target": "InventoryItem",
+      "kind": "hasMany",
+      "name": "stockLines"
     },
     {
       "source": "IngredientDemand",
@@ -29620,6 +32655,38 @@
         "fields": [
           "tenantId",
           "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "PrepTask",
+      "target": "DishTask",
+      "kind": "belongsTo",
+      "name": "dishTask",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "dishTaskId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "PrepTask",
+      "target": "Dish",
+      "kind": "belongsTo",
+      "name": "dish",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "dishId"
         ],
         "references": [
           "tenantId",
@@ -30218,6 +33285,60 @@
       }
     },
     {
+      "source": "VendorOrderLine",
+      "target": "VendorOrderLineDemand",
+      "kind": "hasMany",
+      "name": "demandLinks"
+    },
+    {
+      "source": "VendorOrderLineDemand",
+      "target": "VendorOrderLine",
+      "kind": "belongsTo",
+      "name": "vendorOrderLine",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "vendorOrderLineId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "VendorOrderLineDemand",
+      "target": "IngredientDemand",
+      "kind": "belongsTo",
+      "name": "ingredientDemand",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "ingredientDemandId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "VendorOrderLineDemand",
+      "target": "VendorOrder",
+      "kind": "belongsTo",
+      "name": "vendorOrder",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "vendorOrderId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "Venue",
       "target": "Event",
       "kind": "hasMany",
@@ -30264,6 +33385,38 @@
         "fields": [
           "tenantId",
           "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "WasteRecord",
+      "target": "InventoryItem",
+      "kind": "belongsTo",
+      "name": "inventoryItem",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "inventoryItemId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "WeeklyPurchasingConfig",
+      "target": "Vendor",
+      "kind": "belongsTo",
+      "name": "defaultVendor",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "defaultVendorId"
         ],
         "references": [
           "tenantId",
@@ -30465,6 +33618,17 @@
     },
     {
       "name": "DishStatus",
+      "values": [
+        {
+          "name": "active"
+        },
+        {
+          "name": "retired"
+        }
+      ]
+    },
+    {
+      "name": "DishTaskStatus",
       "values": [
         {
           "name": "active"
@@ -31501,7 +34665,7 @@
     {
       "name": "DishRecipeAttached",
       "channel": "dish_recipe.attached",
-      "payload": "{dishRecipeId: string, tenantId: string, dishId: string, recipeId: string, sortOrder: number, role: string | null}"
+      "payload": "{dishRecipeId: string, tenantId: string, dishId: string, recipeId: string, yieldQuantity: number, batchMultiplier: number, sortOrder: number, role: string | null}"
     },
     {
       "name": "DishRecipeDetached",
@@ -31586,7 +34750,7 @@
     {
       "name": "EventDishAdded",
       "channel": "event_dish.added",
-      "payload": "{eventDishId: string, tenantId: string, eventId: string, dishId: string, quantityServings: number, course: string | null, serviceStyle: string | null}"
+      "payload": "{eventDishId: string, tenantId: string, eventId: string, dishId: string, quantityServings: number, purchasingWeekStart: datetime | null, course: string | null, serviceStyle: string | null}"
     },
     {
       "name": "EventDishCourseChanged",
@@ -31597,6 +34761,11 @@
       "name": "EventDishInstructionsUpdated",
       "channel": "event_dish.instructions_updated",
       "payload": "{eventDishId: string, tenantId: string, eventId: string, dishId: string}"
+    },
+    {
+      "name": "EventDishRecipeSeeded",
+      "channel": "event_dish_recipe.seeded",
+      "payload": "{seedId: string, tenantId: string, eventId: string, eventDishId: string, dishId: string, recipeId: string, servings: number, yieldQuantity: number, batchMultiplier: number, purchasingWeekStart: datetime | null}"
     },
     {
       "name": "EventDishRemoved",
@@ -31647,6 +34816,11 @@
       "name": "EventHeadcountChanged",
       "channel": "event.headcount_changed",
       "payload": "{eventId: string, tenantId: string, previousHeadcount: number, newHeadcount: number}"
+    },
+    {
+      "name": "EventIngredientContributionRecorded",
+      "channel": "event_ingredient_contribution.recorded",
+      "payload": "{contributionId: string, tenantId: string, eventId: string, eventDishId: string, ingredientId: string, quantity: number, unit: UnitOfMeasure, purchasingWeekStart: datetime | null}"
     },
     {
       "name": "EventOwnerAssigned",
@@ -31742,6 +34916,11 @@
       "name": "IngredientDemandRecalculated",
       "channel": "ingredient_demand.recalculated",
       "payload": "{ingredientDemandId: string, tenantId: string, eventId: string, ingredientId: string, previousQuantity: decimal, requiredQuantity: decimal, unit: UnitOfMeasure, reason: string}"
+    },
+    {
+      "name": "IngredientDemandReleased",
+      "channel": "ingredient_demand.released",
+      "payload": "{ingredientDemandId: string, tenantId: string, eventId: string, ingredientId: string, requiredQuantity: decimal, unit: UnitOfMeasure}"
     },
     {
       "name": "IngredientDemandSuperseded",
@@ -32114,14 +35293,24 @@
       "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, assignedToId: string | null, quantity: decimal, completedQuantity: decimal, unit: UnitOfMeasure, previousStatus: PrepTaskStatus, status: PrepTaskStatus}"
     },
     {
+      "name": "PrepTaskGeneratedRefreshed",
+      "channel": "prep_task.generated_refreshed",
+      "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, quantity: decimal, unit: UnitOfMeasure, specialInstructions: string | null}"
+    },
+    {
       "name": "PrepTaskOpened",
       "channel": "prep_task.opened",
-      "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, ingredientId: string | null, ingredientDemandId: string | null, recipeId: string | null, quantity: decimal, unit: UnitOfMeasure, station: string | null, dueAt: datetime | null, status: PrepTaskStatus}"
+      "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, ingredientId: string | null, ingredientDemandId: string | null, dishId: string | null, recipeId: string | null, dishTaskId: string | null, category: string, taskType: string, specialInstructions: string | null, isGenerated: boolean, quantity: decimal, unit: UnitOfMeasure, station: string | null, dueAt: datetime | null, status: PrepTaskStatus}"
     },
     {
       "name": "PrepTaskReleased",
       "channel": "prep_task.released",
       "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, previousAssignedToId: string | null, quantity: decimal, unit: UnitOfMeasure, previousStatus: PrepTaskStatus, status: PrepTaskStatus}"
+    },
+    {
+      "name": "PrepTaskRevised",
+      "channel": "prep_task.revised",
+      "payload": "{prepTaskId: string, tenantId: string, eventDishId: string, eventId: string, name: string, quantity: decimal, unit: UnitOfMeasure, category: string, taskType: string, specialInstructions: string | null}"
     },
     {
       "name": "PrepTaskStarted",
@@ -32201,12 +35390,17 @@
     {
       "name": "PurchaseNeedOpened",
       "channel": "purchase_need.opened",
-      "payload": "{purchaseNeedId: string, tenantId: string, eventId: string, ingredientDemandId: string, ingredientId: string, requiredQuantity: decimal, unit: UnitOfMeasure, status: PurchaseNeedStatus}"
+      "payload": "{purchaseNeedId: string, tenantId: string, eventId: string, ingredientDemandId: string, ingredientId: string, requiredQuantity: decimal, unit: UnitOfMeasure, purchasingWeekStart: datetime | null, status: PurchaseNeedStatus}"
     },
     {
       "name": "PurchaseNeedOrdered",
       "channel": "purchase_need.ordered",
       "payload": "{purchaseNeedId: string, tenantId: string, eventId: string, ingredientDemandId: string, ingredientId: string, vendorOrderId: string, vendorOrderLineId: string, previousStatus: PurchaseNeedStatus, status: PurchaseNeedStatus}"
+    },
+    {
+      "name": "PurchaseNeedReadyForWeeklyDraft",
+      "channel": "purchase_need.ready_for_weekly_draft",
+      "payload": "{purchaseNeedId: string, tenantId: string, eventId: string, ingredientDemandId: string, ingredientId: string, requiredQuantity: number, unit: UnitOfMeasure, purchasingWeekStart: datetime, vendorId: string}"
     },
     {
       "name": "QualificationExpired",
@@ -32519,9 +35713,34 @@
       "payload": "{vendorOrderLineId: string, tenantId: string, vendorOrderId: string, ingredientId: string, ingredientDemandId: string | null, eventId: string | null, orderedQuantity: decimal, receivedQuantity: decimal, unit: UnitOfMeasure, reason: string}"
     },
     {
+      "name": "VendorOrderLineDemandLinked",
+      "channel": "vendor_order_line_demand.linked",
+      "payload": "{vendorOrderLineDemandId: string, tenantId: string, vendorOrderLineId: string, ingredientDemandId: string, contributionQuantity: decimal, unit: UnitOfMeasure}"
+    },
+    {
+      "name": "VendorOrderLineDemandRetired",
+      "channel": "vendor_order_line_demand.retired",
+      "payload": "{vendorOrderLineDemandId: string, tenantId: string, vendorOrderLineId: string, ingredientDemandId: string, reason: string}"
+    },
+    {
+      "name": "VendorOrderLineDemandRevised",
+      "channel": "vendor_order_line_demand.revised",
+      "payload": "{vendorOrderLineDemandId: string, tenantId: string, vendorOrderLineId: string, ingredientDemandId: string, contributionQuantity: decimal, unit: UnitOfMeasure}"
+    },
+    {
+      "name": "VendorOrderLineQuantityRevised",
+      "channel": "vendor_order_line.quantity_revised",
+      "payload": "{vendorOrderLineId: string, tenantId: string, vendorOrderId: string, ingredientId: string, orderedQuantity: decimal, unit: UnitOfMeasure, unitCost: money}"
+    },
+    {
       "name": "VendorOrderLineReceived",
       "channel": "vendor_order_line.received",
       "payload": "{vendorOrderLineId: string, tenantId: string, vendorOrderId: string, ingredientId: string, ingredientDemandId: string | null, eventId: string | null, locationId: string, previousReceivedQuantity: decimal, receivedQuantity: decimal, receiptQuantity: decimal, orderedQuantity: decimal, unit: UnitOfMeasure, unitCost: money, discrepancyQuantity: decimal | null}"
+    },
+    {
+      "name": "VendorOrderLineWeeklyEnsured",
+      "channel": "vendor_order_line.weekly_ensured",
+      "payload": "{vendorOrderLineId: string, tenantId: string, vendorOrderId: string, purchaseNeedId: string, ingredientDemandId: string, ingredientId: string, orderedQuantity: number, contributionQuantity: number, unit: UnitOfMeasure}"
     },
     {
       "name": "VendorOrderOpened",
@@ -32547,6 +35766,11 @@
       "name": "VendorOrderTotalsUpdated",
       "channel": "vendor_order.totals_updated",
       "payload": "{vendorOrderId: string, tenantId: string, vendorId: string, eventId: string | null, previousTotalAmount: money, subtotal: money, taxAmount: money, shippingAmount: money, totalAmount: money}"
+    },
+    {
+      "name": "VendorOrderWeeklyDraftEnsured",
+      "channel": "vendor_order.weekly_draft_ensured",
+      "payload": "{vendorOrderId: string, tenantId: string, vendorId: string, purchasingWeekStart: datetime, purchaseNeedId: string, ingredientDemandId: string, ingredientId: string, requiredQuantity: number, unit: UnitOfMeasure}"
     },
     {
       "name": "VendorReinstated",
@@ -32591,12 +35815,12 @@
     {
       "name": "WasteRecorded",
       "channel": "waste_record.recorded",
-      "payload": "{wasteRecordId: string, tenantId: string, ingredientId: string, locationId: string, eventId: string | null, quantity: decimal, unit: UnitOfMeasure, reason: WasteReason, unitCost: money}"
+      "payload": "{wasteRecordId: string, tenantId: string, ingredientId: string, locationId: string, eventId: string | null, inventoryItemId: string | null, quantity: decimal, unit: UnitOfMeasure, reason: WasteReason, unitCost: money}"
     },
     {
       "name": "WasteVoided",
       "channel": "waste_record.voided",
-      "payload": "{wasteRecordId: string, tenantId: string, ingredientId: string, locationId: string, eventId: string | null, quantity: decimal, unit: UnitOfMeasure, reason: string}"
+      "payload": "{wasteRecordId: string, tenantId: string, ingredientId: string, locationId: string, eventId: string | null, inventoryItemId: string | null, quantity: decimal, unit: UnitOfMeasure, reason: string}"
     }
   ],
   "stores": [
@@ -32629,6 +35853,10 @@
       "target": "durable"
     },
     {
+      "entity": "DishTask",
+      "target": "durable"
+    },
+    {
       "entity": "Event",
       "target": "durable"
     },
@@ -32649,7 +35877,15 @@
       "target": "durable"
     },
     {
+      "entity": "EventDishRecipeSeed",
+      "target": "durable"
+    },
+    {
       "entity": "EventGuest",
+      "target": "durable"
+    },
+    {
+      "entity": "EventIngredientContribution",
       "target": "durable"
     },
     {
@@ -32785,11 +36021,19 @@
       "target": "durable"
     },
     {
+      "entity": "VendorOrderLineDemand",
+      "target": "durable"
+    },
+    {
       "entity": "Venue",
       "target": "durable"
     },
     {
       "entity": "WasteRecord",
+      "target": "durable"
+    },
+    {
+      "entity": "WeeklyPurchasingConfig",
       "target": "durable"
     }
   ]

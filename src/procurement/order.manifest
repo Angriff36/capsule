@@ -54,8 +54,8 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   hasMany lines: VendorOrderLine
 
   constraint orderMoneyNonnegative: self.subtotal >= 0 and self.taxAmount >= 0 and self.shippingAmount >= 0 and self.totalAmount >= 0 "Order money amounts cannot be negative"
-  constraint orderSourceRangeComplete: (self.sourceRangeStart == null and self.sourceRangeEnd == null) or (self.sourceRangeStart != null and self.sourceRangeEnd != null) "Purchase draft date range requires both a start and end"
-  constraint orderSourceRangeOrdered: self.sourceRangeStart == null or self.sourceRangeEnd == null or self.sourceRangeStart <= self.sourceRangeEnd "Purchase draft date range end must not precede its start"
+  constraint orderSourceRangeComplete: (self.sourceRangeStart == null and self.sourceRangeEnd == null) or (self.sourceRangeStart != null and self.sourceRangeEnd != null) "Order source range requires both a start and end"
+  constraint orderSourceRangeOrdered: self.sourceRangeStart == null or self.sourceRangeEnd == null or self.sourceRangeStart <= self.sourceRangeEnd "Order source range end must not precede its start"
 
   transition status from "draft" to ["submitted", "cancelled"]
   transition status from "submitted" to ["confirmed", "cancelled"]
@@ -64,9 +64,11 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   transition status from "received" to []
   transition status from "cancelled" to []
 
-  default policy vendorOrderRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor orders"
-  default policy vendorOrderWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write vendor orders through commands"
-  default policy vendorOrderExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute vendor order commands"
+  // manageAccess: Event.approve reaction chain ensures the weekly DRAFT.
+  // procurementAccess: day-to-day purchasing. Submit stays a buyer action.
+  default policy vendorOrderRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read vendor orders"
+  default policy vendorOrderWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write vendor orders through commands"
+  default policy vendorOrderExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute vendor order commands"
 
   command open(
     vendorId: uuid,
@@ -82,8 +84,8 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     guard self.vendor != null and self.vendor.status == "active" and self.vendor.onboardedAt != null
     constraint openVendorMatch: vendorId == self.vendorId "Open vendorId must match the seeded vendor reference"
     constraint openEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Open eventId must match the seeded event reference when provided"
-    constraint openSourceRangeComplete: (sourceRangeStart == null and sourceRangeEnd == null) or (sourceRangeStart != null and sourceRangeEnd != null) "Purchase draft date range requires both a start and end"
-    constraint openSourceRangeOrdered: sourceRangeStart == null or sourceRangeEnd == null or sourceRangeStart <= sourceRangeEnd "Purchase draft date range end must not precede its start"
+    constraint openSourceRangeComplete: (sourceRangeStart == null and sourceRangeEnd == null) or (sourceRangeStart != null and sourceRangeEnd != null) "Open source range requires both a start and end"
+    constraint openSourceRangeOrdered: sourceRangeStart == null or sourceRangeEnd == null or sourceRangeStart <= sourceRangeEnd "Open source range end must not precede its start"
     mutate vendorId = vendorId
     mutate eventId = eventId != null ? eventId : self.eventId
     mutate sourceRangeStart = sourceRangeStart != null ? sourceRangeStart : self.sourceRangeStart
@@ -100,6 +102,37 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
       sourceRangeEnd: sourceRangeEnd != null ? sourceRangeEnd : self.sourceRangeEnd
       orderNumber: orderNumber
       status: "draft"
+    }
+  }
+
+  // Manifest weekly draft ensure (match else create from PurchaseNeedReadyForWeeklyDraft).
+  command ensureWeeklyDraft(
+    vendorId: uuid,
+    sourceRangeStart: datetime,
+    sourceRangeEnd: datetime,
+    purchaseNeedId: uuid,
+    ingredientDemandId: uuid,
+    ingredientId: uuid,
+    requiredQuantity: decimal(12, 4),
+    unit: UnitOfMeasure
+  ) {
+    guard self.deletedAt == null
+    guard self.status == "draft"
+    guard self.vendor != null and self.vendor.status == "active" and self.vendor.onboardedAt != null
+    mutate vendorId = vendorId
+    mutate sourceRangeStart = sourceRangeStart
+    mutate sourceRangeEnd = sourceRangeEnd
+    mutate openedAt = self.openedAt == null ? now() : self.openedAt
+    emit VendorOrderWeeklyDraftEnsured {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: vendorId
+      purchasingWeekStart: sourceRangeStart
+      purchaseNeedId: purchaseNeedId
+      ingredientDemandId: ingredientDemandId
+      ingredientId: ingredientId
+      requiredQuantity: requiredQuantity
+      unit: unit
     }
   }
 
@@ -205,7 +238,9 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   command cancel(reason: string) {
     guard self.status == "draft" or self.status == "submitted" or self.status == "confirmed" or self.status == "partially_received"
     guard self.deletedAt == null
-    guard roleAllows(user.role, "inventoryManageAccess")
+    // Draft abort (prep-list generate rollback) is a procurement action; later-stage
+    // cancel stays manage-gated.
+    guard roleAllows(user.role, "inventoryManageAccess") or (self.status == "draft" and roleAllows(user.role, "procurementAccess"))
     constraint cancelOrderReason: length(trim(reason)) > 0 "Cancellation reason is required"
     compute previousStatus = self.status
     mutate status = "cancelled"
@@ -253,6 +288,7 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
+  hasMany demandLinks: VendorOrderLineDemand
 
   computed lineTotal: money(12, 2) = self.orderedQuantity * self.unitCost
   computed remainingQuantity: decimal(12, 4) = self.orderedQuantity - self.receivedQuantity
@@ -268,9 +304,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   transition status from "complete" to []
   transition status from "cancelled" to []
 
-  default policy vendorOrderLineRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor order lines"
-  default policy vendorOrderLineWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write vendor order lines through commands"
-  default policy vendorOrderLineExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute vendor order line commands"
+  default policy vendorOrderLineRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read vendor order lines"
+  default policy vendorOrderLineWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write vendor order lines through commands"
+  default policy vendorOrderLineExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute vendor order line commands"
 
   command addLine(
     vendorOrderId: uuid,
@@ -311,6 +347,67 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       orderedQuantity: orderedQuantity
       unit: unit
       unitCost: unitCost
+    }
+  }
+
+  // Weekly draft line ensure: create or revise consolidated shortage quantity.
+  // weekNeed / onHand are reaction-param sums (command-body sum() is not projected).
+  command ensureWeeklyLine(
+    vendorOrderId: uuid,
+    ingredientId: uuid,
+    weekNeed: decimal(12, 4),
+    onHand: decimal(12, 4),
+    contributionQuantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    unitCost: money(12, 2),
+    purchaseNeedId: uuid,
+    ingredientDemandId: uuid
+  ) {
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
+    guard self.ingredient != null and self.ingredient.status == "active"
+    constraint ensureContributionPositive: contributionQuantity > 0 "Contribution quantity must be positive"
+    compute orderQty = max(0.0001, weekNeed - onHand)
+    mutate vendorOrderId = vendorOrderId
+    mutate ingredientId = ingredientId
+    mutate ingredientDemandId = ingredientDemandId
+    mutate orderedQuantity = orderQty
+    mutate unit = unit
+    mutate unitCost = unitCost
+    mutate status = self.addedAt == null ? "added" : self.status
+    mutate addedAt = self.addedAt == null ? now() : self.addedAt
+    emit VendorOrderLineWeeklyEnsured {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: vendorOrderId
+      purchaseNeedId: purchaseNeedId
+      ingredientDemandId: ingredientDemandId
+      ingredientId: ingredientId
+      orderedQuantity: orderQty
+      contributionQuantity: contributionQuantity
+      unit: unit
+    }
+  }
+
+  command reviseQuantity(
+    orderedQuantity: decimal(12, 4),
+    optional unitCost: money(12, 2)
+  ) {
+    guard self.status == "added"
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
+    constraint reviseLineQuantityPositive: orderedQuantity > 0 "Ordered quantity must be positive"
+    constraint reviseLineCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    mutate orderedQuantity = orderedQuantity
+    mutate unitCost = unitCost != null ? unitCost : self.unitCost
+    emit VendorOrderLineQuantityRevised {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: self.vendorOrderId
+      ingredientId: self.ingredientId
+      orderedQuantity: orderedQuantity
+      unit: self.unit
+      unitCost: unitCost != null ? unitCost : self.unitCost
     }
   }
 
@@ -360,7 +457,8 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.status == "added" or self.status == "receiving"
     guard self.deletedAt == null
     guard self.vendorOrder != null and (self.vendorOrder.status == "draft" or self.vendorOrder.status == "submitted" or self.vendorOrder.status == "confirmed")
-    guard roleAllows(user.role, "inventoryManageAccess")
+    // Draft-line abort for prep-list generate rollback; later-stage cancel stays manage-gated.
+    guard roleAllows(user.role, "inventoryManageAccess") or (self.vendorOrder.status == "draft" and roleAllows(user.role, "procurementAccess"))
     constraint cancelLineReason: length(trim(reason)) > 0 "Cancellation reason is required"
     mutate status = "cancelled"
     mutate cancelledAt = now()
@@ -380,6 +478,127 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   }
 
   store VendorOrderLine in durable
+}
+
+// Provenance contribution from one IngredientDemand to an aggregated weekly
+// VendorOrderLine. Several Events may contribute to the same order line.
+// vendorOrderId is denormalized (one-hop belongsTo) so draft guards project
+// correctly — nested self.vendorOrderLine.vendorOrder is not hydrated on
+// __rel_* locals in Convex createVia/link runners (Guard 2 always failed).
+entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required vendorOrderLineId: uuid
+  property required ingredientDemandId: uuid
+  property required vendorOrderId: uuid
+  property required contributionQuantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property linkedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
+  belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
+  belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
+
+  constraint demandLinkQuantityPositive: self.linkedAt == null or self.contributionQuantity > 0 "Demand link contribution must be positive"
+
+  default policy vendorOrderLineDemandRead read: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may read order demand links"
+  default policy vendorOrderLineDemandWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may write order demand links through commands"
+  default policy vendorOrderLineDemandExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute order demand link commands"
+
+  command link(
+    vendorOrderLineId: uuid,
+    ingredientDemandId: uuid,
+    vendorOrderId: uuid,
+    contributionQuantity: decimal(12, 4),
+    unit: UnitOfMeasure
+  ) {
+    guard self.deletedAt == null
+    guard self.vendorOrderLine != null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
+    guard self.ingredientDemand != null
+    // First link or idempotent revise of the same demand→line contribution.
+    guard self.linkedAt == null or (self.vendorOrderLineId == vendorOrderLineId and self.ingredientDemandId == ingredientDemandId)
+    constraint linkLineMatch: self.linkedAt == null or vendorOrderLineId == self.vendorOrderLineId "Demand link vendorOrderLineId must match the seeded line reference"
+    constraint linkDemandMatch: self.linkedAt == null or ingredientDemandId == self.ingredientDemandId "Demand link ingredientDemandId must match the seeded demand reference"
+    constraint linkOrderMatch: self.linkedAt == null or vendorOrderId == self.vendorOrderId "Demand link vendorOrderId must match the seeded order reference"
+    constraint linkOrderOwnsLine: vendorOrderId == self.vendorOrderLine.vendorOrderId "Demand link vendorOrderId must own the vendor order line"
+    constraint linkQuantityPositive: contributionQuantity > 0 "Demand link contribution must be positive"
+    mutate vendorOrderLineId = vendorOrderLineId
+    mutate ingredientDemandId = ingredientDemandId
+    mutate vendorOrderId = vendorOrderId
+    mutate contributionQuantity = contributionQuantity
+    mutate unit = unit
+    mutate linkedAt = self.linkedAt == null ? now() : self.linkedAt
+    emit VendorOrderLineDemandLinked {
+      vendorOrderLineDemandId: self.id
+      tenantId: self.tenantId
+      vendorOrderLineId: vendorOrderLineId
+      ingredientDemandId: ingredientDemandId
+      contributionQuantity: contributionQuantity
+      unit: unit
+    }
+  }
+
+  command revise(contributionQuantity: decimal(12, 4)) {
+    guard self.linkedAt != null
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
+    constraint reviseQuantityPositive: contributionQuantity > 0 "Demand link contribution must be positive"
+    mutate contributionQuantity = contributionQuantity
+    emit VendorOrderLineDemandRevised {
+      vendorOrderLineDemandId: self.id
+      tenantId: self.tenantId
+      vendorOrderLineId: self.vendorOrderLineId
+      ingredientDemandId: self.ingredientDemandId
+      contributionQuantity: contributionQuantity
+      unit: self.unit
+    }
+  }
+
+  command retire(reason: string) {
+    guard self.linkedAt != null
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
+    constraint retireReasonPresent: length(trim(reason)) > 0 "Demand link retirement reason is required"
+    mutate removedAt = now()
+    mutate deletedAt = now()
+    emit VendorOrderLineDemandRetired {
+      vendorOrderLineDemandId: self.id
+      tenantId: self.tenantId
+      vendorOrderLineId: self.vendorOrderLineId
+      ingredientDemandId: self.ingredientDemandId
+      reason: reason
+    }
+  }
+
+  store VendorOrderLineDemand in durable
+}
+
+event VendorOrderWeeklyDraftEnsured: "vendor_order.weekly_draft_ensured" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  purchasingWeekStart: datetime
+  purchaseNeedId: string
+  ingredientDemandId: string
+  ingredientId: string
+  requiredQuantity: number
+  unit: UnitOfMeasure
+}
+
+event VendorOrderLineWeeklyEnsured: "vendor_order_line.weekly_ensured" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  purchaseNeedId: string
+  ingredientDemandId: string
+  ingredientId: string
+  orderedQuantity: number
+  contributionQuantity: number
+  unit: UnitOfMeasure
 }
 
 event VendorOrderOpened: "vendor_order.opened" {
@@ -485,6 +704,16 @@ event VendorOrderLineReceived: "vendor_order_line.received" {
   discrepancyQuantity: decimal(12, 4)?
 }
 
+event VendorOrderLineQuantityRevised: "vendor_order_line.quantity_revised" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  ingredientId: string
+  orderedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  unitCost: money(12, 2)
+}
+
 event VendorOrderLineCancelled: "vendor_order_line.cancelled" {
   vendorOrderLineId: string
   tenantId: string
@@ -495,5 +724,31 @@ event VendorOrderLineCancelled: "vendor_order_line.cancelled" {
   orderedQuantity: decimal(12, 4)
   receivedQuantity: decimal(12, 4)
   unit: UnitOfMeasure
+  reason: string
+}
+
+event VendorOrderLineDemandLinked: "vendor_order_line_demand.linked" {
+  vendorOrderLineDemandId: string
+  tenantId: string
+  vendorOrderLineId: string
+  ingredientDemandId: string
+  contributionQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event VendorOrderLineDemandRevised: "vendor_order_line_demand.revised" {
+  vendorOrderLineDemandId: string
+  tenantId: string
+  vendorOrderLineId: string
+  ingredientDemandId: string
+  contributionQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event VendorOrderLineDemandRetired: "vendor_order_line_demand.retired" {
+  vendorOrderLineDemandId: string
+  tenantId: string
+  vendorOrderLineId: string
+  ingredientDemandId: string
   reason: string
 }

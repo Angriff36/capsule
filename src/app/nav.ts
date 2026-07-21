@@ -42,7 +42,6 @@ export const NAV_AREAS: NavArea[] = [
     label: "Logistics",
     group: "Operate",
     icon: TruckIcon,
-    planned: "Shipments, routes, drivers and vehicles.",
   },
   {
     path: "/staff",
@@ -55,21 +54,18 @@ export const NAV_AREAS: NavArea[] = [
     label: "Clients & CRM",
     group: "People",
     icon: ContactIcon,
-    planned: "Clients, leads, deals and interactions.",
   },
   {
     path: "/finance",
     label: "Finance",
     group: "Business",
     icon: CoinsIcon,
-    planned: "Invoices, payments, budgets and profitability.",
   },
   {
     path: "/reports",
     label: "Reports",
     group: "Business",
     icon: ChartIcon,
-    planned: "Event reports and operational summaries.",
   },
   {
     path: "/facilities",

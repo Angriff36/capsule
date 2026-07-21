@@ -14,6 +14,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   property required eventId: uuid
   property required dishId: uuid
   property required quantityServings: int = 1
+  // Denormalized from Event at add time for BOM → weekly purchasing reactions.
+  property purchasingWeekStart: datetime?
   property course: string?
   property serviceStyle: string?
   property specialInstructions: string?
@@ -53,6 +55,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     mutate eventId = eventId
     mutate dishId = dishId
     mutate quantityServings = quantityServings
+    mutate purchasingWeekStart = self.event.purchasingWeekStart
     mutate course = course
     mutate serviceStyle = serviceStyle
     mutate specialInstructions = specialInstructions
@@ -63,6 +66,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
       eventId: eventId
       dishId: dishId
       quantityServings: quantityServings
+      purchasingWeekStart: self.event.purchasingWeekStart
       course: course
       serviceStyle: serviceStyle
     }
@@ -145,6 +149,7 @@ event EventDishAdded: "event_dish.added" {
   eventId: string
   dishId: string
   quantityServings: number
+  purchasingWeekStart: datetime?
   course: string?
   serviceStyle: string?
 }

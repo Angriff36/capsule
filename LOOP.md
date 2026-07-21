@@ -1,8 +1,18 @@
 # LOOP.md — capsule loop configuration
 
+## Loops in this repo (2026-07-21)
+
+1. **Hygiene tick** (`capsule-loop-tick`, every 2h 9:15-17:15): triage scan ->
+   STATE.md queue -> queue-drain fix flow. Prompt: `.claude/loop-tick-prompt.txt`.
+2. **Product loop** (`capsule-product-loop`, 4-iteration shifts at 9:00/13:00/
+   17:00): works `PRODUCT-BACKLOG.md` top-down, one item -> one draft PR per
+   iteration. Prompt: `PROMPT-product.md`. Runner: `.claude/product-loop.cmd`.
+   Backlog = OD-defect fixes + evolution-plan slices; human merges + reorders.
+   Kill: delete the task, or `loop-pause-all` in STATE.md (stops both loops).
+
 Architecture per [loop-engineering](https://github.com/cobusgreyling/loop-engineering).
 Ported from the retired capsule-pro loop 2026-07-16 (13 clean L1 ticks there).
-**Current phase: L1 report-only.**
+**Current phase: L2 standing (draft PRs; human decision 2026-07-19 — see loop-constraints.md).**
 
 Stack note: this repo is Bun + Vite + Convex + Vitest (NOT the capsule-pro
 pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
@@ -11,19 +21,19 @@ pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
 
 | Role                        | Model                                                 | Mechanism                                                                                                                                                                                                                                                |
 | --------------------------- | ----------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Scheduler                   | Windows Task Scheduler (`capsule-loop-tick`)          | 9:15–17:15 every 2h weekdays → `.claude/loop-tick.cmd` → headless `claude -p` on a worker profile                                                                                                                                                        |
+| Scheduler                   | Windows Task Scheduler (`capsule-loop-tick`)          | 9:15–17:15 every 2h, daily (switched from weekdays 2026-07-17 for away coverage) → `.claude/loop-tick.cmd` → headless `claude -p` on a worker profile                                                                                                    |
 | Tick runner (triage, state) | **GLM 5.2** (z.ai plan), auto-fallback **MiniMax-M3** | `~/.claude/claude-glm.ps1` / `claude-minimax.ps1` profiles — zero Anthropic quota; reads `.claude/loop-tick-prompt.txt`, runs `loop-triage`, owns STATE.md; scoped Edit perms (state files only). Manual alternate: Codex `gpt-5.6-luna` (`codex exec`). |
 | Overseer                    | Fable 5 — on-demand only                              | reviews STATE.md when the human asks; judges graduation; NEVER runs ticks. No Anthropic-quota model runs ticks (incl. Sonnet).                                                                                                                           |
-| Implementers (L2 — **OFF**) | TBD at graduation                                     | dispatch mechanism decided then                                                                                                                                                                                                                          |
-| Review gate (L2 — **OFF**)  | Codex (gpt-5.6-sol)                                   | `.claude/agents/loop-verifier.md` wraps `codex exec`                                                                                                                                                                                                     |
+| Implementers (L2 — **ON, away mode**) | GLM/MiniMax, in-tick                        | One fix attempt per tick, inside `.loop-worktrees/<run-id>` only; draft PRs; per loop-constraints.md away-mode rules                                                                                                                                     |
+| Review gate (L2 — **ON, away mode**)  | Codex (gpt-5.6-sol)                         | Tick pipes worktree diff to `codex exec -s read-only`; REJECT blocks the PR                                                                                                                                                                              |
 | Circuit breaker             | loop-context                                          | `loop-ledger.json`; 3× same error / 5 fails → escalate                                                                                                                                                                                                   |
 | Final gate                  | Human (Ryan)                                          | STATE.md High Priority + escalations                                                                                                                                                                                                                     |
 
 ## Active loops
 
-| Pattern                   | Cadence                        | Status         |
-| ------------------------- | ------------------------------ | -------------- |
-| Daily Triage (2h variant) | work hours, weekdays, every 2h | L1 report-only |
+| Pattern                   | Cadence                     | Status         |
+| ------------------------- | --------------------------- | -------------- |
+| Daily Triage (2h variant) | work hours, daily, every 2h | L2 away mode (draft PRs) |
 
 ## L1 → L2 graduation criteria (all required — evidence bar, not calendar)
 

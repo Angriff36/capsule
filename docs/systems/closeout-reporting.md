@@ -14,35 +14,49 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
 | `finance/payroll-input.manifest`                               | PayrollInput          |
 | `insights/report.manifest`                                     | SavedReportDefinition |
 
-## Primary workspace
+## Primary workspace (Slice 8 + 8b + reports)
 
-Use a **reconciliation folio**:
+| Route               | Outcome                                                              |
+| ------------------- | -------------------------------------------------------------------- |
+| `/finance/closeout` | Capture reconciled numbers for a closed-out event; finalize folio    |
+| `/finance/payroll`  | Prepare person/period payroll rollup; finalize or void               |
+| `/reports`          | Save/rename/share/archive/restore report definitions                 |
 
-- Event closeout compares captured planned/actual financial and operational facts, unresolved issues, and notes before finalization;
-- PayrollInput is a private ruled worksheet by Person/period with regular, overtime, total minutes, rates, and optional Event/Shift attribution;
-- Reports is a library of governed saved definitions and a result workspace projected from live facts—not a collection of ornamental charts.
+**User outcomes proven**
 
-## Core workflows
+1. Event → `closed_out` → EventCloseout.capture → finalize
+2. Person.hire → PayrollInput.prepare → finalize (finance managers; opaque person ids)
+3. SavedReportDefinition.createDefinition → archive → restore (staffAccess)
 
-- Capture and finalize an immutable EventCloseout point-in-time fact.
-- Prepare, finalize, or void PayrollInput.
-- Create, rename, update, share, archive, or restore SavedReportDefinitions.
-- Navigate from closeout/report results to owning operational records for correction before finalization.
+## Core workflows (shipped vs deferred)
+
+**Shipped**
+
+- EventCloseout capture/finalize
+- PayrollInput prepare/finalize/void (`financeManageAccess`)
+- SavedReportDefinition library on `/reports` (create, rename, share, archive, restore)
+
+**Deferred**
+
+- Chart/result rendering for saved definitions (library stores config only)
+- Automatic aggregation from operational facts into closeout/payroll numbers
+- PayrollInput `hourlyRate` / `overtimeRate` / `grossAmount` entry — Manifest encrypts
+  private money to ciphertext while Convex schema still declares `number` (proven insert
+  failure); minutes + optional notes ship without those fields
 
 ## Cross-system handoffs
 
-Event lifecycle owns `closeOut`; EventCloseout stores the reconciliation fact. PayrollInput derives from Person/Shift/TimeRecord context but is finance-owned. Report results derive from governed facts across all systems. Automatic closeout aggregation is not yet defined.
+Event lifecycle owns `closeOut`; EventCloseout stores the reconciliation fact. PayrollInput is finance-owned and optionally links Event/Shift. Person list uses `staffAccess` (finance managers have it).
 
-## States and permissions
+## Proof
 
-Closeout finalization and payroll facts are finance-manage work; payroll rates/amounts and notes are sensitive. Report sharing must follow the saved definition's governed scope. Exact money/decimal behavior remains a release gate.
-
-## Current status
-
-Generated queries and commands exist. No authored closeout, payroll, or report workspace exists. Reporting data execution/rendering is not implied by the SavedReportDefinition entity and must be designed against a real query/projection path.
+- Closeout runtime: `tests/proofs/event-closeout-lifecycle.runtime.test.ts`
+- Payroll runtime: `tests/proofs/payroll-input-lifecycle.runtime.test.ts`
+- Reports runtime: `tests/proofs/saved-report-definition-lifecycle.runtime.test.ts`
+- Routes/lifecycle: `tests/finance-routes.test.ts`, `tests/reports-routes.test.ts`
+- Guards: `bun run check:closeout-manifest`, `bun run check:payroll-manifest`
 
 ## References
 
-- Canonical: `C:/projects/Manifest-source/src/finance`, `C:/projects/Manifest-source/src/insights/report.manifest`
 - Related owner: [workforce.md](workforce.md)
-- Read-only intent reference: Capsule-Pro accounting, payroll, and analytics areas
+- Implementation sequence: [implementation-plan.md](../product/implementation-plan.md)

@@ -13,6 +13,8 @@ export const getAuthStatus = query({
       authenticated: identity !== null,
       hasRole: identity !== null && auth.role !== "anonymous",
       hasTenant: identity !== null && auth.tenantId !== "",
+      // Mapped claim only (never raw token) so Home can role-shape attention.
+      role: auth.role,
     };
   },
 });

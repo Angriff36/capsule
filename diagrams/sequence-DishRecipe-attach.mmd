@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant DishRecipe as DishRecipe
     participant EventBus
-    Client->>+DishRecipe: attach(dishId, recipeId, sortOrder, role)
+    Client->>+DishRecipe: attach(dishId, recipeId, yieldQuantity, batchMultiplier, sortOrder, role)
     Note over DishRecipe: Policies: dishRecipeRead, dishRecipeWrite, dishRecipeExecute
     Note over DishRecipe: Guards (3)
     DishRecipe->>DishRecipe: guard[0]: self.attachedAt == null
@@ -10,6 +10,8 @@ sequenceDiagram
     DishRecipe->>DishRecipe: guard[2]: self.dish != null and self.dish.status == #quot;active#quot;
     DishRecipe->>DishRecipe: mutate.dishId
     DishRecipe->>DishRecipe: mutate.recipeId
+    DishRecipe->>DishRecipe: mutate.yieldQuantity
+    DishRecipe->>DishRecipe: mutate.batchMultiplier
     DishRecipe->>DishRecipe: mutate.sortOrder
     DishRecipe->>DishRecipe: mutate.role
     DishRecipe->>DishRecipe: mutate.attachedAt

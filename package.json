@@ -14,10 +14,14 @@
     "agent:mint-jwt": "bun scripts/capsule-mint-agent-jwt.ts",
     "baseline:decay": "bun scripts/check-baseline-decay.ts",
     "build": "vite build",
-    "check": "bun run toolchain && bun scripts/builder-regen-guard.ts --check-ownership && bun run proof:emit && bun run check:proof && bun run check:manifest-registry && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run check:production-manifest && bun run check:workforce-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
+    "check": "bun run toolchain && bun scripts/builder-regen-guard.ts --check-ownership && bun run proof:emit && bun run check:proof && bun run check:manifest-registry && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run check:production-manifest && bun run check:workforce-manifest && bun run check:logistics-manifest && bun run check:commercial-manifest && bun run check:closeout-manifest && bun run check:payroll-manifest && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
+    "check:closeout-manifest": "bun scripts/check-closeout-manifest-integration.ts",
+    "check:commercial-manifest": "bun scripts/check-commercial-manifest-integration.ts",
     "check:culinary-manifest": "bun scripts/check-culinary-manifest-integration.ts",
     "check:event-manifest": "bun scripts/check-event-manifest-integration.ts",
+    "check:logistics-manifest": "bun scripts/check-logistics-manifest-integration.ts",
     "check:manifest-registry": "bun scripts/check-manifest-registry-pin.ts",
+    "check:payroll-manifest": "bun scripts/check-payroll-manifest-integration.ts",
     "check:production-manifest": "bun scripts/check-production-manifest-integration.ts",
     "check:proof": "bun scripts/check-proof-registry.ts",
     "check:supply-manifest": "bun scripts/check-supply-manifest-integration.ts",
@@ -38,7 +42,7 @@
     "seed": "bun scripts/seed-convex.ts",
     "test": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "test:proofs": "vitest run tests/proofs tests/proof-registry-gate.test.ts tests/supply-manifest-integration-guard.test.ts tests/production-manifest-integration-guard.test.ts tests/workforce-manifest-integration-guard.test.ts",
+    "test:proofs": "vitest run tests/proofs tests/proof-registry-gate.test.ts tests/supply-manifest-integration-guard.test.ts tests/production-manifest-integration-guard.test.ts tests/workforce-manifest-integration-guard.test.ts tests/logistics-manifest-integration-guard.test.ts tests/commercial-manifest-integration-guard.test.ts tests/closeout-manifest-integration-guard.test.ts tests/payroll-manifest-integration-guard.test.ts tests/finance-routes.test.ts",
     "toolchain": "bun scripts/check-toolchain.ts",
     "typecheck": "tsc --noEmit"
   },
@@ -46,7 +50,7 @@
     "*.{ts,tsx,js,jsx,json,md,css,yml,yaml,html}": "prettier --write"
   },
   "dependencies": {
-    "@angriff36/manifest": "3.6.24",
+    "@angriff36/manifest": "3.6.41",
     "@clerk/backend": "^3.11.7",
     "@clerk/react": "^6.12.4",
     "@fontsource-variable/archivo": "^5.2.5",

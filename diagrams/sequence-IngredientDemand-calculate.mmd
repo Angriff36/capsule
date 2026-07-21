@@ -21,5 +21,6 @@ sequenceDiagram
     IngredientDemand->>IngredientDemand: mutate.sourceYieldQuantity
     IngredientDemand->>IngredientDemand: mutate.status
     IngredientDemand->>IngredientDemand: mutate.calculatedAt
+    IngredientDemand->>IngredientDemand: mutate.purchaseEligibleEventId
     IngredientDemand->>EventBus: emit IngredientDemandCalculated on ingredient_demand.calculated
     IngredientDemand-->>-Client: void

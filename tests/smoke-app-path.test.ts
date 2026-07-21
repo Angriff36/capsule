@@ -19,6 +19,7 @@ describe("smoke: signed-in workspace path", () => {
         authenticated: true,
         hasRole: true,
         hasTenant: true,
+        role: "staff",
       }),
     ).toBe(true);
 

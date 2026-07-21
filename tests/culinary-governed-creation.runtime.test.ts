@@ -1,5 +1,5 @@
 import { convexTest } from "convex-test";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { api } from "../convex/_generated/api";
 import schema from "../convex/schema";
 import { createManifestTestContext } from "@angriff36/manifest/proof-kit/convex-test";
@@ -18,6 +18,13 @@ function kitchenActor() {
   });
   return { proof, actor };
 }
+
+beforeAll(() => {
+  if (!process.env.CONVEX_FIELD_ENCRYPTION_KEY) {
+    process.env.CONVEX_FIELD_ENCRYPTION_KEY =
+      "A1MKNFPVRhFaPf83T45BwooVzAogtiphQhYraAD5gqU=";
+  }
+});
 
 describe("culinary governed creation", () => {
   it("creates Ingredient, Recipe, and Dish with command-owned timestamps", async () => {
@@ -103,6 +110,74 @@ describe("culinary governed creation", () => {
     });
     expect(doc?.category ?? null).toBeNull();
     expect(doc?.introducedAt).toEqual(expect.any(Number));
+  });
+
+  it("creates a PrepTask with default category and task type when the UI omits them", async () => {
+    const { proof, actor } = kitchenActor();
+    const sales = proof.asRole({
+      subject: "prep-defaults-sales",
+      role: "sales_manager",
+      tenantId: "tenant-culinary-create",
+    });
+    const client = (await proof.executeCommand(
+      sales,
+      api.mutations.Client_createViaRegister,
+      { clientType: "company", companyName: "Prep defaults test client" },
+    )) as { docId: string };
+    const event = (await proof.executeCommand(
+      sales,
+      api.mutations.Event_createViaPlanEngagement,
+      {
+        clientId: client.docId,
+        title: "Prep defaults test event",
+        eventType: "testing",
+        startsAt: Date.UTC(2026, 6, 20, 17),
+        endsAt: Date.UTC(2026, 6, 20, 21),
+        expectedHeadcount: 1,
+        primaryContactName: "Test contact",
+        budgetAmount: 1,
+        quotedPrice: 1,
+      },
+    )) as { docId: string };
+    const dish = (await proof.executeCommand(
+      actor,
+      api.mutations.Dish_createViaIntroduce,
+      { name: "Prep defaults test dish", portionSize: 1, portionUnit: "each" },
+    )) as { docId: string };
+    const eventManager = proof.asRole({
+      subject: "prep-defaults-event-manager",
+      role: "event_manager",
+      tenantId: "tenant-culinary-create",
+    });
+    const eventDish = (await proof.executeCommand(
+      eventManager,
+      api.mutations.EventDish_createViaAddToEvent,
+      { eventId: event.docId, dishId: dish.docId, quantityServings: 1 },
+    )) as { docId: string };
+
+    const result = (await proof.executeCommand(
+      actor,
+      api.mutations.PrepTask_createViaOpen,
+      {
+        eventDishId: eventDish.docId,
+        eventId: event.docId,
+        name: "Mince garlic",
+        quantity: 1,
+        unit: "each",
+      },
+    )) as { docId: string };
+
+    const doc = await actor.run(async (ctx) =>
+      ctx.db.get(result.docId as never),
+    );
+
+    expect(doc).toMatchObject({
+      name: "Mince garlic",
+      category: "finish_at_event",
+      taskType: "manual",
+      status: "pending",
+      tenantId: "tenant-culinary-create",
+    });
   });
 
   it("rejects invalid allergen values at the generated API boundary", async () => {

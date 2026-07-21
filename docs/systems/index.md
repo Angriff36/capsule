@@ -13,11 +13,11 @@ Current generated boundary: **43 governed business entities**, **219 command cap
 | [Culinary](culinary.md)       | Ingredient, Recipe, RecipeIngredient, Dish, Menu, EventDish                         | `/kitchen`                              | Shipping catalogs, recipe detail, menus, and event dish selection  |
 | [Inventory](inventory.md)     | StorageLocation, InventoryItem, InventoryReservation, IngredientDemand, WasteRecord | `/inventory`                            | Shipping demand and stock ledgers; reaction limits remain explicit |
 | [Procurement](procurement.md) | Vendor, VendorOrder, VendorOrderLine, PurchaseNeed                                  | Inventory purchasing subworkspace       | Shipping queue and order folio; reaction limits remain explicit    |
-| Production & quality          | PrepTask, ProductionBatch, QualityCheck, Incident, EventAllergenCheck               | `/kitchen/production`, event execution  | Generated; planned UI; reaction blocker                            |
-| Workforce                     | EventAssignment, Shift, AvailabilityWindow, TimeRecord, Qualification               | `/staff`                                | Generated; planned UI                                              |
-| Logistics                     | PackList, PackListItem, Delivery                                                    | `/logistics`                            | Generated; planned UI; cancellation reaction blocker               |
-| Commercial & billing          | ClientContact, Proposal, Contract, Invoice, Payment, PaymentMethod                  | `/clients`, `/finance`                  | Generated; planned UI; payment reaction blocker                    |
-| Closeout & reporting          | EventCloseout, PayrollInput, SavedReportDefinition                                  | `/finance/closeout`, `/reports`         | Generated; planned UI                                              |
+| Production & quality          | PrepTask, ProductionBatch, QualityCheck, Incident, EventAllergenCheck               | `/kitchen/prep`                         | Shipping prep board + quality fail→block proof                     |
+| Workforce                     | EventAssignment, Shift, AvailabilityWindow, TimeRecord, Qualification               | `/staff`                                | Shipping roster, time, qualifications + shift lifecycle proof      |
+| [Logistics](logistics.md)     | PackList, PackListItem, Delivery                                                    | `/logistics`                            | Shipping pack lists, load sheet, deliveries + lifecycle proof      |
+| Commercial & billing          | ClientContact, Proposal, Contract, Invoice, Payment, PaymentMethod                  | `/clients`, `/finance`                  | Slice 7 shipped; OD035/OD038 automation deferred                   |
+| Closeout & reporting          | EventCloseout, PayrollInput, SavedReportDefinition                                  | `/finance/closeout`, `/finance/payroll`, `/reports` | Closeout + payroll + report library shipped; chart render deferred |
 
 `TenantScoped` and `SoftDeletable` are source mixins, not operator systems or standalone workspaces.
 
@@ -26,7 +26,7 @@ Current generated boundary: **43 governed business entities**, **219 command cap
 | System owner                                             | Scope                                                        | Status                                                                 |
 | -------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------- |
 | [Authentication](auth.md)                                | Clerk session, membership, trusted Convex auth context       | Shipping                                                               |
-| [Navigation shell](navigation-shell.md)                  | Shell, command palette, route catalog, responsive navigation | Shipping shell; route catalog still reflects Capsule-V2 legacy scope   |
+| [Navigation shell](navigation-shell.md)                  | Shell, command palette, route catalog, Home service desk     | Shipping; Home is role-shaped attention over queryable facts           |
 | [Manifest generation](../generation/manifest-builder.md) | Assembly and generated/authored boundary                     | Shipping                                                               |
 | Projection status                                        | Current generated capability and blockers                    | Not a public completion authority until its evidence page is published |
 

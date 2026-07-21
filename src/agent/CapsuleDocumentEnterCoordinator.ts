@@ -163,7 +163,6 @@ export class CapsuleDocumentEnterCoordinator {
       const dishResult = await this.executor.execute({
         capabilityId: "Dish.introduce",
         args: {
-          recipeId: saved.recipeId,
           name: ready.name.trim(),
           portionSize: options.dishPortionSize ?? ready.yieldQuantity,
           portionUnit: options.dishPortionUnit ?? ready.yieldUnit,
@@ -173,6 +172,17 @@ export class CapsuleDocumentEnterCoordinator {
         idempotencyKey: keys.forCapability("Dish.introduce", "dish"),
       });
       dishId = asDocId(dishResult);
+      await this.executor.execute({
+        capabilityId: "DishRecipe.attach",
+        args: {
+          dishId,
+          recipeId: saved.recipeId,
+          yieldQuantity: ready.yieldQuantity,
+          batchMultiplier: ready.batchMultiplier ?? 1,
+          sortOrder: 0,
+        },
+        idempotencyKey: keys.forCapability("DishRecipe.attach", "link"),
+      });
     }
 
     return {

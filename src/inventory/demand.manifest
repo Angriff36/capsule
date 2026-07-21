@@ -51,6 +51,13 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   property sourceBatchMultiplier: decimal(12, 4)?
   property sourceYieldQuantity: decimal(12, 4)?
   property required status: IngredientDemandStatus = "pending"
+  // Set on calculate; cleared on confirm / markReleased / supersede / fulfill.
+  // EventApproved fans out where this equals payload.eventId so pending /
+  // superseded rows never enter the purchase foreach-create (guard failures
+  // would roll back approve).
+  property indexed purchaseEligibleEventId: uuid?
+  // Denormalized from Event for approve → PurchaseNeed without hydrating event.
+  property purchasingWeekStart: datetime?
   property calculatedAt: datetime?
   property confirmedAt: datetime?
   property fulfilledAt: datetime?
@@ -70,9 +77,43 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   transition status from "fulfilled" to []
   transition status from "superseded" to []
 
-  default policy ingredientDemandRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read ingredient demand"
-  default policy ingredientDemandWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write ingredient demand through commands"
-  default policy ingredientDemandExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute ingredient demand commands"
+  default policy ingredientDemandRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may read ingredient demand"
+  default policy ingredientDemandWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may write ingredient demand through commands"
+  default policy ingredientDemandExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "manageAccess") "Inventory staff and event managers may execute ingredient demand commands"
+
+  // Manifest-owned BOM reconcile (match else create from contributions).
+  // Initialization-capable: mutates required eventId/ingredientId/quantity/unit.
+  command syncFromContributions(
+    eventId: uuid,
+    ingredientId: uuid,
+    requiredQuantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    optional purchasingWeekStart: datetime
+  ) {
+    guard self.deletedAt == null
+    guard self.status == "pending" or self.status == "calculated" or self.status == "confirmed"
+    // Floor tiny/zero aggregate so retire→resync and first-write races stay valid.
+    compute nextQuantity = max(0.0001, requiredQuantity)
+    compute previousStatus = self.status
+    mutate eventId = eventId
+    mutate ingredientId = ingredientId
+    mutate requiredQuantity = nextQuantity
+    mutate unit = unit
+    mutate purchasingWeekStart = purchasingWeekStart != null ? purchasingWeekStart : self.purchasingWeekStart
+    mutate status = previousStatus == "pending" ? "calculated" : previousStatus
+    mutate calculatedAt = self.calculatedAt == null ? now() : self.calculatedAt
+    mutate purchaseEligibleEventId = (previousStatus == "pending" or previousStatus == "calculated") ? eventId : self.purchaseEligibleEventId
+    emit IngredientDemandCalculated {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      ingredientId: ingredientId
+      dishId: self.dishId
+      requiredQuantity: nextQuantity
+      unit: unit
+      servings: self.servings
+    }
+  }
 
   command calculate(
     eventId: uuid,
@@ -108,6 +149,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     mutate sourceYieldQuantity = sourceYieldQuantity != null ? sourceYieldQuantity : self.sourceYieldQuantity
     mutate status = "calculated"
     mutate calculatedAt = now()
+    mutate purchaseEligibleEventId = eventId
     emit IngredientDemandCalculated {
       ingredientDemandId: self.id
       tenantId: self.tenantId
@@ -120,12 +162,15 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Manual ledger confirm (before or without Event.approve). Clears purchase
+  // eligibility so EventApproved foreach-create will not double-create a need.
   command confirm() {
     guard self.status == "calculated"
     guard self.calculatedAt != null
     guard self.deletedAt == null
     mutate status = "confirmed"
     mutate confirmedAt = now()
+    mutate purchaseEligibleEventId = null
     emit IngredientDemandConfirmed {
       ingredientDemandId: self.id
       tenantId: self.tenantId
@@ -134,6 +179,34 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
       requiredQuantity: self.requiredQuantity
       unit: self.unit
     }
+  }
+
+  // After PurchaseNeedOpened (approve foreach-create or manual confirm→create):
+  // confirm if still calculated; always clear eligibility. Idempotent when the
+  // demand was already confirmed by the ledger path.
+  command markReleased() {
+    guard self.deletedAt == null
+    guard self.status == "calculated" or self.status == "confirmed"
+    guard self.calculatedAt != null
+    mutate status = self.status == "calculated" ? "confirmed" : self.status
+    mutate confirmedAt = self.status == "calculated" ? now() : self.confirmedAt
+    mutate purchaseEligibleEventId = null
+    emit IngredientDemandReleased {
+      ingredientDemandId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      ingredientId: self.ingredientId
+      requiredQuantity: self.requiredQuantity
+      unit: self.unit
+    }
+  }
+
+  // Compat for calculated rows that predate purchaseEligibleEventId (or lost
+  // it). Soft mutate — never fails guards for non-calculated rows so Event.approve
+  // cannot roll back. Wired as EventApproved fanOut before PurchaseNeed.create.
+  command ensurePurchaseEligible() {
+    guard self.deletedAt == null
+    mutate purchaseEligibleEventId = (self.status == "calculated" and self.purchaseEligibleEventId == null) ? self.eventId : self.purchaseEligibleEventId
   }
 
   command recalculate(newQuantity: decimal(12, 4), reason: string) {
@@ -163,6 +236,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     mutate status = "fulfilled"
     mutate fulfilledAt = now()
+    mutate purchaseEligibleEventId = null
     emit IngredientDemandFulfilled {
       ingredientDemandId: self.id
       tenantId: self.tenantId
@@ -183,6 +257,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     mutate status = "superseded"
     mutate supersededAt = now()
     mutate supersedeReason = reason
+    mutate purchaseEligibleEventId = null
     emit IngredientDemandSuperseded {
       ingredientDemandId: self.id
       tenantId: self.tenantId
@@ -199,7 +274,8 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
 }
 
 // Recorded loss of ingredient stock at a storage location. Optional Event
-// provenance when the loss is event-linked. Stock decrement reaction deferred.
+// provenance when the loss is event-linked. Optional inventoryItemId drives
+// on-hand decrement and void restore.
 entity WasteRecord mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -208,6 +284,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
   property required ingredientId: uuid
   property required locationId: uuid
   property eventId: uuid?
+  property inventoryItemId: uuid?
   property required quantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
   property required reason: WasteReason = "other"
@@ -221,6 +298,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo inventoryItem: InventoryItem fields [tenantId, inventoryItemId] references [tenantId, id]
 
   computed costImpact: money(12, 2) = self.quantity * self.unitCost
 
@@ -242,6 +320,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     unit: UnitOfMeasure,
     reason: WasteReason,
     optional eventId: uuid,
+    optional inventoryItemId: uuid,
     optional unitCost: money(12, 2),
     optional notes: string
   ) {
@@ -252,11 +331,13 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
     guard self.location != null and self.location.status == "active"
     constraint recordIngredientMatch: ingredientId == self.ingredientId "Record ingredientId must match the seeded ingredient reference"
     constraint recordLocationMatch: locationId == self.locationId "Record locationId must match the seeded location reference"
+    constraint recordStockMatch: inventoryItemId == null or self.inventoryItemId == null or inventoryItemId == self.inventoryItemId "Record inventoryItemId must match the seeded stock reference when provided"
     constraint recordQuantityPositive: quantity > 0 "Waste quantity must be positive"
     constraint recordCostNonnegative: unitCost == null or unitCost >= 0 "Waste unit cost cannot be negative"
     mutate ingredientId = ingredientId
     mutate locationId = locationId
     mutate eventId = eventId != null ? eventId : self.eventId
+    mutate inventoryItemId = inventoryItemId != null ? inventoryItemId : self.inventoryItemId
     mutate quantity = quantity
     mutate unit = unit
     mutate reason = reason
@@ -270,6 +351,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
       ingredientId: ingredientId
       locationId: locationId
       eventId: eventId != null ? eventId : self.eventId
+      inventoryItemId: inventoryItemId != null ? inventoryItemId : self.inventoryItemId
       quantity: quantity
       unit: unit
       reason: reason
@@ -292,6 +374,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
       ingredientId: self.ingredientId
       locationId: self.locationId
       eventId: self.eventId
+      inventoryItemId: self.inventoryItemId
       quantity: self.quantity
       unit: self.unit
       reason: reason
@@ -313,6 +396,15 @@ event IngredientDemandCalculated: "ingredient_demand.calculated" {
 }
 
 event IngredientDemandConfirmed: "ingredient_demand.confirmed" {
+  ingredientDemandId: string
+  tenantId: string
+  eventId: string
+  ingredientId: string
+  requiredQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+event IngredientDemandReleased: "ingredient_demand.released" {
   ingredientDemandId: string
   tenantId: string
   eventId: string
@@ -358,6 +450,7 @@ event WasteRecorded: "waste_record.recorded" {
   ingredientId: string
   locationId: string
   eventId: string?
+  inventoryItemId: string?
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
   reason: WasteReason
@@ -370,7 +463,25 @@ event WasteVoided: "waste_record.voided" {
   ingredientId: string
   locationId: string
   eventId: string?
+  inventoryItemId: string?
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
   reason: string
 }
+
+// Waste decrements on-hand when a stock target is tied. Literal reason
+// because WasteRecorded.reason is WasteReason enum, not string.
+on WasteRecorded run InventoryItem.adjustQuantity
+  resolve payload.inventoryItemId
+  params {
+    delta: 0 - payload.quantity,
+    reason: "Waste"
+  }
+
+// Void restores the quantity WasteRecorded decremented (adjustQuantity).
+on WasteVoided run InventoryItem.adjustQuantity
+  resolve payload.inventoryItemId
+  params {
+    delta: payload.quantity,
+    reason: payload.reason
+  }

@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client
+    participant WeeklyPurchasingConfig as WeeklyPurchasingConfig
+    Client->>+WeeklyPurchasingConfig: configure(defaultVendorId)
+    Note over WeeklyPurchasingConfig: Policies: weeklyPurchasingConfigRead, weeklyPurchasingConfigWrite, weeklyPurchasingConfigExecute
+    Note over WeeklyPurchasingConfig: Guards (3)
+    WeeklyPurchasingConfig->>WeeklyPurchasingConfig: guard[0]: self.configuredAt == null
+    WeeklyPurchasingConfig->>WeeklyPurchasingConfig: guard[1]: self.deletedAt == null
+    WeeklyPurchasingConfig->>WeeklyPurchasingConfig: guard[2]: self.defaultVendor != null and self.defaultVendor.status ...
+    WeeklyPurchasingConfig->>WeeklyPurchasingConfig: mutate.defaultVendorId
+    WeeklyPurchasingConfig->>WeeklyPurchasingConfig: mutate.configuredAt
+    WeeklyPurchasingConfig-->>-Client: void

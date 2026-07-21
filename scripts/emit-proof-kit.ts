@@ -29,6 +29,10 @@ const WORKFORCE_ENTITIES = [
   "TimeRecord",
   "Qualification",
 ] as const;
+const LOGISTICS_ENTITIES = ["PackList", "PackListItem", "Delivery"] as const;
+const COMMERCIAL_ENTITIES = ["Invoice", "Payment"] as const;
+const CLOSEOUT_ENTITIES = ["EventCloseout"] as const;
+const PAYROLL_ENTITIES = ["PayrollInput"] as const;
 const CULINARY_ENTITIES = [
   "Ingredient",
   "Recipe",
@@ -40,6 +44,10 @@ const CATALOG_ENTITIES = [
   ...SUPPLY_ENTITIES,
   ...PRODUCTION_ENTITIES,
   ...WORKFORCE_ENTITIES,
+  ...LOGISTICS_ENTITIES,
+  ...COMMERCIAL_ENTITIES,
+  ...CLOSEOUT_ENTITIES,
+  ...PAYROLL_ENTITIES,
   ...CULINARY_ENTITIES,
 ] as const;
 
@@ -48,6 +56,14 @@ const DEMAND_RUNTIME_TEST =
 const QUALITY_RUNTIME_TEST =
   "tests/proofs/quality-check-fail-block.runtime.test.ts";
 const SHIFT_RUNTIME_TEST = "tests/proofs/shift-lifecycle.runtime.test.ts";
+const LOGISTICS_RUNTIME_TEST =
+  "tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts";
+const COMMERCIAL_RUNTIME_TEST =
+  "tests/proofs/invoice-payment-lifecycle.runtime.test.ts";
+const CLOSEOUT_RUNTIME_TEST =
+  "tests/proofs/event-closeout-lifecycle.runtime.test.ts";
+const PAYROLL_RUNTIME_TEST =
+  "tests/proofs/payroll-input-lifecycle.runtime.test.ts";
 const RECIPE_IMPORT_RUNTIME_TEST =
   "tests/proofs/recipe-import-finalize.runtime.test.ts";
 const STRUCTURAL_TEST = "tests/event-reaction-projection.test.ts";
@@ -55,6 +71,28 @@ const SHIFT_RUNTIME_PROOF_IDS = [
   "Shift.schedule",
   "Shift.start",
   "Shift.complete",
+] as const;
+const LOGISTICS_RUNTIME_PROOF_IDS = [
+  "PackList.open",
+  "PackList.startPacking",
+  "PackList.markPacked",
+  "Delivery.schedule",
+  "Delivery.startTransit",
+  "Delivery.confirmDelivery",
+] as const;
+const COMMERCIAL_RUNTIME_PROOF_IDS = [
+  "Invoice.issue",
+  "Invoice.send",
+  "Payment.record",
+  "Payment.settle",
+] as const;
+const CLOSEOUT_RUNTIME_PROOF_IDS = [
+  "EventCloseout.capture",
+  "EventCloseout.finalize",
+] as const;
+const PAYROLL_RUNTIME_PROOF_IDS = [
+  "PayrollInput.prepare",
+  "PayrollInput.finalize",
 ] as const;
 const RECIPE_IMPORT_PROOF_IDS = [
   "Recipe.draft",
@@ -64,15 +102,23 @@ const RECIPE_IMPORT_PROOF_IDS = [
 
 function compileIr(): void {
   mkdirSync(path.dirname(irPath), { recursive: true });
-  const result = spawnSync(
-    "bunx",
-    ["manifest", "compile", "-g", "src/**/*.manifest", "--merge", "-o", irPath],
-    { cwd: root, encoding: "utf8", shell: true },
-  );
+  // Config-driven merge (`manifest.config.yaml` src glob). Do NOT use
+  // `shell: true` + `-g src/**/*.manifest`: Linux bash expands the glob and
+  // Commander then treats one .manifest path as the sole source → "Found 1
+  // file" / unknown PrepTask|PackList|Delivery (CI failure on every PR).
+  const result = spawnSync("bunx", ["manifest", "compile", "--all"], {
+    cwd: root,
+    encoding: "utf8",
+  });
   if (result.status !== 0) {
     console.error(result.stdout);
     console.error(result.stderr);
     throw new Error("manifest compile (merge) failed");
+  }
+  if (!existsSync(irPath)) {
+    throw new Error(
+      `manifest compile --all did not write ${irPath} (check manifest.config.yaml output)`,
+    );
   }
 }
 
@@ -143,15 +189,31 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     "PrepTask",
     "markBlocked",
   );
+  const paymentReaction = requireReaction(
+    ir,
+    "PaymentSettled",
+    "Invoice",
+    "applyPayment",
+  );
   const demandReactionId = reactionProofId(demandReaction);
   const qualityReactionId = reactionProofId(qualityReaction);
+  const paymentReactionId = reactionProofId(paymentReaction);
   const runtimeProofIds = new Set<string>([
     demandReactionId,
     qualityReactionId,
+    paymentReactionId,
     ...SHIFT_RUNTIME_PROOF_IDS,
+    ...LOGISTICS_RUNTIME_PROOF_IDS,
+    ...COMMERCIAL_RUNTIME_PROOF_IDS,
+    ...CLOSEOUT_RUNTIME_PROOF_IDS,
+    ...PAYROLL_RUNTIME_PROOF_IDS,
     ...RECIPE_IMPORT_PROOF_IDS,
   ]);
-  const structuralProofIds = new Set([demandReactionId, qualityReactionId]);
+  const structuralProofIds = new Set([
+    demandReactionId,
+    qualityReactionId,
+    paymentReactionId,
+  ]);
 
   const catalog = emitCapabilityCatalog(ir, {
     entityFilter: CATALOG_ENTITIES,
@@ -174,9 +236,30 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
         structuralTest: STRUCTURAL_TEST,
         runtimeTest: QUALITY_RUNTIME_TEST,
       },
+      {
+        proofId: paymentReactionId,
+        structuralTest: STRUCTURAL_TEST,
+        runtimeTest: COMMERCIAL_RUNTIME_TEST,
+      },
       ...SHIFT_RUNTIME_PROOF_IDS.map((proofId) => ({
         proofId,
         runtimeTest: SHIFT_RUNTIME_TEST,
+      })),
+      ...LOGISTICS_RUNTIME_PROOF_IDS.map((proofId) => ({
+        proofId,
+        runtimeTest: LOGISTICS_RUNTIME_TEST,
+      })),
+      ...COMMERCIAL_RUNTIME_PROOF_IDS.map((proofId) => ({
+        proofId,
+        runtimeTest: COMMERCIAL_RUNTIME_TEST,
+      })),
+      ...CLOSEOUT_RUNTIME_PROOF_IDS.map((proofId) => ({
+        proofId,
+        runtimeTest: CLOSEOUT_RUNTIME_TEST,
+      })),
+      ...PAYROLL_RUNTIME_PROOF_IDS.map((proofId) => ({
+        proofId,
+        runtimeTest: PAYROLL_RUNTIME_TEST,
       })),
       ...RECIPE_IMPORT_PROOF_IDS.map((proofId) => ({
         proofId,
@@ -314,6 +397,115 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     extraOwnedTables: ["productionBatches", "incidents", "eventAllergenChecks"],
   });
 
+  const logisticsCatalog = emitCapabilityCatalog(ir, {
+    entityFilter: LOGISTICS_ENTITIES,
+    versions,
+    runtimeProofIds: new Set(LOGISTICS_RUNTIME_PROOF_IDS),
+    structuralProofIds: new Set(),
+  });
+  const logisticsLifecycleStates = [
+    "draft",
+    "packing",
+    "packed",
+    "loaded",
+    "dispatched",
+    "cancelled",
+    "pending",
+    "listed",
+    "missing",
+    "scheduled",
+    "in_transit",
+    "delivered",
+    "failed",
+  ];
+  const logisticsGuard = emitIntegrationGuardConfig(logisticsCatalog, {
+    featureRoots: ["src/features/logistics"],
+    convexLibRoot: "convex/lib",
+    versions,
+    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:${logisticsLifecycleStates.join("|")})["']`,
+    lifecyclePolicies: [
+      {
+        pathSuffix: "/LogisticsLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: [
+          "PackListStartPackingLifecycle",
+          "DeliveryConfirmDeliveryLifecycle",
+        ],
+      },
+    ],
+  });
+
+  const commercialCatalog = emitCapabilityCatalog(ir, {
+    entityFilter: COMMERCIAL_ENTITIES,
+    versions,
+    runtimeProofIds: new Set([
+      paymentReactionId,
+      ...COMMERCIAL_RUNTIME_PROOF_IDS,
+    ]),
+    structuralProofIds: new Set([paymentReactionId]),
+  });
+  const commercialLifecycleStates = [
+    "draft",
+    "sent",
+    "viewed",
+    "overdue",
+    "partial",
+    "paid",
+    "voided",
+    "written_off",
+    "pending",
+    "processing",
+    "completed",
+    "failed",
+    "refunded",
+  ];
+  const commercialGuard = emitIntegrationGuardConfig(commercialCatalog, {
+    featureRoots: ["src/features/finance"],
+    convexLibRoot: "convex/lib",
+    versions,
+    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:${commercialLifecycleStates.join("|")})["']`,
+    lifecyclePolicies: [
+      {
+        pathSuffix: "/CommercialLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: ["InvoiceSendLifecycle", "PaymentSettleLifecycle"],
+      },
+      {
+        pathSuffix: "/CloseoutLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: ["EventCloseoutFinalizeLifecycle"],
+      },
+      {
+        pathSuffix: "/PayrollLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: [
+          "PayrollInputFinalizeLifecycle",
+          "PayrollInputMarkVoidedLifecycle",
+        ],
+      },
+    ],
+  });
+
+  const closeoutCatalog = emitCapabilityCatalog(ir, {
+    entityFilter: CLOSEOUT_ENTITIES,
+    versions,
+    runtimeProofIds: new Set(CLOSEOUT_RUNTIME_PROOF_IDS),
+    structuralProofIds: new Set(),
+  });
+  const closeoutGuard = emitIntegrationGuardConfig(closeoutCatalog, {
+    featureRoots: ["src/features/finance"],
+    convexLibRoot: "convex/lib",
+    versions,
+    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:draft|finalized)["']`,
+    lifecyclePolicies: [
+      {
+        pathSuffix: "/CloseoutLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: ["EventCloseoutFinalizeLifecycle"],
+      },
+    ],
+  });
+
   mkdirSync(outDir, { recursive: true });
   const write = (name: string, value: unknown) => {
     const text =
@@ -326,6 +518,33 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
   write("guard.supply.json", supplyGuard);
   write("guard.production.json", productionGuard);
   write("guard.workforce.json", workforceGuard);
+  write("guard.logistics.json", logisticsGuard);
+  write("guard.commercial.json", commercialGuard);
+  write("guard.closeout.json", closeoutGuard);
+
+  const payrollCatalog = emitCapabilityCatalog(ir, {
+    entityFilter: PAYROLL_ENTITIES,
+    versions,
+    runtimeProofIds: new Set(PAYROLL_RUNTIME_PROOF_IDS),
+    structuralProofIds: new Set(),
+  });
+  const payrollGuard = emitIntegrationGuardConfig(payrollCatalog, {
+    featureRoots: ["src/features/finance"],
+    convexLibRoot: "convex/lib",
+    versions,
+    lifecycleLiteralPattern: `\\b(?:from|to)\\s*:\\s*["'](?:draft|prepared|finalized|voided)["']`,
+    lifecyclePolicies: [
+      {
+        pathSuffix: "/PayrollLifecyclePolicy.ts",
+        bindingsImport: '../../generated/manifest-wiring-bindings"',
+        requiredSymbols: [
+          "PayrollInputFinalizeLifecycle",
+          "PayrollInputMarkVoidedLifecycle",
+        ],
+      },
+    ],
+  });
+  write("guard.payroll.json", payrollGuard);
   write("capability-catalog.md", formatCapabilityCatalogMarkdown(catalog));
 
   console.log(`Emitted proof-kit artifacts to ${outDir}`);
