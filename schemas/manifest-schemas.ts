@@ -690,9 +690,6 @@ export const PackListItemSchema = z.object({
   description: z.string().default(""),
   dishId: z.string().uuid().nullable().optional(),
   productionBatchId: z.string().uuid().nullable().optional(),
-  eventDishId: z.string().uuid().nullable().optional(),
-  prepTaskId: z.string().uuid().nullable().optional(),
-  isGenerated: z.boolean().default(false),
   requiredQuantity: z.number().default(0),
   packedQuantity: z.number().min(0).default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
@@ -2494,9 +2491,6 @@ export const PackListItemAddItemParamsSchema = z.object({
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   dishId: z.string().min(1).optional(),
   productionBatchId: z.string().min(1).optional(),
-  eventDishId: z.string().min(1).optional(),
-  prepTaskId: z.string().min(1).optional(),
-  isGenerated: z.boolean().optional(),
 });
 
 export type PackListItemAddItemParams = z.infer<typeof PackListItemAddItemParamsSchema>;
@@ -2519,14 +2513,6 @@ export const PackListItemMarkPackedParamsSchema = z.object({
 });
 
 export type PackListItemMarkPackedParams = z.infer<typeof PackListItemMarkPackedParamsSchema>;
-
-// Command: refreshGenerated on PackListItem
-export const PackListItemRefreshGeneratedParamsSchema = z.object({
-  requiredQuantity: z.number(),
-  description: z.string().optional(),
-});
-
-export type PackListItemRefreshGeneratedParams = z.infer<typeof PackListItemRefreshGeneratedParamsSchema>;
 
 // Command: beginProcessing on Payment
 export const PaymentBeginProcessingParamsSchema = z.object({});

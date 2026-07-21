@@ -619,9 +619,6 @@ export default defineSchema({
     description: v.string(),
     dishId: v.optional(v.union(v.id("dishes"), v.null())),
     productionBatchId: v.optional(v.union(v.id("productionBatches"), v.null())),
-    eventDishId: v.optional(v.union(v.id("eventDishes"), v.null())),
-    prepTaskId: v.optional(v.union(v.id("prepTasks"), v.null())),
-    isGenerated: v.boolean(),
     requiredQuantity: v.number(),
     packedQuantity: v.number(),
     unit: v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion")),
@@ -636,9 +633,7 @@ export default defineSchema({
     .index("by_tenantId", ["tenantId"])
     .index("by_packListId", ["packListId"])
     .index("by_dishId", ["dishId"])
-    .index("by_productionBatchId", ["productionBatchId"])
-    .index("by_eventDishId", ["eventDishId"])
-    .index("by_prepTaskId", ["prepTaskId"]),
+    .index("by_productionBatchId", ["productionBatchId"]),
   payments: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

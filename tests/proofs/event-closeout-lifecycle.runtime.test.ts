@@ -78,6 +78,29 @@ async function seedClosedOutEvent(
     docId: event.docId,
     version: 2,
   });
+  // Event.approve match-else-creates a PackList draft; beginExecution requires
+  // every pack list dispatched or cancelled.
+  const logistics = proof.asRole({
+    subject: `logistics-${tenantId}`,
+    role: "logistics_manager",
+    tenantId,
+  });
+  const openPackLists = await logistics.run(async (ctx) =>
+    (await ctx.db.query("packLists").collect()).filter(
+      (row) =>
+        (row as { eventId?: string }).eventId === event.docId &&
+        (row as { deletedAt?: number | null }).deletedAt == null &&
+        (row as { status?: string }).status !== "cancelled" &&
+        (row as { status?: string }).status !== "dispatched",
+    ),
+  );
+  for (const pack of openPackLists) {
+    await proof.executeCommand(logistics, api.mutations.PackList_cancel, {
+      docId: (pack as { _id: string })._id,
+      reason: "Closeout proof skips packing",
+      version: (pack as { version?: number }).version,
+    });
+  }
   await proof.executeCommand(events, api.mutations.Event_beginExecution, {
     docId: event.docId,
     version: 3,

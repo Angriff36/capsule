@@ -3,16 +3,16 @@
   "meta": {
     "compilerVersion": "3.6.41",
     "schemaVersion": "1.0",
-    "contentHash": "0418609823cc581c4807e29385bcba0390816488350fac71c8522ca6529e7824:0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:179c8e9c509d5272b28e02a7b64a82ecb6b34d6446bac4ba7ef4f52b92a39e66:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:33d4d2785d45b54a41664cd7f7619db35c422ba75508e4fc45e3d26bea96042a:3ab18f80440f7b17dd279810d252f487d5b77c5b93a3a0549ded2cfe546237d4:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:46867b01b878e36ec13d445c9c59195a4d593b1f85eecf98aaa3960786131e6d:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5a0cea365867f6047ba8a5442020de61432d3cb2a279d197d6378afa046f46d8:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:5ec1dab5824cab5560ca99e12a1c91b3fed30258913626ce02ded8ecfd421fa8:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c481269f88ada8b405a26741315811fd1904d2def1602cfb4dd276f745bd6578:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:ccb3757ff8aa9cdd9a84cbfdf97aebbba82cf6529a9855a12169e622532f2b72:cdfef54ea3c18cb709a1b706a6712b6bbe2ab70b34887f7e6f46dd99c23e6bef:ce6c8c2338527b6902932ba1343b5ba5ab1d9fb646854150818441a400957161:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:f8444d8a8a114f5edaa2c8882c00aa74c8bfe088209a5414f4658f4032a5742f",
+    "contentHash": "153be5b9b94014082c2ecf3f789a56a5f5341623eb666b714a7044232174a257:1ab6083e1a469f8aaf08104169ae3d9a1ca53a91770df4a6ef4e57bfa05c6a10:1e506668fbefd709f384af429ccf3b970daf7143b943b29219c7229605c90f97:21d57d616e827ed9eba8950af310277f2eb66471f5fba0eb3107b6da20518a15:317bb23515379f8c3797f3065e69af8d8ea35f013bcf07410205891f51cb2b71:444a34406a1be59e2318e52618f06e2c024cc5f4b8539eaad99e8688068b5ba0:44817c0e4d994b4f9eaaec0ff77a7354d8c429d3ff64ed2ed697a04afa1ecc61:4b3a8bb3b8a0100eb0c02aea49d373e01fa7f0e403a9d707dc9dc9766112663f:5111ecb9c8543db2375be26fff8638deafdd1c5aeebe5eb098383347a0252960:521cdeef965c39fc3dcb888dfe409087134b9e4fb88195a97285eee2d187fd29:5684e36052f2f3e9f2970eddd04d2c910664e2ad238b7981517cc430f653a959:61fee74be61813476c9563e3efbd2e0bb8567052cdc4a9ecdae853f68c6c6a3a:77766fdde34e6bfb38efd3184bf84bf99af350cfcdf58cabbbd913f0a73037b8:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:7b55a406b8fcf935714eb9636512d7c46b73211747ffbb1dd39628d50f256e68:84f68f8800dc2f30826ff3f1c923c7d89966a11dfffbddf5d27a47acf7c2e936:8d3397fc8c4a274927af3f654a36b9318b077aaca2262d574e8325b167c138fb:91013449fb5b6d6f2dcd45746d7b46bbda19031e1d6da873e2d4e9c02821c560:91fd78bcaab65af1e80ac79531842df3f3bc3ae121aedb26189b0c93850883ea:952203740dd05c52a2ee55ca78f80b811be3bb48449b03126e87f3171ef3179d:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:99966b159339ed3d6cc1a24f287d64c5be13db08bbf07c6fb855b352c9c256e4:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:a55d023b26a6299c99c87138658384e8f97eb636a0cabeeb80ff159c6a9d1c45:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:b42238d427001b39dbfbd3becd1f66b96f676331afc164c7ccd1209349510271:bca45b4a706c571e4061fb9a8131be61278b265eea1cf2f4381f27e5a1d638df:c91413f626012769224ca1ab08abe6469f993619bc17a22e6bcd686926832d79:cd648a831023e2befe3dc8a1d9e9e58dc11b27477ee7df4156733631bed767eb:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:dcc4e69c9df237e5972ba749c7e1e76525f0d181301b8d8c2b437cf8eaede1dd:e2230c0ce31b04ea452a5349be34a5841703e415f46c8d0e2f7f1afb914a1761:e542220c6e01b1cde78d80d483bde5d7be7c513aa50cb188a1b61852a2e9d441:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:ec9971ce1c031ad5c042cb3dcc36c516e37a4d1509a302f7aea0e0b293452f4c:f22810fa49283ef6682ac632621533b3b2d72d92f59e7f47285a2881d1b7ecaf:f688898cf4c0c68871d41e91b8f5999fcde4faf80d7703a080841d3e90649720:fdc28fad241416ceed92a345c3acf5b15954417bb2bda3075aff77e7beebeb45",
     "projection": "llm-context"
   },
   "domain": {
     "entityCount": 55,
-    "commandCount": 271,
+    "commandCount": 270,
     "policyCount": 156,
     "constraintCount": 95,
     "enumCount": 59,
-    "eventCount": 260,
+    "eventCount": 259,
     "modules": [],
     "multiTenant": true
   },
@@ -5957,27 +5957,6 @@
           "modifiers": []
         },
         {
-          "name": "eventDishId",
-          "type": "uuid | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "prepTaskId",
-          "type": "uuid | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "isGenerated",
-          "type": "boolean",
-          "required": true,
-          "modifiers": [
-            "required"
-          ],
-          "defaultValue": false
-        },
-        {
           "name": "requiredQuantity",
           "type": "decimal",
           "required": true,
@@ -6094,36 +6073,6 @@
               "id"
             ]
           }
-        },
-        {
-          "name": "eventDish",
-          "kind": "belongsTo",
-          "target": "EventDish",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "eventDishId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "prepTask",
-          "kind": "belongsTo",
-          "target": "PrepTask",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "prepTaskId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
         }
       ],
       "constraints": [
@@ -6156,8 +6105,7 @@
         "addItem",
         "adjustQuantity",
         "markMissing",
-        "markPacked",
-        "refreshGenerated"
+        "markPacked"
       ],
       "policies": [],
       "key": [
@@ -20796,21 +20744,6 @@
           "name": "productionBatchId",
           "type": "uuid",
           "required": false
-        },
-        {
-          "name": "eventDishId",
-          "type": "uuid",
-          "required": false
-        },
-        {
-          "name": "prepTaskId",
-          "type": "uuid",
-          "required": false
-        },
-        {
-          "name": "isGenerated",
-          "type": "boolean",
-          "required": false
         }
       ],
       "guards": [
@@ -20840,20 +20773,6 @@
           "severity": "block",
           "expression": "[omitted]",
           "message": "Add item productionBatchId must match the seeded batch reference when provided"
-        },
-        {
-          "name": "addItemEventDishMatch",
-          "code": "addItemEventDishMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Add item eventDishId must match the seeded event dish reference when provided"
-        },
-        {
-          "name": "addItemPrepTaskMatch",
-          "code": "addItemPrepTaskMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Add item prepTaskId must match the seeded prep task reference when provided"
         },
         {
           "name": "addItemDescriptionPresent",
@@ -20894,21 +20813,6 @@
         {
           "kind": "mutate",
           "target": "productionBatchId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "eventDishId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "prepTaskId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "isGenerated",
           "expression": "[omitted]"
         },
         {
@@ -20982,11 +20886,6 @@
         {
           "kind": "mutate",
           "target": "requiredQuantity",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "isGenerated",
           "expression": "[omitted]"
         }
       ],
@@ -21097,65 +20996,6 @@
       ],
       "emits": [
         "PackListItemPacked"
-      ]
-    },
-    {
-      "name": "refreshGenerated",
-      "entity": "PackListItem",
-      "parameters": [
-        {
-          "name": "requiredQuantity",
-          "type": "decimal",
-          "required": true
-        },
-        {
-          "name": "description",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [
-        {
-          "name": "refreshGeneratedQuantityPositive",
-          "code": "refreshGeneratedQuantityPositive",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Generated pack quantity must be positive"
-        },
-        {
-          "name": "refreshGeneratedDescriptionPresent",
-          "code": "refreshGeneratedDescriptionPresent",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Generated pack description cannot be blank"
-        }
-      ],
-      "policies": [
-        "packListItemRead",
-        "packListItemWrite",
-        "packListItemExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "requiredQuantity",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "description",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "PackListItemGeneratedRefreshed"
       ]
     },
     {
@@ -29926,22 +29766,22 @@
       "name": "deliveryExecute",
       "entity": "Delivery",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"logisticsAccess\")",
-      "message": "Logistics staff may execute delivery commands"
+      "expression": "roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Logistics staff and managers may execute delivery commands"
     },
     {
       "name": "deliveryRead",
       "entity": "Delivery",
       "action": "read",
-      "expression": "roleAllows(user.role, \"logisticsAccess\")",
-      "message": "Logistics staff may read deliveries"
+      "expression": "roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Logistics staff and managers may read deliveries"
     },
     {
       "name": "deliveryWrite",
       "entity": "Delivery",
       "action": "write",
-      "expression": "roleAllows(user.role, \"logisticsAccess\")",
-      "message": "Logistics staff may write deliveries through commands"
+      "expression": "roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Logistics staff and managers may write deliveries through commands"
     },
     {
       "name": "dishExecute",
@@ -30325,8 +30165,8 @@
       "name": "packListExecute",
       "entity": "PackList",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"logisticsAccess\")",
-      "message": "Logistics staff may execute pack list commands"
+      "expression": "roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Logistics staff and managers may execute pack list commands"
     },
     {
       "name": "packListItemExecute",
@@ -30353,15 +30193,15 @@
       "name": "packListRead",
       "entity": "PackList",
       "action": "read",
-      "expression": "roleAllows(user.role, \"logisticsAccess\")",
-      "message": "Logistics staff may read pack lists"
+      "expression": "roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Logistics staff and managers may read pack lists"
     },
     {
       "name": "packListWrite",
       "entity": "PackList",
       "action": "write",
-      "expression": "roleAllows(user.role, \"logisticsAccess\")",
-      "message": "Logistics staff may write pack lists through commands"
+      "expression": "roleAllows(user.role, \"logisticsAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Logistics staff and managers may write pack lists through commands"
     },
     {
       "name": "paymentExecute",
@@ -30472,22 +30312,22 @@
       "name": "productionBatchExecute",
       "entity": "ProductionBatch",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"kitchenAccess\")",
-      "message": "Kitchen staff may execute production batch commands"
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may execute production batch commands"
     },
     {
       "name": "productionBatchRead",
       "entity": "ProductionBatch",
       "action": "read",
-      "expression": "roleAllows(user.role, \"kitchenAccess\")",
-      "message": "Kitchen staff may read production batches"
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may read production batches"
     },
     {
       "name": "productionBatchWrite",
       "entity": "ProductionBatch",
       "action": "write",
-      "expression": "roleAllows(user.role, \"kitchenAccess\")",
-      "message": "Kitchen staff may write production batches through commands"
+      "expression": "roleAllows(user.role, \"kitchenAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Kitchen staff and managers may write production batches through commands"
     },
     {
       "name": "proposalExecute",
@@ -32655,38 +32495,6 @@
         "fields": [
           "tenantId",
           "productionBatchId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "PackListItem",
-      "target": "EventDish",
-      "kind": "belongsTo",
-      "name": "eventDish",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "eventDishId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "PackListItem",
-      "target": "PrepTask",
-      "kind": "belongsTo",
-      "name": "prepTask",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "prepTaskId"
         ],
         "references": [
           "tenantId",
@@ -35322,12 +35130,7 @@
     {
       "name": "PackListItemAdded",
       "channel": "pack_list_item.added",
-      "payload": "{packListItemId: string, tenantId: string, packListId: string, eventId: string, description: string, dishId: string | null, productionBatchId: string | null, eventDishId: string | null, prepTaskId: string | null, isGenerated: boolean, requiredQuantity: decimal, unit: UnitOfMeasure, status: PackListItemStatus}"
-    },
-    {
-      "name": "PackListItemGeneratedRefreshed",
-      "channel": "pack_list_item.generated_refreshed",
-      "payload": "{packListItemId: string, tenantId: string, packListId: string, eventId: string, description: string, eventDishId: string | null, prepTaskId: string | null, requiredQuantity: decimal, unit: UnitOfMeasure, status: PackListItemStatus}"
+      "payload": "{packListItemId: string, tenantId: string, packListId: string, eventId: string, description: string, dishId: string | null, productionBatchId: string | null, requiredQuantity: decimal, unit: UnitOfMeasure, status: PackListItemStatus}"
     },
     {
       "name": "PackListItemMissing",
@@ -35357,7 +35160,7 @@
     {
       "name": "PackListPacked",
       "channel": "pack_list.packed",
-      "payload": "{packListId: string, tenantId: string, eventId: string, name: string, previousStatus: PackListStatus, status: PackListStatus, packedAt: datetime | null}"
+      "payload": "{packListId: string, tenantId: string, eventId: string, name: string, previousStatus: PackListStatus, status: PackListStatus, packedAt: datetime | null, destination: string, windowStartsAt: datetime, windowEndsAt: datetime}"
     },
     {
       "name": "PackListPackingStarted",

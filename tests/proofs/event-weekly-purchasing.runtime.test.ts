@@ -53,7 +53,7 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
     });
     const kitchen = proof.asRole({
       subject: "kitchen-weekly",
-      role: "kitchen_staff",
+      role: "kitchen_manager",
       tenantId: S.tenantId,
     });
     const inventory = proof.asRole({
@@ -198,6 +198,16 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
         unit: "kilogram",
       },
     );
+
+    // Event.approve → ProductionBatch.plan requires published recipes.
+    await proof.executeCommand(kitchen, api.mutations.Recipe_publishVersion, {
+      docId: recipeA.docId,
+      version: 1,
+    });
+    await proof.executeCommand(kitchen, api.mutations.Recipe_publishVersion, {
+      docId: recipeB.docId,
+      version: 1,
+    });
 
     const dishA = (await proof.executeCommand(
       kitchen,

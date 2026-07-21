@@ -44,10 +44,12 @@ entity Delivery mixin TenantScoped, SoftDeletable {
   transition status from "failed" to []
   transition status from "cancelled" to []
 
-  default policy deliveryRead read: roleAllows(user.role, "logisticsAccess") "Logistics staff may read deliveries"
-  default policy deliveryWrite write: roleAllows(user.role, "logisticsAccess") "Logistics staff may write deliveries through commands"
-  default policy deliveryExecute execute: roleAllows(user.role, "logisticsAccess") "Logistics staff may execute delivery commands"
+  // manageAccess: reserved for manager-driven cascade; logisticsAccess: packing staff.
+  default policy deliveryRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read deliveries"
+  default policy deliveryWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write deliveries through commands"
+  default policy deliveryExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute delivery commands"
 
+  // Idempotent schedule: PackListPacked reaction may re-fire; do not duplicate.
   command schedule(
     packListId: uuid,
     eventId: uuid,
@@ -57,33 +59,33 @@ entity Delivery mixin TenantScoped, SoftDeletable {
     optional driverId: uuid,
     optional notes: string
   ) {
-    guard self.scheduledAt == null
-    guard self.status == "scheduled"
     guard self.deletedAt == null
+    guard self.status == "scheduled"
     guard self.packList != null and (self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
     guard self.event != null
+    guard self.scheduledAt == null or self.packListId == packListId
     constraint schedulePackListMatch: packListId == self.packListId "Schedule packListId must match the seeded pack list reference"
     constraint scheduleEventMatch: eventId == self.eventId "Schedule eventId must match the seeded event reference"
     constraint scheduleDriverMatch: driverId == null or self.driverId == null or driverId == self.driverId "Schedule driverId must match the seeded driver reference when provided"
-    constraint scheduleDestinationPresent: length(trim(destination)) > 0 "Delivery destination is required"
-    constraint scheduleWindowDates: windowEndsAt > windowStartsAt "Delivery window end must be after its start"
+    constraint scheduleDestinationPresent: length(trim(destination)) > 0 or length(trim(self.destination)) > 0 "Delivery destination is required"
+    constraint scheduleWindowDates: (self.scheduledAt != null) or (windowEndsAt > windowStartsAt) "Delivery window end must be after its start"
     mutate packListId = packListId
     mutate eventId = eventId
-    mutate destination = destination
-    mutate windowStartsAt = windowStartsAt
-    mutate windowEndsAt = windowEndsAt
+    mutate destination = length(trim(self.destination)) > 0 ? self.destination : destination
+    mutate windowStartsAt = self.windowStartsAt != null ? self.windowStartsAt : windowStartsAt
+    mutate windowEndsAt = self.windowEndsAt != null ? self.windowEndsAt : windowEndsAt
     mutate driverId = driverId != null ? driverId : self.driverId
     mutate notes = notes != null ? notes : self.notes
-    mutate scheduledAt = now()
+    mutate scheduledAt = self.scheduledAt != null ? self.scheduledAt : now()
     emit DeliveryScheduled {
       deliveryId: self.id
       tenantId: self.tenantId
       packListId: packListId
       eventId: eventId
       driverId: driverId != null ? driverId : self.driverId
-      destination: destination
-      windowStartsAt: windowStartsAt
-      windowEndsAt: windowEndsAt
+      destination: length(trim(self.destination)) > 0 ? self.destination : destination
+      windowStartsAt: self.windowStartsAt != null ? self.windowStartsAt : windowStartsAt
+      windowEndsAt: self.windowEndsAt != null ? self.windowEndsAt : windowEndsAt
       status: "scheduled"
     }
   }
@@ -237,3 +239,15 @@ event DeliveryCancelled: "delivery.cancelled" {
 on EventCancelled fanOut Delivery where eventId = payload.eventId
   run cancel
   params { reason: payload.reason }
+
+// Vision cascade: packed pack list ensures one Delivery schedule (match else create).
+on PackListPacked run Delivery.schedule
+  match packListId = payload.packListId
+  else create
+  params {
+    packListId: payload.packListId
+    eventId: payload.eventId
+    destination: payload.destination
+    windowStartsAt: payload.windowStartsAt
+    windowEndsAt: payload.windowEndsAt
+  }

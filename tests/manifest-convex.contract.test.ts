@@ -416,9 +416,6 @@ describe("Manifest Convex contract", () => {
   it("exports mutation PackListItem_markPacked", () => {
     expect(typeof (mutations as any).PackListItem_markPacked).toBe("function");
   });
-  it("exports mutation PackListItem_refreshGenerated", () => {
-    expect(typeof (mutations as any).PackListItem_refreshGenerated).toBe("function");
-  });
   it("exports mutation Payment_beginProcessing", () => {
     expect(typeof (mutations as any).Payment_beginProcessing).toBe("function");
   });
@@ -823,4 +820,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 272 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 271 as const;
