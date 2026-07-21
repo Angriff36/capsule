@@ -881,7 +881,15 @@ export const ProductionBatchSchema = z.object({
   updatedAt: z.coerce.date().optional(),
 });
 
+// Computed: ProductionBatch
+export const ProductionBatchComputedSchema = ProductionBatchSchema.extend({
+  yieldVariance: z.number().nullable(),
+  varianceRatio: z.number().nullable(),
+  fulfillmentRatio: z.number().nullable(),
+});
+
 export type ProductionBatch = z.infer<typeof ProductionBatchSchema>;
+export type ProductionBatchWithComputed = z.infer<typeof ProductionBatchComputedSchema>;
 
 // Entity: Proposal
 export const ProposalSchema = z.object({

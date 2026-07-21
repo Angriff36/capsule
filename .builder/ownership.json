@@ -2,7 +2,7 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "32884267d28dab72fa2ec4c52826b5d243f3b6ba5098ced603a8544588f3acfc"
+      "sha256": "45d2219d262089a60081e22b83de531d3e7b6599af962646e0aeeeda8d6e9924"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
@@ -848,7 +848,7 @@
       "sha256": "cd928fd6c3a0b07f62de709c125e7abd923866430b962bf0f4cfe88a6acbca91"
     },
     "manifest-context-summary.json": {
-      "sha256": "f516507232810b83173de6cd301030ee6db79b319422877731c95cadd511a7f5"
+      "sha256": "745666ce54231307a5dd4504d3baf360009f00d5f0dc6719bf14bfbd726c6d73"
     },
     "package.json": {
       "sha256": "7e473f5663af5ee8b406f88f8027c8e893630e4dfc35de2903b2c506886fa866"
@@ -857,16 +857,16 @@
       "sha256": "d6a4c74ee34c02ed5af5166190a8dab595f6d195bf1d13b6706262c0f4501585"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "bd3a0cf7f4ca0484592d488e1c97bd2887f320ceaf897a1d25b6560cd3a2db62"
+      "sha256": "5e34b49ca9e431b8db0d8c8b27563294416db4778e831655abf492172232a0e9"
     },
     "scripts/seed-convex.ts": {
       "sha256": "da84fffd51f9f1cc892363442c71c50847d3d8388b3f116eb427a593349a47ce"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "444ea3af7a03ec1cc188ab25f26fe7b253f75dfadd17c0516cbaac20c470e04a"
+      "sha256": "4625b4b8e4c924ce70878828a8cce569f5cacb6fe4b6d54abb7241a728e745be"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "12f45c16906641312e4ab93542c87d48cf306ab9410985500fed175824bda2c8"
+      "sha256": "5022e391e948a1669916ed691fc30915162baedf90e99368498b3be37c28cffd"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "a7da358ac0ed6bed5e3fe8bc78ee51b196a295d57ef71a6e052748068ee04317"
@@ -878,7 +878,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "c8b921e5e7a3963e9abf86fc6501c5354946103d0e36cacc2c3c0b260802a83a"
+      "sha256": "d729a23975b3637561000bebb2e4f58a25bd542cd2e8be2c69b026b2efb1ca78"
     }
   },
   "package": {
@@ -902,8 +902,8 @@
   },
   "editableManifest": {
     "paths": [
-      ".local/scratch/capability-wip/capability-setting.manifest",
       "manifest.config.yaml",
+      "src/admin/capability-setting.manifest",
       "src/app.manifest",
       "src/culinary/dish.manifest",
       "src/culinary/event-dish.manifest",

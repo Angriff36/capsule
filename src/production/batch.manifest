@@ -20,6 +20,10 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
   property required plannedYield: decimal(12, 4) = 0
   property actualYield: decimal(12, 4)?
   property required yieldUnit: UnitOfMeasure = "portion"
+
+  computed yieldVariance: decimal(12, 4)? = self.actualYield != null ? self.actualYield - self.plannedYield : null
+  computed varianceRatio: decimal(12, 4)? = self.actualYield != null ? (self.actualYield - self.plannedYield) / self.plannedYield : null
+  computed fulfillmentRatio: decimal(12, 4)? = self.actualYield != null ? self.actualYield / self.plannedYield : null
   property notes: string?
   property required status: ProductionBatchStatus = "planned"
   property plannedAt: datetime?
