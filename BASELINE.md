@@ -36,7 +36,7 @@ and the last green `bun run check` / CI run.
 ~~Aim ≤35 tracked root entries (excluding `node_modules` / `dist` / `graphify-out`).~~
 ~~**Correction (2026-07-16):** Aim ≤37 — live Manifest project adds root
 `manifest.config.yaml` and `.builder/` (ownership).~~
-**Correction (2026-07-17):** Aim ≤41 — Builder preset adds root
+**Correction (2026-07-17):** Aim ≤43 (was 41; +2 on 2026-07-21 for the product loop's PRODUCT-BACKLOG.md + PROMPT-product.md) — Builder preset adds root
 `tsconfig.builder.json` (Convex application assembly). Still excludes
 `node_modules` / `dist` / `graphify-out`.
 ~~**Correction (2026-07-17):** Aim ≤40 — loop engineering adds durable root

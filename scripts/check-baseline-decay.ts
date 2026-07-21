@@ -9,7 +9,7 @@ import { resolve } from "node:path";
  * durable loop-engineering roots (`loop-budget.md`, `loop-constraints.md`,
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
-const ROOT_CAP = 41;
+const ROOT_CAP = 43; // +2 (2026-07-21): PRODUCT-BACKLOG.md + PROMPT-product.md (product loop)
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {
