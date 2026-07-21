@@ -35,8 +35,11 @@ entity Vendor mixin TenantScoped, SoftDeletable {
   property terminatedAt: datetime?
   property terminationReason: string?
 
-  // VendorOrder belongsTo Vendor is declared in order.manifest; inverse
-  // hasMany omitted so this file stays a standalone harness entry (PB010 pattern).
+  // VendorOrder belongsTo Vendor is declared in order.manifest; inverse hasMany added
+  // for S8 order visibility (openOrderCount, outstandingTotal).
+  hasMany orders: VendorOrder
+  computed openOrderCount: number = count_of(self.orders, (o) => o.status == "draft" or o.status == "submitted" or o.status == "confirmed" or o.status == "partially_received")
+  computed outstandingTotal: decimal(12, 2) = sum(self.orders, (o) => (o.status == "submitted" or o.status == "confirmed" or o.status == "partially_received") ? o.totalAmount : 0)
 
   constraint vendorNamePresent: self.onboardedAt == null or length(trim(self.name)) > 0 "Vendor name is required once onboarded"
   constraint vendorPaymentTerms: self.paymentTermsDays >= 0 and self.paymentTermsDays <= 365 "Payment terms must be between 0 and 365 days"

@@ -1247,7 +1247,14 @@ export const VendorSchema = z.object({
   updatedAt: z.coerce.date().optional(),
 });
 
+// Computed: Vendor
+export const VendorComputedSchema = VendorSchema.extend({
+  openOrderCount: z.number(),
+  outstandingTotal: z.number(),
+});
+
 export type Vendor = z.infer<typeof VendorSchema>;
+export type VendorWithComputed = z.infer<typeof VendorComputedSchema>;
 
 // Entity: VendorOrder
 export const VendorOrderSchema = z.object({

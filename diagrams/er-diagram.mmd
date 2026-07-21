@@ -1071,6 +1071,7 @@ erDiagram
         datetime createdAt
         datetime updatedAt
     }
+    Vendor ||--o{ VendorOrder : "orders"
     VendorOrder {
         uuid id "PK"
         string tenantId "PK"
