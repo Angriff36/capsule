@@ -205,7 +205,9 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   command cancel(reason: string) {
     guard self.status == "draft" or self.status == "submitted" or self.status == "confirmed" or self.status == "partially_received"
     guard self.deletedAt == null
-    guard roleAllows(user.role, "inventoryManageAccess")
+    // Draft abort (prep-list generate rollback) is a procurement action; later-stage
+    // cancel stays manage-gated.
+    guard roleAllows(user.role, "inventoryManageAccess") or (self.status == "draft" and roleAllows(user.role, "procurementAccess"))
     constraint cancelOrderReason: length(trim(reason)) > 0 "Cancellation reason is required"
     compute previousStatus = self.status
     mutate status = "cancelled"
@@ -315,6 +317,28 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command reviseQuantity(
+    orderedQuantity: decimal(12, 4),
+    optional unitCost: money(12, 2)
+  ) {
+    guard self.status == "added"
+    guard self.deletedAt == null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
+    constraint reviseLineQuantityPositive: orderedQuantity > 0 "Ordered quantity must be positive"
+    constraint reviseLineCostNonnegative: unitCost == null or unitCost >= 0 "Unit cost cannot be negative"
+    mutate orderedQuantity = orderedQuantity
+    mutate unitCost = unitCost != null ? unitCost : self.unitCost
+    emit VendorOrderLineQuantityRevised {
+      vendorOrderLineId: self.id
+      tenantId: self.tenantId
+      vendorOrderId: self.vendorOrderId
+      ingredientId: self.ingredientId
+      orderedQuantity: orderedQuantity
+      unit: self.unit
+      unitCost: unitCost != null ? unitCost : self.unitCost
+    }
+  }
+
   command recordReceipt(
     quantity: decimal(12, 4),
     locationId: uuid,
@@ -361,7 +385,8 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     guard self.status == "added" or self.status == "receiving"
     guard self.deletedAt == null
     guard self.vendorOrder != null and (self.vendorOrder.status == "draft" or self.vendorOrder.status == "submitted" or self.vendorOrder.status == "confirmed")
-    guard roleAllows(user.role, "inventoryManageAccess")
+    // Draft-line abort for prep-list generate rollback; later-stage cancel stays manage-gated.
+    guard roleAllows(user.role, "inventoryManageAccess") or (self.vendorOrder.status == "draft" and roleAllows(user.role, "procurementAccess"))
     constraint cancelLineReason: length(trim(reason)) > 0 "Cancellation reason is required"
     mutate status = "cancelled"
     mutate cancelledAt = now()
@@ -385,6 +410,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
 
 // Provenance contribution from one IngredientDemand to an aggregated weekly
 // VendorOrderLine. Several Events may contribute to the same order line.
+// vendorOrderId is denormalized (one-hop belongsTo) so draft guards project
+// correctly — nested self.vendorOrderLine.vendorOrder is not hydrated on
+// __rel_* locals in Convex createVia/link runners (Guard 2 always failed).
 entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -392,6 +420,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
 
   property required vendorOrderLineId: uuid
   property required ingredientDemandId: uuid
+  property required vendorOrderId: uuid
   property required contributionQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
   property linkedAt: datetime?
@@ -399,6 +428,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
 
   belongsTo vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
   belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
+  belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
 
   constraint demandLinkQuantityPositive: self.linkedAt == null or self.contributionQuantity > 0 "Demand link contribution must be positive"
 
@@ -409,18 +439,23 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
   command link(
     vendorOrderLineId: uuid,
     ingredientDemandId: uuid,
+    vendorOrderId: uuid,
     contributionQuantity: decimal(12, 4),
     unit: UnitOfMeasure
   ) {
     guard self.linkedAt == null
     guard self.deletedAt == null
-    guard self.vendorOrderLine != null and self.vendorOrderLine.vendorOrder != null and self.vendorOrderLine.vendorOrder.status == "draft"
+    guard self.vendorOrderLine != null
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     guard self.ingredientDemand != null
     constraint linkLineMatch: vendorOrderLineId == self.vendorOrderLineId "Demand link vendorOrderLineId must match the seeded line reference"
     constraint linkDemandMatch: ingredientDemandId == self.ingredientDemandId "Demand link ingredientDemandId must match the seeded demand reference"
+    constraint linkOrderMatch: vendorOrderId == self.vendorOrderId "Demand link vendorOrderId must match the seeded order reference"
+    constraint linkOrderOwnsLine: vendorOrderId == self.vendorOrderLine.vendorOrderId "Demand link vendorOrderId must own the vendor order line"
     constraint linkQuantityPositive: contributionQuantity > 0 "Demand link contribution must be positive"
     mutate vendorOrderLineId = vendorOrderLineId
     mutate ingredientDemandId = ingredientDemandId
+    mutate vendorOrderId = vendorOrderId
     mutate contributionQuantity = contributionQuantity
     mutate unit = unit
     mutate linkedAt = now()
@@ -437,7 +472,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
   command revise(contributionQuantity: decimal(12, 4)) {
     guard self.linkedAt != null
     guard self.deletedAt == null
-    guard self.vendorOrderLine != null and self.vendorOrderLine.vendorOrder != null and self.vendorOrderLine.vendorOrder.status == "draft"
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     constraint reviseQuantityPositive: contributionQuantity > 0 "Demand link contribution must be positive"
     mutate contributionQuantity = contributionQuantity
     emit VendorOrderLineDemandRevised {
@@ -453,7 +488,7 @@ entity VendorOrderLineDemand mixin TenantScoped, SoftDeletable {
   command retire(reason: string) {
     guard self.linkedAt != null
     guard self.deletedAt == null
-    guard self.vendorOrderLine != null and self.vendorOrderLine.vendorOrder != null and self.vendorOrderLine.vendorOrder.status == "draft"
+    guard self.vendorOrder != null and self.vendorOrder.status == "draft"
     constraint retireReasonPresent: length(trim(reason)) > 0 "Demand link retirement reason is required"
     mutate removedAt = now()
     mutate deletedAt = now()
@@ -570,6 +605,16 @@ event VendorOrderLineReceived: "vendor_order_line.received" {
   unit: UnitOfMeasure
   unitCost: money(12, 2)
   discrepancyQuantity: decimal(12, 4)?
+}
+
+event VendorOrderLineQuantityRevised: "vendor_order_line.quantity_revised" {
+  vendorOrderLineId: string
+  tenantId: string
+  vendorOrderId: string
+  ingredientId: string
+  orderedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  unitCost: money(12, 2)
 }
 
 event VendorOrderLineCancelled: "vendor_order_line.cancelled" {

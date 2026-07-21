@@ -7,7 +7,7 @@ sequenceDiagram
     Note over VendorOrderLineDemand: Guards (3)
     VendorOrderLineDemand->>VendorOrderLineDemand: guard[0]: self.linkedAt != null
     VendorOrderLineDemand->>VendorOrderLineDemand: guard[1]: self.deletedAt == null
-    VendorOrderLineDemand->>VendorOrderLineDemand: guard[2]: self.vendorOrderLine != null and self.vendorOrderLine.ven...
+    VendorOrderLineDemand->>VendorOrderLineDemand: guard[2]: self.vendorOrder != null and self.vendorOrder.status == #quot;...
     VendorOrderLineDemand->>VendorOrderLineDemand: mutate.contributionQuantity
     VendorOrderLineDemand->>EventBus: emit VendorOrderLineDemandRevised on vendor_order_line_demand.revised
     VendorOrderLineDemand-->>-Client: void

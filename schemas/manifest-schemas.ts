@@ -446,6 +446,7 @@ export const IngredientDemandSchema = z.object({
   sourceBatchMultiplier: z.number().nullable().optional(),
   sourceYieldQuantity: z.number().nullable().optional(),
   status: z.enum(["pending", "calculated", "confirmed", "fulfilled", "superseded"]).default("pending"),
+  purchaseEligibleEventId: z.string().uuid().nullable().optional(),
   calculatedAt: z.coerce.date().nullable().optional(),
   confirmedAt: z.coerce.date().nullable().optional(),
   fulfilledAt: z.coerce.date().nullable().optional(),
@@ -1255,6 +1256,7 @@ export const VendorOrderLineDemandSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
   vendorOrderLineId: z.string().uuid(),
   ingredientDemandId: z.string().uuid(),
+  vendorOrderId: z.string().uuid(),
   contributionQuantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
   linkedAt: z.coerce.date().nullable().optional(),
@@ -2021,10 +2023,20 @@ export const IngredientDemandConfirmParamsSchema = z.object({});
 
 export type IngredientDemandConfirmParams = z.infer<typeof IngredientDemandConfirmParamsSchema>;
 
+// Command: ensurePurchaseEligible on IngredientDemand
+export const IngredientDemandEnsurePurchaseEligibleParamsSchema = z.object({});
+
+export type IngredientDemandEnsurePurchaseEligibleParams = z.infer<typeof IngredientDemandEnsurePurchaseEligibleParamsSchema>;
+
 // Command: fulfill on IngredientDemand
 export const IngredientDemandFulfillParamsSchema = z.object({});
 
 export type IngredientDemandFulfillParams = z.infer<typeof IngredientDemandFulfillParamsSchema>;
+
+// Command: markReleased on IngredientDemand
+export const IngredientDemandMarkReleasedParamsSchema = z.object({});
+
+export type IngredientDemandMarkReleasedParams = z.infer<typeof IngredientDemandMarkReleasedParamsSchema>;
 
 // Command: recalculate on IngredientDemand
 export const IngredientDemandRecalculateParamsSchema = z.object({
@@ -3333,6 +3345,7 @@ export type VendorOrderLineReviseQuantityParams = z.infer<typeof VendorOrderLine
 export const VendorOrderLineDemandLinkParamsSchema = z.object({
   vendorOrderLineId: z.string().min(1),
   ingredientDemandId: z.string().min(1),
+  vendorOrderId: z.string().min(1),
   contributionQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
 });

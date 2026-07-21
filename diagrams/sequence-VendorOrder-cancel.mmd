@@ -7,7 +7,7 @@ sequenceDiagram
     Note over VendorOrder: Guards (3)
     VendorOrder->>VendorOrder: guard[0]: self.status == #quot;draft#quot; or self.status == #quot;submitted#quot; or s...
     VendorOrder->>VendorOrder: guard[1]: self.deletedAt == null
-    VendorOrder->>VendorOrder: guard[2]: roleAllows(user.role, #quot;inventoryManageAccess#quot;)
+    VendorOrder->>VendorOrder: guard[2]: roleAllows(user.role, #quot;inventoryManageAccess#quot;) or self.st...
     VendorOrder->>VendorOrder: compute.previousStatus
     VendorOrder->>VendorOrder: mutate.status
     VendorOrder->>VendorOrder: mutate.cancelledAt

@@ -384,6 +384,7 @@ erDiagram
         decimal sourceBatchMultiplier "nullable"
         decimal sourceYieldQuantity "nullable"
         IngredientDemandStatus status "PK"
+        uuid purchaseEligibleEventId "nullable"
         datetime calculatedAt "nullable"
         datetime confirmedAt "nullable"
         datetime fulfilledAt "nullable"
@@ -1079,6 +1080,7 @@ erDiagram
         datetime deletedAt "nullable"
         uuid vendorOrderLineId "PK"
         uuid ingredientDemandId "PK"
+        uuid vendorOrderId "PK"
         decimal contributionQuantity "PK"
         UnitOfMeasure unit "PK"
         datetime linkedAt "nullable"
@@ -1088,6 +1090,7 @@ erDiagram
     }
     VendorOrderLineDemand }o--|| VendorOrderLine : "vendorOrderLine"
     VendorOrderLineDemand }o--|| IngredientDemand : "ingredientDemand"
+    VendorOrderLineDemand }o--|| VendorOrder : "vendorOrder"
     Venue {
         uuid id "PK"
         string tenantId "PK"

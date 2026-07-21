@@ -9,7 +9,7 @@ sequenceDiagram
     VendorOrderLine->>VendorOrderLine: guard[1]: self.status == #quot;added#quot; or self.status == #quot;receiving#quot;
     VendorOrderLine->>VendorOrderLine: guard[2]: self.deletedAt == null
     VendorOrderLine->>VendorOrderLine: guard[3]: self.vendorOrder != null and self.vendorOrder.status == #quot;...
-    VendorOrderLine->>VendorOrderLine: guard[4]: roleAllows(user.role, #quot;inventoryManageAccess#quot;)
+    VendorOrderLine->>VendorOrderLine: guard[4]: roleAllows(user.role, #quot;inventoryManageAccess#quot;) or self.ve...
     VendorOrderLine->>VendorOrderLine: mutate.status
     VendorOrderLine->>VendorOrderLine: mutate.cancelledAt
     VendorOrderLine->>VendorOrderLine: mutate.deletedAt

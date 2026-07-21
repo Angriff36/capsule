@@ -78,7 +78,9 @@ import {
   IngredientClassifyAllergensParamsSchema,
   IngredientDemandCalculateParamsSchema,
   IngredientDemandConfirmParamsSchema,
+  IngredientDemandEnsurePurchaseEligibleParamsSchema,
   IngredientDemandFulfillParamsSchema,
+  IngredientDemandMarkReleasedParamsSchema,
   IngredientDemandRecalculateParamsSchema,
   IngredientDemandSupersedeParamsSchema,
   IngredientDiscontinueParamsSchema,
@@ -1426,12 +1428,32 @@ export function useIngredientDemandConfirm() {
   };
 }
 
+/** Mutation hook for IngredientDemand.ensurePurchaseEligible. */
+export function useIngredientDemandEnsurePurchaseEligible() {
+  const mutate = useMutation(api.mutations.IngredientDemand_ensurePurchaseEligible);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IngredientDemandEnsurePurchaseEligibleParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for IngredientDemand.fulfill. */
 export function useIngredientDemandFulfill() {
   const mutate = useMutation(api.mutations.IngredientDemand_fulfill);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = IngredientDemandFulfillParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for IngredientDemand.markReleased. */
+export function useIngredientDemandMarkReleased() {
+  const mutate = useMutation(api.mutations.IngredientDemand_markReleased);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IngredientDemandMarkReleasedParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -3889,4 +3911,4 @@ export function useCreateWasteRecord() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 407 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 409 as const;

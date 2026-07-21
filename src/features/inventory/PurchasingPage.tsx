@@ -4,47 +4,51 @@ import {
   useCreateVendor,
   useCreateVendorOrder,
   useCreateVendorOrderLine,
+  useCreateVendorOrderLineDemand,
   useListEvent,
   useListIngredient,
   useListPurchaseNeed,
   useListVendor,
   useListVendorOrder,
   useListVendorOrderLine,
+  useListVendorOrderLineDemand,
   usePurchaseNeedCancel,
   usePurchaseNeedAssignToDraft,
   usePurchaseNeedMarkFulfilled,
   usePurchaseNeedMarkOrdered,
+  useVendorOrderCancel,
+  useVendorOrderLineCancelLine,
+  useVendorOrderLineDemandRetire,
+  useVendorOrderLineReviseQuantity,
 } from "../../lib/manifest-convex-react";
+import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { PurchasingCommandForm } from "./PurchasingCommandForm";
+import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
+import { endOfDay, startOfDay } from "./PurchasingFormHelpers";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { PrepPurchaseDraftCoordinator } from "./PrepPurchaseDraftCoordinator";
 
 const policy = new SupplyLifecyclePolicy();
 
-function isoDate(value: Date) {
-  return value.toISOString().slice(0, 10);
-}
-
-function startOfDay(value: string) {
-  return new Date(`${value}T00:00:00`).getTime();
-}
-
-function endOfDay(value: string) {
-  return new Date(`${value}T23:59:59.999`).getTime();
-}
-
 export function PurchasingPage() {
   const needs = useListPurchaseNeed();
   const vendors = useListVendor();
   const orders = useListVendorOrder();
   const lines = useListVendorOrderLine();
+  const demandLinks = useListVendorOrderLineDemand();
   const ingredients = useListIngredient();
   const events = useListEvent();
   const createVendor = useCreateVendor();
   const createOrder = useCreateVendorOrder();
   const createOrderLine = useCreateVendorOrderLine();
+  const createDemandLink = useCreateVendorOrderLineDemand();
+  const reviseOrderLine = useVendorOrderLineReviseQuantity();
+  const cancelOrder = useVendorOrderCancel();
+  const cancelOrderLine = useVendorOrderLineCancelLine();
+  const retireDemandLink = useVendorOrderLineDemandRetire();
   const assignNeedToDraft = usePurchaseNeedAssignToDraft();
   const markOrdered = usePurchaseNeedMarkOrdered();
   const markFulfilled = usePurchaseNeedMarkFulfilled();
@@ -52,10 +56,14 @@ export function PurchasingPage() {
   const [form, setForm] = useState<"vendor" | "order" | "prepDraft" | null>(
     null,
   );
+  const [selectedNeedIds, setSelectedNeedIds] = useState<Set<string>>(
+    () => new Set(),
+  );
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [generatedOrderId, setGeneratedOrderId] = useState<string | null>(null);
   const [draftRange, setDraftRange] = useState({ start: "", end: "" });
+  const { prompt, host } = useActionPrompt(busy != null);
 
   const activeNeeds = (needs ?? []).filter((item) => item.deletedAt == null);
   const activeVendors = (vendors ?? []).filter(
@@ -69,12 +77,23 @@ export function PurchasingPage() {
   const vendorName = (id: string) =>
     vendors?.find((item) => item._id === id)?.name ?? "Unknown vendor";
   const linkedLine = (need: any) =>
-    lines?.find(
-      (line) =>
-        line.deletedAt == null &&
-        line.ingredientDemandId === need.ingredientDemandId &&
-        line.status !== "cancelled",
-    );
+    lines?.find((line) => {
+      if (line.deletedAt != null || line.status === "cancelled") return false;
+      if (line.ingredientDemandId === need.ingredientDemandId) return true;
+      return demandLinks?.some(
+        (link) =>
+          link.deletedAt == null &&
+          link.vendorOrderLineId === line._id &&
+          link.ingredientDemandId === need.ingredientDemandId,
+      );
+    });
+  const needCanCancel = (need: any) =>
+    policy
+      .purchaseNeedActions(String(need.status))
+      .some((action) => action.key === "cancel");
+  const openCancellableNeeds = activeNeeds.filter(
+    (need) => String(need.status) === "open" && needCanCancel(need),
+  );
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -112,6 +131,15 @@ export function PurchasingPage() {
           notes: String(data.get("notes") ?? "").trim() || undefined,
         });
       } else {
+        if (
+          orders === undefined ||
+          lines === undefined ||
+          demandLinks === undefined
+        ) {
+          throw new Error(
+            "Purchasing data is still loading. Try again shortly.",
+          );
+        }
         const rangeStart = startOfDay(String(data.get("rangeStart") ?? ""));
         const rangeEnd = endOfDay(String(data.get("rangeEnd") ?? ""));
         if (!Number.isFinite(rangeStart) || !Number.isFinite(rangeEnd)) {
@@ -122,8 +150,13 @@ export function PurchasingPage() {
             createOrder(input) as Promise<{ docId: string }>,
           addLine: (input) =>
             createOrderLine(input) as Promise<{ docId: string }>,
+          reviseLine: (input) => reviseOrderLine(input),
+          linkDemand: (input) => createDemandLink(input),
           assignNeedToDraft: (input) =>
             assignNeedToDraft(input as Parameters<typeof assignNeedToDraft>[0]),
+          cancelOrder: (input) => cancelOrder(input),
+          cancelLine: (input) => cancelOrderLine(input),
+          retireDemandLink: (input) => retireDemandLink(input),
         });
         const result = await coordinator.generate({
           vendorId: String(data.get("vendorId")),
@@ -133,16 +166,46 @@ export function PurchasingPage() {
             id: need._id,
             version: need.version,
             eventId: need.eventId,
+            ingredientDemandId: need.ingredientDemandId,
             ingredientId: need.ingredientId,
             requiredQuantity: Number(need.requiredQuantity),
             unit: String(need.unit),
             status: String(need.status),
+            vendorOrderId: need.vendorOrderId,
+            vendorOrderLineId: need.vendorOrderLineId,
             deletedAt: need.deletedAt,
           })),
           events: (events ?? []).map((item) => ({
             id: item._id,
             startsAt: item.startsAt,
             deletedAt: item.deletedAt,
+          })),
+          orders: activeOrders.map((order) => ({
+            id: order._id,
+            vendorId: order.vendorId,
+            sourceRangeStart: order.sourceRangeStart,
+            sourceRangeEnd: order.sourceRangeEnd,
+            status: order.status,
+            deletedAt: order.deletedAt,
+          })),
+          lines: (lines ?? []).map((line) => ({
+            id: line._id,
+            vendorOrderId: line.vendorOrderId,
+            ingredientId: line.ingredientId,
+            orderedQuantity: Number(line.orderedQuantity),
+            unit: String(line.unit),
+            status: line.status,
+            version: line.version,
+            deletedAt: line.deletedAt,
+          })),
+          demandLinks: (demandLinks ?? []).map((link) => ({
+            id: link._id,
+            vendorOrderLineId: link.vendorOrderLineId,
+            ingredientDemandId: link.ingredientDemandId,
+            contributionQuantity: Number(link.contributionQuantity),
+            unit: String(link.unit),
+            version: link.version,
+            deletedAt: link.deletedAt,
           })),
         });
         setGeneratedOrderId(result.orderId);
@@ -153,25 +216,61 @@ export function PurchasingPage() {
   };
 
   const needAction = (need: any, key: string) => {
-    void run(`${need._id}:${key}`, async () => {
-      const args = { docId: need._id, version: need.version };
-      if (key === "markOrdered") {
-        const line = linkedLine(need);
-        if (!line)
-          throw new Error("Add an order line linked to this demand first.");
-        await markOrdered({
-          ...args,
-          vendorOrderId: line.vendorOrderId,
-          vendorOrderLineId: line._id,
-        });
-      }
-      if (key === "markFulfilled") await markFulfilled(args);
+    void (async () => {
       if (key === "cancel") {
-        const reason = window.prompt("Cancellation reason")?.trim();
+        const reason = await prompt.askReason({
+          ...ReasonCopy.cancelNeed,
+          tone: "danger",
+        });
         if (!reason) return;
-        await cancelNeed({ ...args, reason });
+        void run(`${need._id}:${key}`, async () => {
+          await cancelNeed({
+            docId: need._id,
+            version: need.version,
+            reason,
+          });
+        });
+        return;
       }
-    });
+      void run(`${need._id}:${key}`, async () => {
+        const args = { docId: need._id, version: need.version };
+        if (key === "markOrdered") {
+          const line = linkedLine(need);
+          if (!line)
+            throw new Error("Add an order line linked to this demand first.");
+          await markOrdered({
+            ...args,
+            vendorOrderId: line.vendorOrderId,
+            vendorOrderLineId: line._id,
+          });
+        }
+        if (key === "markFulfilled") await markFulfilled(args);
+      });
+    })();
+  };
+
+  const bulkCancelNeeds = () => {
+    if (selectedNeedIds.size === 0) return;
+    void (async () => {
+      const reason = await prompt.askReason({
+        ...ReasonCopy.cancelNeed,
+        tone: "danger",
+      });
+      if (!reason) return;
+      const targets = activeNeeds.filter(
+        (need) => selectedNeedIds.has(need._id) && needCanCancel(need),
+      );
+      void run("bulk-cancel-needs", async () => {
+        for (const need of targets) {
+          await cancelNeed({
+            docId: need._id,
+            version: need.version,
+            reason,
+          });
+        }
+        setSelectedNeedIds(new Set());
+      });
+    })();
   };
 
   return (
@@ -202,199 +301,27 @@ export function PurchasingPage() {
       </header>
       <InventoryWorkspaceNav />
       <aside className="supply-degraded" role="note">
-        <strong>Demand provenance stays explicit</strong>
+        <strong>Weekly draft from approved events</strong>
         <span>
-          The generated add-line reaction does not yet prove PurchaseNeed
-          ordering. Link a line to demand in the order folio, then apply the
-          separate governed “Mark ordered” command here.
+          Event approve opens PurchaseNeeds for calculated demand. Generate a
+          prep-list draft for a vendor and date range to combine those open
+          needs into one VendorOrder. Needs stay open until you submit the draft
+          — then they mark ordered.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
+      {host}
       {form ? (
-        <form className="supply-form" onSubmit={submit}>
-          <div className="supply-form-heading">
-            <div>
-              <p className="eyebrow">Governed procurement command</p>
-              <h2>
-                {form === "vendor"
-                  ? "Onboard vendor"
-                  : form === "order"
-                    ? "Open vendor order"
-                    : "Generate prep-list draft"}
-              </h2>
-            </div>
-            <div className="supply-row-actions">
-              <button
-                type="button"
-                className="btn btn-ghost"
-                onClick={() => setForm(null)}
-              >
-                Cancel
-              </button>
-              <button className="btn btn-primary" disabled={busy != null}>
-                {busy ? "Working…" : "Create"}
-              </button>
-            </div>
-          </div>
-          <div className="supply-form-grid">
-            {form === "vendor" ? (
-              <>
-                <label className="field-label">
-                  Vendor name
-                  <input name="name" className="input" required autoFocus />
-                </label>
-                <label className="field-label">
-                  Email
-                  <input name="email" type="email" className="input" />
-                </label>
-                <label className="field-label">
-                  Phone
-                  <input name="phone" className="input" />
-                </label>
-                <label className="field-label">
-                  Payment terms (days)
-                  <input
-                    name="paymentTermsDays"
-                    type="number"
-                    min={0}
-                    defaultValue={30}
-                    className="input"
-                    required
-                  />
-                </label>
-                <label className="field-label supply-span-2">
-                  Notes
-                  <textarea name="notes" className="input min-h-20 py-2" />
-                </label>
-              </>
-            ) : form === "order" ? (
-              <>
-                <label className="field-label">
-                  Vendor
-                  <select name="vendorId" className="input" required>
-                    <option value="">Select vendor</option>
-                    {activeVendors
-                      .filter((item) => item.status === "active")
-                      .map((item) => (
-                        <option key={item._id} value={item._id}>
-                          {item.name}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-                <label className="field-label">
-                  Event (optional)
-                  <select name="eventId" className="input">
-                    <option value="">No event</option>
-                    {(events ?? [])
-                      .filter((item) => item.deletedAt == null)
-                      .map((item) => (
-                        <option key={item._id} value={item._id}>
-                          {item.title}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-                <label className="field-label">
-                  Order number
-                  <input name="orderNumber" className="input" />
-                </label>
-                <label className="field-label supply-span-2">
-                  Notes
-                  <textarea name="notes" className="input min-h-20 py-2" />
-                </label>
-              </>
-            ) : (
-              <>
-                <label className="field-label">
-                  Vendor
-                  <select name="vendorId" className="input" required>
-                    <option value="">Select vendor</option>
-                    {activeVendors
-                      .filter((item) => item.status === "active")
-                      .map((item) => (
-                        <option key={item._id} value={item._id}>
-                          {item.name}
-                        </option>
-                      ))}
-                  </select>
-                </label>
-                <div className="field-label">
-                  Quick range
-                  <div className="supply-row-actions">
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => {
-                        const today = new Date();
-                        const start = new Date(today);
-                        start.setDate(today.getDate() - 7);
-                        setDraftRange({
-                          start: isoDate(start),
-                          end: isoDate(today),
-                        });
-                      }}
-                    >
-                      Last 7 days
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      onClick={() => {
-                        const today = new Date();
-                        const end = new Date(today);
-                        end.setDate(today.getDate() + 7);
-                        setDraftRange({
-                          start: isoDate(today),
-                          end: isoDate(end),
-                        });
-                      }}
-                    >
-                      Upcoming 7 days
-                    </button>
-                  </div>
-                </div>
-                <label className="field-label">
-                  From
-                  <input
-                    name="rangeStart"
-                    type="date"
-                    className="input"
-                    required
-                    value={draftRange.start}
-                    onChange={(event) =>
-                      setDraftRange((range) => ({
-                        ...range,
-                        start: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <label className="field-label">
-                  Through
-                  <input
-                    name="rangeEnd"
-                    type="date"
-                    className="input"
-                    required
-                    value={draftRange.end}
-                    onChange={(event) =>
-                      setDraftRange((range) => ({
-                        ...range,
-                        end: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <p className="supply-span-2 text-[12px] text-ink-2">
-                  Combines open prep-list purchase needs across every event in
-                  the selected inclusive range. The generated order remains a
-                  draft until you submit it.
-                </p>
-              </>
-            )}
-          </div>
-        </form>
+        <PurchasingCommandForm
+          form={form}
+          busy={busy != null}
+          activeVendors={activeVendors}
+          events={events}
+          draftRange={draftRange}
+          setDraftRange={setDraftRange}
+          onCancel={() => setForm(null)}
+          onSubmit={submit}
+        />
       ) : null}
 
       {generatedOrderId ? (
@@ -409,108 +336,29 @@ export function PurchasingPage() {
         </div>
       ) : null}
 
-      <div className="supply-split">
-        <section className="working-ledger">
-          <div className="ledger-heading">
-            <div>
-              <p className="eyebrow">Open demand</p>
-              <h2>Purchase needs</h2>
-            </div>
-            <span>{activeNeeds.length} needs</span>
-          </div>
-          {needs === undefined ||
+      <PurchasingQueueSplit
+        needsLoading={
+          needs === undefined ||
           ingredients === undefined ||
           events === undefined ||
-          lines === undefined ? (
-            <TableSkeleton rows={6} />
-          ) : activeNeeds.length === 0 ? (
-            <div className="document-empty">
-              <p>No purchase needs are open.</p>
-              <span>Confirmed demand can create the first governed need.</span>
-            </div>
-          ) : (
-            <ul className="purchase-queue">
-              {activeNeeds.map((need) => {
-                const line = linkedLine(need);
-                return (
-                  <li key={need._id}>
-                    <div>
-                      <strong>{ingredientName(need.ingredientId)}</strong>
-                      <span>
-                        {eventName(need.eventId)} · {need.requiredQuantity}{" "}
-                        {need.unit}
-                      </span>
-                    </div>
-                    <StatusChip status={String(need.status)} />
-                    <div className="supply-row-actions">
-                      {policy
-                        .purchaseNeedActions(String(need.status))
-                        .map((action) => (
-                          <button
-                            key={action.key}
-                            className="btn btn-ghost btn-sm"
-                            disabled={
-                              busy != null ||
-                              (action.key === "markOrdered" && !line)
-                            }
-                            title={
-                              action.key === "markOrdered" && !line
-                                ? "Add an order line linked to this demand first"
-                                : undefined
-                            }
-                            onClick={() => needAction(need, action.key)}
-                          >
-                            {busy === `${need._id}:${action.key}`
-                              ? "Working…"
-                              : action.label}
-                          </button>
-                        ))}
-                    </div>
-                    {line ? (
-                      <small>
-                        Line {line._id.slice(-8)} · order{" "}
-                        {line.vendorOrderId.slice(-8)}
-                      </small>
-                    ) : (
-                      <small>No linked order line</small>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </section>
-        <aside className="vendor-index">
-          <div className="ledger-heading">
-            <div>
-              <p className="eyebrow">Supplier book</p>
-              <h2>Vendors</h2>
-            </div>
-            <span>{activeVendors.length}</span>
-          </div>
-          {vendors === undefined ? (
-            <TableSkeleton rows={4} />
-          ) : activeVendors.length === 0 ? (
-            <div className="document-empty">
-              <p>No vendors onboarded.</p>
-            </div>
-          ) : (
-            <ul>
-              {activeVendors.map((vendor) => (
-                <li key={vendor._id}>
-                  <div>
-                    <strong>{vendor.name}</strong>
-                    <span>
-                      {vendor.email || vendor.phone || "No contact shown"}
-                    </span>
-                  </div>
-                  <StatusChip status={String(vendor.status)} />
-                </li>
-              ))}
-            </ul>
-          )}
-        </aside>
-      </div>
+          lines === undefined ||
+          demandLinks === undefined
+        }
+        activeNeeds={activeNeeds}
+        activeVendors={activeVendors}
+        vendorsLoading={vendors === undefined}
+        selectedNeedIds={selectedNeedIds}
+        setSelectedNeedIds={setSelectedNeedIds}
+        busy={busy}
+        openCancellableNeeds={openCancellableNeeds}
+        needCanCancel={needCanCancel}
+        linkedLine={linkedLine}
+        ingredientName={ingredientName}
+        eventName={eventName}
+        onNeedAction={needAction}
+        onBulkCancel={bulkCancelNeeds}
+        onOnboardVendor={() => setForm("vendor")}
+      />
 
       <section className="working-ledger mt-10">
         <div className="ledger-heading">
@@ -526,6 +374,21 @@ export function PurchasingPage() {
           <div className="document-empty">
             <p>No vendor orders are open.</p>
             <span>Open one against an active vendor.</span>
+            <div className="mt-3 flex justify-center">
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                disabled={!activeVendors.length}
+                title={
+                  activeVendors.length
+                    ? undefined
+                    : "Onboard a vendor before opening an order"
+                }
+                onClick={() => setForm("order")}
+              >
+                Open vendor order
+              </button>
+            </div>
           </div>
         ) : (
           <div className="supply-table-wrap">

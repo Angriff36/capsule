@@ -406,6 +406,7 @@ export default defineSchema({
     sourceBatchMultiplier: v.optional(v.union(v.number(), v.null())),
     sourceYieldQuantity: v.optional(v.union(v.number(), v.null())),
     status: v.union(v.literal("pending"), v.literal("calculated"), v.literal("confirmed"), v.literal("fulfilled"), v.literal("superseded")),
+    purchaseEligibleEventId: v.optional(v.union(v.string(), v.null())),
     calculatedAt: v.optional(v.union(v.number(), v.null())),
     confirmedAt: v.optional(v.union(v.number(), v.null())),
     fulfilledAt: v.optional(v.union(v.number(), v.null())),
@@ -417,6 +418,7 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
+    .index("by_purchaseEligibleEventId", ["purchaseEligibleEventId"])
     .index("by_eventId", ["eventId"])
     .index("by_ingredientId", ["ingredientId"])
     .index("by_dishId", ["dishId"]),
@@ -1128,6 +1130,7 @@ export default defineSchema({
     deletedAt: v.optional(v.union(v.number(), v.null())),
     vendorOrderLineId: v.id("vendorOrderLines"),
     ingredientDemandId: v.id("ingredientDemands"),
+    vendorOrderId: v.id("vendorOrders"),
     contributionQuantity: v.number(),
     unit: v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion")),
     linkedAt: v.optional(v.union(v.number(), v.null())),
@@ -1138,7 +1141,8 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_vendorOrderLineId", ["vendorOrderLineId"])
-    .index("by_ingredientDemandId", ["ingredientDemandId"]),
+    .index("by_ingredientDemandId", ["ingredientDemandId"])
+    .index("by_vendorOrderId", ["vendorOrderId"]),
   venues: defineTable({
     tenantId: v.string(),
     deletedAt: v.optional(v.union(v.number(), v.null())),

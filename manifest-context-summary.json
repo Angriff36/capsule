@@ -1,18 +1,18 @@
 {
   "$schema": "manifest-context/v1",
   "meta": {
-    "compilerVersion": "3.6.33",
+    "compilerVersion": "3.6.37",
     "schemaVersion": "1.0",
-    "contentHash": "0418609823cc581c4807e29385bcba0390816488350fac71c8522ca6529e7824:0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:163e3e5a62247a87df7d28f964610b711c79351f6f04a547a052ac74022c4f6f:16f5b86fa64677653383a3565cc55ae5abd29b5f0ab299becbd63a2a989ea054:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:33d4d2785d45b54a41664cd7f7619db35c422ba75508e4fc45e3d26bea96042a:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:5351917c1d988382d27a9e6277171f3fb8096a32ef5a9341d2bbf9b222fcef47:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:6a60de19fa21e314590a79d5c721aa690946b2a1b33e3a4fc1bba2dad8aff529:77543c04544a302a7e81f32299d2e7de93e987cb1175825530715f4b7e279bb8:7e7486fd901a601b2abd157671c9cf7f61583e5d775485e1c077543ace6f5767:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:912275cde11d5e8a1d08152b4e4a7b9ce259359101cbccb87198e639e3cda783:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:d6910e1f58113618897b7fccf4dcbc6efd0fd1f39f05ac403e6a7f7c9a701a9f:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08",
+    "contentHash": "0418609823cc581c4807e29385bcba0390816488350fac71c8522ca6529e7824:0afa363307cd9ac3760ad9ceaaa99ceb92a60166f70f7fe5a240bad3642dfb96:16f5b86fa64677653383a3565cc55ae5abd29b5f0ab299becbd63a2a989ea054:1e85a353683f8f3cee405eae530ffef87a980786d711a48682286728ae42d2a3:21075d4f48878597cbafeabc7f13915953acbecc05e9a4359807dabb2ed87e79:27beb6e160c59bb0fbd7b7e4a260ca57ca675bd683a7366e0a0d00b3fca360a5:2a4ea95cbd23fbb7fe982f8871566507e57da4e8f02c13d207ec26d49da2b0c7:2bb75da3d2180fd598100db6ea4a5ba23b22d1c37e795f1ec70fa5dabfa5ee2c:3124934dc655f9f6e4f8ce966db19a1ed59732188ac81d5ef63953b00221815c:32756165ca0cba544f5bc9c0704a31b4ca0ed1ac0a49368f00508a41da760b5c:33d4d2785d45b54a41664cd7f7619db35c422ba75508e4fc45e3d26bea96042a:3cace1142ec170edf896abaae2033c1618158a914805d6f62a19889c5c016544:3eac4036bd3fbec9ded49b0ee9128c29abd2d7ed370a4a1eaba77b89dd4e0754:46867b01b878e36ec13d445c9c59195a4d593b1f85eecf98aaa3960786131e6d:470ac5758d3f838778b3dfea6640c0ca03c728fae8c11e82fc805a81b783a824:49dfabd893026655ee0e439cc52624a892802114f8bc8884df33d113ff97876d:4b2e6ec9ec9ffc8b508e3e38a26dce3dc4a31267f0c46372060bd9bd7164ec8f:4d26350ace95e6633243ac163d9aa3a6d2e7d2ec67d48a36fda689220d6d7bd9:4ec30ef9959ec632fb5733d0a27d6a3f36f0f267cd6b591b4de471a8303ee8f0:5351917c1d988382d27a9e6277171f3fb8096a32ef5a9341d2bbf9b222fcef47:57f308c480c711e9710797f6fccdab6f0bb270f703a03242f23ca03d89c86559:5c9fc96ba1838014c7ceb846b987c070f5901676fa0223f5a91f6ed61dae887f:5de6fbf74fdf5bbfda1602719d213343eaf691d2fbcd268b06109e04b38f54e6:62d08288929fcda84ccfeb3ef8475f33d5a867b51ba4e56ba537f030c2b9f2b3:6a60de19fa21e314590a79d5c721aa690946b2a1b33e3a4fc1bba2dad8aff529:84adc3b714a25afb1ba3a1e32b8b46bac665535ecb1fea6851b3e292fb3aa88c:84cef0a4a26771e3105beb6e7a9365b9499e8eb8f454b5082a0b2919f5a34927:856b9d38ec996605b5656a7dc0cf1be591198b151fbf7e76e15b5c2342a3c918:8bb356e37613dfd678659a9770de8fc71de9155bc8f7438d8e32bcb79c149f4d:a8ecbe2b86abfca2e08c3e5a4810a228408ef970010ba70cecd5954b607e66a9:b1a8b188b293f8d5ddde7fdee91346f4f81897c89f7ff342d3671089d689d87e:ba90ae45d0e80c9a437ad3ff620ebc547764a4f6cd4cc05d572f396d2e41d157:c3c42392b912cba00235f49b58f357ab62cd011e5d194cf6103d0bd1f87daa78:cabf02d93a2bbe83580f55c66199ca137e59d0a1a350325e3d740c67a1a46730:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d6238f09f3f1f9a2dcd8703d05f8b44b3a965ca0700924109c47472d3b404032:d6910e1f58113618897b7fccf4dcbc6efd0fd1f39f05ac403e6a7f7c9a701a9f:ea25156e0553678af52f854eb24c9508395a4021ff1ddd4338bb2d178b574b08:ea95ffd054e7a6711602dd2e1d4d1523c49d05e14503100d6b96f2e6dc909f5d",
     "projection": "llm-context"
   },
   "domain": {
     "entityCount": 52,
-    "commandCount": 258,
+    "commandCount": 260,
     "policyCount": 150,
     "constraintCount": 95,
     "enumCount": 59,
-    "eventCount": 254,
+    "eventCount": 255,
     "modules": [],
     "multiTenant": true
   },
@@ -3849,6 +3849,14 @@
           "defaultValue": "pending"
         },
         {
+          "name": "purchaseEligibleEventId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": [
+            "indexed"
+          ]
+        },
+        {
           "name": "calculatedAt",
           "type": "datetime | null",
           "required": false,
@@ -3962,7 +3970,9 @@
       "commands": [
         "calculate",
         "confirm",
+        "ensurePurchaseEligible",
         "fulfill",
+        "markReleased",
         "recalculate",
         "supersede"
       ],
@@ -11154,6 +11164,14 @@
           ]
         },
         {
+          "name": "vendorOrderId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
           "name": "contributionQuantity",
           "type": "decimal",
           "required": true,
@@ -11225,6 +11243,21 @@
             "fields": [
               "tenantId",
               "ingredientDemandId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "vendorOrder",
+          "kind": "belongsTo",
+          "target": "VendorOrder",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "vendorOrderId"
             ],
             "references": [
               "tenantId",
@@ -17097,6 +17130,11 @@
           "kind": "mutate",
           "target": "calculatedAt",
           "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
         }
       ],
       "emits": [
@@ -17128,11 +17166,38 @@
           "kind": "mutate",
           "target": "confirmedAt",
           "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
         }
       ],
       "emits": [
         "IngredientDemandConfirmed"
       ]
+    },
+    {
+      "name": "ensurePurchaseEligible",
+      "entity": "IngredientDemand",
+      "parameters": [],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "ingredientDemandRead",
+        "ingredientDemandWrite",
+        "ingredientDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": []
     },
     {
       "name": "fulfill",
@@ -17159,10 +17224,51 @@
           "kind": "mutate",
           "target": "fulfilledAt",
           "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
         }
       ],
       "emits": [
         "IngredientDemandFulfilled"
+      ]
+    },
+    {
+      "name": "markReleased",
+      "entity": "IngredientDemand",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "ingredientDemandRead",
+        "ingredientDemandWrite",
+        "ingredientDemandExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "confirmedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "IngredientDemandReleased"
       ]
     },
     {
@@ -17276,6 +17382,11 @@
         {
           "kind": "mutate",
           "target": "supersedeReason",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "purchaseEligibleEventId",
           "expression": "[omitted]"
         }
       ],
@@ -27522,6 +27633,11 @@
           "required": true
         },
         {
+          "name": "vendorOrderId",
+          "type": "uuid",
+          "required": true
+        },
+        {
           "name": "contributionQuantity",
           "type": "decimal",
           "required": true
@@ -27533,6 +27649,7 @@
         }
       ],
       "guards": [
+        "[omitted]",
         "[omitted]",
         "[omitted]",
         "[omitted]",
@@ -27552,6 +27669,20 @@
           "severity": "block",
           "expression": "[omitted]",
           "message": "Demand link ingredientDemandId must match the seeded demand reference"
+        },
+        {
+          "name": "linkOrderMatch",
+          "code": "linkOrderMatch",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link vendorOrderId must match the seeded order reference"
+        },
+        {
+          "name": "linkOrderOwnsLine",
+          "code": "linkOrderOwnsLine",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Demand link vendorOrderId must own the vendor order line"
         },
         {
           "name": "linkQuantityPositive",
@@ -27575,6 +27706,11 @@
         {
           "kind": "mutate",
           "target": "ingredientDemandId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "vendorOrderId",
           "expression": "[omitted]"
         },
         {
@@ -29042,22 +29178,22 @@
       "name": "purchaseNeedExecute",
       "entity": "PurchaseNeed",
       "action": "execute",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may execute purchase need commands"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory staff and managers may execute purchase need commands"
     },
     {
       "name": "purchaseNeedRead",
       "entity": "PurchaseNeed",
       "action": "read",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may read purchase needs"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory staff and managers may read purchase needs"
     },
     {
       "name": "purchaseNeedWrite",
       "entity": "PurchaseNeed",
       "action": "write",
-      "expression": "roleAllows(user.role, \"inventoryAccess\")",
-      "message": "Inventory staff may write purchase needs through commands"
+      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"manageAccess\")",
+      "message": "Inventory staff and managers may write purchase needs through commands"
     },
     {
       "name": "qualificationExecute",
@@ -31958,6 +32094,22 @@
       }
     },
     {
+      "source": "VendorOrderLineDemand",
+      "target": "VendorOrder",
+      "kind": "belongsTo",
+      "name": "vendorOrder",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "vendorOrderId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "Venue",
       "target": "Event",
       "kind": "hasMany",
@@ -33509,6 +33661,11 @@
       "name": "IngredientDemandRecalculated",
       "channel": "ingredient_demand.recalculated",
       "payload": "{ingredientDemandId: string, tenantId: string, eventId: string, ingredientId: string, previousQuantity: decimal, requiredQuantity: decimal, unit: UnitOfMeasure, reason: string}"
+    },
+    {
+      "name": "IngredientDemandReleased",
+      "channel": "ingredient_demand.released",
+      "payload": "{ingredientDemandId: string, tenantId: string, eventId: string, ingredientId: string, requiredQuantity: decimal, unit: UnitOfMeasure}"
     },
     {
       "name": "IngredientDemandSuperseded",

@@ -2,14 +2,14 @@ sequenceDiagram
     participant Client
     participant IngredientDemand as IngredientDemand
     participant EventBus
-    Client->>+IngredientDemand: confirm()
+    Client->>+IngredientDemand: markReleased()
     Note over IngredientDemand: Policies: ingredientDemandRead, ingredientDemandWrite, ingredientDemandExecute
     Note over IngredientDemand: Guards (3)
-    IngredientDemand->>IngredientDemand: guard[0]: self.status == #quot;calculated#quot;
-    IngredientDemand->>IngredientDemand: guard[1]: self.calculatedAt != null
-    IngredientDemand->>IngredientDemand: guard[2]: self.deletedAt == null
+    IngredientDemand->>IngredientDemand: guard[0]: self.deletedAt == null
+    IngredientDemand->>IngredientDemand: guard[1]: self.status == #quot;calculated#quot; or self.status == #quot;confirmed#quot;
+    IngredientDemand->>IngredientDemand: guard[2]: self.calculatedAt != null
     IngredientDemand->>IngredientDemand: mutate.status
     IngredientDemand->>IngredientDemand: mutate.confirmedAt
     IngredientDemand->>IngredientDemand: mutate.purchaseEligibleEventId
-    IngredientDemand->>EventBus: emit IngredientDemandConfirmed on ingredient_demand.confirmed
+    IngredientDemand->>EventBus: emit IngredientDemandReleased on ingredient_demand.released
     IngredientDemand-->>-Client: void
