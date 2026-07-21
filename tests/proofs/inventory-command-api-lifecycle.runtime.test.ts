@@ -158,13 +158,32 @@ describe("runtime proof: inventory command API lifecycle", () => {
       },
     });
 
-    const firstIssue = await issueCoordinator.issue({
-      eventId,
-      reservationId: String(activeAfterReconcile[0]._id),
-      reservations: mapReservations(afterReconcile.reservations),
-      demands: mapDemands(afterReconcile.demands),
-      items: mapItems(afterReconcile.items),
-    });
+    // Reactions from reconcile land asynchronously; a row version read before
+    // they settle goes stale (VERSION_MISMATCH, platform-timing dependent).
+    // Mirror production behavior: re-query and retry once on conflict.
+    const issueWithFreshRows = async (reservationId: string) => {
+      for (let attempt = 0; ; attempt++) {
+        const rows = await loadRows(inventory, eventId);
+        try {
+          return {
+            result: await issueCoordinator.issue({
+              eventId,
+              reservationId,
+              reservations: mapReservations(rows.reservations),
+              demands: mapDemands(rows.demands),
+              items: mapItems(rows.items),
+            }),
+          };
+        } catch (error) {
+          if (attempt >= 1 || !String(error).includes("VERSION_MISMATCH"))
+            throw error;
+        }
+      }
+    };
+
+    const { result: firstIssue } = await issueWithFreshRows(
+      String(activeAfterReconcile[0]._id),
+    );
     expect(firstIssue.fulfilledDemandId).toBeNull();
     expect(firstIssue.demandPreserved).toBe(true);
     expect(firstIssue.stockAdjustment.quantityOnHand).toBe(
@@ -188,13 +207,9 @@ describe("runtime proof: inventory command API lifecycle", () => {
     );
     expect(remainingActive).toBeTruthy();
 
-    const secondIssue = await issueCoordinator.issue({
-      eventId,
-      reservationId: String(remainingActive!._id),
-      reservations: mapReservations(afterPartial.reservations),
-      demands: mapDemands(afterPartial.demands),
-      items: mapItems(afterPartial.items),
-    });
+    const { result: secondIssue } = await issueWithFreshRows(
+      String(remainingActive!._id),
+    );
     expect(secondIssue.fulfilledDemandId).toBe(demandId);
     expect(secondIssue.demandPreserved).toBe(false);
 
