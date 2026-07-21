@@ -32,7 +32,7 @@ only at/after the deadline; `revoke()` is the early-termination command).
 Regen + scenario/test coverage: expire before deadline denied, at/after
 deadline succeeds. Canonical port: YES (OD054 in Manifest-source).
 
-### 3. OD055 — multiple default PaymentMethods possible — open
+### 3. OD055 — multiple default PaymentMethods possible — blocked: tooling failure (2026-07-21)
 
 `src/sales/payment-method.manifest` `makeDefault()` sets only the bound row;
 nothing clears the previous default. A default is definitionally exclusive.
