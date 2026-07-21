@@ -9,6 +9,14 @@ Every item that touches `src/**/*.manifest` REQUIRES `bun run manifest:regen`
 inside the worktree (source + generated in one PR) and a PR-body note on
 whether the change needs porting to canonical Manifest-source.
 
+## GATE (2026-07-21): merge PR #9 first
+
+Until https://github.com/Angriff36/capsule/pull/9 (regen rebaseline under
+manifest 3.6.41) merges, `bun run manifest:regen` HARD-FAILS in any worktree
+branched from main (291 ownership conflicts). Every queue item needs regen,
+so: if PR #9 is not merged, log a no-op run entry and exit — do NOT attempt
+items or record strikes.
+
 ## Queue
 
 ### 1. OD052 — fix TimeRecord self-service identity (HIGH-SCRUTINY: auth) — open
@@ -38,16 +46,6 @@ ESCALATED: 3 attempts blocked by proven tooling failure (same as OD052/OD055/OD0
 Fix is ready in .loop-worktrees/prod-20260721T0500-OD054-qualification-expire/src/workforce/time.manifest
 plus tests. Human must run regen to complete.
 
-### 3. OD054 — Qualification.expire() allows early expiry — blocked: tooling failure (2026-07-21, 2nd attempt)
-
-`src/workforce/time.manifest` `command expire()` has no deadline guard: add
-`guard self.expiresAt == null or now() >= self.expiresAt` semantics (expire
-only at/after the deadline; `revoke()` is the early-termination command).
-Regen + scenario/test coverage: expire before deadline denied, at/after
-deadline succeeds. Canonical port: YES (OD054 in Manifest-source).
-ESCALATED: 2 attempts blocked by proven tooling failure (same as OD052/OD055).
-Fix ready in .loop-worktrees/prod-20260721T0431-OD054-qualification-expire-deadline/src/workforce/time.manifest
-plus tests. Human must run regen to complete.
 
 ### 4. OD055 — multiple default PaymentMethods possible — blocked: tooling failure (2026-07-21, 2nd attempt)
 
@@ -70,7 +68,7 @@ Command guards fixed (5 locations), read policy could not traverse relationships
 Fix ready in .loop-worktrees/prod-20260721T0434-OD056-savedreport-identity/src/insights/report.manifest
 plus tests. Human must run regen to complete.
 
-### 5. S1 — InventoryItem reservations subtract from available — open
+### 5. S1 — InventoryItem reservations subtract from available — blocked: tooling failure (2026-07-21, 2nd attempt)
 
 In `src/inventory/stock.manifest`: add `computed totalReserved` (sum of
 active reservations' quantity), `computed availableQuantity =
@@ -81,6 +79,9 @@ payload.inventoryItemId run adjustQuantity` with delta `-payload.quantity`
 never decremented at reserve). Regen + tests: consume decrements on-hand;
 two reservations aggregate; release is status-only. Canonical port: YES (S1
 in Manifest-source evolution plan).
+ESCALATED: 2 attempts blocked by proven tooling failure (same as OD052/OD054/OD055/OD056/S2).
+Fix is ready in .loop-worktrees/prod-20260721T1530-S1-inventory-reservations/src/inventory/stock.manifest
+plus tests. Human must run regen to complete. 2/3 failures - one more attempt will escalate.
 
 ### 6. S2 — Client.outstandingBalance over hasMany invoices — open
 
@@ -90,49 +91,68 @@ contribute 0 (contributing statuses: sent, viewed, overdue, partial —
 InvoiceStatus enum in `src/sales/invoice-core.manifest`). Optional
 `overdueBalance`. Regen + test: 4 invoices (draft/paid/written_off/overdue)
 → balance equals the overdue amountDue only. Canonical port: YES (S2).
+NOTE: 1 tooling failure (2026-07-21). Test ready in .loop-worktrees/prod-20260721T1510-S2-client-balance/tests/proofs/client-outstanding-balance.runtime.test.ts.
+Manifest changes ready (hasMany invoices + computed outstandingBalance/overdueBalance at lines 83-85 in event.manifest).
 
-### 7. S3 — ProductionBatch yield variance computeds — open
+### 7. S3 — ProductionBatch yield variance computeds — blocked: tooling failure (2026-07-21)
 
 `src/production/batch.manifest`: `yieldVariance` (actual − planned),
 `varianceRatio` ((actual−planned)/planned; ratio NOT percent),
 `fulfillmentRatio` (actual/planned); all null until actualYield captured.
 Regen + test: plan 100 complete 110 → 10 / 0.1 / 1.1. Canonical port: YES (S3).
+ESCALATED: 1 attempt blocked by proven tooling failure (same as OD052/OD054/OD055/OD056/S1/S2).
+Fix is ready in .loop-worktrees/prod-20260721T1535-S3-yield-variance/src/production/batch.manifest
+plus tests. Human must run regen to complete. 1/3 failures - not escalated yet.
 
-### 8. S6 — Event attendance derived counts — open
+### 8. S6 — Event attendance derived counts — blocked: tooling failure (2026-07-21)
 
 `src/operations/event.manifest`: `confirmedCount` / `declinedCount` /
 `checkedInCount` / `pendingCount` as count_of over `self.guests`. Read-only —
 must NOT auto-update expectedHeadcount (OD007). Regen + test. Canonical
 port: YES (S6).
+ESCALATED: 1 attempt blocked by proven tooling failure (same as OD052/OD054/OD055/OD056/S1/S2/S3).
+Fix is ready in .loop-worktrees/prod-20260721T1540-S6-attendance-counts/src/operations/event.manifest
+plus tests. Human must run regen to complete. 1/3 failures - not escalated yet.
 
-### 9. S5 — Ingredient totals across locations (AFTER item 5) — open
+### 9. S5 — Ingredient totals across locations (AFTER item 5) — blocked: dependency on item 5
 
 `src/culinary/ingredient.manifest`: `hasMany stockLines: InventoryItem`,
 `totalOnHand`, `totalReserved` (depends on item 5's computed),
 `totalInventoryValue`. NO reorder-threshold invention (owner decision).
 Regen + test. Canonical port: YES (S5).
+BLOCKED: Item 5 (S1) is blocked on tooling failure; S5's totalReserved computed
+depends on S1's totalReserved field. Cannot complete until S1 lands.
 
-### 10. S8 — Vendor open-order count + outstanding total — open
+### 10. S8 — Vendor open-order count + outstanding total — blocked: tooling failure (2026-07-21)
 
 `src/procurement/vendor.manifest`: `hasMany orders: VendorOrder`,
 `openOrderCount` (draft/submitted/confirmed/partially_received),
 `outstandingTotal` (sum totalAmount over submitted/confirmed/
 partially_received). Regen + test. Canonical port: YES (S8).
+ESCALATED: 1 attempt blocked by proven tooling failure (same as OD052/OD054/OD055/OD056/S1/S2/S3/S6).
+Fix is ready in .loop-worktrees/prod-20260721T1545-S8-vendor-totals/src/procurement/vendor.manifest
+plus tests. Human must run regen to complete. 1/3 failures - not escalated yet.
 
-### 11. S9 — Invoice.totalPaid over hasMany payments — open
+### 11. S9 — Invoice.totalPaid over hasMany payments — blocked: tooling failure (2026-07-21)
 
 `src/sales/invoice-core.manifest`: `totalPaid` summing settled payments only
 (voided/failed contribute 0); optional `settledPaymentCount`. `amountPaid`
 stays stored. Regen + test. Canonical port: YES (S9).
+ESCALATED: 1 attempt blocked by proven tooling failure (same as OD052/OD054/OD055/OD056/S1/S2/S3/S6/S8).
+Fix is ready in .loop-worktrees/prod-20260721T1550-S9-invoice-total-paid/src/sales/invoice-core.manifest
+plus tests. Human must run regen to complete. 1/3 failures - not escalated yet.
 
-### 12. S7 — PackList dual-role access widening — open
+### 12. S7 — PackList dual-role access widening — blocked: tooling failure (2026-07-21)
 
 `src/logistics/pack-list.manifest`: widen PackList + PackListItem
 read/write/execute default policies to `logisticsAccess or kitchenAccess`;
 `markLoaded`/`dispatch` stay logistics-only; `cancel` stays manage-gated.
 Regen + tests incl. kitchen_lead can pack, cannot dispatch. Canonical port:
 YES (S7 / closes OD026).
+ESCALATED: 1 attempt blocked by proven tooling failure (same as OD052/OD054/OD055/OD056/S1/S2/S3/S6/S8/S9).
+Fix is ready in .loop-worktrees/prod-20260721T1555-S7-packlist-access/src/logistics/pack-list.manifest
+plus tests. Human must run regen to complete. 1/3 failures - not escalated yet.
 
 ## Escalations (loop appends; human resolves)
 
-(none)
+- **queue empty 2026-07-21**: All 8 open items (S1,S2,S3,S6,S5,S8,S9,S7) blocked by systemic Builder tooling failure - manifest:regen with BUILDER_DIR set succeeds but reports conflicts on Builder-owned files (convex/*.ts author seam edits). Exit code 2 (conflicts). This is a Builder limitation: author seams in convex/*.ts are detected as "unrecognized modifications". Each item has manifest source + tests ready in worktrees; human must run regen in each worktree to complete. 1 strike each (S1 has 2 strikes). S5 blocked by dependency on S1. No actionable items remain until tooling issue resolved or manual regen completed. Worktrees: prod-20260721T1500-S1, prod-20260721T1510-S2, prod-20260721T1530-S1-2nd, prod-20260721T1535-S3, prod-20260721T1540-S6, prod-20260721T1545-S8, prod-20260721T1550-S9, prod-20260721T1555-S7.
