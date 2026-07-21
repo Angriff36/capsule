@@ -10,6 +10,7 @@ sequenceDiagram
     PackList->>PackList: guard[2]: roleAllows(user.role, #quot;logisticsManageAccess#quot;)
     PackList->>PackList: compute.previousStatus
     PackList->>PackList: mutate.status
+    PackList->>PackList: mutate.activeEventId
     PackList->>PackList: mutate.cancelledAt
     PackList->>PackList: mutate.cancellationReason
     PackList->>EventBus: emit PackListCancelled on pack_list.cancelled

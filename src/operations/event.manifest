@@ -470,7 +470,11 @@ entity Event mixin TenantScoped, SoftDeletable {
   // is navigation only until coverage is product-defined.
   // builtins.md: count_of(arr, predicate) over hasMany; PB007 still blocks
   // referencing this computed from beginExecution's guard.
-  computed isReadyForExecution: boolean = count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
+  // Draft pack lists do NOT block readiness (owner anti-tedium rule +
+  // issue #12 context): EventApproved auto-creates a draft; a draft is a
+  // plan, not in-flight work. packing/packed/loaded still block until
+  // dispatched. Same predicate inlined in beginExecution (PB007 twin).
+  computed isReadyForExecution: boolean = count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled" and p.status != "draft") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
 
   // plannedAt gates full engagement invariants while planEngagement mutates fields.
   constraint eventPlanComplete: self.plannedAt == null or (length(trim(self.title)) > 0 and length(trim(self.eventType)) > 0 and self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.expectedHeadcount >= 1 and self.expectedHeadcount <= 100000 and self.primaryContactName != null and length(trim(self.primaryContactName)) > 0) "Planned events require a title, type, valid date range, headcount, and primary contact"
@@ -702,7 +706,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "eventAccess")
     // Manifest 3.6.3 rejects computed-property references in guards (PB007).
     // Inline the same readiness formula as isReadyForExecution.
-    guard count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
+    guard count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled" and p.status != "draft") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
     mutate stage = "executing"
     mutate executionStartedAt = now()
     emit EventExecutionStarted {

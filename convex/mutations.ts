@@ -3203,8 +3203,29 @@ async function __runEventApprove(ctx: MutationCtx, { docId, version }: any, __cr
       const target = __row;
       await __runIngredientDemandEnsurePurchaseEligible(ctx, { docId: (__row as any)._id } as any);
     }
-    const fanRows1 = (await ctx.db.query("ingredientDemands").withIndex("by_purchaseEligibleEventId", (q) => q.eq("purchaseEligibleEventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
-    for (const __row of fanRows1) {
+    const __match1_raw = await ctx.db.query("packLists").withIndex("by_eventId", (q) => q.eq("eventId", payload.eventId)).collect();
+    const __match1_rows = __match1_raw.filter((d) => (d as any).eventId === payload.eventId && (d as any).activeEventId === payload.eventId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
+    const __match1_id = __match1_rows.length > 0 ? (__match1_rows[0] as any)._id : null;
+    if (__match1_id) {
+      await __runPackListOpen(ctx, { docId: __match1_id, eventId: payload.eventId, name: "Event pack list" } as any);
+    } else {
+      const __elseArgs: Record<string, any> = { eventId: payload.eventId, name: "Event pack list" };
+      const __elseDoc: Record<string, any> = {
+        tenantId: __auth.tenantId,
+        name: "",
+        status: "draft",
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        version: 0,
+      };
+      for (const __k of ["deletedAt","eventId","activeEventId","name","purpose","notes","status","openedAt","packingStartedAt","packedAt","loadedAt","dispatchedAt","cancelledAt","cancellationReason","createdAt","updatedAt"] as string[]) {
+        if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
+      }
+      const __elseId = await ctx.db.insert("packLists", __elseDoc as any);
+      await __runPackListOpen(ctx, { docId: __elseId, ...__elseArgs } as any);
+    }
+    const fanRows2 = (await ctx.db.query("ingredientDemands").withIndex("by_purchaseEligibleEventId", (q) => q.eq("purchaseEligibleEventId", payload.eventId)).collect()).filter((d) => (d as any).deletedAt == null);
+    for (const __row of fanRows2) {
       const target = __row;
       await __runPurchaseNeedCreate(ctx, { eventId: __row.eventId, ingredientDemandId: (__row as any)._id, ingredientId: __row.ingredientId, requiredQuantity: __row.requiredQuantity, unit: __row.unit, purchasingWeekStart: __row.purchasingWeekStart } as any);
     }
@@ -3293,7 +3314,7 @@ async function __runEventBeginExecution(ctx: MutationCtx, { docId, version }: an
     if (!((doc.stage === "approved"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user.role, "eventAccess"))) throw new Error("Guard 2 failed");
-    if (!((((((doc.prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && (((doc.packLists) ?? []).filter((p: Doc<"packLists">) => (((p.status !== "dispatched") && (p.status !== "cancelled")))).length === 0)) && (((doc.deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0)))) throw new Error("Guard 3 failed");
+    if (!((((((doc.prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && (((doc.packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && (((doc.deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0)))) throw new Error("Guard 3 failed");
     {
       const __cur = doc.stage;
       if (__cur !== undefined) {
@@ -10056,9 +10077,9 @@ async function __runPackListCancel(ctx: MutationCtx, { docId, reason, version }:
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack lists");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack lists through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read pack lists");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write pack lists through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list commands");
     if (!(((((doc.status === "draft") || (doc.status === "packing")) || (doc.status === "packed")) || (doc.status === "loaded")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(checkRole(user.role, "logisticsManageAccess"))) throw new Error("Guard 2 failed");
@@ -10081,6 +10102,7 @@ async function __runPackListCancel(ctx: MutationCtx, { docId, reason, version }:
     }
     const updates = {
       status: "cancelled",
+      activeEventId: null,
       cancelledAt: Date.now(),
       cancellationReason: reason,
       version: ((doc as any).version ?? 0) + 1
@@ -10120,9 +10142,9 @@ async function __runPackListDispatch(ctx: MutationCtx, { docId, version }: any, 
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack lists");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack lists through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read pack lists");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write pack lists through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list commands");
     if (!((doc.status === "loaded"))) throw new Error("Guard 0 failed");
     if (!((doc.loadedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -10144,6 +10166,7 @@ async function __runPackListDispatch(ctx: MutationCtx, { docId, version }: any, 
     }
     const updates = {
       status: "dispatched",
+      activeEventId: null,
       dispatchedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
@@ -10181,9 +10204,9 @@ async function __runPackListMarkLoaded(ctx: MutationCtx, { docId, version }: any
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack lists");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack lists through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read pack lists");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write pack lists through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list commands");
     if (!((doc.status === "packed"))) throw new Error("Guard 0 failed");
     if (!((doc.packedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -10242,9 +10265,9 @@ async function __runPackListMarkPacked(ctx: MutationCtx, { docId, version }: any
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack lists");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack lists through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read pack lists");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write pack lists through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list commands");
     if (!((doc.status === "packing"))) throw new Error("Guard 0 failed");
     if (!((doc.packingStartedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -10308,31 +10331,32 @@ async function __runPackListOpen(ctx: MutationCtx, { docId, eventId, name, purpo
       const __fk = ((doc as any) as any).eventId;
       ((doc as any) as any).event = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack lists");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack lists through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list commands");
-    if (!((doc.openedAt == null))) throw new Error("Guard 0 failed");
-    if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
-    if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read pack lists");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write pack lists through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list commands");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!(((doc.status !== "cancelled") && (doc.status !== "dispatched")))) throw new Error("Guard 1 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 2 failed");
+    if (!(((doc.openedAt == null) || (doc.eventId === eventId)))) throw new Error("Guard 3 failed");
     if (!((eventId === doc.eventId))) throw new Error("Open eventId must match the seeded event reference");
-    if (!((((name).trim()).length > 0))) throw new Error("Pack list name is required");
+    if (!(((((name).trim()).length > 0) || (((doc.name).trim()).length > 0)))) throw new Error("Pack list name is required");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
       eventId: eventId,
-      name: name,
+      activeEventId: eventId,
+      name: ((((doc.name).trim()).length > 0) ? doc.name : name),
       purpose: ((purpose != null) ? purpose : doc.purpose),
       notes: ((notes != null) ? notes : doc.notes),
-      openedAt: Date.now(),
+      openedAt: ((doc.openedAt != null) ? doc.openedAt : Date.now()),
       version: ((doc as any).version ?? 0) + 1
     };
     const __storedUpdates = await __encryptDoc(ctx, "PackList", ["notes"], updates);
     await ctx.db.patch(docId, __storedUpdates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListId: docId, tenantId: __after.tenantId, eventId: eventId, name: name, purpose: ((purpose != null) ? purpose : __after.purpose), status: "draft", _subject: { entity: "PackList", command: "open", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "PackListOpened", entity: "PackList", entityId: docId, payload: { packListId: docId, tenantId: __after.tenantId, eventId: eventId, name: name, purpose: ((purpose != null) ? purpose : __after.purpose), status: "draft" }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, packListId: docId, tenantId: __after.tenantId, eventId: eventId, name: ((((__after.name).trim()).length > 0) ? __after.name : name), purpose: ((purpose != null) ? purpose : __after.purpose), status: __after.status, _subject: { entity: "PackList", command: "open", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PackListOpened", entity: "PackList", entityId: docId, payload: { packListId: docId, tenantId: __after.tenantId, eventId: eventId, name: ((((__after.name).trim()).length > 0) ? __after.name : name), purpose: ((purpose != null) ? purpose : __after.purpose), status: __after.status }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -10386,28 +10410,29 @@ export const PackList_createViaOpen = mutation({
       purpose: args.purpose
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack lists");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack lists through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list commands");
-    if (!((__draft.openedAt == null))) throw new Error("Guard 0 failed");
-    if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
-    if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((__rel_event != null))) throw new Error("Guard 3 failed");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read pack lists");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write pack lists through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list commands");
+    if (!((__draft.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!(((__draft.status !== "cancelled") && (__draft.status !== "dispatched")))) throw new Error("Guard 1 failed");
+    if (!((__rel_event != null))) throw new Error("Guard 2 failed");
+    if (!(((__draft.openedAt == null) || (__draft.eventId === eventId)))) throw new Error("Guard 3 failed");
     if (!((eventId === __draft.eventId))) throw new Error("Open eventId must match the seeded event reference");
-    if (!((((name).trim()).length > 0))) throw new Error("Pack list name is required");
+    if (!(((((name).trim()).length > 0) || (((__draft.name).trim()).length > 0)))) throw new Error("Pack list name is required");
     const doc: Record<string, any> = {
       ...__draft,
       eventId: eventId,
-      name: name,
+      activeEventId: eventId,
+      name: ((((__draft.name).trim()).length > 0) ? __draft.name : name),
       purpose: ((purpose != null) ? purpose : __draft.purpose),
       notes: ((notes != null) ? notes : __draft.notes),
-      openedAt: Date.now(),
+      openedAt: ((__draft.openedAt != null) ? __draft.openedAt : Date.now()),
       version: 1,
     };
     const __storedDoc = await __encryptDoc(ctx, "PackList", ["notes"], doc);
     const docId = await ctx.db.insert("packLists", __storedDoc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, packListId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: doc.name, purpose: ((doc.purpose != null) ? doc.purpose : doc.purpose), status: "draft", _subject: { entity: "PackList", command: "open", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "PackListOpened", entity: "PackList", entityId: docId, payload: { packListId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: doc.name, purpose: ((doc.purpose != null) ? doc.purpose : doc.purpose), status: "draft" }, createdAt: Date.now() });
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, packListId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: ((((doc.name).trim()).length > 0) ? doc.name : doc.name), purpose: ((doc.purpose != null) ? doc.purpose : doc.purpose), status: doc.status, _subject: { entity: "PackList", command: "open", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PackListOpened", entity: "PackList", entityId: docId, payload: { packListId: docId, tenantId: doc.tenantId, eventId: doc.eventId, name: ((((doc.name).trim()).length > 0) ? doc.name : doc.name), purpose: ((doc.purpose != null) ? doc.purpose : doc.purpose), status: doc.status }, createdAt: Date.now() });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
       await __setCommandIdempotency(ctx, args.idempotencyKey, "PackList_createViaOpen", __result);
@@ -10423,9 +10448,9 @@ async function __runPackListStartPacking(ctx: MutationCtx, { docId, version }: a
     if (!__storedDoc) throw new Error("PackList not found");
     if ((__storedDoc as any).tenantId !== __auth.tenantId) throw new Error("PackList not found");
     const doc = await __decryptDoc(ctx, "PackList", ["notes"], __storedDoc) as Record<string, any>;
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may read pack lists");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may write pack lists through commands");
-    if (!(checkRole(user.role, "logisticsAccess"))) throw new Error("Logistics staff may execute pack list commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may read pack lists");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may write pack lists through commands");
+    if (!((checkRole(user.role, "logisticsAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Logistics staff and managers may execute pack list commands");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.openedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
