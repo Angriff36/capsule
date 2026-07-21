@@ -15,3 +15,5 @@ manifest-context-summary.json text eol=lf
 PRESET.md text eol=lf
 tsconfig.builder.json text eol=lf
 .builder/** text eol=lf
+package.json text eol=lf
+tsconfig.json text eol=lf
