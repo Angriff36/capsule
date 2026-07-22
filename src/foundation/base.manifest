@@ -72,6 +72,9 @@ role sales_manager extends manager {
 role event_manager extends manager {
   allow eventAccess
   allow eventManageAccess
+  // EventApproved cascades issue/close out invoices inline under the caller's
+  // role (issue #32/#65) — event managers carry financeAccess so approve works.
+  allow financeAccess
 }
 
 role inventory_manager extends manager {

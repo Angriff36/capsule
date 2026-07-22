@@ -168,6 +168,9 @@ const ROLE_PERMISSIONS: Record<string, { action: string; target?: string }[]> = 
       "action": "eventManageAccess"
     },
     {
+      "action": "financeAccess"
+    },
+    {
       "action": "manageAccess"
     },
     {

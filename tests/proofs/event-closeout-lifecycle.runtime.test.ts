@@ -223,8 +223,12 @@ describe("runtime proof: EventCloseout capture → finalize", () => {
     const listed = (await finance.query(
       api.queries.listEventCloseout,
       {},
-    )) as Array<{ eventId?: string }>;
-    expect(listed.some((row) => row.eventId === eventId)).toBe(false);
+    )) as Array<{ eventId?: string; actualRevenue?: number }>;
+    // Event.closeOut cascade-captures exactly one closeout during seeding;
+    // the denied kitchen attempt must not add another.
+    const rows = listed.filter((row) => row.eventId === eventId);
+    expect(rows).toHaveLength(1);
+    expect(rows[0]?.actualRevenue).not.toBe(100);
   });
 
   it("keeps closeouts tenant-isolated", async () => {

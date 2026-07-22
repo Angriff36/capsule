@@ -10,7 +10,7 @@ import { resolve } from "node:path";
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
 /** Clean CI checkout root entries (see BASELINE.md § Root cap). */
-const ROOT_CAP = 44; // +1 (2026-07-21): .gitattributes (LF rules for Builder-owned output)
+const ROOT_CAP = 45; // +1 (2026-07-22): vision.md landed (667c524) without a cap bump
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {
