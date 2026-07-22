@@ -25,14 +25,14 @@
       "reason": "Codex rejected: package.json is Builder-owned per .builder/ownership.json, direct edit violates repository ownership policy. This is not a hand-fix item - requires Builder update-mode regen. Escalating to human to run bun run manifest:regen with Builder in update mode."
     },
     {
-      "item": "actions/checkout 4\u00e2\u2020\u2019v7",
+      "item": "actions/checkout 4 to v7",
       "runId": "fix-20260721T1201-actions-checkout",
       "timestamp": "2026-07-21T12:16:00Z",
       "verdict": "SUCCESS",
       "reason": "PR #7 created (draft). Review gate caught v7 invalid, corrected to v6. Verification: bun install passed, typecheck passed, Codex APPROVED. CI-only change, no app impact."
     },
     {
-      "item": "S1 \u00e2\u20ac\u201d InventoryItem reservations subtract from available",
+      "item": "S1 - InventoryItem reservations subtract from available",
       "runId": "prod-20260722T0800-S1-inventory-reservations",
       "timestamp": "2026-07-22T08:00:00Z",
       "verdict": "BLOCKED",
@@ -40,12 +40,12 @@
       "reason": "Test added (inventory-reservation-aggregation.runtime.test.ts) verifies totalReserved aggregation and consume/release semantics. Manifest changes already on main (stock.manifest L41-42, L483-488). PR #28 created, test failing in CI. Needs investigation: tooling, test gap, or computed field query issue. Worktree preserved at .loop-worktrees/prod-20260722T0800-S1-inventory-reservations."
     },
     {
-      "item": "OD052 \u00e2\u20ac\u201d TimeRecord self-service identity (HIGH-SCRUTINY: auth)",
+      "item": "OD052 - TimeRecord self-service identity (HIGH-SCRUTINY: auth)",
       "runId": "prod-20260721T1600-OD052-timerecord-identity",
       "timestamp": "2026-07-21T16:00:00Z",
       "status": "CI_FAILURE",
       "verdict": "BLOCKED",
-      "reason": "Fix ready and Codex APPROVED (personId == user.id \u00e2\u2020\u2019 roleAllows(workforceManageAccess) or (self.person != null and self.person.authSubjectId == user.id)). Documentation updated. PR #27 created, test failing in CI. HIGH-SCRUTINY auth work - needs immediate investigation. Worktree preserved at .loop-worktrees/prod-20260721T1600-OD052-timerecord-identity. 1/3 failures."
+      "reason": "Fix ready and Codex APPROVED (personId == user.id  to roleAllows(workforceManageAccess) or (self.person != null and self.person.authSubjectId == user.id)). Documentation updated. PR #27 created, test failing in CI. HIGH-SCRUTINY auth work - needs immediate investigation. Worktree preserved at .loop-worktrees/prod-20260721T1600-OD052-timerecord-identity. 1/3 failures."
     },
     {
       "item": "actions/checkout v7 upgrade (CI-only, after PR #26)",
@@ -55,7 +55,7 @@
       "reason": "Proven tooling failure (same as OD052/OD054/OD055/OD056/S1/S2/S3/S6/S8/S9/S7): manifest:regen-check pre-push hook fails on clean CI-only change (no .manifest files touched). Root cause is Builder CRLF issue fixed in PR #26 (.gitattributes eol=lf on Builder trees). Commit ready in worktree loop/dep-20260721T1600-actions-checkout-7, human must push after #26 merges. 1/3 failures."
     },
     {
-      "item": "actions/checkout v4\u00e2\u2020\u2019v6 (CI-only)",
+      "item": "actions/checkout v4 tov6 (CI-only)",
       "runId": "fix-20260721T1645-actions-checkout-v6",
       "timestamp": "2026-07-21T16:45:00Z",
       "verdict": "SUCCESS",
@@ -69,102 +69,102 @@
       "reason": "MCP catalog refresh (#16) requires architectural decision (catalog rebuild vs host restart). All other new issues either require manifest:regen (BLOCKED by Builder worktree isolation) or are Manifest upstream bugs (#25). Actions/checkout v6 fix ready but blocked by pre-push hook. No fixes shipped this tick - all blocked by tooling constraints or require human decision on approach."
     },
     {
-      "item": "OD054 \u00e2\u20ac\u201d Qualification.expire() allows early expiry",
+      "item": "OD054 - Qualification.expire() allows early expiry",
       "runId": "prod-20260721T1700-OD054-qualification-expire-guard",
       "timestamp": "2026-07-21T17:00:00Z",
       "verdict": "REJECT",
       "reason": "Codex rejected: (1) Test uses past deadline (2024-07-01) proving now() > expiresAt, not equality boundary now() >= expiresAt. (2) UI still offers 'Expire' before deadline - users hit guard rejection instead of being directed to 'Revoke'. Fix added guard 'now() >= self.expiresAt' to expire() command in src/workforce/time.manifest, created qualification-expire-deadline.runtime.test.ts, typecheck passes, tests pass. Scope limited to manifest only per backlog item. 1/3 failures - not escalated yet."
     },
     {
-      "item": "OD055 \u00e2\u20ac\u201d multiple default PaymentMethods possible",
+      "item": "OD055 - multiple default PaymentMethods possible",
       "runId": "prod-20260721T1800-OD055-payment-method-default",
       "timestamp": "2026-07-21T18:00:00Z",
       "verdict": "ESCALATED",
-      "reason": "Manifest platform limitation: fanOut reactions run AFTER all mutations in a command and don't support != in where clauses. Attempted pattern: emit PaymentMethodDefaultSet \u00e2\u2020\u2019 fanOut PaymentMethod where clientId = X run clearDefault. This clears ALL matching rows including the one being set as default, because: (1) mutate isDefault = true happens first, (2) emit triggers fanOut, (3) fanOut clears ALL rows (no != support), (4) no way to restore the target row after fanOut. Constraints also cannot check across rows (only self.*). This feature requires Manifest platform changes: either != support in fanOut where clauses, cross-row constraints, or a different native exclusivity mechanism. Escalated to backlog."
+      "reason": "Manifest platform limitation: fanOut reactions run AFTER all mutations in a command and don't support != in where clauses. Attempted pattern: emit PaymentMethodDefaultSet  to fanOut PaymentMethod where clientId = X run clearDefault. This clears ALL matching rows including the one being set as default, because: (1) mutate isDefault = true happens first, (2) emit triggers fanOut, (3) fanOut clears ALL rows (no != support), (4) no way to restore the target row after fanOut. Constraints also cannot check across rows (only self.*). This feature requires Manifest platform changes: either != support in fanOut where clauses, cross-row constraints, or a different native exclusivity mechanism. Escalated to backlog."
     },
     {
-      "item": "OD056 \u00e2\u20ac\u201d SavedReport owner identity mismatch",
+      "item": "OD056 - SavedReport owner identity mismatch",
       "runId": "prod-20260721T1852-OD056-saved-report-owner",
       "timestamp": "2026-07-21T18:52:00Z",
       "verdict": "REJECT",
       "reason": "Codex rejected: (1) Identity mismatch remains - personId == user.id still compares Person FK with auth subject instead of resolving Person.authSubjectId == user.id. (2) Owner-scoped reads removed, not fixed - savedReportRead excludes ordinary owners from their own owner_only reports. (3) Required client-supplied personId breaks existing UI and contradicts never client-supplied ownership rule. (4) Owner command guards fail open - self.owner == null authorizes ordinary staff when owner relation is absent. (5) Generated create events use nonexistent doc.personId. (6) Tests do not prove self-service - event_manager inherits manageAccess. This is a symptom workaround, breaks existing workflow, adds user tedium, and does not satisfy OD052 identity rule. Implementation needs different pattern that properly resolves Person.authSubjectId for identity checks. Worktree preserved at .loop-worktrees/prod-20260721T1852-OD056-saved-report-owner. 1/3 failures."
     },
     {
-      "item": "S2 \u00e2\u20ac\u201d Client.outstandingBalance over hasMany invoices",
+      "item": "S2 - Client.outstandingBalance over hasMany invoices",
       "runId": "prod-202607211313-S2-client-outstanding-balance",
       "timestamp": "2026-07-21T13:20:00Z",
       "verdict": "REJECT",
       "reason": "Codex rejected: Manifest computed fields over hasMany relationships (outstandingBalance, overdueBalance) are not generated into Convex schema, so they don't exist at runtime. The test manually computes values, so it passes even though the shipped fields don't exist. One-line fix direction: implement the balances in the generated/runtime Client read path and assert those returned fields instead of recomputing them in the test. This is a Manifest platform limitation - computed fields over hasMany relationships are not projected into the generated Convex schema. Worktree preserved at .loop-worktrees/prod-202607211313-S2-client-outstanding-balance. 1/3 failures."
     },
     {
-      "item": "S2 \u00e2\u20ac\u201d Client.outstandingBalance over hasMany invoices",
+      "item": "S2 - Client.outstandingBalance over hasMany invoices",
       "runId": "prod-20260722T0900-S2-client-balance",
       "timestamp": "2026-07-22T09:00:00Z",
       "verdict": "SUCCESS",
-      "reason": "PR #31 created (draft). Added hasMany invoices: Invoice to Client with computed outstandingBalance and overdueBalance. Test uses generated hydration/computation helpers from convex/computed.ts. Covers all 8 invoice statuses (draft, sent, paid, viewed, overdue, partial, written_off, voided). Typecheck \u00e2\u0153\u2026, test \u00e2\u0153\u2026, format \u00e2\u0153\u2026. KNOWN ISSUES (Manifest platform limitations): (1) Generated hydrateComputedRelationsForClient does not filter soft-deleted invoices. (2) Generated Client read queries don't hydrate relations or compute balances. REVIEW_GATE=0 override required. Canonical port: YES (S2). Worktree: .loop-worktrees/prod-20260722T0900-S2-client-balance."
+      "reason": "PR #31 created (draft). Added hasMany invoices: Invoice to Client with computed outstandingBalance and overdueBalance. Test uses generated hydration/computation helpers from convex/computed.ts. Covers all 8 invoice statuses (draft, sent, paid, viewed, overdue, partial, written_off, voided). Typecheck OK\u2026, test OK\u2026, format OK\u2026. KNOWN ISSUES (Manifest platform limitations): (1) Generated hydrateComputedRelationsForClient does not filter soft-deleted invoices. (2) Generated Client read queries don't hydrate relations or compute balances. REVIEW_GATE=0 override required. Canonical port: YES (S2). Worktree: .loop-worktrees/prod-20260722T0900-S2-client-balance."
     },
     {
-      "item": "S3 \u00e2\u20ac\u201d ProductionBatch yield variance computeds",
+      "item": "S3 - ProductionBatch yield variance computeds",
       "runId": "prod-20260721T1545-S3-yield-variance",
       "timestamp": "2026-07-21T15:45:00Z",
       "verdict": "SUCCESS",
-      "reason": "PR #33 created (draft). Added yieldVariance, varianceRatio, fulfillmentRatio computed fields to ProductionBatch (src/production/batch.manifest). All null until actualYield captured. Regen generated convex/computed.ts helper. Test proves: plan 100 complete 110 \u00e2\u2020\u2019 variance 10, ratio 0.1, fulfillment 1.1. Typecheck \u00e2\u0153\u2026, test \u00e2\u0153\u2026, format \u00e2\u0153\u2026. Canonical port: YES (S3). Worktree: .loop-worktrees/prod-20260721T1545-S3-yield-variance."
+      "reason": "PR #33 created (draft). Added yieldVariance, varianceRatio, fulfillmentRatio computed fields to ProductionBatch (src/production/batch.manifest). All null until actualYield captured. Regen generated convex/computed.ts helper. Test proves: plan 100 complete 110  to variance 10, ratio 0.1, fulfillment 1.1. Typecheck OK\u2026, test OK\u2026, format OK\u2026. Canonical port: YES (S3). Worktree: .loop-worktrees/prod-20260721T1545-S3-yield-variance."
     },
     {
-      "item": "issue #32 \u00e2\u20ac\u201d Main CI red (wiring drift + cascade auth context)",
+      "item": "issue #32 - Main CI red (wiring drift + cascade auth context)",
       "runId": "prod-20260721T2115-issue32-wiring-drift",
       "timestamp": "2026-07-21T21:15:00Z",
       "verdict": "ESCALATED",
       "reason": "Diagnosed: regen only fixed contentHash metadata. Actual blocker is cascade authorization policy - Event.approve cascades to Invoice.issue but runs under CALLER role (kitchen staff) vs Finance role. Product decision needed: should cascade operations run under caller role or elevated role? Blocks PRs #27/#28/#31. Worktree preserved at .loop-worktrees/prod-20260721T2115-issue32-wiring-drift with diagnosis commit."
     },
     {
-      "item": "issue #24 \u00e2\u20ac\u201d savedReportDefinitions.ownerId stores Clerk user_ id",
+      "item": "issue #24 - savedReportDefinitions.ownerId stores Clerk user_ id",
       "runId": "prod-20260721T2120-issue24-savedreport-schema",
       "timestamp": "2026-07-21T21:20:00Z",
       "verdict": "ESCALATED",
       "reason": "Diagnosed: 3rd entity with ownership pattern issue after OD052/OD056. Manifest line 80 does mutate ownerId = user.id (Clerk subject) but schema defines ref owner: Person (Person FK). Needs coordinated auth pattern fix across TimeRecord/SavedReport/SavedReportDefinition plus data repair, not isolated patches. Product decision: should entities store direct Person FK or resolve via authSubjectId lookup?"
     },
     {
-      "item": "issue #22 \u00e2\u20ac\u201d packListItems schema drift",
+      "item": "issue #22 - packListItems schema drift",
       "runId": "prod-20260721T2130-issue22-packlist-schema",
       "timestamp": "2026-07-21T21:30:00Z",
       "verdict": "PRUNED",
       "reason": "Diagnosed: Same wiring drift as issue #32 (contentHash metadata changes, not actual schema drift). manifest:regen fixes it. No orphan eventDishId/isGenerated fields found in source or generated code. Issue obsolete or already fixed by recent regens."
     },
     {
-      "item": "issue #15 \u00e2\u20ac\u201d prepTasks/dishTasks schema drift",
+      "item": "issue #15 - prepTasks/dishTasks schema drift",
       "runId": "prod-20260721T2135-issue15-preptasks-schema",
       "timestamp": "2026-07-21T21:35:00Z",
       "verdict": "PRUNED",
       "reason": "Diagnosed: Same wiring drift as issue #32 (contentHash metadata changes, not actual schema drift). manifest:regen fixes it. Event.cancel / EventDish.remove / DishTask.retire are not blocked by schema drift - issue is cascade auth context (#32). Issue obsolete."
     },
     {
-      "item": "S6 \u00e2\u20ac\u201d Event attendance derived counts",
+      "item": "S6 - Event attendance derived counts",
       "runId": "prod-20260721T2136-S6-event-attendance-counts",
       "timestamp": "2026-07-21T21:36:00Z",
       "verdict": "REJECT",
       "reason": "Codex rejected: HIGH - Event list/get queries return stored documents without invoking attendance hydration or computeEvent, so the new counts are absent from the actual application API while the test only exercises helpers directly. MEDIUM - hydrateComputedRelationsForEvent includes withdrawn soft-deleted guests, so their RSVP and check-in states continue inflating all four attendance counts. Both are Manifest platform limitations (same as S2's first attempt): (1) Generated queries don't hydrate/compute hasMany relationships. (2) Generated hydration helpers don't filter soft-deletes. These require Builder platform changes - cannot fix in manifest source alone. Test correctly uses helpers (pattern matches S2's successful retry). 1/3 failures. Worktree preserved at .loop-worktrees/prod-20260721T2136-S6-event-attendance-counts."
     },
     {
-      "item": "S8 \u00e2\u20ac\u201d Vendor open-order count + outstanding total",
+      "item": "S8 - Vendor open-order count + outstanding total",
       "runId": "prod-20260721T2135-S8-vendor-open-orders",
       "timestamp": "2026-07-21T21:40:00Z",
       "verdict": "SUCCESS",
-      "reason": "PR #36 created (draft). Added hasMany orders: VendorOrder + computed openOrderCount (draft/submitted/confirmed/partially_received with deletedAt filter) + computed outstandingTotal (sum totalAmount over submitted/confirmed/partially_received with deletedAt filter). Regen generated convex/computed.ts helpers. 6 runtime tests pass: count semantics, amount aggregation, draft vs outstanding, received/cancelled exclusion, soft-delete exclusion. Typecheck \u00e2\u0153\u2026, format \u00e2\u0153\u2026. KNOWN ISSUES (Manifest platform limitations): (1) Generated Vendor queries don't hydrate/compute hasMany relationships - production callers must manually call hydrateComputedRelationsForVendor + computeVendor (same as S2, S3, S6, S9). REVIEW_GATE=0 push required for platform limitation. Canonical port: YES (S8). Worktree: .loop-worktrees/prod-20260721T2135-S8-vendor-open-orders."
+      "reason": "PR #36 created (draft). Added hasMany orders: VendorOrder + computed openOrderCount (draft/submitted/confirmed/partially_received with deletedAt filter) + computed outstandingTotal (sum totalAmount over submitted/confirmed/partially_received with deletedAt filter). Regen generated convex/computed.ts helpers. 6 runtime tests pass: count semantics, amount aggregation, draft vs outstanding, received/cancelled exclusion, soft-delete exclusion. Typecheck OK\u2026, format OK\u2026. KNOWN ISSUES (Manifest platform limitations): (1) Generated Vendor queries don't hydrate/compute hasMany relationships - production callers must manually call hydrateComputedRelationsForVendor + computeVendor (same as S2, S3, S6, S9). REVIEW_GATE=0 push required for platform limitation. Canonical port: YES (S8). Worktree: .loop-worktrees/prod-20260721T2135-S8-vendor-open-orders."
     },
     {
-      "item": "S5 \u00e2\u20ac\u201d Ingredient totals across locations",
+      "item": "S5 - Ingredient totals across locations",
       "runId": "prod-20260721T2230-S5-ingredient-totals",
       "timestamp": "2026-07-21T22:30:00Z",
       "verdict": "REJECT",
       "reason": "Same Manifest platform limitation as S6: computed fields over hasMany relationships (Ingredient.stockLines) are not generated into convex/computed.ts hydration helpers. Manifest changes added (totalOnHand, totalReserved, totalInventoryValue) and regen ran, but computeIngredient() only includes self-only computeds (isActive, isDiscontinued) - no hydrateComputedRelationsForIngredient helper generated. Typecheck fails: Ingredient totals don't exist in generated types. Test created (ingredient-stock-totals.runtime.test.ts) but can't verify nonexistent fields. Requires Builder platform changes - cannot fix in manifest source alone. Worktree preserved at .loop-worktrees/prod-20260721T2230-S5-ingredient-totals. 1/3 failures."
     },
     {
-      "item": "S9 \u00e2\u20ac\u201d Invoice.totalPaid over hasMany payments",
+      "item": "S9 - Invoice.totalPaid over hasMany payments",
       "runId": "prod-20260721T2345-S9-invoice-total-paid",
       "timestamp": "2026-07-21T23:54:00Z",
       "verdict": "SUCCESS",
-      "reason": "PR #37 created (draft). Added computed fields totalPaid (sum completed payments, excluding soft-deleted) and settledPaymentCount (count completed payments, excluding soft-deleted) to Invoice in src/sales/invoice-core.manifest. Review-gate caught missing soft-delete filter initially; fixed with p.deletedAt == null predicate. Regen generated convex/computed.ts helpers. 3 runtime tests pass: completed payments sum, failed/refunded excluded, stored amountPaid unchanged. Typecheck \u00e2\u0153\u2026, test \u00e2\u0153\u2026. Canonical port: YES (S9). Worktree: .loop-worktrees/prod-20260721T2345-S9-invoice-total-paid."
+      "reason": "PR #37 created (draft). Added computed fields totalPaid (sum completed payments, excluding soft-deleted) and settledPaymentCount (count completed payments, excluding soft-deleted) to Invoice in src/sales/invoice-core.manifest. Review-gate caught missing soft-delete filter initially; fixed with p.deletedAt == null predicate. Regen generated convex/computed.ts helpers. 3 runtime tests pass: completed payments sum, failed/refunded excluded, stored amountPaid unchanged. Typecheck OK\u2026, test OK\u2026. Canonical port: YES (S9). Worktree: .loop-worktrees/prod-20260721T2345-S9-invoice-total-paid."
     }
   ]
 }
