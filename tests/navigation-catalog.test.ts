@@ -22,7 +22,8 @@ describe("NavigationCatalog", () => {
 
   it("keeps unshipped systems in planned areas", () => {
     const planned = catalog.plannedAreas().map((a) => a.path);
-    expect(planned).toEqual(expect.arrayContaining(["/admin"]));
+    expect(planned).toEqual(expect.arrayContaining(["/facilities"]));
+    expect(planned).not.toContain("/admin");
     expect(planned).not.toContain("/finance");
     expect(planned).not.toContain("/inventory");
     expect(planned).not.toContain("/logistics");

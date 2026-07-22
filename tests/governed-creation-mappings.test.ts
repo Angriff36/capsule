@@ -33,6 +33,7 @@ describe("governed creation mappings", () => {
       "Invoice_createViaIssue",
       "MenuDish_createViaAdd",
       "Menu_createViaDraft",
+      "OrganizationCapabilitySetting_createViaRegister",
       "Organization_createViaRegister",
       "PackListItem_createViaAddItem",
       "PackList_createViaOpen",

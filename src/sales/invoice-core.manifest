@@ -62,9 +62,13 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   transition status from "voided" to []
   transition status from "written_off" to []
 
-  default policy invoiceRead read: roleAllows(user.role, "financeAccess") "Finance staff may read invoices"
-  default policy invoiceWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write invoices through commands"
-  default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute invoice commands"
+  // financeAccess OR manageAccess (house composite, same as IngredientDemand):
+  // the EventApproved -> Invoice.issue vision cascade runs as the approving
+  // actor (event_manager has manageAccess); finance-only policies aborted
+  // every approve. Line staff still excluded. 2026-07-22.
+  default policy invoiceRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may read invoices"
+  default policy invoiceWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may write invoices through commands"
+  default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may execute invoice commands"
 
   command issue(
     clientId: uuid,

@@ -17,10 +17,10 @@
       "sha256": "075f3e463eb1092530df76b0dd6a25a12277c68308d39a78e06e859d59cae07e"
     },
     "convex/mutations.ts": {
-      "sha256": "94fbf1bb3c71147666163b22d46b381ed7eb9feb7b2437c096cad7da69884d4f"
+      "sha256": "6319b8927745c13d230f70da26fef64578c031f93e4227c37c36d1521e73062a"
     },
     "convex/queries.ts": {
-      "sha256": "8ee1cfb71a92677e6b3946394b8b3d3c4b3af69b7bb0e8f85985013bfe396157"
+      "sha256": "9f31101bc2eb4d30144cb94938b53dcfe68923137f28685e401075541074cfab"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
@@ -848,7 +848,7 @@
       "sha256": "cd928fd6c3a0b07f62de709c125e7abd923866430b962bf0f4cfe88a6acbca91"
     },
     "manifest-context-summary.json": {
-      "sha256": "16ff5d051348788182ce213eea68656df298a34830823f859069927ee5f6c844"
+      "sha256": "e8ccefedf259ec6e6240456caff8fe01410672d59eb7344128a21275110efb2f"
     },
     "package.json": {
       "sha256": "7e473f5663af5ee8b406f88f8027c8e893630e4dfc35de2903b2c506886fa866"
@@ -863,10 +863,10 @@
       "sha256": "da84fffd51f9f1cc892363442c71c50847d3d8388b3f116eb427a593349a47ce"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "fa9e0e41a9295c9c7d22f4f47b62ee6d3402d46ab597c45c3d239d108d11542a"
+      "sha256": "3d2618ecc552634643671f1a6aa955db50eef19ad8bb3939548fe75e49f71d34"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "3a3b18825310bf8d4e5891417320631db324927c413e6c0c592a11f3ad8bd262"
+      "sha256": "636320453f5cc1bf5b57041f855ef0b3fa6ddbce4c73089d9a2ecc2d13686b13"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "a7da358ac0ed6bed5e3fe8bc78ee51b196a295d57ef71a6e052748068ee04317"
@@ -878,7 +878,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "37800703f021943f01b192551982da04b9635293e1f7a7804d05efe2d0781baa"
+      "sha256": "d77d0219273eb38abb6f590c5636aff46ebe7854108558fc12379158082ec2f0"
     }
   },
   "package": {
