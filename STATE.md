@@ -1,66 +1,92 @@
 # Loop State — capsule
 
-Last run: 2026-07-21T19:45:00Z (queue-drain tick: OD052 & S1 rebased onto main, CI expected green; next: OD056 or schema regens)
+Last run: 2026-07-21T23:40:00Z (queue-drain mode: new critical bugs + cascade auth context block main CI)
 
 ## High Priority (queue-drain mode)
 
-**PR #27 OD052 - REBASED (CI expected green)**
+**issue #37 — CRITICAL: S7 PackList widening exposes cross-tenant data leak (2026-07-21 product-loop)**
+- Widening PackList/PackListItem policies to kitchenAccess generated tenant-scoped list queries
+  (listPackListByTenantId, listPackListItemByTenantId) that don't bind tenantId argument to auth context
+- Kitchen users could pass another tenant's ID to these queries and receive cross-tenant pack-list data
+- review-gate blocked push: VERDICT FAIL - "newly authorized kitchen users can pass another tenant's ID
+  to listPackListByTenantId or listPackListItemByTenantId and receive cross-tenant pack-list data"
+- Worktree at .loop-worktrees/prod-20260721T2355-S7-packlist-access-widening (commit a714427)
+- This is a Manifest platform issue: TenantScoped entity read queries must bind tenantId to __auth.tenantId
+- Product decision: does S7 need to block until platform fixes cross-tenant query binding, or can we work around?
+
+**issue #35 — CRITICAL: PrepTask.claim writes Clerk user.id into Person FK (v.id("people"))**
+- Same bug pattern as OD052/OD056: self-service commands write auth subject (user.id) into relation FK
+- src/operations/event.manifest line ~338: `mutate assignedToId = user.id` where assignedToId is v.id("people")
+- Breaks claim for all staff under real auth (id never matches Person table)
+- Blocks: Event preparation self-service workflow
+- Fix: resolve Person.authSubjectId == user.id or use roleAllows(workforceManageAccess)
+- Pattern established: OD052, OD056, savedReportDefinitions (issue #24)
+
+**issue #32 — CRITICAL: Main CI red (cascade auth context)**
+- cascade-approve runs invoice reads under CALLER's role vs Finance role
+- ~10 event/closeout proofs fail "Finance staff may read invoices"
+- Product decision: should cascade operations run under caller or elevated role?
+- Blocks: PRs #27 OD052, #28 S1, #31 S2, #36 S8
+- Action: decide cascade authorization policy → fix wiring or adjust proofs
+
+**issue #24 — ESCALATED: savedReportDefinitions.ownerId stores Clerk user_ id**
+- 3rd entity with ownership pattern issue after TimeRecord/SavedReport
+- Needs coordinated auth pattern fix + data repair, not isolated patches
+- Product decision: entities store direct Person FK or resolve via authSubjectId?
+
+**PR #27 OD052 — BLOCKED on #32 (HIGH-SCRUTINY: auth)**
 - TimeRecord self-service identity via Person.authSubjectId
-- Rebased onto main (includes agent modules fix 0226af6)
-- Codex APPROVED, awaiting CI verification
+- Codex APPROVED, test failing on #32's cascade failures
+- Worktree at .loop-worktrees/prod-20260721T1600-OD052-timerecord-identity
 
-**PR #28 S1 - REBASED (CI expected green)**
+**PR #28 S1 — BLOCKED on #32**
 - Inventory reservation aggregation proof
-- Rebased onto main (includes agent modules fix)
-- Test at tests/proofs/inventory-reservation-aggregation.runtime.test.ts
+- Failing on cascade auth failures
 
-**OD056 - REJECT (1/3 failures - Codex rejected identity fix)**
+**PR #31 S2 — BLOCKED on #32**
+- Client.outstandingBalance over hasMany invoices
+- Codex APPROVED, blocked on cascade fallout
+
+**PR #36 S8 — BLOCKED on #32**
+- Vendor open-order count + outstanding total
+- Codex APPROVED, failing on cascade failures
+
+**PR #33 S3 — CI green, awaiting auto-merge**
+- ProductionBatch yield variance computeds
+- Draft, ready for human review
+
+**OD056 — REJECT (1/3 failures)**
 - SavedReport owner identity mismatch
-- Codex rejected: personId == user.id compares Person FK with auth subject (wrong)
-- Removed owner-scoped reads (broke existing workflow)
+- Codex rejected: personId == user.id compares Person FK with auth subject
 - Needs correct pattern: resolve Person.authSubjectId for identity checks
 - Worktree preserved at .loop-worktrees/prod-20260721T1852-OD056-saved-report-owner
 
-**PR #26 MERGED by human 2026-07-21T20:39Z (verified via gh). Human also
-enabled repo AUTO-MERGE: green PRs now land without manual review — treat CI
-green as the final gate and keep Codex review verdicts in PR bodies. Local
-main has origin merged back in (4f5190f).**
+**OD054 — REJECT (1/3 failures)**
+- Qualification.expire() guard
+- Codex rejected: test uses past deadline, UI still offers Expire before deadline
+- Needs UI changes to unblock
 
-**MAIN CI IS RED — issue #32 (overseer 2026-07-22, verified in clean
-worktrees): committed wiring drifted from committed manifests; after faithful
-regen the cascade-approve feature (cee67e3) still runs invoice reads under the
-CALLER's role → ~10 event/closeout proofs throw "Finance staff may read
-invoices"; plus governed-creation-mappings 53≠52 and navigation-catalog
-/facilities≠/admin. This is a PRODUCT decision (cascade authorization
-context), not a test-tweak — do NOT paper over by editing tests. Hold
-manifest-touching pushes/rebases until #32 resolves; PR #27 was updated with
-main merged in (fixes #29/#30 CI noise) and will stay red only on #32's
-failures.**
-- Pre-push from worktrees was actually fixed by repairing `BUILDER_DIR`: both
-  `.claude/product-loop.cmd` and `.claude/loop-tick.cmd` contained a literal
-  backspace byte (`C:\Projects<BS>uilder`); fixed, plus user-level
-  `setx BUILDER_DIR C:\Projects\builder`. PR #26 only fixes EOL phantom
-  staleness for fresh checkouts.
-- PR #27/#28 CI red root causes (verified from run logs, NOT fixed by rebase):
-  **issue #29** (agent-document-enter proof hits live OIDC via
-  CapsuleRecipeStatusLoader — escapes the convex-test harness) and
-  **issue #30** (capsule-command-catalog test expects 21 capabilities, wiring
-  exposes 270). Both defect-shaped → fix queue. Every PR from main stays red
-  until they land.
+**PR #26 MERGED 2026-07-21T20:39Z** (fix-20260721-eol-gitattributes)
+- Fixed Builder CRLF drift
+- AUTO-MERGE enabled: green PRs land without manual review
 
-**NEW BUGS FROM 2026-07-21 (defect-shaped → fix queue):**
-- **issue #25**: Convex fanOut where id= never matches people (Manifest upstream bug - wait for fix, then bump pin)
-- **issue #24**: savedReportDefinitions.ownerId stores Clerk user_ id (schema drift; needs regen + data repair - ready to attempt)
-- **issue #22**: packListItems schema drift (orphan fields; needs regen + data repair - ready to attempt)
-- **issue #21**: missing agent bridge modules (PRUNED - fixed in 0226af6)
-- **issue #20**: ownership ledger drift (PRUNED - fixed in PR #26)
-- **issue #17**: enter-recipe idempotency returns retired recipe ids (PRUNED - generation-bump retry in code at L151-174)
-- **issue #16**: Capsule MCP stale capability catalog (ESCALATED - needs architectural decision: catalog rebuild vs host restart)
-- **issue #15**: prepTasks/dishTasks schema drift (needs regen + data repair - ready to attempt)
+**PRUNED/OBSOLETE (2026-07-21 issues):**
+- **issue #25**: Convex fanOut where id= never matches people (Manifest upstream)
+- **issue #22**: packListItems schema drift (same wiring drift as #32)
+- **issue #21**: missing agent bridge modules (FIXED in 0226af6)
+- **issue #20**: ownership ledger drift (FIXED in PR #26)
+- **issue #17**: enter-recipe idempotency (FIXED in code)
+- **issue #16**: Capsule MCP stale catalog (architectural decision)
+- **issue #15**: prepTasks/dishTasks schema drift (same wiring drift as #32)
 
-**DEPENDENCY UPGRADES (attemptable from main checkout):**
-- actions/checkout v4→v6 (PR #7 draft exists, needs update/push)
-- 5 remaining Dependabot majors: plugin-react, vite, react-dom, react-router-dom, typescript
+**OTHER ISSUES (product gap → backlog):**
+- **issue #34**: No email delivery infrastructure for invoice reminders
+- **issue #19**: Recipe.reinstate enhancement
+- **issue #18**: Ingredient.discontinue not a wipe
+
+**DEPENDENCY UPGRADES (blocked by #32):**
+- actions/checkout v4→v6 (PR #7 draft, CI red)
+- 5 Dependabot majors: plugin-react, vite, react-dom, react-router-dom, typescript
 
 ## Watch List
 

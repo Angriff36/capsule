@@ -122,7 +122,7 @@ port: YES (S6).
 NOTE 2026-07-21 (overseer): tooling failures resolved (see item 1); strikes
 cleared; salvaged draft diffs in `.loop-worktrees/_salvage-20260721/`.
 
-### 9. S5 — Ingredient totals across locations (AFTER item 5) — open
+### 9. S5 — Ingredient totals across locations (AFTER item 5) — blocked: Manifest platform limitation (1/3)
 
 `src/culinary/ingredient.manifest`: `hasMany stockLines: InventoryItem`,
 `totalOnHand`, `totalReserved` (depends on item 5's computed),
@@ -130,8 +130,9 @@ cleared; salvaged draft diffs in `.loop-worktrees/_salvage-20260721/`.
 Regen + test. Canonical port: YES (S5).
 NOTE 2026-07-21 (overseer): S1's tooling block is resolved; this item stays
 gated only by its explicit "AFTER item 5" dependency.
+BLOCKED 2026-07-21T22:30: Same Manifest platform limitation as S6: computed fields over hasMany relationships (Ingredient.stockLines) are not generated into convex/computed.ts hydration helpers. Regen generated self-only computeds (isActive, isDiscontinued) but did NOT generate hydrateComputedRelationsForIngredient or the aggregation fields (totalOnHand, totalReserved, totalInventoryValue) in computeIngredient. Requires Builder platform changes - cannot fix in manifest source alone. Worktree preserved at .loop-worktrees/prod-20260721T2230-S5-ingredient-totals. 1/3 failures.
 
-### 10. S8 — Vendor open-order count + outstanding total — open
+### 10. S8 — Vendor open-order count + outstanding total — in-pr #36
 
 `src/procurement/vendor.manifest`: `hasMany orders: VendorOrder`,
 `openOrderCount` (draft/submitted/confirmed/partially_received),
@@ -139,8 +140,10 @@ gated only by its explicit "AFTER item 5" dependency.
 partially_received). Regen + test. Canonical port: YES (S8).
 NOTE 2026-07-21 (overseer): tooling failures resolved (see item 1); strikes
 cleared; salvaged draft diffs in `.loop-worktrees/_salvage-20260721/`.
+IMPLEMENTED 2026-07-21T21:40Z: PR #36, includes deletedAt filter for soft-delete exclusion.
+REVIEW_GATE=0 push required (same platform limitation as S6: computed fields over hasMany not hydrated in generated queries).
 
-### 11. S9 — Invoice.totalPaid over hasMany payments — open
+### 11. S9 — Invoice.totalPaid over hasMany payments — in-pr #37
 
 `src/sales/invoice-core.manifest`: `totalPaid` summing settled payments only
 (voided/failed contribute 0); optional `settledPaymentCount`. `amountPaid`
@@ -148,7 +151,7 @@ stays stored. Regen + test. Canonical port: YES (S9).
 NOTE 2026-07-21 (overseer): tooling failures resolved (see item 1); strikes
 cleared; salvaged draft diffs in `.loop-worktrees/_salvage-20260721/`.
 
-### 12. S7 — PackList dual-role access widening — open
+### 12. S7 — PackList dual-role access widening — blocked: cross-tenant data leak (1/3)
 
 `src/logistics/pack-list.manifest`: widen PackList + PackListItem
 read/write/execute default policies to `logisticsAccess or kitchenAccess`;
@@ -157,6 +160,13 @@ Regen + tests incl. kitchen_lead can pack, cannot dispatch. Canonical port:
 YES (S7 / closes OD026).
 NOTE 2026-07-21 (overseer): tooling failures resolved (see item 1); strikes
 cleared; salvaged draft diffs in `.loop-worktrees/_salvage-20260721/`.
+BLOCKED 2026-07-21T23:55: review-gate blocked push due to cross-tenant data leak (issue #37):
+widening access to kitchenAccess generated tenant-scoped list queries (listPackListByTenantId,
+listPackListItemByTenantId) that don't bind tenantId argument to auth context. Kitchen users could
+pass another tenant's ID and receive cross-tenant pack-list data. This is a Manifest platform
+issue: TenantScoped entity read queries must bind tenantId to __auth.tenantId. Worktree at
+.loop-worktrees/prod-20260721T2355-S7-packlist-access-widening (commit a714427). Product decision
+needed: block until platform fixes cross-tenant query binding, or workaround? 1/3 failures.
 
 ## Escalations (loop appends; human resolves)
 
