@@ -4966,9 +4966,9 @@ async function __runEventCloseoutCapture(ctx: MutationCtx, { docId, eventId, act
       const __fk = ((doc as any) as any).eventId;
       ((doc as any) as any).event = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read event closeouts");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write event closeouts through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute event closeout commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Finance staff and managers may read event closeouts");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Finance staff and managers may write event closeouts through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Finance staff and managers may execute event closeout commands");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_event != null))) throw new Error("Guard 2 failed");
@@ -5100,9 +5100,9 @@ export const EventCloseout_createViaCapture = mutation({
       unresolvedIssues: args.unresolvedIssues
     };
     const __rel_event = await __resolveRelation(ctx, "events", [__auth.tenantId, __draft.eventId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read event closeouts");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write event closeouts through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute event closeout commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Finance staff and managers may read event closeouts");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Finance staff and managers may write event closeouts through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Finance staff and managers may execute event closeout commands");
     if (!((__draft.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((__rel_event != null))) throw new Error("Guard 2 failed");
@@ -5153,9 +5153,9 @@ async function __runEventCloseoutFinalize(ctx: MutationCtx, { docId, version }: 
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("EventCloseout not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("EventCloseout not found");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read event closeouts");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write event closeouts through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute event closeout commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Finance staff and managers may read event closeouts");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Finance staff and managers may write event closeouts through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "eventManageAccess")))) throw new Error("Finance staff and managers may execute event closeout commands");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.capturedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -8621,9 +8621,9 @@ async function __runInvoiceApplyPayment(ctx: MutationCtx, { docId, paymentAmount
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
     if (!(((((doc.status === "sent") || (doc.status === "viewed")) || (doc.status === "overdue")) || (doc.status === "partial")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((paymentAmount > 0))) throw new Error("Payment amount must be positive");
@@ -8691,9 +8691,9 @@ async function __runInvoiceIssue(ctx: MutationCtx, { docId, clientId, invoiceNum
       const __fk = ((doc as any) as any).clientId;
       ((doc as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
     if (!((doc.issuedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -8797,9 +8797,9 @@ export const Invoice_createViaIssue = mutation({
       total: args.total
     };
     const __rel_client = await __resolveRelation(ctx, "clients", [__auth.tenantId, __draft.clientId], ["tenantId","id"], "tenantId", __auth.tenantId);
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
     if (!((__draft.issuedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "draft"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -8843,9 +8843,9 @@ async function __runInvoiceMarkOverdue(ctx: MutationCtx, { docId, version }: any
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
     if (!((((doc.status === "sent") || (doc.status === "viewed")) || (doc.status === "partial")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!(((doc.dueDate != null) && (doc.dueDate < Date.now())))) throw new Error("Guard 2 failed");
@@ -8901,9 +8901,9 @@ async function __runInvoiceMarkViewed(ctx: MutationCtx, { docId, version }: any,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
     if (!((doc.status === "sent"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     {
@@ -8958,9 +8958,9 @@ async function __runInvoiceMarkVoided(ctx: MutationCtx, { docId, reason, version
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
     if (!(((((doc.status === "draft") || (doc.status === "sent")) || (doc.status === "viewed")) || (doc.status === "overdue")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((doc.amountPaid === 0))) throw new Error("Guard 2 failed");
@@ -9019,9 +9019,9 @@ async function __runInvoiceRecordRefund(ctx: MutationCtx, { docId, refundAmount,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
     if (!(((doc.status === "paid") || (doc.status === "partial")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((refundAmount > 0))) throw new Error("Refund amount must be positive");
@@ -9085,9 +9085,9 @@ async function __runInvoiceSend(ctx: MutationCtx, { docId, version }: any, __cre
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
     if (!((doc.status === "draft"))) throw new Error("Guard 0 failed");
     if (!((doc.issuedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
@@ -9144,9 +9144,9 @@ async function __runInvoiceWriteOff(ctx: MutationCtx, { docId, reason, writeOffA
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("Invoice not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Invoice not found");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may read invoices");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may write invoices through commands");
-    if (!(checkRole(user.role, "financeAccess"))) throw new Error("Finance staff may execute invoice commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may read invoices");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may write invoices through commands");
+    if (!((checkRole(user.role, "financeAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Finance staff and managers may execute invoice commands");
     if (!(((doc.status === "overdue") || (doc.status === "partial")))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((((reason).trim()).length > 0))) throw new Error("Write-off reason is required");

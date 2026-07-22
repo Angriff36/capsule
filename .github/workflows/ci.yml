@@ -27,4 +27,8 @@ jobs:
         run: bun install --frozen-lockfile
 
       - name: Run repository check gate
+        env:
+          # Agent client construction needs a value; tests run against the
+          # convex-test harness and never dial it.
+          CONVEX_URL: http://127.0.0.1:3210
         run: bun run check
