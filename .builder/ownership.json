@@ -2,7 +2,7 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "32884267d28dab72fa2ec4c52826b5d243f3b6ba5098ced603a8544588f3acfc"
+      "sha256": "9ffd365cbf79f5fdc684344f5471aa81256f5f5955f7267d48bf7a3d9dbafd40"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
@@ -848,7 +848,7 @@
       "sha256": "cd928fd6c3a0b07f62de709c125e7abd923866430b962bf0f4cfe88a6acbca91"
     },
     "manifest-context-summary.json": {
-      "sha256": "16ff5d051348788182ce213eea68656df298a34830823f859069927ee5f6c844"
+      "sha256": "909d412223b8f521076c5612434deb57caa8d5ef9780c657a3c19bae87daa46e"
     },
     "package.json": {
       "sha256": "7e473f5663af5ee8b406f88f8027c8e893630e4dfc35de2903b2c506886fa866"
@@ -857,16 +857,16 @@
       "sha256": "d6a4c74ee34c02ed5af5166190a8dab595f6d195bf1d13b6706262c0f4501585"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "bd3a0cf7f4ca0484592d488e1c97bd2887f320ceaf897a1d25b6560cd3a2db62"
+      "sha256": "2612de4ebe6c0cf12c14ac9f8decfa25049df32bc4d9b0b149c43d1541b3fdec"
     },
     "scripts/seed-convex.ts": {
       "sha256": "da84fffd51f9f1cc892363442c71c50847d3d8388b3f116eb427a593349a47ce"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "fa9e0e41a9295c9c7d22f4f47b62ee6d3402d46ab597c45c3d239d108d11542a"
+      "sha256": "24d19fb85ed9b40d93dc286560c6de072eb7e68a10a8e58e709f2b40c889bc18"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "3a3b18825310bf8d4e5891417320631db324927c413e6c0c592a11f3ad8bd262"
+      "sha256": "6b4296dd8093580fb11698a553dc04715b8c0c6d84801d02f457e3fb3e51ae75"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "a7da358ac0ed6bed5e3fe8bc78ee51b196a295d57ef71a6e052748068ee04317"
@@ -878,7 +878,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "37800703f021943f01b192551982da04b9635293e1f7a7804d05efe2d0781baa"
+      "sha256": "da27bdf024c8373bd0b1f7811fa675a4570bc874e7df5d7f6a2ebea8edb6dcbd"
     }
   },
   "package": {

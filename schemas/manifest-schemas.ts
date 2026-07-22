@@ -587,7 +587,14 @@ export const InvoiceSchema = z.object({
   updatedAt: z.coerce.date().optional(),
 });
 
+// Computed: Invoice
+export const InvoiceComputedSchema = InvoiceSchema.extend({
+  totalPaid: z.number(),
+  settledPaymentCount: z.number(),
+});
+
 export type Invoice = z.infer<typeof InvoiceSchema>;
+export type InvoiceWithComputed = z.infer<typeof InvoiceComputedSchema>;
 
 // Entity: Menu
 export const MenuSchema = z.object({

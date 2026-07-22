@@ -49,6 +49,10 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   hasMany payments: Payment
 
+  // Payment aggregations (S9); amountPaid stays stored for command transitions.
+  computed totalPaid: money(12, 2) = sum(self.payments, (p) => p.status == "completed" and p.deletedAt == null ? p.amount : 0)
+  computed settledPaymentCount: number = count_of(self.payments, (p) => p.status == "completed" and p.deletedAt == null)
+
   constraint invoiceIssuedComplete: self.issuedAt == null or (length(trim(self.invoiceNumber)) > 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0 and self.amountPaid >= 0 and self.amountDue >= 0) "Issued invoices require a number and non-negative money amounts"
   constraint invoiceTotalsConsistent: self.issuedAt == null or self.total == self.subtotal + self.taxAmount - self.discountAmount "Invoice total must equal subtotal plus tax minus discount"
   constraint invoiceBalanceConsistent: self.issuedAt == null or self.amountDue == self.total - self.amountPaid "Invoice amount due must equal total minus amount paid"
