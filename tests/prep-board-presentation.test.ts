@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import { PrepBoardPage } from "../src/features/production/PrepBoardPage";
 
 const manifest = vi.hoisted(() => ({
@@ -44,7 +45,9 @@ vi.mock("../src/features/production/ProductionWorkspaceNav", () => ({
 }));
 
 function renderPage() {
-  return renderToStaticMarkup(createElement(PrepBoardPage));
+  return renderToStaticMarkup(
+    createElement(MemoryRouter, {}, createElement(PrepBoardPage)),
+  );
 }
 
 describe("PrepBoardPage presentation", () => {
