@@ -2,6 +2,8 @@
 /.aboardai
 /.artifacts
 /.tmp
+/.convex
+/node_modules
 /generated
 /diagrams
 /tests
