@@ -1,15 +1,10 @@
 import {
-  DishReinstateLifecycle,
-  DishRetireLifecycle,
-  IngredientDiscontinueLifecycle,
-  IngredientReinstateLifecycle,
   MenuArchiveLifecycle,
   MenuMarkPublishedLifecycle,
   MenuRestoreLifecycle,
   MenuUnpublishLifecycle,
   RecipePublishVersionLifecycle,
   RecipeRetractLifecycle,
-  RecipeRetireLifecycle,
 } from "../../generated/manifest-wiring-bindings";
 
 export interface CulinaryAction<Key extends string = string> {
@@ -37,7 +32,7 @@ function available<Key extends string>(
     .map(({ key, label }) => ({ key, label }));
 }
 
-const RECIPE_ACTIONS = [
+const RECIPE_PUBLISH_ACTIONS = [
   {
     key: "publishVersion",
     label: "Publish",
@@ -48,25 +43,6 @@ const RECIPE_ACTIONS = [
     label: "Return to draft",
     lifecycle: RecipeRetractLifecycle,
   },
-  { key: "retire", label: "Retire", lifecycle: RecipeRetireLifecycle },
-] as const;
-
-const INGREDIENT_ACTIONS = [
-  {
-    key: "discontinue",
-    label: "Discontinue",
-    lifecycle: IngredientDiscontinueLifecycle,
-  },
-  {
-    key: "reinstate",
-    label: "Reinstate",
-    lifecycle: IngredientReinstateLifecycle,
-  },
-] as const;
-
-const DISH_ACTIONS = [
-  { key: "retire", label: "Retire", lifecycle: DishRetireLifecycle },
-  { key: "reinstate", label: "Reinstate", lifecycle: DishReinstateLifecycle },
 ] as const;
 
 const MENU_ACTIONS = [
@@ -84,17 +60,47 @@ const MENU_ACTIONS = [
   { key: "restore", label: "Restore draft", lifecycle: MenuRestoreLifecycle },
 ] as const;
 
+/**
+ * Kitchen lifecycle buttons. Delete is always one click (purge) when the row
+ * is still visible — no restore-first, no reason prompt.
+ */
 export class CulinaryLifecyclePolicy {
-  recipeActions(status: string) {
-    return available(status, RECIPE_ACTIONS);
+  recipeActions(status: string, deletedAt?: number | null) {
+    const actions: CulinaryAction[] = [
+      ...available(status, RECIPE_PUBLISH_ACTIONS),
+    ];
+    if (deletedAt == null) {
+      actions.push({ key: "purge", label: "Delete" });
+    }
+    return actions;
   }
 
-  ingredientActions(status: string) {
-    return available(status, INGREDIENT_ACTIONS);
+  ingredientActions(
+    status: string,
+    deletedAt?: number | null,
+    options?: { includeRestore?: boolean },
+  ) {
+    const actions: CulinaryAction[] = [];
+    if (deletedAt == null) {
+      actions.push({ key: "purge", label: "Delete" });
+    } else if (options?.includeRestore && status === "discontinued") {
+      actions.push({ key: "reinstate", label: "Restore" });
+    }
+    return actions;
   }
 
-  dishActions(status: string) {
-    return available(status, DISH_ACTIONS);
+  dishActions(
+    status: string,
+    deletedAt?: number | null,
+    options?: { includeRestore?: boolean },
+  ) {
+    const actions: CulinaryAction[] = [];
+    if (deletedAt == null) {
+      actions.push({ key: "purge", label: "Delete" });
+    } else if (options?.includeRestore && status === "retired") {
+      actions.push({ key: "reinstate", label: "Restore" });
+    }
+    return actions;
   }
 
   menuActions(status: string) {
