@@ -149,7 +149,7 @@ export function AllergenMatrixPage() {
   };
 
   return (
-    <div className="recipe-book-stage">
+    <div className="recipe-book-stage culinary-studio">
       <header className="recipe-book-masthead">
         <div>
           <p className="eyebrow">Culinary book · Allergens</p>

@@ -7,7 +7,13 @@ import {
 } from "../../lib/manifest-convex-react";
 
 export type AttachmentParentType =
-  "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout";
+  | "eventRecord"
+  | "client"
+  | "contract"
+  | "vendor"
+  | "delivery"
+  | "closeout"
+  | "dish";
 
 function formatSize(bytes: number): string {
   if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;

@@ -59,6 +59,16 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   belongsTo purchasingConfig: WeeklyPurchasingConfig fields [tenantId] references [tenantId]
   hasMany lines: VendorOrderLine
 
+  // Workflow flags for VendorOrderPage action routing. Current derived state
+  // only — status / timestamps stay persisted.
+  computed isDraft: boolean = self.status == "draft"
+  computed isPendingApproval: boolean = self.status == "pending_approval"
+  computed isOpenForReceiving: boolean = self.status == "confirmed" or self.status == "partially_received"
+  // Tenant-singleton purchasingConfig hydrate (fields [tenantId]) supplies the threshold.
+  computed needsSpendApproval: boolean = self.purchasingConfig != null and self.purchasingConfig.orderApprovalThresholdAmount != null and self.totalAmount > self.purchasingConfig.orderApprovalThresholdAmount
+  // Raw child status fields via count_of — not child computeds (parent rollup limitation).
+  computed hasIncompleteLines: boolean = count_of(self.lines, (line) => line.deletedAt == null and line.status != "cancelled" and line.status != "complete") > 0
+
   constraint orderMoneyNonnegative: self.subtotal >= 0 and self.taxAmount >= 0 and self.shippingAmount >= 0 and self.totalAmount >= 0 "Order money amounts cannot be negative"
   constraint orderSourceRangeComplete: (self.sourceRangeStart == null and self.sourceRangeEnd == null) or (self.sourceRangeStart != null and self.sourceRangeEnd != null) "Order source range requires both a start and end"
   constraint orderSourceRangeOrdered: self.sourceRangeStart == null or self.sourceRangeEnd == null or self.sourceRangeStart <= self.sourceRangeEnd "Order source range end must not precede its start"
@@ -364,6 +374,9 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
 
   computed lineTotal: money(12, 2) = self.orderedQuantity * self.unitCost
   computed remainingQuantity: decimal(12, 4) = self.orderedQuantity - self.receivedQuantity
+  // Receiving display flags — discrepancyQuantity stays a persisted buyer note.
+  computed isFullyReceived: boolean = self.orderedQuantity > 0 and self.receivedQuantity >= self.orderedQuantity
+  computed hasReceivingDiscrepancy: boolean = self.discrepancyQuantity != null and self.discrepancyQuantity > 0
 
   constraint lineOrderedPositive: self.addedAt == null or self.orderedQuantity > 0 "Ordered quantity must be positive once added"
   constraint lineReceivedNonnegative: self.receivedQuantity >= 0 "Received quantity cannot be negative"

@@ -9,11 +9,11 @@ import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
 import { HomePage } from "../features/home/HomePage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
-import { EventMenuPage } from "../features/kitchen/EventMenuPage";
 import { DishDetailPage } from "../features/kitchen/DishDetailPage";
 import { IngredientDetailPage } from "../features/kitchen/IngredientDetailPage";
 import { RecipeImportPage } from "../features/kitchen/import/RecipeImportPage";
 import { KitchenCatalogPage } from "../features/kitchen/KitchenCatalogPage";
+import { KitchenDashboardPage } from "../features/kitchen/KitchenDashboardPage";
 import { MenuDetailPage } from "../features/kitchen/MenuDetailPage";
 import { RecipeDetailPage } from "../features/kitchen/RecipeDetailPage";
 import { ErrorState, TableSkeleton } from "../ui/primitives";
@@ -71,18 +71,6 @@ const KitchenDisplayPage = lazy(() =>
   import("../features/production/KitchenDisplayPage").then((module) => ({
     default: module.KitchenDisplayPage,
   })),
-);
-const PrepBoardPage = lazy(() =>
-  import("../features/production/PrepBoardPage").then((module) => ({
-    default: module.PrepBoardPage,
-  })),
-);
-const ProductionYieldDashboardPage = lazy(() =>
-  import("../features/production/ProductionYieldDashboardPage").then(
-    (module) => ({
-      default: module.ProductionYieldDashboardPage,
-    }),
-  ),
 );
 const RosterPage = lazy(() =>
   import("../features/workforce/RosterPage").then((module) => ({
@@ -398,23 +386,22 @@ export function App() {
               path="/kitchen/menus"
               element={<KitchenCatalogPage section="menus" />}
             />
-            <Route path="/kitchen/event-menu" element={<EventMenuPage />} />
-            <Route path="/kitchen/allergens" element={<AllergenMatrixPage />} />
             <Route
-              path="/kitchen/prep"
-              element={
-                <SupplyRoute>
-                  <PrepBoardPage />
-                </SupplyRoute>
-              }
+              path="/kitchen/event-menu"
+              element={<Navigate to="/events" replace />}
             />
             <Route
+              path="/kitchen/allergens"
+              element={<Navigate to="/kitchen/dishes" replace />}
+            />
+            <Route
+              path="/kitchen/allergen-matrix"
+              element={<AllergenMatrixPage />}
+            />
+            <Route path="/kitchen/prep" element={<KitchenDashboardPage />} />
+            <Route
               path="/kitchen/yield"
-              element={
-                <SupplyRoute>
-                  <ProductionYieldDashboardPage />
-                </SupplyRoute>
-              }
+              element={<Navigate to="/kitchen/dishes" replace />}
             />
             <Route
               path="/inventory"

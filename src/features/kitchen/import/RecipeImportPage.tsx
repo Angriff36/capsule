@@ -194,7 +194,7 @@ export function RecipeImportPage() {
   };
 
   return (
-    <div className="recipe-book-stage recipe-import-page">
+    <div className="recipe-book-stage recipe-import-page culinary-studio">
       <KitchenBookNav />
       <header className="recipe-import-header">
         <div>

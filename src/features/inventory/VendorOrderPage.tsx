@@ -12,7 +12,6 @@ import {
   useListVendor,
   useListVendorContact,
   useListVendorOrderLine,
-  useListWeeklyPurchasingConfig,
   useVendorOrderApprove,
   useVendorOrderCancel,
   useVendorOrderConfirm,
@@ -47,7 +46,6 @@ export function VendorOrderPage() {
   const inventoryLots = useListInventoryLot();
   const locations = useListStorageLocation();
   const createLine = useCreateVendorOrderLine();
-  const purchasingConfigs = useListWeeklyPurchasingConfig();
   const submitOrder = useVendorOrderSubmit();
   const submitForApproval = useVendorOrderSubmitForApproval();
   const approveOrder = useVendorOrderApprove();
@@ -112,14 +110,12 @@ export function VendorOrderPage() {
   const locationName = (locationId?: string | null) =>
     locations?.find((item) => item._id === locationId)?.name ?? "Unassigned";
 
-  // Spend-approval gate: over-threshold drafts route to a manager instead of
-  // submitting directly. The server enforces the same rule on submit.
-  const approvalThreshold =
-    (purchasingConfigs ?? []).find((config) => config.deletedAt == null)
-      ?.orderApprovalThresholdAmount ?? null;
-  const needsApproval =
-    approvalThreshold != null &&
-    Number(order.totalAmount) > Number(approvalThreshold);
+  // Spend-approval gate: Manifest-derived VendorOrder.needsSpendApproval
+  // (hydrates tenant-singleton WeeklyPurchasingConfig by tenantId).
+  const needsApproval = Boolean(order.needsSpendApproval);
+  const isPendingApproval = Boolean(order.isPendingApproval);
+  const isDraft = Boolean(order.isDraft);
+  const isOpenForReceiving = Boolean(order.isOpenForReceiving);
   const orderActions = policy
     .orderActions(String(order.status))
     .filter((action) => {
@@ -128,7 +124,7 @@ export function VendorOrderPage() {
       // approve/requestChanges share the draft→submitted / →draft transitions
       // in the generated lifecycle; they only make sense while pending.
       if (action.key === "approve" || action.key === "requestChanges")
-        return String(order.status) === "pending_approval";
+        return isPendingApproval;
       return true;
     });
 
@@ -349,23 +345,29 @@ export function VendorOrderPage() {
         </aside>
       ) : null}
 
-      {String(order.status) === "pending_approval" ? (
+      {isPendingApproval ? (
         <aside className="supply-degraded" role="note">
           <strong>Awaiting manager approval before it is sent</strong>
           <span>
             This order total (${Number(order.totalAmount).toFixed(2)}) is above
-            the spend approval threshold
-            {approvalThreshold != null
-              ? ` of $${Number(approvalThreshold).toFixed(2)}`
-              : ""}
-            . A manager can approve it in one click or request modifications.
+            the spend approval threshold. A manager can approve it in one click
+            or request modifications.
           </span>
         </aside>
       ) : null}
-      {String(order.status) === "draft" && order.approvalNotes ? (
+      {isDraft && order.approvalNotes ? (
         <aside className="supply-degraded" role="note">
           <strong>Changes requested by a manager</strong>
           <span>{order.approvalNotes}</span>
+        </aside>
+      ) : null}
+      {isOpenForReceiving && order.hasIncompleteLines ? (
+        <aside className="supply-degraded" role="note">
+          <strong>Receiving still open</strong>
+          <span>
+            One or more lines still have quantity left to receive. Record each
+            receipt below until every line is complete.
+          </span>
         </aside>
       ) : null}
 
@@ -529,12 +531,18 @@ export function VendorOrderPage() {
                       <strong>
                         {line.receivedQuantity} / {line.orderedQuantity}
                       </strong>
-                      <span>{line.unit} received</span>
+                      <span>
+                        {line.unit} received
+                        {line.isFullyReceived
+                          ? " · complete"
+                          : ` · ${line.remainingQuantity} remaining`}
+                      </span>
                       <small>
-                        ${Number(line.unitCost).toFixed(2)} / {line.unit} ·{" "}
-                        {Number(line.receivedQuantity) > 0
-                          ? "latest receipt"
-                          : "order estimate"}
+                        ${Number(line.lineTotal).toFixed(2)} line · $
+                        {Number(line.unitCost).toFixed(2)} / {line.unit}
+                        {line.hasReceivingDiscrepancy
+                          ? ` · discrepancy ${line.discrepancyQuantity}`
+                          : ""}
                       </small>
                     </div>
                     <div>
@@ -543,7 +551,11 @@ export function VendorOrderPage() {
                     </div>
                     <button
                       className="btn btn-ghost btn-sm"
-                      disabled={busy != null}
+                      disabled={
+                        busy != null ||
+                        !isOpenForReceiving ||
+                        Boolean(line.isFullyReceived)
+                      }
                       onClick={() =>
                         setReceivingLineId((value) =>
                           value === line._id ? null : line._id,

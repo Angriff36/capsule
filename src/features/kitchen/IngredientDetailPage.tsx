@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   useGetIngredient,
-  useIngredientDiscontinue,
+  useIngredientPurge,
   useIngredientReinstate,
   useIngredientSetPreferredVendors,
   useListIngredient,
@@ -263,7 +263,7 @@ export function IngredientDetailPage() {
   const ingredients = useListIngredient();
   const vendors = useListVendor();
   const priceObservations = useListIngredientPriceObservation();
-  const discontinue = useIngredientDiscontinue();
+  const purge = useIngredientPurge();
   const reinstate = useIngredientReinstate();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -297,7 +297,11 @@ export function IngredientDetailPage() {
     }))
     .filter((entry) => entry.recipe && entry.recipe.deletedAt == null);
 
-  const actions = policy.ingredientActions(String(ingredient.status));
+  const actions = policy.ingredientActions(
+    String(ingredient.status),
+    ingredient.deletedAt,
+    { includeRestore: true },
+  );
   const ingredientPrices = (priceObservations ?? []).filter(
     (observation) =>
       observation.deletedAt == null &&
@@ -328,10 +332,10 @@ export function IngredientDetailPage() {
   };
 
   return (
-    <article className="culinary-document culinary-document-compact">
+    <article className="culinary-document culinary-document-compact culinary-studio">
       <Link
         to={kitchenCatalogPath("ingredients")}
-        className="text-[12px] text-ink-3 hover:text-ink"
+        className="culinary-studio-back"
       >
         ← Ingredient index
       </Link>
@@ -354,19 +358,12 @@ export function IngredientDetailPage() {
                 className="btn btn-ghost"
                 disabled={busy != null}
                 onClick={() => {
-                  const reason =
-                    action.key === "discontinue"
-                      ? window.prompt("Discontinuation reason")?.trim()
-                      : undefined;
-                  if (action.key === "discontinue" && !reason) return;
                   void run(action.key, async () => {
                     const args = {
                       docId: ingredient._id,
                       version: ingredient.version,
                     };
-                    if (action.key === "discontinue") {
-                      await discontinue({ ...args, reason: reason! });
-                    }
+                    if (action.key === "purge") await purge(args);
                     if (action.key === "reinstate") await reinstate(args);
                   });
                 }}

@@ -95,17 +95,12 @@ describe("Culinary planning slice contract", () => {
     }
   });
 
-  it("uses generated lifecycle metadata for every authored state offer", () => {
+  it("uses generated lifecycle metadata for menu/recipe publish offers", () => {
     const policy = read("src/features/kitchen/CulinaryLifecyclePolicy.ts");
     expect(policy).toContain('from "../../generated/manifest-wiring-bindings"');
     for (const metadata of [
       "RecipePublishVersionLifecycle",
       "RecipeRetractLifecycle",
-      "RecipeRetireLifecycle",
-      "IngredientDiscontinueLifecycle",
-      "IngredientReinstateLifecycle",
-      "DishRetireLifecycle",
-      "DishReinstateLifecycle",
       "MenuMarkPublishedLifecycle",
       "MenuUnpublishLifecycle",
       "MenuArchiveLifecycle",
@@ -113,5 +108,8 @@ describe("Culinary planning slice contract", () => {
     ]) {
       expect(policy).toContain(metadata);
     }
+    // Delete is one-click purge — not lifecycle-gated retire/discontinue.
+    expect(policy).toContain('key: "purge"');
+    expect(policy).toContain('label: "Delete"');
   });
 });

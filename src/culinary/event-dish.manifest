@@ -6,6 +6,13 @@ use "./menu-dish.manifest"
 // One plate line on an event. Removing a line soft-deletes THAT row.
 // Re-adding the same Dish is a NEW EventDish row (new id) via addToEvent — not
 // resurrecting the deleted line.
+//
+// Live food-cost / batch scaling (2026-07-23):
+//   targetHeadcount defaults to Event.expectedHeadcount; optional
+//   headcountOverride when not every guest receives the dish.
+//   requiredBatches = ceil(targetHeadcount / Recipe.servesPerYield) per
+//   attached DishRecipe line; estimatedCost sums batch × liveBatchCost.
+//   quantityServings remains for prep-list sync — not the cost authority.
 entity EventDish mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -13,7 +20,13 @@ entity EventDish mixin TenantScoped, SoftDeletable {
 
   property required eventId: uuid
   property required dishId: uuid
+  // Prep-list / ops servings. Callers should pass Event.expectedHeadcount;
+  // do not force 1 when the dish is for the whole event. Live food cost uses
+  // targetHeadcount below, not this field.
   property required quantityServings: int = 1
+  // 0/null = no override (use Event.expectedHeadcount). >0 = this dish's guest count.
+  // Optional so pre-field EventDish rows still validate under Convex schema push.
+  property headcountOverride: int? = 0
   // Denormalized from Event at add time for BOM → weekly purchasing reactions.
   property purchasingWeekStart: datetime?
   property course: string?
@@ -25,8 +38,19 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
 
+  computed targetHeadcount: int = self.headcountOverride != null and self.headcountOverride > 0 ? self.headcountOverride : self.event.expectedHeadcount
+  // Display helper: largest batch count across attached recipes (lemonade = one recipe).
+  // Headcount uses self.targetHeadcount (sibling computed; Convex helpers assign in order).
+  computed requiredBatches: int = max_of(filter(self.dish.recipeLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => line.recipe.servesPerYield > 0 ? ceil(self.targetHeadcount / line.recipe.servesPerYield) : 0)
+  computed requiredYieldQuantity: decimal(10, 2) = max_of(filter(self.dish.recipeLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.recipe.servesPerYield > 0 ? ceil(self.targetHeadcount / line.recipe.servesPerYield) : 0) * line.recipe.yieldQuantity)
+  // Sum of ceil(headcount / servesPerYield) × same-unit ingredient batch cost per attached recipe.
+  // Batch cost is inlined (not line.recipe.liveBatchCost) so Convex hydrate can load
+  // recipe.ingredientLines → ingredient without a nested compute pass.
+  computed estimatedCost: money(12, 2) = sum(filter(self.dish.recipeLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.recipe.servesPerYield > 0 ? ceil(self.targetHeadcount / line.recipe.servesPerYield) : 0) * sum(filter(line.recipe.ingredientLines, (il) => il.deletedAt == null and il.addedAt != null), (il) => il.unit == il.ingredient.unit ? il.quantity * (il.wasteFactor != null ? il.wasteFactor : 1) * il.ingredient.costPerUnit : 0))
+
   // Zero servings = 86'd / not serving; remove() is the other path.
   constraint eventDishServingsNonnegative: self.addedAt == null or self.quantityServings >= 0 "Event dish servings cannot be negative"
+  constraint eventDishHeadcountOverrideNonnegative: self.headcountOverride == null or self.headcountOverride >= 0 "Headcount override cannot be negative"
 
   // Read: any staff on this tenant. Write/execute: managers+.
   default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dishes"
@@ -38,6 +62,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     eventId: uuid,
     dishId: uuid,
     quantityServings: number,
+    optional headcountOverride: int,
     optional course: string,
     optional serviceStyle: string,
     optional specialInstructions: string
@@ -52,9 +77,11 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     // that seed. Fails only on buggy/mismatched API calls — not a business "can't move dishes" rule.
     constraint addToEventEventMatch: eventId == self.eventId "addToEvent eventId must match the seeded event reference"
     constraint addToEventServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
+    constraint addToEventHeadcountOverrideNonnegative: headcountOverride == null or headcountOverride >= 0 "Headcount override cannot be negative"
     mutate eventId = eventId
     mutate dishId = dishId
     mutate quantityServings = quantityServings
+    mutate headcountOverride = headcountOverride != null ? headcountOverride : 0
     mutate purchasingWeekStart = self.event.purchasingWeekStart
     mutate course = course
     mutate serviceStyle = serviceStyle
@@ -66,6 +93,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
       eventId: eventId
       dishId: dishId
       quantityServings: quantityServings
+      headcountOverride: headcountOverride != null ? headcountOverride : 0
       purchasingWeekStart: self.event.purchasingWeekStart
       course: course
       serviceStyle: serviceStyle
@@ -88,6 +116,22 @@ entity EventDish mixin TenantScoped, SoftDeletable {
       dishId: self.dishId
       previousQuantityServings: previousQuantityServings
       quantityServings: quantityServings
+    }
+  }
+
+  // Override how many guests this dish is prepared for (0 clears → Event.expectedHeadcount).
+  command setHeadcountOverride(headcountOverride: int) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
+    constraint setHeadcountOverrideNonnegative: headcountOverride >= 0 "Headcount override cannot be negative"
+    mutate headcountOverride = headcountOverride
+    emit EventDishHeadcountOverrideSet {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      headcountOverride: headcountOverride
     }
   }
 
@@ -188,6 +232,7 @@ event EventDishAdded: "event_dish.added" {
   eventId: string
   dishId: string
   quantityServings: number
+  headcountOverride: int
   purchasingWeekStart: datetime?
   course: string?
   serviceStyle: string?
@@ -215,6 +260,14 @@ event EventDishServingsAdjusted: "event_dish.servings_adjusted" {
   dishId: string
   previousQuantityServings: number
   quantityServings: number
+}
+
+event EventDishHeadcountOverrideSet: "event_dish.headcount_override_set" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  headcountOverride: int
 }
 
 event EventDishCourseChanged: "event_dish.course_changed" {

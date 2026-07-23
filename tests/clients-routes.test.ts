@@ -16,6 +16,7 @@ describe("Clients CRM routes and lifecycle bindings", () => {
       "/clients",
       "/clients/proposals",
       "/clients/contracts",
+      "/clients/retention",
     ]);
   });
 

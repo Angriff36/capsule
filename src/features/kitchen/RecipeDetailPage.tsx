@@ -11,7 +11,7 @@ import {
   useRecipeIngredientAdjustQuantity,
   useRecipeIngredientRemove,
   useRecipePublishVersion,
-  useRecipeRetire,
+  useRecipePurge,
   useRecipeRetract,
   useRecipeReviseDraft,
 } from "../../lib/manifest-convex-react";
@@ -50,7 +50,7 @@ export function RecipeDetailPage() {
   const revise = useRecipeReviseDraft();
   const publish = useRecipePublishVersion();
   const retract = useRecipeRetract();
-  const retire = useRecipeRetire();
+  const purge = useRecipePurge();
   const createLine = useCreateRecipeIngredient();
   const adjustLine = useRecipeIngredientAdjustQuantity();
   const removeLine = useRecipeIngredientRemove();
@@ -89,7 +89,7 @@ export function RecipeDetailPage() {
   const recipeDishes = (dishes ?? []).filter(
     (dish) => dish.deletedAt == null && recipeDishIds.has(dish._id),
   );
-  const actions = policy.recipeActions(String(recipe.status));
+  const actions = policy.recipeActions(String(recipe.status), recipe.deletedAt);
   const targetYieldNumber = Number(targetYield);
   const baseYield = Number(recipe.yieldQuantity);
   const scaleFactor =
@@ -158,6 +158,7 @@ export function RecipeDetailPage() {
         yieldQuantity: Number(data.get("yieldQuantity")),
         yieldUnit: String(data.get("yieldUnit")) as (typeof UNITS)[number],
         batchMultiplier: Number(data.get("batchMultiplier")),
+        servesPerYield: Number(data.get("servesPerYield")),
         category: optional(data.get("category")),
         cuisine: optional(data.get("cuisine")),
         description: optional(data.get("description")),
@@ -187,23 +188,17 @@ export function RecipeDetailPage() {
   };
 
   const invokeLifecycle = (key: string) => {
-    const reason =
-      key === "retire" ? window.prompt("Retirement reason")?.trim() : undefined;
-    if (key === "retire" && !reason) return;
     void run(key, async () => {
       const args = { docId: recipe._id, version: recipe.version };
       if (key === "publishVersion") await publish(args);
       if (key === "retract") await retract(args);
-      if (key === "retire") await retire({ ...args, reason: reason! });
+      if (key === "purge") await purge(args);
     });
   };
 
   return (
-    <article className="culinary-document culinary-document-compact">
-      <Link
-        to="/kitchen/recipes"
-        className="text-[12px] text-ink-3 hover:text-ink"
-      >
+    <article className="culinary-document culinary-document-compact culinary-studio">
+      <Link to="/kitchen/recipes" className="culinary-studio-back">
         ← Recipe index
       </Link>
       <KitchenBookNav />
@@ -259,6 +254,13 @@ export function RecipeDetailPage() {
             <dt>Yield</dt>
             <dd>
               {recipe.yieldQuantity} {String(recipe.yieldUnit)}
+            </dd>
+          </div>
+          <div>
+            <dt>Serves per yield</dt>
+            <dd>
+              {(recipe as { servesPerYield?: number }).servesPerYield ?? 1}{" "}
+              guests
             </dd>
           </div>
           <div>
@@ -590,6 +592,20 @@ function RecipeEditForm({
             step="0.01"
             className="input"
             defaultValue={recipe.batchMultiplier}
+            required
+          />
+        </label>
+        <label className="field-label">
+          Serves per yield
+          <input
+            name="servesPerYield"
+            type="number"
+            min={1}
+            step={1}
+            className="input"
+            defaultValue={
+              (recipe as { servesPerYield?: number }).servesPerYield ?? 1
+            }
             required
           />
         </label>

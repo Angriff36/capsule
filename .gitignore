@@ -41,6 +41,9 @@ generated/ir/
 # Local kitchen reference (photos/CSVs; may include large binaries)
 work/
 
+# Local reproducible tool / harness output (not part of CI checkout)
+output/
+
 
 # Agent transcript workspaces - never commit (can contain env dumps/secrets)
 .aboardai/

@@ -207,13 +207,15 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // assignedToId is a Person FK (v.id("people")). Auth seam exposes the linked
+  // Person doc id as user.personId; user.id remains the Clerk auth subject.
   command claim() {
     guard self.status == "pending"
     guard self.deletedAt == null
-    guard user.id != null
+    guard user.personId != null
     constraint claimQuantityReady: self.quantity > 0 "Prep quantity must be positive before claim"
     compute previousStatus = self.status
-    mutate assignedToId = user.id
+    mutate assignedToId = user.personId
     mutate status = "claimed"
     mutate claimedAt = now()
     emit PrepTaskClaimed {
@@ -222,7 +224,34 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
       eventDishId: self.eventDishId
       eventId: self.eventId
       name: self.name
-      assignedToId: user.id
+      assignedToId: user.personId
+      quantity: self.quantity
+      unit: self.unit
+      previousStatus: previousStatus
+      status: "claimed"
+    }
+  }
+
+  // Lead/manager puts a cook on a prep line (or moves it) before work starts.
+  // Pending → claimed with assignee; claimed → reassign without restarting the clock.
+  command assign(personId: uuid) {
+    guard self.status == "pending" or self.status == "claimed"
+    guard self.deletedAt == null
+    guard personId != null
+    constraint assignQuantityReady: self.quantity > 0 "Prep quantity must be positive before assign"
+    compute previousStatus = self.status
+    compute previousAssignee = self.assignedToId
+    mutate assignedToId = personId
+    mutate status = "claimed"
+    mutate claimedAt = self.claimedAt != null ? self.claimedAt : now()
+    emit PrepTaskAssigned {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      name: self.name
+      assignedToId: personId
+      previousAssignedToId: previousAssignee
       quantity: self.quantity
       unit: self.unit
       previousStatus: previousStatus
@@ -234,7 +263,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "claimed"
     guard self.claimedAt != null
     guard self.deletedAt == null
-    guard self.assignedToId == user.id or roleAllows(user.role, "kitchenLeadAccess")
+    guard self.assignedToId == user.personId or roleAllows(user.role, "kitchenLeadAccess")
     compute previousStatus = self.status
     compute previousAssignee = self.assignedToId
     mutate assignedToId = null
@@ -496,6 +525,20 @@ event PrepTaskClaimed: "prep_task.claimed" {
   eventId: string
   name: string
   assignedToId: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  previousStatus: PrepTaskStatus
+  status: PrepTaskStatus
+}
+
+event PrepTaskAssigned: "prep_task.assigned" {
+  prepTaskId: string
+  tenantId: string
+  eventDishId: string
+  eventId: string
+  name: string
+  assignedToId: string
+  previousAssignedToId: string?
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
   previousStatus: PrepTaskStatus

@@ -28,6 +28,7 @@ export const listForParent = query({
       v.literal("vendor"),
       v.literal("delivery"),
       v.literal("closeout"),
+      v.literal("dish"),
     ),
     parentId: v.string(),
   },
@@ -50,5 +51,24 @@ export const listForParent = query({
         url: await ctx.storage.getUrl(r.storageId as Id<"_storage">),
       })),
     );
+  },
+});
+
+/** Resolve download URLs for dish (or other) primary image storage ids. */
+export const urlsForStorageIds = query({
+  args: {
+    storageIds: v.array(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId) return {} as Record<string, string | null>;
+    const unique = [...new Set(args.storageIds.filter((id) => id.length > 0))];
+    const entries = await Promise.all(
+      unique.map(async (storageId) => {
+        const url = await ctx.storage.getUrl(storageId as Id<"_storage">);
+        return [storageId, url] as const;
+      }),
+    );
+    return Object.fromEntries(entries) as Record<string, string | null>;
   },
 });

@@ -58,12 +58,20 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   property introducedAt: datetime?
   property discontinuedAt: datetime?
   property discontinuationReason: string?
+  // Canonical lineage: null = root; otherwise a version of that root.
+  property canonicalIngredientId: uuid?
+  // Optional so existing ingredient rows validate before backfill; UI treats null as 1.
+  property editionNumber: int? = 1
+  property mergedIntoIngredientId: uuid?
 
   hasMany recipeLines: RecipeIngredient
   hasMany stockLines: InventoryItem
+  belongsTo canonicalIngredient: Ingredient fields [tenantId, canonicalIngredientId] references [tenantId, id]
+  belongsTo mergedIntoIngredient: Ingredient fields [tenantId, mergedIntoIngredientId] references [tenantId, id]
 
   computed isActive: boolean = self.status == "active"
   computed isDiscontinued: boolean = self.status == "discontinued"
+  computed isCanonicalRoot: boolean = self.canonicalIngredientId == null and self.mergedIntoIngredientId == null
 
   constraint ingredientIdentityComplete: self.introducedAt == null or length(trim(self.name)) > 0 "Introduced ingredients require a name"
   constraint ingredientCostNonnegative: self.costPerUnit >= 0 "Ingredient cost per unit cannot be negative"
@@ -172,31 +180,86 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command discontinue(reason: string) {
+  // Discontinue = remove from the kitchen book (soft-delete). Recipe lines that
+  // still reference the id keep working; the row is hidden from catalog pickers.
+  // Reason is optional — no mandatory prompt for kitchen ops.
+  command discontinue(optional reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint discontinueReason: length(trim(reason)) > 0 "Discontinuation reason is required"
     mutate status = "discontinued"
     mutate discontinuedAt = now()
-    mutate discontinuationReason = reason
+    mutate discontinuationReason = reason != null ? reason : "Deleted"
+    mutate deletedAt = now()
     emit IngredientDiscontinued {
       ingredientId: self.id
       tenantId: self.tenantId
-      reason: reason
+      reason: reason != null ? reason : "Deleted"
     }
   }
 
   command reinstate() {
     guard self.status == "discontinued"
-    guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
     mutate status = "active"
     mutate discontinuedAt = null
     mutate discontinuationReason = null
+    mutate deletedAt = null
     emit IngredientReinstated {
       ingredientId: self.id
       tenantId: self.tenantId
+    }
+  }
+
+  // One-click hide. Works on active or already-discontinued rows — no restore first.
+  command purge() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "discontinued"
+    mutate discontinuedAt = self.discontinuedAt != null ? self.discontinuedAt : now()
+    mutate discontinuationReason = "Deleted"
+    mutate deletedAt = now()
+    emit IngredientPurged {
+      ingredientId: self.id
+      tenantId: self.tenantId
+      reason: "Deleted"
+    }
+  }
+
+  // Attach an already-introduced ingredient as an edition of a canonical root.
+  command linkAsEdition(sourceIngredientId: uuid, optional editionNumber: int) {
+    guard self.introducedAt != null
+    guard self.deletedAt == null
+    guard self.mergedIntoIngredientId == null
+    constraint linkIngredientEditionSelf: sourceIngredientId != self.id "An ingredient cannot be an edition of itself"
+    constraint linkIngredientEditionNumber: editionNumber == null or editionNumber > 0 "Edition number must be positive"
+    mutate canonicalIngredientId = sourceIngredientId
+    mutate editionNumber = editionNumber != null ? editionNumber : self.editionNumber
+    emit IngredientEditionCreated {
+      ingredientId: self.id
+      tenantId: self.tenantId
+      sourceIngredientId: sourceIngredientId
+      name: self.name
+      editionNumber: editionNumber != null ? editionNumber : self.editionNumber
+    }
+  }
+
+  command mergeInto(targetIngredientId: uuid, reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard self.mergedIntoIngredientId == null
+    constraint mergeIngredientSelf: targetIngredientId != self.id "Cannot merge an ingredient into itself"
+    constraint mergeIngredientReason: length(trim(reason)) > 0 "Merge reason is required"
+    mutate mergedIntoIngredientId = targetIngredientId
+    mutate status = "discontinued"
+    mutate discontinuedAt = now()
+    mutate discontinuationReason = reason
+    mutate deletedAt = now()
+    emit IngredientMerged {
+      ingredientId: self.id
+      tenantId: self.tenantId
+      targetIngredientId: targetIngredientId
+      reason: reason
     }
   }
 
@@ -242,4 +305,25 @@ event IngredientDiscontinued: "ingredient.discontinued" {
 event IngredientReinstated: "ingredient.reinstated" {
   ingredientId: string
   tenantId: string
+}
+
+event IngredientPurged: "ingredient.purged" {
+  ingredientId: string
+  tenantId: string
+  reason: string
+}
+
+event IngredientEditionCreated: "ingredient.edition_created" {
+  ingredientId: string
+  tenantId: string
+  sourceIngredientId: string
+  name: string
+  editionNumber: number
+}
+
+event IngredientMerged: "ingredient.merged" {
+  ingredientId: string
+  tenantId: string
+  targetIngredientId: string
+  reason: string
 }
