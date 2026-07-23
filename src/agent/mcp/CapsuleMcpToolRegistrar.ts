@@ -1,6 +1,6 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
-import { CapsuleCommandCatalog } from "../CapsuleCommandCatalog";
+import type { CapsuleCommandCatalogProvider } from "../CapsuleCommandCatalogProvider";
 import type { CapsuleCommandExecutor } from "../CapsuleCommandExecutor";
 import { CapsuleDocumentEnterCoordinator } from "../CapsuleDocumentEnterCoordinator";
 import { CapsuleEventPrepCoordinator } from "../CapsuleEventPrepCoordinator";
@@ -10,23 +10,25 @@ import { CapsuleMcpTextResult } from "./CapsuleMcpTextResult";
 
 /**
  * Registers Capsule product command tools (not Manifest authoring MCP).
+ * Catalog is resolved per call so long-lived hosts see regen updates (#16).
  */
 export class CapsuleMcpToolRegistrar {
   private readonly text = new CapsuleMcpTextResult();
 
   constructor(
-    private readonly catalog: CapsuleCommandCatalog,
+    private readonly catalogProvider: CapsuleCommandCatalogProvider,
     private readonly executor: CapsuleCommandExecutor,
   ) {}
 
   register(server: McpServer): void {
     server.tool(
       "list_capsule_commands",
-      "List Capsule governed kitchen/ops commands. Each entry has uiImplemented; gaps mean backend-only (no Capsule screen yet).",
+      "List Capsule governed kitchen/ops commands (reloads catalog from disk). Each entry has uiImplemented; gaps mean backend-only (no Capsule screen yet).",
       {},
       async () => {
-        const commands = this.catalog.list();
-        const uiGaps = this.catalog.uiGaps();
+        const catalog = this.catalogProvider.get();
+        const commands = catalog.list();
+        const uiGaps = catalog.uiGaps();
         return this.text.format(
           {
             commands,
@@ -50,7 +52,7 @@ export class CapsuleMcpToolRegistrar {
           .describe("e.g. Ingredient.introduce, Recipe.draft"),
       },
       async ({ capabilityId }) => {
-        const descriptor = this.catalog.get(capabilityId);
+        const descriptor = this.catalogProvider.get().get(capabilityId);
         return this.text.format(descriptor, {
           warnCapabilityIds: [capabilityId],
         });
@@ -68,6 +70,7 @@ export class CapsuleMcpToolRegistrar {
         idempotencyKey: z.string().optional(),
       },
       async ({ capabilityId, args, idempotencyKey }) => {
+        const catalog = this.catalogProvider.get();
         const result = await this.executor.execute({
           capabilityId,
           args,
@@ -77,7 +80,7 @@ export class CapsuleMcpToolRegistrar {
           {
             ok: true,
             capabilityId,
-            uiImplemented: this.catalog.get(capabilityId).uiImplemented,
+            uiImplemented: catalog.get(capabilityId).uiImplemented,
             result,
           },
           { warnCapabilityIds: [capabilityId] },

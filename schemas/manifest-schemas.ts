@@ -4560,6 +4560,11 @@ export const RecipePublishVersionParamsSchema = z.object({});
 
 export type RecipePublishVersionParams = z.infer<typeof RecipePublishVersionParamsSchema>;
 
+// Command: reinstate on Recipe
+export const RecipeReinstateParamsSchema = z.object({});
+
+export type RecipeReinstateParams = z.infer<typeof RecipeReinstateParamsSchema>;
+
 // Command: retire on Recipe
 export const RecipeRetireParamsSchema = z.object({
   reason: z.string(),

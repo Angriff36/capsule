@@ -4,13 +4,14 @@ import {
   type CapsuleEventPrepStateLoader,
 } from "../../src/agent/CapsuleEventPrepCoordinator";
 import { CapsuleCommandCatalog } from "../../src/agent/CapsuleCommandCatalog";
+import { CapsuleCommandCatalogProvider } from "../../src/agent/CapsuleCommandCatalogProvider";
 import { CapsuleLiveEventPrepStateLoader } from "../../src/agent/CapsuleLiveEventPrepStateLoader";
 import { CapsuleMcpToolRegistrar } from "../../src/agent/mcp/CapsuleMcpToolRegistrar";
 
 describe("CapsuleEventPrepCoordinator", () => {
   it("registers the combined event dish and prep synchronization tool", () => {
     const tool = vi.fn();
-    new CapsuleMcpToolRegistrar(new CapsuleCommandCatalog(), {
+    new CapsuleMcpToolRegistrar(new CapsuleCommandCatalogProvider(), {
       execute: vi.fn(),
     }).register({ tool } as never);
 

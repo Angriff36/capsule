@@ -1,4 +1,6 @@
 export { CapsuleCommandCatalog } from "./CapsuleCommandCatalog";
+export { CapsuleCommandCatalogProvider } from "./CapsuleCommandCatalogProvider";
+export { CapsuleWiringContractLoader } from "./CapsuleWiringContractLoader";
 export type { CapsuleCommandDescriptor } from "./CapsuleCommandCatalog";
 export type {
   CapsuleCommandExecutor,
