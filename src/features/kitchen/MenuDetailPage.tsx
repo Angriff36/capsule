@@ -157,11 +157,8 @@ export function MenuDetailPage() {
   };
 
   return (
-    <article className="culinary-document culinary-document-compact">
-      <Link
-        to={kitchenCatalogPath("menus")}
-        className="text-[12px] text-ink-3 hover:text-ink"
-      >
+    <article className="culinary-document culinary-document-compact culinary-studio">
+      <Link to={kitchenCatalogPath("menus")} className="culinary-studio-back">
         ← Menu index
       </Link>
       <KitchenBookNav />

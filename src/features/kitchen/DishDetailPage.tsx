@@ -4,8 +4,8 @@ import {
   useCreateDish,
   useDishLinkAsEdition,
   useDishMergeInto,
+  useDishPurge,
   useDishReinstate,
-  useDishRetire,
   useDishSetPrimaryRecipe,
   useGetDish,
   useGetRecipe,
@@ -38,7 +38,7 @@ export function DishDetailPage() {
   const primaryRecipe = useGetRecipe(dish?.primaryRecipeId ?? "skip");
   const events = useListEvent();
   const eventDishes = useListEventDish();
-  const retire = useDishRetire();
+  const purge = useDishPurge();
   const reinstate = useDishReinstate();
   const setPrimaryRecipe = useDishSetPrimaryRecipe();
   const createDish = useCreateDish();
@@ -85,7 +85,9 @@ export function DishDetailPage() {
       : (recipes?.find((recipe) => recipe._id === dish.primaryRecipeId) ??
         null);
 
-  const actions = policy.dishActions(String(dish.status));
+  const actions = policy.dishActions(String(dish.status), dish.deletedAt, {
+    includeRestore: true,
+  });
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -100,11 +102,8 @@ export function DishDetailPage() {
   };
 
   return (
-    <article className="culinary-document culinary-document-compact">
-      <Link
-        to={kitchenCatalogPath("dishes")}
-        className="text-[12px] text-ink-3 hover:text-ink"
-      >
+    <article className="culinary-document culinary-document-compact culinary-studio">
+      <Link to={kitchenCatalogPath("dishes")} className="culinary-studio-back">
         ← Dish index
       </Link>
       <KitchenBookNav />
@@ -129,16 +128,11 @@ export function DishDetailPage() {
                 className="btn btn-ghost"
                 disabled={busy != null}
                 onClick={() => {
-                  const reason =
-                    action.key === "retire"
-                      ? window.prompt("Retirement reason")?.trim()
-                      : undefined;
-                  if (action.key === "retire" && !reason) return;
                   void run(action.key, async () => {
                     const args = { docId: dish._id, version: dish.version };
-                    if (action.key === "retire") {
-                      await retire({ ...args, reason: reason! });
-                      notifyUndo(`Retired "${dish.name}"`, () =>
+                    if (action.key === "purge") {
+                      await purge(args);
+                      notifyUndo(`Deleted "${dish.name}"`, () =>
                         reinstate({ docId: dish._id }),
                       );
                     }

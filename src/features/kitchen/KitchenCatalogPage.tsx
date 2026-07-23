@@ -5,36 +5,32 @@ import {
   useCreateIngredient,
   useCreateMenu,
   useCreateRecipe,
+  useDishPurge,
   useDishReinstate,
-  useDishRetire,
-  useIngredientDiscontinue,
+  useIngredientPurge,
   useIngredientReinstate,
   useListDish,
   useListIngredient,
   useListMenu,
   useListRecipe,
+  useRecipePurge,
   useMenuArchive,
   useMenuMarkPublished,
   useMenuRestore,
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
-import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
-import { DishPrimaryImage } from "./DishPrimaryImage";
+import { culinaryCatalogVisibility } from "./CulinaryCatalogVisibility";
 import { KitchenBookNav } from "./KitchenBookNav";
+import { KitchenCatalogCards } from "./KitchenCatalogCards";
 import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
-import { KitchenCatalogLifecycleButtons } from "./KitchenCatalogLifecycleButtons";
 import {
   RECIPE_IMPORT_PATH,
-  dishPath,
-  ingredientPath,
-  menuPath,
   recipePath,
   type KitchenSection,
 } from "./kitchenRoutes";
-import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const UNITS = UNIT_OF_MEASURE;
@@ -62,15 +58,17 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const createRecipe = useCreateRecipe();
   const createDish = useCreateDish();
   const createMenu = useCreateMenu();
-  const discontinueIngredient = useIngredientDiscontinue();
+  const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
-  const retireDish = useDishRetire();
+  const purgeDish = useDishPurge();
   const reinstateDish = useDishReinstate();
+  const purgeRecipe = useRecipePurge();
   const publishMenu = useMenuMarkPublished();
   const unpublishMenu = useMenuUnpublish();
   const archiveMenu = useMenuArchive();
   const restoreMenu = useMenuRestore();
   const [search, setSearch] = useState("");
+  const [showHidden, setShowHidden] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -78,8 +76,10 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const data = { recipes, ingredients, dishes, menus }[section];
   const rows = useMemo(() => {
     const query = search.trim().toLowerCase();
-    return (data ?? [])
-      .filter((item) => item.deletedAt == null)
+    const base = showHidden
+      ? (data ?? [])
+      : culinaryCatalogVisibility.filterLive(data ?? []);
+    return base
       .filter((item) =>
         query
           ? [item.name, "category" in item ? item.category : undefined]
@@ -88,7 +88,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           : true,
       )
       .sort((a, b) => String(a.name).localeCompare(String(b.name)));
-  }, [data, search]);
+  }, [data, search, showHidden]);
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -197,15 +197,26 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   };
 
   const title = section[0].toUpperCase() + section.slice(1);
+  const lifecycleCommands = {
+    purgeIngredient,
+    reinstateIngredient,
+    purgeDish,
+    reinstateDish,
+    purgeRecipe,
+    publishMenu,
+    unpublishMenu,
+    archiveMenu,
+    restoreMenu,
+  };
   return (
-    <div className="recipe-book-stage">
+    <div className="recipe-book-stage culinary-studio">
       <header className="recipe-book-masthead">
         <div>
           <p className="eyebrow">Culinary book · {title}</p>
           <h1 className="display-title mt-2">The house book</h1>
           <p className="mt-3 max-w-150 text-ink-2">
-            Source-backed recipes, ingredients, plated dishes, and publishable
-            menu records.
+            Browse and open {section} as cards — then drill into the record that
+            needs work.
           </p>
         </div>
         <div className="recipe-book-masthead-actions">
@@ -256,6 +267,18 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
               placeholder={`Search ${section}…`}
             />
           </label>
+          {section === "dishes" ||
+          section === "ingredients" ||
+          section === "recipes" ? (
+            <label className="flex items-center gap-2 text-sm text-ink-2">
+              <input
+                type="checkbox"
+                checked={showHidden}
+                onChange={(event) => setShowHidden(event.target.checked)}
+              />
+              Show deleted / retired
+            </label>
+          ) : null}
         </div>
 
         {data === undefined ? (
@@ -285,152 +308,14 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
             </div>
           )
         ) : (
-          <ul className="recipe-index">
-            {rows.map((item, index) => {
-              const content = (
-                <>
-                  <span className="recipe-index-number">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span className="flex min-w-0 items-start gap-2">
-                    {section === "dishes" && "primaryImageStorageId" in item ? (
-                      <DishPrimaryImage
-                        storageId={item.primaryImageStorageId as string | null}
-                        alt={item.name}
-                        size="thumb"
-                      />
-                    ) : null}
-                    <span>
-                      <strong className="recipe-index-name">{item.name}</strong>
-                      <small className="recipe-index-description">
-                        {"description" in item
-                          ? item.description || "No description recorded"
-                          : "category" in item
-                            ? item.category || "Unclassified"
-                            : ""}
-                      </small>
-                      {section === "dishes" && "allergenSummary" in item ? (
-                        <AllergenIconRow
-                          codes={item.allergenSummary as string[]}
-                          className="mt-1"
-                        />
-                      ) : null}
-                    </span>
-                  </span>
-                  <span className="recipe-index-taxonomy">
-                    {"category" in item
-                      ? item.category || "Unclassified"
-                      : "Culinary"}
-                    <small>
-                      {section === "recipes" && "cuisine" in item
-                        ? item.cuisine || "No cuisine"
-                        : section.slice(0, -1)}
-                    </small>
-                  </span>
-                  <span className="recipe-index-tags">
-                    {section === "ingredients" && "unit" in item ? (
-                      <span>{String(item.unit)}</span>
-                    ) : null}
-                    {section === "dishes" && "course" in item && item.course ? (
-                      <span>{item.course}</span>
-                    ) : null}
-                    {section === "menus" &&
-                    "isTemplate" in item &&
-                    item.isTemplate ? (
-                      <span>Template</span>
-                    ) : null}
-                  </span>
-                  <span className="recipe-index-state">
-                    <span
-                      className={
-                        String(item.status) === "active" ||
-                        String(item.status) === "published"
-                          ? "active"
-                          : "inactive"
-                      }
-                    >
-                      {String(item.status)}
-                    </span>
-                    <small>v{item.version}</small>
-                  </span>
-                  <span className="recipe-index-arrow">→</span>
-                </>
-              );
-              return (
-                <li key={item._id}>
-                  {section === "recipes" ? (
-                    <Link to={recipePath(item._id)}>{content}</Link>
-                  ) : section === "ingredients" ? (
-                    <div className="culinary-index-row">
-                      <CulinaryEntityLink kind="ingredient" id={item._id}>
-                        {content}
-                      </CulinaryEntityLink>
-                      <KitchenCatalogLifecycleButtons
-                        section={section}
-                        item={item}
-                        busy={busy}
-                        run={run}
-                        commands={{
-                          discontinueIngredient,
-                          reinstateIngredient,
-                          retireDish,
-                          reinstateDish,
-                          publishMenu,
-                          unpublishMenu,
-                          archiveMenu,
-                          restoreMenu,
-                        }}
-                      />
-                    </div>
-                  ) : section === "dishes" ? (
-                    <div className="culinary-index-row">
-                      <CulinaryEntityLink kind="dish" id={item._id}>
-                        {content}
-                      </CulinaryEntityLink>
-                      <KitchenCatalogLifecycleButtons
-                        section={section}
-                        item={item}
-                        busy={busy}
-                        run={run}
-                        commands={{
-                          discontinueIngredient,
-                          reinstateIngredient,
-                          retireDish,
-                          reinstateDish,
-                          publishMenu,
-                          unpublishMenu,
-                          archiveMenu,
-                          restoreMenu,
-                        }}
-                      />
-                    </div>
-                  ) : (
-                    <div className="culinary-index-row">
-                      <CulinaryEntityLink kind="menu" id={item._id}>
-                        {content}
-                      </CulinaryEntityLink>
-                      <KitchenCatalogLifecycleButtons
-                        section={section}
-                        item={item}
-                        busy={busy}
-                        run={run}
-                        commands={{
-                          discontinueIngredient,
-                          reinstateIngredient,
-                          retireDish,
-                          reinstateDish,
-                          publishMenu,
-                          unpublishMenu,
-                          archiveMenu,
-                          restoreMenu,
-                        }}
-                      />
-                    </div>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
+          <KitchenCatalogCards
+            section={section}
+            rows={rows as never}
+            busy={busy}
+            showHidden={showHidden}
+            run={run}
+            commands={lifecycleCommands}
+          />
         )}
       </section>
     </div>

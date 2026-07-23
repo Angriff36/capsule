@@ -1,0 +1,168 @@
+/* Culinary studio — detail panels, fact tiles, work lists */
+
+.culinary-studio .culinary-facts,
+.culinary-studio .culinary-facts-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.55rem;
+  margin-top: 1.1rem;
+  border: 0;
+  padding: 0;
+}
+
+.culinary-studio .culinary-facts > div,
+.culinary-studio .culinary-facts-compact > div {
+  padding: 0.75rem 0.85rem;
+  border: 1px solid var(--color-line);
+  border-left: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-panel);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--color-ink) 3%, transparent);
+}
+
+.culinary-studio .culinary-facts > div:first-child,
+.culinary-studio .culinary-facts-compact > div:first-child {
+  padding-left: 0.85rem;
+  border-left: 1px solid var(--color-line);
+}
+
+.culinary-studio .culinary-facts dt,
+.culinary-studio .culinary-facts-compact dt {
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+}
+
+.culinary-studio .culinary-facts dd,
+.culinary-studio .culinary-facts-compact dd {
+  margin-top: 0.35rem;
+  font-size: 0.85rem;
+}
+
+.culinary-studio .culinary-section {
+  padding: 0;
+  margin: 1rem 0;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: var(--color-panel);
+  overflow: hidden;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--color-ink) 4%, transparent);
+}
+
+.culinary-studio .culinary-section-heading {
+  margin: 0;
+  padding: 0.85rem 1.05rem;
+  background: color-mix(in srgb, var(--color-sage) 35%, var(--color-panel));
+  border-bottom: 1px dashed var(--color-line-2);
+  gap: 0.75rem;
+}
+
+.culinary-studio .culinary-section-heading::after {
+  background: color-mix(in srgb, var(--color-ink) 18%, transparent);
+}
+
+.culinary-studio .culinary-section-heading h2 {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+.culinary-studio .culinary-section > :not(.culinary-section-heading) {
+  padding-left: 1.05rem;
+  padding-right: 1.05rem;
+}
+
+.culinary-studio
+  .culinary-section
+  > :not(.culinary-section-heading):last-child {
+  padding-bottom: 1.05rem;
+}
+
+.culinary-studio
+  .culinary-section
+  > :not(.culinary-section-heading):first-of-type {
+  padding-top: 0.95rem;
+}
+
+.culinary-studio .culinary-lead {
+  padding: 0.95rem 1.05rem;
+  margin: 1rem 0;
+  border-radius: 12px;
+  border: 1px solid var(--color-line);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--color-accent-soft) 55%, var(--color-panel)),
+    var(--color-panel)
+  );
+}
+
+.culinary-studio table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.85rem;
+}
+
+.culinary-studio table thead th {
+  text-align: left;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-sage) 25%, transparent);
+}
+
+.culinary-studio table tbody td {
+  padding: 0.7rem 0.65rem;
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--color-line) 75%, transparent);
+  vertical-align: top;
+}
+
+.culinary-studio table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.culinary-studio table tbody tr:hover td {
+  background: color-mix(in srgb, var(--color-sage) 22%, transparent);
+}
+
+.culinary-studio .document-empty,
+.culinary-studio .recipe-empty-state,
+.culinary-studio .recipe-filter-empty {
+  border: 1px dashed var(--color-line-2);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--color-sage) 28%, transparent);
+  padding: 1.5rem 1.25rem;
+}
+
+.culinary-studio .culinary-line-form,
+.culinary-studio .culinary-edit-form {
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-sage) 20%, var(--color-panel));
+  padding: 0.95rem 1rem;
+}
+
+.culinary-studio-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.culinary-studio-back:hover {
+  color: var(--color-brand);
+}
+
+.culinary-studio .btn {
+  border-radius: 9px;
+}
