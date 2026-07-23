@@ -24,6 +24,8 @@ approves.
    to `blocked: 3 strikes — <last error>`, move to the NEXT open item.
 4. Work the item END TO END in a fresh worktree:
    `git worktree add .loop-worktrees/<run-id> -b loop/<run-id> main`
+   (FROM THE REPO ROOT - never create a worktree from inside another
+   worktree.)
    (run-id: `prod-YYYYMMDDTHHMM-<slug>`).
    - Implement the full item as specified in the backlog: manifest source
      edits AND `bun run manifest:regen` (inside the worktree) AND app-code
@@ -55,7 +57,11 @@ approves.
    (commands + results + the reviewing model and its verdict) and the
    canonical-port note from the backlog item. Items marked HIGH-SCRUTINY:
    prefix the PR title "HIGH-SCRUTINY:".
-8. Update `PRODUCT-BACKLOG.md`: item status → `in-pr #N`. Append a JSON
+8. Update `PRODUCT-BACKLOG.md`: item status → `in-pr #N`. REMOVE your
+   worktree (`git worktree remove --force <path>`) — the branch is safe on
+   origin and the PR is the artifact. On failure exits, also remove the
+   worktree after logging the error + diff summary to the ledger; dead trees
+   confuse the human's tools. Append a JSON
    entry to `loop-run-log.md` with `"source":"product-loop"`.
 9. Exit. Do not start a second item in the same iteration.
 
