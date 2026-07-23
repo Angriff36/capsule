@@ -142,7 +142,21 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-[Emergency bridge — running bridge was not updated]
-Files: src/features/inventory/WasteCostReportPage.tsx (create), src/features/inventory/WasteCostReportPage.css (create), src/features/inventory/WasteCostReportPage.tsx (edit), src/app/App.tsx (edit), src/features/inventory/InventoryWorkspaceNav.tsx (edit), .artifacts/seed-waste.ts (create)
+[auto-bridge snapshot @ 10 changes]
+Files: src/features/finance/RevenueTrendsPage.tsx (edit), src/lib/format.ts (edit), src/foundation/base.manifest (edit), src/sales/invoice-core.manifest (edit)
 
 # === END COGNILAYER ===
+
+<!-- convex-ai-start -->
+
+This project uses [Convex](https://convex.dev) as its backend.
+
+When working on Convex code, **always read
+`convex/_generated/ai/guidelines.md` first** for important guidelines on
+how to correctly use Convex APIs and patterns. The file contains rules that
+override what you may have learned about Convex from training data.
+
+Convex agent skills for common tasks can be installed by running
+`npx convex ai-files install`.
+
+<!-- convex-ai-end -->

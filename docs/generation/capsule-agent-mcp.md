@@ -45,12 +45,10 @@ non-`createVia` instance commands (e.g. `ingredientdemand_confirm`).
 - Introspection builtins use MCP-aligned names: `list_capsule_commands`,
   `describe_capsule_command`
 
-CLI consumer (no auth for dump; JWT for live call):
-
-```bash
-bun run agent:llm-tools -- --format anthropic
-bun run agent:llm-tools -- --call recipe_draft --args '{"name":"Soup","yieldQuantity":4,"yieldUnit":"portion"}'
-```
+LLM tool dump / `--call` helpers live in `src/agent/llm/`
+(`CapsuleLlmToolDriver`). There is **no** `package.json` script named
+`agent:llm-tools` or `agent:mcp:verify` in this checkout — use the MCP host
+below (or call the driver from a one-off `bun` script).
 
 ## Setup
 
@@ -64,28 +62,23 @@ bun run agent:llm-tools -- --call recipe_draft --args '{"name":"Soup","yieldQuan
    - Committed template: [cursor-mcp.capsule.example.json](./cursor-mcp.capsule.example.json)
    - Launcher `chdir`s to the Capsule repo and loads `.env.local` even if Cursor
      omits `cwd` (that was the live discovery failure mode).
-5. Prove the server advertises tools (no Cursor UI):
-   `bun run agent:mcp:verify` — expects snake tools including `recipe_draft`
-   (catalog = full wiring; verify checks required names, not a fixed total).
-6. Prove a durable write through the same stdio MCP path Cursor uses:
-   `bun run agent:mcp:verify -- --live` (needs `bun run dev:convex` +
-   `CLERK_SECRET_KEY` / active Capsule UI org session for JWT remint).
-7. In Cursor: Settings → MCP → enable/refresh **`capsule`**. Chat tools should
+5. Start the stdio host: `bun run agent:mcp` (idle in a TTY is expected).
+6. In Cursor: Settings → MCP → enable/refresh **`capsule`**. Chat tools should
    include `recipe_draft`, `ingredient_introduce`,
    `savedreportdefinition_createDefinition`, etc. (full wiring catalog — if a
    capability exists locally but Cursor returns UNKNOWN_TOOL / “not in catalog”,
    the long-lived MCP host is stale; refresh it). Do **not** expect
    `bun run agent:mcp` in a normal terminal to print a prompt — stdio host only.
-8. Live writes need Convex up (`bun run dev:convex`). Clerk session JWTs expire
+7. Live writes need Convex up (`bun run dev:convex`). Clerk session JWTs expire
    in ~60s; `ConvexCommandClient`, `CapsuleIngredientCatalogLoader`,
    `CapsuleQueryClient`, and `CapsuleLiveEventPrepStateLoader` remint via
    `CLERK_SECRET_KEY` on each call when the token in `.env.local` is stale
    (same path as `agent:mint-jwt`). After changing that remint code, refresh
    the Cursor **`capsule`** MCP server so the long-lived stdio host reloads.
-9. Datetime client params are ISO strings in MCP schemas; `ConvexCommandClient`
+8. Datetime client params are ISO strings in MCP schemas; `ConvexCommandClient`
    coerces them to epoch ms before Convex mutations (same as UI
    `new Date(...).getTime()`). Manifest `list` / `T[]` params are JSON arrays.
-10. Prove the event→demand→weekly draft cascade by calling MCP tools in-session
+9. Prove the event→demand→weekly draft cascade by calling MCP tools in-session
     (`ingredient_introduce` → … → `event_approve`, then `capsule_query` read-back).
     Do not wrap that path in a separate smoke script — the MCP tools are the test.
 
@@ -121,15 +114,14 @@ bun run test tests/agent/capsule-command-catalog.test.ts tests/agent/capsule-age
 ```
 
 Document-enter + LLM bridge createVia/confirm are proven under `convex-test`
-without a live JWT. Live MCP / `agent:llm-tools --call` requires
-`CAPSULE_AGENT_JWT`.
+without a live JWT. Live MCP tool calls require `CAPSULE_AGENT_JWT`.
 
 ## Out of scope here
 
 - Manifest `@manifest/mcp-server` (authoring compile/execute on IR — not Capsule persistence)
 - Partner/mobile public HTTP product packaging beyond the emitted `/api/manifest/` dispatcher
 - OCR of scanned cookbooks
-- Full in-app chat UI (CLI `agent:llm-tools` + MCP snake tools are the consumers)
+- Full in-app chat UI (MCP snake tools + `CapsuleLlmToolDriver` are the consumers)
 
 `add_event_dish_and_sync_prep` does not submit purchasing. It creates the
 EventDish through `EventDish.addToEvent`, then materializes PrepTasks from

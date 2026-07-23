@@ -4,21 +4,21 @@ Catering / event ops app: Vite + React, Convex, Clerk. Assembled from Manifest p
 
 ## Directory ownership
 
-| Path                                                             | Role                                                                  |
-| ---------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `src/app/**`, `src/features/**`, `src/ui/**`                     | Authored UI                                                           |
-| `src/app.manifest`, `src/**/*.manifest`                          | Authored Manifest domain (root entry + modules; no daisy-chain `use`) |
-| `src/agent/**`, `scripts/capsule-mcp.ts`                         | Authored agent command bridge (MCP → Convex mutations)                |
-| `convex/lib/**`, `convex/auth.config.ts`, `convex/authStatus.ts` | Author Convex seams                                                   |
-| `convex/{schema,queries,mutations,http,crons,sagas,computed}.ts` | Generated — do not edit                                               |
-| `convex/_generated/**`                                           | Convex codegen — do not edit                                          |
-| `src/generated/**`, `src/lib/manifest-convex-react.ts`           | Manifest client wiring — do not edit                                  |
-| `schemas/`, `wiring/`, `scripts/seed-convex.ts`                  | Manifest assembly — do not edit                                       |
-| `tests/`                                                         | Vitest (authored policy/seam + generated contract tests)              |
-| `docs/`                                                          | Architecture / systems / generation truth                             |
-| `diagrams/`                                                      | Manifest docs-diagrams companion                                      |
-| `.artifacts/`, `graphify-out/`                                   | Ignored scratch only                                                  |
-| `.aboardai/**`                                                   | AboardAI product board (features/kanban) — **never move or stash**    |
+| Path                                                             | Role                                                                      |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `src/app/**`, `src/features/**`, `src/ui/**`                     | Authored UI                                                               |
+| `src/app.manifest`, `src/**/*.manifest`                          | Authored Manifest domain (root entry + modules; no daisy-chain `use`)     |
+| `src/agent/**`, `scripts/capsule-mcp.ts`                         | Authored agent command bridge (MCP → Convex mutations)                    |
+| `convex/lib/**`, `convex/auth.config.ts`, `convex/authStatus.ts` | Author Convex seams                                                       |
+| `convex/{schema,queries,mutations,http,crons,sagas,computed}.ts` | Generated — do not edit                                                   |
+| `convex/_generated/**`                                           | Convex codegen — do not edit                                              |
+| `src/generated/**`, `src/lib/manifest-convex-react.ts`           | Manifest client wiring — do not edit                                      |
+| `schemas/`, `wiring/`, `scripts/seed-convex.ts`                  | Manifest assembly — do not edit                                           |
+| `tests/`                                                         | Vitest (authored policy/seam + generated contract tests)                  |
+| `docs/`                                                          | Architecture / systems / generation truth                                 |
+| `diagrams/`                                                      | Opted out (`skipDocsDiagrams` in `manifest.config.yaml`) — do not rebuild |
+| `.artifacts/`, `graphify-out/`                                   | Ignored scratch only                                                      |
+| `.aboardai/**`                                                   | AboardAI product board (features/kanban) — **never move or stash**        |
 
 ## Commands
 

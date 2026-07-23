@@ -62,7 +62,10 @@ Plugin CLI commands: none declared in Capsule today.
 
 **Implementation:** `diagram.ts` defaults `options.output \|\| 'diagrams'`, then `fs.mkdir` + `fs.writeFile` for each Mermaid artifact (`diagramCommand` ~L129–217).
 
-**Capsule:** Builder `docs-diagrams` companion emits the same `diagrams/`** paths and records digests in `.builder/ownership.json`. Off-ledger writes fail ownership checks.
+**Capsule:** Builder can emit `diagrams/**` from `docs-diagrams`, but Capsule sets
+`skipDocsDiagrams: true` in `manifest.config.yaml` so regen does **not** rebuild
+them. Owned diagram digests are deleted on the next successful regen. Do not
+hand-write under `diagrams/`.
 
 **Safe:** `bun run manifest:regen` (committed) or `bunx manifest diagram -o .artifacts/diagrams` (scratch).
 
@@ -165,14 +168,14 @@ Status meanings:
 ## Builder-owned paths (do not write outside regen)
 
 
-| Path                                                             | Owner                     |
-| ---------------------------------------------------------------- | ------------------------- |
-| `convex/{schema,queries,mutations,http,crons,sagas,computed}.ts` | Builder Convex projection |
-| `schemas/`**, `wiring/**`                                        | Builder companions        |
-| `src/generated/**`, `src/lib/manifest-convex-react.ts`           | Builder client wiring     |
-| `scripts/seed-convex.ts`                                         | Builder seed binding      |
-| `diagrams/**`                                                    | Builder `docs-diagrams`   |
-| Owned `package.json` / `PRESET.md` / contract tests              | Builder glue              |
+| Path                                                             | Owner                          |
+| ---------------------------------------------------------------- | ------------------------------ |
+| `convex/{schema,queries,mutations,http,crons,sagas,computed}.ts` | Builder Convex projection      |
+| `schemas/`**, `wiring/**`                                        | Builder companions             |
+| `src/generated/**`, `src/lib/manifest-convex-react.ts`           | Builder client wiring          |
+| `scripts/seed-convex.ts`                                         | Builder seed binding           |
+| `diagrams/**`                                                    | Opted out (`skipDocsDiagrams`) |
+| Owned `package.json` / `PRESET.md` / contract tests              | Builder glue                   |
 
 
 Scratch: `.artifacts/**`. Author: `src/**/*.manifest`, `src/app|features|ui/**`, `convex/lib/**`, auth seams, `docs/`.
