@@ -1,9 +1,10 @@
 import { OrganizationSwitcher, UserButton, useUser } from "@clerk/react";
+import { useQuery } from "convex/react";
 import { Link, useLocation } from "react-router-dom";
 import { NotificationTray } from "../../features/notifications/NotificationTray";
+import { api } from "../../lib/api";
 import { WORKSPACE_NAME } from "../../lib/workspace";
 import { ChevronRightIcon, GearIcon, SearchIcon } from "../../ui/icons";
-import { NAV_AREAS } from "../nav";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
 import { RecentsMenu } from "./RecentsMenu";
 
@@ -32,6 +33,10 @@ function useBreadcrumbs(): Array<{ label: string; to?: string }> {
 
 export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
   const crumbs = useBreadcrumbs();
+  const authStatus = useQuery(api.authStatus.getAuthStatus, {});
+  const mobileAreas = navigationCatalog.availableAreas(
+    authStatus?.disabledCapabilities,
+  );
   return (
     <header className="app-shell-header flex h-16 shrink-0 items-center gap-3 border-b border-line/70 bg-panel/95 px-5 max-sm:px-3">
       <Link
@@ -49,7 +54,7 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
           aria-label="Mobile primary"
           className="absolute top-10 left-0 z-30 w-44 rounded-sm border border-line-2 bg-panel p-1.5 shadow-[0_12px_32px_-12px_rgba(34,30,22,0.3)]"
         >
-          {NAV_AREAS.filter((area) => !area.planned).map((area) => (
+          {mobileAreas.map((area) => (
             <Link
               key={area.path}
               to={area.path}

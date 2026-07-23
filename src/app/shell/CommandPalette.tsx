@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "convex/react";
 import { useNavigate } from "react-router-dom";
+import { api } from "../../lib/api";
 import { useListEvent } from "../../lib/manifest-convex-react";
 import {
   BoxIcon,
@@ -15,7 +17,7 @@ import {
 } from "../../ui/icons";
 import { useNaturalLanguageSearch } from "../../features/search/useNaturalLanguageSearch";
 import { StatusChip } from "../../ui/primitives";
-import { NAV_AREAS } from "../nav";
+import { navigationCatalog } from "../navigation/NavigationCatalog";
 
 interface Command {
   key: string;
@@ -56,6 +58,8 @@ export function CommandPalette({
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const events = useListEvent();
+  const authStatus = useQuery(api.authStatus.getAuthStatus, {});
+  const disabledCapabilities = authStatus?.disabledCapabilities;
   const { hits: searchHits, loading: searchLoading } =
     useNaturalLanguageSearch(query);
 
@@ -73,21 +77,32 @@ export function CommandPalette({
       navigate(to);
     };
     const eventRows = open ? (events ?? []) : [];
+    const navAreas = navigationCatalog.availableAreas(disabledCapabilities);
+    const kitchenOn = navAreas.some((area) => area.path === "/kitchen");
+    const eventsOn = navAreas.some((area) => area.path === "/events");
     const base: Command[] = [
-      {
-        key: "new-event",
-        label: "New event",
-        hint: "Create",
-        icon: <PlusIcon />,
-        run: go("/events/new"),
-      },
-      {
-        key: "import-recipe",
-        label: "Import recipe",
-        hint: "Create",
-        icon: <PlusIcon />,
-        run: go("/kitchen/recipes/import"),
-      },
+      ...(eventsOn
+        ? [
+            {
+              key: "new-event",
+              label: "New event",
+              hint: "Create",
+              icon: <PlusIcon />,
+              run: go("/events/new"),
+            } satisfies Command,
+          ]
+        : []),
+      ...(kitchenOn
+        ? [
+            {
+              key: "import-recipe",
+              label: "Import recipe",
+              hint: "Create",
+              icon: <PlusIcon />,
+              run: go("/kitchen/recipes/import"),
+            } satisfies Command,
+          ]
+        : []),
       ...(onOpenShortcuts
         ? [
             {
@@ -102,7 +117,7 @@ export function CommandPalette({
             } satisfies Command,
           ]
         : []),
-      ...NAV_AREAS.map((a) => ({
+      ...navAreas.map((a) => ({
         key: a.path,
         label: a.label,
         hint: "Go to",
@@ -133,7 +148,16 @@ export function CommandPalette({
     if (q.length === 0) return base;
     const filteredBase = base.filter((c) => c.label.toLowerCase().includes(q));
     return [...ranked, ...filteredBase];
-  }, [events, query, navigate, onClose, open, onOpenShortcuts, searchHits]);
+  }, [
+    events,
+    query,
+    navigate,
+    onClose,
+    open,
+    onOpenShortcuts,
+    searchHits,
+    disabledCapabilities,
+  ]);
 
   if (!open) return null;
 

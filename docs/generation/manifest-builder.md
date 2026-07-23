@@ -39,7 +39,7 @@ Current preset: `convex-application` **v1.3.5** (`package.json` → `manifestPre
 - `convex/auth.config.ts`, `convex/authStatus.ts`
 - Thin adapters such as `src/lib/api.ts`
 
-Generated Convex surfaces import `getAuthContext` from `./lib/authContext`. That module is fail-closed; customize IdP claims there only.
+Generated Convex surfaces import `getAuthContext` from `./lib/authContext`. That module is fail-closed; customize identity → Capsule role mapping there only (prefer linked `Person.role`; IdP org-role claims are bootstrap fallback — see `docs/systems/auth.md`). Org capability kill-switches load as `disabledCapabilities` on the same auth object; `bun run manifest:regen` re-applies `scripts/apply-org-capability-check-role.ts` so generated `checkRole` honors those flags (and passes the auth object, not only `user.role`).
 
 ## Flow
 

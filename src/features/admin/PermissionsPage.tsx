@@ -10,6 +10,7 @@ import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
 import { RolePermissionAudit } from "./RolePermissionAuditPanel";
+import { TeamRolesPanel } from "./TeamRolesPanel";
 
 const CAPABILITIES = [
   ["kitchen", "Kitchen", "Recipes, dishes, menus, and prep work."],
@@ -28,7 +29,10 @@ const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
 export function PermissionsPage() {
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const canEdit = ADMIN_ROLES.has(authStatus?.role ?? "");
-  const people = useQuery(api.queries.listPerson, canEdit ? {} : "skip");
+  const people = useQuery(
+    api.queries.listPerson,
+    authStatus?.hasRole ? {} : "skip",
+  );
   const rows = useListOrganizationCapabilitySetting();
   const createSetting = useCreateOrganizationCapabilitySetting();
   const setEnabled = useOrganizationCapabilitySettingSetEnabled();
@@ -73,16 +77,31 @@ export function PermissionsPage() {
     <div className="operations-stage space-y-6">
       <PageHeader
         title="Permissions"
-        lead="These switches apply to everyone in this organization. Everything starts allowed."
+        lead="Team roles decide what each person can do. Organization access switches turn whole domains off for everyone — commands fail closed and those areas leave the nav."
       />
       <AdminWorkspaceNav />
       {!canEdit && (
         <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-[13px] text-warn">
-          Only an organization admin can change these settings.
+          Only a Capsule admin can change these settings.
         </div>
       )}
+      {authStatus.hasRole ? (
+        <div className="card border-line bg-inset px-4 py-3 text-[13px] text-ink-2">
+          Your Capsule role is{" "}
+          <strong className="text-ink">
+            {String(authStatus.role).replaceAll("_", " ")}
+          </strong>
+          {roleSourceHint(authStatus.roleSource)}
+        </div>
+      ) : null}
       {error && <ErrorState title="Permission change failed" detail={error} />}
+      <TeamRolesPanel people={people} canEdit={canEdit} />
       <Section title="Organization access">
+        <div className="border-b border-line px-4 py-3 text-[12px] leading-relaxed text-ink-3">
+          Off means nobody in this organization can use that domain (including
+          admins), until you turn it back on here. Administration stays in the
+          nav so you can always reach this page.
+        </div>
         <div className="divide-y divide-line">
           {CAPABILITIES.map(([id, label, detail]) => {
             const enabled = settings.get(id)?.enabled ?? true;
@@ -122,4 +141,14 @@ export function PermissionsPage() {
       ) : null}
     </div>
   );
+}
+
+function roleSourceHint(roleSource: string | undefined): string {
+  if (roleSource === "person") {
+    return " (from team record in app settings).";
+  }
+  if (roleSource === "idp") {
+    return " (temporary sign-in fallback — hire and link this account under Team roles).";
+  }
+  return ".";
 }

@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useQuery } from "convex/react";
+import { api } from "../../lib/api";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
 import { MoonIcon, SunIcon } from "../../ui/icons";
 
@@ -31,7 +33,10 @@ function ThemeToggle() {
 }
 
 export function Sidebar() {
-  const available = navigationCatalog.availableAreas();
+  const authStatus = useQuery(api.authStatus.getAuthStatus, {});
+  const available = navigationCatalog.availableAreas(
+    authStatus?.disabledCapabilities,
+  );
   const planned = navigationCatalog.plannedAreas();
 
   return (

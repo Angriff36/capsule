@@ -149,7 +149,7 @@ export class EventSeamContract {
     );
     const authAt = body.indexOf("getAuthContext(ctx)");
     const tenantAt = body.indexOf("tenantId !== __auth.tenantId");
-    const roleAt = body.indexOf('checkRole(user.role, "eventAccess")');
+    const roleAt = body.indexOf('checkRole(user, "eventAccess")');
     const encryptAt = body.indexOf("__encryptDoc(");
     const patchAt = body.indexOf("ctx.db.patch(");
     const returnAt = body.lastIndexOf("return {");
