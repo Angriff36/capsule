@@ -17,7 +17,8 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "31fc4cf4d16fb9bab8d87531a643e9efd16b5a0d6c35a0691e745991cffe4c3e"
+      "sha256": "31fc4cf4d16fb9bab8d87531a643e9efd16b5a0d6c35a0691e745991cffe4c3e",
+      "baselined": true
     },
     "convex/queries.ts": {
       "sha256": "c87a7a5bb688a0e064efbdd775fa4f9ae94b41f584a919e4dd1596894b6534fd"
@@ -29,10 +30,12 @@
       "sha256": "3a51f25a005a86dbec6598e2f593306be7713d0d933af54c13dbc5b0fa2d12cb"
     },
     "manifest-context-summary.json": {
-      "sha256": "496385362f033c5b99137d65e50dbf86046079654e56bf7685cdbfcb941b1b25"
+      "sha256": "bcaf92291ba22b41102694d796b419c82f3480cd3efc8bbcc3f818e85467cbb3",
+      "baselined": true
     },
     "package.json": {
-      "sha256": "bc7abdda55d6e2b586f6b9512ea2c697ccba42ab658b62a40f6fb8209d448435"
+      "sha256": "bc7abdda55d6e2b586f6b9512ea2c697ccba42ab658b62a40f6fb8209d448435",
+      "baselined": true
     },
     "PRESET.md": {
       "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
@@ -44,10 +47,12 @@
       "sha256": "42e37e2e66545ae37c27d2e91932cda6251720b15ec3aaec93293a086783f028"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "07abbfd9546279e3859c60068aebaea5300c64a90eeabad19df2ba7fe7d00034"
+      "sha256": "07abbfd9546279e3859c60068aebaea5300c64a90eeabad19df2ba7fe7d00034",
+      "baselined": true
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "543de7d41334c9abe6ea05e61498560c2ee829f868054e3712e7a790f900b1c2"
+      "sha256": "543de7d41334c9abe6ea05e61498560c2ee829f868054e3712e7a790f900b1c2",
+      "baselined": true
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "2ab496fb81de79871684d46f44fb4f1ecb815da5febd8fb27e9cb62751f6aabb"
@@ -59,14 +64,13 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "f29c6cea6bc3b856dcc7274b918cd5ad4f96e301246835178aae81829069593e"
+      "sha256": "f29c6cea6bc3b856dcc7274b918cd5ad4f96e301246835178aae81829069593e",
+      "baselined": true
     }
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "3.6.41",
-      "convex": "^1.0.0",
-      "zod": "^3.23.0"
+      "@angriff36/manifest": "3.6.41"
     },
     "devDependencies": {
       "typescript": "^5.9.3",
