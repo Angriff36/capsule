@@ -2014,15 +2014,25 @@ export const listEvent = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __fk = ((__row as any) as any).clientId;
+      ((__row as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
+      }
+      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
+      (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
-      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).isTerminal = (((__row as any).stage === "cancelled") || ((__row as any).stage === "closed_out"));
       (__row as any).isEditable = ((((__row as any).stage === "planning") || ((__row as any).stage === "pending_approval")) || ((__row as any).stage === "approved"));
+      (__row as any).hasAssignedClient = (((__row as any).client != null) && ((__row as any).client.deletedAt == null));
+      (__row as any).hasExpectedHeadcount = ((__row as any).expectedHeadcount > 0);
+      (__row as any).hasMenuDishes = ((((__row as any).eventDishes) ?? []).filter((d: Doc<"eventDishes">) => (((d.deletedAt == null) && (d.removedAt == null)))).length > 0);
+      (__row as any).hasStaffAssigned = ((((__row as any).assignments) ?? []).filter((a: Doc<"eventAssignments">) => (((a.deletedAt == null) && (a.status !== "unassigned")))).length > 0);
+      (__row as any).isSetupReady = ((((__row as any).hasAssignedClient && (__row as any).hasExpectedHeadcount) && (__row as any).hasMenuDishes) && (__row as any).hasStaffAssigned);
       (__row as any).isReadyForExecution = ((((((__row as any).prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && ((((__row as any).packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && ((((__row as any).deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
+      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
     return __projectedRows;
   },
@@ -2041,15 +2051,25 @@ export const getEvent = query({
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
     const __doc = await __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], __rawDoc);
+    {
+      const __fk = ((__doc as any) as any).clientId;
+      ((__doc as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
+    }
+    (__doc as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __doc._id)).collect();
+    (__doc as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __doc._id)).collect();
     (__doc as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __doc._id)).collect();
     (__doc as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", __doc._id)).collect();
     (__doc as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", __doc._id)).collect();
-    (__doc as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __doc._id)).collect();
     (__doc as any).isTerminal = (((__doc as any).stage === "cancelled") || ((__doc as any).stage === "closed_out"));
     (__doc as any).isEditable = ((((__doc as any).stage === "planning") || ((__doc as any).stage === "pending_approval")) || ((__doc as any).stage === "approved"));
+    (__doc as any).hasAssignedClient = (((__doc as any).client != null) && ((__doc as any).client.deletedAt == null));
+    (__doc as any).hasExpectedHeadcount = ((__doc as any).expectedHeadcount > 0);
+    (__doc as any).hasMenuDishes = ((((__doc as any).eventDishes) ?? []).filter((d: Doc<"eventDishes">) => (((d.deletedAt == null) && (d.removedAt == null)))).length > 0);
+    (__doc as any).hasStaffAssigned = ((((__doc as any).assignments) ?? []).filter((a: Doc<"eventAssignments">) => (((a.deletedAt == null) && (a.status !== "unassigned")))).length > 0);
+    (__doc as any).isSetupReady = ((((__doc as any).hasAssignedClient && (__doc as any).hasExpectedHeadcount) && (__doc as any).hasMenuDishes) && (__doc as any).hasStaffAssigned);
     (__doc as any).isReadyForExecution = ((((((__doc as any).prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && ((((__doc as any).packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && ((((__doc as any).deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
     (__doc as any).estimatedFoodCost = (((((__doc as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-    const __hydrated = { ...(__doc as any), isTerminal: (__doc as any).isTerminal, isEditable: (__doc as any).isEditable, isReadyForExecution: (__doc as any).isReadyForExecution, estimatedFoodCost: (__doc as any).estimatedFoodCost };
+    const __hydrated = { ...(__doc as any), isTerminal: (__doc as any).isTerminal, isEditable: (__doc as any).isEditable, hasAssignedClient: (__doc as any).hasAssignedClient, hasExpectedHeadcount: (__doc as any).hasExpectedHeadcount, hasMenuDishes: (__doc as any).hasMenuDishes, hasStaffAssigned: (__doc as any).hasStaffAssigned, isSetupReady: (__doc as any).isSetupReady, isReadyForExecution: (__doc as any).isReadyForExecution, estimatedFoodCost: (__doc as any).estimatedFoodCost };
     return __hydrated;
   },
 });
@@ -2065,15 +2085,25 @@ export const listEventByTenantId = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __fk = ((__row as any) as any).clientId;
+      ((__row as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
+      }
+      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
+      (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
-      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).isTerminal = (((__row as any).stage === "cancelled") || ((__row as any).stage === "closed_out"));
       (__row as any).isEditable = ((((__row as any).stage === "planning") || ((__row as any).stage === "pending_approval")) || ((__row as any).stage === "approved"));
+      (__row as any).hasAssignedClient = (((__row as any).client != null) && ((__row as any).client.deletedAt == null));
+      (__row as any).hasExpectedHeadcount = ((__row as any).expectedHeadcount > 0);
+      (__row as any).hasMenuDishes = ((((__row as any).eventDishes) ?? []).filter((d: Doc<"eventDishes">) => (((d.deletedAt == null) && (d.removedAt == null)))).length > 0);
+      (__row as any).hasStaffAssigned = ((((__row as any).assignments) ?? []).filter((a: Doc<"eventAssignments">) => (((a.deletedAt == null) && (a.status !== "unassigned")))).length > 0);
+      (__row as any).isSetupReady = ((((__row as any).hasAssignedClient && (__row as any).hasExpectedHeadcount) && (__row as any).hasMenuDishes) && (__row as any).hasStaffAssigned);
       (__row as any).isReadyForExecution = ((((((__row as any).prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && ((((__row as any).packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && ((((__row as any).deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
+      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
     return __projectedRows;
   },
@@ -2092,15 +2122,25 @@ export const listEventByClientId = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __fk = ((__row as any) as any).clientId;
+      ((__row as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
+      }
+      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
+      (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
-      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).isTerminal = (((__row as any).stage === "cancelled") || ((__row as any).stage === "closed_out"));
       (__row as any).isEditable = ((((__row as any).stage === "planning") || ((__row as any).stage === "pending_approval")) || ((__row as any).stage === "approved"));
+      (__row as any).hasAssignedClient = (((__row as any).client != null) && ((__row as any).client.deletedAt == null));
+      (__row as any).hasExpectedHeadcount = ((__row as any).expectedHeadcount > 0);
+      (__row as any).hasMenuDishes = ((((__row as any).eventDishes) ?? []).filter((d: Doc<"eventDishes">) => (((d.deletedAt == null) && (d.removedAt == null)))).length > 0);
+      (__row as any).hasStaffAssigned = ((((__row as any).assignments) ?? []).filter((a: Doc<"eventAssignments">) => (((a.deletedAt == null) && (a.status !== "unassigned")))).length > 0);
+      (__row as any).isSetupReady = ((((__row as any).hasAssignedClient && (__row as any).hasExpectedHeadcount) && (__row as any).hasMenuDishes) && (__row as any).hasStaffAssigned);
       (__row as any).isReadyForExecution = ((((((__row as any).prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && ((((__row as any).packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && ((((__row as any).deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
+      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
     return __projectedRows;
   },
@@ -2119,15 +2159,25 @@ export const listEventByClientMergeAuthorizationId = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __fk = ((__row as any) as any).clientId;
+      ((__row as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
+      }
+      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
+      (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
-      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).isTerminal = (((__row as any).stage === "cancelled") || ((__row as any).stage === "closed_out"));
       (__row as any).isEditable = ((((__row as any).stage === "planning") || ((__row as any).stage === "pending_approval")) || ((__row as any).stage === "approved"));
+      (__row as any).hasAssignedClient = (((__row as any).client != null) && ((__row as any).client.deletedAt == null));
+      (__row as any).hasExpectedHeadcount = ((__row as any).expectedHeadcount > 0);
+      (__row as any).hasMenuDishes = ((((__row as any).eventDishes) ?? []).filter((d: Doc<"eventDishes">) => (((d.deletedAt == null) && (d.removedAt == null)))).length > 0);
+      (__row as any).hasStaffAssigned = ((((__row as any).assignments) ?? []).filter((a: Doc<"eventAssignments">) => (((a.deletedAt == null) && (a.status !== "unassigned")))).length > 0);
+      (__row as any).isSetupReady = ((((__row as any).hasAssignedClient && (__row as any).hasExpectedHeadcount) && (__row as any).hasMenuDishes) && (__row as any).hasStaffAssigned);
       (__row as any).isReadyForExecution = ((((((__row as any).prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && ((((__row as any).packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && ((((__row as any).deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
+      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
     return __projectedRows;
   },
@@ -2146,15 +2196,25 @@ export const listEventByMergeTargetClientId = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __fk = ((__row as any) as any).clientId;
+      ((__row as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
+      }
+      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
+      (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
-      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).isTerminal = (((__row as any).stage === "cancelled") || ((__row as any).stage === "closed_out"));
       (__row as any).isEditable = ((((__row as any).stage === "planning") || ((__row as any).stage === "pending_approval")) || ((__row as any).stage === "approved"));
+      (__row as any).hasAssignedClient = (((__row as any).client != null) && ((__row as any).client.deletedAt == null));
+      (__row as any).hasExpectedHeadcount = ((__row as any).expectedHeadcount > 0);
+      (__row as any).hasMenuDishes = ((((__row as any).eventDishes) ?? []).filter((d: Doc<"eventDishes">) => (((d.deletedAt == null) && (d.removedAt == null)))).length > 0);
+      (__row as any).hasStaffAssigned = ((((__row as any).assignments) ?? []).filter((a: Doc<"eventAssignments">) => (((a.deletedAt == null) && (a.status !== "unassigned")))).length > 0);
+      (__row as any).isSetupReady = ((((__row as any).hasAssignedClient && (__row as any).hasExpectedHeadcount) && (__row as any).hasMenuDishes) && (__row as any).hasStaffAssigned);
       (__row as any).isReadyForExecution = ((((((__row as any).prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && ((((__row as any).packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && ((((__row as any).deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
+      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
     return __projectedRows;
   },
@@ -2173,15 +2233,25 @@ export const listEventByVenueId = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __fk = ((__row as any) as any).clientId;
+      ((__row as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
+      }
+      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
+      (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
-      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).isTerminal = (((__row as any).stage === "cancelled") || ((__row as any).stage === "closed_out"));
       (__row as any).isEditable = ((((__row as any).stage === "planning") || ((__row as any).stage === "pending_approval")) || ((__row as any).stage === "approved"));
+      (__row as any).hasAssignedClient = (((__row as any).client != null) && ((__row as any).client.deletedAt == null));
+      (__row as any).hasExpectedHeadcount = ((__row as any).expectedHeadcount > 0);
+      (__row as any).hasMenuDishes = ((((__row as any).eventDishes) ?? []).filter((d: Doc<"eventDishes">) => (((d.deletedAt == null) && (d.removedAt == null)))).length > 0);
+      (__row as any).hasStaffAssigned = ((((__row as any).assignments) ?? []).filter((a: Doc<"eventAssignments">) => (((a.deletedAt == null) && (a.status !== "unassigned")))).length > 0);
+      (__row as any).isSetupReady = ((((__row as any).hasAssignedClient && (__row as any).hasExpectedHeadcount) && (__row as any).hasMenuDishes) && (__row as any).hasStaffAssigned);
       (__row as any).isReadyForExecution = ((((((__row as any).prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && ((((__row as any).packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && ((((__row as any).deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
+      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
     return __projectedRows;
   },
@@ -2200,15 +2270,25 @@ export const listEventByAssignedToId = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __fk = ((__row as any) as any).clientId;
+      ((__row as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
+      }
+      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
+      (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
-      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).isTerminal = (((__row as any).stage === "cancelled") || ((__row as any).stage === "closed_out"));
       (__row as any).isEditable = ((((__row as any).stage === "planning") || ((__row as any).stage === "pending_approval")) || ((__row as any).stage === "approved"));
+      (__row as any).hasAssignedClient = (((__row as any).client != null) && ((__row as any).client.deletedAt == null));
+      (__row as any).hasExpectedHeadcount = ((__row as any).expectedHeadcount > 0);
+      (__row as any).hasMenuDishes = ((((__row as any).eventDishes) ?? []).filter((d: Doc<"eventDishes">) => (((d.deletedAt == null) && (d.removedAt == null)))).length > 0);
+      (__row as any).hasStaffAssigned = ((((__row as any).assignments) ?? []).filter((a: Doc<"eventAssignments">) => (((a.deletedAt == null) && (a.status !== "unassigned")))).length > 0);
+      (__row as any).isSetupReady = ((((__row as any).hasAssignedClient && (__row as any).hasExpectedHeadcount) && (__row as any).hasMenuDishes) && (__row as any).hasStaffAssigned);
       (__row as any).isReadyForExecution = ((((((__row as any).prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && ((((__row as any).packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && ((((__row as any).deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
+      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
     return __projectedRows;
   },
@@ -2227,15 +2307,25 @@ export const listEventByRecurrenceTemplateEventId = query({
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "Event", ["primaryContactName","primaryContactEmail","primaryContactPhone"], row)));
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __fk = ((__row as any) as any).clientId;
+      ((__row as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
+      }
+      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
+      (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
-      (__row as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).isTerminal = (((__row as any).stage === "cancelled") || ((__row as any).stage === "closed_out"));
       (__row as any).isEditable = ((((__row as any).stage === "planning") || ((__row as any).stage === "pending_approval")) || ((__row as any).stage === "approved"));
+      (__row as any).hasAssignedClient = (((__row as any).client != null) && ((__row as any).client.deletedAt == null));
+      (__row as any).hasExpectedHeadcount = ((__row as any).expectedHeadcount > 0);
+      (__row as any).hasMenuDishes = ((((__row as any).eventDishes) ?? []).filter((d: Doc<"eventDishes">) => (((d.deletedAt == null) && (d.removedAt == null)))).length > 0);
+      (__row as any).hasStaffAssigned = ((((__row as any).assignments) ?? []).filter((a: Doc<"eventAssignments">) => (((a.deletedAt == null) && (a.status !== "unassigned")))).length > 0);
+      (__row as any).isSetupReady = ((((__row as any).hasAssignedClient && (__row as any).hasExpectedHeadcount) && (__row as any).hasMenuDishes) && (__row as any).hasStaffAssigned);
       (__row as any).isReadyForExecution = ((((((__row as any).prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && ((((__row as any).packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && ((((__row as any).deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
       (__row as any).estimatedFoodCost = (((((__row as any).eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
+      __projectedRows.push({ ...(__row as any), isTerminal: (__row as any).isTerminal, isEditable: (__row as any).isEditable, hasAssignedClient: (__row as any).hasAssignedClient, hasExpectedHeadcount: (__row as any).hasExpectedHeadcount, hasMenuDishes: (__row as any).hasMenuDishes, hasStaffAssigned: (__row as any).hasStaffAssigned, isSetupReady: (__row as any).isSetupReady, isReadyForExecution: (__row as any).isReadyForExecution, estimatedFoodCost: (__row as any).estimatedFoodCost });
     }
     return __projectedRows;
   },

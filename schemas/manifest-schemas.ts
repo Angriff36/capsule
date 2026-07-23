@@ -529,6 +529,11 @@ export const EventSchema = z.object({
 export const EventComputedSchema = EventSchema.extend({
   isTerminal: z.boolean(),
   isEditable: z.boolean(),
+  hasAssignedClient: z.boolean(),
+  hasExpectedHeadcount: z.boolean(),
+  hasMenuDishes: z.boolean(),
+  hasStaffAssigned: z.boolean(),
+  isSetupReady: z.boolean(),
   isReadyForExecution: z.boolean(),
   estimatedFoodCost: z.number(),
 });

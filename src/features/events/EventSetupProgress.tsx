@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import type { Doc, Id } from "../../lib/api";
+import type { Id } from "../../lib/api";
 import { Section } from "../../ui/primitives";
 import { CheckIcon, ChevronRightIcon } from "../../ui/icons";
 
@@ -12,66 +12,50 @@ type SetupItem = {
   fixLabel: string;
 };
 
+type EventSetupFlags = {
+  hasAssignedClient?: boolean;
+  hasExpectedHeadcount?: boolean;
+  hasMenuDishes?: boolean;
+  hasStaffAssigned?: boolean;
+};
+
 /**
  * Lists the setup gaps that stop an event from deriving prep lists, demand,
- * and staffing. Each gap links to where it gets fixed. Answers the common
- * "why didn't the automation fire" question before it becomes a support ticket.
+ * and staffing. Flags come from Event Manifest computeds (isSetupReady family).
  */
 export function EventSetupProgress({
   eventId,
-  clientId,
-  clients,
-  expectedHeadcount,
-  eventDishes,
-  eventAssignments,
+  event,
 }: {
   eventId: Id<"events">;
-  clientId: Id<"clients">;
-  clients: Doc<"clients">[] | undefined;
-  expectedHeadcount: number;
-  eventDishes: Doc<"eventDishes">[] | undefined;
-  eventAssignments: Doc<"eventAssignments">[] | undefined;
+  event: EventSetupFlags | undefined | null;
 }) {
-  const dishCount = eventDishes?.filter(
-    (row) =>
-      row.eventId === eventId && row.deletedAt == null && row.removedAt == null,
-  ).length;
-  const staffCount = eventAssignments?.filter(
-    (row) =>
-      row.eventId === eventId &&
-      row.deletedAt == null &&
-      row.status !== "unassigned",
-  ).length;
-
   const items: SetupItem[] = [
     {
       key: "client",
       label: "Client assigned",
-      ready:
-        clients === undefined
-          ? undefined
-          : clients.some((c) => c._id === clientId && c.deletedAt == null),
+      ready: event == null ? undefined : Boolean(event.hasAssignedClient),
       fixTo: "/clients",
       fixLabel: "Assign client",
     },
     {
       key: "headcount",
       label: "Expected headcount set",
-      ready: expectedHeadcount > 0,
+      ready: event == null ? undefined : Boolean(event.hasExpectedHeadcount),
       fixTo: "#event-setup-basics",
       fixLabel: "Set headcount",
     },
     {
       key: "dishes",
       label: "Menu dishes selected",
-      ready: dishCount === undefined ? undefined : dishCount > 0,
+      ready: event == null ? undefined : Boolean(event.hasMenuDishes),
       fixTo: `/kitchen/event-menu?eventId=${eventId}`,
       fixLabel: "Add dishes",
     },
     {
       key: "staff",
       label: "Staff assigned",
-      ready: staffCount === undefined ? undefined : staffCount > 0,
+      ready: event == null ? undefined : Boolean(event.hasStaffAssigned),
       fixTo: "/staff/roster",
       fixLabel: "Assign staff",
     },

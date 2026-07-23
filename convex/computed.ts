@@ -43,10 +43,15 @@ export function computeEquipment(doc: Record<string, any>): Record<string, any> 
 /** Preload nested relations for Event computeds (mutates doc in place). */
 export async function hydrateComputedRelationsForEvent(ctx: any, doc: Record<string, any>): Promise<void> {
   const docId = doc._id;
+  {
+    const __fk = ((doc as any) as any).clientId;
+    ((doc as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
+  }
+  (doc as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
+  (doc as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
   (doc as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
   (doc as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
   (doc as any).deliveries = await ctx.db.query("deliveries").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
-  (doc as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
 }
 
 /** Computed fields for Event. Pass the stored (and hydrated) document. */
@@ -55,6 +60,16 @@ export function computeEvent(doc: Record<string, any>): Record<string, any> {
   doc.isTerminal = __isTerminal;
   const __isEditable = (((doc.stage === "planning") || (doc.stage === "pending_approval")) || (doc.stage === "approved"));
   doc.isEditable = __isEditable;
+  const __hasAssignedClient = ((doc.client != null) && (doc.client.deletedAt == null));
+  doc.hasAssignedClient = __hasAssignedClient;
+  const __hasExpectedHeadcount = (doc.expectedHeadcount > 0);
+  doc.hasExpectedHeadcount = __hasExpectedHeadcount;
+  const __hasMenuDishes = (((doc.eventDishes) ?? []).filter((d: Doc<"eventDishes">) => (((d.deletedAt == null) && (d.removedAt == null)))).length > 0);
+  doc.hasMenuDishes = __hasMenuDishes;
+  const __hasStaffAssigned = (((doc.assignments) ?? []).filter((a: Doc<"eventAssignments">) => (((a.deletedAt == null) && (a.status !== "unassigned")))).length > 0);
+  doc.hasStaffAssigned = __hasStaffAssigned;
+  const __isSetupReady = (((doc.hasAssignedClient && doc.hasExpectedHeadcount) && doc.hasMenuDishes) && doc.hasStaffAssigned);
+  doc.isSetupReady = __isSetupReady;
   const __isReadyForExecution = (((((doc.prepTasks) ?? []).filter((t: Doc<"prepTasks">) => (((t.status !== "completed") && (t.status !== "cancelled")))).length === 0) && (((doc.packLists) ?? []).filter((p: Doc<"packLists">) => ((((p.status !== "dispatched") && (p.status !== "cancelled")) && (p.status !== "draft")))).length === 0)) && (((doc.deliveries) ?? []).filter((d: Doc<"deliveries">) => ((((d.status !== "delivered") && (d.status !== "cancelled")) && (d.status !== "failed")))).length === 0));
   doc.isReadyForExecution = __isReadyForExecution;
   const __estimatedFoodCost = ((((doc.eventDishes) ?? []).filter((item: Doc<"eventDishes">) => (((item.deletedAt == null) && (item.addedAt != null))))) ?? []).map((item: Record<string, any>) => (item.estimatedCost)).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
@@ -62,6 +77,11 @@ export function computeEvent(doc: Record<string, any>): Record<string, any> {
   return {
     isTerminal: __isTerminal,
     isEditable: __isEditable,
+    hasAssignedClient: __hasAssignedClient,
+    hasExpectedHeadcount: __hasExpectedHeadcount,
+    hasMenuDishes: __hasMenuDishes,
+    hasStaffAssigned: __hasStaffAssigned,
+    isSetupReady: __isSetupReady,
     isReadyForExecution: __isReadyForExecution,
     estimatedFoodCost: __estimatedFoodCost,
   };

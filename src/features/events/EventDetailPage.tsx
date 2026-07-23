@@ -292,14 +292,7 @@ export function EventDetailPage() {
         ]}
       />
 
-      <EventSetupProgress
-        eventId={event._id}
-        clientId={event.clientId}
-        clients={clients}
-        expectedHeadcount={event.expectedHeadcount}
-        eventDishes={eventDishes}
-        eventAssignments={eventAssignments}
-      />
+      <EventSetupProgress eventId={event._id} event={event} />
 
       <LiveEventProfitabilityWidget eventId={event._id} />
 

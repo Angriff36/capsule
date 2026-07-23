@@ -543,6 +543,14 @@ entity Event mixin TenantScoped, SoftDeletable {
 
   computed isTerminal: boolean = self.stage == "cancelled" or self.stage == "closed_out"
   computed isEditable: boolean = self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+  // Setup readiness for approval / automation (UI EventSetupProgress). Distinct
+  // from isReadyForExecution (in-flight prep/pack/delivery). Uses raw child
+  // fields via count_of — not child computeds (parent rollup limitation).
+  computed hasAssignedClient: boolean = self.client != null and self.client.deletedAt == null
+  computed hasExpectedHeadcount: boolean = self.expectedHeadcount > 0
+  computed hasMenuDishes: boolean = count_of(self.eventDishes, (d) => d.deletedAt == null and d.removedAt == null) > 0
+  computed hasStaffAssigned: boolean = count_of(self.assignments, (a) => a.deletedAt == null and a.status != "unassigned") > 0
+  computed isSetupReady: boolean = self.hasAssignedClient and self.hasExpectedHeadcount and self.hasMenuDishes and self.hasStaffAssigned
   // Readiness: no incomplete prep, undelivered logistics work, or open pack lists.
   // Staffing coverage math remains deferred (NO EVIDENCE) — assignments hasMany
   // is navigation only until coverage is product-defined.
