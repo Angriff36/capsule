@@ -29,7 +29,7 @@
       "sha256": "3a51f25a005a86dbec6598e2f593306be7713d0d933af54c13dbc5b0fa2d12cb"
     },
     "manifest-context-summary.json": {
-      "sha256": "bcaf92291ba22b41102694d796b419c82f3480cd3efc8bbcc3f818e85467cbb3"
+      "sha256": "496385362f033c5b99137d65e50dbf86046079654e56bf7685cdbfcb941b1b25"
     },
     "package.json": {
       "sha256": "bc7abdda55d6e2b586f6b9512ea2c697ccba42ab658b62a40f6fb8209d448435"
@@ -61,5 +61,92 @@
     "wiring/contract.json": {
       "sha256": "f29c6cea6bc3b856dcc7274b918cd5ad4f96e301246835178aae81829069593e"
     }
+  },
+  "package": {
+    "dependencies": {
+      "@angriff36/manifest": "3.6.41",
+      "convex": "^1.0.0",
+      "zod": "^3.23.0"
+    },
+    "devDependencies": {
+      "typescript": "^5.9.3",
+      "vitest": "^3.2.4"
+    },
+    "scripts": {
+      "deploy": "convex deploy",
+      "dev:convex": "convex dev",
+      "manifest:build": "manifest build",
+      "manifest:compile": "manifest compile --merge",
+      "test": "vitest run",
+      "typecheck": "tsc --noEmit"
+    }
+  },
+  "editableManifest": {
+    "paths": [
+      "manifest.config.yaml",
+      "src/admin/announcement.manifest",
+      "src/admin/capability-setting.manifest",
+      "src/app.manifest",
+      "src/culinary/dish.manifest",
+      "src/culinary/event-dish.manifest",
+      "src/culinary/ingredient.manifest",
+      "src/culinary/menu-dish.manifest",
+      "src/culinary/menu.manifest",
+      "src/culinary/recipe-import.manifest",
+      "src/culinary/recipe.manifest",
+      "src/documents/attachment.manifest",
+      "src/facilities/equipment.manifest",
+      "src/finance/closeout.manifest",
+      "src/finance/event-closeout.manifest",
+      "src/finance/payroll-input.manifest",
+      "src/foundation/base.manifest",
+      "src/identity/email-notification-subscription.manifest",
+      "src/identity/person.manifest",
+      "src/insights/report.manifest",
+      "src/inventory/demand.manifest",
+      "src/inventory/location.manifest",
+      "src/inventory/stock-count.manifest",
+      "src/inventory/stock.manifest",
+      "src/inventory/transfer.manifest",
+      "src/logistics/delivery.manifest",
+      "src/logistics/pack-list.manifest",
+      "src/logistics/packing.manifest",
+      "src/logistics/vehicle.manifest",
+      "src/operations/event-template.manifest",
+      "src/operations/event.manifest",
+      "src/procurement/event-purchasing.manifest",
+      "src/procurement/order.manifest",
+      "src/procurement/purchase-need.manifest",
+      "src/procurement/vendor-contract.manifest",
+      "src/procurement/vendor.manifest",
+      "src/production/batch.manifest",
+      "src/production/prep.manifest",
+      "src/production/task-comment.manifest",
+      "src/production/task.manifest",
+      "src/quality/allergen-check.manifest",
+      "src/quality/incident.manifest",
+      "src/sales/client-communication.manifest",
+      "src/sales/client-retention.manifest",
+      "src/sales/contact-merge.manifest",
+      "src/sales/contact.manifest",
+      "src/sales/contract.manifest",
+      "src/sales/credit-memo.manifest",
+      "src/sales/invoice-core.manifest",
+      "src/sales/invoice.manifest",
+      "src/sales/lead.manifest",
+      "src/sales/payment-method.manifest",
+      "src/sales/payment.manifest",
+      "src/sales/proposal-dish-selection.manifest",
+      "src/sales/proposal.manifest",
+      "src/sales/tax-rate.manifest",
+      "src/workforce/assignment.manifest",
+      "src/workforce/availability.manifest",
+      "src/workforce/shift-swap.manifest",
+      "src/workforce/shift.manifest",
+      "src/workforce/staff-message.manifest",
+      "src/workforce/time.manifest",
+      "src/workforce/training.manifest"
+    ],
+    "configPath": "manifest.config.yaml"
   }
 }
