@@ -60,8 +60,9 @@ below (or call the driver from a one-off `bun` script).
    - Project: `.cursor/mcp.json` (gitignored)
    - User: `~/.cursor/mcp.json` entry **`capsule`**
    - Committed template: [cursor-mcp.capsule.example.json](./cursor-mcp.capsule.example.json)
-   - Launcher `chdir`s to the Capsule repo and loads `.env.local` even if Cursor
-     omits `cwd` (that was the live discovery failure mode).
+   - `scripts/capsule-mcp.ts` bootstraps via `CapsuleMcpHostBootstrap`: `chdir`s
+     to the Capsule repo and loads `.env.local` even if Cursor omits `cwd`
+     (fixes live discovery / `mcp_auth` timeout — #85).
 5. Start the stdio host: `bun run agent:mcp` (idle in a TTY is expected).
 6. In Cursor: Settings → MCP → enable/refresh **`capsule`**. Prefer
    `list_capsule_commands` + `execute_capsule_command` (or
