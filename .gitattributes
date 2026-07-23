@@ -1,7 +1,32 @@
-# Builder-owned generated output must check out byte-identical to the commit
-# (LF). Builder hashes raw disk bytes against .builder/ownership.json; CRLF
-# conversion on checkout made every fresh worktree/clone read as "modified"
-# (290 phantom conflicts, regen refused). Proven 2026-07-21.
+# Whole-repo LF for Git working trees and objects.
+# This file ONLY affects Git checkout/commit. It does NOT fix:
+#   - Convex deployment secrets (`convex env set` on Windows — use
+#     `bun run convex:env-set -- NAME value`, see docs/operations/local-dev.md)
+#   - PowerShell piping / clipboard pastes into CLIs
+#   - Global core.autocrlf=true outside this repo (local override: false)
+#
+# Builder-owned paths still need byte-identical LF checkouts so
+# .builder/ownership.json hashes match (proven 2026-07-21: CRLF checkout
+# caused ~290 phantom conflicts, regen refused). Explicit pins below
+# keep that contract obvious; the `*` rule already covers them.
+* text=auto eol=lf
+
+# Binary / generated blobs — never touch line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.zip binary
+*.gz binary
+
+# Builder / regen-sensitive paths (explicit LF pin; same as `*` above)
 convex/** text eol=lf
 generated/** text eol=lf
 src/generated/** text eol=lf
