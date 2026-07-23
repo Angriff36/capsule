@@ -172,6 +172,13 @@
       "timestamp": "2026-07-23T17:30:00Z",
       "verdict": "SUCCESS",
       "reason": "PR #91 created (draft). Independent cross-model review by Opus 4.8 (GLM/MiniMax worker): APPROVE. Fix refreshed Builder hashes (ownership.json, manifest-context-summary.json, wiring files). Typecheck ✅, manifest:regen:check ✅ (\"generated output is current\"). Minimal correct fix, no hand-edits. Infrastructure fix only — no Manifest source changes to port. Worktree removed, branch safe on origin."
+    },
+    {
+      "item": "PR #27 conflicting - rebase onto main",
+      "runId": "rebase-20260723T1815-pr27",
+      "timestamp": "2026-07-23T18:15:00Z",
+      "verdict": "SUCCESS",
+      "reason": "Rebased loop/prod-20260721T1600-OD052-timerecord-identity onto main (removed merge commit 8af2501, reset to 448b09c, rebase, regen, force-push). PR #27 now current with main and should pass CI. HIGH-SCRUTINY auth fix (TimeRecord self-service identity via Person.authSubjectId) awaiting CI verification."
     }
   ]
 }

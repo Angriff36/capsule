@@ -1,6 +1,6 @@
 # Loop State — capsule
 
-Last run: 2026-07-23T18:15:00Z (CI fix shipped; queue: 15 issues; budget: 100k/2M tokens)
+Last run: 2026-07-23T18:20:00Z (CI fix shipped, PR #27 rebased; queue: 15 issues; budget: 120k/2M tokens)
 
 ## High Priority (fix queue - drain in order)
 
@@ -11,7 +11,12 @@ Last run: 2026-07-23T18:15:00Z (CI fix shipped; queue: 15 issues; budget: 100k/2
 - Status: PR #91 draft created, awaiting human review/merge
 - Per loop-constraints: PR gate satisfied, draft PR is the artifact
 
-**CRITICAL: PR #27 CONFLICTING**
+**✅ REBASED: PR #27 (HIGH-SCRUTINY auth)**
+- TimeRecord self-service identity via Person.authSubjectId
+- Rebased onto main (removed merge commit, regen, force-push)
+- Status: PR #27 now current, awaiting CI verification
+
+**Infrastructure Issues (block dev/deploy):**
 - HIGH-SCRUTINY auth fix (TimeRecord self-service identity) has merge conflicts
 - Needs rebase onto current main before can merge
 - Blocks: depends on cascade auth fix (issue #32) which may have regressed
