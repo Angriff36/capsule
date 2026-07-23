@@ -11,23 +11,15 @@ import {
   useListRecipeIngredient,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import {
+  CULINARY_ALLERGENS,
+  type CulinaryAllergenCode,
+} from "./CulinaryAllergenVocabulary";
 import { KitchenBookNav } from "./KitchenBookNav";
 
-// Display order/labels for the repo's closed AllergenCode vocabulary
-// (US major food allergens per the FASTER Act — see ingredient.manifest).
-const ALLERGENS = [
-  { code: "milk", label: "Milk" },
-  { code: "eggs", label: "Eggs" },
-  { code: "fish", label: "Fish" },
-  { code: "crustacean_shellfish", label: "Crustacean shellfish" },
-  { code: "tree_nuts", label: "Tree nuts" },
-  { code: "peanuts", label: "Peanuts" },
-  { code: "wheat", label: "Wheat" },
-  { code: "soybeans", label: "Soybeans" },
-  { code: "sesame", label: "Sesame" },
-] as const;
+const ALLERGENS = CULINARY_ALLERGENS;
 
-type AllergenCode = (typeof ALLERGENS)[number]["code"];
+type AllergenCode = CulinaryAllergenCode;
 
 type MatrixRecord = {
   _id: string;

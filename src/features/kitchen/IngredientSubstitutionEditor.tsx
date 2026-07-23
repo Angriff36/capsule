@@ -153,7 +153,7 @@ export function IngredientSubstitutionEditor({
       )}
 
       <div className="mt-4 flex flex-wrap items-end gap-2">
-        <label className="grid min-w-64 flex-1 gap-1 text-[12px] text-ink-2">
+        <label className="grid min-w-0 flex-1 basis-48 gap-1 text-[12px] text-ink-2">
           Add substitute
           <select
             className="input"

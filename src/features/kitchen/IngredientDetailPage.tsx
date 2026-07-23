@@ -23,6 +23,8 @@ import {
 } from "./IngredientPriceHistory";
 import { IngredientPriceTrendPanel } from "./IngredientPriceTrendPanel";
 import { VendorPriceComparisonPanel } from "./VendorPriceComparisonPanel";
+import { IngredientCostingEditor } from "./IngredientCostingEditor";
+import { IngredientDetailsEditor } from "./IngredientDetailsEditor";
 import { IngredientSubstitutionEditor } from "./IngredientSubstitutionEditor";
 import { kitchenCatalogPath } from "./kitchenRoutes";
 
@@ -165,7 +167,7 @@ export function PreferredVendorRankingEditor({
       )}
 
       <div className="mt-4 flex flex-wrap items-end gap-2">
-        <label className="grid min-w-64 flex-1 gap-1 text-[12px] text-ink-2">
+        <label className="grid min-w-0 flex-1 basis-48 gap-1 text-[12px] text-ink-2">
           Add vendor
           <select
             className="input"
@@ -407,6 +409,18 @@ export function IngredientDetailPage() {
           </div>
         </dl>
       </header>
+
+      <IngredientDetailsEditor
+        key={`details:${ingredient._id}:${ingredient.version}`}
+        ingredient={ingredient}
+        onFailure={setFailure}
+      />
+
+      <IngredientCostingEditor
+        key={`costing:${ingredient._id}:${ingredient.version}`}
+        ingredient={ingredient}
+        onFailure={setFailure}
+      />
 
       <IngredientSubstitutionEditor
         key={`substitutes:${ingredient._id}:${ingredient.version}`}

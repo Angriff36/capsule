@@ -31,23 +31,9 @@ import {
   type KitchenSection,
 } from "./kitchenRoutes";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
+import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
-const UNITS = [
-  "each",
-  "gram",
-  "kilogram",
-  "ounce",
-  "pound",
-  "milliliter",
-  "liter",
-  "teaspoon",
-  "tablespoon",
-  "cup",
-  "pint",
-  "quart",
-  "gallon",
-  "portion",
-] as const;
+const UNITS = UNIT_OF_MEASURE;
 
 const policy = new CulinaryLifecyclePolicy();
 

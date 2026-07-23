@@ -28,24 +28,10 @@ import {
 } from "./IngredientPriceHistory";
 import { calculateRecipeCost } from "./RecipeCostCalculator";
 import { RecipeCostPanel } from "./RecipeCostPanel";
+import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const policy = new CulinaryLifecyclePolicy();
-const UNITS = [
-  "each",
-  "gram",
-  "kilogram",
-  "ounce",
-  "pound",
-  "milliliter",
-  "liter",
-  "teaspoon",
-  "tablespoon",
-  "cup",
-  "pint",
-  "quart",
-  "gallon",
-  "portion",
-] as const;
+const UNITS = UNIT_OF_MEASURE;
 
 function optional(value: FormDataEntryValue | null) {
   const result = String(value ?? "").trim();
