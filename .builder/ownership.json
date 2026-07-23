@@ -2,7 +2,7 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "7a9451c9b8107a81979f09bd4b00211a9bd105ab91479faa1c1f202b86932400"
+      "sha256": "3c5a6d699b06eade4b27e080de9f7490e68cc256e158e176afb88676c1f2bd01"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
@@ -20,7 +20,7 @@
       "sha256": "6214e7d249f5b770ed2f380b69778211fce75742a21a5f8a2bca6f6480965c1c"
     },
     "convex/queries.ts": {
-      "sha256": "06ee301f8e40f846d0e9d00c5c37c9ab42dc6917c623a32c0fcb67befdf7b6b3"
+      "sha256": "d7de5ac0559fa8fd946f2866957f1e8a487f336a8e88b2d3dc5b86709ed2cb7e"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
@@ -29,10 +29,10 @@
       "sha256": "7b899f76639446f7f75a79736f4d616192ab25fab7129151237be2ae594839a5"
     },
     "manifest-context-summary.json": {
-      "sha256": "1e92c45fe70b16653b936b9dfe7db721a40b7bc8a222e37bf8ebfa099019af74"
+      "sha256": "42692c1129325582e925eebfecbae7872525b3bb5a57fad047c88d014630734c"
     },
     "package.json": {
-      "sha256": "e109192dfb6a57189aa00b321cc8644795257a162adefc6b7b5906538039d02f"
+      "sha256": "739b255b25533cb083f60a1cd1af151bfbd7d6d38336b71d8691d91f7d748d2b"
     },
     "PRESET.md": {
       "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
@@ -47,7 +47,7 @@
       "sha256": "b52afc0e379a0f34db7758e0501e8b415308efab9531995a6decf21cd8bf640e"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "3eaa564ed71475ff1d1f5d49165b2a84eed85b30f2caa7039cf00ea1ff1bdc66"
+      "sha256": "a22cef734c8dc4fafd925ba54c816381d9c48f41fabf9e9de9b309ac6d11fe38"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "28e4f999413686d18c524b0fe4fadaec8c4f75ab6adfebf45780615c79dc8ede"
@@ -59,12 +59,12 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "d5ea57ca5b169fe48bc89180f046fa15816e3d3c0cbe57345713af69499b2ffd"
+      "sha256": "7bfbc263b0c6655b368ce79b108c801734a01f0ad5f22532177418763f4b3a8c"
     }
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "^3.6.43",
+      "@angriff36/manifest": "^3.6.44",
       "convex": "^1.0.0",
       "zod": "^3.23.0"
     },

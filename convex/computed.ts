@@ -48,6 +48,40 @@ export async function hydrateComputedRelationsForEvent(ctx: any, doc: Record<str
     ((doc as any) as any).client = __fk != null ? await ctx.db.get(__fk as any) : null;
   }
   (doc as any).eventDishes = await ctx.db.query("eventDishes").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
+  for (const __agg0 of ((doc as any).eventDishes ?? []) as any[]) {
+    {
+      const __fk = (__agg0 as any).eventId;
+      (__agg0 as any).event = __fk != null ? await ctx.db.get(__fk as any) : null;
+    }
+    {
+      const __fk = (__agg0 as any).dishId;
+      (__agg0 as any).dish = __fk != null ? await ctx.db.get(__fk as any) : null;
+    }
+    if ((__agg0 as any).dish) {
+      (__agg0 as any).dish.recipeLines = await ctx.db.query("dishRecipes").withIndex("by_dishId", (q: any) => q.eq("dishId", (__agg0 as any).dish._id)).collect();
+      for (const __agg1 of ((__agg0 as any).dish.recipeLines ?? []) as any[]) {
+        {
+          const __fk = (__agg1 as any).recipeId;
+          (__agg1 as any).recipe = __fk != null ? await ctx.db.get(__fk as any) : null;
+        }
+        if ((__agg1 as any).recipe) {
+          (__agg1 as any).recipe.ingredientLines = await ctx.db.query("recipeIngredients").withIndex("by_recipeId", (q: any) => q.eq("recipeId", (__agg1 as any).recipe._id)).collect();
+          for (const __agg2 of ((__agg1 as any).recipe.ingredientLines ?? []) as any[]) {
+            {
+              const __fk = (__agg2 as any).ingredientId;
+              (__agg2 as any).ingredient = __fk != null ? await ctx.db.get(__fk as any) : null;
+            }
+          }
+        }
+        {
+          const __fk = (__agg1 as any).eventId;
+          (__agg1 as any).event = __fk != null ? await ctx.db.get(__fk as any) : null;
+        }
+      }
+    }
+    __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+    __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+  }
   (doc as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
   (doc as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
   (doc as any).packLists = await ctx.db.query("packLists").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
@@ -113,6 +147,10 @@ export async function hydrateComputedRelationsForEventDish(ctx: any, doc: Record
             (__agg1 as any).ingredient = __fk != null ? await ctx.db.get(__fk as any) : null;
           }
         }
+      }
+      {
+        const __fk = (__agg0 as any).eventId;
+        (__agg0 as any).event = __fk != null ? await ctx.db.get(__fk as any) : null;
       }
     }
   }
