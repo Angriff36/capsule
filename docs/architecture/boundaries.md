@@ -44,13 +44,13 @@
 
 ### What must stay in git vs companion noise
 
-| Keep tracked (CI / runtime)                                   | Today tracked because ownership, low product value                          |
-| ------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Authored `tests/**`                                           | `diagrams/**` mermaid companions                                            |
-| `tests/manifest-convex.contract.test.ts` (export smoke)       | Legacy `schemas/*.schema.ts` microfiles (removed after regen on new preset) |
-| `convex/schema.ts` + surfaces + `schemas/manifest-schemas.ts` |                                                                             |
+| Keep tracked (CI / runtime)                                   | Opted out / do not rebuild                                                                                                                                          |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Authored `tests/**`                                           | `diagrams/**` mermaid companions — Capsule sets `skipDocsDiagrams: true` in `manifest.config.yaml` (Builder stops emitting; next regen deletes owned diagram files) |
+| `tests/manifest-convex.contract.test.ts` (export smoke)       | Legacy `schemas/*.schema.ts` microfiles (removed after regen on new preset)                                                                                         |
+| `convex/schema.ts` + surfaces + `schemas/manifest-schemas.ts` |                                                                                                                                                                     |
 
-Untracking diagrams is still a companion packaging change. Do not delete owned paths without `.builder/ownership.json` via regen.
+Do not hand-delete owned `diagrams/**` — regen with `skipDocsDiagrams` updates `.builder/ownership.json` and deletes matching digests.
 
 If a Builder regenerate would overwrite an author seam, **stop**. Preserve the seam; never “fix” generated output by hand.
 

@@ -14,10 +14,10 @@ Current preset: `convex-application` **v1.3.5** (`package.json` → `manifestPre
 
 ## Authoritative generators
 
-| Tool                                                | Produces                                                                                                            |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Manifest / `@angriff36/manifest` + Builder assemble | Convex surfaces, Zod companion (`schemas/**`), wiring, seed script, client wiring, contract tests, mermaid diagrams |
-| Convex codegen (`bun run codegen`)                  | `convex/_generated/**`                                                                                              |
+| Tool                                                | Produces                                                                                                                                                                        |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Manifest / `@angriff36/manifest` + Builder assemble | Convex surfaces, Zod companion (`schemas/**`), wiring, seed script, client wiring, contract tests (mermaid diagrams opted out via `skipDocsDiagrams` in `manifest.config.yaml`) |
+| Convex codegen (`bun run codegen`)                  | `convex/_generated/**`                                                                                                                                                          |
 
 ## Generated — do not hand-edit
 
