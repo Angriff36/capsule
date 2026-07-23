@@ -52,6 +52,7 @@ import {
   DishIntroduceParamsSchema,
   DishLinkAsEditionParamsSchema,
   DishMergeIntoParamsSchema,
+  DishPurgeParamsSchema,
   DishRecipeAttachParamsSchema,
   DishRecipeDetachParamsSchema,
   DishReinstateParamsSchema,
@@ -156,6 +157,7 @@ import {
   IngredientLinkAsEditionParamsSchema,
   IngredientMergeIntoParamsSchema,
   IngredientPriceObservationRecordParamsSchema,
+  IngredientPurgeParamsSchema,
   IngredientReinstateParamsSchema,
   IngredientSetPreferredVendorParamsSchema,
   IngredientSetPreferredVendorsParamsSchema,
@@ -251,6 +253,7 @@ import {
   PersonHireParamsSchema,
   PersonReactivateParamsSchema,
   PersonTerminateParamsSchema,
+  PrepTaskAssignParamsSchema,
   PrepTaskCancelParamsSchema,
   PrepTaskClaimParamsSchema,
   PrepTaskCommentEditParamsSchema,
@@ -320,6 +323,7 @@ import {
   RecipeIngredientRemoveParamsSchema,
   RecipeIngredientSetWasteFactorParamsSchema,
   RecipePublishVersionParamsSchema,
+  RecipePurgeParamsSchema,
   RecipeRetireParamsSchema,
   RecipeRetractParamsSchema,
   RecipeReviseDraftParamsSchema,
@@ -1218,6 +1222,16 @@ export function useDishMergeInto() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = DishMergeIntoParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Dish.purge. */
+export function useDishPurge() {
+  const mutate = useMutation(api.mutations.Dish_purge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishPurgeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -2598,6 +2612,16 @@ export function useIngredientMergeInto() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = IngredientMergeIntoParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Ingredient.purge. */
+export function useIngredientPurge() {
+  const mutate = useMutation(api.mutations.Ingredient_purge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IngredientPurgeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -4020,6 +4044,16 @@ export function useGetPrepTask(id: string | "skip") {
   return useQuery(api.queries.getPrepTask, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for PrepTask.assign. */
+export function usePrepTaskAssign() {
+  const mutate = useMutation(api.mutations.PrepTask_assign);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskAssignParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PrepTask.cancel. */
 export function usePrepTaskCancel() {
   const mutate = useMutation(api.mutations.PrepTask_cancel);
@@ -4644,6 +4678,16 @@ export function useRecipePublishVersion() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = RecipePublishVersionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Recipe.purge. */
+export function useRecipePurge() {
+  const mutate = useMutation(api.mutations.Recipe_purge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RecipePurgeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -6640,4 +6684,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 704 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 708 as const;

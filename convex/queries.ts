@@ -2096,8 +2096,8 @@ export const listEvent = query({
       }
       }
       }
-      __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
-      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      __agg0.targetHeadcount = (((__agg0.headcountOverride != null) && (__agg0.headcountOverride > 0)) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       }
       (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
@@ -2167,8 +2167,8 @@ export const getEvent = query({
           }
         }
       }
-      __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
-      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      __agg0.targetHeadcount = (((__agg0.headcountOverride != null) && (__agg0.headcountOverride > 0)) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
     }
     (__doc as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __doc._id)).collect();
     (__doc as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __doc._id)).collect();
@@ -2235,8 +2235,8 @@ export const listEventByTenantId = query({
       }
       }
       }
-      __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
-      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      __agg0.targetHeadcount = (((__agg0.headcountOverride != null) && (__agg0.headcountOverride > 0)) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       }
       (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
@@ -2306,8 +2306,8 @@ export const listEventByClientId = query({
       }
       }
       }
-      __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
-      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      __agg0.targetHeadcount = (((__agg0.headcountOverride != null) && (__agg0.headcountOverride > 0)) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       }
       (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
@@ -2377,8 +2377,8 @@ export const listEventByClientMergeAuthorizationId = query({
       }
       }
       }
-      __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
-      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      __agg0.targetHeadcount = (((__agg0.headcountOverride != null) && (__agg0.headcountOverride > 0)) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       }
       (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
@@ -2448,8 +2448,8 @@ export const listEventByMergeTargetClientId = query({
       }
       }
       }
-      __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
-      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      __agg0.targetHeadcount = (((__agg0.headcountOverride != null) && (__agg0.headcountOverride > 0)) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       }
       (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
@@ -2519,8 +2519,8 @@ export const listEventByVenueId = query({
       }
       }
       }
-      __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
-      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      __agg0.targetHeadcount = (((__agg0.headcountOverride != null) && (__agg0.headcountOverride > 0)) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       }
       (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
@@ -2590,8 +2590,8 @@ export const listEventByAssignedToId = query({
       }
       }
       }
-      __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
-      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      __agg0.targetHeadcount = (((__agg0.headcountOverride != null) && (__agg0.headcountOverride > 0)) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       }
       (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
@@ -2661,8 +2661,8 @@ export const listEventByRecurrenceTemplateEventId = query({
       }
       }
       }
-      __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
-      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      __agg0.targetHeadcount = (((__agg0.headcountOverride != null) && (__agg0.headcountOverride > 0)) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+      __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       }
       (__row as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
       (__row as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", __row._id)).collect();
@@ -2962,10 +2962,10 @@ export const listEventDish = query({
       }
       }
       }
-      (__row as any).targetHeadcount = (((__row as any).headcountOverride > 0) ? (__row as any).headcountOverride : (__row as any).event.expectedHeadcount);
+      (__row as any).targetHeadcount = ((((__row as any).headcountOverride != null) && ((__row as any).headcountOverride > 0)) ? (__row as any).headcountOverride : (__row as any).event.expectedHeadcount);
       (__row as any).requiredBatches = (() => { const __vals = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
       (__row as any).requiredYieldQuantity = (() => { const __vals = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * line.recipe.yieldQuantity))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
-      (__row as any).estimatedCost = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      (__row as any).estimatedCost = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), targetHeadcount: (__row as any).targetHeadcount, requiredBatches: (__row as any).requiredBatches, requiredYieldQuantity: (__row as any).requiredYieldQuantity, estimatedCost: (__row as any).estimatedCost });
     }
     return __projectedRows;
@@ -3015,10 +3015,10 @@ export const getEventDish = query({
         }
       }
     }
-    (__doc as any).targetHeadcount = (((__doc as any).headcountOverride > 0) ? (__doc as any).headcountOverride : (__doc as any).event.expectedHeadcount);
+    (__doc as any).targetHeadcount = ((((__doc as any).headcountOverride != null) && ((__doc as any).headcountOverride > 0)) ? (__doc as any).headcountOverride : (__doc as any).event.expectedHeadcount);
     (__doc as any).requiredBatches = (() => { const __vals = (((((__doc as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.recipe.servesPerYield > 0) ? Math.ceil(((__doc as any).targetHeadcount / line.recipe.servesPerYield)) : 0))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
     (__doc as any).requiredYieldQuantity = (() => { const __vals = (((((__doc as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__doc as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * line.recipe.yieldQuantity))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
-    (__doc as any).estimatedCost = (((((__doc as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__doc as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+    (__doc as any).estimatedCost = (((((__doc as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__doc as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
     const __hydrated = { ...(__doc as any), targetHeadcount: (__doc as any).targetHeadcount, requiredBatches: (__doc as any).requiredBatches, requiredYieldQuantity: (__doc as any).requiredYieldQuantity, estimatedCost: (__doc as any).estimatedCost };
     return __hydrated;
   },
@@ -3065,10 +3065,10 @@ export const listEventDishByTenantId = query({
       }
       }
       }
-      (__row as any).targetHeadcount = (((__row as any).headcountOverride > 0) ? (__row as any).headcountOverride : (__row as any).event.expectedHeadcount);
+      (__row as any).targetHeadcount = ((((__row as any).headcountOverride != null) && ((__row as any).headcountOverride > 0)) ? (__row as any).headcountOverride : (__row as any).event.expectedHeadcount);
       (__row as any).requiredBatches = (() => { const __vals = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
       (__row as any).requiredYieldQuantity = (() => { const __vals = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * line.recipe.yieldQuantity))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
-      (__row as any).estimatedCost = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      (__row as any).estimatedCost = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), targetHeadcount: (__row as any).targetHeadcount, requiredBatches: (__row as any).requiredBatches, requiredYieldQuantity: (__row as any).requiredYieldQuantity, estimatedCost: (__row as any).estimatedCost });
     }
     return __projectedRows;
@@ -3118,10 +3118,10 @@ export const listEventDishByEventId = query({
       }
       }
       }
-      (__row as any).targetHeadcount = (((__row as any).headcountOverride > 0) ? (__row as any).headcountOverride : (__row as any).event.expectedHeadcount);
+      (__row as any).targetHeadcount = ((((__row as any).headcountOverride != null) && ((__row as any).headcountOverride > 0)) ? (__row as any).headcountOverride : (__row as any).event.expectedHeadcount);
       (__row as any).requiredBatches = (() => { const __vals = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
       (__row as any).requiredYieldQuantity = (() => { const __vals = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * line.recipe.yieldQuantity))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
-      (__row as any).estimatedCost = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      (__row as any).estimatedCost = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), targetHeadcount: (__row as any).targetHeadcount, requiredBatches: (__row as any).requiredBatches, requiredYieldQuantity: (__row as any).requiredYieldQuantity, estimatedCost: (__row as any).estimatedCost });
     }
     return __projectedRows;
@@ -3171,10 +3171,10 @@ export const listEventDishByDishId = query({
       }
       }
       }
-      (__row as any).targetHeadcount = (((__row as any).headcountOverride > 0) ? (__row as any).headcountOverride : (__row as any).event.expectedHeadcount);
+      (__row as any).targetHeadcount = ((((__row as any).headcountOverride != null) && ((__row as any).headcountOverride > 0)) ? (__row as any).headcountOverride : (__row as any).event.expectedHeadcount);
       (__row as any).requiredBatches = (() => { const __vals = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
       (__row as any).requiredYieldQuantity = (() => { const __vals = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * line.recipe.yieldQuantity))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
-      (__row as any).estimatedCost = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      (__row as any).estimatedCost = (((((__row as any).dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil(((__row as any).targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
       __projectedRows.push({ ...(__row as any), targetHeadcount: (__row as any).targetHeadcount, requiredBatches: (__row as any).requiredBatches, requiredYieldQuantity: (__row as any).requiredYieldQuantity, estimatedCost: (__row as any).estimatedCost });
     }
     return __projectedRows;
@@ -6309,8 +6309,8 @@ export const listRecipe = query({
       }
       (__row as any).isPublished = ((__row as any).status === "published");
       (__row as any).isEditable = ((__row as any).status === "draft");
-      (__row as any).liveBatchCost = (((((__row as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * line.wasteFactor) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-      (__row as any).liveCostPerGuest = (((__row as any).servesPerYield > 0) ? ((((((__row as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * line.wasteFactor) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) / (__row as any).servesPerYield) : 0);
+      (__row as any).liveBatchCost = (((((__row as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * ((line.wasteFactor != null) ? line.wasteFactor : 1)) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      (__row as any).liveCostPerGuest = (((__row as any).servesPerYield > 0) ? ((((((__row as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * ((line.wasteFactor != null) ? line.wasteFactor : 1)) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) / (__row as any).servesPerYield) : 0);
       __projectedRows.push({ ...(__row as any), isPublished: (__row as any).isPublished, isEditable: (__row as any).isEditable, liveBatchCost: (__row as any).liveBatchCost, liveCostPerGuest: (__row as any).liveCostPerGuest });
     }
     return __projectedRows;
@@ -6339,8 +6339,8 @@ export const getRecipe = query({
     }
     (__doc as any).isPublished = ((__doc as any).status === "published");
     (__doc as any).isEditable = ((__doc as any).status === "draft");
-    (__doc as any).liveBatchCost = (((((__doc as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * line.wasteFactor) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-    (__doc as any).liveCostPerGuest = (((__doc as any).servesPerYield > 0) ? ((((((__doc as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * line.wasteFactor) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) / (__doc as any).servesPerYield) : 0);
+    (__doc as any).liveBatchCost = (((((__doc as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * ((line.wasteFactor != null) ? line.wasteFactor : 1)) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+    (__doc as any).liveCostPerGuest = (((__doc as any).servesPerYield > 0) ? ((((((__doc as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * ((line.wasteFactor != null) ? line.wasteFactor : 1)) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) / (__doc as any).servesPerYield) : 0);
     const __hydrated = { ...(__doc as any), isPublished: (__doc as any).isPublished, isEditable: (__doc as any).isEditable, liveBatchCost: (__doc as any).liveBatchCost, liveCostPerGuest: (__doc as any).liveCostPerGuest };
     return __hydrated;
   },
@@ -6366,8 +6366,8 @@ export const listRecipeByTenantId = query({
       }
       (__row as any).isPublished = ((__row as any).status === "published");
       (__row as any).isEditable = ((__row as any).status === "draft");
-      (__row as any).liveBatchCost = (((((__row as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * line.wasteFactor) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
-      (__row as any).liveCostPerGuest = (((__row as any).servesPerYield > 0) ? ((((((__row as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * line.wasteFactor) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) / (__row as any).servesPerYield) : 0);
+      (__row as any).liveBatchCost = (((((__row as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * ((line.wasteFactor != null) ? line.wasteFactor : 1)) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+      (__row as any).liveCostPerGuest = (((__row as any).servesPerYield > 0) ? ((((((__row as any).ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * ((line.wasteFactor != null) ? line.wasteFactor : 1)) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) / (__row as any).servesPerYield) : 0);
       __projectedRows.push({ ...(__row as any), isPublished: (__row as any).isPublished, isEditable: (__row as any).isEditable, liveBatchCost: (__row as any).liveBatchCost, liveCostPerGuest: (__row as any).liveCostPerGuest });
     }
     return __projectedRows;
@@ -6523,9 +6523,9 @@ export const listRecipeIngredient = query({
       const __fk = ((__row as any) as any).ingredientId;
       ((__row as any) as any).ingredient = __fk != null ? await ctx.db.get(__fk as any) : null;
       }
-      (__row as any).adjustedQuantity = ((__row as any).quantity * (__row as any).wasteFactor);
+      (__row as any).adjustedQuantity = ((__row as any).quantity * (((__row as any).wasteFactor != null) ? (__row as any).wasteFactor : 1));
       (__row as any).unitsMatchIngredientPrice = ((__row as any).unit === (__row as any).ingredient.unit);
-      (__row as any).liveIngredientCost = (((__row as any).unit === (__row as any).ingredient.unit) ? (((__row as any).quantity * (__row as any).wasteFactor) * (__row as any).ingredient.costPerUnit) : 0);
+      (__row as any).liveIngredientCost = (((__row as any).unit === (__row as any).ingredient.unit) ? (((__row as any).quantity * (((__row as any).wasteFactor != null) ? (__row as any).wasteFactor : 1)) * (__row as any).ingredient.costPerUnit) : 0);
       __projectedRows.push({ ...(__row as any), adjustedQuantity: (__row as any).adjustedQuantity, unitsMatchIngredientPrice: (__row as any).unitsMatchIngredientPrice, liveIngredientCost: (__row as any).liveIngredientCost });
     }
     return __projectedRows;
@@ -6549,9 +6549,9 @@ export const getRecipeIngredient = query({
       const __fk = ((__doc as any) as any).ingredientId;
       ((__doc as any) as any).ingredient = __fk != null ? await ctx.db.get(__fk as any) : null;
     }
-    (__doc as any).adjustedQuantity = ((__doc as any).quantity * (__doc as any).wasteFactor);
+    (__doc as any).adjustedQuantity = ((__doc as any).quantity * (((__doc as any).wasteFactor != null) ? (__doc as any).wasteFactor : 1));
     (__doc as any).unitsMatchIngredientPrice = ((__doc as any).unit === (__doc as any).ingredient.unit);
-    (__doc as any).liveIngredientCost = (((__doc as any).unit === (__doc as any).ingredient.unit) ? (((__doc as any).quantity * (__doc as any).wasteFactor) * (__doc as any).ingredient.costPerUnit) : 0);
+    (__doc as any).liveIngredientCost = (((__doc as any).unit === (__doc as any).ingredient.unit) ? (((__doc as any).quantity * (((__doc as any).wasteFactor != null) ? (__doc as any).wasteFactor : 1)) * (__doc as any).ingredient.costPerUnit) : 0);
     const __hydrated = { ...(__doc as any), adjustedQuantity: (__doc as any).adjustedQuantity, unitsMatchIngredientPrice: (__doc as any).unitsMatchIngredientPrice, liveIngredientCost: (__doc as any).liveIngredientCost };
     return __hydrated;
   },
@@ -6572,9 +6572,9 @@ export const listRecipeIngredientByTenantId = query({
       const __fk = ((__row as any) as any).ingredientId;
       ((__row as any) as any).ingredient = __fk != null ? await ctx.db.get(__fk as any) : null;
       }
-      (__row as any).adjustedQuantity = ((__row as any).quantity * (__row as any).wasteFactor);
+      (__row as any).adjustedQuantity = ((__row as any).quantity * (((__row as any).wasteFactor != null) ? (__row as any).wasteFactor : 1));
       (__row as any).unitsMatchIngredientPrice = ((__row as any).unit === (__row as any).ingredient.unit);
-      (__row as any).liveIngredientCost = (((__row as any).unit === (__row as any).ingredient.unit) ? (((__row as any).quantity * (__row as any).wasteFactor) * (__row as any).ingredient.costPerUnit) : 0);
+      (__row as any).liveIngredientCost = (((__row as any).unit === (__row as any).ingredient.unit) ? (((__row as any).quantity * (((__row as any).wasteFactor != null) ? (__row as any).wasteFactor : 1)) * (__row as any).ingredient.costPerUnit) : 0);
       __projectedRows.push({ ...(__row as any), adjustedQuantity: (__row as any).adjustedQuantity, unitsMatchIngredientPrice: (__row as any).unitsMatchIngredientPrice, liveIngredientCost: (__row as any).liveIngredientCost });
     }
     return __projectedRows;
@@ -6598,9 +6598,9 @@ export const listRecipeIngredientByRecipeId = query({
       const __fk = ((__row as any) as any).ingredientId;
       ((__row as any) as any).ingredient = __fk != null ? await ctx.db.get(__fk as any) : null;
       }
-      (__row as any).adjustedQuantity = ((__row as any).quantity * (__row as any).wasteFactor);
+      (__row as any).adjustedQuantity = ((__row as any).quantity * (((__row as any).wasteFactor != null) ? (__row as any).wasteFactor : 1));
       (__row as any).unitsMatchIngredientPrice = ((__row as any).unit === (__row as any).ingredient.unit);
-      (__row as any).liveIngredientCost = (((__row as any).unit === (__row as any).ingredient.unit) ? (((__row as any).quantity * (__row as any).wasteFactor) * (__row as any).ingredient.costPerUnit) : 0);
+      (__row as any).liveIngredientCost = (((__row as any).unit === (__row as any).ingredient.unit) ? (((__row as any).quantity * (((__row as any).wasteFactor != null) ? (__row as any).wasteFactor : 1)) * (__row as any).ingredient.costPerUnit) : 0);
       __projectedRows.push({ ...(__row as any), adjustedQuantity: (__row as any).adjustedQuantity, unitsMatchIngredientPrice: (__row as any).unitsMatchIngredientPrice, liveIngredientCost: (__row as any).liveIngredientCost });
     }
     return __projectedRows;
@@ -6624,9 +6624,9 @@ export const listRecipeIngredientByIngredientId = query({
       const __fk = ((__row as any) as any).ingredientId;
       ((__row as any) as any).ingredient = __fk != null ? await ctx.db.get(__fk as any) : null;
       }
-      (__row as any).adjustedQuantity = ((__row as any).quantity * (__row as any).wasteFactor);
+      (__row as any).adjustedQuantity = ((__row as any).quantity * (((__row as any).wasteFactor != null) ? (__row as any).wasteFactor : 1));
       (__row as any).unitsMatchIngredientPrice = ((__row as any).unit === (__row as any).ingredient.unit);
-      (__row as any).liveIngredientCost = (((__row as any).unit === (__row as any).ingredient.unit) ? (((__row as any).quantity * (__row as any).wasteFactor) * (__row as any).ingredient.costPerUnit) : 0);
+      (__row as any).liveIngredientCost = (((__row as any).unit === (__row as any).ingredient.unit) ? (((__row as any).quantity * (((__row as any).wasteFactor != null) ? (__row as any).wasteFactor : 1)) * (__row as any).ingredient.costPerUnit) : 0);
       __projectedRows.push({ ...(__row as any), adjustedQuantity: (__row as any).adjustedQuantity, unitsMatchIngredientPrice: (__row as any).unitsMatchIngredientPrice, liveIngredientCost: (__row as any).liveIngredientCost });
     }
     return __projectedRows;

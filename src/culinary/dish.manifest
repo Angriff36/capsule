@@ -38,7 +38,8 @@ entity Dish mixin TenantScoped, SoftDeletable {
   property primaryRecipeId: uuid?
   // Canonical lineage: null means this row is a canonical root; otherwise a version of that root.
   property canonicalDishId: uuid?
-  property required editionNumber: int = 1
+  // Optional so existing dish rows validate before backfill; UI treats null as 1.
+  property editionNumber: int? = 1
   // Soft merge pointer — keep row for reference integrity; pickers prefer the target.
   property mergedIntoDishId: uuid?
 
@@ -152,31 +153,50 @@ entity Dish mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command retire(reason: string) {
+  // Retire = remove from the kitchen book (soft-delete). Historical EventDish
+  // references keep their dishId; the row is hidden from catalog pickers.
+  // Reason is optional — catering ops should not be blocked by audit prompts.
+  command retire(optional reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenAccess")
-    constraint retireDishReason: length(trim(reason)) > 0 "Retirement reason is required"
     mutate status = "retired"
     mutate retiredAt = now()
-    mutate retirementReason = reason
+    mutate retirementReason = reason != null ? reason : "Deleted"
+    mutate deletedAt = now()
     emit DishRetired {
       dishId: self.id
       tenantId: self.tenantId
-      reason: reason
+      reason: reason != null ? reason : "Deleted"
     }
   }
 
   command reinstate() {
     guard self.status == "retired"
-    guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenAccess")
     mutate status = "active"
     mutate retiredAt = null
     mutate retirementReason = null
+    mutate deletedAt = null
     emit DishReinstated {
       dishId: self.id
       tenantId: self.tenantId
+    }
+  }
+
+  // One-click hide from the kitchen book. Works whether the row is still
+  // active or already retired/merged without deletedAt — no restore dance.
+  command purge() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenAccess")
+    mutate status = "retired"
+    mutate retiredAt = self.retiredAt != null ? self.retiredAt : now()
+    mutate retirementReason = "Deleted"
+    mutate deletedAt = now()
+    emit DishPurged {
+      dishId: self.id
+      tenantId: self.tenantId
+      reason: "Deleted"
     }
   }
 
@@ -234,7 +254,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Soft-merge into another dish: retire this row and point pickers at the survivor.
+  // Soft-merge into another dish: hide this row and point pickers at the survivor.
   command mergeInto(targetDishId: uuid, reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -245,6 +265,7 @@ entity Dish mixin TenantScoped, SoftDeletable {
     mutate status = "retired"
     mutate retiredAt = now()
     mutate retirementReason = reason
+    mutate deletedAt = now()
     emit DishMerged {
       dishId: self.id
       tenantId: self.tenantId
@@ -512,6 +533,12 @@ event DishRetired: "dish.retired" {
 event DishReinstated: "dish.reinstated" {
   dishId: string
   tenantId: string
+}
+
+event DishPurged: "dish.purged" {
+  dishId: string
+  tenantId: string
+  reason: string
 }
 
 event DishPrimaryImageSet: "dish.primary_image_set" {

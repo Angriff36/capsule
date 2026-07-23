@@ -60,7 +60,8 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   property discontinuationReason: string?
   // Canonical lineage: null = root; otherwise a version of that root.
   property canonicalIngredientId: uuid?
-  property required editionNumber: int = 1
+  // Optional so existing ingredient rows validate before backfill; UI treats null as 1.
+  property editionNumber: int? = 1
   property mergedIntoIngredientId: uuid?
 
   hasMany recipeLines: RecipeIngredient
@@ -179,31 +180,49 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command discontinue(reason: string) {
+  // Discontinue = remove from the kitchen book (soft-delete). Recipe lines that
+  // still reference the id keep working; the row is hidden from catalog pickers.
+  // Reason is optional — no mandatory prompt for kitchen ops.
+  command discontinue(optional reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint discontinueReason: length(trim(reason)) > 0 "Discontinuation reason is required"
     mutate status = "discontinued"
     mutate discontinuedAt = now()
-    mutate discontinuationReason = reason
+    mutate discontinuationReason = reason != null ? reason : "Deleted"
+    mutate deletedAt = now()
     emit IngredientDiscontinued {
       ingredientId: self.id
       tenantId: self.tenantId
-      reason: reason
+      reason: reason != null ? reason : "Deleted"
     }
   }
 
   command reinstate() {
     guard self.status == "discontinued"
-    guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
     mutate status = "active"
     mutate discontinuedAt = null
     mutate discontinuationReason = null
+    mutate deletedAt = null
     emit IngredientReinstated {
       ingredientId: self.id
       tenantId: self.tenantId
+    }
+  }
+
+  // One-click hide. Works on active or already-discontinued rows — no restore first.
+  command purge() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "discontinued"
+    mutate discontinuedAt = self.discontinuedAt != null ? self.discontinuedAt : now()
+    mutate discontinuationReason = "Deleted"
+    mutate deletedAt = now()
+    emit IngredientPurged {
+      ingredientId: self.id
+      tenantId: self.tenantId
+      reason: "Deleted"
     }
   }
 
@@ -235,6 +254,7 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     mutate status = "discontinued"
     mutate discontinuedAt = now()
     mutate discontinuationReason = reason
+    mutate deletedAt = now()
     emit IngredientMerged {
       ingredientId: self.id
       tenantId: self.tenantId
@@ -285,6 +305,12 @@ event IngredientDiscontinued: "ingredient.discontinued" {
 event IngredientReinstated: "ingredient.reinstated" {
   ingredientId: string
   tenantId: string
+}
+
+event IngredientPurged: "ingredient.purged" {
+  ingredientId: string
+  tenantId: string
+  reason: string
 }
 
 event IngredientEditionCreated: "ingredient.edition_created" {

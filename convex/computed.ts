@@ -82,8 +82,8 @@ export async function hydrateComputedRelationsForEvent(ctx: any, doc: Record<str
         }
       }
     }
-    __agg0.targetHeadcount = ((__agg0.headcountOverride > 0) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
-    __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+    __agg0.targetHeadcount = (((__agg0.headcountOverride != null) && (__agg0.headcountOverride > 0)) ? __agg0.headcountOverride : __agg0.event.expectedHeadcount);
+    __agg0.estimatedCost = ((((__agg0.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((__agg0.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
   }
   (doc as any).assignments = await ctx.db.query("eventAssignments").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
   (doc as any).prepTasks = await ctx.db.query("prepTasks").withIndex("by_eventId", (q: any) => q.eq("eventId", docId)).collect();
@@ -161,13 +161,13 @@ export async function hydrateComputedRelationsForEventDish(ctx: any, doc: Record
 
 /** Computed fields for EventDish. Pass the stored (and hydrated) document. */
 export function computeEventDish(doc: Record<string, any>): Record<string, any> {
-  const __targetHeadcount = ((doc.headcountOverride > 0) ? doc.headcountOverride : doc.event.expectedHeadcount);
+  const __targetHeadcount = (((doc.headcountOverride != null) && (doc.headcountOverride > 0)) ? doc.headcountOverride : doc.event.expectedHeadcount);
   doc.targetHeadcount = __targetHeadcount;
   const __requiredBatches = (() => { const __vals = ((((doc.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.recipe.servesPerYield > 0) ? Math.ceil((doc.targetHeadcount / line.recipe.servesPerYield)) : 0))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
   doc.requiredBatches = __requiredBatches;
   const __requiredYieldQuantity = (() => { const __vals = ((((doc.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((doc.targetHeadcount / line.recipe.servesPerYield)) : 0) * line.recipe.yieldQuantity))).filter((v: unknown): v is number => typeof v === "number"); return __vals.length === 0 ? undefined : Math.max(...__vals); })();
   doc.requiredYieldQuantity = __requiredYieldQuantity;
-  const __estimatedCost = ((((doc.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((doc.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * il.wasteFactor) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+  const __estimatedCost = ((((doc.dish.recipeLines) ?? []).filter((line: Record<string, any>) => (((line.deletedAt == null) && (line.attachedAt != null))))) ?? []).map((line: Record<string, any>) => ((((line.recipe.servesPerYield > 0) ? Math.ceil((doc.targetHeadcount / line.recipe.servesPerYield)) : 0) * ((((line.recipe.ingredientLines) ?? []).filter((il: Record<string, any>) => (((il.deletedAt == null) && (il.addedAt != null))))) ?? []).map((il: Record<string, any>) => (((il.unit === il.ingredient.unit) ? ((il.quantity * ((il.wasteFactor != null) ? il.wasteFactor : 1)) * il.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0)))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
   doc.estimatedCost = __estimatedCost;
   return {
     targetHeadcount: __targetHeadcount,
@@ -318,9 +318,9 @@ export function computeRecipe(doc: Record<string, any>): Record<string, any> {
   doc.isPublished = __isPublished;
   const __isEditable = (doc.status === "draft");
   doc.isEditable = __isEditable;
-  const __liveBatchCost = ((((doc.ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * line.wasteFactor) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
+  const __liveBatchCost = ((((doc.ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * ((line.wasteFactor != null) ? line.wasteFactor : 1)) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0);
   doc.liveBatchCost = __liveBatchCost;
-  const __liveCostPerGuest = ((doc.servesPerYield > 0) ? (((((doc.ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * line.wasteFactor) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) / doc.servesPerYield) : 0);
+  const __liveCostPerGuest = ((doc.servesPerYield > 0) ? (((((doc.ingredientLines) ?? []).filter((line: Doc<"recipeIngredients">) => (((line.deletedAt == null) && (line.addedAt != null))))) ?? []).map((line: Record<string, any>) => (((line.unit === line.ingredient.unit) ? ((line.quantity * ((line.wasteFactor != null) ? line.wasteFactor : 1)) * line.ingredient.costPerUnit) : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) / doc.servesPerYield) : 0);
   doc.liveCostPerGuest = __liveCostPerGuest;
   return {
     isPublished: __isPublished,
@@ -341,11 +341,11 @@ export async function hydrateComputedRelationsForRecipeIngredient(ctx: any, doc:
 
 /** Computed fields for RecipeIngredient. Pass the stored (and hydrated) document. */
 export function computeRecipeIngredient(doc: Record<string, any>): Record<string, any> {
-  const __adjustedQuantity = (doc.quantity * doc.wasteFactor);
+  const __adjustedQuantity = (doc.quantity * ((doc.wasteFactor != null) ? doc.wasteFactor : 1));
   doc.adjustedQuantity = __adjustedQuantity;
   const __unitsMatchIngredientPrice = (doc.unit === doc.ingredient.unit);
   doc.unitsMatchIngredientPrice = __unitsMatchIngredientPrice;
-  const __liveIngredientCost = ((doc.unit === doc.ingredient.unit) ? ((doc.quantity * doc.wasteFactor) * doc.ingredient.costPerUnit) : 0);
+  const __liveIngredientCost = ((doc.unit === doc.ingredient.unit) ? ((doc.quantity * ((doc.wasteFactor != null) ? doc.wasteFactor : 1)) * doc.ingredient.costPerUnit) : 0);
   doc.liveIngredientCost = __liveIngredientCost;
   return {
     adjustedQuantity: __adjustedQuantity,

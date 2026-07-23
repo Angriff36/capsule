@@ -23,8 +23,9 @@ entity Recipe mixin TenantScoped, SoftDeletable {
   property required yieldQuantity: decimal(10, 2) = 1
   property required yieldUnit: UnitOfMeasure = "portion"
   // Guests served by one yieldQuantity batch (e.g. 1 gallon lemonade → 5 people).
-  property required servesPerYield: int = 1
-  property required batchMultiplier: decimal(10, 4) = 1
+  // Optional so pre-field Recipe rows validate under Convex schema push.
+  property servesPerYield: int? = 1
+  property batchMultiplier: decimal(10, 4)? = 1
   property required status: RecipeStatus = "draft"
   property draftedAt: datetime?
   property publishedAt: datetime?
@@ -38,8 +39,8 @@ entity Recipe mixin TenantScoped, SoftDeletable {
   computed isEditable: boolean = self.status == "draft"
   // Live batch cost from non-deleted ingredient lines (Ingredient.costPerUnit).
   // Inlined line cost (not line.liveIngredientCost) so Convex projection can emit one expression.
-  computed liveBatchCost: money(12, 2) = sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * line.wasteFactor * line.ingredient.costPerUnit : 0)
-  computed liveCostPerGuest: money(12, 2) = self.servesPerYield > 0 ? sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * line.wasteFactor * line.ingredient.costPerUnit : 0) / self.servesPerYield : 0
+  computed liveBatchCost: money(12, 2) = sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * (line.wasteFactor != null ? line.wasteFactor : 1) * line.ingredient.costPerUnit : 0)
+  computed liveCostPerGuest: money(12, 2) = self.servesPerYield > 0 ? sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * (line.wasteFactor != null ? line.wasteFactor : 1) * line.ingredient.costPerUnit : 0) / self.servesPerYield : 0
 
   constraint recipeIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Drafted recipes require a name"
   constraint recipeYieldPositive: self.yieldQuantity > 0 "Recipe yield quantity must be positive"
@@ -176,18 +177,34 @@ entity Recipe mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command retire(reason: string) {
+  // Retire = remove from the kitchen book (soft-delete). Reason optional.
+  command retire(optional reason: string) {
     guard self.status == "draft" or self.status == "published"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint retireReason: length(trim(reason)) > 0 "Retirement reason is required"
     mutate status = "retired"
     mutate retiredAt = now()
-    mutate retirementReason = reason
+    mutate retirementReason = reason != null ? reason : "Deleted"
+    mutate deletedAt = now()
     emit RecipeRetired {
       recipeId: self.id
       tenantId: self.tenantId
-      reason: reason
+      reason: reason != null ? reason : "Deleted"
+    }
+  }
+
+  // One-click hide from any non-deleted status — no restore dance.
+  command purge() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "retired"
+    mutate retiredAt = self.retiredAt != null ? self.retiredAt : now()
+    mutate retirementReason = "Deleted"
+    mutate deletedAt = now()
+    emit RecipePurged {
+      recipeId: self.id
+      tenantId: self.tenantId
+      reason: "Deleted"
     }
   }
 
@@ -205,22 +222,23 @@ entity RecipeIngredient mixin TenantScoped, SoftDeletable {
   property required unit: UnitOfMeasure = "each"
   property required sortOrder: int = 0
   // Waste / trim multiplier (1.0 = no waste). Applied before live cost.
-  property required wasteFactor: decimal(10, 4) = 1
+  // Optional so pre-field RecipeIngredient rows validate under Convex schema push.
+  property wasteFactor: decimal(10, 4)? = 1
   property prepNotes: string?
   property addedAt: datetime?
 
   belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
 
-  computed adjustedQuantity: decimal(10, 4) = self.quantity * self.wasteFactor
+  computed adjustedQuantity: decimal(10, 4) = self.quantity * (self.wasteFactor != null ? self.wasteFactor : 1)
   // Capsule prices recipes from Ingredient.costPerUnit (catalog). Same-unit
   // only — do not silently multiply incompatible UnitOfMeasure values.
   // Cross-unit conversion remains in RecipeCostCalculator until Manifest owns factors.
   computed unitsMatchIngredientPrice: boolean = self.unit == self.ingredient.unit
-  computed liveIngredientCost: money(12, 2) = self.unit == self.ingredient.unit ? self.quantity * self.wasteFactor * self.ingredient.costPerUnit : 0
+  computed liveIngredientCost: money(12, 2) = self.unit == self.ingredient.unit ? self.quantity * (self.wasteFactor != null ? self.wasteFactor : 1) * self.ingredient.costPerUnit : 0
 
   constraint lineQuantityPositive: self.addedAt == null or self.quantity > 0 "Recipe ingredient quantity must be positive"
-  constraint lineWasteFactorPositive: self.addedAt == null or self.wasteFactor > 0 "Waste factor must be greater than 0"
+  constraint lineWasteFactorPositive: self.addedAt == null or self.wasteFactor == null or self.wasteFactor > 0 "Waste factor must be greater than 0"
 
   default policy recipeIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read recipe ingredient lines"
   default policy recipeIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write recipe ingredient lines through commands"
@@ -436,6 +454,12 @@ event RecipeVersionRetracted: "recipe.version_retracted" {
 }
 
 event RecipeRetired: "recipe.retired" {
+  recipeId: string
+  tenantId: string
+  reason: string
+}
+
+event RecipePurged: "recipe.purged" {
   recipeId: string
   tenantId: string
   reason: string

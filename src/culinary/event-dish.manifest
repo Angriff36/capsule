@@ -24,8 +24,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   // do not force 1 when the dish is for the whole event. Live food cost uses
   // targetHeadcount below, not this field.
   property required quantityServings: int = 1
-  // 0 = no override (use Event.expectedHeadcount). >0 = this dish's guest count.
-  property required headcountOverride: int = 0
+  // 0/null = no override (use Event.expectedHeadcount). >0 = this dish's guest count.
+  // Optional so pre-field EventDish rows still validate under Convex schema push.
+  property headcountOverride: int? = 0
   // Denormalized from Event at add time for BOM → weekly purchasing reactions.
   property purchasingWeekStart: datetime?
   property course: string?
@@ -37,7 +38,7 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
 
-  computed targetHeadcount: int = self.headcountOverride > 0 ? self.headcountOverride : self.event.expectedHeadcount
+  computed targetHeadcount: int = self.headcountOverride != null and self.headcountOverride > 0 ? self.headcountOverride : self.event.expectedHeadcount
   // Display helper: largest batch count across attached recipes (lemonade = one recipe).
   // Headcount uses self.targetHeadcount (sibling computed; Convex helpers assign in order).
   computed requiredBatches: int = max_of(filter(self.dish.recipeLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => line.recipe.servesPerYield > 0 ? ceil(self.targetHeadcount / line.recipe.servesPerYield) : 0)
@@ -45,11 +46,11 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   // Sum of ceil(headcount / servesPerYield) × same-unit ingredient batch cost per attached recipe.
   // Batch cost is inlined (not line.recipe.liveBatchCost) so Convex hydrate can load
   // recipe.ingredientLines → ingredient without a nested compute pass.
-  computed estimatedCost: money(12, 2) = sum(filter(self.dish.recipeLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.recipe.servesPerYield > 0 ? ceil(self.targetHeadcount / line.recipe.servesPerYield) : 0) * sum(filter(line.recipe.ingredientLines, (il) => il.deletedAt == null and il.addedAt != null), (il) => il.unit == il.ingredient.unit ? il.quantity * il.wasteFactor * il.ingredient.costPerUnit : 0))
+  computed estimatedCost: money(12, 2) = sum(filter(self.dish.recipeLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.recipe.servesPerYield > 0 ? ceil(self.targetHeadcount / line.recipe.servesPerYield) : 0) * sum(filter(line.recipe.ingredientLines, (il) => il.deletedAt == null and il.addedAt != null), (il) => il.unit == il.ingredient.unit ? il.quantity * (il.wasteFactor != null ? il.wasteFactor : 1) * il.ingredient.costPerUnit : 0))
 
   // Zero servings = 86'd / not serving; remove() is the other path.
   constraint eventDishServingsNonnegative: self.addedAt == null or self.quantityServings >= 0 "Event dish servings cannot be negative"
-  constraint eventDishHeadcountOverrideNonnegative: self.headcountOverride >= 0 "Headcount override cannot be negative"
+  constraint eventDishHeadcountOverrideNonnegative: self.headcountOverride == null or self.headcountOverride >= 0 "Headcount override cannot be negative"
 
   // Read: any staff on this tenant. Write/execute: managers+.
   default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dishes"

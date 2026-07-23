@@ -310,7 +310,7 @@ export const DishSchema = z.object({
   primaryImageFileName: z.string().nullable().optional(),
   primaryRecipeId: z.string().uuid().nullable().optional(),
   canonicalDishId: z.string().uuid().nullable().optional(),
-  editionNumber: z.number().int().default(1),
+  editionNumber: z.number().int().nullable().optional().default(1),
   mergedIntoDishId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -631,7 +631,7 @@ export const EventDishSchema = z.object({
   eventId: z.string().uuid(),
   dishId: z.string().uuid(),
   quantityServings: z.number().int().default(1),
-  headcountOverride: z.number().int().min(0).default(0),
+  headcountOverride: z.number().int().nullable().optional().default(0),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   course: z.string().nullable().optional(),
   serviceStyle: z.string().nullable().optional(),
@@ -860,7 +860,7 @@ export const IngredientSchema = z.object({
   discontinuedAt: z.coerce.date().nullable().optional(),
   discontinuationReason: z.string().nullable().optional(),
   canonicalIngredientId: z.string().uuid().nullable().optional(),
-  editionNumber: z.number().int().default(1),
+  editionNumber: z.number().int().nullable().optional().default(1),
   mergedIntoIngredientId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
@@ -1569,8 +1569,8 @@ export const RecipeSchema = z.object({
   versionNumber: z.number().int().default(1),
   yieldQuantity: z.number().min(1).default(1),
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("portion"),
-  servesPerYield: z.number().int().min(1).default(1),
-  batchMultiplier: z.number().min(1).default(1),
+  servesPerYield: z.number().int().min(1).nullable().optional().default(1),
+  batchMultiplier: z.number().min(1).nullable().optional().default(1),
   status: z.enum(["draft", "published", "retired"]).default("draft"),
   draftedAt: z.coerce.date().nullable().optional(),
   publishedAt: z.coerce.date().nullable().optional(),
@@ -1661,7 +1661,7 @@ export const RecipeIngredientSchema = z.object({
   quantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
   sortOrder: z.number().int().default(0),
-  wasteFactor: z.number().default(1),
+  wasteFactor: z.number().nullable().optional().default(1),
   prepNotes: z.string().nullable().optional(),
   addedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
@@ -2766,6 +2766,11 @@ export const DishMergeIntoParamsSchema = z.object({
 
 export type DishMergeIntoParams = z.infer<typeof DishMergeIntoParamsSchema>;
 
+// Command: purge on Dish
+export const DishPurgeParamsSchema = z.object({});
+
+export type DishPurgeParams = z.infer<typeof DishPurgeParamsSchema>;
+
 // Command: reinstate on Dish
 export const DishReinstateParamsSchema = z.object({});
 
@@ -2773,7 +2778,7 @@ export type DishReinstateParams = z.infer<typeof DishReinstateParamsSchema>;
 
 // Command: retire on Dish
 export const DishRetireParamsSchema = z.object({
-  reason: z.string(),
+  reason: z.string().optional(),
 });
 
 export type DishRetireParams = z.infer<typeof DishRetireParamsSchema>;
@@ -3553,7 +3558,7 @@ export type IngredientConfigureSubstitutesParams = z.infer<typeof IngredientConf
 
 // Command: discontinue on Ingredient
 export const IngredientDiscontinueParamsSchema = z.object({
-  reason: z.string(),
+  reason: z.string().optional(),
 });
 
 export type IngredientDiscontinueParams = z.infer<typeof IngredientDiscontinueParamsSchema>;
@@ -3585,6 +3590,11 @@ export const IngredientMergeIntoParamsSchema = z.object({
 });
 
 export type IngredientMergeIntoParams = z.infer<typeof IngredientMergeIntoParamsSchema>;
+
+// Command: purge on Ingredient
+export const IngredientPurgeParamsSchema = z.object({});
+
+export type IngredientPurgeParams = z.infer<typeof IngredientPurgeParamsSchema>;
 
 // Command: reinstate on Ingredient
 export const IngredientReinstateParamsSchema = z.object({});
@@ -4407,6 +4417,13 @@ export const PersonTerminateParamsSchema = z.object({
 
 export type PersonTerminateParams = z.infer<typeof PersonTerminateParamsSchema>;
 
+// Command: assign on PrepTask
+export const PrepTaskAssignParamsSchema = z.object({
+  personId: z.string().min(1),
+});
+
+export type PrepTaskAssignParams = z.infer<typeof PrepTaskAssignParamsSchema>;
+
 // Command: cancel on PrepTask
 export const PrepTaskCancelParamsSchema = z.object({
   reason: z.string(),
@@ -4771,9 +4788,14 @@ export const RecipePublishVersionParamsSchema = z.object({});
 
 export type RecipePublishVersionParams = z.infer<typeof RecipePublishVersionParamsSchema>;
 
+// Command: purge on Recipe
+export const RecipePurgeParamsSchema = z.object({});
+
+export type RecipePurgeParams = z.infer<typeof RecipePurgeParamsSchema>;
+
 // Command: retire on Recipe
 export const RecipeRetireParamsSchema = z.object({
-  reason: z.string(),
+  reason: z.string().optional(),
 });
 
 export type RecipeRetireParams = z.infer<typeof RecipeRetireParamsSchema>;

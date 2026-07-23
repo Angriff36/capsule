@@ -154,6 +154,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Dish_mergeInto", () => {
     expect(typeof (mutations as any).Dish_mergeInto).toBe("function");
   });
+  it("exports mutation Dish_purge", () => {
+    expect(typeof (mutations as any).Dish_purge).toBe("function");
+  });
   it("exports mutation Dish_reinstate", () => {
     expect(typeof (mutations as any).Dish_reinstate).toBe("function");
   });
@@ -442,6 +445,9 @@ describe("Manifest Convex contract", () => {
   });
   it("exports mutation Ingredient_mergeInto", () => {
     expect(typeof (mutations as any).Ingredient_mergeInto).toBe("function");
+  });
+  it("exports mutation Ingredient_purge", () => {
+    expect(typeof (mutations as any).Ingredient_purge).toBe("function");
   });
   it("exports mutation Ingredient_reinstate", () => {
     expect(typeof (mutations as any).Ingredient_reinstate).toBe("function");
@@ -755,6 +761,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Person_terminate", () => {
     expect(typeof (mutations as any).Person_terminate).toBe("function");
   });
+  it("exports mutation PrepTask_assign", () => {
+    expect(typeof (mutations as any).PrepTask_assign).toBe("function");
+  });
   it("exports mutation PrepTask_cancel", () => {
     expect(typeof (mutations as any).PrepTask_cancel).toBe("function");
   });
@@ -889,6 +898,9 @@ describe("Manifest Convex contract", () => {
   });
   it("exports mutation Recipe_publishVersion", () => {
     expect(typeof (mutations as any).Recipe_publishVersion).toBe("function");
+  });
+  it("exports mutation Recipe_purge", () => {
+    expect(typeof (mutations as any).Recipe_purge).toBe("function");
   });
   it("exports mutation Recipe_retire", () => {
     expect(typeof (mutations as any).Recipe_retire).toBe("function");
@@ -1291,4 +1303,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 428 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 432 as const;
