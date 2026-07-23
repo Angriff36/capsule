@@ -530,10 +530,11 @@ entity Event mixin TenantScoped, SoftDeletable {
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
   ref recurrenceTemplateEvent: Event fields [tenantId, recurrenceTemplateEventId] references [tenantId, id]
   hasMany guests: EventGuest
-  // EventDish inverse remains omitted (PB010) — culinary entry still compiles
-  // without production/logistics. Ops inverses below require compile entry
-  // packing.manifest / time.manifest (or later) so PrepTask/PackList/Delivery/
-  // EventAssignment are in scope.
+  // EventDish inverse for live estimatedFoodCost rollup (2026-07-23). Culinary
+  // EventDish is in the root compile entry; forward ref is resolved at merge.
+  hasMany eventDishes: EventDish
+  // Ops inverses below require compile entry packing.manifest / time.manifest
+  // (or later) so PrepTask/PackList/Delivery/EventAssignment are in scope.
   hasMany prepTasks: PrepTask
   hasMany packLists: PackList
   hasMany deliveries: Delivery
@@ -552,6 +553,9 @@ entity Event mixin TenantScoped, SoftDeletable {
   // packing/packed/loaded still block until dispatched. Same predicate
   // inlined in beginExecution (PB007 twin).
   computed isReadyForExecution: boolean = count_of(self.prepTasks, (t) => t.status != "completed" and t.status != "cancelled") == 0 and count_of(self.packLists, (p) => p.status != "dispatched" and p.status != "cancelled" and p.status != "draft") == 0 and count_of(self.deliveries, (d) => d.status != "delivered" and d.status != "cancelled" and d.status != "failed") == 0
+  // Live internal food-cost estimate from menu dishes. Does NOT overwrite
+  // budgets, invoices, quotedPrice, or locked customer prices.
+  computed estimatedFoodCost: money(12, 2) = sum(filter(self.eventDishes, (item) => item.deletedAt == null and item.addedAt != null), (item) => item.estimatedCost)
 
   // plannedAt gates full engagement invariants while planEngagement mutates fields.
   constraint eventPlanComplete: self.plannedAt == null or (length(trim(self.title)) > 0 and length(trim(self.eventType)) > 0 and self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.expectedHeadcount >= 1 and self.expectedHeadcount <= 100000 and self.primaryContactName != null and length(trim(self.primaryContactName)) > 0) "Planned events require a title, type, valid date range, headcount, and primary contact"

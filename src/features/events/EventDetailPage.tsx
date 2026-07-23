@@ -47,6 +47,7 @@ import { downloadBeoPdf } from "./beoPdf";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { EventDetailRevisePanels } from "./EventDetailRevisePanels";
 import { EventEquipmentPanel } from "./EventEquipmentPanel";
+import { EventMenuPanel } from "./EventMenuPanel";
 import { EventGuestPanel } from "./EventGuestPanel";
 import { EventIncidentPanel } from "./EventIncidentPanel";
 import { EventTimelinePanel } from "./EventTimelinePanel";
@@ -392,6 +393,11 @@ export function EventDetailPage() {
           onChangeRequirements={changeRequirements}
         />
       </div>
+
+      <EventMenuPanel
+        eventId={event._id}
+        expectedHeadcount={Number(event.expectedHeadcount) || 0}
+      />
 
       <RecurringEventPanel
         eventId={event._id}

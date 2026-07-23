@@ -86,7 +86,7 @@ export function EventAllergenBriefingPage() {
         if (!wanted) continue;
         const hits = menu
           .filter((item) =>
-            (item.dish?.allergenSummary ?? []).some((allergen) => {
+            (item.dish?.allergenSummary ?? []).some((allergen: string) => {
               const present = normalize(allergen);
               return present === wanted || wanted.includes(present);
             }),

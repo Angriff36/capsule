@@ -158,6 +158,7 @@ export function RecipeDetailPage() {
         yieldQuantity: Number(data.get("yieldQuantity")),
         yieldUnit: String(data.get("yieldUnit")) as (typeof UNITS)[number],
         batchMultiplier: Number(data.get("batchMultiplier")),
+        servesPerYield: Number(data.get("servesPerYield")),
         category: optional(data.get("category")),
         cuisine: optional(data.get("cuisine")),
         description: optional(data.get("description")),
@@ -259,6 +260,13 @@ export function RecipeDetailPage() {
             <dt>Yield</dt>
             <dd>
               {recipe.yieldQuantity} {String(recipe.yieldUnit)}
+            </dd>
+          </div>
+          <div>
+            <dt>Serves per yield</dt>
+            <dd>
+              {(recipe as { servesPerYield?: number }).servesPerYield ?? 1}{" "}
+              guests
             </dd>
           </div>
           <div>
@@ -590,6 +598,20 @@ function RecipeEditForm({
             step="0.01"
             className="input"
             defaultValue={recipe.batchMultiplier}
+            required
+          />
+        </label>
+        <label className="field-label">
+          Serves per yield
+          <input
+            name="servesPerYield"
+            type="number"
+            min={1}
+            step={1}
+            className="input"
+            defaultValue={
+              (recipe as { servesPerYield?: number }).servesPerYield ?? 1
+            }
             required
           />
         </label>

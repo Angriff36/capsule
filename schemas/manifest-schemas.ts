@@ -530,6 +530,7 @@ export const EventComputedSchema = EventSchema.extend({
   isTerminal: z.boolean(),
   isEditable: z.boolean(),
   isReadyForExecution: z.boolean(),
+  estimatedFoodCost: z.number(),
 });
 
 export type Event = z.infer<typeof EventSchema>;
@@ -618,6 +619,7 @@ export const EventDishSchema = z.object({
   eventId: z.string().uuid(),
   dishId: z.string().uuid(),
   quantityServings: z.number().int().default(1),
+  headcountOverride: z.number().int().min(0).default(0),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   course: z.string().nullable().optional(),
   serviceStyle: z.string().nullable().optional(),
@@ -628,7 +630,16 @@ export const EventDishSchema = z.object({
   updatedAt: z.coerce.date().optional(),
 });
 
+// Computed: EventDish
+export const EventDishComputedSchema = EventDishSchema.extend({
+  targetHeadcount: z.number().int(),
+  requiredBatches: z.number().int(),
+  requiredYieldQuantity: z.number(),
+  estimatedCost: z.number(),
+});
+
 export type EventDish = z.infer<typeof EventDishSchema>;
+export type EventDishWithComputed = z.infer<typeof EventDishComputedSchema>;
 
 // Entity: EventDishRecipeSeed
 export const EventDishRecipeSeedSchema = z.object({
@@ -1500,6 +1511,7 @@ export const RecipeSchema = z.object({
   versionNumber: z.number().int().default(1),
   yieldQuantity: z.number().min(1).default(1),
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("portion"),
+  servesPerYield: z.number().int().min(1).default(1),
   batchMultiplier: z.number().min(1).default(1),
   status: z.enum(["draft", "published", "retired"]).default("draft"),
   draftedAt: z.coerce.date().nullable().optional(),
@@ -1514,6 +1526,8 @@ export const RecipeSchema = z.object({
 export const RecipeComputedSchema = RecipeSchema.extend({
   isPublished: z.boolean(),
   isEditable: z.boolean(),
+  liveBatchCost: z.number(),
+  liveCostPerGuest: z.number(),
 });
 
 export type Recipe = z.infer<typeof RecipeSchema>;
@@ -1589,13 +1603,22 @@ export const RecipeIngredientSchema = z.object({
   quantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
   sortOrder: z.number().int().default(0),
+  wasteFactor: z.number().default(1),
   prepNotes: z.string().nullable().optional(),
   addedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
 
+// Computed: RecipeIngredient
+export const RecipeIngredientComputedSchema = RecipeIngredientSchema.extend({
+  adjustedQuantity: z.number(),
+  unitsMatchIngredientPrice: z.boolean(),
+  liveIngredientCost: z.number(),
+});
+
 export type RecipeIngredient = z.infer<typeof RecipeIngredientSchema>;
+export type RecipeIngredientWithComputed = z.infer<typeof RecipeIngredientComputedSchema>;
 
 // Entity: RecipeStep
 export const RecipeStepSchema = z.object({
@@ -1631,6 +1654,87 @@ export const RecurringAvailabilitySchema = z.object({
 });
 
 export type RecurringAvailability = z.infer<typeof RecurringAvailabilitySchema>;
+
+// Entity: RequestForQuote
+export const RequestForQuoteSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  rfqNumber: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  responseDeadline: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid().nullable().optional(),
+  status: z.enum(["draft", "issued", "awarded", "cancelled"]).default("draft"),
+  openedAt: z.coerce.date().nullable().optional(),
+  issuedAt: z.coerce.date().nullable().optional(),
+  awardedAt: z.coerce.date().nullable().optional(),
+  cancelledAt: z.coerce.date().nullable().optional(),
+  cancellationReason: z.string().nullable().optional(),
+  winningRfqVendorId: z.string().uuid().nullable().optional(),
+  winningVendorId: z.string().uuid().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type RequestForQuote = z.infer<typeof RequestForQuoteSchema>;
+
+// Entity: RfqLine
+export const RfqLineSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  rfqId: z.string().uuid(),
+  purchaseNeedId: z.string().uuid(),
+  ingredientId: z.string().uuid(),
+  requiredQuantity: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type RfqLine = z.infer<typeof RfqLineSchema>;
+
+// Entity: RfqQuote
+export const RfqQuoteSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  rfqId: z.string().uuid(),
+  rfqVendorId: z.string().uuid(),
+  rfqLineId: z.string().uuid(),
+  vendorId: z.string().uuid(),
+  ingredientId: z.string().uuid(),
+  unitPrice: z.number().default(0),
+  leadTimeDays: z.number().int().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  submittedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type RfqQuote = z.infer<typeof RfqQuoteSchema>;
+
+// Entity: RfqVendor
+export const RfqVendorSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  rfqId: z.string().uuid(),
+  vendorId: z.string().uuid(),
+  status: z.enum(["invited", "awarded", "declined"]).default("invited"),
+  isCompliant: z.boolean().default(true),
+  leadTimeDays: z.number().int().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  invitedAt: z.coerce.date().nullable().optional(),
+  awardedAt: z.coerce.date().nullable().optional(),
+  declinedAt: z.coerce.date().nullable().optional(),
+  declineReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type RfqVendor = z.infer<typeof RfqVendorSchema>;
 
 // Entity: SavedReportDefinition
 export const SavedReportDefinitionSchema = z.object({
@@ -3100,6 +3204,7 @@ export const EventDishAddToEventParamsSchema = z.object({
   eventId: z.string().min(1),
   dishId: z.string().min(1),
   quantityServings: z.number(),
+  headcountOverride: z.number().int().optional(),
   course: z.string().optional(),
   serviceStyle: z.string().optional(),
   specialInstructions: z.string().optional(),
@@ -3140,6 +3245,13 @@ export const EventDishRemoveParamsSchema = z.object({
 });
 
 export type EventDishRemoveParams = z.infer<typeof EventDishRemoveParamsSchema>;
+
+// Command: setHeadcountOverride on EventDish
+export const EventDishSetHeadcountOverrideParamsSchema = z.object({
+  headcountOverride: z.number().int(),
+});
+
+export type EventDishSetHeadcountOverrideParams = z.infer<typeof EventDishSetHeadcountOverrideParamsSchema>;
 
 // Command: updateInstructions on EventDish
 export const EventDishUpdateInstructionsParamsSchema = z.object({
@@ -4546,6 +4658,7 @@ export const RecipeDraftParamsSchema = z.object({
   name: z.string(),
   yieldQuantity: z.number(),
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  servesPerYield: z.number().int().optional(),
   batchMultiplier: z.number().optional(),
   category: z.string().optional(),
   cuisine: z.string().optional(),
@@ -4578,6 +4691,7 @@ export const RecipeReviseDraftParamsSchema = z.object({
   yieldQuantity: z.number(),
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   batchMultiplier: z.number(),
+  servesPerYield: z.number().int().optional(),
   category: z.string().optional(),
   cuisine: z.string().optional(),
   description: z.string().optional(),
@@ -4585,6 +4699,13 @@ export const RecipeReviseDraftParamsSchema = z.object({
 });
 
 export type RecipeReviseDraftParams = z.infer<typeof RecipeReviseDraftParamsSchema>;
+
+// Command: setServesPerYield on Recipe
+export const RecipeSetServesPerYieldParamsSchema = z.object({
+  servesPerYield: z.number().int(),
+});
+
+export type RecipeSetServesPerYieldParams = z.infer<typeof RecipeSetServesPerYieldParamsSchema>;
 
 // Command: approveReview on RecipeImport
 export const RecipeImportApproveReviewParamsSchema = z.object({});
@@ -4736,6 +4857,7 @@ export const RecipeIngredientAddParamsSchema = z.object({
   quantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   sortOrder: z.number().optional(),
+  wasteFactor: z.number().optional(),
   prepNotes: z.string().optional(),
 });
 
@@ -4755,6 +4877,13 @@ export const RecipeIngredientRemoveParamsSchema = z.object({
 });
 
 export type RecipeIngredientRemoveParams = z.infer<typeof RecipeIngredientRemoveParamsSchema>;
+
+// Command: setWasteFactor on RecipeIngredient
+export const RecipeIngredientSetWasteFactorParamsSchema = z.object({
+  wasteFactor: z.number(),
+});
+
+export type RecipeIngredientSetWasteFactorParams = z.infer<typeof RecipeIngredientSetWasteFactorParamsSchema>;
 
 // Command: add on RecipeStep
 export const RecipeStepAddParamsSchema = z.object({
@@ -4797,6 +4926,98 @@ export type RecurringAvailabilityDeclareParams = z.infer<typeof RecurringAvailab
 export const RecurringAvailabilityWithdrawParamsSchema = z.object({});
 
 export type RecurringAvailabilityWithdrawParams = z.infer<typeof RecurringAvailabilityWithdrawParamsSchema>;
+
+// Command: cancel on RequestForQuote
+export const RequestForQuoteCancelParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type RequestForQuoteCancelParams = z.infer<typeof RequestForQuoteCancelParamsSchema>;
+
+// Command: issue on RequestForQuote
+export const RequestForQuoteIssueParamsSchema = z.object({});
+
+export type RequestForQuoteIssueParams = z.infer<typeof RequestForQuoteIssueParamsSchema>;
+
+// Command: markAwarded on RequestForQuote
+export const RequestForQuoteMarkAwardedParamsSchema = z.object({
+  rfqVendorId: z.string().min(1),
+  vendorId: z.string().min(1),
+});
+
+export type RequestForQuoteMarkAwardedParams = z.infer<typeof RequestForQuoteMarkAwardedParamsSchema>;
+
+// Command: open on RequestForQuote
+export const RequestForQuoteOpenParamsSchema = z.object({
+  rfqNumber: z.string().optional(),
+  notes: z.string().optional(),
+  responseDeadline: z.coerce.date().optional(),
+  eventId: z.string().min(1).optional(),
+});
+
+export type RequestForQuoteOpenParams = z.infer<typeof RequestForQuoteOpenParamsSchema>;
+
+// Command: add on RfqLine
+export const RfqLineAddParamsSchema = z.object({
+  rfqId: z.string().min(1),
+  purchaseNeedId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  requiredQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+});
+
+export type RfqLineAddParams = z.infer<typeof RfqLineAddParamsSchema>;
+
+// Command: remove on RfqLine
+export const RfqLineRemoveParamsSchema = z.object({});
+
+export type RfqLineRemoveParams = z.infer<typeof RfqLineRemoveParamsSchema>;
+
+// Command: submit on RfqQuote
+export const RfqQuoteSubmitParamsSchema = z.object({
+  rfqId: z.string().min(1),
+  rfqVendorId: z.string().min(1),
+  rfqLineId: z.string().min(1),
+  vendorId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  unitPrice: z.number(),
+  leadTimeDays: z.number().int().optional(),
+  notes: z.string().optional(),
+});
+
+export type RfqQuoteSubmitParams = z.infer<typeof RfqQuoteSubmitParamsSchema>;
+
+// Command: award on RfqVendor
+export const RfqVendorAwardParamsSchema = z.object({});
+
+export type RfqVendorAwardParams = z.infer<typeof RfqVendorAwardParamsSchema>;
+
+// Command: decline on RfqVendor
+export const RfqVendorDeclineParamsSchema = z.object({
+  reason: z.string().optional(),
+});
+
+export type RfqVendorDeclineParams = z.infer<typeof RfqVendorDeclineParamsSchema>;
+
+// Command: invite on RfqVendor
+export const RfqVendorInviteParamsSchema = z.object({
+  rfqId: z.string().min(1),
+  vendorId: z.string().min(1),
+});
+
+export type RfqVendorInviteParams = z.infer<typeof RfqVendorInviteParamsSchema>;
+
+// Command: remove on RfqVendor
+export const RfqVendorRemoveParamsSchema = z.object({});
+
+export type RfqVendorRemoveParams = z.infer<typeof RfqVendorRemoveParamsSchema>;
+
+// Command: setCompliant on RfqVendor
+export const RfqVendorSetCompliantParamsSchema = z.object({
+  isCompliant: z.boolean(),
+});
+
+export type RfqVendorSetCompliantParams = z.infer<typeof RfqVendorSetCompliantParamsSchema>;
 
 // Command: archive on SavedReportDefinition
 export const SavedReportDefinitionArchiveParamsSchema = z.object({});
@@ -5397,7 +5618,7 @@ export const VendorOrderEnsureWeeklyDraftParamsSchema = z.object({
   vendorId: z.string().min(1),
   sourceRangeStart: z.coerce.date(),
   sourceRangeEnd: z.coerce.date(),
-  purchaseNeedId: z.string().uuid(),
+  purchaseNeedId: z.string().min(1),
   ingredientDemandId: z.string().min(1),
   ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
@@ -5483,7 +5704,7 @@ export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({
   contributionQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   unitCost: z.number(),
-  purchaseNeedId: z.string().uuid(),
+  purchaseNeedId: z.string().min(1),
   ingredientDemandId: z.string().min(1),
 });
 
@@ -5623,7 +5844,7 @@ export type WeeklyPurchasingConfigConfigureParams = z.infer<typeof WeeklyPurchas
 
 // Command: routeNeed on WeeklyPurchasingConfig
 export const WeeklyPurchasingConfigRouteNeedParamsSchema = z.object({
-  purchaseNeedId: z.string().uuid(),
+  purchaseNeedId: z.string().min(1),
   eventId: z.string().min(1),
   ingredientDemandId: z.string().min(1),
   ingredientId: z.string().min(1),

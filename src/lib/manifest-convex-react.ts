@@ -99,6 +99,7 @@ import {
   EventDishConfirmFromProposalParamsSchema,
   EventDishRecipeSeedSeedParamsSchema,
   EventDishRemoveParamsSchema,
+  EventDishSetHeadcountOverrideParamsSchema,
   EventDishUpdateInstructionsParamsSchema,
   EventGuestAssignTableParamsSchema,
   EventGuestCheckInParamsSchema,
@@ -303,15 +304,29 @@ import {
   RecipeIngredientAddParamsSchema,
   RecipeIngredientAdjustQuantityParamsSchema,
   RecipeIngredientRemoveParamsSchema,
+  RecipeIngredientSetWasteFactorParamsSchema,
   RecipePublishVersionParamsSchema,
   RecipeRetireParamsSchema,
   RecipeRetractParamsSchema,
   RecipeReviseDraftParamsSchema,
+  RecipeSetServesPerYieldParamsSchema,
   RecipeStepAddParamsSchema,
   RecipeStepRemoveParamsSchema,
   RecipeStepReviseParamsSchema,
   RecurringAvailabilityDeclareParamsSchema,
   RecurringAvailabilityWithdrawParamsSchema,
+  RequestForQuoteCancelParamsSchema,
+  RequestForQuoteIssueParamsSchema,
+  RequestForQuoteMarkAwardedParamsSchema,
+  RequestForQuoteOpenParamsSchema,
+  RfqLineAddParamsSchema,
+  RfqLineRemoveParamsSchema,
+  RfqQuoteSubmitParamsSchema,
+  RfqVendorAwardParamsSchema,
+  RfqVendorDeclineParamsSchema,
+  RfqVendorInviteParamsSchema,
+  RfqVendorRemoveParamsSchema,
+  RfqVendorSetCompliantParamsSchema,
   SavedReportDefinitionArchiveParamsSchema,
   SavedReportDefinitionChangeSharingParamsSchema,
   SavedReportDefinitionCreateDefinitionParamsSchema,
@@ -1972,6 +1987,16 @@ export function useEventDishRemove() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventDishRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventDish.setHeadcountOverride. */
+export function useEventDishSetHeadcountOverride() {
+  const mutate = useMutation(api.mutations.EventDish_setHeadcountOverride);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventDishSetHeadcountOverrideParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -4469,6 +4494,16 @@ export function useRecipeReviseDraft() {
   };
 }
 
+/** Mutation hook for Recipe.setServesPerYield. */
+export function useRecipeSetServesPerYield() {
+  const mutate = useMutation(api.mutations.Recipe_setServesPerYield);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RecipeSetServesPerYieldParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for Recipe.draft. */
 export function useCreateRecipe() {
   const mutate = useMutation(api.mutations.Recipe_createViaDraft);
@@ -4762,6 +4797,16 @@ export function useRecipeIngredientRemove() {
   };
 }
 
+/** Mutation hook for RecipeIngredient.setWasteFactor. */
+export function useRecipeIngredientSetWasteFactor() {
+  const mutate = useMutation(api.mutations.RecipeIngredient_setWasteFactor);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RecipeIngredientSetWasteFactorParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Governed creation hook for RecipeIngredient.add. */
 export function useCreateRecipeIngredient() {
   const mutate = useMutation(api.mutations.RecipeIngredient_createViaAdd);
@@ -4860,6 +4905,210 @@ export function useCreateRecurringAvailability() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = RecurringAvailabilityDeclareParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for RequestForQuote. */
+export function useListRequestForQuote() {
+  return useQuery(api.queries.listRequestForQuote);
+}
+
+/** Reactive get-by-id for RequestForQuote. Pass "skip" to suspend. */
+export function useGetRequestForQuote(id: string | "skip") {
+  return useQuery(api.queries.getRequestForQuote, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RequestForQuote.cancel. */
+export function useRequestForQuoteCancel() {
+  const mutate = useMutation(api.mutations.RequestForQuote_cancel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RequestForQuoteCancelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RequestForQuote.issue. */
+export function useRequestForQuoteIssue() {
+  const mutate = useMutation(api.mutations.RequestForQuote_issue);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RequestForQuoteIssueParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RequestForQuote.markAwarded. */
+export function useRequestForQuoteMarkAwarded() {
+  const mutate = useMutation(api.mutations.RequestForQuote_markAwarded);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RequestForQuoteMarkAwardedParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RequestForQuote.open. */
+export function useRequestForQuoteOpen() {
+  const mutate = useMutation(api.mutations.RequestForQuote_open);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RequestForQuoteOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for RequestForQuote.open. */
+export function useCreateRequestForQuote() {
+  const mutate = useMutation(api.mutations.RequestForQuote_createViaOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = RequestForQuoteOpenParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for RfqLine. */
+export function useListRfqLine() {
+  return useQuery(api.queries.listRfqLine);
+}
+
+/** Reactive get-by-id for RfqLine. Pass "skip" to suspend. */
+export function useGetRfqLine(id: string | "skip") {
+  return useQuery(api.queries.getRfqLine, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RfqLine.add. */
+export function useRfqLineAdd() {
+  const mutate = useMutation(api.mutations.RfqLine_add);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqLineAddParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RfqLine.remove. */
+export function useRfqLineRemove() {
+  const mutate = useMutation(api.mutations.RfqLine_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqLineRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for RfqLine.add. */
+export function useCreateRfqLine() {
+  const mutate = useMutation(api.mutations.RfqLine_createViaAdd);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqLineAddParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for RfqQuote. */
+export function useListRfqQuote() {
+  return useQuery(api.queries.listRfqQuote);
+}
+
+/** Reactive get-by-id for RfqQuote. Pass "skip" to suspend. */
+export function useGetRfqQuote(id: string | "skip") {
+  return useQuery(api.queries.getRfqQuote, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RfqQuote.submit. */
+export function useRfqQuoteSubmit() {
+  const mutate = useMutation(api.mutations.RfqQuote_submit);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqQuoteSubmitParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for RfqQuote.submit. */
+export function useCreateRfqQuote() {
+  const mutate = useMutation(api.mutations.RfqQuote_createViaSubmit);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqQuoteSubmitParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for RfqVendor. */
+export function useListRfqVendor() {
+  return useQuery(api.queries.listRfqVendor);
+}
+
+/** Reactive get-by-id for RfqVendor. Pass "skip" to suspend. */
+export function useGetRfqVendor(id: string | "skip") {
+  return useQuery(api.queries.getRfqVendor, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RfqVendor.award. */
+export function useRfqVendorAward() {
+  const mutate = useMutation(api.mutations.RfqVendor_award);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqVendorAwardParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RfqVendor.decline. */
+export function useRfqVendorDecline() {
+  const mutate = useMutation(api.mutations.RfqVendor_decline);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqVendorDeclineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RfqVendor.invite. */
+export function useRfqVendorInvite() {
+  const mutate = useMutation(api.mutations.RfqVendor_invite);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqVendorInviteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RfqVendor.remove. */
+export function useRfqVendorRemove() {
+  const mutate = useMutation(api.mutations.RfqVendor_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqVendorRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RfqVendor.setCompliant. */
+export function useRfqVendorSetCompliant() {
+  const mutate = useMutation(api.mutations.RfqVendor_setCompliant);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqVendorSetCompliantParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for RfqVendor.invite. */
+export function useCreateRfqVendor() {
+  const mutate = useMutation(api.mutations.RfqVendor_createViaInvite);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = RfqVendorInviteParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -6411,4 +6660,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 681 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 708 as const;
