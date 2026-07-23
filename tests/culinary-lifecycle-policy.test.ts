@@ -12,7 +12,9 @@ describe("CulinaryLifecyclePolicy", () => {
     expect(
       policy.recipeActions("published").map((action) => action.key),
     ).toEqual(["retract", "retire"]);
-    expect(policy.recipeActions("retired")).toEqual([]);
+    expect(policy.recipeActions("retired").map((action) => action.key)).toEqual(
+      ["reinstate"],
+    );
   });
 
   it("derives ingredient and dish retirement actions from generated metadata", () => {

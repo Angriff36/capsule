@@ -41,7 +41,7 @@ entity Recipe mixin TenantScoped, SoftDeletable {
 
   transition status from "draft" to ["published", "retired"]
   transition status from "published" to ["draft", "retired"]
-  transition status from "retired" to []
+  transition status from "retired" to ["draft"]
 
   default policy recipeRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read recipes"
   default policy recipeWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write recipes through commands"
@@ -161,6 +161,20 @@ entity Recipe mixin TenantScoped, SoftDeletable {
       recipeId: self.id
       tenantId: self.tenantId
       reason: reason
+    }
+  }
+
+  command reinstate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "draft"
+    mutate retiredAt = null
+    mutate retirementReason = null
+    mutate publishedAt = null
+    emit RecipeReinstated {
+      recipeId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -376,6 +390,11 @@ event RecipeRetired: "recipe.retired" {
   recipeId: string
   tenantId: string
   reason: string
+}
+
+event RecipeReinstated: "recipe.reinstated" {
+  recipeId: string
+  tenantId: string
 }
 
 event RecipeIngredientAdded: "recipe_ingredient.added" {
