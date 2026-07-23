@@ -8,12 +8,14 @@ dist/
 *.log
 coverage/
 .artifacts/
+.pw-verify/
 graphify-out/
 
 # Editor / IDE local state
 .cursor/
 .sonarlint/
 .vscode/
+.scannerwork/
 *.tsbuildinfo
 package-lock.json
 npm-shrinkwrap.json
@@ -45,3 +47,6 @@ work/
 
 # Agent transcript workspaces - never commit (can contain env dumps/secrets)
 .aboardai/
+.vercel
+
+.playwright-mcp/
