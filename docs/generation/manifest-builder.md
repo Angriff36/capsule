@@ -156,7 +156,7 @@ builder adopt ownership --apply   # re-baseline digests only
 bun run manifest:regen
 ```
 
-If adopt dry-run refuses a path, read its classification (`identical` vs `baselined` vs `unproven`). Customized author seams (`convex/lib/authContext.ts`) should be **baselined** to current content so Builder stops treating your Clerk claim mapping as drift.
+If adopt dry-run refuses a path, read its classification (`identical` vs `baselined` vs `unproven`). Customized author seams (`convex/lib/authContext.ts`) should be **baselined** to current content: adopt records `baselined: true` on that ownership entry so update-mode regen **preserves** the seam instead of planning a stock overwrite (requires Builder with that preserve behavior).
 
 After recovery, commit `.builder/ownership.json` together with any regenerated files from `--apply`.
 
