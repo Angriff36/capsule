@@ -2214,7 +2214,16 @@ export const VendorOrderSchema = z.object({
   updatedAt: z.coerce.date().optional(),
 });
 
+// Computed: VendorOrder
+export const VendorOrderComputedSchema = VendorOrderSchema.extend({
+  isDraft: z.boolean(),
+  isPendingApproval: z.boolean(),
+  isOpenForReceiving: z.boolean(),
+  hasIncompleteLines: z.boolean(),
+});
+
 export type VendorOrder = z.infer<typeof VendorOrderSchema>;
+export type VendorOrderWithComputed = z.infer<typeof VendorOrderComputedSchema>;
 
 // Entity: VendorOrderLine
 export const VendorOrderLineSchema = z.object({
@@ -2243,6 +2252,8 @@ export const VendorOrderLineSchema = z.object({
 export const VendorOrderLineComputedSchema = VendorOrderLineSchema.extend({
   lineTotal: z.number(),
   remainingQuantity: z.number(),
+  isFullyReceived: z.boolean(),
+  hasReceivingDiscrepancy: z.boolean(),
 });
 
 export type VendorOrderLine = z.infer<typeof VendorOrderLineSchema>;

@@ -8002,7 +8002,16 @@ export const listVendorOrder = query({
     let rows = await ctx.db.query("vendorOrders").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    const __projectedRows: any[] = [];
+    for (const __row of __plainRows as any[]) {
+      (__row as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __row._id)).collect();
+      (__row as any).isDraft = ((__row as any).status === "draft");
+      (__row as any).isPendingApproval = ((__row as any).status === "pending_approval");
+      (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
+      (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, hasIncompleteLines: (__row as any).hasIncompleteLines });
+    }
+    return __projectedRows;
   },
 });
 
@@ -8019,7 +8028,13 @@ export const getVendorOrder = query({
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
     const __doc = __rawDoc;
-    return __doc;
+    (__doc as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __doc._id)).collect();
+    (__doc as any).isDraft = ((__doc as any).status === "draft");
+    (__doc as any).isPendingApproval = ((__doc as any).status === "pending_approval");
+    (__doc as any).isOpenForReceiving = (((__doc as any).status === "confirmed") || ((__doc as any).status === "partially_received"));
+    (__doc as any).hasIncompleteLines = ((((__doc as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
+    const __hydrated = { ...(__doc as any), isDraft: (__doc as any).isDraft, isPendingApproval: (__doc as any).isPendingApproval, isOpenForReceiving: (__doc as any).isOpenForReceiving, hasIncompleteLines: (__doc as any).hasIncompleteLines };
+    return __hydrated;
   },
 });
 
@@ -8032,7 +8047,16 @@ export const listVendorOrderByTenantId = query({
     let rows = await ctx.db.query("vendorOrders").withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    const __projectedRows: any[] = [];
+    for (const __row of __plainRows as any[]) {
+      (__row as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __row._id)).collect();
+      (__row as any).isDraft = ((__row as any).status === "draft");
+      (__row as any).isPendingApproval = ((__row as any).status === "pending_approval");
+      (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
+      (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, hasIncompleteLines: (__row as any).hasIncompleteLines });
+    }
+    return __projectedRows;
   },
 });
 
@@ -8047,7 +8071,16 @@ export const listVendorOrderByVendorId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    const __projectedRows: any[] = [];
+    for (const __row of __plainRows as any[]) {
+      (__row as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __row._id)).collect();
+      (__row as any).isDraft = ((__row as any).status === "draft");
+      (__row as any).isPendingApproval = ((__row as any).status === "pending_approval");
+      (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
+      (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, hasIncompleteLines: (__row as any).hasIncompleteLines });
+    }
+    return __projectedRows;
   },
 });
 
@@ -8062,7 +8095,16 @@ export const listVendorOrderByEventId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    const __projectedRows: any[] = [];
+    for (const __row of __plainRows as any[]) {
+      (__row as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __row._id)).collect();
+      (__row as any).isDraft = ((__row as any).status === "draft");
+      (__row as any).isPendingApproval = ((__row as any).status === "pending_approval");
+      (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
+      (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, hasIncompleteLines: (__row as any).hasIncompleteLines });
+    }
+    return __projectedRows;
   },
 });
 
@@ -8077,7 +8119,16 @@ export const listVendorOrderByPurchasingConfigId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return __plainRows;
+    const __projectedRows: any[] = [];
+    for (const __row of __plainRows as any[]) {
+      (__row as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __row._id)).collect();
+      (__row as any).isDraft = ((__row as any).status === "draft");
+      (__row as any).isPendingApproval = ((__row as any).status === "pending_approval");
+      (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
+      (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, hasIncompleteLines: (__row as any).hasIncompleteLines });
+    }
+    return __projectedRows;
   },
 });
 
@@ -8091,7 +8142,7 @@ export const listVendorOrderLine = query({
     let rows = await ctx.db.query("vendorOrderLines").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity }; });
+    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); (__row as any).isFullyReceived = (((__row as any).orderedQuantity > 0) && ((__row as any).receivedQuantity >= (__row as any).orderedQuantity)); (__row as any).hasReceivingDiscrepancy = (((__row as any).discrepancyQuantity != null) && ((__row as any).discrepancyQuantity > 0)); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity, isFullyReceived: (__row as any).isFullyReceived, hasReceivingDiscrepancy: (__row as any).hasReceivingDiscrepancy }; });
   },
 });
 
@@ -8110,7 +8161,9 @@ export const getVendorOrderLine = query({
     const __doc = __rawDoc;
     (__doc as any).lineTotal = ((__doc as any).orderedQuantity * (__doc as any).unitCost);
     (__doc as any).remainingQuantity = ((__doc as any).orderedQuantity - (__doc as any).receivedQuantity);
-    const __hydrated = { ...(__doc as any), lineTotal: (__doc as any).lineTotal, remainingQuantity: (__doc as any).remainingQuantity };
+    (__doc as any).isFullyReceived = (((__doc as any).orderedQuantity > 0) && ((__doc as any).receivedQuantity >= (__doc as any).orderedQuantity));
+    (__doc as any).hasReceivingDiscrepancy = (((__doc as any).discrepancyQuantity != null) && ((__doc as any).discrepancyQuantity > 0));
+    const __hydrated = { ...(__doc as any), lineTotal: (__doc as any).lineTotal, remainingQuantity: (__doc as any).remainingQuantity, isFullyReceived: (__doc as any).isFullyReceived, hasReceivingDiscrepancy: (__doc as any).hasReceivingDiscrepancy };
     return __hydrated;
   },
 });
@@ -8124,7 +8177,7 @@ export const listVendorOrderLineByTenantId = query({
     let rows = await ctx.db.query("vendorOrderLines").withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity }; });
+    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); (__row as any).isFullyReceived = (((__row as any).orderedQuantity > 0) && ((__row as any).receivedQuantity >= (__row as any).orderedQuantity)); (__row as any).hasReceivingDiscrepancy = (((__row as any).discrepancyQuantity != null) && ((__row as any).discrepancyQuantity > 0)); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity, isFullyReceived: (__row as any).isFullyReceived, hasReceivingDiscrepancy: (__row as any).hasReceivingDiscrepancy }; });
   },
 });
 
@@ -8139,7 +8192,7 @@ export const listVendorOrderLineByVendorOrderId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity }; });
+    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); (__row as any).isFullyReceived = (((__row as any).orderedQuantity > 0) && ((__row as any).receivedQuantity >= (__row as any).orderedQuantity)); (__row as any).hasReceivingDiscrepancy = (((__row as any).discrepancyQuantity != null) && ((__row as any).discrepancyQuantity > 0)); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity, isFullyReceived: (__row as any).isFullyReceived, hasReceivingDiscrepancy: (__row as any).hasReceivingDiscrepancy }; });
   },
 });
 
@@ -8154,7 +8207,7 @@ export const listVendorOrderLineByIngredientId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity }; });
+    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); (__row as any).isFullyReceived = (((__row as any).orderedQuantity > 0) && ((__row as any).receivedQuantity >= (__row as any).orderedQuantity)); (__row as any).hasReceivingDiscrepancy = (((__row as any).discrepancyQuantity != null) && ((__row as any).discrepancyQuantity > 0)); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity, isFullyReceived: (__row as any).isFullyReceived, hasReceivingDiscrepancy: (__row as any).hasReceivingDiscrepancy }; });
   },
 });
 
@@ -8169,7 +8222,7 @@ export const listVendorOrderLineByIngredientDemandId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity }; });
+    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); (__row as any).isFullyReceived = (((__row as any).orderedQuantity > 0) && ((__row as any).receivedQuantity >= (__row as any).orderedQuantity)); (__row as any).hasReceivingDiscrepancy = (((__row as any).discrepancyQuantity != null) && ((__row as any).discrepancyQuantity > 0)); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity, isFullyReceived: (__row as any).isFullyReceived, hasReceivingDiscrepancy: (__row as any).hasReceivingDiscrepancy }; });
   },
 });
 
@@ -8184,7 +8237,7 @@ export const listVendorOrderLineByLocationId = query({
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = rows;
-    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity }; });
+    return (__plainRows).map((__row) => { (__row as any).lineTotal = ((__row as any).orderedQuantity * (__row as any).unitCost); (__row as any).remainingQuantity = ((__row as any).orderedQuantity - (__row as any).receivedQuantity); (__row as any).isFullyReceived = (((__row as any).orderedQuantity > 0) && ((__row as any).receivedQuantity >= (__row as any).orderedQuantity)); (__row as any).hasReceivingDiscrepancy = (((__row as any).discrepancyQuantity != null) && ((__row as any).discrepancyQuantity > 0)); return { ...(__row as any), lineTotal: (__row as any).lineTotal, remainingQuantity: (__row as any).remainingQuantity, isFullyReceived: (__row as any).isFullyReceived, hasReceivingDiscrepancy: (__row as any).hasReceivingDiscrepancy }; });
   },
 });
 
