@@ -7,7 +7,8 @@
 
 - **L2 STANDING (human decision 2026-07-19; throughput redesign 2026-07-21)**
   — draft-PR fix powers are permanent. **The PR gate is the safety boundary**:
-  every change is worktree-isolated, test-verified, Codex-reviewed, and ships
+  every change is worktree-isolated, test-verified, cross-model reviewed
+  (see Push & Merge → Reviewer selection), and ships
   only as a draft PR the human must approve — so the loop does NOT pre-filter
   work into "safe" and "unsafe". Anything reviewable is attemptable.
 - **Drain the queue every tick.** Work items in priority order — one fresh
@@ -52,14 +53,16 @@
   override mechanism — the 2026-07-22 `REVIEW_GATE=0` push (PR #31) was a
   violation, not a precedent. REJECT → fix or escalate in STATE.md; never
   push around the gate.
-- Reviewer selection (cross-model rule, owner 2026-07-22): the reviewer must
-  be a DIFFERENT model than the diff's author; a model never approves its
-  own diff. Primary: Codex gpt-5.6-sol. When Codex is unavailable
-  (quota/outage) or authored the diff: **Fable 5** reviews codex/grok-authored
-  diffs; **grok via Cursor CLI**
-  (`agent -p --trust --model cursor-grok-4.5-high-fast`, PowerShell) reviews
-  Claude/Fable- or Codex-authored diffs. The PR body must name the reviewing
-  model and its verdict.
+- Reviewer selection (cross-model rule, owner 2026-07-22): **any frontier
+  model that did NOT author the diff is an eligible reviewer** — the only
+  hard rule is reviewer ≠ author; a model never approves its own diff.
+  Preferred routing: primary is Codex gpt-5.6-sol; when Codex is unavailable
+  (quota/outage) or authored the diff, fall back to **Fable 5** (fresh
+  review pass) or **grok via Cursor CLI**
+  (`agent -p --trust --model cursor-grok-4.5-high-fast`, PowerShell) —
+  either may review GLM/MiniMax-authored loop diffs. Only when NO eligible
+  reviewer can produce a verdict: escalate in STATE.md; never push
+  unreviewed. The PR body must name the reviewing model and its verdict.
 
 ## Paths (hard rules — the short list that is NOT about caution)
 

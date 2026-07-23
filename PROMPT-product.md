@@ -8,7 +8,8 @@ checkout, never push main/merge, never commit secrets, never hand-edit
 generated files).
 
 THE PR GATE IS THE SAFETY BOUNDARY: every change is worktree-isolated,
-test-verified, Codex-reviewed, and ships as a draft PR the human approves.
+test-verified, cross-model reviewed, and ships as a draft PR the human
+approves.
 
 ## Iteration contract
 
@@ -41,11 +42,13 @@ test-verified, Codex-reviewed, and ships as a draft PR the human approves.
    tedium via guards/policies that barely matter (catering app, not a bank).
    Verdict: APPROVE or REJECT with reasons."`
    If Codex is unavailable (quota/outage) or authored the diff, use the same
-   prompt through a cross-model alternate: Fable 5 (fresh Claude review
-   pass) for codex/grok-authored diffs, or grok via Cursor CLI
-   (`agent -p --trust --model cursor-grok-4.5-high-fast`, PowerShell) for
-   Claude/Fable- or Codex-authored diffs. No verdict from ANY eligible
-   reviewer → treat as REJECT (never push unreviewed).
+   prompt through a cross-model alternate — any frontier model that did not
+   author the diff is eligible: Fable 5 (fresh Claude review pass) or grok
+   via Cursor CLI
+   (`agent -p --trust --model cursor-grok-4.5-high-fast`, PowerShell);
+   either may review GLM/MiniMax-authored loop diffs. No verdict from ANY
+   eligible reviewer → treat as REJECT (never push unreviewed; escalate in
+   STATE.md).
    REJECT → log to ledger + backlog, leave worktree, exit iteration.
 7. APPROVE → commit in the worktree, `git push origin loop/<run-id>`,
    `gh pr create --draft`. PR body MUST include: verification evidence

@@ -131,13 +131,19 @@ codex -c model="gpt-5.6-sol" review --base main
 ```
 
 Cross-model alternates, when Codex is unavailable (quota/outage) or authored
-the change:
+the change — **any frontier model that did not author the diff is
+eligible**; the named routes are the preferred defaults:
 
 - Diff authored by Codex or grok → **Fable 5** reviews (a fresh Claude
   review pass, not the session/agent that wrote the code).
 - Diff authored by Claude/Fable or Codex → **grok via Cursor CLI** reviews:
   `agent -p --trust --model cursor-grok-4.5-high-fast "<review prompt + diff scope>"`
   (PowerShell; `agent` is a PowerShell script on this machine).
+- Diff authored by GLM/MiniMax (loop implementers) → Codex primary; either
+  Fable 5 or grok as the fallback.
+
+If no eligible reviewer can produce a verdict, treat it as REJECT and
+escalate to the human; never merge unreviewed.
 
 Whichever model reviews, the prompt MUST include: "Review the changes AND
 ensure they do NOT add tedium for app users via guardrails and policies that
