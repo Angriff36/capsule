@@ -41,10 +41,9 @@ bun run manifest:regen      # only regen entry — Builder apply when conflict-f
 bun run seed             # requires Convex URL
 bun run agent:mint-jwt   # write CAPSULE_AGENT_JWT (UI session + org first)
 bun run agent:enter-recipe -- <recipe.txt>
-bun run agent:llm-tools  # dump Anthropic/OpenAI defs or --call snake tool (JWT for --call)
 bun run agent:mcp        # Capsule MCP stdio host for Cursor (idle in a TTY is expected; needs CAPSULE_AGENT_JWT)
-bun run agent:mcp:verify # stdio tools/list proof (AC snake tools incl. recipe_draft)
-bun run agent:mcp:verify -- --live # same path + durable recipe_draft write
+# Note: agent:llm-tools / agent:mcp:verify are documented in docs/generation/capsule-agent-mcp.md
+# but are not package.json scripts in this checkout — use the MCP host + mint-jwt path above.
 ```
 
 Essential commands: [docs/commands.md](docs/commands.md). Full reference: [docs/operations/commands.md](docs/operations/commands.md).  
@@ -166,3 +165,45 @@ real-world reason."
 Reviewer APPROVE = authorization to merge. Reviewer REJECT = fix or escalate
 to the human; never merge over a rejection. The PR body must name the
 reviewing model and its verdict.
+
+<!-- convex-ai-start -->
+
+This project uses [Convex](https://convex.dev) as its backend.
+
+When working on Convex code, **always read
+`convex/_generated/ai/guidelines.md` first** for important guidelines on
+how to correctly use Convex APIs and patterns. The file contains rules that
+override what you may have learned about Convex from training data.
+
+Convex agent skills for common tasks can be installed by running
+`npx convex ai-files install`.
+
+<!-- convex-ai-end -->
+
+## Deploying (agents: read before touching anything deploy-shaped)
+
+**Deploys are HUMAN-AUTHORIZED only.** No loop or agent runs
+`npx convex deploy`, `vercel deploy`, or edits Vercel/Clerk settings without
+the human explicitly asking in the current conversation. Merging a PR to
+`main` DOES auto-deploy the frontend (GitHub→Vercel integration, production
+branch `main`) — that is expected and fine; it ships whatever CI already
+verified.
+
+When the human asks for a deploy, the correct order is:
+
+1. Backend first, if `convex/` or manifests changed:
+   `bun run manifest:regen` (manifest changes only) → `npx convex deploy -y`
+   → prod deployment `tangible-skunk-448`.
+2. Frontend: merge to `main` (auto-deploys) or
+   `vercel deploy --prod --yes --archive=tgz`.
+
+Invariants agents must not break (each broke a real deploy once):
+
+- `vercel.json` SPA rewrites stay.
+- `.vercelignore` patterns stay ROOT-ANCHORED (`/generated`, never bare
+  `generated` — it swallows `src/generated`).
+- `package.json` `prepare` keeps its `|| exit 0` guard (gitless build env).
+- Frontend env (`VITE_CONVEX_URL`, `VITE_CLERK_PUBLISHABLE_KEY`) lives in
+  Vercel project env and is baked at build; backend env lives on the Convex
+  deployment (`npx convex env set ... --prod`).
+- New domains must also land in Clerk allowed origins or sign-in loops.
