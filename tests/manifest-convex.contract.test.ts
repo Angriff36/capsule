@@ -4,11 +4,23 @@ import * as queries from "../convex/queries";
 import * as mutations from "../convex/mutations";
 
 describe("Manifest Convex contract", () => {
+  it("exports mutation Announcement_post", () => {
+    expect(typeof (mutations as any).Announcement_post).toBe("function");
+  });
+  it("exports mutation Announcement_remove", () => {
+    expect(typeof (mutations as any).Announcement_remove).toBe("function");
+  });
+  it("exports mutation AnnouncementDismissal_dismiss", () => {
+    expect(typeof (mutations as any).AnnouncementDismissal_dismiss).toBe("function");
+  });
   it("exports mutation Attachment_attach", () => {
     expect(typeof (mutations as any).Attachment_attach).toBe("function");
   });
   it("exports mutation Attachment_remove", () => {
     expect(typeof (mutations as any).Attachment_remove).toBe("function");
+  });
+  it("exports mutation Attachment_setSurveySelection", () => {
+    expect(typeof (mutations as any).Attachment_setSurveySelection).toBe("function");
   });
   it("exports mutation AvailabilityWindow_declare", () => {
     expect(typeof (mutations as any).AvailabilityWindow_declare).toBe("function");
@@ -63,6 +75,15 @@ describe("Manifest Convex contract", () => {
   });
   it("exports mutation ClientMerge_merge", () => {
     expect(typeof (mutations as any).ClientMerge_merge).toBe("function");
+  });
+  it("exports mutation ClientOutreachTask_complete", () => {
+    expect(typeof (mutations as any).ClientOutreachTask_complete).toBe("function");
+  });
+  it("exports mutation ClientOutreachTask_dismiss", () => {
+    expect(typeof (mutations as any).ClientOutreachTask_dismiss).toBe("function");
+  });
+  it("exports mutation ClientOutreachTask_open", () => {
+    expect(typeof (mutations as any).ClientOutreachTask_open).toBe("function");
   });
   it("exports mutation Contract_draft", () => {
     expect(typeof (mutations as any).Contract_draft).toBe("function");
@@ -285,6 +306,9 @@ describe("Manifest Convex contract", () => {
   });
   it("exports mutation EventDish_changeCourse", () => {
     expect(typeof (mutations as any).EventDish_changeCourse).toBe("function");
+  });
+  it("exports mutation EventDish_confirmFromProposal", () => {
+    expect(typeof (mutations as any).EventDish_confirmFromProposal).toBe("function");
   });
   it("exports mutation EventDish_remove", () => {
     expect(typeof (mutations as any).EventDish_remove).toBe("function");
@@ -569,6 +593,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Organization_rename", () => {
     expect(typeof (mutations as any).Organization_rename).toBe("function");
   });
+  it("exports mutation Organization_setDefaultCurrency", () => {
+    expect(typeof (mutations as any).Organization_setDefaultCurrency).toBe("function");
+  });
   it("exports mutation Organization_suspend", () => {
     expect(typeof (mutations as any).Organization_suspend).toBe("function");
   });
@@ -713,6 +740,12 @@ describe("Manifest Convex contract", () => {
   it("exports mutation PrepTask_unblock", () => {
     expect(typeof (mutations as any).PrepTask_unblock).toBe("function");
   });
+  it("exports mutation PrepTaskComment_edit", () => {
+    expect(typeof (mutations as any).PrepTaskComment_edit).toBe("function");
+  });
+  it("exports mutation PrepTaskComment_post", () => {
+    expect(typeof (mutations as any).PrepTaskComment_post).toBe("function");
+  });
   it("exports mutation PrepTaskDependency_declare", () => {
     expect(typeof (mutations as any).PrepTaskDependency_declare).toBe("function");
   });
@@ -754,6 +787,15 @@ describe("Manifest Convex contract", () => {
   });
   it("exports mutation Proposal_stageClientMerge", () => {
     expect(typeof (mutations as any).Proposal_stageClientMerge).toBe("function");
+  });
+  it("exports mutation ProposalDishSelection_adjustServings", () => {
+    expect(typeof (mutations as any).ProposalDishSelection_adjustServings).toBe("function");
+  });
+  it("exports mutation ProposalDishSelection_remove", () => {
+    expect(typeof (mutations as any).ProposalDishSelection_remove).toBe("function");
+  });
+  it("exports mutation ProposalDishSelection_select", () => {
+    expect(typeof (mutations as any).ProposalDishSelection_select).toBe("function");
   });
   it("exports mutation PurchaseNeed_assignToDraft", () => {
     expect(typeof (mutations as any).PurchaseNeed_assignToDraft).toBe("function");
@@ -961,6 +1003,12 @@ describe("Manifest Convex contract", () => {
   });
   it("exports mutation ShiftType_retire", () => {
     expect(typeof (mutations as any).ShiftType_retire).toBe("function");
+  });
+  it("exports mutation StaffMessage_markRead", () => {
+    expect(typeof (mutations as any).StaffMessage_markRead).toBe("function");
+  });
+  it("exports mutation StaffMessage_send", () => {
+    expect(typeof (mutations as any).StaffMessage_send).toBe("function");
   });
   it("exports mutation StockCountLine_confirmLedgerMatch", () => {
     expect(typeof (mutations as any).StockCountLine_confirmLedgerMatch).toBe("function");
@@ -1192,4 +1240,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 395 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 411 as const;

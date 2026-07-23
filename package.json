@@ -27,6 +27,7 @@
     "check:supply-manifest": "bun scripts/check-supply-manifest-integration.ts",
     "check:workforce-manifest": "bun scripts/check-workforce-manifest-integration.ts",
     "codegen": "convex codegen",
+    "convex:env-set": "bun scripts/convex-env-set.ts",
     "deploy": "convex deploy",
     "dev": "vite",
     "dev:convex": "convex dev",

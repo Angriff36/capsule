@@ -2,8 +2,12 @@
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import {
+  AnnouncementDismissalDismissParamsSchema,
+  AnnouncementPostParamsSchema,
+  AnnouncementRemoveParamsSchema,
   AttachmentAttachParamsSchema,
   AttachmentRemoveParamsSchema,
+  AttachmentSetSurveySelectionParamsSchema,
   AvailabilityWindowDeclareParamsSchema,
   AvailabilityWindowWithdrawParamsSchema,
   ClientArchiveParamsSchema,
@@ -19,6 +23,9 @@ import {
   ClientContactUpdateDetailsParamsSchema,
   ClientMarkMergedParamsSchema,
   ClientMergeMergeParamsSchema,
+  ClientOutreachTaskCompleteParamsSchema,
+  ClientOutreachTaskDismissParamsSchema,
+  ClientOutreachTaskOpenParamsSchema,
   ClientReactivateParamsSchema,
   ClientRegisterParamsSchema,
   ClientStageClientMergeParamsSchema,
@@ -89,6 +96,7 @@ import {
   EventDishAddToEventParamsSchema,
   EventDishAdjustServingsParamsSchema,
   EventDishChangeCourseParamsSchema,
+  EventDishConfirmFromProposalParamsSchema,
   EventDishRecipeSeedSeedParamsSchema,
   EventDishRemoveParamsSchema,
   EventDishUpdateInstructionsParamsSchema,
@@ -191,6 +199,7 @@ import {
   OrganizationReactivateParamsSchema,
   OrganizationRegisterParamsSchema,
   OrganizationRenameParamsSchema,
+  OrganizationSetDefaultCurrencyParamsSchema,
   OrganizationSuspendParamsSchema,
   PackListCancelParamsSchema,
   PackListDispatchParamsSchema,
@@ -229,6 +238,8 @@ import {
   PersonTerminateParamsSchema,
   PrepTaskCancelParamsSchema,
   PrepTaskClaimParamsSchema,
+  PrepTaskCommentEditParamsSchema,
+  PrepTaskCommentPostParamsSchema,
   PrepTaskCompleteParamsSchema,
   PrepTaskDependencyDeclareParamsSchema,
   PrepTaskDependencySatisfyParamsSchema,
@@ -245,6 +256,9 @@ import {
   ProductionBatchStartParamsSchema,
   ProposalAcceptParamsSchema,
   ProposalDeclineParamsSchema,
+  ProposalDishSelectionAdjustServingsParamsSchema,
+  ProposalDishSelectionRemoveParamsSchema,
+  ProposalDishSelectionSelectParamsSchema,
   ProposalDraftParamsSchema,
   ProposalExpireParamsSchema,
   ProposalMarkViewedParamsSchema,
@@ -320,6 +334,8 @@ import {
   ShiftTypeDefineParamsSchema,
   ShiftTypeReactivateParamsSchema,
   ShiftTypeRetireParamsSchema,
+  StaffMessageMarkReadParamsSchema,
+  StaffMessageSendParamsSchema,
   StockCountLineConfirmLedgerMatchParamsSchema,
   StockCountLineFreezeParamsSchema,
   StockCountLineReconcileVarianceParamsSchema,
@@ -406,6 +422,78 @@ function __convexArgsFromZod(parsed: Record<string, unknown>): Record<string, un
   return out;
 }
 
+/** Reactive list for Announcement. */
+export function useListAnnouncement() {
+  return useQuery(api.queries.listAnnouncement);
+}
+
+/** Reactive get-by-id for Announcement. Pass "skip" to suspend. */
+export function useGetAnnouncement(id: string | "skip") {
+  return useQuery(api.queries.getAnnouncement, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for Announcement.post. */
+export function useAnnouncementPost() {
+  const mutate = useMutation(api.mutations.Announcement_post);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = AnnouncementPostParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Announcement.remove. */
+export function useAnnouncementRemove() {
+  const mutate = useMutation(api.mutations.Announcement_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = AnnouncementRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for Announcement.post. */
+export function useCreateAnnouncement() {
+  const mutate = useMutation(api.mutations.Announcement_createViaPost);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = AnnouncementPostParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for AnnouncementDismissal. */
+export function useListAnnouncementDismissal() {
+  return useQuery(api.queries.listAnnouncementDismissal);
+}
+
+/** Reactive get-by-id for AnnouncementDismissal. Pass "skip" to suspend. */
+export function useGetAnnouncementDismissal(id: string | "skip") {
+  return useQuery(api.queries.getAnnouncementDismissal, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for AnnouncementDismissal.dismiss. */
+export function useAnnouncementDismissalDismiss() {
+  const mutate = useMutation(api.mutations.AnnouncementDismissal_dismiss);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = AnnouncementDismissalDismissParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for AnnouncementDismissal.dismiss. */
+export function useCreateAnnouncementDismissal() {
+  const mutate = useMutation(api.mutations.AnnouncementDismissal_createViaDismiss);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = AnnouncementDismissalDismissParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for Attachment. */
 export function useListAttachment() {
   return useQuery(api.queries.listAttachment);
@@ -432,6 +520,16 @@ export function useAttachmentRemove() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = AttachmentRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Attachment.setSurveySelection. */
+export function useAttachmentSetSurveySelection() {
+  const mutate = useMutation(api.mutations.Attachment_setSurveySelection);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = AttachmentSetSurveySelectionParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -727,6 +825,57 @@ export function useCreateClientMerge() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = ClientMergeMergeParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for ClientOutreachTask. */
+export function useListClientOutreachTask() {
+  return useQuery(api.queries.listClientOutreachTask);
+}
+
+/** Reactive get-by-id for ClientOutreachTask. Pass "skip" to suspend. */
+export function useGetClientOutreachTask(id: string | "skip") {
+  return useQuery(api.queries.getClientOutreachTask, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ClientOutreachTask.complete. */
+export function useClientOutreachTaskComplete() {
+  const mutate = useMutation(api.mutations.ClientOutreachTask_complete);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientOutreachTaskCompleteParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ClientOutreachTask.dismiss. */
+export function useClientOutreachTaskDismiss() {
+  const mutate = useMutation(api.mutations.ClientOutreachTask_dismiss);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientOutreachTaskDismissParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ClientOutreachTask.open. */
+export function useClientOutreachTaskOpen() {
+  const mutate = useMutation(api.mutations.ClientOutreachTask_open);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientOutreachTaskOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ClientOutreachTask.open. */
+export function useCreateClientOutreachTask() {
+  const mutate = useMutation(api.mutations.ClientOutreachTask_createViaOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ClientOutreachTaskOpenParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -1803,6 +1952,16 @@ export function useEventDishChangeCourse() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventDishChangeCourseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventDish.confirmFromProposal. */
+export function useEventDishConfirmFromProposal() {
+  const mutate = useMutation(api.mutations.EventDish_confirmFromProposal);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventDishConfirmFromProposalParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -3094,6 +3253,16 @@ export function useOrganizationRename() {
   };
 }
 
+/** Mutation hook for Organization.setDefaultCurrency. */
+export function useOrganizationSetDefaultCurrency() {
+  const mutate = useMutation(api.mutations.Organization_setDefaultCurrency);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = OrganizationSetDefaultCurrencyParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Organization.suspend. */
 export function useOrganizationSuspend() {
   const mutate = useMutation(api.mutations.Organization_suspend);
@@ -3753,6 +3922,47 @@ export function useCreatePrepTask() {
   };
 }
 
+/** Reactive list for PrepTaskComment. */
+export function useListPrepTaskComment() {
+  return useQuery(api.queries.listPrepTaskComment);
+}
+
+/** Reactive get-by-id for PrepTaskComment. Pass "skip" to suspend. */
+export function useGetPrepTaskComment(id: string | "skip") {
+  return useQuery(api.queries.getPrepTaskComment, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for PrepTaskComment.edit. */
+export function usePrepTaskCommentEdit() {
+  const mutate = useMutation(api.mutations.PrepTaskComment_edit);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskCommentEditParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PrepTaskComment.post. */
+export function usePrepTaskCommentPost() {
+  const mutate = useMutation(api.mutations.PrepTaskComment_post);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskCommentPostParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for PrepTaskComment.post. */
+export function useCreatePrepTaskComment() {
+  const mutate = useMutation(api.mutations.PrepTaskComment_createViaPost);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskCommentPostParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for PrepTaskDependency. */
 export function useListPrepTaskDependency() {
   return useQuery(api.queries.listPrepTaskDependency);
@@ -3951,6 +4161,57 @@ export function useCreateProposal() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = ProposalDraftParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for ProposalDishSelection. */
+export function useListProposalDishSelection() {
+  return useQuery(api.queries.listProposalDishSelection);
+}
+
+/** Reactive get-by-id for ProposalDishSelection. Pass "skip" to suspend. */
+export function useGetProposalDishSelection(id: string | "skip") {
+  return useQuery(api.queries.getProposalDishSelection, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ProposalDishSelection.adjustServings. */
+export function useProposalDishSelectionAdjustServings() {
+  const mutate = useMutation(api.mutations.ProposalDishSelection_adjustServings);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalDishSelectionAdjustServingsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ProposalDishSelection.remove. */
+export function useProposalDishSelectionRemove() {
+  const mutate = useMutation(api.mutations.ProposalDishSelection_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalDishSelectionRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ProposalDishSelection.select. */
+export function useProposalDishSelectionSelect() {
+  const mutate = useMutation(api.mutations.ProposalDishSelection_select);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalDishSelectionSelectParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ProposalDishSelection.select. */
+export function useCreateProposalDishSelection() {
+  const mutate = useMutation(api.mutations.ProposalDishSelection_createViaSelect);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalDishSelectionSelectParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -4903,6 +5164,47 @@ export function useCreateShiftType() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = ShiftTypeDefineParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for StaffMessage. */
+export function useListStaffMessage() {
+  return useQuery(api.queries.listStaffMessage);
+}
+
+/** Reactive get-by-id for StaffMessage. Pass "skip" to suspend. */
+export function useGetStaffMessage(id: string | "skip") {
+  return useQuery(api.queries.getStaffMessage, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for StaffMessage.markRead. */
+export function useStaffMessageMarkRead() {
+  const mutate = useMutation(api.mutations.StaffMessage_markRead);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffMessageMarkReadParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for StaffMessage.send. */
+export function useStaffMessageSend() {
+  const mutate = useMutation(api.mutations.StaffMessage_send);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffMessageSendParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for StaffMessage.send. */
+export function useCreateStaffMessage() {
+  const mutate = useMutation(api.mutations.StaffMessage_createViaSend);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = StaffMessageSendParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -6109,4 +6411,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 647 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 681 as const;

@@ -6,7 +6,130 @@
  * trusted-context injection helpers, and invalidation metadata.
  */
 
-export const WIRING_CONTRACT_HASH = "0861b118eaa6a83a9967ed0b71f90d8139877c79b6ce258ef0101de49c4f5bc8:12df2bd06d045bc630e6f9144157b2f18f005c988d06f5b67324d5dce0f41e54:18a22e0a458915f73d8644be1345f57479a26425557b880f04cb8ab7ee40e59b:21d57d616e827ed9eba8950af310277f2eb66471f5fba0eb3107b6da20518a15:35722048e86baf13526c030321982ce8497b1a6b010b211540b83544ca05f11a:3780783b0721f34c0537df6d6254bec964e454dd7602704d866f566d7925a856:5684e36052f2f3e9f2970eddd04d2c910664e2ad238b7981517cc430f653a959:57e25eb5f1ce20eacbdf19da4cb399738daeeff2049c04c0251e24560128a386:62d856968eb92d7e0cf2734b71ef359d1a1103425a5f3b48d5859619e1c49241:640f04ad6e291f9325a33e5e3c2901f410493e25065a7c323d602a02ea73d6e6:676cef4d545428924b573f0c8d7ea1dc1055d63f164c59d6de27446e2ff60d68:6d74792149ee7042aed16ae31027a3630c03c046f64af0e56ebf02f779d2fa8f:7039fa7f6c8ec13607fe831966e5b958096cd77aeb1110fd6a68d5ea04e7c775:7173d8a64e35e262a61b0b95ba993e1e695f342f68d7a40d791d0856040d9278:740e5fd73da6f86a070e0435aae951f2008294e485361b48106344ac7eb3c920:742148ae34d4781302dcfd80d5af4bffa29154a2d020a6fdd37cbc493bc6f047:750e9a3b26e97e5ffe1b26b41f97f6940ac938420142f8ba4696af3b0d910998:78e46f6a505262ecfd52084cc415aeac8efcbf5f077974543942f189171f8352:78e7696836db43bde87ae1423e73343ee69da9215d277ce139adcb0f0199a121:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:84f25060bd29a6bdcf542d798feb184207a29cad705130584530f714e1597cd1:89f4794e84334d13b013751cc91f8227cabb8df50c322ae70801b9d03dca4005:8d3397fc8c4a274927af3f654a36b9318b077aaca2262d574e8325b167c138fb:901fcec837eb4010f07ca65d92396c3734bd9b6be9869d7656f073083ac4f492:92ca7ad9082112355b127cc4cb2be6108b31b46e237d17db7cc10c76a60065a1:952203740dd05c52a2ee55ca78f80b811be3bb48449b03126e87f3171ef3179d:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:9f194b40fa4b1661ae56b911e20b411476f698ae695811bc36c5842c7e45f1f4:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:a7eeb33a4f16596b845ffb69086ca92411a6c9812ba0317f9f42d85aaf3bcda8:ad5452fcc945edafa18d87fc86d692ef8843e10f755df1438b8477354de55ed7:af9c177655742f3a849205171736a1e5f6f5589e240c7c387770fd977f9884bb:b38eedb31c112f3b546ab336405806e4c3658142f776a108a4749e50637ca64c:b42238d427001b39dbfbd3becd1f66b96f676331afc164c7ccd1209349510271:c292f9a449d3f5c37d473d5c3596730ac95184a0871cfb8df2547e28a4da94d1:c51fb214da66c36512f8a35951ff6ba7969536e6796e9c0e861ceee3b8cc25ef:c5c3cb8a23265c76b507a7206d6a5353cead202dadcbc117b937c6082e568123:c65a3d8390a6c5b812122453db8c9e6ab2e5d426a4455a0a70baf4100367fd77:c82beb51d6e212d91e5634d33abd69fac7529bdc6deb23ad22ad4a45dae15a9a:cb82afbf711e68032b7a8e3d0fea3348437b922bbc06f1ed0b6b08fd37c83938:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:d00737957dde7e09dfa3a2a30bbaed51488ff95c850ad8c04e6e48c161cc86a9:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d61c96fa15bd5815e19eec9e7215b1be87ab7f88291df2d23a30c40f888cdfd9:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:da1267a9a4bfbc99d479edbde604aea21048f91c4543ccd1228f73881090b371:dbbe867224d3607a6d857d4bffabd53be15df161c02590da3514d50b032bb99e:e2f38b455e1d32a59d2655cc8e5c4a709c06213516da4def5b892f1c5a5d5d05:e7e8ce754616c728487b15bb743b8301c3a4cf7893695428c5a3ad18335cbc7b:e8fd7023b86e8b73c80a7c43d22c2aeb1493e611bce2595e85e0f41cb4143f86:e8fe4e91176e8847364a389dddb97a6688953e8c370099b3f10fef850567da66:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:edb49293401dd479d94ca73b926b7536657a7b01b230cf5e1e9d0d6cd6ffe50e:f395c32c63ec7a0a0028fed1f11873122fa6f87127a464f8c3d1c462e225232a:f3c019822f1384676c707b93fdcfc09909720057cfb5fdaa1e92318f095856bb:fdc28fad241416ceed92a345c3acf5b15954417bb2bda3075aff77e7beebeb45";
+export const WIRING_CONTRACT_HASH = "0861b118eaa6a83a9967ed0b71f90d8139877c79b6ce258ef0101de49c4f5bc8:12df2bd06d045bc630e6f9144157b2f18f005c988d06f5b67324d5dce0f41e54:15ebe6d14f03ad9380b7771ae7f9b01376fbff58d3dd6bb02fafe7d35c9cf33d:18a22e0a458915f73d8644be1345f57479a26425557b880f04cb8ab7ee40e59b:35722048e86baf13526c030321982ce8497b1a6b010b211540b83544ca05f11a:3780783b0721f34c0537df6d6254bec964e454dd7602704d866f566d7925a856:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:5684e36052f2f3e9f2970eddd04d2c910664e2ad238b7981517cc430f653a959:57e25eb5f1ce20eacbdf19da4cb399738daeeff2049c04c0251e24560128a386:5a6d59634bc99c6820b53319f767e1d284a9a0136fa367c65f651c9ca8fa660f:62d856968eb92d7e0cf2734b71ef359d1a1103425a5f3b48d5859619e1c49241:640f04ad6e291f9325a33e5e3c2901f410493e25065a7c323d602a02ea73d6e6:6d74792149ee7042aed16ae31027a3630c03c046f64af0e56ebf02f779d2fa8f:7039fa7f6c8ec13607fe831966e5b958096cd77aeb1110fd6a68d5ea04e7c775:7173d8a64e35e262a61b0b95ba993e1e695f342f68d7a40d791d0856040d9278:740e5fd73da6f86a070e0435aae951f2008294e485361b48106344ac7eb3c920:750e9a3b26e97e5ffe1b26b41f97f6940ac938420142f8ba4696af3b0d910998:78a1a1ef98dd0a4fb7bbb8321593d992a18018ba7d0fcb7db95533b2e5431865:78e46f6a505262ecfd52084cc415aeac8efcbf5f077974543942f189171f8352:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:85385fc86af52e4173667cff2f8fb5de36e5bc85a7361ae7548511cb2ef41b9d:889487f2a4623ddc90c5d30da2946baf50b962592b3f833e3125a39ddc5285f2:89f4794e84334d13b013751cc91f8227cabb8df50c322ae70801b9d03dca4005:900775182df3a259afebb9c31862eadafc6bbdec6d8f3fd5dd55001e14f6f589:92ca7ad9082112355b127cc4cb2be6108b31b46e237d17db7cc10c76a60065a1:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:990435c424b523765049393bedc227dd78fbcfb27bc44158dd76679131479b95:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a6dbe41f222f0347df0d920ce626dc570486af22a53af2d4fbe8fe0fe1eceb17:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:a7c16c5034498040d967f3e5b6674e39a675a9f1a54dd6a8d3649ecc5184da49:a7eeb33a4f16596b845ffb69086ca92411a6c9812ba0317f9f42d85aaf3bcda8:ad5452fcc945edafa18d87fc86d692ef8843e10f755df1438b8477354de55ed7:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:af9c177655742f3a849205171736a1e5f6f5589e240c7c387770fd977f9884bb:afd799346286bf789da14b3b1917cce446ff51ed4a5e96e673ec1ce4932a314d:b38eedb31c112f3b546ab336405806e4c3658142f776a108a4749e50637ca64c:b42238d427001b39dbfbd3becd1f66b96f676331afc164c7ccd1209349510271:c292f9a449d3f5c37d473d5c3596730ac95184a0871cfb8df2547e28a4da94d1:c51fb214da66c36512f8a35951ff6ba7969536e6796e9c0e861ceee3b8cc25ef:c5c3cb8a23265c76b507a7206d6a5353cead202dadcbc117b937c6082e568123:c82beb51d6e212d91e5634d33abd69fac7529bdc6deb23ad22ad4a45dae15a9a:cb82afbf711e68032b7a8e3d0fea3348437b922bbc06f1ed0b6b08fd37c83938:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:cfd3f63f28e209efbcb595ad4213aefe472f404b76538660d27817a45ea19e4e:d00737957dde7e09dfa3a2a30bbaed51488ff95c850ad8c04e6e48c161cc86a9:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d61c96fa15bd5815e19eec9e7215b1be87ab7f88291df2d23a30c40f888cdfd9:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:da1267a9a4bfbc99d479edbde604aea21048f91c4543ccd1228f73881090b371:e2f38b455e1d32a59d2655cc8e5c4a709c06213516da4def5b892f1c5a5d5d05:e6371e5a54a60125d23ec584d9372eb3d6390fb47d9c02d692e9c3e81e54f054:e7e8ce754616c728487b15bb743b8301c3a4cf7893695428c5a3ad18335cbc7b:e8fd7023b86e8b73c80a7c43d22c2aeb1493e611bce2595e85e0f41cb4143f86:e8fe4e91176e8847364a389dddb97a6688953e8c370099b3f10fef850567da66:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f395c32c63ec7a0a0028fed1f11873122fa6f87127a464f8c3d1c462e225232a:f3c019822f1384676c707b93fdcfc09909720057cfb5fdaa1e92318f095856bb:faa464534a5fd835172497b6d8582e26fe0653aba4b8c4ac262b10c9b21e4eb6";
+
+// --- Announcement.post ---
+export interface AnnouncementPostClientInput {
+  title: string;
+  body: string;
+  /** Allowed: "policyUpdate" | "safety" | "training" | "general" */
+  category: "policyUpdate" | "safety" | "training" | "general";
+  /** Must not be "". */
+  expiresAt: string & { readonly __nonEmpty?: true };
+}
+
+export const AnnouncementPostCapability = {
+  capabilityId: "Announcement.post",
+  entity: "Announcement",
+  command: "post",
+  route: "/api/manifest/Announcement/commands/post",
+  instanceCommand: true,
+  clientParameterNames: ["title","body","category","expiresAt"],
+  serverParameterNames: [],
+  emits: ["AnnouncementPosted"],
+} as const;
+
+/**
+ * Build command input for Announcement.post.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindAnnouncementPostInput(client: AnnouncementPostClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Announcement.post. */
+export const AnnouncementPostInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Announcement",
+    "queryKeyHint": "queryKeys.announcement.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Announcement",
+    "queryKeyHint": "queryKeys.announcement.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- Announcement.remove ---
+export type AnnouncementRemoveClientInput = Record<string, never>;
+
+export const AnnouncementRemoveCapability = {
+  capabilityId: "Announcement.remove",
+  entity: "Announcement",
+  command: "remove",
+  route: "/api/manifest/Announcement/commands/remove",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["AnnouncementRemoved"],
+} as const;
+
+/**
+ * Build command input for Announcement.remove.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindAnnouncementRemoveInput(client: AnnouncementRemoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Announcement.remove. */
+export const AnnouncementRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Announcement",
+    "queryKeyHint": "queryKeys.announcement.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Announcement",
+    "queryKeyHint": "queryKeys.announcement.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- AnnouncementDismissal.dismiss ---
+export interface AnnouncementDismissalDismissClientInput {
+  announcementId: string;
+}
+
+export const AnnouncementDismissalDismissCapability = {
+  capabilityId: "AnnouncementDismissal.dismiss",
+  entity: "AnnouncementDismissal",
+  command: "dismiss",
+  route: "/api/manifest/AnnouncementDismissal/commands/dismiss",
+  instanceCommand: true,
+  clientParameterNames: ["announcementId"],
+  serverParameterNames: [],
+  emits: ["AnnouncementDismissed"],
+} as const;
+
+/**
+ * Build command input for AnnouncementDismissal.dismiss.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindAnnouncementDismissalDismissInput(client: AnnouncementDismissalDismissClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful AnnouncementDismissal.dismiss. */
+export const AnnouncementDismissalDismissInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "AnnouncementDismissal",
+    "queryKeyHint": "queryKeys.announcementDismissal.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "AnnouncementDismissal",
+    "queryKeyHint": "queryKeys.announcementDismissal.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
 
 // --- Attachment.attach ---
 export interface AttachmentAttachClientInput {
@@ -18,8 +141,8 @@ export interface AttachmentAttachClientInput {
   /** Bounds: 0..∞ */
   fileSize: number;
   storageId: string;
-  /** Allowed: "venueCondition" | "leftoverFood" | "equipmentReturn" */
-  evidenceType?: "venueCondition" | "leftoverFood" | "equipmentReturn";
+  /** Allowed: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue" */
+  evidenceType?: "venueCondition" | "leftoverFood" | "equipmentReturn" | "setup" | "food" | "service" | "venue";
 }
 
 export const AttachmentAttachCapability = {
@@ -81,6 +204,46 @@ export function bindAttachmentRemoveInput(client: AttachmentRemoveClientInput): 
 
 /** Invalidation targets after a successful Attachment.remove. */
 export const AttachmentRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Attachment",
+    "queryKeyHint": "queryKeys.attachment.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Attachment",
+    "queryKeyHint": "queryKeys.attachment.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- Attachment.setSurveySelection ---
+export interface AttachmentSetSurveySelectionClientInput {
+  included: boolean;
+}
+
+export const AttachmentSetSurveySelectionCapability = {
+  capabilityId: "Attachment.setSurveySelection",
+  entity: "Attachment",
+  command: "setSurveySelection",
+  route: "/api/manifest/Attachment/commands/setSurveySelection",
+  instanceCommand: true,
+  clientParameterNames: ["included"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for Attachment.setSurveySelection.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindAttachmentSetSurveySelectionInput(client: AttachmentSetSurveySelectionClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Attachment.setSurveySelection. */
+export const AttachmentSetSurveySelectionInvalidation = [
   {
     "kind": "entityList",
     "entity": "Attachment",
@@ -914,6 +1077,147 @@ export const ClientMergeMergeInvalidation = [
     "kind": "entityDetail",
     "entity": "ClientMerge",
     "queryKeyHint": "queryKeys.clientMerge.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ClientOutreachTask.complete ---
+export interface ClientOutreachTaskCompleteClientInput {
+  note?: string;
+}
+
+export const ClientOutreachTaskCompleteCapability = {
+  capabilityId: "ClientOutreachTask.complete",
+  entity: "ClientOutreachTask",
+  command: "complete",
+  route: "/api/manifest/ClientOutreachTask/commands/complete",
+  instanceCommand: true,
+  clientParameterNames: ["note"],
+  serverParameterNames: [],
+  emits: ["ClientOutreachTaskCompleted"],
+} as const;
+
+/**
+ * Build command input for ClientOutreachTask.complete.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindClientOutreachTaskCompleteInput(client: ClientOutreachTaskCompleteClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ClientOutreachTask.complete. */
+export const ClientOutreachTaskCompleteInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for ClientOutreachTask.complete. */
+export const ClientOutreachTaskCompleteLifecycle = [
+  {
+    "property": "status",
+    "from": "open",
+    "to": "completed",
+    "proven": true
+  }
+] as const;
+
+// --- ClientOutreachTask.dismiss ---
+export interface ClientOutreachTaskDismissClientInput {
+  note?: string;
+}
+
+export const ClientOutreachTaskDismissCapability = {
+  capabilityId: "ClientOutreachTask.dismiss",
+  entity: "ClientOutreachTask",
+  command: "dismiss",
+  route: "/api/manifest/ClientOutreachTask/commands/dismiss",
+  instanceCommand: true,
+  clientParameterNames: ["note"],
+  serverParameterNames: [],
+  emits: ["ClientOutreachTaskDismissed"],
+} as const;
+
+/**
+ * Build command input for ClientOutreachTask.dismiss.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindClientOutreachTaskDismissInput(client: ClientOutreachTaskDismissClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ClientOutreachTask.dismiss. */
+export const ClientOutreachTaskDismissInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for ClientOutreachTask.dismiss. */
+export const ClientOutreachTaskDismissLifecycle = [
+  {
+    "property": "status",
+    "from": "open",
+    "to": "dismissed",
+    "proven": true
+  }
+] as const;
+
+// --- ClientOutreachTask.open ---
+export interface ClientOutreachTaskOpenClientInput {
+  clientId: string;
+  reason: string;
+}
+
+export const ClientOutreachTaskOpenCapability = {
+  capabilityId: "ClientOutreachTask.open",
+  entity: "ClientOutreachTask",
+  command: "open",
+  route: "/api/manifest/ClientOutreachTask/commands/open",
+  instanceCommand: true,
+  clientParameterNames: ["clientId","reason"],
+  serverParameterNames: [],
+  emits: ["ClientOutreachTaskOpened"],
+} as const;
+
+/**
+ * Build command input for ClientOutreachTask.open.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindClientOutreachTaskOpenInput(client: ClientOutreachTaskOpenClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ClientOutreachTask.open. */
+export const ClientOutreachTaskOpenInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ClientOutreachTask",
+    "queryKeyHint": "queryKeys.clientOutreachTask.detail(id)",
     "label": "entity detail"
   }
 ] as const;
@@ -4436,6 +4740,52 @@ export const EventDishChangeCourseInvalidation = [
   }
 ] as const;
 
+// --- EventDish.confirmFromProposal ---
+export interface EventDishConfirmFromProposalClientInput {
+  eventId: string;
+  dishId: string;
+  /** Bounds: 0..∞ */
+  quantityServings: number;
+  course?: string;
+  serviceStyle?: string;
+  specialInstructions?: string;
+}
+
+export const EventDishConfirmFromProposalCapability = {
+  capabilityId: "EventDish.confirmFromProposal",
+  entity: "EventDish",
+  command: "confirmFromProposal",
+  route: "/api/manifest/EventDish/commands/confirmFromProposal",
+  instanceCommand: true,
+  clientParameterNames: ["eventId","dishId","quantityServings","course","serviceStyle","specialInstructions"],
+  serverParameterNames: [],
+  emits: ["EventDishConfirmedFromProposal"],
+} as const;
+
+/**
+ * Build command input for EventDish.confirmFromProposal.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventDishConfirmFromProposalInput(client: EventDishConfirmFromProposalClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventDish.confirmFromProposal. */
+export const EventDishConfirmFromProposalInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventDish",
+    "queryKeyHint": "queryKeys.eventDish.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- EventDish.remove ---
 export interface EventDishRemoveClientInput {
   reason: string;
@@ -7058,6 +7408,9 @@ export interface InvoiceIssueClientInput {
   notes?: string;
   lineItems?: unknown;
   taxBreakdown?: unknown;
+  currencyCode?: string;
+  /** Bounds: 1..∞ */
+  exchangeRate?: number;
 }
 
 export const InvoiceIssueCapability = {
@@ -7066,7 +7419,7 @@ export const InvoiceIssueCapability = {
   command: "issue",
   route: "/api/manifest/Invoice/commands/issue",
   instanceCommand: true,
-  clientParameterNames: ["clientId","invoiceNumber","subtotal","taxAmount","discountAmount","total","eventId","paymentTermsDays","dueDate","notes","lineItems","taxBreakdown"],
+  clientParameterNames: ["clientId","invoiceNumber","subtotal","taxAmount","discountAmount","total","eventId","paymentTermsDays","dueDate","notes","lineItems","taxBreakdown","currencyCode","exchangeRate"],
   serverParameterNames: [],
   emits: ["InvoiceIssued"],
 } as const;
@@ -8736,6 +9089,46 @@ export function bindOrganizationRenameInput(client: OrganizationRenameClientInpu
 
 /** Invalidation targets after a successful Organization.rename. */
 export const OrganizationRenameInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Organization",
+    "queryKeyHint": "queryKeys.organization.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Organization",
+    "queryKeyHint": "queryKeys.organization.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- Organization.setDefaultCurrency ---
+export interface OrganizationSetDefaultCurrencyClientInput {
+  currencyCode: string;
+}
+
+export const OrganizationSetDefaultCurrencyCapability = {
+  capabilityId: "Organization.setDefaultCurrency",
+  entity: "Organization",
+  command: "setDefaultCurrency",
+  route: "/api/manifest/Organization/commands/setDefaultCurrency",
+  instanceCommand: true,
+  clientParameterNames: ["currencyCode"],
+  serverParameterNames: [],
+  emits: ["OrganizationDefaultCurrencySet"],
+} as const;
+
+/**
+ * Build command input for Organization.setDefaultCurrency.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindOrganizationSetDefaultCurrencyInput(client: OrganizationSetDefaultCurrencyClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Organization.setDefaultCurrency. */
+export const OrganizationSetDefaultCurrencyInvalidation = [
   {
     "kind": "entityList",
     "entity": "Organization",
@@ -11111,6 +11504,95 @@ export const PrepTaskUnblockLifecycle = [
   }
 ] as const;
 
+// --- PrepTaskComment.edit ---
+export interface PrepTaskCommentEditClientInput {
+  body: string;
+}
+
+export const PrepTaskCommentEditCapability = {
+  capabilityId: "PrepTaskComment.edit",
+  entity: "PrepTaskComment",
+  command: "edit",
+  route: "/api/manifest/PrepTaskComment/commands/edit",
+  instanceCommand: true,
+  clientParameterNames: ["body"],
+  serverParameterNames: [],
+  emits: ["PrepTaskCommentEdited"],
+} as const;
+
+/**
+ * Build command input for PrepTaskComment.edit.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPrepTaskCommentEditInput(client: PrepTaskCommentEditClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PrepTaskComment.edit. */
+export const PrepTaskCommentEditInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PrepTaskComment",
+    "queryKeyHint": "queryKeys.prepTaskComment.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTaskComment",
+    "queryKeyHint": "queryKeys.prepTaskComment.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- PrepTaskComment.post ---
+export interface PrepTaskCommentPostClientInput {
+  prepTaskId: string;
+  eventId: string;
+  body: string;
+  eventDishId?: string;
+  /** Allowed: "note" | "blocker" | "substitution" | "status_update" */
+  category?: "note" | "blocker" | "substitution" | "status_update";
+  authorPersonId?: string;
+  authorName?: string;
+  taskOwnerAssignedToId?: string;
+  taskOwnerAuthSubjectId?: string;
+}
+
+export const PrepTaskCommentPostCapability = {
+  capabilityId: "PrepTaskComment.post",
+  entity: "PrepTaskComment",
+  command: "post",
+  route: "/api/manifest/PrepTaskComment/commands/post",
+  instanceCommand: true,
+  clientParameterNames: ["prepTaskId","eventId","body","eventDishId","category","authorPersonId","authorName","taskOwnerAssignedToId","taskOwnerAuthSubjectId"],
+  serverParameterNames: [],
+  emits: ["PrepTaskCommentPosted"],
+} as const;
+
+/**
+ * Build command input for PrepTaskComment.post.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindPrepTaskCommentPostInput(client: PrepTaskCommentPostClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful PrepTaskComment.post. */
+export const PrepTaskCommentPostInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "PrepTaskComment",
+    "queryKeyHint": "queryKeys.prepTaskComment.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "PrepTaskComment",
+    "queryKeyHint": "queryKeys.prepTaskComment.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- PrepTaskDependency.declare ---
 export interface PrepTaskDependencyDeclareClientInput {
   dependentTaskId: string;
@@ -11785,6 +12267,132 @@ export const ProposalStageClientMergeInvalidation = [
     "kind": "entityDetail",
     "entity": "Proposal",
     "queryKeyHint": "queryKeys.proposal.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ProposalDishSelection.adjustServings ---
+export interface ProposalDishSelectionAdjustServingsClientInput {
+  /** Bounds: 1..∞ */
+  quantityServings: number;
+}
+
+export const ProposalDishSelectionAdjustServingsCapability = {
+  capabilityId: "ProposalDishSelection.adjustServings",
+  entity: "ProposalDishSelection",
+  command: "adjustServings",
+  route: "/api/manifest/ProposalDishSelection/commands/adjustServings",
+  instanceCommand: true,
+  clientParameterNames: ["quantityServings"],
+  serverParameterNames: [],
+  emits: ["ProposalDishSelectionServingsAdjusted"],
+} as const;
+
+/**
+ * Build command input for ProposalDishSelection.adjustServings.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProposalDishSelectionAdjustServingsInput(client: ProposalDishSelectionAdjustServingsClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ProposalDishSelection.adjustServings. */
+export const ProposalDishSelectionAdjustServingsInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ProposalDishSelection",
+    "queryKeyHint": "queryKeys.proposalDishSelection.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalDishSelection",
+    "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ProposalDishSelection.remove ---
+export type ProposalDishSelectionRemoveClientInput = Record<string, never>;
+
+export const ProposalDishSelectionRemoveCapability = {
+  capabilityId: "ProposalDishSelection.remove",
+  entity: "ProposalDishSelection",
+  command: "remove",
+  route: "/api/manifest/ProposalDishSelection/commands/remove",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["ProposalDishSelectionRemoved"],
+} as const;
+
+/**
+ * Build command input for ProposalDishSelection.remove.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProposalDishSelectionRemoveInput(client: ProposalDishSelectionRemoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ProposalDishSelection.remove. */
+export const ProposalDishSelectionRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ProposalDishSelection",
+    "queryKeyHint": "queryKeys.proposalDishSelection.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalDishSelection",
+    "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ProposalDishSelection.select ---
+export interface ProposalDishSelectionSelectClientInput {
+  proposalId: string;
+  menuId: string;
+  dishId: string;
+  /** Bounds: 1..∞ */
+  quantityServings: number;
+  course?: string;
+  serviceStyle?: string;
+  specialInstructions?: string;
+}
+
+export const ProposalDishSelectionSelectCapability = {
+  capabilityId: "ProposalDishSelection.select",
+  entity: "ProposalDishSelection",
+  command: "select",
+  route: "/api/manifest/ProposalDishSelection/commands/select",
+  instanceCommand: true,
+  clientParameterNames: ["proposalId","menuId","dishId","quantityServings","course","serviceStyle","specialInstructions"],
+  serverParameterNames: [],
+  emits: ["ProposalDishSelected"],
+} as const;
+
+/**
+ * Build command input for ProposalDishSelection.select.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindProposalDishSelectionSelectInput(client: ProposalDishSelectionSelectClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ProposalDishSelection.select. */
+export const ProposalDishSelectionSelectInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ProposalDishSelection",
+    "queryKeyHint": "queryKeys.proposalDishSelection.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ProposalDishSelection",
+    "queryKeyHint": "queryKeys.proposalDishSelection.detail(id)",
     "label": "entity detail"
   }
 ] as const;
@@ -15098,6 +15706,87 @@ export const ShiftTypeRetireLifecycle = [
     "from": "active",
     "to": "retired",
     "proven": true
+  }
+] as const;
+
+// --- StaffMessage.markRead ---
+export type StaffMessageMarkReadClientInput = Record<string, never>;
+
+export const StaffMessageMarkReadCapability = {
+  capabilityId: "StaffMessage.markRead",
+  entity: "StaffMessage",
+  command: "markRead",
+  route: "/api/manifest/StaffMessage/commands/markRead",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["StaffMessageRead"],
+} as const;
+
+/**
+ * Build command input for StaffMessage.markRead.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStaffMessageMarkReadInput(client: StaffMessageMarkReadClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful StaffMessage.markRead. */
+export const StaffMessageMarkReadInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "StaffMessage",
+    "queryKeyHint": "queryKeys.staffMessage.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffMessage",
+    "queryKeyHint": "queryKeys.staffMessage.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- StaffMessage.send ---
+export interface StaffMessageSendClientInput {
+  senderPersonId: string;
+  recipientPersonId: string;
+  recipientAuthSubjectId?: string;
+  body: string;
+}
+
+export const StaffMessageSendCapability = {
+  capabilityId: "StaffMessage.send",
+  entity: "StaffMessage",
+  command: "send",
+  route: "/api/manifest/StaffMessage/commands/send",
+  instanceCommand: true,
+  clientParameterNames: ["senderPersonId","recipientPersonId","recipientAuthSubjectId","body"],
+  serverParameterNames: [],
+  emits: ["StaffMessageSent"],
+} as const;
+
+/**
+ * Build command input for StaffMessage.send.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindStaffMessageSendInput(client: StaffMessageSendClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful StaffMessage.send. */
+export const StaffMessageSendInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "StaffMessage",
+    "queryKeyHint": "queryKeys.staffMessage.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "StaffMessage",
+    "queryKeyHint": "queryKeys.staffMessage.detail(id)",
+    "label": "entity detail"
   }
 ] as const;
 
@@ -18781,8 +19470,12 @@ export const WeeklyScheduleNoticeRepublishScheduleInvalidation = [
 
 /** All capability ids in this contract (sorted). */
 export const ALL_CAPABILITY_IDS = [
+  "Announcement.post",
+  "Announcement.remove",
+  "AnnouncementDismissal.dismiss",
   "Attachment.attach",
   "Attachment.remove",
+  "Attachment.setSurveySelection",
   "AvailabilityWindow.declare",
   "AvailabilityWindow.withdraw",
   "Client.archive",
@@ -18801,6 +19494,9 @@ export const ALL_CAPABILITY_IDS = [
   "ClientContact.stageClientMerge",
   "ClientContact.updateDetails",
   "ClientMerge.merge",
+  "ClientOutreachTask.complete",
+  "ClientOutreachTask.dismiss",
+  "ClientOutreachTask.open",
   "Contract.draft",
   "Contract.expire",
   "Contract.markViewed",
@@ -18875,6 +19571,7 @@ export const ALL_CAPABILITY_IDS = [
   "EventDish.addToEvent",
   "EventDish.adjustServings",
   "EventDish.changeCourse",
+  "EventDish.confirmFromProposal",
   "EventDish.remove",
   "EventDish.updateInstructions",
   "EventDishRecipeSeed.seed",
@@ -18968,6 +19665,7 @@ export const ALL_CAPABILITY_IDS = [
   "Organization.reactivate",
   "Organization.register",
   "Organization.rename",
+  "Organization.setDefaultCurrency",
   "Organization.suspend",
   "OrganizationCapabilitySetting.register",
   "OrganizationCapabilitySetting.setEnabled",
@@ -19016,6 +19714,8 @@ export const ALL_CAPABILITY_IDS = [
   "PrepTask.revise",
   "PrepTask.start",
   "PrepTask.unblock",
+  "PrepTaskComment.edit",
+  "PrepTaskComment.post",
   "PrepTaskDependency.declare",
   "PrepTaskDependency.satisfy",
   "ProductionBatch.cancel",
@@ -19030,6 +19730,9 @@ export const ALL_CAPABILITY_IDS = [
   "Proposal.reassignClient",
   "Proposal.send",
   "Proposal.stageClientMerge",
+  "ProposalDishSelection.adjustServings",
+  "ProposalDishSelection.remove",
+  "ProposalDishSelection.select",
   "PurchaseNeed.assignToDraft",
   "PurchaseNeed.cancel",
   "PurchaseNeed.create",
@@ -19099,6 +19802,8 @@ export const ALL_CAPABILITY_IDS = [
   "ShiftType.define",
   "ShiftType.reactivate",
   "ShiftType.retire",
+  "StaffMessage.markRead",
+  "StaffMessage.send",
   "StockCountLine.confirmLedgerMatch",
   "StockCountLine.freeze",
   "StockCountLine.reconcileVariance",

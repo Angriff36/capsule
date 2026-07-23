@@ -7,7 +7,7 @@ Status: **complete** (`verifyConvexApplicationAssembly` passed).
 - [x] **Convex schema, queries, mutations, crons, HTTP, sagas, react (+ registry extras)** (convex-core)
 - [x] **Consumer wiring contract and bindings** (wiring-contract)
 - [x] **Agent context / LLM documentation** (agent-context)
-- [x] **Docs and diagrams** (docs-diagrams)
+- [x] **Docs and diagrams** (docs-diagrams) — Capsule opted out (`skipDocsDiagrams`; not emitted)
 - [x] **Frontend Convex API consumption contract** (frontend-convex-api)
 - [x] **Shared validation synchronized with Convex API** (synced-validation)
 - [x] **Seed / fixture support for Convex apps** (seed-fixtures)
@@ -20,6 +20,9 @@ Status: **complete** (`verifyConvexApplicationAssembly` passed).
 - mermaid
 - zod
 - contract-tests
+
+## Capsule opt-outs
+- docs-diagrams / mermaid file emission (`skipDocsDiagrams`)
 
 ## Auth context seam
 - Generated Convex surfaces import `getAuthContext` from `./lib/authContext`.

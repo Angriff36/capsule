@@ -9,12 +9,15 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   const client = new ConvexHttpClient(deploymentUrl);
   void PACK_ID;
   void PACK_VERSION;
+  // skip Announcement: no create command in IR (2 rows unused)
+  // skip AnnouncementDismissal: no create command in IR (2 rows unused)
   // skip Attachment: no create command in IR (2 rows unused)
   // skip AvailabilityWindow: no create command in IR (2 rows unused)
   // skip Client: no create command in IR (2 rows unused)
   // skip ClientCommunication: no create command in IR (2 rows unused)
   // skip ClientContact: no create command in IR (2 rows unused)
   // skip ClientMerge: no create command in IR (2 rows unused)
+  // skip ClientOutreachTask: no create command in IR (2 rows unused)
   // skip Contract: no create command in IR (2 rows unused)
   // skip CorrectiveAction: no create command in IR (2 rows unused)
   // skip CreditMemo: no create command in IR (2 rows unused)
@@ -57,9 +60,11 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip PayrollInput: no create command in IR (2 rows unused)
   // skip Person: no create command in IR (2 rows unused)
   // skip PrepTask: no create command in IR (2 rows unused)
+  // skip PrepTaskComment: no create command in IR (2 rows unused)
   // skip PrepTaskDependency: no create command in IR (2 rows unused)
   // skip ProductionBatch: no create command in IR (2 rows unused)
   // skip Proposal: no create command in IR (2 rows unused)
+  // skip ProposalDishSelection: no create command in IR (2 rows unused)
   // PurchaseNeed → api.mutations.PurchaseNeed_create
   await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-1", "ingredientDemandId": "ingredientDemandId-purchase-need-1", "ingredientId": "ingredientId-purchase-need-1", "preferredVendorId": "preferredVendorId-purchase-need-1", "requiredQuantity": 1, "unit": "demo-unit-1", "purchasingWeekStart": 1767268800000 } as any);
   await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-2", "ingredientDemandId": "ingredientDemandId-purchase-need-2", "ingredientId": "ingredientId-purchase-need-2", "preferredVendorId": "preferredVendorId-purchase-need-2", "requiredQuantity": 2, "unit": "demo-unit-2", "purchasingWeekStart": 1767355200000 } as any);
@@ -76,6 +81,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip ShiftSwapRequest: no create command in IR (2 rows unused)
   // skip ShiftType: no create command in IR (2 rows unused)
   // skip SoftDeletable: not a Convex-persistent store (2 rows unused)
+  // skip StaffMessage: no create command in IR (2 rows unused)
   // skip StockCountLine: no create command in IR (2 rows unused)
   // skip StockCountSession: no create command in IR (2 rows unused)
   // skip StockTransfer: no create command in IR (2 rows unused)
@@ -105,6 +111,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
   "version": "1.0.0",
   "entities": [
     {
+      "entity": "Announcement",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "AnnouncementDismissal",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "Attachment",
       "createMutation": null,
       "rowCount": 2
@@ -131,6 +147,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "ClientMerge",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "ClientOutreachTask",
       "createMutation": null,
       "rowCount": 2
     },
@@ -345,6 +366,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "PrepTaskComment",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "PrepTaskDependency",
       "createMutation": null,
       "rowCount": 2
@@ -356,6 +382,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "Proposal",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "ProposalDishSelection",
       "createMutation": null,
       "rowCount": 2
     },
@@ -426,6 +457,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "SoftDeletable",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "StaffMessage",
       "createMutation": null,
       "rowCount": 2
     },

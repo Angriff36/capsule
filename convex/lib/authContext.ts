@@ -23,14 +23,25 @@ export async function getAuthContext(ctx: {
   if (!identity) return ANONYMOUS;
 
   const claims = identity as Record<string, unknown>;
+  const org =
+    typeof claims.o === "object" && claims.o !== null
+      ? (claims.o as Record<string, unknown>)
+      : undefined;
+
+  const roleClaim =
+    (typeof claims.role === "string" && claims.role) ||
+    (typeof org?.rol === "string" && org.rol) ||
+    "";
+  const tenantClaim =
+    (typeof claims.tenantId === "string" && claims.tenantId) ||
+    (typeof org?.id === "string" && org.id) ||
+    (typeof claims.org_id === "string" && claims.org_id) ||
+    "";
+
   return {
     id: identity.subject,
-    role:
-      typeof claims.role === "string" && claims.role !== ""
-        ? normalizeRole(claims.role)
-        : ANONYMOUS.role,
-    tenantId:
-      typeof claims.tenantId === "string" ? claims.tenantId : ANONYMOUS.tenantId,
+    role: roleClaim ? normalizeRole(roleClaim) : ANONYMOUS.role,
+    tenantId: tenantClaim || ANONYMOUS.tenantId,
   };
 }
 
