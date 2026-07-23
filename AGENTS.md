@@ -93,7 +93,7 @@ bun run manifest:regen
 
 Builder plans, applies when conflict-free, and updates `.builder/ownership.json` in one transaction. Optional flags after `--` (e.g. `--install`).
 
-Do **not** use bare `manifest generate` / `manifest build`, `bun run manifest:build`, or `place-manifest-convex-react.ts` — they bypass Builder ownership. Preset may still emit `manifest:build` / `manifest:compile` in `package.json`; only `place-manifest-convex-react` is deny-guarded today. Regen path: `bun run manifest:regen` only.
+Do **not** use bare `manifest generate` / `manifest build`, `bun run manifest:build`, or `place-manifest-convex-react.ts` — they bypass Builder ownership. Capsule wires `manifest:build` and `place-manifest-convex-react` through deny-guards (exit 1). Preset may still emit `manifest:compile` as a live script — do not run it. Regen path: `bun run manifest:regen` only.
 
 `bun run check` verifies owned files still match the ownership ledger. Pre-commit rejects commits that touch owned paths without updating ownership.
 
