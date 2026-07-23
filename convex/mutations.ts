@@ -31203,8 +31203,10 @@ async function __runVendorOrderSubmit(ctx: MutationCtx, { docId, version }: any,
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("VendorOrder not found");
     const __rel_purchasingConfig = await __resolveRelation(ctx, "weeklyPurchasingConfigs", [__auth.tenantId], ["tenantId"], "tenantId", __auth.tenantId);
     {
-      const __fk = ((doc as any) as any).purchasingConfigId;
-      ((doc as any) as any).purchasingConfig = __fk != null ? await ctx.db.get(__fk as any) : null;
+      const __lookup = ((doc as any) as any).tenantId;
+      ((doc as any) as any).purchasingConfig = __lookup != null
+        ? await ctx.db.query("weeklyPurchasingConfigs").withIndex("by_tenantId", (q: any) => q.eq("tenantId", __lookup)).first()
+        : null;
     }
     if (!((checkRole(user.role, "procurementAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Procurement and managers may read vendor orders");
     if (!((checkRole(user.role, "procurementAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");

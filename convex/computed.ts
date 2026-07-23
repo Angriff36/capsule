@@ -340,6 +340,12 @@ export function computeVehicle(doc: Record<string, any>): Record<string, any> {
 /** Preload nested relations for VendorOrder computeds (mutates doc in place). */
 export async function hydrateComputedRelationsForVendorOrder(ctx: any, doc: Record<string, any>): Promise<void> {
   const docId = doc._id;
+  {
+    const __lookup = ((doc as any) as any).tenantId;
+    ((doc as any) as any).purchasingConfig = __lookup != null
+      ? await ctx.db.query("weeklyPurchasingConfigs").withIndex("by_tenantId", (q: any) => q.eq("tenantId", __lookup)).first()
+      : null;
+  }
   (doc as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", docId)).collect();
 }
 
@@ -351,12 +357,15 @@ export function computeVendorOrder(doc: Record<string, any>): Record<string, any
   doc.isPendingApproval = __isPendingApproval;
   const __isOpenForReceiving = ((doc.status === "confirmed") || (doc.status === "partially_received"));
   doc.isOpenForReceiving = __isOpenForReceiving;
+  const __needsSpendApproval = (((doc.purchasingConfig != null) && (doc.purchasingConfig.orderApprovalThresholdAmount != null)) && (doc.totalAmount > doc.purchasingConfig.orderApprovalThresholdAmount));
+  doc.needsSpendApproval = __needsSpendApproval;
   const __hasIncompleteLines = (((doc.lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
   doc.hasIncompleteLines = __hasIncompleteLines;
   return {
     isDraft: __isDraft,
     isPendingApproval: __isPendingApproval,
     isOpenForReceiving: __isOpenForReceiving,
+    needsSpendApproval: __needsSpendApproval,
     hasIncompleteLines: __hasIncompleteLines,
   };
 }

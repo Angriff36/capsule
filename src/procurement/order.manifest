@@ -60,12 +60,12 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   hasMany lines: VendorOrderLine
 
   // Workflow flags for VendorOrderPage action routing. Current derived state
-  // only — status / timestamps stay persisted. Spend-approval vs threshold
-  // still needs tenant-singleton purchasingConfig hydrate (purchasingConfigId
-  // is not populated today); UI keeps that comparison until Manifest pins it.
+  // only — status / timestamps stay persisted.
   computed isDraft: boolean = self.status == "draft"
   computed isPendingApproval: boolean = self.status == "pending_approval"
   computed isOpenForReceiving: boolean = self.status == "confirmed" or self.status == "partially_received"
+  // Tenant-singleton purchasingConfig hydrate (fields [tenantId]) supplies the threshold.
+  computed needsSpendApproval: boolean = self.purchasingConfig != null and self.purchasingConfig.orderApprovalThresholdAmount != null and self.totalAmount > self.purchasingConfig.orderApprovalThresholdAmount
   // Raw child status fields via count_of — not child computeds (parent rollup limitation).
   computed hasIncompleteLines: boolean = count_of(self.lines, (line) => line.deletedAt == null and line.status != "cancelled" and line.status != "complete") > 0
 

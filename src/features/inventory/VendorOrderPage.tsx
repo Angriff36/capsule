@@ -12,7 +12,6 @@ import {
   useListVendor,
   useListVendorContact,
   useListVendorOrderLine,
-  useListWeeklyPurchasingConfig,
   useVendorOrderApprove,
   useVendorOrderCancel,
   useVendorOrderConfirm,
@@ -47,7 +46,6 @@ export function VendorOrderPage() {
   const inventoryLots = useListInventoryLot();
   const locations = useListStorageLocation();
   const createLine = useCreateVendorOrderLine();
-  const purchasingConfigs = useListWeeklyPurchasingConfig();
   const submitOrder = useVendorOrderSubmit();
   const submitForApproval = useVendorOrderSubmitForApproval();
   const approveOrder = useVendorOrderApprove();
@@ -112,16 +110,9 @@ export function VendorOrderPage() {
   const locationName = (locationId?: string | null) =>
     locations?.find((item) => item._id === locationId)?.name ?? "Unassigned";
 
-  // Spend-approval gate: over-threshold drafts route to a manager instead of
-  // submitting directly. The server enforces the same rule on submit.
-  // Threshold compare stays client-side until VendorOrder.needsSpendApproval
-  // can hydrate the tenant-singleton WeeklyPurchasingConfig reliably.
-  const approvalThreshold =
-    (purchasingConfigs ?? []).find((config) => config.deletedAt == null)
-      ?.orderApprovalThresholdAmount ?? null;
-  const needsApproval =
-    approvalThreshold != null &&
-    Number(order.totalAmount) > Number(approvalThreshold);
+  // Spend-approval gate: Manifest-derived VendorOrder.needsSpendApproval
+  // (hydrates tenant-singleton WeeklyPurchasingConfig by tenantId).
+  const needsApproval = Boolean(order.needsSpendApproval);
   const isPendingApproval = Boolean(order.isPendingApproval);
   const isDraft = Boolean(order.isDraft);
   const isOpenForReceiving = Boolean(order.isOpenForReceiving);
@@ -359,11 +350,8 @@ export function VendorOrderPage() {
           <strong>Awaiting manager approval before it is sent</strong>
           <span>
             This order total (${Number(order.totalAmount).toFixed(2)}) is above
-            the spend approval threshold
-            {approvalThreshold != null
-              ? ` of $${Number(approvalThreshold).toFixed(2)}`
-              : ""}
-            . A manager can approve it in one click or request modifications.
+            the spend approval threshold. A manager can approve it in one click
+            or request modifications.
           </span>
         </aside>
       ) : null}

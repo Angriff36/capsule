@@ -8004,12 +8004,19 @@ export const listVendorOrder = query({
     const __plainRows = rows;
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __lookup = ((__row as any) as any).tenantId;
+      ((__row as any) as any).purchasingConfig = __lookup != null
+      ? await ctx.db.query("weeklyPurchasingConfigs").withIndex("by_tenantId", (q: any) => q.eq("tenantId", __lookup)).first()
+      : null;
+      }
       (__row as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __row._id)).collect();
       (__row as any).isDraft = ((__row as any).status === "draft");
       (__row as any).isPendingApproval = ((__row as any).status === "pending_approval");
       (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
+      (__row as any).needsSpendApproval = ((((__row as any).purchasingConfig != null) && ((__row as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__row as any).totalAmount > (__row as any).purchasingConfig.orderApprovalThresholdAmount));
       (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, hasIncompleteLines: (__row as any).hasIncompleteLines });
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines });
     }
     return __projectedRows;
   },
@@ -8028,12 +8035,19 @@ export const getVendorOrder = query({
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
     const __doc = __rawDoc;
+    {
+      const __lookup = ((__doc as any) as any).tenantId;
+      ((__doc as any) as any).purchasingConfig = __lookup != null
+        ? await ctx.db.query("weeklyPurchasingConfigs").withIndex("by_tenantId", (q: any) => q.eq("tenantId", __lookup)).first()
+        : null;
+    }
     (__doc as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __doc._id)).collect();
     (__doc as any).isDraft = ((__doc as any).status === "draft");
     (__doc as any).isPendingApproval = ((__doc as any).status === "pending_approval");
     (__doc as any).isOpenForReceiving = (((__doc as any).status === "confirmed") || ((__doc as any).status === "partially_received"));
+    (__doc as any).needsSpendApproval = ((((__doc as any).purchasingConfig != null) && ((__doc as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__doc as any).totalAmount > (__doc as any).purchasingConfig.orderApprovalThresholdAmount));
     (__doc as any).hasIncompleteLines = ((((__doc as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-    const __hydrated = { ...(__doc as any), isDraft: (__doc as any).isDraft, isPendingApproval: (__doc as any).isPendingApproval, isOpenForReceiving: (__doc as any).isOpenForReceiving, hasIncompleteLines: (__doc as any).hasIncompleteLines };
+    const __hydrated = { ...(__doc as any), isDraft: (__doc as any).isDraft, isPendingApproval: (__doc as any).isPendingApproval, isOpenForReceiving: (__doc as any).isOpenForReceiving, needsSpendApproval: (__doc as any).needsSpendApproval, hasIncompleteLines: (__doc as any).hasIncompleteLines };
     return __hydrated;
   },
 });
@@ -8049,12 +8063,19 @@ export const listVendorOrderByTenantId = query({
     const __plainRows = rows;
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __lookup = ((__row as any) as any).tenantId;
+      ((__row as any) as any).purchasingConfig = __lookup != null
+      ? await ctx.db.query("weeklyPurchasingConfigs").withIndex("by_tenantId", (q: any) => q.eq("tenantId", __lookup)).first()
+      : null;
+      }
       (__row as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __row._id)).collect();
       (__row as any).isDraft = ((__row as any).status === "draft");
       (__row as any).isPendingApproval = ((__row as any).status === "pending_approval");
       (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
+      (__row as any).needsSpendApproval = ((((__row as any).purchasingConfig != null) && ((__row as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__row as any).totalAmount > (__row as any).purchasingConfig.orderApprovalThresholdAmount));
       (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, hasIncompleteLines: (__row as any).hasIncompleteLines });
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines });
     }
     return __projectedRows;
   },
@@ -8073,12 +8094,19 @@ export const listVendorOrderByVendorId = query({
     const __plainRows = rows;
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __lookup = ((__row as any) as any).tenantId;
+      ((__row as any) as any).purchasingConfig = __lookup != null
+      ? await ctx.db.query("weeklyPurchasingConfigs").withIndex("by_tenantId", (q: any) => q.eq("tenantId", __lookup)).first()
+      : null;
+      }
       (__row as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __row._id)).collect();
       (__row as any).isDraft = ((__row as any).status === "draft");
       (__row as any).isPendingApproval = ((__row as any).status === "pending_approval");
       (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
+      (__row as any).needsSpendApproval = ((((__row as any).purchasingConfig != null) && ((__row as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__row as any).totalAmount > (__row as any).purchasingConfig.orderApprovalThresholdAmount));
       (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, hasIncompleteLines: (__row as any).hasIncompleteLines });
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines });
     }
     return __projectedRows;
   },
@@ -8097,12 +8125,19 @@ export const listVendorOrderByEventId = query({
     const __plainRows = rows;
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __lookup = ((__row as any) as any).tenantId;
+      ((__row as any) as any).purchasingConfig = __lookup != null
+      ? await ctx.db.query("weeklyPurchasingConfigs").withIndex("by_tenantId", (q: any) => q.eq("tenantId", __lookup)).first()
+      : null;
+      }
       (__row as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __row._id)).collect();
       (__row as any).isDraft = ((__row as any).status === "draft");
       (__row as any).isPendingApproval = ((__row as any).status === "pending_approval");
       (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
+      (__row as any).needsSpendApproval = ((((__row as any).purchasingConfig != null) && ((__row as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__row as any).totalAmount > (__row as any).purchasingConfig.orderApprovalThresholdAmount));
       (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, hasIncompleteLines: (__row as any).hasIncompleteLines });
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines });
     }
     return __projectedRows;
   },
@@ -8121,12 +8156,19 @@ export const listVendorOrderByPurchasingConfigId = query({
     const __plainRows = rows;
     const __projectedRows: any[] = [];
     for (const __row of __plainRows as any[]) {
+      {
+      const __lookup = ((__row as any) as any).tenantId;
+      ((__row as any) as any).purchasingConfig = __lookup != null
+      ? await ctx.db.query("weeklyPurchasingConfigs").withIndex("by_tenantId", (q: any) => q.eq("tenantId", __lookup)).first()
+      : null;
+      }
       (__row as any).lines = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q: any) => q.eq("vendorOrderId", __row._id)).collect();
       (__row as any).isDraft = ((__row as any).status === "draft");
       (__row as any).isPendingApproval = ((__row as any).status === "pending_approval");
       (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
+      (__row as any).needsSpendApproval = ((((__row as any).purchasingConfig != null) && ((__row as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__row as any).totalAmount > (__row as any).purchasingConfig.orderApprovalThresholdAmount));
       (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, hasIncompleteLines: (__row as any).hasIncompleteLines });
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines });
     }
     return __projectedRows;
   },

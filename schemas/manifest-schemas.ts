@@ -2219,6 +2219,7 @@ export const VendorOrderComputedSchema = VendorOrderSchema.extend({
   isDraft: z.boolean(),
   isPendingApproval: z.boolean(),
   isOpenForReceiving: z.boolean(),
+  needsSpendApproval: z.boolean(),
   hasIncompleteLines: z.boolean(),
 });
 
