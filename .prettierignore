@@ -35,6 +35,7 @@ package-lock.json
 # Runtime artifacts (AboardAI, Playwright MCP)
 .aboardai/
 .playwright-mcp/
+test-results/
 
 # Loop state files (preserve original formatting)
 loop-ledger-append.json

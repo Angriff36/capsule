@@ -53,6 +53,14 @@ class BaselineDecayCheck {
       ".cursor",
       ".sonarlint",
       ".vscode",
+      // Gitignored local tool/loop state — never part of a clean CI checkout
+      ".aboardai",
+      ".local",
+      ".loop-worktrees",
+      ".worktrees",
+      ".playwright-mcp",
+      "test-results",
+      "work",
     ]);
     const entries = readdirSync(ROOT).filter((name) => !localOnly.has(name));
     if (entries.length > ROOT_CAP) {
