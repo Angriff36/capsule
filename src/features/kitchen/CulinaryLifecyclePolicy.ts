@@ -8,6 +8,7 @@ import {
   MenuRestoreLifecycle,
   MenuUnpublishLifecycle,
   RecipePublishVersionLifecycle,
+  RecipeReinstateLifecycle,
   RecipeRetractLifecycle,
   RecipeRetireLifecycle,
 } from "../../generated/manifest-wiring-bindings";
@@ -49,6 +50,11 @@ const RECIPE_ACTIONS = [
     lifecycle: RecipeRetractLifecycle,
   },
   { key: "retire", label: "Retire", lifecycle: RecipeRetireLifecycle },
+  {
+    key: "reinstate",
+    label: "Reinstate",
+    lifecycle: RecipeReinstateLifecycle,
+  },
 ] as const;
 
 const INGREDIENT_ACTIONS = [
@@ -86,7 +92,14 @@ const MENU_ACTIONS = [
 
 export class CulinaryLifecyclePolicy {
   recipeActions(status: string) {
-    return available(status, RECIPE_ACTIONS);
+    // Wiring lifecycle proofs attribute every status→draft edge to both
+    // retract and reinstate. Narrow to the command guards: retract only from
+    // published, reinstate only from retired.
+    return available(status, RECIPE_ACTIONS).filter((action) => {
+      if (action.key === "retract") return status === "published";
+      if (action.key === "reinstate") return status === "retired";
+      return true;
+    });
   }
 
   ingredientActions(status: string) {

@@ -210,7 +210,7 @@ Tempted by generate / build / watch / diagram -o diagrams / install-hooks?
 
 | Footgun                    | Reality                                                                                                                                           |
 | -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bun run manifest:build`   | Still in Capsule `package.json` (Builder glue). Runs bare `manifest build` → unsafe. [capsule#38](https://github.com/Angriff36/capsule/issues/38) |
+| `bun run manifest:build`   | Deny-guarded via `scripts/manifest-build-deny.ts` (exits 1). Use `bun run manifest:regen`. [capsule#38](https://github.com/Angriff36/capsule/issues/38) |
 | `manifest generate --all`  | Writes Capsule `convex/` off-ledger                                                                                                               |
 | `manifest migrate` “apply” | Stub; still not Convex                                                                                                                            |
 | `install-hooks`            | Rewrites owned `package.json`                                                                                                                     |

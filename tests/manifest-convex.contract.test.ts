@@ -845,6 +845,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Recipe_publishVersion", () => {
     expect(typeof (mutations as any).Recipe_publishVersion).toBe("function");
   });
+  it("exports mutation Recipe_reinstate", () => {
+    expect(typeof (mutations as any).Recipe_reinstate).toBe("function");
+  });
   it("exports mutation Recipe_retire", () => {
     expect(typeof (mutations as any).Recipe_retire).toBe("function");
   });
@@ -1240,4 +1243,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 411 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 412 as const;
