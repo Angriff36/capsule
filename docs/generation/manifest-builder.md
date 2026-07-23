@@ -124,11 +124,11 @@ When `@angriff36/manifest` gains projection behavior, consuming that release mea
 
 Do **not** use bare `manifest generate` / `manifest build`, `bun run manifest:build`, or `place-manifest-convex-react.ts`.
 ~~There is no npm script for them.~~
-> **Correction (2026-07-22):** Builder's `convex-application` preset still emits
-> `manifest:compile` / `manifest:build` into owned `package.json`. Those scripts
-> are **unsafe** here — they bypass Builder ownership. Capsule regen is only
-> `bun run manifest:regen`. `place-manifest-convex-react.ts` is deny-guarded;
-> `manifest:build` is not yet wired through the same deny path.
+> **Correction (2026-07-22 / deny wired 2026-07-23):** Builder's
+> `convex-application` preset still emits `manifest:compile` / `manifest:build`
+> into owned `package.json`. Those paths bypass Builder ownership. Capsule regen
+> is only `bun run manifest:regen`. `place-manifest-convex-react.ts` and
+> `manifest:build` (via `scripts/manifest-build-deny.ts`) are deny-guarded.
 
 Full safe/unsafe Manifest CLI inventory for Capsule:
 [manifest-cli-safety.md](./manifest-cli-safety.md).

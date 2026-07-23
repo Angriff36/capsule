@@ -11,11 +11,12 @@ import {
 import { NAV_AREAS } from "../src/app/nav";
 
 describe("Clients CRM routes and lifecycle bindings", () => {
-  it("exposes accounts, proposals, and contracts sections", () => {
+  it("exposes accounts, proposals, contracts, and retention sections", () => {
     expect(CLIENTS_SECTIONS.map((section) => section.path)).toEqual([
       "/clients",
       "/clients/proposals",
       "/clients/contracts",
+      "/clients/retention",
     ]);
   });
 
@@ -34,10 +35,12 @@ describe("Clients CRM routes and lifecycle bindings", () => {
     expect(app).toContain('path="/clients/:id"');
     expect(app).toContain('path="/clients/proposals"');
     expect(app).toContain('path="/clients/contracts"');
+    expect(app).toContain('path="/clients/retention"');
     expect(app).toContain("ClientsPage");
     expect(app).toContain("ClientDetailPage");
     expect(app).toContain("ProposalsPage");
     expect(app).toContain("ContractsPage");
+    expect(app).toContain("ClientRetentionPage");
   });
 
   it("deep-links Client and signed Contract into invoice issue", () => {
