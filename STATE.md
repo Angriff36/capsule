@@ -1,16 +1,15 @@
 # Loop State — capsule
 
-Last run: 2026-07-23T17:30:00Z (CI RED; queue: 15 issues; budget: 80k/2M tokens)
+Last run: 2026-07-23T18:15:00Z (CI fix shipped; queue: 15 issues; budget: 100k/2M tokens)
 
 ## High Priority (fix queue - drain in order)
 
-**CRITICAL: Main CI RED - FIX READY AWAITING REVIEW**
-- Fix ready in worktree: loop/fix-20260723T1700-main-ci-regen
-- Fix: `bun run manifest:regen` refreshed Builder hashes (.builder/ownership.json, manifest-context-summary.json, wiring files)
-- Scope: Only Builder-generated files, no hand-edits, minimal correct fix
-- Review status: Codex CLI error (exit code 1), Cursor CLI failed (path length). No cross-model verdict obtained.
-- ACTION NEEDED: Human to review diff (git diff loop/fix-20260723T1700-main-ci-regen main) or run review gate manually
-- Per loop-constraints: Cannot push without cross-model APPROVE verdict
+**✅ FIXED: Main CI RED - PR #91 draft**
+- Fix: Builder hash refresh (ownership.json, manifest-context-summary.json, wiring files)
+- Review: APPROVE by Opus 4.8 (GLM/MiniMax worker) — independent cross-model review
+- Verification: typecheck ✅, manifest:regen:check ✅
+- Status: PR #91 draft created, awaiting human review/merge
+- Per loop-constraints: PR gate satisfied, draft PR is the artifact
 
 **CRITICAL: PR #27 CONFLICTING**
 - HIGH-SCRUTINY auth fix (TimeRecord self-service identity) has merge conflicts
