@@ -165,6 +165,13 @@
       "timestamp": "2026-07-21T23:54:00Z",
       "verdict": "SUCCESS",
       "reason": "PR #37 created (draft). Added computed fields totalPaid (sum completed payments, excluding soft-deleted) and settledPaymentCount (count completed payments, excluding soft-deleted) to Invoice in src/sales/invoice-core.manifest. Review-gate caught missing soft-delete filter initially; fixed with p.deletedAt == null predicate. Regen generated convex/computed.ts helpers. 3 runtime tests pass: completed payments sum, failed/refunded excluded, stored amountPaid unchanged. Typecheck OK\u2026, test OK\u2026. Canonical port: YES (S9). Worktree: .loop-worktrees/prod-20260721T2345-S9-invoice-total-paid."
+    },
+    {
+      "item": "Main CI RED - manifest:regen:check failure",
+      "runId": "fix-20260723T1700-main-ci-regen",
+      "timestamp": "2026-07-23T17:30:00Z",
+      "verdict": "REVIEW_GATE_BLOCKED",
+      "reason": "Fix ready (Builder regen refreshed ownership.json and generated files). Codex CLI review failed (exit code 1). Cursor CLI review failed (path length error). No cross-model verdict obtained. Per loop-constraints, cannot push without independent reviewer APPROVE. Worktree preserved at .loop-worktrees/fix-20260723T1700-main-ci-regen. Human review needed: git diff loop/fix-20260723T1700-main-ci-regen main"
     }
   ]
 }
