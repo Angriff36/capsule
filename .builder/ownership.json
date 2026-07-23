@@ -18,10 +18,11 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "31fc4cf4d16fb9bab8d87531a643e9efd16b5a0d6c35a0691e745991cffe4c3e"
+      "sha256": "31fc4cf4d16fb9bab8d87531a643e9efd16b5a0d6c35a0691e745991cffe4c3e",
+      "baselined": true
     },
     "convex/queries.ts": {
-      "sha256": "c87a7a5bb688a0e064efbdd775fa4f9ae94b41f584a919e4dd1596894b6534fd"
+      "sha256": "2d0314791a57eef449720016f81881429ce53e111a2abedb405e2e94737153eb"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
