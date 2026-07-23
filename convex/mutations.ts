@@ -19526,7 +19526,7 @@ async function __runPrepTaskClaim(ctx: MutationCtx, { docId, version }: any, __c
     if (!((checkRole(user.role, "kitchenAccess") || checkRole(user.role, "manageAccess")))) throw new Error("Kitchen and event managers may execute prep task commands");
     if (!((doc.status === "pending"))) throw new Error("Guard 0 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((user.id != null))) throw new Error("Guard 2 failed");
+    if (!((user.personId != null))) throw new Error("Guard 2 failed");
     if (!((doc.quantity > 0))) throw new Error("Prep quantity must be positive before claim");
     const previousStatus = doc.status;
     {
@@ -19545,15 +19545,15 @@ async function __runPrepTaskClaim(ctx: MutationCtx, { docId, version }: any, __c
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      assignedToId: user.id,
+      assignedToId: user.personId,
       status: "claimed",
       claimedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, prepTaskId: docId, tenantId: __after.tenantId, eventDishId: __after.eventDishId, eventId: __after.eventId, name: __after.name, assignedToId: user.id, quantity: __after.quantity, unit: __after.unit, previousStatus: previousStatus, status: "claimed", _subject: { entity: "PrepTask", command: "claim", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "PrepTaskClaimed", entity: "PrepTask", entityId: docId, payload: { prepTaskId: docId, tenantId: __after.tenantId, eventDishId: __after.eventDishId, eventId: __after.eventId, name: __after.name, assignedToId: user.id, quantity: __after.quantity, unit: __after.unit, previousStatus: previousStatus, status: "claimed" }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, prepTaskId: docId, tenantId: __after.tenantId, eventDishId: __after.eventDishId, eventId: __after.eventId, name: __after.name, assignedToId: user.personId, quantity: __after.quantity, unit: __after.unit, previousStatus: previousStatus, status: "claimed", _subject: { entity: "PrepTask", command: "claim", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "PrepTaskClaimed", entity: "PrepTask", entityId: docId, payload: { prepTaskId: docId, tenantId: __after.tenantId, eventDishId: __after.eventDishId, eventId: __after.eventId, name: __after.name, assignedToId: user.personId, quantity: __after.quantity, unit: __after.unit, previousStatus: previousStatus, status: "claimed" }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -19956,7 +19956,7 @@ async function __runPrepTaskRelease(ctx: MutationCtx, { docId, version }: any, _
     if (!((doc.status === "claimed"))) throw new Error("Guard 0 failed");
     if (!((doc.claimedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!(((doc.assignedToId === user.id) || checkRole(user.role, "kitchenLeadAccess")))) throw new Error("Guard 3 failed");
+    if (!(((doc.assignedToId === user.personId) || checkRole(user.role, "kitchenLeadAccess")))) throw new Error("Guard 3 failed");
     const previousStatus = doc.status;
     const previousAssignee = doc.assignedToId;
     {

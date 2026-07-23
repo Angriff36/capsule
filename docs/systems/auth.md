@@ -6,7 +6,7 @@
 - **Convex + Clerk JWT** — `convex/auth.config.ts` validates tokens via `CLERK_JWT_ISSUER_DOMAIN`.
 - **AuthGate** — `src/app/AuthGate.tsx` blocks the shell until session + membership are ok.
 - **Workspace membership** — `src/app/auth/WorkspaceMembershipPolicy.ts` decides claim / org readiness.
-- **Server auth context** — `convex/lib/authContext.ts` maps `ctx.auth.getUserIdentity()` (+ claims) to `{ id, role, tenantId }`. Fail-closed anonymous sentinels when unauthenticated.
+- **Server auth context** — `convex/lib/authContext.ts` maps `ctx.auth.getUserIdentity()` (+ claims) to `{ id, role, tenantId, personId? }`. `id` is the Clerk auth subject; when an active `Person` is linked via `authSubjectId`, `personId` is that people-table document id for Person FK writes (e.g. `PrepTask.claim` → `assignedToId`). Fail-closed anonymous sentinels when unauthenticated.
 
 ## Client gate flow
 

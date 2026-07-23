@@ -207,13 +207,15 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // assignedToId is a Person FK (v.id("people")). Auth seam exposes the linked
+  // Person doc id as user.personId; user.id remains the Clerk auth subject.
   command claim() {
     guard self.status == "pending"
     guard self.deletedAt == null
-    guard user.id != null
+    guard user.personId != null
     constraint claimQuantityReady: self.quantity > 0 "Prep quantity must be positive before claim"
     compute previousStatus = self.status
-    mutate assignedToId = user.id
+    mutate assignedToId = user.personId
     mutate status = "claimed"
     mutate claimedAt = now()
     emit PrepTaskClaimed {
@@ -222,7 +224,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
       eventDishId: self.eventDishId
       eventId: self.eventId
       name: self.name
-      assignedToId: user.id
+      assignedToId: user.personId
       quantity: self.quantity
       unit: self.unit
       previousStatus: previousStatus
@@ -261,7 +263,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.status == "claimed"
     guard self.claimedAt != null
     guard self.deletedAt == null
-    guard self.assignedToId == user.id or roleAllows(user.role, "kitchenLeadAccess")
+    guard self.assignedToId == user.personId or roleAllows(user.role, "kitchenLeadAccess")
     compute previousStatus = self.status
     compute previousAssignee = self.assignedToId
     mutate assignedToId = null
