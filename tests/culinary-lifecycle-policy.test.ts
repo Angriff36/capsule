@@ -4,30 +4,42 @@ import { CulinaryLifecyclePolicy } from "../src/features/kitchen/CulinaryLifecyc
 describe("CulinaryLifecyclePolicy", () => {
   const policy = new CulinaryLifecyclePolicy();
 
-  it("derives recipe actions from generated lifecycle metadata", () => {
+  it("offers one-click delete for live recipes without a reason prompt path", () => {
     expect(policy.recipeActions("draft").map((action) => action.key)).toEqual([
       "publishVersion",
-      "retire",
+      "purge",
     ]);
     expect(
       policy.recipeActions("published").map((action) => action.key),
-    ).toEqual(["retract", "retire"]);
-    expect(policy.recipeActions("retired")).toEqual([]);
+    ).toEqual(["retract", "purge"]);
+    expect(policy.recipeActions("retired", Date.now())).toEqual([]);
+    expect(policy.recipeActions("retired", null).map((a) => a.key)).toEqual([
+      "purge",
+    ]);
   });
 
-  it("derives ingredient and dish retirement actions from generated metadata", () => {
+  it("offers delete without restore-first; restore only when explicitly included", () => {
     expect(
       policy.ingredientActions("active").map((action) => action.key),
-    ).toEqual(["discontinue"]);
+    ).toEqual(["purge"]);
     expect(
-      policy.ingredientActions("discontinued").map((action) => action.key),
+      policy
+        .ingredientActions("discontinued", Date.now())
+        .map((action) => action.key),
+    ).toEqual([]);
+    expect(
+      policy
+        .ingredientActions("discontinued", Date.now(), { includeRestore: true })
+        .map((action) => action.key),
     ).toEqual(["reinstate"]);
     expect(policy.dishActions("active").map((action) => action.key)).toEqual([
-      "retire",
+      "purge",
     ]);
-    expect(policy.dishActions("retired").map((action) => action.key)).toEqual([
-      "reinstate",
-    ]);
+    expect(
+      policy
+        .dishActions("retired", Date.now(), { includeRestore: true })
+        .map((action) => action.key),
+    ).toEqual(["reinstate"]);
   });
 
   it("derives menu publishing actions from generated metadata", () => {

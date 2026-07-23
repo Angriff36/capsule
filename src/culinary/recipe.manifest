@@ -22,7 +22,10 @@ entity Recipe mixin TenantScoped, SoftDeletable {
   property required versionNumber: int = 1
   property required yieldQuantity: decimal(10, 2) = 1
   property required yieldUnit: UnitOfMeasure = "portion"
-  property required batchMultiplier: decimal(10, 4) = 1
+  // Guests served by one yieldQuantity batch (e.g. 1 gallon lemonade → 5 people).
+  // Optional so pre-field Recipe rows validate under Convex schema push.
+  property servesPerYield: int? = 1
+  property batchMultiplier: decimal(10, 4)? = 1
   property required status: RecipeStatus = "draft"
   property draftedAt: datetime?
   property publishedAt: datetime?
@@ -34,9 +37,14 @@ entity Recipe mixin TenantScoped, SoftDeletable {
 
   computed isPublished: boolean = self.status == "published"
   computed isEditable: boolean = self.status == "draft"
+  // Live batch cost from non-deleted ingredient lines (Ingredient.costPerUnit).
+  // Inlined line cost (not line.liveIngredientCost) so Convex projection can emit one expression.
+  computed liveBatchCost: money(12, 2) = sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * (line.wasteFactor != null ? line.wasteFactor : 1) * line.ingredient.costPerUnit : 0)
+  computed liveCostPerGuest: money(12, 2) = self.servesPerYield > 0 ? sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * (line.wasteFactor != null ? line.wasteFactor : 1) * line.ingredient.costPerUnit : 0) / self.servesPerYield : 0
 
   constraint recipeIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Drafted recipes require a name"
   constraint recipeYieldPositive: self.yieldQuantity > 0 "Recipe yield quantity must be positive"
+  constraint recipeServesPerYieldPositive: self.servesPerYield > 0 "Serves per yield must be a positive integer"
   constraint recipeBatchPositive: self.batchMultiplier > 0 "Recipe batch multiplier must be positive"
 
   transition status from "draft" to ["published", "retired"]
@@ -51,6 +59,7 @@ entity Recipe mixin TenantScoped, SoftDeletable {
     name: string,
     yieldQuantity: decimal(10, 2),
     yieldUnit: UnitOfMeasure,
+    optional servesPerYield: int,
     optional batchMultiplier: decimal(10, 4),
     optional category: string,
     optional cuisine: string,
@@ -61,10 +70,12 @@ entity Recipe mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint draftRecipeName: length(trim(name)) > 0 "Recipe name is required"
     constraint draftYieldPositive: yieldQuantity > 0 "Recipe yield quantity must be positive"
+    constraint draftServesPerYieldPositive: servesPerYield == null or servesPerYield > 0 "Serves per yield must be a positive integer"
     constraint draftBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Recipe batch multiplier must be positive"
     mutate name = name
     mutate yieldQuantity = yieldQuantity
     mutate yieldUnit = yieldUnit
+    mutate servesPerYield = servesPerYield != null ? servesPerYield : 1
     mutate batchMultiplier = batchMultiplier != null ? batchMultiplier : 1
     mutate category = category
     mutate cuisine = cuisine
@@ -78,6 +89,7 @@ entity Recipe mixin TenantScoped, SoftDeletable {
       name: name
       yieldQuantity: yieldQuantity
       yieldUnit: yieldUnit
+      servesPerYield: servesPerYield != null ? servesPerYield : 1
       batchMultiplier: batchMultiplier != null ? batchMultiplier : 1
       versionNumber: 1
     }
@@ -88,6 +100,7 @@ entity Recipe mixin TenantScoped, SoftDeletable {
     yieldQuantity: decimal(10, 2),
     yieldUnit: UnitOfMeasure,
     batchMultiplier: decimal(10, 4),
+    optional servesPerYield: int,
     optional category: string,
     optional cuisine: string,
     optional description: string,
@@ -97,10 +110,12 @@ entity Recipe mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     constraint reviseRecipeName: length(trim(name)) > 0 "Recipe name is required"
     constraint reviseYieldPositive: yieldQuantity > 0 "Recipe yield quantity must be positive"
+    constraint reviseServesPerYieldPositive: servesPerYield == null or servesPerYield > 0 "Serves per yield must be a positive integer"
     constraint reviseBatchPositive: batchMultiplier > 0 "Recipe batch multiplier must be positive"
     mutate name = name
     mutate yieldQuantity = yieldQuantity
     mutate yieldUnit = yieldUnit
+    mutate servesPerYield = servesPerYield != null ? servesPerYield : self.servesPerYield
     mutate batchMultiplier = batchMultiplier
     mutate category = category
     mutate cuisine = cuisine
@@ -112,8 +127,21 @@ entity Recipe mixin TenantScoped, SoftDeletable {
       name: name
       yieldQuantity: yieldQuantity
       yieldUnit: yieldUnit
+      servesPerYield: servesPerYield != null ? servesPerYield : self.servesPerYield
       batchMultiplier: batchMultiplier
       versionNumber: self.versionNumber
+    }
+  }
+
+  // How many guests one yieldQuantity batch serves.
+  command setServesPerYield(servesPerYield: int) {
+    guard self.deletedAt == null
+    constraint setServesPerYieldPositive: servesPerYield > 0 "Serves per yield must be a positive integer"
+    mutate servesPerYield = servesPerYield
+    emit RecipeServesPerYieldSet {
+      recipeId: self.id
+      tenantId: self.tenantId
+      servesPerYield: servesPerYield
     }
   }
 
@@ -149,18 +177,34 @@ entity Recipe mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command retire(reason: string) {
+  // Retire = remove from the kitchen book (soft-delete). Reason optional.
+  command retire(optional reason: string) {
     guard self.status == "draft" or self.status == "published"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
-    constraint retireReason: length(trim(reason)) > 0 "Retirement reason is required"
     mutate status = "retired"
     mutate retiredAt = now()
-    mutate retirementReason = reason
+    mutate retirementReason = reason != null ? reason : "Deleted"
+    mutate deletedAt = now()
     emit RecipeRetired {
       recipeId: self.id
       tenantId: self.tenantId
-      reason: reason
+      reason: reason != null ? reason : "Deleted"
+    }
+  }
+
+  // One-click hide from any non-deleted status — no restore dance.
+  command purge() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "retired"
+    mutate retiredAt = self.retiredAt != null ? self.retiredAt : now()
+    mutate retirementReason = "Deleted"
+    mutate deletedAt = now()
+    emit RecipePurged {
+      recipeId: self.id
+      tenantId: self.tenantId
+      reason: "Deleted"
     }
   }
 
@@ -177,13 +221,24 @@ entity RecipeIngredient mixin TenantScoped, SoftDeletable {
   property required quantity: decimal(10, 4) = 0
   property required unit: UnitOfMeasure = "each"
   property required sortOrder: int = 0
+  // Waste / trim multiplier (1.0 = no waste). Applied before live cost.
+  // Optional so pre-field RecipeIngredient rows validate under Convex schema push.
+  property wasteFactor: decimal(10, 4)? = 1
   property prepNotes: string?
   property addedAt: datetime?
 
   belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
 
+  computed adjustedQuantity: decimal(10, 4) = self.quantity * (self.wasteFactor != null ? self.wasteFactor : 1)
+  // Capsule prices recipes from Ingredient.costPerUnit (catalog). Same-unit
+  // only — do not silently multiply incompatible UnitOfMeasure values.
+  // Cross-unit conversion remains in RecipeCostCalculator until Manifest owns factors.
+  computed unitsMatchIngredientPrice: boolean = self.unit == self.ingredient.unit
+  computed liveIngredientCost: money(12, 2) = self.unit == self.ingredient.unit ? self.quantity * (self.wasteFactor != null ? self.wasteFactor : 1) * self.ingredient.costPerUnit : 0
+
   constraint lineQuantityPositive: self.addedAt == null or self.quantity > 0 "Recipe ingredient quantity must be positive"
+  constraint lineWasteFactorPositive: self.addedAt == null or self.wasteFactor == null or self.wasteFactor > 0 "Waste factor must be greater than 0"
 
   default policy recipeIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read recipe ingredient lines"
   default policy recipeIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write recipe ingredient lines through commands"
@@ -195,15 +250,18 @@ entity RecipeIngredient mixin TenantScoped, SoftDeletable {
     quantity: decimal(10, 4),
     unit: UnitOfMeasure,
     optional sortOrder: number,
+    optional wasteFactor: decimal(10, 4),
     optional prepNotes: string
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
     constraint addLineQuantity: quantity > 0 "Recipe ingredient quantity must be positive"
+    constraint addLineWasteFactor: wasteFactor == null or wasteFactor > 0 "Waste factor must be greater than 0"
     mutate recipeId = recipeId
     mutate ingredientId = ingredientId
     mutate quantity = quantity
     mutate unit = unit
+    mutate wasteFactor = wasteFactor != null ? wasteFactor : 1
     mutate sortOrder = sortOrder != null ? sortOrder : 0
     mutate prepNotes = prepNotes
     mutate addedAt = now()
@@ -214,6 +272,21 @@ entity RecipeIngredient mixin TenantScoped, SoftDeletable {
       ingredientId: ingredientId
       quantity: quantity
       unit: unit
+      wasteFactor: wasteFactor != null ? wasteFactor : 1
+    }
+  }
+
+  command setWasteFactor(wasteFactor: decimal(10, 4)) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint setWasteFactorPositive: wasteFactor > 0 "Waste factor must be greater than 0"
+    mutate wasteFactor = wasteFactor
+    emit RecipeIngredientWasteFactorSet {
+      recipeIngredientId: self.id
+      tenantId: self.tenantId
+      recipeId: self.recipeId
+      ingredientId: self.ingredientId
+      wasteFactor: wasteFactor
     }
   }
 
@@ -343,6 +416,7 @@ event RecipeDrafted: "recipe.drafted" {
   name: string
   yieldQuantity: decimal(10, 2)
   yieldUnit: UnitOfMeasure
+  servesPerYield: int
   batchMultiplier: decimal(10, 4)
   versionNumber: number
 }
@@ -353,8 +427,15 @@ event RecipeDraftRevised: "recipe.draft_revised" {
   name: string
   yieldQuantity: decimal(10, 2)
   yieldUnit: UnitOfMeasure
+  servesPerYield: int
   batchMultiplier: decimal(10, 4)
   versionNumber: number
+}
+
+event RecipeServesPerYieldSet: "recipe.serves_per_yield_set" {
+  recipeId: string
+  tenantId: string
+  servesPerYield: int
 }
 
 event RecipeVersionPublished: "recipe.version_published" {
@@ -378,6 +459,12 @@ event RecipeRetired: "recipe.retired" {
   reason: string
 }
 
+event RecipePurged: "recipe.purged" {
+  recipeId: string
+  tenantId: string
+  reason: string
+}
+
 event RecipeIngredientAdded: "recipe_ingredient.added" {
   recipeIngredientId: string
   tenantId: string
@@ -385,6 +472,15 @@ event RecipeIngredientAdded: "recipe_ingredient.added" {
   ingredientId: string
   quantity: decimal(10, 4)
   unit: UnitOfMeasure
+  wasteFactor: decimal(10, 4)
+}
+
+event RecipeIngredientWasteFactorSet: "recipe_ingredient.waste_factor_set" {
+  recipeIngredientId: string
+  tenantId: string
+  recipeId: string
+  ingredientId: string
+  wasteFactor: decimal(10, 4)
 }
 
 event RecipeIngredientQuantityAdjusted: "recipe_ingredient.quantity_adjusted" {

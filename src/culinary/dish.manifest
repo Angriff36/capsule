@@ -31,12 +31,27 @@ entity Dish mixin TenantScoped, SoftDeletable {
   property introducedAt: datetime?
   property retiredAt: datetime?
   property retirementReason: string?
+  // Convex storage id for the customer-facing hero image (upload via Attachment).
+  property primaryImageStorageId: string?
+  property primaryImageFileName: string?
+  // Optional primary Recipe for compact summary / hyperlink (not composition editor).
+  property primaryRecipeId: uuid?
+  // Canonical lineage: null means this row is a canonical root; otherwise a version of that root.
+  property canonicalDishId: uuid?
+  // Optional so existing dish rows validate before backfill; UI treats null as 1.
+  property editionNumber: int? = 1
+  // Soft merge pointer — keep row for reference integrity; pickers prefer the target.
+  property mergedIntoDishId: uuid?
 
   hasMany recipeLines: DishRecipe
   hasMany prepTasks: DishTask
+  belongsTo primaryRecipe: Recipe fields [tenantId, primaryRecipeId] references [tenantId, id]
+  belongsTo canonicalDish: Dish fields [tenantId, canonicalDishId] references [tenantId, id]
+  belongsTo mergedIntoDish: Dish fields [tenantId, mergedIntoDishId] references [tenantId, id]
 
   computed isActive: boolean = self.status == "active"
   computed isRetired: boolean = self.status == "retired"
+  computed isCanonicalRoot: boolean = self.canonicalDishId == null and self.mergedIntoDishId == null
 
   constraint dishIdentityComplete: self.introducedAt == null or length(trim(self.name)) > 0 "Introduced dishes require a name"
   constraint dishPortionPositive: self.introducedAt == null or self.portionSize > 0 "Dish portion size must be positive"
@@ -138,31 +153,124 @@ entity Dish mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command retire(reason: string) {
+  // Retire = remove from the kitchen book (soft-delete). Historical EventDish
+  // references keep their dishId; the row is hidden from catalog pickers.
+  // Reason is optional — catering ops should not be blocked by audit prompts.
+  command retire(optional reason: string) {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenAccess")
-    constraint retireDishReason: length(trim(reason)) > 0 "Retirement reason is required"
     mutate status = "retired"
     mutate retiredAt = now()
-    mutate retirementReason = reason
+    mutate retirementReason = reason != null ? reason : "Deleted"
+    mutate deletedAt = now()
     emit DishRetired {
       dishId: self.id
       tenantId: self.tenantId
-      reason: reason
+      reason: reason != null ? reason : "Deleted"
     }
   }
 
   command reinstate() {
     guard self.status == "retired"
-    guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenAccess")
     mutate status = "active"
     mutate retiredAt = null
     mutate retirementReason = null
+    mutate deletedAt = null
     emit DishReinstated {
       dishId: self.id
       tenantId: self.tenantId
+    }
+  }
+
+  // One-click hide from the kitchen book. Works whether the row is still
+  // active or already retired/merged without deletedAt — no restore dance.
+  command purge() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenAccess")
+    mutate status = "retired"
+    mutate retiredAt = self.retiredAt != null ? self.retiredAt : now()
+    mutate retirementReason = "Deleted"
+    mutate deletedAt = now()
+    emit DishPurged {
+      dishId: self.id
+      tenantId: self.tenantId
+      reason: "Deleted"
+    }
+  }
+
+  command setPrimaryImage(storageId: string, optional fileName: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint primaryImageStorage: length(trim(storageId)) > 0 "Primary image storage id is required"
+    mutate primaryImageStorageId = storageId
+    mutate primaryImageFileName = fileName
+    emit DishPrimaryImageSet {
+      dishId: self.id
+      tenantId: self.tenantId
+      storageId: storageId
+    }
+  }
+
+  command clearPrimaryImage() {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate primaryImageStorageId = null
+    mutate primaryImageFileName = null
+    emit DishPrimaryImageCleared {
+      dishId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command setPrimaryRecipe(optional primaryRecipeId: uuid) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate primaryRecipeId = primaryRecipeId
+    emit DishPrimaryRecipeSet {
+      dishId: self.id
+      tenantId: self.tenantId
+      primaryRecipeId: primaryRecipeId
+    }
+  }
+
+  // Attach an already-introduced dish as an edition of a canonical root.
+  // Birth stays on introduce so createViaIntroduce remains the catalog create path.
+  command linkAsEdition(sourceDishId: uuid, optional editionNumber: int) {
+    guard self.introducedAt != null
+    guard self.deletedAt == null
+    guard self.mergedIntoDishId == null
+    constraint linkEditionSelf: sourceDishId != self.id "A dish cannot be an edition of itself"
+    constraint linkEditionNumber: editionNumber == null or editionNumber > 0 "Edition number must be positive"
+    mutate canonicalDishId = sourceDishId
+    mutate editionNumber = editionNumber != null ? editionNumber : self.editionNumber
+    emit DishEditionCreated {
+      dishId: self.id
+      tenantId: self.tenantId
+      sourceDishId: sourceDishId
+      name: self.name
+      editionNumber: editionNumber != null ? editionNumber : self.editionNumber
+    }
+  }
+
+  // Soft-merge into another dish: hide this row and point pickers at the survivor.
+  command mergeInto(targetDishId: uuid, reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard self.mergedIntoDishId == null
+    constraint mergeIntoSelf: targetDishId != self.id "Cannot merge a dish into itself"
+    constraint mergeIntoReason: length(trim(reason)) > 0 "Merge reason is required"
+    mutate mergedIntoDishId = targetDishId
+    mutate status = "retired"
+    mutate retiredAt = now()
+    mutate retirementReason = reason
+    mutate deletedAt = now()
+    emit DishMerged {
+      dishId: self.id
+      tenantId: self.tenantId
+      targetDishId: targetDishId
+      reason: reason
     }
   }
 
@@ -425,6 +533,44 @@ event DishRetired: "dish.retired" {
 event DishReinstated: "dish.reinstated" {
   dishId: string
   tenantId: string
+}
+
+event DishPurged: "dish.purged" {
+  dishId: string
+  tenantId: string
+  reason: string
+}
+
+event DishPrimaryImageSet: "dish.primary_image_set" {
+  dishId: string
+  tenantId: string
+  storageId: string
+}
+
+event DishPrimaryImageCleared: "dish.primary_image_cleared" {
+  dishId: string
+  tenantId: string
+}
+
+event DishPrimaryRecipeSet: "dish.primary_recipe_set" {
+  dishId: string
+  tenantId: string
+  primaryRecipeId: string?
+}
+
+event DishEditionCreated: "dish.edition_created" {
+  dishId: string
+  tenantId: string
+  sourceDishId: string
+  name: string
+  editionNumber: number
+}
+
+event DishMerged: "dish.merged" {
+  dishId: string
+  tenantId: string
+  targetDishId: string
+  reason: string
 }
 
 event DishRecipeAttached: "dish_recipe.attached" {

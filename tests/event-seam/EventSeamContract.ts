@@ -112,7 +112,11 @@ export class EventSeamContract {
     const allowAt = body.indexOf("__allowsRead(");
     const tenantAt = body.indexOf("tenantId");
     const decryptAt = body.indexOf("__decryptDoc(");
-    const returnDocAt = body.lastIndexOf("return __doc");
+    // Generated getEvent may return the decrypted doc or a hydrated projection.
+    const returnDocAt = Math.max(
+      body.lastIndexOf("return __doc"),
+      body.lastIndexOf("return __hydrated"),
+    );
     if (authAt < 0 || allowAt < 0 || decryptAt < 0 || returnDocAt < 0) {
       throw new Error("getEvent missing auth/decrypt/return steps");
     }

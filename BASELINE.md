@@ -45,5 +45,7 @@ L1, commit 94a79c9).~~
 committed roots (includes loop spine + `PRODUCT-BACKLOG.md` /
 `PROMPT-product.md` / `ASSEMBLY_REPORT.json` / `LOOP.md` / `STATE.md`). Cap was
 stale at 41; CI never reached `baseline:decay` until `proof:emit` was fixed.
-Still excludes `node_modules` / `dist` / `graphify-out` and local editor dirs
-(`.cursor` / `.sonarlint` / `.vscode`). Enforced by `bun run baseline:decay`.
+Still excludes `node_modules` / `dist` / `graphify-out`, local editor dirs
+(`.cursor` / `.sonarlint` / `.vscode`), and other gitignored local tool state
+(`.scannerwork` / `.vercel` / `output` / `work`). Enforced by
+`bun run baseline:decay`.

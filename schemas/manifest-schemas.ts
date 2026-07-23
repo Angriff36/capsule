@@ -36,7 +36,7 @@ export const AttachmentSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
-  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout"]).default("eventRecord"),
+  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish"]).default("eventRecord"),
   parentId: z.string(),
   fileName: z.string(),
   contentType: z.string(),
@@ -306,6 +306,12 @@ export const DishSchema = z.object({
   introducedAt: z.coerce.date().nullable().optional(),
   retiredAt: z.coerce.date().nullable().optional(),
   retirementReason: z.string().nullable().optional(),
+  primaryImageStorageId: z.string().nullable().optional(),
+  primaryImageFileName: z.string().nullable().optional(),
+  primaryRecipeId: z.string().uuid().nullable().optional(),
+  canonicalDishId: z.string().uuid().nullable().optional(),
+  editionNumber: z.number().int().nullable().optional().default(1),
+  mergedIntoDishId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -314,6 +320,7 @@ export const DishSchema = z.object({
 export const DishComputedSchema = DishSchema.extend({
   isActive: z.boolean(),
   isRetired: z.boolean(),
+  isCanonicalRoot: z.boolean(),
 });
 
 export type Dish = z.infer<typeof DishSchema>;
@@ -529,7 +536,13 @@ export const EventSchema = z.object({
 export const EventComputedSchema = EventSchema.extend({
   isTerminal: z.boolean(),
   isEditable: z.boolean(),
+  hasAssignedClient: z.boolean(),
+  hasExpectedHeadcount: z.boolean(),
+  hasMenuDishes: z.boolean(),
+  hasStaffAssigned: z.boolean(),
+  isSetupReady: z.boolean(),
   isReadyForExecution: z.boolean(),
+  estimatedFoodCost: z.number(),
 });
 
 export type Event = z.infer<typeof EventSchema>;
@@ -618,6 +631,7 @@ export const EventDishSchema = z.object({
   eventId: z.string().uuid(),
   dishId: z.string().uuid(),
   quantityServings: z.number().int().default(1),
+  headcountOverride: z.number().int().nullable().optional().default(0),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   course: z.string().nullable().optional(),
   serviceStyle: z.string().nullable().optional(),
@@ -628,7 +642,16 @@ export const EventDishSchema = z.object({
   updatedAt: z.coerce.date().optional(),
 });
 
+// Computed: EventDish
+export const EventDishComputedSchema = EventDishSchema.extend({
+  targetHeadcount: z.number().int(),
+  requiredBatches: z.number().int(),
+  requiredYieldQuantity: z.number(),
+  estimatedCost: z.number(),
+});
+
 export type EventDish = z.infer<typeof EventDishSchema>;
+export type EventDishWithComputed = z.infer<typeof EventDishComputedSchema>;
 
 // Entity: EventDishRecipeSeed
 export const EventDishRecipeSeedSchema = z.object({
@@ -702,6 +725,30 @@ export const EventIngredientContributionSchema = z.object({
 
 export type EventIngredientContribution = z.infer<typeof EventIngredientContributionSchema>;
 
+// Entity: EventStaffNeed
+export const EventStaffNeedSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  role: z.string().default(""),
+  description: z.string().nullable().optional(),
+  startsAt: z.coerce.date().nullable().optional(),
+  endsAt: z.coerce.date().nullable().optional(),
+  status: z.enum(["open", "claimed", "filled", "cancelled"]).default("open"),
+  claimedByPersonId: z.string().uuid().nullable().optional(),
+  filledByPersonId: z.string().uuid().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  postedAt: z.coerce.date().nullable().optional(),
+  claimedAt: z.coerce.date().nullable().optional(),
+  filledAt: z.coerce.date().nullable().optional(),
+  cancelledAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventStaffNeed = z.infer<typeof EventStaffNeedSchema>;
+
 // Entity: EventTemplate
 export const EventTemplateSchema = z.object({
   id: z.string().uuid(),
@@ -739,16 +786,34 @@ export const EventTimelineActivitySchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
   eventId: z.string().uuid(),
   name: z.string().default(""),
+  category: z.string().nullable().optional(),
   startsAt: z.coerce.date().nullable().optional(),
   endsAt: z.coerce.date().nullable().optional(),
   responsibleParty: z.string().nullable().optional(),
   notes: z.string().nullable().optional(),
+  siteNotes: z.string().nullable().optional(),
   scheduledAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
 
 export type EventTimelineActivity = z.infer<typeof EventTimelineActivitySchema>;
+
+// Entity: EventTimelineComment
+export const EventTimelineCommentSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  authorPersonId: z.string().uuid(),
+  authorName: z.string().default(""),
+  body: z.string().default(""),
+  postedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventTimelineComment = z.infer<typeof EventTimelineCommentSchema>;
 
 // Entity: Incident
 export const IncidentSchema = z.object({
@@ -794,6 +859,9 @@ export const IngredientSchema = z.object({
   introducedAt: z.coerce.date().nullable().optional(),
   discontinuedAt: z.coerce.date().nullable().optional(),
   discontinuationReason: z.string().nullable().optional(),
+  canonicalIngredientId: z.string().uuid().nullable().optional(),
+  editionNumber: z.number().int().nullable().optional().default(1),
+  mergedIntoIngredientId: z.string().uuid().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -802,6 +870,7 @@ export const IngredientSchema = z.object({
 export const IngredientComputedSchema = IngredientSchema.extend({
   isActive: z.boolean(),
   isDiscontinued: z.boolean(),
+  isCanonicalRoot: z.boolean(),
 });
 
 export type Ingredient = z.infer<typeof IngredientSchema>;
@@ -1500,7 +1569,8 @@ export const RecipeSchema = z.object({
   versionNumber: z.number().int().default(1),
   yieldQuantity: z.number().min(1).default(1),
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("portion"),
-  batchMultiplier: z.number().min(1).default(1),
+  servesPerYield: z.number().int().min(1).nullable().optional().default(1),
+  batchMultiplier: z.number().min(1).nullable().optional().default(1),
   status: z.enum(["draft", "published", "retired"]).default("draft"),
   draftedAt: z.coerce.date().nullable().optional(),
   publishedAt: z.coerce.date().nullable().optional(),
@@ -1514,6 +1584,8 @@ export const RecipeSchema = z.object({
 export const RecipeComputedSchema = RecipeSchema.extend({
   isPublished: z.boolean(),
   isEditable: z.boolean(),
+  liveBatchCost: z.number(),
+  liveCostPerGuest: z.number(),
 });
 
 export type Recipe = z.infer<typeof RecipeSchema>;
@@ -1589,13 +1661,22 @@ export const RecipeIngredientSchema = z.object({
   quantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
   sortOrder: z.number().int().default(0),
+  wasteFactor: z.number().nullable().optional().default(1),
   prepNotes: z.string().nullable().optional(),
   addedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
 
+// Computed: RecipeIngredient
+export const RecipeIngredientComputedSchema = RecipeIngredientSchema.extend({
+  adjustedQuantity: z.number(),
+  unitsMatchIngredientPrice: z.boolean(),
+  liveIngredientCost: z.number(),
+});
+
 export type RecipeIngredient = z.infer<typeof RecipeIngredientSchema>;
+export type RecipeIngredientWithComputed = z.infer<typeof RecipeIngredientComputedSchema>;
 
 // Entity: RecipeStep
 export const RecipeStepSchema = z.object({
@@ -2105,7 +2186,17 @@ export const VendorOrderSchema = z.object({
   updatedAt: z.coerce.date().optional(),
 });
 
+// Computed: VendorOrder
+export const VendorOrderComputedSchema = VendorOrderSchema.extend({
+  isDraft: z.boolean(),
+  isPendingApproval: z.boolean(),
+  isOpenForReceiving: z.boolean(),
+  needsSpendApproval: z.boolean(),
+  hasIncompleteLines: z.boolean(),
+});
+
 export type VendorOrder = z.infer<typeof VendorOrderSchema>;
+export type VendorOrderWithComputed = z.infer<typeof VendorOrderComputedSchema>;
 
 // Entity: VendorOrderLine
 export const VendorOrderLineSchema = z.object({
@@ -2134,6 +2225,8 @@ export const VendorOrderLineSchema = z.object({
 export const VendorOrderLineComputedSchema = VendorOrderLineSchema.extend({
   lineTotal: z.number(),
   remainingQuantity: z.number(),
+  isFullyReceived: z.boolean(),
+  hasReceivingDiscrepancy: z.boolean(),
 });
 
 export type VendorOrderLine = z.infer<typeof VendorOrderLineSchema>;
@@ -2279,7 +2372,7 @@ export type AnnouncementDismissalDismissParams = z.infer<typeof AnnouncementDism
 
 // Command: attach on Attachment
 export const AttachmentAttachParamsSchema = z.object({
-  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout"]),
+  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout", "dish"]),
   parentId: z.string(),
   fileName: z.string(),
   contentType: z.string(),
@@ -2637,6 +2730,11 @@ export const DishClassifyAllergensParamsSchema = z.object({
 
 export type DishClassifyAllergensParams = z.infer<typeof DishClassifyAllergensParamsSchema>;
 
+// Command: clearPrimaryImage on Dish
+export const DishClearPrimaryImageParamsSchema = z.object({});
+
+export type DishClearPrimaryImageParams = z.infer<typeof DishClearPrimaryImageParamsSchema>;
+
 // Command: introduce on Dish
 export const DishIntroduceParamsSchema = z.object({
   name: z.string(),
@@ -2652,6 +2750,27 @@ export const DishIntroduceParamsSchema = z.object({
 
 export type DishIntroduceParams = z.infer<typeof DishIntroduceParamsSchema>;
 
+// Command: linkAsEdition on Dish
+export const DishLinkAsEditionParamsSchema = z.object({
+  sourceDishId: z.string().uuid(),
+  editionNumber: z.number().int().optional(),
+});
+
+export type DishLinkAsEditionParams = z.infer<typeof DishLinkAsEditionParamsSchema>;
+
+// Command: mergeInto on Dish
+export const DishMergeIntoParamsSchema = z.object({
+  targetDishId: z.string().uuid(),
+  reason: z.string(),
+});
+
+export type DishMergeIntoParams = z.infer<typeof DishMergeIntoParamsSchema>;
+
+// Command: purge on Dish
+export const DishPurgeParamsSchema = z.object({});
+
+export type DishPurgeParams = z.infer<typeof DishPurgeParamsSchema>;
+
 // Command: reinstate on Dish
 export const DishReinstateParamsSchema = z.object({});
 
@@ -2659,7 +2778,7 @@ export type DishReinstateParams = z.infer<typeof DishReinstateParamsSchema>;
 
 // Command: retire on Dish
 export const DishRetireParamsSchema = z.object({
-  reason: z.string(),
+  reason: z.string().optional(),
 });
 
 export type DishRetireParams = z.infer<typeof DishRetireParamsSchema>;
@@ -2675,6 +2794,21 @@ export const DishReviseDetailsParamsSchema = z.object({
 });
 
 export type DishReviseDetailsParams = z.infer<typeof DishReviseDetailsParamsSchema>;
+
+// Command: setPrimaryImage on Dish
+export const DishSetPrimaryImageParamsSchema = z.object({
+  storageId: z.string(),
+  fileName: z.string().optional(),
+});
+
+export type DishSetPrimaryImageParams = z.infer<typeof DishSetPrimaryImageParamsSchema>;
+
+// Command: setPrimaryRecipe on Dish
+export const DishSetPrimaryRecipeParamsSchema = z.object({
+  primaryRecipeId: z.string().min(1).optional(),
+});
+
+export type DishSetPrimaryRecipeParams = z.infer<typeof DishSetPrimaryRecipeParamsSchema>;
 
 // Command: updatePortioning on Dish
 export const DishUpdatePortioningParamsSchema = z.object({
@@ -3100,6 +3234,7 @@ export const EventDishAddToEventParamsSchema = z.object({
   eventId: z.string().min(1),
   dishId: z.string().min(1),
   quantityServings: z.number(),
+  headcountOverride: z.number().int().optional(),
   course: z.string().optional(),
   serviceStyle: z.string().optional(),
   specialInstructions: z.string().optional(),
@@ -3140,6 +3275,13 @@ export const EventDishRemoveParamsSchema = z.object({
 });
 
 export type EventDishRemoveParams = z.infer<typeof EventDishRemoveParamsSchema>;
+
+// Command: setHeadcountOverride on EventDish
+export const EventDishSetHeadcountOverrideParamsSchema = z.object({
+  headcountOverride: z.number().int(),
+});
+
+export type EventDishSetHeadcountOverrideParams = z.infer<typeof EventDishSetHeadcountOverrideParamsSchema>;
 
 // Command: updateInstructions on EventDish
 export const EventDishUpdateInstructionsParamsSchema = z.object({
@@ -3237,6 +3379,44 @@ export const EventIngredientContributionReviseParamsSchema = z.object({
 
 export type EventIngredientContributionReviseParams = z.infer<typeof EventIngredientContributionReviseParamsSchema>;
 
+// Command: cancel on EventStaffNeed
+export const EventStaffNeedCancelParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type EventStaffNeedCancelParams = z.infer<typeof EventStaffNeedCancelParamsSchema>;
+
+// Command: claim on EventStaffNeed
+export const EventStaffNeedClaimParamsSchema = z.object({
+  personId: z.string().min(1),
+});
+
+export type EventStaffNeedClaimParams = z.infer<typeof EventStaffNeedClaimParamsSchema>;
+
+// Command: fill on EventStaffNeed
+export const EventStaffNeedFillParamsSchema = z.object({
+  personId: z.string().min(1),
+});
+
+export type EventStaffNeedFillParams = z.infer<typeof EventStaffNeedFillParamsSchema>;
+
+// Command: postOpen on EventStaffNeed
+export const EventStaffNeedPostOpenParamsSchema = z.object({
+  eventId: z.string().min(1),
+  role: z.string(),
+  description: z.string().optional(),
+  startsAt: z.coerce.date().optional(),
+  endsAt: z.coerce.date().optional(),
+  notes: z.string().optional(),
+});
+
+export type EventStaffNeedPostOpenParams = z.infer<typeof EventStaffNeedPostOpenParamsSchema>;
+
+// Command: releaseClaim on EventStaffNeed
+export const EventStaffNeedReleaseClaimParamsSchema = z.object({});
+
+export type EventStaffNeedReleaseClaimParams = z.infer<typeof EventStaffNeedReleaseClaimParamsSchema>;
+
 // Command: archive on EventTemplate
 export const EventTemplateArchiveParamsSchema = z.object({
   reason: z.string(),
@@ -3285,6 +3465,8 @@ export const EventTimelineActivityAdjustParamsSchema = z.object({
   endsAt: z.coerce.date().optional(),
   responsibleParty: z.string().optional(),
   notes: z.string().optional(),
+  category: z.string().optional(),
+  siteNotes: z.string().optional(),
 });
 
 export type EventTimelineActivityAdjustParams = z.infer<typeof EventTimelineActivityAdjustParamsSchema>;
@@ -3302,9 +3484,26 @@ export const EventTimelineActivityScheduleParamsSchema = z.object({
   endsAt: z.coerce.date().optional(),
   responsibleParty: z.string().optional(),
   notes: z.string().optional(),
+  category: z.string().optional(),
+  siteNotes: z.string().optional(),
 });
 
 export type EventTimelineActivityScheduleParams = z.infer<typeof EventTimelineActivityScheduleParamsSchema>;
+
+// Command: post on EventTimelineComment
+export const EventTimelineCommentPostParamsSchema = z.object({
+  eventId: z.string().min(1),
+  authorPersonId: z.string().min(1),
+  authorName: z.string(),
+  body: z.string(),
+});
+
+export type EventTimelineCommentPostParams = z.infer<typeof EventTimelineCommentPostParamsSchema>;
+
+// Command: remove on EventTimelineComment
+export const EventTimelineCommentRemoveParamsSchema = z.object({});
+
+export type EventTimelineCommentRemoveParams = z.infer<typeof EventTimelineCommentRemoveParamsSchema>;
 
 // Command: beginInvestigation on Incident
 export const IncidentBeginInvestigationParamsSchema = z.object({});
@@ -3359,7 +3558,7 @@ export type IngredientConfigureSubstitutesParams = z.infer<typeof IngredientConf
 
 // Command: discontinue on Ingredient
 export const IngredientDiscontinueParamsSchema = z.object({
-  reason: z.string(),
+  reason: z.string().optional(),
 });
 
 export type IngredientDiscontinueParams = z.infer<typeof IngredientDiscontinueParamsSchema>;
@@ -3375,6 +3574,27 @@ export const IngredientIntroduceParamsSchema = z.object({
 });
 
 export type IngredientIntroduceParams = z.infer<typeof IngredientIntroduceParamsSchema>;
+
+// Command: linkAsEdition on Ingredient
+export const IngredientLinkAsEditionParamsSchema = z.object({
+  sourceIngredientId: z.string().uuid(),
+  editionNumber: z.number().int().optional(),
+});
+
+export type IngredientLinkAsEditionParams = z.infer<typeof IngredientLinkAsEditionParamsSchema>;
+
+// Command: mergeInto on Ingredient
+export const IngredientMergeIntoParamsSchema = z.object({
+  targetIngredientId: z.string().uuid(),
+  reason: z.string(),
+});
+
+export type IngredientMergeIntoParams = z.infer<typeof IngredientMergeIntoParamsSchema>;
+
+// Command: purge on Ingredient
+export const IngredientPurgeParamsSchema = z.object({});
+
+export type IngredientPurgeParams = z.infer<typeof IngredientPurgeParamsSchema>;
 
 // Command: reinstate on Ingredient
 export const IngredientReinstateParamsSchema = z.object({});
@@ -4197,6 +4417,13 @@ export const PersonTerminateParamsSchema = z.object({
 
 export type PersonTerminateParams = z.infer<typeof PersonTerminateParamsSchema>;
 
+// Command: assign on PrepTask
+export const PrepTaskAssignParamsSchema = z.object({
+  personId: z.string().min(1),
+});
+
+export type PrepTaskAssignParams = z.infer<typeof PrepTaskAssignParamsSchema>;
+
 // Command: cancel on PrepTask
 export const PrepTaskCancelParamsSchema = z.object({
   reason: z.string(),
@@ -4546,6 +4773,7 @@ export const RecipeDraftParamsSchema = z.object({
   name: z.string(),
   yieldQuantity: z.number(),
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  servesPerYield: z.number().int().optional(),
   batchMultiplier: z.number().optional(),
   category: z.string().optional(),
   cuisine: z.string().optional(),
@@ -4560,9 +4788,14 @@ export const RecipePublishVersionParamsSchema = z.object({});
 
 export type RecipePublishVersionParams = z.infer<typeof RecipePublishVersionParamsSchema>;
 
+// Command: purge on Recipe
+export const RecipePurgeParamsSchema = z.object({});
+
+export type RecipePurgeParams = z.infer<typeof RecipePurgeParamsSchema>;
+
 // Command: retire on Recipe
 export const RecipeRetireParamsSchema = z.object({
-  reason: z.string(),
+  reason: z.string().optional(),
 });
 
 export type RecipeRetireParams = z.infer<typeof RecipeRetireParamsSchema>;
@@ -4578,6 +4811,7 @@ export const RecipeReviseDraftParamsSchema = z.object({
   yieldQuantity: z.number(),
   yieldUnit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   batchMultiplier: z.number(),
+  servesPerYield: z.number().int().optional(),
   category: z.string().optional(),
   cuisine: z.string().optional(),
   description: z.string().optional(),
@@ -4585,6 +4819,13 @@ export const RecipeReviseDraftParamsSchema = z.object({
 });
 
 export type RecipeReviseDraftParams = z.infer<typeof RecipeReviseDraftParamsSchema>;
+
+// Command: setServesPerYield on Recipe
+export const RecipeSetServesPerYieldParamsSchema = z.object({
+  servesPerYield: z.number().int(),
+});
+
+export type RecipeSetServesPerYieldParams = z.infer<typeof RecipeSetServesPerYieldParamsSchema>;
 
 // Command: approveReview on RecipeImport
 export const RecipeImportApproveReviewParamsSchema = z.object({});
@@ -4736,6 +4977,7 @@ export const RecipeIngredientAddParamsSchema = z.object({
   quantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   sortOrder: z.number().optional(),
+  wasteFactor: z.number().optional(),
   prepNotes: z.string().optional(),
 });
 
@@ -4755,6 +4997,13 @@ export const RecipeIngredientRemoveParamsSchema = z.object({
 });
 
 export type RecipeIngredientRemoveParams = z.infer<typeof RecipeIngredientRemoveParamsSchema>;
+
+// Command: setWasteFactor on RecipeIngredient
+export const RecipeIngredientSetWasteFactorParamsSchema = z.object({
+  wasteFactor: z.number(),
+});
+
+export type RecipeIngredientSetWasteFactorParams = z.infer<typeof RecipeIngredientSetWasteFactorParamsSchema>;
 
 // Command: add on RecipeStep
 export const RecipeStepAddParamsSchema = z.object({

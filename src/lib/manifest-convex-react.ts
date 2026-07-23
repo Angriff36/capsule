@@ -48,12 +48,18 @@ import {
   DeliveryScheduleParamsSchema,
   DeliveryStartTransitParamsSchema,
   DishClassifyAllergensParamsSchema,
+  DishClearPrimaryImageParamsSchema,
   DishIntroduceParamsSchema,
+  DishLinkAsEditionParamsSchema,
+  DishMergeIntoParamsSchema,
+  DishPurgeParamsSchema,
   DishRecipeAttachParamsSchema,
   DishRecipeDetachParamsSchema,
   DishReinstateParamsSchema,
   DishRetireParamsSchema,
   DishReviseDetailsParamsSchema,
+  DishSetPrimaryImageParamsSchema,
+  DishSetPrimaryRecipeParamsSchema,
   DishTaskAddParamsSchema,
   DishTaskRetireParamsSchema,
   DishTaskReviseParamsSchema,
@@ -99,6 +105,7 @@ import {
   EventDishConfirmFromProposalParamsSchema,
   EventDishRecipeSeedSeedParamsSchema,
   EventDishRemoveParamsSchema,
+  EventDishSetHeadcountOverrideParamsSchema,
   EventDishUpdateInstructionsParamsSchema,
   EventGuestAssignTableParamsSchema,
   EventGuestCheckInParamsSchema,
@@ -113,6 +120,11 @@ import {
   EventReassignClientParamsSchema,
   EventRescheduleParamsSchema,
   EventReturnToPlanningParamsSchema,
+  EventStaffNeedCancelParamsSchema,
+  EventStaffNeedClaimParamsSchema,
+  EventStaffNeedFillParamsSchema,
+  EventStaffNeedPostOpenParamsSchema,
+  EventStaffNeedReleaseClaimParamsSchema,
   EventStageClientMergeParamsSchema,
   EventStopRecurrenceParamsSchema,
   EventSubmitForApprovalParamsSchema,
@@ -123,6 +135,8 @@ import {
   EventTimelineActivityAdjustParamsSchema,
   EventTimelineActivityRemoveParamsSchema,
   EventTimelineActivityScheduleParamsSchema,
+  EventTimelineCommentPostParamsSchema,
+  EventTimelineCommentRemoveParamsSchema,
   IncidentBeginInvestigationParamsSchema,
   IncidentClearCorrectiveActionLockParamsSchema,
   IncidentDismissParamsSchema,
@@ -140,7 +154,10 @@ import {
   IngredientDemandSyncFromContributionsParamsSchema,
   IngredientDiscontinueParamsSchema,
   IngredientIntroduceParamsSchema,
+  IngredientLinkAsEditionParamsSchema,
+  IngredientMergeIntoParamsSchema,
   IngredientPriceObservationRecordParamsSchema,
+  IngredientPurgeParamsSchema,
   IngredientReinstateParamsSchema,
   IngredientSetPreferredVendorParamsSchema,
   IngredientSetPreferredVendorsParamsSchema,
@@ -236,6 +253,7 @@ import {
   PersonHireParamsSchema,
   PersonReactivateParamsSchema,
   PersonTerminateParamsSchema,
+  PrepTaskAssignParamsSchema,
   PrepTaskCancelParamsSchema,
   PrepTaskClaimParamsSchema,
   PrepTaskCommentEditParamsSchema,
@@ -303,10 +321,13 @@ import {
   RecipeIngredientAddParamsSchema,
   RecipeIngredientAdjustQuantityParamsSchema,
   RecipeIngredientRemoveParamsSchema,
+  RecipeIngredientSetWasteFactorParamsSchema,
   RecipePublishVersionParamsSchema,
+  RecipePurgeParamsSchema,
   RecipeRetireParamsSchema,
   RecipeRetractParamsSchema,
   RecipeReviseDraftParamsSchema,
+  RecipeSetServesPerYieldParamsSchema,
   RecipeStepAddParamsSchema,
   RecipeStepRemoveParamsSchema,
   RecipeStepReviseParamsSchema,
@@ -1165,12 +1186,52 @@ export function useDishClassifyAllergens() {
   };
 }
 
+/** Mutation hook for Dish.clearPrimaryImage. */
+export function useDishClearPrimaryImage() {
+  const mutate = useMutation(api.mutations.Dish_clearPrimaryImage);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishClearPrimaryImageParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Dish.introduce. */
 export function useDishIntroduce() {
   const mutate = useMutation(api.mutations.Dish_introduce);
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = DishIntroduceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Dish.linkAsEdition. */
+export function useDishLinkAsEdition() {
+  const mutate = useMutation(api.mutations.Dish_linkAsEdition);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishLinkAsEditionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Dish.mergeInto. */
+export function useDishMergeInto() {
+  const mutate = useMutation(api.mutations.Dish_mergeInto);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishMergeIntoParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Dish.purge. */
+export function useDishPurge() {
+  const mutate = useMutation(api.mutations.Dish_purge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishPurgeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -1201,6 +1262,26 @@ export function useDishReviseDetails() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = DishReviseDetailsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Dish.setPrimaryImage. */
+export function useDishSetPrimaryImage() {
+  const mutate = useMutation(api.mutations.Dish_setPrimaryImage);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishSetPrimaryImageParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Dish.setPrimaryRecipe. */
+export function useDishSetPrimaryRecipe() {
+  const mutate = useMutation(api.mutations.Dish_setPrimaryRecipe);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = DishSetPrimaryRecipeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -1976,6 +2057,16 @@ export function useEventDishRemove() {
   };
 }
 
+/** Mutation hook for EventDish.setHeadcountOverride. */
+export function useEventDishSetHeadcountOverride() {
+  const mutate = useMutation(api.mutations.EventDish_setHeadcountOverride);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventDishSetHeadcountOverrideParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for EventDish.updateInstructions. */
 export function useEventDishUpdateInstructions() {
   const mutate = useMutation(api.mutations.EventDish_updateInstructions);
@@ -2160,6 +2251,77 @@ export function useCreateEventIngredientContribution() {
   };
 }
 
+/** Reactive list for EventStaffNeed. */
+export function useListEventStaffNeed() {
+  return useQuery(api.queries.listEventStaffNeed);
+}
+
+/** Reactive get-by-id for EventStaffNeed. Pass "skip" to suspend. */
+export function useGetEventStaffNeed(id: string | "skip") {
+  return useQuery(api.queries.getEventStaffNeed, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for EventStaffNeed.cancel. */
+export function useEventStaffNeedCancel() {
+  const mutate = useMutation(api.mutations.EventStaffNeed_cancel);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventStaffNeedCancelParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventStaffNeed.claim. */
+export function useEventStaffNeedClaim() {
+  const mutate = useMutation(api.mutations.EventStaffNeed_claim);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventStaffNeedClaimParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventStaffNeed.fill. */
+export function useEventStaffNeedFill() {
+  const mutate = useMutation(api.mutations.EventStaffNeed_fill);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventStaffNeedFillParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventStaffNeed.postOpen. */
+export function useEventStaffNeedPostOpen() {
+  const mutate = useMutation(api.mutations.EventStaffNeed_postOpen);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventStaffNeedPostOpenParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventStaffNeed.releaseClaim. */
+export function useEventStaffNeedReleaseClaim() {
+  const mutate = useMutation(api.mutations.EventStaffNeed_releaseClaim);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventStaffNeedReleaseClaimParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EventStaffNeed.postOpen. */
+export function useCreateEventStaffNeed() {
+  const mutate = useMutation(api.mutations.EventStaffNeed_createViaPostOpen);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EventStaffNeedPostOpenParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for EventTemplate. */
 export function useListEventTemplate() {
   return useQuery(api.queries.listEventTemplate);
@@ -2267,6 +2429,47 @@ export function useCreateEventTimelineActivity() {
   return (args: any) => {
     const { idempotencyKey, ...params } = args ?? {};
     const parsed = EventTimelineActivityScheduleParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for EventTimelineComment. */
+export function useListEventTimelineComment() {
+  return useQuery(api.queries.listEventTimelineComment);
+}
+
+/** Reactive get-by-id for EventTimelineComment. Pass "skip" to suspend. */
+export function useGetEventTimelineComment(id: string | "skip") {
+  return useQuery(api.queries.getEventTimelineComment, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for EventTimelineComment.post. */
+export function useEventTimelineCommentPost() {
+  const mutate = useMutation(api.mutations.EventTimelineComment_post);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventTimelineCommentPostParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventTimelineComment.remove. */
+export function useEventTimelineCommentRemove() {
+  const mutate = useMutation(api.mutations.EventTimelineComment_remove);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventTimelineCommentRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for EventTimelineComment.post. */
+export function useCreateEventTimelineComment() {
+  const mutate = useMutation(api.mutations.EventTimelineComment_createViaPost);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = EventTimelineCommentPostParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
   };
@@ -2389,6 +2592,36 @@ export function useIngredientIntroduce() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = IngredientIntroduceParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Ingredient.linkAsEdition. */
+export function useIngredientLinkAsEdition() {
+  const mutate = useMutation(api.mutations.Ingredient_linkAsEdition);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IngredientLinkAsEditionParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Ingredient.mergeInto. */
+export function useIngredientMergeInto() {
+  const mutate = useMutation(api.mutations.Ingredient_mergeInto);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IngredientMergeIntoParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Ingredient.purge. */
+export function useIngredientPurge() {
+  const mutate = useMutation(api.mutations.Ingredient_purge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = IngredientPurgeParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -3811,6 +4044,16 @@ export function useGetPrepTask(id: string | "skip") {
   return useQuery(api.queries.getPrepTask, id === "skip" ? "skip" : { id: id as any });
 }
 
+/** Mutation hook for PrepTask.assign. */
+export function usePrepTaskAssign() {
+  const mutate = useMutation(api.mutations.PrepTask_assign);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskAssignParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for PrepTask.cancel. */
 export function usePrepTaskCancel() {
   const mutate = useMutation(api.mutations.PrepTask_cancel);
@@ -4439,6 +4682,16 @@ export function useRecipePublishVersion() {
   };
 }
 
+/** Mutation hook for Recipe.purge. */
+export function useRecipePurge() {
+  const mutate = useMutation(api.mutations.Recipe_purge);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RecipePurgeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Recipe.retire. */
 export function useRecipeRetire() {
   const mutate = useMutation(api.mutations.Recipe_retire);
@@ -4465,6 +4718,16 @@ export function useRecipeReviseDraft() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = RecipeReviseDraftParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Recipe.setServesPerYield. */
+export function useRecipeSetServesPerYield() {
+  const mutate = useMutation(api.mutations.Recipe_setServesPerYield);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RecipeSetServesPerYieldParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -4758,6 +5021,16 @@ export function useRecipeIngredientRemove() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = RecipeIngredientRemoveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RecipeIngredient.setWasteFactor. */
+export function useRecipeIngredientSetWasteFactor() {
+  const mutate = useMutation(api.mutations.RecipeIngredient_setWasteFactor);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RecipeIngredientSetWasteFactorParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -6411,4 +6684,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 681 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 708 as const;

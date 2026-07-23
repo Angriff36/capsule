@@ -282,6 +282,8 @@ export function RecordPhotoCaptureView({
   const [selectedEvidenceType, setSelectedEvidenceType] = useState<
     PhotoEvidenceType | undefined
   >(evidenceCategories[0]?.value);
+  const selectedCategoryLabel =
+    evidenceLabel(selectedEvidenceType, evidenceCategories) ?? null;
 
   async function selectFile(file: File) {
     try {
@@ -290,6 +292,15 @@ export function RecordPhotoCaptureView({
       if (cameraInput.current) cameraInput.current.value = "";
       if (libraryInput.current) libraryInput.current.value = "";
     }
+  }
+
+  function chooseCategoryAndPickPhoto(categoryValue: PhotoEvidenceType) {
+    setSelectedEvidenceType(categoryValue);
+    // Open the picker on the same click so category chips actually do work
+    // (sr-only radios previously only mutated state and often scrolled the page).
+    window.requestAnimationFrame(() => {
+      libraryInput.current?.click();
+    });
   }
 
   return (
@@ -306,42 +317,51 @@ export function RecordPhotoCaptureView({
       </div>
 
       {evidenceCategories.length > 0 ? (
-        <fieldset className="mt-4">
-          <legend className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-2">
-            What does this photo show?
-          </legend>
-          <div className="mt-2 grid gap-2 sm:grid-cols-3">
+        <div className="mt-4">
+          <p
+            id={`${testId}-category-label`}
+            className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-2"
+          >
+            Add a photo by type
+          </p>
+          <div
+            className="mt-2 grid grid-cols-2 gap-2 sm:grid-cols-4"
+            role="group"
+            aria-labelledby={`${testId}-category-label`}
+          >
             {evidenceCategories.map((category) => {
               const selected = selectedEvidenceType === category.value;
               return (
-                <label
+                <button
                   key={category.value}
-                  className={`cursor-pointer rounded-sm border px-3 py-2.5 transition-colors ${
+                  type="button"
+                  disabled={busy}
+                  data-testid={`${testId}-category-${category.value}`}
+                  aria-pressed={selected}
+                  className={`rounded-sm border px-3 py-2.5 text-left transition-colors ${
                     selected
                       ? "border-accent bg-accent-soft text-ink"
-                      : "border-line-2 bg-panel text-ink-2 hover:border-line-3"
+                      : "border-line-2 bg-panel text-ink-2 hover:border-line hover:text-ink"
                   }`}
+                  onClick={() => chooseCategoryAndPickPhoto(category.value)}
                 >
-                  <input
-                    type="radio"
-                    name={`${testId}-evidence-type`}
-                    value={category.value}
-                    checked={selected}
-                    className="sr-only"
-                    data-testid={`${testId}-category-${category.value}`}
-                    onChange={() => setSelectedEvidenceType(category.value)}
-                  />
                   <span className="block text-[13px] font-semibold">
                     {category.label}
                   </span>
                   <span className="mt-0.5 block text-[11.5px] leading-snug text-ink-3">
                     {category.hint}
                   </span>
-                </label>
+                </button>
               );
             })}
           </div>
-        </fieldset>
+          {selectedCategoryLabel ? (
+            <p className="mt-2 text-[12px] text-ink-2" role="status">
+              Next photo will be tagged as{" "}
+              <strong className="text-ink">{selectedCategoryLabel}</strong>.
+            </p>
+          ) : null}
+        </div>
       ) : null}
 
       <div className="mt-3 flex flex-wrap gap-2">
@@ -374,7 +394,11 @@ export function RecordPhotoCaptureView({
           disabled={busy}
           onClick={() => cameraInput.current?.click()}
         >
-          {busy ? "Uploading…" : "Take photo"}
+          {busy
+            ? "Uploading…"
+            : selectedCategoryLabel
+              ? `Take ${selectedCategoryLabel.toLowerCase()} photo`
+              : "Take photo"}
         </button>
         <button
           type="button"

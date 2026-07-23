@@ -2,7 +2,32 @@ export type EventCreatePrefill = {
   clientId?: string;
 };
 
+export type EventDetailTab =
+  | "menu"
+  | "equipment"
+  | "client"
+  | "photos"
+  | "timeline"
+  | "recurring"
+  | "staffing"
+  | "margin";
+
+export const EVENT_DETAIL_TABS: readonly {
+  key: EventDetailTab;
+  label: string;
+}[] = [
+  { key: "menu", label: "Menu" },
+  { key: "equipment", label: "Equipment" },
+  { key: "client", label: "Client Information" },
+  { key: "photos", label: "Event Photo Gallery" },
+  { key: "timeline", label: "Timeline" },
+  { key: "recurring", label: "Recurring Schedule" },
+  { key: "staffing", label: "Staffing" },
+  { key: "margin", label: "Margin" },
+] as const;
+
 const EVENTS_NEW_PATH = "/events/new";
+const TAB_KEYS = new Set<string>(EVENT_DETAIL_TABS.map((tab) => tab.key));
 
 /** Builds /events/new?clientId= deep links from CRM (e.g. accepted Proposal). */
 export class EventCreateLinkBuilder {
@@ -16,10 +41,23 @@ export class EventCreateLinkBuilder {
 
 export const eventCreateLinkBuilder = new EventCreateLinkBuilder();
 
-export function eventDetailPath(id: string): string {
-  return `/events/${id}`;
+export function eventDetailPath(id: string, tab?: EventDetailTab): string {
+  if (!tab || tab === "menu") return `/events/${id}?tab=menu`;
+  return `/events/${id}?tab=${tab}`;
+}
+
+export function parseEventDetailTab(
+  value: string | null | undefined,
+): EventDetailTab {
+  if (value && TAB_KEYS.has(value)) return value as EventDetailTab;
+  return "menu";
 }
 
 export function eventCreatePath(prefill: EventCreatePrefill = {}): string {
   return eventCreateLinkBuilder.build(prefill);
+}
+
+/** Old Kitchen Event Menu destination → Event detail Menu tab. */
+export function eventMenuRedirectPath(eventId: string): string {
+  return eventDetailPath(eventId, "menu");
 }

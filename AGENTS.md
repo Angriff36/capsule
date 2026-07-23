@@ -2,6 +2,13 @@
 
 Catering / event ops app: Vite + React, Convex, Clerk. Assembled from Manifest proofs.
 
+# Documentation (read this whenever you are making any changes) 
+
+RYAN_APPROVED 7-23-2026 Created by Ryan
+C:/Projects/Manifest/mintlify/llms-full.txt
+That is the full docuemntation for manifest, it will save you so many headaches if you read it.
+RYAN_APPROVED 7-23-2026 Created by Ryan
+
 ## Directory ownership
 
 | Path                                                             | Role                                                                      |
@@ -196,6 +203,11 @@ When the human asks for a deploy, the correct order is:
    → prod deployment `tangible-skunk-448`.
 2. Frontend: merge to `main` (auto-deploys) or
    `vercel deploy --prod --yes --archive=tgz`.
+
+**Pushing `main` alone is not enough** when Manifest/Convex surfaces changed.
+Vercel ships the UI immediately; until `npx convex deploy -y` lands, new
+queries (e.g. `listAnnouncement` in `AppShell`) Server Error and can white-
+screen the whole app via the top-level error boundary.
 
 Invariants agents must not break (each broke a real deploy once):
 

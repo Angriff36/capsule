@@ -1,0 +1,240 @@
+/* Kitchen Command Deck — service-board polish (scoped).
+   Warm paper tickets + saffron gesture; not a spreadsheet grid. */
+
+.kitchen-command-deck {
+  --kcd-ticket: var(--color-panel);
+  --kcd-mist: color-mix(in srgb, var(--color-sage) 55%, var(--color-panel));
+  --kcd-spine: var(--color-accent);
+  --kcd-rise: 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+.kitchen-command-deck::before {
+  content: "";
+  position: absolute;
+  inset: -0.5rem -0.25rem auto;
+  height: 11rem;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(
+      ellipse 70% 80% at 8% 0%,
+      color-mix(in srgb, var(--color-accent) 14%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 50% 60% at 92% 10%,
+      color-mix(in srgb, var(--color-brand) 12%, transparent),
+      transparent 65%
+    );
+}
+
+.kitchen-command-deck > * {
+  position: relative;
+  z-index: 1;
+}
+
+.kcd-masthead {
+  display: grid;
+  gap: 0.35rem;
+  padding-bottom: 1rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.kcd-masthead h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 3vw, 2.75rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  color: var(--color-ink);
+  margin: 0;
+}
+
+.kcd-masthead .kcd-lede {
+  max-width: 40rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-ink-2);
+  margin: 0;
+}
+
+.kcd-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  padding: 0.85rem 1rem;
+  margin-bottom: 0.25rem;
+  background: var(--kcd-mist);
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+}
+
+.kcd-horizon-nav {
+  display: inline-flex;
+  padding: 0.2rem;
+  gap: 0.15rem;
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  min-inline-size: 0;
+}
+
+.kcd-horizon-nav legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.kcd-horizon-nav button {
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-2);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.kcd-horizon-nav button:hover {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-sage-2) 45%, transparent);
+}
+
+.kcd-horizon-nav button:active {
+  transform: scale(0.97);
+}
+
+.kcd-horizon-nav button[data-active="true"] {
+  background: var(--color-brand);
+  color: var(--color-panel);
+}
+
+.dark .kcd-horizon-nav button[data-active="true"] {
+  color: var(--color-canvas);
+}
+
+.kcd-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-inline-size: 0;
+}
+
+.kcd-filters > legend {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.kcd-chip {
+  border: 1px solid var(--color-line-2);
+  background: var(--color-panel);
+  color: var(--color-ink-2);
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.38rem 0.7rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
+}
+
+.kcd-chip:hover {
+  border-color: var(--color-brand);
+  color: var(--color-brand);
+}
+
+.kcd-chip:active {
+  transform: scale(0.97);
+}
+
+.kcd-chip[aria-pressed="true"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-deep);
+}
+
+.kcd-field {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+}
+
+.kcd-field select {
+  min-width: 9rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--color-ink);
+  background: var(--color-panel);
+  border: 1px solid var(--color-line-2);
+  border-radius: 8px;
+  padding: 0.4rem 0.55rem;
+}
+
+.kcd-board {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+
+@media (min-width: 1280px) {
+  .kcd-board {
+    grid-template-columns: minmax(250px, 290px) minmax(0, 1fr) minmax(
+        230px,
+        270px
+      );
+    gap: 1.15rem;
+  }
+}
+
+.kcd-rail,
+.kcd-stage {
+  min-width: 0;
+}
+
+.kcd-rail-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--color-ink-3);
+  margin: 0 0 0.65rem;
+}

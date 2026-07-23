@@ -1,18 +1,7 @@
 import { useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import { AttachmentsSection } from "../attachments/AttachmentsSection";
-import {
-  EVENT_PHOTO_CATEGORIES,
-  RecordPhotoCapture,
-} from "../attachments/RecordPhotoCapture";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import type { Id } from "../../lib/api";
-import {
-  formatCount,
-  formatDate,
-  formatMoney,
-  formatTime,
-  relativeDays,
-} from "../../lib/format";
+import { relativeDays } from "../../lib/format";
 import {
   useEventApprove,
   useEventBeginExecution,
@@ -36,36 +25,42 @@ import {
   useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { useTrackRecent } from "../../lib/recents";
 import { ArrowLeftIcon } from "../../ui/icons";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, PageHeader, StatusChip } from "../../ui/primitives";
 import { useTenantBranding } from "../admin/tenantBranding";
-import { ClientCommunicationPanel } from "../clients/ClientCommunicationPanel";
 import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
+import { ClientPreviewCard } from "../clients/ClientPreviewCard";
+import { HoverPreview } from "../../ui/HoverPreview";
 import { downloadBeoPdf } from "./beoPdf";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
-import { EventDetailRevisePanels } from "./EventDetailRevisePanels";
-import { EventEquipmentPanel } from "./EventEquipmentPanel";
-import { EventGuestPanel } from "./EventGuestPanel";
-import { EventIncidentPanel } from "./EventIncidentPanel";
-import { EventTimelinePanel } from "./EventTimelinePanel";
-import { EventInventoryPanel } from "./EventInventoryPanel";
-import { LiveEventProfitabilityWidget } from "./LiveEventProfitabilityWidget";
-import { EventSetupProgress } from "./EventSetupProgress";
-import { RecurringEventPanel } from "./RecurringEventPanel";
-import { useTrackRecent } from "../../lib/recents";
-import { HoverPreview } from "../../ui/HoverPreview";
-import { ClientPreviewCard } from "../clients/ClientPreviewCard";
-import { FailureBanner } from "./FailureBanner";
 import { clientDisplayName } from "./clientName";
+import { EventClientTab } from "./EventClientTab";
+import { EventDetailRevisePanels } from "./EventDetailRevisePanels";
+import { EventDetailSummaryFacts } from "./EventDetailSummaryFacts";
+import { EventDetailTabs } from "./EventDetailTabs";
+import { EventEquipmentPanel } from "./EventEquipmentPanel";
 import {
   type EventLifecycleActionKey,
   eventLifecyclePolicy,
 } from "./EventLifecyclePolicy";
+import { EventMarginTab } from "./EventMarginTab";
+import { EventMenuTab } from "./EventMenuTab";
+import { EventPhotosTab } from "./EventPhotosTab";
+import { EventSetupProgress } from "./EventSetupProgress";
+import { EventStaffingTab } from "./EventStaffingTab";
+import { EventTabErrorBoundary } from "./EventTabErrorBoundary";
+import { EventTimelineTab } from "./EventTimelineTab";
+import { FailureBanner } from "./FailureBanner";
+import { RecurringEventPanel } from "./RecurringEventPanel";
+import { type EventDetailTab, parseEventDetailTab } from "./eventRoutes";
 
 export function EventDetailPage() {
   const { id } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = parseEventDetailTab(searchParams.get("tab"));
   const eventId = (id ?? "skip") as Id<"events"> | "skip";
   const event = useGetEvent(eventId);
   const clients = useListClient();
@@ -135,6 +130,13 @@ export function EventDetailPage() {
       venue.registeredAt != null &&
       venue.deletedAt == null,
   );
+  const venue = venues?.find((row) => row._id === event.venueId);
+
+  const setTab = (tab: EventDetailTab) => {
+    const next = new URLSearchParams(searchParams);
+    next.set("tab", tab);
+    setSearchParams(next, { replace: true });
+  };
 
   const run = async (work: () => Promise<unknown>) => {
     setFailure(null);
@@ -197,6 +199,17 @@ export function EventDetailPage() {
                 </HoverPreview>
               );
             })()}
+            {venue ? (
+              <>
+                {" · "}
+                <Link
+                  to="/facilities"
+                  className="underline decoration-dotted underline-offset-2 hover:text-ink"
+                >
+                  {venue.name}
+                </Link>
+              </>
+            ) : null}
             {event.startsAt != null ? ` · ${relativeDays(event.startsAt)}` : ""}
           </span>
         }
@@ -291,16 +304,20 @@ export function EventDetailPage() {
         ]}
       />
 
-      <EventSetupProgress
-        eventId={event._id}
+      <EventSetupProgress eventId={event._id} event={event} />
+
+      <EventDetailSummaryFacts
+        startsAt={event.startsAt}
+        endsAt={event.endsAt}
+        expectedHeadcount={event.expectedHeadcount}
+        budgetAmount={event.budgetAmount}
+        quotedPrice={event.quotedPrice}
+        venue={venue}
         clientId={event.clientId}
         clients={clients}
-        expectedHeadcount={event.expectedHeadcount}
-        eventDishes={eventDishes}
-        eventAssignments={eventAssignments}
+        primaryContactName={event.primaryContactName}
+        stage={String(event.stage)}
       />
-
-      <LiveEventProfitabilityWidget eventId={event._id} />
 
       {pdfNotice ? (
         <p className="text-[13px] text-ink-2" role="status">
@@ -393,71 +410,85 @@ export function EventDetailPage() {
         />
       </div>
 
-      <RecurringEventPanel
-        eventId={event._id}
-        startsAt={event.startsAt}
-        version={version}
-        canConfigure={canRevise}
-        recurrenceFrequency={event.recurrenceFrequency}
-        recurrenceEndCondition={event.recurrenceEndCondition}
-        recurrenceEndsAt={event.recurrenceEndsAt}
-        recurrenceOccurrenceLimit={event.recurrenceOccurrenceLimit}
-        recurrenceNextStartsAt={event.recurrenceNextStartsAt}
-        recurrenceGeneratedCount={event.recurrenceGeneratedCount}
-        recurrenceActive={event.recurrenceActive}
-        recurrenceStoppedAt={event.recurrenceStoppedAt}
-        recurrenceCompletedAt={event.recurrenceCompletedAt}
-        recurrenceTemplateEventId={event.recurrenceTemplateEventId}
-        recurrenceSequence={event.recurrenceSequence}
-      />
+      <EventDetailTabs active={activeTab} onChange={setTab} />
 
-      <ClientCommunicationPanel
-        target={{
-          kind: "event",
-          eventId: event._id,
-          eventTitle: event.title,
-        }}
-      />
-
-      <EventTimelinePanel eventId={event._id} />
-
-      <EventGuestPanel eventId={event._id} />
-
-      <EventInventoryPanel
-        eventId={event._id}
-        eventStage={String(event.stage)}
-        busy={busy}
-        onBusy={setBusy}
-        onError={(error) =>
-          setFailure(error == null ? null : classifyCommandFailure(error))
-        }
-      />
-
-      <EventEquipmentPanel
-        eventId={event._id}
-        startsAt={event.startsAt}
-        endsAt={event.endsAt}
-      />
-
-      <EventIncidentPanel eventId={event._id} />
-
-      <RecordPhotoCapture
-        parentType="eventRecord"
-        parentId={event._id}
-        title="Event photo gallery"
-        description="Capture setup, food, service, and venue photos during and after the event. Download the gallery for marketing, or pick photos for the post-event feedback survey."
-        evidenceCategories={EVENT_PHOTO_CATEGORIES}
-        surveySelection
-        downloadAll
-      />
-
-      <AttachmentsSection parentType="eventRecord" parentId={event._id} />
-
-      <div className="sr-only">
-        Current facts: {formatDate(event.startsAt)} {formatTime(event.startsAt)}
-        , {formatCount(event.expectedHeadcount)} guests,{" "}
-        {formatMoney(event.quotedPrice)} quoted.
-      </div>
+      {activeTab === "menu" ? (
+        <EventTabErrorBoundary tabLabel="Menu" key="menu">
+          <EventMenuTab
+            eventId={event._id}
+            expectedHeadcount={Number(event.expectedHeadcount) || 0}
+          />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "equipment" ? (
+        <EventTabErrorBoundary tabLabel="Equipment" key="equipment">
+          <EventEquipmentPanel
+            eventId={event._id}
+            startsAt={event.startsAt}
+            endsAt={event.endsAt}
+          />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "client" ? (
+        <EventTabErrorBoundary tabLabel="Client Information" key="client">
+          <EventClientTab
+            eventId={event._id}
+            eventTitle={event.title}
+            clientId={event.clientId}
+            primaryContactName={event.primaryContactName}
+            primaryContactEmail={event.primaryContactEmail}
+            primaryContactPhone={event.primaryContactPhone}
+            accessibilityNeeds={event.accessibilityNeeds}
+            serviceRequirements={event.serviceRequirements}
+            operationalRequirements={event.operationalRequirements}
+          />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "photos" ? (
+        <EventTabErrorBoundary tabLabel="Event Photo Gallery" key="photos">
+          <EventPhotosTab eventId={event._id} />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "timeline" ? (
+        <EventTabErrorBoundary tabLabel="Timeline" key="timeline">
+          <EventTimelineTab eventId={event._id} startsAt={event.startsAt} />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "recurring" ? (
+        <EventTabErrorBoundary tabLabel="Recurring Schedule" key="recurring">
+          <RecurringEventPanel
+            eventId={event._id}
+            startsAt={event.startsAt}
+            version={version}
+            canConfigure={canRevise}
+            recurrenceFrequency={event.recurrenceFrequency}
+            recurrenceEndCondition={event.recurrenceEndCondition}
+            recurrenceEndsAt={event.recurrenceEndsAt}
+            recurrenceOccurrenceLimit={event.recurrenceOccurrenceLimit}
+            recurrenceNextStartsAt={event.recurrenceNextStartsAt}
+            recurrenceGeneratedCount={event.recurrenceGeneratedCount}
+            recurrenceActive={event.recurrenceActive}
+            recurrenceStoppedAt={event.recurrenceStoppedAt}
+            recurrenceCompletedAt={event.recurrenceCompletedAt}
+            recurrenceTemplateEventId={event.recurrenceTemplateEventId}
+            recurrenceSequence={event.recurrenceSequence}
+          />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "staffing" ? (
+        <EventTabErrorBoundary tabLabel="Staffing" key="staffing">
+          <EventStaffingTab
+            eventId={event._id}
+            startsAt={event.startsAt}
+            endsAt={event.endsAt}
+          />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "margin" ? (
+        <EventTabErrorBoundary tabLabel="Margin" key="margin">
+          <EventMarginTab eventId={event._id} />
+        </EventTabErrorBoundary>
+      ) : null}
     </div>
   );
 }

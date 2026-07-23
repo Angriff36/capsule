@@ -230,6 +230,33 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Lead/manager puts a cook on a prep line (or moves it) before work starts.
+  // Pending → claimed with assignee; claimed → reassign without restarting the clock.
+  command assign(personId: uuid) {
+    guard self.status == "pending" or self.status == "claimed"
+    guard self.deletedAt == null
+    guard personId != null
+    constraint assignQuantityReady: self.quantity > 0 "Prep quantity must be positive before assign"
+    compute previousStatus = self.status
+    compute previousAssignee = self.assignedToId
+    mutate assignedToId = personId
+    mutate status = "claimed"
+    mutate claimedAt = self.claimedAt != null ? self.claimedAt : now()
+    emit PrepTaskAssigned {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      name: self.name
+      assignedToId: personId
+      previousAssignedToId: previousAssignee
+      quantity: self.quantity
+      unit: self.unit
+      previousStatus: previousStatus
+      status: "claimed"
+    }
+  }
+
   command release() {
     guard self.status == "claimed"
     guard self.claimedAt != null
@@ -496,6 +523,20 @@ event PrepTaskClaimed: "prep_task.claimed" {
   eventId: string
   name: string
   assignedToId: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  previousStatus: PrepTaskStatus
+  status: PrepTaskStatus
+}
+
+event PrepTaskAssigned: "prep_task.assigned" {
+  prepTaskId: string
+  tenantId: string
+  eventDishId: string
+  eventId: string
+  name: string
+  assignedToId: string
+  previousAssignedToId: string?
   quantity: decimal(12, 4)
   unit: UnitOfMeasure
   previousStatus: PrepTaskStatus

@@ -216,6 +216,142 @@ entity EventAssignment mixin TenantScoped, SoftDeletable {
   store EventAssignment in durable
 }
 
+// Open / claimable staffing need for an Event (fills when claimed or assigned).
+enum EventStaffNeedStatus {
+  open
+  claimed
+  filled
+  cancelled
+}
+
+entity EventStaffNeed mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required role: string = ""
+  property description: string?
+  property startsAt: datetime?
+  property endsAt: datetime?
+  property required status: EventStaffNeedStatus = "open"
+  property claimedByPersonId: uuid?
+  property filledByPersonId: uuid?
+  property notes: string?
+  property postedAt: datetime?
+  property claimedAt: datetime?
+  property filledAt: datetime?
+  property cancelledAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo claimedBy: Person fields [tenantId, claimedByPersonId] references [tenantId, id]
+  belongsTo filledBy: Person fields [tenantId, filledByPersonId] references [tenantId, id]
+
+  constraint staffNeedRole: self.postedAt == null or length(trim(self.role)) > 0 "Staff need role is required once posted"
+  constraint staffNeedWindow: self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt "Staff need end must be after its start"
+
+  transition status from "open" to ["claimed", "filled", "cancelled"]
+  transition status from "claimed" to ["filled", "open", "cancelled"]
+  transition status from "filled" to []
+  transition status from "cancelled" to []
+
+  default policy eventStaffNeedRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read open staff needs"
+  default policy eventStaffNeedWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write staff needs through commands"
+  default policy eventStaffNeedExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute staff need commands"
+
+  command postOpen(
+    eventId: uuid,
+    role: string,
+    optional description: string,
+    optional startsAt: datetime,
+    optional endsAt: datetime,
+    optional notes: string
+  ) {
+    guard self.postedAt == null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint postOpenRole: length(trim(role)) > 0 "Staff need role is required"
+    constraint postOpenWindow: startsAt == null or endsAt == null or endsAt > startsAt "Staff need end must be after its start"
+    mutate eventId = eventId
+    mutate role = role
+    mutate description = description
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate notes = notes
+    mutate status = "open"
+    mutate postedAt = now()
+    emit EventStaffNeedPosted {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      role: role
+    }
+  }
+
+  command claim(personId: uuid) {
+    guard self.status == "open"
+    guard self.postedAt != null
+    guard self.deletedAt == null
+    mutate claimedByPersonId = personId
+    mutate status = "claimed"
+    mutate claimedAt = now()
+    emit EventStaffNeedClaimed {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      personId: personId
+    }
+  }
+
+  command fill(personId: uuid) {
+    guard self.status == "open" or self.status == "claimed"
+    guard self.postedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate filledByPersonId = personId
+    mutate claimedByPersonId = personId
+    mutate status = "filled"
+    mutate filledAt = now()
+    emit EventStaffNeedFilled {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      personId: personId
+    }
+  }
+
+  command releaseClaim() {
+    guard self.status == "claimed"
+    guard self.deletedAt == null
+    mutate claimedByPersonId = null
+    mutate claimedAt = null
+    mutate status = "open"
+    emit EventStaffNeedReleased {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command cancel(reason: string) {
+    guard self.status == "open" or self.status == "claimed"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint cancelStaffNeedReason: length(trim(reason)) > 0 "Cancel reason is required"
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    mutate notes = reason
+    emit EventStaffNeedCancelled {
+      staffNeedId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      reason: reason
+    }
+  }
+
+  store EventStaffNeed in durable
+}
+
 event EventAssignmentAssigned: "event_assignment.assigned" {
   eventAssignmentId: string
   tenantId: string
@@ -275,4 +411,38 @@ event EventAssignmentUnassigned: "event_assignment.unassigned" {
   role: string
   previousStatus: EventAssignmentStatus
   status: EventAssignmentStatus
+}
+
+event EventStaffNeedPosted: "event_staff_need.posted" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
+  role: string
+}
+
+event EventStaffNeedClaimed: "event_staff_need.claimed" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
+  personId: string
+}
+
+event EventStaffNeedFilled: "event_staff_need.filled" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
+  personId: string
+}
+
+event EventStaffNeedReleased: "event_staff_need.released" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventStaffNeedCancelled: "event_staff_need.cancelled" {
+  staffNeedId: string
+  tenantId: string
+  eventId: string
+  reason: string
 }

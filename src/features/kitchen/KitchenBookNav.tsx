@@ -1,4 +1,6 @@
 import { NavLink } from "react-router-dom";
+import "./culinary-studio/CulinaryStudio.css";
+import "./culinary-studio/CulinaryStudioSurfaces.css";
 import { KITCHEN_SECTIONS } from "./kitchenRoutes";
 
 export function KitchenBookNav() {

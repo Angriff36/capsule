@@ -13,6 +13,8 @@ enum AttachmentParentType {
   vendor
   delivery
   closeout
+  // Culinary dish hero / primary image (Dish.setPrimaryImage).
+  dish
 }
 
 enum AttachmentEvidenceType {
