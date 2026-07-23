@@ -1110,10 +1110,14 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
 
   property required eventId: uuid
   property required searchable name: string = ""
+  // Planning block type: load_in, setup, bar_setup, kitchen_setup, service, etc.
+  property category: string?
   property startsAt: datetime?
   property endsAt: datetime?
   property responsibleParty: string?
   property notes: string?
+  // Site planning notes (parking, loading access, entrances, kitchen/bar location).
+  property siteNotes: string?
   property scheduledAt: datetime?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
@@ -1131,7 +1135,9 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     startsAt: datetime,
     optional endsAt: datetime,
     optional responsibleParty: string,
-    optional notes: string
+    optional notes: string,
+    optional category: string,
+    optional siteNotes: string
   ) {
     guard self.scheduledAt == null
     guard self.deletedAt == null
@@ -1143,6 +1149,8 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     mutate endsAt = endsAt
     mutate responsibleParty = responsibleParty
     mutate notes = notes
+    mutate category = category
+    mutate siteNotes = siteNotes
     mutate scheduledAt = now()
     emit EventTimelineActivityScheduled {
       activityId: self.id
@@ -1158,7 +1166,9 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     optional startsAt: datetime,
     optional endsAt: datetime,
     optional responsibleParty: string,
-    optional notes: string
+    optional notes: string,
+    optional category: string,
+    optional siteNotes: string
   ) {
     guard self.scheduledAt != null
     guard self.deletedAt == null
@@ -1168,6 +1178,8 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     mutate endsAt = endsAt != null ? endsAt : self.endsAt
     mutate responsibleParty = responsibleParty != null ? responsibleParty : self.responsibleParty
     mutate notes = notes != null ? notes : self.notes
+    mutate category = category != null ? category : self.category
+    mutate siteNotes = siteNotes != null ? siteNotes : self.siteNotes
     emit EventTimelineActivityAdjusted {
       activityId: self.id
       tenantId: self.tenantId
@@ -1186,6 +1198,63 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   }
 
   store EventTimelineActivity in durable
+}
+
+// Staff discussion thread on the Event Timeline (battle-board) tab.
+entity EventTimelineComment mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required authorPersonId: uuid
+  property required authorName: string = ""
+  property required body: string = ""
+  property postedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo author: Person fields [tenantId, authorPersonId] references [tenantId, id]
+
+  constraint timelineCommentBody: self.postedAt == null or length(trim(self.body)) > 0 "Timeline comment text is required"
+
+  default policy eventTimelineCommentRead read: roleAllows(user.role, "eventAccess") "Event staff may read timeline comments"
+  default policy eventTimelineCommentWrite write: roleAllows(user.role, "eventAccess") "Event staff may write timeline comments through commands"
+  default policy eventTimelineCommentExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute timeline comment commands"
+
+  command post(
+    eventId: uuid,
+    authorPersonId: uuid,
+    authorName: string,
+    body: string
+  ) {
+    guard self.postedAt == null
+    guard self.deletedAt == null
+    constraint postTimelineCommentBody: length(trim(body)) > 0 "Comment text is required"
+    constraint postTimelineCommentAuthor: length(trim(authorName)) > 0 "Author name is required"
+    mutate eventId = eventId
+    mutate authorPersonId = authorPersonId
+    mutate authorName = authorName
+    mutate body = body
+    mutate postedAt = now()
+    emit EventTimelineCommentPosted {
+      commentId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      authorPersonId: authorPersonId
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    mutate deletedAt = now()
+    emit EventTimelineCommentRemoved {
+      commentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  store EventTimelineComment in durable
 }
 
 event VenueRegistered: "venue.registered" {
@@ -1461,6 +1530,19 @@ event EventTimelineActivityAdjusted: "event_timeline_activity.adjusted" {
 
 event EventTimelineActivityRemoved: "event_timeline_activity.removed" {
   activityId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventTimelineCommentPosted: "event_timeline_comment.posted" {
+  commentId: string
+  tenantId: string
+  eventId: string
+  authorPersonId: string
+}
+
+event EventTimelineCommentRemoved: "event_timeline_comment.removed" {
+  commentId: string
   tenantId: string
   eventId: string
 }

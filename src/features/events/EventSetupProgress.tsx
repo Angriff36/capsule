@@ -49,7 +49,7 @@ export function EventSetupProgress({
       key: "dishes",
       label: "Menu dishes selected",
       ready: event == null ? undefined : Boolean(event.hasMenuDishes),
-      fixTo: `/kitchen/event-menu?eventId=${eventId}`,
+      fixTo: `/events/${eventId}?tab=menu`,
       fixLabel: "Add dishes",
     },
     {

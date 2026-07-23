@@ -6,7 +6,7 @@
  * trusted-context injection helpers, and invalidation metadata.
  */
 
-export const WIRING_CONTRACT_HASH = "0861b118eaa6a83a9967ed0b71f90d8139877c79b6ce258ef0101de49c4f5bc8:12df2bd06d045bc630e6f9144157b2f18f005c988d06f5b67324d5dce0f41e54:18a22e0a458915f73d8644be1345f57479a26425557b880f04cb8ab7ee40e59b:35722048e86baf13526c030321982ce8497b1a6b010b211540b83544ca05f11a:3780783b0721f34c0537df6d6254bec964e454dd7602704d866f566d7925a856:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:4a344d87ef2ab0abad8ce1200c439523d6636d451db3df26e7e1acefb6d94469:53b2bc95a178563f068d011c5fa68b2759d1a3b5e67837500d0dd786be754eec:5a6d59634bc99c6820b53319f767e1d284a9a0136fa367c65f651c9ca8fa660f:5be5622bcdf2f4e8a723d22adc552bcf8bb02076733ba58c9c914a1c23968d58:6052e2ac7dc7c04b5d60ef7f346f1154ec2a9edd10fc35cdab72a21258e4e3f9:62d856968eb92d7e0cf2734b71ef359d1a1103425a5f3b48d5859619e1c49241:640f04ad6e291f9325a33e5e3c2901f410493e25065a7c323d602a02ea73d6e6:6d74792149ee7042aed16ae31027a3630c03c046f64af0e56ebf02f779d2fa8f:7039fa7f6c8ec13607fe831966e5b958096cd77aeb1110fd6a68d5ea04e7c775:7173d8a64e35e262a61b0b95ba993e1e695f342f68d7a40d791d0856040d9278:740e5fd73da6f86a070e0435aae951f2008294e485361b48106344ac7eb3c920:750e9a3b26e97e5ffe1b26b41f97f6940ac938420142f8ba4696af3b0d910998:78a1a1ef98dd0a4fb7bbb8321593d992a18018ba7d0fcb7db95533b2e5431865:78e46f6a505262ecfd52084cc415aeac8efcbf5f077974543942f189171f8352:7abe26602908cb318bd00232566db7324fb3e990f90df331908805bcb4ca8c33:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:889487f2a4623ddc90c5d30da2946baf50b962592b3f833e3125a39ddc5285f2:89f4794e84334d13b013751cc91f8227cabb8df50c322ae70801b9d03dca4005:900775182df3a259afebb9c31862eadafc6bbdec6d8f3fd5dd55001e14f6f589:92ca7ad9082112355b127cc4cb2be6108b31b46e237d17db7cc10c76a60065a1:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:990435c424b523765049393bedc227dd78fbcfb27bc44158dd76679131479b95:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a6dbe41f222f0347df0d920ce626dc570486af22a53af2d4fbe8fe0fe1eceb17:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:a7c16c5034498040d967f3e5b6674e39a675a9f1a54dd6a8d3649ecc5184da49:a7eeb33a4f16596b845ffb69086ca92411a6c9812ba0317f9f42d85aaf3bcda8:ad5452fcc945edafa18d87fc86d692ef8843e10f755df1438b8477354de55ed7:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:af9c177655742f3a849205171736a1e5f6f5589e240c7c387770fd977f9884bb:afd799346286bf789da14b3b1917cce446ff51ed4a5e96e673ec1ce4932a314d:b38eedb31c112f3b546ab336405806e4c3658142f776a108a4749e50637ca64c:baf09f81826c20997d670f15d16728a5ff0aa7dc6a9972bb005ceead8bf7433f:c292f9a449d3f5c37d473d5c3596730ac95184a0871cfb8df2547e28a4da94d1:c5c3cb8a23265c76b507a7206d6a5353cead202dadcbc117b937c6082e568123:c82beb51d6e212d91e5634d33abd69fac7529bdc6deb23ad22ad4a45dae15a9a:cb82afbf711e68032b7a8e3d0fea3348437b922bbc06f1ed0b6b08fd37c83938:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:cfd3f63f28e209efbcb595ad4213aefe472f404b76538660d27817a45ea19e4e:d00737957dde7e09dfa3a2a30bbaed51488ff95c850ad8c04e6e48c161cc86a9:d13acf521aa1b0afbaf97c72e523bf4558fe7882d30bd601028e1e357d894412:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d61c96fa15bd5815e19eec9e7215b1be87ab7f88291df2d23a30c40f888cdfd9:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:da1267a9a4bfbc99d479edbde604aea21048f91c4543ccd1228f73881090b371:e2f38b455e1d32a59d2655cc8e5c4a709c06213516da4def5b892f1c5a5d5d05:e6371e5a54a60125d23ec584d9372eb3d6390fb47d9c02d692e9c3e81e54f054:e7e8ce754616c728487b15bb743b8301c3a4cf7893695428c5a3ad18335cbc7b:e8fe4e91176e8847364a389dddb97a6688953e8c370099b3f10fef850567da66:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f395c32c63ec7a0a0028fed1f11873122fa6f87127a464f8c3d1c462e225232a:f3c019822f1384676c707b93fdcfc09909720057cfb5fdaa1e92318f095856bb:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321:faa464534a5fd835172497b6d8582e26fe0653aba4b8c4ac262b10c9b21e4eb6";
+export const WIRING_CONTRACT_HASH = "0861b118eaa6a83a9967ed0b71f90d8139877c79b6ce258ef0101de49c4f5bc8:12df2bd06d045bc630e6f9144157b2f18f005c988d06f5b67324d5dce0f41e54:15ebe6d14f03ad9380b7771ae7f9b01376fbff58d3dd6bb02fafe7d35c9cf33d:18a22e0a458915f73d8644be1345f57479a26425557b880f04cb8ab7ee40e59b:2eb82120c660aeee715838871ba498a8eff8bb1396e00aa9e729e26ec263b169:35722048e86baf13526c030321982ce8497b1a6b010b211540b83544ca05f11a:3780783b0721f34c0537df6d6254bec964e454dd7602704d866f566d7925a856:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:5a6d59634bc99c6820b53319f767e1d284a9a0136fa367c65f651c9ca8fa660f:5be5622bcdf2f4e8a723d22adc552bcf8bb02076733ba58c9c914a1c23968d58:6052e2ac7dc7c04b5d60ef7f346f1154ec2a9edd10fc35cdab72a21258e4e3f9:62d856968eb92d7e0cf2734b71ef359d1a1103425a5f3b48d5859619e1c49241:6d74792149ee7042aed16ae31027a3630c03c046f64af0e56ebf02f779d2fa8f:7039fa7f6c8ec13607fe831966e5b958096cd77aeb1110fd6a68d5ea04e7c775:7173d8a64e35e262a61b0b95ba993e1e695f342f68d7a40d791d0856040d9278:7364597e0f9f93cfe57cb2a1f6ff4cde9c0a49f29698a8c4a53761e55576533e:740e5fd73da6f86a070e0435aae951f2008294e485361b48106344ac7eb3c920:750e9a3b26e97e5ffe1b26b41f97f6940ac938420142f8ba4696af3b0d910998:78a1a1ef98dd0a4fb7bbb8321593d992a18018ba7d0fcb7db95533b2e5431865:78e46f6a505262ecfd52084cc415aeac8efcbf5f077974543942f189171f8352:7abe26602908cb318bd00232566db7324fb3e990f90df331908805bcb4ca8c33:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:7c62f95195fe0c7dd52b559c5aff67122f95479ad45062350467b87df7013e4f:889487f2a4623ddc90c5d30da2946baf50b962592b3f833e3125a39ddc5285f2:89f4794e84334d13b013751cc91f8227cabb8df50c322ae70801b9d03dca4005:900775182df3a259afebb9c31862eadafc6bbdec6d8f3fd5dd55001e14f6f589:92ca7ad9082112355b127cc4cb2be6108b31b46e237d17db7cc10c76a60065a1:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:990435c424b523765049393bedc227dd78fbcfb27bc44158dd76679131479b95:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a6dbe41f222f0347df0d920ce626dc570486af22a53af2d4fbe8fe0fe1eceb17:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:a7c16c5034498040d967f3e5b6674e39a675a9f1a54dd6a8d3649ecc5184da49:a7eeb33a4f16596b845ffb69086ca92411a6c9812ba0317f9f42d85aaf3bcda8:ad5452fcc945edafa18d87fc86d692ef8843e10f755df1438b8477354de55ed7:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:b38eedb31c112f3b546ab336405806e4c3658142f776a108a4749e50637ca64c:baf09f81826c20997d670f15d16728a5ff0aa7dc6a9972bb005ceead8bf7433f:c292f9a449d3f5c37d473d5c3596730ac95184a0871cfb8df2547e28a4da94d1:c5c3cb8a23265c76b507a7206d6a5353cead202dadcbc117b937c6082e568123:c82beb51d6e212d91e5634d33abd69fac7529bdc6deb23ad22ad4a45dae15a9a:cb82afbf711e68032b7a8e3d0fea3348437b922bbc06f1ed0b6b08fd37c83938:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:cfd3f63f28e209efbcb595ad4213aefe472f404b76538660d27817a45ea19e4e:d00737957dde7e09dfa3a2a30bbaed51488ff95c850ad8c04e6e48c161cc86a9:d080d946752ebc2d1a2f66ce735d3a61e44af93a4b43293cfc32aadcbf0a93a9:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d61c96fa15bd5815e19eec9e7215b1be87ab7f88291df2d23a30c40f888cdfd9:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:da1267a9a4bfbc99d479edbde604aea21048f91c4543ccd1228f73881090b371:daa0f34e8fae0c60c4bf8c353cb28e24be2a710c5bd4946a758eac650d0c3abd:e2f38b455e1d32a59d2655cc8e5c4a709c06213516da4def5b892f1c5a5d5d05:e6371e5a54a60125d23ec584d9372eb3d6390fb47d9c02d692e9c3e81e54f054:e7e8ce754616c728487b15bb743b8301c3a4cf7893695428c5a3ad18335cbc7b:e8fe4e91176e8847364a389dddb97a6688953e8c370099b3f10fef850567da66:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f395c32c63ec7a0a0028fed1f11873122fa6f87127a464f8c3d1c462e225232a:f3c019822f1384676c707b93fdcfc09909720057cfb5fdaa1e92318f095856bb:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321";
 
 // --- Announcement.post ---
 export interface AnnouncementPostClientInput {
@@ -133,8 +133,8 @@ export const AnnouncementDismissalDismissInvalidation = [
 
 // --- Attachment.attach ---
 export interface AttachmentAttachClientInput {
-  /** Allowed: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" */
-  parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout";
+  /** Allowed: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish" */
+  parentType: "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout" | "dish";
   parentId: string;
   fileName: string;
   contentType: string;
@@ -2119,6 +2119,44 @@ export const DishClassifyAllergensInvalidation = [
   }
 ] as const;
 
+// --- Dish.clearPrimaryImage ---
+export type DishClearPrimaryImageClientInput = Record<string, never>;
+
+export const DishClearPrimaryImageCapability = {
+  capabilityId: "Dish.clearPrimaryImage",
+  entity: "Dish",
+  command: "clearPrimaryImage",
+  route: "/api/manifest/Dish/commands/clearPrimaryImage",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["DishPrimaryImageCleared"],
+} as const;
+
+/**
+ * Build command input for Dish.clearPrimaryImage.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishClearPrimaryImageInput(client: DishClearPrimaryImageClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Dish.clearPrimaryImage. */
+export const DishClearPrimaryImageInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- Dish.introduce ---
 export interface DishIntroduceClientInput {
   name: string;
@@ -2166,6 +2204,99 @@ export const DishIntroduceInvalidation = [
     "entity": "Dish",
     "queryKeyHint": "queryKeys.dish.detail(id)",
     "label": "entity detail"
+  }
+] as const;
+
+// --- Dish.linkAsEdition ---
+export interface DishLinkAsEditionClientInput {
+  sourceDishId: string;
+  /** Bounds: 1..∞ */
+  editionNumber?: number;
+}
+
+export const DishLinkAsEditionCapability = {
+  capabilityId: "Dish.linkAsEdition",
+  entity: "Dish",
+  command: "linkAsEdition",
+  route: "/api/manifest/Dish/commands/linkAsEdition",
+  instanceCommand: true,
+  clientParameterNames: ["sourceDishId","editionNumber"],
+  serverParameterNames: [],
+  emits: ["DishEditionCreated"],
+} as const;
+
+/**
+ * Build command input for Dish.linkAsEdition.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishLinkAsEditionInput(client: DishLinkAsEditionClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Dish.linkAsEdition. */
+export const DishLinkAsEditionInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- Dish.mergeInto ---
+export interface DishMergeIntoClientInput {
+  targetDishId: string;
+  reason: string;
+}
+
+export const DishMergeIntoCapability = {
+  capabilityId: "Dish.mergeInto",
+  entity: "Dish",
+  command: "mergeInto",
+  route: "/api/manifest/Dish/commands/mergeInto",
+  instanceCommand: true,
+  clientParameterNames: ["targetDishId","reason"],
+  serverParameterNames: [],
+  emits: ["DishMerged"],
+} as const;
+
+/**
+ * Build command input for Dish.mergeInto.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishMergeIntoInput(client: DishMergeIntoClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Dish.mergeInto. */
+export const DishMergeIntoInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for Dish.mergeInto. */
+export const DishMergeIntoLifecycle = [
+  {
+    "property": "status",
+    "from": "active",
+    "to": "retired",
+    "proven": true
   }
 ] as const;
 
@@ -2298,6 +2429,87 @@ export function bindDishReviseDetailsInput(client: DishReviseDetailsClientInput)
 
 /** Invalidation targets after a successful Dish.reviseDetails. */
 export const DishReviseDetailsInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- Dish.setPrimaryImage ---
+export interface DishSetPrimaryImageClientInput {
+  storageId: string;
+  fileName?: string;
+}
+
+export const DishSetPrimaryImageCapability = {
+  capabilityId: "Dish.setPrimaryImage",
+  entity: "Dish",
+  command: "setPrimaryImage",
+  route: "/api/manifest/Dish/commands/setPrimaryImage",
+  instanceCommand: true,
+  clientParameterNames: ["storageId","fileName"],
+  serverParameterNames: [],
+  emits: ["DishPrimaryImageSet"],
+} as const;
+
+/**
+ * Build command input for Dish.setPrimaryImage.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishSetPrimaryImageInput(client: DishSetPrimaryImageClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Dish.setPrimaryImage. */
+export const DishSetPrimaryImageInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Dish",
+    "queryKeyHint": "queryKeys.dish.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- Dish.setPrimaryRecipe ---
+export interface DishSetPrimaryRecipeClientInput {
+  primaryRecipeId?: string;
+}
+
+export const DishSetPrimaryRecipeCapability = {
+  capabilityId: "Dish.setPrimaryRecipe",
+  entity: "Dish",
+  command: "setPrimaryRecipe",
+  route: "/api/manifest/Dish/commands/setPrimaryRecipe",
+  instanceCommand: true,
+  clientParameterNames: ["primaryRecipeId"],
+  serverParameterNames: [],
+  emits: ["DishPrimaryRecipeSet"],
+} as const;
+
+/**
+ * Build command input for Dish.setPrimaryRecipe.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindDishSetPrimaryRecipeInput(client: DishSetPrimaryRecipeClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Dish.setPrimaryRecipe. */
+export const DishSetPrimaryRecipeInvalidation = [
   {
     "kind": "entityList",
     "entity": "Dish",
@@ -5364,6 +5576,271 @@ export const EventIngredientContributionReviseInvalidation = [
   }
 ] as const;
 
+// --- EventStaffNeed.cancel ---
+export interface EventStaffNeedCancelClientInput {
+  reason: string;
+}
+
+export const EventStaffNeedCancelCapability = {
+  capabilityId: "EventStaffNeed.cancel",
+  entity: "EventStaffNeed",
+  command: "cancel",
+  route: "/api/manifest/EventStaffNeed/commands/cancel",
+  instanceCommand: true,
+  clientParameterNames: ["reason"],
+  serverParameterNames: [],
+  emits: ["EventStaffNeedCancelled"],
+} as const;
+
+/**
+ * Build command input for EventStaffNeed.cancel.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventStaffNeedCancelInput(client: EventStaffNeedCancelClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventStaffNeed.cancel. */
+export const EventStaffNeedCancelInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for EventStaffNeed.cancel. */
+export const EventStaffNeedCancelLifecycle = [
+  {
+    "property": "status",
+    "from": "open",
+    "to": "cancelled",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "claimed",
+    "to": "cancelled",
+    "proven": true
+  }
+] as const;
+
+// --- EventStaffNeed.claim ---
+export interface EventStaffNeedClaimClientInput {
+  personId: string;
+}
+
+export const EventStaffNeedClaimCapability = {
+  capabilityId: "EventStaffNeed.claim",
+  entity: "EventStaffNeed",
+  command: "claim",
+  route: "/api/manifest/EventStaffNeed/commands/claim",
+  instanceCommand: true,
+  clientParameterNames: ["personId"],
+  serverParameterNames: [],
+  emits: ["EventStaffNeedClaimed"],
+} as const;
+
+/**
+ * Build command input for EventStaffNeed.claim.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventStaffNeedClaimInput(client: EventStaffNeedClaimClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventStaffNeed.claim. */
+export const EventStaffNeedClaimInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for EventStaffNeed.claim. */
+export const EventStaffNeedClaimLifecycle = [
+  {
+    "property": "status",
+    "from": "open",
+    "to": "claimed",
+    "proven": true
+  }
+] as const;
+
+// --- EventStaffNeed.fill ---
+export interface EventStaffNeedFillClientInput {
+  personId: string;
+}
+
+export const EventStaffNeedFillCapability = {
+  capabilityId: "EventStaffNeed.fill",
+  entity: "EventStaffNeed",
+  command: "fill",
+  route: "/api/manifest/EventStaffNeed/commands/fill",
+  instanceCommand: true,
+  clientParameterNames: ["personId"],
+  serverParameterNames: [],
+  emits: ["EventStaffNeedFilled"],
+} as const;
+
+/**
+ * Build command input for EventStaffNeed.fill.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventStaffNeedFillInput(client: EventStaffNeedFillClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventStaffNeed.fill. */
+export const EventStaffNeedFillInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for EventStaffNeed.fill. */
+export const EventStaffNeedFillLifecycle = [
+  {
+    "property": "status",
+    "from": "open",
+    "to": "filled",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "claimed",
+    "to": "filled",
+    "proven": true
+  }
+] as const;
+
+// --- EventStaffNeed.postOpen ---
+export interface EventStaffNeedPostOpenClientInput {
+  eventId: string;
+  role: string;
+  description?: string;
+  startsAt?: string;
+  endsAt?: string;
+  notes?: string;
+}
+
+export const EventStaffNeedPostOpenCapability = {
+  capabilityId: "EventStaffNeed.postOpen",
+  entity: "EventStaffNeed",
+  command: "postOpen",
+  route: "/api/manifest/EventStaffNeed/commands/postOpen",
+  instanceCommand: true,
+  clientParameterNames: ["eventId","role","description","startsAt","endsAt","notes"],
+  serverParameterNames: [],
+  emits: ["EventStaffNeedPosted"],
+} as const;
+
+/**
+ * Build command input for EventStaffNeed.postOpen.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventStaffNeedPostOpenInput(client: EventStaffNeedPostOpenClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventStaffNeed.postOpen. */
+export const EventStaffNeedPostOpenInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for EventStaffNeed.postOpen. */
+export const EventStaffNeedPostOpenLifecycle = [
+  {
+    "property": "status",
+    "from": "claimed",
+    "to": "open",
+    "proven": true
+  }
+] as const;
+
+// --- EventStaffNeed.releaseClaim ---
+export type EventStaffNeedReleaseClaimClientInput = Record<string, never>;
+
+export const EventStaffNeedReleaseClaimCapability = {
+  capabilityId: "EventStaffNeed.releaseClaim",
+  entity: "EventStaffNeed",
+  command: "releaseClaim",
+  route: "/api/manifest/EventStaffNeed/commands/releaseClaim",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["EventStaffNeedReleased"],
+} as const;
+
+/**
+ * Build command input for EventStaffNeed.releaseClaim.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventStaffNeedReleaseClaimInput(client: EventStaffNeedReleaseClaimClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventStaffNeed.releaseClaim. */
+export const EventStaffNeedReleaseClaimInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventStaffNeed",
+    "queryKeyHint": "queryKeys.eventStaffNeed.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for EventStaffNeed.releaseClaim. */
+export const EventStaffNeedReleaseClaimLifecycle = [
+  {
+    "property": "status",
+    "from": "claimed",
+    "to": "open",
+    "proven": true
+  }
+] as const;
+
 // --- EventTemplate.archive ---
 export interface EventTemplateArchiveClientInput {
   reason: string;
@@ -5568,6 +6045,8 @@ export interface EventTimelineActivityAdjustClientInput {
   endsAt?: string;
   responsibleParty?: string;
   notes?: string;
+  category?: string;
+  siteNotes?: string;
 }
 
 export const EventTimelineActivityAdjustCapability = {
@@ -5576,7 +6055,7 @@ export const EventTimelineActivityAdjustCapability = {
   command: "adjust",
   route: "/api/manifest/EventTimelineActivity/commands/adjust",
   instanceCommand: true,
-  clientParameterNames: ["name","startsAt","endsAt","responsibleParty","notes"],
+  clientParameterNames: ["name","startsAt","endsAt","responsibleParty","notes","category","siteNotes"],
   serverParameterNames: [],
   emits: ["EventTimelineActivityAdjusted"],
 } as const;
@@ -5652,6 +6131,8 @@ export interface EventTimelineActivityScheduleClientInput {
   endsAt?: string;
   responsibleParty?: string;
   notes?: string;
+  category?: string;
+  siteNotes?: string;
 }
 
 export const EventTimelineActivityScheduleCapability = {
@@ -5660,7 +6141,7 @@ export const EventTimelineActivityScheduleCapability = {
   command: "schedule",
   route: "/api/manifest/EventTimelineActivity/commands/schedule",
   instanceCommand: true,
-  clientParameterNames: ["eventId","name","startsAt","endsAt","responsibleParty","notes"],
+  clientParameterNames: ["eventId","name","startsAt","endsAt","responsibleParty","notes","category","siteNotes"],
   serverParameterNames: [],
   emits: ["EventTimelineActivityScheduled"],
 } as const;
@@ -5685,6 +6166,87 @@ export const EventTimelineActivityScheduleInvalidation = [
     "kind": "entityDetail",
     "entity": "EventTimelineActivity",
     "queryKeyHint": "queryKeys.eventTimelineActivity.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- EventTimelineComment.post ---
+export interface EventTimelineCommentPostClientInput {
+  eventId: string;
+  authorPersonId: string;
+  authorName: string;
+  body: string;
+}
+
+export const EventTimelineCommentPostCapability = {
+  capabilityId: "EventTimelineComment.post",
+  entity: "EventTimelineComment",
+  command: "post",
+  route: "/api/manifest/EventTimelineComment/commands/post",
+  instanceCommand: true,
+  clientParameterNames: ["eventId","authorPersonId","authorName","body"],
+  serverParameterNames: [],
+  emits: ["EventTimelineCommentPosted"],
+} as const;
+
+/**
+ * Build command input for EventTimelineComment.post.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventTimelineCommentPostInput(client: EventTimelineCommentPostClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventTimelineComment.post. */
+export const EventTimelineCommentPostInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventTimelineComment",
+    "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTimelineComment",
+    "queryKeyHint": "queryKeys.eventTimelineComment.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- EventTimelineComment.remove ---
+export type EventTimelineCommentRemoveClientInput = Record<string, never>;
+
+export const EventTimelineCommentRemoveCapability = {
+  capabilityId: "EventTimelineComment.remove",
+  entity: "EventTimelineComment",
+  command: "remove",
+  route: "/api/manifest/EventTimelineComment/commands/remove",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["EventTimelineCommentRemoved"],
+} as const;
+
+/**
+ * Build command input for EventTimelineComment.remove.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindEventTimelineCommentRemoveInput(client: EventTimelineCommentRemoveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful EventTimelineComment.remove. */
+export const EventTimelineCommentRemoveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "EventTimelineComment",
+    "queryKeyHint": "queryKeys.eventTimelineComment.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "EventTimelineComment",
+    "queryKeyHint": "queryKeys.eventTimelineComment.detail(id)",
     "label": "entity detail"
   }
 ] as const;
@@ -6109,6 +6671,99 @@ export const IngredientIntroduceInvalidation = [
     "entity": "Ingredient",
     "queryKeyHint": "queryKeys.ingredient.detail(id)",
     "label": "entity detail"
+  }
+] as const;
+
+// --- Ingredient.linkAsEdition ---
+export interface IngredientLinkAsEditionClientInput {
+  sourceIngredientId: string;
+  /** Bounds: 1..∞ */
+  editionNumber?: number;
+}
+
+export const IngredientLinkAsEditionCapability = {
+  capabilityId: "Ingredient.linkAsEdition",
+  entity: "Ingredient",
+  command: "linkAsEdition",
+  route: "/api/manifest/Ingredient/commands/linkAsEdition",
+  instanceCommand: true,
+  clientParameterNames: ["sourceIngredientId","editionNumber"],
+  serverParameterNames: [],
+  emits: ["IngredientEditionCreated"],
+} as const;
+
+/**
+ * Build command input for Ingredient.linkAsEdition.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIngredientLinkAsEditionInput(client: IngredientLinkAsEditionClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Ingredient.linkAsEdition. */
+export const IngredientLinkAsEditionInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- Ingredient.mergeInto ---
+export interface IngredientMergeIntoClientInput {
+  targetIngredientId: string;
+  reason: string;
+}
+
+export const IngredientMergeIntoCapability = {
+  capabilityId: "Ingredient.mergeInto",
+  entity: "Ingredient",
+  command: "mergeInto",
+  route: "/api/manifest/Ingredient/commands/mergeInto",
+  instanceCommand: true,
+  clientParameterNames: ["targetIngredientId","reason"],
+  serverParameterNames: [],
+  emits: ["IngredientMerged"],
+} as const;
+
+/**
+ * Build command input for Ingredient.mergeInto.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindIngredientMergeIntoInput(client: IngredientMergeIntoClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful Ingredient.mergeInto. */
+export const IngredientMergeIntoInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "Ingredient",
+    "queryKeyHint": "queryKeys.ingredient.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for Ingredient.mergeInto. */
+export const IngredientMergeIntoLifecycle = [
+  {
+    "property": "status",
+    "from": "active",
+    "to": "discontinued",
+    "proven": true
   }
 ] as const;
 
@@ -14789,554 +15444,6 @@ export const RecurringAvailabilityWithdrawLifecycle = [
   }
 ] as const;
 
-// --- RequestForQuote.cancel ---
-export interface RequestForQuoteCancelClientInput {
-  reason: string;
-}
-
-export const RequestForQuoteCancelCapability = {
-  capabilityId: "RequestForQuote.cancel",
-  entity: "RequestForQuote",
-  command: "cancel",
-  route: "/api/manifest/RequestForQuote/commands/cancel",
-  instanceCommand: true,
-  clientParameterNames: ["reason"],
-  serverParameterNames: [],
-  emits: ["RequestForQuoteCancelled"],
-} as const;
-
-/**
- * Build command input for RequestForQuote.cancel.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRequestForQuoteCancelInput(client: RequestForQuoteCancelClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RequestForQuote.cancel. */
-export const RequestForQuoteCancelInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RequestForQuote",
-    "queryKeyHint": "queryKeys.requestForQuote.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RequestForQuote",
-    "queryKeyHint": "queryKeys.requestForQuote.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-/** Proven lifecycle transitions for RequestForQuote.cancel. */
-export const RequestForQuoteCancelLifecycle = [
-  {
-    "property": "status",
-    "from": "draft",
-    "to": "cancelled",
-    "proven": true
-  },
-  {
-    "property": "status",
-    "from": "issued",
-    "to": "cancelled",
-    "proven": true
-  }
-] as const;
-
-// --- RequestForQuote.issue ---
-export type RequestForQuoteIssueClientInput = Record<string, never>;
-
-export const RequestForQuoteIssueCapability = {
-  capabilityId: "RequestForQuote.issue",
-  entity: "RequestForQuote",
-  command: "issue",
-  route: "/api/manifest/RequestForQuote/commands/issue",
-  instanceCommand: true,
-  clientParameterNames: [],
-  serverParameterNames: [],
-  emits: ["RequestForQuoteIssued"],
-} as const;
-
-/**
- * Build command input for RequestForQuote.issue.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRequestForQuoteIssueInput(client: RequestForQuoteIssueClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RequestForQuote.issue. */
-export const RequestForQuoteIssueInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RequestForQuote",
-    "queryKeyHint": "queryKeys.requestForQuote.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RequestForQuote",
-    "queryKeyHint": "queryKeys.requestForQuote.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-/** Proven lifecycle transitions for RequestForQuote.issue. */
-export const RequestForQuoteIssueLifecycle = [
-  {
-    "property": "status",
-    "from": "draft",
-    "to": "issued",
-    "proven": true
-  }
-] as const;
-
-// --- RequestForQuote.markAwarded ---
-export interface RequestForQuoteMarkAwardedClientInput {
-  rfqVendorId: string;
-  vendorId: string;
-}
-
-export const RequestForQuoteMarkAwardedCapability = {
-  capabilityId: "RequestForQuote.markAwarded",
-  entity: "RequestForQuote",
-  command: "markAwarded",
-  route: "/api/manifest/RequestForQuote/commands/markAwarded",
-  instanceCommand: true,
-  clientParameterNames: ["rfqVendorId","vendorId"],
-  serverParameterNames: [],
-  emits: ["RequestForQuoteAwarded"],
-} as const;
-
-/**
- * Build command input for RequestForQuote.markAwarded.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRequestForQuoteMarkAwardedInput(client: RequestForQuoteMarkAwardedClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RequestForQuote.markAwarded. */
-export const RequestForQuoteMarkAwardedInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RequestForQuote",
-    "queryKeyHint": "queryKeys.requestForQuote.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RequestForQuote",
-    "queryKeyHint": "queryKeys.requestForQuote.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-/** Proven lifecycle transitions for RequestForQuote.markAwarded. */
-export const RequestForQuoteMarkAwardedLifecycle = [
-  {
-    "property": "status",
-    "from": "issued",
-    "to": "awarded",
-    "proven": true
-  }
-] as const;
-
-// --- RequestForQuote.open ---
-export interface RequestForQuoteOpenClientInput {
-  rfqNumber?: string;
-  notes?: string;
-  responseDeadline?: string;
-  eventId?: string;
-}
-
-export const RequestForQuoteOpenCapability = {
-  capabilityId: "RequestForQuote.open",
-  entity: "RequestForQuote",
-  command: "open",
-  route: "/api/manifest/RequestForQuote/commands/open",
-  instanceCommand: true,
-  clientParameterNames: ["rfqNumber","notes","responseDeadline","eventId"],
-  serverParameterNames: [],
-  emits: ["RequestForQuoteOpened"],
-} as const;
-
-/**
- * Build command input for RequestForQuote.open.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRequestForQuoteOpenInput(client: RequestForQuoteOpenClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RequestForQuote.open. */
-export const RequestForQuoteOpenInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RequestForQuote",
-    "queryKeyHint": "queryKeys.requestForQuote.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RequestForQuote",
-    "queryKeyHint": "queryKeys.requestForQuote.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-// --- RfqLine.add ---
-export interface RfqLineAddClientInput {
-  rfqId: string;
-  purchaseNeedId: string;
-  ingredientId: string;
-  /** Bounds: 1..∞ */
-  requiredQuantity: number;
-  /** Allowed: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion" */
-  unit: "each" | "gram" | "kilogram" | "ounce" | "pound" | "milliliter" | "liter" | "teaspoon" | "tablespoon" | "cup" | "pint" | "quart" | "gallon" | "portion";
-}
-
-export const RfqLineAddCapability = {
-  capabilityId: "RfqLine.add",
-  entity: "RfqLine",
-  command: "add",
-  route: "/api/manifest/RfqLine/commands/add",
-  instanceCommand: true,
-  clientParameterNames: ["rfqId","purchaseNeedId","ingredientId","requiredQuantity","unit"],
-  serverParameterNames: [],
-  emits: ["RfqLineAdded"],
-} as const;
-
-/**
- * Build command input for RfqLine.add.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRfqLineAddInput(client: RfqLineAddClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RfqLine.add. */
-export const RfqLineAddInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RfqLine",
-    "queryKeyHint": "queryKeys.rfqLine.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RfqLine",
-    "queryKeyHint": "queryKeys.rfqLine.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-// --- RfqLine.remove ---
-export type RfqLineRemoveClientInput = Record<string, never>;
-
-export const RfqLineRemoveCapability = {
-  capabilityId: "RfqLine.remove",
-  entity: "RfqLine",
-  command: "remove",
-  route: "/api/manifest/RfqLine/commands/remove",
-  instanceCommand: true,
-  clientParameterNames: [],
-  serverParameterNames: [],
-  emits: ["RfqLineRemoved"],
-} as const;
-
-/**
- * Build command input for RfqLine.remove.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRfqLineRemoveInput(client: RfqLineRemoveClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RfqLine.remove. */
-export const RfqLineRemoveInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RfqLine",
-    "queryKeyHint": "queryKeys.rfqLine.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RfqLine",
-    "queryKeyHint": "queryKeys.rfqLine.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-// --- RfqQuote.submit ---
-export interface RfqQuoteSubmitClientInput {
-  rfqId: string;
-  rfqVendorId: string;
-  rfqLineId: string;
-  vendorId: string;
-  ingredientId: string;
-  /** Bounds: 0..∞ */
-  unitPrice: number;
-  /** Bounds: 0..∞ */
-  leadTimeDays?: number;
-  notes?: string;
-}
-
-export const RfqQuoteSubmitCapability = {
-  capabilityId: "RfqQuote.submit",
-  entity: "RfqQuote",
-  command: "submit",
-  route: "/api/manifest/RfqQuote/commands/submit",
-  instanceCommand: true,
-  clientParameterNames: ["rfqId","rfqVendorId","rfqLineId","vendorId","ingredientId","unitPrice","leadTimeDays","notes"],
-  serverParameterNames: [],
-  emits: ["RfqQuoteSubmitted"],
-} as const;
-
-/**
- * Build command input for RfqQuote.submit.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRfqQuoteSubmitInput(client: RfqQuoteSubmitClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RfqQuote.submit. */
-export const RfqQuoteSubmitInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RfqQuote",
-    "queryKeyHint": "queryKeys.rfqQuote.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RfqQuote",
-    "queryKeyHint": "queryKeys.rfqQuote.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-// --- RfqVendor.award ---
-export type RfqVendorAwardClientInput = Record<string, never>;
-
-export const RfqVendorAwardCapability = {
-  capabilityId: "RfqVendor.award",
-  entity: "RfqVendor",
-  command: "award",
-  route: "/api/manifest/RfqVendor/commands/award",
-  instanceCommand: true,
-  clientParameterNames: [],
-  serverParameterNames: [],
-  emits: ["RfqVendorAwarded"],
-} as const;
-
-/**
- * Build command input for RfqVendor.award.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRfqVendorAwardInput(client: RfqVendorAwardClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RfqVendor.award. */
-export const RfqVendorAwardInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RfqVendor",
-    "queryKeyHint": "queryKeys.rfqVendor.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RfqVendor",
-    "queryKeyHint": "queryKeys.rfqVendor.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-/** Proven lifecycle transitions for RfqVendor.award. */
-export const RfqVendorAwardLifecycle = [
-  {
-    "property": "status",
-    "from": "invited",
-    "to": "awarded",
-    "proven": true
-  }
-] as const;
-
-// --- RfqVendor.decline ---
-export interface RfqVendorDeclineClientInput {
-  reason?: string;
-}
-
-export const RfqVendorDeclineCapability = {
-  capabilityId: "RfqVendor.decline",
-  entity: "RfqVendor",
-  command: "decline",
-  route: "/api/manifest/RfqVendor/commands/decline",
-  instanceCommand: true,
-  clientParameterNames: ["reason"],
-  serverParameterNames: [],
-  emits: ["RfqVendorDeclined"],
-} as const;
-
-/**
- * Build command input for RfqVendor.decline.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRfqVendorDeclineInput(client: RfqVendorDeclineClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RfqVendor.decline. */
-export const RfqVendorDeclineInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RfqVendor",
-    "queryKeyHint": "queryKeys.rfqVendor.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RfqVendor",
-    "queryKeyHint": "queryKeys.rfqVendor.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-/** Proven lifecycle transitions for RfqVendor.decline. */
-export const RfqVendorDeclineLifecycle = [
-  {
-    "property": "status",
-    "from": "invited",
-    "to": "declined",
-    "proven": true
-  }
-] as const;
-
-// --- RfqVendor.invite ---
-export interface RfqVendorInviteClientInput {
-  rfqId: string;
-  vendorId: string;
-}
-
-export const RfqVendorInviteCapability = {
-  capabilityId: "RfqVendor.invite",
-  entity: "RfqVendor",
-  command: "invite",
-  route: "/api/manifest/RfqVendor/commands/invite",
-  instanceCommand: true,
-  clientParameterNames: ["rfqId","vendorId"],
-  serverParameterNames: [],
-  emits: ["RfqVendorInvited"],
-} as const;
-
-/**
- * Build command input for RfqVendor.invite.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRfqVendorInviteInput(client: RfqVendorInviteClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RfqVendor.invite. */
-export const RfqVendorInviteInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RfqVendor",
-    "queryKeyHint": "queryKeys.rfqVendor.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RfqVendor",
-    "queryKeyHint": "queryKeys.rfqVendor.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-// --- RfqVendor.remove ---
-export type RfqVendorRemoveClientInput = Record<string, never>;
-
-export const RfqVendorRemoveCapability = {
-  capabilityId: "RfqVendor.remove",
-  entity: "RfqVendor",
-  command: "remove",
-  route: "/api/manifest/RfqVendor/commands/remove",
-  instanceCommand: true,
-  clientParameterNames: [],
-  serverParameterNames: [],
-  emits: ["RfqVendorRemoved"],
-} as const;
-
-/**
- * Build command input for RfqVendor.remove.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRfqVendorRemoveInput(client: RfqVendorRemoveClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RfqVendor.remove. */
-export const RfqVendorRemoveInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RfqVendor",
-    "queryKeyHint": "queryKeys.rfqVendor.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RfqVendor",
-    "queryKeyHint": "queryKeys.rfqVendor.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
-// --- RfqVendor.setCompliant ---
-export interface RfqVendorSetCompliantClientInput {
-  isCompliant: boolean;
-}
-
-export const RfqVendorSetCompliantCapability = {
-  capabilityId: "RfqVendor.setCompliant",
-  entity: "RfqVendor",
-  command: "setCompliant",
-  route: "/api/manifest/RfqVendor/commands/setCompliant",
-  instanceCommand: true,
-  clientParameterNames: ["isCompliant"],
-  serverParameterNames: [],
-  emits: ["RfqVendorComplianceSet"],
-} as const;
-
-/**
- * Build command input for RfqVendor.setCompliant.
- * Client fields only; server-owned fields are injected separately.
- */
-export function bindRfqVendorSetCompliantInput(client: RfqVendorSetCompliantClientInput): Record<string, unknown> {
-  return { ...client };
-}
-
-/** Invalidation targets after a successful RfqVendor.setCompliant. */
-export const RfqVendorSetCompliantInvalidation = [
-  {
-    "kind": "entityList",
-    "entity": "RfqVendor",
-    "queryKeyHint": "queryKeys.rfqVendor.lists()",
-    "label": "entity list"
-  },
-  {
-    "kind": "entityDetail",
-    "entity": "RfqVendor",
-    "queryKeyHint": "queryKeys.rfqVendor.detail(id)",
-    "label": "entity detail"
-  }
-] as const;
-
 // --- SavedReportDefinition.archive ---
 export type SavedReportDefinitionArchiveClientInput = Record<string, never>;
 
@@ -20195,10 +20302,15 @@ export const ALL_CAPABILITY_IDS = [
   "Delivery.schedule",
   "Delivery.startTransit",
   "Dish.classifyAllergens",
+  "Dish.clearPrimaryImage",
   "Dish.introduce",
+  "Dish.linkAsEdition",
+  "Dish.mergeInto",
   "Dish.reinstate",
   "Dish.retire",
   "Dish.reviseDetails",
+  "Dish.setPrimaryImage",
+  "Dish.setPrimaryRecipe",
   "Dish.updatePortioning",
   "DishRecipe.attach",
   "DishRecipe.detach",
@@ -20264,6 +20376,11 @@ export const ALL_CAPABILITY_IDS = [
   "EventIngredientContribution.record",
   "EventIngredientContribution.retire",
   "EventIngredientContribution.revise",
+  "EventStaffNeed.cancel",
+  "EventStaffNeed.claim",
+  "EventStaffNeed.fill",
+  "EventStaffNeed.postOpen",
+  "EventStaffNeed.releaseClaim",
   "EventTemplate.archive",
   "EventTemplate.define",
   "EventTemplate.reactivate",
@@ -20271,6 +20388,8 @@ export const ALL_CAPABILITY_IDS = [
   "EventTimelineActivity.adjust",
   "EventTimelineActivity.remove",
   "EventTimelineActivity.schedule",
+  "EventTimelineComment.post",
+  "EventTimelineComment.remove",
   "Incident.beginInvestigation",
   "Incident.clearCorrectiveActionLock",
   "Incident.dismiss",
@@ -20280,6 +20399,8 @@ export const ALL_CAPABILITY_IDS = [
   "Ingredient.configureSubstitutes",
   "Ingredient.discontinue",
   "Ingredient.introduce",
+  "Ingredient.linkAsEdition",
+  "Ingredient.mergeInto",
   "Ingredient.reinstate",
   "Ingredient.setPreferredVendor",
   "Ingredient.setPreferredVendors",
@@ -20462,18 +20583,6 @@ export const ALL_CAPABILITY_IDS = [
   "RecipeStep.revise",
   "RecurringAvailability.declare",
   "RecurringAvailability.withdraw",
-  "RequestForQuote.cancel",
-  "RequestForQuote.issue",
-  "RequestForQuote.markAwarded",
-  "RequestForQuote.open",
-  "RfqLine.add",
-  "RfqLine.remove",
-  "RfqQuote.submit",
-  "RfqVendor.award",
-  "RfqVendor.decline",
-  "RfqVendor.invite",
-  "RfqVendor.remove",
-  "RfqVendor.setCompliant",
   "SavedReportDefinition.archive",
   "SavedReportDefinition.changeSharing",
   "SavedReportDefinition.createDefinition",

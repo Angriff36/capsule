@@ -21,6 +21,7 @@ import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
+import { MenuDishManager } from "./MenuDishManager";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
 import { MenuProfitabilityPanel } from "./MenuProfitabilityPanel";
 import {
@@ -311,6 +312,25 @@ export function MenuDetailPage() {
       {menu.description ? (
         <p className="culinary-lead">{menu.description}</p>
       ) : null}
+
+      <MenuDishManager
+        menuId={menu._id}
+        menuStatus={String(menu.status)}
+        menuDishes={selectedMenuDishes}
+        dishes={(dishes ?? []).map((dish) => ({
+          _id: dish._id,
+          name: dish.name,
+          description: dish.description,
+          allergenSummary: dish.allergenSummary,
+          primaryImageStorageId: dish.primaryImageStorageId,
+          editionNumber: dish.editionNumber,
+          deletedAt: dish.deletedAt,
+          status: String(dish.status),
+          mergedIntoDishId: dish.mergedIntoDishId,
+          canonicalDishId: dish.canonicalDishId,
+        }))}
+        onError={setFailure}
+      />
 
       <MenuProfitabilityPanel
         analysis={profitability}

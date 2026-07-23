@@ -22,9 +22,12 @@ export function computeDish(doc: Record<string, any>): Record<string, any> {
   doc.isActive = __isActive;
   const __isRetired = (doc.status === "retired");
   doc.isRetired = __isRetired;
+  const __isCanonicalRoot = ((doc.canonicalDishId == null) && (doc.mergedIntoDishId == null));
+  doc.isCanonicalRoot = __isCanonicalRoot;
   return {
     isActive: __isActive,
     isRetired: __isRetired,
+    isCanonicalRoot: __isCanonicalRoot,
   };
 }
 
@@ -198,9 +201,12 @@ export function computeIngredient(doc: Record<string, any>): Record<string, any>
   doc.isActive = __isActive;
   const __isDiscontinued = (doc.status === "discontinued");
   doc.isDiscontinued = __isDiscontinued;
+  const __isCanonicalRoot = ((doc.canonicalIngredientId == null) && (doc.mergedIntoIngredientId == null));
+  doc.isCanonicalRoot = __isCanonicalRoot;
   return {
     isActive: __isActive,
     isDiscontinued: __isDiscontinued,
+    isCanonicalRoot: __isCanonicalRoot,
   };
 }
 

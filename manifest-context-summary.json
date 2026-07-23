@@ -3,16 +3,16 @@
   "meta": {
     "compilerVersion": "3.6.44",
     "schemaVersion": "1.0",
-    "contentHash": "0861b118eaa6a83a9967ed0b71f90d8139877c79b6ce258ef0101de49c4f5bc8:12df2bd06d045bc630e6f9144157b2f18f005c988d06f5b67324d5dce0f41e54:18a22e0a458915f73d8644be1345f57479a26425557b880f04cb8ab7ee40e59b:35722048e86baf13526c030321982ce8497b1a6b010b211540b83544ca05f11a:3780783b0721f34c0537df6d6254bec964e454dd7602704d866f566d7925a856:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:4a344d87ef2ab0abad8ce1200c439523d6636d451db3df26e7e1acefb6d94469:53b2bc95a178563f068d011c5fa68b2759d1a3b5e67837500d0dd786be754eec:5a6d59634bc99c6820b53319f767e1d284a9a0136fa367c65f651c9ca8fa660f:5be5622bcdf2f4e8a723d22adc552bcf8bb02076733ba58c9c914a1c23968d58:6052e2ac7dc7c04b5d60ef7f346f1154ec2a9edd10fc35cdab72a21258e4e3f9:62d856968eb92d7e0cf2734b71ef359d1a1103425a5f3b48d5859619e1c49241:640f04ad6e291f9325a33e5e3c2901f410493e25065a7c323d602a02ea73d6e6:6d74792149ee7042aed16ae31027a3630c03c046f64af0e56ebf02f779d2fa8f:7039fa7f6c8ec13607fe831966e5b958096cd77aeb1110fd6a68d5ea04e7c775:7173d8a64e35e262a61b0b95ba993e1e695f342f68d7a40d791d0856040d9278:740e5fd73da6f86a070e0435aae951f2008294e485361b48106344ac7eb3c920:750e9a3b26e97e5ffe1b26b41f97f6940ac938420142f8ba4696af3b0d910998:78a1a1ef98dd0a4fb7bbb8321593d992a18018ba7d0fcb7db95533b2e5431865:78e46f6a505262ecfd52084cc415aeac8efcbf5f077974543942f189171f8352:7abe26602908cb318bd00232566db7324fb3e990f90df331908805bcb4ca8c33:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:889487f2a4623ddc90c5d30da2946baf50b962592b3f833e3125a39ddc5285f2:89f4794e84334d13b013751cc91f8227cabb8df50c322ae70801b9d03dca4005:900775182df3a259afebb9c31862eadafc6bbdec6d8f3fd5dd55001e14f6f589:92ca7ad9082112355b127cc4cb2be6108b31b46e237d17db7cc10c76a60065a1:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:990435c424b523765049393bedc227dd78fbcfb27bc44158dd76679131479b95:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a6dbe41f222f0347df0d920ce626dc570486af22a53af2d4fbe8fe0fe1eceb17:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:a7c16c5034498040d967f3e5b6674e39a675a9f1a54dd6a8d3649ecc5184da49:a7eeb33a4f16596b845ffb69086ca92411a6c9812ba0317f9f42d85aaf3bcda8:ad5452fcc945edafa18d87fc86d692ef8843e10f755df1438b8477354de55ed7:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:af9c177655742f3a849205171736a1e5f6f5589e240c7c387770fd977f9884bb:afd799346286bf789da14b3b1917cce446ff51ed4a5e96e673ec1ce4932a314d:b38eedb31c112f3b546ab336405806e4c3658142f776a108a4749e50637ca64c:baf09f81826c20997d670f15d16728a5ff0aa7dc6a9972bb005ceead8bf7433f:c292f9a449d3f5c37d473d5c3596730ac95184a0871cfb8df2547e28a4da94d1:c5c3cb8a23265c76b507a7206d6a5353cead202dadcbc117b937c6082e568123:c82beb51d6e212d91e5634d33abd69fac7529bdc6deb23ad22ad4a45dae15a9a:cb82afbf711e68032b7a8e3d0fea3348437b922bbc06f1ed0b6b08fd37c83938:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:cfd3f63f28e209efbcb595ad4213aefe472f404b76538660d27817a45ea19e4e:d00737957dde7e09dfa3a2a30bbaed51488ff95c850ad8c04e6e48c161cc86a9:d13acf521aa1b0afbaf97c72e523bf4558fe7882d30bd601028e1e357d894412:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d61c96fa15bd5815e19eec9e7215b1be87ab7f88291df2d23a30c40f888cdfd9:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:da1267a9a4bfbc99d479edbde604aea21048f91c4543ccd1228f73881090b371:e2f38b455e1d32a59d2655cc8e5c4a709c06213516da4def5b892f1c5a5d5d05:e6371e5a54a60125d23ec584d9372eb3d6390fb47d9c02d692e9c3e81e54f054:e7e8ce754616c728487b15bb743b8301c3a4cf7893695428c5a3ad18335cbc7b:e8fe4e91176e8847364a389dddb97a6688953e8c370099b3f10fef850567da66:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f395c32c63ec7a0a0028fed1f11873122fa6f87127a464f8c3d1c462e225232a:f3c019822f1384676c707b93fdcfc09909720057cfb5fdaa1e92318f095856bb:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321:faa464534a5fd835172497b6d8582e26fe0653aba4b8c4ac262b10c9b21e4eb6",
+    "contentHash": "0861b118eaa6a83a9967ed0b71f90d8139877c79b6ce258ef0101de49c4f5bc8:12df2bd06d045bc630e6f9144157b2f18f005c988d06f5b67324d5dce0f41e54:15ebe6d14f03ad9380b7771ae7f9b01376fbff58d3dd6bb02fafe7d35c9cf33d:18a22e0a458915f73d8644be1345f57479a26425557b880f04cb8ab7ee40e59b:2eb82120c660aeee715838871ba498a8eff8bb1396e00aa9e729e26ec263b169:35722048e86baf13526c030321982ce8497b1a6b010b211540b83544ca05f11a:3780783b0721f34c0537df6d6254bec964e454dd7602704d866f566d7925a856:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:5a6d59634bc99c6820b53319f767e1d284a9a0136fa367c65f651c9ca8fa660f:5be5622bcdf2f4e8a723d22adc552bcf8bb02076733ba58c9c914a1c23968d58:6052e2ac7dc7c04b5d60ef7f346f1154ec2a9edd10fc35cdab72a21258e4e3f9:62d856968eb92d7e0cf2734b71ef359d1a1103425a5f3b48d5859619e1c49241:6d74792149ee7042aed16ae31027a3630c03c046f64af0e56ebf02f779d2fa8f:7039fa7f6c8ec13607fe831966e5b958096cd77aeb1110fd6a68d5ea04e7c775:7173d8a64e35e262a61b0b95ba993e1e695f342f68d7a40d791d0856040d9278:7364597e0f9f93cfe57cb2a1f6ff4cde9c0a49f29698a8c4a53761e55576533e:740e5fd73da6f86a070e0435aae951f2008294e485361b48106344ac7eb3c920:750e9a3b26e97e5ffe1b26b41f97f6940ac938420142f8ba4696af3b0d910998:78a1a1ef98dd0a4fb7bbb8321593d992a18018ba7d0fcb7db95533b2e5431865:78e46f6a505262ecfd52084cc415aeac8efcbf5f077974543942f189171f8352:7abe26602908cb318bd00232566db7324fb3e990f90df331908805bcb4ca8c33:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:7c62f95195fe0c7dd52b559c5aff67122f95479ad45062350467b87df7013e4f:889487f2a4623ddc90c5d30da2946baf50b962592b3f833e3125a39ddc5285f2:89f4794e84334d13b013751cc91f8227cabb8df50c322ae70801b9d03dca4005:900775182df3a259afebb9c31862eadafc6bbdec6d8f3fd5dd55001e14f6f589:92ca7ad9082112355b127cc4cb2be6108b31b46e237d17db7cc10c76a60065a1:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:990435c424b523765049393bedc227dd78fbcfb27bc44158dd76679131479b95:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a6dbe41f222f0347df0d920ce626dc570486af22a53af2d4fbe8fe0fe1eceb17:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:a7c16c5034498040d967f3e5b6674e39a675a9f1a54dd6a8d3649ecc5184da49:a7eeb33a4f16596b845ffb69086ca92411a6c9812ba0317f9f42d85aaf3bcda8:ad5452fcc945edafa18d87fc86d692ef8843e10f755df1438b8477354de55ed7:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:b38eedb31c112f3b546ab336405806e4c3658142f776a108a4749e50637ca64c:baf09f81826c20997d670f15d16728a5ff0aa7dc6a9972bb005ceead8bf7433f:c292f9a449d3f5c37d473d5c3596730ac95184a0871cfb8df2547e28a4da94d1:c5c3cb8a23265c76b507a7206d6a5353cead202dadcbc117b937c6082e568123:c82beb51d6e212d91e5634d33abd69fac7529bdc6deb23ad22ad4a45dae15a9a:cb82afbf711e68032b7a8e3d0fea3348437b922bbc06f1ed0b6b08fd37c83938:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:cfd3f63f28e209efbcb595ad4213aefe472f404b76538660d27817a45ea19e4e:d00737957dde7e09dfa3a2a30bbaed51488ff95c850ad8c04e6e48c161cc86a9:d080d946752ebc2d1a2f66ce735d3a61e44af93a4b43293cfc32aadcbf0a93a9:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d61c96fa15bd5815e19eec9e7215b1be87ab7f88291df2d23a30c40f888cdfd9:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:da1267a9a4bfbc99d479edbde604aea21048f91c4543ccd1228f73881090b371:daa0f34e8fae0c60c4bf8c353cb28e24be2a710c5bd4946a758eac650d0c3abd:e2f38b455e1d32a59d2655cc8e5c4a709c06213516da4def5b892f1c5a5d5d05:e6371e5a54a60125d23ec584d9372eb3d6390fb47d9c02d692e9c3e81e54f054:e7e8ce754616c728487b15bb743b8301c3a4cf7893695428c5a3ad18335cbc7b:e8fe4e91176e8847364a389dddb97a6688953e8c370099b3f10fef850567da66:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f395c32c63ec7a0a0028fed1f11873122fa6f87127a464f8c3d1c462e225232a:f3c019822f1384676c707b93fdcfc09909720057cfb5fdaa1e92318f095856bb:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321",
     "projection": "llm-context"
   },
   "domain": {
-    "entityCount": 97,
-    "commandCount": 425,
-    "policyCount": 282,
-    "constraintCount": 154,
-    "enumCount": 91,
-    "eventCount": 407,
+    "entityCount": 95,
+    "commandCount": 427,
+    "policyCount": 276,
+    "constraintCount": 155,
+    "enumCount": 90,
+    "eventCount": 409,
     "modules": [],
     "multiTenant": true
   },
@@ -2658,6 +2658,45 @@
           "modifiers": []
         },
         {
+          "name": "primaryImageStorageId",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "primaryImageFileName",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "primaryRecipeId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "canonicalDishId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "editionNumber",
+          "type": "int",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 1
+        },
+        {
+          "name": "mergedIntoDishId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -2690,6 +2729,15 @@
           "dependencies": [
             "status"
           ]
+        },
+        {
+          "name": "isCanonicalRoot",
+          "type": "boolean",
+          "expression": "[omitted]",
+          "dependencies": [
+            "canonicalDishId",
+            "mergedIntoDishId"
+          ]
         }
       ],
       "relationships": [
@@ -2702,6 +2750,51 @@
           "name": "prepTasks",
           "kind": "hasMany",
           "target": "DishTask"
+        },
+        {
+          "name": "primaryRecipe",
+          "kind": "belongsTo",
+          "target": "Recipe",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "primaryRecipeId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "canonicalDish",
+          "kind": "belongsTo",
+          "target": "Dish",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "canonicalDishId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "mergedIntoDish",
+          "kind": "belongsTo",
+          "target": "Dish",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "mergedIntoDishId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
         }
       ],
       "constraints": [
@@ -2724,10 +2817,15 @@
       ],
       "commands": [
         "classifyAllergens",
+        "clearPrimaryImage",
         "introduce",
+        "linkAsEdition",
+        "mergeInto",
         "reinstate",
         "retire",
         "reviseDetails",
+        "setPrimaryImage",
+        "setPrimaryRecipe",
         "updatePortioning"
       ],
       "policies": [],
@@ -6179,6 +6277,244 @@
       ]
     },
     {
+      "name": "EventStaffNeed",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "description",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "startsAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "endsAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "status",
+          "type": "EventStaffNeedStatus",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": "open"
+        },
+        {
+          "name": "claimedByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "filledByPersonId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "notes",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "postedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "claimedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "filledAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "cancelledAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "claimedBy",
+          "kind": "belongsTo",
+          "target": "Person",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "claimedByPersonId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "filledBy",
+          "kind": "belongsTo",
+          "target": "Person",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "filledByPersonId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "staffNeedRole",
+          "code": "staffNeedRole",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Staff need role is required once posted",
+          "overrideable": false
+        },
+        {
+          "name": "staffNeedWindow",
+          "code": "staffNeedWindow",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Staff need end must be after its start",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "cancel",
+        "claim",
+        "fill",
+        "postOpen",
+        "releaseClaim"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ],
+      "transitions": [
+        {
+          "property": "status",
+          "from": "open",
+          "to": [
+            "claimed",
+            "filled",
+            "cancelled"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "claimed",
+          "to": [
+            "filled",
+            "open",
+            "cancelled"
+          ]
+        },
+        {
+          "property": "status",
+          "from": "filled",
+          "to": []
+        },
+        {
+          "property": "status",
+          "from": "cancelled",
+          "to": []
+        }
+      ]
+    },
+    {
       "name": "EventTemplate",
       "properties": [
         {
@@ -6419,6 +6755,12 @@
           "defaultValue": ""
         },
         {
+          "name": "category",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "startsAt",
           "type": "datetime | null",
           "required": false,
@@ -6438,6 +6780,12 @@
         },
         {
           "name": "notes",
+          "type": "string | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "siteNotes",
           "type": "string | null",
           "required": false,
           "modifiers": []
@@ -6505,6 +6853,142 @@
         "adjust",
         "remove",
         "schedule"
+      ],
+      "policies": [],
+      "key": [
+        "tenantId",
+        "id"
+      ]
+    },
+    {
+      "name": "EventTimelineComment",
+      "properties": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "tenantId",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "indexed",
+            "required"
+          ]
+        },
+        {
+          "name": "deletedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "authorPersonId",
+          "type": "uuid",
+          "required": true,
+          "modifiers": [
+            "required"
+          ]
+        },
+        {
+          "name": "authorName",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "body",
+          "type": "string",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": ""
+        },
+        {
+          "name": "postedAt",
+          "type": "datetime | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "createdAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        },
+        {
+          "name": "updatedAt",
+          "type": "datetime",
+          "required": false,
+          "modifiers": [
+            "readonly"
+          ]
+        }
+      ],
+      "computedProperties": [],
+      "relationships": [
+        {
+          "name": "event",
+          "kind": "belongsTo",
+          "target": "Event",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "eventId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "author",
+          "kind": "belongsTo",
+          "target": "Person",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "authorPersonId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        }
+      ],
+      "constraints": [
+        {
+          "name": "timelineCommentBody",
+          "code": "timelineCommentBody",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Timeline comment text is required",
+          "overrideable": false
+        }
+      ],
+      "commands": [
+        "post",
+        "remove"
       ],
       "policies": [],
       "key": [
@@ -6895,6 +7379,27 @@
           "modifiers": []
         },
         {
+          "name": "canonicalIngredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
+          "name": "editionNumber",
+          "type": "int",
+          "required": true,
+          "modifiers": [
+            "required"
+          ],
+          "defaultValue": 1
+        },
+        {
+          "name": "mergedIntoIngredientId",
+          "type": "uuid | null",
+          "required": false,
+          "modifiers": []
+        },
+        {
           "name": "createdAt",
           "type": "datetime",
           "required": false,
@@ -6927,6 +7432,15 @@
           "dependencies": [
             "status"
           ]
+        },
+        {
+          "name": "isCanonicalRoot",
+          "type": "boolean",
+          "expression": "[omitted]",
+          "dependencies": [
+            "canonicalIngredientId",
+            "mergedIntoIngredientId"
+          ]
         }
       ],
       "relationships": [
@@ -6939,6 +7453,36 @@
           "name": "stockLines",
           "kind": "hasMany",
           "target": "InventoryItem"
+        },
+        {
+          "name": "canonicalIngredient",
+          "kind": "belongsTo",
+          "target": "Ingredient",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "canonicalIngredientId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
+        },
+        {
+          "name": "mergedIntoIngredient",
+          "kind": "belongsTo",
+          "target": "Ingredient",
+          "foreignKey": {
+            "fields": [
+              "tenantId",
+              "mergedIntoIngredientId"
+            ],
+            "references": [
+              "tenantId",
+              "id"
+            ]
+          }
         }
       ],
       "constraints": [
@@ -6964,6 +7508,8 @@
         "configureSubstitutes",
         "discontinue",
         "introduce",
+        "linkAsEdition",
+        "mergeInto",
         "reinstate",
         "setPreferredVendor",
         "setPreferredVendors",
@@ -14704,790 +15250,6 @@
         {
           "property": "status",
           "from": "withdrawn",
-          "to": []
-        }
-      ]
-    },
-    {
-      "name": "RequestForQuote",
-      "properties": [
-        {
-          "name": "id",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "required"
-          ]
-        },
-        {
-          "name": "tenantId",
-          "type": "string",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "deletedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "rfqNumber",
-          "type": "string | null",
-          "required": false,
-          "modifiers": [
-            "searchable"
-          ]
-        },
-        {
-          "name": "notes",
-          "type": "string | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "responseDeadline",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "eventId",
-          "type": "uuid | null",
-          "required": false,
-          "modifiers": [
-            "indexed"
-          ]
-        },
-        {
-          "name": "status",
-          "type": "RfqStatus",
-          "required": true,
-          "modifiers": [
-            "required"
-          ],
-          "defaultValue": "draft"
-        },
-        {
-          "name": "openedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "issuedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "awardedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "cancelledAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "cancellationReason",
-          "type": "string | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "winningRfqVendorId",
-          "type": "uuid | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "winningVendorId",
-          "type": "uuid | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "createdAt",
-          "type": "datetime",
-          "required": false,
-          "modifiers": [
-            "readonly"
-          ]
-        },
-        {
-          "name": "updatedAt",
-          "type": "datetime",
-          "required": false,
-          "modifiers": [
-            "readonly"
-          ]
-        }
-      ],
-      "computedProperties": [],
-      "relationships": [
-        {
-          "name": "event",
-          "kind": "belongsTo",
-          "target": "Event",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "eventId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "winningRfqVendor",
-          "kind": "ref",
-          "target": "RfqVendor",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "winningRfqVendorId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "winningVendor",
-          "kind": "ref",
-          "target": "Vendor",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "winningVendorId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "lines",
-          "kind": "hasMany",
-          "target": "RfqLine"
-        },
-        {
-          "name": "vendors",
-          "kind": "hasMany",
-          "target": "RfqVendor"
-        }
-      ],
-      "constraints": [],
-      "commands": [
-        "cancel",
-        "issue",
-        "markAwarded",
-        "open"
-      ],
-      "policies": [],
-      "key": [
-        "tenantId",
-        "id"
-      ],
-      "transitions": [
-        {
-          "property": "status",
-          "from": "draft",
-          "to": [
-            "issued",
-            "cancelled"
-          ]
-        },
-        {
-          "property": "status",
-          "from": "issued",
-          "to": [
-            "awarded",
-            "cancelled"
-          ]
-        },
-        {
-          "property": "status",
-          "from": "awarded",
-          "to": []
-        },
-        {
-          "property": "status",
-          "from": "cancelled",
-          "to": []
-        }
-      ]
-    },
-    {
-      "name": "RfqLine",
-      "properties": [
-        {
-          "name": "id",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "required"
-          ]
-        },
-        {
-          "name": "tenantId",
-          "type": "string",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "deletedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "rfqId",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "purchaseNeedId",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "ingredientId",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "required"
-          ]
-        },
-        {
-          "name": "requiredQuantity",
-          "type": "decimal",
-          "required": true,
-          "modifiers": [
-            "required"
-          ],
-          "defaultValue": 0
-        },
-        {
-          "name": "unit",
-          "type": "UnitOfMeasure",
-          "required": true,
-          "modifiers": [
-            "required"
-          ],
-          "defaultValue": "each"
-        },
-        {
-          "name": "addedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "createdAt",
-          "type": "datetime",
-          "required": false,
-          "modifiers": [
-            "readonly"
-          ]
-        },
-        {
-          "name": "updatedAt",
-          "type": "datetime",
-          "required": false,
-          "modifiers": [
-            "readonly"
-          ]
-        }
-      ],
-      "computedProperties": [],
-      "relationships": [
-        {
-          "name": "rfq",
-          "kind": "belongsTo",
-          "target": "RequestForQuote",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "rfqId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "purchaseNeed",
-          "kind": "belongsTo",
-          "target": "PurchaseNeed",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "purchaseNeedId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "ingredient",
-          "kind": "belongsTo",
-          "target": "Ingredient",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "ingredientId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "quotes",
-          "kind": "hasMany",
-          "target": "RfqQuote"
-        }
-      ],
-      "constraints": [
-        {
-          "name": "lineQuantityPositive",
-          "code": "lineQuantityPositive",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Required quantity must be positive once added",
-          "overrideable": false
-        }
-      ],
-      "commands": [
-        "add",
-        "remove"
-      ],
-      "policies": [],
-      "key": [
-        "tenantId",
-        "id"
-      ]
-    },
-    {
-      "name": "RfqQuote",
-      "properties": [
-        {
-          "name": "id",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "required"
-          ]
-        },
-        {
-          "name": "tenantId",
-          "type": "string",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "deletedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "rfqId",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "rfqVendorId",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "rfqLineId",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "vendorId",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "required"
-          ]
-        },
-        {
-          "name": "ingredientId",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "required"
-          ]
-        },
-        {
-          "name": "unitPrice",
-          "type": "money",
-          "required": true,
-          "modifiers": [
-            "required"
-          ],
-          "defaultValue": 0
-        },
-        {
-          "name": "leadTimeDays",
-          "type": "int | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "notes",
-          "type": "string | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "submittedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "createdAt",
-          "type": "datetime",
-          "required": false,
-          "modifiers": [
-            "readonly"
-          ]
-        },
-        {
-          "name": "updatedAt",
-          "type": "datetime",
-          "required": false,
-          "modifiers": [
-            "readonly"
-          ]
-        }
-      ],
-      "computedProperties": [],
-      "relationships": [
-        {
-          "name": "rfq",
-          "kind": "belongsTo",
-          "target": "RequestForQuote",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "rfqId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "rfqVendor",
-          "kind": "belongsTo",
-          "target": "RfqVendor",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "rfqVendorId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "rfqLine",
-          "kind": "belongsTo",
-          "target": "RfqLine",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "rfqLineId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "vendor",
-          "kind": "belongsTo",
-          "target": "Vendor",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "vendorId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "ingredient",
-          "kind": "belongsTo",
-          "target": "Ingredient",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "ingredientId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        }
-      ],
-      "constraints": [
-        {
-          "name": "quotePriceNonnegative",
-          "code": "quotePriceNonnegative",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Quote unit price cannot be negative",
-          "overrideable": false
-        }
-      ],
-      "commands": [
-        "submit"
-      ],
-      "policies": [],
-      "key": [
-        "tenantId",
-        "id"
-      ]
-    },
-    {
-      "name": "RfqVendor",
-      "properties": [
-        {
-          "name": "id",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "required"
-          ]
-        },
-        {
-          "name": "tenantId",
-          "type": "string",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "deletedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "rfqId",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "vendorId",
-          "type": "uuid",
-          "required": true,
-          "modifiers": [
-            "indexed",
-            "required"
-          ]
-        },
-        {
-          "name": "status",
-          "type": "RfqVendorStatus",
-          "required": true,
-          "modifiers": [
-            "required"
-          ],
-          "defaultValue": "invited"
-        },
-        {
-          "name": "isCompliant",
-          "type": "boolean",
-          "required": true,
-          "modifiers": [
-            "required"
-          ],
-          "defaultValue": true
-        },
-        {
-          "name": "leadTimeDays",
-          "type": "int | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "notes",
-          "type": "string | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "invitedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "awardedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "declinedAt",
-          "type": "datetime | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "declineReason",
-          "type": "string | null",
-          "required": false,
-          "modifiers": []
-        },
-        {
-          "name": "createdAt",
-          "type": "datetime",
-          "required": false,
-          "modifiers": [
-            "readonly"
-          ]
-        },
-        {
-          "name": "updatedAt",
-          "type": "datetime",
-          "required": false,
-          "modifiers": [
-            "readonly"
-          ]
-        }
-      ],
-      "computedProperties": [],
-      "relationships": [
-        {
-          "name": "rfq",
-          "kind": "belongsTo",
-          "target": "RequestForQuote",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "rfqId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "vendor",
-          "kind": "belongsTo",
-          "target": "Vendor",
-          "foreignKey": {
-            "fields": [
-              "tenantId",
-              "vendorId"
-            ],
-            "references": [
-              "tenantId",
-              "id"
-            ]
-          }
-        },
-        {
-          "name": "quotes",
-          "kind": "hasMany",
-          "target": "RfqQuote"
-        }
-      ],
-      "constraints": [],
-      "commands": [
-        "award",
-        "decline",
-        "invite",
-        "remove",
-        "setCompliant"
-      ],
-      "policies": [],
-      "key": [
-        "tenantId",
-        "id"
-      ],
-      "transitions": [
-        {
-          "property": "status",
-          "from": "invited",
-          "to": [
-            "awarded",
-            "declined"
-          ]
-        },
-        {
-          "property": "status",
-          "from": "awarded",
-          "to": []
-        },
-        {
-          "property": "status",
-          "from": "declined",
           "to": []
         }
       ]
@@ -23960,6 +23722,36 @@
       ]
     },
     {
+      "name": "clearPrimaryImage",
+      "entity": "Dish",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "dishRead",
+        "dishWrite",
+        "dishExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "primaryImageStorageId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "primaryImageFileName",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishPrimaryImageCleared"
+      ]
+    },
+    {
       "name": "introduce",
       "entity": "Dish",
       "parameters": [
@@ -24088,6 +23880,130 @@
       ],
       "emits": [
         "DishIntroduced"
+      ]
+    },
+    {
+      "name": "linkAsEdition",
+      "entity": "Dish",
+      "parameters": [
+        {
+          "name": "sourceDishId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "editionNumber",
+          "type": "int",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "linkEditionSelf",
+          "code": "linkEditionSelf",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "A dish cannot be an edition of itself"
+        },
+        {
+          "name": "linkEditionNumber",
+          "code": "linkEditionNumber",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Edition number must be positive"
+        }
+      ],
+      "policies": [
+        "dishRead",
+        "dishWrite",
+        "dishExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "canonicalDishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "editionNumber",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishEditionCreated"
+      ]
+    },
+    {
+      "name": "mergeInto",
+      "entity": "Dish",
+      "parameters": [
+        {
+          "name": "targetDishId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "mergeIntoSelf",
+          "code": "mergeIntoSelf",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Cannot merge a dish into itself"
+        },
+        {
+          "name": "mergeIntoReason",
+          "code": "mergeIntoReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Merge reason is required"
+        }
+      ],
+      "policies": [
+        "dishRead",
+        "dishWrite",
+        "dishExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "mergedIntoDishId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "retiredAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "retirementReason",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishMerged"
       ]
     },
     {
@@ -24263,6 +24179,86 @@
       ],
       "emits": [
         "DishDetailsRevised"
+      ]
+    },
+    {
+      "name": "setPrimaryImage",
+      "entity": "Dish",
+      "parameters": [
+        {
+          "name": "storageId",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "fileName",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "primaryImageStorage",
+          "code": "primaryImageStorage",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Primary image storage id is required"
+        }
+      ],
+      "policies": [
+        "dishRead",
+        "dishWrite",
+        "dishExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "primaryImageStorageId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "primaryImageFileName",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishPrimaryImageSet"
+      ]
+    },
+    {
+      "name": "setPrimaryRecipe",
+      "entity": "Dish",
+      "parameters": [
+        {
+          "name": "primaryRecipeId",
+          "type": "uuid",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "dishRead",
+        "dishWrite",
+        "dishExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "primaryRecipeId",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "DishPrimaryRecipeSet"
       ]
     },
     {
@@ -28714,6 +28710,288 @@
       ]
     },
     {
+      "name": "cancel",
+      "entity": "EventStaffNeed",
+      "parameters": [
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "cancelStaffNeedReason",
+          "code": "cancelStaffNeedReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Cancel reason is required"
+        }
+      ],
+      "policies": [
+        "eventStaffNeedRead",
+        "eventStaffNeedWrite",
+        "eventStaffNeedExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "cancelledAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "notes",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventStaffNeedCancelled"
+      ]
+    },
+    {
+      "name": "claim",
+      "entity": "EventStaffNeed",
+      "parameters": [
+        {
+          "name": "personId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventStaffNeedRead",
+        "eventStaffNeedWrite",
+        "eventStaffNeedExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "claimedByPersonId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "claimedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventStaffNeedClaimed"
+      ]
+    },
+    {
+      "name": "fill",
+      "entity": "EventStaffNeed",
+      "parameters": [
+        {
+          "name": "personId",
+          "type": "uuid",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventStaffNeedRead",
+        "eventStaffNeedWrite",
+        "eventStaffNeedExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "filledByPersonId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "claimedByPersonId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "filledAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventStaffNeedFilled"
+      ]
+    },
+    {
+      "name": "postOpen",
+      "entity": "EventStaffNeed",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "role",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "startsAt",
+          "type": "datetime",
+          "required": false
+        },
+        {
+          "name": "endsAt",
+          "type": "datetime",
+          "required": false
+        },
+        {
+          "name": "notes",
+          "type": "string",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "postOpenRole",
+          "code": "postOpenRole",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Staff need role is required"
+        },
+        {
+          "name": "postOpenWindow",
+          "code": "postOpenWindow",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Staff need end must be after its start"
+        }
+      ],
+      "policies": [
+        "eventStaffNeedRead",
+        "eventStaffNeedWrite",
+        "eventStaffNeedExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "role",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "description",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "startsAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "endsAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "notes",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "postedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventStaffNeedPosted"
+      ]
+    },
+    {
+      "name": "releaseClaim",
+      "entity": "EventStaffNeed",
+      "parameters": [],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventStaffNeedRead",
+        "eventStaffNeedWrite",
+        "eventStaffNeedExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "claimedByPersonId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "claimedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventStaffNeedReleased"
+      ]
+    },
+    {
       "name": "archive",
       "entity": "EventTemplate",
       "parameters": [
@@ -29088,6 +29366,16 @@
           "name": "notes",
           "type": "string",
           "required": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "siteNotes",
+          "type": "string",
+          "required": false
         }
       ],
       "guards": [
@@ -29132,6 +29420,16 @@
         {
           "kind": "mutate",
           "target": "notes",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "siteNotes",
           "expression": "[omitted]"
         }
       ],
@@ -29196,6 +29494,16 @@
           "name": "notes",
           "type": "string",
           "required": false
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": false
+        },
+        {
+          "name": "siteNotes",
+          "type": "string",
+          "required": false
         }
       ],
       "guards": [
@@ -29256,12 +29564,127 @@
         },
         {
           "kind": "mutate",
+          "target": "category",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "siteNotes",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
           "target": "scheduledAt",
           "expression": "[omitted]"
         }
       ],
       "emits": [
         "EventTimelineActivityScheduled"
+      ]
+    },
+    {
+      "name": "post",
+      "entity": "EventTimelineComment",
+      "parameters": [
+        {
+          "name": "eventId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "authorPersonId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "authorName",
+          "type": "string",
+          "required": true
+        },
+        {
+          "name": "body",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "postTimelineCommentBody",
+          "code": "postTimelineCommentBody",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Comment text is required"
+        },
+        {
+          "name": "postTimelineCommentAuthor",
+          "code": "postTimelineCommentAuthor",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Author name is required"
+        }
+      ],
+      "policies": [
+        "eventTimelineCommentRead",
+        "eventTimelineCommentWrite",
+        "eventTimelineCommentExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "eventId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "authorPersonId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "authorName",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "body",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "postedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventTimelineCommentPosted"
+      ]
+    },
+    {
+      "name": "remove",
+      "entity": "EventTimelineComment",
+      "parameters": [],
+      "guards": [
+        "[omitted]"
+      ],
+      "constraints": [],
+      "policies": [
+        "eventTimelineCommentRead",
+        "eventTimelineCommentWrite",
+        "eventTimelineCommentExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "deletedAt",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "EventTimelineCommentRemoved"
       ]
     },
     {
@@ -29803,6 +30226,130 @@
       ],
       "emits": [
         "IngredientIntroduced"
+      ]
+    },
+    {
+      "name": "linkAsEdition",
+      "entity": "Ingredient",
+      "parameters": [
+        {
+          "name": "sourceIngredientId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "editionNumber",
+          "type": "int",
+          "required": false
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "linkIngredientEditionSelf",
+          "code": "linkIngredientEditionSelf",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "An ingredient cannot be an edition of itself"
+        },
+        {
+          "name": "linkIngredientEditionNumber",
+          "code": "linkIngredientEditionNumber",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Edition number must be positive"
+        }
+      ],
+      "policies": [
+        "ingredientRead",
+        "ingredientWrite",
+        "ingredientExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "canonicalIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "editionNumber",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "IngredientEditionCreated"
+      ]
+    },
+    {
+      "name": "mergeInto",
+      "entity": "Ingredient",
+      "parameters": [
+        {
+          "name": "targetIngredientId",
+          "type": "uuid",
+          "required": true
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "required": true
+        }
+      ],
+      "guards": [
+        "[omitted]",
+        "[omitted]",
+        "[omitted]"
+      ],
+      "constraints": [
+        {
+          "name": "mergeIngredientSelf",
+          "code": "mergeIngredientSelf",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Cannot merge an ingredient into itself"
+        },
+        {
+          "name": "mergeIngredientReason",
+          "code": "mergeIngredientReason",
+          "severity": "block",
+          "expression": "[omitted]",
+          "message": "Merge reason is required"
+        }
+      ],
+      "policies": [
+        "ingredientRead",
+        "ingredientWrite",
+        "ingredientExecute"
+      ],
+      "actions": [
+        {
+          "kind": "mutate",
+          "target": "mergedIntoIngredientId",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "status",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "discontinuedAt",
+          "expression": "[omitted]"
+        },
+        {
+          "kind": "mutate",
+          "target": "discontinuationReason",
+          "expression": "[omitted]"
+        }
+      ],
+      "emits": [
+        "IngredientMerged"
       ]
     },
     {
@@ -41151,696 +41698,6 @@
       ]
     },
     {
-      "name": "cancel",
-      "entity": "RequestForQuote",
-      "parameters": [
-        {
-          "name": "reason",
-          "type": "string",
-          "required": true
-        }
-      ],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [
-        {
-          "name": "cancelRfqReason",
-          "code": "cancelRfqReason",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Cancellation reason is required"
-        }
-      ],
-      "policies": [
-        "rfqRead",
-        "rfqWrite",
-        "rfqExecute"
-      ],
-      "actions": [
-        {
-          "kind": "compute",
-          "target": "previousStatus",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "status",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "cancelledAt",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "cancellationReason",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RequestForQuoteCancelled"
-      ]
-    },
-    {
-      "name": "issue",
-      "entity": "RequestForQuote",
-      "parameters": [],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [],
-      "policies": [
-        "rfqRead",
-        "rfqWrite",
-        "rfqExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "status",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "issuedAt",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RequestForQuoteIssued"
-      ]
-    },
-    {
-      "name": "markAwarded",
-      "entity": "RequestForQuote",
-      "parameters": [
-        {
-          "name": "rfqVendorId",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "vendorId",
-          "type": "uuid",
-          "required": true
-        }
-      ],
-      "guards": [
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [],
-      "policies": [
-        "rfqRead",
-        "rfqWrite",
-        "rfqExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "winningRfqVendorId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "winningVendorId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "status",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "awardedAt",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RequestForQuoteAwarded"
-      ]
-    },
-    {
-      "name": "open",
-      "entity": "RequestForQuote",
-      "parameters": [
-        {
-          "name": "rfqNumber",
-          "type": "string",
-          "required": false
-        },
-        {
-          "name": "notes",
-          "type": "string",
-          "required": false
-        },
-        {
-          "name": "responseDeadline",
-          "type": "datetime",
-          "required": false
-        },
-        {
-          "name": "eventId",
-          "type": "uuid",
-          "required": false
-        }
-      ],
-      "guards": [
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [],
-      "policies": [
-        "rfqRead",
-        "rfqWrite",
-        "rfqExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "rfqNumber",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "notes",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "responseDeadline",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "eventId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "openedAt",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RequestForQuoteOpened"
-      ]
-    },
-    {
-      "name": "add",
-      "entity": "RfqLine",
-      "parameters": [
-        {
-          "name": "rfqId",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "purchaseNeedId",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "ingredientId",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "requiredQuantity",
-          "type": "decimal",
-          "required": true
-        },
-        {
-          "name": "unit",
-          "type": "UnitOfMeasure",
-          "required": true
-        }
-      ],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [
-        {
-          "name": "addLineRfqMatch",
-          "code": "addLineRfqMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Add line rfqId must match the seeded RFQ reference"
-        },
-        {
-          "name": "addLineNeedMatch",
-          "code": "addLineNeedMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Add line purchaseNeedId must match the seeded need reference"
-        },
-        {
-          "name": "addLineIngredientMatch",
-          "code": "addLineIngredientMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Add line ingredientId must match the seeded ingredient reference"
-        },
-        {
-          "name": "addLineQuantityPositive",
-          "code": "addLineQuantityPositive",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Required quantity must be positive"
-        }
-      ],
-      "policies": [
-        "rfqLineRead",
-        "rfqLineWrite",
-        "rfqLineExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "rfqId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "purchaseNeedId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "ingredientId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "requiredQuantity",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "unit",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "addedAt",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RfqLineAdded"
-      ]
-    },
-    {
-      "name": "remove",
-      "entity": "RfqLine",
-      "parameters": [],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [],
-      "policies": [
-        "rfqLineRead",
-        "rfqLineWrite",
-        "rfqLineExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "deletedAt",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RfqLineRemoved"
-      ]
-    },
-    {
-      "name": "submit",
-      "entity": "RfqQuote",
-      "parameters": [
-        {
-          "name": "rfqId",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "rfqVendorId",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "rfqLineId",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "vendorId",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "ingredientId",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "unitPrice",
-          "type": "money",
-          "required": true
-        },
-        {
-          "name": "leadTimeDays",
-          "type": "int",
-          "required": false
-        },
-        {
-          "name": "notes",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [
-        {
-          "name": "submitQuoteRfqMatch",
-          "code": "submitQuoteRfqMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Submit rfqId must match the seeded RFQ reference"
-        },
-        {
-          "name": "submitQuoteVendorMatch",
-          "code": "submitQuoteVendorMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Submit rfqVendorId must match the seeded invite reference"
-        },
-        {
-          "name": "submitQuoteLineMatch",
-          "code": "submitQuoteLineMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Submit rfqLineId must match the seeded line reference"
-        },
-        {
-          "name": "submitQuoteVendorIdMatch",
-          "code": "submitQuoteVendorIdMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Submit vendorId must match the seeded vendor reference"
-        },
-        {
-          "name": "submitQuoteIngredientMatch",
-          "code": "submitQuoteIngredientMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Submit ingredientId must match the seeded ingredient reference"
-        },
-        {
-          "name": "submitQuotePriceNonnegative",
-          "code": "submitQuotePriceNonnegative",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Quote unit price cannot be negative"
-        },
-        {
-          "name": "submitQuoteLeadTimeNonnegative",
-          "code": "submitQuoteLeadTimeNonnegative",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Lead time cannot be negative"
-        }
-      ],
-      "policies": [
-        "rfqQuoteRead",
-        "rfqQuoteWrite",
-        "rfqQuoteExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "rfqId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "rfqVendorId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "rfqLineId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "vendorId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "ingredientId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "unitPrice",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "leadTimeDays",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "notes",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "submittedAt",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RfqQuoteSubmitted"
-      ]
-    },
-    {
-      "name": "award",
-      "entity": "RfqVendor",
-      "parameters": [],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [],
-      "policies": [
-        "rfqVendorRead",
-        "rfqVendorWrite",
-        "rfqVendorExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "status",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "awardedAt",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RfqVendorAwarded"
-      ]
-    },
-    {
-      "name": "decline",
-      "entity": "RfqVendor",
-      "parameters": [
-        {
-          "name": "reason",
-          "type": "string",
-          "required": false
-        }
-      ],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [],
-      "policies": [
-        "rfqVendorRead",
-        "rfqVendorWrite",
-        "rfqVendorExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "status",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "declinedAt",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "declineReason",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RfqVendorDeclined"
-      ]
-    },
-    {
-      "name": "invite",
-      "entity": "RfqVendor",
-      "parameters": [
-        {
-          "name": "rfqId",
-          "type": "uuid",
-          "required": true
-        },
-        {
-          "name": "vendorId",
-          "type": "uuid",
-          "required": true
-        }
-      ],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [
-        {
-          "name": "inviteRfqMatch",
-          "code": "inviteRfqMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Invite rfqId must match the seeded RFQ reference"
-        },
-        {
-          "name": "inviteVendorMatch",
-          "code": "inviteVendorMatch",
-          "severity": "block",
-          "expression": "[omitted]",
-          "message": "Invite vendorId must match the seeded vendor reference"
-        }
-      ],
-      "policies": [
-        "rfqVendorRead",
-        "rfqVendorWrite",
-        "rfqVendorExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "rfqId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "vendorId",
-          "expression": "[omitted]"
-        },
-        {
-          "kind": "mutate",
-          "target": "invitedAt",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RfqVendorInvited"
-      ]
-    },
-    {
-      "name": "remove",
-      "entity": "RfqVendor",
-      "parameters": [],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [],
-      "policies": [
-        "rfqVendorRead",
-        "rfqVendorWrite",
-        "rfqVendorExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "deletedAt",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RfqVendorRemoved"
-      ]
-    },
-    {
-      "name": "setCompliant",
-      "entity": "RfqVendor",
-      "parameters": [
-        {
-          "name": "isCompliant",
-          "type": "boolean",
-          "required": true
-        }
-      ],
-      "guards": [
-        "[omitted]",
-        "[omitted]",
-        "[omitted]"
-      ],
-      "constraints": [],
-      "policies": [
-        "rfqVendorRead",
-        "rfqVendorWrite",
-        "rfqVendorExecute"
-      ],
-      "actions": [
-        {
-          "kind": "mutate",
-          "target": "isCompliant",
-          "expression": "[omitted]"
-        }
-      ],
-      "emits": [
-        "RfqVendorComplianceSet"
-      ]
-    },
-    {
       "name": "archive",
       "entity": "SavedReportDefinition",
       "parameters": [],
@@ -49930,6 +49787,27 @@
       "message": "Event and sales staff may read events"
     },
     {
+      "name": "eventStaffNeedExecute",
+      "entity": "EventStaffNeed",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"workforceAccess\")",
+      "message": "Workforce staff may execute staff need commands"
+    },
+    {
+      "name": "eventStaffNeedRead",
+      "entity": "EventStaffNeed",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"workforceAccess\")",
+      "message": "Workforce staff may read open staff needs"
+    },
+    {
+      "name": "eventStaffNeedWrite",
+      "entity": "EventStaffNeed",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"workforceAccess\")",
+      "message": "Workforce staff may write staff needs through commands"
+    },
+    {
       "name": "eventTemplateExecute",
       "entity": "EventTemplate",
       "action": "execute",
@@ -49970,6 +49848,27 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"eventAccess\")",
       "message": "Event staff may write the event timeline through commands"
+    },
+    {
+      "name": "eventTimelineCommentExecute",
+      "entity": "EventTimelineComment",
+      "action": "execute",
+      "expression": "roleAllows(user.role, \"eventAccess\")",
+      "message": "Event staff may execute timeline comment commands"
+    },
+    {
+      "name": "eventTimelineCommentRead",
+      "entity": "EventTimelineComment",
+      "action": "read",
+      "expression": "roleAllows(user.role, \"eventAccess\")",
+      "message": "Event staff may read timeline comments"
+    },
+    {
+      "name": "eventTimelineCommentWrite",
+      "entity": "EventTimelineComment",
+      "action": "write",
+      "expression": "roleAllows(user.role, \"eventAccess\")",
+      "message": "Event staff may write timeline comments through commands"
     },
     {
       "name": "eventWrite",
@@ -50691,90 +50590,6 @@
       "action": "write",
       "expression": "roleAllows(user.role, \"workforceAccess\")",
       "message": "Workforce staff may write recurring availability through commands"
-    },
-    {
-      "name": "rfqExecute",
-      "entity": "RequestForQuote",
-      "action": "execute",
-      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Procurement and managers may execute RFQ commands"
-    },
-    {
-      "name": "rfqLineExecute",
-      "entity": "RfqLine",
-      "action": "execute",
-      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Procurement and managers may execute RFQ line commands"
-    },
-    {
-      "name": "rfqLineRead",
-      "entity": "RfqLine",
-      "action": "read",
-      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Inventory, procurement, and managers may read RFQ lines"
-    },
-    {
-      "name": "rfqLineWrite",
-      "entity": "RfqLine",
-      "action": "write",
-      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Procurement and managers may write RFQ lines through commands"
-    },
-    {
-      "name": "rfqQuoteExecute",
-      "entity": "RfqQuote",
-      "action": "execute",
-      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Procurement and managers may execute RFQ quote commands"
-    },
-    {
-      "name": "rfqQuoteRead",
-      "entity": "RfqQuote",
-      "action": "read",
-      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Inventory, procurement, and managers may read RFQ quotes"
-    },
-    {
-      "name": "rfqQuoteWrite",
-      "entity": "RfqQuote",
-      "action": "write",
-      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Procurement and managers may write RFQ quotes through commands"
-    },
-    {
-      "name": "rfqRead",
-      "entity": "RequestForQuote",
-      "action": "read",
-      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Inventory, procurement, and managers may read RFQs"
-    },
-    {
-      "name": "rfqVendorExecute",
-      "entity": "RfqVendor",
-      "action": "execute",
-      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Procurement and managers may execute RFQ vendor invite commands"
-    },
-    {
-      "name": "rfqVendorRead",
-      "entity": "RfqVendor",
-      "action": "read",
-      "expression": "roleAllows(user.role, \"inventoryAccess\") or roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Inventory, procurement, and managers may read RFQ vendor invites"
-    },
-    {
-      "name": "rfqVendorWrite",
-      "entity": "RfqVendor",
-      "action": "write",
-      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Procurement and managers may write RFQ vendor invites through commands"
-    },
-    {
-      "name": "rfqWrite",
-      "entity": "RequestForQuote",
-      "action": "write",
-      "expression": "roleAllows(user.role, \"procurementAccess\") or roleAllows(user.role, \"manageAccess\")",
-      "message": "Procurement and managers may write RFQs through commands"
     },
     {
       "name": "savedReportExecute",
@@ -51721,6 +51536,24 @@
       "overrideable": false
     },
     {
+      "entity": "EventStaffNeed",
+      "name": "staffNeedRole",
+      "code": "staffNeedRole",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Staff need role is required once posted",
+      "overrideable": false
+    },
+    {
+      "entity": "EventStaffNeed",
+      "name": "staffNeedWindow",
+      "code": "staffNeedWindow",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Staff need end must be after its start",
+      "overrideable": false
+    },
+    {
       "entity": "EventTemplate",
       "name": "templateComplete",
       "code": "templateComplete",
@@ -51754,6 +51587,15 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Timeline activity end must not precede its start",
+      "overrideable": false
+    },
+    {
+      "entity": "EventTimelineComment",
+      "name": "timelineCommentBody",
+      "code": "timelineCommentBody",
+      "severity": "block",
+      "expression": "[omitted]",
+      "message": "Timeline comment text is required",
       "overrideable": false
     },
     {
@@ -52330,24 +52172,6 @@
       "severity": "block",
       "expression": "[omitted]",
       "message": "Recipe steps require an instruction",
-      "overrideable": false
-    },
-    {
-      "entity": "RfqLine",
-      "name": "lineQuantityPositive",
-      "code": "lineQuantityPositive",
-      "severity": "block",
-      "expression": "[omitted]",
-      "message": "Required quantity must be positive once added",
-      "overrideable": false
-    },
-    {
-      "entity": "RfqQuote",
-      "name": "quotePriceNonnegative",
-      "code": "quotePriceNonnegative",
-      "severity": "block",
-      "expression": "[omitted]",
-      "message": "Quote unit price cannot be negative",
       "overrideable": false
     },
     {
@@ -53195,6 +53019,54 @@
       "name": "prepTasks"
     },
     {
+      "source": "Dish",
+      "target": "Recipe",
+      "kind": "belongsTo",
+      "name": "primaryRecipe",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "primaryRecipeId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "Dish",
+      "target": "Dish",
+      "kind": "belongsTo",
+      "name": "canonicalDish",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "canonicalDishId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "Dish",
+      "target": "Dish",
+      "kind": "belongsTo",
+      "name": "mergedIntoDish",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "mergedIntoDishId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "DishRecipe",
       "target": "Dish",
       "kind": "belongsTo",
@@ -53735,6 +53607,54 @@
       }
     },
     {
+      "source": "EventStaffNeed",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventStaffNeed",
+      "target": "Person",
+      "kind": "belongsTo",
+      "name": "claimedBy",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "claimedByPersonId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventStaffNeed",
+      "target": "Person",
+      "kind": "belongsTo",
+      "name": "filledBy",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "filledByPersonId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
       "source": "EventTimelineActivity",
       "target": "Event",
       "kind": "belongsTo",
@@ -53743,6 +53663,38 @@
         "fields": [
           "tenantId",
           "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventTimelineComment",
+      "target": "Event",
+      "kind": "belongsTo",
+      "name": "event",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "eventId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "EventTimelineComment",
+      "target": "Person",
+      "kind": "belongsTo",
+      "name": "author",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "authorPersonId"
         ],
         "references": [
           "tenantId",
@@ -53825,6 +53777,38 @@
       "target": "InventoryItem",
       "kind": "hasMany",
       "name": "stockLines"
+    },
+    {
+      "source": "Ingredient",
+      "target": "Ingredient",
+      "kind": "belongsTo",
+      "name": "canonicalIngredient",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "canonicalIngredientId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
+    },
+    {
+      "source": "Ingredient",
+      "target": "Ingredient",
+      "kind": "belongsTo",
+      "name": "mergedIntoIngredient",
+      "foreignKey": {
+        "fields": [
+          "tenantId",
+          "mergedIntoIngredientId"
+        ],
+        "references": [
+          "tenantId",
+          "id"
+        ]
+      }
     },
     {
       "source": "IngredientDemand",
@@ -55245,238 +55229,6 @@
       }
     },
     {
-      "source": "RequestForQuote",
-      "target": "Event",
-      "kind": "belongsTo",
-      "name": "event",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "eventId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RequestForQuote",
-      "target": "RfqVendor",
-      "kind": "ref",
-      "name": "winningRfqVendor",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "winningRfqVendorId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RequestForQuote",
-      "target": "Vendor",
-      "kind": "ref",
-      "name": "winningVendor",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "winningVendorId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RequestForQuote",
-      "target": "RfqLine",
-      "kind": "hasMany",
-      "name": "lines"
-    },
-    {
-      "source": "RequestForQuote",
-      "target": "RfqVendor",
-      "kind": "hasMany",
-      "name": "vendors"
-    },
-    {
-      "source": "RfqLine",
-      "target": "RequestForQuote",
-      "kind": "belongsTo",
-      "name": "rfq",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "rfqId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RfqLine",
-      "target": "PurchaseNeed",
-      "kind": "belongsTo",
-      "name": "purchaseNeed",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "purchaseNeedId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RfqLine",
-      "target": "Ingredient",
-      "kind": "belongsTo",
-      "name": "ingredient",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "ingredientId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RfqLine",
-      "target": "RfqQuote",
-      "kind": "hasMany",
-      "name": "quotes"
-    },
-    {
-      "source": "RfqQuote",
-      "target": "RequestForQuote",
-      "kind": "belongsTo",
-      "name": "rfq",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "rfqId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RfqQuote",
-      "target": "RfqVendor",
-      "kind": "belongsTo",
-      "name": "rfqVendor",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "rfqVendorId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RfqQuote",
-      "target": "RfqLine",
-      "kind": "belongsTo",
-      "name": "rfqLine",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "rfqLineId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RfqQuote",
-      "target": "Vendor",
-      "kind": "belongsTo",
-      "name": "vendor",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "vendorId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RfqQuote",
-      "target": "Ingredient",
-      "kind": "belongsTo",
-      "name": "ingredient",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "ingredientId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RfqVendor",
-      "target": "RequestForQuote",
-      "kind": "belongsTo",
-      "name": "rfq",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "rfqId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RfqVendor",
-      "target": "Vendor",
-      "kind": "belongsTo",
-      "name": "vendor",
-      "foreignKey": {
-        "fields": [
-          "tenantId",
-          "vendorId"
-        ],
-        "references": [
-          "tenantId",
-          "id"
-        ]
-      }
-    },
-    {
-      "source": "RfqVendor",
-      "target": "RfqQuote",
-      "kind": "hasMany",
-      "name": "quotes"
-    },
-    {
       "source": "SavedReportDefinition",
       "target": "Person",
       "kind": "ref",
@@ -56477,6 +56229,9 @@
         },
         {
           "name": "closeout"
+        },
+        {
+          "name": "dish"
         }
       ]
     },
@@ -56889,6 +56644,23 @@
         },
         {
           "name": "annually"
+        }
+      ]
+    },
+    {
+      "name": "EventStaffNeedStatus",
+      "values": [
+        {
+          "name": "open"
+        },
+        {
+          "name": "claimed"
+        },
+        {
+          "name": "filled"
+        },
+        {
+          "name": "cancelled"
         }
       ]
     },
@@ -57562,37 +57334,6 @@
       ]
     },
     {
-      "name": "RfqStatus",
-      "values": [
-        {
-          "name": "draft"
-        },
-        {
-          "name": "issued"
-        },
-        {
-          "name": "awarded"
-        },
-        {
-          "name": "cancelled"
-        }
-      ]
-    },
-    {
-      "name": "RfqVendorStatus",
-      "values": [
-        {
-          "name": "invited"
-        },
-        {
-          "name": "awarded"
-        },
-        {
-          "name": "declined"
-        }
-      ]
-    },
-    {
       "name": "RsvpStatus",
       "values": [
         {
@@ -58241,14 +57982,39 @@
       "payload": "{dishId: string, tenantId: string, name: string}"
     },
     {
+      "name": "DishEditionCreated",
+      "channel": "dish.edition_created",
+      "payload": "{dishId: string, tenantId: string, sourceDishId: string, name: string, editionNumber: number}"
+    },
+    {
       "name": "DishIntroduced",
       "channel": "dish.introduced",
       "payload": "{dishId: string, tenantId: string, name: string, portionSize: decimal, portionUnit: UnitOfMeasure, allergenSummary: list<AllergenCode>}"
     },
     {
+      "name": "DishMerged",
+      "channel": "dish.merged",
+      "payload": "{dishId: string, tenantId: string, targetDishId: string, reason: string}"
+    },
+    {
       "name": "DishPortioningUpdated",
       "channel": "dish.portioning_updated",
       "payload": "{dishId: string, tenantId: string, previousPortionSize: decimal, previousPortionUnit: UnitOfMeasure, portionSize: decimal, portionUnit: UnitOfMeasure}"
+    },
+    {
+      "name": "DishPrimaryImageCleared",
+      "channel": "dish.primary_image_cleared",
+      "payload": "{dishId: string, tenantId: string}"
+    },
+    {
+      "name": "DishPrimaryImageSet",
+      "channel": "dish.primary_image_set",
+      "payload": "{dishId: string, tenantId: string, storageId: string}"
+    },
+    {
+      "name": "DishPrimaryRecipeSet",
+      "channel": "dish.primary_recipe_set",
+      "payload": "{dishId: string, tenantId: string, primaryRecipeId: string | null}"
     },
     {
       "name": "DishRecipeAttached",
@@ -58551,6 +58317,31 @@
       "payload": "{eventId: string, tenantId: string, startsAt: datetime, endsAt: datetime}"
     },
     {
+      "name": "EventStaffNeedCancelled",
+      "channel": "event_staff_need.cancelled",
+      "payload": "{staffNeedId: string, tenantId: string, eventId: string, reason: string}"
+    },
+    {
+      "name": "EventStaffNeedClaimed",
+      "channel": "event_staff_need.claimed",
+      "payload": "{staffNeedId: string, tenantId: string, eventId: string, personId: string}"
+    },
+    {
+      "name": "EventStaffNeedFilled",
+      "channel": "event_staff_need.filled",
+      "payload": "{staffNeedId: string, tenantId: string, eventId: string, personId: string}"
+    },
+    {
+      "name": "EventStaffNeedPosted",
+      "channel": "event_staff_need.posted",
+      "payload": "{staffNeedId: string, tenantId: string, eventId: string, role: string}"
+    },
+    {
+      "name": "EventStaffNeedReleased",
+      "channel": "event_staff_need.released",
+      "payload": "{staffNeedId: string, tenantId: string, eventId: string}"
+    },
+    {
       "name": "EventSubmittedForApproval",
       "channel": "event.submitted_for_approval",
       "payload": "{eventId: string, tenantId: string}"
@@ -58589,6 +58380,16 @@
       "name": "EventTimelineActivityScheduled",
       "channel": "event_timeline_activity.scheduled",
       "payload": "{activityId: string, tenantId: string, eventId: string, name: string, startsAt: datetime}"
+    },
+    {
+      "name": "EventTimelineCommentPosted",
+      "channel": "event_timeline_comment.posted",
+      "payload": "{commentId: string, tenantId: string, eventId: string, authorPersonId: string}"
+    },
+    {
+      "name": "EventTimelineCommentRemoved",
+      "channel": "event_timeline_comment.removed",
+      "payload": "{commentId: string, tenantId: string, eventId: string}"
     },
     {
       "name": "EventVenueChanged",
@@ -58671,9 +58472,19 @@
       "payload": "{ingredientId: string, tenantId: string, reason: string}"
     },
     {
+      "name": "IngredientEditionCreated",
+      "channel": "ingredient.edition_created",
+      "payload": "{ingredientId: string, tenantId: string, sourceIngredientId: string, name: string, editionNumber: number}"
+    },
+    {
       "name": "IngredientIntroduced",
       "channel": "ingredient.introduced",
       "payload": "{ingredientId: string, tenantId: string, name: string, unit: UnitOfMeasure, costPerUnit: money, allergens: list<AllergenCode>}"
+    },
+    {
+      "name": "IngredientMerged",
+      "channel": "ingredient.merged",
+      "payload": "{ingredientId: string, tenantId: string, targetIngredientId: string, reason: string}"
     },
     {
       "name": "IngredientReinstated",
@@ -59491,66 +59302,6 @@
       "payload": "{recurringAvailabilityId: string, tenantId: string, personId: string, dayOfWeek: int, previousStatus: RecurringAvailabilityStatus, status: RecurringAvailabilityStatus}"
     },
     {
-      "name": "RequestForQuoteAwarded",
-      "channel": "rfq.awarded",
-      "payload": "{rfqId: string, tenantId: string, rfqVendorId: string, vendorId: string, status: RfqStatus}"
-    },
-    {
-      "name": "RequestForQuoteCancelled",
-      "channel": "rfq.cancelled",
-      "payload": "{rfqId: string, tenantId: string, previousStatus: RfqStatus, status: RfqStatus, reason: string}"
-    },
-    {
-      "name": "RequestForQuoteIssued",
-      "channel": "rfq.issued",
-      "payload": "{rfqId: string, tenantId: string, responseDeadline: datetime | null, status: RfqStatus}"
-    },
-    {
-      "name": "RequestForQuoteOpened",
-      "channel": "rfq.opened",
-      "payload": "{rfqId: string, tenantId: string, rfqNumber: string | null, notes: string | null, responseDeadline: datetime | null, eventId: string | null, status: RfqStatus}"
-    },
-    {
-      "name": "RfqLineAdded",
-      "channel": "rfq_line.added",
-      "payload": "{rfqLineId: string, tenantId: string, rfqId: string, purchaseNeedId: string, ingredientId: string, requiredQuantity: decimal, unit: UnitOfMeasure}"
-    },
-    {
-      "name": "RfqLineRemoved",
-      "channel": "rfq_line.removed",
-      "payload": "{rfqLineId: string, tenantId: string, rfqId: string, purchaseNeedId: string}"
-    },
-    {
-      "name": "RfqQuoteSubmitted",
-      "channel": "rfq_quote.submitted",
-      "payload": "{rfqQuoteId: string, tenantId: string, rfqId: string, rfqVendorId: string, rfqLineId: string, vendorId: string, ingredientId: string, unitPrice: money, leadTimeDays: int | null}"
-    },
-    {
-      "name": "RfqVendorAwarded",
-      "channel": "rfq_vendor.awarded",
-      "payload": "{rfqVendorId: string, tenantId: string, rfqId: string, vendorId: string}"
-    },
-    {
-      "name": "RfqVendorComplianceSet",
-      "channel": "rfq_vendor.compliance_set",
-      "payload": "{rfqVendorId: string, tenantId: string, rfqId: string, vendorId: string, isCompliant: boolean}"
-    },
-    {
-      "name": "RfqVendorDeclined",
-      "channel": "rfq_vendor.declined",
-      "payload": "{rfqVendorId: string, tenantId: string, rfqId: string, vendorId: string, status: RfqVendorStatus, reason: string | null}"
-    },
-    {
-      "name": "RfqVendorInvited",
-      "channel": "rfq_vendor.invited",
-      "payload": "{rfqVendorId: string, tenantId: string, rfqId: string, vendorId: string, status: RfqVendorStatus}"
-    },
-    {
-      "name": "RfqVendorRemoved",
-      "channel": "rfq_vendor.removed",
-      "payload": "{rfqVendorId: string, tenantId: string, rfqId: string, vendorId: string}"
-    },
-    {
       "name": "SavedReportArchived",
       "channel": "saved_report.archived",
       "payload": "{savedReportDefinitionId: string, tenantId: string, ownerId: string | null, previousStatus: SavedReportStatus, status: SavedReportStatus}"
@@ -60154,11 +59905,19 @@
       "target": "durable"
     },
     {
+      "entity": "EventStaffNeed",
+      "target": "durable"
+    },
+    {
       "entity": "EventTemplate",
       "target": "durable"
     },
     {
       "entity": "EventTimelineActivity",
+      "target": "durable"
+    },
+    {
+      "entity": "EventTimelineComment",
       "target": "durable"
     },
     {
@@ -60295,22 +60054,6 @@
     },
     {
       "entity": "RecurringAvailability",
-      "target": "durable"
-    },
-    {
-      "entity": "RequestForQuote",
-      "target": "durable"
-    },
-    {
-      "entity": "RfqLine",
-      "target": "durable"
-    },
-    {
-      "entity": "RfqQuote",
-      "target": "durable"
-    },
-    {
-      "entity": "RfqVendor",
       "target": "durable"
     },
     {

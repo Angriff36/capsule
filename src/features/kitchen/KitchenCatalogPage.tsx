@@ -18,10 +18,14 @@ import {
   useMenuRestore,
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { TableSkeleton } from "../../ui/primitives";
+import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
-import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
+import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
+import { DishPrimaryImage } from "./DishPrimaryImage";
 import { KitchenBookNav } from "./KitchenBookNav";
+import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
+import { KitchenCatalogLifecycleButtons } from "./KitchenCatalogLifecycleButtons";
 import {
   RECIPE_IMPORT_PATH,
   dishPath,
@@ -34,8 +38,6 @@ import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const UNITS = UNIT_OF_MEASURE;
-
-const policy = new CulinaryLifecyclePolicy();
 
 function optional(value: FormDataEntryValue | null) {
   const result = String(value ?? "").trim();
@@ -106,8 +108,21 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
     const data = new FormData(form);
     void run("create", async () => {
       if (section === "ingredients") {
+        const name = String(data.get("name") ?? "").trim();
+        const duplicate = culinaryCanonicalMatcher.likelyDuplicate(
+          ingredients ?? [],
+          name,
+        );
+        if (
+          duplicate &&
+          !window.confirm(
+            `An ingredient named "${duplicate.name}" already exists (edition ${duplicate.editionNumber ?? 1}). Create anyway? Prefer linking a new edition from the ingredient detail when you mean a version.`,
+          )
+        ) {
+          return;
+        }
         await createIngredient({
-          name: String(data.get("name") ?? "").trim(),
+          name,
           unit: String(data.get("unit")) as (typeof UNITS)[number],
           costPerUnit: Number(data.get("costPerUnit")),
           category: optional(data.get("category")),
@@ -139,8 +154,21 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         navigate(recipePath(created.docId));
         return;
       } else if (section === "dishes") {
+        const name = String(data.get("name") ?? "").trim();
+        const duplicate = culinaryCanonicalMatcher.likelyDuplicate(
+          dishes ?? [],
+          name,
+        );
+        if (
+          duplicate &&
+          !window.confirm(
+            `A dish named "${duplicate.name}" already exists (edition ${duplicate.editionNumber ?? 1}). Create anyway? Use dish detail → Create new edition for a versioned edition.`,
+          )
+        ) {
+          return;
+        }
         await createDish({
-          name: String(data.get("name") ?? "").trim(),
+          name,
           portionSize: Number(data.get("portionSize")),
           portionUnit: String(
             data.get("portionUnit"),
@@ -202,9 +230,8 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         </div>
       ) : null}
       {showCreate ? (
-        <CreateForm
+        <KitchenCatalogCreateForm
           section={section}
-          recipes={recipes ?? []}
           busy={busy === "create"}
           onSubmit={submit}
         />
@@ -265,15 +292,30 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
                   <span className="recipe-index-number">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <span>
-                    <strong className="recipe-index-name">{item.name}</strong>
-                    <small className="recipe-index-description">
-                      {"description" in item
-                        ? item.description || "No description recorded"
-                        : "category" in item
-                          ? item.category || "Unclassified"
-                          : ""}
-                    </small>
+                  <span className="flex min-w-0 items-start gap-2">
+                    {section === "dishes" && "primaryImageStorageId" in item ? (
+                      <DishPrimaryImage
+                        storageId={item.primaryImageStorageId as string | null}
+                        alt={item.name}
+                        size="thumb"
+                      />
+                    ) : null}
+                    <span>
+                      <strong className="recipe-index-name">{item.name}</strong>
+                      <small className="recipe-index-description">
+                        {"description" in item
+                          ? item.description || "No description recorded"
+                          : "category" in item
+                            ? item.category || "Unclassified"
+                            : ""}
+                      </small>
+                      {section === "dishes" && "allergenSummary" in item ? (
+                        <AllergenIconRow
+                          codes={item.allergenSummary as string[]}
+                          className="mt-1"
+                        />
+                      ) : null}
+                    </span>
                   </span>
                   <span className="recipe-index-taxonomy">
                     {"category" in item
@@ -323,7 +365,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
                       <CulinaryEntityLink kind="ingredient" id={item._id}>
                         {content}
                       </CulinaryEntityLink>
-                      <LifecycleButtons
+                      <KitchenCatalogLifecycleButtons
                         section={section}
                         item={item}
                         busy={busy}
@@ -345,7 +387,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
                       <CulinaryEntityLink kind="dish" id={item._id}>
                         {content}
                       </CulinaryEntityLink>
-                      <LifecycleButtons
+                      <KitchenCatalogLifecycleButtons
                         section={section}
                         item={item}
                         busy={busy}
@@ -367,7 +409,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
                       <CulinaryEntityLink kind="menu" id={item._id}>
                         {content}
                       </CulinaryEntityLink>
-                      <LifecycleButtons
+                      <KitchenCatalogLifecycleButtons
                         section={section}
                         item={item}
                         busy={busy}
@@ -392,275 +434,5 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         )}
       </section>
     </div>
-  );
-}
-
-function LifecycleButtons({ section, item, busy, run, commands }: any) {
-  const actions =
-    section === "ingredients"
-      ? policy.ingredientActions(String(item.status))
-      : section === "dishes"
-        ? policy.dishActions(String(item.status))
-        : policy.menuActions(String(item.status));
-  if (!actions.length) return null;
-  const invoke = (key: string) => {
-    const reason = ["discontinue", "retire", "unpublish", "archive"].includes(
-      key,
-    )
-      ? window.prompt("Reason")?.trim()
-      : undefined;
-    if (
-      ["discontinue", "retire", "unpublish", "archive"].includes(key) &&
-      !reason
-    )
-      return;
-    void run(`${item._id}:${key}`, async () => {
-      const args = { docId: item._id, version: item.version };
-      if (key === "discontinue")
-        await commands.discontinueIngredient({ ...args, reason });
-      if (key === "reinstate")
-        await (section === "ingredients"
-          ? commands.reinstateIngredient(args)
-          : commands.reinstateDish(args));
-      if (key === "retire") await commands.retireDish({ ...args, reason });
-      if (key === "markPublished") await commands.publishMenu(args);
-      if (key === "unpublish")
-        await commands.unpublishMenu({ ...args, reason });
-      if (key === "archive") await commands.archiveMenu({ ...args, reason });
-      if (key === "restore") await commands.restoreMenu(args);
-    });
-  };
-  return (
-    <div className="culinary-row-actions">
-      {actions.map((action) => (
-        <button
-          key={action.key}
-          type="button"
-          className="btn btn-ghost btn-sm"
-          disabled={busy != null}
-          onClick={() => invoke(action.key)}
-        >
-          {busy === `${item._id}:${action.key}` ? "Working…" : action.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function CreateForm({
-  section,
-  recipes,
-  busy,
-  onSubmit,
-}: {
-  section: KitchenSection;
-  recipes: any[];
-  busy: boolean;
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
-}) {
-  return (
-    <form onSubmit={onSubmit} className="culinary-create-form">
-      <div className="culinary-create-heading">
-        <div>
-          <p className="eyebrow">New record</p>
-          <h2 className="font-display text-2xl">Add {section.slice(0, -1)}</h2>
-        </div>
-        <button className="btn btn-primary" disabled={busy}>
-          {busy ? "Creating…" : "Create"}
-        </button>
-      </div>
-      <div className="culinary-create-grid">
-        <label className="field-label">
-          Name
-          <input name="name" className="input" required autoFocus />
-        </label>
-        {section === "ingredients" ? (
-          <>
-            <UnitField name="unit" label="Stock unit" />
-            <label className="field-label">
-              Cost per unit
-              <input
-                name="costPerUnit"
-                type="number"
-                min={0}
-                step="0.01"
-                defaultValue={0}
-                className="input"
-                required
-              />
-            </label>
-            <label className="field-label">
-              Category
-              <input name="category" className="input" />
-            </label>
-            <label className="field-label sm:col-span-2">
-              Allergens
-              <input
-                name="allergens"
-                className="input"
-                placeholder="milk, eggs, sesame"
-              />
-            </label>
-          </>
-        ) : null}
-        {section === "recipes" ? (
-          <>
-            <label className="field-label">
-              Yield
-              <input
-                name="yieldQuantity"
-                type="number"
-                min={1}
-                defaultValue={1}
-                className="input"
-                required
-              />
-            </label>
-            <UnitField name="yieldUnit" label="Yield unit" />
-            <label className="field-label">
-              Batch multiplier
-              <input
-                name="batchMultiplier"
-                type="number"
-                min={0.01}
-                step="0.01"
-                defaultValue={1}
-                className="input"
-                required
-              />
-            </label>
-            <label className="field-label">
-              Category
-              <input name="category" className="input" />
-            </label>
-            <label className="field-label">
-              Cuisine
-              <input name="cuisine" className="input" />
-            </label>
-            <label className="field-label sm:col-span-2">
-              Description
-              <textarea name="description" className="input min-h-20 py-2" />
-            </label>
-            <label className="field-label sm:col-span-2">
-              Method
-              <textarea name="instructions" className="input min-h-28 py-2" />
-            </label>
-          </>
-        ) : null}
-        {section === "dishes" ? (
-          <>
-            <label className="field-label">
-              Portion size
-              <input
-                name="portionSize"
-                type="number"
-                min={0.01}
-                step="0.01"
-                defaultValue={1}
-                className="input"
-                required
-              />
-            </label>
-            <UnitField name="portionUnit" label="Portion unit" />
-            <label className="field-label">
-              Category
-              <input name="category" className="input" />
-            </label>
-            <label className="field-label">
-              Course
-              <input name="course" className="input" />
-            </label>
-            <label className="field-label">
-              Service style
-              <input name="serviceStyle" className="input" />
-            </label>
-            <label className="field-label sm:col-span-2">
-              Dietary tags
-              <input
-                name="dietaryTags"
-                className="input"
-                placeholder="vegan, gluten-free"
-              />
-            </label>
-            <label className="field-label sm:col-span-2">
-              Description
-              <textarea name="description" className="input min-h-20 py-2" />
-            </label>
-          </>
-        ) : null}
-        {section === "menus" ? (
-          <>
-            <label className="field-label">
-              Category
-              <input name="category" className="input" />
-            </label>
-            <label className="field-label">
-              Base price
-              <input
-                name="basePrice"
-                type="number"
-                min={0}
-                step="0.01"
-                defaultValue={0}
-                className="input"
-              />
-            </label>
-            <label className="field-label">
-              Price per person
-              <input
-                name="pricePerPerson"
-                type="number"
-                min={0}
-                step="0.01"
-                defaultValue={0}
-                className="input"
-              />
-            </label>
-            <label className="field-label">
-              Minimum guests
-              <input
-                name="minGuests"
-                type="number"
-                min={0}
-                defaultValue={0}
-                className="input"
-              />
-            </label>
-            <label className="field-label">
-              Maximum guests
-              <input
-                name="maxGuests"
-                type="number"
-                min={0}
-                defaultValue={0}
-                className="input"
-              />
-            </label>
-            <label className="field-label flex-row items-center gap-2">
-              <input name="isTemplate" type="checkbox" /> Reusable template
-            </label>
-            <label className="field-label sm:col-span-2">
-              Description
-              <textarea name="description" className="input min-h-20 py-2" />
-            </label>
-          </>
-        ) : null}
-      </div>
-    </form>
-  );
-}
-
-function UnitField({ name, label }: { name: string; label: string }) {
-  return (
-    <label className="field-label">
-      {label}
-      <select name={name} className="input">
-        {UNITS.map((unit) => (
-          <option key={unit} value={unit}>
-            {unit}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }

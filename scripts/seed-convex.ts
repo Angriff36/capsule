@@ -38,8 +38,10 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip EventDishRecipeSeed: no create command in IR (2 rows unused)
   // skip EventGuest: no create command in IR (2 rows unused)
   // skip EventIngredientContribution: no create command in IR (2 rows unused)
+  // skip EventStaffNeed: no create command in IR (2 rows unused)
   // skip EventTemplate: no create command in IR (2 rows unused)
   // skip EventTimelineActivity: no create command in IR (2 rows unused)
+  // skip EventTimelineComment: no create command in IR (2 rows unused)
   // skip Incident: no create command in IR (2 rows unused)
   // skip Ingredient: no create command in IR (2 rows unused)
   // skip IngredientDemand: no create command in IR (2 rows unused)
@@ -76,10 +78,6 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip RecipeIngredient: no create command in IR (2 rows unused)
   // skip RecipeStep: no create command in IR (2 rows unused)
   // skip RecurringAvailability: no create command in IR (2 rows unused)
-  // skip RequestForQuote: no create command in IR (2 rows unused)
-  // skip RfqLine: no create command in IR (2 rows unused)
-  // skip RfqQuote: no create command in IR (2 rows unused)
-  // skip RfqVendor: no create command in IR (2 rows unused)
   // skip SavedReportDefinition: no create command in IR (2 rows unused)
   // skip Shift: no create command in IR (2 rows unused)
   // skip ShiftSwapRequest: no create command in IR (2 rows unused)
@@ -260,12 +258,22 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "EventStaffNeed",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "EventTemplate",
       "createMutation": null,
       "rowCount": 2
     },
     {
       "entity": "EventTimelineActivity",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "EventTimelineComment",
       "createMutation": null,
       "rowCount": 2
     },
@@ -436,26 +444,6 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "RecurringAvailability",
-      "createMutation": null,
-      "rowCount": 2
-    },
-    {
-      "entity": "RequestForQuote",
-      "createMutation": null,
-      "rowCount": 2
-    },
-    {
-      "entity": "RfqLine",
-      "createMutation": null,
-      "rowCount": 2
-    },
-    {
-      "entity": "RfqQuote",
-      "createMutation": null,
-      "rowCount": 2
-    },
-    {
-      "entity": "RfqVendor",
       "createMutation": null,
       "rowCount": 2
     },
