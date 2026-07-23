@@ -10,8 +10,8 @@ This is not a broad CRM, venue-management suite, readiness dashboard, or replace
 
 ## Owned domain
 
-| Canonical source                                            | Entities                         | Operator meaning                                                                         |
-| ----------------------------------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------- |
+| Canonical source                                    | Entities                         | Operator meaning                                                                         |
+| --------------------------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------- |
 | `C:\projects\capsule\src\operations\event.manifest` | Client, Venue, Event, EventGuest | Engagement account, reusable venue, governed event plan/lifecycle, individual attendance |
 
 Manifest source owns business rules. Capsule provides the operator workflow through generated Convex queries, commands, policies, guards, constraints, lifecycle metadata, and authored integration seams.
@@ -151,7 +151,10 @@ The UI disables actions from generated lifecycle/capability state and the guest'
 
 - Tenant and role come from the verified Clerk identity in `C:\projects\capsule\convex\lib\authContext.ts`; client input cannot select a tenant.
 - Generated queries and mutations enforce tenant ownership and role policies.
-- Client, Event contact, and EventGuest contact fields use the generated encryption seam and require `CONVEX_FIELD_ENCRYPTION_KEY` in the Convex deployment.
+- Client, Event contact, and EventGuest contact fields use the generated encryption seam and require `CONVEX_FIELD_ENCRYPTION_KEY` on **the same Convex deployment the UI calls**.
+- Vercel production uses cloud Convex (`VITE_CONVEX_URL` in the Vercel project). Local `bunx convex env set` only updates the local/dev deployment — production needs `bunx convex env set --prod` (and `bunx convex deploy` for author-seam code). A missing prod key surfaces as opaque `Server Error` on create.
+- Do **not** rewrite that key with bare `bunx convex env set` on Windows: a trailing `\r` changes key derivation (`sha256` vs 32-byte base64). Use `bun run convex:env-set -- CONVEX_FIELD_ENCRYPTION_KEY <secret>` (strips CR/LF). Mismatched material surfaces as `OperationError: Decryption failed` (GitHub issue #83). This is **not** a `.gitattributes` / Git line-ending failure — Convex secrets are outside the repo.
+- After cleaning a CR-suffixed key, `convex/lib/encryption.ts` must still try legacy `sha256(secret+"\\r")` materials so existing encrypted Event/Client fields decrypt. Dropping those fallbacks breaks `listEvent` with “key material may have drifted.”
 - UI reads and writes use generated hooks from `C:\projects\capsule\src\lib\manifest-convex-react.ts` and API exports from `C:\projects\capsule\src\lib\api.ts`.
 - Generated files remain regeneration-owned and are not hand-edited.
 
@@ -172,9 +175,9 @@ An event manager can select the Northstar Events Client and Harborview Loft Venu
 | Index                      | `C:\projects\capsule\src\features\events\EventsListPage.tsx`                   |
 | Creation                   | `C:\projects\capsule\src\features\events\EventCreatePage.tsx`                  |
 | Dossier and lifecycle      | `C:\projects\capsule\src\features\events\EventDetailPage.tsx`                  |
-| Recurrence UI              | `C:\projects\capsule\src\features\events\RecurringEventPanel.tsx`             |
+| Recurrence UI              | `C:\projects\capsule\src\features\events\RecurringEventPanel.tsx`              |
 | Recurrence calendar math   | `C:\projects\capsule\src\lib\eventRecurrence.ts`                               |
-| Scheduled Draft bridge     | `C:\projects\capsule\convex\recurringEvents.ts`                                 |
+| Scheduled Draft bridge     | `C:\projects\capsule\convex\recurringEvents.ts`                                |
 | Guest workflow             | `C:\projects\capsule\src\features\events\EventGuestPanel.tsx`                  |
 | Lifecycle/capability offer | `C:\projects\capsule\src\features\events\EventLifecyclePolicy.ts`              |
 | Failure classification     | `C:\projects\capsule\src\features\events\CommandFailure.ts`                    |

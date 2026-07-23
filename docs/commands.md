@@ -13,8 +13,12 @@ bun install --frozen-lockfile
 cp .env.example .env.local
 # VITE_CONVEX_URL, VITE_CLERK_PUBLISHABLE_KEY
 
-bunx convex env set CLERK_JWT_ISSUER_DOMAIN https://YOUR.clerk.accounts.dev
-bunx convex env set CONVEX_FIELD_ENCRYPTION_KEY <32-byte-secret>
+bun run convex:env-set -- CLERK_JWT_ISSUER_DOMAIN https://YOUR.clerk.accounts.dev
+bun run convex:env-set -- CONVEX_FIELD_ENCRYPTION_KEY <32-byte-secret>
+# Production (Vercel app → cloud Convex): set the same vars with --prod, then
+# bunx convex deploy. Local env set does not affect tangible-skunk / prod.
+# Windows: if env list warns about trailing \r on this key, do not "clean" it
+# without migrating ciphertext — decrypt/create will fail as Server Error.
 
 bun run dev:convex    # terminal 1
 bun run dev           # terminal 2 → http://localhost:7811
