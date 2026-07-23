@@ -34,8 +34,7 @@
       "baselined": true
     },
     "package.json": {
-      "sha256": "bc7abdda55d6e2b586f6b9512ea2c697ccba42ab658b62a40f6fb8209d448435",
-      "baselined": true
+      "sha256": "bc7abdda55d6e2b586f6b9512ea2c697ccba42ab658b62a40f6fb8209d448435"
     },
     "PRESET.md": {
       "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
@@ -70,7 +69,9 @@
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "3.6.41"
+      "@angriff36/manifest": "^3.6.41",
+      "convex": "^1.0.0",
+      "zod": "^3.23.0"
     },
     "devDependencies": {
       "typescript": "^5.9.3",
