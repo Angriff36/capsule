@@ -25,7 +25,7 @@ pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
 | Tick runner (triage, state) | **GLM 5.2** (z.ai plan), auto-fallback **MiniMax-M3** | `~/.claude/claude-glm.ps1` / `claude-minimax.ps1` profiles — zero Anthropic quota; reads `.claude/loop-tick-prompt.txt`, runs `loop-triage`, owns STATE.md; scoped Edit perms (state files only). Manual alternate: Codex `gpt-5.6-luna` (`codex exec`). |
 | Overseer                    | Fable 5 — on-demand only                              | reviews STATE.md when the human asks; judges graduation; NEVER runs ticks. No Anthropic-quota model runs ticks (incl. Sonnet).                                                                                                                           |
 | Implementers (L2 — **ON, away mode**) | GLM/MiniMax, in-tick                        | One fix attempt per tick, inside `.loop-worktrees/<run-id>` only; draft PRs; per loop-constraints.md away-mode rules                                                                                                                                     |
-| Review gate (L2 — **ON, away mode**)  | Codex (gpt-5.6-sol)                         | Tick pipes worktree diff to `codex exec -s read-only`; REJECT blocks the PR                                                                                                                                                                              |
+| Review gate (L2 — **ON, away mode**)  | Codex (gpt-5.6-sol); cross-model fallback: Fable 5 or grok (Cursor CLI) | Tick pipes worktree diff to `codex exec -s read-only`; REJECT blocks the PR. Reviewer must be a different model than the diff's author; if Codex is unavailable (quota/outage) or authored the diff, fall back per loop-constraints.md § Push & Merge — either fallback may review GLM/MiniMax loop diffs |
 | Circuit breaker             | loop-context                                          | `loop-ledger.json`; 3× same error / 5 fails → escalate                                                                                                                                                                                                   |
 | Final gate                  | Human (Ryan)                                          | STATE.md High Priority + escalations                                                                                                                                                                                                                     |
 
@@ -38,7 +38,7 @@ pnpm/turbo monorepo). All commands are `bun run <script>`; see package.json.
 ## L1 → L2 graduation criteria (all required — evidence bar, not calendar)
 
 1. ≥10 L1 ticks with <20% noise in High Priority
-2. One _manual_ dispatch → verifier round-trip proven (Codex gate)
+2. One _manual_ dispatch → verifier round-trip proven (cross-model review gate)
 3. Human flips this file's implementer status to ON
 
 ## Coordination
