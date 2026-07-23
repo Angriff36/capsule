@@ -49,13 +49,21 @@ export const CAPABILITY_UI_SURFACES: Readonly<
     surfaces: [
       "src/features/production/PrepBoardPage.tsx",
       "src/features/kitchen/EventMenuPage.tsx",
+      "src/features/kitchen/KitchenDashboardPage.tsx",
+      "src/features/events/EventMenuTab.tsx",
     ],
+  },
+  "PrepTask.assign": {
+    hooks: ["usePrepTaskAssign"],
+    surfaces: ["src/features/kitchen/KitchenDashboardPage.tsx"],
   },
   "PrepTask.refreshGenerated": {
     hooks: ["usePrepTaskRefreshGenerated"],
     surfaces: [
       "src/features/production/PrepBoardPage.tsx",
       "src/features/kitchen/EventMenuPage.tsx",
+      "src/features/kitchen/KitchenDashboardPage.tsx",
+      "src/features/events/EventMenuTab.tsx",
     ],
   },
   "IngredientDemand.calculate": {
@@ -89,7 +97,10 @@ export const CAPABILITY_UI_SURFACES: Readonly<
   },
   "EventDish.addToEvent": {
     hooks: ["useCreateEventDish"],
-    surfaces: ["src/features/kitchen/EventMenuPage.tsx"],
+    surfaces: [
+      "src/features/kitchen/EventMenuPage.tsx",
+      "src/features/events/EventMenuTab.tsx",
+    ],
   },
   "Event.submitForApproval": {
     hooks: ["useEventSubmitForApproval"],

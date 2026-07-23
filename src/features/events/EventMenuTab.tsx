@@ -12,6 +12,7 @@ import { AllergenIconRow } from "../kitchen/AllergenIconRow";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
 import { DishPrimaryImage } from "../kitchen/DishPrimaryImage";
 import { dishPath, recipePath } from "../kitchen/kitchenRoutes";
+import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 
@@ -27,6 +28,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
   const removeDish = useEventDishRemove();
+  const { ready: prepSyncReady, syncPrepForDish } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
@@ -92,12 +94,21 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           excludeIds={existingDishIds}
           onSelect={(dishId) =>
             void run("add", async () => {
-              await createEventDish({
+              const servings = Math.max(1, expectedHeadcount || 1);
+              const created = (await createEventDish({
                 eventId,
                 dishId,
-                quantityServings: Math.max(1, expectedHeadcount || 1),
+                quantityServings: servings,
                 headcountOverride: 0,
-              });
+              })) as { docId: string };
+              if (prepSyncReady) {
+                await syncPrepForDish({
+                  id: created.docId,
+                  eventId,
+                  dishId,
+                  quantityServings: servings,
+                });
+              }
               setShowPicker(false);
             })
           }

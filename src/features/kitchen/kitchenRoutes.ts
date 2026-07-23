@@ -9,7 +9,7 @@ export const KITCHEN_SECTIONS: readonly {
   { key: "ingredients", label: "Ingredients", path: "/kitchen/ingredients" },
   { key: "dishes", label: "Dishes", path: "/kitchen/dishes" },
   { key: "menus", label: "Menus", path: "/kitchen/menus" },
-  { key: "prep", label: "Dashboard", path: "/kitchen/prep" },
+  { key: "prep", label: "Command deck", path: "/kitchen/prep" },
 ] as const;
 
 export function recipePath(id: string) {

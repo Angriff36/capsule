@@ -1,0 +1,547 @@
+/* Command deck surfaces — tickets, dishes, tasks, crew */
+
+.kcd-event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.kcd-event-ticket {
+  --delay: 0ms;
+  position: relative;
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--color-line);
+  background: var(--kcd-ticket);
+  border-radius: 12px;
+  padding: 0.85rem 0.9rem 0.85rem 1.05rem;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--color-ink) 4%, transparent);
+  animation: kcd-rise var(--kcd-rise) both;
+  animation-delay: var(--delay);
+  transition:
+    border-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.kcd-event-ticket::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.7rem;
+  bottom: 0.7rem;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--color-line-2);
+  transition: background 0.18s ease;
+}
+
+.kcd-event-ticket:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--color-brand) 35%, var(--color-line));
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+
+.kcd-event-ticket:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.kcd-event-ticket.is-selected {
+  border-color: color-mix(in srgb, var(--color-accent) 55%, var(--color-line));
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-soft) 0%,
+    var(--color-panel) 55%
+  );
+  box-shadow: 0 10px 24px
+    color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+
+.kcd-event-ticket.is-selected::before {
+  background: var(--kcd-spine);
+  top: 0.45rem;
+  bottom: 0.45rem;
+}
+
+.kcd-event-ticket .kcd-event-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.kcd-event-ticket .kcd-event-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+  line-height: 1.15;
+}
+
+.kcd-event-ticket .kcd-event-pct {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-accent-deep);
+  white-space: nowrap;
+}
+
+.kcd-event-ticket .kcd-event-meta {
+  margin: 0.35rem 0 0;
+  font-size: 0.72rem;
+  color: var(--color-ink-2);
+  line-height: 1.35;
+}
+
+.kcd-progress {
+  margin-top: 0.55rem;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-line) 80%, transparent);
+  overflow: hidden;
+}
+
+.kcd-progress > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-brand), var(--color-accent));
+  transition: width 0.35s ease;
+}
+
+.kcd-event-ticket .kcd-event-foot {
+  margin: 0.4rem 0 0;
+  font-size: 0.68rem;
+  color: var(--color-ink-3);
+}
+
+.kcd-stage-shell {
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  padding: 1rem 1.1rem 1.25rem;
+  box-shadow: 0 12px 32px color-mix(in srgb, var(--color-ink) 5%, transparent);
+  animation: kcd-rise var(--kcd-rise) both;
+  animation-delay: 80ms;
+}
+
+.kcd-stage-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-bottom: 0.9rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px dashed var(--color-line-2);
+}
+
+.kcd-stage-head h2 {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  margin: 0 0 0.25rem;
+  color: var(--color-ink);
+}
+
+.kcd-stage-head p {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-ink-2);
+}
+
+.kcd-stage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.kcd-dish {
+  --delay: 0ms;
+  margin-bottom: 0.85rem;
+  border-radius: 12px;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--color-sage) 35%, var(--color-panel)),
+    var(--color-panel) 42%
+  );
+  border: 1px solid var(--color-line);
+  overflow: hidden;
+  animation: kcd-rise var(--kcd-rise) both;
+  animation-delay: var(--delay);
+}
+
+.kcd-dish:last-child {
+  margin-bottom: 0;
+}
+
+.kcd-dish-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.85rem 1rem;
+}
+
+.kcd-dish-head .dish-primary-image,
+.kcd-dish-head img {
+  border-radius: 10px;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--color-ink) 12%, transparent);
+}
+
+.kcd-dish-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.kcd-dish-copy h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  color: var(--color-ink);
+}
+
+.kcd-dish-meta {
+  margin: 0.25rem 0 0;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-ink-3);
+}
+
+.kcd-dish-meta a {
+  color: var(--color-brand);
+  text-underline-offset: 2px;
+}
+
+.kcd-task-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem 0.55rem 0.65rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.kcd-task {
+  display: grid;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  background: var(--color-panel);
+  border: 1px solid color-mix(in srgb, var(--color-line) 85%, transparent);
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+@media (min-width: 768px) {
+  .kcd-task {
+    grid-template-columns: 1fr auto;
+  }
+}
+
+.kcd-task:hover {
+  border-color: color-mix(in srgb, var(--color-brand) 30%, var(--color-line));
+  box-shadow: 0 4px 14px color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+
+.kcd-task.is-done {
+  opacity: 0.62;
+}
+
+.kcd-task.is-doing {
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--color-line));
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--color-accent-soft) 70%, var(--color-panel)),
+    var(--color-panel) 40%
+  );
+}
+
+.kcd-task-name {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  line-height: 1.3;
+}
+
+.kcd-status-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-top: 0.35rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--color-ink-3);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ink-3) 18%, transparent);
+}
+
+.kcd-status-dot[data-status="claimed"] {
+  background: var(--color-info);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-info) 18%, transparent);
+}
+
+.kcd-status-dot[data-status="in_progress"] {
+  background: var(--color-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 22%, transparent);
+  animation: kcd-pulse 1.6s ease-in-out infinite;
+}
+
+.kcd-status-dot[data-status="completed"] {
+  background: var(--color-ok);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-ok) 18%, transparent);
+}
+
+.kcd-status-dot[data-status="blocked"] {
+  background: var(--color-danger);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 18%, transparent);
+}
+
+.kcd-task-meta {
+  margin: 0.2rem 0 0 1.1rem;
+  font-size: 0.72rem;
+  color: var(--color-ink-3);
+  line-height: 1.35;
+}
+
+.kcd-task-meta a {
+  color: var(--color-brand);
+}
+
+.kcd-task-note {
+  margin: 0.35rem 0 0 1.1rem;
+  font-size: 0.78rem;
+  color: var(--color-ink-2);
+  font-style: italic;
+}
+
+.kcd-task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.kcd-task-actions .btn {
+  border-radius: 8px;
+  font-size: 0.72rem;
+}
+
+.kcd-empty {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--color-ink-3);
+  font-size: 0.85rem;
+  border: 1px dashed var(--color-line-2);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--color-sage) 25%, transparent);
+}
+
+.kcd-crew-card {
+  --delay: 0ms;
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.7rem 0.75rem;
+  margin-bottom: 0.45rem;
+  border-radius: 12px;
+  border: 1px solid var(--color-line);
+  background: var(--color-panel);
+  animation: kcd-rise var(--kcd-rise) both;
+  animation-delay: var(--delay);
+}
+
+.kcd-crew-top {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.kcd-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-panel);
+  background: var(--color-brand);
+  flex-shrink: 0;
+}
+
+.dark .kcd-avatar {
+  color: var(--color-canvas);
+}
+
+.kcd-crew-name {
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: var(--color-ink);
+}
+
+.kcd-crew-stats {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--color-ink-3);
+}
+
+.kcd-crew-load {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-ink-2);
+}
+
+.kcd-assign-panel {
+  margin-top: 1rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  border: 1px solid
+    color-mix(in srgb, var(--color-accent) 35%, var(--color-line));
+  background: linear-gradient(
+    160deg,
+    var(--color-accent-soft),
+    var(--color-panel) 70%
+  );
+}
+
+.kcd-assign-panel .kcd-rail-title {
+  color: var(--color-accent-deep);
+}
+
+.kcd-assign-help {
+  margin: 0 0 0.65rem;
+  font-size: 0.75rem;
+  color: var(--color-ink-2);
+  line-height: 1.4;
+}
+
+.kcd-cook-picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.kcd-cook-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--color-line-2);
+  background: var(--color-panel);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem 0.35rem 0.35rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    transform 0.12s ease,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.kcd-cook-pick:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.kcd-cook-pick:active {
+  transform: scale(0.97);
+}
+
+.kcd-cook-pick.is-armed {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: #1a120a;
+  box-shadow: 0 6px 16px
+    color-mix(in srgb, var(--color-accent) 35%, transparent);
+}
+
+.kcd-cook-pick.is-armed .kcd-avatar {
+  background: #1a120a;
+  color: var(--color-accent);
+}
+
+.kcd-armed-banner {
+  margin: 0.7rem 0 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  color: var(--color-accent-deep);
+}
+
+.kcd-toast {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 50%;
+  z-index: 40;
+  transform: translateX(-50%);
+  border: 0;
+  background: var(--color-ink);
+  color: var(--color-panel);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  padding: 0.65rem 1.15rem;
+  border-radius: 999px;
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--color-ink) 28%, transparent);
+  animation: kcd-toast-in 0.28s ease both;
+}
+
+.dark .kcd-toast {
+  color: var(--color-canvas);
+}
+
+@keyframes kcd-rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes kcd-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+@keyframes kcd-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kcd-event-ticket,
+  .kcd-stage-shell,
+  .kcd-dish,
+  .kcd-crew-card,
+  .kcd-toast,
+  .kcd-status-dot[data-status="in_progress"] {
+    animation: none;
+  }
+}

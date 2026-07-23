@@ -1,6 +1,5 @@
-import { useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import { formatDate, formatTime } from "../../lib/format";
+import { useEffect, useMemo, useState } from "react";
+import { formatDate } from "../../lib/format";
 import {
   useListDish,
   useListEvent,
@@ -9,34 +8,31 @@ import {
   useListPrepTask,
   useListRecipe,
   useListVenue,
+  usePrepTaskAssign,
   usePrepTaskClaim,
   usePrepTaskComplete,
-  usePrepTaskRevise,
+  usePrepTaskRelease,
   usePrepTaskStart,
 } from "../../lib/manifest-convex-react";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { AllergenIconRow } from "./AllergenIconRow";
-import { DishPrimaryImage } from "./DishPrimaryImage";
-import { KitchenBookNav } from "./KitchenBookNav";
-import { eventDetailMenuPath, recipePath } from "./kitchenRoutes";
+import { TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
+import { KitchenBookNav } from "./KitchenBookNav";
+import { KitchenCommandDeckCrewRail } from "./command-deck/KitchenCommandDeckCrewRail";
+import { KitchenCommandDeckEventRail } from "./command-deck/KitchenCommandDeckEventRail";
+import { KitchenCommandDeckFilters } from "./command-deck/KitchenCommandDeckFilters";
+import { KitchenCommandDeckHorizon } from "./command-deck/KitchenCommandDeckHorizon";
+import { KitchenCommandDeckModel } from "./command-deck/KitchenCommandDeckModel";
+import { KitchenCommandDeckTaskPanel } from "./command-deck/KitchenCommandDeckTaskPanel";
+import type {
+  CommandDeckFilter,
+  PrepTaskLike,
+} from "./command-deck/KitchenCommandDeckTypes";
+import { KitchenPrepAssignManager } from "./command-deck/KitchenPrepAssignManager";
+import "./command-deck/KitchenCommandDeck.css";
+import "./command-deck/KitchenCommandDeckSurfaces.css";
+import { useEventMenuSync } from "./useEventMenuSync";
 
-function startOfWeek(date: Date): Date {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + diff);
-  return d;
-}
-
-function addDays(date: Date, days: number): Date {
-  const d = new Date(date);
-  d.setDate(d.getDate() + days);
-  return d;
-}
-
-/** Week-scoped Kitchen Dashboard: Event → Dish → Prep Task. */
+/** Kitchen command deck: 7-day horizon, assign cooks to dishes/steps, crew load. */
 export function KitchenDashboardPage() {
   const events = useListEvent();
   const eventDishes = useListEventDish();
@@ -45,45 +41,87 @@ export function KitchenDashboardPage() {
   const tasks = useListPrepTask();
   const people = useListPerson();
   const venues = useListVenue();
+
+  const assign = usePrepTaskAssign();
   const claim = usePrepTaskClaim();
+  const release = usePrepTaskRelease();
   const start = usePrepTaskStart();
   const complete = usePrepTaskComplete();
-  const revise = usePrepTaskRevise();
-  const [weekOffset, setWeekOffset] = useState(0);
-  const [eventFilter, setEventFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState("");
+  const { ready: prepSyncReady, syncPrepForDish } = useEventMenuSync();
+
+  const [horizonOffset, setHorizonOffset] = useState(0);
+  const [selectedEventId, setSelectedEventId] = useState("");
+  const [filter, setFilter] = useState<CommandDeckFilter>("all");
   const [assigneeFilter, setAssigneeFilter] = useState("");
+  const [armedPersonId, setArmedPersonId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
-  const weekStart = useMemo(() => {
-    const base = startOfWeek(new Date());
-    return addDays(base, weekOffset * 7);
-  }, [weekOffset]);
-  const weekEnd = useMemo(() => addDays(weekStart, 7), [weekStart]);
+  const horizon = useMemo(
+    () => new KitchenCommandDeckHorizon(7, horizonOffset),
+    [horizonOffset],
+  );
 
-  const weekEvents = useMemo(() => {
-    return (events ?? [])
-      .filter((event) => event.deletedAt == null)
-      .filter((event) => {
-        const start = Number(event.startsAt ?? 0);
-        return start >= weekStart.getTime() && start < weekEnd.getTime();
-      })
-      .filter((event) => !eventFilter || event._id === eventFilter)
-      .sort((a, b) => Number(a.startsAt) - Number(b.startsAt));
-  }, [eventFilter, events, weekEnd, weekStart]);
+  const model = useMemo(
+    () =>
+      new KitchenCommandDeckModel(
+        events ?? [],
+        eventDishes ?? [],
+        dishes ?? [],
+        tasks ?? [],
+        people ?? [],
+        horizon,
+      ),
+    [dishes, eventDishes, events, horizon, people, tasks],
+  );
+
+  const actions = useMemo(
+    () => new KitchenPrepAssignManager(assign, release, claim, start, complete),
+    [assign, claim, complete, release, start],
+  );
+
+  const horizonEvents = model.horizonEvents();
+
+  useEffect(() => {
+    if (!selectedEventId && horizonEvents[0]) {
+      setSelectedEventId(horizonEvents[0]._id);
+      return;
+    }
+    if (
+      selectedEventId &&
+      horizonEvents.length > 0 &&
+      !horizonEvents.some((e) => e._id === selectedEventId)
+    ) {
+      setSelectedEventId(horizonEvents[0]?._id ?? "");
+    }
+  }, [horizonEvents, selectedEventId]);
+
+  const selectedEvent = horizonEvents.find((e) => e._id === selectedEventId);
+  const crewRows = model.crewLoad(horizonEvents.map((e) => e._id));
 
   const loading =
     events === undefined ||
     eventDishes === undefined ||
     dishes === undefined ||
-    tasks === undefined;
+    tasks === undefined ||
+    people === undefined;
 
-  const run = async (key: string, work: () => Promise<void>) => {
+  const showToast = (message: string) => {
+    setToast(message);
+    globalThis.setTimeout(() => setToast(null), 1800);
+  };
+
+  const run = async (
+    key: string,
+    work: () => Promise<void>,
+    okMessage?: string,
+  ) => {
     setFailure(null);
     setBusy(key);
     try {
       await work();
+      if (okMessage) showToast(okMessage);
     } catch (error) {
       setFailure(error);
     } finally {
@@ -91,76 +129,68 @@ export function KitchenDashboardPage() {
     }
   };
 
+  const requireArmed = (): string | null => {
+    if (!armedPersonId) {
+      showToast("Arm a cook on the right first");
+      return null;
+    }
+    return armedPersonId;
+  };
+
+  const onAssignTask = (task: PrepTaskLike) => {
+    const personId = requireArmed();
+    if (!personId) return;
+    const label = model.personLabel(model.findPerson(personId));
+    void run(
+      `assign:${task._id}`,
+      () => actions.assignOne(task, personId),
+      `Assigned → ${label}`,
+    );
+  };
+
+  const onAssignDish = (dishTasks: PrepTaskLike[]) => {
+    const personId = requireArmed();
+    if (!personId) return;
+    const label = model.personLabel(model.findPerson(personId));
+    void run(`assign-dish:${dishTasks[0]?._id ?? "x"}`, async () => {
+      const count = await actions.assignMany(dishTasks, personId);
+      showToast(`${count} tasks → ${label}`);
+    });
+  };
+
   return (
-    <div className="culinary-document culinary-document-compact space-y-4">
+    <div className="culinary-document culinary-document-compact culinary-studio kitchen-command-deck space-y-4">
       <KitchenBookNav />
-      <header className="space-y-2">
+      <header className="kcd-masthead">
         <p className="eyebrow">Kitchen</p>
-        <h1 className="culinary-title-compact">Weekly prep dashboard</h1>
-        <p className="text-[13px] text-ink-2">
-          Week of {formatDate(weekStart.getTime())} — organized by event, dish,
-          then prep task.
+        <h1>Command deck</h1>
+        <p className="kcd-lede">
+          Next 7 days from {formatDate(horizon.start().getTime())} — put cooks
+          on dishes and steps, and keep an eye on who is buried.
         </p>
       </header>
 
-      <div className="flex flex-wrap items-end gap-3">
-        <div className="flex gap-2">
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => setWeekOffset((value) => value - 1)}
-          >
-            Previous week
+      <div className="kcd-toolbar">
+        <fieldset className="kcd-horizon-nav">
+          <legend>Horizon</legend>
+          <button type="button" onClick={() => setHorizonOffset((v) => v - 7)}>
+            Earlier
           </button>
           <button
             type="button"
-            className="btn btn-ghost"
-            onClick={() => setWeekOffset(0)}
+            data-active={horizonOffset === 0 ? "true" : "false"}
+            onClick={() => setHorizonOffset(0)}
           >
-            This week
+            From today
           </button>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => setWeekOffset((value) => value + 1)}
-          >
-            Next week
+          <button type="button" onClick={() => setHorizonOffset((v) => v + 7)}>
+            Later
           </button>
-        </div>
-        <label className="field-label">
-          Event
+        </fieldset>
+        <KitchenCommandDeckFilters value={filter} onChange={setFilter} />
+        <label className="kcd-field">
+          <span>Assignee</span>
           <select
-            className="field-input"
-            value={eventFilter}
-            onChange={(e) => setEventFilter(e.target.value)}
-          >
-            <option value="">All events</option>
-            {weekEvents.map((event) => (
-              <option key={event._id} value={event._id}>
-                {event.title}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="field-label">
-          Status
-          <select
-            className="field-input"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="pending">Pending</option>
-            <option value="claimed">Claimed</option>
-            <option value="in_progress">In progress</option>
-            <option value="completed">Completed</option>
-            <option value="blocked">Blocked</option>
-          </select>
-        </label>
-        <label className="field-label">
-          Assignee
-          <select
-            className="field-input"
             value={assigneeFilter}
             onChange={(e) => setAssigneeFilter(e.target.value)}
           >
@@ -169,9 +199,7 @@ export function KitchenDashboardPage() {
               .filter((person) => person.deletedAt == null)
               .map((person) => (
                 <option key={person._id} value={person._id}>
-                  {[person.givenName, person.familyName]
-                    .filter(Boolean)
-                    .join(" ") || person._id}
+                  {model.personLabel(person)}
                 </option>
               ))}
           </select>
@@ -179,279 +207,99 @@ export function KitchenDashboardPage() {
       </div>
 
       {failure ? <CulinaryFailureBanner error={failure} /> : null}
-      {loading ? <TableSkeleton rows={6} /> : null}
+      {loading ? <TableSkeleton rows={8} /> : null}
 
-      {!loading && weekEvents.length === 0 ? (
-        <div className="document-empty">
-          <p>
-            No events scheduled this week. Change the week filter or add events.
-          </p>
+      {loading ? null : (
+        <div className="kcd-board">
+          <aside className="kcd-rail" aria-label="Events in horizon">
+            <h2 className="kcd-rail-title">This horizon</h2>
+            <KitchenCommandDeckEventRail
+              model={model}
+              events={horizonEvents}
+              selectedEventId={selectedEventId}
+              onSelect={setSelectedEventId}
+              venueName={(id) =>
+                venues?.find((v) => v._id === id)?.name ?? "No venue"
+              }
+            />
+          </aside>
+
+          <main className="kcd-stage">
+            <KitchenCommandDeckTaskPanel
+              model={model}
+              event={selectedEvent}
+              filter={filter}
+              assigneeFilter={assigneeFilter}
+              armedPersonId={armedPersonId}
+              busy={busy}
+              prepSyncReady={prepSyncReady}
+              recipeName={(id) =>
+                id ? (recipes?.find((r) => r._id === id)?.name ?? null) : null
+              }
+              onAssignTask={onAssignTask}
+              onAssignDish={onAssignDish}
+              onRelease={(task) =>
+                void run(
+                  `release:${task._id}`,
+                  () => actions.releaseOne(task),
+                  "Released",
+                )
+              }
+              onClaim={(task) =>
+                void run(
+                  `claim:${task._id}`,
+                  () => actions.claimOne(task),
+                  "Claimed",
+                )
+              }
+              onStart={(task) =>
+                void run(
+                  `start:${task._id}`,
+                  () => actions.startOne(task),
+                  "Started",
+                )
+              }
+              onComplete={(task) =>
+                void run(
+                  `complete:${task._id}`,
+                  () => actions.completeOne(task),
+                  "Completed",
+                )
+              }
+              onSyncPrep={() => {
+                if (!selectedEvent) return;
+                void run(
+                  `sync:${selectedEvent._id}`,
+                  async () => {
+                    const rows = model.selections(selectedEvent._id);
+                    for (const row of rows) {
+                      await syncPrepForDish({
+                        id: row._id,
+                        eventId: selectedEvent._id,
+                        dishId: row.dishId,
+                        quantityServings: Number(row.quantityServings) || 1,
+                      });
+                    }
+                  },
+                  "Prep synced from dish templates",
+                );
+              }}
+            />
+          </main>
+
+          <aside className="kcd-rail" aria-label="Crew load">
+            <KitchenCommandDeckCrewRail
+              model={model}
+              rows={crewRows}
+              people={people ?? []}
+              armedPersonId={armedPersonId}
+              onArm={setArmedPersonId}
+            />
+          </aside>
         </div>
-      ) : null}
+      )}
 
-      <div className="space-y-6">
-        {weekEvents.map((event) => {
-          const venue = venues?.find((row) => row._id === event.venueId);
-          const selections = (eventDishes ?? []).filter(
-            (row) => row.deletedAt == null && row.eventId === event._id,
-          );
-          const eventTasks = (tasks ?? []).filter(
-            (task) =>
-              task.deletedAt == null &&
-              task.eventId === event._id &&
-              (!statusFilter || task.status === statusFilter) &&
-              (!assigneeFilter || task.assignedToId === assigneeFilter),
-          );
-          const completed = eventTasks.filter(
-            (task) => task.status === "completed",
-          ).length;
-          const progress =
-            eventTasks.length === 0
-              ? "No prep tasks"
-              : `${completed}/${eventTasks.length} complete`;
-
-          return (
-            <section
-              key={event._id}
-              className="border border-line bg-surface"
-              data-testid="kitchen-dashboard-event"
-            >
-              <header className="flex flex-wrap items-start justify-between gap-3 border-b border-line px-4 py-3">
-                <div>
-                  <h2 className="font-display text-lg text-ink">
-                    {event.title}
-                  </h2>
-                  <p className="font-mono text-[12px] text-ink-2">
-                    {formatDate(event.startsAt)} {formatTime(event.startsAt)}
-                    {event.endsAt ? ` – ${formatTime(event.endsAt)}` : ""}
-                    {" · "}
-                    {venue?.name ?? "No venue"}
-                    {" · "}
-                    {event.expectedHeadcount ?? "—"} guests
-                  </p>
-                  <p className="text-[12px] text-ink-3">
-                    Prep progress: {progress}
-                  </p>
-                </div>
-                <Link
-                  to={eventDetailMenuPath(event._id)}
-                  className="btn btn-ghost"
-                >
-                  Open event
-                </Link>
-              </header>
-
-              {selections.length === 0 ? (
-                <p className="px-4 py-3 text-[13px] text-ink-3">
-                  No dishes on this event yet.{" "}
-                  <Link
-                    to={eventDetailMenuPath(event._id)}
-                    className="underline"
-                  >
-                    Add dishes on the event menu tab
-                  </Link>
-                  .
-                </p>
-              ) : (
-                selections.map((selection) => {
-                  const dish = dishes?.find(
-                    (row) => row._id === selection.dishId,
-                  );
-                  if (!dish) return null;
-                  const recipe = dish.primaryRecipeId
-                    ? recipes?.find((row) => row._id === dish.primaryRecipeId)
-                    : null;
-                  const dishTasks = eventTasks.filter(
-                    (task) => task.eventDishId === selection._id,
-                  );
-                  const dishDone = dishTasks.filter(
-                    (task) => task.status === "completed",
-                  ).length;
-
-                  return (
-                    <div
-                      key={selection._id}
-                      className="border-t border-line px-4 py-3"
-                      data-testid="kitchen-dashboard-dish"
-                    >
-                      <div className="flex flex-wrap gap-3">
-                        <DishPrimaryImage
-                          storageId={dish.primaryImageStorageId}
-                          alt={dish.name}
-                          size="thumb"
-                        />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-[15px] font-semibold">
-                              {dish.name}
-                            </h3>
-                            <AllergenIconRow codes={dish.allergenSummary} />
-                          </div>
-                          <p className="font-mono text-[11px] text-ink-3">
-                            {selection.quantityServings} servings
-                            {recipe ? (
-                              <>
-                                {" · "}
-                                <Link
-                                  to={recipePath(recipe._id)}
-                                  className="underline"
-                                >
-                                  {recipe.name}
-                                </Link>
-                              </>
-                            ) : null}
-                            {" · "}
-                            {dishTasks.length
-                              ? `${dishDone}/${dishTasks.length} tasks`
-                              : "No prep tasks"}
-                          </p>
-                        </div>
-                      </div>
-
-                      {dishTasks.length === 0 ? (
-                        <p className="mt-2 text-[12px] text-ink-3">
-                          No prep tasks for this dish in the current filters.
-                        </p>
-                      ) : (
-                        <ul className="mt-2 divide-y divide-line border border-line">
-                          {dishTasks.map((task) => {
-                            const assignee = people?.find(
-                              (person) => person._id === task.assignedToId,
-                            );
-                            const taskRecipe = task.recipeId
-                              ? recipes?.find(
-                                  (row) => row._id === task.recipeId,
-                                )
-                              : null;
-                            return (
-                              <li
-                                key={task._id}
-                                className="grid gap-2 px-3 py-2 md:grid-cols-[1fr_auto]"
-                                data-testid="kitchen-dashboard-task"
-                              >
-                                <div>
-                                  <p className="text-[13px] font-medium">
-                                    {task.name}
-                                  </p>
-                                  <p className="font-mono text-[11px] text-ink-3">
-                                    {task.quantity} {String(task.unit)}
-                                    {task.dueAt
-                                      ? ` · due ${formatTime(task.dueAt)}`
-                                      : ""}
-                                    {assignee
-                                      ? ` · ${[assignee.givenName, assignee.familyName].filter(Boolean).join(" ")}`
-                                      : " · unassigned"}
-                                    {taskRecipe ? (
-                                      <>
-                                        {" · "}
-                                        <Link
-                                          to={recipePath(taskRecipe._id)}
-                                          className="underline"
-                                        >
-                                          {taskRecipe.name}
-                                        </Link>
-                                      </>
-                                    ) : null}
-                                  </p>
-                                  {task.notes ? (
-                                    <p className="text-[12px] text-ink-2">
-                                      {task.notes}
-                                    </p>
-                                  ) : null}
-                                </div>
-                                <div className="flex flex-wrap items-center gap-2">
-                                  <StatusChip status={String(task.status)} />
-                                  {task.status === "pending" ? (
-                                    <button
-                                      type="button"
-                                      className="btn btn-ghost"
-                                      disabled={busy != null}
-                                      onClick={() =>
-                                        void run(`claim:${task._id}`, () =>
-                                          claim({
-                                            docId: task._id,
-                                            version: task.version,
-                                          }),
-                                        )
-                                      }
-                                    >
-                                      Claim
-                                    </button>
-                                  ) : null}
-                                  {task.status === "claimed" ? (
-                                    <button
-                                      type="button"
-                                      className="btn btn-ghost"
-                                      disabled={busy != null}
-                                      onClick={() =>
-                                        void run(`start:${task._id}`, () =>
-                                          start({
-                                            docId: task._id,
-                                            version: task.version,
-                                          }),
-                                        )
-                                      }
-                                    >
-                                      Start
-                                    </button>
-                                  ) : null}
-                                  {task.status === "in_progress" ||
-                                  task.status === "claimed" ? (
-                                    <button
-                                      type="button"
-                                      className="btn btn-primary"
-                                      disabled={busy != null}
-                                      onClick={() =>
-                                        void run(`complete:${task._id}`, () =>
-                                          complete({
-                                            docId: task._id,
-                                            version: task.version,
-                                          }),
-                                        )
-                                      }
-                                    >
-                                      Complete
-                                    </button>
-                                  ) : null}
-                                  {task.status === "pending" ? (
-                                    <button
-                                      type="button"
-                                      className="btn btn-ghost"
-                                      disabled={busy != null}
-                                      onClick={() => {
-                                        const specialInstructions = window
-                                          .prompt(
-                                            "Special instructions",
-                                            task.specialInstructions ?? "",
-                                          )
-                                          ?.trim();
-                                        if (specialInstructions == null) return;
-                                        void run(`notes:${task._id}`, () =>
-                                          revise({
-                                            docId: task._id,
-                                            version: task.version,
-                                            specialInstructions,
-                                          }),
-                                        );
-                                      }}
-                                    >
-                                      Edit
-                                    </button>
-                                  ) : null}
-                                </div>
-                              </li>
-                            );
-                          })}
-                        </ul>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </section>
-          );
-        })}
-      </div>
+      {toast ? <output className="kcd-toast">{toast}</output> : null}
     </div>
   );
 }
