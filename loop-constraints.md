@@ -45,6 +45,21 @@
 - Push ONLY `loop/*` branches (`git push origin loop/<run-id>`).
 - PRs must be created with `gh pr create --draft`, verification evidence in
   the body. NEVER push main, merge, mark PRs ready, or close PRs.
+- **AUTO-MERGE IS ON (human enabled 2026-07-21): once a PR is marked ready, a
+  green CI merges it with no further human step.** The review verdict is
+  therefore a HARD gate: never push a PR branch without a recorded APPROVE
+  from an independent cross-model reviewer. There is NO `REVIEW_GATE`
+  override mechanism — the 2026-07-22 `REVIEW_GATE=0` push (PR #31) was a
+  violation, not a precedent. REJECT → fix or escalate in STATE.md; never
+  push around the gate.
+- Reviewer selection (cross-model rule, owner 2026-07-22): the reviewer must
+  be a DIFFERENT model than the diff's author; a model never approves its
+  own diff. Primary: Codex gpt-5.6-sol. When Codex is unavailable
+  (quota/outage) or authored the diff: **Fable 5** reviews codex/grok-authored
+  diffs; **grok via Cursor CLI**
+  (`agent -p --trust --model cursor-grok-4.5-high-fast`, PowerShell) reviews
+  Claude/Fable- or Codex-authored diffs. The PR body must name the reviewing
+  model and its verdict.
 
 ## Paths (hard rules — the short list that is NOT about caution)
 
