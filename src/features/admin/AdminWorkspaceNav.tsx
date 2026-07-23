@@ -2,6 +2,7 @@ import { NavLink } from "react-router-dom";
 
 const sections = [
   { label: "Permissions", path: "/admin" },
+  { label: "Announcements", path: "/admin/announcements" },
   { label: "Branding", path: "/admin/branding" },
   { label: "Data exports", path: "/admin/data-export" },
   { label: "Integrations", path: "/admin/integrations" },

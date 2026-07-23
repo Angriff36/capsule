@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
+import {
+  EVENT_PHOTO_CATEGORIES,
+  RecordPhotoCapture,
+} from "../attachments/RecordPhotoCapture";
 import type { Id } from "../../lib/api";
 import {
   formatCount,
@@ -324,7 +328,7 @@ export function EventDetailPage() {
               );
           }}
         >
-          <label className="field-label min-w-64 flex-1">
+          <label className="field-label min-w-0 flex-1 basis-48">
             {reasonFor === "cancel"
               ? "Reason for cancelling"
               : "Reason for returning to planning"}
@@ -436,6 +440,16 @@ export function EventDetailPage() {
       />
 
       <EventIncidentPanel eventId={event._id} />
+
+      <RecordPhotoCapture
+        parentType="eventRecord"
+        parentId={event._id}
+        title="Event photo gallery"
+        description="Capture setup, food, service, and venue photos during and after the event. Download the gallery for marketing, or pick photos for the post-event feedback survey."
+        evidenceCategories={EVENT_PHOTO_CATEGORIES}
+        surveySelection
+        downloadAll
+      />
 
       <AttachmentsSection parentType="eventRecord" parentId={event._id} />
 

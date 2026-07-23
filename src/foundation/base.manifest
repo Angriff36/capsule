@@ -155,8 +155,16 @@ entity Organization mixin TenantScoped, SoftDeletable {
   property brandAddress: string?
   property brandPrimaryColor: string?
   property brandAccentColor: string?
+  // 4217 three-letter code used by financial reports as the tenant's
+  // functional currency. Invoices issued in another currency store an
+  // exchangeRate so reports can fold the issued total back into this code.
+  property defaultCurrencyCode: string?
+  property defaultExchangeRateScale: int = 6
 
   computed isOperable: boolean = self.status == "active" and self.deletedAt == null
+  // 3-character ISO 4217, uppercase. Defaults to USD when unset so existing
+  // tenants without a configured default continue to report in USD.
+  computed functionalCurrencyCode: string = self.defaultCurrencyCode != null and length(trim(self.defaultCurrencyCode)) == 3 ? self.defaultCurrencyCode : "USD"
 
   constraint namePresent: length(trim(self.name)) > 0 "Organization name is required"
 
@@ -231,6 +239,20 @@ entity Organization mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Set the tenant's default (functional) currency. ISO 4217 three-letter
+  // uppercase codes only — the same code is reused by financial reports.
+  command setDefaultCurrency(currencyCode: string) {
+    guard self.deletedAt == null
+    constraint setDefaultCurrencyCodeFormat: length(trim(currencyCode)) == 3 "Currency code must be a three-letter ISO 4217 code"
+    compute normalizedCode = toUpperCase(currencyCode)
+    mutate defaultCurrencyCode = normalizedCode
+    emit OrganizationDefaultCurrencySet {
+      organizationId: self.id
+      tenantId: self.tenantId
+      currencyCode: normalizedCode
+    }
+  }
+
   command suspend(reason: string = "") {
     guard self.status == "active"
     guard self.deletedAt == null
@@ -299,6 +321,12 @@ event OrganizationSuspended: "organization.suspended" {
 event OrganizationReactivated: "organization.reactivated" {
   organizationId: string
   tenantId: string
+}
+
+event OrganizationDefaultCurrencySet: "organization.default_currency_set" {
+  organizationId: string
+  tenantId: string
+  currencyCode: string
 }
 
 event OrganizationDeactivated: "organization.deactivated" {

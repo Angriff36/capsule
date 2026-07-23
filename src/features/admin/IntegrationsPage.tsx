@@ -5,6 +5,7 @@ import { api } from "../../lib/api";
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { WebhooksSection } from "./WebhooksSection";
 
 function formatWhen(value: number | null | undefined): string {
   return value == null
@@ -254,6 +255,8 @@ export function IntegrationsPage() {
           </dl>
         </div>
       </Section>
+
+      <WebhooksSection canManage={connection.canManage} />
     </div>
   );
 }

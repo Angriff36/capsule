@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import type { Doc, Id } from "../../lib/api";
+import type { Doc } from "../../lib/api";
 import {
   useCreateClient,
   useCreateEvent,
@@ -15,7 +15,9 @@ import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
 import { PageHeader, Section, Skeleton } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
+import { cleanCommandArgs } from "./CleanCommandArgs";
 import { clientDisplayName } from "./clientName";
+import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
 import { eventDetailPath } from "./eventRoutes";
 
@@ -31,14 +33,6 @@ const VENUE_TYPES = [
 function optional(value: string): string | undefined {
   const trimmed = value.trim();
   return trimmed || undefined;
-}
-
-function lines(value: string): string[] | undefined {
-  const values = value
-    .split(/[,\n]/)
-    .map((part) => part.trim())
-    .filter(Boolean);
-  return values.length ? values : undefined;
 }
 
 function eventFieldRules(data: FormData): Record<string, string> {
@@ -113,6 +107,8 @@ export function EventCreatePage() {
     try {
       await work();
     } catch (error) {
+      // Full Convex payload helps when the UI only shows "Server Error".
+      console.error(`[event-create:${kind}]`, error);
       setFailure(classifyCommandFailure(error));
     } finally {
       setBusy(null);
@@ -124,16 +120,17 @@ export function EventCreatePage() {
     const data = new FormData(event.currentTarget);
     const clientType = String(data.get("clientType")) as "company" | "person";
     void run("client", async () => {
-      const created = await createClient({
+      const args = cleanCommandArgs.from({
         clientType,
         companyName: optional(String(data.get("companyName") ?? "")),
         givenName: optional(String(data.get("givenName") ?? "")),
         familyName: optional(String(data.get("familyName") ?? "")),
         email: optional(String(data.get("email") ?? "")),
         phone: optional(String(data.get("phone") ?? "")),
-        paymentTermsDays: 0,
+        paymentTermsDays: 30,
         taxExempt: false,
       });
+      const created = await createClient(args);
       setClientId(created.docId);
       setShowClient(false);
     });
@@ -143,17 +140,22 @@ export function EventCreatePage() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     void run("venue", async () => {
-      const created = await createVenue({
+      const capacity = Number(data.get("capacity"));
+      if (!Number.isFinite(capacity) || capacity < 0) {
+        throw new Error("Venue capacity must be zero or greater.");
+      }
+      const args = cleanCommandArgs.from({
         name: String(data.get("name") ?? "").trim(),
         venueType: String(
           data.get("venueType"),
         ) as (typeof VENUE_TYPES)[number][0],
-        capacity: Number(data.get("capacity")),
+        capacity,
         addressLine1: optional(String(data.get("addressLine1") ?? "")),
         city: optional(String(data.get("city") ?? "")),
         region: optional(String(data.get("region") ?? "")),
         postalCode: optional(String(data.get("postalCode") ?? "")),
       });
+      const created = await createVenue(args);
       setVenueId(created.docId);
       setShowVenue(false);
     });
@@ -164,34 +166,27 @@ export function EventCreatePage() {
     const data = new FormData(event.currentTarget);
     const venue = activeVenues.find((item) => item._id === venueId);
     void run("event", async () => {
-      const created = await createEvent({
+      const args = eventPlanEngagementFormMapper.toCommandArgs({
         clientId,
         venueId,
-        venueName: venue?.name,
-        venueAddress: venueAddress(venue),
-        venueCapacity: venue?.capacity,
-        title: String(data.get("title") ?? "").trim(),
-        eventType: String(data.get("eventType") ?? "").trim(),
-        startsAt: new Date(String(data.get("startsAt"))).getTime(),
-        endsAt: new Date(String(data.get("endsAt"))).getTime(),
-        expectedHeadcount: Number(data.get("expectedHeadcount")),
-        primaryContactName: String(data.get("primaryContactName") ?? "").trim(),
-        primaryContactEmail: optional(
-          String(data.get("primaryContactEmail") ?? ""),
-        ),
-        primaryContactPhone: optional(
-          String(data.get("primaryContactPhone") ?? ""),
-        ),
-        budgetAmount: Number(data.get("budgetAmount")),
-        quotedPrice: Number(data.get("quotedPrice")),
-        accessibilityNeeds: lines(String(data.get("accessibilityNeeds") ?? "")),
-        serviceRequirements: optional(
-          String(data.get("serviceRequirements") ?? ""),
-        ),
-        operationalRequirements: optional(
-          String(data.get("operationalRequirements") ?? ""),
+        venue,
+        title: String(data.get("title") ?? ""),
+        eventType: String(data.get("eventType") ?? ""),
+        startsAtRaw: String(data.get("startsAt") ?? ""),
+        endsAtRaw: String(data.get("endsAt") ?? ""),
+        expectedHeadcountRaw: data.get("expectedHeadcount"),
+        primaryContactName: String(data.get("primaryContactName") ?? ""),
+        primaryContactEmail: String(data.get("primaryContactEmail") ?? ""),
+        primaryContactPhone: String(data.get("primaryContactPhone") ?? ""),
+        budgetAmountRaw: data.get("budgetAmount"),
+        quotedPriceRaw: data.get("quotedPrice"),
+        accessibilityNeedsRaw: String(data.get("accessibilityNeeds") ?? ""),
+        serviceRequirements: String(data.get("serviceRequirements") ?? ""),
+        operationalRequirements: String(
+          data.get("operationalRequirements") ?? "",
         ),
       });
+      const created = await createEvent(args);
       draftForm.clear();
       navigate(eventDetailPath(created.docId));
     });
@@ -638,7 +633,7 @@ function InlineVenueForm({
         Address
         <input name="addressLine1" className="input" />
       </label>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <label className="field-label">
           City
           <input name="city" className="input" />

@@ -366,7 +366,7 @@ export function EventIncidentPanel({ eventId }: { eventId: Id<"events"> }) {
                           );
                       }}
                     >
-                      <label className="field-label min-w-64 flex-1">
+                      <label className="field-label min-w-0 flex-1 basis-48">
                         {incidentAction.kind === "resolve"
                           ? "Resolution"
                           : incidentAction.kind === "dismiss"

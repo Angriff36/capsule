@@ -1,7 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useListEvent } from "../../lib/manifest-convex-react";
-import { CalendarIcon, PlusIcon } from "../../ui/icons";
+import {
+  BoxIcon,
+  BuildingIcon,
+  CalendarIcon,
+  CoinsIcon,
+  ContactIcon,
+  FlameIcon,
+  KeyboardIcon,
+  PlusIcon,
+  TruckIcon,
+  UsersIcon,
+} from "../../ui/icons";
+import { useNaturalLanguageSearch } from "../../features/search/useNaturalLanguageSearch";
 import { StatusChip } from "../../ui/primitives";
 import { NAV_AREAS } from "../nav";
 
@@ -14,18 +26,38 @@ interface Command {
   run: () => void;
 }
 
+const KIND_ICON: Record<string, React.ReactNode> = {
+  event: <CalendarIcon />,
+  invoice: <CoinsIcon />,
+  client: <ContactIcon />,
+  vendor: <TruckIcon />,
+  dish: <FlameIcon />,
+  menu: <FlameIcon />,
+  recipe: <FlameIcon />,
+  ingredient: <BoxIcon />,
+  proposal: <ContactIcon />,
+  contract: <ContactIcon />,
+  lead: <ContactIcon />,
+  person: <UsersIcon />,
+  venue: <BuildingIcon />,
+};
+
 export function CommandPalette({
   open,
   onClose,
+  onOpenShortcuts,
 }: {
   open: boolean;
   onClose: () => void;
+  onOpenShortcuts?: () => void;
 }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const events = useListEvent();
+  const { hits: searchHits, loading: searchLoading } =
+    useNaturalLanguageSearch(query);
 
   useEffect(() => {
     if (open) {
@@ -49,6 +81,27 @@ export function CommandPalette({
         icon: <PlusIcon />,
         run: go("/events/new"),
       },
+      {
+        key: "import-recipe",
+        label: "Import recipe",
+        hint: "Create",
+        icon: <PlusIcon />,
+        run: go("/kitchen/recipes/import"),
+      },
+      ...(onOpenShortcuts
+        ? [
+            {
+              key: "keyboard-shortcuts",
+              label: "Keyboard shortcuts",
+              hint: "?",
+              icon: <KeyboardIcon />,
+              run: () => {
+                onClose();
+                onOpenShortcuts();
+              },
+            } satisfies Command,
+          ]
+        : []),
       ...NAV_AREAS.map((a) => ({
         key: a.path,
         label: a.label,
@@ -66,8 +119,21 @@ export function CommandPalette({
       })),
     ];
     const q = query.trim().toLowerCase();
-    return q ? base.filter((c) => c.label.toLowerCase().includes(q)) : base;
-  }, [events, query, navigate, onClose, open]);
+
+    // Ranked natural-language hits live at the top once the server has spoken.
+    // While typing, still filter the static commands so the palette feels live.
+    const ranked: Command[] = searchHits.map((h) => ({
+      key: `hit-${h.kind}-${h.id}`,
+      label: h.label,
+      hint: h.hint,
+      icon: KIND_ICON[h.kind] ?? <CalendarIcon />,
+      run: go(h.path),
+    }));
+
+    if (q.length === 0) return base;
+    const filteredBase = base.filter((c) => c.label.toLowerCase().includes(q));
+    return [...ranked, ...filteredBase];
+  }, [events, query, navigate, onClose, open, onOpenShortcuts, searchHits]);
 
   if (!open) return null;
 
@@ -103,12 +169,15 @@ export function CommandPalette({
             }
             if (e.key === "Enter") commands[active]?.run();
           }}
-          placeholder="Search events, jump to an area…"
+          placeholder="Search events, clients, invoices… (e.g. “unpaid invoices over 30 days”)"
           className="h-11 w-full border-b border-line bg-transparent px-4 text-[14px] outline-none placeholder:text-ink-3"
         />
         <ul className="max-h-80 overflow-y-auto py-1.5">
-          {commands.length === 0 && (
+          {commands.length === 0 && !searchLoading && (
             <li className="px-4 py-6 text-center text-ink-3">No matches.</li>
+          )}
+          {commands.length === 0 && searchLoading && (
+            <li className="px-4 py-6 text-center text-ink-3">Searching…</li>
           )}
           {commands.slice(0, 40).map((c, i) => (
             <li key={c.key}>

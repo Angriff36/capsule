@@ -23,6 +23,7 @@ export interface InvoicePdfRecord {
   status: string;
   issuedAt?: number | null;
   createdAt?: number | null;
+  currencyCode?: string | null;
 }
 
 export interface InvoicePdfClient {
@@ -62,6 +63,18 @@ const usd = (value: unknown) =>
     currency: "USD",
   });
 
+const moneyFmt = (currencyCode?: string | null) => {
+  const code = String(currencyCode ?? "")
+    .trim()
+    .toUpperCase();
+  const safeCode = code.length === 3 ? code : "USD";
+  return (value: unknown) =>
+    Number(value ?? 0).toLocaleString("en-US", {
+      style: "currency",
+      currency: safeCode,
+    });
+};
+
 const dateText = (value: unknown) =>
   value == null ? "—" : new Date(Number(value)).toLocaleDateString("en-US");
 
@@ -89,6 +102,7 @@ export function buildInvoicePdf(input: InvoicePdfInput): jsPDF {
   const { invoice, client, event, branding } = input;
   const brand = brandColorRgb(branding.primaryColor);
   const accent = brandColorRgb(branding.accentColor);
+  const format = moneyFmt(invoice.currencyCode);
   const address = documentAddressLines(branding);
   const doc = new jsPDF({ unit: "pt", format: "letter" });
   let y = 64;

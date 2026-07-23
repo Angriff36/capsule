@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
 import { WifiOffIcon } from "../../ui/icons";
+import { AnnouncementBanner } from "../../features/announcements/AnnouncementBanner";
 import { CommandPalette } from "./CommandPalette";
 import { ShellOnlineMonitor } from "./ShellOnlineMonitor";
+import { ShortcutReferenceOverlay } from "./ShortcutReferenceOverlay";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 
@@ -21,8 +23,23 @@ function useOnline() {
   return online;
 }
 
+/** True when the key event originated inside a text field or editable region,
+ * where single-key shortcuts (like `?`) must not fire. */
+function isEditableTarget(e: KeyboardEvent): boolean {
+  const el = e.target as HTMLElement | null;
+  if (!el) return false;
+  const tag = el.tagName;
+  return (
+    tag === "INPUT" ||
+    tag === "TEXTAREA" ||
+    tag === "SELECT" ||
+    el.isContentEditable
+  );
+}
+
 export function AppShell() {
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const online = useOnline();
 
   useEffect(() => {
@@ -30,11 +47,23 @@ export function AppShell() {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setPaletteOpen((v) => !v);
+        return;
+      }
+      if (
+        e.key === "?" &&
+        !e.ctrlKey &&
+        !e.metaKey &&
+        !e.altKey &&
+        !isEditableTarget(e) &&
+        !paletteOpen
+      ) {
+        e.preventDefault();
+        setShortcutsOpen(true);
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [paletteOpen]);
 
   return (
     <div className="flex h-dvh bg-canvas">
@@ -48,6 +77,7 @@ export function AppShell() {
             connection returns.
           </div>
         )}
+        <AnnouncementBanner />
         <main className="app-canvas min-h-0 flex-1 overflow-y-auto">
           <div className="workspace-sheet mx-auto max-w-[1440px] px-12 py-11 max-xl:px-8 max-md:px-5 max-md:py-7">
             <Outlet />
@@ -57,6 +87,11 @@ export function AppShell() {
       <CommandPalette
         open={paletteOpen}
         onClose={() => setPaletteOpen(false)}
+        onOpenShortcuts={() => setShortcutsOpen(true)}
+      />
+      <ShortcutReferenceOverlay
+        open={shortcutsOpen}
+        onClose={() => setShortcutsOpen(false)}
       />
     </div>
   );

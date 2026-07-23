@@ -3,7 +3,10 @@ import {
   useListClient,
   useListEvent,
   useListInvoice,
+  useListOrganization,
 } from "../../lib/manifest-convex-react";
+import { normalizeCurrencyCode } from "../../lib/format";
+import { formatCurrencyLabel } from "../../lib/currency";
 import { TableSkeleton } from "../../ui/primitives";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import {
@@ -26,18 +29,37 @@ const CATEGORY_COLORS = [
   "#7c4b67",
 ] as const;
 
-const compactMoney = new Intl.NumberFormat(undefined, {
-  style: "currency",
-  currency: "USD",
-  notation: "compact",
-  maximumFractionDigits: 1,
-});
+// Reports render totals already folded into the tenant's functional currency,
+// so the formatter is keyed on that code. Cached so re-renders reuse formatters.
+const compactMoneyCache = new Map<string, Intl.NumberFormat>();
+const moneyCache = new Map<string, Intl.NumberFormat>();
 
-const money = new Intl.NumberFormat(undefined, {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
+function compactMoneyFmt(currencyCode: string): Intl.NumberFormat {
+  let fmt = compactMoneyCache.get(currencyCode);
+  if (!fmt) {
+    fmt = new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: currencyCode,
+      notation: "compact",
+      maximumFractionDigits: 1,
+    });
+    compactMoneyCache.set(currencyCode, fmt);
+  }
+  return fmt;
+}
+
+function moneyFmt(currencyCode: string): Intl.NumberFormat {
+  let fmt = moneyCache.get(currencyCode);
+  if (!fmt) {
+    fmt = new Intl.NumberFormat(undefined, {
+      style: "currency",
+      currency: currencyCode,
+      maximumFractionDigits: 0,
+    });
+    moneyCache.set(currencyCode, fmt);
+  }
+  return fmt;
+}
 
 const dateRange = new Intl.DateTimeFormat(undefined, {
   month: "short",
@@ -85,7 +107,15 @@ function periodCategoryValue(
   );
 }
 
-function RevenueBars({ trend }: { trend: RevenueTrend }) {
+function RevenueBars({
+  trend,
+  currencyCode,
+}: {
+  trend: RevenueTrend;
+  currencyCode: string;
+}) {
+  const money = moneyFmt(currencyCode);
+  const compactMoney = compactMoneyFmt(currencyCode);
   const width = 960;
   const height = 340;
   const plot = { left: 66, right: 20, top: 26, bottom: 56 };
@@ -193,7 +223,14 @@ function RevenueBars({ trend }: { trend: RevenueTrend }) {
   );
 }
 
-function RevenueLegend({ categories }: { categories: RevenueCategory[] }) {
+function RevenueLegend({
+  categories,
+  currencyCode,
+}: {
+  categories: RevenueCategory[];
+  currencyCode: string;
+}) {
+  const compactMoney = compactMoneyFmt(currencyCode);
   const visible = chartCategories(categories);
   return (
     <div className="revenue-legend" aria-label="Revenue breakdown legend">
@@ -215,7 +252,14 @@ function RevenueLegend({ categories }: { categories: RevenueCategory[] }) {
   );
 }
 
-function RevenueTable({ trend }: { trend: RevenueTrend }) {
+function RevenueTable({
+  trend,
+  currencyCode,
+}: {
+  trend: RevenueTrend;
+  currencyCode: string;
+}) {
+  const money = moneyFmt(currencyCode);
   return (
     <details className="revenue-table-disclosure">
       <summary>View exact period values</summary>
@@ -261,17 +305,20 @@ export function RevenueTrendsDashboard({
   invoices,
   clients,
   events,
+  functionalCurrencyCode,
   loading = false,
   now,
 }: {
   invoices: readonly RevenueInvoice[];
   clients: readonly RevenueClient[];
   events: readonly RevenueEvent[];
+  functionalCurrencyCode: string;
   loading?: boolean;
   now: Date;
 }) {
   const [granularity, setGranularity] = useState<RevenueGranularity>("month");
   const [breakdown, setBreakdown] = useState<RevenueBreakdown>("event_type");
+  const compactMoney = compactMoneyFmt(functionalCurrencyCode);
   const trend = useMemo(
     () =>
       buildRevenueTrend({
@@ -280,9 +327,18 @@ export function RevenueTrendsDashboard({
         events,
         granularity,
         breakdown,
+        functionalCurrencyCode,
         now,
       }),
-    [breakdown, clients, events, granularity, invoices, now],
+    [
+      breakdown,
+      clients,
+      events,
+      functionalCurrencyCode,
+      granularity,
+      invoices,
+      now,
+    ],
   );
   const rangeEnd = new Date(trend.rangeEnd);
   rangeEnd.setDate(rangeEnd.getDate() - 1);
@@ -351,9 +407,17 @@ export function RevenueTrendsDashboard({
         <>
           <section className="revenue-scorecard" aria-label="Revenue summary">
             <div className="revenue-scorecard-lead">
-              <span>Current window</span>
+              <span>
+                Current window · {formatCurrencyLabel(functionalCurrencyCode)}
+              </span>
               <strong>{compactMoney.format(trend.currentTotal)}</strong>
-              <small>{trend.currentInvoiceCount} issued invoices</small>
+              <small>
+                {trend.currentInvoiceCount} issued invoice
+                {trend.currentInvoiceCount === 1 ? "" : "s"}
+                {trend.foreignCurrencyInvoiceCount > 0
+                  ? ` · ${trend.foreignCurrencyInvoiceCount} in other currencies`
+                  : ""}
+              </small>
             </div>
             <div>
               <span>Prior-year window</span>
@@ -413,9 +477,18 @@ export function RevenueTrendsDashboard({
               </div>
             ) : (
               <>
-                <RevenueBars trend={trend} />
-                <RevenueLegend categories={trend.categories} />
-                <RevenueTable trend={trend} />
+                <RevenueBars
+                  trend={trend}
+                  currencyCode={functionalCurrencyCode}
+                />
+                <RevenueLegend
+                  categories={trend.categories}
+                  currencyCode={functionalCurrencyCode}
+                />
+                <RevenueTable
+                  trend={trend}
+                  currencyCode={functionalCurrencyCode}
+                />
               </>
             )}
           </section>
@@ -445,15 +518,24 @@ export function RevenueTrendsPage() {
   const invoices = useListInvoice();
   const clients = useListClient();
   const events = useListEvent();
+  const organizations = useListOrganization();
   const now = useMemo(() => new Date(), []);
+  const functionalCurrencyCode = normalizeCurrencyCode(
+    organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,
+    "USD",
+  );
 
   return (
     <RevenueTrendsDashboard
       invoices={invoices ?? []}
       clients={clients ?? []}
       events={events ?? []}
+      functionalCurrencyCode={functionalCurrencyCode}
       loading={
-        invoices === undefined || clients === undefined || events === undefined
+        invoices === undefined ||
+        clients === undefined ||
+        events === undefined ||
+        organizations === undefined
       }
       now={now}
     />

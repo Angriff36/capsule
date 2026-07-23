@@ -102,7 +102,7 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
         >
           <SearchIcon className="shrink-0" />
           <span className="truncate whitespace-nowrap max-sm:hidden">
-            Find an event or area…
+            Search events, clients, invoices…
           </span>
           <span className="kbd ml-auto shrink-0 whitespace-nowrap max-sm:hidden">
             Ctrl K

@@ -8,6 +8,13 @@ import {
   type InvoiceLineDraft,
   type TaxRateRecord,
 } from "./invoiceTax";
+import {
+  formatCurrencyLabel,
+  isValidCurrencyCode,
+  normalizeCurrencyCode,
+  SUPPORTED_CURRENCY_CODES,
+} from "../../lib/currency";
+import { formatMoney } from "../../lib/format";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import "./taxWorkspace.css";
 
@@ -35,9 +42,6 @@ const clientLabel = (row: ClientOption) => {
   return row.companyName?.trim() || "Client";
 };
 
-const usd = (value: number) =>
-  value.toLocaleString(undefined, { style: "currency", currency: "USD" });
-
 const categoryLabel = (category: InvoiceLineCategory) =>
   category.charAt(0).toUpperCase() + category.slice(1);
 
@@ -57,6 +61,7 @@ export function InvoiceIssueForm({
   onSubmit,
   defaultClientId = "",
   defaultEventId = "",
+  functionalCurrencyCode = "USD",
 }: {
   clients: ClientOption[];
   events: EventOption[];
@@ -65,6 +70,7 @@ export function InvoiceIssueForm({
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   defaultClientId?: string;
   defaultEventId?: string;
+  functionalCurrencyCode?: string;
 }) {
   const clientDefault =
     defaultClientId && clients.some((row) => row._id === defaultClientId)
@@ -75,9 +81,12 @@ export function InvoiceIssueForm({
     events.some((row) => row._id === defaultEventId && row.deletedAt == null)
       ? defaultEventId
       : "";
+  const functionalCode = normalizeCurrencyCode(functionalCurrencyCode, "USD");
   const [selectedClientId, setSelectedClientId] = useState(clientDefault);
   const [lines, setLines] = useState<InvoiceLineDraft[]>([initialLine()]);
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [currencyCode, setCurrencyCode] = useState(functionalCode);
+  const [exchangeRate, setExchangeRate] = useState("1");
   const selectedClient = clients.find((row) => row._id === selectedClientId);
   const taxExempt = selectedClient?.taxExempt === true;
   const activeTaxRates = taxRates.filter(
@@ -90,6 +99,18 @@ export function InvoiceIssueForm({
   const total = roundMoney(
     Math.max(0, calculation.total - Math.max(0, discountAmount)),
   );
+  const normalizedCurrencyCode = normalizeCurrencyCode(
+    currencyCode,
+    functionalCode,
+  );
+  const parsedExchangeRate = Number(exchangeRate);
+  const isFunctionalCurrency = normalizedCurrencyCode === functionalCode;
+  const exchangeRateValid =
+    isFunctionalCurrency ||
+    (Number.isFinite(parsedExchangeRate) && parsedExchangeRate > 0);
+  const functionalEquivalent = exchangeRateValid
+    ? roundMoney(total * parsedExchangeRate)
+    : null;
 
   const updateLine = <K extends keyof InvoiceLineDraft>(
     id: string,
@@ -193,6 +214,50 @@ export function InvoiceIssueForm({
                 </option>
               ))}
           </select>
+        </label>
+        <label>
+          Invoice currency
+          <select
+            name="currencyCode"
+            value={normalizedCurrencyCode}
+            onChange={(event) => {
+              const next = normalizeCurrencyCode(
+                event.target.value,
+                functionalCode,
+              );
+              setCurrencyCode(next);
+              if (next === functionalCode) setExchangeRate("1");
+            }}
+          >
+            {Array.from(
+              new Set([functionalCode, ...SUPPORTED_CURRENCY_CODES]),
+            ).map((code) => (
+              <option key={code} value={code}>
+                {formatCurrencyLabel(code)}
+              </option>
+            ))}
+          </select>
+          <span className="mt-1 block text-[11px] font-normal text-ink-3">
+            Tenant functional currency is {formatCurrencyLabel(functionalCode)}.
+          </span>
+        </label>
+        <label>
+          Exchange rate to {formatCurrencyLabel(functionalCode)}
+          <input
+            name="exchangeRate"
+            type="number"
+            min={isFunctionalCurrency ? 1 : 0.000001}
+            step="0.000001"
+            required
+            disabled={isFunctionalCurrency}
+            value={exchangeRate}
+            onChange={(event) => setExchangeRate(event.target.value)}
+          />
+          <span className="mt-1 block text-[11px] font-normal text-ink-3">
+            {isFunctionalCurrency
+              ? "Locked at 1.000000 — invoice is already in the functional currency."
+              : `1 ${normalizedCurrencyCode} = ${parsedExchangeRate || 0} ${functionalCode} (recorded at issue).`}
+          </span>
         </label>
       </div>
 
@@ -299,8 +364,19 @@ export function InvoiceIssueForm({
                   />
                 </label>
                 <div className="invoice-line-result" aria-live="polite">
-                  <span>{usd(snapshot?.subtotal ?? 0)}</span>
-                  <strong>{usd(snapshot?.taxAmount ?? 0)} tax</strong>
+                  <span>
+                    {formatMoney(
+                      snapshot?.subtotal ?? 0,
+                      normalizedCurrencyCode,
+                    )}
+                  </span>
+                  <strong>
+                    {formatMoney(
+                      snapshot?.taxAmount ?? 0,
+                      normalizedCurrencyCode,
+                    )}{" "}
+                    tax
+                  </strong>
                 </div>
                 <button
                   className="invoice-line-remove"
@@ -315,7 +391,8 @@ export function InvoiceIssueForm({
                   {snapshot?.appliedTaxRates.length ? (
                     snapshot.appliedTaxRates.map((rate) => (
                       <span key={rate.taxRateId}>
-                        {rate.name} · {rate.percentage}% · {usd(rate.amount)}
+                        {rate.name} · {rate.percentage}% ·{" "}
+                        {formatMoney(rate.amount, normalizedCurrencyCode)}
                       </span>
                     ))
                   ) : (
@@ -369,28 +446,52 @@ export function InvoiceIssueForm({
           className="invoice-total-ticket"
           aria-label="Calculated invoice totals"
         >
-          <p className="eyebrow">Calculated total</p>
+          <p className="eyebrow">Calculated total ({normalizedCurrencyCode})</p>
           <dl>
             <div>
               <dt>Subtotal</dt>
-              <dd>{usd(calculation.subtotal)}</dd>
+              <dd>
+                {formatMoney(calculation.subtotal, normalizedCurrencyCode)}
+              </dd>
             </div>
             <div>
               <dt>Tax</dt>
               <dd data-testid="invoice-tax-total">
-                {usd(calculation.taxAmount)}
+                {formatMoney(calculation.taxAmount, normalizedCurrencyCode)}
               </dd>
             </div>
             <div>
               <dt>Discount</dt>
-              <dd>−{usd(Math.max(0, discountAmount))}</dd>
+              <dd>
+                −
+                {formatMoney(
+                  Math.max(0, discountAmount),
+                  normalizedCurrencyCode,
+                )}
+              </dd>
             </div>
             <div className="invoice-total-ticket-grand">
               <dt>Total</dt>
-              <dd data-testid="invoice-grand-total">{usd(total)}</dd>
+              <dd data-testid="invoice-grand-total">
+                {formatMoney(total, normalizedCurrencyCode)}
+              </dd>
             </div>
           </dl>
-          <button className="btn btn-primary" type="submit" disabled={busy}>
+          {isFunctionalCurrency ? null : (
+            <p className="text-[11px] text-ink-3" role="status">
+              Functional equivalent ·{" "}
+              {formatMoney(functionalEquivalent ?? 0, functionalCode)}
+            </p>
+          )}
+          <button
+            className="btn btn-primary"
+            type="submit"
+            disabled={
+              busy ||
+              !exchangeRateValid ||
+              !isValidCurrencyCode(normalizedCurrencyCode)
+            }
+          >
             {busy ? "Issuing…" : "Issue invoice"}
           </button>
         </aside>
@@ -408,6 +509,12 @@ export function InvoiceIssueForm({
         type="hidden"
         name="taxBreakdown"
         value={JSON.stringify(calculation.taxBreakdown)}
+      />
+      <input type="hidden" name="currencyCode" value={normalizedCurrencyCode} />
+      <input
+        type="hidden"
+        name="exchangeRate"
+        value={parsedExchangeRate || 1}
       />
     </form>
   );

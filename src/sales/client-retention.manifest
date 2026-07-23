@@ -1,0 +1,95 @@
+// Capsule sales — proactive outreach reminders for churn-candidate clients.
+// A reminder is opened for a client who was active the prior year but has no
+// booking in the current year; sales works it to completion or dismisses it.
+
+enum ClientOutreachTaskStatus {
+  open
+  completed
+  dismissed
+}
+
+entity ClientOutreachTask mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required clientId: uuid
+  property required reason: string = ""
+  property required status: ClientOutreachTaskStatus = "open"
+  // Auth subject from trusted runtime context, not a Person document id.
+  property openedById: string?
+  property openedAt: datetime?
+  property resolvedAt: datetime?
+  property resolutionNote: string?
+
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+
+  constraint reminderReasonComplete: self.openedAt == null or length(trim(self.reason)) > 0 "Open follow-up reminders require a reason"
+
+  transition status from "open" to ["completed", "dismissed"]
+  transition status from "completed" to []
+  transition status from "dismissed" to []
+
+  default policy clientFollowUpReminderRead read: roleAllows(user.role, "salesAccess") "Sales staff may read client follow-up reminders"
+  default policy clientFollowUpReminderWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write client follow-up reminders through commands"
+  default policy clientFollowUpReminderExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute client follow-up commands"
+
+  command open(clientId: uuid, reason: string) {
+    guard self.openedAt == null
+    constraint openReminderReason: length(trim(reason)) > 0 "Follow-up reason is required"
+    mutate clientId = clientId
+    mutate reason = reason
+    mutate status = "open"
+    mutate openedById = user.id
+    mutate openedAt = now()
+    emit ClientOutreachTaskOpened {
+      reminderId: self.id
+      tenantId: self.tenantId
+      clientId: clientId
+    }
+  }
+
+  command complete(optional note: string) {
+    guard self.status == "open"
+    mutate status = "completed"
+    mutate resolvedAt = now()
+    mutate resolutionNote = note
+    emit ClientOutreachTaskCompleted {
+      reminderId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  command dismiss(optional note: string) {
+    guard self.status == "open"
+    mutate status = "dismissed"
+    mutate resolvedAt = now()
+    mutate resolutionNote = note
+    emit ClientOutreachTaskDismissed {
+      reminderId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+    }
+  }
+
+  store ClientOutreachTask in durable
+}
+
+event ClientOutreachTaskOpened: "client_outreach_task.opened" {
+  reminderId: string
+  tenantId: string
+  clientId: string
+}
+
+event ClientOutreachTaskCompleted: "client_outreach_task.completed" {
+  reminderId: string
+  tenantId: string
+  clientId: string
+}
+
+event ClientOutreachTaskDismissed: "client_outreach_task.dismissed" {
+  reminderId: string
+  tenantId: string
+  clientId: string
+}

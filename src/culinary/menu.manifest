@@ -41,7 +41,9 @@ entity Menu mixin TenantScoped, SoftDeletable {
   transition status from "published" to ["draft", "archived"]
   transition status from "archived" to ["draft"]
 
-  default policy menuRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read menus"
+  // salesAccess: sales browses the published catalog for proposal menu
+  // selection (sales/proposal-dish-selection.manifest).
+  default policy menuRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") "Kitchen and sales staff may read menus"
   default policy menuWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write menus through commands"
   default policy menuExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute menu commands"
 

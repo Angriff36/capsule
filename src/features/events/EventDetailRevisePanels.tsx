@@ -167,7 +167,7 @@ export function EventDetailRevisePanels({
           <div className="space-y-3 p-3">
             <form
               key={`headcount-${version}`}
-              className="flex items-end gap-2"
+              className="flex min-w-0 flex-wrap items-end gap-2"
               onSubmit={(formEvent) => {
                 formEvent.preventDefault();
                 const data = new FormData(formEvent.currentTarget);
@@ -180,7 +180,7 @@ export function EventDetailRevisePanels({
                 );
               }}
             >
-              <label className="field-label flex-1">
+              <label className="field-label min-w-0 flex-1">
                 Headcount
                 <input
                   name="headcount"
@@ -204,7 +204,7 @@ export function EventDetailRevisePanels({
             </form>
             <form
               key={`venue-${version}`}
-              className="flex items-end gap-2"
+              className="flex min-w-0 flex-wrap items-end gap-2"
               onSubmit={(formEvent) => {
                 formEvent.preventDefault();
                 const selected = activeVenues.find(
@@ -233,7 +233,7 @@ export function EventDetailRevisePanels({
                 );
               }}
             >
-              <label className="field-label flex-1">
+              <label className="field-label min-w-0 flex-1">
                 Venue
                 <select
                   name="venueId"

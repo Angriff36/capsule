@@ -7,6 +7,9 @@ use "./payment.manifest"
 
 // Vision cascade: approved event ensures one Invoice issued from quoted price
 // (match else create). Remains draft until finance sends — issue sets issuedAt.
+// Currency code / exchange rate default to the tenant's functional currency
+// (no exchangeRate field on EventApproved). Finance can adjust per invoice on
+// the issue form before sending.
 on EventApproved run Invoice.issue
   match eventId = payload.eventId
   else create

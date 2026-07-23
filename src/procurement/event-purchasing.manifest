@@ -279,6 +279,24 @@ on EventDishAdded fanOut DishRecipe where dishId = payload.dishId
     purchasingWeekStart: payload.purchasingWeekStart
   }
 
+// Proposal-fed dish lines (EventDish.confirmFromProposal) seed BOM the same
+// way as manual adds. seedDishId is null when the line already existed —
+// null fanOut key matches no DishRecipe rows, so no double-seed.
+on EventDishConfirmedFromProposal fanOut DishRecipe where dishId = payload.seedDishId
+  run EventDishRecipeSeed.seed
+  match eventDishId = payload.eventDishId, recipeId = self.recipeId
+  else create
+  params {
+    eventId: payload.eventId
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    recipeId: self.recipeId
+    servings: payload.quantityServings
+    yieldQuantity: self.yieldQuantity
+    batchMultiplier: self.batchMultiplier
+    purchasingWeekStart: payload.purchasingWeekStart
+  }
+
 on EventDishRecipeSeeded fanOut RecipeIngredient where recipeId = payload.recipeId
   run EventIngredientContribution.record
   match eventDishId = payload.eventDishId, ingredientId = self.ingredientId, unit = self.unit

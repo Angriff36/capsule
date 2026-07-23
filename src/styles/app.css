@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Capsule editorial system — warm working paper, botanical frame, deep green
    ink, and a small saffron gesture. Dense controls stay crisp; key pages read
    like beautifully composed service documents. */
@@ -44,6 +46,83 @@
 
   --radius-xs: 3px;
   --radius-sm: 5px;
+}
+
+/* Dark scheme — same editorial palette shifted to lamplight: deep green-black
+   paper, pale sage ink, brand lifted so it stays legible as text. Applied via
+   .dark on <html> (set pre-paint in index.html from the stored preference or
+   the OS prefers-color-scheme default). */
+.dark {
+  color-scheme: dark;
+
+  --color-canvas: #171d1a;
+  --color-panel: #212824;
+  --color-inset: #2a322d;
+  --color-sage: #242c27;
+  --color-sage-2: #38423b;
+
+  --color-ink: #e3e9e2;
+  --color-ink-2: #a9b4ab;
+  --color-ink-3: #7e8981;
+  --color-brand: #85b8a9;
+
+  --color-line: #313a34;
+  --color-line-2: #414c44;
+  --color-rail: #1b211d;
+  --color-rail-2: #262e29;
+  --color-rail-ink: #b4bfb6;
+  --color-rail-dim: #7e8981;
+  --color-service: #85b8a9;
+
+  --color-accent: #d79860;
+  --color-accent-deep: #e2ac79;
+  --color-accent-soft: #3a2d20;
+  --color-ok: #82b992;
+  --color-ok-soft: #22362a;
+  --color-info: #93a9d8;
+  --color-info-soft: #242c3c;
+  --color-warn: #d0a854;
+  --color-warn-soft: #383021;
+  --color-danger: #d97f6e;
+  --color-danger-soft: #3c2723;
+  --color-mute-soft: #31302a;
+}
+
+/* Brand is light in dark mode, so white-on-brand chips flip to dark ink,
+   and hardcoded paper gradients/tints get night equivalents. */
+.dark .capsule-mark,
+.dark .icon-nav a.active,
+.dark .icon-nav a > span,
+.dark .clear-check,
+.dark .schedule-notice-count,
+.dark .revenue-switch button[aria-pressed="true"],
+.dark .btn-primary {
+  color: var(--color-canvas);
+}
+.dark .app-canvas {
+  background:
+    radial-gradient(
+      circle at 8% 2%,
+      rgb(255 255 255 / 0.04),
+      transparent 25rem
+    ),
+    linear-gradient(135deg, #1d2420 0%, #161c19 100%);
+}
+.dark .workspace-sheet {
+  border-color: rgb(133 184 169 / 0.14);
+}
+.dark .attention-ledger {
+  background: #232b26;
+}
+.dark .recipe-empty-state {
+  background: linear-gradient(105deg, #262e29 0%, #212824 74%);
+}
+.dark .schedule-publish-status span,
+.dark .schedule-notice-item {
+  background: rgb(33 40 36 / 0.85);
+}
+.dark .revenue-prior-bar {
+  fill: rgb(33 40 36 / 0.55);
 }
 
 @layer base {
@@ -295,6 +374,21 @@
   .module-popover a:hover {
     background: var(--color-inset);
     color: var(--color-ink);
+  }
+  .theme-toggle {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--color-ink-3);
+    transition: 160ms ease;
+  }
+  .theme-toggle:hover {
+    background: var(--color-rail-2);
+    color: var(--color-brand);
   }
 
   .journal-masthead {
@@ -896,7 +990,10 @@
   .culinary-line-form {
     display: grid;
     grid-template-columns:
-      minmax(180px, 1.5fr) 100px 130px minmax(180px, 1fr)
+      minmax(0, 1.5fr) minmax(4.5rem, 100px) minmax(5.5rem, 130px) minmax(
+        0,
+        1fr
+      )
       auto;
     gap: 0.7rem;
     margin-top: 1.2rem;
@@ -1021,6 +1118,8 @@
     list-style: none;
   }
   .culinary-section {
+    container-type: inline-size;
+    container-name: culinary;
     padding: 2.7rem 0;
   }
   .culinary-section-heading {
@@ -1081,15 +1180,16 @@
   }
   .ingredient-list li {
     display: grid;
-    grid-template-columns: 90px minmax(180px, 0.8fr) 1fr;
+    grid-template-columns: 90px minmax(0, 0.8fr) minmax(0, 1fr) auto;
     gap: 1rem;
+    align-items: center;
     padding: 0.9rem 0;
     border-bottom: 1px solid var(--color-line);
   }
   .ingredient-list strong {
     font-weight: 500;
   }
-  .ingredient-list li > span:last-child {
+  .ingredient-list li > span:last-of-type {
     color: var(--color-ink-3);
     font-size: 11px;
   }
@@ -1680,7 +1780,7 @@
 
 .receipt-form {
   display: grid;
-  grid-template-columns: repeat(6, minmax(105px, 1fr)) auto;
+  grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr)) auto;
   align-items: end;
   gap: 0.8rem;
   padding: 1rem;
@@ -1842,7 +1942,7 @@
   .ingredient-list li {
     grid-template-columns: 70px minmax(0, 1fr);
   }
-  .ingredient-list li > span:last-child {
+  .ingredient-list li > span:last-of-type {
     grid-column: 2;
   }
   .ingredient-list .culinary-line-actions {
@@ -2639,6 +2739,37 @@
   .culinary-work-grid {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     align-items: start;
+  }
+}
+
+/* Collapse recipe line form/list by Composition column width, not viewport —
+   the work grid is already 2-col from 960px while the form only stacked at 767. */
+@container culinary (max-width: 640px) {
+  .culinary-line-form {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .culinary-line-form > .field-label:first-child,
+  .culinary-line-form > .field-label:nth-child(4),
+  .culinary-line-form > .btn {
+    grid-column: 1 / -1;
+  }
+  .ingredient-list li {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+  .ingredient-list li > span:last-of-type,
+  .ingredient-list .culinary-line-actions {
+    grid-column: 2;
+  }
+}
+
+@container culinary (max-width: 420px) {
+  .culinary-line-form {
+    grid-template-columns: 1fr;
+  }
+  .culinary-line-form > .field-label:first-child,
+  .culinary-line-form > .field-label:nth-child(4),
+  .culinary-line-form > .btn {
+    grid-column: auto;
   }
 }
 

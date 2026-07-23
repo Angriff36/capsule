@@ -60,6 +60,22 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   property voidReason: string?
   property writtenOffAt: datetime?
   property writeOffReason: string?
+  // Multi-currency issuance (multi-currency-support). Three-letter ISO 4217
+  // code stamped at issue time so each invoice carries its invoice-time
+  // amount, currency, and exchange rate into the tenant's functional currency.
+  // Null = legacy single-currency invoice; defaults normalize to "USD".
+  property currencyCode: string?
+  // Per-invoice exchange rate to the tenant's functional currency (the
+  // Organization's defaultCurrencyCode, falling back to USD). Stored at
+  // issue so historical reports cannot drift after a rate refresh.
+  property exchangeRate: decimal(18, 8)?
+
+  computed invoiceCurrencyCode: string = self.currencyCode != null and length(trim(self.currencyCode)) == 3 ? self.currencyCode : "USD"
+  // Null rates default to 1.0 (assume functional currency). Reports multiply
+  // total / amountDue by exchangeRate to fold back into the tenant's code.
+  computed safeExchangeRate: decimal(18, 8) = self.exchangeRate != null and self.exchangeRate > 0 ? self.exchangeRate : 1.0
+  computed functionalCurrencyTotal: money(14, 6) = round(self.total * self.safeExchangeRate, 6)
+  computed functionalCurrencyAmountDue: money(14, 6) = round(self.amountDue * self.safeExchangeRate, 6)
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
@@ -96,7 +112,9 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     optional dueDate: datetime,
     optional notes: string,
     optional lineItems: json,
-    optional taxBreakdown: json
+    optional taxBreakdown: json,
+    optional currencyCode: string,
+    optional exchangeRate: decimal(18, 8)
   ) {
     guard self.issuedAt == null
     guard self.status == "draft"
@@ -107,6 +125,10 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     constraint issueNumber: length(trim(invoiceNumber)) > 0 "Invoice number is required"
     constraint issueMoneyNonnegative: subtotal >= 0 and taxAmount >= 0 and discountAmount >= 0 and total >= 0 "Invoice money amounts cannot be negative"
     constraint issueTotalMatch: total == subtotal + taxAmount - discountAmount "Invoice total must equal subtotal plus tax minus discount"
+    constraint issueCurrencyCode: currencyCode == null or length(trim(currencyCode)) == 3 "Currency code must be a three-letter ISO 4217 code"
+    constraint issueExchangeRate: exchangeRate == null or exchangeRate > 0 "Exchange rate must be greater than zero"
+    compute normalizedCurrencyCode = currencyCode != null ? toUpperCase(currencyCode) : null
+    compute resolvedExchangeRate = exchangeRate != null ? exchangeRate : 1.0
     mutate clientId = clientId
     mutate eventId = eventId != null ? eventId : self.eventId
     mutate invoiceNumber = invoiceNumber
@@ -123,6 +145,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     mutate paymentTermsDays = paymentTermsDays != null ? paymentTermsDays : 30
     mutate dueDate = dueDate
     mutate notes = notes
+    mutate currencyCode = normalizedCurrencyCode
+    mutate exchangeRate = resolvedExchangeRate
     mutate issuedAt = now()
     emit InvoiceIssued {
       invoiceId: self.id
@@ -132,6 +156,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
       invoiceNumber: invoiceNumber
       total: total
       amountDue: total
+      currencyCode: normalizedCurrencyCode
+      exchangeRate: resolvedExchangeRate
     }
   }
 
@@ -430,6 +456,8 @@ event InvoiceIssued: "invoice.issued" {
   invoiceNumber: string
   total: money(12, 2)
   amountDue: money(12, 2)
+  currencyCode: string?
+  exchangeRate: decimal(18, 8)?
 }
 
 event InvoiceSent: "invoice.sent" {

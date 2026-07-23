@@ -104,6 +104,11 @@ const TimeOffRequestsPage = lazy(() =>
     default: module.TimeOffRequestsPage,
   })),
 );
+const MessagesPage = lazy(() =>
+  import("../features/workforce/MessagesPage").then((module) => ({
+    default: module.MessagesPage,
+  })),
+);
 const QualificationsPage = lazy(() =>
   import("../features/workforce/QualificationsPage").then((module) => ({
     default: module.QualificationsPage,
@@ -142,6 +147,11 @@ const VehicleFleetPage = lazy(() =>
 const VehicleSchedulePage = lazy(() =>
   import("../features/logistics/VehicleSchedulePage").then((module) => ({
     default: module.VehicleSchedulePage,
+  })),
+);
+const RoutePlannerPage = lazy(() =>
+  import("../features/logistics/RoutePlannerPage").then((module) => ({
+    default: module.RoutePlannerPage,
   })),
 );
 const InvoicesPage = lazy(() =>
@@ -234,6 +244,11 @@ const ContractDocumentPage = lazy(() =>
     default: module.ContractDocumentPage,
   })),
 );
+const ClientRetentionPage = lazy(() =>
+  import("../features/clients/ClientRetentionPage").then((module) => ({
+    default: module.ClientRetentionPage,
+  })),
+);
 const EquipmentCatalogPage = lazy(() =>
   import("../features/facilities/EquipmentCatalogPage").then((module) => ({
     default: module.EquipmentCatalogPage,
@@ -242,6 +257,11 @@ const EquipmentCatalogPage = lazy(() =>
 const PermissionsPage = lazy(() =>
   import("../features/admin/PermissionsPage").then((module) => ({
     default: module.PermissionsPage,
+  })),
+);
+const AnnouncementsPage = lazy(() =>
+  import("../features/admin/AnnouncementsPage").then((module) => ({
+    default: module.AnnouncementsPage,
   })),
 );
 const BrandingPage = lazy(() =>
@@ -509,6 +529,14 @@ export function App() {
               }
             />
             <Route
+              path="/staff/messages"
+              element={
+                <SupplyRoute>
+                  <MessagesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/staff/qualifications"
               element={
                 <SupplyRoute>
@@ -565,6 +593,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <VehicleSchedulePage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/route"
+              element={
+                <SupplyRoute>
+                  <RoutePlannerPage />
                 </SupplyRoute>
               }
             />
@@ -717,6 +753,14 @@ export function App() {
               }
             />
             <Route
+              path="/clients/retention"
+              element={
+                <SupplyRoute>
+                  <ClientRetentionPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/clients/:id"
               element={
                 <SupplyRoute>
@@ -745,6 +789,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <BrandingPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/announcements"
+              element={
+                <SupplyRoute>
+                  <AnnouncementsPage />
                 </SupplyRoute>
               }
             />

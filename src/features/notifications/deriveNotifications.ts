@@ -18,7 +18,9 @@ export interface AppNotification {
     | "shift_conflict"
     | "time_off_request"
     | "certification_expiry"
-    | "allergen_incident";
+    | "allergen_incident"
+    | "staff_message"
+    | "prep_task_comment";
   message: string;
   /** Route to the relevant record. */
   link: string;
@@ -36,6 +38,8 @@ export const NOTIFICATION_KIND_LABELS: Record<AppNotification["kind"], string> =
     time_off_request: "Time off",
     certification_expiry: "Certification",
     allergen_incident: "Allergen",
+    staff_message: "Message",
+    prep_task_comment: "Prep note",
   };
 
 /** Stage changes older than this are history, not notifications. */
@@ -73,7 +77,12 @@ export interface NotificationSources {
   qualifications: Doc<"qualifications">[] | undefined;
   timeOffRequests: Doc<"timeOffRequests">[] | undefined;
   vendorOrders: Doc<"vendorOrders">[] | undefined;
+  staffMessages: Doc<"staffMessages">[] | undefined;
+  prepTaskComments: Doc<"prepTaskComments">[] | undefined;
 }
+
+/** Staff messages are retained for 90 days; older ones drop out of the UI. */
+const MESSAGE_RETENTION_MS = 90 * 86_400_000;
 
 export function deriveNotifications(
   src: NotificationSources,
@@ -205,6 +214,58 @@ export function deriveNotifications(
       message: `${who} requested time off · ${range}`,
       link: "/staff/time-off",
       at: request.submittedAt,
+    });
+  }
+
+  for (const message of src.staffMessages ?? []) {
+    if (
+      src.currentAuthSubjectId == null ||
+      message.recipientAuthSubjectId !== src.currentAuthSubjectId ||
+      message.deletedAt != null ||
+      message.readAt != null ||
+      message.createdAt == null ||
+      now - message.createdAt > MESSAGE_RETENTION_MS
+    ) {
+      continue;
+    }
+    const who =
+      personNames.get(message.senderPersonId as string) ?? "A teammate";
+    out.push({
+      id: `staff-message:${message._id}`,
+      kind: "staff_message",
+      message: `New message from ${who}`,
+      link: "/staff/messages",
+      at: message.createdAt,
+    });
+  }
+
+  for (const comment of src.prepTaskComments ?? []) {
+    if (
+      src.currentAuthSubjectId == null ||
+      comment.deletedAt != null ||
+      comment.taskOwnerAuthSubjectId == null ||
+      comment.taskOwnerAuthSubjectId !== src.currentAuthSubjectId ||
+      comment.authorAuthSubjectId === src.currentAuthSubjectId ||
+      comment.postedAt == null
+    ) {
+      continue;
+    }
+    const who = comment.authorName?.trim() || "A teammate";
+    const category = String(comment.category ?? "note");
+    const verb =
+      category === "blocker"
+        ? "reported a blocker on your prep task"
+        : category === "substitution"
+          ? "logged a substitution on your prep task"
+          : category === "status_update"
+            ? "updated your prep task"
+            : "added a note on your prep task";
+    out.push({
+      id: `prep-task-comment:${comment._id}`,
+      kind: "prep_task_comment",
+      message: `${who} ${verb}`,
+      link: "/kitchen/prep",
+      at: comment.postedAt,
     });
   }
 

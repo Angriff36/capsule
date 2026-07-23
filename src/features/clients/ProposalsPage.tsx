@@ -1,8 +1,9 @@
-import { useState, type FormEvent } from "react";
+import { Fragment, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreateProposal,
   useListClient,
+  useListEvent,
   useListProposal,
   useProposalAccept,
   useProposalDecline,
@@ -21,6 +22,19 @@ import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
 import { downloadProposalPdf } from "./proposalPdf";
+import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
+
+// Event stages the acceptance cascade can feed dishes into (matches the
+// EventDish.confirmFromProposal stage guard).
+const LINKABLE_EVENT_STAGES = [
+  "planning",
+  "pending_approval",
+  "approved",
+  "executing",
+];
+
+// Proposal statuses where the client is still choosing dishes.
+const MENU_EDITABLE_STATUSES = ["draft", "sent", "viewed"];
 
 const policy = new CrmLifecyclePolicy();
 
@@ -57,8 +71,10 @@ export function ProposalsPage() {
   const accept = useProposalAccept();
   const decline = useProposalDecline();
   const expire = useProposalExpire();
+  const events = useListEvent();
   const [showDraft, setShowDraft] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
+  const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -140,22 +156,56 @@ export function ProposalsPage() {
   };
 
   const invoke = (
-    row: { _id: string; version: number; status: unknown },
+    row: { _id: string; version: number; status: unknown; clientId?: unknown },
     key: string,
   ) => {
     void (async () => {
       if (key === "accept") {
-        const ok = await prompt.askConfirm({
-          title: "Accept proposal",
-          description:
-            "Acceptance records the commercial win. Create or link the Event from Events afterward — Manifest does not mint one from ProposalAccepted.",
-          confirmLabel: "Accept proposal",
-        });
-        if (!ok) return;
+        const linkableEvents = (events ?? []).filter(
+          (event) =>
+            event.deletedAt == null &&
+            event.clientId === row.clientId &&
+            LINKABLE_EVENT_STAGES.includes(String(event.stage)),
+        );
+        let eventId: string | undefined;
+        if (linkableEvents.length > 0) {
+          const values = await prompt.askFields({
+            title: "Accept proposal",
+            description:
+              "Acceptance records the commercial win. Link an existing event to copy the client's menu selections onto it as dish lines.",
+            fields: [
+              {
+                name: "eventId",
+                label: "Link event (optional)",
+                required: false,
+                placeholder: "No event — link later",
+                helper:
+                  "Menu selections feed the linked event's dishes on accept.",
+                options: linkableEvents.map((event) => ({
+                  value: event._id,
+                  label: String(event.title || event._id),
+                })),
+              },
+            ],
+            confirmLabel: "Accept proposal",
+          });
+          if (!values) return;
+          eventId = values.eventId || undefined;
+        } else {
+          const ok = await prompt.askConfirm({
+            title: "Accept proposal",
+            description:
+              "Acceptance records the commercial win. Create or link the Event from Events afterward — Manifest does not mint one from ProposalAccepted.",
+            confirmLabel: "Accept proposal",
+          });
+          if (!ok) return;
+        }
         void run(`${row._id}:accept`, async () => {
-          await accept({ docId: row._id, version: row.version });
+          await accept({ docId: row._id, version: row.version, eventId });
           setNotice(
-            "Proposal accepted. Use Create Event on the row to continue planning.",
+            eventId
+              ? "Proposal accepted. Menu selections were copied to the linked event's dishes."
+              : "Proposal accepted. Use Create Event on the row to continue planning.",
           );
         });
         return;
@@ -387,55 +437,85 @@ export function ProposalsPage() {
             </thead>
             <tbody>
               {visibleRows.map((row) => (
-                <tr key={row._id}>
-                  <td>{row.title}</td>
-                  <td>{clientDisplayName(row.clientId, clients)}</td>
-                  <td>{Number(row.total ?? 0).toFixed(2)}</td>
-                  <td>
-                    <StatusChip status={String(row.status)} />
-                  </td>
-                  <td className="supply-row-actions">
-                    <button
-                      className="btn btn-ghost"
-                      type="button"
-                      disabled={busy != null}
-                      onClick={() => {
-                        void downloadProposalPdf({
-                          proposal: row,
-                          clientName: clientDisplayName(row.clientId, clients),
-                          branding,
-                        })
-                          .then(() => setNotice("Proposal PDF downloaded."))
-                          .catch((error) => setFailure(error));
-                      }}
-                    >
-                      Download PDF
-                    </button>
-                    {policy
-                      .proposalActions(String(row.status))
-                      .map((action) => (
-                        <button
-                          key={action.key}
-                          className="btn btn-ghost"
-                          type="button"
-                          disabled={busy != null}
-                          onClick={() => invoke(row, action.key)}
-                        >
-                          {action.label}
-                        </button>
-                      ))}
-                    {String(row.status) === "accepted" ? (
-                      <Link
+                <Fragment key={row._id}>
+                  <tr>
+                    <td>{row.title}</td>
+                    <td>{clientDisplayName(row.clientId, clients)}</td>
+                    <td>{Number(row.total ?? 0).toFixed(2)}</td>
+                    <td>
+                      <StatusChip status={String(row.status)} />
+                    </td>
+                    <td className="supply-row-actions">
+                      <button
                         className="btn btn-ghost"
-                        to={eventCreatePath({
-                          clientId: String(row.clientId),
-                        })}
+                        type="button"
+                        onClick={() =>
+                          setMenuOpenFor((current) =>
+                            current === row._id ? null : row._id,
+                          )
+                        }
                       >
-                        Create Event
-                      </Link>
-                    ) : null}
-                  </td>
-                </tr>
+                        {menuOpenFor === row._id ? "Hide menu" : "Menu"}
+                      </button>
+                      <button
+                        className="btn btn-ghost"
+                        type="button"
+                        disabled={busy != null}
+                        onClick={() => {
+                          void downloadProposalPdf({
+                            proposal: row,
+                            clientName: clientDisplayName(
+                              row.clientId,
+                              clients,
+                            ),
+                            branding,
+                          })
+                            .then(() => setNotice("Proposal PDF downloaded."))
+                            .catch((error) => setFailure(error));
+                        }}
+                      >
+                        Download PDF
+                      </button>
+                      {policy
+                        .proposalActions(String(row.status))
+                        .map((action) => (
+                          <button
+                            key={action.key}
+                            className="btn btn-ghost"
+                            type="button"
+                            disabled={busy != null}
+                            onClick={() => invoke(row, action.key)}
+                          >
+                            {action.label}
+                          </button>
+                        ))}
+                      {String(row.status) === "accepted" ? (
+                        <Link
+                          className="btn btn-ghost"
+                          to={eventCreatePath({
+                            clientId: String(row.clientId),
+                          })}
+                        >
+                          Create Event
+                        </Link>
+                      ) : null}
+                    </td>
+                  </tr>
+                  {menuOpenFor === row._id ? (
+                    <tr>
+                      <td colSpan={5}>
+                        <ProposalMenuSelectionPanel
+                          proposalId={row._id}
+                          guestCount={Number(row.guestCount ?? 0)}
+                          editable={MENU_EDITABLE_STATUSES.includes(
+                            String(row.status),
+                          )}
+                          onFailure={setFailure}
+                        />
+                      </td>
+                    </tr>
+                  ) : null}
+                </Fragment>
               ))}
             </tbody>
           </table>

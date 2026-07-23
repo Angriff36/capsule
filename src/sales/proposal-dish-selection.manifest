@@ -1,0 +1,149 @@
+// Capsule sales — client menu selection during proposal review.
+// While a proposal is in review (draft/sent/viewed) the client picks dishes
+// from the operator's PUBLISHED menu catalog. When the proposal is accepted
+// with a linked Event, the selections cascade into EventDish records
+// (EventDish.confirmFromProposal, match/else-create) so nobody re-keys the
+// menu into the event by hand. Accepting without an event keeps the
+// selections; they simply do not cascade (null fanOut key skips cleanly).
+
+use "./proposal.manifest"
+use "../culinary/event-dish.manifest"
+
+// One selection row per (proposal, dish). Picking the same dish again is an
+// adjustServings on the existing row — the UI hides already-selected dishes.
+entity ProposalDishSelection mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required proposalId: uuid
+  property required menuId: uuid
+  property required dishId: uuid
+  property required quantityServings: int = 1
+  property course: string?
+  property serviceStyle: string?
+  property specialInstructions: string?
+  property selectedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
+  belongsTo menu: Menu fields [tenantId, menuId] references [tenantId, id]
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+
+  constraint proposalDishSelectionServingsPositive: self.selectedAt == null or self.quantityServings > 0 "Selection servings must be positive"
+
+  default policy proposalDishSelectionRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposal dish selections"
+  default policy proposalDishSelectionWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposal dish selections through commands"
+  default policy proposalDishSelectionExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal dish selection commands"
+
+  // Pick a dish off a published menu while the proposal is still in review.
+  command select(
+    proposalId: uuid,
+    menuId: uuid,
+    dishId: uuid,
+    quantityServings: number,
+    optional course: string,
+    optional serviceStyle: string,
+    optional specialInstructions: string
+  ) {
+    guard self.selectedAt == null
+    guard self.deletedAt == null
+    guard self.proposal != null and (self.proposal.status == "draft" or self.proposal.status == "sent" or self.proposal.status == "viewed")
+    guard self.menu != null and self.menu.status == "published"
+    guard self.dish != null and self.dish.status == "active"
+    constraint selectProposalMatch: proposalId == self.proposalId "Select proposalId must match the seeded proposal reference"
+    constraint selectServingsPositive: quantityServings > 0 "Selection servings must be positive"
+    mutate proposalId = proposalId
+    mutate menuId = menuId
+    mutate dishId = dishId
+    mutate quantityServings = quantityServings
+    mutate course = course
+    mutate serviceStyle = serviceStyle
+    mutate specialInstructions = specialInstructions
+    mutate selectedAt = now()
+    emit ProposalDishSelected {
+      selectionId: self.id
+      tenantId: self.tenantId
+      proposalId: proposalId
+      menuId: menuId
+      dishId: dishId
+      quantityServings: quantityServings
+    }
+  }
+
+  command adjustServings(quantityServings: number) {
+    guard self.selectedAt != null
+    guard self.deletedAt == null
+    guard self.proposal != null and (self.proposal.status == "draft" or self.proposal.status == "sent" or self.proposal.status == "viewed")
+    constraint adjustSelectionServingsPositive: quantityServings > 0 "Selection servings must be positive"
+    compute previousQuantityServings = self.quantityServings
+    mutate quantityServings = quantityServings
+    emit ProposalDishSelectionServingsAdjusted {
+      selectionId: self.id
+      tenantId: self.tenantId
+      proposalId: self.proposalId
+      dishId: self.dishId
+      previousQuantityServings: previousQuantityServings
+      quantityServings: quantityServings
+    }
+  }
+
+  command remove() {
+    guard self.selectedAt != null
+    guard self.deletedAt == null
+    guard self.proposal != null and (self.proposal.status == "draft" or self.proposal.status == "sent" or self.proposal.status == "viewed")
+    mutate deletedAt = now()
+    mutate removedAt = now()
+    emit ProposalDishSelectionRemoved {
+      selectionId: self.id
+      tenantId: self.tenantId
+      proposalId: self.proposalId
+      dishId: self.dishId
+    }
+  }
+
+  store ProposalDishSelection in durable
+}
+
+event ProposalDishSelected: "proposal_dish_selection.selected" {
+  selectionId: string
+  tenantId: string
+  proposalId: string
+  menuId: string
+  dishId: string
+  quantityServings: number
+}
+
+event ProposalDishSelectionServingsAdjusted: "proposal_dish_selection.servings_adjusted" {
+  selectionId: string
+  tenantId: string
+  proposalId: string
+  dishId: string
+  previousQuantityServings: number
+  quantityServings: number
+}
+
+event ProposalDishSelectionRemoved: "proposal_dish_selection.removed" {
+  selectionId: string
+  tenantId: string
+  proposalId: string
+  dishId: string
+}
+
+// Acceptance cascade. Proposal.accept emits dishSelectionProposalId non-null
+// only when an Event is linked; the index fanOut on a null key matches no
+// rows (proposalId is required) and skips cleanly. Soft-deleted (removed)
+// selections are skipped by the 3.6.41 fanOut filter. confirmFromProposal is
+// idempotent on an existing live (eventId, dishId) line — kitchen edits win.
+on ProposalAccepted fanOut ProposalDishSelection where proposalId = payload.dishSelectionProposalId
+  run EventDish.confirmFromProposal
+  match eventId = payload.eventId, dishId = self.dishId
+  else create
+  params {
+    eventId: payload.eventId
+    dishId: self.dishId
+    quantityServings: self.quantityServings
+    course: self.course
+    serviceStyle: self.serviceStyle
+    specialInstructions: self.specialInstructions
+  }

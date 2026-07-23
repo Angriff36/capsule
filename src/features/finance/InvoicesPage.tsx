@@ -10,6 +10,7 @@ import {
   useListClient,
   useListEvent,
   useListInvoice,
+  useListOrganization,
   useListTaxRate,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
@@ -19,6 +20,7 @@ import {
   useBulkSelection,
 } from "../../ui/bulk-select";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatMoney, normalizeCurrencyCode } from "../../lib/format";
 import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
@@ -55,12 +57,17 @@ export function InvoicesPage() {
   const clients = useListClient();
   const events = useListEvent();
   const taxRates = useListTaxRate();
+  const organizations = useListOrganization();
   const createInvoice = useCreateInvoice();
   const send = useInvoiceSend();
   const markViewed = useInvoiceMarkViewed();
   const markOverdue = useInvoiceMarkOverdue();
   const markVoided = useInvoiceMarkVoided();
   const writeOff = useInvoiceWriteOff();
+  const functionalCurrencyCode = normalizeCurrencyCode(
+    organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,
+    "USD",
+  );
   const [showIssue, setShowIssue] = useState(openFromLink);
   const [showClosed, setShowClosed] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -162,6 +169,15 @@ export function InvoicesPage() {
       setFailure(new Error("Add at least one invoice line."));
       return;
     }
+    const rawCurrencyCode = String(data.get("currencyCode") || "").trim();
+    const rawExchangeRate = Number(data.get("exchangeRate"));
+    const issueCurrencyCode = rawCurrencyCode
+      ? rawCurrencyCode.toUpperCase()
+      : functionalCurrencyCode;
+    const issueExchangeRate =
+      Number.isFinite(rawExchangeRate) && rawExchangeRate > 0
+        ? rawExchangeRate
+        : 1;
     void run("issue-invoice", async () => {
       await createInvoice({
         clientId,
@@ -176,6 +192,8 @@ export function InvoicesPage() {
         notes: String(data.get("notes") || "").trim() || undefined,
         lineItems,
         taxBreakdown,
+        currencyCode: issueCurrencyCode,
+        exchangeRate: issueExchangeRate,
       });
       form.reset();
       setShowIssue(false);
@@ -327,6 +345,7 @@ export function InvoicesPage() {
           onSubmit={submitIssue}
           defaultClientId={prefillClientId}
           defaultEventId={prefillEventId}
+          functionalCurrencyCode={functionalCurrencyCode}
         />
       ) : null}
 
@@ -380,71 +399,73 @@ export function InvoicesPage() {
                 </tr>
               </thead>
               <tbody>
-                {visibleRows.map((row) => (
-                  <tr key={row._id}>
-                    <td className="w-8">
-                      {canSend(row) ? (
-                        <input
-                          type="checkbox"
-                          aria-label={`Select invoice ${row.invoiceNumber || "draft"}`}
-                          checked={selection.isSelected(row._id)}
-                          disabled={busy != null}
-                          onChange={(event) =>
-                            selection.toggle(row._id, event.target.checked)
-                          }
-                        />
-                      ) : null}
-                    </td>
-                    <td>
-                      <Link
-                        className="text-link"
-                        to={FINANCE_ROUTES.invoiceDetail(row._id)}
-                      >
-                        <strong>{row.invoiceNumber || "Draft invoice"}</strong>
-                      </Link>
-                      <small>
-                        {Number(row.total ?? 0).toLocaleString(undefined, {
-                          style: "currency",
-                          currency: "USD",
-                        })}
-                      </small>
-                    </td>
-                    <td>{nameForClient(String(row.clientId))}</td>
-                    <td>
-                      {Number(row.amountDue ?? 0).toLocaleString(undefined, {
-                        style: "currency",
-                        currency: "USD",
-                      })}
-                    </td>
-                    <td>
-                      <StatusChip status={String(row.status)} />
-                    </td>
-                    <td>
-                      <div className="supply-row-actions">
+                {visibleRows.map((row) => {
+                  const rowCurrency = normalizeCurrencyCode(
+                    (row as { currencyCode?: unknown }).currencyCode,
+                    functionalCurrencyCode,
+                  );
+                  return (
+                    <tr key={row._id}>
+                      <td className="w-8">
+                        {canSend(row) ? (
+                          <input
+                            type="checkbox"
+                            aria-label={`Select invoice ${row.invoiceNumber || "draft"}`}
+                            checked={selection.isSelected(row._id)}
+                            disabled={busy != null}
+                            onChange={(event) =>
+                              selection.toggle(row._id, event.target.checked)
+                            }
+                          />
+                        ) : null}
+                      </td>
+                      <td>
                         <Link
-                          className="btn btn-ghost btn-sm"
+                          className="text-link"
                           to={FINANCE_ROUTES.invoiceDetail(row._id)}
                         >
-                          Open
+                          <strong>
+                            {row.invoiceNumber || "Draft invoice"}
+                          </strong>
                         </Link>
-                        {policy
-                          .invoiceActions(String(row.status))
-                          .map((action) => (
-                            <button
-                              key={action.key}
-                              className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
-                              onClick={() => invoke(row, action.key)}
-                            >
-                              {busy === `${row._id}:${action.key}`
-                                ? "Working…"
-                                : action.label}
-                            </button>
-                          ))}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                        <small>
+                          {formatMoney(Number(row.total ?? 0), rowCurrency)}
+                        </small>
+                      </td>
+                      <td>{nameForClient(String(row.clientId))}</td>
+                      <td>
+                        {formatMoney(Number(row.amountDue ?? 0), rowCurrency)}
+                      </td>
+                      <td>
+                        <StatusChip status={String(row.status)} />
+                      </td>
+                      <td>
+                        <div className="supply-row-actions">
+                          <Link
+                            className="btn btn-ghost btn-sm"
+                            to={FINANCE_ROUTES.invoiceDetail(row._id)}
+                          >
+                            Open
+                          </Link>
+                          {policy
+                            .invoiceActions(String(row.status))
+                            .map((action) => (
+                              <button
+                                key={action.key}
+                                className="btn btn-ghost btn-sm"
+                                disabled={busy != null}
+                                onClick={() => invoke(row, action.key)}
+                              >
+                                {busy === `${row._id}:${action.key}`
+                                  ? "Working…"
+                                  : action.label}
+                              </button>
+                            ))}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

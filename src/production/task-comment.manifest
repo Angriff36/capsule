@@ -1,0 +1,127 @@
+// Capsule production — PrepTaskComment (activity thread per prep task).
+// Kitchen staff log blockers, substitutions, and notes without changing the
+// task status. Posts surface in the event-scope rollup and notify the task
+// owner (assignedTo). The notification check re-stamps the owner's auth
+// subject at post time — if the owner logs out and a new cook is assigned,
+// the original owner stops getting notifications.
+
+use "../identity/person.manifest"
+
+enum PrepTaskCommentCategory {
+  note
+  blocker
+  substitution
+  status_update
+}
+
+entity PrepTaskComment mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required prepTaskId: uuid
+  property indexed required eventId: uuid
+  property eventDishId: uuid?
+  // Copied from PrepTask.assignedToId at post time so notifications keep
+  // matching even if the task owner changes mid-thread.
+  property taskOwnerAssignedToId: uuid?
+  property taskOwnerAuthSubjectId: string?
+  property required authorPersonId: uuid
+  // Stamped from trusted auth context on post; never accepted from the browser.
+  property indexed required authorAuthSubjectId: string
+  property required authorName: string
+  property required category: PrepTaskCommentCategory = "note"
+  property required body: string
+  property required postedAt: datetime
+
+  belongsTo prepTask: PrepTask fields [tenantId, prepTaskId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
+  belongsTo author: Person fields [tenantId, authorPersonId] references [tenantId, id]
+  belongsTo taskOwner: Person fields [tenantId, taskOwnerAssignedToId] references [tenantId, id]
+
+  constraint prepTaskCommentBodyPresent: length(trim(self.body)) > 0 "Comment text is required"
+  constraint prepTaskCommentOwnerImmutable: self.postedAt == null or self.taskOwnerAssignedToId == null or self.authorPersonId != self.taskOwnerAssignedToId or self.taskOwnerAuthSubjectId == null or self.taskOwnerAuthSubjectId != self.authorAuthSubjectId "Task owners cannot post comments that notify themselves"
+
+  default policy prepTaskCommentRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may read prep task comments"
+  default policy prepTaskCommentWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may post prep task comments through commands"
+  default policy prepTaskCommentExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen staff and event managers may execute prep task comment commands"
+
+  command post(
+    prepTaskId: uuid,
+    eventId: uuid,
+    body: string,
+    optional eventDishId: uuid,
+    optional category: PrepTaskCommentCategory,
+    optional authorPersonId: uuid,
+    optional authorName: string,
+    optional taskOwnerAssignedToId: uuid,
+    optional taskOwnerAuthSubjectId: string
+  ) {
+    guard self.deletedAt == null
+    guard self.postedAt == null
+    guard user.id != null
+    constraint postBodyPresent: length(trim(body)) > 0 "Comment text is required"
+    constraint postAuthorName: authorName == null or length(trim(authorName)) > 0 "Author name cannot be blank"
+    constraint postNotSelf: taskOwnerAuthSubjectId == null or taskOwnerAuthSubjectId != user.id "Task owners cannot post comments that notify themselves"
+    mutate prepTaskId = prepTaskId
+    mutate eventId = eventId
+    mutate eventDishId = eventDishId != null ? eventDishId : self.eventDishId
+    mutate taskOwnerAssignedToId = taskOwnerAssignedToId
+    mutate taskOwnerAuthSubjectId = taskOwnerAuthSubjectId
+    mutate authorPersonId = authorPersonId != null ? authorPersonId : self.authorPersonId
+    mutate authorAuthSubjectId = user.id
+    mutate authorName = authorName != null ? authorName : self.authorName
+    mutate category = category != null ? category : "note"
+    mutate body = body
+    mutate postedAt = now()
+    emit PrepTaskCommentPosted {
+      prepTaskCommentId: self.id
+      tenantId: self.tenantId
+      prepTaskId: prepTaskId
+      eventId: eventId
+      eventDishId: eventDishId != null ? eventDishId : self.eventDishId
+      taskOwnerAuthSubjectId: taskOwnerAuthSubjectId
+      authorPersonId: authorPersonId != null ? authorPersonId : self.authorPersonId
+      authorName: authorName != null ? authorName : self.authorName
+      category: category != null ? category : "note"
+      body: body
+    }
+  }
+
+  command edit(body: string) {
+    guard self.deletedAt == null
+    guard self.postedAt != null
+    guard self.authorAuthSubjectId == user.id or roleAllows(user.role, "kitchenLeadAccess")
+    constraint editBodyPresent: length(trim(body)) > 0 "Comment text is required"
+    mutate body = body
+    emit PrepTaskCommentEdited {
+      prepTaskCommentId: self.id
+      tenantId: self.tenantId
+      prepTaskId: self.prepTaskId
+      eventId: self.eventId
+    }
+  }
+
+  store PrepTaskComment in durable
+}
+
+event PrepTaskCommentPosted: "prep_task_comment.posted" {
+  prepTaskCommentId: string
+  tenantId: string
+  prepTaskId: string
+  eventId: string
+  eventDishId: string?
+  taskOwnerAuthSubjectId: string?
+  authorPersonId: string
+  authorName: string
+  category: PrepTaskCommentCategory
+  body: string
+}
+
+event PrepTaskCommentEdited: "prep_task_comment.edited" {
+  prepTaskCommentId: string
+  tenantId: string
+  prepTaskId: string
+  eventId: string
+}

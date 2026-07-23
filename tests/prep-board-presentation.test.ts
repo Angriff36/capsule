@@ -13,6 +13,8 @@ const manifest = vi.hoisted(() => ({
   eventDishes: [] as any[] | undefined,
   dishes: [] as any[] | undefined,
   ingredients: [] as any[] | undefined,
+  comments: [] as any[] | undefined,
+  people: [] as any[] | undefined,
   command: vi.fn(async () => undefined),
 }));
 
@@ -24,9 +26,12 @@ vi.mock("../src/lib/manifest-convex-react", () => ({
   useListEventDish: () => manifest.eventDishes,
   useListDish: () => manifest.dishes,
   useListIngredient: () => manifest.ingredients,
+  useListPrepTaskComment: () => manifest.comments,
+  useListPerson: () => manifest.people,
   useCreatePrepTask: () => manifest.command,
   useCreatePrepTaskDependency: () => manifest.command,
   useCreateQualityCheck: () => manifest.command,
+  useCreatePrepTaskComment: () => manifest.command,
   usePrepTaskCancel: () => manifest.command,
   usePrepTaskClaim: () => manifest.command,
   usePrepTaskComplete: () => manifest.command,
@@ -60,6 +65,8 @@ describe("PrepBoardPage presentation", () => {
     manifest.checks = [];
     manifest.events = [];
     manifest.ingredients = [];
+    manifest.comments = [];
+    manifest.people = [];
     manifest.command.mockClear();
   });
 

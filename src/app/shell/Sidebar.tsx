@@ -1,5 +1,34 @@
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
+import { MoonIcon, SunIcon } from "../../ui/icons";
+
+function ThemeToggle() {
+  const [dark, setDark] = useState(() =>
+    document.documentElement.classList.contains("dark"),
+  );
+  const label = dark ? "Switch to light mode" : "Switch to dark mode";
+  return (
+    <button
+      type="button"
+      className="theme-toggle"
+      aria-label={label}
+      title={label}
+      onClick={() => {
+        const next = !dark;
+        setDark(next);
+        document.documentElement.classList.toggle("dark", next);
+        localStorage.setItem("capsule-theme", next ? "dark" : "light");
+      }}
+    >
+      {dark ? (
+        <SunIcon width={17} height={17} />
+      ) : (
+        <MoonIcon width={17} height={17} />
+      )}
+    </button>
+  );
+}
 
 export function Sidebar() {
   const available = navigationCatalog.availableAreas();
@@ -25,6 +54,7 @@ export function Sidebar() {
           </NavLink>
         ))}
       </nav>
+      <ThemeToggle />
       <details className="module-drawer">
         <summary aria-label="Planned areas" title="Planned areas">
           <span aria-hidden="true">•••</span>

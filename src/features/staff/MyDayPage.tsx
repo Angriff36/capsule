@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/react";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useAvailabilityWindowWithdraw,
@@ -27,12 +27,22 @@ import {
   useTimeRecordClockOut,
   useWeeklyScheduleNoticeAcknowledge,
 } from "../../lib/manifest-convex-react";
+import { CheckIcon, WifiOffIcon } from "../../ui/icons";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
   CLOSEOUT_EVIDENCE_CATEGORIES,
   RecordPhotoCapture,
 } from "../attachments/RecordPhotoCapture";
 import { WorkforceFailureBanner } from "../workforce/WorkforceFailureBanner";
+import {
+  drainQueue,
+  enqueueAction,
+  useCachedRead,
+  useOfflineSync,
+  useOnlineStatus,
+  useQueuedActions,
+  type MutationRunner,
+} from "./offlineStore";
 import { ShiftSwapCard } from "./ShiftSwapCard";
 import { TimeOffRequestCard } from "./TimeOffRequestCard";
 import { WeeklyAvailabilityCard } from "./WeeklyAvailabilityCard";
@@ -63,17 +73,23 @@ const timeLabel = (ms?: number | null) =>
  */
 export function MyDayPage() {
   const { user } = useUser();
-  const people = useListPerson();
-  const shifts = useListShift();
-  const scheduleNotices = useListWeeklyScheduleNotice();
-  const records = useListTimeRecord();
-  const tasks = useListPrepTask();
-  const deliveries = useListDelivery();
-  const closeouts = useListEventCloseout();
-  const events = useListEvent();
-  const packLists = useListPackList();
-  const packItems = useListPackListItem();
-  const windows = useListAvailabilityWindow();
+  const people = useCachedRead("people", useListPerson());
+  const shifts = useCachedRead("shifts", useListShift());
+  const scheduleNotices = useCachedRead(
+    "scheduleNotices",
+    useListWeeklyScheduleNotice(),
+  );
+  const records = useCachedRead("timeRecords", useListTimeRecord());
+  const tasks = useCachedRead("prepTasks", useListPrepTask());
+  const deliveries = useCachedRead("deliveries", useListDelivery());
+  const closeouts = useCachedRead("closeouts", useListEventCloseout());
+  const events = useCachedRead("events", useListEvent());
+  const packLists = useCachedRead("packLists", useListPackList());
+  const packItems = useCachedRead("packItems", useListPackListItem());
+  const windows = useCachedRead(
+    "availabilityWindows",
+    useListAvailabilityWindow(),
+  );
 
   const clockIn = useCreateTimeRecord();
   const clockOut = useTimeRecordClockOut();
@@ -88,6 +104,44 @@ export function MyDayPage() {
   const markItemMissing = usePackListItemMarkMissing();
   const declareWindow = useCreateAvailabilityWindow();
   const withdrawWindow = useAvailabilityWindowWithdraw();
+
+  const online = useOnlineStatus();
+  const pending = useQueuedActions();
+
+  // Registry of queueable mutations keyed by a stable runKey. Held in a ref so
+  // the drain effect doesn't re-run on every render, while always calling the
+  // freshest hook-generated function.
+  const runnersRef = useRef<Record<string, MutationRunner>>({
+    "clock-in": clockIn,
+    "clock-out": clockOut,
+    "shift-start": startShift,
+    "shift-complete": completeShift,
+    "schedule-acknowledge": acknowledgeSchedule,
+    "task-claim": claimTask,
+    "task-start": startTask,
+    "task-complete": completeTask,
+    "task-release": releaseTask,
+    "pack-mark-packed": markItemPacked,
+    "pack-mark-missing": markItemMissing,
+    "availability-declare": declareWindow,
+    "availability-withdraw": withdrawWindow,
+  });
+  runnersRef.current = {
+    "clock-in": clockIn,
+    "clock-out": clockOut,
+    "shift-start": startShift,
+    "shift-complete": completeShift,
+    "schedule-acknowledge": acknowledgeSchedule,
+    "task-claim": claimTask,
+    "task-start": startTask,
+    "task-complete": completeTask,
+    "task-release": releaseTask,
+    "pack-mark-packed": markItemPacked,
+    "pack-mark-missing": markItemMissing,
+    "availability-declare": declareWindow,
+    "availability-withdraw": withdrawWindow,
+  };
+  useOfflineSync(runnersRef);
 
   const [storedPersonId, setStoredPersonId] = useState<string | null>(() =>
     localStorage.getItem(PERSON_STORAGE_KEY),
@@ -115,6 +169,39 @@ export function MyDayPage() {
     void work()
       .catch(setFailure)
       .finally(() => setBusy(null));
+  };
+
+  /**
+   * Queueable write: when offline, append to the pending queue (each entry
+   * carries its own idempotencyKey so a replay can't double-apply) and return
+   * immediately; when online, run the mutation now. `afterSuccess` only fires
+   * for the online path — the queue path drains later and the optimistic UI
+   * already reflects the user's intent.
+   */
+  const perform = (
+    busyKey: string,
+    runKey: string,
+    label: string,
+    args: Record<string, unknown>,
+    afterSuccess?: () => void,
+  ) => {
+    if (!online) {
+      enqueueAction({ runKey, label, args });
+      return;
+    }
+    const runner = runnersRef.current[runKey];
+    if (!runner) return;
+    setFailure(null);
+    setBusy(busyKey);
+    void Promise.resolve(runner(args))
+      .then(() => afterSuccess?.())
+      .catch(setFailure)
+      .finally(() => setBusy(null));
+  };
+
+  const retryPending = () => {
+    setFailure(null);
+    void drainQueue(runnersRef.current).catch(setFailure);
   };
 
   if (people === undefined) {
@@ -246,16 +333,20 @@ export function MyDayPage() {
     const data = new FormData(event.currentTarget);
     const toEpoch = (value: FormDataEntryValue | null) =>
       new Date(String(value)).getTime();
-    run("declare", async () => {
-      await declareWindow({
+    const notes = String(data.get("notes") || "") || undefined;
+    perform(
+      "declare",
+      "availability-declare",
+      "Declare availability",
+      {
         personId: me._id,
         startsAt: toEpoch(data.get("startsAt")),
         endsAt: toEpoch(data.get("endsAt")),
         kind: "available",
-        notes: String(data.get("notes") || "") || undefined,
-      });
-      setShowDeclare(false);
-    });
+        notes,
+      },
+      () => setShowDeclare(false),
+    );
   };
 
   const loading =
@@ -281,6 +372,16 @@ export function MyDayPage() {
             }
       }
     >
+      <OfflineStatusBar
+        online={online}
+        pending={pending}
+        onRetry={retryPending}
+      />
+      <OfflineStatusBar
+        online={online}
+        pending={pending}
+        onRetry={retryPending}
+      />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       {loading ? <TableSkeleton rows={8} /> : null}
 
@@ -300,11 +401,9 @@ export function MyDayPage() {
             className="btn btn-primary mt-3 w-full py-3 text-[15px]"
             disabled={busy != null}
             onClick={() =>
-              run("clock-out", async () => {
-                await clockOut({
-                  docId: openRecord._id,
-                  version: openRecord.version,
-                });
+              perform("clock-out", "clock-out", "Clock out", {
+                docId: openRecord._id,
+                version: openRecord.version,
               })
             }
           >
@@ -315,8 +414,8 @@ export function MyDayPage() {
             className="btn btn-primary mt-3 w-full py-3 text-[15px]"
             disabled={busy != null}
             onClick={() =>
-              run("clock-in", async () => {
-                await clockIn({ personId: me._id });
+              perform("clock-in", "clock-in", "Clock in", {
+                personId: me._id,
               })
             }
           >
@@ -385,12 +484,12 @@ export function MyDayPage() {
                       data-testid="acknowledge-schedule-action"
                       disabled={busy != null}
                       onClick={() =>
-                        run(`acknowledge:${notice._id}`, async () => {
-                          await acknowledgeSchedule({
-                            docId: notice._id,
-                            version: notice.version,
-                          });
-                        })
+                        perform(
+                          `acknowledge:${notice._id}`,
+                          "schedule-acknowledge",
+                          "Acknowledge schedule",
+                          { docId: notice._id, version: notice.version },
+                        )
                       }
                     >
                       {busy === `acknowledge:${notice._id}`
@@ -434,12 +533,15 @@ export function MyDayPage() {
                     className="btn btn-ghost btn-sm py-2"
                     disabled={busy != null}
                     onClick={() =>
-                      run(`shift:${shift._id}`, async () => {
-                        await startShift({
+                      perform(
+                        `shift:${shift._id}`,
+                        "shift-start",
+                        "Start shift",
+                        {
                           docId: shift._id,
                           version: shift.version,
-                        });
-                      })
+                        },
+                      )
                     }
                   >
                     Start
@@ -450,12 +552,12 @@ export function MyDayPage() {
                     className="btn btn-ghost btn-sm py-2"
                     disabled={busy != null}
                     onClick={() =>
-                      run(`shift:${shift._id}`, async () => {
-                        await completeShift({
-                          docId: shift._id,
-                          version: shift.version,
-                        });
-                      })
+                      perform(
+                        `shift:${shift._id}`,
+                        "shift-complete",
+                        "Finish shift",
+                        { docId: shift._id, version: shift.version },
+                      )
                     }
                   >
                     Finish
@@ -480,27 +582,12 @@ export function MyDayPage() {
             {myTasks.map((task) => {
               const status = String(task.status);
               const key = `task:${task._id}`;
-              const action =
+              const next =
                 status === "pending"
-                  ? {
-                      label: "Claim",
-                      work: () =>
-                        claimTask({ docId: task._id, version: task.version }),
-                    }
+                  ? { label: "Claim", runKey: "task-claim" }
                   : status === "claimed"
-                    ? {
-                        label: "Start",
-                        work: () =>
-                          startTask({ docId: task._id, version: task.version }),
-                      }
-                    : {
-                        label: "Done",
-                        work: () =>
-                          completeTask({
-                            docId: task._id,
-                            version: task.version,
-                          }),
-                      };
+                    ? { label: "Start", runKey: "task-start" }
+                    : { label: "Done", runKey: "task-complete" };
               return (
                 <li key={task._id} className="flex items-center gap-3 py-3">
                   <div className="min-w-0 flex-1">
@@ -517,22 +604,25 @@ export function MyDayPage() {
                     className="btn btn-ghost btn-sm py-2"
                     disabled={busy != null}
                     onClick={() =>
-                      run(key, async () => void (await action.work()))
+                      perform(key, next.runKey, next.label, {
+                        docId: task._id,
+                        version: task.version,
+                      })
                     }
                   >
-                    {busy === key ? "…" : action.label}
+                    {busy === key ? "…" : next.label}
                   </button>
                   {status === "claimed" ? (
                     <button
                       className="btn btn-ghost btn-sm py-2"
                       disabled={busy != null}
                       onClick={() =>
-                        run(`${key}:release`, async () => {
-                          await releaseTask({
-                            docId: task._id,
-                            version: task.version,
-                          });
-                        })
+                        perform(
+                          `${key}:release`,
+                          "task-release",
+                          "Release task",
+                          { docId: task._id, version: task.version },
+                        )
                       }
                     >
                       Release
@@ -568,13 +658,16 @@ export function MyDayPage() {
                   className="btn btn-primary btn-sm py-2"
                   disabled={busy != null}
                   onClick={() =>
-                    run(`pack:${item._id}`, async () => {
-                      await markItemPacked({
+                    perform(
+                      `pack:${item._id}`,
+                      "pack-mark-packed",
+                      "Mark packed",
+                      {
                         docId: item._id,
                         version: item.version,
                         packedQuantity: item.requiredQuantity,
-                      });
-                    })
+                      },
+                    )
                   }
                 >
                   Packed
@@ -583,12 +676,12 @@ export function MyDayPage() {
                   className="btn btn-ghost btn-sm py-2"
                   disabled={busy != null}
                   onClick={() =>
-                    run(`pack:${item._id}:missing`, async () => {
-                      await markItemMissing({
-                        docId: item._id,
-                        version: item.version,
-                      });
-                    })
+                    perform(
+                      `pack:${item._id}:missing`,
+                      "pack-mark-missing",
+                      "Mark missing",
+                      { docId: item._id, version: item.version },
+                    )
                   }
                 >
                   Missing
@@ -780,12 +873,12 @@ export function MyDayPage() {
                   className="btn btn-ghost btn-sm py-2"
                   disabled={busy != null}
                   onClick={() =>
-                    run(`window:${window._id}`, async () => {
-                      await withdrawWindow({
-                        docId: window._id,
-                        version: window.version,
-                      });
-                    })
+                    perform(
+                      `window:${window._id}`,
+                      "availability-withdraw",
+                      "Withdraw availability",
+                      { docId: window._id, version: window.version },
+                    )
                   }
                 >
                   Withdraw
@@ -837,6 +930,84 @@ function MobileFrame({
       <main className="mx-auto flex max-w-md flex-col gap-4 px-4 py-5 pb-16">
         {children}
       </main>
+    </div>
+  );
+}
+
+function OfflineStatusBar({
+  online,
+  pending,
+  onRetry,
+}: {
+  online: boolean;
+  pending: ReturnType<typeof useQueuedActions>;
+  onRetry: () => void;
+}) {
+  if (pending.length === 0) {
+    if (!online) {
+      return (
+        <div
+          role="status"
+          data-testid="offline-banner"
+          className="flex items-center gap-2 rounded-xs border border-warn/30 bg-warn-soft px-3 py-2 text-[12px] font-medium text-warn"
+        >
+          <WifiOffIcon width={13} height={13} />
+          Offline — showing the last synced data.
+        </div>
+      );
+    }
+    return null;
+  }
+
+  const failed = pending.find((action) => action.lastError);
+  const failedCount = pending.filter((action) => action.lastError).length;
+  return (
+    <div
+      role="status"
+      data-testid="offline-pending"
+      className="flex flex-col gap-1.5 rounded-xs border border-brand/30 bg-brand-soft px-3 py-2.5 text-[12px]"
+    >
+      <div className="flex items-center justify-between gap-2">
+        <p className="font-medium text-brand">
+          {!online ? (
+            "Offline"
+          ) : failed ? (
+            "Couldn't sync"
+          ) : (
+            <span className="inline-flex items-center gap-1">
+              <CheckIcon width={12} height={12} /> All set
+            </span>
+          )}
+          {" — "}
+          {pending.length} action{pending.length === 1 ? "" : "s"} queued
+        </p>
+        {online ? (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm py-1"
+            onClick={onRetry}
+          >
+            {failed ? "Retry" : "Sync now"}
+          </button>
+        ) : null}
+      </div>
+      <ul className="flex flex-col gap-0.5 text-ink-2">
+        {pending.slice(0, 3).map((action) => (
+          <li key={action.id} className="truncate">
+            {action.label}
+            {action.lastError ? " — failed, will retry" : ""}
+          </li>
+        ))}
+        {pending.length > 3 ? (
+          <li className="text-ink-3">+{pending.length - 3} more</li>
+        ) : null}
+      </ul>
+      {failed && failedCount > 0 ? (
+        <p className="text-ink-3">
+          {failedCount} action{failedCount === 1 ? "" : "s"} couldn't sync and
+          will retry when you reconnect.
+        </p>
+      ) : null}
     </div>
   );
 }

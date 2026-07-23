@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { formatMoney, normalizeCurrencyCode } from "../../lib/format";
+import { formatCurrencyLabel } from "../../lib/currency";
 import {
   useCreateCreditMemo,
   useGetInvoice,
@@ -15,6 +17,7 @@ import {
   useListCreditMemo,
   useListEvent,
   useListInvoice,
+  useListOrganization,
   useListPayment,
 } from "../../lib/manifest-convex-react";
 import { useInvoiceReminderActions } from "../../lib/invoiceReminderActions";
@@ -60,6 +63,11 @@ export function InvoiceDetailPage() {
   const events = useListEvent();
   const invoices = useListInvoice();
   const payments = useListPayment();
+  const organizations = useListOrganization();
+  const functionalCurrencyCode = normalizeCurrencyCode(
+    organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,
+    "USD",
+  );
   const { branding, loading: brandingLoading } = useTenantBranding();
   const send = useInvoiceSend();
   const markViewed = useInvoiceMarkViewed();
@@ -194,11 +202,25 @@ export function InvoiceDetailPage() {
   const lineItems = readInvoiceLineItems(invoice.lineItems);
   const taxBreakdown = readTaxBreakdown(invoice.taxBreakdown);
 
+  const invoiceCurrencyCode = normalizeCurrencyCode(
+    (invoice as { currencyCode?: unknown }).currencyCode,
+    "USD",
+  );
+  const exchangeRateRaw = Number(invoice.exchangeRate ?? 1);
+  const exchangeRate =
+    Number.isFinite(exchangeRateRaw) && exchangeRateRaw > 0
+      ? exchangeRateRaw
+      : 1;
+  const isForeignCurrency = invoiceCurrencyCode !== functionalCurrencyCode;
+  const functionalEquivalentTotal = isForeignCurrency
+    ? Number(invoice.total ?? 0) * exchangeRate
+    : null;
+  const functionalEquivalentDue = isForeignCurrency
+    ? Number(invoice.amountDue ?? 0) * exchangeRate
+    : null;
+
   const usd = (value: unknown) =>
-    Number(value ?? 0).toLocaleString(undefined, {
-      style: "currency",
-      currency: "USD",
-    });
+    formatMoney(Number(value ?? 0), invoiceCurrencyCode);
   const depositAmount = Number(invoice.depositAmount ?? 0);
   const depositPaidAt =
     invoice.depositPaidAt != null ? Number(invoice.depositPaidAt) : null;
@@ -529,12 +551,19 @@ export function InvoiceDetailPage() {
                 </Link>
               </>
             ) : null}{" "}
-            ·{" "}
-            {Number(invoice.amountDue ?? 0).toLocaleString(undefined, {
-              style: "currency",
-              currency: "USD",
-            })}{" "}
+            · {formatMoney(Number(invoice.amountDue ?? 0), invoiceCurrencyCode)}{" "}
             due
+            {isForeignCurrency && functionalEquivalentDue != null ? (
+              <>
+                {" "}
+                · {formatMoney(
+                  functionalEquivalentDue,
+                  functionalCurrencyCode,
+                )}{" "}
+                {formatCurrencyLabel(functionalCurrencyCode).split(" ")[0]}{" "}
+                equivalent
+              </>
+            ) : null}
           </p>
         </div>
         <div className="supply-row-actions">
@@ -677,9 +706,15 @@ export function InvoiceDetailPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Amounts</p>
+            <p className="eyebrow">Amounts ({invoiceCurrencyCode})</p>
             <h2>Balance</h2>
           </div>
+          {isForeignCurrency ? (
+            <span className="text-[11px] text-ink-3">
+              1 {invoiceCurrencyCode} = {exchangeRate} {functionalCurrencyCode}{" "}
+              · recorded at issue
+            </span>
+          ) : null}
         </div>
         <dl className="supply-kv">
           <div>
@@ -692,21 +727,11 @@ export function InvoiceDetailPage() {
           </div>
           <div>
             <dt>Total</dt>
-            <dd>
-              {Number(invoice.total ?? 0).toLocaleString(undefined, {
-                style: "currency",
-                currency: "USD",
-              })}
-            </dd>
+            <dd>{usd(invoice.total)}</dd>
           </div>
           <div>
             <dt>Paid</dt>
-            <dd>
-              {Number(invoice.amountPaid ?? 0).toLocaleString(undefined, {
-                style: "currency",
-                currency: "USD",
-              })}
-            </dd>
+            <dd>{usd(invoice.amountPaid)}</dd>
           </div>
           <div>
             <dt>Credits applied</dt>
@@ -718,13 +743,30 @@ export function InvoiceDetailPage() {
           </div>
           <div>
             <dt>Due</dt>
-            <dd>
-              {Number(invoice.amountDue ?? 0).toLocaleString(undefined, {
-                style: "currency",
-                currency: "USD",
-              })}
-            </dd>
+            <dd>{usd(invoice.amountDue)}</dd>
           </div>
+          {isForeignCurrency ? (
+            <>
+              <div>
+                <dt>Total · {functionalCurrencyCode}</dt>
+                <dd>
+                  {formatMoney(
+                    functionalEquivalentTotal ?? 0,
+                    functionalCurrencyCode,
+                  )}
+                </dd>
+              </div>
+              <div>
+                <dt>Due · {functionalCurrencyCode}</dt>
+                <dd>
+                  {formatMoney(
+                    functionalEquivalentDue ?? 0,
+                    functionalCurrencyCode,
+                  )}
+                </dd>
+              </div>
+            </>
+          ) : null}
         </dl>
         {taxBreakdown.length ? (
           <div
@@ -1200,10 +1242,10 @@ export function InvoiceDetailPage() {
                 {relatedPayments.map((payment) => (
                   <tr key={payment._id}>
                     <td>
-                      {Number(payment.amount ?? 0).toLocaleString(undefined, {
-                        style: "currency",
-                        currency: "USD",
-                      })}
+                      {formatMoney(
+                        Number(payment.amount ?? 0),
+                        invoiceCurrencyCode,
+                      )}
                     </td>
                     <td>{String(payment.method)}</td>
                     <td>

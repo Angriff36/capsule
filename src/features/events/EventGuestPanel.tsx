@@ -309,7 +309,7 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
                           );
                       }}
                     >
-                      <label className="field-label min-w-64 flex-1">
+                      <label className="field-label min-w-0 flex-1 basis-48">
                         {guestAction.kind === "table"
                           ? "Table assignment"
                           : `${guestAction.kind === "decline" ? "Decline" : "Withdrawal"} reason${guestAction.kind === "decline" ? " (optional)" : ""}`}

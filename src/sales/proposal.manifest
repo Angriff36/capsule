@@ -169,6 +169,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
       taxAmount: self.taxAmount
       discountAmount: self.discountAmount
       total: self.total
+      dishSelectionProposalId: self.eventId != null ? self.id : null
     }
   }
 
@@ -281,6 +282,9 @@ event ProposalAccepted: "proposal.accepted" {
   taxAmount: money(12, 2)
   discountAmount: money(12, 2)
   total: money(12, 2)
+  // Non-null only when an Event was linked at accept time — keys the menu
+  // selection → EventDish cascade (sales/proposal-dish-selection.manifest).
+  dishSelectionProposalId: string?
 }
 
 event ProposalDeclined: "proposal.declined" {

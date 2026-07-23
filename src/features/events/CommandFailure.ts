@@ -56,7 +56,16 @@ function stateTransitionFailure(detail: string): CommandFailure | null {
 }
 
 function messageOf(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+  if (error instanceof Error) {
+    const data =
+      "data" in error && error.data != null
+        ? typeof error.data === "string"
+          ? error.data
+          : JSON.stringify(error.data)
+        : "";
+    return data ? `${error.message}\n${data}` : error.message;
+  }
+  return String(error);
 }
 
 interface NormalizedCommandError {
@@ -69,11 +78,21 @@ function normalizeCommandError(error: unknown): NormalizedCommandError {
   const raw = messageOf(error).trim();
   const operation = raw.match(/mutations:([A-Za-z0-9_]+)/)?.[1];
   const requestId = raw.match(/\[Request ID:\s*([^\]]+)\]/i)?.[1];
-  const uncaught = raw.match(/Uncaught Error:\s*([^\r\n]+)/i)?.[1];
-  const detail = (uncaught ?? raw)
+  // WebCrypto failures arrive as OperationError, not Error — must not drop them.
+  const uncaught = raw.match(
+    /Uncaught (?:DOMException|OperationError|Error):\s*([^\r\n]+)/i,
+  )?.[1];
+  const argumentValidation = raw.match(
+    /ArgumentValidationError:\s*([^\r\n]+)/i,
+  )?.[1];
+  const schemaValidation = raw.match(
+    /(?:DocumentDoesNotMatchSchema|does not match the schema):\s*([^\r\n]+)/i,
+  )?.[1];
+  const detail = (uncaught ?? argumentValidation ?? schemaValidation ?? raw)
     .replace(/^\[CONVEX [^\]]+\]\s*/, "")
+    .replace(/\[Request ID:\s*[^\]]+\]\s*/gi, "")
     .replace(/^Server Error\s*/i, "")
-    .replace(/^Uncaught Error:\s*/i, "")
+    .replace(/^Uncaught (?:DOMException|OperationError|Error):\s*/i, "")
     .replace(/^Error:\s*/i, "")
     .replace(/\s+Called by client\s*$/i, "")
     .trim();
@@ -87,9 +106,28 @@ function creationSubject(operation: string | undefined): string {
     : "record";
 }
 
+function isZodError(
+  error: unknown,
+): error is { name: string; issues?: unknown } {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "name" in error &&
+    (error as { name: string }).name === "ZodError"
+  );
+}
+
 export function classifyCommandFailure(error: unknown): CommandFailure {
   const normalized = normalizeCommandError(error);
   const { detail, operation, requestId } = normalized;
+  if (isZodError(error)) {
+    return {
+      category: "validation",
+      title: "Check the entered details",
+      detail:
+        "One or more fields are missing or invalid. Confirm client, venue, dates, headcount, contact, and pricing, then try again.",
+    };
+  }
   if (/ConcurrencyConflict|VERSION_MISMATCH/i.test(detail)) {
     return {
       category: "conflict",
@@ -118,6 +156,20 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
         "Your session does not include the workspace access this action requires.",
     };
   }
+  if (
+    /Decryption failed|Unsupported Manifest encryption|CONVEX_FIELD_ENCRYPTION_KEY/i.test(
+      detail,
+    )
+  ) {
+    return {
+      category: "unexpected",
+      title: "Secure field storage failed",
+      detail: requestId
+        ? `Contact/address encryption could not run (Request ID: ${requestId}). Refresh once. If it persists, the workspace encryption key drifted — do not rewrite CONVEX_FIELD_ENCRYPTION_KEY without migrating data.`
+        : "Contact/address encryption could not run. Refresh once. If it persists, the workspace encryption key may have drifted.",
+      action: REFRESH_ACTION,
+    };
+  }
   if (/staff may|permission|not allowed|policy/i.test(detail)) {
     return { category: "denied", title: "Action denied", detail };
   }
@@ -137,7 +189,7 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
     };
   }
   if (
-    /required|must be|cannot be|between|after its start|two characters|Invalid argument|before parsing|Reading the selected file/i.test(
+    /required|must be|cannot be|between|after its start|two characters|Invalid argument|ArgumentValidation|does not match the schema|before parsing|Reading the selected file|Select a |Headcount|Budget and quoted/i.test(
       detail,
     )
   ) {
@@ -147,9 +199,19 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
       detail,
     };
   }
+  if (!detail || /^server error$/i.test(detail)) {
+    return {
+      category: "unexpected",
+      title: "Action failed unexpectedly",
+      detail: requestId
+        ? `The server rejected this action without a usable reason (Request ID: ${requestId}). Confirm you are signed into a workspace, refresh, and retry. If it keeps failing, share that request ID.`
+        : "The server rejected this action without a usable reason. Refresh and retry.",
+      action: REFRESH_ACTION,
+    };
+  }
   return {
     category: "unexpected",
     title: "Action failed unexpectedly",
-    detail: detail || "The server did not return an error description.",
+    detail: requestId ? `${detail} (Request ID: ${requestId})` : detail,
   };
 }

@@ -112,22 +112,48 @@ export function ActionPromptPanel({
                     {field.helper}
                   </p>
                 ) : null}
-                <input
-                  id={fieldId}
-                  name={field.name}
-                  type={field.inputType ?? "text"}
-                  className="input mt-1"
-                  value={values[field.name] ?? ""}
-                  required={field.required ?? true}
-                  autoFocus={index === 0}
-                  placeholder={field.placeholder}
-                  onChange={(event) =>
-                    setValues((current) => ({
-                      ...current,
-                      [field.name]: event.target.value,
-                    }))
-                  }
-                />
+                {field.options ? (
+                  <select
+                    id={fieldId}
+                    name={field.name}
+                    className="input mt-1"
+                    value={values[field.name] ?? ""}
+                    required={field.required ?? true}
+                    autoFocus={index === 0}
+                    onChange={(event) =>
+                      setValues((current) => ({
+                        ...current,
+                        [field.name]: event.target.value,
+                      }))
+                    }
+                  >
+                    <option value="">
+                      {field.placeholder ?? "Select an option"}
+                    </option>
+                    {field.options.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <input
+                    id={fieldId}
+                    name={field.name}
+                    type={field.inputType ?? "text"}
+                    className="input mt-1"
+                    value={values[field.name] ?? ""}
+                    required={field.required ?? true}
+                    autoFocus={index === 0}
+                    placeholder={field.placeholder}
+                    onChange={(event) =>
+                      setValues((current) => ({
+                        ...current,
+                        [field.name]: event.target.value,
+                      }))
+                    }
+                  />
+                )}
               </div>
             );
           })

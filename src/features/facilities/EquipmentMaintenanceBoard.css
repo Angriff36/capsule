@@ -3,7 +3,7 @@
   --maintenance-paper: #eee9dc;
   --maintenance-signal: #ed6a32;
   --maintenance-warning: #b93624;
-  overflow: hidden;
+  overflow-x: auto;
   margin-bottom: 22px;
   border: 1px solid color-mix(in srgb, var(--line) 65%, var(--maintenance-ink));
   border-radius: 12px;
@@ -154,16 +154,12 @@
 }
 
 .maintenance-form--schedule {
-  grid-template-columns:
-    minmax(150px, 0.7fr) minmax(200px, 1.25fr) minmax(190px, 1.2fr)
-    130px minmax(175px, 1fr) minmax(230px, 1.5fr) auto;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
 }
 
 .maintenance-form--service {
   grid-column: 1 / -1;
-  grid-template-columns:
-    minmax(160px, 0.75fr) minmax(170px, 0.8fr) minmax(190px, 0.9fr)
-    110px minmax(260px, 1.6fr) auto;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   margin: 0;
   border-width: 1px 0 0 5px;
   background: #e4decf;

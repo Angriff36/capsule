@@ -8,8 +8,10 @@ import {
   useListInventoryItem,
   useListInvoice,
   useListPerson,
+  useListPrepTaskComment,
   useListQualification,
   useListShift,
+  useListStaffMessage,
   useListTimeOffRequest,
   useListVendorOrder,
 } from "../../lib/manifest-convex-react";
@@ -61,6 +63,8 @@ export function NotificationTray() {
   const qualifications = useListQualification();
   const timeOffRequests = useListTimeOffRequest();
   const vendorOrders = useListVendorOrder();
+  const staffMessages = useListStaffMessage();
+  const prepTaskComments = useListPrepTaskComment();
 
   const notifications = useMemo(
     () =>
@@ -77,6 +81,8 @@ export function NotificationTray() {
         qualifications,
         timeOffRequests,
         vendorOrders,
+        staffMessages,
+        prepTaskComments,
       }),
     [
       events,
@@ -89,6 +95,8 @@ export function NotificationTray() {
       qualifications,
       timeOffRequests,
       vendorOrders,
+      staffMessages,
+      prepTaskComments,
       user?.id,
     ],
   );

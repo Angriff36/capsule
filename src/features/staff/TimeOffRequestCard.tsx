@@ -61,7 +61,7 @@ export function TimeOffRequestCard({
 
   return (
     <section
-      className="card overflow-hidden border-brand/20"
+      className="card overflow-x-auto border-brand/20"
       data-testid="time-off-request-card"
     >
       <div className="border-b border-line-2 bg-brand-soft px-4 py-4">
@@ -88,7 +88,7 @@ export function TimeOffRequestCard({
 
       {showForm ? (
         <form className="flex flex-col gap-3 px-4 py-4" onSubmit={submit}>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 min-[380px]:grid-cols-2">
             <label className="field-label">
               First day
               <input name="startsOn" className="input" type="date" required />

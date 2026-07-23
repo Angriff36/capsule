@@ -1,3 +1,7 @@
+import { normalizeCurrencyCode } from "./currency";
+
+export { normalizeCurrencyCode };
+
 const dateFmt = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
@@ -7,7 +11,7 @@ const timeFmt = new Intl.DateTimeFormat("en-US", {
   hour: "numeric",
   minute: "2-digit",
 });
-const moneyFmt = new Intl.NumberFormat("en-US", {
+const defaultMoneyFmt = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
   maximumFractionDigits: 0,
@@ -22,8 +26,25 @@ export function formatTime(ms: number | null | undefined): string {
   return ms == null ? "—" : timeFmt.format(ms);
 }
 
-export function formatMoney(n: number | null | undefined): string {
-  return n == null ? "—" : moneyFmt.format(n);
+// Single-currency callers keep using the legacy signature; per-row callers
+// pass the invoice's currencyCode so financial reports stay coherent in
+// mixed-currency ledgers. Unknown / null codes fall back to USD.
+export function formatMoney(
+  n: number | null | undefined,
+  currencyCode?: string | null,
+): string {
+  if (n == null) return "—";
+  const code = normalizeCurrencyCode(currencyCode);
+  if (code === "USD") return defaultMoneyFmt.format(n);
+  try {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: code,
+      maximumFractionDigits: 2,
+    }).format(n);
+  } catch {
+    return `${code} ${n.toLocaleString("en-US", { maximumFractionDigits: 2 })}`;
+  }
 }
 
 export function formatCount(n: number | null | undefined): string {

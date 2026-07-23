@@ -19,6 +19,11 @@ enum AttachmentEvidenceType {
   venueCondition
   leftoverFood
   equipmentReturn
+  // Event photo gallery categories (parentType eventRecord).
+  setup
+  food
+  service
+  venue
 }
 
 event AttachmentAdded: "attachment.added" {
@@ -50,6 +55,8 @@ entity Attachment mixin TenantScoped, SoftDeletable {
   property evidenceType: AttachmentEvidenceType?
   property uploadedById: string?
   property uploadedAt: datetime?
+  // Operator-selected photos to include in the post-event client feedback survey.
+  property inFeedbackSurvey: boolean?
 
   default policy attachmentRead read: roleAllows(user.role, "staffAccess") "Staff may read attachments"
   default policy attachmentWrite write: roleAllows(user.role, "staffAccess") "Staff may write attachments through commands"
@@ -84,6 +91,11 @@ entity Attachment mixin TenantScoped, SoftDeletable {
       parentId: parentId
       fileName: fileName
     }
+  }
+
+  command setSurveySelection(included: boolean) {
+    guard self.deletedAt == null
+    mutate inFeedbackSurvey = included
   }
 
   command remove() {

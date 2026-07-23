@@ -1,0 +1,121 @@
+// Capsule admin — org-wide announcement board.
+//
+// Managers post announcements (new policy, safety reminder, upcoming training)
+// that appear as pinned banners for every org member. Each announcement has an
+// expiry date; banners hide automatically once expired. Each member dismisses
+// an announcement per-user (tracked in AnnouncementDismissal) so it stays
+// visible for everyone else until they individually acknowledge it.
+
+use "../foundation/base.manifest"
+
+enum AnnouncementCategory {
+  policyUpdate
+  safety
+  training
+  general
+}
+
+entity Announcement mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable title: string
+  property required body: string
+  property required category: AnnouncementCategory = "general"
+  property required expiresAt: datetime
+  // Auth subject of the manager who posted, stamped from trusted context.
+  property postedById: string?
+
+  constraint announcementTitlePresent: length(trim(self.title)) > 0 "Announcement title is required"
+  constraint announcementBodyPresent: length(trim(self.body)) > 0 "Announcement body is required"
+
+  // All staff see announcements. Posting and removing are manager actions and
+  // are gated explicitly on each command (manageAccess capability).
+  default policy announcementRead read: roleAllows(user.role, "staffAccess") "Staff may read announcements"
+  default policy announcementWrite write: roleAllows(user.role, "staffAccess") "Staff may write announcements through commands"
+  default policy announcementExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute announcement commands"
+
+  command post(title: string, body: string, category: AnnouncementCategory, expiresAt: datetime) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "manageAccess")
+    constraint postTitlePresent: length(trim(title)) > 0 "Announcement title is required"
+    constraint postBodyPresent: length(trim(body)) > 0 "Announcement body is required"
+    mutate title = title
+    mutate body = body
+    mutate category = category
+    mutate expiresAt = expiresAt
+    mutate postedById = user.id
+    emit AnnouncementPosted {
+      announcementId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // Retract an announcement before its expiry (e.g. a correction). Soft-deletes
+  // so the banner disappears for everyone; dismissals are retained.
+  command remove() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "manageAccess")
+    mutate deletedAt = now()
+    emit AnnouncementRemoved {
+      announcementId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Announcement in durable
+}
+
+entity AnnouncementDismissal mixin TenantScoped {
+  key [tenantId, id]
+  unique [tenantId, announcementId, authSubjectId]
+  timestamps
+  versionProperty version: number
+
+  property indexed required announcementId: uuid
+  property indexed required authSubjectId: string
+  property dismissedAt: datetime?
+
+  belongsTo announcement: Announcement fields [tenantId, announcementId] references [tenantId, id]
+
+  constraint dismissalSubjectPresent: length(trim(self.authSubjectId)) > 0 "Dismissal requires a signed-in account"
+
+  default policy announcementDismissalRead read: roleAllows(user.role, "staffAccess") "Staff may read announcement dismissals"
+  default policy announcementDismissalWrite write: roleAllows(user.role, "staffAccess") "Staff may write their own announcement dismissals through commands"
+  default policy announcementDismissalExecute execute: roleAllows(user.role, "staffAccess") "Staff may dismiss announcements for themselves"
+
+  // Governed creation — one row per (announcement, signed-in account). The
+  // unique key makes a repeat dismiss a no-op failure the UI ignores.
+  command dismiss(announcementId: uuid) {
+    guard user.id != null
+    mutate announcementId = announcementId
+    mutate authSubjectId = user.id
+    mutate dismissedAt = now()
+    emit AnnouncementDismissed {
+      announcementDismissalId: self.id
+      tenantId: self.tenantId
+      announcementId: announcementId
+      authSubjectId: self.authSubjectId
+    }
+  }
+
+  store AnnouncementDismissal in durable
+}
+
+event AnnouncementPosted: "announcement.posted" {
+  announcementId: string
+  tenantId: string
+}
+
+event AnnouncementRemoved: "announcement.removed" {
+  announcementId: string
+  tenantId: string
+}
+
+event AnnouncementDismissed: "announcement.dismissed" {
+  announcementDismissalId: string
+  tenantId: string
+  announcementId: string
+  authSubjectId: string
+}

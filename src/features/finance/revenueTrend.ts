@@ -12,6 +12,8 @@ export type RevenueInvoice = {
   issuedAt?: DateValue;
   createdAt?: DateValue;
   deletedAt?: DateValue;
+  currencyCode?: string | null;
+  exchangeRate?: number | string | null;
 };
 
 export type RevenueClient = {
@@ -55,6 +57,15 @@ export type RevenueTrend = {
   changePercent: number | null;
   rangeStart: Date;
   rangeEnd: Date;
+  functionalCurrencyCode: string;
+  foreignCurrencyInvoiceCount: number;
+};
+
+export type RevenueInvoiceWithFx = RevenueInvoice & {
+  /** Total converted to the tenant's functional currency (defaults to 1.0). */
+  functionalTotal: number;
+  /** True when the invoice was issued in a code other than the functional one. */
+  foreign: boolean;
 };
 
 const PERIOD_COUNT: Record<RevenueGranularity, number> = {
@@ -160,6 +171,7 @@ export function buildRevenueTrend({
   events,
   granularity,
   breakdown,
+  functionalCurrencyCode = "USD",
   now = new Date(),
 }: {
   invoices: readonly RevenueInvoice[];
@@ -167,6 +179,7 @@ export function buildRevenueTrend({
   events: readonly RevenueEvent[];
   granularity: RevenueGranularity;
   breakdown: RevenueBreakdown;
+  functionalCurrencyCode?: string;
   now?: Date;
 }): RevenueTrend {
   const clientsById = new Map(clients.map((row) => [String(row._id), row]));
@@ -176,6 +189,26 @@ export function buildRevenueTrend({
   const rangeStart = shiftPeriod(finalStart, -(periodCount - 1), granularity);
   const rangeEnd = shiftPeriod(finalStart, 1, granularity);
   const categoryLabels = new Map<string, string>();
+  const functionalCode = String(functionalCurrencyCode || "USD")
+    .trim()
+    .toUpperCase();
+  const annotatedInvoices: RevenueInvoiceWithFx[] = invoices.map((invoice) => {
+    const total = Number(invoice.total ?? 0);
+    const rawRate = Number(invoice.exchangeRate ?? 1);
+    const rate = Number.isFinite(rawRate) && rawRate > 0 ? rawRate : 1;
+    const invoiceCode = String(invoice.currencyCode ?? "")
+      .trim()
+      .toUpperCase();
+    const foreign = invoiceCode.length === 3 && invoiceCode !== functionalCode;
+    return {
+      ...invoice,
+      functionalTotal: total * rate,
+      foreign,
+    };
+  });
+  const foreignCurrencyInvoiceCount = annotatedInvoices.filter(
+    (row) => row.foreign,
+  ).length;
 
   const periods: RevenuePeriod[] = Array.from(
     { length: periodCount },
@@ -195,7 +228,7 @@ export function buildRevenueTrend({
   );
 
   let currentInvoiceCount = 0;
-  for (const invoice of invoices) {
+  for (const invoice of annotatedInvoices) {
     if (
       invoice.deletedAt != null ||
       ["voided", "written_off"].includes(String(invoice.status))
@@ -203,7 +236,7 @@ export function buildRevenueTrend({
       continue;
     }
     const issuedAt = validDate(invoice.issuedAt ?? invoice.createdAt);
-    const total = Number(invoice.total ?? 0);
+    const total = invoice.functionalTotal;
     if (!issuedAt || !Number.isFinite(total)) continue;
     const category = categoryFor(invoice, breakdown, clientsById, eventsById);
     categoryLabels.set(category.key, category.label);
@@ -287,5 +320,7 @@ export function buildRevenueTrend({
         : ((currentTotal - priorTotal) / priorTotal) * 100,
     rangeStart,
     rangeEnd,
+    functionalCurrencyCode: functionalCode,
+    foreignCurrencyInvoiceCount,
   };
 }

@@ -2,7 +2,7 @@
   --dispatch-ink: #17221d;
   --dispatch-paper: #f2efe5;
   --dispatch-signal: #e96234;
-  overflow: hidden;
+  overflow-x: auto;
   border: 1px solid color-mix(in srgb, var(--line) 75%, var(--dispatch-ink));
   border-radius: 12px;
   background:
@@ -104,9 +104,7 @@
 
 .equipment-reserve-form {
   display: grid;
-  grid-template-columns:
-    minmax(150px, 0.8fr) minmax(220px, 1.8fr) 90px minmax(170px, 1fr)
-    minmax(170px, 1fr) auto;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
   align-items: end;
   gap: 12px;
   margin: 16px 18px;

@@ -121,6 +121,45 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Feed a proposal menu selection into this event's dish lines
+  // (ProposalAccepted cascade, sales/proposal-dish-selection.manifest).
+  // Idempotent on an existing live (eventId, dishId) line: first write wins,
+  // kitchen edits are preserved (ClientFollowUpReminder.open pattern), and
+  // seedDishId goes out null so the BOM hop does not re-seed.
+  command confirmFromProposal(
+    eventId: uuid,
+    dishId: uuid,
+    quantityServings: number,
+    optional course: string,
+    optional serviceStyle: string,
+    optional specialInstructions: string
+  ) {
+    guard self.deletedAt == null
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    constraint confirmFromProposalEventMatch: eventId == self.eventId "confirmFromProposal eventId must match the seeded event reference"
+    constraint confirmFromProposalServingsNonnegative: quantityServings >= 0 "Event dish servings cannot be negative"
+    compute wasExistingLine = self.addedAt != null
+    mutate eventId = eventId
+    mutate dishId = dishId
+    mutate quantityServings = self.addedAt != null ? self.quantityServings : quantityServings
+    mutate purchasingWeekStart = self.event.purchasingWeekStart
+    mutate course = self.addedAt != null ? self.course : course
+    mutate serviceStyle = self.addedAt != null ? self.serviceStyle : serviceStyle
+    mutate specialInstructions = self.addedAt != null ? self.specialInstructions : specialInstructions
+    mutate addedAt = self.addedAt != null ? self.addedAt : now()
+    emit EventDishConfirmedFromProposal {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      dishId: dishId
+      seedDishId: wasExistingLine ? null : dishId
+      quantityServings: self.quantityServings
+      purchasingWeekStart: self.event.purchasingWeekStart
+      course: self.course
+      serviceStyle: self.serviceStyle
+    }
+  }
+
   command remove(reason: string) {
     guard self.addedAt != null
     guard self.deletedAt == null
@@ -148,6 +187,21 @@ event EventDishAdded: "event_dish.added" {
   tenantId: string
   eventId: string
   dishId: string
+  quantityServings: number
+  purchasingWeekStart: datetime?
+  course: string?
+  serviceStyle: string?
+}
+
+event EventDishConfirmedFromProposal: "event_dish.confirmed_from_proposal" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  // Non-null only when the confirmation created a fresh line — keys the BOM
+  // seed hop (procurement/event-purchasing.manifest); pre-existing lines
+  // already seeded at addToEvent time.
+  seedDishId: string?
   quantityServings: number
   purchasingWeekStart: datetime?
   course: string?

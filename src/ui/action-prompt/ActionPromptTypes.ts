@@ -6,6 +6,8 @@ export interface ActionPromptField {
   defaultValue?: string;
   placeholder?: string;
   inputType?: "text" | "number" | "datetime-local";
+  /** When present the field renders as a select over these options. */
+  options?: Array<{ value: string; label: string }>;
   required?: boolean;
   helper?: string;
 }

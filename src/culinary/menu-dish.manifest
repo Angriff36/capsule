@@ -22,7 +22,9 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
   belongsTo menu: Menu fields [tenantId, menuId] references [tenantId, id]
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
 
-  default policy menuDishRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read menu dish lines"
+  // salesAccess: sales browses the published catalog for proposal menu
+  // selection (sales/proposal-dish-selection.manifest).
+  default policy menuDishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") "Kitchen and sales staff may read menu dish lines"
   default policy menuDishWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write menu dish lines through commands"
   default policy menuDishExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute menu dish line commands"
 

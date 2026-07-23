@@ -1,0 +1,87 @@
+// Capsule workforce — StaffMessage (direct message between two staff members
+// in the same tenant). Distinct from client-facing communication
+// (sales/client-communication.manifest). Surfaced in the notification tray;
+// the UI shows the last 90 days (createdAt is the send time).
+
+use "../identity/person.manifest"
+
+entity StaffMessage mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required senderPersonId: uuid
+  property indexed required recipientPersonId: uuid
+  // Stamped from trusted auth context on send, never accepted from the browser.
+  property senderAuthSubjectId: string?
+  // Copied from the recipient Person row so the recipient account can mark read.
+  property recipientAuthSubjectId: string?
+  property required encrypted body: string
+  property readAt: datetime?
+
+  belongsTo sender: Person fields [tenantId, senderPersonId] references [tenantId, id]
+  belongsTo recipient: Person fields [tenantId, recipientPersonId] references [tenantId, id]
+
+  constraint staffMessageBodyPresent: length(trim(self.body)) > 0 "Message text is required"
+  constraint staffMessageDistinctParties: self.senderPersonId != self.recipientPersonId "Sender and recipient must be different people"
+
+  default policy staffMessageRead read: roleAllows(user.role, "staffAccess") "Staff may read staff messages"
+  default policy staffMessageWrite write: roleAllows(user.role, "staffAccess") "Staff may write staff messages through commands"
+  default policy staffMessageExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute staff message commands"
+
+  // Governed creation — one row per message.
+  command send(
+    senderPersonId: uuid,
+    recipientPersonId: uuid,
+    optional recipientAuthSubjectId: string,
+    body: string
+  ) {
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint sendBodyPresent: length(trim(body)) > 0 "Message text is required"
+    constraint sendDistinctParties: senderPersonId != recipientPersonId "Sender and recipient must be different people"
+    mutate senderPersonId = senderPersonId
+    mutate recipientPersonId = recipientPersonId
+    mutate senderAuthSubjectId = user.id
+    mutate recipientAuthSubjectId = recipientAuthSubjectId
+    mutate body = body
+    emit StaffMessageSent {
+      staffMessageId: self.id
+      tenantId: self.tenantId
+      senderPersonId: senderPersonId
+      recipientPersonId: recipientPersonId
+    }
+  }
+
+  // Only the linked recipient account clears its own unread marker.
+  command markRead() {
+    guard self.deletedAt == null
+    guard self.readAt == null
+    guard user.id != null
+    guard self.recipientAuthSubjectId != null
+    guard self.recipientAuthSubjectId == user.id
+    mutate readAt = now()
+    emit StaffMessageRead {
+      staffMessageId: self.id
+      tenantId: self.tenantId
+      recipientPersonId: self.recipientPersonId
+      readAt: self.readAt
+    }
+  }
+
+  store StaffMessage in durable
+}
+
+event StaffMessageSent: "staff_message.sent" {
+  staffMessageId: string
+  tenantId: string
+  senderPersonId: string
+  recipientPersonId: string
+}
+
+event StaffMessageRead: "staff_message.read" {
+  staffMessageId: string
+  tenantId: string
+  recipientPersonId: string
+  readAt: datetime?
+}

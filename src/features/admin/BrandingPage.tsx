@@ -4,7 +4,14 @@ import { api } from "../../lib/api";
 import {
   useCreateOrganization,
   useOrganizationConfigureBranding,
+  useOrganizationSetDefaultCurrency,
 } from "../../lib/manifest-convex-react";
+import {
+  formatCurrencyLabel,
+  isValidCurrencyCode,
+  normalizeCurrencyCode,
+  SUPPORTED_CURRENCY_CODES,
+} from "../../lib/currency";
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
@@ -25,9 +32,19 @@ export function BrandingPage() {
   const { branding, record, clerkOrganization, loading } = useTenantBranding();
   const configureBranding = useOrganizationConfigureBranding();
   const createOrganization = useCreateOrganization();
+  const setDefaultCurrency = useOrganizationSetDefaultCurrency();
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [logoPreview, setLogoPreview] = useState<string | undefined>();
   const [previewBrand, setPreviewBrand] = useState(branding);
+  const [defaultCurrency, setDefaultCurrencyState] = useState<string>(
+    normalizeCurrencyCode(
+      (record as { defaultCurrencyCode?: unknown })?.defaultCurrencyCode ??
+        "USD",
+    ),
+  );
+  const [currencyBusy, setCurrencyBusy] = useState(false);
+  const [currencyError, setCurrencyError] = useState<string | null>(null);
+  const [currencyNotice, setCurrencyNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -52,6 +69,14 @@ export function BrandingPage() {
     branding.accentColor,
     branding.logoUrl,
   ]);
+
+  useEffect(() => {
+    const raw = (record as { defaultCurrencyCode?: unknown })
+      ?.defaultCurrencyCode;
+    if (raw != null) {
+      setDefaultCurrencyState(normalizeCurrencyCode(raw));
+    }
+  }, [record]);
 
   if (authStatus === undefined || loading) {
     return (
@@ -138,6 +163,43 @@ export function BrandingPage() {
       );
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function saveCurrency(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!canEdit || currencyBusy) return;
+    const code = normalizeCurrencyCode(defaultCurrency);
+    if (!isValidCurrencyCode(code)) {
+      setCurrencyError("Pick a three-letter ISO 4217 currency code.");
+      return;
+    }
+    if (!record) {
+      setCurrencyError(
+        "Save branding first so the organization record exists before setting a currency.",
+      );
+      return;
+    }
+    setCurrencyBusy(true);
+    setCurrencyError(null);
+    setCurrencyNotice(null);
+    try {
+      await setDefaultCurrency({
+        docId: record._id,
+        version: record.version,
+        currencyCode: code,
+      });
+      setCurrencyNotice(
+        `Default currency set to ${formatCurrencyLabel(code)}. Financial reports will report totals in this code.`,
+      );
+    } catch (cause) {
+      setCurrencyError(
+        cause instanceof Error
+          ? cause.message
+          : "Could not update default currency.",
+      );
+    } finally {
+      setCurrencyBusy(false);
     }
   }
 
@@ -319,6 +381,62 @@ export function BrandingPage() {
                   Remove logo
                 </button>
               ) : null}
+            </div>
+          </form>
+        </Section>
+
+        <Section title="Functional currency">
+          <form
+            className="supply-form border-0 shadow-none"
+            onSubmit={saveCurrency}
+          >
+            <label>
+              Default currency for financial reports
+              <select
+                name="defaultCurrencyCode"
+                value={defaultCurrency}
+                onChange={(event) =>
+                  setDefaultCurrencyState(
+                    normalizeCurrencyCode(event.target.value),
+                  )
+                }
+                disabled={!canEdit || currencyBusy}
+              >
+                {Array.from(
+                  new Set([
+                    normalizeCurrencyCode(defaultCurrency),
+                    ...SUPPORTED_CURRENCY_CODES,
+                  ]),
+                ).map((code) => (
+                  <option key={code} value={code}>
+                    {formatCurrencyLabel(code)}
+                  </option>
+                ))}
+              </select>
+              <span className="mt-1 block text-[11px] font-normal text-ink-3">
+                Invoices can be issued in any ISO 4217 currency; exchange rates
+                are stamped at issue so historical reports never drift.
+              </span>
+            </label>
+            {currencyError ? (
+              <ErrorState title="Currency not saved" detail={currencyError} />
+            ) : null}
+            {currencyNotice ? (
+              <p
+                className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok"
+                role="status"
+              >
+                {currencyNotice}
+              </p>
+            ) : null}
+            <div className="supply-row-actions">
+              <button
+                className="btn btn-primary"
+                type="submit"
+                disabled={!canEdit || currencyBusy || !record}
+              >
+                {currencyBusy ? "Saving…" : "Save default currency"}
+              </button>
             </div>
           </form>
         </Section>

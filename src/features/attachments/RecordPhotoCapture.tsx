@@ -3,10 +3,18 @@ import { useRef, useState } from "react";
 import { api } from "../../lib/api";
 import {
   useAttachmentRemove,
+  useAttachmentSetSurveySelection,
   useCreateAttachment,
 } from "../../lib/manifest-convex-react";
 
-export type PhotoParentType = "delivery" | "closeout";
+export type PhotoParentType = "delivery" | "closeout" | "eventRecord";
+
+export const EVENT_PHOTO_CATEGORIES = [
+  { value: "setup", label: "Setup", hint: "Room, tables, and décor" },
+  { value: "food", label: "Food", hint: "Plated dishes and displays" },
+  { value: "service", label: "Service", hint: "Staff and guests in action" },
+  { value: "venue", label: "Venue", hint: "Space and surroundings" },
+] as const;
 
 export const CLOSEOUT_EVIDENCE_CATEGORIES = [
   {
@@ -27,7 +35,8 @@ export const CLOSEOUT_EVIDENCE_CATEGORIES = [
 ] as const;
 
 export type PhotoEvidenceType =
-  (typeof CLOSEOUT_EVIDENCE_CATEGORIES)[number]["value"];
+  | (typeof CLOSEOUT_EVIDENCE_CATEGORIES)[number]["value"]
+  | (typeof EVENT_PHOTO_CATEGORIES)[number]["value"];
 
 export type PhotoEvidenceCategory = {
   value: PhotoEvidenceType;
@@ -41,6 +50,7 @@ export type RecordPhoto = {
   fileSize: number;
   uploadedAt?: number | null;
   evidenceType?: PhotoEvidenceType | null;
+  inFeedbackSurvey?: boolean | null;
   url?: string | null;
   version: number;
 };
@@ -58,6 +68,8 @@ export type RecordPhotoCaptureViewProps = {
   notice: string | null;
   onUpload: (file: File, evidenceType?: PhotoEvidenceType) => Promise<void>;
   onRemove: (photo: RecordPhoto) => Promise<void>;
+  onToggleSurvey?: (photo: RecordPhoto) => Promise<void>;
+  onDownloadAll?: () => Promise<void>;
 };
 
 function formatSize(bytes: number): string {
@@ -90,12 +102,18 @@ export function RecordPhotoCapture({
   title,
   description,
   evidenceCategories,
+  surveySelection = false,
+  downloadAll = false,
 }: {
   parentType: PhotoParentType;
   parentId: string;
   title: string;
   description: string;
   evidenceCategories?: readonly PhotoEvidenceCategory[];
+  /** Show a per-photo "Use in survey" toggle (post-event feedback survey). */
+  surveySelection?: boolean;
+  /** Show a "Download all" button for marketing use of the gallery. */
+  downloadAll?: boolean;
 }) {
   const photos = useQuery(api.fileStorage.listForParent, {
     parentType,
@@ -104,6 +122,7 @@ export function RecordPhotoCapture({
   const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl);
   const createAttachment = useCreateAttachment();
   const removeAttachment = useAttachmentRemove();
+  const setSurveySelection = useAttachmentSetSurveySelection();
   const [busy, setBusy] = useState(false);
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -169,6 +188,57 @@ export function RecordPhotoCapture({
     }
   }
 
+  async function toggleSurvey(photo: RecordPhoto) {
+    setError(null);
+    setNotice(null);
+    try {
+      await setSurveySelection({
+        docId: photo._id,
+        included: !photo.inFeedbackSurvey,
+        version: photo.version,
+      });
+      setNotice(
+        photo.inFeedbackSurvey
+          ? "Photo removed from the feedback survey."
+          : "Photo will appear in the feedback survey.",
+      );
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "The survey selection could not be saved.",
+      );
+    }
+  }
+
+  async function downloadAllPhotos() {
+    const withUrls = (photos ?? []).filter((photo) => photo.url);
+    if (withUrls.length === 0) return;
+    setError(null);
+    setNotice(null);
+    try {
+      for (const photo of withUrls) {
+        const response = await fetch(photo.url as string);
+        if (!response.ok)
+          throw new Error(`Download failed (${response.status})`);
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = objectUrl;
+        anchor.download = photo.fileName;
+        anchor.click();
+        URL.revokeObjectURL(objectUrl);
+      }
+      setNotice(
+        `Downloaded ${withUrls.length} photo${withUrls.length === 1 ? "" : "s"}.`,
+      );
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : "The gallery download failed.",
+      );
+    }
+  }
+
   return (
     <RecordPhotoCaptureView
       parentType={parentType}
@@ -183,6 +253,8 @@ export function RecordPhotoCapture({
       notice={notice}
       onUpload={upload}
       onRemove={(photo) => remove(photo._id, photo.version)}
+      onToggleSurvey={surveySelection ? toggleSurvey : undefined}
+      onDownloadAll={downloadAll ? downloadAllPhotos : undefined}
     />
   );
 }
@@ -201,6 +273,8 @@ export function RecordPhotoCaptureView({
   notice,
   onUpload,
   onRemove,
+  onToggleSurvey,
+  onDownloadAll,
 }: RecordPhotoCaptureViewProps) {
   const cameraInput = useRef<HTMLInputElement>(null);
   const libraryInput = useRef<HTMLInputElement>(null);
@@ -310,6 +384,16 @@ export function RecordPhotoCaptureView({
         >
           Choose photo
         </button>
+        {onDownloadAll && (photos?.length ?? 0) > 0 ? (
+          <button
+            type="button"
+            className="btn btn-ghost min-h-10 flex-1 sm:flex-none"
+            data-testid={`${testId}-download-all`}
+            onClick={() => void onDownloadAll()}
+          >
+            Download all
+          </button>
+        ) : null}
       </div>
 
       {error ? (
@@ -363,6 +447,20 @@ export function RecordPhotoCaptureView({
                     ? ` · ${new Date(photo.uploadedAt).toLocaleString()}`
                     : ""}
                 </p>
+                {onToggleSurvey ? (
+                  <button
+                    type="button"
+                    className={`btn btn-sm mt-2 w-full ${
+                      photo.inFeedbackSurvey ? "btn-primary" : "btn-ghost"
+                    }`}
+                    data-testid={`${testId}-survey-toggle-${photo._id}`}
+                    onClick={() => void onToggleSurvey(photo)}
+                  >
+                    {photo.inFeedbackSurvey
+                      ? "In feedback survey"
+                      : "Use in survey"}
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   className="btn btn-ghost btn-sm mt-2 w-full"

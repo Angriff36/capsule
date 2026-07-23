@@ -44,7 +44,9 @@ entity Dish mixin TenantScoped, SoftDeletable {
   transition status from "active" to ["retired"]
   transition status from "retired" to ["active"]
 
-  default policy dishRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dishes"
+  // salesAccess: sales browses the published catalog for proposal menu
+  // selection (sales/proposal-dish-selection.manifest).
+  default policy dishRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "salesAccess") "Kitchen and sales staff may read dishes"
   default policy dishWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dishes through commands"
   default policy dishExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish commands"
 

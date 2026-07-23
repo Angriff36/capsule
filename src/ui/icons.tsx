@@ -103,6 +103,21 @@ export const ClockIcon = icon(
 export const CheckIcon = icon(<path d="m3 8.5 3.2 3L13 4.5" />);
 export const XIcon = icon(<path d="m4 4 8 8M12 4l-8 8" />);
 export const ArrowLeftIcon = icon(<path d="M13 8H3m4.5-4.5L3 8l4.5 4.5" />);
+export const SunIcon = icon(
+  <>
+    <circle cx="8" cy="8" r="3" />
+    <path d="M8 1.5v1.8M8 12.7v1.8M1.5 8h1.8M12.7 8h1.8M3.4 3.4l1.3 1.3M11.3 11.3l1.3 1.3M12.6 3.4l-1.3 1.3M4.7 11.3l-1.3 1.3" />
+  </>,
+);
+export const MoonIcon = icon(
+  <path d="M13.5 9.3A5.7 5.7 0 0 1 6.7 2.5a5.7 5.7 0 1 0 6.8 6.8z" />,
+);
+export const KeyboardIcon = icon(
+  <>
+    <rect x="1.5" y="5" width="13" height="7" rx="1" />
+    <path d="M4 8h.01M6.5 8h.01M9 8h.01M11.5 8h.01M5.5 10.5h5" />
+  </>,
+);
 export const WifiOffIcon = icon(
   <>
     <path d="M2 2l12 12M5 8.6a6 6 0 0 1 2.5-1.4M2.8 6.2a9 9 0 0 1 2-1.3M8.4 5.2a9 9 0 0 1 4.8 2.4M10.8 8.8a6 6 0 0 1 .8.7" />

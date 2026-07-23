@@ -32,7 +32,9 @@ import type * as personalDataExport from "../personalDataExport.js";
 import type * as queries from "../queries.js";
 import type * as recurringEvents from "../recurringEvents.js";
 import type * as sagas from "../sagas.js";
+import type * as search from "../search.js";
 import type * as vehicleAssignment from "../vehicleAssignment.js";
+import type * as webhookIntegrations from "../webhookIntegrations.js";
 import type * as workforceScheduling from "../workforceScheduling.js";
 
 import type {
@@ -66,7 +68,9 @@ declare const fullApi: ApiFromModules<{
   queries: typeof queries;
   recurringEvents: typeof recurringEvents;
   sagas: typeof sagas;
+  search: typeof search;
   vehicleAssignment: typeof vehicleAssignment;
+  webhookIntegrations: typeof webhookIntegrations;
   workforceScheduling: typeof workforceScheduling;
 }>;
 

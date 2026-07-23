@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreatePrepTask,
@@ -9,6 +9,7 @@ import {
   useListEventDish,
   useListIngredient,
   useListPrepTask,
+  useListPrepTaskComment,
   useListPrepTaskDependency,
   useListQualityCheck,
   usePrepTaskCancel,
@@ -34,6 +35,7 @@ import {
   PrepActionReasonForm,
   type PrepReasonAction,
 } from "./PrepActionReasonForm";
+import { PrepTaskCommentThread } from "./PrepTaskCommentThread";
 import { ProductionFailureBanner } from "./ProductionFailureBanner";
 import { ProductionLifecyclePolicy } from "./ProductionLifecyclePolicy";
 import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
@@ -82,6 +84,7 @@ export function PrepBoardPage() {
   const eventDishes = useListEventDish();
   const dishes = useListDish();
   const ingredients = useListIngredient();
+  const comments = useListPrepTaskComment();
   const createTask = useCreatePrepTask();
   const createDependency = useCreatePrepTaskDependency();
   const claim = usePrepTaskClaim();
@@ -103,6 +106,7 @@ export function PrepBoardPage() {
   const [reasonRequest, setReasonRequest] = useState<ReasonRequest | null>(
     null,
   );
+  const [threadTaskId, setThreadTaskId] = useState<string | null>(null);
   const optimistic = useOptimisticStatus();
 
   const activeTasks = (tasks ?? []).filter((task) => task.deletedAt == null);
@@ -169,6 +173,22 @@ export function PrepBoardPage() {
   );
   const selection = useBulkSelection(selectableTasks);
   const bulk = useBulkRun();
+  const commentsByTask = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const comment of comments ?? []) {
+      if (comment.deletedAt != null) continue;
+      if (!comment.prepTaskId) continue;
+      counts.set(
+        String(comment.prepTaskId),
+        (counts.get(String(comment.prepTaskId)) ?? 0) + 1,
+      );
+    }
+    return counts;
+  }, [comments]);
+  const threadTask =
+    threadTaskId != null
+      ? orderedTasks.find((task) => task._id === threadTaskId)
+      : undefined;
   const isLoading =
     tasks === undefined ||
     events === undefined ||
@@ -628,6 +648,7 @@ export function PrepBoardPage() {
                   <th scope="col">Quantity</th>
                   <th scope="col">State</th>
                   <th scope="col">Quality</th>
+                  <th scope="col">Notes</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
@@ -637,6 +658,7 @@ export function PrepBoardPage() {
                   const linked = checksForTask(task._id);
                   const dependency = dependencyForTask(task._id);
                   const bulkable = taskBulkKeys(task).length > 0;
+                  const taskComments = commentsByTask.get(task._id) ?? 0;
                   return (
                     <tr key={task._id}>
                       <td className="w-8">
@@ -744,6 +766,28 @@ export function PrepBoardPage() {
                         </div>
                       </td>
                       <td>
+                        <button
+                          type="button"
+                          className={`chip border-line-2 ${
+                            taskComments > 0
+                              ? "bg-brand-soft text-brand"
+                              : "bg-inset text-ink-3"
+                          }`}
+                          aria-label={`${taskComments} note${taskComments === 1 ? "" : "s"} for ${taskLabel(task)} — open thread`}
+                          aria-pressed={threadTaskId === task._id}
+                          disabled={busy != null}
+                          onClick={() =>
+                            setThreadTaskId((current) =>
+                              current === task._id ? null : task._id,
+                            )
+                          }
+                        >
+                          {taskComments > 0
+                            ? `${taskComments} note${taskComments === 1 ? "" : "s"}`
+                            : "Add note"}
+                        </button>
+                      </td>
+                      <td>
                         <div
                           className="supply-row-actions"
                           aria-label={`Prep actions for ${taskLabel(task)}`}
@@ -811,6 +855,36 @@ export function PrepBoardPage() {
           </div>
         ) : null}
       </section>
+
+      {threadTask ? (
+        <section
+          className="working-ledger mt-6"
+          aria-label={`Thread for ${taskLabel(threadTask)}`}
+          data-testid="prep-thread-panel"
+        >
+          <div className="ledger-heading">
+            <div>
+              <p className="eyebrow">Prep thread</p>
+              <h2>{taskLabel(threadTask)}</h2>
+              <p className="mt-1 text-[12px] text-ink-2">
+                {eventName(threadTask.eventId)} ·{" "}
+                {threadTask.station || "Unassigned"} ·{" "}
+                {String(threadTask.status)}
+              </p>
+            </div>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => setThreadTaskId(null)}
+            >
+              Close thread
+            </button>
+          </div>
+          <div className="p-4">
+            <PrepTaskCommentThread task={threadTask} />
+          </div>
+        </section>
+      ) : null}
 
       <BulkActionBar
         count={selection.count}
