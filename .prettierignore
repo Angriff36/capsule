@@ -32,9 +32,10 @@ package-lock.json
 *.min.js
 *.min.css
 
-# Runtime artifacts (AboardAI, Playwright MCP)
+# Runtime artifacts (AboardAI, Playwright MCP/CLI)
 .aboardai/
 .playwright-mcp/
+.playwright-cli/
 test-results/
 
 # Loop state files (preserve original formatting)
