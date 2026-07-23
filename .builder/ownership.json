@@ -35,7 +35,7 @@
       "baselined": true
     },
     "package.json": {
-      "sha256": "bc7abdda55d6e2b586f6b9512ea2c697ccba42ab658b62a40f6fb8209d448435",
+      "sha256": "f8f4743da5237b8a3bc96bcefcd102384b9b3a6409f6c389db6a39c2b8b1187d",
       "baselined": true
     },
     "PRESET.md": {
@@ -71,7 +71,9 @@
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "3.6.41"
+      "@angriff36/manifest": "^3.6.41",
+      "convex": "^1.0.0",
+      "zod": "^3.23.0"
     },
     "devDependencies": {
       "typescript": "^5.9.3",
@@ -80,7 +82,7 @@
     "scripts": {
       "deploy": "convex deploy",
       "dev:convex": "convex dev",
-      "manifest:build": "manifest build",
+      "manifest:build": "bun scripts/manifest-build-deny.ts",
       "manifest:compile": "manifest compile --merge",
       "test": "vitest run",
       "typecheck": "tsc --noEmit"
