@@ -11,14 +11,14 @@
       "sha256": "cb2551f7089f7756292b7680d9ca1dcfeea5bcf8ad2e90bace3202f8aa75ec8e"
     },
     "convex/lib/authContext.ts": {
-      "sha256": "4529e5d1e4a15082d28fc13764770cd5ef45b16f1466eefb3ab6e1b80b9672fe"
+      "sha256": "e23339e4fe7fd998bb774c40adf75b86e65dc6aaf3fab98c483a65cf0551c381",
+      "baselined": true
     },
     "convex/lib/encryption.ts": {
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "31fc4cf4d16fb9bab8d87531a643e9efd16b5a0d6c35a0691e745991cffe4c3e",
-      "baselined": true
+      "sha256": "31fc4cf4d16fb9bab8d87531a643e9efd16b5a0d6c35a0691e745991cffe4c3e"
     },
     "convex/queries.ts": {
       "sha256": "c87a7a5bb688a0e064efbdd775fa4f9ae94b41f584a919e4dd1596894b6534fd"
@@ -34,7 +34,8 @@
       "baselined": true
     },
     "package.json": {
-      "sha256": "bc7abdda55d6e2b586f6b9512ea2c697ccba42ab658b62a40f6fb8209d448435"
+      "sha256": "bc7abdda55d6e2b586f6b9512ea2c697ccba42ab658b62a40f6fb8209d448435",
+      "baselined": true
     },
     "PRESET.md": {
       "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
@@ -69,9 +70,7 @@
   },
   "package": {
     "dependencies": {
-      "@angriff36/manifest": "^3.6.41",
-      "convex": "^1.0.0",
-      "zod": "^3.23.0"
+      "@angriff36/manifest": "3.6.41"
     },
     "devDependencies": {
       "typescript": "^5.9.3",
