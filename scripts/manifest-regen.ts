@@ -18,6 +18,7 @@ import { existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { BuilderManifestPinSync } from "./builder-manifest-pin.ts";
+import { ManifestBuildDenyPin } from "./manifest-build-deny-pin.ts";
 
 const CAPSULE_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -53,5 +54,10 @@ export function runBuilder(args: string[]): number {
 
 if (import.meta.main) {
   const passthrough = process.argv.slice(2);
-  process.exit(runBuilder(["generate", "convex", "--apply", ...passthrough]));
+  const status = runBuilder(["generate", "convex", "--apply", ...passthrough]);
+  if (status === 0) {
+    // Builder rewrites package.json scripts; restore Capsule deny for manifest:build.
+    new ManifestBuildDenyPin(CAPSULE_ROOT).ensurePinned();
+  }
+  process.exit(status);
 }

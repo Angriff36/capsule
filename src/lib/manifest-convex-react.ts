@@ -304,6 +304,7 @@ import {
   RecipeIngredientAdjustQuantityParamsSchema,
   RecipeIngredientRemoveParamsSchema,
   RecipePublishVersionParamsSchema,
+  RecipeReinstateParamsSchema,
   RecipeRetireParamsSchema,
   RecipeRetractParamsSchema,
   RecipeReviseDraftParamsSchema,
@@ -4439,6 +4440,16 @@ export function useRecipePublishVersion() {
   };
 }
 
+/** Mutation hook for Recipe.reinstate. */
+export function useRecipeReinstate() {
+  const mutate = useMutation(api.mutations.Recipe_reinstate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RecipeReinstateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Recipe.retire. */
 export function useRecipeRetire() {
   const mutate = useMutation(api.mutations.Recipe_retire);
@@ -6411,4 +6422,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 681 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 682 as const;

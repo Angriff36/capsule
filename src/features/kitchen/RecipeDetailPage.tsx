@@ -11,6 +11,7 @@ import {
   useRecipeIngredientAdjustQuantity,
   useRecipeIngredientRemove,
   useRecipePublishVersion,
+  useRecipeReinstate,
   useRecipeRetire,
   useRecipeRetract,
   useRecipeReviseDraft,
@@ -51,6 +52,7 @@ export function RecipeDetailPage() {
   const publish = useRecipePublishVersion();
   const retract = useRecipeRetract();
   const retire = useRecipeRetire();
+  const reinstate = useRecipeReinstate();
   const createLine = useCreateRecipeIngredient();
   const adjustLine = useRecipeIngredientAdjustQuantity();
   const removeLine = useRecipeIngredientRemove();
@@ -195,6 +197,7 @@ export function RecipeDetailPage() {
       if (key === "publishVersion") await publish(args);
       if (key === "retract") await retract(args);
       if (key === "retire") await retire({ ...args, reason: reason! });
+      if (key === "reinstate") await reinstate(args);
     });
   };
 

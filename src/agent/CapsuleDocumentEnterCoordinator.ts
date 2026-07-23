@@ -11,6 +11,7 @@ import {
   CapsuleRecipeStatusLoader,
   type CapsuleRecipeStatusReader,
 } from "./CapsuleRecipeStatusLoader";
+import { CapsuleRetiredRecipeEnterRecovery } from "./CapsuleRetiredRecipeEnterRecovery";
 
 export interface CapsuleDocumentEnterOptions {
   sourceText: string;
@@ -64,11 +65,17 @@ function asDocId(result: unknown): string {
  */
 export class CapsuleDocumentEnterCoordinator {
   private readonly importCoordinator = new RecipeImportCoordinator();
+  private readonly retiredRecipeRecovery: CapsuleRetiredRecipeEnterRecovery;
 
   constructor(
     private readonly executor: CapsuleCommandExecutor,
     private readonly recipeStatusLoader: CapsuleRecipeStatusReader = new CapsuleRecipeStatusLoader(),
-  ) {}
+  ) {
+    this.retiredRecipeRecovery = new CapsuleRetiredRecipeEnterRecovery(
+      executor,
+      recipeStatusLoader,
+    );
+  }
 
   previewFromText(options: {
     sourceText: string;
@@ -138,7 +145,7 @@ export class CapsuleDocumentEnterCoordinator {
     let ingredientIndex = 0;
     let lineIndex = 0;
     // Document-hash idempotency can return a retired Recipe after wipe (#17).
-    // Bump generation until Recipe.draft yields a writable (draft/published) row.
+    // Prefer Recipe.reinstate (same id); fall back to aliveN draft keys if needed.
     let recipeAliveGeneration = 0;
     const finalizer = new RecipeImportFinalizer({
       createIngredient: async (input) => {
@@ -164,15 +171,16 @@ export class CapsuleDocumentEnterCoordinator {
             ),
           });
           const docId = asDocId(result);
-          const status = await this.recipeStatusLoader.loadStatus(docId);
-          if (status === "draft" || status === "published") {
-            return { docId };
+          const writable =
+            await this.retiredRecipeRecovery.ensureWritableRecipe(docId);
+          if (writable != null) {
+            return { docId: writable };
           }
         }
         throw new Error(
           `Refuse to enter: Recipe.draft idempotency only returned retired/missing ` +
-            `recipes for document scope ${keys.scope}. Open/fix GitHub #17 path — ` +
-            `do not silently attach lines to a retired recipe.`,
+            `recipes for document scope ${keys.scope} (reinstate/aliveN recovery failed). ` +
+            `Do not silently attach lines to a retired recipe.`,
         );
       },
       createRecipeIngredient: async (input) => {

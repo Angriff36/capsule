@@ -60,15 +60,19 @@ below (or call the driver from a one-off `bun` script).
    - Project: `.cursor/mcp.json` (gitignored)
    - User: `~/.cursor/mcp.json` entry **`capsule`**
    - Committed template: [cursor-mcp.capsule.example.json](./cursor-mcp.capsule.example.json)
-   - Launcher `chdir`s to the Capsule repo and loads `.env.local` even if Cursor
-     omits `cwd` (that was the live discovery failure mode).
+   - `scripts/capsule-mcp.ts` bootstraps via `CapsuleMcpHostBootstrap`: `chdir`s
+     to the Capsule repo and loads `.env.local` even if Cursor omits `cwd`
+     (fixes live discovery / `mcp_auth` timeout — #85).
 5. Start the stdio host: `bun run agent:mcp` (idle in a TTY is expected).
-6. In Cursor: Settings → MCP → enable/refresh **`capsule`**. Chat tools should
-   include `recipe_draft`, `ingredient_introduce`,
-   `savedreportdefinition_createDefinition`, etc. (full wiring catalog — if a
-   capability exists locally but Cursor returns UNKNOWN_TOOL / “not in catalog”,
-   the long-lived MCP host is stale; refresh it). Do **not** expect
-   `bun run agent:mcp` in a normal terminal to print a prompt — stdio host only.
+6. In Cursor: Settings → MCP → enable/refresh **`capsule`**. Prefer
+   `list_capsule_commands` + `execute_capsule_command` (or
+   `get_capsule_llm_tools` + `execute_capsule_llm_tool`). The host does **not**
+   register one MCP tool per capability — that froze `tools/list` at startup
+   (#16). Catalog JSON is reloaded from disk when
+   `manifest-wiring-contract.json` changes, so regen updates are visible without
+   restarting for list/execute. Restart the host only if the process itself is
+   stuck. Do **not** expect `bun run agent:mcp` in a normal terminal to print a
+   prompt — stdio host only.
 7. Live writes need Convex up (`bun run dev:convex`). Clerk session JWTs expire
    in ~60s; `ConvexCommandClient`, `CapsuleIngredientCatalogLoader`,
    `CapsuleQueryClient`, and `CapsuleLiveEventPrepStateLoader` remint via

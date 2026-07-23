@@ -21706,7 +21706,7 @@ async function __runRecipePublishVersion(ctx: MutationCtx, { docId, version }: a
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "published";
-        const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": ["draft"] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -21765,7 +21765,7 @@ async function __runRecipeRetire(ctx: MutationCtx, { docId, reason, version }: a
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "retired";
-        const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": ["draft"] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
@@ -21808,6 +21808,66 @@ export const Recipe_retire = mutation({
   },
 });
 
+async function __runRecipeReinstate(ctx: MutationCtx, { docId, version }: any, __creation = false) {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = __auth;
+    const doc = await ctx.db.get(docId) as Record<string, any> | null;
+    if (!doc) throw new Error("Recipe not found");
+    if ((doc as any).tenantId !== __auth.tenantId) throw new Error("Recipe not found");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may read recipes");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may write recipes through commands");
+    if (!(checkRole(user.role, "kitchenAccess"))) throw new Error("Kitchen staff may execute recipe commands");
+    if (!((doc.status === "retired"))) throw new Error("Guard 0 failed");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!(checkRole(user.role, "kitchenManageAccess"))) throw new Error("Guard 2 failed");
+    {
+      const __cur = doc.status;
+      if (__cur !== undefined) {
+        const __from = String(__cur);
+        const __to = "draft";
+        const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": ["draft"] };
+        if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
+          const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
+          throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");
+        }
+      }
+    }
+    if (version !== undefined && (doc as any).version !== version) {
+      throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
+    }
+    const updates = {
+      status: "draft",
+      retiredAt: null,
+      retirementReason: null,
+      publishedAt: null,
+      version: ((doc as any).version ?? 0) + 1
+    };
+    await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, recipeId: docId, tenantId: __after.tenantId, _subject: { entity: "Recipe", command: "reinstate", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "RecipeReinstated", entity: "Recipe", entityId: docId, payload: { recipeId: docId, tenantId: __after.tenantId }, createdAt: Date.now() });
+    return { ...doc, ...updates };
+}
+
+export const Recipe_reinstate = mutation({
+  args: {
+    docId: v.id("recipes"),
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
+  },
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runRecipeReinstate(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "Recipe_reinstate", __result);
+    }
+    return __result;
+  },
+});
+
 async function __runRecipeRetract(ctx: MutationCtx, { docId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -21826,7 +21886,7 @@ async function __runRecipeRetract(ctx: MutationCtx, { docId, version }: any, __c
       if (__cur !== undefined) {
         const __from = String(__cur);
         const __to = "draft";
-        const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": [] };
+        const __allowed: Record<string, string[]> = { "draft": ["published", "retired"], "published": ["draft", "retired"], "retired": ["draft"] };
         if (__from !== __to && Object.hasOwn(__allowed, __from) && !__allowed[__from].includes(__to)) {
           const __opts = __allowed[__from].map((v) => "'" + v + "'").join(", ");
           throw new Error("Invalid state transition for " + "'status'" + ": '" + __from + "' -> '" + __to + "' is not allowed. Allowed from '" + __from + "': [" + __opts + "]");

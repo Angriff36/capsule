@@ -1,4 +1,6 @@
 export { CapsuleCommandCatalog } from "./CapsuleCommandCatalog";
+export { CapsuleCommandCatalogProvider } from "./CapsuleCommandCatalogProvider";
+export { CapsuleWiringContractLoader } from "./CapsuleWiringContractLoader";
 export type { CapsuleCommandDescriptor } from "./CapsuleCommandCatalog";
 export type {
   CapsuleCommandExecutor,
@@ -34,6 +36,7 @@ export { CapsuleCapabilityMutationResolver } from "./CapsuleCapabilityMutationRe
 export { listWiringCapabilityIds } from "./CapsuleWiringCapabilityIds";
 export { ConvexCommandClient } from "./ConvexCommandClient";
 export { CapsuleIngredientCatalogLoader } from "./CapsuleIngredientCatalogLoader";
+export { CapsuleMcpHostBootstrap } from "./mcp/CapsuleMcpHostBootstrap";
 export { CapsuleMcpServerFactory } from "./mcp/CapsuleMcpServerFactory";
 export { CapsuleAgentToolBridge } from "./llm/CapsuleAgentToolBridge";
 export { CapsuleLlmToolDriver } from "./llm/CapsuleLlmToolDriver";

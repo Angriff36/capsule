@@ -4,36 +4,39 @@ import { api } from "../lib/api";
 import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
 import { CapsuleCommandArgsNormalizer } from "./CapsuleCommandArgsNormalizer";
 import { CapsuleCommandCatalog } from "./CapsuleCommandCatalog";
+import { CapsuleCommandCatalogProvider } from "./CapsuleCommandCatalogProvider";
 import type {
   CapsuleCommandExecutor,
   CapsuleCommandInvocation,
 } from "./CapsuleCommandExecutor";
 
 type AnyMutationRef = FunctionReference<"mutation">;
+type CatalogSource = CapsuleCommandCatalog | CapsuleCommandCatalogProvider;
 
 /**
  * Live executor: ConvexHttpClient + Clerk JWT → same api.mutations.* as the UI.
  * Auth/URL resolve lazily so MCP tool discovery can succeed before a write.
  * JWT is refreshed on every execute (Clerk session tokens expire in ~60s).
+ * Catalog may be a provider so long-lived MCP hosts pick up regen (#16).
  */
 export class ConvexCommandClient implements CapsuleCommandExecutor {
   private client: ConvexHttpClient | null = null;
   private readonly auth: CapsuleAgentAuthManager;
-  private readonly catalog: CapsuleCommandCatalog;
+  private readonly catalogSource: CatalogSource;
   private readonly argsNormalizer: CapsuleCommandArgsNormalizer;
 
   constructor(
     auth: CapsuleAgentAuthManager = new CapsuleAgentAuthManager(),
-    catalog: CapsuleCommandCatalog = new CapsuleCommandCatalog(),
+    catalog: CatalogSource = new CapsuleCommandCatalog(),
     argsNormalizer: CapsuleCommandArgsNormalizer = new CapsuleCommandArgsNormalizer(),
   ) {
     this.auth = auth;
-    this.catalog = catalog;
+    this.catalogSource = catalog;
     this.argsNormalizer = argsNormalizer;
   }
 
   async execute(invocation: CapsuleCommandInvocation): Promise<unknown> {
-    const descriptor = this.catalog.get(invocation.capabilityId);
+    const descriptor = this.resolveCatalog().get(invocation.capabilityId);
     const mutationTable = api.mutations as unknown as Record<
       string,
       AnyMutationRef
@@ -56,6 +59,12 @@ export class ConvexCommandClient implements CapsuleCommandExecutor {
     };
     const client = await this.resolveClient();
     return client.mutation(ref, args);
+  }
+
+  private resolveCatalog(): CapsuleCommandCatalog {
+    return this.catalogSource instanceof CapsuleCommandCatalogProvider
+      ? this.catalogSource.get()
+      : this.catalogSource;
   }
 
   private async resolveClient(): Promise<ConvexHttpClient> {

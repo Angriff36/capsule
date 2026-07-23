@@ -6608,7 +6608,7 @@ export const listTimeRecord = query({
   handler: async (ctx) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("timeRecordRead", "TimeRecord", () => checkRole(user.role, "workforceAccess"))) return [];
+    if (!__allowsRead("timeRecordRead", "TimeRecord", () => (checkRole(user.role, "workforceAccess") || checkRole(user.role, "financeAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("timeRecords").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
@@ -6622,7 +6622,7 @@ export const getTimeRecord = query({
   handler: async (ctx, { id }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("timeRecordRead", "TimeRecord", () => checkRole(user.role, "workforceAccess"))) return null;
+    if (!__allowsRead("timeRecordRead", "TimeRecord", () => (checkRole(user.role, "workforceAccess") || checkRole(user.role, "financeAccess")))) return null;
     const doc = await ctx.db.get(id);
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     if (doc && (doc as any).tenantId !== __tenant) return null;
@@ -6639,7 +6639,7 @@ export const listTimeRecordByTenantId = query({
   handler: async (ctx, { tenantId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("timeRecordRead", "TimeRecord", () => checkRole(user.role, "workforceAccess"))) return [];
+    if (!__allowsRead("timeRecordRead", "TimeRecord", () => (checkRole(user.role, "workforceAccess") || checkRole(user.role, "financeAccess")))) return [];
     let rows = await ctx.db.query("timeRecords").withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId)).collect();
     rows = rows.filter((d) => (d as any).deletedAt == null);
     const __plainRows = await Promise.all((rows).map((row) => __decryptDoc(ctx, "TimeRecord", ["notes"], row)));
@@ -6652,7 +6652,7 @@ export const listTimeRecordByPersonId = query({
   handler: async (ctx, { personId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("timeRecordRead", "TimeRecord", () => checkRole(user.role, "workforceAccess"))) return [];
+    if (!__allowsRead("timeRecordRead", "TimeRecord", () => (checkRole(user.role, "workforceAccess") || checkRole(user.role, "financeAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("timeRecords").withIndex("by_personId", (q) => q.eq("personId", personId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
@@ -6667,7 +6667,7 @@ export const listTimeRecordByShiftId = query({
   handler: async (ctx, { shiftId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("timeRecordRead", "TimeRecord", () => checkRole(user.role, "workforceAccess"))) return [];
+    if (!__allowsRead("timeRecordRead", "TimeRecord", () => (checkRole(user.role, "workforceAccess") || checkRole(user.role, "financeAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("timeRecords").withIndex("by_shiftId", (q) => q.eq("shiftId", shiftId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);
@@ -6682,7 +6682,7 @@ export const listTimeRecordByEventId = query({
   handler: async (ctx, { eventId }) => {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = (__auth.user ?? __auth) as any;
-    if (!__allowsRead("timeRecordRead", "TimeRecord", () => checkRole(user.role, "workforceAccess"))) return [];
+    if (!__allowsRead("timeRecordRead", "TimeRecord", () => (checkRole(user.role, "workforceAccess") || checkRole(user.role, "financeAccess")))) return [];
     const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
     let rows = await ctx.db.query("timeRecords").withIndex("by_eventId", (q) => q.eq("eventId", eventId)).collect();
     rows = rows.filter((d) => (d as any).tenantId === __tenant);

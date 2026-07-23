@@ -49,7 +49,9 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
   transition status from "closed" to ["corrected"]
   transition status from "corrected" to ["corrected"]
 
-  default policy timeRecordRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read time records"
+  // Finance managers export payroll at /finance/payroll but lack workforceAccess;
+  // they must still list completed TimeRecords. Write/execute stay workforce-only.
+  default policy timeRecordRead read: roleAllows(user.role, "workforceAccess") or roleAllows(user.role, "financeAccess") "Workforce and finance may read time records for ops and payroll"
   default policy timeRecordWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write time records through commands"
   default policy timeRecordExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute time record commands"
 
