@@ -1,0 +1,1219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Capsule — How Events Work</title>
+    <style>
+      :root {
+        --ink: #1a221c;
+        --ink-2: #3d4a40;
+        --ink-3: #6a756c;
+        --paper: #f3f0e8;
+        --panel: #fffdf8;
+        --line: #d8d2c4;
+        --line-2: #ebe6da;
+        --accent: #0f6b5c;
+        --accent-soft: #d7efe9;
+        --warn: #9a5b12;
+        --warn-soft: #f7e7cf;
+        --ok: #2f6b3a;
+        --ok-soft: #dcefdc;
+        --danger: #8b2e2e;
+        --danger-soft: #f4dede;
+        --stage: #245b8a;
+        --stage-soft: #dceaf5;
+        --shadow: 0 10px 30px rgba(26, 34, 28, 0.08);
+        --radius: 14px;
+        --font: "Segoe UI", "Avenir Next", "Helvetica Neue", sans-serif;
+        --display: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font);
+        color: var(--ink);
+        background:
+          radial-gradient(
+            1200px 500px at 10% -10%,
+            #e7f3ef 0%,
+            transparent 55%
+          ),
+          radial-gradient(900px 400px at 100% 0%, #f7e9d4 0%, transparent 50%),
+          var(--paper);
+        line-height: 1.5;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 2px;
+      }
+
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 28px 20px 80px;
+      }
+
+      header.hero {
+        display: grid;
+        gap: 18px;
+        padding: 28px 0 10px;
+      }
+
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      h1 {
+        font-family: var(--display);
+        font-size: clamp(2.2rem, 4vw, 3.4rem);
+        line-height: 1.05;
+        margin: 0;
+        letter-spacing: -0.02em;
+      }
+
+      .lead {
+        max-width: 62ch;
+        font-size: 1.08rem;
+        color: var(--ink-2);
+        margin: 0;
+      }
+
+      .toc {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .toc a {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        color: var(--ink-2);
+        text-decoration: none;
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+      }
+
+      .toc a:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+
+      section.block {
+        margin-top: 42px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .block-head {
+        padding: 22px 24px 14px;
+        border-bottom: 1px solid var(--line-2);
+        background: linear-gradient(180deg, #fff 0%, var(--panel) 100%);
+      }
+
+      .block-head h2 {
+        margin: 4px 0 6px;
+        font-family: var(--display);
+        font-size: 1.7rem;
+      }
+
+      .block-head p {
+        margin: 0;
+        color: var(--ink-2);
+        max-width: 70ch;
+      }
+
+      .block-body {
+        padding: 20px 24px 24px;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 18px;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+      }
+
+      .grid-4 {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+      }
+
+      @media (max-width: 960px) {
+        .grid-2,
+        .grid-3,
+        .grid-4 {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        padding: 14px 16px;
+      }
+
+      .card h3 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+      }
+
+      .card p,
+      .card li {
+        font-size: 14px;
+        color: var(--ink-2);
+      }
+
+      .card ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }
+
+      .path {
+        display: inline-block;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        background: var(--stage-soft);
+        color: var(--stage);
+        border-radius: 6px;
+        padding: 2px 7px;
+        margin-top: 6px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        border-radius: 999px;
+        padding: 3px 9px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid transparent;
+      }
+
+      .chip.ok {
+        background: var(--ok-soft);
+        color: var(--ok);
+      }
+
+      .chip.warn {
+        background: var(--warn-soft);
+        color: var(--warn);
+      }
+
+      .chip.stage {
+        background: var(--stage-soft);
+        color: var(--stage);
+      }
+
+      .chip.muted {
+        background: var(--line-2);
+        color: var(--ink-3);
+      }
+
+      .chip.danger {
+        background: var(--danger-soft);
+        color: var(--danger);
+      }
+
+      /* Lifecycle */
+      .lifecycle {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        margin: 8px 0 18px;
+      }
+
+      .lifecycle .step {
+        background: var(--accent-soft);
+        color: var(--accent);
+        border: 1px solid #b7ddd4;
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .lifecycle .arrow {
+        color: var(--ink-3);
+        font-size: 18px;
+      }
+
+      .lifecycle .end {
+        background: var(--line-2);
+        color: var(--ink-2);
+      }
+
+      .lifecycle .cancel {
+        background: var(--danger-soft);
+        color: var(--danger);
+        border-color: #e2b4b4;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+
+      th,
+      td {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line-2);
+        vertical-align: top;
+      }
+
+      th {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--ink-3);
+        background: #faf7f0;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      /* Flow diagram */
+      .flow {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin-top: 8px;
+      }
+
+      @media (max-width: 960px) {
+        .flow {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .flow-node {
+        position: relative;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        background: #fff;
+        padding: 14px;
+        min-height: 130px;
+      }
+
+      .flow-node strong {
+        display: block;
+        margin-bottom: 6px;
+      }
+
+      .flow-node small {
+        color: var(--ink-3);
+        display: block;
+        margin-top: 8px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 11px;
+      }
+
+      .flow-node::after {
+        content: "→";
+        position: absolute;
+        right: -12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--ink-3);
+        font-size: 18px;
+      }
+
+      .flow-node:last-child::after {
+        content: "";
+      }
+
+      @media (max-width: 960px) {
+        .flow-node::after {
+          content: "↓";
+          right: auto;
+          left: 50%;
+          top: auto;
+          bottom: -16px;
+          transform: translateX(-50%);
+        }
+        .flow-node:last-child::after {
+          content: "";
+        }
+      }
+
+      .hub {
+        border: 2px solid var(--accent);
+        background: linear-gradient(180deg, #f4fffb 0%, #fff 70%);
+      }
+
+      .detail-layout {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: 16px;
+      }
+
+      @media (max-width: 860px) {
+        .detail-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .mock-screen {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+      }
+
+      .mock-top {
+        padding: 14px 16px;
+        border-bottom: 1px solid var(--line-2);
+        background: #faf7f0;
+      }
+
+      .mock-top h3 {
+        margin: 0 0 4px;
+        font-family: var(--display);
+      }
+
+      .mock-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 10px;
+      }
+
+      .btn {
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--ink-2);
+        font-size: 12px;
+        padding: 6px 10px;
+      }
+
+      .btn.primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+
+      .btn.danger {
+        background: var(--danger-soft);
+        border-color: #e2b4b4;
+        color: var(--danger);
+      }
+
+      .panel-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .panel-list li {
+        display: grid;
+        grid-template-columns: 170px 1fr;
+        gap: 12px;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--line-2);
+        font-size: 14px;
+      }
+
+      .panel-list li:last-child {
+        border-bottom: 0;
+      }
+
+      .panel-list strong {
+        color: var(--ink);
+      }
+
+      .panel-list span {
+        color: var(--ink-2);
+      }
+
+      .side-note {
+        background: var(--warn-soft);
+        border: 1px solid #ebd3a8;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 14px;
+        color: var(--warn);
+      }
+
+      .ok-note {
+        background: var(--ok-soft);
+        border: 1px solid #b9d8bc;
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 14px;
+        color: var(--ok);
+      }
+
+      .connect-map {
+        display: grid;
+        gap: 10px;
+      }
+
+      .connect-row {
+        display: grid;
+        grid-template-columns: 180px 28px 1fr;
+        gap: 10px;
+        align-items: start;
+      }
+
+      @media (max-width: 700px) {
+        .connect-row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .connect-from {
+        font-weight: 700;
+        font-size: 14px;
+        padding-top: 10px;
+      }
+
+      .connect-arrow {
+        text-align: center;
+        color: var(--ink-3);
+        padding-top: 8px;
+      }
+
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+
+      footer {
+        margin-top: 36px;
+        color: var(--ink-3);
+        font-size: 13px;
+      }
+
+      .stack {
+        display: grid;
+        gap: 12px;
+      }
+
+      .callout-title {
+        font-weight: 700;
+        margin-bottom: 4px;
+        color: inherit;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <div class="eyebrow">Capsule · Operations map</div>
+        <h1>How Events work</h1>
+        <p class="lead">
+          An event is the booking hub for a catering job. Staff plan it, attach
+          a menu, generate prep work, run the day, then close the books. This
+          page shows the real screens in Capsule, what each one should show, and
+          how events connect to prep lists, dishes, and the rest of the app.
+        </p>
+        <nav class="toc" aria-label="Jump to section">
+          <a href="#journey">Happy path</a>
+          <a href="#screens">All event screens</a>
+          <a href="#detail">Event detail anatomy</a>
+          <a href="#lifecycle">Stage buttons</a>
+          <a href="#connections">Links to other pages</a>
+          <a href="#prep-dishes">Prep &amp; dishes</a>
+          <a href="#should-show">Should show vs shows</a>
+        </nav>
+      </header>
+
+      <!-- JOURNEY -->
+      <section class="block" id="journey">
+        <div class="block-head">
+          <div class="eyebrow">Typical day-to-day path</div>
+          <h2>From client interest to closed books</h2>
+          <p>
+            This is the path most sales and ops staff follow. Each box is a
+            place you can click in the left nav or from links on the event.
+          </p>
+        </div>
+        <div class="block-body">
+          <div class="flow">
+            <div class="flow-node">
+              <strong>1. Win the job</strong>
+              Client record + proposal accepted in CRM.
+              <small>/clients · /clients/proposals</small>
+            </div>
+            <div class="flow-node">
+              <strong>2. Create event</strong>
+              New booking with client, date, headcount, venue.
+              <small>/events/new</small>
+            </div>
+            <div class="flow-node hub">
+              <strong>3. Event home</strong>
+              Setup checklist, revise basics, guests, stock, equipment.
+              <small>/events/:id</small>
+            </div>
+            <div class="flow-node">
+              <strong>4. Menu &amp; prep</strong>
+              Pick dishes → prep lines + stock holds appear.
+              <small>/kitchen/event-menu · /kitchen/prep</small>
+            </div>
+            <div class="flow-node">
+              <strong>5. Run &amp; close</strong>
+              Execute day → complete → finance closeout / invoice.
+              <small>/finance/closeout · /finance/invoices</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCREENS -->
+      <section class="block" id="screens">
+        <div class="block-head">
+          <div class="eyebrow">Routes that exist today</div>
+          <h2>Event screens in the app</h2>
+          <p>
+            Left nav → <strong>Events</strong> opens the list. Capacity,
+            templates, create, detail, and allergen briefing hang off that area.
+          </p>
+        </div>
+        <div class="block-body">
+          <div class="grid-3">
+            <article class="card">
+              <h3>Events list</h3>
+              <span class="path">/events</span>
+              <p>
+                Every booking. Filter by stage tabs, search title/client/venue,
+                sort by date.
+              </p>
+              <ul>
+                <li>Jump to Capacity calendar</li>
+                <li>Jump to Templates</li>
+                <li>New event</li>
+                <li>Open any row → event detail</li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Create event</h3>
+              <span class="path">/events/new</span>
+              <p>
+                Register a booking. Requires an active client and venue, plus
+                schedule, headcount, primary contact, and pricing. Can arrive
+                with
+                <code>?clientId=</code> from an accepted proposal, or
+                <code>?templateId=</code> from templates.
+              </p>
+              <ul>
+                <li>After save → opens that event’s detail page</li>
+                <li>
+                  Create encrypts contact fields. If production shows only
+                  “Server Error”, the cloud Convex deployment is usually missing
+                  <code>CONVEX_FIELD_ENCRYPTION_KEY</code> (set with
+                  <code>bunx convex env set … --prod</code>, then
+                  <code>bunx convex deploy</code>). Local env does not fix
+                  Vercel.
+                </li>
+              </ul>
+            </article>
+            <article class="card">
+              <h3>Event detail (hub)</h3>
+              <span class="path">/events/:id</span>
+              <p>
+                Single-event command center: lifecycle buttons, setup readiness,
+                revise panels, guests, inventory, equipment, incidents, photos,
+                files, client portal share, BEO PDF.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Templates</h3>
+              <span class="path">/events/templates</span>
+              <p>
+                Save an event as a reusable template, or start a new event from
+                one. Detail links here with
+                <code>?fromEvent=</code>.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Capacity calendar</h3>
+              <span class="path">/events/capacity</span>
+              <p>
+                See how booked headcount stacks across days so you don’t
+                overcommit the kitchen or service team.
+              </p>
+            </article>
+            <article class="card">
+              <h3>Allergen briefing</h3>
+              <span class="path">/events/:id/allergen-briefing</span>
+              <p>
+                Day-of allergen pass/flag view for the event menu. Linked from
+                the event header.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- DETAIL ANATOMY -->
+      <section class="block" id="detail">
+        <div class="block-head">
+          <div class="eyebrow">What you see on /events/:id</div>
+          <h2>Event detail anatomy</h2>
+          <p>
+            Top to bottom on the event page. This is the screen staff live on
+            once a booking exists.
+          </p>
+        </div>
+        <div class="block-body">
+          <div class="detail-layout">
+            <aside class="stack">
+              <div class="ok-note">
+                <div class="callout-title">Always on this page</div>
+                Lifecycle actions, setup readiness, profitability, basics
+                revise, recurrence, client messages, timeline, guests,
+                inventory, equipment, incidents, photo gallery, attachments.
+              </div>
+              <div class="side-note">
+                <div class="callout-title">Not on this page</div>
+                Dish picking and prep lines live under Kitchen. Staff assignment
+                is fixed under Staff roster. Closeout money work lives under
+                Finance.
+              </div>
+            </aside>
+
+            <div class="mock-screen">
+              <div class="mock-top">
+                <div class="eyebrow">Page header</div>
+                <h3>Spring Gala · Planning</h3>
+                <div>Corporate client link · relative date · type chip</div>
+                <div class="mock-actions">
+                  <span class="btn">Share client portal</span>
+                  <span class="btn">Download BEO</span>
+                  <span class="btn">Save as template</span>
+                  <span class="btn">Allergen briefing</span>
+                  <span class="btn primary">Submit for approval</span>
+                  <span class="btn danger">Cancel event</span>
+                </div>
+              </div>
+              <ul class="panel-list">
+                <li>
+                  <strong>Setup readiness</strong>
+                  <span
+                    >Checklist: client, headcount, menu dishes, staff. Gaps link
+                    to the fix screen (event menu, roster, or basics).</span
+                  >
+                </li>
+                <li>
+                  <strong>Live profitability</strong>
+                  <span>Quick money pulse for this booking.</span>
+                </li>
+                <li>
+                  <strong>Revise basics</strong>
+                  <span
+                    >Schedule, headcount, venue, pricing, primary contact,
+                    requirements — only while stage allows edits.</span
+                  >
+                </li>
+                <li>
+                  <strong>Recurring schedule</strong>
+                  <span>Weekly / monthly / annual series settings.</span>
+                </li>
+                <li>
+                  <strong>Client communication</strong>
+                  <span>Messages tied to this event.</span>
+                </li>
+                <li>
+                  <strong>Day-of timeline</strong>
+                  <span>Run-of-show activities with times and owners.</span>
+                </li>
+                <li>
+                  <strong>Guests</strong>
+                  <span>Invite list and RSVP status.</span>
+                </li>
+                <li>
+                  <strong>Inventory / stock</strong>
+                  <span
+                    >Reserve and issue stock for event demand. Active when stage
+                    is Approved or Executing.</span
+                  >
+                </li>
+                <li>
+                  <strong>Equipment</strong>
+                  <span
+                    >Reserve, check out, and return gear for the event
+                    window.</span
+                  >
+                </li>
+                <li>
+                  <strong>Incidents</strong>
+                  <span>Log and resolve day-of problems.</span>
+                </li>
+                <li>
+                  <strong>Photo gallery + attachments</strong>
+                  <span
+                    >Setup / food / service / venue photos; survey picks; file
+                    attachments.</span
+                  >
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- LIFECYCLE -->
+      <section class="block" id="lifecycle">
+        <div class="block-head">
+          <div class="eyebrow">Stage machine</div>
+          <h2>Which buttons show at each stage</h2>
+          <p>
+            Buttons come from proven Manifest stage transitions. The UI only
+            offers moves that are allowed from the current stage.
+          </p>
+        </div>
+        <div class="block-body">
+          <div class="lifecycle" aria-label="Main happy path stages">
+            <span class="step">Planning</span><span class="arrow">→</span>
+            <span class="step">Pending approval</span
+            ><span class="arrow">→</span> <span class="step">Approved</span
+            ><span class="arrow">→</span> <span class="step">Executing</span
+            ><span class="arrow">→</span> <span class="step">Completed</span
+            ><span class="arrow">→</span>
+            <span class="step end">Closed out</span>
+            <span class="arrow">·</span>
+            <span class="step cancel">Cancelled</span>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Stage</th>
+                <th>Primary button(s)</th>
+                <th>Also available</th>
+                <th>Editing rules</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="chip stage">Planning</span></td>
+                <td>Submit for approval</td>
+                <td>Cancel event (reason required)</td>
+                <td>Basics revisable; headcount revisable</td>
+              </tr>
+              <tr>
+                <td><span class="chip stage">Pending approval</span></td>
+                <td>Approve</td>
+                <td>Return to planning · Cancel</td>
+                <td>Basics revisable; headcount revisable</td>
+              </tr>
+              <tr>
+                <td><span class="chip stage">Approved</span></td>
+                <td>Begin execution</td>
+                <td>Return to planning · Cancel</td>
+                <td>Basics revisable; headcount revisable; stock panel on</td>
+              </tr>
+              <tr>
+                <td><span class="chip stage">Executing</span></td>
+                <td>Complete</td>
+                <td>Cancel</td>
+                <td>
+                  Basics locked; headcount still revisable; stock panel on
+                </td>
+              </tr>
+              <tr>
+                <td><span class="chip stage">Completed</span></td>
+                <td>Close out</td>
+                <td>—</td>
+                <td>Basics locked; headcount revisable</td>
+              </tr>
+              <tr>
+                <td><span class="chip muted">Closed out</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>Terminal for the event lifecycle</td>
+              </tr>
+              <tr>
+                <td><span class="chip danger">Cancelled</span></td>
+                <td>—</td>
+                <td>—</td>
+                <td>
+                  Terminal; cancel allowed from planning through executing
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- CONNECTIONS -->
+      <section class="block" id="connections">
+        <div class="block-head">
+          <div class="eyebrow">Cross-app map</div>
+          <h2>How the event talks to other pages</h2>
+          <p>
+            The event page is the hub. Other workspaces either deep-link into an
+            event, or read the same event id to show related work.
+          </p>
+        </div>
+        <div class="block-body">
+          <div class="legend">
+            <span class="chip ok">Outbound from event</span>
+            <span class="chip stage">Inbound to event</span>
+            <span class="chip warn">Shared by event id</span>
+          </div>
+
+          <div class="connect-map">
+            <div class="connect-row">
+              <div class="connect-from">Clients &amp; CRM</div>
+              <div class="connect-arrow">↔</div>
+              <div class="card">
+                Client name on the event header links to
+                <span class="path">/clients/:id</span>. Accepted proposals offer
+                “create event” with client prefilled (<span class="path"
+                  >/events/new?clientId=…</span
+                >. Client communication panel sits on the event itself.
+              </div>
+            </div>
+
+            <div class="connect-row">
+              <div class="connect-from">Kitchen · Event menu</div>
+              <div class="connect-arrow">→</div>
+              <div class="card">
+                Setup readiness “Add dishes” goes to
+                <span class="path">/kitchen/event-menu?eventId=…</span>. There
+                you select dishes / apply a menu template. That creates
+                <strong>EventDish</strong> rows and syncs prep tasks + inventory
+                reservations.
+              </div>
+            </div>
+
+            <div class="connect-row">
+              <div class="connect-from">Kitchen · Prep</div>
+              <div class="connect-arrow">↔</div>
+              <div class="card">
+                Prep board at <span class="path">/kitchen/prep</span> lists prep
+                tasks by event. Each task belongs to an event (and usually an
+                event dish). Home attention and notifications can deep-link here
+                when prep is blocked or waiting.
+              </div>
+            </div>
+
+            <div class="connect-row">
+              <div class="connect-from">Kitchen · Dishes / menus</div>
+              <div class="connect-arrow">→</div>
+              <div class="card">
+                Catalog dishes and menus live under
+                <span class="path">/kitchen/dishes</span> and
+                <span class="path">/kitchen/menus</span>. They become
+                event-specific only after Event Menu selection. Allergen matrix
+                and allergen briefing read those event dishes.
+              </div>
+            </div>
+
+            <div class="connect-row">
+              <div class="connect-from">Staff roster</div>
+              <div class="connect-arrow">→</div>
+              <div class="card">
+                Setup readiness “Assign staff” sends you to
+                <span class="path">/staff/roster</span>. Assignments show up in
+                BEO PDF staffing and setup readiness counts.
+              </div>
+            </div>
+
+            <div class="connect-row">
+              <div class="connect-from">Inventory</div>
+              <div class="connect-arrow">↔</div>
+              <div class="card">
+                Event Menu sync creates ingredient demand + reservations. Event
+                Inventory panel (approved/executing) reserves, confirms, and
+                issues stock. Broader stock books live under
+                <span class="path">/inventory/*</span>.
+              </div>
+            </div>
+
+            <div class="connect-row">
+              <div class="connect-from">Logistics</div>
+              <div class="connect-arrow">↔</div>
+              <div class="card">
+                Route planner stops reference event ids and show event titles.
+                Plan vehicles/day under
+                <span class="path">/logistics</span> (route planner).
+              </div>
+            </div>
+
+            <div class="connect-row">
+              <div class="connect-from">Finance</div>
+              <div class="connect-arrow">↔</div>
+              <div class="card">
+                After Complete, use Close out on the event, then
+                capture/finalize money on
+                <span class="path">/finance/closeout</span>. Invoices can
+                deep-link with
+                <span class="path">/finance/invoices?eventId=…</span>. Tips,
+                payroll, food-cost, and margin reports also key off event
+                closeouts.
+              </div>
+            </div>
+
+            <div class="connect-row">
+              <div class="connect-from">Client portal</div>
+              <div class="connect-arrow">→</div>
+              <div class="card">
+                Share control on the event header. Guests/clients can open a
+                portal view at <span class="path">/portal/events/:token</span>.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PREP & DISHES -->
+      <section class="block" id="prep-dishes">
+        <div class="block-head">
+          <div class="eyebrow">Production chain</div>
+          <h2>Events ↔ dishes ↔ prep lists</h2>
+          <p>
+            This is the most important handoff. The event does not hold a
+            free-form grocery list — dishes drive prep, and prep drives the
+            kitchen day.
+          </p>
+        </div>
+        <div class="block-body">
+          <div class="grid-2">
+            <div class="stack">
+              <div class="card">
+                <h3>1. Catalog exists first</h3>
+                <p>
+                  Chefs maintain reusable dishes (and optional menu templates)
+                  in Kitchen. Recipes and dish tasks define how a dish is made.
+                </p>
+                <span class="path">/kitchen/dishes · /kitchen/menus</span>
+              </div>
+              <div class="card">
+                <h3>2. Attach dishes to the event</h3>
+                <p>
+                  On Event Menu, pick an event, optionally apply a menu
+                  template, then select dishes and servings. That writes
+                  EventDish rows for that booking.
+                </p>
+                <span class="path">/kitchen/event-menu?eventId=…</span>
+              </div>
+              <div class="card">
+                <h3>3. Prep lines appear</h3>
+                <p>
+                  Selecting dishes syncs generated prep tasks (and stock holds)
+                  for that event. On the Prep board you can also add manual prep
+                  tasks against an event dish, set dependencies, run quality
+                  checks, and comment.
+                </p>
+                <span class="path">/kitchen/prep</span>
+              </div>
+              <div class="card">
+                <h3>4. Event page watches readiness</h3>
+                <p>
+                  Setup readiness shows whether menu dishes and staff are in
+                  place. Until dishes exist, prep/demand automation has nothing
+                  to derive.
+                </p>
+                <span class="path">/events/:id → Setup readiness</span>
+              </div>
+            </div>
+
+            <div class="stack">
+              <div class="mock-screen">
+                <div class="mock-top">
+                  <div class="eyebrow">Mental model</div>
+                  <h3>One booking, three layers</h3>
+                </div>
+                <ul class="panel-list">
+                  <li>
+                    <strong>Event</strong>
+                    <span>When, where, who, stage, money, day-of ops.</span>
+                  </li>
+                  <li>
+                    <strong>EventDish</strong>
+                    <span
+                      >Which catalog dishes (and servings) are on this
+                      booking.</span
+                    >
+                  </li>
+                  <li>
+                    <strong>PrepTask</strong>
+                    <span
+                      >Concrete kitchen work lines tied to the event (and
+                      usually a dish), with status, station, deps, QC.</span
+                    >
+                  </li>
+                </ul>
+              </div>
+
+              <div class="ok-note">
+                <div class="callout-title">What staff should do</div>
+                Open the event → clear Setup readiness gaps → use
+                <strong>Add dishes</strong> → then open Kitchen → Prep to work
+                the sheet. Download BEO from the event when you need a printable
+                packet of menu + timeline + staff.
+              </div>
+
+              <div class="side-note">
+                <div class="callout-title">Common confusion</div>
+                The event detail page does <em>not</em> contain a full dish
+                picker or prep board. If someone expects “menu” and “prep” tabs
+                on the event itself, send them to Event Menu and Prep under
+                Kitchen — that is intentional current wiring.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SHOULD SHOW -->
+      <section class="block" id="should-show">
+        <div class="block-head">
+          <div class="eyebrow">Expectations check</div>
+          <h2>What should show vs what shows today</h2>
+          <p>
+            Honest map of intended user outcomes versus current UI placement.
+            Use this when deciding whether something is missing or just living
+            on another screen.
+          </p>
+        </div>
+        <div class="block-body">
+          <table>
+            <thead>
+              <tr>
+                <th>User expectation</th>
+                <th>Should show</th>
+                <th>Current reality</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>See all bookings</td>
+                <td>Stage-filterable list</td>
+                <td>
+                  <span class="chip ok">Shows</span> on
+                  <span class="path">/events</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Create booking from won proposal</td>
+                <td>Prefill client on create</td>
+                <td>
+                  <span class="chip ok">Shows</span> proposal →
+                  <span class="path">/events/new?clientId=</span> (not a full
+                  proposal→menu clone)
+                </td>
+              </tr>
+              <tr>
+                <td>Know what’s blocking the event</td>
+                <td>Setup checklist with fix links</td>
+                <td>
+                  <span class="chip ok">Shows</span> Setup readiness on detail
+                </td>
+              </tr>
+              <tr>
+                <td>Pick the menu on the event page</td>
+                <td>Dish selection near the booking</td>
+                <td>
+                  <span class="chip warn">Elsewhere</span> Kitchen → Event menu
+                  (linked from readiness)
+                </td>
+              </tr>
+              <tr>
+                <td>See / work the prep list for this event</td>
+                <td>Prep sheet filtered to the event</td>
+                <td>
+                  <span class="chip warn">Elsewhere</span> Kitchen → Prep
+                  (grouped by event; not embedded on detail)
+                </td>
+              </tr>
+              <tr>
+                <td>Print BEO / packet</td>
+                <td>One-click BEO with menu, timeline, staff</td>
+                <td>
+                  <span class="chip ok">Shows</span> Download BEO on detail
+                </td>
+              </tr>
+              <tr>
+                <td>Allergen day brief</td>
+                <td>Dedicated briefing view</td>
+                <td>
+                  <span class="chip ok">Shows</span>
+                  <span class="path">/events/:id/allergen-briefing</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Hold / issue stock for the event</td>
+                <td>Stock actions around service</td>
+                <td>
+                  <span class="chip ok">Shows</span> Inventory panel when
+                  Approved or Executing
+                </td>
+              </tr>
+              <tr>
+                <td>Assign staff from event</td>
+                <td>Staffing UI or deep link</td>
+                <td>
+                  <span class="chip warn">Deep link only</span> readiness →
+                  <span class="path">/staff/roster</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Close money after service</td>
+                <td>Closeout after Complete</td>
+                <td>
+                  <span class="chip ok">Split</span> lifecycle Close out on
+                  event + capture UI on
+                  <span class="path">/finance/closeout</span>
+                </td>
+              </tr>
+              <tr>
+                <td>Delivery route for the event</td>
+                <td>Stops that name the event</td>
+                <td>
+                  <span class="chip ok">Shows</span> Logistics route planner
+                  uses event ids/titles
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer>
+        Generated from Capsule source routes and feature pages
+        (<code>src/features/events/*</code>,
+        <code>src/features/kitchen/EventMenuPage.tsx</code>,
+        <code>src/features/production/PrepBoardPage.tsx</code>,
+        <code>src/app/App.tsx</code>). Open this file in any browser. It is a
+        map for humans — not part of the running app shell.
+      </footer>
+    </div>
+  </body>
+</html>
