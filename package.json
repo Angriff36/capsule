@@ -51,7 +51,7 @@
     "*.{ts,tsx,js,jsx,json,md,css,yml,yaml,html}": "prettier --write"
   },
   "dependencies": {
-    "@angriff36/manifest": "3.6.42",
+    "@angriff36/manifest": "3.6.43",
     "@clerk/backend": "^3.11.7",
     "@clerk/react": "^6.12.4",
     "@fontsource-variable/archivo": "^5.2.5",
