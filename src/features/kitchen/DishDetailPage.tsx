@@ -9,7 +9,9 @@ import {
   useListEvent,
   useListRecipe,
 } from "../../lib/manifest-convex-react";
+import { useTrackRecent } from "../../lib/recents";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
+import { useUndoToast } from "../../ui/useUndoToast";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
@@ -21,6 +23,7 @@ const policy = new CulinaryLifecyclePolicy();
 export function DishDetailPage() {
   const { id } = useParams();
   const dish = useGetDish(id ?? "skip");
+  useTrackRecent("Dish", dish?.name);
   const dishRecipes = useListDishRecipe();
   const recipes = useListRecipe();
   const events = useListEvent();
@@ -29,6 +32,7 @@ export function DishDetailPage() {
   const reinstate = useDishReinstate();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { notifyUndo, host: undoHost } = useUndoToast();
 
   if (!id) return <ErrorState title="Dish not found" />;
   if (dish === undefined) {
@@ -94,6 +98,7 @@ export function DishDetailPage() {
           <CulinaryFailureBanner error={failure} />
         </div>
       ) : null}
+      {undoHost}
       <header className="culinary-header-compact">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -116,6 +121,9 @@ export function DishDetailPage() {
                     const args = { docId: dish._id, version: dish.version };
                     if (action.key === "retire") {
                       await retire({ ...args, reason: reason! });
+                      notifyUndo(`Retired "${dish.name}"`, () =>
+                        reinstate({ docId: dish._id }),
+                      );
                     }
                     if (action.key === "reinstate") await reinstate(args);
                   });

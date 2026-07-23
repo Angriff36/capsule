@@ -1,0 +1,31 @@
+# Staff Certifications Progress
+
+## 2026-07-22
+- Read project instructions supplied in the task, including generated-file ownership, domain-gating restraint, required gate, and temporary Playwright-test requirement.
+- Read the planning-with-files and Playwright skills.
+- Pinned branch/worktree state and confirmed `npx` availability.
+- Began Phase 1 repository exploration.
+- Read domain-gating and no-invented-deferrals guidance.
+- Confirmed the feature extends an existing `Qualification` model and `/staff/qualifications` UI rather than requiring a second certification entity.
+- Located current assignment, shift, and client-derived notification surfaces.
+- Confirmed Manifest supports `count_of` predicates over `hasMany` relationships in Convex mutation guards.
+- Narrowed the likely design to an explicit optional required certification type plus server validation, avoiding a fabricated closed role catalog.
+- Logged and corrected one read-only exploration error caused by an outdated guessed Manifest source path.
+- Compared the read-only Capsule-Pro shift-validation implementation and extracted its evidence-backed role-to-certification mapping and blocking behavior.
+- Confirmed the Convex aggregate generator requires a direct `self.<hasMany>` relationship for qualification checks.
+- Re-pinned target-file content and isolated the existing Roster availability-grid change from this feature's prospective edits.
+- Read the exact AboardAI feature records and separated this generic certification/prerequisite substrate from the dependent food-handler compliance-roster feature and staff-training feature.
+- Completed exploration and the implementation design; began the source-first implementation phase.
+- First Builder regeneration completed without assembly conflicts and proved the generated fields/hooks.
+- Inspected generated createVia enforcement, found its nested-relation hydration gap, and revised the domain model to an explicit credential proof relation before runtime verification.
+- Second Builder regeneration completed conflict-free. Generated createVia now resolves `requiredQualification` directly and enforces Person ownership, active state, and validity through shift end.
+- Focused verification passed: `bun run typecheck`, `bun run check:workforce-manifest`, and `bun run test -- tests/proofs/shift-lifecycle.runtime.test.ts` (3/3 tests).
+- Confirmed the existing Vite server and Playwright browser binaries are available for the required temporary browser test.
+- Inspected prior Playwright snapshots to identify the authentication boundary before creating the temporary verification spec.
+- First required Playwright run failed at the expected authentication boundary (Clerk sign-in); captured the exact failure and stopped rather than repeating it.
+- Second Playwright run reached the disposable harness URL (HTTP 200) but the React root did not render; captured the failure for targeted browser-error diagnosis.
+- Required Playwright verification passed in Chromium (1/1): the real qualification page submitted type, issuing body, issue date, and expiry; real notification derivation emitted the certification-expiry alert; the real roster form submitted the selected `requiredQualificationId`.
+- Deleted the temporary Playwright spec, disposable Vite harness, and its `.last-run.json` result file after the successful run.
+- Final scoped verification passed: workforce Manifest integration guard, TypeScript, Prettier on supported authored files, focused shift runtime tests, and production build.
+- Required `bun run check` was attempted and stopped during `proof:emit` on unrelated untracked `src/sales/tax-rate.manifest`; filed https://github.com/Angriff36/capsule/issues/42 as required by the blocker-escalation policy.
+- Reviewed the feature-scoped diff and confirmed all `staff-certifications*` temporary Playwright artifacts are absent.

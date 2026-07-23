@@ -29,6 +29,10 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
   property required unitCost: money(12, 2) = 0
   property stockedAt: datetime?
   property removedAt: datetime?
+  // Expiry instants (end of the labeled day). Use-by is the food-safety
+  // cutoff that blocks issuance; best-before is advisory quality only.
+  property bestBeforeAt: datetime?
+  property useByAt: datetime?
 
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
@@ -79,6 +83,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     emit InventoryItemOpened {
       inventoryItemId: self.id
       tenantId: self.tenantId
+      actorId: user.id
       ingredientId: ingredientId
       locationId: locationId
       previousQuantity: previousQuantity
@@ -100,6 +105,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     emit InventoryStockReceived {
       inventoryItemId: self.id
       tenantId: self.tenantId
+      actorId: user.id
       ingredientId: self.ingredientId
       locationId: self.locationId
       previousQuantity: previousQuantity
@@ -121,6 +127,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     emit InventoryQuantityAdjusted {
       inventoryItemId: self.id
       tenantId: self.tenantId
+      actorId: user.id
       ingredientId: self.ingredientId
       locationId: self.locationId
       previousQuantity: previousQuantity
@@ -140,6 +147,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     emit InventoryRecounted {
       inventoryItemId: self.id
       tenantId: self.tenantId
+      actorId: user.id
       ingredientId: self.ingredientId
       locationId: self.locationId
       previousQuantity: previousQuantity
@@ -159,6 +167,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     emit InventoryTransferredOut {
       inventoryItemId: self.id
       tenantId: self.tenantId
+      actorId: user.id
       ingredientId: self.ingredientId
       locationId: self.locationId
       destinationLocationId: destinationLocationId
@@ -179,6 +188,7 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
     emit InventoryTransferredIn {
       inventoryItemId: self.id
       tenantId: self.tenantId
+      actorId: user.id
       ingredientId: self.ingredientId
       locationId: self.locationId
       sourceLocationId: sourceLocationId
@@ -211,6 +221,23 @@ entity InventoryItem mixin TenantScoped, SoftDeletable {
       parLevel: parLevel
       reorderThreshold: reorderThreshold
       unitCost: unitCost != null ? unitCost : self.unitCost
+    }
+  }
+
+  command setExpiry(optional bestBeforeAt: datetime, optional useByAt: datetime) {
+    guard self.stockedAt != null
+    guard self.deletedAt == null
+    constraint expiryOrder: bestBeforeAt == null or useByAt == null or bestBeforeAt <= useByAt "Best-before cannot be after use-by"
+    // Overwrite semantics: omitting a date clears it (relabeling a lot).
+    mutate bestBeforeAt = bestBeforeAt
+    mutate useByAt = useByAt
+    emit InventoryExpiryUpdated {
+      inventoryItemId: self.id
+      tenantId: self.tenantId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      bestBeforeAt: bestBeforeAt
+      useByAt: useByAt
     }
   }
 
@@ -247,6 +274,7 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property required inventoryItemId: uuid
+  property indexed inventoryLotId: uuid?
   property required eventId: uuid
   property required ingredientId: uuid
   property required quantity: decimal(12, 4) = 0
@@ -257,6 +285,7 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
   property releaseReason: string?
 
   belongsTo inventoryItem: InventoryItem fields [tenantId, inventoryItemId] references [tenantId, id]
+  belongsTo inventoryLot: InventoryLot fields [tenantId, inventoryLotId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
 
@@ -276,7 +305,8 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
     inventoryItemId: uuid,
     eventId: uuid,
     ingredientId: uuid,
-    quantity: decimal(12, 4)
+    quantity: decimal(12, 4),
+    optional inventoryLotId: uuid
   ) {
     guard self.reservedAt == null
     guard self.status == "pending"
@@ -289,8 +319,12 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
     constraint reserveItemMatch: inventoryItemId == self.inventoryItemId "Reserve inventoryItemId must match the seeded stock reference"
     constraint reserveEventMatch: eventId == self.eventId "Reserve eventId must match the seeded event reference"
     constraint reserveIngredientMatch: ingredientId == self.inventoryItem.ingredientId "Reserve ingredientId must match the stock ingredient"
+    // Lot provenance prevents a recall report from attributing an issue to a
+    // different ingredient or storage location. Legacy stock may omit a lot.
+    constraint reserveLotMatch: inventoryLotId == null or (self.inventoryLot != null and self.inventoryLot.deletedAt == null and self.inventoryLot.ingredientId == ingredientId and self.inventoryLot.locationId == self.inventoryItem.locationId) "Selected lot must match the reserved ingredient and stock location"
     constraint reserveQuantityPositive: quantity > 0 "Reservation quantity must be positive"
     mutate inventoryItemId = inventoryItemId
+    mutate inventoryLotId = inventoryLotId
     mutate eventId = eventId
     mutate ingredientId = ingredientId
     mutate quantity = quantity
@@ -299,7 +333,9 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
     emit InventoryReserved {
       inventoryReservationId: self.id
       tenantId: self.tenantId
+      actorId: user.id
       inventoryItemId: inventoryItemId
+      inventoryLotId: inventoryLotId
       eventId: eventId
       ingredientId: ingredientId
       quantity: quantity
@@ -318,7 +354,9 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
     emit InventoryReservationReleased {
       inventoryReservationId: self.id
       tenantId: self.tenantId
+      actorId: user.id
       inventoryItemId: self.inventoryItemId
+      inventoryLotId: self.inventoryLotId
       eventId: self.eventId
       ingredientId: self.ingredientId
       previousQuantity: previousQuantity
@@ -331,13 +369,18 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
     guard self.status == "active"
     guard self.reservedAt != null
     guard self.deletedAt == null
+    // Food-safety gate: never issue stock past its use-by instant. Best-before
+    // stays advisory (quality, not safety) — see domain-gating-restraint.
+    guard self.inventoryItem == null or self.inventoryItem.useByAt == null or self.inventoryItem.useByAt >= now()
     compute previousQuantity = self.quantity
     mutate status = "consumed"
     mutate consumedAt = now()
     emit InventoryReservationConsumed {
       inventoryReservationId: self.id
       tenantId: self.tenantId
+      actorId: user.id
       inventoryItemId: self.inventoryItemId
+      inventoryLotId: self.inventoryLotId
       eventId: self.eventId
       ingredientId: self.ingredientId
       previousQuantity: previousQuantity
@@ -351,6 +394,7 @@ entity InventoryReservation mixin TenantScoped, SoftDeletable {
 event InventoryItemOpened: "inventory_item.opened" {
   inventoryItemId: string
   tenantId: string
+  actorId: string
   ingredientId: string
   locationId: string
   previousQuantity: decimal(12, 4)
@@ -362,6 +406,7 @@ event InventoryItemOpened: "inventory_item.opened" {
 event InventoryStockReceived: "inventory_item.stock_received" {
   inventoryItemId: string
   tenantId: string
+  actorId: string
   ingredientId: string
   locationId: string
   previousQuantity: decimal(12, 4)
@@ -374,6 +419,7 @@ event InventoryStockReceived: "inventory_item.stock_received" {
 event InventoryQuantityAdjusted: "inventory_item.quantity_adjusted" {
   inventoryItemId: string
   tenantId: string
+  actorId: string
   ingredientId: string
   locationId: string
   previousQuantity: decimal(12, 4)
@@ -386,6 +432,7 @@ event InventoryQuantityAdjusted: "inventory_item.quantity_adjusted" {
 event InventoryRecounted: "inventory_item.recounted" {
   inventoryItemId: string
   tenantId: string
+  actorId: string
   ingredientId: string
   locationId: string
   previousQuantity: decimal(12, 4)
@@ -396,6 +443,7 @@ event InventoryRecounted: "inventory_item.recounted" {
 event InventoryTransferredOut: "inventory_item.transferred_out" {
   inventoryItemId: string
   tenantId: string
+  actorId: string
   ingredientId: string
   locationId: string
   destinationLocationId: string
@@ -408,6 +456,7 @@ event InventoryTransferredOut: "inventory_item.transferred_out" {
 event InventoryTransferredIn: "inventory_item.transferred_in" {
   inventoryItemId: string
   tenantId: string
+  actorId: string
   ingredientId: string
   locationId: string
   sourceLocationId: string
@@ -427,6 +476,15 @@ event InventoryLevelsUpdated: "inventory_item.levels_updated" {
   unitCost: money(12, 2)
 }
 
+event InventoryExpiryUpdated: "inventory_item.expiry_updated" {
+  inventoryItemId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  bestBeforeAt: datetime?
+  useByAt: datetime?
+}
+
 event InventoryItemRemoved: "inventory_item.removed" {
   inventoryItemId: string
   tenantId: string
@@ -440,7 +498,9 @@ event InventoryItemRemoved: "inventory_item.removed" {
 event InventoryReserved: "inventory_reservation.reserved" {
   inventoryReservationId: string
   tenantId: string
+  actorId: string
   inventoryItemId: string
+  inventoryLotId: string?
   eventId: string
   ingredientId: string
   quantity: decimal(12, 4)
@@ -449,7 +509,9 @@ event InventoryReserved: "inventory_reservation.reserved" {
 event InventoryReservationReleased: "inventory_reservation.released" {
   inventoryReservationId: string
   tenantId: string
+  actorId: string
   inventoryItemId: string
+  inventoryLotId: string?
   eventId: string
   ingredientId: string
   previousQuantity: decimal(12, 4)
@@ -460,7 +522,9 @@ event InventoryReservationReleased: "inventory_reservation.released" {
 event InventoryReservationConsumed: "inventory_reservation.consumed" {
   inventoryReservationId: string
   tenantId: string
+  actorId: string
   inventoryItemId: string
+  inventoryLotId: string?
   eventId: string
   ingredientId: string
   previousQuantity: decimal(12, 4)

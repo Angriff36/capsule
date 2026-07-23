@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client
+    participant Payment as Payment
+    participant EventBus
+    Client->>+Payment: reassignClient()
+    Note over Payment: Policies: paymentRead, paymentWrite, paymentExecute
+    Note over Payment: Guards (8)
+    Payment->>Payment: guard[0]: self.deletedAt == null
+    Payment->>Payment: guard[1]: roleAllows(user.role, #quot;adminAccess#quot;)
+    Payment->>Payment: guard[2]: self.clientMergeAuthorization != null
+    Payment->>Payment: guard[3]: self.clientMergeAuthorization.deletedAt == null
+    Payment->>Payment: guard[4]: self.clientMergeAuthorization.mergedAt != null
+    Payment->>Payment: guard[5]: self.mergeTargetClient != null
+    Payment->>Payment: guard[6]: self.mergeTargetClient.status == #quot;active#quot;
+    Payment->>Payment: guard[7]: self.mergeTargetClient.deletedAt == null
+    Payment->>Payment: compute.previousClientId
+    Payment->>Payment: mutate.clientId
+    Payment->>EventBus: emit PaymentClientReassigned on payment.client_reassigned
+    Payment-->>-Client: void

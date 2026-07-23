@@ -1,4 +1,20 @@
 erDiagram
+    Attachment {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        AttachmentParentType parentType "PK"
+        string parentId "PK"
+        string fileName "PK"
+        string contentType "PK"
+        int fileSize "PK"
+        string storageId "PK"
+        AttachmentEvidenceType evidenceType "nullable"
+        string uploadedById "nullable"
+        datetime uploadedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
     AvailabilityWindow {
         uuid id "PK"
         string tenantId "PK"
@@ -7,6 +23,7 @@ erDiagram
         datetime startsAt "nullable"
         datetime endsAt "nullable"
         string notes "nullable"
+        AvailabilityWindowKind kind "nullable"
         AvailabilityWindowStatus status "PK"
         datetime declaredAt "nullable"
         datetime withdrawnAt "nullable"
@@ -36,19 +53,42 @@ erDiagram
         int paymentTermsDays "PK"
         string notes "nullable"
         uuid assignedToId "nullable"
+        uuid clientMergeAuthorizationId "nullable"
+        uuid mergedIntoClientId "nullable"
         ClientStatus status "PK"
         datetime registeredAt "nullable"
         datetime archivedAt "nullable"
+        datetime mergedAt "nullable"
         datetime createdAt
         datetime updatedAt
     }
     Client }o--|| Person : "assignedTo"
+    Client }o--|| ClientMerge : "clientMergeAuthorization"
+    Client }o--|| Client : "mergedIntoClient"
     Client ||--o{ Event : "events"
+    ClientCommunication {
+        uuid id "PK"
+        string tenantId "PK"
+        uuid clientContactId "nullable"
+        uuid eventId "nullable"
+        datetime occurredAt "nullable"
+        ClientCommunicationMedium medium "PK"
+        string summary "PK"
+        string authorId "nullable"
+        string authorName "PK"
+        datetime recordedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    ClientCommunication }o--|| ClientContact : "clientContact"
+    ClientCommunication }o--|| Event : "event"
     ClientContact {
         uuid id "PK"
         string tenantId "PK"
         datetime deletedAt "nullable"
         uuid clientId "PK"
+        uuid clientMergeAuthorizationId "nullable"
+        uuid mergeTargetClientId "nullable"
         string givenName "nullable"
         string familyName "nullable"
         string title "nullable"
@@ -65,12 +105,28 @@ erDiagram
         datetime updatedAt
     }
     ClientContact }o--|| Client : "client"
+    ClientContact }o--|| ClientMerge : "clientMergeAuthorization"
+    ClientContact }o--|| Client : "mergeTargetClient"
+    ClientMerge {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid primaryClientId "PK"
+        uuid duplicateClientId "PK"
+        datetime mergedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    ClientMerge }o--|| Client : "primaryClient"
+    ClientMerge }o--|| Client : "duplicateClient"
     Contract {
         uuid id "PK"
         string tenantId "PK"
         datetime deletedAt "nullable"
         uuid eventId "PK"
         uuid clientId "PK"
+        uuid clientMergeAuthorizationId "nullable"
+        uuid mergeTargetClientId "nullable"
         string contractNumber "nullable"
         string title "PK"
         string documentUrl "nullable"
@@ -89,6 +145,53 @@ erDiagram
     }
     Contract }o--|| Event : "event"
     Contract }o--|| Client : "client"
+    Contract }o--|| ClientMerge : "clientMergeAuthorization"
+    Contract }o--|| Client : "mergeTargetClient"
+    CorrectiveAction {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid incidentId "PK"
+        uuid eventId "PK"
+        string description "PK"
+        string resolutionNotes "nullable"
+        string openedById "nullable"
+        string closedById "nullable"
+        CorrectiveActionStatus status "PK"
+        datetime openedAt "nullable"
+        datetime closedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    CorrectiveAction }o--|| Incident : "incident"
+    CorrectiveAction }o--|| Event : "event"
+    CreditMemo {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid sourceInvoiceId "PK"
+        uuid clientId "PK"
+        uuid clientMergeAuthorizationId "nullable"
+        uuid mergeTargetClientId "nullable"
+        uuid targetInvoiceId "nullable"
+        uuid eventId "nullable"
+        string creditMemoNumber "nullable"
+        money amount "PK"
+        money remainingAmount "PK"
+        string reason "nullable"
+        CreditMemoDisposition disposition "PK"
+        CreditMemoStatus status "PK"
+        datetime issuedAt "nullable"
+        datetime appliedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    CreditMemo }o--|| Invoice : "sourceInvoice"
+    CreditMemo }o--|| Client : "client"
+    CreditMemo }o--|| ClientMerge : "clientMergeAuthorization"
+    CreditMemo }o--|| Client : "mergeTargetClient"
+    CreditMemo }o--|| Invoice : "targetInvoice"
+    CreditMemo }o--|| Event : "event"
     Delivery {
         uuid id "PK"
         string tenantId "PK"
@@ -96,6 +199,7 @@ erDiagram
         uuid packListId "PK"
         uuid eventId "PK"
         uuid driverId "nullable"
+        uuid vehicleId "nullable"
         string destination "PK"
         datetime windowStartsAt "nullable"
         datetime windowEndsAt "nullable"
@@ -114,6 +218,7 @@ erDiagram
     Delivery }o--|| PackList : "packList"
     Delivery }o--|| Event : "event"
     Delivery }o--|| Person : "driver"
+    Delivery }o--|| Vehicle : "vehicle"
     Dish {
         uuid id "PK"
         string tenantId "PK"
@@ -177,11 +282,103 @@ erDiagram
     DishTask }o--|| Dish : "dish"
     DishTask }o--|| Recipe : "recipe"
     DishTask }o--|| Ingredient : "ingredient"
+    EmailNotificationSubscription {
+        uuid id "PK"
+        string tenantId "PK"
+        string ownerId "nullable"
+        boolean eventUpdates "PK"
+        boolean invoiceReminders "PK"
+        boolean lowStockAlerts "PK"
+        boolean shiftChanges "PK"
+        datetime configuredAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    Equipment {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        string name "PK"
+        string assetTag "PK"
+        string category "PK"
+        EquipmentOwnership ownership "PK"
+        int quantity "PK"
+        money purchaseValue "PK"
+        EquipmentCondition condition "PK"
+        EquipmentStatus status "PK"
+        string conditionNote "nullable"
+        datetime registeredAt "nullable"
+        datetime retiredAt "nullable"
+        string retirementReason "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    Equipment ||--o{ EquipmentReservation : "reservations"
+    Equipment ||--o{ EquipmentMaintenanceTask : "maintenanceTasks"
+    EquipmentMaintenanceTask {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid equipmentId "PK"
+        string taskName "PK"
+        int intervalDays "PK"
+        datetime nextDueAt "PK"
+        string instructions "nullable"
+        datetime scheduledAt "nullable"
+        datetime lastServicedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    EquipmentMaintenanceTask }o--|| Equipment : "equipment"
+    EquipmentMaintenanceTask ||--o{ EquipmentServiceEntry : "serviceEntries"
+    EquipmentReservation {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        string equipmentId "PK"
+        string eventId "PK"
+        datetime startsAt "PK"
+        datetime endsAt "PK"
+        int quantity "PK"
+        EquipmentReservationStatus status "PK"
+        datetime reservedAt "nullable"
+        datetime checkedOutAt "nullable"
+        EquipmentCondition checkoutCondition "nullable"
+        string checkoutNote "nullable"
+        datetime returnedAt "nullable"
+        EquipmentCondition returnCondition "nullable"
+        string returnNote "nullable"
+        datetime cancelledAt "nullable"
+        string cancellationReason "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    EquipmentReservation }o--|| Equipment : "equipment"
+    EquipmentReservation }o--|| Event : "event"
+    EquipmentServiceEntry {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid maintenanceTaskId "PK"
+        uuid equipmentId "PK"
+        string technician "PK"
+        money cost "PK"
+        string notes "nullable"
+        datetime completedAt "nullable"
+        datetime nextDueAt "nullable"
+        datetime loggedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    EquipmentServiceEntry }o--|| EquipmentMaintenanceTask : "maintenanceTask"
+    EquipmentServiceEntry }o--|| Equipment : "equipment"
     Event {
         uuid id "PK"
         string tenantId "PK"
         datetime deletedAt "nullable"
         uuid clientId "PK"
+        uuid clientMergeAuthorizationId "nullable"
+        uuid mergeTargetClientId "nullable"
         uuid venueId "nullable"
         uuid assignedToId "nullable"
         string title "PK"
@@ -191,6 +388,7 @@ erDiagram
         datetime purchasingWeekStart "nullable"
         string venueName "nullable"
         string venueAddress "nullable"
+        int venueCapacity "nullable"
         int expectedHeadcount "PK"
         string primaryContactName "nullable"
         string primaryContactEmail "nullable"
@@ -208,17 +406,35 @@ erDiagram
         datetime cancelledAt "nullable"
         datetime closedOutAt "nullable"
         string cancellationReason "nullable"
+        EventRecurrenceFrequency recurrenceFrequency "nullable"
+        EventRecurrenceEndCondition recurrenceEndCondition "nullable"
+        datetime recurrenceEndsAt "nullable"
+        int recurrenceOccurrenceLimit "nullable"
+        datetime recurrenceAnchorStartsAt "nullable"
+        datetime recurrenceNextStartsAt "nullable"
+        int recurrenceGeneratedCount "nullable"
+        string recurrenceSeriesId "nullable"
+        boolean recurrenceActive "nullable"
+        datetime recurrenceConfiguredAt "nullable"
+        datetime recurrenceStoppedAt "nullable"
+        datetime recurrenceCompletedAt "nullable"
+        uuid recurrenceTemplateEventId "nullable"
+        int recurrenceSequence "nullable"
         datetime createdAt
         datetime updatedAt
     }
     Event }o--|| Client : "client"
+    Event }o--|| ClientMerge : "clientMergeAuthorization"
+    Event }o--|| Client : "mergeTargetClient"
     Event }o--|| Venue : "venue"
     Event }o--|| Person : "assignedTo"
+    Event }o--|| Event : "recurrenceTemplateEvent"
     Event ||--o{ EventGuest : "guests"
     Event ||--o{ PrepTask : "prepTasks"
     Event ||--o{ PackList : "packLists"
     Event ||--o{ Delivery : "deliveries"
     Event ||--o{ EventAssignment : "assignments"
+    Event ||--o{ EventTimelineActivity : "timelineActivities"
     EventAllergenCheck {
         uuid id "PK"
         string tenantId "PK"
@@ -366,6 +582,41 @@ erDiagram
     EventIngredientContribution }o--|| Event : "event"
     EventIngredientContribution }o--|| EventDish : "eventDish"
     EventIngredientContribution }o--|| Ingredient : "ingredient"
+    EventTemplate {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        string name "PK"
+        ClientType clientType "PK"
+        string eventType "PK"
+        int defaultHeadcount "PK"
+        uuid menuId "nullable"
+        list defaultStaffRoles
+        list typicalEquipment
+        string notes "nullable"
+        uuid sourceEventId "nullable"
+        EventTemplateStatus status "PK"
+        datetime definedAt "nullable"
+        datetime archivedAt "nullable"
+        string archiveReason "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    EventTimelineActivity {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid eventId "PK"
+        string name "PK"
+        datetime startsAt "nullable"
+        datetime endsAt "nullable"
+        string responsibleParty "nullable"
+        string notes "nullable"
+        datetime scheduledAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    EventTimelineActivity }o--|| Event : "event"
     Incident {
         uuid id "PK"
         string tenantId "PK"
@@ -379,8 +630,9 @@ erDiagram
         string description "PK"
         string resolution "nullable"
         string dismissalReason "nullable"
-        uuid reportedById "nullable"
+        string reportedById "nullable"
         IncidentStatus status "PK"
+        boolean correctiveActionRequired "nullable"
         datetime reportedAt "nullable"
         datetime investigatingAt "nullable"
         datetime resolvedAt "nullable"
@@ -392,7 +644,6 @@ erDiagram
     Incident }o--|| PrepTask : "prepTask"
     Incident }o--|| Delivery : "delivery"
     Incident }o--|| Shift : "shift"
-    Incident }o--|| Person : "reportedBy"
     Ingredient {
         uuid id "PK"
         string tenantId "PK"
@@ -402,6 +653,8 @@ erDiagram
         list allergens
         money costPerUnit "PK"
         string category "nullable"
+        list substituteIngredientIds
+        list preferredVendorIds
         uuid preferredVendorId "nullable"
         IngredientStatus status "PK"
         datetime introducedAt "nullable"
@@ -418,6 +671,7 @@ erDiagram
         datetime deletedAt "nullable"
         uuid eventId "PK"
         uuid ingredientId "PK"
+        uuid preferredVendorId "nullable"
         decimal requiredQuantity "PK"
         UnitOfMeasure unit "PK"
         decimal servings "nullable"
@@ -440,6 +694,26 @@ erDiagram
     IngredientDemand }o--|| Event : "event"
     IngredientDemand }o--|| Ingredient : "ingredient"
     IngredientDemand }o--|| Dish : "dish"
+    IngredientPriceObservation {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid ingredientId "PK"
+        uuid vendorId "PK"
+        uuid vendorOrderId "PK"
+        uuid vendorOrderLineId "PK"
+        decimal receiptQuantity "PK"
+        decimal cumulativeReceivedQuantity "PK"
+        UnitOfMeasure unit "PK"
+        money unitPrice "PK"
+        datetime observedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    IngredientPriceObservation }o--|| Ingredient : "ingredient"
+    IngredientPriceObservation }o--|| Vendor : "vendor"
+    IngredientPriceObservation }o--|| VendorOrder : "vendorOrder"
+    IngredientPriceObservation }o--|| VendorOrderLine : "vendorOrderLine"
     InventoryItem {
         uuid id "PK"
         string tenantId "PK"
@@ -453,17 +727,47 @@ erDiagram
         money unitCost "PK"
         datetime stockedAt "nullable"
         datetime removedAt "nullable"
+        datetime bestBeforeAt "nullable"
+        datetime useByAt "nullable"
         datetime createdAt
         datetime updatedAt
     }
     InventoryItem }o--|| Ingredient : "ingredient"
     InventoryItem }o--|| StorageLocation : "location"
     InventoryItem ||--o{ InventoryReservation : "reservations"
+    InventoryLot {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        string supplierLotNumber "PK"
+        uuid vendorOrderLineId "PK"
+        uuid vendorOrderId "PK"
+        uuid vendorId "PK"
+        uuid ingredientId "PK"
+        uuid ingredientDemandId "nullable"
+        uuid eventId "nullable"
+        uuid locationId "PK"
+        decimal receiptQuantity "PK"
+        decimal cumulativeReceivedQuantity "PK"
+        UnitOfMeasure unit "PK"
+        money unitCost "PK"
+        datetime receivedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    InventoryLot }o--|| VendorOrderLine : "vendorOrderLine"
+    InventoryLot }o--|| VendorOrder : "vendorOrder"
+    InventoryLot }o--|| Vendor : "vendor"
+    InventoryLot }o--|| Ingredient : "ingredient"
+    InventoryLot }o--|| IngredientDemand : "ingredientDemand"
+    InventoryLot }o--|| Event : "event"
+    InventoryLot }o--|| StorageLocation : "location"
     InventoryReservation {
         uuid id "PK"
         string tenantId "PK"
         datetime deletedAt "nullable"
         uuid inventoryItemId "PK"
+        uuid inventoryLotId "nullable"
         uuid eventId "PK"
         uuid ingredientId "PK"
         decimal quantity "PK"
@@ -476,6 +780,7 @@ erDiagram
         datetime updatedAt
     }
     InventoryReservation }o--|| InventoryItem : "inventoryItem"
+    InventoryReservation }o--|| InventoryLot : "inventoryLot"
     InventoryReservation }o--|| Event : "event"
     InventoryReservation }o--|| Ingredient : "ingredient"
     Invoice {
@@ -483,6 +788,8 @@ erDiagram
         string tenantId "PK"
         datetime deletedAt "nullable"
         uuid clientId "PK"
+        uuid clientMergeAuthorizationId "nullable"
+        uuid mergeTargetClientId "nullable"
         uuid eventId "nullable"
         string invoiceNumber "nullable"
         money subtotal "PK"
@@ -491,7 +798,15 @@ erDiagram
         money total "PK"
         money amountPaid "PK"
         money amountDue "PK"
+        money amountCredited "nullable"
+        money creditMemoAmount "nullable"
+        json lineItems "nullable"
+        json taxBreakdown "nullable"
         int paymentTermsDays "PK"
+        money depositAmount "nullable"
+        datetime depositPaidAt "nullable"
+        int balanceReminderLeadDays "nullable"
+        datetime balanceReminderSentAt "nullable"
         datetime dueDate "nullable"
         string notes "nullable"
         InvoiceStatus status "PK"
@@ -508,8 +823,37 @@ erDiagram
         datetime updatedAt
     }
     Invoice }o--|| Client : "client"
+    Invoice }o--|| ClientMerge : "clientMergeAuthorization"
+    Invoice }o--|| Client : "mergeTargetClient"
     Invoice }o--|| Event : "event"
     Invoice ||--o{ Payment : "payments"
+    Lead {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        ClientType leadType "PK"
+        string companyName "nullable"
+        string givenName "nullable"
+        string familyName "nullable"
+        string email "nullable"
+        string phone "nullable"
+        string source "PK"
+        money estimatedValue "PK"
+        LeadStage stage "PK"
+        int probability "PK"
+        string notes "nullable"
+        uuid clientId "nullable"
+        uuid clientContactId "nullable"
+        uuid proposalId "nullable"
+        datetime capturedAt "nullable"
+        datetime convertedAt "nullable"
+        datetime proposalLinkedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    Lead }o--|| Client : "client"
+    Lead }o--|| ClientContact : "clientContact"
+    Lead }o--|| Proposal : "proposal"
     Menu {
         uuid id "PK"
         string tenantId "PK"
@@ -537,6 +881,7 @@ erDiagram
         uuid menuId "PK"
         uuid dishId "PK"
         int sortOrder "PK"
+        money sellingPrice "nullable"
         string course "nullable"
         string serviceStyle "nullable"
         string specialInstructions "nullable"
@@ -553,6 +898,10 @@ erDiagram
         datetime deletedAt "nullable"
         string name "PK"
         OrganizationStatus status "PK"
+        string brandDisplayName "nullable"
+        string brandAddress "nullable"
+        string brandPrimaryColor "nullable"
+        string brandAccentColor "nullable"
         datetime createdAt
         datetime updatedAt
     }
@@ -615,6 +964,8 @@ erDiagram
         datetime deletedAt "nullable"
         uuid invoiceId "PK"
         uuid clientId "PK"
+        uuid clientMergeAuthorizationId "nullable"
+        uuid mergeTargetClientId "nullable"
         uuid eventId "nullable"
         money amount "PK"
         PaymentMethodKind method "PK"
@@ -632,6 +983,8 @@ erDiagram
     }
     Payment }o--|| Invoice : "invoice"
     Payment }o--|| Client : "client"
+    Payment }o--|| ClientMerge : "clientMergeAuthorization"
+    Payment }o--|| Client : "mergeTargetClient"
     Payment }o--|| Event : "event"
     Payment }o--|| PaymentMethod : "paymentMethod"
     PaymentMethod {
@@ -639,6 +992,8 @@ erDiagram
         string tenantId "PK"
         datetime deletedAt "nullable"
         uuid clientId "PK"
+        uuid clientMergeAuthorizationId "nullable"
+        uuid mergeTargetClientId "nullable"
         PaymentMethodType methodType "PK"
         string provider "nullable"
         string lastFour "nullable"
@@ -653,6 +1008,8 @@ erDiagram
         datetime updatedAt
     }
     PaymentMethod }o--|| Client : "client"
+    PaymentMethod }o--|| ClientMerge : "clientMergeAuthorization"
+    PaymentMethod }o--|| Client : "mergeTargetClient"
     PayrollInput {
         uuid id "PK"
         string tenantId "PK"
@@ -740,6 +1097,18 @@ erDiagram
     PrepTask }o--|| IngredientDemand : "ingredientDemand"
     PrepTask }o--|| Recipe : "recipe"
     PrepTask }o--|| Person : "assignedTo"
+    PrepTask ||--o{ PrepTaskDependency : "incomingDependencies"
+    PrepTaskDependency {
+        uuid id "PK"
+        string tenantId "PK"
+        uuid dependentTaskId "PK"
+        uuid predecessorTaskId "PK"
+        boolean isSatisfied "PK"
+        datetime createdAt
+        datetime updatedAt
+    }
+    PrepTaskDependency }o--|| PrepTask : "dependentTask"
+    PrepTaskDependency }o--|| PrepTask : "predecessorTask"
     ProductionBatch {
         uuid id "PK"
         string tenantId "PK"
@@ -766,6 +1135,8 @@ erDiagram
         string tenantId "PK"
         datetime deletedAt "nullable"
         uuid clientId "PK"
+        uuid clientMergeAuthorizationId "nullable"
+        uuid mergeTargetClientId "nullable"
         uuid eventId "nullable"
         string proposalNumber "nullable"
         string title "PK"
@@ -792,6 +1163,8 @@ erDiagram
         datetime updatedAt
     }
     Proposal }o--|| Client : "client"
+    Proposal }o--|| ClientMerge : "clientMergeAuthorization"
+    Proposal }o--|| Client : "mergeTargetClient"
     Proposal }o--|| Event : "event"
     PurchaseNeed {
         uuid id "PK"
@@ -800,6 +1173,7 @@ erDiagram
         uuid eventId "PK"
         uuid ingredientDemandId "PK"
         uuid ingredientId "PK"
+        uuid preferredVendorId "nullable"
         decimal requiredQuantity "PK"
         UnitOfMeasure unit "PK"
         datetime purchasingWeekStart "nullable"
@@ -817,6 +1191,7 @@ erDiagram
     PurchaseNeed }o--|| Event : "event"
     PurchaseNeed }o--|| IngredientDemand : "ingredientDemand"
     PurchaseNeed }o--|| Ingredient : "ingredient"
+    PurchaseNeed }o--|| Vendor : "preferredVendor"
     PurchaseNeed }o--|| VendorOrder : "vendorOrder"
     PurchaseNeed }o--|| VendorOrderLine : "vendorOrderLine"
     Qualification {
@@ -826,6 +1201,7 @@ erDiagram
         uuid personId "PK"
         string name "PK"
         string certificationType "nullable"
+        string issuingBody "nullable"
         datetime issuedAt "nullable"
         datetime expiresAt "nullable"
         string documentRef "nullable"
@@ -964,6 +1340,22 @@ erDiagram
         datetime updatedAt
     }
     RecipeStep }o--|| Recipe : "recipe"
+    RecurringAvailability {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid personId "PK"
+        int dayOfWeek "PK"
+        int startMinute "PK"
+        int endMinute "PK"
+        string notes "nullable"
+        RecurringAvailabilityStatus status "PK"
+        datetime declaredAt "nullable"
+        datetime withdrawnAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    RecurringAvailability }o--|| Person : "person"
     SavedReportDefinition {
         uuid id "PK"
         string tenantId "PK"
@@ -991,6 +1383,13 @@ erDiagram
         datetime startsAt "nullable"
         datetime endsAt "nullable"
         string role "nullable"
+        uuid shiftTypeId "nullable"
+        uuid requiredQualificationId "nullable"
+        uuid requiredTrainingCompletionId "nullable"
+        uuid swapAuthorizationId "nullable"
+        uuid swapTargetPersonId "nullable"
+        uuid swapTargetQualificationId "nullable"
+        uuid swapTargetTrainingCompletionId "nullable"
         string notes "nullable"
         ShiftStatus status "PK"
         datetime scheduledAt "nullable"
@@ -1004,9 +1403,126 @@ erDiagram
     }
     Shift }o--|| Person : "person"
     Shift }o--|| Event : "event"
+    Shift }o--|| ShiftType : "shiftType"
+    Shift }o--|| Qualification : "requiredQualification"
+    Shift }o--|| TrainingCompletion : "requiredTrainingCompletion"
+    Shift }o--|| ShiftSwapRequest : "swapAuthorization"
+    Shift }o--|| Person : "swapTargetPerson"
+    Shift }o--|| Qualification : "swapTargetQualification"
+    Shift }o--|| TrainingCompletion : "swapTargetTrainingCompletion"
+    ShiftSwapRequest {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid shiftId "PK"
+        uuid requesterPersonId "PK"
+        uuid recipientPersonId "PK"
+        uuid shiftTypeId "nullable"
+        uuid sourceQualificationId "nullable"
+        uuid targetQualificationId "nullable"
+        uuid targetTrainingCompletionId "nullable"
+        string reason "nullable"
+        ShiftSwapRequestStatus status "PK"
+        datetime requesterConfirmedAt "nullable"
+        datetime recipientConfirmedAt "nullable"
+        datetime managerApprovedAt "nullable"
+        datetime declinedAt "nullable"
+        datetime withdrawnAt "nullable"
+        datetime rejectedAt "nullable"
+        string reviewNote "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    ShiftSwapRequest }o--|| Shift : "shift"
+    ShiftSwapRequest }o--|| Person : "requesterPerson"
+    ShiftSwapRequest }o--|| Person : "recipientPerson"
+    ShiftSwapRequest }o--|| ShiftType : "shiftType"
+    ShiftSwapRequest }o--|| Qualification : "sourceQualification"
+    ShiftSwapRequest }o--|| Qualification : "targetQualification"
+    ShiftSwapRequest }o--|| TrainingCompletion : "targetTrainingCompletion"
+    ShiftType {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        string name "PK"
+        string description "nullable"
+        uuid requiredTrainingModuleId "nullable"
+        TrainingModuleStatus status "PK"
+        datetime definedAt "nullable"
+        datetime retiredAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    ShiftType }o--|| TrainingModule : "requiredTrainingModule"
     SoftDeletable {
         datetime deletedAt "nullable"
     }
+    StockCountLine {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid stockCountSessionId "PK"
+        uuid inventoryItemId "PK"
+        uuid locationId "PK"
+        uuid ingredientId "PK"
+        UnitOfMeasure unit "PK"
+        decimal expectedQuantity "PK"
+        decimal countedQuantity "PK"
+        decimal varianceQuantity "PK"
+        decimal ledgerQuantityAtReconcile "PK"
+        decimal adjustmentQuantity "PK"
+        StockCountLineStatus status "PK"
+        string countNote "nullable"
+        string countedById "nullable"
+        string reconciledById "nullable"
+        datetime frozenAt "nullable"
+        datetime countedAt "nullable"
+        datetime reconciledAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    StockCountLine }o--|| StockCountSession : "session"
+    StockCountLine }o--|| InventoryItem : "inventoryItem"
+    StockCountLine }o--|| StorageLocation : "location"
+    StockCountLine }o--|| Ingredient : "ingredient"
+    StockCountSession {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        string label "PK"
+        string locationIds "PK"
+        string locationNames "PK"
+        int lineCount "PK"
+        StockCountSessionStatus status "PK"
+        string startedById "nullable"
+        string closedById "nullable"
+        datetime startedAt "nullable"
+        datetime closedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    StockCountSession ||--o{ StockCountLine : "lines"
+    StockTransfer {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid sourceInventoryItemId "PK"
+        uuid destinationInventoryItemId "PK"
+        uuid ingredientId "PK"
+        uuid sourceLocationId "PK"
+        uuid destinationLocationId "PK"
+        decimal quantity "PK"
+        UnitOfMeasure unit "PK"
+        string notes "nullable"
+        datetime transferredAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    StockTransfer }o--|| InventoryItem : "sourceItem"
+    StockTransfer }o--|| InventoryItem : "destinationItem"
+    StockTransfer }o--|| Ingredient : "ingredient"
+    StockTransfer }o--|| StorageLocation : "sourceLocation"
+    StockTransfer }o--|| StorageLocation : "destinationLocation"
     StorageLocation {
         uuid id "PK"
         string tenantId "PK"
@@ -1025,10 +1541,42 @@ erDiagram
         datetime updatedAt
     }
     StorageLocation ||--o{ InventoryItem : "stockLines"
+    TaxRate {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        string name "PK"
+        decimal percentage "PK"
+        boolean appliesToFood "PK"
+        boolean appliesToService "PK"
+        boolean appliesToRental "PK"
+        boolean active "PK"
+        datetime configuredAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
     TenantScoped {
         uuid id "PK"
         string tenantId "PK"
     }
+    TimeOffRequest {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid personId "PK"
+        string requesterAuthSubjectId "nullable"
+        datetime startsAt "PK"
+        datetime endsAt "PK"
+        string reason "nullable"
+        TimeOffRequestStatus status "PK"
+        datetime submittedAt "nullable"
+        datetime reviewedAt "nullable"
+        string reviewedByAuthSubjectId "nullable"
+        string responseNote "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    TimeOffRequest }o--|| Person : "person"
     TimeRecord {
         uuid id "PK"
         string tenantId "PK"
@@ -1048,6 +1596,53 @@ erDiagram
     TimeRecord }o--|| Person : "person"
     TimeRecord }o--|| Shift : "shift"
     TimeRecord }o--|| Event : "event"
+    TrainingCompletion {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid personId "PK"
+        uuid trainingModuleId "PK"
+        datetime completedAt "nullable"
+        int assessmentScore "PK"
+        string notes "nullable"
+        datetime recordedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    TrainingCompletion }o--|| Person : "person"
+    TrainingCompletion }o--|| TrainingModule : "trainingModule"
+    TrainingModule {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        string name "PK"
+        TrainingModuleCategory category "PK"
+        string description "nullable"
+        int passingScore "PK"
+        TrainingModuleStatus status "PK"
+        datetime definedAt "nullable"
+        datetime retiredAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    TrainingModule ||--o{ TrainingCompletion : "completions"
+    TrainingModule ||--o{ ShiftType : "shiftTypes"
+    Vehicle {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        string make "PK"
+        string model "PK"
+        string registration "PK"
+        VehicleOwnership ownership "PK"
+        int payloadCapacityKg "PK"
+        VehicleOperationalStatus operationalStatus "PK"
+        string statusNote "nullable"
+        datetime registeredAt "nullable"
+        datetime statusChangedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
     Vendor {
         uuid id "PK"
         string tenantId "PK"
@@ -1071,6 +1666,59 @@ erDiagram
         datetime createdAt
         datetime updatedAt
     }
+    VendorContact {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid vendorId "PK"
+        string name "PK"
+        VendorContactRole role "PK"
+        string email "nullable"
+        string phone "nullable"
+        string notes "nullable"
+        datetime addedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    VendorContact }o--|| Vendor : "vendor"
+    VendorContract {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid vendorId "PK"
+        string title "PK"
+        string contractNumber "nullable"
+        int paymentTermsDays "PK"
+        int deliveryLeadTimeDays "PK"
+        datetime startsAt "nullable"
+        datetime endsAt "nullable"
+        string documentUrl "nullable"
+        string notes "nullable"
+        VendorContractStatus status "PK"
+        datetime draftedAt "nullable"
+        datetime activatedAt "nullable"
+        datetime expiredAt "nullable"
+        datetime terminatedAt "nullable"
+        string terminationReason "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    VendorContract }o--|| Vendor : "vendor"
+    VendorContractPriceTier {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid contractId "PK"
+        string itemName "PK"
+        string unit "PK"
+        decimal minQuantity "PK"
+        money unitPrice "PK"
+        string notes "nullable"
+        datetime addedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    VendorContractPriceTier }o--|| VendorContract : "contract"
     VendorOrder {
         uuid id "PK"
         string tenantId "PK"
@@ -1092,11 +1740,15 @@ erDiagram
         datetime receivedAt "nullable"
         datetime cancelledAt "nullable"
         string cancellationReason "nullable"
+        datetime approvalRequestedAt "nullable"
+        datetime approvedAt "nullable"
+        string approvalNotes "nullable"
         datetime createdAt
         datetime updatedAt
     }
     VendorOrder }o--|| Vendor : "vendor"
     VendorOrder }o--|| Event : "event"
+    VendorOrder }o--|| WeeklyPurchasingConfig : "purchasingConfig"
     VendorOrder ||--o{ VendorOrderLine : "lines"
     VendorOrderLine {
         uuid id "PK"
@@ -1197,7 +1849,24 @@ erDiagram
         datetime deletedAt "nullable"
         uuid defaultVendorId "PK"
         datetime configuredAt "nullable"
+        money orderApprovalThresholdAmount "nullable"
         datetime createdAt
         datetime updatedAt
     }
     WeeklyPurchasingConfig }o--|| Vendor : "defaultVendor"
+    WeeklyScheduleNotice {
+        uuid id "PK"
+        string tenantId "PK"
+        datetime deletedAt "nullable"
+        uuid personId "PK"
+        string recipientAuthSubjectId "nullable"
+        datetime weekStartsAt "PK"
+        datetime weekEndsAt "PK"
+        int shiftCount "PK"
+        string shiftSummary "PK"
+        datetime publishedAt "nullable"
+        datetime acknowledgedAt "nullable"
+        datetime createdAt
+        datetime updatedAt
+    }
+    WeeklyScheduleNotice }o--|| Person : "person"

@@ -1,0 +1,119 @@
+// Capsule sales — validated, auditable client-account deduplication.
+
+entity ClientMerge mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required primaryClientId: uuid
+  property required duplicateClientId: uuid
+  property mergedAt: datetime?
+
+  belongsTo primaryClient: Client fields [tenantId, primaryClientId] references [tenantId, id]
+  belongsTo duplicateClient: Client fields [tenantId, duplicateClientId] references [tenantId, id]
+
+  constraint mergeComplete: self.mergedAt == null or self.primaryClientId != self.duplicateClientId "Primary and duplicate clients must be different"
+
+  default policy clientMergeRead read: roleAllows(user.role, "salesAccess") "Sales staff may review client merge history"
+  default policy clientMergeWrite write: roleAllows(user.role, "adminAccess") "Administrators may consolidate client accounts and their financial history"
+  default policy clientMergeExecute execute: roleAllows(user.role, "adminAccess") "Administrators may consolidate client accounts and their financial history"
+
+  command merge(primaryClientId: uuid, duplicateClientId: uuid) {
+    guard self.mergedAt == null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.primaryClient != null
+    guard self.duplicateClient != null
+    guard self.primaryClient.status == "active"
+    guard self.primaryClient.deletedAt == null
+    guard self.duplicateClient.status == "active"
+    guard self.duplicateClient.deletedAt == null
+    constraint mergePrimaryMatch: primaryClientId == self.primaryClientId "Primary client must match the seeded account"
+    constraint mergeDuplicateMatch: duplicateClientId == self.duplicateClientId "Duplicate client must match the seeded account"
+    constraint mergeDistinctClients: primaryClientId != duplicateClientId "Choose two different clients"
+    mutate primaryClientId = primaryClientId
+    mutate duplicateClientId = duplicateClientId
+    mutate mergedAt = now()
+    emit ClientMergeCompleted {
+      clientMergeId: self.id
+      tenantId: self.tenantId
+      primaryClientId: primaryClientId
+      duplicateClientId: duplicateClientId
+    }
+  }
+
+  store ClientMerge in durable
+}
+
+event ClientMergeCompleted: "client_merge.completed" {
+  clientMergeId: string
+  tenantId: string
+  primaryClientId: string
+  duplicateClientId: string
+}
+
+// Move history first, then hide the duplicate. All reactions execute in the
+// merge transaction, so any failed transfer rolls the merge back.
+on ClientMergeCompleted fanOut Event where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+on ClientMergeCompleted fanOut ClientContact where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+on ClientMergeCompleted fanOut Proposal where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+on ClientMergeCompleted fanOut Contract where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+on ClientMergeCompleted fanOut Invoice where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+on ClientMergeCompleted fanOut Payment where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+on ClientMergeCompleted fanOut PaymentMethod where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+on ClientMergeCompleted fanOut CreditMemo where clientId = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, clientId: payload.primaryClientId }
+
+on ClientMergeCompleted fanOut Client where id = payload.duplicateClientId
+  run stageClientMerge
+  params { clientMergeId: payload.clientMergeId, primaryClientId: payload.primaryClientId }
+
+on EventClientMergeStaged run Event.reassignClient
+  resolve payload.eventId
+
+on ClientContactMergeStaged run ClientContact.reassignClient
+  resolve payload.clientContactId
+
+on ProposalClientMergeStaged run Proposal.reassignClient
+  resolve payload.proposalId
+
+on ContractClientMergeStaged run Contract.reassignClient
+  resolve payload.contractId
+
+on InvoiceClientMergeStaged run Invoice.reassignClient
+  resolve payload.invoiceId
+
+on PaymentClientMergeStaged run Payment.reassignClient
+  resolve payload.paymentId
+
+on PaymentMethodClientMergeStaged run PaymentMethod.reassignClient
+  resolve payload.paymentMethodId
+
+on CreditMemoClientMergeStaged run CreditMemo.reassignClient
+  resolve payload.creditMemoId
+
+on ClientMergeStaged run Client.markMerged
+  resolve payload.duplicateClientId
+  params { clientId: payload.duplicateClientId }

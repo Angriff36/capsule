@@ -1,9 +1,14 @@
 import { Component, lazy, Suspense, type ReactNode } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useMatch } from "react-router-dom";
+import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
+import { EventAllergenBriefingPage } from "../features/events/EventAllergenBriefingPage";
+import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlannerPage";
 import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventsListPage } from "../features/events/EventsListPage";
+import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
 import { HomePage } from "../features/home/HomePage";
+import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
 import { EventMenuPage } from "../features/kitchen/EventMenuPage";
 import { DishDetailPage } from "../features/kitchen/DishDetailPage";
 import { IngredientDetailPage } from "../features/kitchen/IngredientDetailPage";
@@ -27,6 +32,26 @@ const StockBookPage = lazy(() =>
     default: module.StockBookPage,
   })),
 );
+const StockCountPage = lazy(() =>
+  import("../features/inventory/StockCountPage").then((module) => ({
+    default: module.StockCountPage,
+  })),
+);
+const InventoryAuditLogPage = lazy(() =>
+  import("../features/inventory/InventoryAuditLogPage").then((module) => ({
+    default: module.InventoryAuditLogPage,
+  })),
+);
+const WasteCostReportPage = lazy(() =>
+  import("../features/inventory/WasteCostReportPage").then((module) => ({
+    default: module.WasteCostReportPage,
+  })),
+);
+const LotTraceabilityPage = lazy(() =>
+  import("../features/inventory/LotTraceabilityPage").then((module) => ({
+    default: module.LotTraceabilityPage,
+  })),
+);
 const PurchasingPage = lazy(() =>
   import("../features/inventory/PurchasingPage").then((module) => ({
     default: module.PurchasingPage,
@@ -37,14 +62,36 @@ const VendorOrderPage = lazy(() =>
     default: module.VendorOrderPage,
   })),
 );
+const VendorContractsPage = lazy(() =>
+  import("../features/inventory/VendorContractsPage").then((module) => ({
+    default: module.VendorContractsPage,
+  })),
+);
+const KitchenDisplayPage = lazy(() =>
+  import("../features/production/KitchenDisplayPage").then((module) => ({
+    default: module.KitchenDisplayPage,
+  })),
+);
 const PrepBoardPage = lazy(() =>
   import("../features/production/PrepBoardPage").then((module) => ({
     default: module.PrepBoardPage,
   })),
 );
+const ProductionYieldDashboardPage = lazy(() =>
+  import("../features/production/ProductionYieldDashboardPage").then(
+    (module) => ({
+      default: module.ProductionYieldDashboardPage,
+    }),
+  ),
+);
 const RosterPage = lazy(() =>
   import("../features/workforce/RosterPage").then((module) => ({
     default: module.RosterPage,
+  })),
+);
+const ShiftSwapRequestsPage = lazy(() =>
+  import("../features/workforce/ShiftSwapRequestsPage").then((module) => ({
+    default: module.ShiftSwapRequestsPage,
   })),
 );
 const TimeSheetPage = lazy(() =>
@@ -52,9 +99,24 @@ const TimeSheetPage = lazy(() =>
     default: module.TimeSheetPage,
   })),
 );
+const TimeOffRequestsPage = lazy(() =>
+  import("../features/workforce/TimeOffRequestsPage").then((module) => ({
+    default: module.TimeOffRequestsPage,
+  })),
+);
 const QualificationsPage = lazy(() =>
   import("../features/workforce/QualificationsPage").then((module) => ({
     default: module.QualificationsPage,
+  })),
+);
+const TrainingPage = lazy(() =>
+  import("../features/workforce/TrainingPage").then((module) => ({
+    default: module.TrainingPage,
+  })),
+);
+const StaffUtilizationPage = lazy(() =>
+  import("../features/workforce/StaffUtilizationPage").then((module) => ({
+    default: module.StaffUtilizationPage,
   })),
 );
 const PackListsPage = lazy(() =>
@@ -72,6 +134,16 @@ const DeliveriesPage = lazy(() =>
     default: module.DeliveriesPage,
   })),
 );
+const VehicleFleetPage = lazy(() =>
+  import("../features/logistics/VehicleFleetPage").then((module) => ({
+    default: module.VehicleFleetPage,
+  })),
+);
+const VehicleSchedulePage = lazy(() =>
+  import("../features/logistics/VehicleSchedulePage").then((module) => ({
+    default: module.VehicleSchedulePage,
+  })),
+);
 const InvoicesPage = lazy(() =>
   import("../features/finance/InvoicesPage").then((module) => ({
     default: module.InvoicesPage,
@@ -80,6 +152,26 @@ const InvoicesPage = lazy(() =>
 const InvoiceDetailPage = lazy(() =>
   import("../features/finance/InvoiceDetailPage").then((module) => ({
     default: module.InvoiceDetailPage,
+  })),
+);
+const RevenueTrendsPage = lazy(() =>
+  import("../features/finance/RevenueTrendsPage").then((module) => ({
+    default: module.RevenueTrendsPage,
+  })),
+);
+const FoodCostPercentagePage = lazy(() =>
+  import("../features/finance/FoodCostPercentagePage").then((module) => ({
+    default: module.FoodCostPercentagePage,
+  })),
+);
+const ProfitMarginReportsPage = lazy(() =>
+  import("../features/finance/ProfitMarginReportsPage").then((module) => ({
+    default: module.ProfitMarginReportsPage,
+  })),
+);
+const TaxRatesPage = lazy(() =>
+  import("../features/finance/TaxRatesPage").then((module) => ({
+    default: module.TaxRatesPage,
   })),
 );
 const PaymentsPage = lazy(() =>
@@ -100,6 +192,11 @@ const CloseoutPage = lazy(() =>
 const PayrollPage = lazy(() =>
   import("../features/finance/PayrollPage").then((module) => ({
     default: module.PayrollPage,
+  })),
+);
+const TipDistributionPage = lazy(() =>
+  import("../features/finance/TipDistributionPage").then((module) => ({
+    default: module.TipDistributionPage,
   })),
 );
 const ReportsPage = lazy(() =>
@@ -127,10 +224,50 @@ const ContractsPage = lazy(() =>
     default: module.ContractsPage,
   })),
 );
+const LeadPipelinePage = lazy(() =>
+  import("../features/clients/LeadPipelinePage").then((module) => ({
+    default: module.LeadPipelinePage,
+  })),
+);
+const ContractDocumentPage = lazy(() =>
+  import("../features/clients/ContractDocumentPage").then((module) => ({
+    default: module.ContractDocumentPage,
+  })),
+);
+const EquipmentCatalogPage = lazy(() =>
+  import("../features/facilities/EquipmentCatalogPage").then((module) => ({
+    default: module.EquipmentCatalogPage,
+  })),
+);
 const PermissionsPage = lazy(() =>
   import("../features/admin/PermissionsPage").then((module) => ({
     default: module.PermissionsPage,
   })),
+);
+const BrandingPage = lazy(() =>
+  import("../features/admin/BrandingPage").then((module) => ({
+    default: module.BrandingPage,
+  })),
+);
+const PersonalDataExportPage = lazy(() =>
+  import("../features/admin/PersonalDataExportPage").then((module) => ({
+    default: module.PersonalDataExportPage,
+  })),
+);
+const IntegrationsPage = lazy(() =>
+  import("../features/admin/IntegrationsPage").then((module) => ({
+    default: module.IntegrationsPage,
+  })),
+);
+const MyDayPage = lazy(() =>
+  import("../features/staff/MyDayPage").then((module) => ({
+    default: module.MyDayPage,
+  })),
+);
+const EmailNotificationSettingsPage = lazy(() =>
+  import("../features/notifications/EmailNotificationSettingsPage").then(
+    (module) => ({ default: module.EmailNotificationSettingsPage }),
+  ),
 );
 
 function SupplyRoute({ children }: { children: ReactNode }) {
@@ -165,15 +302,51 @@ class AppErrorBoundary extends Component<
 }
 
 export function App() {
+  const clientPortalMatch = useMatch("/portal/events/:token");
+  if (clientPortalMatch?.params.token) {
+    return (
+      <AppErrorBoundary>
+        <ClientPortalPage token={clientPortalMatch.params.token} />
+      </AppErrorBoundary>
+    );
+  }
+
   return (
     <AppErrorBoundary>
       <AuthGate>
         <Routes>
+          {/* Staff-facing mobile view lives outside AppShell so admin nav never renders. */}
+          <Route
+            path="/my"
+            element={
+              <SupplyRoute>
+                <MyDayPage />
+              </SupplyRoute>
+            }
+          />
+          {/* Full-screen kitchen display lives outside AppShell for floor screens. */}
+          <Route
+            path="/kitchen/display"
+            element={
+              <SupplyRoute>
+                <KitchenDisplayPage />
+              </SupplyRoute>
+            }
+          />
           <Route element={<AppShell />}>
             <Route index element={<HomePage />} />
             <Route path="/events" element={<EventsListPage />} />
             <Route path="/events/new" element={<EventCreatePage />} />
+            <Route path="/events/templates" element={<EventTemplatesPage />} />
+            <Route
+              path="/events/capacity"
+              element={<EventCapacityPlannerPage />}
+            />
             <Route path="/events/:id" element={<EventDetailPage />} />
+            <Route
+              path="/events/:id/allergen-briefing"
+              element={<EventAllergenBriefingPage />}
+            />
             <Route
               path="/kitchen"
               element={<Navigate to="/kitchen/recipes" replace />}
@@ -206,11 +379,20 @@ export function App() {
               element={<KitchenCatalogPage section="menus" />}
             />
             <Route path="/kitchen/event-menu" element={<EventMenuPage />} />
+            <Route path="/kitchen/allergens" element={<AllergenMatrixPage />} />
             <Route
               path="/kitchen/prep"
               element={
                 <SupplyRoute>
                   <PrepBoardPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/kitchen/yield"
+              element={
+                <SupplyRoute>
+                  <ProductionYieldDashboardPage />
                 </SupplyRoute>
               }
             />
@@ -235,6 +417,38 @@ export function App() {
               }
             />
             <Route
+              path="/inventory/counts"
+              element={
+                <SupplyRoute>
+                  <StockCountPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/inventory/audit"
+              element={
+                <SupplyRoute>
+                  <InventoryAuditLogPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/inventory/waste"
+              element={
+                <SupplyRoute>
+                  <WasteCostReportPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/inventory/traceability"
+              element={
+                <SupplyRoute>
+                  <LotTraceabilityPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/inventory/purchasing"
               element={
                 <SupplyRoute>
@@ -251,6 +465,14 @@ export function App() {
               }
             />
             <Route
+              path="/inventory/contracts"
+              element={
+                <SupplyRoute>
+                  <VendorContractsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/staff"
               element={<Navigate to="/staff/roster" replace />}
             />
@@ -263,6 +485,14 @@ export function App() {
               }
             />
             <Route
+              path="/staff/swaps"
+              element={
+                <SupplyRoute>
+                  <ShiftSwapRequestsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/staff/time"
               element={
                 <SupplyRoute>
@@ -271,10 +501,34 @@ export function App() {
               }
             />
             <Route
+              path="/staff/time-off"
+              element={
+                <SupplyRoute>
+                  <TimeOffRequestsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/staff/qualifications"
               element={
                 <SupplyRoute>
                   <QualificationsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff/training"
+              element={
+                <SupplyRoute>
+                  <TrainingPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff/utilization"
+              element={
+                <SupplyRoute>
+                  <StaffUtilizationPage />
                 </SupplyRoute>
               }
             />
@@ -307,6 +561,22 @@ export function App() {
               }
             />
             <Route
+              path="/logistics/schedule"
+              element={
+                <SupplyRoute>
+                  <VehicleSchedulePage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/fleet"
+              element={
+                <SupplyRoute>
+                  <VehicleFleetPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/finance"
               element={<Navigate to="/finance/invoices" replace />}
             />
@@ -323,6 +593,38 @@ export function App() {
               element={
                 <SupplyRoute>
                   <InvoiceDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/revenue"
+              element={
+                <SupplyRoute>
+                  <RevenueTrendsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/food-cost"
+              element={
+                <SupplyRoute>
+                  <FoodCostPercentagePage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/profit-margins"
+              element={
+                <SupplyRoute>
+                  <ProfitMarginReportsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/taxes"
+              element={
+                <SupplyRoute>
+                  <TaxRatesPage />
                 </SupplyRoute>
               }
             />
@@ -359,6 +661,14 @@ export function App() {
               }
             />
             <Route
+              path="/finance/tips"
+              element={
+                <SupplyRoute>
+                  <TipDistributionPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/reports"
               element={
                 <SupplyRoute>
@@ -371,6 +681,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ClientsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/pipeline"
+              element={
+                <SupplyRoute>
+                  <LeadPipelinePage />
                 </SupplyRoute>
               }
             />
@@ -391,6 +709,14 @@ export function App() {
               }
             />
             <Route
+              path="/clients/contracts/:id/document"
+              element={
+                <SupplyRoute>
+                  <ContractDocumentPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/clients/:id"
               element={
                 <SupplyRoute>
@@ -399,10 +725,50 @@ export function App() {
               }
             />
             <Route
+              path="/facilities"
+              element={
+                <SupplyRoute>
+                  <EquipmentCatalogPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/admin"
               element={
                 <SupplyRoute>
                   <PermissionsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/branding"
+              element={
+                <SupplyRoute>
+                  <BrandingPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/data-export"
+              element={
+                <SupplyRoute>
+                  <PersonalDataExportPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/integrations"
+              element={
+                <SupplyRoute>
+                  <IntegrationsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/settings/email"
+              element={
+                <SupplyRoute>
+                  <EmailNotificationSettingsPage />
                 </SupplyRoute>
               }
             />

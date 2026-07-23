@@ -1,0 +1,168 @@
+// Capsule operations — reusable event templates. A fully-configured event
+// (client type, default headcount, linked menu, default staff roles, typical
+// equipment) saved under a name so new events of a common type can be
+// bootstrapped with standard fields pre-filled.
+
+use "./event.manifest"
+
+enum EventTemplateStatus {
+  active
+  archived
+}
+
+// Menu link stays a plain uuid (UI joins by id); staff roles and equipment
+// stay open string lists until coverage math / checkout slices give them
+// structure (same posture as Event.accessibilityNeeds).
+entity EventTemplate mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property required clientType: ClientType = "company"
+  property required eventType: string = ""
+  property required defaultHeadcount: int = 1
+  property menuId: uuid?
+  property defaultStaffRoles: list<string> = []
+  property typicalEquipment: list<string> = []
+  property notes: string?
+  property sourceEventId: uuid?
+  property required status: EventTemplateStatus = "active"
+  property definedAt: datetime?
+  property archivedAt: datetime?
+  property archiveReason: string?
+
+  computed isActive: boolean = self.status == "active"
+
+  constraint templateComplete: self.definedAt == null or (length(trim(self.name)) > 0 and length(trim(self.eventType)) > 0) "Defined templates require a name and event type"
+  constraint templateHeadcountRange: self.defaultHeadcount >= 1 and self.defaultHeadcount <= 100000 "Default headcount must be between 1 and 100000"
+
+  transition status from "active" to ["archived"]
+  transition status from "archived" to ["active"]
+
+  default policy eventTemplateRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read event templates"
+  default policy eventTemplateWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may write event templates through commands"
+  default policy eventTemplateExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may execute event template commands"
+
+  command define(
+    name: string,
+    clientType: ClientType,
+    eventType: string,
+    defaultHeadcount: int,
+    optional menuId: uuid,
+    optional defaultStaffRoles: list<string>,
+    optional typicalEquipment: list<string>,
+    optional notes: string,
+    optional sourceEventId: uuid
+  ) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    constraint defineTemplateName: length(trim(name)) > 0 "Template name is required"
+    constraint defineTemplateEventType: length(trim(eventType)) > 0 "Event type is required"
+    constraint defineTemplateHeadcount: defaultHeadcount >= 1 and defaultHeadcount <= 100000 "Default headcount must be between 1 and 100000"
+    mutate name = name
+    mutate clientType = clientType
+    mutate eventType = eventType
+    mutate defaultHeadcount = defaultHeadcount
+    mutate menuId = menuId
+    mutate defaultStaffRoles = defaultStaffRoles != null ? defaultStaffRoles : []
+    mutate typicalEquipment = typicalEquipment != null ? typicalEquipment : []
+    mutate notes = notes
+    mutate sourceEventId = sourceEventId
+    mutate definedAt = now()
+    emit EventTemplateDefined {
+      templateId: self.id
+      tenantId: self.tenantId
+      name: name
+      eventType: eventType
+      sourceEventId: sourceEventId
+    }
+  }
+
+  command revise(
+    name: string,
+    clientType: ClientType,
+    eventType: string,
+    defaultHeadcount: int,
+    optional menuId: uuid,
+    optional defaultStaffRoles: list<string>,
+    optional typicalEquipment: list<string>,
+    optional notes: string
+  ) {
+    guard self.definedAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint reviseTemplateName: length(trim(name)) > 0 "Template name is required"
+    constraint reviseTemplateEventType: length(trim(eventType)) > 0 "Event type is required"
+    constraint reviseTemplateHeadcount: defaultHeadcount >= 1 and defaultHeadcount <= 100000 "Default headcount must be between 1 and 100000"
+    mutate name = name
+    mutate clientType = clientType
+    mutate eventType = eventType
+    mutate defaultHeadcount = defaultHeadcount
+    mutate menuId = menuId
+    mutate defaultStaffRoles = defaultStaffRoles != null ? defaultStaffRoles : []
+    mutate typicalEquipment = typicalEquipment != null ? typicalEquipment : []
+    mutate notes = notes
+    emit EventTemplateRevised {
+      templateId: self.id
+      tenantId: self.tenantId
+      name: name
+      eventType: eventType
+    }
+  }
+
+  command archive(reason: string) {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    constraint archiveTemplateReason: length(trim(reason)) > 0 "Archive reason is required"
+    mutate status = "archived"
+    mutate archivedAt = now()
+    mutate archiveReason = reason
+    emit EventTemplateArchived {
+      templateId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "archived"
+    guard self.deletedAt == null
+    mutate status = "active"
+    mutate archivedAt = null
+    mutate archiveReason = null
+    emit EventTemplateReactivated {
+      templateId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store EventTemplate in durable
+}
+
+event EventTemplateDefined: "event_template.defined" {
+  templateId: string
+  tenantId: string
+  name: string
+  eventType: string
+  sourceEventId: string?
+}
+
+event EventTemplateRevised: "event_template.revised" {
+  templateId: string
+  tenantId: string
+  name: string
+  eventType: string
+}
+
+event EventTemplateArchived: "event_template.archived" {
+  templateId: string
+  tenantId: string
+  reason: string
+}
+
+event EventTemplateReactivated: "event_template.reactivated" {
+  templateId: string
+  tenantId: string
+}

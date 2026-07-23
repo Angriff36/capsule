@@ -1,13 +1,162 @@
-// Capsule workforce — AvailabilityWindow (Person-declared availability).
+// Capsule workforce — AvailabilityWindow (Person-declared availability) and
+// RecurringAvailability (general weekly pattern; delivers OD022 recurrence).
 // Compile chain: time → packing → … → assignment → shift → this file → prep.
-// Recurrence (capsule-pro dayOfWeek) deferred — OD022.
 // TimeRecord authored in workforce-2 (`time.manifest`).
 
 use "../production/prep.manifest"
 
+enum TimeOffRequestStatus {
+  pending
+  approved
+  denied
+}
+
+// Staff-submitted time off stays a request until a workforce manager reviews
+// it. Approved rows are the durable source used by shift scheduling; direct
+// AvailabilityWindow declarations remain useful for other date exceptions.
+entity TimeOffRequest mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required personId: uuid
+  property requesterAuthSubjectId: string?
+  property required startsAt: datetime?
+  property required endsAt: datetime?
+  property encrypted reason: string?
+  property required status: TimeOffRequestStatus = "pending"
+  property submittedAt: datetime?
+  property reviewedAt: datetime?
+  property reviewedByAuthSubjectId: string?
+  property encrypted responseNote: string?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
+  constraint timeOffRequestComplete: self.submittedAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.reason != null and length(trim(self.reason)) > 0) "Submitted time off requires a valid date range and reason"
+
+  transition status from "pending" to ["approved", "denied"]
+  transition status from "approved" to []
+  transition status from "denied" to []
+
+  default policy timeOffRequestRead read: roleAllows(user.role, "workforceManageAccess") or (user.id != null and self.requesterAuthSubjectId == user.id) or self.requesterAuthSubjectId == null "Staff may read their own time-off requests; workforce managers may review all requests"
+  default policy timeOffRequestWrite write: roleAllows(user.role, "workforceManageAccess") or (user.id != null and (self.requesterAuthSubjectId == null or self.requesterAuthSubjectId == user.id)) "Staff may submit their own time-off requests; workforce managers may review them"
+  default policy timeOffRequestExecute execute: roleAllows(user.role, "workforceManageAccess") or (user.id != null and (self.requesterAuthSubjectId == null or self.requesterAuthSubjectId == user.id)) "Staff may submit their own time-off requests; workforce managers may review them"
+
+  command submit(
+    personId: uuid,
+    startsAt: datetime,
+    endsAt: datetime,
+    reason: string
+  ) {
+    guard self.submittedAt == null
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.person != null and self.person.status == "active" and self.person.deletedAt == null
+    guard (self.person.authSubjectId != null and self.person.authSubjectId == user.id) or roleAllows(user.role, "workforceManageAccess")
+    constraint submitTimeOffPersonMatch: personId == self.personId "Time-off person must match the seeded staff profile"
+    constraint submitTimeOffDates: endsAt > startsAt "Time-off end must be after its start"
+    constraint submitTimeOffReason: length(trim(reason)) > 0 "Tell your manager why you need the time off"
+    mutate personId = personId
+    mutate requesterAuthSubjectId = self.person.authSubjectId
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate reason = reason
+    mutate submittedAt = now()
+    emit TimeOffRequestSubmitted {
+      timeOffRequestId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      startsAt: startsAt
+      endsAt: endsAt
+      status: "pending"
+    }
+  }
+
+  command approve(optional responseNote: string) {
+    guard self.status == "pending"
+    guard self.submittedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "approved"
+    mutate reviewedAt = now()
+    mutate reviewedByAuthSubjectId = user.id
+    mutate responseNote = responseNote
+    emit TimeOffRequestApproved {
+      timeOffRequestId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      startsAt: self.startsAt
+      endsAt: self.endsAt
+      previousStatus: previousStatus
+      status: "approved"
+    }
+  }
+
+  command decline(optional responseNote: string) {
+    guard self.status == "pending"
+    guard self.submittedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "denied"
+    mutate reviewedAt = now()
+    mutate reviewedByAuthSubjectId = user.id
+    mutate responseNote = responseNote
+    emit TimeOffRequestDenied {
+      timeOffRequestId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      startsAt: self.startsAt
+      endsAt: self.endsAt
+      previousStatus: previousStatus
+      status: "denied"
+    }
+  }
+
+  store TimeOffRequest in durable
+}
+
+event TimeOffRequestSubmitted: "time_off_request.submitted" {
+  timeOffRequestId: string
+  tenantId: string
+  personId: string
+  startsAt: datetime
+  endsAt: datetime
+  status: TimeOffRequestStatus
+}
+
+event TimeOffRequestApproved: "time_off_request.approved" {
+  timeOffRequestId: string
+  tenantId: string
+  personId: string
+  startsAt: datetime?
+  endsAt: datetime?
+  previousStatus: TimeOffRequestStatus
+  status: TimeOffRequestStatus
+}
+
+event TimeOffRequestDenied: "time_off_request.denied" {
+  timeOffRequestId: string
+  tenantId: string
+  personId: string
+  startsAt: datetime?
+  endsAt: datetime?
+  previousStatus: TimeOffRequestStatus
+  status: TimeOffRequestStatus
+}
+
 enum AvailabilityWindowStatus {
   active
   withdrawn
+}
+
+// Direction of a date-range window relative to the weekly pattern:
+// "available" adds working time, "unavailable" blocks it (time off).
+enum AvailabilityWindowKind {
+  available
+  unavailable
 }
 
 // One-shot availability interval for a Person. Workers declare/withdraw their
@@ -21,6 +170,8 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
   property startsAt: datetime?
   property endsAt: datetime?
   property encrypted notes: string?
+  // Optional so pre-kind rows stay schema-valid; absent reads as "available".
+  property kind: AvailabilityWindowKind?
   property required status: AvailabilityWindowStatus = "active"
   property declaredAt: datetime?
   property withdrawnAt: datetime?
@@ -40,6 +191,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
     personId: uuid,
     startsAt: datetime,
     endsAt: datetime,
+    kind: AvailabilityWindowKind = "available",
     optional notes: string
   ) {
     guard self.declaredAt == null
@@ -52,6 +204,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
     mutate personId = personId
     mutate startsAt = startsAt
     mutate endsAt = endsAt
+    mutate kind = kind
     mutate notes = notes != null ? notes : self.notes
     mutate declaredAt = now()
     emit AvailabilityDeclared {
@@ -60,6 +213,7 @@ entity AvailabilityWindow mixin TenantScoped, SoftDeletable {
       personId: personId
       startsAt: startsAt
       endsAt: endsAt
+      kind: kind
       status: "active"
     }
   }
@@ -93,6 +247,7 @@ event AvailabilityDeclared: "availability.declared" {
   personId: string
   startsAt: datetime
   endsAt: datetime
+  kind: AvailabilityWindowKind
   status: AvailabilityWindowStatus
 }
 
@@ -104,4 +259,108 @@ event AvailabilityWithdrawn: "availability.withdrawn" {
   endsAt: datetime?
   previousStatus: AvailabilityWindowStatus
   status: AvailabilityWindowStatus
+}
+
+enum RecurringAvailabilityStatus {
+  active
+  withdrawn
+}
+
+// General weekly availability: one row per (person, weekday, time band),
+// minutes measured from local midnight. Absence of a row = not generally
+// available that weekday. Date-range exceptions live on AvailabilityWindow.
+entity RecurringAvailability mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required personId: uuid
+  property required dayOfWeek: int = 0
+  property required startMinute: int = 0
+  property required endMinute: int = 0
+  property encrypted notes: string?
+  property required status: RecurringAvailabilityStatus = "active"
+  property declaredAt: datetime?
+  property withdrawnAt: datetime?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
+  transition status from "active" to ["withdrawn"]
+  transition status from "withdrawn" to []
+
+  default policy recurringAvailabilityRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read recurring availability"
+  default policy recurringAvailabilityWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write recurring availability through commands"
+  default policy recurringAvailabilityExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute recurring availability commands"
+
+  command declare(
+    personId: uuid,
+    dayOfWeek: int,
+    startMinute: int,
+    endMinute: int,
+    optional notes: string
+  ) {
+    guard self.declaredAt == null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard user.id != null
+    guard personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    constraint declarePersonMatch: personId == self.personId "Declare personId must match the seeded person reference"
+    constraint declareDayOfWeek: dayOfWeek >= 0 and dayOfWeek <= 6 "Day of week must be 0 (Sunday) through 6 (Saturday)"
+    constraint declareMinutes: startMinute >= 0 and endMinute <= 1440 and endMinute > startMinute "Time band must fall within the day and end after it starts"
+    mutate personId = personId
+    mutate dayOfWeek = dayOfWeek
+    mutate startMinute = startMinute
+    mutate endMinute = endMinute
+    mutate notes = notes != null ? notes : self.notes
+    mutate declaredAt = now()
+    emit RecurringAvailabilityDeclared {
+      recurringAvailabilityId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      dayOfWeek: dayOfWeek
+      startMinute: startMinute
+      endMinute: endMinute
+      status: "active"
+    }
+  }
+
+  command withdraw() {
+    guard self.status == "active"
+    guard self.declaredAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.personId == user.id or roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "withdrawn"
+    mutate withdrawnAt = now()
+    emit RecurringAvailabilityWithdrawn {
+      recurringAvailabilityId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      dayOfWeek: self.dayOfWeek
+      previousStatus: previousStatus
+      status: "withdrawn"
+    }
+  }
+
+  store RecurringAvailability in durable
+}
+
+event RecurringAvailabilityDeclared: "recurring_availability.declared" {
+  recurringAvailabilityId: string
+  tenantId: string
+  personId: string
+  dayOfWeek: int
+  startMinute: int
+  endMinute: int
+  status: RecurringAvailabilityStatus
+}
+
+event RecurringAvailabilityWithdrawn: "recurring_availability.withdrawn" {
+  recurringAvailabilityId: string
+  tenantId: string
+  personId: string
+  dayOfWeek: int
+  previousStatus: RecurringAvailabilityStatus
+  status: RecurringAvailabilityStatus
 }

@@ -1,0 +1,538 @@
+// Capsule facilities — owned and rented kitchen/service equipment, including
+// event reservations and the outbound/return condition record.
+
+use "../foundation/base.manifest"
+
+enum EquipmentOwnership {
+  owned
+  rented
+}
+
+enum EquipmentCondition {
+  excellent
+  good
+  fair
+  poor
+  out_of_service
+}
+
+enum EquipmentStatus {
+  active
+  retired
+}
+
+enum EquipmentReservationStatus {
+  reserved
+  checked_out
+  returned
+  cancelled
+}
+
+// One catalog line per asset (or pooled asset group, e.g. 200 linens).
+// category stays an open string until a closed catalog is evidenced
+// (same posture as StorageLocation.locationType).
+entity Equipment mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, assetTag]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property required assetTag: string = ""
+  property required category: string = ""
+  property required ownership: EquipmentOwnership = "owned"
+  property required quantity: int = 1
+  property required purchaseValue: money(12, 2) = 0
+  property required condition: EquipmentCondition = "good"
+  property required status: EquipmentStatus = "active"
+  property conditionNote: string?
+  property registeredAt: datetime?
+  property retiredAt: datetime?
+  property retirementReason: string?
+
+  hasMany reservations: EquipmentReservation
+  hasMany maintenanceTasks: EquipmentMaintenanceTask
+
+  computed isActive: boolean = self.status == "active"
+  computed totalValue: money(12, 2) = self.quantity * self.purchaseValue
+
+  constraint equipmentQuantityNonnegative: self.quantity >= 0 "Equipment quantity cannot be negative"
+  constraint equipmentValueNonnegative: self.purchaseValue >= 0 "Purchase value cannot be negative"
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  // Logistics staff read/execute too: pack-out and event checkout consume this catalog.
+  default policy equipmentRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment"
+  default policy equipmentWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may write equipment through commands"
+  default policy equipmentExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment commands"
+
+  command register(
+    name: string,
+    assetTag: string,
+    category: string,
+    ownership: EquipmentOwnership,
+    optional quantity: int,
+    optional purchaseValue: money(12, 2),
+    optional condition: EquipmentCondition
+  ) {
+    guard self.registeredAt == null
+    guard self.deletedAt == null
+    constraint registerEquipmentName: length(trim(name)) > 0 "Equipment name is required"
+    constraint registerEquipmentAssetTag: length(trim(assetTag)) > 0 "Asset tag is required"
+    constraint registerEquipmentCategory: length(trim(category)) > 0 "Category is required"
+    constraint registerEquipmentQuantity: quantity == null or quantity > 0 "Quantity must be positive"
+    constraint registerEquipmentValue: purchaseValue == null or purchaseValue >= 0 "Purchase value cannot be negative"
+    mutate name = name
+    mutate assetTag = assetTag
+    mutate category = category
+    mutate ownership = ownership
+    mutate quantity = quantity != null ? quantity : 1
+    mutate purchaseValue = purchaseValue != null ? purchaseValue : 0
+    mutate condition = condition != null ? condition : "good"
+    mutate registeredAt = now()
+    emit EquipmentRegistered {
+      equipmentId: self.id
+      tenantId: self.tenantId
+      name: name
+      assetTag: assetTag
+      category: category
+      ownership: ownership
+    }
+  }
+
+  command reviseDetails(
+    name: string,
+    category: string,
+    optional ownership: EquipmentOwnership,
+    optional purchaseValue: money(12, 2)
+  ) {
+    guard self.registeredAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint reviseEquipmentName: length(trim(name)) > 0 "Equipment name is required"
+    constraint reviseEquipmentCategory: length(trim(category)) > 0 "Category is required"
+    constraint reviseEquipmentValue: purchaseValue == null or purchaseValue >= 0 "Purchase value cannot be negative"
+    mutate name = name
+    mutate category = category
+    mutate ownership = ownership != null ? ownership : self.ownership
+    mutate purchaseValue = purchaseValue != null ? purchaseValue : self.purchaseValue
+    emit EquipmentDetailsRevised {
+      equipmentId: self.id
+      tenantId: self.tenantId
+      name: name
+      category: category
+    }
+  }
+
+  command updateCondition(condition: EquipmentCondition, optional note: string) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    compute previousCondition = self.condition
+    mutate condition = condition
+    mutate conditionNote = note
+    emit EquipmentConditionUpdated {
+      equipmentId: self.id
+      tenantId: self.tenantId
+      previousCondition: previousCondition
+      condition: condition
+      note: note
+    }
+  }
+
+  command recount(actualQuantity: int) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint recountEquipmentNonnegative: actualQuantity >= 0 "Recount quantity cannot be negative"
+    compute previousQuantity = self.quantity
+    mutate quantity = actualQuantity
+    emit EquipmentRecounted {
+      equipmentId: self.id
+      tenantId: self.tenantId
+      previousQuantity: previousQuantity
+      quantity: actualQuantity
+    }
+  }
+
+  command retire(reason: string) {
+    guard self.status == "active"
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess") or roleAllows(user.role, "logisticsManageAccess")
+    constraint retireEquipmentReason: length(trim(reason)) > 0 "Retirement reason is required"
+    mutate status = "retired"
+    mutate retiredAt = now()
+    mutate retirementReason = reason
+    emit EquipmentRetired {
+      equipmentId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess") or roleAllows(user.role, "logisticsManageAccess")
+    mutate status = "active"
+    mutate retiredAt = null
+    mutate retirementReason = null
+    emit EquipmentReactivated {
+      equipmentId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Equipment in durable
+}
+
+event EquipmentRegistered: "equipment.registered" {
+  equipmentId: string
+  tenantId: string
+  name: string
+  assetTag: string
+  category: string
+  ownership: EquipmentOwnership
+}
+
+event EquipmentDetailsRevised: "equipment.details_revised" {
+  equipmentId: string
+  tenantId: string
+  name: string
+  category: string
+}
+
+event EquipmentConditionUpdated: "equipment.condition_updated" {
+  equipmentId: string
+  tenantId: string
+  previousCondition: EquipmentCondition
+  condition: EquipmentCondition
+  note: string?
+}
+
+event EquipmentRecounted: "equipment.recounted" {
+  equipmentId: string
+  tenantId: string
+  previousQuantity: int
+  quantity: int
+}
+
+event EquipmentRetired: "equipment.retired" {
+  equipmentId: string
+  tenantId: string
+  reason: string
+}
+
+event EquipmentReactivated: "equipment.reactivated" {
+  equipmentId: string
+  tenantId: string
+}
+
+// One reservation per equipment catalog line and event window. Quantity keeps
+// pooled assets (linens, chairs) practical while single tagged assets naturally
+// reserve one at a time. Creation is owned by the authored Convex seam because
+// the current Convex projection cannot hydrate hasMany overlap guards during a
+// generated create command; every later lifecycle change remains generated.
+entity EquipmentReservation mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required equipmentId: string = ""
+  property indexed required eventId: string = ""
+  property required startsAt: datetime?
+  property required endsAt: datetime?
+  property required quantity: int = 1
+  property required status: EquipmentReservationStatus = "reserved"
+  property reservedAt: datetime?
+  property checkedOutAt: datetime?
+  property checkoutCondition: EquipmentCondition?
+  property checkoutNote: string?
+  property returnedAt: datetime?
+  property returnCondition: EquipmentCondition?
+  property returnNote: string?
+  property cancelledAt: datetime?
+  property cancellationReason: string?
+
+  belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint equipmentReservationComplete: self.reservedAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.quantity > 0) "Equipment reservations require a valid date range and positive quantity"
+
+  transition status from "reserved" to ["checked_out", "cancelled"]
+  transition status from "checked_out" to ["returned"]
+
+  default policy equipmentReservationRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment reservations"
+  default policy equipmentReservationWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment handoffs"
+  default policy equipmentReservationExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment handoff commands"
+
+  command checkOut(condition: EquipmentCondition, optional note: string) {
+    guard self.status == "reserved"
+    guard self.deletedAt == null
+    constraint checkoutEquipmentServiceable: self.equipment != null and self.equipment.condition != "out_of_service" "Equipment marked out of service cannot be checked out"
+    mutate status = "checked_out"
+    mutate checkoutCondition = condition
+    mutate checkoutNote = note
+    mutate checkedOutAt = now()
+    emit EquipmentCheckedOut {
+      equipmentReservationId: self.id
+      equipmentId: self.equipmentId
+      eventId: self.eventId
+      tenantId: self.tenantId
+      condition: condition
+      note: note
+    }
+  }
+
+  command markReturned(condition: EquipmentCondition, optional note: string) {
+    guard self.status == "checked_out"
+    guard self.deletedAt == null
+    mutate status = "returned"
+    mutate returnCondition = condition
+    mutate returnNote = note
+    mutate returnedAt = now()
+    emit EquipmentReturned {
+      equipmentReservationId: self.id
+      equipmentId: self.equipmentId
+      eventId: self.eventId
+      tenantId: self.tenantId
+      condition: condition
+      note: note
+    }
+  }
+
+  command cancel(optional reason: string) {
+    guard self.status == "reserved"
+    guard self.deletedAt == null
+    mutate status = "cancelled"
+    mutate cancellationReason = reason
+    mutate cancelledAt = now()
+    emit EquipmentReservationCancelled {
+      equipmentReservationId: self.id
+      equipmentId: self.equipmentId
+      eventId: self.eventId
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  store EquipmentReservation in durable
+}
+
+event EquipmentReserved: "equipment.reserved" {
+  equipmentReservationId: string
+  equipmentId: string
+  eventId: string
+  tenantId: string
+  startsAt: datetime
+  endsAt: datetime
+  quantity: int
+}
+
+event EquipmentCheckedOut: "equipment.checked_out" {
+  equipmentReservationId: string
+  equipmentId: string
+  eventId: string
+  tenantId: string
+  condition: EquipmentCondition
+  note: string?
+}
+
+event EquipmentReturned: "equipment.returned" {
+  equipmentReservationId: string
+  equipmentId: string
+  eventId: string
+  tenantId: string
+  condition: EquipmentCondition
+  note: string?
+}
+
+event EquipmentReservationCancelled: "equipment.reservation_cancelled" {
+  equipmentReservationId: string
+  equipmentId: string
+  eventId: string
+  tenantId: string
+  reason: string?
+}
+
+// Recurring service task for one catalog item. The next due date advances from
+// each newly recorded service while older backfilled entries remain valid
+// history without moving the live schedule backwards.
+entity EquipmentMaintenanceTask mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required equipmentId: uuid
+  property required searchable taskName: string = ""
+  property required intervalDays: int = 30
+  property required nextDueAt: datetime?
+  property instructions: string?
+  property scheduledAt: datetime?
+  property lastServicedAt: datetime?
+
+  belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
+  hasMany serviceEntries: EquipmentServiceEntry
+
+  constraint maintenanceTaskComplete: self.scheduledAt == null or (length(trim(self.taskName)) > 0 and self.intervalDays > 0 and self.nextDueAt != null) "Scheduled maintenance requires a task, recurrence interval, and due date"
+
+  default policy maintenanceTaskRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment maintenance"
+  default policy maintenanceTaskWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may update equipment maintenance"
+  default policy maintenanceTaskExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment maintenance commands"
+
+  command schedule(
+    equipmentId: uuid,
+    taskName: string,
+    intervalDays: int,
+    nextDueAt: datetime,
+    optional instructions: string
+  ) {
+    guard self.scheduledAt == null
+    guard self.deletedAt == null
+    guard self.equipment != null
+    constraint scheduleMaintenanceEquipmentMatch: equipmentId == self.equipmentId "Maintenance equipment must match the selected catalog item"
+    constraint scheduleMaintenanceName: length(trim(taskName)) > 0 "Maintenance task is required"
+    constraint scheduleMaintenanceInterval: intervalDays > 0 "Recurring interval must be at least one day"
+    mutate taskName = taskName
+    mutate intervalDays = intervalDays
+    mutate nextDueAt = nextDueAt
+    mutate instructions = instructions
+    mutate scheduledAt = now()
+    emit EquipmentMaintenanceScheduled {
+      maintenanceTaskId: self.id
+      equipmentId: equipmentId
+      tenantId: self.tenantId
+      taskName: taskName
+      intervalDays: intervalDays
+      nextDueAt: nextDueAt
+    }
+  }
+
+  command applyService(completedAt: datetime, nextDueAt: datetime) {
+    guard self.scheduledAt != null
+    guard self.deletedAt == null
+    constraint applyServiceNextDue: nextDueAt > completedAt "Next maintenance due date must be after the completed service"
+    compute isLatestService = self.lastServicedAt == null or completedAt >= self.lastServicedAt
+    mutate lastServicedAt = isLatestService ? completedAt : self.lastServicedAt
+    mutate nextDueAt = isLatestService ? nextDueAt : self.nextDueAt
+    emit EquipmentMaintenanceAdvanced {
+      maintenanceTaskId: self.id
+      equipmentId: self.equipmentId
+      tenantId: self.tenantId
+      completedAt: completedAt
+      nextDueAt: isLatestService ? nextDueAt : self.nextDueAt
+    }
+  }
+
+  store EquipmentMaintenanceTask in durable
+}
+
+event EquipmentMaintenanceScheduled: "equipment.maintenance_scheduled" {
+  maintenanceTaskId: string
+  equipmentId: string
+  tenantId: string
+  taskName: string
+  intervalDays: int
+  nextDueAt: datetime
+}
+
+event EquipmentMaintenanceAdvanced: "equipment.maintenance_advanced" {
+  maintenanceTaskId: string
+  equipmentId: string
+  tenantId: string
+  completedAt: datetime
+  nextDueAt: datetime?
+}
+
+// Immutable completion history. Recording a service emits the fact that
+// advances the linked recurring task in the same generated transaction.
+entity EquipmentServiceEntry mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required maintenanceTaskId: uuid
+  property indexed required equipmentId: uuid
+  property required technician: string = ""
+  property required cost: money(12, 2) = 0
+  property notes: string?
+  property completedAt: datetime?
+  property nextDueAt: datetime?
+  property loggedAt: datetime?
+
+  belongsTo maintenanceTask: EquipmentMaintenanceTask fields [tenantId, maintenanceTaskId] references [tenantId, id]
+  belongsTo equipment: Equipment fields [tenantId, equipmentId] references [tenantId, id]
+
+  constraint equipmentServiceComplete: self.loggedAt == null or (length(trim(self.technician)) > 0 and self.cost >= 0 and self.completedAt != null and self.nextDueAt != null) "Completed service requires a technician, nonnegative cost, completion time, and next due date"
+
+  default policy equipmentServiceRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may read equipment service history"
+  default policy equipmentServiceWrite write: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may record equipment service"
+  default policy equipmentServiceExecute execute: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "logisticsAccess") "Inventory or logistics staff may execute equipment service commands"
+
+  command record(
+    maintenanceTaskId: uuid,
+    equipmentId: uuid,
+    technician: string,
+    cost: money(12, 2),
+    completedAt: datetime,
+    nextDueAt: datetime,
+    optional notes: string
+  ) {
+    guard self.loggedAt == null
+    guard self.deletedAt == null
+    guard self.maintenanceTask != null
+    guard self.equipment != null
+    constraint recordServiceTaskMatch: maintenanceTaskId == self.maintenanceTaskId "Service entry must match the selected maintenance task"
+    constraint recordServiceEquipmentMatch: equipmentId == self.equipmentId and self.maintenanceTask.equipmentId == equipmentId "Service entry equipment must match its maintenance task"
+    constraint recordServiceTechnician: length(trim(technician)) > 0 "Technician is required"
+    constraint recordServiceCost: cost >= 0 "Service cost cannot be negative"
+    constraint recordServiceTime: completedAt <= now() "Service completion cannot be in the future"
+    constraint recordServiceNextDue: nextDueAt > completedAt "Next maintenance due date must be after the completed service"
+    mutate technician = technician
+    mutate cost = cost
+    mutate notes = notes
+    mutate completedAt = completedAt
+    mutate nextDueAt = nextDueAt
+    mutate loggedAt = now()
+    emit EquipmentServiceRecorded {
+      serviceEntryId: self.id
+      maintenanceTaskId: maintenanceTaskId
+      equipmentId: equipmentId
+      tenantId: self.tenantId
+      technician: technician
+      cost: cost
+      notes: notes
+      completedAt: completedAt
+      nextDueAt: nextDueAt
+    }
+  }
+
+  store EquipmentServiceEntry in durable
+}
+
+event EquipmentServiceRecorded: "equipment.service_recorded" {
+  serviceEntryId: string
+  maintenanceTaskId: string
+  equipmentId: string
+  tenantId: string
+  technician: string
+  cost: money(12, 2)
+  notes: string?
+  completedAt: datetime
+  nextDueAt: datetime
+}
+
+on EquipmentServiceRecorded run EquipmentMaintenanceTask.applyService
+  resolve payload.maintenanceTaskId
+  params {
+    completedAt: payload.completedAt
+    nextDueAt: payload.nextDueAt
+  }
+
+// The return checklist is the authoritative latest condition observation.
+on EquipmentReturned fanOut Equipment where id = payload.equipmentId
+  run updateCondition
+  params {
+    condition: payload.condition
+    note: payload.note
+  }

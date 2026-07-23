@@ -28,8 +28,13 @@ describe("SupplyLifecyclePolicy", () => {
   });
 
   it("derives order offers from generated metadata", () => {
+    // submitForApproval/approve appeared with the order-approval flow;
+    // offers derive from target-status legality and approve is guard-
+    // filtered at runtime (requires pending_approval).
     expect(policy.orderActions("draft").map((item) => item.key)).toEqual([
       "submit",
+      "submitForApproval",
+      "approve",
       "cancel",
     ]);
     expect(policy.orderActions("submitted").map((item) => item.key)).toEqual([

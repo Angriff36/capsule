@@ -1,10 +1,10 @@
 import { NavLink } from "react-router-dom";
-import { CLIENTS_SECTIONS } from "./clientsRoutes";
+import { CLIENTS_PIPELINE_SECTION, CLIENTS_SECTIONS } from "./clientsRoutes";
 
 export function ClientsWorkspaceNav() {
   return (
     <nav className="kitchen-book-nav" aria-label="Clients workspace">
-      {CLIENTS_SECTIONS.map((section) => (
+      {[CLIENTS_PIPELINE_SECTION, ...CLIENTS_SECTIONS].map((section) => (
         <NavLink
           key={section.key}
           to={section.path}

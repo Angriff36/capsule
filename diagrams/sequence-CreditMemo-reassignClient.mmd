@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client
+    participant CreditMemo as CreditMemo
+    participant EventBus
+    Client->>+CreditMemo: reassignClient()
+    Note over CreditMemo: Policies: creditMemoRead, creditMemoWrite, creditMemoExecute
+    Note over CreditMemo: Guards (8)
+    CreditMemo->>CreditMemo: guard[0]: self.deletedAt == null
+    CreditMemo->>CreditMemo: guard[1]: roleAllows(user.role, #quot;adminAccess#quot;)
+    CreditMemo->>CreditMemo: guard[2]: self.clientMergeAuthorization != null
+    CreditMemo->>CreditMemo: guard[3]: self.clientMergeAuthorization.deletedAt == null
+    CreditMemo->>CreditMemo: guard[4]: self.clientMergeAuthorization.mergedAt != null
+    CreditMemo->>CreditMemo: guard[5]: self.mergeTargetClient != null
+    CreditMemo->>CreditMemo: guard[6]: self.mergeTargetClient.status == #quot;active#quot;
+    CreditMemo->>CreditMemo: guard[7]: self.mergeTargetClient.deletedAt == null
+    CreditMemo->>CreditMemo: compute.previousClientId
+    CreditMemo->>CreditMemo: mutate.clientId
+    CreditMemo->>EventBus: emit CreditMemoClientReassigned on credit_memo.client_reassigned
+    CreditMemo-->>-Client: void

@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant VendorContract as VendorContract
+    participant EventBus
+    Client->>+VendorContract: terminate(reason)
+    Note over VendorContract: Policies: vendorContractRead, vendorContractWrite, vendorContractExecute
+    Note over VendorContract: Guards (2)
+    VendorContract->>VendorContract: guard[0]: self.status == #quot;draft#quot; or self.status == #quot;active#quot;
+    VendorContract->>VendorContract: guard[1]: self.deletedAt == null
+    VendorContract->>VendorContract: mutate.status
+    VendorContract->>VendorContract: mutate.terminatedAt
+    VendorContract->>VendorContract: mutate.terminationReason
+    VendorContract->>EventBus: emit VendorContractTerminated on vendor_contract.terminated
+    VendorContract-->>-Client: void

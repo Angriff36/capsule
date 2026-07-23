@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   useCreateInventoryReservation,
   useCreatePrepTask,
@@ -15,7 +15,10 @@ import {
   useListIngredient,
   useListIngredientDemand,
   useListInventoryItem,
+  useListInventoryLot,
   useListInventoryReservation,
+  useListMenu,
+  useListMenuDish,
   useListPrepTask,
   useListRecipe,
   useListRecipeIngredient,
@@ -41,7 +44,10 @@ export function EventMenuPage() {
   const ingredients = useListIngredient();
   const demands = useListIngredientDemand();
   const inventoryItems = useListInventoryItem();
+  const inventoryLots = useListInventoryLot();
   const inventoryReservations = useListInventoryReservation();
+  const menus = useListMenu();
+  const menuDishes = useListMenuDish();
   const createEventDish = useCreateEventDish();
   const createPrepTask = useCreatePrepTask();
   const createReservation = useCreateInventoryReservation();
@@ -49,7 +55,9 @@ export function EventMenuPage() {
   const refreshGeneratedTask = usePrepTaskRefreshGenerated();
   const adjustServings = useEventDishAdjustServings();
   const removeDish = useEventDishRemove();
-  const [eventId, setEventId] = useState("");
+  const [searchParams] = useSearchParams();
+  const [eventId, setEventId] = useState(searchParams.get("eventId") ?? "");
+  const [templateMenuId, setTemplateMenuId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
@@ -63,6 +71,10 @@ export function EventMenuPage() {
   );
   const dishName = (dishId: string) =>
     dishes?.find((dish) => dish._id === dishId)?.name ?? "Unknown dish";
+  const templateMenus = (menus ?? []).filter(
+    (menu) =>
+      menu.deletedAt == null && menu.isTemplate && menu.status !== "archived",
+  );
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
     setBusy(key);
@@ -96,6 +108,7 @@ export function EventMenuPage() {
         recipeIngredients: recipeIngredients as never,
         eventDishes: eventDishes as never,
         inventoryItems: inventoryItems as never,
+        inventoryLots: inventoryLots as never,
         inventoryReservations: inventoryReservations as never,
       }),
     );
@@ -128,6 +141,47 @@ export function EventMenuPage() {
     });
   };
 
+  const applyTemplate = () => {
+    if (!templateMenuId || !selectedEvent) return;
+    const existing = new Set(selections.map((item) => item.dishId));
+    const activeDishIds = new Set(
+      (dishes ?? [])
+        .filter((dish) => dish.deletedAt == null && dish.status === "active")
+        .map((dish) => dish._id),
+    );
+    const lines = (menuDishes ?? []).filter(
+      (line) =>
+        line.deletedAt == null &&
+        line.menuId === templateMenuId &&
+        !existing.has(line.dishId) &&
+        activeDishIds.has(line.dishId),
+    );
+    const servings = Number(selectedEvent.expectedHeadcount) || 1;
+    void run("applyTemplate", async () => {
+      const allShortages: EventStockShortage[] = [];
+      for (const line of lines) {
+        const created = (await createEventDish({
+          eventId,
+          dishId: line.dishId,
+          quantityServings: servings,
+          course: line.course ?? undefined,
+          serviceStyle: line.serviceStyle ?? undefined,
+          specialInstructions: line.specialInstructions ?? undefined,
+        })) as { docId: string };
+        const shortages = await menuSync().syncPrepForDish({
+          id: created.docId,
+          eventId,
+          dishId: line.dishId,
+          quantityServings: servings,
+          specialInstructions: line.specialInstructions ?? undefined,
+        });
+        allShortages.push(...shortages);
+      }
+      setStockShortages(allShortages);
+      setTemplateMenuId("");
+    });
+  };
+
   return (
     <div className="recipe-book-stage">
       <header className="recipe-book-masthead">
@@ -148,10 +202,30 @@ export function EventMenuPage() {
       ) : null}
       <EventMenuStockShortageBanner
         shortages={stockShortages}
-        ingredientName={(ingredientId) =>
-          ingredients?.find((ingredient) => ingredient._id === ingredientId)
-            ?.name ?? ingredientId
-        }
+        ingredients={(ingredients ?? []).map((ingredient) => ({
+          id: ingredient._id,
+          name: ingredient.name,
+          unit: String(ingredient.unit),
+          costPerUnit: Number(ingredient.costPerUnit),
+          allergens: ingredient.allergens ?? [],
+          status: String(ingredient.status),
+          substituteIngredientIds: ingredient.substituteIngredientIds,
+          deletedAt: ingredient.deletedAt,
+        }))}
+        inventoryItems={(inventoryItems ?? []).map((item) => ({
+          id: item._id,
+          ingredientId: item.ingredientId,
+          quantityOnHand: Number(item.quantityOnHand),
+          unit: String(item.unit),
+          stockedAt: item.stockedAt,
+          deletedAt: item.deletedAt,
+        }))}
+        reservations={(inventoryReservations ?? []).map((reservation) => ({
+          inventoryItemId: reservation.inventoryItemId,
+          quantity: Number(reservation.quantity),
+          status: String(reservation.status),
+          deletedAt: reservation.deletedAt,
+        }))}
         onDismiss={() => setStockShortages([])}
       />
       {host}
@@ -193,6 +267,43 @@ export function EventMenuPage() {
                 <dd>{selectedEvent.venueName || "—"}</dd>
               </div>
             </dl>
+          ) : null}
+          {eventId && templateMenus.length ? (
+            <div className="culinary-create-form mt-6">
+              <div className="culinary-create-heading">
+                <div>
+                  <p className="eyebrow">Menu template</p>
+                  <h2 className="font-display text-2xl">
+                    Start from a template
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  disabled={
+                    !templateMenuId || busy != null || menuDishes === undefined
+                  }
+                  onClick={applyTemplate}
+                >
+                  {busy === "applyTemplate" ? "Applying…" : "Apply template"}
+                </button>
+              </div>
+              <label className="field-label">
+                Template
+                <select
+                  className="input"
+                  value={templateMenuId}
+                  onChange={(event) => setTemplateMenuId(event.target.value)}
+                >
+                  <option value="">Select template</option>
+                  {templateMenus.map((menu) => (
+                    <option key={menu._id} value={menu._id}>
+                      {menu.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
           ) : null}
           <form onSubmit={submit} className="culinary-create-form mt-6">
             <div className="culinary-create-heading">

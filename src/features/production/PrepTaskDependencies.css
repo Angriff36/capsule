@@ -1,0 +1,93 @@
+.prep-dependency-picker {
+  grid-column: 1 / -1;
+  min-width: 0;
+  border: 1px solid var(--color-line);
+  border-left: 3px solid var(--color-accent-deep);
+  padding: 0.8rem 0.9rem 0.9rem;
+  background: color-mix(in srgb, var(--color-inset) 82%, transparent);
+}
+
+.prep-dependency-picker legend {
+  padding: 0 0.35rem;
+  color: var(--color-ink);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.prep-dependency-picker > p,
+.prep-dependency-picker > span {
+  color: var(--color-ink-3);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.prep-dependency-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 0.5rem;
+  max-height: 190px;
+  margin-top: 0.7rem;
+  overflow-y: auto;
+}
+
+.prep-dependency-options label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  min-width: 0;
+  cursor: pointer;
+  border: 1px solid var(--color-line);
+  padding: 0.65rem 0.7rem;
+  background: var(--color-panel);
+}
+
+.prep-dependency-options label:has(input:checked) {
+  border-color: var(--color-accent-deep);
+  background: var(--color-ok-soft);
+}
+
+.prep-dependency-options input {
+  margin-top: 0.15rem;
+}
+
+.prep-dependency-options span {
+  display: grid;
+  min-width: 0;
+  gap: 0.2rem;
+}
+
+.prep-dependency-options strong,
+.prep-dependency-options small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.prep-dependency-options strong {
+  color: var(--color-ink);
+  font-size: 11px;
+}
+
+.prep-dependency-options small,
+.prep-dependency-state {
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+.prep-dependency-state {
+  display: block;
+  max-width: 16rem;
+  margin-top: 0.35rem;
+  line-height: 1.4;
+}
+
+.prep-dependency-state.is-waiting {
+  color: var(--color-warn);
+}
+
+.prep-dependency-state.is-ready {
+  color: var(--color-ok);
+}

@@ -94,6 +94,12 @@ export const SearchIcon = icon(
 );
 export const PlusIcon = icon(<path d="M8 3v10M3 8h10" />);
 export const ChevronRightIcon = icon(<path d="m6 3.5 4.5 4.5L6 12.5" />);
+export const ClockIcon = icon(
+  <>
+    <circle cx="8" cy="8" r="6" />
+    <path d="M8 4.5V8l2.5 1.5" />
+  </>,
+);
 export const CheckIcon = icon(<path d="m3 8.5 3.2 3L13 4.5" />);
 export const XIcon = icon(<path d="m4 4 8 8M12 4l-8 8" />);
 export const ArrowLeftIcon = icon(<path d="M13 8H3m4.5-4.5L3 8l4.5 4.5" />);

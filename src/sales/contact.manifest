@@ -1,6 +1,6 @@
 // Capsule sales — ClientContact under a Client account (D008 delivery).
 // Compile chain continues via contract.manifest / proposal.manifest.
-// Lead, ClientInteraction, ClientPreference deferred (OD037).
+// Manual communication history is authored in client-communication.manifest.
 
 use "../workforce/time.manifest"
 
@@ -17,6 +17,8 @@ entity ClientContact mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property required clientId: uuid
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
   property searchable givenName: string?
   property searchable familyName: string?
   property title: string?
@@ -31,6 +33,8 @@ entity ClientContact mixin TenantScoped, SoftDeletable {
   property removedAt: datetime?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
 
   constraint contactIdentityComplete: self.addedAt == null or (self.givenName != null and length(trim(self.givenName)) > 0) "Active contacts require a given name"
 
@@ -133,6 +137,39 @@ entity ClientContact mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Contact already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit ClientContactMergeStaged {
+      clientContactId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the contact client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit ClientContactReassigned {
+      clientContactId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
+  }
+
   store ClientContact in durable
 }
 
@@ -160,4 +197,16 @@ event ClientContactRemoved: "client_contact.removed" {
   clientContactId: string
   tenantId: string
   clientId: string
+}
+
+event ClientContactReassigned: "client_contact.reassigned" {
+  clientContactId: string
+  tenantId: string
+  previousClientId: string
+  clientId: string
+}
+
+event ClientContactMergeStaged: "client_contact.merge_staged" {
+  clientContactId: string
+  tenantId: string
 }

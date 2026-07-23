@@ -1,0 +1,446 @@
+.tip-stage {
+  min-height: calc(100dvh - 108px);
+  color: var(--color-ink);
+}
+
+.tip-masthead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 310px);
+  gap: 2rem;
+  align-items: end;
+  border-bottom: 1px solid rgb(49 87 79 / 0.22);
+  padding: 1.2rem 0 1.5rem;
+}
+
+.tip-masthead h1 {
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: clamp(3.8rem, 7vw, 7.4rem);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 0.82;
+}
+
+.tip-masthead > div:first-child > p:last-child {
+  max-width: 48rem;
+  margin-top: 1rem;
+  color: var(--color-ink-2);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.tip-total-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #294b43;
+  padding: 1.1rem 1.3rem;
+  background: #294b43;
+  color: #fffefa;
+  box-shadow: 12px 12px 0 rgb(200 120 63 / 0.22);
+}
+
+.tip-total-card::after {
+  position: absolute;
+  right: -18px;
+  bottom: -42px;
+  width: 110px;
+  height: 110px;
+  border: 1px solid rgb(255 254 250 / 0.22);
+  border-radius: 50%;
+  content: "";
+}
+
+.tip-total-card span,
+.tip-total-card small {
+  display: block;
+  color: rgb(255 254 250 / 0.68);
+  font-size: 9px;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.tip-total-card strong {
+  display: block;
+  margin: 0.45rem 0;
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.tip-controls {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.2fr) minmax(150px, 0.6fr) minmax(
+      390px,
+      1.8fr
+    );
+  gap: 1rem;
+  align-items: end;
+  margin-top: 1.2rem;
+  border: 1px solid var(--color-line-2);
+  border-top: 3px solid var(--color-accent);
+  padding: 1rem;
+  background: rgb(255 254 250 / 0.72);
+}
+
+.tip-money-input {
+  position: relative;
+  display: block;
+}
+
+.tip-money-input b {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 0.75rem;
+  color: var(--color-ink-3);
+  transform: translateY(-50%);
+}
+
+.tip-money-input input {
+  padding-left: 1.7rem;
+  font-family: var(--font-mono);
+  font-weight: 600;
+}
+
+.tip-methods {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.45rem;
+}
+
+.tip-methods legend {
+  margin-bottom: 0.35rem;
+  color: var(--color-ink-2);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.tip-methods label {
+  display: grid;
+  min-height: 58px;
+  cursor: pointer;
+  border: 1px solid var(--color-line-2);
+  padding: 0.55rem 0.65rem;
+  background: var(--color-panel);
+  transition: 140ms ease;
+}
+
+.tip-methods label:hover,
+.tip-methods label.is-active {
+  border-color: var(--color-brand);
+  background: var(--color-sage);
+  box-shadow: inset 0 -2px 0 var(--color-brand);
+}
+
+.tip-methods input {
+  position: absolute;
+  opacity: 0;
+}
+
+.tip-methods span {
+  font-weight: 650;
+}
+
+.tip-methods small {
+  color: var(--color-ink-3);
+  font-size: 9px;
+}
+
+.tip-empty {
+  display: grid;
+  place-items: center;
+  min-height: 360px;
+  margin-top: 1.2rem;
+  border: 1px dashed var(--color-line-2);
+  background:
+    linear-gradient(
+      135deg,
+      transparent 49.7%,
+      rgb(49 87 79 / 0.055) 50%,
+      transparent 50.3%
+    ),
+    var(--color-panel);
+  text-align: center;
+}
+
+.tip-empty span {
+  color: var(--color-accent);
+  font-family: var(--font-mono);
+  font-size: 3rem;
+}
+
+.tip-empty h2 {
+  max-width: 32rem;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 400;
+}
+
+.tip-empty p {
+  color: var(--color-ink-3);
+}
+
+.tip-role-weights {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  border-left: 3px solid var(--color-accent);
+  padding: 0.8rem 1rem;
+  background: var(--color-accent-soft);
+}
+
+.tip-role-weights h2 {
+  margin-top: 0.2rem;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 400;
+}
+
+.tip-role-weight-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.tip-role-weight-list label {
+  width: 130px;
+}
+
+.tip-print-sheet {
+  margin-top: 1rem;
+  border: 1px solid var(--color-line-2);
+  background:
+    linear-gradient(rgb(49 87 79 / 0.035) 1px, transparent 1px) 0 74px / 100%
+      38px,
+    #fffefa;
+  box-shadow: 0 24px 55px -46px rgb(36 50 45 / 0.8);
+}
+
+.tip-sheet-heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 2rem;
+  border-bottom: 2px solid var(--color-ink);
+  padding: 1.35rem 1.5rem 1.1rem;
+}
+
+.tip-sheet-heading h2 {
+  margin-top: 0.3rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.4rem);
+  font-weight: 400;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.tip-sheet-heading p:not(.eyebrow),
+.tip-sheet-heading small {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--color-ink-3);
+  font-size: 10px;
+}
+
+.tip-sheet-heading > div:last-child {
+  min-width: 160px;
+  border-left: 1px solid var(--color-line-2);
+  padding-left: 1.25rem;
+  text-align: right;
+}
+
+.tip-sheet-heading > div:last-child span {
+  color: var(--color-ink-3);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.tip-sheet-heading > div:last-child strong {
+  display: block;
+  margin-top: 0.25rem;
+  color: var(--color-accent-deep);
+  font-family: var(--font-display);
+  font-size: 2.3rem;
+  font-weight: 400;
+}
+
+.tip-table-wrap {
+  overflow-x: auto;
+}
+
+.tip-print-sheet table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.tip-print-sheet th {
+  border-bottom: 1px solid var(--color-line-2);
+  padding: 0.65rem 0.8rem;
+  color: var(--color-ink-3);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.tip-print-sheet td {
+  height: 54px;
+  border-bottom: 1px solid var(--color-line);
+  padding: 0.55rem 0.8rem;
+  vertical-align: middle;
+}
+
+.tip-print-sheet td > strong,
+.tip-print-sheet td > small {
+  display: block;
+}
+
+.tip-print-sheet td > small {
+  margin-top: 0.15rem;
+  color: var(--color-ink-3);
+  font-size: 9px;
+}
+
+.tip-print-sheet tbody tr.is-excluded {
+  opacity: 0.42;
+}
+
+.tip-hours-input {
+  width: 74px;
+  height: 28px;
+  border: 1px solid var(--color-line-2);
+  padding: 0 0.45rem;
+  background: var(--color-panel);
+  font-family: var(--font-mono);
+}
+
+.tip-print-hours {
+  display: none;
+}
+
+.tip-share-cell strong {
+  color: var(--color-brand);
+  font-family: var(--font-mono);
+  font-size: 14px;
+}
+
+.tip-signature {
+  min-width: 120px;
+}
+
+.tip-signature span {
+  display: block;
+  border-bottom: 1px solid var(--color-ink-3);
+}
+
+.tip-print-sheet tfoot td {
+  border-top: 2px solid var(--color-ink);
+  border-bottom: 0;
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.tip-print-sheet footer {
+  border-top: 1px solid var(--color-line-2);
+  padding: 0.75rem 1.5rem;
+  color: var(--color-ink-3);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+}
+
+.tip-error,
+.tip-notice,
+.tip-bridge-note {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  font-size: 11px;
+}
+
+.tip-error {
+  border-left: 3px solid var(--color-danger);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.tip-notice {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-left: 3px solid var(--color-ok);
+  background: var(--color-ok-soft);
+}
+
+.tip-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.tip-bridge-note {
+  margin-left: auto;
+  max-width: 52rem;
+  border-left: 2px solid var(--color-line-2);
+  padding-block: 0.25rem;
+  color: var(--color-ink-3);
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .tip-masthead,
+  .tip-controls {
+    grid-template-columns: 1fr;
+  }
+  .tip-total-card {
+    max-width: 360px;
+  }
+  .tip-role-weights,
+  .tip-sheet-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .tip-sheet-heading > div:last-child {
+    border-top: 1px solid var(--color-line-2);
+    border-left: 0;
+    padding-top: 0.8rem;
+    padding-left: 0;
+    text-align: left;
+  }
+}
+
+@media (max-width: 520px) {
+  .tip-methods {
+    grid-template-columns: 1fr;
+  }
+  .tip-actions,
+  .tip-notice {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
+@media print {
+  @page {
+    size: landscape;
+    margin: 0.45in;
+  }
+  .tip-print-sheet {
+    margin: 0;
+    border-color: #555;
+    box-shadow: none;
+  }
+  .tip-print-hours {
+    display: inline;
+  }
+  .tip-print-sheet tbody tr.is-excluded {
+    display: none;
+  }
+}

@@ -38,8 +38,13 @@ export const FINANCE_ROUTES = {
   invoiceDetail: (id: string) => `${INVOICES_PATH}/${id}`,
   issueInvoice: (prefill: InvoiceIssuePrefill = {}) =>
     invoiceIssueLinkBuilder.build(prefill),
+  taxes: "/finance/taxes",
   payments: "/finance/payments",
   paymentMethods: "/finance/payment-methods",
+  revenue: "/finance/revenue",
+  foodCost: "/finance/food-cost",
+  profitMargins: "/finance/profit-margins",
   closeout: "/finance/closeout",
   payroll: "/finance/payroll",
+  tips: "/finance/tips",
 } as const;

@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant VendorOrderLine as VendorOrderLine
     participant EventBus
-    Client->>+VendorOrderLine: recordReceipt(quantity, locationId, discrepancyQuantity, discrepancyNotes)
+    Client->>+VendorOrderLine: recordReceipt(quantity, locationId, unitPrice, supplierLotNumber, discrepancyQuantity, discrepancyNotes)
     Note over VendorOrderLine: Policies: vendorOrderLineRead, vendorOrderLineWrite, vendorOrderLineExecute
     Note over VendorOrderLine: Guards (4)
     VendorOrderLine->>VendorOrderLine: guard[0]: self.addedAt != null
@@ -14,6 +14,7 @@ sequenceDiagram
     VendorOrderLine->>VendorOrderLine: compute.nextStatus
     VendorOrderLine->>VendorOrderLine: mutate.locationId
     VendorOrderLine->>VendorOrderLine: mutate.receivedQuantity
+    VendorOrderLine->>VendorOrderLine: mutate.unitCost
     VendorOrderLine->>VendorOrderLine: mutate.discrepancyQuantity
     VendorOrderLine->>VendorOrderLine: mutate.discrepancyNotes
     VendorOrderLine->>VendorOrderLine: mutate.status

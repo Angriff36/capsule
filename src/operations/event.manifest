@@ -27,6 +27,17 @@ enum EventStage {
   closed_out
 }
 
+enum EventRecurrenceFrequency {
+  weekly
+  monthly
+  annually
+}
+
+enum EventRecurrenceEndCondition {
+  on_date
+  after_occurrences
+}
+
 enum VenueType {
   client_site
   banquet_hall
@@ -74,11 +85,16 @@ entity Client mixin TenantScoped, SoftDeletable {
   property required paymentTermsDays: int = 30
   property notes: string?
   property assignedToId: uuid?
+  property clientMergeAuthorizationId: uuid?
+  property mergedIntoClientId: uuid?
   property required status: ClientStatus = "active"
   property registeredAt: datetime?
   property archivedAt: datetime?
+  property mergedAt: datetime?
 
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergedIntoClient: Client fields [tenantId, mergedIntoClientId] references [tenantId, id]
   hasMany events: Event
 
   computed displayName: string = self.clientType == "company" ? self.companyName : self.givenName + " " + self.familyName
@@ -232,6 +248,44 @@ entity Client mixin TenantScoped, SoftDeletable {
     mutate archivedAt = null
     emit ClientReactivated {
       clientId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  // The first step records the completed merge that authorizes deletion. The
+  // follow-up command rehydrates both references before changing the account.
+  command stageClientMerge(clientMergeId: uuid, primaryClientId: uuid) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergedIntoClientId = primaryClientId
+    emit ClientMergeStaged {
+      duplicateClientId: self.id
+      clientMergeId: clientMergeId
+      tenantId: self.tenantId
+    }
+  }
+
+  command markMerged(clientId: uuid) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergedIntoClient != null
+    guard self.mergedIntoClient.status == "active"
+    guard self.mergedIntoClient.deletedAt == null
+    constraint mergeAuthorizedDuplicate: self.clientMergeAuthorization.duplicateClientId == clientId "Merge authorization does not belong to this duplicate"
+    constraint mergeAuthorizedPrimary: self.clientMergeAuthorization.primaryClientId == self.mergedIntoClientId "Merge authorization does not match the primary client"
+    mutate status = "archived"
+    mutate archivedAt = now()
+    mutate mergedAt = now()
+    mutate deletedAt = now()
+    emit ClientMerged {
+      duplicateClientId: self.id
+      primaryClientId: self.mergedIntoClientId
       tenantId: self.tenantId
     }
   }
@@ -420,6 +474,8 @@ entity Event mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property required clientId: uuid
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
   property venueId: uuid?
   property assignedToId: uuid?
   property required searchable title: string = ""
@@ -432,6 +488,9 @@ entity Event mixin TenantScoped, SoftDeletable {
   property purchasingWeekStart: datetime?
   property venueName: string?
   property venueAddress: string?
+  // Snapshot the selected venue limit so historical event planning does not
+  // silently change when the reusable Venue record is revised later.
+  property venueCapacity: int?
   property required expectedHeadcount: int = 0
   property encrypted primaryContactName: string?
   property encrypted primaryContactEmail: string?
@@ -449,10 +508,27 @@ entity Event mixin TenantScoped, SoftDeletable {
   property cancelledAt: datetime?
   property closedOutAt: datetime?
   property cancellationReason: string?
+  property recurrenceFrequency: EventRecurrenceFrequency?
+  property recurrenceEndCondition: EventRecurrenceEndCondition?
+  property recurrenceEndsAt: datetime?
+  property recurrenceOccurrenceLimit: int?
+  property recurrenceAnchorStartsAt: datetime?
+  property recurrenceNextStartsAt: datetime?
+  property recurrenceGeneratedCount: int?
+  property recurrenceSeriesId: string?
+  property recurrenceActive: boolean? = false
+  property recurrenceConfiguredAt: datetime?
+  property recurrenceStoppedAt: datetime?
+  property recurrenceCompletedAt: datetime?
+  property recurrenceTemplateEventId: uuid?
+  property recurrenceSequence: int?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
+  ref recurrenceTemplateEvent: Event fields [tenantId, recurrenceTemplateEventId] references [tenantId, id]
   hasMany guests: EventGuest
   // EventDish inverse remains omitted (PB010) — culinary entry still compiles
   // without production/logistics. Ops inverses below require compile entry
@@ -462,6 +538,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   hasMany packLists: PackList
   hasMany deliveries: Delivery
   hasMany assignments: EventAssignment
+  hasMany timelineActivities: EventTimelineActivity
 
   computed isTerminal: boolean = self.stage == "cancelled" or self.stage == "closed_out"
   computed isEditable: boolean = self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
@@ -478,7 +555,10 @@ entity Event mixin TenantScoped, SoftDeletable {
 
   // plannedAt gates full engagement invariants while planEngagement mutates fields.
   constraint eventPlanComplete: self.plannedAt == null or (length(trim(self.title)) > 0 and length(trim(self.eventType)) > 0 and self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt and self.expectedHeadcount >= 1 and self.expectedHeadcount <= 100000 and self.primaryContactName != null and length(trim(self.primaryContactName)) > 0) "Planned events require a title, type, valid date range, headcount, and primary contact"
+  constraint validEventVenueCapacity: self.venueCapacity == null or self.venueCapacity >= 0 "Venue capacity cannot be negative"
   constraint validEventPricing: self.budgetAmount >= 0 and self.quotedPrice >= 0 "Event pricing cannot be negative"
+  constraint validRecurrenceCount: self.recurrenceGeneratedCount == null or self.recurrenceGeneratedCount >= 1 "Recurring event generated count cannot be below one"
+  constraint validRecurrenceSequence: self.recurrenceSequence == null or self.recurrenceSequence >= 2 "Recurring event instances must follow the source event"
 
   transition stage from "planning" to ["pending_approval", "cancelled"]
   transition stage from "pending_approval" to ["planning", "approved", "cancelled"]
@@ -507,6 +587,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional venueId: uuid,
     optional venueName: string,
     optional venueAddress: string,
+    optional venueCapacity: number,
     optional primaryContactEmail: string,
     optional primaryContactPhone: string,
     optional accessibilityNeeds: list<string>,
@@ -521,6 +602,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     constraint planType: length(trim(eventType)) > 0 "Event type is required"
     constraint planDates: endsAt > startsAt "Event end must be after its start"
     constraint planHeadcount: expectedHeadcount >= 1 and expectedHeadcount <= 100000 "Headcount must be between 1 and 100000"
+    constraint planVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity cannot be negative"
     constraint planContact: length(trim(primaryContactName)) > 0 "Primary contact name is required"
     constraint planPricing: budgetAmount >= 0 and quotedPrice >= 0 "Event pricing cannot be negative"
     mutate clientId = clientId
@@ -532,6 +614,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate venueId = venueId
     mutate venueName = venueName
     mutate venueAddress = venueAddress
+    mutate venueCapacity = venueCapacity
     mutate expectedHeadcount = expectedHeadcount
     mutate primaryContactName = primaryContactName
     mutate primaryContactEmail = primaryContactEmail
@@ -548,6 +631,7 @@ entity Event mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       clientId: clientId
       venueId: venueId
+      venueCapacity: venueCapacity
       startsAt: startsAt
       endsAt: endsAt
       expectedHeadcount: expectedHeadcount
@@ -569,18 +653,79 @@ entity Event mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command changeVenue(optional venueId: uuid, optional venueName: string, optional venueAddress: string) {
+  command configureRecurrence(
+    frequency: EventRecurrenceFrequency,
+    endCondition: EventRecurrenceEndCondition,
+    optional recurrenceEndsAt: datetime,
+    optional occurrenceLimit: int,
+    nextStartsAt: datetime,
+    seriesId: string
+  ) {
+    guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
+    guard self.plannedAt != null
+    guard self.startsAt != null
+    guard self.endsAt != null
+    guard self.deletedAt == null
+    guard self.recurrenceTemplateEventId == null
+    constraint recurrenceSeriesIdPresent: length(trim(seriesId)) > 0 "Recurring series id is required"
+    constraint recurrenceNextAfterSource: nextStartsAt > self.startsAt "The first recurring instance must start after the source event"
+    constraint recurrenceEndShape: (endCondition == "on_date" and recurrenceEndsAt != null and recurrenceEndsAt >= nextStartsAt and occurrenceLimit == null) or (endCondition == "after_occurrences" and recurrenceEndsAt == null and occurrenceLimit != null and occurrenceLimit >= 2 and occurrenceLimit <= 1000) "Choose an end date that includes another event or a total occurrence count from 2 to 1000"
+    mutate recurrenceFrequency = frequency
+    mutate recurrenceEndCondition = endCondition
+    mutate recurrenceEndsAt = recurrenceEndsAt
+    mutate recurrenceOccurrenceLimit = occurrenceLimit
+    mutate recurrenceAnchorStartsAt = self.startsAt
+    mutate recurrenceNextStartsAt = nextStartsAt
+    mutate recurrenceGeneratedCount = 1
+    mutate recurrenceSeriesId = seriesId
+    mutate recurrenceActive = true
+    mutate recurrenceConfiguredAt = now()
+    mutate recurrenceStoppedAt = null
+    mutate recurrenceCompletedAt = null
+    emit EventRecurrenceConfigured {
+      eventId: self.id
+      tenantId: self.tenantId
+      frequency: frequency
+      endCondition: endCondition
+      recurrenceEndsAt: recurrenceEndsAt
+      occurrenceLimit: occurrenceLimit
+      nextStartsAt: nextStartsAt
+    }
+  }
+
+  command stopRecurrence() {
+    guard self.recurrenceActive == true
+    guard self.deletedAt == null
+    mutate recurrenceActive = false
+    mutate recurrenceNextStartsAt = null
+    mutate recurrenceStoppedAt = now()
+    emit EventRecurrenceStopped {
+      eventId: self.id
+      tenantId: self.tenantId
+      generatedCount: self.recurrenceGeneratedCount
+    }
+  }
+
+  command changeVenue(
+    optional venueId: uuid,
+    optional venueName: string,
+    optional venueAddress: string,
+    optional venueCapacity: number
+  ) {
     guard self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
     guard self.deletedAt == null
+    constraint changeVenueCapacity: venueCapacity == null or venueCapacity >= 0 "Venue capacity cannot be negative"
     mutate venueId = venueId
     mutate venueName = venueName
     mutate venueAddress = venueAddress
+    mutate venueCapacity = venueCapacity
     emit EventVenueChanged {
       eventId: self.id
       tenantId: self.tenantId
       venueId: venueId
       venueName: venueName
       venueAddress: venueAddress
+      venueCapacity: venueCapacity
     }
   }
 
@@ -612,6 +757,39 @@ entity Event mixin TenantScoped, SoftDeletable {
     emit EventPrimaryContactChanged {
       eventId: self.id
       tenantId: self.tenantId
+    }
+  }
+
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Event already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit EventClientMergeStaged {
+      eventId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the event client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit EventClientReassigned {
+      eventId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
     }
   }
 
@@ -906,6 +1084,98 @@ entity EventGuest mixin TenantScoped, SoftDeletable {
   store EventGuest in durable
 }
 
+// ---------------------------------------------------------------------------
+// EventTimelineActivity — a named activity on an event's day-of timeline
+// (vendor arrival, kitchen production start, guest arrival, service, breakdown)
+// with a start time and responsible party. Rendered as a Gantt-style strip on
+// the event detail page and exported to the BEO.
+// ---------------------------------------------------------------------------
+
+entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required searchable name: string = ""
+  property startsAt: datetime?
+  property endsAt: datetime?
+  property responsibleParty: string?
+  property notes: string?
+  property scheduledAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint timelineActivityNameComplete: self.scheduledAt == null or length(trim(self.name)) > 0 "Timeline activities require a name once scheduled"
+  constraint timelineActivityWindowOrdered: self.startsAt == null or self.endsAt == null or self.endsAt >= self.startsAt "Timeline activity end must not precede its start"
+
+  default policy eventTimelineActivityRead read: roleAllows(user.role, "eventAccess") "Event staff may read the event timeline"
+  default policy eventTimelineActivityWrite write: roleAllows(user.role, "eventAccess") "Event staff may write the event timeline through commands"
+  default policy eventTimelineActivityExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute event timeline commands"
+
+  command schedule(
+    eventId: uuid,
+    name: string,
+    startsAt: datetime,
+    optional endsAt: datetime,
+    optional responsibleParty: string,
+    optional notes: string
+  ) {
+    guard self.scheduledAt == null
+    guard self.deletedAt == null
+    constraint scheduleActivityName: length(trim(name)) > 0 "Activity name is required"
+    constraint scheduleActivityWindow: endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
+    mutate eventId = eventId
+    mutate name = name
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate responsibleParty = responsibleParty
+    mutate notes = notes
+    mutate scheduledAt = now()
+    emit EventTimelineActivityScheduled {
+      activityId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      name: name
+      startsAt: startsAt
+    }
+  }
+
+  command adjust(
+    optional name: string,
+    optional startsAt: datetime,
+    optional endsAt: datetime,
+    optional responsibleParty: string,
+    optional notes: string
+  ) {
+    guard self.scheduledAt != null
+    guard self.deletedAt == null
+    constraint adjustActivityName: name == null or length(trim(name)) > 0 "Activity name cannot be blanked"
+    mutate name = name != null ? name : self.name
+    mutate startsAt = startsAt != null ? startsAt : self.startsAt
+    mutate endsAt = endsAt != null ? endsAt : self.endsAt
+    mutate responsibleParty = responsibleParty != null ? responsibleParty : self.responsibleParty
+    mutate notes = notes != null ? notes : self.notes
+    emit EventTimelineActivityAdjusted {
+      activityId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    mutate deletedAt = now()
+    emit EventTimelineActivityRemoved {
+      activityId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  store EventTimelineActivity in durable
+}
+
 event VenueRegistered: "venue.registered" {
   venueId: string
   tenantId: string
@@ -972,11 +1242,24 @@ event ClientReactivated: "client.reactivated" {
   tenantId: string
 }
 
+event ClientMerged: "client.merged" {
+  duplicateClientId: string
+  primaryClientId: string
+  tenantId: string
+}
+
+event ClientMergeStaged: "client.merge_staged" {
+  duplicateClientId: string
+  clientMergeId: string
+  tenantId: string
+}
+
 event EventPlanned: "event.planned" {
   eventId: string
   tenantId: string
   clientId: string
   venueId: string?
+  venueCapacity: number?
   startsAt: datetime
   endsAt: datetime
   expectedHeadcount: number
@@ -989,12 +1272,41 @@ event EventScheduleChanged: "event.schedule_changed" {
   endsAt: datetime
 }
 
+event EventRecurrenceConfigured: "event.recurrence_configured" {
+  eventId: string
+  tenantId: string
+  frequency: EventRecurrenceFrequency
+  endCondition: EventRecurrenceEndCondition
+  recurrenceEndsAt: datetime?
+  occurrenceLimit: int?
+  nextStartsAt: datetime
+}
+
+event EventRecurrenceStopped: "event.recurrence_stopped" {
+  eventId: string
+  tenantId: string
+  generatedCount: int?
+}
+
+event EventClientReassigned: "event.client_reassigned" {
+  eventId: string
+  tenantId: string
+  previousClientId: string
+  clientId: string
+}
+
+event EventClientMergeStaged: "event.client_merge_staged" {
+  eventId: string
+  tenantId: string
+}
+
 event EventVenueChanged: "event.venue_changed" {
   eventId: string
   tenantId: string
   venueId: string?
   venueName: string?
   venueAddress: string?
+  venueCapacity: number?
 }
 
 event EventHeadcountChanged: "event.headcount_changed" {
@@ -1119,4 +1431,24 @@ event EventGuestWithdrawn: "event_guest.withdrawn" {
   tenantId: string
   eventId: string
   reason: string
+}
+
+event EventTimelineActivityScheduled: "event_timeline_activity.scheduled" {
+  activityId: string
+  tenantId: string
+  eventId: string
+  name: string
+  startsAt: datetime
+}
+
+event EventTimelineActivityAdjusted: "event_timeline_activity.adjusted" {
+  activityId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventTimelineActivityRemoved: "event_timeline_activity.removed" {
+  activityId: string
+  tenantId: string
+  eventId: string
 }

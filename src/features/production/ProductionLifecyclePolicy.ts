@@ -60,6 +60,17 @@ const QUALITY_ACTIONS = [
   },
 ] as const;
 
+function nextStatus(
+  key: string,
+  from: string,
+  actions: readonly { key: string; lifecycle: Lifecycle }[],
+): string | undefined {
+  const action = actions.find((entry) => entry.key === key);
+  return action?.lifecycle.find(
+    (transition) => transition.proven && transition.from === from,
+  )?.to;
+}
+
 export class ProductionLifecyclePolicy {
   prepActions(status: string) {
     return available(status, PREP_ACTIONS);
@@ -67,5 +78,15 @@ export class ProductionLifecyclePolicy {
 
   qualityActions(status: string) {
     return available(status, QUALITY_ACTIONS);
+  }
+
+  /** Proven target status for a prep transition, for optimistic UI. */
+  prepNextStatus(key: string, from: string) {
+    return nextStatus(key, from, PREP_ACTIONS);
+  }
+
+  /** Proven target status for a quality transition, for optimistic UI. */
+  qualityNextStatus(key: string, from: string) {
+    return nextStatus(key, from, QUALITY_ACTIONS);
   }
 }

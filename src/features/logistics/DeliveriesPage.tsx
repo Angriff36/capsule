@@ -1,5 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { Fragment, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import type { Id } from "../../lib/api";
 import {
   useCreateDelivery,
   useDeliveryCancel,
@@ -10,9 +11,15 @@ import {
   useListDelivery,
   useListPackList,
   useListPerson,
+  useListVehicle,
 } from "../../lib/manifest-convex-react";
+import {
+  useAssignVehicle,
+  useUnassignVehicle,
+} from "../facilities/vehicleAssignment";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { RecordPhotoCapture } from "../attachments/RecordPhotoCapture";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -29,6 +36,9 @@ export function DeliveriesPage() {
   const packLists = useListPackList();
   const events = useListEvent();
   const people = useListPerson();
+  const vehicles = useListVehicle();
+  const assignVehicle = useAssignVehicle();
+  const unassignVehicle = useUnassignVehicle();
   const createDelivery = useCreateDelivery();
   const startTransit = useDeliveryStartTransit();
   const confirmDelivery = useDeliveryConfirmDelivery();
@@ -39,6 +49,7 @@ export function DeliveriesPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [photoDeliveryId, setPhotoDeliveryId] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
 
   const activeRows = (deliveries ?? []).filter((row) => row.deletedAt == null);
@@ -57,6 +68,10 @@ export function DeliveriesPage() {
   );
   const drivers = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
+  );
+  const fleet = (vehicles ?? []).filter(
+    (vehicle) =>
+      vehicle.deletedAt == null && vehicle.operationalStatus !== "retired",
   );
   const eventName = (id: string) =>
     events?.find((event) => event._id === id)?.title ?? "Unknown event";
@@ -151,11 +166,34 @@ export function DeliveriesPage() {
     })();
   };
 
+  const changeVehicle = (
+    row: { _id: string; version: number; destination: string },
+    vehicleId: string,
+  ) => {
+    void run(`${row._id}:vehicle`, async () => {
+      if (vehicleId) {
+        await assignVehicle({
+          deliveryId: row._id as Id<"deliveries">,
+          vehicleId: vehicleId as Id<"vehicles">,
+          version: row.version,
+        });
+        setNotice(`Vehicle assigned to ${row.destination}.`);
+      } else {
+        await unassignVehicle({
+          deliveryId: row._id as Id<"deliveries">,
+          version: row.version,
+        });
+        setNotice(`Vehicle cleared from ${row.destination}.`);
+      }
+    });
+  };
+
   const loading =
     deliveries === undefined ||
     packLists === undefined ||
     events === undefined ||
-    people === undefined;
+    people === undefined ||
+    vehicles === undefined;
 
   return (
     <div className="operations-stage supply-stage">
@@ -307,6 +345,7 @@ export function DeliveriesPage() {
                   <th>Destination</th>
                   <th>Pack / event</th>
                   <th>Driver</th>
+                  <th>Vehicle</th>
                   <th>Window</th>
                   <th>State</th>
                   <th aria-label="Actions" />
@@ -314,49 +353,102 @@ export function DeliveriesPage() {
               </thead>
               <tbody>
                 {visibleRows.map((row) => (
-                  <tr key={row._id}>
-                    <td>
-                      <strong>{row.destination}</strong>
-                    </td>
-                    <td>
-                      {packName(row.packListId)}
-                      <small>{eventName(row.eventId)}</small>
-                    </td>
-                    <td>{personName(row.driverId)}</td>
-                    <td>
-                      {row.windowStartsAt
-                        ? new Date(row.windowStartsAt).toLocaleString()
-                        : "—"}{" "}
-                      →{" "}
-                      {row.windowEndsAt
-                        ? new Date(row.windowEndsAt).toLocaleString()
-                        : "—"}
-                    </td>
-                    <td>
-                      <StatusChip status={String(row.status)} />
-                      {row.failureReason ? (
-                        <small>{row.failureReason}</small>
-                      ) : null}
-                    </td>
-                    <td>
-                      <div className="supply-row-actions">
-                        {policy
-                          .deliveryActions(String(row.status))
-                          .map((action) => (
-                            <button
-                              key={action.key}
-                              className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
-                              onClick={() => invoke(row, action.key)}
-                            >
-                              {busy === `${row._id}:${action.key}`
-                                ? "Working…"
-                                : action.label}
-                            </button>
-                          ))}
-                      </div>
-                    </td>
-                  </tr>
+                  <Fragment key={row._id}>
+                    <tr>
+                      <td>
+                        <strong>{row.destination}</strong>
+                      </td>
+                      <td>
+                        {packName(row.packListId)}
+                        <small>{eventName(row.eventId)}</small>
+                      </td>
+                      <td>{personName(row.driverId)}</td>
+                      <td>
+                        {String(row.status) === "scheduled" ||
+                        String(row.status) === "in_transit" ? (
+                          <select
+                            className="input"
+                            aria-label={`Vehicle for ${row.destination}`}
+                            value={row.vehicleId ?? ""}
+                            disabled={busy != null}
+                            onChange={(event) =>
+                              changeVehicle(row, event.currentTarget.value)
+                            }
+                          >
+                            <option value="">No vehicle</option>
+                            {fleet.map((vehicle) => (
+                              <option key={vehicle._id} value={vehicle._id}>
+                                {vehicle.registration}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          (fleet.find(
+                            (vehicle) => vehicle._id === row.vehicleId,
+                          )?.registration ?? "—")
+                        )}
+                      </td>
+                      <td>
+                        {row.windowStartsAt
+                          ? new Date(row.windowStartsAt).toLocaleString()
+                          : "—"}{" "}
+                        →{" "}
+                        {row.windowEndsAt
+                          ? new Date(row.windowEndsAt).toLocaleString()
+                          : "—"}
+                      </td>
+                      <td>
+                        <StatusChip status={String(row.status)} />
+                        {row.failureReason ? (
+                          <small>{row.failureReason}</small>
+                        ) : null}
+                      </td>
+                      <td>
+                        <div className="supply-row-actions">
+                          {policy
+                            .deliveryActions(String(row.status))
+                            .map((action) => (
+                              <button
+                                key={action.key}
+                                className="btn btn-ghost btn-sm"
+                                disabled={busy != null}
+                                onClick={() => invoke(row, action.key)}
+                              >
+                                {busy === `${row._id}:${action.key}`
+                                  ? "Working…"
+                                  : action.label}
+                              </button>
+                            ))}
+                          <button
+                            type="button"
+                            className="btn btn-ghost btn-sm"
+                            aria-expanded={photoDeliveryId === row._id}
+                            onClick={() =>
+                              setPhotoDeliveryId((current) =>
+                                current === row._id ? null : row._id,
+                              )
+                            }
+                          >
+                            {photoDeliveryId === row._id
+                              ? "Hide photos"
+                              : "Photos"}
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    {photoDeliveryId === row._id ? (
+                      <tr>
+                        <td colSpan={7} className="!p-3">
+                          <RecordPhotoCapture
+                            parentType="delivery"
+                            parentId={row._id}
+                            title="Proof of delivery"
+                            description="Photos captured by the driver appear here for dispatch and office review."
+                          />
+                        </td>
+                      </tr>
+                    ) : null}
+                  </Fragment>
                 ))}
               </tbody>
             </table>

@@ -14,9 +14,12 @@ import {
   useListProposal,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
+import { AttachmentsSection } from "../attachments/AttachmentsSection";
+import { useTrackRecent } from "../../lib/recents";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
+import { ClientCommunicationPanel } from "./ClientCommunicationPanel";
 import { ClientContactsPanel } from "./ClientContactsPanel";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -33,6 +36,10 @@ function optional(value: string): string | undefined {
 export function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
   const client = useGetClient(id ?? "skip");
+  useTrackRecent(
+    "Client",
+    client ? clientDisplayName(client._id, [client]) : undefined,
+  );
   const contacts = useListClientContact();
   const proposals = useListProposal();
   const contracts = useListContract();
@@ -82,11 +89,11 @@ export function ClientDetailPage() {
     );
   }
 
-  const activeContacts = contacts.filter(
-    (row) =>
-      row.deletedAt == null &&
-      row.clientId === client._id &&
-      String(row.status) === "active",
+  const clientContacts = contacts.filter(
+    (row) => row.deletedAt == null && row.clientId === client._id,
+  );
+  const activeContacts = clientContacts.filter(
+    (row) => row.deletedAt == null && String(row.status) === "active",
   );
   const clientProposals = proposals.filter(
     (row) => row.deletedAt == null && row.clientId === client._id,
@@ -286,6 +293,12 @@ export function ClientDetailPage() {
           })
         }
       />
+
+      <ClientCommunicationPanel
+        target={{ kind: "contacts", contacts: clientContacts }}
+      />
+
+      <AttachmentsSection parentType="client" parentId={client._id} />
 
       <section className="working-ledger">
         <div className="ledger-heading">

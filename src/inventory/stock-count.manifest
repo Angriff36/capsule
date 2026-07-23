@@ -1,0 +1,383 @@
+// Guided physical inventory counts. Expected quantities are frozen from the
+// governed InventoryItem at line creation; reconciliation posts only the
+// adjustment required to make the current ledger match the physical count.
+
+use "./stock.manifest"
+
+enum StockCountSessionStatus {
+  in_progress
+  closed
+}
+
+enum StockCountLineStatus {
+  pending
+  counted
+  reconciled
+}
+
+entity StockCountSession mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required label: string = ""
+  property required locationIds: string = "[]"
+  property required locationNames: string = ""
+  property required lineCount: int = 0
+  property required status: StockCountSessionStatus = "in_progress"
+  property startedById: string?
+  property closedById: string?
+  property startedAt: datetime?
+  property closedAt: datetime?
+
+  hasMany lines: StockCountLine
+
+  transition status from "in_progress" to ["closed"]
+  transition status from "closed" to []
+
+  default policy stockCountSessionRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read stock count sessions"
+  default policy stockCountSessionWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write stock count sessions through commands"
+  default policy stockCountSessionExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute stock count session commands"
+
+  command start(
+    label: string,
+    locationIds: string,
+    locationNames: string,
+    lineCount: number
+  ) {
+    guard self.startedAt == null
+    guard self.status == "in_progress"
+    guard self.deletedAt == null
+    constraint stockCountLabelRequired: length(trim(label)) > 0 "Count session name is required"
+    constraint stockCountLocationsRequired: length(trim(locationIds)) > 2 "Choose at least one storage location"
+    constraint stockCountLocationNamesRequired: length(trim(locationNames)) > 0 "Count session locations are required"
+    constraint stockCountLineCountNonnegative: lineCount >= 0 "Count line total cannot be negative"
+    mutate label = label
+    mutate locationIds = locationIds
+    mutate locationNames = locationNames
+    mutate lineCount = lineCount
+    mutate startedById = user.id
+    mutate startedAt = now()
+    emit StockCountSessionStarted {
+      stockCountSessionId: self.id
+      tenantId: self.tenantId
+      actorId: user.id
+      label: label
+      locationIds: locationIds
+      locationNames: locationNames
+      lineCount: lineCount
+      status: "in_progress"
+    }
+  }
+
+  command close() {
+    guard self.status == "in_progress"
+    guard self.startedAt != null
+    guard self.deletedAt == null
+    // A session cannot close after a partial start or with skipped lines.
+    guard count_of(self.lines, (line) => line.deletedAt == null) == self.lineCount
+    guard count_of(self.lines, (line) => line.deletedAt == null and line.status != "reconciled") == 0
+    mutate status = "closed"
+    mutate closedById = user.id
+    mutate closedAt = now()
+    emit StockCountSessionClosed {
+      stockCountSessionId: self.id
+      tenantId: self.tenantId
+      actorId: user.id
+      label: self.label
+      locationIds: self.locationIds
+      lineCount: self.lineCount
+      status: "closed"
+    }
+  }
+
+  store StockCountSession in durable
+}
+
+entity StockCountLine mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, stockCountSessionId, inventoryItemId]
+  timestamps
+  versionProperty version: number
+
+  property required stockCountSessionId: uuid
+  property required inventoryItemId: uuid
+  property required locationId: uuid
+  property required ingredientId: uuid
+  property required unit: UnitOfMeasure = "each"
+  property required expectedQuantity: decimal(12, 4) = 0
+  property required countedQuantity: decimal(12, 4) = 0
+  property required varianceQuantity: decimal(12, 4) = 0
+  property required ledgerQuantityAtReconcile: decimal(12, 4) = 0
+  property required adjustmentQuantity: decimal(12, 4) = 0
+  property required status: StockCountLineStatus = "pending"
+  property countNote: string?
+  property countedById: string?
+  property reconciledById: string?
+  property frozenAt: datetime?
+  property countedAt: datetime?
+  property reconciledAt: datetime?
+
+  belongsTo session: StockCountSession fields [tenantId, stockCountSessionId] references [tenantId, id]
+  belongsTo inventoryItem: InventoryItem fields [tenantId, inventoryItemId] references [tenantId, id]
+  belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+
+  transition status from "pending" to ["counted"]
+  transition status from "counted" to ["reconciled"]
+  transition status from "reconciled" to []
+
+  default policy stockCountLineRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read stock count lines"
+  default policy stockCountLineWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write stock count lines through commands"
+  default policy stockCountLineExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute stock count line commands"
+
+  command freeze(
+    stockCountSessionId: uuid,
+    inventoryItemId: uuid,
+    locationId: uuid,
+    ingredientId: uuid,
+    unit: UnitOfMeasure
+  ) {
+    guard self.frozenAt == null
+    guard self.status == "pending"
+    guard self.deletedAt == null
+    guard self.session != null and self.session.status == "in_progress" and self.session.deletedAt == null
+    guard self.inventoryItem != null and self.inventoryItem.stockedAt != null and self.inventoryItem.deletedAt == null
+    constraint stockCountSessionMatch: stockCountSessionId == self.stockCountSessionId "Count session must match the seeded session reference"
+    constraint stockCountInventoryItemMatch: inventoryItemId == self.inventoryItemId "Stock line must match the seeded inventory reference"
+    constraint stockCountLocationMatch: locationId == self.locationId and locationId == self.inventoryItem.locationId "Count location must match the stock line location"
+    constraint stockCountIngredientMatch: ingredientId == self.ingredientId and ingredientId == self.inventoryItem.ingredientId "Count ingredient must match the stock line ingredient"
+    constraint stockCountUnitMatch: unit == self.unit and unit == self.inventoryItem.unit "Count unit must match the stock line unit"
+    mutate stockCountSessionId = stockCountSessionId
+    mutate inventoryItemId = inventoryItemId
+    mutate locationId = locationId
+    mutate ingredientId = ingredientId
+    mutate unit = unit
+    mutate expectedQuantity = self.inventoryItem.quantityOnHand
+    mutate countedQuantity = 0
+    mutate varianceQuantity = 0
+    mutate ledgerQuantityAtReconcile = 0
+    mutate adjustmentQuantity = 0
+    mutate frozenAt = now()
+    emit StockCountLineFrozen {
+      stockCountLineId: self.id
+      stockCountSessionId: self.stockCountSessionId
+      tenantId: self.tenantId
+      actorId: user.id
+      inventoryItemId: self.inventoryItemId
+      locationId: self.locationId
+      ingredientId: self.ingredientId
+      expectedQuantity: self.inventoryItem.quantityOnHand
+      unit: self.unit
+      status: "pending"
+    }
+  }
+
+  command recordCount(countedQuantity: decimal(12, 4), optional countNote: string) {
+    guard self.status == "pending"
+    guard self.frozenAt != null
+    guard self.deletedAt == null
+    guard self.session != null and self.session.status == "in_progress"
+    constraint stockCountQuantityNonnegative: countedQuantity >= 0 "Counted quantity cannot be negative"
+    compute varianceQuantity = countedQuantity - self.expectedQuantity
+    mutate countedQuantity = countedQuantity
+    mutate varianceQuantity = varianceQuantity
+    mutate countNote = countNote
+    mutate countedById = user.id
+    mutate countedAt = now()
+    mutate status = "counted"
+    emit StockCountLineCounted {
+      stockCountLineId: self.id
+      stockCountSessionId: self.stockCountSessionId
+      tenantId: self.tenantId
+      actorId: user.id
+      inventoryItemId: self.inventoryItemId
+      expectedQuantity: self.expectedQuantity
+      countedQuantity: countedQuantity
+      varianceQuantity: varianceQuantity
+      unit: self.unit
+      status: "counted"
+    }
+  }
+
+  command reviseCount(countedQuantity: decimal(12, 4), optional countNote: string) {
+    guard self.status == "counted"
+    guard self.deletedAt == null
+    guard self.session != null and self.session.status == "in_progress"
+    constraint stockCountRevisedQuantityNonnegative: countedQuantity >= 0 "Counted quantity cannot be negative"
+    compute varianceQuantity = countedQuantity - self.expectedQuantity
+    mutate countedQuantity = countedQuantity
+    mutate varianceQuantity = varianceQuantity
+    mutate countNote = countNote
+    mutate countedById = user.id
+    mutate countedAt = now()
+    emit StockCountLineCountRevised {
+      stockCountLineId: self.id
+      stockCountSessionId: self.stockCountSessionId
+      tenantId: self.tenantId
+      actorId: user.id
+      inventoryItemId: self.inventoryItemId
+      expectedQuantity: self.expectedQuantity
+      countedQuantity: countedQuantity
+      varianceQuantity: varianceQuantity
+      unit: self.unit
+      status: "counted"
+    }
+  }
+
+  command confirmLedgerMatch() {
+    guard self.status == "counted"
+    guard self.deletedAt == null
+    guard self.session != null and self.session.status == "in_progress"
+    guard self.inventoryItem != null and self.inventoryItem.deletedAt == null
+    guard self.countedQuantity == self.inventoryItem.quantityOnHand
+    mutate ledgerQuantityAtReconcile = self.inventoryItem.quantityOnHand
+    mutate adjustmentQuantity = 0
+    mutate reconciledById = user.id
+    mutate reconciledAt = now()
+    mutate status = "reconciled"
+    emit StockCountLineMatched {
+      stockCountLineId: self.id
+      stockCountSessionId: self.stockCountSessionId
+      tenantId: self.tenantId
+      actorId: user.id
+      inventoryItemId: self.inventoryItemId
+      expectedQuantity: self.expectedQuantity
+      countedQuantity: self.countedQuantity
+      varianceQuantity: self.varianceQuantity
+      ledgerQuantityAtReconcile: self.inventoryItem.quantityOnHand
+      unit: self.unit
+      status: "reconciled"
+    }
+  }
+
+  command reconcileVariance(reason: string) {
+    guard self.status == "counted"
+    guard self.deletedAt == null
+    guard self.session != null and self.session.status == "in_progress"
+    guard self.inventoryItem != null and self.inventoryItem.deletedAt == null
+    guard self.countedQuantity != self.inventoryItem.quantityOnHand
+    constraint stockCountVarianceReasonRequired: length(trim(reason)) > 0 "Adjustment reason is required"
+    compute ledgerQuantity = self.inventoryItem.quantityOnHand
+    compute adjustmentQuantity = self.countedQuantity - ledgerQuantity
+    mutate ledgerQuantityAtReconcile = ledgerQuantity
+    mutate adjustmentQuantity = adjustmentQuantity
+    mutate reconciledById = user.id
+    mutate reconciledAt = now()
+    mutate status = "reconciled"
+    emit StockCountVarianceReconciled {
+      stockCountLineId: self.id
+      stockCountSessionId: self.stockCountSessionId
+      tenantId: self.tenantId
+      actorId: user.id
+      inventoryItemId: self.inventoryItemId
+      expectedQuantity: self.expectedQuantity
+      countedQuantity: self.countedQuantity
+      varianceQuantity: self.varianceQuantity
+      ledgerQuantityAtReconcile: ledgerQuantity
+      adjustmentQuantity: adjustmentQuantity
+      unit: self.unit
+      reason: reason
+      status: "reconciled"
+    }
+  }
+
+  store StockCountLine in durable
+}
+
+event StockCountSessionStarted: "stock_count_session.started" {
+  stockCountSessionId: string
+  tenantId: string
+  actorId: string
+  label: string
+  locationIds: string
+  locationNames: string
+  lineCount: number
+  status: string
+}
+
+event StockCountSessionClosed: "stock_count_session.closed" {
+  stockCountSessionId: string
+  tenantId: string
+  actorId: string
+  label: string
+  locationIds: string
+  lineCount: number
+  status: string
+}
+
+event StockCountLineFrozen: "stock_count_line.frozen" {
+  stockCountLineId: string
+  stockCountSessionId: string
+  tenantId: string
+  actorId: string
+  inventoryItemId: string
+  locationId: string
+  ingredientId: string
+  expectedQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  status: string
+}
+
+event StockCountLineCounted: "stock_count_line.counted" {
+  stockCountLineId: string
+  stockCountSessionId: string
+  tenantId: string
+  actorId: string
+  inventoryItemId: string
+  expectedQuantity: decimal(12, 4)
+  countedQuantity: decimal(12, 4)
+  varianceQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  status: string
+}
+
+event StockCountLineCountRevised: "stock_count_line.count_revised" {
+  stockCountLineId: string
+  stockCountSessionId: string
+  tenantId: string
+  actorId: string
+  inventoryItemId: string
+  expectedQuantity: decimal(12, 4)
+  countedQuantity: decimal(12, 4)
+  varianceQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  status: string
+}
+
+event StockCountLineMatched: "stock_count_line.matched" {
+  stockCountLineId: string
+  stockCountSessionId: string
+  tenantId: string
+  actorId: string
+  inventoryItemId: string
+  expectedQuantity: decimal(12, 4)
+  countedQuantity: decimal(12, 4)
+  varianceQuantity: decimal(12, 4)
+  ledgerQuantityAtReconcile: decimal(12, 4)
+  unit: UnitOfMeasure
+  status: string
+}
+
+event StockCountVarianceReconciled: "stock_count_line.variance_reconciled" {
+  stockCountLineId: string
+  stockCountSessionId: string
+  tenantId: string
+  actorId: string
+  inventoryItemId: string
+  expectedQuantity: decimal(12, 4)
+  countedQuantity: decimal(12, 4)
+  varianceQuantity: decimal(12, 4)
+  ledgerQuantityAtReconcile: decimal(12, 4)
+  adjustmentQuantity: decimal(12, 4)
+  unit: UnitOfMeasure
+  reason: string
+  status: string
+}
+
+on StockCountVarianceReconciled run InventoryItem.adjustQuantity
+  resolve payload.inventoryItemId
+  params {
+    delta: payload.adjustmentQuantity
+    reason: payload.reason
+  }

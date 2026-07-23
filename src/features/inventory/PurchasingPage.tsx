@@ -2,25 +2,36 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreateVendor,
+  useCreateVendorContact,
   useCreateVendorOrder,
   useListEvent,
   useListIngredient,
+  useListIngredientPriceObservation,
   useListPurchaseNeed,
   useListVendor,
+  useListVendorContact,
   useListVendorOrder,
   useListVendorOrderLine,
   useListVendorOrderLineDemand,
+  useListWeeklyPurchasingConfig,
   usePurchaseNeedCancel,
   usePurchaseNeedMarkFulfilled,
   usePurchaseNeedMarkOrdered,
+  useWeeklyPurchasingConfigSetOrderApprovalThreshold,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
+import {
+  BulkActionBar,
+  useBulkRun,
+  useBulkSelection,
+} from "../../ui/bulk-select";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { PurchasingCommandForm } from "./PurchasingCommandForm";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
+import { byVendorScore, computeVendorPerformance } from "./vendorPerformance";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -32,15 +43,19 @@ export function PurchasingPage() {
   const demandLinks = useListVendorOrderLineDemand();
   const ingredients = useListIngredient();
   const events = useListEvent();
+  const vendorContacts = useListVendorContact();
+  const priceObservations = useListIngredientPriceObservation();
   const createVendor = useCreateVendor();
   const createOrder = useCreateVendorOrder();
+  const createContact = useCreateVendorContact();
   const markOrdered = usePurchaseNeedMarkOrdered();
   const markFulfilled = usePurchaseNeedMarkFulfilled();
   const cancelNeed = usePurchaseNeedCancel();
-  const [form, setForm] = useState<"vendor" | "order" | null>(null);
-  const [selectedNeedIds, setSelectedNeedIds] = useState<Set<string>>(
-    () => new Set(),
-  );
+  const purchasingConfigs = useListWeeklyPurchasingConfig();
+  const setApprovalThreshold =
+    useWeeklyPurchasingConfigSetOrderApprovalThreshold();
+  const [form, setForm] = useState<"vendor" | "order" | "contact" | null>(null);
+  const [contactVendorId, setContactVendorId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt(busy != null);
@@ -50,6 +65,21 @@ export function PurchasingPage() {
     (item) => item.deletedAt == null,
   );
   const activeOrders = (orders ?? []).filter((item) => item.deletedAt == null);
+  const vendorPerformance = useMemo(
+    () =>
+      computeVendorPerformance(
+        activeVendors.map((vendor) => vendor._id),
+        orders ?? [],
+        lines ?? [],
+        priceObservations ?? [],
+        Date.now(),
+      ),
+    [activeVendors, orders, lines, priceObservations],
+  );
+  const rankedVendors = useMemo(
+    () => [...activeVendors].sort(byVendorScore(vendorPerformance)),
+    [activeVendors, vendorPerformance],
+  );
   const weeklyDrafts = useMemo(
     () =>
       activeOrders.filter(
@@ -79,9 +109,15 @@ export function PurchasingPage() {
     policy
       .purchaseNeedActions(String(need.status))
       .some((action) => action.key === "cancel");
-  const openCancellableNeeds = activeNeeds.filter(
-    (need) => String(need.status) === "open" && needCanCancel(need),
+  const needCanFulfill = (need: any) =>
+    policy
+      .purchaseNeedActions(String(need.status))
+      .some((action) => action.key === "markFulfilled");
+  const selectableNeeds = activeNeeds.filter(
+    (need) => needCanCancel(need) || needCanFulfill(need),
   );
+  const selection = useBulkSelection(selectableNeeds);
+  const bulk = useBulkRun();
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -110,6 +146,15 @@ export function PurchasingPage() {
           paymentTermsDays: Number(data.get("paymentTermsDays")),
           notes: String(data.get("notes") ?? "").trim() || undefined,
         });
+      } else if (current === "contact") {
+        await createContact({
+          vendorId: String(data.get("vendorId")),
+          name: String(data.get("name") ?? "").trim(),
+          role: String(data.get("role") ?? "general"),
+          email: String(data.get("email") ?? "").trim() || undefined,
+          phone: String(data.get("phone") ?? "").trim() || undefined,
+          notes: String(data.get("notes") ?? "").trim() || undefined,
+        });
       } else {
         await createOrder({
           vendorId: String(data.get("vendorId")),
@@ -121,6 +166,7 @@ export function PurchasingPage() {
       }
       element.reset();
       setForm(null);
+      setContactVendorId(null);
     });
   };
 
@@ -159,27 +205,79 @@ export function PurchasingPage() {
   };
 
   const bulkCancelNeeds = () => {
-    if (selectedNeedIds.size === 0) return;
+    const targets = selection.selected.filter(needCanCancel);
+    if (targets.length === 0) return;
     void (async () => {
       const reason = await prompt.askReason({
         ...ReasonCopy.cancelNeed,
         tone: "danger",
       });
       if (!reason) return;
-      const targets = activeNeeds.filter(
-        (need) => selectedNeedIds.has(need._id) && needCanCancel(need),
-      );
       void run("bulk-cancel-needs", async () => {
-        for (const need of targets) {
-          await cancelNeed({
-            docId: need._id,
-            version: need.version,
-            reason,
-          });
-        }
-        setSelectedNeedIds(new Set());
+        await bulk.runBulk(targets, async (need) => {
+          await cancelNeed({ docId: need._id, version: need.version, reason });
+        });
+        selection.clear();
       });
     })();
+  };
+
+  const purchasingConfig = (purchasingConfigs ?? []).find(
+    (config) => config.deletedAt == null,
+  );
+  const approvalThreshold =
+    purchasingConfig?.orderApprovalThresholdAmount ?? null;
+
+  const editApprovalThreshold = () => {
+    void (async () => {
+      if (!purchasingConfig) {
+        setFailure(
+          new Error(
+            "Weekly purchasing is not set up for this workspace yet — the approval threshold lives on that config.",
+          ),
+        );
+        return;
+      }
+      const values = await prompt.askFields({
+        title: "Order approval threshold",
+        description:
+          "Vendor orders above this total need manager approval before they are sent. Leave blank to turn the gate off.",
+        fields: [
+          {
+            name: "amount",
+            label: "Threshold ($)",
+            defaultValue:
+              approvalThreshold != null ? String(approvalThreshold) : "",
+            inputType: "number",
+            required: false,
+          },
+        ],
+        confirmLabel: "Save threshold",
+      });
+      if (!values) return;
+      const raw = String(values.amount ?? "").trim();
+      const amount = raw === "" ? undefined : Number(raw);
+      if (amount !== undefined && (!Number.isFinite(amount) || amount < 0))
+        return;
+      void run("approval-threshold", async () => {
+        await setApprovalThreshold({
+          docId: purchasingConfig._id,
+          version: purchasingConfig.version,
+          amount,
+        });
+      });
+    })();
+  };
+
+  const bulkFulfillNeeds = () => {
+    const targets = selection.selected.filter(needCanFulfill);
+    if (targets.length === 0) return;
+    void run("bulk-fulfill-needs", async () => {
+      await bulk.runBulk(targets, async (need) => {
+        await markFulfilled({ docId: need._id, version: need.version });
+      });
+      selection.clear();
+    });
   };
 
   return (
@@ -194,6 +292,15 @@ export function PurchasingPage() {
           </p>
         </div>
         <div className="supply-masthead-actions">
+          <button
+            className="btn btn-ghost"
+            disabled={busy != null}
+            onClick={editApprovalThreshold}
+          >
+            {approvalThreshold != null
+              ? `Approval threshold: $${Number(approvalThreshold).toFixed(2)}`
+              : "Approval threshold: off"}
+          </button>
           <button className="btn btn-ghost" onClick={() => setForm("vendor")}>
             Onboard vendor
           </button>
@@ -217,9 +324,13 @@ export function PurchasingPage() {
         <PurchasingCommandForm
           form={form}
           busy={busy != null}
-          activeVendors={activeVendors}
+          activeVendors={rankedVendors}
           events={events}
-          onCancel={() => setForm(null)}
+          contactVendorId={contactVendorId}
+          onCancel={() => {
+            setForm(null);
+            setContactVendorId(null);
+          }}
           onSubmit={submit}
         />
       ) : null}
@@ -236,11 +347,20 @@ export function PurchasingPage() {
           <TableSkeleton rows={3} />
         ) : weeklyDrafts.length === 0 ? (
           <div className="document-empty">
-            <p>No weekly drafts yet.</p>
+            <p>No weekly drafts yet</p>
             <span>
-              Approve an event with dish demand after configuring a default
-              vendor — the draft appears here.
+              Approved events with dish demand consolidate into one weekly draft
+              here — no manual step. Set a default vendor so purchasing knows
+              where to route.
             </span>
+            <div className="mt-3 flex justify-center gap-2">
+              <Link to="/events" className="btn btn-primary btn-sm">
+                Go to events
+              </Link>
+              <Link to="/inventory/demand" className="btn btn-ghost btn-sm">
+                Demand ledger
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="supply-table-wrap">
@@ -298,19 +418,25 @@ export function PurchasingPage() {
           demandLinks === undefined
         }
         activeNeeds={activeNeeds}
-        activeVendors={activeVendors}
+        activeVendors={rankedVendors}
+        vendorPerformance={vendorPerformance}
         vendorsLoading={vendors === undefined}
-        selectedNeedIds={selectedNeedIds}
-        setSelectedNeedIds={setSelectedNeedIds}
         busy={busy}
-        openCancellableNeeds={openCancellableNeeds}
-        needCanCancel={needCanCancel}
+        canSelectNeed={(need) => needCanCancel(need) || needCanFulfill(need)}
+        isNeedSelected={selection.isSelected}
+        onToggleNeed={selection.toggle}
         linkedLine={linkedLine}
         ingredientName={ingredientName}
         eventName={eventName}
         onNeedAction={needAction}
-        onBulkCancel={bulkCancelNeeds}
         onOnboardVendor={() => setForm("vendor")}
+        vendorContacts={(vendorContacts ?? []).filter(
+          (contact) => contact.deletedAt == null,
+        )}
+        onAddContact={(vendorId) => {
+          setContactVendorId(vendorId);
+          setForm("contact");
+        }}
       />
 
       <section className="working-ledger mt-10">
@@ -325,8 +451,23 @@ export function PurchasingPage() {
           <TableSkeleton rows={5} />
         ) : activeOrders.length === 0 ? (
           <div className="document-empty">
-            <p>No vendor orders are open.</p>
-            <span>Weekly drafts appear after event approval.</span>
+            <p>No vendor orders yet</p>
+            <span>
+              Weekly drafts appear here automatically once you approve an event
+              with demand. Onboard a vendor to be ready.
+            </span>
+            <div className="mt-3 flex justify-center gap-2">
+              <Link to="/events" className="btn btn-primary btn-sm">
+                Go to events
+              </Link>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => setForm("vendor")}
+              >
+                Onboard vendor
+              </button>
+            </div>
           </div>
         ) : (
           <div className="supply-table-wrap">
@@ -376,6 +517,36 @@ export function PurchasingPage() {
           </div>
         )}
       </section>
+
+      <BulkActionBar
+        count={selection.count}
+        noun="need"
+        progress={bulk.progress}
+        onClear={selection.clear}
+      >
+        <button
+          type="button"
+          className="btn btn-primary btn-sm"
+          disabled={
+            busy != null ||
+            selection.selected.filter(needCanFulfill).length === 0
+          }
+          onClick={bulkFulfillNeeds}
+        >
+          Fulfill ({selection.selected.filter(needCanFulfill).length})
+        </button>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          disabled={
+            busy != null ||
+            selection.selected.filter(needCanCancel).length === 0
+          }
+          onClick={bulkCancelNeeds}
+        >
+          Cancel ({selection.selected.filter(needCanCancel).length})
+        </button>
+      </BulkActionBar>
     </div>
   );
 }

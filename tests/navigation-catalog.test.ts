@@ -22,7 +22,8 @@ describe("NavigationCatalog", () => {
 
   it("keeps unshipped systems in planned areas", () => {
     const planned = catalog.plannedAreas().map((a) => a.path);
-    expect(planned).toEqual(expect.arrayContaining(["/admin"]));
+    // 2026-07-22: every area has shipped — nothing is planned right now.
+    expect(planned).toEqual([]);
     expect(planned).not.toContain("/finance");
     expect(planned).not.toContain("/inventory");
     expect(planned).not.toContain("/logistics");

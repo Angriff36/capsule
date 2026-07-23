@@ -142,19 +142,7 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-[pre-compact bridge — saved before context compaction]
-Files (12):
-  loop-ledger.json (edit)
-  PRODUCT-BACKLOG.md (edit)
-  .loop-worktrees/prod-20260721T1535-S3-yield-variance/src/production/batch.manifest (edit)
-  .loop-worktrees/prod-20260721T1535-S3-yield-variance/tests/proofs/production-batch-yield-computeds.runtime.test.ts (create)
-  .loop-worktrees/prod-20260721T1540-S6-attendance-counts/src/operations/event.manifest (edit)
-  .loop-worktrees/prod-20260721T1540-S6-attendance-counts/tests/proofs/event-attendance-counts.runtime.test.ts (create)
-  loop-ledger.json (create)
-  .loop-worktrees/prod-20260721T1545-S8-vendor-totals/src/procurement/vendor.manifest (edit)
-  .loop-worktrees/prod-20260721T1545-S8-vendor-totals/tests/proofs/vendor-order-totals.runtime.test.ts (create)
-  .loop-worktrees/prod-20260721T1550-S9-invoice-total-paid/src/sales/invoice-core.manifest (edit)
-  .loop-worktrees/prod-20260721T1550-S9-invoice-total-paid/tests/proofs/invoice-total-paid.runtime.test.ts (create)
-  .loop-worktrees/prod-20260721T1555-S7-packlist-access/src/logistics/pack-list.manifest (edit)
+[Emergency bridge — running bridge was not updated]
+Files: src/features/inventory/WasteCostReportPage.tsx (create), src/features/inventory/WasteCostReportPage.css (create), src/features/inventory/WasteCostReportPage.tsx (edit), src/app/App.tsx (edit), src/features/inventory/InventoryWorkspaceNav.tsx (edit), .artifacts/seed-waste.ts (create)
 
 # === END COGNILAYER ===

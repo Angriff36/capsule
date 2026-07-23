@@ -1,14 +1,14 @@
-// Capsule procurement — vendor orders and line receiving facts.
-// ~~PurchaseNeed and Receipt aggregates deferred (evidence: no first-class
-// PurchaseNeed; receiving lives on PO lines + inventory restock reaction).~~
-// 2026-07-15: PurchaseNeed authored in purchase-need.manifest (user directive;
-// OD018 resolved). Receipt aggregate remains deferred (OD019).
+// Capsule procurement — vendor orders, line receiving, and confirmed price facts.
+// PurchaseNeed is authored in purchase-need.manifest. Line receipts remain the
+// quantity-changing command; each receipt also creates an immutable ingredient /
+// vendor price observation for costing and trend views.
 // Compile entry: uses vendor → demand → stock → culinary → operations.
 
 use "./vendor.manifest"
 
 enum VendorOrderStatus {
   draft
+  pending_approval
   submitted
   confirmed
   partially_received
@@ -48,16 +48,23 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   property receivedAt: datetime?
   property cancelledAt: datetime?
   property cancellationReason: string?
+  property approvalRequestedAt: datetime?
+  property approvedAt: datetime?
+  property approvalNotes: string?
 
   belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  // Tenant-singleton purchasing config (unique [tenantId]) — supplies the
+  // spend-approval threshold to submit-time checks.
+  belongsTo purchasingConfig: WeeklyPurchasingConfig fields [tenantId] references [tenantId]
   hasMany lines: VendorOrderLine
 
   constraint orderMoneyNonnegative: self.subtotal >= 0 and self.taxAmount >= 0 and self.shippingAmount >= 0 and self.totalAmount >= 0 "Order money amounts cannot be negative"
   constraint orderSourceRangeComplete: (self.sourceRangeStart == null and self.sourceRangeEnd == null) or (self.sourceRangeStart != null and self.sourceRangeEnd != null) "Order source range requires both a start and end"
   constraint orderSourceRangeOrdered: self.sourceRangeStart == null or self.sourceRangeEnd == null or self.sourceRangeStart <= self.sourceRangeEnd "Order source range end must not precede its start"
 
-  transition status from "draft" to ["submitted", "cancelled"]
+  transition status from "draft" to ["submitted", "pending_approval", "cancelled"]
+  transition status from "pending_approval" to ["submitted", "draft", "cancelled"]
   transition status from "submitted" to ["confirmed", "cancelled"]
   transition status from "confirmed" to ["partially_received", "received", "cancelled"]
   transition status from "partially_received" to ["received", "cancelled"]
@@ -168,6 +175,7 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     guard self.openedAt != null
     guard self.status == "draft"
     guard self.deletedAt == null
+    constraint submitUnderApprovalThreshold: self.purchasingConfig == null or self.purchasingConfig.orderApprovalThresholdAmount == null or self.totalAmount <= self.purchasingConfig.orderApprovalThresholdAmount "Orders above the spend approval threshold need manager approval — use submit for approval"
     compute previousStatus = self.status
     mutate status = "submitted"
     mutate submittedAt = now()
@@ -179,6 +187,69 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
       previousStatus: previousStatus
       status: "submitted"
       totalAmount: self.totalAmount
+    }
+  }
+
+  // Route an over-threshold order to a manager instead of sending it directly.
+  command submitForApproval() {
+    guard self.openedAt != null
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    mutate status = "pending_approval"
+    mutate approvalRequestedAt = now()
+    emit VendorOrderApprovalRequested {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      totalAmount: self.totalAmount
+    }
+  }
+
+  // One-click manager approve — transmits the order immediately. Emits
+  // VendorOrderSubmitted so downstream reactions (PurchaseNeed fanOut) still fire.
+  command approve() {
+    guard self.status == "pending_approval"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "manageAccess")
+    compute previousStatus = self.status
+    mutate status = "submitted"
+    mutate approvedAt = now()
+    mutate submittedAt = now()
+    emit VendorOrderApproved {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      totalAmount: self.totalAmount
+    }
+    emit VendorOrderSubmitted {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      previousStatus: previousStatus
+      status: "submitted"
+      totalAmount: self.totalAmount
+    }
+  }
+
+  // Manager returns the order to draft with notes for the buyer.
+  command requestChanges(notes: string) {
+    guard self.status == "pending_approval"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "manageAccess")
+    constraint requestChangesNotes: length(trim(notes)) > 0 "Modification request notes are required"
+    mutate status = "draft"
+    mutate approvalNotes = notes
+    mutate approvalRequestedAt = null
+    emit VendorOrderChangesRequested {
+      vendorOrderId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      eventId: self.eventId
+      totalAmount: self.totalAmount
+      notes: notes
     }
   }
 
@@ -236,11 +307,12 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   }
 
   command cancel(reason: string) {
-    guard self.status == "draft" or self.status == "submitted" or self.status == "confirmed" or self.status == "partially_received"
+    guard self.status == "draft" or self.status == "pending_approval" or self.status == "submitted" or self.status == "confirmed" or self.status == "partially_received"
     guard self.deletedAt == null
     // Draft abort (prep-list generate rollback) is a procurement action; later-stage
-    // cancel stays manage-gated.
-    guard roleAllows(user.role, "inventoryManageAccess") or (self.status == "draft" and roleAllows(user.role, "procurementAccess"))
+    // cancel stays manage-gated. Pending-approval orders are still pre-send, so the
+    // buyer may pull them back too.
+    guard roleAllows(user.role, "inventoryManageAccess") or ((self.status == "draft" or self.status == "pending_approval") and roleAllows(user.role, "procurementAccess"))
     constraint cancelOrderReason: length(trim(reason)) > 0 "Cancellation reason is required"
     compute previousStatus = self.status
     mutate status = "cancelled"
@@ -262,8 +334,8 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
 }
 
 // Ordered/received quantity line for one Ingredient on a VendorOrder
-// (capsule-pro PurchaseOrderItem). Discrepancy + location facts support a
-// later InventoryItem.receiveStock reaction; no separate Receipt aggregate.
+// (capsule-pro PurchaseOrderItem). Every partial receipt creates an immutable
+// InventoryLot with supplier and purchase-line provenance.
 entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -414,6 +486,8 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   command recordReceipt(
     quantity: decimal(12, 4),
     locationId: uuid,
+    unitPrice: money(12, 2),
+    supplierLotNumber: string,
     optional discrepancyQuantity: decimal(12, 4),
     optional discrepancyNotes: string
   ) {
@@ -424,12 +498,15 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
     constraint receiptLocationMatch: self.locationId == null or locationId == self.locationId "Receipt locationId must match the seeded location when one was pre-set"
     constraint receiptQuantityPositive: quantity > 0 "Received quantity must be positive"
     constraint receiptNotOver: self.receivedQuantity + quantity <= self.orderedQuantity "Received quantity cannot exceed ordered quantity"
+    constraint receiptPriceNonnegative: unitPrice >= 0 "Receipt unit price cannot be negative"
+    constraint receiptSupplierLotRequired: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required for traceability"
     constraint receiptDiscrepancyNonnegative: discrepancyQuantity == null or discrepancyQuantity >= 0 "Discrepancy quantity cannot be negative"
     compute previousReceived = self.receivedQuantity
     compute nextReceived = self.receivedQuantity + quantity
     compute nextStatus = nextReceived == self.orderedQuantity ? "complete" : "receiving"
     mutate locationId = locationId
     mutate receivedQuantity = nextReceived
+    mutate unitCost = unitPrice
     mutate discrepancyQuantity = discrepancyQuantity != null ? discrepancyQuantity : self.discrepancyQuantity
     mutate discrepancyNotes = discrepancyNotes != null ? discrepancyNotes : self.discrepancyNotes
     mutate status = nextStatus
@@ -438,16 +515,19 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
       vendorOrderLineId: self.id
       tenantId: self.tenantId
       vendorOrderId: self.vendorOrderId
+      vendorId: self.vendorOrder.vendorId
       ingredientId: self.ingredientId
       ingredientDemandId: self.ingredientDemandId
       eventId: self.vendorOrder.eventId
       locationId: locationId
+      supplierLotNumber: supplierLotNumber
       previousReceivedQuantity: previousReceived
       receivedQuantity: nextReceived
       receiptQuantity: quantity
       orderedQuantity: self.orderedQuantity
       unit: self.unit
-      unitCost: self.unitCost
+      unitCost: unitPrice
+      unitPrice: unitPrice
       discrepancyQuantity: discrepancyQuantity != null ? discrepancyQuantity : self.discrepancyQuantity
     }
   }
@@ -478,6 +558,142 @@ entity VendorOrderLine mixin TenantScoped, SoftDeletable {
   }
 
   store VendorOrderLine in durable
+}
+
+// Immutable lot receipt. The purchase-order line plus cumulative received
+// quantity identifies one partial receipt, while supplierLotNumber supports
+// downstream traceability and targeted recall workflows.
+entity InventoryLot mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, vendorOrderLineId, cumulativeReceivedQuantity]
+  timestamps
+  versionProperty version: number
+
+  property indexed required supplierLotNumber: string = ""
+  property indexed required vendorOrderLineId: uuid
+  property required vendorOrderId: uuid
+  property indexed required vendorId: uuid
+  property indexed required ingredientId: uuid
+  property ingredientDemandId: uuid?
+  property eventId: uuid?
+  property indexed required locationId: uuid
+  property required receiptQuantity: decimal(12, 4) = 0
+  property required cumulativeReceivedQuantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required unitCost: money(12, 2) = 0
+  property receivedAt: datetime?
+
+  belongsTo vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
+  belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
+  belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo location: StorageLocation fields [tenantId, locationId] references [tenantId, id]
+
+  constraint inventoryLotComplete: self.receivedAt == null or (length(trim(self.supplierLotNumber)) > 0 and self.receiptQuantity > 0 and self.cumulativeReceivedQuantity > 0) "Recorded inventory lots require a supplier lot number and positive receipt quantities"
+  constraint inventoryLotCostNonnegative: self.unitCost >= 0 "Inventory lot unit cost cannot be negative"
+
+  default policy inventoryLotRead read: roleAllows(user.role, "inventoryAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Inventory, procurement, and managers may read receipt lots"
+  default policy inventoryLotWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may record receipt lots"
+  default policy inventoryLotExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute receipt lot commands"
+
+  command record(
+    supplierLotNumber: string,
+    vendorOrderLineId: uuid,
+    vendorOrderId: uuid,
+    vendorId: uuid,
+    ingredientId: uuid,
+    optional ingredientDemandId: uuid,
+    optional eventId: uuid,
+    locationId: uuid,
+    receiptQuantity: decimal(12, 4),
+    cumulativeReceivedQuantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    unitCost: money(12, 2)
+  ) {
+    guard self.receivedAt == null or (self.supplierLotNumber == supplierLotNumber and self.vendorOrderLineId == vendorOrderLineId and self.vendorOrderId == vendorOrderId and self.vendorId == vendorId and self.ingredientId == ingredientId and self.ingredientDemandId == ingredientDemandId and self.eventId == eventId and self.locationId == locationId and self.receiptQuantity == receiptQuantity and self.cumulativeReceivedQuantity == cumulativeReceivedQuantity and self.unit == unit and self.unitCost == unitCost)
+    guard self.deletedAt == null
+    constraint recordInventoryLotNumberRequired: length(trim(supplierLotNumber)) > 0 "Supplier lot number is required for traceability"
+    constraint recordInventoryLotReceiptPositive: receiptQuantity > 0 "Inventory lot receipt quantity must be positive"
+    constraint recordInventoryLotCumulativePositive: cumulativeReceivedQuantity > 0 "Inventory lot cumulative quantity must be positive"
+    constraint recordInventoryLotCostNonnegative: unitCost >= 0 "Inventory lot unit cost cannot be negative"
+    mutate supplierLotNumber = supplierLotNumber
+    mutate vendorOrderLineId = vendorOrderLineId
+    mutate vendorOrderId = vendorOrderId
+    mutate vendorId = vendorId
+    mutate ingredientId = ingredientId
+    mutate ingredientDemandId = ingredientDemandId
+    mutate eventId = eventId
+    mutate locationId = locationId
+    mutate receiptQuantity = receiptQuantity
+    mutate cumulativeReceivedQuantity = cumulativeReceivedQuantity
+    mutate unit = unit
+    mutate unitCost = unitCost
+    mutate receivedAt = self.receivedAt == null ? now() : self.receivedAt
+  }
+
+  store InventoryLot in durable
+}
+
+// Immutable receipt-price fact. The cumulative received quantity identifies a
+// particular partial receipt on a line and makes reaction retries idempotent.
+entity IngredientPriceObservation mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, vendorOrderLineId, cumulativeReceivedQuantity]
+  timestamps
+  versionProperty version: number
+
+  property indexed required ingredientId: uuid
+  property indexed required vendorId: uuid
+  property required vendorOrderId: uuid
+  property indexed required vendorOrderLineId: uuid
+  property required receiptQuantity: decimal(12, 4) = 0
+  property required cumulativeReceivedQuantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required unitPrice: money(12, 2) = 0
+  property observedAt: datetime?
+
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
+  belongsTo vendorOrder: VendorOrder fields [tenantId, vendorOrderId] references [tenantId, id]
+  belongsTo vendorOrderLine: VendorOrderLine fields [tenantId, vendorOrderLineId] references [tenantId, id]
+
+  constraint observationReceiptPositive: self.observedAt == null or self.receiptQuantity > 0 "Price observation receipt quantity must be positive"
+  constraint observationCumulativePositive: self.observedAt == null or self.cumulativeReceivedQuantity > 0 "Price observation cumulative quantity must be positive"
+  constraint observationPriceNonnegative: self.unitPrice >= 0 "Price observation unit price cannot be negative"
+
+  default policy ingredientPriceObservationRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Kitchen, procurement, and managers may read confirmed ingredient prices"
+  default policy ingredientPriceObservationWrite write: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may record confirmed ingredient prices"
+  default policy ingredientPriceObservationExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute confirmed ingredient price commands"
+
+  command record(
+    ingredientId: uuid,
+    vendorId: uuid,
+    vendorOrderId: uuid,
+    vendorOrderLineId: uuid,
+    receiptQuantity: decimal(12, 4),
+    cumulativeReceivedQuantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    unitPrice: money(12, 2)
+  ) {
+    guard self.observedAt == null or (self.ingredientId == ingredientId and self.vendorId == vendorId and self.vendorOrderId == vendorOrderId and self.vendorOrderLineId == vendorOrderLineId and self.receiptQuantity == receiptQuantity and self.cumulativeReceivedQuantity == cumulativeReceivedQuantity and self.unit == unit and self.unitPrice == unitPrice)
+    guard self.deletedAt == null
+    constraint recordObservationReceiptPositive: receiptQuantity > 0 "Price observation receipt quantity must be positive"
+    constraint recordObservationCumulativePositive: cumulativeReceivedQuantity > 0 "Price observation cumulative quantity must be positive"
+    constraint recordObservationPriceNonnegative: unitPrice >= 0 "Price observation unit price cannot be negative"
+    mutate ingredientId = ingredientId
+    mutate vendorId = vendorId
+    mutate vendorOrderId = vendorOrderId
+    mutate vendorOrderLineId = vendorOrderLineId
+    mutate receiptQuantity = receiptQuantity
+    mutate cumulativeReceivedQuantity = cumulativeReceivedQuantity
+    mutate unit = unit
+    mutate unitPrice = unitPrice
+    mutate observedAt = self.observedAt == null ? now() : self.observedAt
+  }
+
+  store IngredientPriceObservation in durable
 }
 
 // Provenance contribution from one IngredientDemand to an aggregated weekly
@@ -634,6 +850,31 @@ event VendorOrderSubmitted: "vendor_order.submitted" {
   totalAmount: money(12, 2)
 }
 
+event VendorOrderApprovalRequested: "vendor_order.approval_requested" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  eventId: string?
+  totalAmount: money(12, 2)
+}
+
+event VendorOrderApproved: "vendor_order.approved" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  eventId: string?
+  totalAmount: money(12, 2)
+}
+
+event VendorOrderChangesRequested: "vendor_order.changes_requested" {
+  vendorOrderId: string
+  tenantId: string
+  vendorId: string
+  eventId: string?
+  totalAmount: money(12, 2)
+  notes: string
+}
+
 event VendorOrderConfirmed: "vendor_order.confirmed" {
   vendorOrderId: string
   tenantId: string
@@ -691,16 +932,19 @@ event VendorOrderLineReceived: "vendor_order_line.received" {
   vendorOrderLineId: string
   tenantId: string
   vendorOrderId: string
+  vendorId: string
   ingredientId: string
   ingredientDemandId: string?
   eventId: string?
   locationId: string
+  supplierLotNumber: string
   previousReceivedQuantity: decimal(12, 4)
   receivedQuantity: decimal(12, 4)
   receiptQuantity: decimal(12, 4)
   orderedQuantity: decimal(12, 4)
   unit: UnitOfMeasure
   unitCost: money(12, 2)
+  unitPrice: money(12, 2)
   discrepancyQuantity: decimal(12, 4)?
 }
 
@@ -752,3 +996,35 @@ event VendorOrderLineDemandRetired: "vendor_order_line_demand.retired" {
   ingredientDemandId: string
   reason: string
 }
+
+on VendorOrderLineReceived run IngredientPriceObservation.record
+  match vendorOrderLineId = payload.vendorOrderLineId, cumulativeReceivedQuantity = payload.receivedQuantity
+  else create
+  params {
+    ingredientId: payload.ingredientId
+    vendorId: payload.vendorId
+    vendorOrderId: payload.vendorOrderId
+    vendorOrderLineId: payload.vendorOrderLineId
+    receiptQuantity: payload.receiptQuantity
+    cumulativeReceivedQuantity: payload.receivedQuantity
+    unit: payload.unit
+    unitPrice: payload.unitPrice
+  }
+
+on VendorOrderLineReceived run InventoryLot.record
+  match vendorOrderLineId = payload.vendorOrderLineId, cumulativeReceivedQuantity = payload.receivedQuantity
+  else create
+  params {
+    supplierLotNumber: payload.supplierLotNumber
+    vendorOrderLineId: payload.vendorOrderLineId
+    vendorOrderId: payload.vendorOrderId
+    vendorId: payload.vendorId
+    ingredientId: payload.ingredientId
+    ingredientDemandId: payload.ingredientDemandId
+    eventId: payload.eventId
+    locationId: payload.locationId
+    receiptQuantity: payload.receiptQuantity
+    cumulativeReceivedQuantity: payload.receivedQuantity
+    unit: payload.unit
+    unitCost: payload.unitCost
+  }

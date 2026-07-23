@@ -1,9 +1,12 @@
-import type { Dispatch, SetStateAction } from "react";
 import { Link } from "react-router-dom";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
+import { vendorContactRoleLabel } from "./vendorContactRoles";
+import type { VendorPerformance } from "./vendorPerformance";
 
 const policy = new SupplyLifecyclePolicy();
+
+const percent = (value: number) => `${Math.round(value * 100)}%`;
 
 type PurchaseNeed = {
   _id: string;
@@ -32,40 +35,51 @@ type Vendor = {
   status: string;
 };
 
+type VendorContact = {
+  _id: string;
+  vendorId: string;
+  name: string;
+  role: string;
+  email?: string | null;
+  phone?: string | null;
+};
+
 export type PurchasingQueueSplitProps = {
   needsLoading: boolean;
   activeNeeds: PurchaseNeed[];
   activeVendors: Vendor[];
+  vendorPerformance: Map<string, VendorPerformance>;
   vendorsLoading: boolean;
-  selectedNeedIds: Set<string>;
-  setSelectedNeedIds: Dispatch<SetStateAction<Set<string>>>;
   busy: string | null;
-  openCancellableNeeds: PurchaseNeed[];
-  needCanCancel: (need: PurchaseNeed) => boolean;
+  canSelectNeed: (need: PurchaseNeed) => boolean;
+  isNeedSelected: (id: string) => boolean;
+  onToggleNeed: (id: string, on: boolean) => void;
   linkedLine: (need: PurchaseNeed) => VendorOrderLine | undefined;
   ingredientName: (id: string) => string;
   eventName: (id: string) => string;
   onNeedAction: (need: PurchaseNeed, key: string) => void;
-  onBulkCancel: () => void;
   onOnboardVendor: () => void;
+  vendorContacts: VendorContact[];
+  onAddContact: (vendorId: string) => void;
 };
 
 export function PurchasingQueueSplit({
   needsLoading,
   activeNeeds,
   activeVendors,
+  vendorPerformance,
   vendorsLoading,
-  selectedNeedIds,
-  setSelectedNeedIds,
   busy,
-  openCancellableNeeds,
-  needCanCancel,
+  canSelectNeed,
+  isNeedSelected,
+  onToggleNeed,
   linkedLine,
   ingredientName,
   eventName,
   onNeedAction,
-  onBulkCancel,
   onOnboardVendor,
+  vendorContacts,
+  onAddContact,
 }: PurchasingQueueSplitProps) {
   return (
     <div className="supply-split">
@@ -75,47 +89,7 @@ export function PurchasingQueueSplit({
             <p className="eyebrow">Open demand</p>
             <h2>Purchase needs</h2>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            {activeNeeds.some(needCanCancel) ? (
-              <>
-                <label className="flex items-center gap-2 text-[12px] text-ink-2">
-                  <input
-                    type="checkbox"
-                    checked={
-                      openCancellableNeeds.length > 0 &&
-                      openCancellableNeeds.every((need) =>
-                        selectedNeedIds.has(need._id),
-                      )
-                    }
-                    disabled={busy != null || openCancellableNeeds.length === 0}
-                    onChange={(event) => {
-                      setSelectedNeedIds(
-                        event.target.checked
-                          ? new Set(
-                              openCancellableNeeds.map((need) => need._id),
-                            )
-                          : new Set(),
-                      );
-                    }}
-                  />
-                  Select all visible open
-                </label>
-                {selectedNeedIds.size ? (
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    disabled={busy != null}
-                    onClick={onBulkCancel}
-                  >
-                    {busy === "bulk-cancel-needs"
-                      ? "Cancelling…"
-                      : `Cancel ${selectedNeedIds.size} selected`}
-                  </button>
-                ) : null}
-              </>
-            ) : null}
-            <span>{activeNeeds.length} needs</span>
-          </div>
+          <span>{activeNeeds.length} needs</span>
         </div>
         {needsLoading ? (
           <TableSkeleton rows={6} />
@@ -139,23 +113,18 @@ export function PurchasingQueueSplit({
           <ul className="purchase-queue">
             {activeNeeds.map((need) => {
               const line = linkedLine(need);
-              const cancellable = needCanCancel(need);
               return (
                 <li key={need._id}>
-                  {cancellable ? (
+                  {canSelectNeed(need) ? (
                     <label className="flex items-center gap-2 self-start">
                       <input
                         type="checkbox"
-                        checked={selectedNeedIds.has(need._id)}
+                        aria-label={`Select ${ingredientName(need.ingredientId)}`}
+                        checked={isNeedSelected(need._id)}
                         disabled={busy != null}
-                        onChange={(event) => {
-                          setSelectedNeedIds((current) => {
-                            const next = new Set(current);
-                            if (event.target.checked) next.add(need._id);
-                            else next.delete(need._id);
-                            return next;
-                          });
-                        }}
+                        onChange={(event) =>
+                          onToggleNeed(need._id, event.target.checked)
+                        }
                       />
                     </label>
                   ) : null}
@@ -231,17 +200,65 @@ export function PurchasingQueueSplit({
           </div>
         ) : (
           <ul>
-            {activeVendors.map((vendor) => (
-              <li key={vendor._id}>
-                <div>
-                  <strong>{vendor.name}</strong>
-                  <span>
-                    {vendor.email || vendor.phone || "No contact shown"}
-                  </span>
-                </div>
-                <StatusChip status={String(vendor.status)} />
-              </li>
-            ))}
+            {activeVendors.map((vendor) => {
+              const contacts = vendorContacts.filter(
+                (contact) => contact.vendorId === vendor._id,
+              );
+              const performance = vendorPerformance.get(vendor._id);
+              return (
+                <li key={vendor._id}>
+                  <div>
+                    <strong>
+                      {vendor.name}
+                      {performance?.score != null ? (
+                        <span
+                          className="ml-2 text-ink-2"
+                          title="Rolling 90-day performance: on-time delivery, order fill accuracy, price stability"
+                        >
+                          {performance.score}/100
+                        </span>
+                      ) : null}
+                    </strong>
+                    <span>
+                      {vendor.email || vendor.phone || "No contact shown"}
+                    </span>
+                    {performance?.score != null ? (
+                      <small className="block">
+                        {[
+                          performance.onTimeRate != null
+                            ? `On-time ${percent(performance.onTimeRate)}`
+                            : null,
+                          performance.fillAccuracy != null
+                            ? `Fill ${percent(performance.fillAccuracy)}`
+                            : null,
+                          performance.priceStability != null
+                            ? `Price stability ${percent(performance.priceStability)}`
+                            : null,
+                        ]
+                          .filter(Boolean)
+                          .join(" · ")}
+                        {` · ${performance.sampleSize} order${performance.sampleSize === 1 ? "" : "s"}`}
+                      </small>
+                    ) : null}
+                    {contacts.map((contact) => (
+                      <small key={contact._id} className="block">
+                        {vendorContactRoleLabel(contact.role)} · {contact.name}
+                        {contact.phone ? ` · ${contact.phone}` : ""}
+                        {contact.email ? ` · ${contact.email}` : ""}
+                      </small>
+                    ))}
+                    <button
+                      type="button"
+                      className="text-link mt-1 self-start"
+                      onClick={() => onAddContact(vendor._id)}
+                    >
+                      + Add contact
+                    </button>
+                  </div>
+                  <StatusChip status={String(vendor.status)} />
+                </li>
+              );
+            })}
           </ul>
         )}
       </aside>

@@ -6,4 +6,5 @@ sequenceDiagram
     Note over IngredientDemand: Guards (1)
     IngredientDemand->>IngredientDemand: guard[0]: self.deletedAt == null
     IngredientDemand->>IngredientDemand: mutate.purchaseEligibleEventId
+    IngredientDemand->>IngredientDemand: mutate.preferredVendorId
     IngredientDemand-->>-Client: void

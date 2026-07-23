@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant Event as Event
     participant EventBus
-    Client->>+Event: changeVenue(venueId, venueName, venueAddress)
+    Client->>+Event: changeVenue(venueId, venueName, venueAddress, venueCapacity)
     Note over Event: Policies: eventRead, eventWrite, eventExecute
     Note over Event: Guards (2)
     Event->>Event: guard[0]: self.stage == #quot;planning#quot; or self.stage == #quot;pending_approv...
@@ -10,5 +10,6 @@ sequenceDiagram
     Event->>Event: mutate.venueId
     Event->>Event: mutate.venueName
     Event->>Event: mutate.venueAddress
+    Event->>Event: mutate.venueCapacity
     Event->>EventBus: emit EventVenueChanged on event.venue_changed
     Event-->>-Client: void

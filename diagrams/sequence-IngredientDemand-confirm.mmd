@@ -11,5 +11,6 @@ sequenceDiagram
     IngredientDemand->>IngredientDemand: mutate.status
     IngredientDemand->>IngredientDemand: mutate.confirmedAt
     IngredientDemand->>IngredientDemand: mutate.purchaseEligibleEventId
+    IngredientDemand->>IngredientDemand: mutate.preferredVendorId
     IngredientDemand->>EventBus: emit IngredientDemandConfirmed on ingredient_demand.confirmed
     IngredientDemand-->>-Client: void

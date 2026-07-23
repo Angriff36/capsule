@@ -1,7 +1,7 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import {
   useCreateEventAssignment,
-  useCreateShift,
+  useCreateWeeklyScheduleNotice,
   useEventAssignmentCheckIn,
   useEventAssignmentCheckOut,
   useEventAssignmentConfirm,
@@ -10,57 +10,222 @@ import {
   useListEvent,
   useListEventAssignment,
   useListPerson,
+  useListQualification,
   useListShift,
+  useListShiftType,
+  useListTrainingCompletion,
+  useListTrainingModule,
+  useListTimeOffRequest,
+  useListWeeklyScheduleNotice,
   useShiftCancel,
   useShiftComplete,
   useShiftMarkNoShow,
   useShiftStart,
+  useWeeklyScheduleNoticeRepublishSchedule,
 } from "../../lib/manifest-convex-react";
+import type { Id } from "../../lib/api";
+import { findApprovedTimeOffConflict } from "../../lib/timeOff";
+import { useScheduleShift } from "../../lib/workforceScheduling";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
+import { AvailabilityGridSection } from "./AvailabilityGridSection";
+import {
+  DEFAULT_OVERTIME_THRESHOLD_HOURS,
+  projectWeeklyHours,
+} from "./overtimeProjection";
+import {
+  addScheduleWeeks,
+  buildStaffShiftSummary,
+  shiftsInScheduleWeek,
+  startOfScheduleWeek,
+} from "./weeklySchedule";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
 const policy = new WorkforceLifecyclePolicy();
+const OVERTIME_THRESHOLD_STORAGE_KEY =
+  "capsule.workforce.overtime-threshold-hours";
+
+const hours = new Intl.NumberFormat(undefined, {
+  maximumFractionDigits: 2,
+});
+
+const weekDate = new Intl.DateTimeFormat(undefined, {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+});
+
+const formatHours = (value: number) =>
+  `${hours.format(value)} ${Math.abs(value - 1) < Number.EPSILON ? "hour" : "hours"}`;
 
 const toEpoch = (value: FormDataEntryValue | null) => {
   const time = new Date(String(value)).getTime();
   return Number.isFinite(time) ? time : Number.NaN;
 };
 
+function initialOvertimeThreshold(): number {
+  if (typeof window === "undefined") return DEFAULT_OVERTIME_THRESHOLD_HOURS;
+  try {
+    const stored = Number(
+      window.localStorage.getItem(OVERTIME_THRESHOLD_STORAGE_KEY),
+    );
+    return stored > 0 && stored <= 168
+      ? stored
+      : DEFAULT_OVERTIME_THRESHOLD_HOURS;
+  } catch {
+    return DEFAULT_OVERTIME_THRESHOLD_HOURS;
+  }
+}
+
 export function RosterPage() {
   const assignments = useListEventAssignment();
   const shifts = useListShift();
+  const scheduleNotices = useListWeeklyScheduleNotice();
   const events = useListEvent();
   const people = useListPerson();
+  const qualifications = useListQualification();
+  const trainingModules = useListTrainingModule();
+  const trainingCompletions = useListTrainingCompletion();
+  const shiftTypes = useListShiftType();
+  const timeOffRequests = useListTimeOffRequest();
   const createAssignment = useCreateEventAssignment();
   const confirm = useEventAssignmentConfirm();
   const checkIn = useEventAssignmentCheckIn();
   const checkOut = useEventAssignmentCheckOut();
   const assignmentNoShow = useEventAssignmentMarkNoShow();
   const unassign = useEventAssignmentUnassign();
-  const createShift = useCreateShift();
+  const scheduleShift = useScheduleShift();
+  const createScheduleNotice = useCreateWeeklyScheduleNotice();
   const startShift = useShiftStart();
   const completeShift = useShiftComplete();
   const cancelShift = useShiftCancel();
   const shiftNoShow = useShiftMarkNoShow();
+  const republishScheduleNotice = useWeeklyScheduleNoticeRepublishSchedule();
   const [showForm, setShowForm] = useState<"assignment" | "shift" | null>(null);
+  const [shiftPersonId, setShiftPersonId] = useState("");
+  const [shiftTypeId, setShiftTypeId] = useState("");
+  const [selectedWeekStartsAt, setSelectedWeekStartsAt] = useState(() =>
+    startOfScheduleWeek(Date.now()),
+  );
+  const [overtimeThresholdHours, setOvertimeThresholdHours] = useState(
+    initialOvertimeThreshold,
+  );
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt(busy != null);
 
   const activeAssignments = (assignments ?? []).filter(
     (row) => row.deletedAt == null,
   );
   const activeShifts = (shifts ?? []).filter((row) => row.deletedAt == null);
+  const activeScheduleNotices = (scheduleNotices ?? []).filter(
+    (row) => row.deletedAt == null,
+  );
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
   );
+  const selectedPersonQualifications = (qualifications ?? []).filter(
+    (qualification) =>
+      qualification.deletedAt == null &&
+      qualification.status === "active" &&
+      qualification.personId === shiftPersonId,
+  );
+  const activeTrainingModules = (trainingModules ?? []).filter(
+    (module) => module.deletedAt == null && module.status === "active",
+  );
+  const activeShiftTypes = (shiftTypes ?? []).filter(
+    (shiftType) => shiftType.deletedAt == null && shiftType.status === "active",
+  );
+  const selectedShiftType = activeShiftTypes.find(
+    (shiftType) => shiftType._id === shiftTypeId,
+  );
+  const requiredTrainingModule = activeTrainingModules.find(
+    (module) => module._id === selectedShiftType?.requiredTrainingModuleId,
+  );
+  const selectedTrainingCompletion = [...(trainingCompletions ?? [])]
+    .filter(
+      (completion) =>
+        completion.deletedAt == null &&
+        completion.recordedAt != null &&
+        completion.personId === shiftPersonId &&
+        completion.trainingModuleId ===
+          selectedShiftType?.requiredTrainingModuleId,
+    )
+    .sort((a, b) => (b.completedAt ?? 0) - (a.completedAt ?? 0))[0];
   const eventName = (id: string | undefined) =>
     events?.find((event) => event._id === id)?.title ?? "—";
   const personName = (id: string) => {
     const person = people?.find((row) => row._id === id);
     return person ? `${person.givenName} ${person.familyName}` : "Unknown";
   };
+  const selectedWeekEndsAt = addScheduleWeeks(selectedWeekStartsAt, 1);
+  const selectedWeekShifts = shiftsInScheduleWeek(
+    activeShifts,
+    selectedWeekStartsAt,
+  );
+  const scheduledPersonIds = [
+    ...new Set(selectedWeekShifts.map((shift) => String(shift.personId))),
+  ];
+  const selectedWeekNotices = activeScheduleNotices.filter(
+    (notice) => notice.weekStartsAt === selectedWeekStartsAt,
+  );
+  const latestNoticeByPerson = new Map<
+    string,
+    (typeof selectedWeekNotices)[number]
+  >();
+  for (const notice of selectedWeekNotices) {
+    const current = latestNoticeByPerson.get(String(notice.personId));
+    if ((notice.publishedAt ?? 0) >= (current?.publishedAt ?? 0)) {
+      latestNoticeByPerson.set(String(notice.personId), notice);
+    }
+  }
+  const publicationRows = scheduledPersonIds.map((personId) => {
+    const personShifts = selectedWeekShifts.filter(
+      (shift) => String(shift.personId) === personId,
+    );
+    const person = people?.find((row) => row._id === personId);
+    const shiftSummary = buildStaffShiftSummary(personShifts, eventName);
+    const notice = latestNoticeByPerson.get(personId);
+    const current =
+      notice != null &&
+      notice.shiftCount === personShifts.length &&
+      notice.shiftSummary === shiftSummary &&
+      (notice.recipientAuthSubjectId ?? undefined) ===
+        (person?.authSubjectId ?? undefined);
+    return {
+      personId,
+      person,
+      personShifts,
+      shiftSummary,
+      notice,
+      current,
+    };
+  });
+  const currentPublicationRows = publicationRows.filter((row) => row.current);
+  const acknowledgedPublicationRows = currentPublicationRows.filter(
+    (row) => row.notice?.acknowledgedAt != null,
+  );
+  const outstandingPublicationRows = currentPublicationRows.filter(
+    (row) => row.notice?.acknowledgedAt == null,
+  );
+  const unpublishedPublicationRows = publicationRows.filter(
+    (row) => !row.current,
+  );
+  const scheduleNeedsPublication = unpublishedPublicationRows.length > 0;
+  const weekHasNotStarted = Date.now() < selectedWeekStartsAt;
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(
+        OVERTIME_THRESHOLD_STORAGE_KEY,
+        String(overtimeThresholdHours),
+      );
+    } catch {
+      // Storage can be unavailable in private or locked-down browser contexts.
+    }
+  }, [overtimeThresholdHours]);
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -100,17 +265,102 @@ export function RosterPage() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    void run("create-shift", async () => {
-      await createShift({
-        personId: String(data.get("personId")),
-        startsAt: toEpoch(data.get("startsAt")),
-        endsAt: toEpoch(data.get("endsAt")),
-        eventId: String(data.get("eventId") || "") || undefined,
-        role: String(data.get("role") || "") || undefined,
-        notes: String(data.get("notes") || "") || undefined,
+    const personId = String(data.get("personId"));
+    const startsAt = toEpoch(data.get("startsAt"));
+    const endsAt = toEpoch(data.get("endsAt"));
+    const selectedTypeId = String(data.get("shiftTypeId") || "") || undefined;
+    const approvedTimeOff = findApprovedTimeOffConflict(timeOffRequests ?? [], {
+      personId,
+      startsAt,
+      endsAt,
+    });
+    if (approvedTimeOff) {
+      setFailure(
+        new Error(
+          `${personName(personId)} has approved time off from ${new Date(
+            approvedTimeOff.startsAt ?? 0,
+          ).toLocaleDateString()} through ${new Date(
+            (approvedTimeOff.endsAt ?? 1) - 1,
+          ).toLocaleDateString()}. Choose another person or adjust the shift.`,
+        ),
+      );
+      return;
+    }
+    if (requiredTrainingModule && !selectedTrainingCompletion) {
+      setFailure(
+        new Error(
+          `${personName(personId)} must complete ${requiredTrainingModule.name} before this shift type can be scheduled.`,
+        ),
+      );
+      return;
+    }
+    const overtimeProjection = projectWeeklyHours({
+      shifts: activeShifts,
+      proposedShift: { personId, startsAt, endsAt },
+      thresholdHours: overtimeThresholdHours,
+    }).find((projection) => projection.exceedsThreshold);
+
+    void (async () => {
+      if (overtimeProjection) {
+        const shouldSchedule = await prompt.askConfirm({
+          title: "Overtime warning",
+          description: `${personName(personId)} is projected for ${formatHours(overtimeProjection.projectedHours)} in the week of ${weekDate.format(overtimeProjection.weekStartsAt)} (${formatHours(overtimeProjection.existingHours)} committed + ${formatHours(overtimeProjection.proposedHours)} proposed). That is ${formatHours(overtimeProjection.overtimeHours)} over the ${hours.format(overtimeProjection.thresholdHours)}-hour threshold.`,
+          confirmLabel: "Schedule anyway",
+          cancelLabel: "Review shift",
+        });
+        if (!shouldSchedule) return;
+      }
+
+      await run("create-shift", async () => {
+        await scheduleShift({
+          personId: personId as Id<"people">,
+          startsAt,
+          endsAt,
+          eventId:
+            (String(data.get("eventId") || "") as Id<"events">) || undefined,
+          role: String(data.get("role") || "") || undefined,
+          shiftTypeId: selectedTypeId as Id<"shiftTypes"> | undefined,
+          requiredQualificationId:
+            (String(
+              data.get("requiredQualificationId") || "",
+            ) as Id<"qualifications">) || undefined,
+          requiredTrainingCompletionId: requiredTrainingModule
+            ? (selectedTrainingCompletion?._id as Id<"trainingCompletions">)
+            : undefined,
+          notes: String(data.get("notes") || "") || undefined,
+        });
+        form.reset();
+        setShiftPersonId("");
+        setShiftTypeId("");
+        setShowForm(null);
       });
-      form.reset();
-      setShowForm(null);
+    })();
+  };
+
+  const publishSelectedWeek = () => {
+    void run("publish-week", async () => {
+      for (const row of unpublishedPublicationRows) {
+        const recipientAuthSubjectId = row.person?.authSubjectId ?? undefined;
+        if (row.notice) {
+          await republishScheduleNotice({
+            docId: row.notice._id,
+            version: row.notice.version,
+            recipientAuthSubjectId,
+            shiftCount: row.personShifts.length,
+            shiftSummary: row.shiftSummary,
+          });
+        } else {
+          await createScheduleNotice({
+            personId: row.personId,
+            recipientAuthSubjectId,
+            weekStartsAt: selectedWeekStartsAt,
+            weekEndsAt: selectedWeekEndsAt,
+            shiftCount: row.personShifts.length,
+            shiftSummary: row.shiftSummary,
+            idempotencyKey: `weekly-schedule:${selectedWeekStartsAt}:${row.personId}`,
+          });
+        }
+      }
     });
   };
 
@@ -142,8 +392,14 @@ export function RosterPage() {
   const loading =
     assignments === undefined ||
     shifts === undefined ||
+    scheduleNotices === undefined ||
     events === undefined ||
-    people === undefined;
+    people === undefined ||
+    qualifications === undefined ||
+    trainingModules === undefined ||
+    trainingCompletions === undefined ||
+    shiftTypes === undefined ||
+    timeOffRequests === undefined;
 
   return (
     <div className="operations-stage supply-stage">
@@ -179,6 +435,7 @@ export function RosterPage() {
       </header>
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
+      {host}
 
       {showForm === "assignment" ? (
         <form className="supply-form" onSubmit={submitAssignment}>
@@ -187,7 +444,14 @@ export function RosterPage() {
               <p className="eyebrow">New governed assignment</p>
               <h2>Assign a person to an event</h2>
             </div>
-            <button className="btn btn-primary" disabled={busy != null}>
+            <button
+              className="btn btn-primary"
+              disabled={
+                busy != null ||
+                (requiredTrainingModule != null &&
+                  selectedTrainingCompletion == null)
+              }
+            >
               {busy === "create-assignment" ? "Assigning…" : "Assign"}
             </button>
           </div>
@@ -255,7 +519,13 @@ export function RosterPage() {
           <div className="supply-form-grid">
             <label className="field-label">
               Person
-              <select name="personId" className="input" required>
+              <select
+                name="personId"
+                className="input"
+                value={shiftPersonId}
+                onChange={(event) => setShiftPersonId(event.target.value)}
+                required
+              >
                 <option value="">Select person</option>
                 {activePeople.map((item) => (
                   <option key={item._id} value={item._id}>
@@ -263,6 +533,26 @@ export function RosterPage() {
                   </option>
                 ))}
               </select>
+            </label>
+            <label className="field-label">
+              Overtime threshold (hours)
+              <input
+                name="overtimeThresholdHours"
+                className="input"
+                type="number"
+                min="0.5"
+                max="168"
+                step="0.5"
+                value={overtimeThresholdHours}
+                data-testid="overtime-threshold-hours"
+                onChange={(event) => {
+                  const next = Number(event.target.value);
+                  if (Number.isFinite(next) && next > 0 && next <= 168) {
+                    setOvertimeThresholdHours(next);
+                  }
+                }}
+              />
+              <small>Saved for this browser</small>
             </label>
             <label className="field-label">
               Starts
@@ -300,12 +590,73 @@ export function RosterPage() {
               <input name="role" className="input" placeholder="captain" />
             </label>
             <label className="field-label">
+              Shift type
+              <select
+                name="shiftTypeId"
+                className="input"
+                value={shiftTypeId}
+                onChange={(event) => setShiftTypeId(event.target.value)}
+              >
+                <option value="">Standard shift · no training gate</option>
+                {activeShiftTypes.map((shiftType) => (
+                  <option key={shiftType._id} value={shiftType._id}>
+                    {shiftType.name}
+                    {shiftType.requiredTrainingModuleId
+                      ? ` · requires ${
+                          activeTrainingModules.find(
+                            (module) =>
+                              module._id === shiftType.requiredTrainingModuleId,
+                          )?.name ?? "training"
+                        }`
+                      : ""}
+                  </option>
+                ))}
+              </select>
+              {requiredTrainingModule ? (
+                <small
+                  className={
+                    selectedTrainingCompletion ? "text-ok" : "text-danger"
+                  }
+                  data-testid="training-gate-status"
+                >
+                  {selectedTrainingCompletion
+                    ? `${requiredTrainingModule.name} completed ${new Date(
+                        selectedTrainingCompletion.completedAt ?? 0,
+                      ).toLocaleDateString()} · ${selectedTrainingCompletion.assessmentScore}%`
+                    : `Missing ${requiredTrainingModule.name}. Record it in Staff → Training first.`}
+                </small>
+              ) : null}
+            </label>
+            <label className="field-label">
+              Required certification (optional)
+              <select name="requiredQualificationId" className="input">
+                <option value="">
+                  {shiftPersonId
+                    ? "No certification prerequisite"
+                    : "Select a person first"}
+                </option>
+                {selectedPersonQualifications.map((qualification) => (
+                  <option key={qualification._id} value={qualification._id}>
+                    {qualification.name}
+                    {qualification.certificationType
+                      ? ` · ${qualification.certificationType}`
+                      : ""}
+                    {qualification.expiresAt
+                      ? ` · expires ${new Date(qualification.expiresAt).toLocaleDateString()}`
+                      : ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field-label">
               Notes
               <input name="notes" className="input" />
             </label>
           </div>
         </form>
       ) : null}
+
+      <AvailabilityGridSection people={activePeople} />
 
       <section className="working-ledger">
         <div className="ledger-heading">
@@ -375,16 +726,120 @@ export function RosterPage() {
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Schedule</p>
-            <h2>Shifts</h2>
+            <h2>Weekly shifts</h2>
           </div>
-          <span>{activeShifts.length} shifts</span>
+          <span>{selectedWeekShifts.length} shifts</span>
+        </div>
+        <div className="schedule-publish-panel">
+          <div className="schedule-publish-heading">
+            <div>
+              <p className="eyebrow">Work week</p>
+              <strong>
+                {weekDate.format(selectedWeekStartsAt)} –{" "}
+                {weekDate.format(selectedWeekEndsAt - 1)}
+              </strong>
+              <small>
+                {scheduledPersonIds.length} scheduled{" "}
+                {scheduledPersonIds.length === 1 ? "person" : "people"}
+              </small>
+            </div>
+            <div
+              className="schedule-week-controls"
+              aria-label="Choose work week"
+            >
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() =>
+                  setSelectedWeekStartsAt((week) => addScheduleWeeks(week, -1))
+                }
+              >
+                Previous
+              </button>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() =>
+                  setSelectedWeekStartsAt(startOfScheduleWeek(Date.now()))
+                }
+              >
+                This week
+              </button>
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() =>
+                  setSelectedWeekStartsAt((week) => addScheduleWeeks(week, 1))
+                }
+              >
+                Next
+              </button>
+            </div>
+          </div>
+
+          <div className="schedule-publish-status" aria-live="polite">
+            <span>
+              <strong>{acknowledgedPublicationRows.length}</strong> acknowledged
+            </span>
+            <span>
+              <strong>{outstandingPublicationRows.length}</strong> awaiting
+              reply
+            </span>
+            <span>
+              <strong>{unpublishedPublicationRows.length}</strong> to publish
+            </span>
+          </div>
+
+          {weekHasNotStarted && outstandingPublicationRows.length > 0 ? (
+            <div
+              className="schedule-ack-warning"
+              role="status"
+              data-testid="schedule-ack-warning"
+            >
+              <strong>Follow up before the week begins.</strong>
+              <span>
+                {outstandingPublicationRows
+                  .map((row) => personName(row.personId))
+                  .join(", ")}{" "}
+                {outstandingPublicationRows.length === 1 ? "has" : "have"} not
+                acknowledged this schedule yet.
+              </span>
+            </div>
+          ) : null}
+
+          {unpublishedPublicationRows.length > 0 &&
+          currentPublicationRows.length > 0 ? (
+            <p className="schedule-publish-note">
+              {unpublishedPublicationRows.length} staff summary{" "}
+              {unpublishedPublicationRows.length === 1 ? "is" : "are"} new or
+              changed. Publishing sends only those updates.
+            </p>
+          ) : null}
+
+          <button
+            className="btn btn-primary schedule-publish-action"
+            data-testid="schedule-publish-action"
+            disabled={
+              busy != null ||
+              selectedWeekShifts.length === 0 ||
+              !scheduleNeedsPublication
+            }
+            onClick={publishSelectedWeek}
+          >
+            {busy === "publish-week"
+              ? "Publishing…"
+              : selectedWeekShifts.length === 0
+                ? "No shifts to publish"
+                : scheduleNeedsPublication
+                  ? currentPublicationRows.length > 0
+                    ? "Publish updates"
+                    : "Publish schedule"
+                  : "Schedule published"}
+          </button>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
-        ) : activeShifts.length === 0 ? (
+        ) : selectedWeekShifts.length === 0 ? (
           <div className="document-empty">
-            <p>No shifts are scheduled.</p>
-            <span>Schedule a shift with a start and end time.</span>
+            <p>No shifts are scheduled for this week.</p>
+            <span>Choose another week or schedule a shift above.</span>
           </div>
         ) : (
           <div className="supply-table-wrap">
@@ -399,11 +854,29 @@ export function RosterPage() {
                 </tr>
               </thead>
               <tbody>
-                {activeShifts.map((row) => (
+                {selectedWeekShifts.map((row) => (
                   <tr key={row._id}>
                     <td>
                       <strong>{personName(row.personId)}</strong>
                       <small>{row.role || ""}</small>
+                      {row.shiftTypeId ? (
+                        <small>
+                          {
+                            shiftTypes?.find(
+                              (shiftType) => shiftType._id === row.shiftTypeId,
+                            )?.name
+                          }
+                        </small>
+                      ) : null}
+                      {row.requiredQualificationId ? (
+                        <small>
+                          Requires{" "}
+                          {qualifications?.find(
+                            (qualification) =>
+                              qualification._id === row.requiredQualificationId,
+                          )?.name || "certification"}
+                        </small>
+                      ) : null}
                     </td>
                     <td>{eventName(row.eventId)}</td>
                     <td>

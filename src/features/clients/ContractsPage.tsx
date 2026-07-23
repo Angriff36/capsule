@@ -310,6 +310,12 @@ export function ContractsPage() {
                           {action.label}
                         </button>
                       ))}
+                    <Link
+                      className="btn btn-ghost"
+                      to={CLIENTS_ROUTES.contractDocument(row._id)}
+                    >
+                      PDF
+                    </Link>
                     {String(row.status) === "signed" ? (
                       <Link
                         className="btn btn-ghost"

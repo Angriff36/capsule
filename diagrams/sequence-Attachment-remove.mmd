@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant Client
+    participant Attachment as Attachment
+    participant EventBus
+    Client->>+Attachment: remove()
+    Note over Attachment: Policies: attachmentRead, attachmentWrite, attachmentExecute
+    Note over Attachment: Guards (1)
+    Attachment->>Attachment: guard[0]: self.deletedAt == null
+    Attachment->>Attachment: mutate.deletedAt
+    Attachment->>EventBus: emit AttachmentRemoved on attachment.removed
+    Attachment-->>-Client: void

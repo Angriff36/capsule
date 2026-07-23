@@ -1,0 +1,428 @@
+.maintenance-board {
+  --maintenance-ink: #1b2420;
+  --maintenance-paper: #eee9dc;
+  --maintenance-signal: #ed6a32;
+  --maintenance-warning: #b93624;
+  overflow: hidden;
+  margin-bottom: 22px;
+  border: 1px solid color-mix(in srgb, var(--line) 65%, var(--maintenance-ink));
+  border-radius: 12px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(27, 36, 32, 0.025) 0,
+      rgba(27, 36, 32, 0.025) 1px,
+      transparent 1px,
+      transparent 24px
+    ),
+    var(--maintenance-paper);
+  color: var(--maintenance-ink);
+  box-shadow: 0 18px 42px rgba(27, 36, 32, 0.1);
+}
+
+.maintenance-board__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+  padding: 22px 24px;
+  border-bottom: 1px solid rgba(27, 36, 32, 0.22);
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.7), transparent 58%), #e2dccb;
+}
+
+.maintenance-board__kicker,
+.maintenance-form__stamp span,
+.maintenance-ticket__label {
+  margin: 0 0 6px;
+  color: #697068;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.maintenance-board__header h2 {
+  margin: 0;
+  font-family: "Archivo Variable", sans-serif;
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-variation-settings:
+    "wdth" 84,
+    "wght" 760;
+  letter-spacing: -0.045em;
+}
+
+.maintenance-board__header p:not(.maintenance-board__kicker) {
+  max-width: 630px;
+  margin: 7px 0 0;
+  color: #59635d;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.maintenance-board__header-side {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.maintenance-board__metrics {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  overflow: hidden;
+  border: 1px solid rgba(27, 36, 32, 0.24);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.maintenance-board__metrics span {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  padding: 7px 9px;
+  color: #677068;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.maintenance-board__metrics span + span {
+  border-left: 1px solid rgba(27, 36, 32, 0.16);
+}
+
+.maintenance-board__metrics b {
+  color: var(--maintenance-ink);
+  font-size: 16px;
+}
+
+.maintenance-alert {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 16px 18px 0;
+  border: 1px solid rgba(185, 54, 36, 0.3);
+  border-left: 5px solid var(--maintenance-warning);
+  background: rgba(185, 54, 36, 0.07);
+  padding: 11px 14px;
+  color: #6f251b;
+}
+
+.maintenance-alert__signal {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--maintenance-warning);
+  color: white;
+  font-family: "IBM Plex Mono", monospace;
+  font-weight: 800;
+}
+
+.maintenance-alert strong,
+.maintenance-alert p {
+  display: block;
+  margin: 0;
+}
+
+.maintenance-alert p {
+  margin-top: 2px;
+  color: #7e4a42;
+  font-size: 11px;
+}
+
+.maintenance-board__notice {
+  margin: 14px 18px 0;
+  border-left: 3px solid #2f8156;
+  background: rgba(47, 129, 86, 0.09);
+  padding: 9px 12px;
+  color: #245d40;
+  font-size: 12px;
+}
+
+.maintenance-form {
+  display: grid;
+  align-items: end;
+  gap: 12px;
+  margin: 16px 18px;
+  border: 1px solid rgba(27, 36, 32, 0.28);
+  border-left: 5px solid var(--maintenance-signal);
+  background: rgba(255, 255, 255, 0.74);
+  padding: 15px;
+  box-shadow: 5px 5px 0 rgba(27, 36, 32, 0.08);
+}
+
+.maintenance-form--schedule {
+  grid-template-columns:
+    minmax(150px, 0.7fr) minmax(200px, 1.25fr) minmax(190px, 1.2fr)
+    130px minmax(175px, 1fr) minmax(230px, 1.5fr) auto;
+}
+
+.maintenance-form--service {
+  grid-column: 1 / -1;
+  grid-template-columns:
+    minmax(160px, 0.75fr) minmax(170px, 0.8fr) minmax(190px, 0.9fr)
+    110px minmax(260px, 1.6fr) auto;
+  margin: 0;
+  border-width: 1px 0 0 5px;
+  background: #e4decf;
+  box-shadow: none;
+}
+
+.maintenance-form__stamp {
+  align-self: center;
+}
+
+.maintenance-form__stamp strong {
+  display: block;
+  font-size: 14px;
+}
+
+.maintenance-form__inline-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.maintenance-form__inline-input em {
+  color: #717870;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-style: normal;
+  text-transform: uppercase;
+}
+
+.maintenance-form__notes textarea {
+  min-height: 58px;
+  resize: vertical;
+}
+
+.maintenance-board__loading {
+  padding: 18px;
+}
+
+.maintenance-board__empty {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  margin: 18px;
+  border: 1px dashed rgba(27, 36, 32, 0.34);
+  background: rgba(255, 255, 255, 0.44);
+  padding: 23px;
+}
+
+.maintenance-board__empty > span {
+  color: var(--maintenance-signal);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 34px;
+  font-weight: 800;
+  opacity: 0.38;
+}
+
+.maintenance-board__empty p {
+  margin: 4px 0 0;
+  color: #697169;
+  font-size: 12px;
+}
+
+.maintenance-ledger {
+  display: grid;
+}
+
+.maintenance-ticket {
+  position: relative;
+  display: grid;
+  grid-template-columns:
+    44px minmax(170px, 1fr) minmax(210px, 1.25fr) minmax(125px, 0.65fr)
+    minmax(180px, 1fr) auto;
+  border-top: 1px solid rgba(27, 36, 32, 0.18);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.maintenance-ticket[data-due="overdue"] {
+  background: linear-gradient(
+    90deg,
+    rgba(185, 54, 36, 0.11),
+    rgba(255, 255, 255, 0.58) 36%
+  );
+}
+
+.maintenance-ticket[data-due="soon"] {
+  background: linear-gradient(
+    90deg,
+    rgba(237, 106, 50, 0.1),
+    rgba(255, 255, 255, 0.58) 36%
+  );
+}
+
+.maintenance-ticket__rail,
+.maintenance-ticket__asset,
+.maintenance-ticket__task,
+.maintenance-ticket__due,
+.maintenance-ticket__last-service,
+.maintenance-ticket__action {
+  min-width: 0;
+  padding: 16px 14px;
+}
+
+.maintenance-ticket__task,
+.maintenance-ticket__due,
+.maintenance-ticket__last-service,
+.maintenance-ticket__action {
+  border-left: 1px solid rgba(27, 36, 32, 0.14);
+}
+
+.maintenance-ticket__rail {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 6px;
+  padding-left: 6px;
+  color: var(--maintenance-signal);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.maintenance-ticket__rail i {
+  width: 1px;
+  flex: 1;
+  background: currentColor;
+  opacity: 0.42;
+}
+
+.maintenance-ticket strong,
+.maintenance-ticket small,
+.maintenance-ticket p {
+  display: block;
+}
+
+.maintenance-ticket strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+
+.maintenance-ticket small {
+  margin-top: 4px;
+  color: #69716a;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 9px;
+}
+
+.maintenance-ticket p {
+  margin: 6px 0 0;
+  color: #576059;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.maintenance-ticket__due-chip,
+.maintenance-ticket__lock {
+  display: inline-block;
+  margin-top: 7px;
+  border-radius: 999px;
+  padding: 3px 7px;
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.maintenance-ticket[data-due="overdue"] .maintenance-ticket__due-chip,
+.maintenance-ticket__lock {
+  background: rgba(185, 54, 36, 0.14);
+  color: #9a2e20;
+}
+
+.maintenance-ticket[data-due="soon"] .maintenance-ticket__due-chip {
+  background: rgba(237, 106, 50, 0.16);
+  color: #9f451f;
+}
+
+.maintenance-ticket[data-due="scheduled"] .maintenance-ticket__due-chip {
+  background: rgba(47, 129, 86, 0.12);
+  color: #286c49;
+}
+
+.maintenance-ticket__action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@media (max-width: 1180px) {
+  .maintenance-board__header,
+  .maintenance-board__header-side {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .maintenance-form--schedule,
+  .maintenance-form--service {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .maintenance-form__stamp,
+  .maintenance-form__asset,
+  .maintenance-form__notes {
+    grid-column: 1 / -1;
+  }
+
+  .maintenance-ticket {
+    grid-template-columns: 40px repeat(2, minmax(0, 1fr));
+  }
+
+  .maintenance-ticket__rail {
+    grid-row: 1 / span 3;
+  }
+
+  .maintenance-ticket__due,
+  .maintenance-ticket__last-service,
+  .maintenance-ticket__action {
+    border-top: 1px solid rgba(27, 36, 32, 0.14);
+  }
+}
+
+@media (max-width: 680px) {
+  .maintenance-board__header {
+    padding: 18px;
+  }
+
+  .maintenance-board__metrics {
+    width: 100%;
+  }
+
+  .maintenance-board__metrics span {
+    justify-content: center;
+  }
+
+  .maintenance-form--schedule,
+  .maintenance-form--service,
+  .maintenance-ticket {
+    grid-template-columns: 1fr;
+  }
+
+  .maintenance-form > *,
+  .maintenance-ticket > * {
+    grid-column: 1;
+  }
+
+  .maintenance-ticket__rail {
+    display: none;
+  }
+
+  .maintenance-ticket__task,
+  .maintenance-ticket__due,
+  .maintenance-ticket__last-service,
+  .maintenance-ticket__action {
+    border-top: 1px solid rgba(27, 36, 32, 0.14);
+    border-left: 0;
+  }
+}

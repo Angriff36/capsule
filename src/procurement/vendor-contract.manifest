@@ -1,0 +1,329 @@
+// Capsule procurement — VendorContract: agreed pricing tiers, payment terms,
+// and delivery lead times negotiated with a Vendor. Terms and tier prices are
+// editable while the contract is draft and locked once activated (the "price
+// lock" for the active period); expiry alerting is a read-side derivation in
+// the UI from endsAt (no cron — no schedule surface exists in this app yet).
+// Compile chain: app root → this file → vendor.manifest.
+
+use "./vendor.manifest"
+
+enum VendorContractStatus {
+  draft
+  active
+  expired
+  terminated
+}
+
+// Negotiated supply agreement with a Vendor for a bounded period.
+entity VendorContract mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required vendorId: uuid
+  property required searchable title: string = ""
+  property contractNumber: string?
+  property required paymentTermsDays: int = 30
+  property required deliveryLeadTimeDays: int = 0
+  property startsAt: datetime?
+  property endsAt: datetime?
+  property documentUrl: string?
+  property notes: string?
+  property required status: VendorContractStatus = "draft"
+  property draftedAt: datetime?
+  property activatedAt: datetime?
+  property expiredAt: datetime?
+  property terminatedAt: datetime?
+  property terminationReason: string?
+
+  belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
+
+  constraint vendorContractPeriod: self.startsAt == null or self.endsAt == null or self.endsAt > self.startsAt "Contract end must be after the start"
+  constraint vendorContractPaymentTerms: self.paymentTermsDays >= 0 and self.paymentTermsDays <= 365 "Payment terms must be between 0 and 365 days"
+  constraint vendorContractLeadTime: self.deliveryLeadTimeDays >= 0 and self.deliveryLeadTimeDays <= 365 "Delivery lead time must be between 0 and 365 days"
+
+  transition status from "draft" to ["active", "terminated"]
+  transition status from "active" to ["expired", "terminated"]
+  transition status from "expired" to []
+  transition status from "terminated" to []
+
+  default policy vendorContractRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor contracts"
+  default policy vendorContractWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write vendor contracts through commands"
+  default policy vendorContractExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute vendor contract commands"
+
+  command draft(
+    vendorId: uuid,
+    title: string,
+    startsAt: datetime,
+    endsAt: datetime,
+    optional contractNumber: string,
+    optional paymentTermsDays: number,
+    optional deliveryLeadTimeDays: number,
+    optional documentUrl: string,
+    optional notes: string
+  ) {
+    guard self.draftedAt == null
+    guard self.deletedAt == null
+    guard self.vendor != null and self.vendor.deletedAt == null
+    constraint draftContractVendorMatch: vendorId == self.vendorId "Draft vendorId must match the seeded vendor reference"
+    constraint draftContractTitle: length(trim(title)) > 0 "Contract title is required"
+    constraint draftContractPeriod: endsAt > startsAt "Contract end must be after the start"
+    constraint draftContractPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Payment terms must be between 0 and 365 days"
+    constraint draftContractLeadTime: deliveryLeadTimeDays == null or (deliveryLeadTimeDays >= 0 and deliveryLeadTimeDays <= 365) "Delivery lead time must be between 0 and 365 days"
+    mutate vendorId = vendorId
+    mutate title = title
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate contractNumber = contractNumber
+    mutate paymentTermsDays = paymentTermsDays != null ? paymentTermsDays : 30
+    mutate deliveryLeadTimeDays = deliveryLeadTimeDays != null ? deliveryLeadTimeDays : 0
+    mutate documentUrl = documentUrl
+    mutate notes = notes
+    mutate draftedAt = now()
+    emit VendorContractDrafted {
+      vendorContractId: self.id
+      tenantId: self.tenantId
+      vendorId: vendorId
+      title: title
+    }
+  }
+
+  // Terms stay editable only while draft — activation locks them for the
+  // active period. Change of an active agreement = terminate + new draft.
+  command updateTerms(
+    title: string,
+    startsAt: datetime,
+    endsAt: datetime,
+    optional contractNumber: string,
+    optional paymentTermsDays: number,
+    optional deliveryLeadTimeDays: number,
+    optional documentUrl: string,
+    optional notes: string
+  ) {
+    guard self.draftedAt != null
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    constraint updateContractTitle: length(trim(title)) > 0 "Contract title is required"
+    constraint updateContractPeriod: endsAt > startsAt "Contract end must be after the start"
+    constraint updateContractPaymentTerms: paymentTermsDays == null or (paymentTermsDays >= 0 and paymentTermsDays <= 365) "Payment terms must be between 0 and 365 days"
+    constraint updateContractLeadTime: deliveryLeadTimeDays == null or (deliveryLeadTimeDays >= 0 and deliveryLeadTimeDays <= 365) "Delivery lead time must be between 0 and 365 days"
+    mutate title = title
+    mutate startsAt = startsAt
+    mutate endsAt = endsAt
+    mutate contractNumber = contractNumber != null ? contractNumber : self.contractNumber
+    mutate paymentTermsDays = paymentTermsDays != null ? paymentTermsDays : self.paymentTermsDays
+    mutate deliveryLeadTimeDays = deliveryLeadTimeDays != null ? deliveryLeadTimeDays : self.deliveryLeadTimeDays
+    mutate documentUrl = documentUrl != null ? documentUrl : self.documentUrl
+    mutate notes = notes != null ? notes : self.notes
+    emit VendorContractTermsUpdated {
+      vendorContractId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      title: title
+    }
+  }
+
+  command activate() {
+    guard self.draftedAt != null
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.startsAt != null and self.endsAt != null
+    constraint activateContractNotEnded: self.endsAt > now() "Cannot activate a contract whose period has already ended"
+    mutate status = "active"
+    mutate activatedAt = now()
+    emit VendorContractActivated {
+      vendorContractId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      title: self.title
+      endsAt: self.endsAt
+    }
+  }
+
+  command markExpired() {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard self.endsAt != null and self.endsAt <= now()
+    mutate status = "expired"
+    mutate expiredAt = now()
+    emit VendorContractExpired {
+      vendorContractId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      title: self.title
+    }
+  }
+
+  command terminate(reason: string) {
+    guard self.status == "draft" or self.status == "active"
+    guard self.deletedAt == null
+    constraint terminateContractReason: length(trim(reason)) > 0 "Termination reason is required"
+    mutate status = "terminated"
+    mutate terminatedAt = now()
+    mutate terminationReason = reason
+    emit VendorContractTerminated {
+      vendorContractId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      title: self.title
+      reason: reason
+    }
+  }
+
+  store VendorContract in durable
+}
+
+// One agreed price line on a contract: an item at a unit price, optionally
+// stepped by minimum order quantity (tiers = several rows for one item).
+entity VendorContractPriceTier mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required contractId: uuid
+  property required searchable itemName: string = ""
+  property required unit: string = "each"
+  property required minQuantity: decimal(12, 4) = 0
+  property required unitPrice: money(12, 2) = 0
+  property notes: string?
+  property addedAt: datetime?
+
+  belongsTo contract: VendorContract fields [tenantId, contractId] references [tenantId, id]
+
+  constraint tierMinQuantity: self.minQuantity >= 0 "Minimum quantity cannot be negative"
+  constraint tierUnitPrice: self.unitPrice >= 0 "Unit price cannot be negative"
+
+  default policy vendorContractTierRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read contract price tiers"
+  default policy vendorContractTierWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write contract price tiers through commands"
+  default policy vendorContractTierExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute contract price tier commands"
+
+  command add(
+    contractId: uuid,
+    itemName: string,
+    unitPrice: money(12, 2),
+    optional unit: string,
+    optional minQuantity: number,
+    optional notes: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard self.contract != null and self.contract.deletedAt == null
+    guard self.contract.status == "draft"
+    constraint addTierContractMatch: contractId == self.contractId "Add tier contractId must match the seeded contract reference"
+    constraint addTierItemName: length(trim(itemName)) > 0 "Item name is required"
+    constraint addTierMinQuantity: minQuantity == null or minQuantity >= 0 "Minimum quantity cannot be negative"
+    constraint addTierUnitPrice: unitPrice >= 0 "Unit price cannot be negative"
+    mutate contractId = contractId
+    mutate itemName = itemName
+    mutate unit = unit != null ? unit : "each"
+    mutate minQuantity = minQuantity != null ? minQuantity : 0
+    mutate unitPrice = unitPrice
+    mutate notes = notes
+    mutate addedAt = now()
+    emit VendorContractPriceTierAdded {
+      vendorContractPriceTierId: self.id
+      tenantId: self.tenantId
+      vendorContractId: contractId
+      itemName: itemName
+    }
+  }
+
+  command update(
+    itemName: string,
+    unitPrice: money(12, 2),
+    optional unit: string,
+    optional minQuantity: number,
+    optional notes: string
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.contract != null and self.contract.status == "draft"
+    constraint updateTierItemName: length(trim(itemName)) > 0 "Item name is required"
+    constraint updateTierMinQuantity: minQuantity == null or minQuantity >= 0 "Minimum quantity cannot be negative"
+    constraint updateTierUnitPrice: unitPrice >= 0 "Unit price cannot be negative"
+    mutate itemName = itemName
+    mutate unit = unit != null ? unit : self.unit
+    mutate minQuantity = minQuantity != null ? minQuantity : self.minQuantity
+    mutate unitPrice = unitPrice
+    mutate notes = notes != null ? notes : self.notes
+    emit VendorContractPriceTierUpdated {
+      vendorContractPriceTierId: self.id
+      tenantId: self.tenantId
+      vendorContractId: self.contractId
+      itemName: itemName
+    }
+  }
+
+  command remove() {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.contract != null and self.contract.status == "draft"
+    mutate deletedAt = now()
+    emit VendorContractPriceTierRemoved {
+      vendorContractPriceTierId: self.id
+      tenantId: self.tenantId
+      vendorContractId: self.contractId
+      itemName: self.itemName
+    }
+  }
+
+  store VendorContractPriceTier in durable
+}
+
+event VendorContractDrafted: "vendor_contract.drafted" {
+  vendorContractId: string
+  tenantId: string
+  vendorId: string
+  title: string
+}
+
+event VendorContractTermsUpdated: "vendor_contract.terms_updated" {
+  vendorContractId: string
+  tenantId: string
+  vendorId: string
+  title: string
+}
+
+event VendorContractActivated: "vendor_contract.activated" {
+  vendorContractId: string
+  tenantId: string
+  vendorId: string
+  title: string
+  endsAt: datetime?
+}
+
+event VendorContractExpired: "vendor_contract.expired" {
+  vendorContractId: string
+  tenantId: string
+  vendorId: string
+  title: string
+}
+
+event VendorContractTerminated: "vendor_contract.terminated" {
+  vendorContractId: string
+  tenantId: string
+  vendorId: string
+  title: string
+  reason: string
+}
+
+event VendorContractPriceTierAdded: "vendor_contract.price_tier_added" {
+  vendorContractPriceTierId: string
+  tenantId: string
+  vendorContractId: string
+  itemName: string
+}
+
+event VendorContractPriceTierUpdated: "vendor_contract.price_tier_updated" {
+  vendorContractPriceTierId: string
+  tenantId: string
+  vendorContractId: string
+  itemName: string
+}
+
+event VendorContractPriceTierRemoved: "vendor_contract.price_tier_removed" {
+  vendorContractPriceTierId: string
+  tenantId: string
+  vendorContractId: string
+  itemName: string
+}

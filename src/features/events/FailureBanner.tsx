@@ -11,6 +11,15 @@ export function FailureBanner({ failure }: { failure: CommandFailure }) {
       <p className="mt-0.5 text-[12px] leading-relaxed text-ink-2">
         {failure.detail}
       </p>
+      {failure.action?.reload ? (
+        <button
+          type="button"
+          className="btn btn-ghost mt-2 text-[12px]"
+          onClick={() => window.location.reload()}
+        >
+          {failure.action.label}
+        </button>
+      ) : null}
     </div>
   );
 }

@@ -1,0 +1,187 @@
+// Capsule sales/billing — post-payment credit memos.
+// Credits preserve the paid source invoice and either reduce another open
+// invoice for the same client or remain available on the client account.
+
+enum CreditMemoDisposition {
+  apply_to_balance
+  carry_forward
+}
+
+enum CreditMemoStatus {
+  draft
+  available
+  applied
+}
+
+entity CreditMemo mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required sourceInvoiceId: uuid
+  property required clientId: uuid
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
+  property targetInvoiceId: uuid?
+  property eventId: uuid?
+  property unique creditMemoNumber: string?
+  property required amount: money(12, 2) = 0
+  property required remainingAmount: money(12, 2) = 0
+  property reason: string?
+  property required disposition: CreditMemoDisposition = "carry_forward"
+  property required status: CreditMemoStatus = "draft"
+  property issuedAt: datetime?
+  property appliedAt: datetime?
+
+  belongsTo sourceInvoice: Invoice fields [tenantId, sourceInvoiceId] references [tenantId, id]
+  belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
+  ref targetInvoice: Invoice fields [tenantId, targetInvoiceId] references [tenantId, id]
+  ref event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint creditMemoIssuedComplete: self.issuedAt == null or (length(trim(self.creditMemoNumber)) > 0 and self.amount > 0 and length(trim(self.reason)) > 0) "Issued credit memos require a number, positive amount, and reason"
+  constraint creditMemoRemainingValid: self.remainingAmount >= 0 and self.remainingAmount <= self.amount "Remaining credit must stay between zero and the issued amount"
+
+  transition status from "draft" to ["available", "applied"]
+  transition status from "available" to ["applied"]
+  transition status from "applied" to []
+
+  default policy creditMemoRead read: roleAllows(user.role, "financeAccess") "Finance staff may read credit memos"
+  default policy creditMemoWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write credit memos through commands"
+  default policy creditMemoExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute credit memo commands"
+
+  command issue(
+    sourceInvoiceId: uuid,
+    clientId: uuid,
+    creditMemoNumber: string,
+    amount: money(12, 2),
+    reason: string,
+    disposition: CreditMemoDisposition,
+    optional targetInvoiceId: uuid,
+    optional eventId: uuid
+  ) {
+    guard self.issuedAt == null
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    guard self.sourceInvoice != null and self.sourceInvoice.deletedAt == null
+    guard self.client != null
+    constraint issueSourceMatch: sourceInvoiceId == self.sourceInvoiceId "Source invoice must match the seeded invoice reference"
+    constraint issueClientMatch: clientId == self.clientId "Client must match the seeded client reference"
+    constraint sourceClientMatch: self.sourceInvoice.clientId == clientId "Credit memo client must match the paid source invoice"
+    constraint sourcePaid: self.sourceInvoice.status == "paid" "Credit memos may only be issued against paid invoices"
+    constraint numberPresent: length(trim(creditMemoNumber)) > 0 "Credit memo number is required"
+    constraint amountPositive: amount > 0 "Credit memo amount must be positive"
+    constraint amountWithinPaid: amount <= self.sourceInvoice.amountPaid "Credit memo amount cannot exceed the amount paid"
+    constraint reasonPresent: length(trim(reason)) > 0 "Credit memo reason is required"
+    constraint targetRequired: disposition != "apply_to_balance" or targetInvoiceId != null "Choose an open invoice when applying the credit now"
+    constraint carryForwardTargetEmpty: disposition != "carry_forward" or targetInvoiceId == null "Carry-forward credit cannot select a target invoice"
+    constraint targetExists: targetInvoiceId == null or self.targetInvoice != null "Selected target invoice was not found"
+    constraint targetDifferent: targetInvoiceId == null or targetInvoiceId != sourceInvoiceId "Credit must be applied to a different invoice"
+    constraint targetClientMatch: targetInvoiceId == null or self.targetInvoice.clientId == clientId "Target invoice must belong to the same client"
+    constraint targetOpen: targetInvoiceId == null or self.targetInvoice.status == "sent" or self.targetInvoice.status == "viewed" or self.targetInvoice.status == "overdue" or self.targetInvoice.status == "partial" "Credit can only be applied to an open invoice"
+    constraint targetBalance: targetInvoiceId == null or amount <= self.targetInvoice.amountDue "Credit memo amount cannot exceed the target invoice balance"
+    mutate sourceInvoiceId = sourceInvoiceId
+    mutate clientId = clientId
+    mutate targetInvoiceId = targetInvoiceId
+    mutate eventId = eventId != null ? eventId : self.eventId
+    mutate creditMemoNumber = creditMemoNumber
+    mutate amount = amount
+    mutate remainingAmount = targetInvoiceId == null ? amount : 0
+    mutate reason = reason
+    mutate disposition = disposition
+    mutate status = targetInvoiceId == null ? "available" : "applied"
+    mutate issuedAt = now()
+    mutate appliedAt = targetInvoiceId == null ? null : now()
+    emit CreditMemoIssued {
+      creditMemoId: self.id
+      tenantId: self.tenantId
+      sourceInvoiceId: sourceInvoiceId
+      targetInvoiceId: targetInvoiceId
+      clientId: clientId
+      eventId: eventId != null ? eventId : self.eventId
+      creditMemoNumber: creditMemoNumber
+      amount: amount
+      remainingAmount: targetInvoiceId == null ? amount : 0
+      disposition: disposition
+    }
+  }
+
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Credit memo already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit CreditMemoClientMergeStaged {
+      creditMemoId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the credit-memo client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit CreditMemoClientReassigned {
+      creditMemoId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
+  }
+
+  store CreditMemo in durable
+}
+
+event CreditMemoClientMergeStaged: "credit_memo.client_merge_staged" {
+  creditMemoId: string
+  tenantId: string
+}
+
+event CreditMemoClientReassigned: "credit_memo.client_reassigned" {
+  creditMemoId: string
+  tenantId: string
+  previousClientId: string
+  clientId: string
+}
+
+event CreditMemoIssued: "credit_memo.issued" {
+  creditMemoId: string
+  tenantId: string
+  sourceInvoiceId: string
+  targetInvoiceId: string?
+  clientId: string
+  eventId: string?
+  creditMemoNumber: string
+  amount: money(12, 2)
+  remainingAmount: money(12, 2)
+  disposition: CreditMemoDisposition
+}
+
+// Every issued memo is recorded against its paid source invoice so cumulative
+// credits cannot exceed the cash actually received.
+on CreditMemoIssued run Invoice.recordCreditMemo
+  resolve payload.sourceInvoiceId
+  params {
+    creditAmount: payload.amount
+    creditMemoId: payload.creditMemoId
+  }
+
+// Carry-forward memos have no target, so the optional fan-out is a no-op.
+// Applying now resolves exactly one eligible open invoice.
+on CreditMemoIssued fanOut Invoice where id = payload.targetInvoiceId
+  run applyCredit
+  params {
+    creditAmount: payload.amount
+    creditMemoId: payload.creditMemoId
+  }

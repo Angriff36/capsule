@@ -1,0 +1,279 @@
+// Capsule workforce — reusable training modules, Person completions, and
+// configurable shift types with explicit training prerequisites.
+
+enum TrainingModuleCategory {
+  food_safety
+  equipment_operation
+  service_standards
+  other
+}
+
+enum TrainingModuleStatus {
+  active
+  retired
+}
+
+entity TrainingModule mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, name]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property required category: TrainingModuleCategory = "other"
+  property description: string?
+  property required passingScore: int = 80
+  property required status: TrainingModuleStatus = "active"
+  property definedAt: datetime?
+  property retiredAt: datetime?
+
+  hasMany completions: TrainingCompletion
+  hasMany shiftTypes: ShiftType
+
+  constraint trainingModuleComplete: self.definedAt == null or length(trim(self.name)) > 0 "Defined training modules require a name"
+  constraint trainingModulePassingScore: self.passingScore >= 0 and self.passingScore <= 100 "Passing score must be between 0 and 100"
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  default policy trainingModuleRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read training modules"
+  default policy trainingModuleWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write training modules through commands"
+  default policy trainingModuleExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute training module commands"
+
+  command define(
+    name: string,
+    category: TrainingModuleCategory,
+    passingScore: int,
+    optional description: string
+  ) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint defineTrainingModuleName: length(trim(name)) > 0 "Training module name is required"
+    constraint defineTrainingModulePassingScore: passingScore >= 0 and passingScore <= 100 "Passing score must be between 0 and 100"
+    mutate name = name
+    mutate category = category
+    mutate passingScore = passingScore
+    mutate description = description
+    mutate status = "active"
+    mutate definedAt = now()
+    emit TrainingModuleDefined {
+      trainingModuleId: self.id
+      tenantId: self.tenantId
+      name: name
+      category: category
+      passingScore: passingScore
+    }
+  }
+
+  command retire() {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate status = "retired"
+    mutate retiredAt = now()
+    emit TrainingModuleRetired {
+      trainingModuleId: self.id
+      tenantId: self.tenantId
+      name: self.name
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate status = "active"
+    mutate retiredAt = null
+    emit TrainingModuleReactivated {
+      trainingModuleId: self.id
+      tenantId: self.tenantId
+      name: self.name
+    }
+  }
+
+  store TrainingModule in durable
+}
+
+entity TrainingCompletion mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required personId: uuid
+  property required trainingModuleId: uuid
+  property completedAt: datetime?
+  property required assessmentScore: int = 0
+  property encrypted notes: string?
+  property recordedAt: datetime?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+  belongsTo trainingModule: TrainingModule fields [tenantId, trainingModuleId] references [tenantId, id]
+
+  constraint trainingCompletionScore: self.assessmentScore >= 0 and self.assessmentScore <= 100 "Assessment score must be between 0 and 100"
+  constraint trainingCompletionComplete: self.recordedAt == null or self.completedAt != null "Recorded training completions require a completion date"
+
+  default policy trainingCompletionRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read training completions"
+  default policy trainingCompletionWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write training completions through commands"
+  default policy trainingCompletionExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute training completion commands"
+
+  command record(
+    personId: uuid,
+    trainingModuleId: uuid,
+    completedAt: datetime,
+    assessmentScore: int,
+    optional notes: string
+  ) {
+    guard self.recordedAt == null
+    guard self.deletedAt == null
+    guard self.person != null and self.person.status == "active"
+    guard self.trainingModule != null and self.trainingModule.status == "active" and self.trainingModule.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint recordTrainingPersonMatch: personId == self.personId "Completion person must match the selected staff member"
+    constraint recordTrainingModuleMatch: trainingModuleId == self.trainingModuleId "Completion module must match the selected training module"
+    constraint recordTrainingScoreRange: assessmentScore >= 0 and assessmentScore <= 100 "Assessment score must be between 0 and 100"
+    constraint recordTrainingPassingScore: assessmentScore >= self.trainingModule.passingScore "Assessment score must meet the module passing score"
+    mutate personId = personId
+    mutate trainingModuleId = trainingModuleId
+    mutate completedAt = completedAt
+    mutate assessmentScore = assessmentScore
+    mutate notes = notes
+    mutate recordedAt = now()
+    emit TrainingCompleted {
+      trainingCompletionId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      trainingModuleId: trainingModuleId
+      completedAt: completedAt
+      assessmentScore: assessmentScore
+    }
+  }
+
+  store TrainingCompletion in durable
+}
+
+entity ShiftType mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, name]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property description: string?
+  property requiredTrainingModuleId: uuid?
+  property required status: TrainingModuleStatus = "active"
+  property definedAt: datetime?
+  property retiredAt: datetime?
+
+  belongsTo requiredTrainingModule: TrainingModule fields [tenantId, requiredTrainingModuleId] references [tenantId, id]
+
+  constraint shiftTypeComplete: self.definedAt == null or length(trim(self.name)) > 0 "Defined shift types require a name"
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  default policy shiftTypeRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read shift types"
+  default policy shiftTypeWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write shift types through commands"
+  default policy shiftTypeExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute shift type commands"
+
+  command define(
+    name: string,
+    optional description: string,
+    optional requiredTrainingModuleId: uuid
+  ) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    guard requiredTrainingModuleId == null or (self.requiredTrainingModule != null and self.requiredTrainingModule.status == "active" and self.requiredTrainingModule.deletedAt == null)
+    constraint defineShiftTypeName: length(trim(name)) > 0 "Shift type name is required"
+    mutate name = name
+    mutate description = description
+    mutate requiredTrainingModuleId = requiredTrainingModuleId
+    mutate status = "active"
+    mutate definedAt = now()
+    emit ShiftTypeDefined {
+      shiftTypeId: self.id
+      tenantId: self.tenantId
+      name: name
+      requiredTrainingModuleId: requiredTrainingModuleId
+    }
+  }
+
+  command retire() {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate status = "retired"
+    mutate retiredAt = now()
+    emit ShiftTypeRetired {
+      shiftTypeId: self.id
+      tenantId: self.tenantId
+      name: self.name
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate status = "active"
+    mutate retiredAt = null
+    emit ShiftTypeReactivated {
+      shiftTypeId: self.id
+      tenantId: self.tenantId
+      name: self.name
+    }
+  }
+
+  store ShiftType in durable
+}
+
+event TrainingModuleDefined: "training_module.defined" {
+  trainingModuleId: string
+  tenantId: string
+  name: string
+  category: TrainingModuleCategory
+  passingScore: int
+}
+
+event TrainingModuleRetired: "training_module.retired" {
+  trainingModuleId: string
+  tenantId: string
+  name: string
+}
+
+event TrainingModuleReactivated: "training_module.reactivated" {
+  trainingModuleId: string
+  tenantId: string
+  name: string
+}
+
+event TrainingCompleted: "training.completed" {
+  trainingCompletionId: string
+  tenantId: string
+  personId: string
+  trainingModuleId: string
+  completedAt: datetime
+  assessmentScore: int
+}
+
+event ShiftTypeDefined: "shift_type.defined" {
+  shiftTypeId: string
+  tenantId: string
+  name: string
+  requiredTrainingModuleId: string?
+}
+
+event ShiftTypeRetired: "shift_type.retired" {
+  shiftTypeId: string
+  tenantId: string
+  name: string
+}
+
+event ShiftTypeReactivated: "shift_type.reactivated" {
+  shiftTypeId: string
+  tenantId: string
+  name: string
+}

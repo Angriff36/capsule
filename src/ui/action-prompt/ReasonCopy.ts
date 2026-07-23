@@ -64,6 +64,20 @@ export const ReasonCopy = {
     placeholder: "e.g. Duplicate draft",
     confirmLabel: "Cancel order",
   },
+  requestOrderChanges: {
+    title: "Request modifications",
+    description: "Send this order back to the buyer with what needs to change.",
+    label: "Requested changes",
+    placeholder: "e.g. Trim the protein order — 20 lb still frozen",
+    confirmLabel: "Send back to draft",
+  },
+  terminateVendorContract: {
+    title: "Terminate contract",
+    description: "Record why this agreement is ending before its end date.",
+    label: "Termination reason",
+    placeholder: "e.g. Terms renegotiated into a new contract",
+    confirmLabel: "Terminate contract",
+  },
   cancelShift: {
     title: "Cancel shift",
     description: "Record why this shift is being cancelled.",

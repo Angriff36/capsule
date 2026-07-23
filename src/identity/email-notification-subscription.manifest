@@ -1,0 +1,99 @@
+// Personal email notification subscriptions, owned by the trusted auth subject.
+
+use "../foundation/base.manifest"
+
+entity EmailNotificationSubscription mixin TenantScoped {
+  key [tenantId, id]
+  unique [tenantId, ownerId]
+  timestamps
+  versionProperty version: number
+
+  property indexed ownerId: string?
+  property required eventUpdates: boolean = true
+  property required invoiceReminders: boolean = true
+  property required lowStockAlerts: boolean = true
+  property required shiftChanges: boolean = true
+  property configuredAt: datetime?
+
+  constraint configuredOwnerPresent: self.configuredAt == null or self.ownerId != null "Configured email subscriptions require an owner"
+
+  // ownerId is null only for Builder's transient create-via draft. Persisted
+  // configured rows are visible solely to their owner.
+  default policy emailNotificationSubscriptionRead read: self.ownerId == null or self.ownerId == user.id "Users may read unowned creation drafts or their own email subscriptions"
+  default policy emailNotificationSubscriptionWrite write: user.id != null and (self.ownerId == null or self.ownerId == user.id) "Users may write only their own email subscriptions"
+  default policy emailNotificationSubscriptionExecute execute: user.id != null and (self.ownerId == null or self.ownerId == user.id) "Users may configure only their own email subscriptions"
+
+  // Governed creation. ownerId is always stamped from trusted auth context,
+  // never accepted from the browser.
+  command configure(
+    eventUpdates: boolean,
+    invoiceReminders: boolean,
+    lowStockAlerts: boolean,
+    shiftChanges: boolean
+  ) {
+    guard self.configuredAt == null
+    guard user.id != null
+    guard self.ownerId == null
+    mutate ownerId = user.id
+    mutate eventUpdates = eventUpdates
+    mutate invoiceReminders = invoiceReminders
+    mutate lowStockAlerts = lowStockAlerts
+    mutate shiftChanges = shiftChanges
+    mutate configuredAt = now()
+    emit EmailNotificationSubscriptionConfigured {
+      emailNotificationSubscriptionId: self.id
+      tenantId: self.tenantId
+      ownerId: user.id
+      eventUpdates: eventUpdates
+      invoiceReminders: invoiceReminders
+      lowStockAlerts: lowStockAlerts
+      shiftChanges: shiftChanges
+    }
+  }
+
+  command updateSubscriptions(
+    eventUpdates: boolean,
+    invoiceReminders: boolean,
+    lowStockAlerts: boolean,
+    shiftChanges: boolean
+  ) {
+    guard self.configuredAt != null
+    guard user.id != null
+    guard self.ownerId == user.id
+    mutate eventUpdates = eventUpdates
+    mutate invoiceReminders = invoiceReminders
+    mutate lowStockAlerts = lowStockAlerts
+    mutate shiftChanges = shiftChanges
+    emit EmailNotificationSubscriptionsUpdated {
+      emailNotificationSubscriptionId: self.id
+      tenantId: self.tenantId
+      ownerId: user.id
+      eventUpdates: eventUpdates
+      invoiceReminders: invoiceReminders
+      lowStockAlerts: lowStockAlerts
+      shiftChanges: shiftChanges
+    }
+  }
+
+  store EmailNotificationSubscription in durable
+}
+
+event EmailNotificationSubscriptionConfigured: "email_notification_subscription.configured" {
+  emailNotificationSubscriptionId: string
+  tenantId: string
+  ownerId: string
+  eventUpdates: boolean
+  invoiceReminders: boolean
+  lowStockAlerts: boolean
+  shiftChanges: boolean
+}
+
+event EmailNotificationSubscriptionsUpdated: "email_notification_subscription.updated" {
+  emailNotificationSubscriptionId: string
+  tenantId: string
+  ownerId: string
+  eventUpdates: boolean
+  invoiceReminders: boolean
+  lowStockAlerts: boolean
+  shiftChanges: boolean
+}

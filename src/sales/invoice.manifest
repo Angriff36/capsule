@@ -1,5 +1,6 @@
 // Capsule sales/billing — compile entry for Invoice + Payment + PaymentMethod.
-// CollectionCase / deposits / PaymentRefundAttempt / InvoiceLine deferred (OD040).
+// CollectionCase / PaymentRefundAttempt / InvoiceLine are not modeled yet (OD040).
+// Deposits implemented per deposit-tracking feature (2026-07-21).
 // EventCancelled voids unpaid draft/sent/viewed/overdue invoices (D041).
 
 use "./payment.manifest"

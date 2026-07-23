@@ -2,19 +2,27 @@ import { useState, type FormEvent } from "react";
 import {
   useCreateInventoryItem,
   useCreateInventoryReservation,
+  useCreateStockTransfer,
   useCreateStorageLocation,
   useInventoryItemReceiveStock,
   useInventoryItemRecount,
+  useInventoryItemSetExpiry,
+  useInventoryItemUpdateLevels,
   useInventoryReservationConsume,
   useInventoryReservationRelease,
   useListEvent,
   useListIngredient,
+  useListIngredientDemand,
   useListInventoryItem,
+  useListInventoryLot,
   useListInventoryReservation,
+  useListStockTransfer,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { StockReceiptScanner } from "./StockReceiptScanner";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 
@@ -37,26 +45,70 @@ const UNITS = [
 
 const policy = new SupplyLifecyclePolicy();
 
+const DAY_MS = 86_400_000;
+const HORIZON_DAYS = [3, 7, 14, 30] as const;
+
+const isExpired = (item: any) =>
+  item.useByAt != null && item.useByAt < Date.now();
+const expiresWithin = (item: any, horizonDays: number) => {
+  const soonest = Math.min(
+    item.useByAt ?? Infinity,
+    item.bestBeforeAt ?? Infinity,
+  );
+  return soonest !== Infinity && soonest < Date.now() + horizonDays * DAY_MS;
+};
+const dateLabel = (value: number | null | undefined) =>
+  value == null ? "—" : new Date(value).toLocaleDateString();
+// Date-only input, stored as end of the labeled local day so a lot stays
+// issuable through its use-by date (matches the consume guard cutoff).
+const promptExpiry = (label: string, current: number | null | undefined) => {
+  const raw = window.prompt(
+    `${label} (YYYY-MM-DD, blank to clear)`,
+    current == null ? "" : new Date(current).toLocaleDateString("en-CA"),
+  );
+  if (raw == null) return undefined; // cancelled
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  const time = new Date(`${trimmed}T23:59:59.999`).getTime();
+  return Number.isFinite(time) ? time : undefined;
+};
+
 export function StockBookPage() {
   const items = useListInventoryItem();
+  const inventoryLots = useListInventoryLot();
   const reservations = useListInventoryReservation();
+  const transfers = useListStockTransfer();
   const locations = useListStorageLocation();
   const ingredients = useListIngredient();
+  const demands = useListIngredientDemand();
   const events = useListEvent();
   const createLocation = useCreateStorageLocation();
   const createItem = useCreateInventoryItem();
   const createReservation = useCreateInventoryReservation();
+  const createTransfer = useCreateStockTransfer();
   const receiveStock = useInventoryItemReceiveStock();
   const recount = useInventoryItemRecount();
+  const setExpiry = useInventoryItemSetExpiry();
+  const updateLevels = useInventoryItemUpdateLevels();
   const consumeReservation = useInventoryReservationConsume();
   const releaseReservation = useInventoryReservationRelease();
-  const [form, setForm] = useState<"location" | "stock" | "reserve" | null>(
-    null,
-  );
+  const [form, setForm] = useState<
+    "location" | "stock" | "reserve" | "transfer" | null
+  >(null);
+  const [transferSource, setTransferSource] = useState<any>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const [horizonDays, setHorizonDays] = useState(7);
+  const { prompt, host } = useActionPrompt(busy != null);
 
   const activeItems = (items ?? []).filter((item) => item.deletedAt == null);
+  const expiringItems = activeItems
+    .filter((item) => isExpired(item) || expiresWithin(item, horizonDays))
+    .sort(
+      (a, b) =>
+        Math.min(a.useByAt ?? Infinity, a.bestBeforeAt ?? Infinity) -
+        Math.min(b.useByAt ?? Infinity, b.bestBeforeAt ?? Infinity),
+    );
   const activeReservations = (reservations ?? []).filter(
     (item) => item.deletedAt == null,
   );
@@ -74,6 +126,22 @@ export function StockBookPage() {
           reservation.status === "active",
       )
       .reduce((sum, reservation) => sum + reservation.quantity, 0);
+
+  // decimal(12, 4) projection — trim float noise from derived quantities.
+  const qty4 = (value: number) => Math.round(value * 10000) / 10000;
+  const availableFor = (item: any) =>
+    qty4(item.quantityOnHand - reservedFor(item._id));
+  const belowPar = (item: any) =>
+    item.parLevel > 0 && availableFor(item) < item.parLevel;
+  const belowReorder = (item: any) =>
+    item.reorderThreshold > 0 && availableFor(item) < item.reorderThreshold;
+  const suggestedPurchase = (item: any) =>
+    qty4(Math.max(0, item.parLevel - availableFor(item)));
+  const lowStockItems = activeItems
+    .filter(belowPar)
+    .sort(
+      (a, b) => availableFor(a) / a.parLevel - availableFor(b) / b.parLevel,
+    );
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -119,12 +187,70 @@ export function StockBookPage() {
           (candidate) => candidate._id === String(data.get("inventoryItemId")),
         );
         if (!item) throw new Error("Select an available stock line.");
+        const inventoryLotId = String(data.get("inventoryLotId") ?? "").trim();
+        if (inventoryLotId) {
+          const lot = inventoryLots?.find(
+            (candidate) =>
+              candidate._id === inventoryLotId && candidate.deletedAt == null,
+          );
+          if (
+            !lot ||
+            lot.ingredientId !== item.ingredientId ||
+            lot.locationId !== item.locationId
+          ) {
+            throw new Error(
+              "Select a supplier lot for the same ingredient and location.",
+            );
+          }
+          const alreadyAllocated = (reservations ?? [])
+            .filter(
+              (reservation) =>
+                reservation.inventoryLotId === inventoryLotId &&
+                reservation.deletedAt == null &&
+                (reservation.status === "active" ||
+                  reservation.status === "consumed"),
+            )
+            .reduce(
+              (sum, reservation) => sum + Number(reservation.quantity),
+              0,
+            );
+          if (
+            Number(data.get("quantity")) >
+            Number(lot.receiptQuantity) - alreadyAllocated
+          ) {
+            throw new Error(
+              "That supplier lot does not have enough unallocated stock.",
+            );
+          }
+        }
         await createReservation({
           inventoryItemId: item._id,
+          inventoryLotId: inventoryLotId || undefined,
           eventId: String(data.get("eventId")),
           ingredientId: item.ingredientId,
           quantity: Number(data.get("quantity")),
         });
+      }
+      if (current === "transfer") {
+        const source = transferSource;
+        const destination = activeItems.find(
+          (candidate) =>
+            candidate._id === String(data.get("destinationInventoryItemId")),
+        );
+        if (!source || !destination)
+          throw new Error("Select a destination stock line.");
+        const notes = String(data.get("notes") ?? "").trim();
+        await createTransfer({
+          sourceInventoryItemId: source._id,
+          destinationInventoryItemId: destination._id,
+          ingredientId: source.ingredientId,
+          sourceLocationId: source.locationId,
+          destinationLocationId: destination.locationId,
+          quantity: Number(data.get("quantity")),
+          unit: source.unit,
+          notes: notes || undefined,
+        });
+        setTransferSource(null);
       }
       element.reset();
       setForm(null);
@@ -146,6 +272,65 @@ export function StockBookPage() {
       if (action === "receive") await receiveStock({ ...base, quantity });
       else await recount({ ...base, actualQuantity: quantity });
     });
+  };
+
+  const expiryAction = (item: any) => {
+    const bestBeforeAt = promptExpiry("Best before", item.bestBeforeAt);
+    if (bestBeforeAt === undefined) return;
+    const useByAt = promptExpiry("Use by", item.useByAt);
+    if (useByAt === undefined) return;
+    void run(`${item._id}:dates`, async () => {
+      await setExpiry({
+        docId: item._id,
+        version: item.version,
+        bestBeforeAt: bestBeforeAt ?? undefined,
+        useByAt: useByAt ?? undefined,
+      });
+    });
+  };
+
+  const levelsAction = (item: any) => {
+    void (async () => {
+      const values = await prompt.askFields({
+        title: "Set PAR & reorder levels",
+        description:
+          "A low-stock alert appears when available stock (on hand minus active reservations) drops below PAR.",
+        fields: [
+          {
+            name: "parLevel",
+            label: `PAR level (${item.unit})`,
+            defaultValue: String(item.parLevel),
+            inputType: "number",
+            required: true,
+          },
+          {
+            name: "reorderThreshold",
+            label: `Reorder threshold (${item.unit})`,
+            defaultValue: String(item.reorderThreshold),
+            inputType: "number",
+            required: true,
+          },
+        ],
+        confirmLabel: "Save levels",
+      });
+      if (!values) return;
+      const parLevel = Number(values.parLevel);
+      const reorderThreshold = Number(values.reorderThreshold);
+      if (
+        ![parLevel, reorderThreshold].every(
+          (value) => Number.isFinite(value) && value >= 0,
+        )
+      )
+        return;
+      void run(`${item._id}:levels`, async () => {
+        await updateLevels({
+          docId: item._id,
+          version: item.version,
+          parLevel,
+          reorderThreshold,
+        });
+      });
+    })();
   };
 
   const reservationAction = (reservation: any, key: string) => {
@@ -185,14 +370,100 @@ export function StockBookPage() {
       </header>
       <InventoryWorkspaceNav />
       <aside className="supply-degraded" role="note">
-        <strong>Visible facts, not inferred shortage</strong>
+        <strong>Live stock facts</strong>
         <span>
-          Quantities use the current number projection. Search and exact decimal
-          precision remain degraded; on-hand and active reservation totals are
-          shown separately rather than inventing an aggregate shortage rule.
+          Quantities use the current number projection; search and exact decimal
+          precision remain degraded. Available stock is on hand minus active
+          reservations — PAR alerts and suggested purchase quantities derive
+          from those live totals.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
+      {host}
+
+      <StockReceiptScanner
+        items={activeItems}
+        demands={demands ?? []}
+        ingredients={ingredients ?? []}
+        locations={locations ?? []}
+        events={events ?? []}
+        onReceive={async ({ item, quantity, unitCost }) => {
+          await receiveStock({
+            docId: item._id,
+            version: item.version,
+            quantity,
+            unitCost,
+          });
+        }}
+      />
+
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">Low-stock alerts</p>
+            <h2>Below PAR</h2>
+          </div>
+          <span>{lowStockItems.length} alerts</span>
+        </div>
+        {items === undefined ||
+        ingredients === undefined ||
+        locations === undefined ? (
+          <TableSkeleton rows={3} />
+        ) : lowStockItems.length === 0 ? (
+          <div className="document-empty">
+            <p>Every stock line with a PAR level is at or above it.</p>
+            <span>
+              Set a PAR level on a stock line (Levels action) to get alerted
+              when available stock drops below it.
+            </span>
+          </div>
+        ) : (
+          <div className="supply-table-wrap">
+            <table className="supply-table">
+              <thead>
+                <tr>
+                  <th>Ingredient</th>
+                  <th>Location</th>
+                  <th>Available</th>
+                  <th>PAR</th>
+                  <th>Suggested purchase</th>
+                  <th>State</th>
+                </tr>
+              </thead>
+              <tbody>
+                {lowStockItems.map((item) => (
+                  <tr key={item._id}>
+                    <td>
+                      <strong>{ingredientName(item.ingredientId)}</strong>
+                      <small>{item.unit}</small>
+                    </td>
+                    <td>{locationName(item.locationId)}</td>
+                    <td className="supply-number">
+                      {availableFor(item)}
+                      {reservedFor(item._id) > 0
+                        ? ` (${item.quantityOnHand} − ${qty4(reservedFor(item._id))} reserved)`
+                        : ""}
+                    </td>
+                    <td className="supply-number">{item.parLevel}</td>
+                    <td className="supply-number">
+                      <strong>
+                        {suggestedPurchase(item)} {item.unit}
+                      </strong>
+                    </td>
+                    <td>
+                      <StatusChip
+                        status={
+                          belowReorder(item) ? "reorder now" : "below par"
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
       {form ? (
         <SupplyStockForm
           kind={form}
@@ -200,11 +471,84 @@ export function StockBookPage() {
           ingredients={ingredients ?? []}
           locations={locations ?? []}
           events={events ?? []}
+          inventoryLots={(inventoryLots ?? []).filter(
+            (lot) => lot.deletedAt == null,
+          )}
+          transferSource={transferSource}
           busy={busy != null}
           onSubmit={submit}
-          onClose={() => setForm(null)}
+          onClose={() => {
+            setForm(null);
+            setTransferSource(null);
+          }}
         />
       ) : null}
+
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">Freshness digest</p>
+            <h2>Expiring soon</h2>
+          </div>
+          <label className="field-label">
+            Horizon
+            <select
+              className="input"
+              value={horizonDays}
+              onChange={(event) => setHorizonDays(Number(event.target.value))}
+            >
+              {HORIZON_DAYS.map((days) => (
+                <option key={days} value={days}>
+                  {days} days
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {expiringItems.length === 0 ? (
+          <div className="document-empty">
+            <p>Nothing expires within {horizonDays} days.</p>
+            <span>
+              Lots with a best-before or use-by date inside the horizon surface
+              here daily.
+            </span>
+          </div>
+        ) : (
+          <div className="supply-table-wrap">
+            <table className="supply-table">
+              <thead>
+                <tr>
+                  <th>Ingredient</th>
+                  <th>Location</th>
+                  <th>On hand</th>
+                  <th>Best before</th>
+                  <th>Use by</th>
+                  <th>State</th>
+                </tr>
+              </thead>
+              <tbody>
+                {expiringItems.map((item) => (
+                  <tr key={item._id}>
+                    <td>
+                      <strong>{ingredientName(item.ingredientId)}</strong>
+                      <small>{item.unit}</small>
+                    </td>
+                    <td>{locationName(item.locationId)}</td>
+                    <td className="supply-number">{item.quantityOnHand}</td>
+                    <td>{dateLabel(item.bestBeforeAt)}</td>
+                    <td>{dateLabel(item.useByAt)}</td>
+                    <td>
+                      <StatusChip
+                        status={isExpired(item) ? "expired" : "use soon"}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
 
       <section className="working-ledger">
         <div className="ledger-heading">
@@ -235,6 +579,7 @@ export function StockBookPage() {
                   <th>On hand</th>
                   <th>Active reserved</th>
                   <th>PAR / reorder</th>
+                  <th>Best before / Use by</th>
                   <th aria-label="Actions" />
                 </tr>
               </thead>
@@ -250,6 +595,17 @@ export function StockBookPage() {
                     <td className="supply-number">{reservedFor(item._id)}</td>
                     <td className="supply-number">
                       {item.parLevel} / {item.reorderThreshold}
+                      {belowPar(item) ? (
+                        <StatusChip
+                          status={
+                            belowReorder(item) ? "reorder now" : "below par"
+                          }
+                        />
+                      ) : null}
+                    </td>
+                    <td>
+                      {dateLabel(item.bestBeforeAt)} / {dateLabel(item.useByAt)}
+                      {isExpired(item) ? <StatusChip status="expired" /> : null}
                     </td>
                     <td>
                       <div className="supply-row-actions">
@@ -266,6 +622,30 @@ export function StockBookPage() {
                           onClick={() => stockAction(item, "recount")}
                         >
                           Recount
+                        </button>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() => expiryAction(item)}
+                        >
+                          Dates
+                        </button>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() => levelsAction(item)}
+                        >
+                          Levels
+                        </button>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          disabled={busy != null}
+                          onClick={() => {
+                            setTransferSource(item);
+                            setForm("transfer");
+                          }}
+                        >
+                          Transfer
                         </button>
                       </div>
                     </td>
@@ -328,6 +708,14 @@ export function StockBookPage() {
                         <div className="supply-row-actions">
                           {policy
                             .reservationActions(String(reservation.status))
+                            // Generated consume guards use-by expiry; do not
+                            // offer an action that can never succeed.
+                            .filter(
+                              (action) =>
+                                action.key !== "consume" ||
+                                item == null ||
+                                !isExpired(item),
+                            )
                             .map((action) => (
                               <button
                                 key={action.key}
@@ -352,6 +740,61 @@ export function StockBookPage() {
           </div>
         )}
       </section>
+
+      <section className="working-ledger mt-10">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">Movement audit</p>
+            <h2>Transfer history</h2>
+          </div>
+          <span>{(transfers ?? []).length} transfers</span>
+        </div>
+        {transfers === undefined ? (
+          <TableSkeleton rows={3} />
+        ) : transfers.length === 0 ? (
+          <div className="document-empty">
+            <p>No stock has moved between locations.</p>
+            <span>
+              Each transfer keeps its debit and credit ledger entries beside the
+              durable record shown here.
+            </span>
+          </div>
+        ) : (
+          <div className="supply-table-wrap">
+            <table className="supply-table">
+              <thead>
+                <tr>
+                  <th>When</th>
+                  <th>Ingredient</th>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Quantity</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[...transfers]
+                  .sort(
+                    (a, b) => (b.transferredAt ?? 0) - (a.transferredAt ?? 0),
+                  )
+                  .map((transfer) => (
+                    <tr key={transfer._id}>
+                      <td>{dateLabel(transfer.transferredAt)}</td>
+                      <td>
+                        <strong>{ingredientName(transfer.ingredientId)}</strong>
+                        <small>{transfer.unit}</small>
+                      </td>
+                      <td>{locationName(transfer.sourceLocationId)}</td>
+                      <td>{locationName(transfer.destinationLocationId)}</td>
+                      <td className="supply-number">{transfer.quantity}</td>
+                      <td>{transfer.notes ?? "—"}</td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </div>
   );
 }
@@ -362,10 +805,21 @@ function SupplyStockForm({
   ingredients,
   locations,
   events,
+  inventoryLots,
+  transferSource,
   busy,
   onSubmit,
   onClose,
 }: any) {
+  const transferDestinations =
+    kind === "transfer" && transferSource
+      ? items.filter(
+          (item: any) =>
+            item._id !== transferSource._id &&
+            item.ingredientId === transferSource.ingredientId &&
+            item.unit === transferSource.unit,
+        )
+      : [];
   return (
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
@@ -376,7 +830,9 @@ function SupplyStockForm({
               ? "Register storage"
               : kind === "stock"
                 ? "Open stock line"
-                : "Reserve for event"}
+                : kind === "transfer"
+                  ? "Transfer between locations"
+                  : "Reserve for event"}
           </h2>
         </div>
         <div className="supply-row-actions">
@@ -474,6 +930,68 @@ function SupplyStockForm({
             )}
           </>
         ) : null}
+        {kind === "transfer" && transferSource ? (
+          <>
+            <label className="field-label">
+              From
+              <input
+                className="input"
+                value={`${
+                  ingredients.find(
+                    (ingredient: any) =>
+                      ingredient._id === transferSource.ingredientId,
+                  )?.name ?? "Ingredient"
+                } · ${
+                  locations.find(
+                    (location: any) =>
+                      location._id === transferSource.locationId,
+                  )?.name ?? "Location"
+                } (${transferSource.quantityOnHand} ${transferSource.unit} on hand)`}
+                readOnly
+              />
+            </label>
+            <label className="field-label">
+              To stock line
+              <select
+                name="destinationInventoryItemId"
+                className="input"
+                required
+              >
+                <option value="">Select destination</option>
+                {transferDestinations.map((item: any) => (
+                  <option key={item._id} value={item._id}>
+                    {locations.find(
+                      (location: any) => location._id === item.locationId,
+                    )?.name ?? "Location"}{" "}
+                    ({item.quantityOnHand} {item.unit} on hand)
+                  </option>
+                ))}
+              </select>
+            </label>
+            {transferDestinations.length === 0 ? (
+              <p className="field-label">
+                No other stock line holds this ingredient. Open a stock line at
+                the destination location first.
+              </p>
+            ) : null}
+            <label className="field-label">
+              Quantity
+              <input
+                name="quantity"
+                className="input"
+                type="number"
+                min={0.0001}
+                max={transferSource.quantityOnHand}
+                step="any"
+                required
+              />
+            </label>
+            <label className="field-label">
+              Notes
+              <input name="notes" className="input" />
+            </label>
+          </>
+        ) : null}
         {kind === "reserve" ? (
           <>
             <label className="field-label">
@@ -505,6 +1023,27 @@ function SupplyStockForm({
                     </option>
                   ))}
               </select>
+            </label>
+            <label className="field-label">
+              Supplier lot
+              <select name="inventoryLotId" className="input">
+                <option value="">Unattributed / legacy stock</option>
+                {inventoryLots.map((lot: any) => (
+                  <option key={lot._id} value={lot._id}>
+                    {lot.supplierLotNumber} ·{" "}
+                    {ingredients.find(
+                      (ingredient: any) => ingredient._id === lot.ingredientId,
+                    )?.name ?? "Ingredient"}{" "}
+                    ·{" "}
+                    {locations.find(
+                      (location: any) => location._id === lot.locationId,
+                    )?.name ?? "Location"}
+                  </option>
+                ))}
+              </select>
+              <span className="field-hint">
+                Select a lot when the stock came from a tracked receipt.
+              </span>
             </label>
             <label className="field-label">
               Quantity

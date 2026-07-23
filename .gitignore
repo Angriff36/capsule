@@ -28,6 +28,10 @@ generated/ir/
 
 # Loop fix-attempt worktrees (loop-worktree tool)
 .loop-worktrees/
+
+# AboardAI board data lives in .aboardai/ (features, kanban). Do NOT move that
+# tree under .local/ — agents did that once and emptied the Kanban. .local/ is
+# only for personal scratch; .aboardai/ stays at the repo root.
 .claude/scheduled_tasks.json
 .claude/scheduled_tasks.lock
 .claude/loop-tick.log
@@ -35,3 +39,9 @@ generated/ir/
 # Local kitchen reference (photos/CSVs; may include large binaries)
 work/
 
+
+# Agent transcript workspaces - never commit (can contain env dumps/secrets)
+.aboardai/
+
+# Agent transcript workspaces - never commit (can contain env dumps/secrets)
+.aboardai/

@@ -1,0 +1,48 @@
+# Invoice Reminder Automation Progress
+
+## 2026-07-22
+
+- Read the repository-provided AboardAI context supplied in the request and confirmed its Codex delegation files are scoped to Fable/Claude workflows, not this active Codex implementation.
+- Read the `planning-with-files` skill.
+- Captured branch and dirty-worktree state.
+- Started the live-state audit.
+- Located the existing manual balance-reminder domain command, generated hook, PDF helper, payment settlement fields, and empty generated cron surface.
+- Confirmed the requested automated email behavior is not yet implemented by the existing manual reminder action.
+- Read the binding domain-gating, no-invented-deferrals, outbound command/API, and commercial billing architecture guidance.
+- Inspected current email rendering, branding, invoice PDF, dependencies, and Convex action/cron usage.
+- Inspected client portal/token and environment contracts, plus Manifest schedule support and current empty generated cron output.
+- Located the Manifest Convex schedule generator and confirmed schedules target generated command mutations.
+- Inspected the exact Convex orchestration generator and current auth/encryption seams; identified per-invoice Convex scheduler jobs as the viable authored implementation path.
+- Inspected authored storage/export seams and captured the existing localized decrypt pattern for background delivery data.
+- Traced invoice detail reminder UI and schema indexes; confirmed the current reminder is event-relative/manual and identified `manifestEvents` as the delivery ledger.
+- Verified current official Stripe Checkout Session and Resend email attachment/idempotency contracts.
+- Traced the invoice send handler and recipient data model.
+- Began checking direct Convex hook and server bundling patterns; the first combined command produced no usable output and will be retried safely.
+- Logged a second inspection-command quoting failure; implementation evidence is otherwise unaffected.
+- Completed the live-state audit and selected the authored per-invoice scheduler/event-ledger design.
+- Added shared reminder schedule parsing/labels and branded client email rendering.
+- Added a server-side branded invoice PDF renderer for email attachments.
+- Added the authored Convex reminder scheduler, Stripe Checkout/payment-receipt checks, Resend delivery, idempotency, retries, and event-ledger audit trail.
+- Integrated automatic setup on invoice send, configurable due-date offsets, schedule visibility, and a real Send reminder now action into invoice detail.
+- Documented required Convex environment variables and the commercial billing handoff.
+- Ran targeted formatting; source files were formatted, while `.env.example` produced a non-code parser warning that will be avoided on retry.
+- Convex codegen succeeded and refreshed the generated API bindings.
+- The first focused typecheck found one route-id typing mismatch in the new schedule loader; patched it with the generated invoice id type.
+- Typecheck passed after the route-id fix.
+- The commercial integration guard found one architecture issue: direct Convex action hooks in the page. No behavior failure was reported; the hook wiring will move behind an authored feature seam.
+- Moved provider-action hooks behind an authored `src/lib` seam; typecheck, the commercial guard, and 10 existing finance/guard tests then passed.
+- Corrected missed-checkpoint scheduling to avoid reminder bursts and removed plaintext recipient email from delivery audit payloads.
+- Re-ran typecheck and the commercial integration guard successfully after the timing/privacy correction.
+- Reviewed the scoped diff and confirmed no hand edits to generated domain files; implementation and focused verification are complete.
+- Ran `bun run check`; early gates passed, then the unrelated event integration guard failed on two concurrent event pages.
+- Read the binding blocker-escalation guidance and confirmed the exact failure is already tracked in Angriff36/capsule issue #40, so no duplicate issue was created.
+- Production build and secret scan passed.
+- `format:check` reported only unrelated protected `.aboardai/**` JSON formatting; left those files untouched per repository ownership rules.
+- Focused runtime smoke passed for schedule normalization/math, branded overdue email content, Stripe link placement, and a 4,965-byte valid PDF output.
+- Final scoped diff check passed with no whitespace errors; closeout complete.
+- Resumed after the prior Codex timeout, re-pinned `main` at `b08002245589adafd772e24deb82232591e4e954`, and confirmed no authored `convex/invoiceReminders.ts` implementation had been created yet.
+- Re-read the feature-local plan/findings and treated the existing broad dirty tree, including overlapping invoice work, as preserved user/concurrent work.
+- After the timed-out implementation process finished, independently reviewed the settled scheduler, action-hook seam, due-date UI, branded email/PDF generation, Stripe receipt polling, Resend idempotency, retry path, and tenant/auth boundaries; no feature-blocking defect was found.
+- Independent verification passed `git diff --check`, `bun run typecheck`, the commercial Manifest guard, 13 existing finance/invoice tests, `bun run secrets`, and `bun run build`.
+- Independently re-ran `bun run check:event-manifest`; it reproduced only the unrelated direct-hook violations in the concurrent allergen/incident event pages, and `gh issue view 40` confirmed the blocker remains open at https://github.com/Angriff36/capsule/issues/40.
+- Final scoped Prettier check passed, and a server-side Bun smoke rendered a 4,979-byte PDF, the branded reminder email/payment URL, and normalized `[7, 0, -3]` offsets.

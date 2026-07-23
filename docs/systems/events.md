@@ -12,7 +12,7 @@ This is not a broad CRM, venue-management suite, readiness dashboard, or replace
 
 | Canonical source                                            | Entities                         | Operator meaning                                                                         |
 | ----------------------------------------------------------- | -------------------------------- | ---------------------------------------------------------------------------------------- |
-| `C:\projects\Manifest-source\src\operations\event.manifest` | Client, Venue, Event, EventGuest | Engagement account, reusable venue, governed event plan/lifecycle, individual attendance |
+| `C:\projects\capsule\src\operations\event.manifest` | Client, Venue, Event, EventGuest | Engagement account, reusable venue, governed event plan/lifecycle, individual attendance |
 
 Manifest source owns business rules. Capsule provides the operator workflow through generated Convex queries, commands, policies, guards, constraints, lifecycle metadata, and authored integration seams.
 
@@ -55,7 +55,7 @@ The create page requires an active registered Client and Venue. Existing records
 
 The browser converts the entered local date/time into an epoch timestamp and displays it in the operator's browser timezone. Venue-specific timezone behavior is not implemented.
 
-Creation uses the actual `Client.register`, `Venue.register`, and `Event.planEngagement` generated commands. The authored action seam allocates the instance ID those contracts require, invokes the generated command, and removes the allocation if the command rejects. A successful Event command navigates directly to `/events/:id`.
+Creation uses the actual governed `Client.register`, `Venue.register`, and `Event.planEngagement` generated create commands. A successful Event command navigates directly to `/events/:id`.
 
 ## Event dossier and revisions
 
@@ -73,6 +73,26 @@ The dossier shows the Event identity and stage plus real schedule, service, comm
 All writes include the current generated version when available. A stale version is rendered as a conflict rather than silently overwriting another operator's change.
 
 Material revisions do not automatically return an approved Event to planning or require renewed approval. Title, Event type, Client, and owner reassignment are not editable in the current dossier. `Event.assignOwner` exists in generated capability metadata but is not yet exposed by this UI.
+
+## Recurring events
+
+The Event dossier can turn a planned Event into a recurring source. Operators choose weekly, monthly, or annual cadence and one of two explicit end conditions:
+
+- An inclusive final Event date.
+- A total number of Events in the series, including the source Event, from 2 to 1000.
+
+`Event.configureRecurrence` records the source schedule, deterministic calendar anchor, end condition, next occurrence, generated count, and a fresh series id. `Event.stopRecurrence` stops future generation without cancelling or deleting Drafts that already exist. Recurring instances cannot become recurrence sources themselves.
+
+Configuration immediately arms an internal Convex materializer. It prepares bounded batches up to 90 days ahead, then durably schedules the next run for when another occurrence enters that review horizon. Every generated instance:
+
+- Copies the source Event's client, Venue snapshot, owner, planning brief, headcount, pricing, and encrypted contact envelope.
+- Preserves the source duration while moving the start/end to its recurrence date.
+- Records source Event, series, and one-based occurrence sequence lineage.
+- Starts at the generated Event default `planning` stage, presented to operators as Draft, with no approval or activation timestamps.
+
+Series tokens and source/sequence lookups make retries idempotent and make jobs from a stopped or replaced series exit without writing. Updating a recurrence starts a new series and does not silently rewrite Drafts already created.
+
+Manifest 3.6.41's Convex schedule projection cannot query tenant-scoped recurrence sources or inject trusted system identity into generated Event commands. The internal-only materializer is the narrow bridge for that projection gap; configuration and stop semantics remain generated Manifest commands. The owning gap is tracked in [Capsule issue #74](https://github.com/Angriff36/capsule/issues/74).
 
 ## Lifecycle
 
@@ -104,7 +124,7 @@ The dossier lists only active invited guests for the current Event. Each record 
 - Accessibility needs.
 - Special-meal requirement.
 
-Invitation uses the same allocate/invoke/cleanup seam as Event creation. The generated projector permits the creation command to reassert its preallocated initial `pending` RSVP value; changing to a different value still requires a legal lifecycle transition.
+Invitation uses the governed generated `EventGuest.invite` creation hook. The generated projector permits the creation command to initialize the `pending` RSVP value; changing to a different value still requires a legal lifecycle transition.
 
 ### Attendance actions
 
@@ -152,10 +172,12 @@ An event manager can select the Northstar Events Client and Harborview Loft Venu
 | Index                      | `C:\projects\capsule\src\features\events\EventsListPage.tsx`                   |
 | Creation                   | `C:\projects\capsule\src\features\events\EventCreatePage.tsx`                  |
 | Dossier and lifecycle      | `C:\projects\capsule\src\features\events\EventDetailPage.tsx`                  |
+| Recurrence UI              | `C:\projects\capsule\src\features\events\RecurringEventPanel.tsx`             |
+| Recurrence calendar math   | `C:\projects\capsule\src\lib\eventRecurrence.ts`                               |
+| Scheduled Draft bridge     | `C:\projects\capsule\convex\recurringEvents.ts`                                 |
 | Guest workflow             | `C:\projects\capsule\src\features\events\EventGuestPanel.tsx`                  |
 | Lifecycle/capability offer | `C:\projects\capsule\src\features\events\EventLifecyclePolicy.ts`              |
 | Failure classification     | `C:\projects\capsule\src\features\events\CommandFailure.ts`                    |
-| Creation action seam       | `C:\projects\capsule\convex\lib\eventPlanning.ts`                              |
 | Focused foundation proof   | `C:\projects\capsule\tests\event-planning-foundation.test.ts`                  |
 | Auth/encryption proof      | `C:\projects\capsule\tests\event-seam-contract.test.ts` and `tests\event-seam` |
 | Reaction projection proof  | `C:\projects\capsule\tests\event-reaction-projection.test.ts`                  |

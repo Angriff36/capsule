@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant EventTimelineActivity as EventTimelineActivity
+    participant EventBus
+    Client->>+EventTimelineActivity: adjust(name, startsAt, endsAt, responsibleParty, notes)
+    Note over EventTimelineActivity: Policies: eventTimelineActivityRead, eventTimelineActivityWrite, eventTimelineActivityExecute
+    Note over EventTimelineActivity: Guards (2)
+    EventTimelineActivity->>EventTimelineActivity: guard[0]: self.scheduledAt != null
+    EventTimelineActivity->>EventTimelineActivity: guard[1]: self.deletedAt == null
+    EventTimelineActivity->>EventTimelineActivity: mutate.name
+    EventTimelineActivity->>EventTimelineActivity: mutate.startsAt
+    EventTimelineActivity->>EventTimelineActivity: mutate.endsAt
+    EventTimelineActivity->>EventTimelineActivity: mutate.responsibleParty
+    EventTimelineActivity->>EventTimelineActivity: mutate.notes
+    EventTimelineActivity->>EventBus: emit EventTimelineActivityAdjusted on event_timeline_activity.adjusted
+    EventTimelineActivity-->>-Client: void

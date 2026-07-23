@@ -12,6 +12,28 @@ import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
 const policy = new WorkforceLifecyclePolicy();
+const EXPIRY_ALERT_WINDOW_MS = 30 * 86_400_000;
+
+const certificationTypes = [
+  ["food_handler", "Food handler card"],
+  ["alcohol_service", "Alcohol service permit"],
+  ["drivers_license_class_c", "Driver's license — Class C"],
+] as const;
+
+function expiryLabel(expiresAt: number | undefined, now: number) {
+  if (expiresAt == null) return null;
+  if (expiresAt < now) {
+    return { label: "Expired", className: "text-danger" };
+  }
+  if (expiresAt <= now + EXPIRY_ALERT_WINDOW_MS) {
+    const days = Math.ceil((expiresAt - now) / 86_400_000);
+    return {
+      label: days <= 1 ? "Expires today" : `Expires in ${days} days`,
+      className: "font-medium text-brand",
+    };
+  }
+  return null;
+}
 
 export function QualificationsPage() {
   const qualifications = useListQualification();
@@ -26,6 +48,13 @@ export function QualificationsPage() {
   const activeRows = (qualifications ?? []).filter(
     (row) => row.deletedAt == null,
   );
+  const now = Date.now();
+  const attentionCount = activeRows.filter(
+    (row) =>
+      row.status === "active" &&
+      row.expiresAt != null &&
+      row.expiresAt <= now + EXPIRY_ALERT_WINDOW_MS,
+  ).length;
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
   );
@@ -60,10 +89,10 @@ export function QualificationsPage() {
         issuedAt: new Date(
           `${String(data.get("issuedAt"))}T00:00:00`,
         ).getTime(),
-        certificationType:
-          String(data.get("certificationType") || "") || undefined,
+        certificationType: String(data.get("certificationType")),
+        issuingBody: String(data.get("issuingBody")),
         expiresAt: expiresRaw
-          ? new Date(`${expiresRaw}T00:00:00`).getTime()
+          ? new Date(`${expiresRaw}T23:59:59.999`).getTime()
           : undefined,
         documentRef: String(data.get("documentRef") || "") || undefined,
         notes: String(data.get("notes") || "") || undefined,
@@ -88,8 +117,8 @@ export function QualificationsPage() {
           <p className="eyebrow">Staff · Qualifications</p>
           <h1 className="display-title mt-2">Qualification ledger</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Grant, revoke, and expire certifications. Granted records require a
-            name and issue date; expiry must follow issue.
+            Record professional certifications by person, issuer, issue date,
+            and expiry. Credentials nearing expiry appear in HR notifications.
           </p>
         </div>
         <button
@@ -143,7 +172,25 @@ export function QualificationsPage() {
               <input
                 name="certificationType"
                 className="input"
-                placeholder="certification"
+                list="certification-type-options"
+                placeholder="food_handler"
+                required
+              />
+              <datalist id="certification-type-options">
+                {certificationTypes.map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </datalist>
+            </label>
+            <label className="field-label">
+              Issuing body
+              <input
+                name="issuingBody"
+                className="input"
+                placeholder="County health department"
+                required
               />
             </label>
             <label className="field-label">
@@ -164,7 +211,10 @@ export function QualificationsPage() {
             <p className="eyebrow">Credentials</p>
             <h2>Qualifications</h2>
           </div>
-          <span>{activeRows.length} on file</span>
+          <span>
+            {activeRows.length} on file
+            {attentionCount > 0 ? ` · ${attentionCount} need attention` : ""}
+          </span>
         </div>
         {qualifications === undefined || people === undefined ? (
           <TableSkeleton rows={5} />
@@ -180,6 +230,7 @@ export function QualificationsPage() {
                 <tr>
                   <th>Person</th>
                   <th>Qualification</th>
+                  <th>Issuing body</th>
                   <th>Issued</th>
                   <th>Expires</th>
                   <th>State</th>
@@ -194,10 +245,9 @@ export function QualificationsPage() {
                     </td>
                     <td>
                       {row.name}
-                      {row.certificationType ? (
-                        <small>{row.certificationType}</small>
-                      ) : null}
+                      <small>{row.certificationType || "Unclassified"}</small>
                     </td>
+                    <td>{row.issuingBody || "—"}</td>
                     <td>
                       {row.issuedAt
                         ? new Date(row.issuedAt).toLocaleDateString()
@@ -207,6 +257,14 @@ export function QualificationsPage() {
                       {row.expiresAt
                         ? new Date(row.expiresAt).toLocaleDateString()
                         : "—"}
+                      {(() => {
+                        const expiry = expiryLabel(row.expiresAt, now);
+                        return expiry ? (
+                          <small className={expiry.className}>
+                            {expiry.label}
+                          </small>
+                        ) : null;
+                      })()}
                     </td>
                     <td>
                       <StatusChip status={String(row.status)} />

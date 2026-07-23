@@ -1,6 +1,7 @@
 // Capsule workforce — Shift (scheduled work period for a Person).
 // Clock-in/out duration facts live on TimeRecord (`time.manifest`); this entity
-// tracks schedule lifecycle only. Optional Event ref; Schedule/OpenShift deferred.
+// tracks individual shift lifecycle. Weekly publication receipts are modeled
+// below; open-shift bidding is not built yet.
 
 use "./availability.manifest"
 
@@ -22,6 +23,13 @@ entity Shift mixin TenantScoped, SoftDeletable {
   property startsAt: datetime?
   property endsAt: datetime?
   property role: string?
+  property shiftTypeId: uuid?
+  property requiredQualificationId: uuid?
+  property requiredTrainingCompletionId: uuid?
+  property swapAuthorizationId: uuid?
+  property swapTargetPersonId: uuid?
+  property swapTargetQualificationId: uuid?
+  property swapTargetTrainingCompletionId: uuid?
   property encrypted notes: string?
   property required status: ShiftStatus = "scheduled"
   property scheduledAt: datetime?
@@ -33,6 +41,13 @@ entity Shift mixin TenantScoped, SoftDeletable {
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  belongsTo shiftType: ShiftType fields [tenantId, shiftTypeId] references [tenantId, id]
+  belongsTo requiredQualification: Qualification fields [tenantId, requiredQualificationId] references [tenantId, id]
+  belongsTo requiredTrainingCompletion: TrainingCompletion fields [tenantId, requiredTrainingCompletionId] references [tenantId, id]
+  ref swapAuthorization: ShiftSwapRequest fields [tenantId, swapAuthorizationId] references [tenantId, id]
+  ref swapTargetPerson: Person fields [tenantId, swapTargetPersonId] references [tenantId, id]
+  ref swapTargetQualification: Qualification fields [tenantId, swapTargetQualificationId] references [tenantId, id]
+  ref swapTargetTrainingCompletion: TrainingCompletion fields [tenantId, swapTargetTrainingCompletionId] references [tenantId, id]
 
   constraint shiftScheduledComplete: self.scheduledAt == null or (self.startsAt != null and self.endsAt != null and self.endsAt > self.startsAt) "Scheduled shifts require a valid start/end range"
 
@@ -52,6 +67,9 @@ entity Shift mixin TenantScoped, SoftDeletable {
     endsAt: datetime,
     optional eventId: uuid,
     optional role: string,
+    optional shiftTypeId: uuid,
+    optional requiredQualificationId: uuid,
+    optional requiredTrainingCompletionId: uuid,
     optional notes: string
   ) {
     guard self.scheduledAt == null
@@ -62,11 +80,21 @@ entity Shift mixin TenantScoped, SoftDeletable {
     constraint schedulePersonMatch: personId == self.personId "Schedule personId must match the seeded person reference"
     constraint scheduleEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Schedule eventId must match the seeded event reference when provided"
     constraint scheduleDates: endsAt > startsAt "Shift end must be after its start"
+    constraint scheduleShiftTypeActive: shiftTypeId == null or (self.shiftType != null and self.shiftType.deletedAt == null and self.shiftType.status == "active") "Selected shift type must be active"
+    constraint scheduleTrainingProofRequired: shiftTypeId == null or self.shiftType == null or self.shiftType.requiredTrainingModuleId == null or requiredTrainingCompletionId != null "This shift type requires completed training before scheduling"
+    constraint scheduleTrainingProofPersonMatch: requiredTrainingCompletionId == null or (self.requiredTrainingCompletion != null and self.requiredTrainingCompletion.deletedAt == null and self.requiredTrainingCompletion.recordedAt != null and self.requiredTrainingCompletion.personId == personId) "Training completion must be recorded for the selected person"
+    constraint scheduleTrainingProofModuleMatch: requiredTrainingCompletionId == null or (self.shiftType != null and self.shiftType.requiredTrainingModuleId != null and self.requiredTrainingCompletion != null and self.requiredTrainingCompletion.trainingModuleId == self.shiftType.requiredTrainingModuleId) "Training completion must match the module required by the shift type"
+    constraint scheduleQualificationPersonMatch: requiredQualificationId == null or (self.requiredQualification != null and self.requiredQualification.personId == personId) "Required certification must belong to the selected person"
+    constraint scheduleQualificationActive: requiredQualificationId == null or (self.requiredQualification != null and self.requiredQualification.deletedAt == null and self.requiredQualification.status == "active") "Required certification must be active"
+    constraint scheduleQualificationValidity: requiredQualificationId == null or (self.requiredQualification != null and (self.requiredQualification.expiresAt == null or self.requiredQualification.expiresAt >= endsAt)) "Required certification must remain valid through the shift"
     mutate personId = personId
     mutate eventId = eventId != null ? eventId : self.eventId
     mutate startsAt = startsAt
     mutate endsAt = endsAt
     mutate role = role != null ? role : self.role
+    mutate shiftTypeId = shiftTypeId != null ? shiftTypeId : self.shiftTypeId
+    mutate requiredQualificationId = requiredQualificationId != null ? requiredQualificationId : self.requiredQualificationId
+    mutate requiredTrainingCompletionId = requiredTrainingCompletionId != null ? requiredTrainingCompletionId : self.requiredTrainingCompletionId
     mutate notes = notes != null ? notes : self.notes
     mutate scheduledAt = now()
     emit ShiftScheduled {
@@ -77,6 +105,9 @@ entity Shift mixin TenantScoped, SoftDeletable {
       startsAt: startsAt
       endsAt: endsAt
       role: role != null ? role : self.role
+      shiftTypeId: shiftTypeId != null ? shiftTypeId : self.shiftTypeId
+      requiredQualificationId: requiredQualificationId != null ? requiredQualificationId : self.requiredQualificationId
+      requiredTrainingCompletionId: requiredTrainingCompletionId != null ? requiredTrainingCompletionId : self.requiredTrainingCompletionId
       status: "scheduled"
     }
   }
@@ -164,7 +195,173 @@ entity Shift mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command stageApprovedSwap(
+    shiftSwapRequestId: uuid,
+    requesterPersonId: uuid,
+    recipientPersonId: uuid,
+    optional targetQualificationId: uuid,
+    optional targetTrainingCompletionId: uuid
+  ) {
+    guard self.status == "scheduled"
+    guard self.scheduledAt != null
+    guard self.deletedAt == null
+    guard self.swapAuthorizationId == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint stageSwapRequesterCurrent: self.personId == requesterPersonId "This shift is no longer assigned to the swap requester"
+    constraint stageSwapDifferentPeople: requesterPersonId != recipientPersonId "Choose another staff member for the swap"
+    mutate swapAuthorizationId = shiftSwapRequestId
+    mutate swapTargetPersonId = recipientPersonId
+    mutate swapTargetQualificationId = targetQualificationId
+    mutate swapTargetTrainingCompletionId = targetTrainingCompletionId
+    emit ShiftSwapStaged {
+      shiftId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command applyApprovedSwap() {
+    guard self.status == "scheduled"
+    guard self.scheduledAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    guard self.swapAuthorization != null and self.swapAuthorization.deletedAt == null and self.swapAuthorization.status == "approved"
+    guard self.swapTargetPerson != null and self.swapTargetPerson.deletedAt == null and self.swapTargetPerson.status == "active"
+    guard self.swapTargetPerson.authSubjectId != null
+    guard self.swapTargetQualificationId == null or (self.swapTargetQualification != null and self.swapTargetQualification.deletedAt == null and self.swapTargetQualification.status == "active")
+    guard self.swapTargetTrainingCompletionId == null or (self.swapTargetTrainingCompletion != null and self.swapTargetTrainingCompletion.deletedAt == null and self.swapTargetTrainingCompletion.recordedAt != null)
+    constraint applySwapAuthorizationSource: self.swapAuthorization.requesterPersonId == self.personId "Swap approval does not match the assigned staff member"
+    constraint applySwapAuthorizationTarget: self.swapAuthorization.recipientPersonId == self.swapTargetPersonId "Swap approval does not match the recipient"
+    constraint applySwapQualificationSnapshot: self.swapAuthorization.sourceQualificationId == self.requiredQualificationId "The shift certification requirement changed after approval"
+    constraint applySwapQualificationTarget: self.swapAuthorization.targetQualificationId == self.swapTargetQualificationId "Swap approval does not match the replacement certification"
+    constraint applySwapTrainingTarget: self.swapAuthorization.targetTrainingCompletionId == self.swapTargetTrainingCompletionId "Swap approval does not match the recipient training proof"
+    compute previousPersonId = self.personId
+    compute shiftSwapRequestId = self.swapAuthorizationId
+    mutate personId = self.swapTargetPersonId
+    mutate requiredQualificationId = self.swapTargetQualificationId
+    mutate requiredTrainingCompletionId = self.swapTargetTrainingCompletionId
+    mutate swapAuthorizationId = null
+    mutate swapTargetPersonId = null
+    mutate swapTargetQualificationId = null
+    mutate swapTargetTrainingCompletionId = null
+    emit ShiftSwapped {
+      shiftId: self.id
+      tenantId: self.tenantId
+      shiftSwapRequestId: shiftSwapRequestId
+      previousPersonId: previousPersonId
+      personId: self.personId
+      requiredQualificationId: self.requiredQualificationId
+      requiredTrainingCompletionId: self.requiredTrainingCompletionId
+    }
+  }
+
   store Shift in durable
+}
+
+// One durable in-app schedule notification per person and work week. The
+// manager UI fans publication out to scheduled people through generated
+// commands; each linked staff account acknowledges its own notice.
+entity WeeklyScheduleNotice mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, personId, weekStartsAt]
+  timestamps
+  versionProperty version: number
+
+  property required personId: uuid
+  property recipientAuthSubjectId: string?
+  property required weekStartsAt: datetime
+  property required weekEndsAt: datetime
+  property required shiftCount: int = 0
+  property required shiftSummary: string = ""
+  property publishedAt: datetime?
+  property acknowledgedAt: datetime?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+
+  constraint weeklyScheduleWindowValid: self.weekEndsAt > self.weekStartsAt "Work week end must be after its start"
+  constraint weeklyScheduleHasShifts: self.publishedAt == null or self.shiftCount > 0 "Published schedules require at least one shift"
+  constraint weeklyScheduleHasSummary: self.publishedAt == null or length(trim(self.shiftSummary)) > 0 "Published schedules require a staff summary"
+
+  default policy weeklyScheduleNoticeRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read schedule notices"
+  default policy weeklyScheduleNoticeWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may write schedule notices through commands"
+  default policy weeklyScheduleNoticeExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute schedule notice commands"
+
+  command publishSchedule(
+    personId: uuid,
+    optional recipientAuthSubjectId: string,
+    weekStartsAt: datetime,
+    weekEndsAt: datetime,
+    shiftCount: int,
+    shiftSummary: string
+  ) {
+    guard self.publishedAt == null
+    guard self.deletedAt == null
+    guard self.person != null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint publishSchedulePersonMatch: personId == self.personId "Schedule recipient must match the seeded person reference"
+    constraint publishScheduleWindow: weekEndsAt > weekStartsAt "Work week end must be after its start"
+    constraint publishScheduleShiftCount: shiftCount > 0 "Publish requires at least one scheduled shift"
+    constraint publishScheduleSummary: length(trim(shiftSummary)) > 0 "Publish requires a shift summary"
+    mutate personId = personId
+    mutate recipientAuthSubjectId = recipientAuthSubjectId
+    mutate weekStartsAt = weekStartsAt
+    mutate weekEndsAt = weekEndsAt
+    mutate shiftCount = shiftCount
+    mutate shiftSummary = shiftSummary
+    mutate publishedAt = now()
+    mutate acknowledgedAt = null
+    emit WeeklySchedulePublished {
+      noticeId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      weekStartsAt: weekStartsAt
+      weekEndsAt: weekEndsAt
+      shiftCount: shiftCount
+    }
+  }
+
+  command republishSchedule(
+    optional recipientAuthSubjectId: string,
+    shiftCount: int,
+    shiftSummary: string
+  ) {
+    guard self.publishedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint republishScheduleShiftCount: shiftCount > 0 "Publish requires at least one scheduled shift"
+    constraint republishScheduleSummary: length(trim(shiftSummary)) > 0 "Publish requires a shift summary"
+    mutate recipientAuthSubjectId = recipientAuthSubjectId
+    mutate shiftCount = shiftCount
+    mutate shiftSummary = shiftSummary
+    mutate publishedAt = now()
+    mutate acknowledgedAt = null
+    emit WeeklyScheduleRepublished {
+      noticeId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      weekStartsAt: self.weekStartsAt
+      weekEndsAt: self.weekEndsAt
+      shiftCount: shiftCount
+    }
+  }
+
+  command acknowledge() {
+    guard self.publishedAt != null
+    guard self.acknowledgedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.recipientAuthSubjectId != null
+    guard self.recipientAuthSubjectId == user.id
+    mutate acknowledgedAt = now()
+    emit WeeklyScheduleAcknowledged {
+      noticeId: self.id
+      tenantId: self.tenantId
+      personId: self.personId
+      weekStartsAt: self.weekStartsAt
+      acknowledgedAt: self.acknowledgedAt
+    }
+  }
+
+  store WeeklyScheduleNotice in durable
 }
 
 event ShiftScheduled: "shift.scheduled" {
@@ -175,6 +372,9 @@ event ShiftScheduled: "shift.scheduled" {
   startsAt: datetime
   endsAt: datetime
   role: string?
+  shiftTypeId: string?
+  requiredQualificationId: string?
+  requiredTrainingCompletionId: string?
   status: ShiftStatus
 }
 
@@ -221,4 +421,45 @@ event ShiftNoShowMarked: "shift.no_show_marked" {
   endsAt: datetime?
   previousStatus: ShiftStatus
   status: ShiftStatus
+}
+
+event ShiftSwapStaged: "shift.swap_staged" {
+  shiftId: string
+  tenantId: string
+}
+
+event ShiftSwapped: "shift.swapped" {
+  shiftId: string
+  tenantId: string
+  shiftSwapRequestId: string
+  previousPersonId: string
+  personId: string
+  requiredQualificationId: string?
+  requiredTrainingCompletionId: string?
+}
+
+event WeeklySchedulePublished: "weekly_schedule.published" {
+  noticeId: string
+  tenantId: string
+  personId: string
+  weekStartsAt: datetime
+  weekEndsAt: datetime
+  shiftCount: int
+}
+
+event WeeklyScheduleRepublished: "weekly_schedule.republished" {
+  noticeId: string
+  tenantId: string
+  personId: string
+  weekStartsAt: datetime
+  weekEndsAt: datetime
+  shiftCount: int
+}
+
+event WeeklyScheduleAcknowledged: "weekly_schedule.acknowledged" {
+  noticeId: string
+  tenantId: string
+  personId: string
+  weekStartsAt: datetime
+  acknowledgedAt: datetime
 }

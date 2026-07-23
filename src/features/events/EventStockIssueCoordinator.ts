@@ -25,6 +25,7 @@ export type EventStockIssueItem = {
   quantityOnHand: number;
   locationId: string;
   unit: string;
+  useByAt?: number | null;
 };
 
 export type EventStockAdjustment = {
@@ -82,6 +83,10 @@ export class EventStockIssueCoordinator {
     );
     if (!item) {
       throw new Error("Inventory item for reservation was not found");
+    }
+    // Guard mirrors InventoryReservation.consume — expired lots cannot issue.
+    if (item.useByAt != null && item.useByAt < Date.now()) {
+      throw new Error("Stock line is past its use-by date");
     }
 
     await this.ports.consumeReservation({

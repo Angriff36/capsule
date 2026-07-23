@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant VendorContractPriceTier as VendorContractPriceTier
+    participant EventBus
+    Client->>+VendorContractPriceTier: add(contractId, itemName, unitPrice, unit, minQuantity, notes)
+    Note over VendorContractPriceTier: Policies: vendorContractTierRead, vendorContractTierWrite, vendorContractTierExecute
+    Note over VendorContractPriceTier: Guards (4)
+    VendorContractPriceTier->>VendorContractPriceTier: guard[0]: self.addedAt == null
+    VendorContractPriceTier->>VendorContractPriceTier: guard[1]: self.deletedAt == null
+    VendorContractPriceTier->>VendorContractPriceTier: guard[2]: self.contract != null and self.contract.deletedAt == null
+    VendorContractPriceTier->>VendorContractPriceTier: guard[3]: self.contract.status == #quot;draft#quot;
+    VendorContractPriceTier->>VendorContractPriceTier: mutate.contractId
+    VendorContractPriceTier->>VendorContractPriceTier: mutate.itemName
+    VendorContractPriceTier->>VendorContractPriceTier: mutate.unit
+    VendorContractPriceTier->>VendorContractPriceTier: mutate.minQuantity
+    VendorContractPriceTier->>VendorContractPriceTier: mutate.unitPrice
+    VendorContractPriceTier->>VendorContractPriceTier: mutate.notes
+    VendorContractPriceTier->>VendorContractPriceTier: mutate.addedAt
+    VendorContractPriceTier->>EventBus: emit VendorContractPriceTierAdded on vendor_contract.price_tier_added
+    VendorContractPriceTier-->>-Client: void

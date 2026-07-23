@@ -29,7 +29,7 @@ Use a **purchase queue** beside an **order folio**:
 - Create/cancel/fulfill PurchaseNeeds and link them to order/line records.
 - Generate a draft VendorOrder from open prep-list PurchaseNeeds for the last seven days, upcoming seven days, or a custom inclusive Event date range; identical ingredient/unit quantities combine on one line.
 - Open, total, submit, confirm, partially receive, receive, or cancel VendorOrders.
-- Add lines, record receipts, and cancel lines.
+- Add lines, record receipts with required supplier lot numbers, and cancel lines.
 
 ## Cross-system handoffs
 
@@ -43,9 +43,9 @@ Procurement work is role-gated; vendor lifecycle and order cancellation require 
 
 The authored Procurement subworkspace now ships at `/inventory/purchasing` and `/inventory/orders/:id`. Operators can onboard Vendors, open VendorOrders, add demand-backed lines, revise totals, submit/confirm/cancel orders, record partial or complete line receipts, and apply explicit PurchaseNeed ordering/fulfillment commands.
 
-Procurement and management roles remain generated policy. Order and PurchaseNeed actions are offered from generated lifecycle metadata. Receipt entry is always submitted to the generated command because its next line state depends on cumulative quantity rather than a static authored transition table.
+Procurement and management roles remain generated policy. Order and PurchaseNeed actions are offered from generated lifecycle metadata. Receipt entry is always submitted to the generated command because its next line state depends on cumulative quantity rather than a static authored transition table. Every partial receipt requires a supplier lot number and creates an immutable `InventoryLot` linked to its VendorOrderLine, VendorOrder, vendor, ingredient, location, and available demand/Event provenance.
 
-The UI preserves IngredientDemand and Event provenance and distinguishes explicit operator commands from unverified reactions. A generated range draft preserves every contributing PurchaseNeed beneath its combined order line; it remains editable and the needs remain open until submission. It does not claim automatic PurchaseNeed creation, cancellation fan-out, or receipt-to-stock updates. Money and quantity values retain the current projected-number limitation.
+The UI preserves IngredientDemand and Event provenance, shows recorded lots under their purchase-order line, and distinguishes explicit operator commands from unverified reactions. A generated range draft preserves every contributing PurchaseNeed beneath its combined order line; it remains editable and the needs remain open until submission. It does not claim automatic PurchaseNeed creation, cancellation fan-out, or receipt-to-stock updates. Money and quantity values retain the current projected-number limitation.
 
 Proof: `tests/supply-slice-contract.test.ts`, `tests/supply-lifecycle-policy.test.ts`, `tests/supply-manifest-integration-guard.test.ts`, and `bun run check:supply-manifest`.
 

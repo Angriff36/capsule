@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Client
+    participant Payment as Payment
+    participant EventBus
+    Client->>+Payment: stageClientMerge(clientMergeId, clientId)
+    Note over Payment: Policies: paymentRead, paymentWrite, paymentExecute
+    Note over Payment: Guards (2)
+    Payment->>Payment: guard[0]: self.deletedAt == null
+    Payment->>Payment: guard[1]: roleAllows(user.role, #quot;adminAccess#quot;)
+    Payment->>Payment: mutate.clientMergeAuthorizationId
+    Payment->>Payment: mutate.mergeTargetClientId
+    Payment->>EventBus: emit PaymentClientMergeStaged on payment.client_merge_staged
+    Payment-->>-Client: void

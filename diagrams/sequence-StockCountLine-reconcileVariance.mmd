@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant StockCountLine as StockCountLine
+    participant EventBus
+    Client->>+StockCountLine: reconcileVariance(reason)
+    Note over StockCountLine: Policies: stockCountLineRead, stockCountLineWrite, stockCountLineExecute
+    Note over StockCountLine: Guards (5)
+    StockCountLine->>StockCountLine: guard[0]: self.status == #quot;counted#quot;
+    StockCountLine->>StockCountLine: guard[1]: self.deletedAt == null
+    StockCountLine->>StockCountLine: guard[2]: self.session != null and self.session.status == #quot;in_progr...
+    StockCountLine->>StockCountLine: guard[3]: self.inventoryItem != null and self.inventoryItem.deleted...
+    StockCountLine->>StockCountLine: guard[4]: self.countedQuantity != self.inventoryItem.quantityOnHand
+    StockCountLine->>StockCountLine: compute.ledgerQuantity
+    StockCountLine->>StockCountLine: compute.adjustmentQuantity
+    StockCountLine->>StockCountLine: mutate.ledgerQuantityAtReconcile
+    StockCountLine->>StockCountLine: mutate.adjustmentQuantity
+    StockCountLine->>StockCountLine: mutate.reconciledById
+    StockCountLine->>StockCountLine: mutate.reconciledAt
+    StockCountLine->>StockCountLine: mutate.status
+    StockCountLine->>EventBus: emit StockCountVarianceReconciled on stock_count_line.variance_reconciled
+    StockCountLine-->>-Client: void

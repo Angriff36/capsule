@@ -46,7 +46,7 @@ Open decisions include first-class stations, task dependencies, quality auto-blo
 
 ## Current status
 
-Slice 4 operator surface ships at `/kitchen/prep` (Prep execution board).
+Slice 4 operator surfaces ship at `/kitchen/prep` (Prep execution board) and `/kitchen/yield` (ProductionBatch yield variance dashboard).
 
 | Surface          | Detail                                                                                                                                                                                                                                                       |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -57,6 +57,8 @@ Slice 4 operator surface ships at `/kitchen/prep` (Prep execution board).
 | Failure behavior | Command failures surface through `ProductionFailureBanner`; denied lead actions and reaction failures leave no partial QC/prep state                                                                                                                         |
 | Limitations      | Convex projection does not hydrate `belongsTo` for guards — PrepTask.open uses seeded FK guards. Stations remain free text. Quality auto-block semantics beyond the declared fail→markBlocked reaction remain open.                                          |
 | Proof            | Structural: `tests/event-reaction-projection.test.ts`. Runtime: `tests/proofs/quality-check-fail-block.runtime.test.ts` (`QualityCheckFailed → PrepTask.markBlocked`). Guard: `generated/proof/guard.production.json` + `bun run check:production-manifest`. |
+
+The yield dashboard is read-only and uses the generated ProductionBatch and Recipe list queries. It includes only non-deleted completed batches with a recorded actual yield, groups compatible yields by recipe and unit, sums planned and actual output before calculating variance percentage, and ranks the largest aggregate shortfall first across selectable 30-, 90-, or 365-day windows. No new production policy or approval is introduced for reporting.
 
 Manifest output dispatches `QualityCheck_fail` through the governed PrepTask `markBlocked` runner. That path is runtime-proven for an allowed lead role; kitchen_staff fail attempts fail closed without partial allocation.
 

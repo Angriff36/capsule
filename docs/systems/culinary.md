@@ -47,6 +47,7 @@ Use a **culinary book** rather than a dashboard:
 ## Core workflows
 
 - Introduce and maintain Ingredient identity, unit, allergen classification, and cost; discontinue/reinstate.
+- Price Recipes from the newest confirmed `IngredientPriceObservation` created by a vendor-line receipt, falling back to the Ingredient catalog cost until a receipt exists.
 - Draft/revise/publish/retract/retire Recipe versions; manage RecipeStep method lines and RecipeIngredient BOM lines.
 - Introduce/revise/portion/classify/retire/reinstate Dishes; attach/detach Recipes via DishRecipe.
 - Draft/revise/price/publish/unpublish/archive/restore Menus; add/update/remove MenuDish lines.
@@ -79,6 +80,8 @@ All culinary entities have generated list/detail/index queries and command hooks
 
 - live Recipe, Ingredient, Dish, and Menu indexes with command-backed creation;
 - detail routes for Recipe, Ingredient, Dish, and Menu;
+- ordered preferred-vendor management on Ingredient detail, with the first vendor feeding automatic weekly purchasing and the tenant vendor as fallback;
+- a vendor-filterable confirmed purchase-price ledger on Ingredient detail, plus newest-receipt pricing in the live Recipe cost panel;
 - a compact Recipe working document for draft revision, lifecycle commands, ingredient lines, method, and Dish usage;
 - generated-metadata lifecycle offers for Recipe, Ingredient, Dish, and Menu;
 - an Event menu composer that selects, adjusts, and removes EventDish records;

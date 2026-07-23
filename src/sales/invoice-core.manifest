@@ -1,5 +1,6 @@
 // Capsule sales/billing — Invoice entity (Payment + entry reactions elsewhere).
-// Line items are JSON-only in evidence — no InvoiceLine entity (OD040).
+// Governed JSON snapshots preserve calculated line items and named tax
+// allocations atomically with issue; TaxRate configuration is a separate entity.
 
 use "./payment-method.manifest"
 
@@ -23,6 +24,8 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property required clientId: uuid
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
   property eventId: uuid?
   property unique invoiceNumber: string?
   property required subtotal: money(12, 2) = 0
@@ -31,7 +34,20 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   property required total: money(12, 2) = 0
   property required amountPaid: money(12, 2) = 0
   property required amountDue: money(12, 2) = 0
+  // Nullable so invoices created before credit memo support stay schema-valid.
+  property amountCredited: money(12, 2)?
+  property creditMemoAmount: money(12, 2)?
+  // Nullable so invoices created before line-item support stay schema-valid;
+  // issue() defaults null to []. Required blocked the Convex schema push.
+  property lineItems: json?
+  property taxBreakdown: json?
   property required paymentTermsDays: int = 30
+  // Deposit due is tracked separately from balance payments (deposit-tracking).
+  // Nullable so pre-existing invoices stay schema-valid; readers default 0 / 14.
+  property depositAmount: money(12, 2)?
+  property depositPaidAt: datetime?
+  property balanceReminderLeadDays: int?
+  property balanceReminderSentAt: datetime?
   property dueDate: datetime?
   property notes: string?
   property required status: InvoiceStatus = "draft"
@@ -46,12 +62,14 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   property writeOffReason: string?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   hasMany payments: Payment
 
   constraint invoiceIssuedComplete: self.issuedAt == null or (length(trim(self.invoiceNumber)) > 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0 and self.amountPaid >= 0 and self.amountDue >= 0) "Issued invoices require a number and non-negative money amounts"
   constraint invoiceTotalsConsistent: self.issuedAt == null or self.total == self.subtotal + self.taxAmount - self.discountAmount "Invoice total must equal subtotal plus tax minus discount"
-  constraint invoiceBalanceConsistent: self.issuedAt == null or self.amountDue == self.total - self.amountPaid "Invoice amount due must equal total minus amount paid"
+  constraint invoiceBalanceConsistent: self.issuedAt == null or (self.amountCredited == null and self.amountDue == self.total - self.amountPaid) or (self.amountCredited != null and self.amountDue == self.total - self.amountPaid - self.amountCredited) "Invoice amount due must equal total minus payments and applied credits"
 
   transition status from "draft" to ["sent", "voided"]
   transition status from "sent" to ["viewed", "overdue", "partial", "paid", "voided"]
@@ -62,9 +80,9 @@ entity Invoice mixin TenantScoped, SoftDeletable {
   transition status from "voided" to []
   transition status from "written_off" to []
 
-  default policy invoiceRead read: roleAllows(user.role, "financeAccess") "Finance staff may read invoices"
-  default policy invoiceWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write invoices through commands"
-  default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute invoice commands"
+  default policy invoiceRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may read invoices"
+  default policy invoiceWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may write invoices through commands"
+  default policy invoiceExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "manageAccess") "Finance staff and managers may execute invoice commands"
 
   command issue(
     clientId: uuid,
@@ -76,7 +94,9 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     optional eventId: uuid,
     optional paymentTermsDays: number,
     optional dueDate: datetime,
-    optional notes: string
+    optional notes: string,
+    optional lineItems: json,
+    optional taxBreakdown: json
   ) {
     guard self.issuedAt == null
     guard self.status == "draft"
@@ -96,6 +116,10 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     mutate total = total
     mutate amountPaid = 0
     mutate amountDue = total
+    mutate amountCredited = 0
+    mutate creditMemoAmount = 0
+    mutate lineItems = lineItems != null ? lineItems : []
+    mutate taxBreakdown = taxBreakdown != null ? taxBreakdown : []
     mutate paymentTermsDays = paymentTermsDays != null ? paymentTermsDays : 30
     mutate dueDate = dueDate
     mutate notes = notes
@@ -166,6 +190,65 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command setDeposit(depositAmount: money(12, 2), optional balanceReminderLeadDays: number) {
+    guard self.deletedAt == null
+    guard self.depositPaidAt == null
+    constraint depositNonnegative: depositAmount >= 0 "Deposit amount cannot be negative"
+    constraint depositWithinTotal: self.total == 0 or depositAmount <= self.total "Deposit amount cannot exceed the invoice total"
+    constraint depositLeadDays: balanceReminderLeadDays == null or balanceReminderLeadDays >= 0 "Reminder lead days cannot be negative"
+    mutate depositAmount = depositAmount
+    mutate balanceReminderLeadDays = balanceReminderLeadDays != null ? balanceReminderLeadDays : self.balanceReminderLeadDays
+    emit InvoiceDepositSet {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      depositAmount: depositAmount
+      balanceReminderLeadDays: balanceReminderLeadDays != null ? balanceReminderLeadDays : self.balanceReminderLeadDays
+    }
+  }
+
+  // Deposit payment applies to the balance like applyPayment, plus stamps depositPaidAt.
+  command markDepositPaid() {
+    guard self.status == "sent" or self.status == "viewed" or self.status == "overdue" or self.status == "partial"
+    guard self.deletedAt == null
+    guard self.depositPaidAt == null
+    constraint depositSet: self.depositAmount != null and self.depositAmount > 0 "No deposit is due on this invoice"
+    constraint depositWithinDue: self.depositAmount != null and self.depositAmount <= self.amountDue "Deposit cannot exceed amount due"
+    compute nextPaid = self.amountPaid + self.depositAmount
+    compute nextDue = self.amountDue - self.depositAmount
+    mutate amountPaid = nextPaid
+    mutate amountDue = nextDue
+    mutate depositPaidAt = now()
+    mutate status = nextDue == 0 ? "paid" : "partial"
+    mutate paidAt = nextDue == 0 ? now() : self.paidAt
+    emit InvoiceDepositPaid {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      depositAmount: self.depositAmount
+      amountPaid: nextPaid
+      amountDue: nextDue
+    }
+  }
+
+  // Balance-due reminder; the UI surfaces this at balanceReminderLeadDays
+  // before the linked event's startsAt (manual trigger, markOverdue precedent).
+  command sendBalanceReminder() {
+    guard self.deletedAt == null
+    guard self.balanceReminderSentAt == null
+    constraint reminderBalance: self.amountDue > 0 "No outstanding balance to remind about"
+    mutate balanceReminderSentAt = now()
+    emit InvoiceBalanceReminderSent {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      amountDue: self.amountDue
+    }
+  }
+
   command recordRefund(refundAmount: money(12, 2), paymentId: string) {
     guard self.status == "paid" or self.status == "partial"
     guard self.deletedAt == null
@@ -186,6 +269,55 @@ entity Invoice mixin TenantScoped, SoftDeletable {
       paymentId: paymentId
       refundAmount: refundAmount
       amountPaid: nextPaid
+      amountDue: nextDue
+    }
+  }
+
+  // Records total credit memos issued against this paid source invoice without
+  // rewriting its payment history or reopening its settled balance.
+  command recordCreditMemo(creditAmount: money(12, 2), creditMemoId: string) {
+    guard self.status == "paid"
+    guard self.deletedAt == null
+    constraint creditMemoPositive: creditAmount > 0 "Credit memo amount must be positive"
+    constraint creditMemoIdPresent: length(trim(creditMemoId)) > 0 "Credit memo id is required"
+    compute priorCreditMemoAmount = self.creditMemoAmount != null ? self.creditMemoAmount : 0
+    constraint creditMemoWithinPaid: creditAmount <= self.amountPaid - (self.creditMemoAmount != null ? self.creditMemoAmount : 0) "Credit memos cannot exceed the amount paid on the source invoice"
+    compute nextCreditMemoAmount = priorCreditMemoAmount + creditAmount
+    mutate creditMemoAmount = nextCreditMemoAmount
+    emit InvoiceCreditMemoRecorded {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      creditMemoId: creditMemoId
+      creditAmount: creditAmount
+      creditMemoAmount: nextCreditMemoAmount
+    }
+  }
+
+  // Applies a credit memo to an open target invoice. Payment totals remain
+  // untouched so finance can distinguish cash received from account credit.
+  command applyCredit(creditAmount: money(12, 2), creditMemoId: string) {
+    guard self.status == "sent" or self.status == "viewed" or self.status == "overdue" or self.status == "partial"
+    guard self.deletedAt == null
+    constraint creditPositive: creditAmount > 0 "Applied credit must be positive"
+    constraint creditWithinDue: creditAmount <= self.amountDue "Applied credit cannot exceed the target invoice balance"
+    constraint appliedCreditMemoIdPresent: length(trim(creditMemoId)) > 0 "Credit memo id is required"
+    compute priorAmountCredited = self.amountCredited != null ? self.amountCredited : 0
+    compute nextAmountCredited = priorAmountCredited + creditAmount
+    compute nextDue = self.amountDue - creditAmount
+    mutate amountCredited = nextAmountCredited
+    mutate amountDue = nextDue
+    mutate status = nextDue == 0 ? "paid" : "partial"
+    mutate paidAt = nextDue == 0 ? now() : self.paidAt
+    emit InvoiceCreditApplied {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      eventId: self.eventId
+      creditMemoId: creditMemoId
+      creditAmount: creditAmount
+      amountCredited: nextAmountCredited
       amountDue: nextDue
     }
   }
@@ -242,7 +374,52 @@ entity Invoice mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Invoice already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit InvoiceClientMergeStaged {
+      invoiceId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the invoice client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit InvoiceClientReassigned {
+      invoiceId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
+  }
+
   store Invoice in durable
+}
+
+event InvoiceClientMergeStaged: "invoice.client_merge_staged" {
+  invoiceId: string
+  tenantId: string
+}
+
+event InvoiceClientReassigned: "invoice.client_reassigned" {
+  invoiceId: string
+  tenantId: string
+  previousClientId: string
+  clientId: string
 }
 
 event InvoiceIssued: "invoice.issued" {
@@ -284,6 +461,33 @@ event InvoicePaymentApplied: "invoice.payment_applied" {
   status: InvoiceStatus
 }
 
+event InvoiceDepositSet: "invoice.deposit_set" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  depositAmount: money(12, 2)
+  balanceReminderLeadDays: number?
+}
+
+event InvoiceDepositPaid: "invoice.deposit_paid" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  depositAmount: money(12, 2)
+  amountPaid: money(12, 2)
+  amountDue: money(12, 2)
+}
+
+event InvoiceBalanceReminderSent: "invoice.balance_reminder_sent" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  amountDue: money(12, 2)
+}
+
 event InvoiceRefundRecorded: "invoice.refund_recorded" {
   invoiceId: string
   tenantId: string
@@ -292,6 +496,27 @@ event InvoiceRefundRecorded: "invoice.refund_recorded" {
   paymentId: string
   refundAmount: money(12, 2)
   amountPaid: money(12, 2)
+  amountDue: money(12, 2)
+}
+
+event InvoiceCreditMemoRecorded: "invoice.credit_memo_recorded" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  creditMemoId: string
+  creditAmount: money(12, 2)
+  creditMemoAmount: money(12, 2)
+}
+
+event InvoiceCreditApplied: "invoice.credit_applied" {
+  invoiceId: string
+  tenantId: string
+  clientId: string
+  eventId: string?
+  creditMemoId: string
+  creditAmount: money(12, 2)
+  amountCredited: money(12, 2)
   amountDue: money(12, 2)
 }
 

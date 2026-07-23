@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant WeeklyScheduleNotice as WeeklyScheduleNotice
+    participant EventBus
+    Client->>+WeeklyScheduleNotice: acknowledge()
+    Note over WeeklyScheduleNotice: Policies: weeklyScheduleNoticeRead, weeklyScheduleNoticeWrite, weeklyScheduleNoticeExecute
+    Note over WeeklyScheduleNotice: Guards (6)
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: guard[0]: self.publishedAt != null
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: guard[1]: self.acknowledgedAt == null
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: guard[2]: self.deletedAt == null
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: guard[3]: user.id != null
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: guard[4]: self.recipientAuthSubjectId != null
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: guard[5]: self.recipientAuthSubjectId == user.id
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: mutate.acknowledgedAt
+    WeeklyScheduleNotice->>EventBus: emit WeeklyScheduleAcknowledged on weekly_schedule.acknowledged
+    WeeklyScheduleNotice-->>-Client: void

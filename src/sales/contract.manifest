@@ -23,6 +23,8 @@ entity Contract mixin TenantScoped, SoftDeletable {
 
   property required eventId: uuid
   property required clientId: uuid
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
   property unique contractNumber: string?
   property required searchable title: string = ""
   property documentUrl: string?
@@ -39,6 +41,8 @@ entity Contract mixin TenantScoped, SoftDeletable {
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
 
   constraint contractDraftComplete: self.draftedAt == null or length(trim(self.title)) > 0 "Drafted contracts require a title"
 
@@ -161,7 +165,52 @@ entity Contract mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Contract already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit ContractClientMergeStaged {
+      contractId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the contract client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit ContractClientReassigned {
+      contractId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
+  }
+
   store Contract in durable
+}
+
+event ContractClientMergeStaged: "contract.client_merge_staged" {
+  contractId: string
+  tenantId: string
+}
+
+event ContractClientReassigned: "contract.client_reassigned" {
+  contractId: string
+  tenantId: string
+  previousClientId: string
+  clientId: string
 }
 
 event ContractDrafted: "contract.drafted" {

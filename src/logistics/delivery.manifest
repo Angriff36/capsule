@@ -19,6 +19,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
   property required packListId: uuid
   property required eventId: uuid
   property driverId: uuid?
+  property vehicleId: uuid?
   property required destination: string = ""
   property windowStartsAt: datetime?
   property windowEndsAt: datetime?
@@ -35,6 +36,7 @@ entity Delivery mixin TenantScoped, SoftDeletable {
   belongsTo packList: PackList fields [tenantId, packListId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo driver: Person fields [tenantId, driverId] references [tenantId, id]
+  belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
 
   constraint deliveryScheduledComplete: self.scheduledAt == null or (length(trim(self.destination)) > 0 and self.windowStartsAt != null and self.windowEndsAt != null and self.windowEndsAt > self.windowStartsAt) "Scheduled deliveries require a destination and a valid delivery window"
 
@@ -233,6 +235,27 @@ event DeliveryCancelled: "delivery.cancelled" {
   previousStatus: DeliveryStatus
   status: DeliveryStatus
   reason: string
+}
+
+// Vehicle assignment is owned by the authored Convex seam
+// (convex/vehicleAssignment.ts) because the current Convex projection cannot
+// hydrate an overlap guard across sibling deliveries during a generated
+// command; the seam performs the range read and patch in one serializable
+// Convex transaction and emits these events.
+event DeliveryVehicleAssigned: "delivery.vehicle_assigned" {
+  deliveryId: string
+  tenantId: string
+  vehicleId: string
+  eventId: string
+  windowStartsAt: datetime?
+  windowEndsAt: datetime?
+}
+
+event DeliveryVehicleUnassigned: "delivery.vehicle_unassigned" {
+  deliveryId: string
+  tenantId: string
+  vehicleId: string
+  eventId: string
 }
 
 // EventCancelled → cancel scheduled/in-transit deliveries for that event.

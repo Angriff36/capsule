@@ -6,6 +6,7 @@ import { list, localDateTime, optional } from "./eventDetailFormHelpers";
 type ActiveVenue = {
   _id: Id<"venues">;
   name: string;
+  capacity: number;
   addressLine1?: string | null;
   city?: string | null;
   region?: string | null;
@@ -51,6 +52,7 @@ export type EventDetailRevisePanelsProps = {
     venueId?: Id<"venues">;
     venueName?: string;
     venueAddress?: string;
+    venueCapacity?: number;
     version: number | undefined;
   }) => Promise<unknown>;
   onChangePricing: (input: {
@@ -225,6 +227,7 @@ export function EventDetailRevisePanels({
                           .filter(Boolean)
                           .join(", ") || undefined
                       : undefined,
+                    venueCapacity: selected?.capacity,
                     version,
                   }),
                 );
@@ -242,7 +245,7 @@ export function EventDetailRevisePanels({
                   <option value="">No venue</option>
                   {activeVenues.map((venue) => (
                     <option key={venue._id} value={venue._id}>
-                      {venue.name}
+                      {venue.name} · capacity {venue.capacity}
                     </option>
                   ))}
                 </select>

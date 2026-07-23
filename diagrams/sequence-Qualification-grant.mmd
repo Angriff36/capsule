@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant Qualification as Qualification
     participant EventBus
-    Client->>+Qualification: grant(personId, name, issuedAt, certificationType, expiresAt, documentRef, notes)
+    Client->>+Qualification: grant(personId, name, issuedAt, certificationType, issuingBody, expiresAt, documentRef, notes)
     Note over Qualification: Policies: qualificationRead, qualificationWrite, qualificationExecute
     Note over Qualification: Guards (5)
     Qualification->>Qualification: guard[0]: self.grantedAt == null
@@ -13,6 +13,7 @@ sequenceDiagram
     Qualification->>Qualification: mutate.personId
     Qualification->>Qualification: mutate.name
     Qualification->>Qualification: mutate.certificationType
+    Qualification->>Qualification: mutate.issuingBody
     Qualification->>Qualification: mutate.issuedAt
     Qualification->>Qualification: mutate.expiresAt
     Qualification->>Qualification: mutate.documentRef

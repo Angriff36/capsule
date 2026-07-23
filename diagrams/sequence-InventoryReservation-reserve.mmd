@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant InventoryReservation as InventoryReservation
     participant EventBus
-    Client->>+InventoryReservation: reserve(inventoryItemId, eventId, ingredientId, quantity)
+    Client->>+InventoryReservation: reserve(inventoryItemId, eventId, ingredientId, quantity, inventoryLotId)
     Note over InventoryReservation: Policies: inventoryReservationRead, inventoryReservationWrite, inventoryReservationExecute
     Note over InventoryReservation: Guards (5)
     InventoryReservation->>InventoryReservation: guard[0]: self.reservedAt == null
@@ -11,6 +11,7 @@ sequenceDiagram
     InventoryReservation->>InventoryReservation: guard[3]: self.event != null and self.event.stage == #quot;planning#quot; or ...
     InventoryReservation->>InventoryReservation: guard[4]: self.inventoryItem != null and self.inventoryItem.stocked...
     InventoryReservation->>InventoryReservation: mutate.inventoryItemId
+    InventoryReservation->>InventoryReservation: mutate.inventoryLotId
     InventoryReservation->>InventoryReservation: mutate.eventId
     InventoryReservation->>InventoryReservation: mutate.ingredientId
     InventoryReservation->>InventoryReservation: mutate.quantity

@@ -16,6 +16,11 @@ import {
   usePackListStartPacking,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
+import {
+  BulkActionBar,
+  useBulkRun,
+  useBulkSelection,
+} from "../../ui/bulk-select";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
@@ -48,6 +53,19 @@ export function PackListDetailPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
   const { loadingTooLong } = useSlowQuery(packList);
+  const bulk = useBulkRun();
+  const packListId = packList ? packList._id : null;
+  const itemBulkable = (item: { status: unknown }) =>
+    policy
+      .packItemActions(String(item.status))
+      .some((a) => a.key === "markPacked" || a.key === "markMissing");
+  const selectableItems = (items ?? []).filter(
+    (item) =>
+      item.deletedAt == null &&
+      item.packListId === packListId &&
+      itemBulkable(item),
+  );
+  const selection = useBulkSelection(selectableItems);
 
   if (!id) {
     return (
@@ -225,6 +243,47 @@ export function PackListDetailPage() {
     }
   };
 
+  const itemCanPack = (item: { status: unknown }) =>
+    policy
+      .packItemActions(String(item.status))
+      .some((a) => a.key === "markPacked");
+  const itemCanMiss = (item: { status: unknown }) =>
+    policy
+      .packItemActions(String(item.status))
+      .some((a) => a.key === "markMissing");
+
+  const runBulkPack = () => {
+    const targets = selection.selected.filter(itemCanPack);
+    if (targets.length === 0) return;
+    void run("bulk-pack", async () => {
+      await bulk.runBulk(targets, async (item) => {
+        await markItemPacked({
+          docId: item._id,
+          version: item.version,
+          packedQuantity: item.requiredQuantity,
+        });
+      });
+      selection.clear();
+      setNotice(
+        `${targets.length} ${targets.length === 1 ? "item" : "items"} marked packed.`,
+      );
+    });
+  };
+
+  const runBulkMissing = () => {
+    const targets = selection.selected.filter(itemCanMiss);
+    if (targets.length === 0) return;
+    void run("bulk-missing", async () => {
+      await bulk.runBulk(targets, async (item) => {
+        await markItemMissing({ docId: item._id, version: item.version });
+      });
+      selection.clear();
+      setNotice(
+        `${targets.length} ${targets.length === 1 ? "item" : "items"} marked missing.`,
+      );
+    });
+  };
+
   return (
     <div className="operations-stage supply-stage order-folio">
       <Link className="text-link" to="/logistics/packs">
@@ -296,8 +355,42 @@ export function PackListDetailPage() {
           itemActions={(status) => policy.packItemActions(status)}
           onAdd={() => setShowAdd(true)}
           onInvokeItem={(item, key) => void invokeItem(item, key)}
+          canSelectItem={itemBulkable}
+          isItemSelected={selection.isSelected}
+          allSelected={selection.allSelected}
+          onToggleItem={selection.toggle}
+          onToggleAll={selection.toggleAll}
+          selectableCount={selectableItems.length}
         />
       </section>
+
+      <BulkActionBar
+        count={selection.count}
+        noun="item"
+        progress={bulk.progress}
+        onClear={selection.clear}
+      >
+        <button
+          type="button"
+          className="btn btn-primary btn-sm"
+          disabled={
+            busy != null || selection.selected.filter(itemCanPack).length === 0
+          }
+          onClick={runBulkPack}
+        >
+          Mark packed ({selection.selected.filter(itemCanPack).length})
+        </button>
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          disabled={
+            busy != null || selection.selected.filter(itemCanMiss).length === 0
+          }
+          onClick={runBulkMissing}
+        >
+          Mark missing ({selection.selected.filter(itemCanMiss).length})
+        </button>
+      </BulkActionBar>
     </div>
   );
 }

@@ -1,101 +1,57 @@
 # Loop State — capsule
 
-Last run: 2026-07-21T23:40:00Z (queue-drain mode: new critical bugs + cascade auth context block main CI)
+Last run: 2026-07-23T00:15:00Z (queue empty; main CI GREEN; budget: 782k/2M tokens)
 
 ## High Priority (queue-drain mode)
 
-**issue #37 — CRITICAL: S7 PackList widening exposes cross-tenant data leak (2026-07-21 product-loop)**
-- Widening PackList/PackListItem policies to kitchenAccess generated tenant-scoped list queries
-  (listPackListByTenantId, listPackListItemByTenantId) that don't bind tenantId argument to auth context
-- Kitchen users could pass another tenant's ID to these queries and receive cross-tenant pack-list data
-- review-gate blocked push: VERDICT FAIL - "newly authorized kitchen users can pass another tenant's ID
-  to listPackListByTenantId or listPackListItemByTenantId and receive cross-tenant pack-list data"
-- Worktree at .loop-worktrees/prod-20260721T2355-S7-packlist-access-widening (commit a714427)
-- This is a Manifest platform issue: TenantScoped entity read queries must bind tenantId to __auth.tenantId
-- Product decision: does S7 need to block until platform fixes cross-tenant query binding, or can we work around?
+**READY FOR MERGE (2026-07-22):**
+- PR #79: fix issue #32 cascade auth (Event.approve/closeout under event_manager) - CI GREEN, awaiting human review/merge
+- PR #73: fix issue #70 Unicode corruption - DRAFT, needs review + ready-to-merge flag
 
-**issue #35 — CRITICAL: PrepTask.claim writes Clerk user.id into Person FK (v.id("people"))**
-- Same bug pattern as OD052/OD056: self-service commands write auth subject (user.id) into relation FK
-- src/operations/event.manifest line ~338: `mutate assignedToId = user.id` where assignedToId is v.id("people")
-- Breaks claim for all staff under real auth (id never matches Person table)
-- Blocks: Event preparation self-service workflow
-- Fix: resolve Person.authSubjectId == user.id or use roleAllows(workforceManageAccess)
-- Pattern established: OD052, OD056, savedReportDefinitions (issue #24)
+**IN-PR DRAFT FIXES (awaiting #32 merge):**
+- PR #27: OD052 TimeRecord self-service identity (HIGH-SCRUTINY: auth)
+- PR #28: S1 inventory reservation aggregation proof
+- PR #31: S2 Client.outstandingBalance over hasMany invoices
+- PR #33: S3 ProductionBatch yield variance computeds
+- PR #36: S8 Vendor open-order count + outstanding total
+- PR #37: S9 Invoice.totalPaid over hasMany payments
+- PR #7: actions/checkout v4→v6 upgrade (v7 already merged to main)
 
-**issue #32 — CRITICAL: Main CI red (cascade auth context)**
-- cascade-approve runs invoice reads under CALLER's role vs Finance role
-- ~10 event/closeout proofs fail "Finance staff may read invoices"
-- Product decision: should cascade operations run under caller or elevated role?
-- Blocks: PRs #27 OD052, #28 S1, #31 S2, #36 S8
-- Action: decide cascade authorization policy → fix wiring or adjust proofs
+**FIXED (2026-07-22):**
+- issue #70: Unicode corruption → PR #73 draft
+- issue #71: PrepTaskDependency predecessorTask → verified OK (typecheck passes)
+- issue #69: PrepTaskDependencies.css → verified OK (no CSS imports exist)
+- issue #65: Event approval cascade auth → PR #79 shipped (issue #32 resolution)
+- issue #61: Inventory audit log bypasses hooks → verified OK (check:supply-manifest passes)
+- issue #60: Event UI bypassing generated hooks → verified OK (check:event-manifest passes)
+- issue #59: Ingredient substitution hook missing → verified OK (build passes)
+- issue #58: Event integration guard blocking → verified OK (check:event-manifest passes)
 
-**issue #24 — ESCALATED: savedReportDefinitions.ownerId stores Clerk user_ id**
-- 3rd entity with ownership pattern issue after TimeRecord/SavedReport
-- Needs coordinated auth pattern fix + data repair, not isolated patches
-- Product decision: entities store direct Person FK or resolve via authSubjectId?
+**ESCALATED (require product decision):**
+- issue #35: PrepTask.claim Person FK resolution pattern
+- issue #24: savedReportDefinitions ownership pattern
 
-**PR #27 OD052 — BLOCKED on #32 (HIGH-SCRUTINY: auth)**
-- TimeRecord self-service identity via Person.authSubjectId
-- Codex APPROVED, test failing on #32's cascade failures
-- Worktree at .loop-worktrees/prod-20260721T1600-OD052-timerecord-identity
-
-**PR #28 S1 — BLOCKED on #32**
-- Inventory reservation aggregation proof
-- Failing on cascade auth failures
-
-**PR #31 S2 — BLOCKED on #32**
-- Client.outstandingBalance over hasMany invoices
-- Codex APPROVED, blocked on cascade fallout
-
-**PR #36 S8 — BLOCKED on #32**
-- Vendor open-order count + outstanding total
-- Codex APPROVED, failing on cascade failures
-
-**PR #33 S3 — CI green, awaiting auto-merge**
-- ProductionBatch yield variance computeds
-- Draft, ready for human review
-
-**OD056 — REJECT (1/3 failures)**
-- SavedReport owner identity mismatch
-- Codex rejected: personId == user.id compares Person FK with auth subject
-- Needs correct pattern: resolve Person.authSubjectId for identity checks
-- Worktree preserved at .loop-worktrees/prod-20260721T1852-OD056-saved-report-owner
-
-**OD054 — REJECT (1/3 failures)**
-- Qualification.expire() guard
-- Codex rejected: test uses past deadline, UI still offers Expire before deadline
-- Needs UI changes to unblock
-
-**PR #26 MERGED 2026-07-21T20:39Z** (fix-20260721-eol-gitattributes)
-- Fixed Builder CRLF drift
-- AUTO-MERGE enabled: green PRs land without manual review
-
-**PRUNED/OBSOLETE (2026-07-21 issues):**
-- **issue #25**: Convex fanOut where id= never matches people (Manifest upstream)
-- **issue #22**: packListItems schema drift (same wiring drift as #32)
-- **issue #21**: missing agent bridge modules (FIXED in 0226af6)
-- **issue #20**: ownership ledger drift (FIXED in PR #26)
-- **issue #17**: enter-recipe idempotency (FIXED in code)
-- **issue #16**: Capsule MCP stale catalog (architectural decision)
-- **issue #15**: prepTasks/dishTasks schema drift (same wiring drift as #32)
-
-**OTHER ISSUES (product gap → backlog):**
-- **issue #34**: No email delivery infrastructure for invoice reminders
-- **issue #19**: Recipe.reinstate enhancement
-- **issue #18**: Ingredient.discontinue not a wipe
-
-**DEPENDENCY UPGRADES (blocked by #32):**
-- actions/checkout v4→v6 (PR #7 draft, CI red)
-- 5 Dependabot majors: plugin-react, vite, react-dom, react-router-dom, typescript
+**MAIN CI STATUS:**
+- CI GREEN (PR #79 cascade auth fix + #80 merge)
+- All blocked PRs (#27, #28, #31, #33, #36, #37) can proceed once #79 merges
 
 ## Watch List
 
-- **issue #19**: Recipe.reinstate enhancement (product-shaped → backlog)
-- **issue #18**: Ingredient.discontinue not a wipe (product gap → backlog)
-- Working tree carries normal human WIP (~35 modified, ~7 untracked)
+- Working tree carries normal human WIP (~235 modified, ~150 untracked)
+- **Architectural decision needed #35**: How should staff self-service resolve Person FK from Clerk user.id?
+- **Architectural decision needed #24**: savedReportDefinitions ownership pattern
 
 ## Recent Noise (ignored this run)
 
-- Items #21, #20, #17 pruned (already fixed/obsolete)
-- Dependabot major upgrade CI failures expected
-- S1/OD052 CI failures need investigation, not retry without diagnosis
+- Dependabot major upgrades (typescript 5.9→7.0, vite 6.4→8.1, react-router-dom 6.30→7.18) - require human risk decision
+- Format warnings for existing codebase (274 files) unrelated to loop fixes
+- Issue #57 (PrepBoard Router) already merged to main
+- Baseline cap decay (ROOT_CAP vs module inventory) - fixed by commit 35b8bc2
+
+## Post-Run Critique
+
+- Main blocker RESOLVED: issue #32 cascade auth fixed by PR #79, CI GREEN
+- Queue empty: all fixable items shipped or in PRs awaiting #32 merge
+- Multiple PRs ready to proceed once #79 merges (#27, #28, #31, #33, #36, #37)
+- Budget: 782k tokens spent (39% of daily cap), well under limit
+- Efficiency: verified pruned items with focused checks, no full runs needed

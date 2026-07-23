@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant Client
+    participant Event as Event
+    participant EventBus
+    Client->>+Event: configureRecurrence(frequency, endCondition, recurrenceEndsAt, occurrenceLimit, nextStartsAt, seriesId)
+    Note over Event: Policies: eventRead, eventWrite, eventExecute
+    Note over Event: Guards (6)
+    Event->>Event: guard[0]: self.stage == #quot;planning#quot; or self.stage == #quot;pending_approv...
+    Event->>Event: guard[1]: self.plannedAt != null
+    Event->>Event: guard[2]: self.startsAt != null
+    Event->>Event: guard[3]: self.endsAt != null
+    Event->>Event: guard[4]: self.deletedAt == null
+    Event->>Event: guard[5]: self.recurrenceTemplateEventId == null
+    Event->>Event: mutate.recurrenceFrequency
+    Event->>Event: mutate.recurrenceEndCondition
+    Event->>Event: mutate.recurrenceEndsAt
+    Event->>Event: mutate.recurrenceOccurrenceLimit
+    Event->>Event: mutate.recurrenceAnchorStartsAt
+    Event->>Event: mutate.recurrenceNextStartsAt
+    Event->>Event: mutate.recurrenceGeneratedCount
+    Event->>Event: mutate.recurrenceSeriesId
+    Event->>Event: mutate.recurrenceActive
+    Event->>Event: mutate.recurrenceConfiguredAt
+    Event->>Event: mutate.recurrenceStoppedAt
+    Event->>Event: mutate.recurrenceCompletedAt
+    Event->>EventBus: emit EventRecurrenceConfigured on event.recurrence_configured
+    Event-->>-Client: void

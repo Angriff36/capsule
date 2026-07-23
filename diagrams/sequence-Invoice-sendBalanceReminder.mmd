@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client
+    participant Invoice as Invoice
+    participant EventBus
+    Client->>+Invoice: sendBalanceReminder()
+    Note over Invoice: Policies: invoiceRead, invoiceWrite, invoiceExecute
+    Note over Invoice: Guards (2)
+    Invoice->>Invoice: guard[0]: self.deletedAt == null
+    Invoice->>Invoice: guard[1]: self.balanceReminderSentAt == null
+    Invoice->>Invoice: mutate.balanceReminderSentAt
+    Invoice->>EventBus: emit InvoiceBalanceReminderSent on invoice.balance_reminder_sent
+    Invoice-->>-Client: void

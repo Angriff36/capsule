@@ -67,6 +67,13 @@ Builder owns the skip: `entry.name === '.loop-worktrees'` in
 If pre-push fails with paths under `.loop-worktrees/`, restore that skip in the
 local Builder checkout (do not delete worktrees as the “fix”).
 
+**Commit that skip in Builder — do not leave it dirty or stash it.** Capsule’s
+regen/pre-push runs the sibling Builder working tree (`BUILDER_DIR`). An
+uncommitted fix disappears the moment an agent bulk-stashes “unrelated Builder
+WIP” for a clean Capsule `/commit`. Proven failure 2026-07-21: the skip existed
+only as a dirty `M` on a tracked file, got stashed with pin/ownership WIP, and
+blocked `git push` until re-committed as `d1c77d6`.
+
 ### Local Convex: “Could not find public function” after a schema reshape
 
 Symptom: client calls a generated query (e.g. `queries:listDishRecipe`) that exists in
@@ -115,7 +122,16 @@ When `@angriff36/manifest` gains projection behavior, consuming that release mea
 4. `bun run manifest:regen`
 5. Authored work only under `src/features/**`, `src/app/**`, `tests/proofs/**`, integration guard scripts
 
-Do **not** use `manifest generate`, `manifest:build`, or `place-manifest-convex-react.ts`. There is no npm script for them.
+Do **not** use bare `manifest generate` / `manifest build`, `bun run manifest:build`, or `place-manifest-convex-react.ts`.
+~~There is no npm script for them.~~
+> **Correction (2026-07-22):** Builder's `convex-application` preset still emits
+> `manifest:compile` / `manifest:build` into owned `package.json`. Those scripts
+> are **unsafe** here — they bypass Builder ownership. Capsule regen is only
+> `bun run manifest:regen`. `place-manifest-convex-react.ts` is deny-guarded;
+> `manifest:build` is not yet wired through the same deny path.
+
+Full safe/unsafe Manifest CLI inventory for Capsule:
+[manifest-cli-safety.md](./manifest-cli-safety.md).
 
 `bun run check` verifies owned files match the ownership ledger. Pre-commit rejects owned-file commits without an ownership update.
 

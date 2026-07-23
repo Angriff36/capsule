@@ -1,0 +1,27 @@
+# Staff training records progress
+
+- 2026-07-22: Read repository instructions and applicable planning, frontend, and Playwright skill instructions.
+- 2026-07-22: Pinned the initial dirty worktree; no changes made yet.
+- 2026-07-22: Read domain gating and no-invented-deferrals rules; traced existing Qualification and Shift prerequisite patterns.
+- 2026-07-22: Reviewed live diffs for overlap and identified pre-existing workforce certification/schedule work to preserve.
+- 2026-07-22: Read prior staff-certification and food-handler findings; incorporated their direct-reference enforcement lesson.
+- 2026-07-22: Detected active `staff-utilization-reports` work with shared workforce route/gate scope; placed shared edits and regeneration on hold.
+- 2026-07-22: Confirmed the Aboard feature record is the explicit product approval that supersedes stale docs saying not to invent training modules.
+- 2026-07-22: Continued monitoring the concurrent utilization task. It declared a UI-only boundary with no Manifest/generated edits, but it will still touch shared workforce navigation and `App.tsx`; this task remains paused until that patch lands.
+- 2026-07-22: The conflicting workforce task ended without landing shared route changes. Began implementation while the replacement concurrent task is inventory-scoped.
+- 2026-07-22: Added the authored training Manifest, training workspace UI/CSS, route/navigation, roster gate integration, and canonical workforce docs.
+- 2026-07-22: Confirmed the concurrent Builder transaction included all training entities and shift constraints in generated hooks/schema/mutations and updated the ownership ledger.
+- 2026-07-22: `bun run typecheck`, `bun run check:workforce-manifest`, and scoped Prettier checks passed. Playwright prerequisites and the documented running URL are available.
+- 2026-07-22: Resumed after the prior feature attempt stalled. Confirmed the untracked training Manifest/UI and shared route edits belong to this same feature attempt, then adopted them for review rather than rewriting them.
+- 2026-07-22: Reviewed the authored model, generated training hooks/mutations, roster proof selection, training workspace, routes, styling, and docs. `bun run typecheck` passed (`tsc --noEmit`, exit 0).
+- 2026-07-22: `bun run check:workforce-manifest` passed. Confirmed the live app responds at `http://localhost:7811`, but real Clerk credentials are unavailable; prepared a disposable real-component/in-memory-hook Playwright strategy for the required core-flow proof.
+- 2026-07-22: Temporary Playwright Chromium flow passed (1 test, 5.3s): defined Food safety basics, defined a gated Hot line lead shift type, proved the missing-completion block, recorded Alex Rivera at 92%, and scheduled the shift successfully. Removed this run's temporary spec/harness after the pass.
+- 2026-07-22: Removed the stale OD027 training-deferral comment from `assignment.manifest` and updated the systems index to list the canonical training entities and route.
+- 2026-07-22: Removed the earlier stalled run's leftover training Playwright config, failed screenshot, error context, and result directory after verifying their exact feature-scoped paths.
+- 2026-07-22: Required `bun run check` passed toolchain, ownership, proof, and registry stages, then stopped on unrelated existing Event integration guard violations before later stages.
+- 2026-07-22: Feature-scoped Prettier check passed for TSX/CSS/Markdown files; `bun run secrets` passed (728 tracked files scanned). GitHub issue #40 is open for the shared Event guard blocker and needs the newly observed CommandFailure/EventTimeline details appended.
+- 2026-07-22: `bun run test` finished with 548 passing/14 failing. Training-adjacent existing Shift lifecycle and Workforce integration tests passed; all failures are in unrelated stale guard/expectation or invoice-reaction areas of the shared dirty checkout.
+- 2026-07-22: `bun run build` passed (685 modules). Updated open GitHub issue #40 with the newly observed EventTimeline and CommandFailure guard violations. Final scoped diff check and training temporary-file hygiene passed.
+- 2026-07-22: Archived the feature plan, findings, progress, and fixes under `docs/task-plans/staff-training-records/`.
+- 2026-07-22: Final source review tightened the server-side shift gate so a referenced training proof must have `recordedAt` set, not merely match the Person and module. Regenerated through Builder and repeated focused workforce verification.
+- 2026-07-22: Post-regeneration verification passed Builder ownership, the Workforce Manifest guard, 7 focused Shift/workforce tests, typecheck, scoped formatting, production build, generated-predicate inspection, diff hygiene, and temporary-file hygiene. The required full gate remains blocked only at the unchanged Event guard tracked in issue #40.

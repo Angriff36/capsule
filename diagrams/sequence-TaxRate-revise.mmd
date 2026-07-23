@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant TaxRate as TaxRate
+    participant EventBus
+    Client->>+TaxRate: revise(name, percentage, appliesToFood, appliesToService, appliesToRental)
+    Note over TaxRate: Policies: taxRateRead, taxRateWrite, taxRateExecute
+    Note over TaxRate: Guards (2)
+    TaxRate->>TaxRate: guard[0]: self.configuredAt != null
+    TaxRate->>TaxRate: guard[1]: self.deletedAt == null
+    TaxRate->>TaxRate: mutate.name
+    TaxRate->>TaxRate: mutate.percentage
+    TaxRate->>TaxRate: mutate.appliesToFood
+    TaxRate->>TaxRate: mutate.appliesToService
+    TaxRate->>TaxRate: mutate.appliesToRental
+    TaxRate->>EventBus: emit TaxRateRevised on tax_rate.revised
+    TaxRate-->>-Client: void

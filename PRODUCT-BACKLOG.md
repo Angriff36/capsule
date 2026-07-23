@@ -182,3 +182,4 @@ needed: block until platform fixes cross-tenant query binding, or workaround? 1/
   open, strikes cleared, stale worktrees pruned, uncommitted diffs salvaged to
   `.loop-worktrees/_salvage-20260721/`. Worktrees MUST be branched from main at
   or after 2f30419 (loop already uses `main`, so this self-heals).
+- **queue empty 2026-07-22**: All 13 backlog items are either in-pr (#27, #28, #31, #33, #36, #37) or blocked by Codex rejects (OD054, OD056, S6, S5), platform limitations (OD055, S7), or awaiting UI work (OD054). No open items remain.

@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant Equipment as Equipment
+    participant EventBus
+    Client->>+Equipment: updateCondition(condition, note)
+    Note over Equipment: Policies: equipmentRead, equipmentWrite, equipmentExecute
+    Note over Equipment: Guards (2)
+    Equipment->>Equipment: guard[0]: self.registeredAt != null
+    Equipment->>Equipment: guard[1]: self.deletedAt == null
+    Equipment->>Equipment: compute.previousCondition
+    Equipment->>Equipment: mutate.condition
+    Equipment->>Equipment: mutate.conditionNote
+    Equipment->>EventBus: emit EquipmentConditionUpdated on equipment.condition_updated
+    Equipment-->>-Client: void

@@ -1,0 +1,25 @@
+sequenceDiagram
+    participant Client
+    participant StockCountLine as StockCountLine
+    participant EventBus
+    Client->>+StockCountLine: freeze(stockCountSessionId, inventoryItemId, locationId, ingredientId, unit)
+    Note over StockCountLine: Policies: stockCountLineRead, stockCountLineWrite, stockCountLineExecute
+    Note over StockCountLine: Guards (5)
+    StockCountLine->>StockCountLine: guard[0]: self.frozenAt == null
+    StockCountLine->>StockCountLine: guard[1]: self.status == #quot;pending#quot;
+    StockCountLine->>StockCountLine: guard[2]: self.deletedAt == null
+    StockCountLine->>StockCountLine: guard[3]: self.session != null and self.session.status == #quot;in_progr...
+    StockCountLine->>StockCountLine: guard[4]: self.inventoryItem != null and self.inventoryItem.stocked...
+    StockCountLine->>StockCountLine: mutate.stockCountSessionId
+    StockCountLine->>StockCountLine: mutate.inventoryItemId
+    StockCountLine->>StockCountLine: mutate.locationId
+    StockCountLine->>StockCountLine: mutate.ingredientId
+    StockCountLine->>StockCountLine: mutate.unit
+    StockCountLine->>StockCountLine: mutate.expectedQuantity
+    StockCountLine->>StockCountLine: mutate.countedQuantity
+    StockCountLine->>StockCountLine: mutate.varianceQuantity
+    StockCountLine->>StockCountLine: mutate.ledgerQuantityAtReconcile
+    StockCountLine->>StockCountLine: mutate.adjustmentQuantity
+    StockCountLine->>StockCountLine: mutate.frozenAt
+    StockCountLine->>EventBus: emit StockCountLineFrozen on stock_count_line.frozen
+    StockCountLine-->>-Client: void

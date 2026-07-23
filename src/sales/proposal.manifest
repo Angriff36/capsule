@@ -2,7 +2,7 @@
 // Compile chain head was this file; billing entry is now invoice.manifest.
 // ProposalAccepted → Event.create is NOT declared (OD035 — no Event.create;
 // planEngagement requires a bound instance, semantics.md § Reactions resolve).
-// Lead / ClientInteraction / ProposalLineItem / ProposalDraft deferred (OD037).
+// Manual communication history is authored in client-communication.manifest.
 
 use "./contract.manifest"
 
@@ -23,6 +23,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property required clientId: uuid
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
   property eventId: uuid?
   property unique proposalNumber: string?
   property required searchable title: string = ""
@@ -47,6 +49,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property expiredAt: datetime?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
 
   constraint proposalDraftComplete: self.draftedAt == null or (length(trim(self.title)) > 0 and self.guestCount >= 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0) "Drafted proposals require a title and non-negative money and guest counts"
@@ -192,7 +196,52 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Proposal already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit ProposalClientMergeStaged {
+      proposalId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the proposal client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit ProposalClientReassigned {
+      proposalId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
+  }
+
   store Proposal in durable
+}
+
+event ProposalClientMergeStaged: "proposal.client_merge_staged" {
+  proposalId: string
+  tenantId: string
+}
+
+event ProposalClientReassigned: "proposal.client_reassigned" {
+  proposalId: string
+  tenantId: string
+  previousClientId: string
+  clientId: string
 }
 
 event ProposalDrafted: "proposal.drafted" {

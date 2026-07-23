@@ -55,6 +55,7 @@ type IngredientRow = {
 type InventoryItemRow = {
   _id: string;
   ingredientId: string;
+  locationId: string;
   quantityOnHand: number;
   unit: string;
   stockedAt?: number | null;
@@ -64,11 +65,21 @@ type InventoryItemRow = {
 type InventoryReservationRow = {
   _id: string;
   inventoryItemId: string;
+  inventoryLotId?: string | null;
   eventId: string;
   ingredientId: string;
   quantity: number;
   status: string;
   version: number;
+  deletedAt?: number | null;
+};
+
+type InventoryLotRow = {
+  _id: string;
+  ingredientId: string;
+  locationId: string;
+  receiptQuantity: number;
+  receivedAt?: number | null;
   deletedAt?: number | null;
 };
 
@@ -114,6 +125,7 @@ type Catalogs = {
     deletedAt?: number | null;
   }[];
   inventoryItems: readonly InventoryItemRow[];
+  inventoryLots: readonly InventoryLotRow[];
   inventoryReservations: readonly InventoryReservationRow[];
 };
 
@@ -123,6 +135,7 @@ type Ports = {
   refreshGeneratedTask: (input: never) => Promise<unknown>;
   createReservation: (input: {
     inventoryItemId: string;
+    inventoryLotId?: string;
     eventId: string;
     ingredientId: string;
     quantity: number;
@@ -152,6 +165,7 @@ export class EventMenuSyncController {
     recipeIngredients: Catalogs["recipeIngredients"] | undefined;
     eventDishes: Catalogs["eventDishes"] | undefined;
     inventoryItems: readonly InventoryItemRow[] | undefined;
+    inventoryLots: readonly InventoryLotRow[] | undefined;
     inventoryReservations: readonly InventoryReservationRow[] | undefined;
   }): Catalogs {
     if (
@@ -164,6 +178,7 @@ export class EventMenuSyncController {
       input.recipeIngredients === undefined ||
       input.eventDishes === undefined ||
       input.inventoryItems === undefined ||
+      input.inventoryLots === undefined ||
       input.inventoryReservations === undefined
     ) {
       throw new Error("Event menu sync catalogs are still loading");
@@ -178,6 +193,7 @@ export class EventMenuSyncController {
       recipeIngredients: input.recipeIngredients,
       eventDishes: input.eventDishes,
       inventoryItems: input.inventoryItems,
+      inventoryLots: input.inventoryLots,
       inventoryReservations: input.inventoryReservations,
     };
   }
@@ -211,14 +227,24 @@ export class EventMenuSyncController {
       items: this.catalogs.inventoryItems.map((item) => ({
         id: item._id,
         ingredientId: item.ingredientId,
+        locationId: item.locationId,
         quantityOnHand: Number(item.quantityOnHand),
         unit: String(item.unit),
         stockedAt: item.stockedAt,
         deletedAt: item.deletedAt,
       })),
+      lots: this.catalogs.inventoryLots.map((lot) => ({
+        id: lot._id,
+        ingredientId: lot.ingredientId,
+        locationId: lot.locationId,
+        receiptQuantity: Number(lot.receiptQuantity),
+        receivedAt: lot.receivedAt,
+        deletedAt: lot.deletedAt,
+      })),
       reservations: this.catalogs.inventoryReservations.map((reservation) => ({
         id: reservation._id,
         inventoryItemId: reservation.inventoryItemId,
+        inventoryLotId: reservation.inventoryLotId,
         eventId: reservation.eventId,
         ingredientId: reservation.ingredientId,
         quantity: Number(reservation.quantity),

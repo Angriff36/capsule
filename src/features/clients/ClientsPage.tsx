@@ -1,13 +1,23 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreateClient,
+  useCreateClientMerge,
   useListClient,
+  useListClientCommunication,
+  useListClientContact,
+  useListEvent,
 } from "../../lib/manifest-convex-react";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
+import { ClientDuplicateReview } from "./ClientDuplicateReview";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
+import {
+  findProbableClientDuplicates,
+  type ClientDuplicateCandidate,
+} from "./contactDedup";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 
 function optional(value: string): string | undefined {
@@ -17,13 +27,22 @@ function optional(value: string): string | undefined {
 
 export function ClientsPage() {
   const clients = useListClient();
+  const contacts = useListClientContact();
+  const events = useListEvent();
+  const communications = useListClientCommunication();
   const createClient = useCreateClient();
+  const createClientMerge = useCreateClientMerge();
   const [showRegister, setShowRegister] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
   const [clientType, setClientType] = useState<"company" | "person">("company");
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(
+    null,
+  );
+  const [primaryClientId, setPrimaryClientId] = useState<string | null>(null);
+  const { prompt, host } = useActionPrompt(busy);
 
   const registered = (clients ?? []).filter(
     (row) => row.deletedAt == null && row.registeredAt != null,
@@ -31,6 +50,91 @@ export function ClientsPage() {
   const visible = showArchived
     ? registered
     : registered.filter((row) => String(row.status) !== "archived");
+  const duplicateCandidates = useMemo(
+    () => findProbableClientDuplicates(clients ?? []),
+    [clients],
+  );
+
+  const reviewCandidate = (candidate: ClientDuplicateCandidate) => {
+    setSelectedCandidateId(candidate.id);
+    setPrimaryClientId(String(candidate.first._id));
+  };
+
+  const countsFor = (clientId: string) => {
+    const allClientContacts = (contacts ?? []).filter(
+      (contact) => String(contact.clientId) === clientId,
+    );
+    const allClientEvents = (events ?? []).filter(
+      (clientEvent) => String(clientEvent.clientId) === clientId,
+    );
+    const clientContacts = allClientContacts.filter(
+      (contact) => contact.deletedAt == null,
+    );
+    const clientEvents = allClientEvents.filter(
+      (clientEvent) => clientEvent.deletedAt == null,
+    );
+    const contactIds = new Set(allClientContacts.map((contact) => contact._id));
+    const eventIds = new Set(
+      allClientEvents.map((clientEvent) => clientEvent._id),
+    );
+    const communicationCount = (communications ?? []).filter(
+      (communication) =>
+        (communication.clientContactId != null &&
+          contactIds.has(communication.clientContactId)) ||
+        (communication.eventId != null && eventIds.has(communication.eventId)),
+    ).length;
+    return {
+      contacts: clientContacts.length,
+      events: clientEvents.length,
+      communications: communicationCount,
+    };
+  };
+
+  const mergeSelected = () => {
+    const candidate = duplicateCandidates.find(
+      (item) => item.id === selectedCandidateId,
+    );
+    if (!candidate || !primaryClientId) return;
+    const duplicateClientId =
+      String(candidate.first._id) === primaryClientId
+        ? String(candidate.second._id)
+        : String(candidate.first._id);
+    const primary =
+      String(candidate.first._id) === primaryClientId
+        ? candidate.first
+        : candidate.second;
+    const duplicate =
+      primary === candidate.first ? candidate.second : candidate.first;
+
+    void (async () => {
+      const confirmed = await prompt.askConfirm({
+        title: "Merge duplicate client?",
+        description: `${clientDisplayName(duplicate._id, [duplicate])}'s events, contacts, communication, commercial, and billing history will move to ${clientDisplayName(primary._id, [primary])}. The duplicate account will be soft-deleted.`,
+        confirmLabel: "Merge client",
+        tone: "danger",
+      });
+      if (!confirmed) return;
+
+      setFailure(null);
+      setNotice(null);
+      setBusy(true);
+      try {
+        await createClientMerge({
+          primaryClientId,
+          duplicateClientId,
+        });
+        setSelectedCandidateId(null);
+        setPrimaryClientId(null);
+        setNotice(
+          "Duplicate merged. Events and communication history now appear on the primary client.",
+        );
+      } catch (error) {
+        setFailure(error);
+      } finally {
+        setBusy(false);
+      }
+    })();
+  };
 
   const submitRegister = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -100,6 +204,7 @@ export function ClientsPage() {
         </div>
       </header>
       <ClientsWorkspaceNav />
+      {host}
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (
         <p className="mt-3 text-[13px] text-ink-2" role="status">
@@ -174,6 +279,26 @@ export function ClientsPage() {
             {busy ? "Registering…" : "Register client"}
           </button>
         </form>
+      ) : null}
+
+      {clients !== undefined &&
+      contacts !== undefined &&
+      events !== undefined &&
+      communications !== undefined ? (
+        <ClientDuplicateReview
+          candidates={duplicateCandidates}
+          selectedCandidateId={selectedCandidateId}
+          primaryClientId={primaryClientId}
+          busy={busy}
+          countsFor={countsFor}
+          onReview={reviewCandidate}
+          onChoosePrimary={setPrimaryClientId}
+          onCancel={() => {
+            setSelectedCandidateId(null);
+            setPrimaryClientId(null);
+          }}
+          onMerge={mergeSelected}
+        />
       ) : null}
 
       <section className="working-ledger">

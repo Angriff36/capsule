@@ -79,6 +79,7 @@ export function TimeSheetPage() {
         personId: String(data.get("personId")),
         startsAt: toEpoch(data.get("startsAt")),
         endsAt: toEpoch(data.get("endsAt")),
+        kind: String(data.get("kind") || "available"),
         notes: String(data.get("notes") || "") || undefined,
       });
       form.reset();
@@ -200,6 +201,13 @@ export function TimeSheetPage() {
                     {item.givenName} {item.familyName}
                   </option>
                 ))}
+              </select>
+            </label>
+            <label className="field-label">
+              Type
+              <select name="kind" className="input">
+                <option value="available">Available to work</option>
+                <option value="unavailable">Time off</option>
               </select>
             </label>
             <label className="field-label">
@@ -343,6 +351,9 @@ export function TimeSheetPage() {
                         : "—"}{" "}
                       →{" "}
                       {row.endsAt ? new Date(row.endsAt).toLocaleString() : "—"}
+                      {row.kind === "unavailable" ? (
+                        <small className="text-danger"> · time off</small>
+                      ) : null}
                     </td>
                     <td>
                       <StatusChip status={String(row.status)} />

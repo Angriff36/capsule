@@ -2,6 +2,26 @@
 
 import { z } from 'zod';
 
+// Entity: Attachment
+export const AttachmentSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout"]).default("eventRecord"),
+  parentId: z.string(),
+  fileName: z.string(),
+  contentType: z.string(),
+  fileSize: z.number().int().default(0),
+  storageId: z.string(),
+  evidenceType: z.enum(["venueCondition", "leftoverFood", "equipmentReturn"]).nullable().optional(),
+  uploadedById: z.string().nullable().optional(),
+  uploadedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type Attachment = z.infer<typeof AttachmentSchema>;
+
 // Entity: AvailabilityWindow
 export const AvailabilityWindowSchema = z.object({
   id: z.string().uuid(),
@@ -11,6 +31,7 @@ export const AvailabilityWindowSchema = z.object({
   startsAt: z.coerce.date().nullable().optional(),
   endsAt: z.coerce.date().nullable().optional(),
   notes: z.string().nullable().optional(),
+  kind: z.enum(["available", "unavailable"]).nullable().optional(),
   status: z.enum(["active", "withdrawn"]).default("active"),
   declaredAt: z.coerce.date().nullable().optional(),
   withdrawnAt: z.coerce.date().nullable().optional(),
@@ -43,9 +64,12 @@ export const ClientSchema = z.object({
   paymentTermsDays: z.number().int().default(30),
   notes: z.string().nullable().optional(),
   assignedToId: z.string().uuid().nullable().optional(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergedIntoClientId: z.string().uuid().nullable().optional(),
   status: z.enum(["active", "archived"]).default("active"),
   registeredAt: z.coerce.date().nullable().optional(),
   archivedAt: z.coerce.date().nullable().optional(),
+  mergedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -59,12 +83,32 @@ export const ClientComputedSchema = ClientSchema.extend({
 export type Client = z.infer<typeof ClientSchema>;
 export type ClientWithComputed = z.infer<typeof ClientComputedSchema>;
 
+// Entity: ClientCommunication
+export const ClientCommunicationSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  clientContactId: z.string().uuid().nullable().optional(),
+  eventId: z.string().uuid().nullable().optional(),
+  occurredAt: z.coerce.date().nullable().optional(),
+  medium: z.enum(["call", "email", "meeting"]).default("call"),
+  summary: z.string().default(""),
+  authorId: z.string().nullable().optional(),
+  authorName: z.string().default(""),
+  recordedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ClientCommunication = z.infer<typeof ClientCommunicationSchema>;
+
 // Entity: ClientContact
 export const ClientContactSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   clientId: z.string().uuid(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   givenName: z.string().nullable().optional(),
   familyName: z.string().nullable().optional(),
   title: z.string().nullable().optional(),
@@ -83,6 +127,20 @@ export const ClientContactSchema = z.object({
 
 export type ClientContact = z.infer<typeof ClientContactSchema>;
 
+// Entity: ClientMerge
+export const ClientMergeSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  primaryClientId: z.string().uuid(),
+  duplicateClientId: z.string().uuid(),
+  mergedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ClientMerge = z.infer<typeof ClientMergeSchema>;
+
 // Entity: Contract
 export const ContractSchema = z.object({
   id: z.string().uuid(),
@@ -90,6 +148,8 @@ export const ContractSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
   eventId: z.string().uuid(),
   clientId: z.string().uuid(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   contractNumber: z.string().nullable().optional(),
   title: z.string().default(""),
   documentUrl: z.string().nullable().optional(),
@@ -109,6 +169,51 @@ export const ContractSchema = z.object({
 
 export type Contract = z.infer<typeof ContractSchema>;
 
+// Entity: CorrectiveAction
+export const CorrectiveActionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  incidentId: z.string().uuid(),
+  eventId: z.string().uuid(),
+  description: z.string().default(""),
+  resolutionNotes: z.string().nullable().optional(),
+  openedById: z.string().nullable().optional(),
+  closedById: z.string().nullable().optional(),
+  status: z.enum(["open", "closed"]).default("open"),
+  openedAt: z.coerce.date().nullable().optional(),
+  closedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type CorrectiveAction = z.infer<typeof CorrectiveActionSchema>;
+
+// Entity: CreditMemo
+export const CreditMemoSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  sourceInvoiceId: z.string().uuid(),
+  clientId: z.string().uuid(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
+  targetInvoiceId: z.string().uuid().nullable().optional(),
+  eventId: z.string().uuid().nullable().optional(),
+  creditMemoNumber: z.string().nullable().optional(),
+  amount: z.number().default(0),
+  remainingAmount: z.number().default(0),
+  reason: z.string().nullable().optional(),
+  disposition: z.enum(["apply_to_balance", "carry_forward"]).default("carry_forward"),
+  status: z.enum(["draft", "available", "applied"]).default("draft"),
+  issuedAt: z.coerce.date().nullable().optional(),
+  appliedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type CreditMemo = z.infer<typeof CreditMemoSchema>;
+
 // Entity: Delivery
 export const DeliverySchema = z.object({
   id: z.string().uuid(),
@@ -117,6 +222,7 @@ export const DeliverySchema = z.object({
   packListId: z.string().uuid(),
   eventId: z.string().uuid(),
   driverId: z.string().uuid().nullable().optional(),
+  vehicleId: z.string().uuid().nullable().optional(),
   destination: z.string().default(""),
   windowStartsAt: z.coerce.date().nullable().optional(),
   windowEndsAt: z.coerce.date().nullable().optional(),
@@ -210,12 +316,123 @@ export const DishTaskSchema = z.object({
 
 export type DishTask = z.infer<typeof DishTaskSchema>;
 
+// Entity: EmailNotificationSubscription
+export const EmailNotificationSubscriptionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  ownerId: z.string().nullable().optional(),
+  eventUpdates: z.boolean().default(true),
+  invoiceReminders: z.boolean().default(true),
+  lowStockAlerts: z.boolean().default(true),
+  shiftChanges: z.boolean().default(true),
+  configuredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EmailNotificationSubscription = z.infer<typeof EmailNotificationSubscriptionSchema>;
+
+// Entity: Equipment
+export const EquipmentSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  assetTag: z.string().default(""),
+  category: z.string().default(""),
+  ownership: z.enum(["owned", "rented"]).default("owned"),
+  quantity: z.number().int().min(0).default(1),
+  purchaseValue: z.number().min(0).default(0),
+  condition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]).default("good"),
+  status: z.enum(["active", "retired"]).default("active"),
+  conditionNote: z.string().nullable().optional(),
+  registeredAt: z.coerce.date().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  retirementReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: Equipment
+export const EquipmentComputedSchema = EquipmentSchema.extend({
+  isActive: z.boolean(),
+  totalValue: z.number(),
+});
+
+export type Equipment = z.infer<typeof EquipmentSchema>;
+export type EquipmentWithComputed = z.infer<typeof EquipmentComputedSchema>;
+
+// Entity: EquipmentMaintenanceTask
+export const EquipmentMaintenanceTaskSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  equipmentId: z.string().uuid(),
+  taskName: z.string().default(""),
+  intervalDays: z.number().int().default(30),
+  nextDueAt: z.coerce.date().nullable(),
+  instructions: z.string().nullable().optional(),
+  scheduledAt: z.coerce.date().nullable().optional(),
+  lastServicedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EquipmentMaintenanceTask = z.infer<typeof EquipmentMaintenanceTaskSchema>;
+
+// Entity: EquipmentReservation
+export const EquipmentReservationSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  equipmentId: z.string().default(""),
+  eventId: z.string().default(""),
+  startsAt: z.coerce.date().nullable(),
+  endsAt: z.coerce.date().nullable(),
+  quantity: z.number().int().default(1),
+  status: z.enum(["reserved", "checked_out", "returned", "cancelled"]).default("reserved"),
+  reservedAt: z.coerce.date().nullable().optional(),
+  checkedOutAt: z.coerce.date().nullable().optional(),
+  checkoutCondition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]).nullable().optional(),
+  checkoutNote: z.string().nullable().optional(),
+  returnedAt: z.coerce.date().nullable().optional(),
+  returnCondition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]).nullable().optional(),
+  returnNote: z.string().nullable().optional(),
+  cancelledAt: z.coerce.date().nullable().optional(),
+  cancellationReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EquipmentReservation = z.infer<typeof EquipmentReservationSchema>;
+
+// Entity: EquipmentServiceEntry
+export const EquipmentServiceEntrySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  maintenanceTaskId: z.string().uuid(),
+  equipmentId: z.string().uuid(),
+  technician: z.string().default(""),
+  cost: z.number().default(0),
+  notes: z.string().nullable().optional(),
+  completedAt: z.coerce.date().nullable().optional(),
+  nextDueAt: z.coerce.date().nullable().optional(),
+  loggedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EquipmentServiceEntry = z.infer<typeof EquipmentServiceEntrySchema>;
+
 // Entity: Event
 export const EventSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   clientId: z.string().uuid(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   venueId: z.string().uuid().nullable().optional(),
   assignedToId: z.string().uuid().nullable().optional(),
   title: z.string().default(""),
@@ -225,6 +442,7 @@ export const EventSchema = z.object({
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   venueName: z.string().nullable().optional(),
   venueAddress: z.string().nullable().optional(),
+  venueCapacity: z.number().int().nullable().optional(),
   expectedHeadcount: z.number().int().default(0),
   primaryContactName: z.string().nullable().optional(),
   primaryContactEmail: z.string().nullable().optional(),
@@ -242,6 +460,20 @@ export const EventSchema = z.object({
   cancelledAt: z.coerce.date().nullable().optional(),
   closedOutAt: z.coerce.date().nullable().optional(),
   cancellationReason: z.string().nullable().optional(),
+  recurrenceFrequency: z.enum(["weekly", "monthly", "annually"]).nullable().optional(),
+  recurrenceEndCondition: z.enum(["on_date", "after_occurrences"]).nullable().optional(),
+  recurrenceEndsAt: z.coerce.date().nullable().optional(),
+  recurrenceOccurrenceLimit: z.number().int().nullable().optional(),
+  recurrenceAnchorStartsAt: z.coerce.date().nullable().optional(),
+  recurrenceNextStartsAt: z.coerce.date().nullable().optional(),
+  recurrenceGeneratedCount: z.number().int().nullable().optional(),
+  recurrenceSeriesId: z.string().nullable().optional(),
+  recurrenceActive: z.boolean().nullable().optional().default(false),
+  recurrenceConfiguredAt: z.coerce.date().nullable().optional(),
+  recurrenceStoppedAt: z.coerce.date().nullable().optional(),
+  recurrenceCompletedAt: z.coerce.date().nullable().optional(),
+  recurrenceTemplateEventId: z.string().uuid().nullable().optional(),
+  recurrenceSequence: z.number().int().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -423,6 +655,54 @@ export const EventIngredientContributionSchema = z.object({
 
 export type EventIngredientContribution = z.infer<typeof EventIngredientContributionSchema>;
 
+// Entity: EventTemplate
+export const EventTemplateSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  clientType: z.enum(["company", "person"]).default("company"),
+  eventType: z.string().default(""),
+  defaultHeadcount: z.number().int().default(1),
+  menuId: z.string().uuid().nullable().optional(),
+  defaultStaffRoles: z.array(z.string()).optional().default([]),
+  typicalEquipment: z.array(z.string()).optional().default([]),
+  notes: z.string().nullable().optional(),
+  sourceEventId: z.string().uuid().nullable().optional(),
+  status: z.enum(["active", "archived"]).default("active"),
+  definedAt: z.coerce.date().nullable().optional(),
+  archivedAt: z.coerce.date().nullable().optional(),
+  archiveReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: EventTemplate
+export const EventTemplateComputedSchema = EventTemplateSchema.extend({
+  isActive: z.boolean(),
+});
+
+export type EventTemplate = z.infer<typeof EventTemplateSchema>;
+export type EventTemplateWithComputed = z.infer<typeof EventTemplateComputedSchema>;
+
+// Entity: EventTimelineActivity
+export const EventTimelineActivitySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  name: z.string().default(""),
+  startsAt: z.coerce.date().nullable().optional(),
+  endsAt: z.coerce.date().nullable().optional(),
+  responsibleParty: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  scheduledAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type EventTimelineActivity = z.infer<typeof EventTimelineActivitySchema>;
+
 // Entity: Incident
 export const IncidentSchema = z.object({
   id: z.string().uuid(),
@@ -433,12 +713,13 @@ export const IncidentSchema = z.object({
   deliveryId: z.string().uuid().nullable().optional(),
   shiftId: z.string().uuid().nullable().optional(),
   severity: z.enum(["low", "medium", "high", "critical"]).default("medium"),
-  category: z.enum(["food_safety", "injury", "equipment", "service", "other"]).default("other"),
+  category: z.enum(["food_safety", "allergen", "injury", "equipment", "service", "other"]).default("other"),
   description: z.string().default(""),
   resolution: z.string().nullable().optional(),
   dismissalReason: z.string().nullable().optional(),
-  reportedById: z.string().uuid().nullable().optional(),
+  reportedById: z.string().nullable().optional(),
   status: z.enum(["open", "investigating", "resolved", "dismissed"]).default("open"),
+  correctiveActionRequired: z.boolean().nullable().optional(),
   reportedAt: z.coerce.date().nullable().optional(),
   investigatingAt: z.coerce.date().nullable().optional(),
   resolvedAt: z.coerce.date().nullable().optional(),
@@ -459,6 +740,8 @@ export const IngredientSchema = z.object({
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional().default([]),
   costPerUnit: z.number().min(0).default(0),
   category: z.string().nullable().optional(),
+  substituteIngredientIds: z.array(z.string().uuid()).optional().default([]),
+  preferredVendorIds: z.array(z.string().uuid()).optional().default([]),
   preferredVendorId: z.string().uuid().nullable().optional(),
   status: z.enum(["active", "discontinued"]).default("active"),
   introducedAt: z.coerce.date().nullable().optional(),
@@ -484,6 +767,7 @@ export const IngredientDemandSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
   eventId: z.string().uuid(),
   ingredientId: z.string().uuid(),
+  preferredVendorId: z.string().uuid().nullable().optional(),
   requiredQuantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
   servings: z.number().nullable().optional(),
@@ -506,6 +790,26 @@ export const IngredientDemandSchema = z.object({
 
 export type IngredientDemand = z.infer<typeof IngredientDemandSchema>;
 
+// Entity: IngredientPriceObservation
+export const IngredientPriceObservationSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  ingredientId: z.string().uuid(),
+  vendorId: z.string().uuid(),
+  vendorOrderId: z.string().uuid(),
+  vendorOrderLineId: z.string().uuid(),
+  receiptQuantity: z.number().default(0),
+  cumulativeReceivedQuantity: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  unitPrice: z.number().min(0).default(0),
+  observedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type IngredientPriceObservation = z.infer<typeof IngredientPriceObservationSchema>;
+
 // Entity: InventoryItem
 export const InventoryItemSchema = z.object({
   id: z.string().uuid(),
@@ -520,6 +824,8 @@ export const InventoryItemSchema = z.object({
   unitCost: z.number().min(0).default(0),
   stockedAt: z.coerce.date().nullable().optional(),
   removedAt: z.coerce.date().nullable().optional(),
+  bestBeforeAt: z.coerce.date().nullable().optional(),
+  useByAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -536,12 +842,37 @@ export const InventoryItemComputedSchema = InventoryItemSchema.extend({
 export type InventoryItem = z.infer<typeof InventoryItemSchema>;
 export type InventoryItemWithComputed = z.infer<typeof InventoryItemComputedSchema>;
 
+// Entity: InventoryLot
+export const InventoryLotSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  supplierLotNumber: z.string().default(""),
+  vendorOrderLineId: z.string().uuid(),
+  vendorOrderId: z.string().uuid(),
+  vendorId: z.string().uuid(),
+  ingredientId: z.string().uuid(),
+  ingredientDemandId: z.string().uuid().nullable().optional(),
+  eventId: z.string().uuid().nullable().optional(),
+  locationId: z.string().uuid(),
+  receiptQuantity: z.number().default(0),
+  cumulativeReceivedQuantity: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  unitCost: z.number().min(0).default(0),
+  receivedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type InventoryLot = z.infer<typeof InventoryLotSchema>;
+
 // Entity: InventoryReservation
 export const InventoryReservationSchema = z.object({
   id: z.string().uuid(),
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   inventoryItemId: z.string().uuid(),
+  inventoryLotId: z.string().uuid().nullable().optional(),
   eventId: z.string().uuid(),
   ingredientId: z.string().uuid(),
   quantity: z.number().default(0),
@@ -562,6 +893,8 @@ export const InvoiceSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   clientId: z.string().uuid(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   eventId: z.string().uuid().nullable().optional(),
   invoiceNumber: z.string().nullable().optional(),
   subtotal: z.number().default(0),
@@ -570,7 +903,15 @@ export const InvoiceSchema = z.object({
   total: z.number().default(0),
   amountPaid: z.number().default(0),
   amountDue: z.number().default(0),
+  amountCredited: z.number().nullable().optional(),
+  creditMemoAmount: z.number().nullable().optional(),
+  lineItems: z.unknown().nullable().optional(),
+  taxBreakdown: z.unknown().nullable().optional(),
   paymentTermsDays: z.number().int().default(30),
+  depositAmount: z.number().nullable().optional(),
+  depositPaidAt: z.coerce.date().nullable().optional(),
+  balanceReminderLeadDays: z.number().int().nullable().optional(),
+  balanceReminderSentAt: z.coerce.date().nullable().optional(),
   dueDate: z.coerce.date().nullable().optional(),
   notes: z.string().nullable().optional(),
   status: z.enum(["draft", "sent", "viewed", "overdue", "partial", "paid", "voided", "written_off"]).default("draft"),
@@ -588,6 +929,40 @@ export const InvoiceSchema = z.object({
 });
 
 export type Invoice = z.infer<typeof InvoiceSchema>;
+
+// Entity: Lead
+export const LeadSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  leadType: z.enum(["company", "person"]).default("company"),
+  companyName: z.string().nullable().optional(),
+  givenName: z.string().nullable().optional(),
+  familyName: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  source: z.string().default(""),
+  estimatedValue: z.number().min(0).default(0),
+  stage: z.enum(["new", "qualified", "proposalSent", "negotiating"]).default("new"),
+  probability: z.number().int().default(10),
+  notes: z.string().nullable().optional(),
+  clientId: z.string().uuid().nullable().optional(),
+  clientContactId: z.string().uuid().nullable().optional(),
+  proposalId: z.string().uuid().nullable().optional(),
+  capturedAt: z.coerce.date().nullable().optional(),
+  convertedAt: z.coerce.date().nullable().optional(),
+  proposalLinkedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: Lead
+export const LeadComputedSchema = LeadSchema.extend({
+  displayName: z.string(),
+});
+
+export type Lead = z.infer<typeof LeadSchema>;
+export type LeadWithComputed = z.infer<typeof LeadComputedSchema>;
 
 // Entity: Menu
 export const MenuSchema = z.object({
@@ -628,6 +1003,7 @@ export const MenuDishSchema = z.object({
   menuId: z.string().uuid(),
   dishId: z.string().uuid(),
   sortOrder: z.number().int().default(0),
+  sellingPrice: z.number().nullable().optional(),
   course: z.string().nullable().optional(),
   serviceStyle: z.string().nullable().optional(),
   specialInstructions: z.string().nullable().optional(),
@@ -646,6 +1022,10 @@ export const OrganizationSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
   name: z.string(),
   status: z.enum(["active", "suspended", "deactivated"]).default("active"),
+  brandDisplayName: z.string().nullable().optional(),
+  brandAddress: z.string().nullable().optional(),
+  brandPrimaryColor: z.string().nullable().optional(),
+  brandAccentColor: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -725,6 +1105,8 @@ export const PaymentSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
   invoiceId: z.string().uuid(),
   clientId: z.string().uuid(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   eventId: z.string().uuid().nullable().optional(),
   amount: z.number().default(0),
   method: z.enum(["card", "check", "cash", "ach", "other"]).default("card"),
@@ -749,6 +1131,8 @@ export const PaymentMethodSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   clientId: z.string().uuid(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   methodType: z.enum(["card", "check", "cash", "ach", "other"]).default("card"),
   provider: z.string().nullable().optional(),
   lastFour: z.string().nullable().optional(),
@@ -860,6 +1244,19 @@ export const PrepTaskSchema = z.object({
 
 export type PrepTask = z.infer<typeof PrepTaskSchema>;
 
+// Entity: PrepTaskDependency
+export const PrepTaskDependencySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  dependentTaskId: z.string().uuid(),
+  predecessorTaskId: z.string().uuid(),
+  isSatisfied: z.boolean().default(false),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type PrepTaskDependency = z.infer<typeof PrepTaskDependencySchema>;
+
 // Entity: ProductionBatch
 export const ProductionBatchSchema = z.object({
   id: z.string().uuid(),
@@ -889,6 +1286,8 @@ export const ProposalSchema = z.object({
   tenantId: z.string(),
   deletedAt: z.coerce.date().nullable().optional(),
   clientId: z.string().uuid(),
+  clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
+  mergeTargetClientId: z.string().uuid().nullable().optional(),
   eventId: z.string().uuid().nullable().optional(),
   proposalNumber: z.string().nullable().optional(),
   title: z.string().default(""),
@@ -925,6 +1324,7 @@ export const PurchaseNeedSchema = z.object({
   eventId: z.string().uuid(),
   ingredientDemandId: z.string().uuid(),
   ingredientId: z.string().uuid(),
+  preferredVendorId: z.string().uuid().nullable().optional(),
   requiredQuantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
@@ -950,6 +1350,7 @@ export const QualificationSchema = z.object({
   personId: z.string().uuid(),
   name: z.string().default(""),
   certificationType: z.string().nullable().optional(),
+  issuingBody: z.string().nullable().optional(),
   issuedAt: z.coerce.date().nullable().optional(),
   expiresAt: z.coerce.date().nullable().optional(),
   documentRef: z.string().nullable().optional(),
@@ -1109,6 +1510,25 @@ export const RecipeStepSchema = z.object({
 
 export type RecipeStep = z.infer<typeof RecipeStepSchema>;
 
+// Entity: RecurringAvailability
+export const RecurringAvailabilitySchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  personId: z.string().uuid(),
+  dayOfWeek: z.number().int().default(0),
+  startMinute: z.number().int().default(0),
+  endMinute: z.number().int().default(0),
+  notes: z.string().nullable().optional(),
+  status: z.enum(["active", "withdrawn"]).default("active"),
+  declaredAt: z.coerce.date().nullable().optional(),
+  withdrawnAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type RecurringAvailability = z.infer<typeof RecurringAvailabilitySchema>;
+
 // Entity: SavedReportDefinition
 export const SavedReportDefinitionSchema = z.object({
   id: z.string().uuid(),
@@ -1140,6 +1560,13 @@ export const ShiftSchema = z.object({
   startsAt: z.coerce.date().nullable().optional(),
   endsAt: z.coerce.date().nullable().optional(),
   role: z.string().nullable().optional(),
+  shiftTypeId: z.string().uuid().nullable().optional(),
+  requiredQualificationId: z.string().uuid().nullable().optional(),
+  requiredTrainingCompletionId: z.string().uuid().nullable().optional(),
+  swapAuthorizationId: z.string().uuid().nullable().optional(),
+  swapTargetPersonId: z.string().uuid().nullable().optional(),
+  swapTargetQualificationId: z.string().uuid().nullable().optional(),
+  swapTargetTrainingCompletionId: z.string().uuid().nullable().optional(),
   notes: z.string().nullable().optional(),
   status: z.enum(["scheduled", "started", "completed", "cancelled", "no_show"]).default("scheduled"),
   scheduledAt: z.coerce.date().nullable().optional(),
@@ -1154,12 +1581,124 @@ export const ShiftSchema = z.object({
 
 export type Shift = z.infer<typeof ShiftSchema>;
 
+// Entity: ShiftSwapRequest
+export const ShiftSwapRequestSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  shiftId: z.string().uuid(),
+  requesterPersonId: z.string().uuid(),
+  recipientPersonId: z.string().uuid(),
+  shiftTypeId: z.string().uuid().nullable().optional(),
+  sourceQualificationId: z.string().uuid().nullable().optional(),
+  targetQualificationId: z.string().uuid().nullable().optional(),
+  targetTrainingCompletionId: z.string().uuid().nullable().optional(),
+  reason: z.string().nullable().optional(),
+  status: z.enum(["pending_recipient", "awaiting_manager", "approved", "declined", "withdrawn", "rejected"]).default("pending_recipient"),
+  requesterConfirmedAt: z.coerce.date().nullable().optional(),
+  recipientConfirmedAt: z.coerce.date().nullable().optional(),
+  managerApprovedAt: z.coerce.date().nullable().optional(),
+  declinedAt: z.coerce.date().nullable().optional(),
+  withdrawnAt: z.coerce.date().nullable().optional(),
+  rejectedAt: z.coerce.date().nullable().optional(),
+  reviewNote: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ShiftSwapRequest = z.infer<typeof ShiftSwapRequestSchema>;
+
+// Entity: ShiftType
+export const ShiftTypeSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  description: z.string().nullable().optional(),
+  requiredTrainingModuleId: z.string().uuid().nullable().optional(),
+  status: z.enum(["active", "retired"]).default("active"),
+  definedAt: z.coerce.date().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ShiftType = z.infer<typeof ShiftTypeSchema>;
+
 // Entity: SoftDeletable
 export const SoftDeletableSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
 });
 
 export type SoftDeletable = z.infer<typeof SoftDeletableSchema>;
+
+// Entity: StockCountLine
+export const StockCountLineSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  stockCountSessionId: z.string().uuid(),
+  inventoryItemId: z.string().uuid(),
+  locationId: z.string().uuid(),
+  ingredientId: z.string().uuid(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  expectedQuantity: z.number().default(0),
+  countedQuantity: z.number().default(0),
+  varianceQuantity: z.number().default(0),
+  ledgerQuantityAtReconcile: z.number().default(0),
+  adjustmentQuantity: z.number().default(0),
+  status: z.enum(["pending", "counted", "reconciled"]).default("pending"),
+  countNote: z.string().nullable().optional(),
+  countedById: z.string().nullable().optional(),
+  reconciledById: z.string().nullable().optional(),
+  frozenAt: z.coerce.date().nullable().optional(),
+  countedAt: z.coerce.date().nullable().optional(),
+  reconciledAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type StockCountLine = z.infer<typeof StockCountLineSchema>;
+
+// Entity: StockCountSession
+export const StockCountSessionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  label: z.string().default(""),
+  locationIds: z.string().default("[]"),
+  locationNames: z.string().default(""),
+  lineCount: z.number().int().default(0),
+  status: z.enum(["in_progress", "closed"]).default("in_progress"),
+  startedById: z.string().nullable().optional(),
+  closedById: z.string().nullable().optional(),
+  startedAt: z.coerce.date().nullable().optional(),
+  closedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type StockCountSession = z.infer<typeof StockCountSessionSchema>;
+
+// Entity: StockTransfer
+export const StockTransferSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  sourceInventoryItemId: z.string().uuid(),
+  destinationInventoryItemId: z.string().uuid(),
+  ingredientId: z.string().uuid(),
+  sourceLocationId: z.string().uuid(),
+  destinationLocationId: z.string().uuid(),
+  quantity: z.number().default(0),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
+  notes: z.string().nullable().optional(),
+  transferredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type StockTransfer = z.infer<typeof StockTransferSchema>;
 
 // Entity: StorageLocation
 export const StorageLocationSchema = z.object({
@@ -1188,6 +1727,30 @@ export const StorageLocationComputedSchema = StorageLocationSchema.extend({
 export type StorageLocation = z.infer<typeof StorageLocationSchema>;
 export type StorageLocationWithComputed = z.infer<typeof StorageLocationComputedSchema>;
 
+// Entity: TaxRate
+export const TaxRateSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  percentage: z.number().default(0),
+  appliesToFood: z.boolean().default(false),
+  appliesToService: z.boolean().default(false),
+  appliesToRental: z.boolean().default(false),
+  active: z.boolean().default(true),
+  configuredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: TaxRate
+export const TaxRateComputedSchema = TaxRateSchema.extend({
+  appliesToAny: z.boolean(),
+});
+
+export type TaxRate = z.infer<typeof TaxRateSchema>;
+export type TaxRateWithComputed = z.infer<typeof TaxRateComputedSchema>;
+
 // Entity: TenantScoped
 export const TenantScopedSchema = z.object({
   id: z.string().uuid(),
@@ -1195,6 +1758,27 @@ export const TenantScopedSchema = z.object({
 });
 
 export type TenantScoped = z.infer<typeof TenantScopedSchema>;
+
+// Entity: TimeOffRequest
+export const TimeOffRequestSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  personId: z.string().uuid(),
+  requesterAuthSubjectId: z.string().nullable().optional(),
+  startsAt: z.coerce.date().nullable(),
+  endsAt: z.coerce.date().nullable(),
+  reason: z.string().nullable().optional(),
+  status: z.enum(["pending", "approved", "denied"]).default("pending"),
+  submittedAt: z.coerce.date().nullable().optional(),
+  reviewedAt: z.coerce.date().nullable().optional(),
+  reviewedByAuthSubjectId: z.string().nullable().optional(),
+  responseNote: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type TimeOffRequest = z.infer<typeof TimeOffRequestSchema>;
 
 // Entity: TimeRecord
 export const TimeRecordSchema = z.object({
@@ -1221,6 +1805,67 @@ export const TimeRecordComputedSchema = TimeRecordSchema.extend({
 
 export type TimeRecord = z.infer<typeof TimeRecordSchema>;
 export type TimeRecordWithComputed = z.infer<typeof TimeRecordComputedSchema>;
+
+// Entity: TrainingCompletion
+export const TrainingCompletionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  personId: z.string().uuid(),
+  trainingModuleId: z.string().uuid(),
+  completedAt: z.coerce.date().nullable().optional(),
+  assessmentScore: z.number().int().default(0),
+  notes: z.string().nullable().optional(),
+  recordedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type TrainingCompletion = z.infer<typeof TrainingCompletionSchema>;
+
+// Entity: TrainingModule
+export const TrainingModuleSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  category: z.enum(["food_safety", "equipment_operation", "service_standards", "other"]).default("other"),
+  description: z.string().nullable().optional(),
+  passingScore: z.number().int().default(80),
+  status: z.enum(["active", "retired"]).default("active"),
+  definedAt: z.coerce.date().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type TrainingModule = z.infer<typeof TrainingModuleSchema>;
+
+// Entity: Vehicle
+export const VehicleSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  make: z.string().default(""),
+  model: z.string().default(""),
+  registration: z.string().default(""),
+  ownership: z.enum(["owned", "leased"]).default("owned"),
+  payloadCapacityKg: z.number().int().min(1).default(1),
+  operationalStatus: z.enum(["available", "in_use", "maintenance", "out_of_service", "retired"]).default("available"),
+  statusNote: z.string().nullable().optional(),
+  registeredAt: z.coerce.date().nullable().optional(),
+  statusChangedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: Vehicle
+export const VehicleComputedSchema = VehicleSchema.extend({
+  isOperational: z.boolean(),
+});
+
+export type Vehicle = z.infer<typeof VehicleSchema>;
+export type VehicleWithComputed = z.infer<typeof VehicleComputedSchema>;
 
 // Entity: Vendor
 export const VendorSchema = z.object({
@@ -1249,6 +1894,68 @@ export const VendorSchema = z.object({
 
 export type Vendor = z.infer<typeof VendorSchema>;
 
+// Entity: VendorContact
+export const VendorContactSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  vendorId: z.string().uuid(),
+  name: z.string(),
+  role: z.enum(["account_rep", "dispatch", "billing", "general"]).default("general"),
+  email: z.string().nullable().optional(),
+  phone: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type VendorContact = z.infer<typeof VendorContactSchema>;
+
+// Entity: VendorContract
+export const VendorContractSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  vendorId: z.string().uuid(),
+  title: z.string().default(""),
+  contractNumber: z.string().nullable().optional(),
+  paymentTermsDays: z.number().int().default(30),
+  deliveryLeadTimeDays: z.number().int().default(0),
+  startsAt: z.coerce.date().nullable().optional(),
+  endsAt: z.coerce.date().nullable().optional(),
+  documentUrl: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  status: z.enum(["draft", "active", "expired", "terminated"]).default("draft"),
+  draftedAt: z.coerce.date().nullable().optional(),
+  activatedAt: z.coerce.date().nullable().optional(),
+  expiredAt: z.coerce.date().nullable().optional(),
+  terminatedAt: z.coerce.date().nullable().optional(),
+  terminationReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type VendorContract = z.infer<typeof VendorContractSchema>;
+
+// Entity: VendorContractPriceTier
+export const VendorContractPriceTierSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  contractId: z.string().uuid(),
+  itemName: z.string().default(""),
+  unit: z.string().default("each"),
+  minQuantity: z.number().min(0).default(0),
+  unitPrice: z.number().min(0).default(0),
+  notes: z.string().nullable().optional(),
+  addedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type VendorContractPriceTier = z.infer<typeof VendorContractPriceTierSchema>;
+
 // Entity: VendorOrder
 export const VendorOrderSchema = z.object({
   id: z.string().uuid(),
@@ -1264,13 +1971,16 @@ export const VendorOrderSchema = z.object({
   shippingAmount: z.number().default(0),
   totalAmount: z.number().default(0),
   notes: z.string().nullable().optional(),
-  status: z.enum(["draft", "submitted", "confirmed", "partially_received", "received", "cancelled"]).default("draft"),
+  status: z.enum(["draft", "pending_approval", "submitted", "confirmed", "partially_received", "received", "cancelled"]).default("draft"),
   openedAt: z.coerce.date().nullable().optional(),
   submittedAt: z.coerce.date().nullable().optional(),
   confirmedAt: z.coerce.date().nullable().optional(),
   receivedAt: z.coerce.date().nullable().optional(),
   cancelledAt: z.coerce.date().nullable().optional(),
   cancellationReason: z.string().nullable().optional(),
+  approvalRequestedAt: z.coerce.date().nullable().optional(),
+  approvedAt: z.coerce.date().nullable().optional(),
+  approvalNotes: z.string().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1373,7 +2083,7 @@ export const WasteRecordSchema = z.object({
   inventoryItemId: z.string().uuid().nullable().optional(),
   quantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]).default("each"),
-  reason: z.enum(["spoilage", "prep_error", "overproduction", "other"]).default("other"),
+  reason: z.enum(["spoilage", "prep_error", "overproduction", "dropped", "date_expired", "quality_reject", "other"]).default("other"),
   unitCost: z.number().min(0).default(0),
   status: z.enum(["pending", "recorded", "voided"]).default("pending"),
   notes: z.string().nullable().optional(),
@@ -1399,17 +2109,56 @@ export const WeeklyPurchasingConfigSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
   defaultVendorId: z.string().uuid(),
   configuredAt: z.coerce.date().nullable().optional(),
+  orderApprovalThresholdAmount: z.number().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
 
 export type WeeklyPurchasingConfig = z.infer<typeof WeeklyPurchasingConfigSchema>;
 
+// Entity: WeeklyScheduleNotice
+export const WeeklyScheduleNoticeSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  personId: z.string().uuid(),
+  recipientAuthSubjectId: z.string().nullable().optional(),
+  weekStartsAt: z.coerce.date(),
+  weekEndsAt: z.coerce.date(),
+  shiftCount: z.number().int().default(0),
+  shiftSummary: z.string().default(""),
+  publishedAt: z.coerce.date().nullable().optional(),
+  acknowledgedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type WeeklyScheduleNotice = z.infer<typeof WeeklyScheduleNoticeSchema>;
+
+// Command: attach on Attachment
+export const AttachmentAttachParamsSchema = z.object({
+  parentType: z.enum(["eventRecord", "client", "contract", "vendor", "delivery", "closeout"]),
+  parentId: z.string(),
+  fileName: z.string(),
+  contentType: z.string(),
+  fileSize: z.number().int(),
+  storageId: z.string(),
+  evidenceType: z.enum(["venueCondition", "leftoverFood", "equipmentReturn"]).optional(),
+});
+
+export type AttachmentAttachParams = z.infer<typeof AttachmentAttachParamsSchema>;
+
+// Command: remove on Attachment
+export const AttachmentRemoveParamsSchema = z.object({});
+
+export type AttachmentRemoveParams = z.infer<typeof AttachmentRemoveParamsSchema>;
+
 // Command: declare on AvailabilityWindow
 export const AvailabilityWindowDeclareParamsSchema = z.object({
   personId: z.string().min(1),
   startsAt: z.coerce.date(),
   endsAt: z.coerce.date(),
+  kind: z.enum(["available", "unavailable"]).default("available"),
   notes: z.string().optional(),
 });
 
@@ -1458,6 +2207,13 @@ export const ClientChangeContactParamsSchema = z.object({
 
 export type ClientChangeContactParams = z.infer<typeof ClientChangeContactParamsSchema>;
 
+// Command: markMerged on Client
+export const ClientMarkMergedParamsSchema = z.object({
+  clientId: z.string().min(1),
+});
+
+export type ClientMarkMergedParams = z.infer<typeof ClientMarkMergedParamsSchema>;
+
 // Command: reactivate on Client
 export const ClientReactivateParamsSchema = z.object({});
 
@@ -1487,6 +2243,26 @@ export const ClientRegisterParamsSchema = z.object({
 
 export type ClientRegisterParams = z.infer<typeof ClientRegisterParamsSchema>;
 
+// Command: stageClientMerge on Client
+export const ClientStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  primaryClientId: z.string().min(1),
+});
+
+export type ClientStageClientMergeParams = z.infer<typeof ClientStageClientMergeParamsSchema>;
+
+// Command: record on ClientCommunication
+export const ClientCommunicationRecordParamsSchema = z.object({
+  clientContactId: z.string().min(1).optional(),
+  eventId: z.string().min(1).optional(),
+  occurredAt: z.coerce.date(),
+  medium: z.enum(["call", "email", "meeting"]),
+  summary: z.string(),
+  authorName: z.string(),
+});
+
+export type ClientCommunicationRecordParams = z.infer<typeof ClientCommunicationRecordParamsSchema>;
+
 // Command: add on ClientContact
 export const ClientContactAddParamsSchema = z.object({
   clientId: z.string().min(1),
@@ -1503,6 +2279,11 @@ export const ClientContactAddParamsSchema = z.object({
 
 export type ClientContactAddParams = z.infer<typeof ClientContactAddParamsSchema>;
 
+// Command: reassignClient on ClientContact
+export const ClientContactReassignClientParamsSchema = z.object({});
+
+export type ClientContactReassignClientParams = z.infer<typeof ClientContactReassignClientParamsSchema>;
+
 // Command: remove on ClientContact
 export const ClientContactRemoveParamsSchema = z.object({});
 
@@ -1512,6 +2293,14 @@ export type ClientContactRemoveParams = z.infer<typeof ClientContactRemoveParams
 export const ClientContactSetPrimaryParamsSchema = z.object({});
 
 export type ClientContactSetPrimaryParams = z.infer<typeof ClientContactSetPrimaryParamsSchema>;
+
+// Command: stageClientMerge on ClientContact
+export const ClientContactStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type ClientContactStageClientMergeParams = z.infer<typeof ClientContactStageClientMergeParamsSchema>;
 
 // Command: updateDetails on ClientContact
 export const ClientContactUpdateDetailsParamsSchema = z.object({
@@ -1526,6 +2315,14 @@ export const ClientContactUpdateDetailsParamsSchema = z.object({
 });
 
 export type ClientContactUpdateDetailsParams = z.infer<typeof ClientContactUpdateDetailsParamsSchema>;
+
+// Command: merge on ClientMerge
+export const ClientMergeMergeParamsSchema = z.object({
+  primaryClientId: z.string().min(1),
+  duplicateClientId: z.string().min(1),
+});
+
+export type ClientMergeMergeParams = z.infer<typeof ClientMergeMergeParamsSchema>;
 
 // Command: draft on Contract
 export const ContractDraftParamsSchema = z.object({
@@ -1557,6 +2354,11 @@ export const ContractMarkVoidedParamsSchema = z.object({
 
 export type ContractMarkVoidedParams = z.infer<typeof ContractMarkVoidedParamsSchema>;
 
+// Command: reassignClient on Contract
+export const ContractReassignClientParamsSchema = z.object({});
+
+export type ContractReassignClientParams = z.infer<typeof ContractReassignClientParamsSchema>;
+
 // Command: send on Contract
 export const ContractSendParamsSchema = z.object({});
 
@@ -1568,6 +2370,57 @@ export const ContractSignParamsSchema = z.object({
 });
 
 export type ContractSignParams = z.infer<typeof ContractSignParamsSchema>;
+
+// Command: stageClientMerge on Contract
+export const ContractStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type ContractStageClientMergeParams = z.infer<typeof ContractStageClientMergeParamsSchema>;
+
+// Command: close on CorrectiveAction
+export const CorrectiveActionCloseParamsSchema = z.object({
+  resolutionNotes: z.string(),
+});
+
+export type CorrectiveActionCloseParams = z.infer<typeof CorrectiveActionCloseParamsSchema>;
+
+// Command: open on CorrectiveAction
+export const CorrectiveActionOpenParamsSchema = z.object({
+  incidentId: z.string().min(1),
+  eventId: z.string().min(1),
+  description: z.string(),
+});
+
+export type CorrectiveActionOpenParams = z.infer<typeof CorrectiveActionOpenParamsSchema>;
+
+// Command: issue on CreditMemo
+export const CreditMemoIssueParamsSchema = z.object({
+  sourceInvoiceId: z.string().min(1),
+  clientId: z.string().min(1),
+  creditMemoNumber: z.string(),
+  amount: z.number(),
+  reason: z.string(),
+  disposition: z.enum(["apply_to_balance", "carry_forward"]),
+  targetInvoiceId: z.string().min(1).optional(),
+  eventId: z.string().min(1).optional(),
+});
+
+export type CreditMemoIssueParams = z.infer<typeof CreditMemoIssueParamsSchema>;
+
+// Command: reassignClient on CreditMemo
+export const CreditMemoReassignClientParamsSchema = z.object({});
+
+export type CreditMemoReassignClientParams = z.infer<typeof CreditMemoReassignClientParamsSchema>;
+
+// Command: stageClientMerge on CreditMemo
+export const CreditMemoStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type CreditMemoStageClientMergeParams = z.infer<typeof CreditMemoStageClientMergeParamsSchema>;
 
 // Command: cancel on Delivery
 export const DeliveryCancelParamsSchema = z.object({
@@ -1717,6 +2570,131 @@ export const DishTaskReviseParamsSchema = z.object({
 
 export type DishTaskReviseParams = z.infer<typeof DishTaskReviseParamsSchema>;
 
+// Command: configure on EmailNotificationSubscription
+export const EmailNotificationSubscriptionConfigureParamsSchema = z.object({
+  eventUpdates: z.boolean(),
+  invoiceReminders: z.boolean(),
+  lowStockAlerts: z.boolean(),
+  shiftChanges: z.boolean(),
+});
+
+export type EmailNotificationSubscriptionConfigureParams = z.infer<typeof EmailNotificationSubscriptionConfigureParamsSchema>;
+
+// Command: updateSubscriptions on EmailNotificationSubscription
+export const EmailNotificationSubscriptionUpdateSubscriptionsParamsSchema = z.object({
+  eventUpdates: z.boolean(),
+  invoiceReminders: z.boolean(),
+  lowStockAlerts: z.boolean(),
+  shiftChanges: z.boolean(),
+});
+
+export type EmailNotificationSubscriptionUpdateSubscriptionsParams = z.infer<typeof EmailNotificationSubscriptionUpdateSubscriptionsParamsSchema>;
+
+// Command: reactivate on Equipment
+export const EquipmentReactivateParamsSchema = z.object({});
+
+export type EquipmentReactivateParams = z.infer<typeof EquipmentReactivateParamsSchema>;
+
+// Command: recount on Equipment
+export const EquipmentRecountParamsSchema = z.object({
+  actualQuantity: z.number().int(),
+});
+
+export type EquipmentRecountParams = z.infer<typeof EquipmentRecountParamsSchema>;
+
+// Command: register on Equipment
+export const EquipmentRegisterParamsSchema = z.object({
+  name: z.string(),
+  assetTag: z.string(),
+  category: z.string(),
+  ownership: z.enum(["owned", "rented"]),
+  quantity: z.number().int().optional(),
+  purchaseValue: z.number().optional(),
+  condition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]).optional(),
+});
+
+export type EquipmentRegisterParams = z.infer<typeof EquipmentRegisterParamsSchema>;
+
+// Command: retire on Equipment
+export const EquipmentRetireParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type EquipmentRetireParams = z.infer<typeof EquipmentRetireParamsSchema>;
+
+// Command: reviseDetails on Equipment
+export const EquipmentReviseDetailsParamsSchema = z.object({
+  name: z.string(),
+  category: z.string(),
+  ownership: z.enum(["owned", "rented"]).optional(),
+  purchaseValue: z.number().optional(),
+});
+
+export type EquipmentReviseDetailsParams = z.infer<typeof EquipmentReviseDetailsParamsSchema>;
+
+// Command: updateCondition on Equipment
+export const EquipmentUpdateConditionParamsSchema = z.object({
+  condition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]),
+  note: z.string().optional(),
+});
+
+export type EquipmentUpdateConditionParams = z.infer<typeof EquipmentUpdateConditionParamsSchema>;
+
+// Command: applyService on EquipmentMaintenanceTask
+export const EquipmentMaintenanceTaskApplyServiceParamsSchema = z.object({
+  completedAt: z.coerce.date(),
+  nextDueAt: z.coerce.date(),
+});
+
+export type EquipmentMaintenanceTaskApplyServiceParams = z.infer<typeof EquipmentMaintenanceTaskApplyServiceParamsSchema>;
+
+// Command: schedule on EquipmentMaintenanceTask
+export const EquipmentMaintenanceTaskScheduleParamsSchema = z.object({
+  equipmentId: z.string().min(1),
+  taskName: z.string(),
+  intervalDays: z.number().int(),
+  nextDueAt: z.coerce.date(),
+  instructions: z.string().optional(),
+});
+
+export type EquipmentMaintenanceTaskScheduleParams = z.infer<typeof EquipmentMaintenanceTaskScheduleParamsSchema>;
+
+// Command: cancel on EquipmentReservation
+export const EquipmentReservationCancelParamsSchema = z.object({
+  reason: z.string().optional(),
+});
+
+export type EquipmentReservationCancelParams = z.infer<typeof EquipmentReservationCancelParamsSchema>;
+
+// Command: checkOut on EquipmentReservation
+export const EquipmentReservationCheckOutParamsSchema = z.object({
+  condition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]),
+  note: z.string().optional(),
+});
+
+export type EquipmentReservationCheckOutParams = z.infer<typeof EquipmentReservationCheckOutParamsSchema>;
+
+// Command: markReturned on EquipmentReservation
+export const EquipmentReservationMarkReturnedParamsSchema = z.object({
+  condition: z.enum(["excellent", "good", "fair", "poor", "out_of_service"]),
+  note: z.string().optional(),
+});
+
+export type EquipmentReservationMarkReturnedParams = z.infer<typeof EquipmentReservationMarkReturnedParamsSchema>;
+
+// Command: record on EquipmentServiceEntry
+export const EquipmentServiceEntryRecordParamsSchema = z.object({
+  maintenanceTaskId: z.string().min(1),
+  equipmentId: z.string().min(1),
+  technician: z.string(),
+  cost: z.number(),
+  completedAt: z.coerce.date(),
+  nextDueAt: z.coerce.date(),
+  notes: z.string().optional(),
+});
+
+export type EquipmentServiceEntryRecordParams = z.infer<typeof EquipmentServiceEntryRecordParamsSchema>;
+
 // Command: approve on Event
 export const EventApproveParamsSchema = z.object({});
 
@@ -1779,6 +2757,7 @@ export const EventChangeVenueParamsSchema = z.object({
   venueId: z.string().min(1).optional(),
   venueName: z.string().optional(),
   venueAddress: z.string().optional(),
+  venueCapacity: z.number().optional(),
 });
 
 export type EventChangeVenueParams = z.infer<typeof EventChangeVenueParamsSchema>;
@@ -1792,6 +2771,18 @@ export type EventCloseOutParams = z.infer<typeof EventCloseOutParamsSchema>;
 export const EventCompleteParamsSchema = z.object({});
 
 export type EventCompleteParams = z.infer<typeof EventCompleteParamsSchema>;
+
+// Command: configureRecurrence on Event
+export const EventConfigureRecurrenceParamsSchema = z.object({
+  frequency: z.enum(["weekly", "monthly", "annually"]),
+  endCondition: z.enum(["on_date", "after_occurrences"]),
+  recurrenceEndsAt: z.coerce.date().optional(),
+  occurrenceLimit: z.number().int().optional(),
+  nextStartsAt: z.coerce.date(),
+  seriesId: z.string(),
+});
+
+export type EventConfigureRecurrenceParams = z.infer<typeof EventConfigureRecurrenceParamsSchema>;
 
 // Command: planEngagement on Event
 export const EventPlanEngagementParamsSchema = z.object({
@@ -1807,6 +2798,7 @@ export const EventPlanEngagementParamsSchema = z.object({
   venueId: z.string().min(1).optional(),
   venueName: z.string().optional(),
   venueAddress: z.string().optional(),
+  venueCapacity: z.number().optional(),
   primaryContactEmail: z.string().optional(),
   primaryContactPhone: z.string().optional(),
   accessibilityNeeds: z.array(z.string()).optional(),
@@ -1816,6 +2808,11 @@ export const EventPlanEngagementParamsSchema = z.object({
 });
 
 export type EventPlanEngagementParams = z.infer<typeof EventPlanEngagementParamsSchema>;
+
+// Command: reassignClient on Event
+export const EventReassignClientParamsSchema = z.object({});
+
+export type EventReassignClientParams = z.infer<typeof EventReassignClientParamsSchema>;
 
 // Command: reschedule on Event
 export const EventRescheduleParamsSchema = z.object({
@@ -1831,6 +2828,19 @@ export const EventReturnToPlanningParamsSchema = z.object({
 });
 
 export type EventReturnToPlanningParams = z.infer<typeof EventReturnToPlanningParamsSchema>;
+
+// Command: stageClientMerge on Event
+export const EventStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type EventStageClientMergeParams = z.infer<typeof EventStageClientMergeParamsSchema>;
+
+// Command: stopRecurrence on Event
+export const EventStopRecurrenceParamsSchema = z.object({});
+
+export type EventStopRecurrenceParams = z.infer<typeof EventStopRecurrenceParamsSchema>;
 
 // Command: submitForApproval on Event
 export const EventSubmitForApprovalParamsSchema = z.object({});
@@ -2044,10 +3054,84 @@ export const EventIngredientContributionReviseParamsSchema = z.object({
 
 export type EventIngredientContributionReviseParams = z.infer<typeof EventIngredientContributionReviseParamsSchema>;
 
+// Command: archive on EventTemplate
+export const EventTemplateArchiveParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type EventTemplateArchiveParams = z.infer<typeof EventTemplateArchiveParamsSchema>;
+
+// Command: define on EventTemplate
+export const EventTemplateDefineParamsSchema = z.object({
+  name: z.string(),
+  clientType: z.enum(["company", "person"]),
+  eventType: z.string(),
+  defaultHeadcount: z.number().int(),
+  menuId: z.string().min(1).optional(),
+  defaultStaffRoles: z.array(z.string()).optional(),
+  typicalEquipment: z.array(z.string()).optional(),
+  notes: z.string().optional(),
+  sourceEventId: z.string().uuid().optional(),
+});
+
+export type EventTemplateDefineParams = z.infer<typeof EventTemplateDefineParamsSchema>;
+
+// Command: reactivate on EventTemplate
+export const EventTemplateReactivateParamsSchema = z.object({});
+
+export type EventTemplateReactivateParams = z.infer<typeof EventTemplateReactivateParamsSchema>;
+
+// Command: revise on EventTemplate
+export const EventTemplateReviseParamsSchema = z.object({
+  name: z.string(),
+  clientType: z.enum(["company", "person"]),
+  eventType: z.string(),
+  defaultHeadcount: z.number().int(),
+  menuId: z.string().min(1).optional(),
+  defaultStaffRoles: z.array(z.string()).optional(),
+  typicalEquipment: z.array(z.string()).optional(),
+  notes: z.string().optional(),
+});
+
+export type EventTemplateReviseParams = z.infer<typeof EventTemplateReviseParamsSchema>;
+
+// Command: adjust on EventTimelineActivity
+export const EventTimelineActivityAdjustParamsSchema = z.object({
+  name: z.string().optional(),
+  startsAt: z.coerce.date().optional(),
+  endsAt: z.coerce.date().optional(),
+  responsibleParty: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type EventTimelineActivityAdjustParams = z.infer<typeof EventTimelineActivityAdjustParamsSchema>;
+
+// Command: remove on EventTimelineActivity
+export const EventTimelineActivityRemoveParamsSchema = z.object({});
+
+export type EventTimelineActivityRemoveParams = z.infer<typeof EventTimelineActivityRemoveParamsSchema>;
+
+// Command: schedule on EventTimelineActivity
+export const EventTimelineActivityScheduleParamsSchema = z.object({
+  eventId: z.string().min(1),
+  name: z.string(),
+  startsAt: z.coerce.date(),
+  endsAt: z.coerce.date().optional(),
+  responsibleParty: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type EventTimelineActivityScheduleParams = z.infer<typeof EventTimelineActivityScheduleParamsSchema>;
+
 // Command: beginInvestigation on Incident
 export const IncidentBeginInvestigationParamsSchema = z.object({});
 
 export type IncidentBeginInvestigationParams = z.infer<typeof IncidentBeginInvestigationParamsSchema>;
+
+// Command: clearCorrectiveActionLock on Incident
+export const IncidentClearCorrectiveActionLockParamsSchema = z.object({});
+
+export type IncidentClearCorrectiveActionLockParams = z.infer<typeof IncidentClearCorrectiveActionLockParamsSchema>;
 
 // Command: dismiss on Incident
 export const IncidentDismissParamsSchema = z.object({
@@ -2067,7 +3151,7 @@ export type IncidentMarkResolvedParams = z.infer<typeof IncidentMarkResolvedPara
 export const IncidentReportParamsSchema = z.object({
   eventId: z.string().min(1),
   severity: z.enum(["low", "medium", "high", "critical"]),
-  category: z.enum(["food_safety", "injury", "equipment", "service", "other"]),
+  category: z.enum(["food_safety", "allergen", "injury", "equipment", "service", "other"]),
   description: z.string(),
   prepTaskId: z.string().min(1).optional(),
   deliveryId: z.string().min(1).optional(),
@@ -2083,6 +3167,13 @@ export const IngredientClassifyAllergensParamsSchema = z.object({
 
 export type IngredientClassifyAllergensParams = z.infer<typeof IngredientClassifyAllergensParamsSchema>;
 
+// Command: configureSubstitutes on Ingredient
+export const IngredientConfigureSubstitutesParamsSchema = z.object({
+  substituteIngredientIds: z.array(z.string().uuid()),
+});
+
+export type IngredientConfigureSubstitutesParams = z.infer<typeof IngredientConfigureSubstitutesParamsSchema>;
+
 // Command: discontinue on Ingredient
 export const IngredientDiscontinueParamsSchema = z.object({
   reason: z.string(),
@@ -2097,7 +3188,7 @@ export const IngredientIntroduceParamsSchema = z.object({
   costPerUnit: z.number(),
   allergens: z.array(z.enum(["milk", "eggs", "fish", "crustacean_shellfish", "tree_nuts", "peanuts", "wheat", "soybeans", "sesame"])).optional(),
   category: z.string().optional(),
-  preferredVendorId: z.string().uuid().optional(),
+  preferredVendorId: z.string().min(1).optional(),
 });
 
 export type IngredientIntroduceParams = z.infer<typeof IngredientIntroduceParamsSchema>;
@@ -2109,10 +3200,18 @@ export type IngredientReinstateParams = z.infer<typeof IngredientReinstateParams
 
 // Command: setPreferredVendor on Ingredient
 export const IngredientSetPreferredVendorParamsSchema = z.object({
-  preferredVendorId: z.string().uuid().optional(),
+  preferredVendorId: z.string().min(1).optional(),
 });
 
 export type IngredientSetPreferredVendorParams = z.infer<typeof IngredientSetPreferredVendorParamsSchema>;
+
+// Command: setPreferredVendors on Ingredient
+export const IngredientSetPreferredVendorsParamsSchema = z.object({
+  preferredVendorIds: z.array(z.string().uuid()),
+  preferredVendorId: z.string().min(1).optional(),
+});
+
+export type IngredientSetPreferredVendorsParams = z.infer<typeof IngredientSetPreferredVendorsParamsSchema>;
 
 // Command: updateCosting on Ingredient
 export const IngredientUpdateCostingParamsSchema = z.object({
@@ -2191,6 +3290,20 @@ export const IngredientDemandSyncFromContributionsParamsSchema = z.object({
 
 export type IngredientDemandSyncFromContributionsParams = z.infer<typeof IngredientDemandSyncFromContributionsParamsSchema>;
 
+// Command: record on IngredientPriceObservation
+export const IngredientPriceObservationRecordParamsSchema = z.object({
+  ingredientId: z.string().min(1),
+  vendorId: z.string().min(1),
+  vendorOrderId: z.string().min(1),
+  vendorOrderLineId: z.string().min(1),
+  receiptQuantity: z.number(),
+  cumulativeReceivedQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  unitPrice: z.number(),
+});
+
+export type IngredientPriceObservationRecordParams = z.infer<typeof IngredientPriceObservationRecordParamsSchema>;
+
 // Command: adjustQuantity on InventoryItem
 export const InventoryItemAdjustQuantityParamsSchema = z.object({
   delta: z.number(),
@@ -2234,10 +3347,18 @@ export const InventoryItemRemoveParamsSchema = z.object({
 
 export type InventoryItemRemoveParams = z.infer<typeof InventoryItemRemoveParamsSchema>;
 
+// Command: setExpiry on InventoryItem
+export const InventoryItemSetExpiryParamsSchema = z.object({
+  bestBeforeAt: z.coerce.date().optional(),
+  useByAt: z.coerce.date().optional(),
+});
+
+export type InventoryItemSetExpiryParams = z.infer<typeof InventoryItemSetExpiryParamsSchema>;
+
 // Command: transferIn on InventoryItem
 export const InventoryItemTransferInParamsSchema = z.object({
   quantity: z.number(),
-  sourceLocationId: z.string().uuid(),
+  sourceLocationId: z.string().min(1),
 });
 
 export type InventoryItemTransferInParams = z.infer<typeof InventoryItemTransferInParamsSchema>;
@@ -2245,7 +3366,7 @@ export type InventoryItemTransferInParams = z.infer<typeof InventoryItemTransfer
 // Command: transferOut on InventoryItem
 export const InventoryItemTransferOutParamsSchema = z.object({
   quantity: z.number(),
-  destinationLocationId: z.string().uuid(),
+  destinationLocationId: z.string().min(1),
 });
 
 export type InventoryItemTransferOutParams = z.infer<typeof InventoryItemTransferOutParamsSchema>;
@@ -2258,6 +3379,24 @@ export const InventoryItemUpdateLevelsParamsSchema = z.object({
 });
 
 export type InventoryItemUpdateLevelsParams = z.infer<typeof InventoryItemUpdateLevelsParamsSchema>;
+
+// Command: record on InventoryLot
+export const InventoryLotRecordParamsSchema = z.object({
+  supplierLotNumber: z.string(),
+  vendorOrderLineId: z.string().min(1),
+  vendorOrderId: z.string().min(1),
+  vendorId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  ingredientDemandId: z.string().min(1).optional(),
+  eventId: z.string().min(1).optional(),
+  locationId: z.string().min(1),
+  receiptQuantity: z.number(),
+  cumulativeReceivedQuantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  unitCost: z.number(),
+});
+
+export type InventoryLotRecordParams = z.infer<typeof InventoryLotRecordParamsSchema>;
 
 // Command: consume on InventoryReservation
 export const InventoryReservationConsumeParamsSchema = z.object({});
@@ -2277,9 +3416,18 @@ export const InventoryReservationReserveParamsSchema = z.object({
   eventId: z.string().min(1),
   ingredientId: z.string().min(1),
   quantity: z.number(),
+  inventoryLotId: z.string().min(1).optional(),
 });
 
 export type InventoryReservationReserveParams = z.infer<typeof InventoryReservationReserveParamsSchema>;
+
+// Command: applyCredit on Invoice
+export const InvoiceApplyCreditParamsSchema = z.object({
+  creditAmount: z.number(),
+  creditMemoId: z.string(),
+});
+
+export type InvoiceApplyCreditParams = z.infer<typeof InvoiceApplyCreditParamsSchema>;
 
 // Command: applyPayment on Invoice
 export const InvoiceApplyPaymentParamsSchema = z.object({
@@ -2301,9 +3449,16 @@ export const InvoiceIssueParamsSchema = z.object({
   paymentTermsDays: z.number().optional(),
   dueDate: z.coerce.date().optional(),
   notes: z.string().optional(),
+  lineItems: z.unknown().optional(),
+  taxBreakdown: z.unknown().optional(),
 });
 
 export type InvoiceIssueParams = z.infer<typeof InvoiceIssueParamsSchema>;
+
+// Command: markDepositPaid on Invoice
+export const InvoiceMarkDepositPaidParamsSchema = z.object({});
+
+export type InvoiceMarkDepositPaidParams = z.infer<typeof InvoiceMarkDepositPaidParamsSchema>;
 
 // Command: markOverdue on Invoice
 export const InvoiceMarkOverdueParamsSchema = z.object({});
@@ -2322,6 +3477,19 @@ export const InvoiceMarkVoidedParamsSchema = z.object({
 
 export type InvoiceMarkVoidedParams = z.infer<typeof InvoiceMarkVoidedParamsSchema>;
 
+// Command: reassignClient on Invoice
+export const InvoiceReassignClientParamsSchema = z.object({});
+
+export type InvoiceReassignClientParams = z.infer<typeof InvoiceReassignClientParamsSchema>;
+
+// Command: recordCreditMemo on Invoice
+export const InvoiceRecordCreditMemoParamsSchema = z.object({
+  creditAmount: z.number(),
+  creditMemoId: z.string(),
+});
+
+export type InvoiceRecordCreditMemoParams = z.infer<typeof InvoiceRecordCreditMemoParamsSchema>;
+
 // Command: recordRefund on Invoice
 export const InvoiceRecordRefundParamsSchema = z.object({
   refundAmount: z.number(),
@@ -2335,6 +3503,27 @@ export const InvoiceSendParamsSchema = z.object({});
 
 export type InvoiceSendParams = z.infer<typeof InvoiceSendParamsSchema>;
 
+// Command: sendBalanceReminder on Invoice
+export const InvoiceSendBalanceReminderParamsSchema = z.object({});
+
+export type InvoiceSendBalanceReminderParams = z.infer<typeof InvoiceSendBalanceReminderParamsSchema>;
+
+// Command: setDeposit on Invoice
+export const InvoiceSetDepositParamsSchema = z.object({
+  depositAmount: z.number(),
+  balanceReminderLeadDays: z.number().optional(),
+});
+
+export type InvoiceSetDepositParams = z.infer<typeof InvoiceSetDepositParamsSchema>;
+
+// Command: stageClientMerge on Invoice
+export const InvoiceStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type InvoiceStageClientMergeParams = z.infer<typeof InvoiceStageClientMergeParamsSchema>;
+
 // Command: writeOff on Invoice
 export const InvoiceWriteOffParamsSchema = z.object({
   reason: z.string(),
@@ -2342,6 +3531,70 @@ export const InvoiceWriteOffParamsSchema = z.object({
 });
 
 export type InvoiceWriteOffParams = z.infer<typeof InvoiceWriteOffParamsSchema>;
+
+// Command: capture on Lead
+export const LeadCaptureParamsSchema = z.object({
+  leadType: z.enum(["company", "person"]),
+  source: z.string(),
+  estimatedValue: z.number(),
+  companyName: z.string().optional(),
+  givenName: z.string().optional(),
+  familyName: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  probability: z.number().optional(),
+  notes: z.string().optional(),
+});
+
+export type LeadCaptureParams = z.infer<typeof LeadCaptureParamsSchema>;
+
+// Command: confirmConversion on Lead
+export const LeadConfirmConversionParamsSchema = z.object({});
+
+export type LeadConfirmConversionParams = z.infer<typeof LeadConfirmConversionParamsSchema>;
+
+// Command: confirmProposalSent on Lead
+export const LeadConfirmProposalSentParamsSchema = z.object({});
+
+export type LeadConfirmProposalSentParams = z.infer<typeof LeadConfirmProposalSentParamsSchema>;
+
+// Command: reviseDetails on Lead
+export const LeadReviseDetailsParamsSchema = z.object({
+  leadType: z.enum(["company", "person"]),
+  source: z.string(),
+  companyName: z.string().optional(),
+  givenName: z.string().optional(),
+  familyName: z.string().optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type LeadReviseDetailsParams = z.infer<typeof LeadReviseDetailsParamsSchema>;
+
+// Command: stageConversion on Lead
+export const LeadStageConversionParamsSchema = z.object({
+  clientId: z.string().min(1),
+  clientContactId: z.string().min(1).optional(),
+});
+
+export type LeadStageConversionParams = z.infer<typeof LeadStageConversionParamsSchema>;
+
+// Command: stageProposal on Lead
+export const LeadStageProposalParamsSchema = z.object({
+  proposalId: z.string().min(1),
+});
+
+export type LeadStageProposalParams = z.infer<typeof LeadStageProposalParamsSchema>;
+
+// Command: updatePipeline on Lead
+export const LeadUpdatePipelineParamsSchema = z.object({
+  stage: z.enum(["new", "qualified", "proposalSent", "negotiating"]),
+  estimatedValue: z.number(),
+  probability: z.number(),
+});
+
+export type LeadUpdatePipelineParams = z.infer<typeof LeadUpdatePipelineParamsSchema>;
 
 // Command: archive on Menu
 export const MenuArchiveParamsSchema = z.object({
@@ -2406,6 +3659,7 @@ export const MenuDishAddParamsSchema = z.object({
   menuId: z.string().min(1),
   dishId: z.string().min(1),
   sortOrder: z.number().optional(),
+  sellingPrice: z.number().optional(),
   course: z.string().optional(),
   serviceStyle: z.string().optional(),
   specialInstructions: z.string().optional(),
@@ -2430,6 +3684,23 @@ export const MenuDishUpdateDetailsParamsSchema = z.object({
 
 export type MenuDishUpdateDetailsParams = z.infer<typeof MenuDishUpdateDetailsParamsSchema>;
 
+// Command: updateSellingPrice on MenuDish
+export const MenuDishUpdateSellingPriceParamsSchema = z.object({
+  sellingPrice: z.number(),
+});
+
+export type MenuDishUpdateSellingPriceParams = z.infer<typeof MenuDishUpdateSellingPriceParamsSchema>;
+
+// Command: configureBranding on Organization
+export const OrganizationConfigureBrandingParamsSchema = z.object({
+  displayName: z.string(),
+  address: z.string(),
+  primaryColor: z.string(),
+  accentColor: z.string(),
+});
+
+export type OrganizationConfigureBrandingParams = z.infer<typeof OrganizationConfigureBrandingParamsSchema>;
+
 // Command: deactivate on Organization
 export const OrganizationDeactivateParamsSchema = z.object({});
 
@@ -2443,6 +3714,10 @@ export type OrganizationReactivateParams = z.infer<typeof OrganizationReactivate
 // Command: register on Organization
 export const OrganizationRegisterParamsSchema = z.object({
   name: z.string(),
+  brandDisplayName: z.string().optional(),
+  brandAddress: z.string().optional(),
+  brandPrimaryColor: z.string().optional(),
+  brandAccentColor: z.string().optional(),
 });
 
 export type OrganizationRegisterParams = z.infer<typeof OrganizationRegisterParamsSchema>;
@@ -2558,6 +3833,11 @@ export const PaymentFailParamsSchema = z.object({
 
 export type PaymentFailParams = z.infer<typeof PaymentFailParamsSchema>;
 
+// Command: reassignClient on Payment
+export const PaymentReassignClientParamsSchema = z.object({});
+
+export type PaymentReassignClientParams = z.infer<typeof PaymentReassignClientParamsSchema>;
+
 // Command: record on Payment
 export const PaymentRecordParamsSchema = z.object({
   invoiceId: z.string().min(1),
@@ -2582,6 +3862,14 @@ export type PaymentRefundParams = z.infer<typeof PaymentRefundParamsSchema>;
 export const PaymentSettleParamsSchema = z.object({});
 
 export type PaymentSettleParams = z.infer<typeof PaymentSettleParamsSchema>;
+
+// Command: stageClientMerge on Payment
+export const PaymentStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type PaymentStageClientMergeParams = z.infer<typeof PaymentStageClientMergeParamsSchema>;
 
 // Command: clearDefault on PaymentMethod
 export const PaymentMethodClearDefaultParamsSchema = z.object({});
@@ -2610,6 +3898,11 @@ export const PaymentMethodReactivateParamsSchema = z.object({});
 
 export type PaymentMethodReactivateParams = z.infer<typeof PaymentMethodReactivateParamsSchema>;
 
+// Command: reassignClient on PaymentMethod
+export const PaymentMethodReassignClientParamsSchema = z.object({});
+
+export type PaymentMethodReassignClientParams = z.infer<typeof PaymentMethodReassignClientParamsSchema>;
+
 // Command: register on PaymentMethod
 export const PaymentMethodRegisterParamsSchema = z.object({
   clientId: z.string().min(1),
@@ -2626,6 +3919,14 @@ export type PaymentMethodRegisterParams = z.infer<typeof PaymentMethodRegisterPa
 export const PaymentMethodRemoveParamsSchema = z.object({});
 
 export type PaymentMethodRemoveParams = z.infer<typeof PaymentMethodRemoveParamsSchema>;
+
+// Command: stageClientMerge on PaymentMethod
+export const PaymentMethodStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type PaymentMethodStageClientMergeParams = z.infer<typeof PaymentMethodStageClientMergeParamsSchema>;
 
 // Command: finalize on PayrollInput
 export const PayrollInputFinalizeParamsSchema = z.object({});
@@ -2790,6 +4091,19 @@ export const PrepTaskUnblockParamsSchema = z.object({});
 
 export type PrepTaskUnblockParams = z.infer<typeof PrepTaskUnblockParamsSchema>;
 
+// Command: declare on PrepTaskDependency
+export const PrepTaskDependencyDeclareParamsSchema = z.object({
+  dependentTaskId: z.string().min(1),
+  predecessorTaskId: z.string().min(1),
+});
+
+export type PrepTaskDependencyDeclareParams = z.infer<typeof PrepTaskDependencyDeclareParamsSchema>;
+
+// Command: satisfy on PrepTaskDependency
+export const PrepTaskDependencySatisfyParamsSchema = z.object({});
+
+export type PrepTaskDependencySatisfyParams = z.infer<typeof PrepTaskDependencySatisfyParamsSchema>;
+
 // Command: cancel on ProductionBatch
 export const ProductionBatchCancelParamsSchema = z.object({
   reason: z.string(),
@@ -2863,10 +4177,23 @@ export const ProposalMarkViewedParamsSchema = z.object({});
 
 export type ProposalMarkViewedParams = z.infer<typeof ProposalMarkViewedParamsSchema>;
 
+// Command: reassignClient on Proposal
+export const ProposalReassignClientParamsSchema = z.object({});
+
+export type ProposalReassignClientParams = z.infer<typeof ProposalReassignClientParamsSchema>;
+
 // Command: send on Proposal
 export const ProposalSendParamsSchema = z.object({});
 
 export type ProposalSendParams = z.infer<typeof ProposalSendParamsSchema>;
+
+// Command: stageClientMerge on Proposal
+export const ProposalStageClientMergeParamsSchema = z.object({
+  clientMergeId: z.string().uuid(),
+  clientId: z.string().min(1),
+});
+
+export type ProposalStageClientMergeParams = z.infer<typeof ProposalStageClientMergeParamsSchema>;
 
 // Command: assignToDraft on PurchaseNeed
 export const PurchaseNeedAssignToDraftParamsSchema = z.object({
@@ -2891,6 +4218,7 @@ export const PurchaseNeedCreateParamsSchema = z.object({
   requiredQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   purchasingWeekStart: z.coerce.date().optional(),
+  preferredVendorId: z.string().min(1).optional(),
 });
 
 export type PurchaseNeedCreateParams = z.infer<typeof PurchaseNeedCreateParamsSchema>;
@@ -2930,7 +4258,8 @@ export const QualificationGrantParamsSchema = z.object({
   personId: z.string().min(1),
   name: z.string(),
   issuedAt: z.coerce.date(),
-  certificationType: z.string().optional(),
+  certificationType: z.string(),
+  issuingBody: z.string(),
   expiresAt: z.coerce.date().optional(),
   documentRef: z.string().optional(),
   notes: z.string().optional(),
@@ -3214,6 +4543,22 @@ export const RecipeStepReviseParamsSchema = z.object({
 
 export type RecipeStepReviseParams = z.infer<typeof RecipeStepReviseParamsSchema>;
 
+// Command: declare on RecurringAvailability
+export const RecurringAvailabilityDeclareParamsSchema = z.object({
+  personId: z.string().min(1),
+  dayOfWeek: z.number().int(),
+  startMinute: z.number().int(),
+  endMinute: z.number().int(),
+  notes: z.string().optional(),
+});
+
+export type RecurringAvailabilityDeclareParams = z.infer<typeof RecurringAvailabilityDeclareParamsSchema>;
+
+// Command: withdraw on RecurringAvailability
+export const RecurringAvailabilityWithdrawParamsSchema = z.object({});
+
+export type RecurringAvailabilityWithdrawParams = z.infer<typeof RecurringAvailabilityWithdrawParamsSchema>;
+
 // Command: archive on SavedReportDefinition
 export const SavedReportDefinitionArchiveParamsSchema = z.object({});
 
@@ -3258,6 +4603,11 @@ export const SavedReportDefinitionUpdateDefinitionParamsSchema = z.object({
 
 export type SavedReportDefinitionUpdateDefinitionParams = z.infer<typeof SavedReportDefinitionUpdateDefinitionParamsSchema>;
 
+// Command: applyApprovedSwap on Shift
+export const ShiftApplyApprovedSwapParamsSchema = z.object({});
+
+export type ShiftApplyApprovedSwapParams = z.infer<typeof ShiftApplyApprovedSwapParamsSchema>;
+
 // Command: cancel on Shift
 export const ShiftCancelParamsSchema = z.object({
   reason: z.string(),
@@ -3282,15 +4632,161 @@ export const ShiftScheduleParamsSchema = z.object({
   endsAt: z.coerce.date(),
   eventId: z.string().min(1).optional(),
   role: z.string().optional(),
+  shiftTypeId: z.string().min(1).optional(),
+  requiredQualificationId: z.string().min(1).optional(),
+  requiredTrainingCompletionId: z.string().min(1).optional(),
   notes: z.string().optional(),
 });
 
 export type ShiftScheduleParams = z.infer<typeof ShiftScheduleParamsSchema>;
 
+// Command: stageApprovedSwap on Shift
+export const ShiftStageApprovedSwapParamsSchema = z.object({
+  shiftSwapRequestId: z.string().uuid(),
+  requesterPersonId: z.string().min(1),
+  recipientPersonId: z.string().min(1),
+  targetQualificationId: z.string().min(1).optional(),
+  targetTrainingCompletionId: z.string().min(1).optional(),
+});
+
+export type ShiftStageApprovedSwapParams = z.infer<typeof ShiftStageApprovedSwapParamsSchema>;
+
 // Command: start on Shift
 export const ShiftStartParamsSchema = z.object({});
 
 export type ShiftStartParams = z.infer<typeof ShiftStartParamsSchema>;
+
+// Command: accept on ShiftSwapRequest
+export const ShiftSwapRequestAcceptParamsSchema = z.object({});
+
+export type ShiftSwapRequestAcceptParams = z.infer<typeof ShiftSwapRequestAcceptParamsSchema>;
+
+// Command: approve on ShiftSwapRequest
+export const ShiftSwapRequestApproveParamsSchema = z.object({
+  reviewNote: z.string().optional(),
+});
+
+export type ShiftSwapRequestApproveParams = z.infer<typeof ShiftSwapRequestApproveParamsSchema>;
+
+// Command: decline on ShiftSwapRequest
+export const ShiftSwapRequestDeclineParamsSchema = z.object({
+  reviewNote: z.string().optional(),
+});
+
+export type ShiftSwapRequestDeclineParams = z.infer<typeof ShiftSwapRequestDeclineParamsSchema>;
+
+// Command: propose on ShiftSwapRequest
+export const ShiftSwapRequestProposeParamsSchema = z.object({
+  shiftId: z.string().min(1),
+  requesterPersonId: z.string().min(1),
+  recipientPersonId: z.string().min(1),
+  shiftTypeId: z.string().min(1).optional(),
+  sourceQualificationId: z.string().min(1).optional(),
+  targetQualificationId: z.string().min(1).optional(),
+  targetTrainingCompletionId: z.string().min(1).optional(),
+  reason: z.string().optional(),
+});
+
+export type ShiftSwapRequestProposeParams = z.infer<typeof ShiftSwapRequestProposeParamsSchema>;
+
+// Command: reject on ShiftSwapRequest
+export const ShiftSwapRequestRejectParamsSchema = z.object({
+  reviewNote: z.string().optional(),
+});
+
+export type ShiftSwapRequestRejectParams = z.infer<typeof ShiftSwapRequestRejectParamsSchema>;
+
+// Command: withdraw on ShiftSwapRequest
+export const ShiftSwapRequestWithdrawParamsSchema = z.object({});
+
+export type ShiftSwapRequestWithdrawParams = z.infer<typeof ShiftSwapRequestWithdrawParamsSchema>;
+
+// Command: define on ShiftType
+export const ShiftTypeDefineParamsSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  requiredTrainingModuleId: z.string().min(1).optional(),
+});
+
+export type ShiftTypeDefineParams = z.infer<typeof ShiftTypeDefineParamsSchema>;
+
+// Command: reactivate on ShiftType
+export const ShiftTypeReactivateParamsSchema = z.object({});
+
+export type ShiftTypeReactivateParams = z.infer<typeof ShiftTypeReactivateParamsSchema>;
+
+// Command: retire on ShiftType
+export const ShiftTypeRetireParamsSchema = z.object({});
+
+export type ShiftTypeRetireParams = z.infer<typeof ShiftTypeRetireParamsSchema>;
+
+// Command: confirmLedgerMatch on StockCountLine
+export const StockCountLineConfirmLedgerMatchParamsSchema = z.object({});
+
+export type StockCountLineConfirmLedgerMatchParams = z.infer<typeof StockCountLineConfirmLedgerMatchParamsSchema>;
+
+// Command: freeze on StockCountLine
+export const StockCountLineFreezeParamsSchema = z.object({
+  stockCountSessionId: z.string().min(1),
+  inventoryItemId: z.string().min(1),
+  locationId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+});
+
+export type StockCountLineFreezeParams = z.infer<typeof StockCountLineFreezeParamsSchema>;
+
+// Command: reconcileVariance on StockCountLine
+export const StockCountLineReconcileVarianceParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type StockCountLineReconcileVarianceParams = z.infer<typeof StockCountLineReconcileVarianceParamsSchema>;
+
+// Command: recordCount on StockCountLine
+export const StockCountLineRecordCountParamsSchema = z.object({
+  countedQuantity: z.number(),
+  countNote: z.string().optional(),
+});
+
+export type StockCountLineRecordCountParams = z.infer<typeof StockCountLineRecordCountParamsSchema>;
+
+// Command: reviseCount on StockCountLine
+export const StockCountLineReviseCountParamsSchema = z.object({
+  countedQuantity: z.number(),
+  countNote: z.string().optional(),
+});
+
+export type StockCountLineReviseCountParams = z.infer<typeof StockCountLineReviseCountParamsSchema>;
+
+// Command: close on StockCountSession
+export const StockCountSessionCloseParamsSchema = z.object({});
+
+export type StockCountSessionCloseParams = z.infer<typeof StockCountSessionCloseParamsSchema>;
+
+// Command: start on StockCountSession
+export const StockCountSessionStartParamsSchema = z.object({
+  label: z.string(),
+  locationIds: z.string(),
+  locationNames: z.string(),
+  lineCount: z.number(),
+});
+
+export type StockCountSessionStartParams = z.infer<typeof StockCountSessionStartParamsSchema>;
+
+// Command: record on StockTransfer
+export const StockTransferRecordParamsSchema = z.object({
+  sourceInventoryItemId: z.string().min(1),
+  destinationInventoryItemId: z.string().min(1),
+  ingredientId: z.string().min(1),
+  sourceLocationId: z.string().min(1),
+  destinationLocationId: z.string().min(1),
+  quantity: z.number(),
+  unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
+  notes: z.string().optional(),
+});
+
+export type StockTransferRecordParams = z.infer<typeof StockTransferRecordParamsSchema>;
 
 // Command: activate on StorageLocation
 export const StorageLocationActivateParamsSchema = z.object({});
@@ -3328,6 +4824,59 @@ export const StorageLocationReviseDetailsParamsSchema = z.object({
 
 export type StorageLocationReviseDetailsParams = z.infer<typeof StorageLocationReviseDetailsParamsSchema>;
 
+// Command: define on TaxRate
+export const TaxRateDefineParamsSchema = z.object({
+  name: z.string(),
+  percentage: z.number(),
+  appliesToFood: z.boolean(),
+  appliesToService: z.boolean(),
+  appliesToRental: z.boolean(),
+});
+
+export type TaxRateDefineParams = z.infer<typeof TaxRateDefineParamsSchema>;
+
+// Command: revise on TaxRate
+export const TaxRateReviseParamsSchema = z.object({
+  name: z.string(),
+  percentage: z.number(),
+  appliesToFood: z.boolean(),
+  appliesToService: z.boolean(),
+  appliesToRental: z.boolean(),
+});
+
+export type TaxRateReviseParams = z.infer<typeof TaxRateReviseParamsSchema>;
+
+// Command: setActive on TaxRate
+export const TaxRateSetActiveParamsSchema = z.object({
+  active: z.boolean(),
+});
+
+export type TaxRateSetActiveParams = z.infer<typeof TaxRateSetActiveParamsSchema>;
+
+// Command: approve on TimeOffRequest
+export const TimeOffRequestApproveParamsSchema = z.object({
+  responseNote: z.string().optional(),
+});
+
+export type TimeOffRequestApproveParams = z.infer<typeof TimeOffRequestApproveParamsSchema>;
+
+// Command: decline on TimeOffRequest
+export const TimeOffRequestDeclineParamsSchema = z.object({
+  responseNote: z.string().optional(),
+});
+
+export type TimeOffRequestDeclineParams = z.infer<typeof TimeOffRequestDeclineParamsSchema>;
+
+// Command: submit on TimeOffRequest
+export const TimeOffRequestSubmitParamsSchema = z.object({
+  personId: z.string().min(1),
+  startsAt: z.coerce.date(),
+  endsAt: z.coerce.date(),
+  reason: z.string(),
+});
+
+export type TimeOffRequestSubmitParams = z.infer<typeof TimeOffRequestSubmitParamsSchema>;
+
 // Command: clockIn on TimeRecord
 export const TimeRecordClockInParamsSchema = z.object({
   personId: z.string().min(1),
@@ -3355,6 +4904,69 @@ export const TimeRecordCorrectParamsSchema = z.object({
 });
 
 export type TimeRecordCorrectParams = z.infer<typeof TimeRecordCorrectParamsSchema>;
+
+// Command: record on TrainingCompletion
+export const TrainingCompletionRecordParamsSchema = z.object({
+  personId: z.string().min(1),
+  trainingModuleId: z.string().min(1),
+  completedAt: z.coerce.date(),
+  assessmentScore: z.number().int(),
+  notes: z.string().optional(),
+});
+
+export type TrainingCompletionRecordParams = z.infer<typeof TrainingCompletionRecordParamsSchema>;
+
+// Command: define on TrainingModule
+export const TrainingModuleDefineParamsSchema = z.object({
+  name: z.string(),
+  category: z.enum(["food_safety", "equipment_operation", "service_standards", "other"]),
+  passingScore: z.number().int(),
+  description: z.string().optional(),
+});
+
+export type TrainingModuleDefineParams = z.infer<typeof TrainingModuleDefineParamsSchema>;
+
+// Command: reactivate on TrainingModule
+export const TrainingModuleReactivateParamsSchema = z.object({});
+
+export type TrainingModuleReactivateParams = z.infer<typeof TrainingModuleReactivateParamsSchema>;
+
+// Command: retire on TrainingModule
+export const TrainingModuleRetireParamsSchema = z.object({});
+
+export type TrainingModuleRetireParams = z.infer<typeof TrainingModuleRetireParamsSchema>;
+
+// Command: register on Vehicle
+export const VehicleRegisterParamsSchema = z.object({
+  make: z.string(),
+  model: z.string(),
+  registration: z.string(),
+  ownership: z.enum(["owned", "leased"]),
+  payloadCapacityKg: z.number().int(),
+  operationalStatus: z.enum(["available", "in_use", "maintenance", "out_of_service", "retired"]),
+  statusNote: z.string().optional(),
+});
+
+export type VehicleRegisterParams = z.infer<typeof VehicleRegisterParamsSchema>;
+
+// Command: reviseDetails on Vehicle
+export const VehicleReviseDetailsParamsSchema = z.object({
+  make: z.string(),
+  model: z.string(),
+  registration: z.string(),
+  ownership: z.enum(["owned", "leased"]),
+  payloadCapacityKg: z.number().int(),
+});
+
+export type VehicleReviseDetailsParams = z.infer<typeof VehicleReviseDetailsParamsSchema>;
+
+// Command: updateOperationalStatus on Vehicle
+export const VehicleUpdateOperationalStatusParamsSchema = z.object({
+  operationalStatus: z.enum(["available", "in_use", "maintenance", "out_of_service", "retired"]),
+  statusNote: z.string().optional(),
+});
+
+export type VehicleUpdateOperationalStatusParams = z.infer<typeof VehicleUpdateOperationalStatusParamsSchema>;
 
 // Command: onboard on Vendor
 export const VendorOnboardParamsSchema = z.object({
@@ -3407,6 +5019,113 @@ export const VendorUpdateDetailsParamsSchema = z.object({
 
 export type VendorUpdateDetailsParams = z.infer<typeof VendorUpdateDetailsParamsSchema>;
 
+// Command: add on VendorContact
+export const VendorContactAddParamsSchema = z.object({
+  vendorId: z.string().min(1),
+  name: z.string(),
+  role: z.enum(["account_rep", "dispatch", "billing", "general"]).optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type VendorContactAddParams = z.infer<typeof VendorContactAddParamsSchema>;
+
+// Command: remove on VendorContact
+export const VendorContactRemoveParamsSchema = z.object({});
+
+export type VendorContactRemoveParams = z.infer<typeof VendorContactRemoveParamsSchema>;
+
+// Command: update on VendorContact
+export const VendorContactUpdateParamsSchema = z.object({
+  name: z.string(),
+  role: z.enum(["account_rep", "dispatch", "billing", "general"]).optional(),
+  email: z.string().optional(),
+  phone: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type VendorContactUpdateParams = z.infer<typeof VendorContactUpdateParamsSchema>;
+
+// Command: activate on VendorContract
+export const VendorContractActivateParamsSchema = z.object({});
+
+export type VendorContractActivateParams = z.infer<typeof VendorContractActivateParamsSchema>;
+
+// Command: draft on VendorContract
+export const VendorContractDraftParamsSchema = z.object({
+  vendorId: z.string().min(1),
+  title: z.string(),
+  startsAt: z.coerce.date(),
+  endsAt: z.coerce.date(),
+  contractNumber: z.string().optional(),
+  paymentTermsDays: z.number().optional(),
+  deliveryLeadTimeDays: z.number().optional(),
+  documentUrl: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type VendorContractDraftParams = z.infer<typeof VendorContractDraftParamsSchema>;
+
+// Command: markExpired on VendorContract
+export const VendorContractMarkExpiredParamsSchema = z.object({});
+
+export type VendorContractMarkExpiredParams = z.infer<typeof VendorContractMarkExpiredParamsSchema>;
+
+// Command: terminate on VendorContract
+export const VendorContractTerminateParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type VendorContractTerminateParams = z.infer<typeof VendorContractTerminateParamsSchema>;
+
+// Command: updateTerms on VendorContract
+export const VendorContractUpdateTermsParamsSchema = z.object({
+  title: z.string(),
+  startsAt: z.coerce.date(),
+  endsAt: z.coerce.date(),
+  contractNumber: z.string().optional(),
+  paymentTermsDays: z.number().optional(),
+  deliveryLeadTimeDays: z.number().optional(),
+  documentUrl: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type VendorContractUpdateTermsParams = z.infer<typeof VendorContractUpdateTermsParamsSchema>;
+
+// Command: add on VendorContractPriceTier
+export const VendorContractPriceTierAddParamsSchema = z.object({
+  contractId: z.string().min(1),
+  itemName: z.string(),
+  unitPrice: z.number(),
+  unit: z.string().optional(),
+  minQuantity: z.number().optional(),
+  notes: z.string().optional(),
+});
+
+export type VendorContractPriceTierAddParams = z.infer<typeof VendorContractPriceTierAddParamsSchema>;
+
+// Command: remove on VendorContractPriceTier
+export const VendorContractPriceTierRemoveParamsSchema = z.object({});
+
+export type VendorContractPriceTierRemoveParams = z.infer<typeof VendorContractPriceTierRemoveParamsSchema>;
+
+// Command: update on VendorContractPriceTier
+export const VendorContractPriceTierUpdateParamsSchema = z.object({
+  itemName: z.string(),
+  unitPrice: z.number(),
+  unit: z.string().optional(),
+  minQuantity: z.number().optional(),
+  notes: z.string().optional(),
+});
+
+export type VendorContractPriceTierUpdateParams = z.infer<typeof VendorContractPriceTierUpdateParamsSchema>;
+
+// Command: approve on VendorOrder
+export const VendorOrderApproveParamsSchema = z.object({});
+
+export type VendorOrderApproveParams = z.infer<typeof VendorOrderApproveParamsSchema>;
+
 // Command: cancel on VendorOrder
 export const VendorOrderCancelParamsSchema = z.object({
   reason: z.string(),
@@ -3455,10 +5174,22 @@ export const VendorOrderOpenParamsSchema = z.object({
 
 export type VendorOrderOpenParams = z.infer<typeof VendorOrderOpenParamsSchema>;
 
+// Command: requestChanges on VendorOrder
+export const VendorOrderRequestChangesParamsSchema = z.object({
+  notes: z.string(),
+});
+
+export type VendorOrderRequestChangesParams = z.infer<typeof VendorOrderRequestChangesParamsSchema>;
+
 // Command: submit on VendorOrder
 export const VendorOrderSubmitParamsSchema = z.object({});
 
 export type VendorOrderSubmitParams = z.infer<typeof VendorOrderSubmitParamsSchema>;
+
+// Command: submitForApproval on VendorOrder
+export const VendorOrderSubmitForApprovalParamsSchema = z.object({});
+
+export type VendorOrderSubmitForApprovalParams = z.infer<typeof VendorOrderSubmitForApprovalParamsSchema>;
 
 // Command: updateTotals on VendorOrder
 export const VendorOrderUpdateTotalsParamsSchema = z.object({
@@ -3508,6 +5239,8 @@ export type VendorOrderLineEnsureWeeklyLineParams = z.infer<typeof VendorOrderLi
 export const VendorOrderLineRecordReceiptParamsSchema = z.object({
   quantity: z.number(),
   locationId: z.string().min(1),
+  unitPrice: z.number(),
+  supplierLotNumber: z.string(),
   discrepancyQuantity: z.number().optional(),
   discrepancyNotes: z.string().optional(),
 });
@@ -3611,7 +5344,7 @@ export const WasteRecordRecordParamsSchema = z.object({
   locationId: z.string().min(1),
   quantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
-  reason: z.enum(["spoilage", "prep_error", "overproduction", "other"]),
+  reason: z.enum(["spoilage", "prep_error", "overproduction", "dropped", "date_expired", "quality_reject", "other"]),
   eventId: z.string().min(1).optional(),
   inventoryItemId: z.string().min(1).optional(),
   unitCost: z.number().optional(),
@@ -3643,6 +5376,40 @@ export const WeeklyPurchasingConfigRouteNeedParamsSchema = z.object({
   requiredQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion"]),
   purchasingWeekStart: z.coerce.date(),
+  preferredVendorId: z.string().min(1).optional(),
 });
 
 export type WeeklyPurchasingConfigRouteNeedParams = z.infer<typeof WeeklyPurchasingConfigRouteNeedParamsSchema>;
+
+// Command: setOrderApprovalThreshold on WeeklyPurchasingConfig
+export const WeeklyPurchasingConfigSetOrderApprovalThresholdParamsSchema = z.object({
+  amount: z.number().optional(),
+});
+
+export type WeeklyPurchasingConfigSetOrderApprovalThresholdParams = z.infer<typeof WeeklyPurchasingConfigSetOrderApprovalThresholdParamsSchema>;
+
+// Command: acknowledge on WeeklyScheduleNotice
+export const WeeklyScheduleNoticeAcknowledgeParamsSchema = z.object({});
+
+export type WeeklyScheduleNoticeAcknowledgeParams = z.infer<typeof WeeklyScheduleNoticeAcknowledgeParamsSchema>;
+
+// Command: publishSchedule on WeeklyScheduleNotice
+export const WeeklyScheduleNoticePublishScheduleParamsSchema = z.object({
+  personId: z.string().min(1),
+  recipientAuthSubjectId: z.string().optional(),
+  weekStartsAt: z.coerce.date(),
+  weekEndsAt: z.coerce.date(),
+  shiftCount: z.number().int(),
+  shiftSummary: z.string(),
+});
+
+export type WeeklyScheduleNoticePublishScheduleParams = z.infer<typeof WeeklyScheduleNoticePublishScheduleParamsSchema>;
+
+// Command: republishSchedule on WeeklyScheduleNotice
+export const WeeklyScheduleNoticeRepublishScheduleParamsSchema = z.object({
+  recipientAuthSubjectId: z.string().optional(),
+  shiftCount: z.number().int(),
+  shiftSummary: z.string(),
+});
+
+export type WeeklyScheduleNoticeRepublishScheduleParams = z.infer<typeof WeeklyScheduleNoticeRepublishScheduleParamsSchema>;

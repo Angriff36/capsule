@@ -76,9 +76,9 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
   transition status from "draft" to ["finalized"]
   transition status from "finalized" to []
 
-  default policy eventCloseoutRead read: roleAllows(user.role, "financeAccess") "Finance staff may read event closeouts"
-  default policy eventCloseoutWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write event closeouts through commands"
-  default policy eventCloseoutExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute event closeout commands"
+  default policy eventCloseoutRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventManageAccess") "Finance staff and event coordinators may read event closeouts"
+  default policy eventCloseoutWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventManageAccess") "Finance staff and event coordinators may write event closeouts through commands"
+  default policy eventCloseoutExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventManageAccess") "Finance staff and event coordinators may execute event closeout commands"
 
   command capture(
     eventId: uuid,

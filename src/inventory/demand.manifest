@@ -18,6 +18,9 @@ enum WasteReason {
   spoilage
   prep_error
   overproduction
+  dropped
+  date_expired
+  quality_reject
   other
 }
 
@@ -43,6 +46,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
 
   property required eventId: uuid
   property required ingredientId: uuid
+  property preferredVendorId: uuid?
   property required requiredQuantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
   property servings: decimal(12, 4)?
@@ -97,6 +101,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     compute previousStatus = self.status
     mutate eventId = eventId
     mutate ingredientId = ingredientId
+    mutate preferredVendorId = self.ingredient.preferredVendorId
     mutate requiredQuantity = nextQuantity
     mutate unit = unit
     mutate purchasingWeekStart = purchasingWeekStart != null ? purchasingWeekStart : self.purchasingWeekStart
@@ -140,6 +145,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     constraint calculateYieldPositive: sourceYieldQuantity == null or sourceYieldQuantity > 0 "Source yield quantity must be positive when provided"
     mutate eventId = eventId
     mutate ingredientId = ingredientId
+    mutate preferredVendorId = self.ingredient.preferredVendorId
     mutate requiredQuantity = requiredQuantity
     mutate unit = unit
     mutate servings = servings != null ? servings : self.servings
@@ -171,11 +177,13 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     mutate status = "confirmed"
     mutate confirmedAt = now()
     mutate purchaseEligibleEventId = null
+    mutate preferredVendorId = self.ingredient.preferredVendorId
     emit IngredientDemandConfirmed {
       ingredientDemandId: self.id
       tenantId: self.tenantId
       eventId: self.eventId
       ingredientId: self.ingredientId
+      preferredVendorId: self.preferredVendorId
       requiredQuantity: self.requiredQuantity
       unit: self.unit
     }
@@ -207,6 +215,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   command ensurePurchaseEligible() {
     guard self.deletedAt == null
     mutate purchaseEligibleEventId = (self.status == "calculated" and self.purchaseEligibleEventId == null) ? self.eventId : self.purchaseEligibleEventId
+    mutate preferredVendorId = self.ingredient.preferredVendorId
   }
 
   command recalculate(newQuantity: decimal(12, 4), reason: string) {
@@ -400,6 +409,7 @@ event IngredientDemandConfirmed: "ingredient_demand.confirmed" {
   tenantId: string
   eventId: string
   ingredientId: string
+  preferredVendorId: string?
   requiredQuantity: decimal(12, 4)
   unit: UnitOfMeasure
 }

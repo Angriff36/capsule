@@ -1,20 +1,27 @@
 import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import {
   useCreateVendorOrderLine,
   useGetVendorOrder,
   useListEvent,
   useListIngredient,
+  useListInventoryLot,
   useListPurchaseNeed,
   useListStorageLocation,
   useListVendor,
+  useListVendorContact,
   useListVendorOrderLine,
+  useListWeeklyPurchasingConfig,
+  useVendorOrderApprove,
   useVendorOrderCancel,
   useVendorOrderConfirm,
   useVendorOrderLineRecordReceipt,
   useVendorOrderMarkPartiallyReceived,
   useVendorOrderMarkReceived,
+  useVendorOrderRequestChanges,
   useVendorOrderSubmit,
+  useVendorOrderSubmitForApproval,
   useVendorOrderUpdateTotals,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
@@ -24,6 +31,7 @@ import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
+import { vendorContactRoleLabel } from "./vendorContactRoles";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -31,13 +39,19 @@ export function VendorOrderPage() {
   const { id } = useParams();
   const order = useGetVendorOrder(id || "skip");
   const vendors = useListVendor();
+  const vendorContacts = useListVendorContact();
   const lines = useListVendorOrderLine();
   const needs = useListPurchaseNeed();
   const events = useListEvent();
   const ingredients = useListIngredient();
+  const inventoryLots = useListInventoryLot();
   const locations = useListStorageLocation();
   const createLine = useCreateVendorOrderLine();
+  const purchasingConfigs = useListWeeklyPurchasingConfig();
   const submitOrder = useVendorOrderSubmit();
+  const submitForApproval = useVendorOrderSubmitForApproval();
+  const approveOrder = useVendorOrderApprove();
+  const requestChanges = useVendorOrderRequestChanges();
   const confirmOrder = useVendorOrderConfirm();
   const markPartial = useVendorOrderMarkPartiallyReceived();
   const markReceived = useVendorOrderMarkReceived();
@@ -86,6 +100,10 @@ export function VendorOrderPage() {
     (need) => need.deletedAt == null && need.status === "open",
   );
   const vendor = vendors?.find((item) => item._id === order.vendorId);
+  const orderContacts = (vendorContacts ?? []).filter(
+    (contact) =>
+      contact.deletedAt == null && contact.vendorId === order.vendorId,
+  );
   const ingredientName = (ingredientId: string) =>
     ingredients?.find((item) => item._id === ingredientId)?.name ??
     "Unknown ingredient";
@@ -93,6 +111,26 @@ export function VendorOrderPage() {
     events?.find((item) => item._id === eventId)?.title ?? "Unknown event";
   const locationName = (locationId?: string | null) =>
     locations?.find((item) => item._id === locationId)?.name ?? "Unassigned";
+
+  // Spend-approval gate: over-threshold drafts route to a manager instead of
+  // submitting directly. The server enforces the same rule on submit.
+  const approvalThreshold =
+    (purchasingConfigs ?? []).find((config) => config.deletedAt == null)
+      ?.orderApprovalThresholdAmount ?? null;
+  const needsApproval =
+    approvalThreshold != null &&
+    Number(order.totalAmount) > Number(approvalThreshold);
+  const orderActions = policy
+    .orderActions(String(order.status))
+    .filter((action) => {
+      if (action.key === "submit") return !needsApproval;
+      if (action.key === "submitForApproval") return needsApproval;
+      // approve/requestChanges share the draft→submitted / →draft transitions
+      // in the generated lifecycle; they only make sense while pending.
+      if (action.key === "approve" || action.key === "requestChanges")
+        return String(order.status) === "pending_approval";
+      return true;
+    });
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -143,6 +181,8 @@ export function VendorOrderPage() {
         version: line.version,
         quantity: Number(data.get("quantity")),
         locationId: String(data.get("locationId")),
+        unitPrice: Number(data.get("unitPrice")),
+        supplierLotNumber: String(data.get("supplierLotNumber") ?? "").trim(),
         discrepancyQuantity: discrepancy ? Number(discrepancy) : undefined,
         discrepancyNotes:
           String(data.get("discrepancyNotes") ?? "").trim() || undefined,
@@ -168,9 +208,23 @@ export function VendorOrderPage() {
         });
         return;
       }
+      if (key === "requestChanges") {
+        const notes = await prompt.askReason(ReasonCopy.requestOrderChanges);
+        if (!notes) return;
+        void run(`order:${key}`, async () => {
+          await requestChanges({
+            docId: order._id,
+            version: order.version,
+            notes,
+          });
+        });
+        return;
+      }
       void run(`order:${key}`, async () => {
         const args = { docId: order._id, version: order.version };
         if (key === "submit") await submitOrder(args);
+        if (key === "submitForApproval") await submitForApproval(args);
+        if (key === "approve") await approveOrder(args);
         if (key === "confirm") await confirmOrder(args);
         if (key === "markPartiallyReceived") await markPartial(args);
         if (key === "markReceived") await markReceived(args);
@@ -266,9 +320,58 @@ export function VendorOrderPage() {
       {failure ? <SupplyFailureBanner error={failure} /> : null}
       {host}
 
+      {orderContacts.length > 0 ? (
+        <aside className="supply-degraded" role="note">
+          <strong>
+            Vendor contacts — who to call about lead time or substitutions
+          </strong>
+          {orderContacts.map((contact) => (
+            <span key={contact._id}>
+              {vendorContactRoleLabel(String(contact.role))} · {contact.name}
+              {contact.phone ? (
+                <>
+                  {" · "}
+                  <a className="text-link" href={`tel:${contact.phone}`}>
+                    {contact.phone}
+                  </a>
+                </>
+              ) : null}
+              {contact.email ? (
+                <>
+                  {" · "}
+                  <a className="text-link" href={`mailto:${contact.email}`}>
+                    {contact.email}
+                  </a>
+                </>
+              ) : null}
+            </span>
+          ))}
+        </aside>
+      ) : null}
+
+      {String(order.status) === "pending_approval" ? (
+        <aside className="supply-degraded" role="note">
+          <strong>Awaiting manager approval before it is sent</strong>
+          <span>
+            This order total (${Number(order.totalAmount).toFixed(2)}) is above
+            the spend approval threshold
+            {approvalThreshold != null
+              ? ` of $${Number(approvalThreshold).toFixed(2)}`
+              : ""}
+            . A manager can approve it in one click or request modifications.
+          </span>
+        </aside>
+      ) : null}
+      {String(order.status) === "draft" && order.approvalNotes ? (
+        <aside className="supply-degraded" role="note">
+          <strong>Changes requested by a manager</strong>
+          <span>{order.approvalNotes}</span>
+        </aside>
+      ) : null}
+
       <section className="order-controls">
         <div className="supply-row-actions">
-          {policy.orderActions(String(order.status)).map((action) => (
+          {orderActions.map((action) => (
             <button
               key={action.key}
               className="btn btn-ghost"
@@ -377,6 +480,7 @@ export function VendorOrderPage() {
         needs === undefined ||
         events === undefined ||
         ingredients === undefined ||
+        inventoryLots === undefined ||
         locations === undefined ? (
           <TableSkeleton rows={6} />
         ) : orderLines.length === 0 ? (
@@ -393,6 +497,17 @@ export function VendorOrderPage() {
                 (item) =>
                   item.deletedAt == null && item.vendorOrderLineId === line._id,
               );
+              const lineLots = inventoryLots
+                .filter(
+                  (item) =>
+                    item.deletedAt == null &&
+                    item.vendorOrderLineId === line._id,
+                )
+                .sort(
+                  (left, right) =>
+                    Number(right.receivedAt ?? 0) -
+                    Number(left.receivedAt ?? 0),
+                );
               return (
                 <li key={line._id}>
                   <div className="order-line-summary">
@@ -415,6 +530,12 @@ export function VendorOrderPage() {
                         {line.receivedQuantity} / {line.orderedQuantity}
                       </strong>
                       <span>{line.unit} received</span>
+                      <small>
+                        ${Number(line.unitCost).toFixed(2)} / {line.unit} ·{" "}
+                        {Number(line.receivedQuantity) > 0
+                          ? "latest receipt"
+                          : "order estimate"}
+                      </small>
                     </div>
                     <div>
                       <StatusChip status={String(line.status)} />
@@ -432,6 +553,25 @@ export function VendorOrderPage() {
                       Record receipt
                     </button>
                   </div>
+                  {lineLots.length > 0 ? (
+                    <div
+                      className="receipt-lot-history"
+                      aria-label="Receipt lot history"
+                    >
+                      <span>Supplier lots</span>
+                      <ul>
+                        {lineLots.map((lot) => (
+                          <li key={lot._id}>
+                            <strong>{lot.supplierLotNumber}</strong>
+                            <span>
+                              {lot.receiptQuantity} {lot.unit} · PO line{" "}
+                              {line._id.slice(-8)}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : null}
                   {receivingLineId === line._id ? (
                     <form
                       className="receipt-form"
@@ -471,6 +611,27 @@ export function VendorOrderPage() {
                         </select>
                       </label>
                       <label className="field-label">
+                        Confirmed unit price
+                        <input
+                          name="unitPrice"
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          defaultValue={Number(line.unitCost)}
+                          className="input"
+                          required
+                        />
+                      </label>
+                      <label className="field-label">
+                        Supplier lot number
+                        <input
+                          name="supplierLotNumber"
+                          className="input"
+                          autoComplete="off"
+                          required
+                        />
+                      </label>
+                      <label className="field-label">
                         Discrepancy quantity
                         <input
                           name="discrepancyQuantity"
@@ -500,6 +661,8 @@ export function VendorOrderPage() {
           </ul>
         )}
       </section>
+
+      <AttachmentsSection parentType="vendor" parentId={order.vendorId} />
     </div>
   );
 }

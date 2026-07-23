@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant WeeklyPurchasingConfig as WeeklyPurchasingConfig
     participant EventBus
-    Client->>+WeeklyPurchasingConfig: routeNeed(purchaseNeedId, eventId, ingredientDemandId, ingredientId, requiredQuantity, unit, purchasingWeekStart)
+    Client->>+WeeklyPurchasingConfig: routeNeed(purchaseNeedId, eventId, ingredientDemandId, ingredientId, requiredQuantity, unit, purchasingWeekStart, preferredVendorId)
     Note over WeeklyPurchasingConfig: Policies: weeklyPurchasingConfigRead, weeklyPurchasingConfigWrite, weeklyPurchasingConfigExecute
     Note over WeeklyPurchasingConfig: Guards (2)
     WeeklyPurchasingConfig->>WeeklyPurchasingConfig: guard[0]: self.configuredAt != null

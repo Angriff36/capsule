@@ -11,13 +11,16 @@ import {
   useProposalSend,
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
 import { eventCreatePath } from "../events/eventRoutes";
+import { useTenantBranding } from "../admin/tenantBranding";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
+import { downloadProposalPdf } from "./proposalPdf";
 
 const policy = new CrmLifecyclePolicy();
 
@@ -26,7 +29,26 @@ const money = (value: FormDataEntryValue | null) => {
   return Number.isFinite(amount) ? amount : Number.NaN;
 };
 
+const dateValue = (value: FormDataEntryValue | null, endOfDay = false) => {
+  const raw = String(value ?? "").trim();
+  if (!raw) return undefined;
+  const timestamp = new Date(
+    `${raw}T${endOfDay ? "23:59:59.999" : "12:00:00.000"}`,
+  ).getTime();
+  return Number.isNaN(timestamp) ? undefined : timestamp;
+};
+
+const defaultValidityDate = () => {
+  const date = new Date();
+  date.setDate(date.getDate() + 14);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export function ProposalsPage() {
+  const { branding } = useTenantBranding();
   const proposals = useListProposal();
   const clients = useListClient();
   const createProposal = useCreateProposal();
@@ -41,6 +63,7 @@ export function ProposalsPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
+  const draftForm = useFormDraft("proposal");
 
   const activeClients = (clients ?? []).filter(
     (row) =>
@@ -100,11 +123,17 @@ export function ProposalsPage() {
         discountAmount,
         total,
         guestCount: Number(data.get("guestCount") || 0) || 0,
+        eventDate: dateValue(data.get("eventDate")),
         eventType: String(data.get("eventType") || "").trim() || undefined,
         venueName: String(data.get("venueName") || "").trim() || undefined,
+        venueAddress:
+          String(data.get("venueAddress") || "").trim() || undefined,
+        expiresAt: dateValue(data.get("expiresAt"), true),
         notes: String(data.get("notes") || "").trim() || undefined,
+        terms: String(data.get("terms") || "").trim() || undefined,
       });
       form.reset();
+      draftForm.clear();
       setShowDraft(false);
       setNotice("Proposal drafted. Send it when ready for the client.");
     });
@@ -195,13 +224,22 @@ export function ProposalsPage() {
       {host}
 
       {showDraft ? (
-        <form className="supply-form" onSubmit={submitDraft}>
+        <form
+          className="supply-form"
+          onSubmit={submitDraft}
+          ref={draftForm.formRef}
+        >
           <div className="supply-form-heading">
             <div>
               <p className="eyebrow">Draft</p>
               <h2>New proposal</h2>
             </div>
           </div>
+          <DraftRestoreBanner
+            draft={draftForm.draft}
+            onRestore={draftForm.restore}
+            onDiscard={draftForm.discard}
+          />
           {activeClients.length === 0 ? (
             <p className="text-[13px] text-ink-2">
               No active clients.{" "}
@@ -243,8 +281,16 @@ export function ProposalsPage() {
                 <input name="eventType" />
               </label>
               <label>
+                Event date
+                <input name="eventDate" type="date" />
+              </label>
+              <label>
                 Venue name
                 <input name="venueName" />
+              </label>
+              <label>
+                Venue address
+                <input name="venueAddress" />
               </label>
               <label>
                 Subtotal
@@ -279,8 +325,28 @@ export function ProposalsPage() {
                 />
               </label>
               <label>
-                Notes
-                <textarea name="notes" rows={2} />
+                Proposed menu
+                <textarea
+                  name="notes"
+                  rows={4}
+                  placeholder="List menu items, one per line"
+                />
+              </label>
+              <label>
+                Valid through
+                <input
+                  name="expiresAt"
+                  type="date"
+                  defaultValue={defaultValidityDate()}
+                />
+              </label>
+              <label>
+                Terms
+                <textarea
+                  name="terms"
+                  rows={3}
+                  placeholder="Deposit, service, cancellation, or other terms"
+                />
               </label>
               <button
                 className="btn btn-primary"
@@ -329,6 +395,22 @@ export function ProposalsPage() {
                     <StatusChip status={String(row.status)} />
                   </td>
                   <td className="supply-row-actions">
+                    <button
+                      className="btn btn-ghost"
+                      type="button"
+                      disabled={busy != null}
+                      onClick={() => {
+                        void downloadProposalPdf({
+                          proposal: row,
+                          clientName: clientDisplayName(row.clientId, clients),
+                          branding,
+                        })
+                          .then(() => setNotice("Proposal PDF downloaded."))
+                          .catch((error) => setFailure(error));
+                      }}
+                    >
+                      Download PDF
+                    </button>
                     {policy
                       .proposalActions(String(row.status))
                       .map((action) => (

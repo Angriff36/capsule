@@ -1,0 +1,147 @@
+import { useMutation, useQuery } from "convex/react";
+import { useRef, useState } from "react";
+import { api } from "../../lib/api";
+import {
+  useAttachmentRemove,
+  useCreateAttachment,
+} from "../../lib/manifest-convex-react";
+
+export type AttachmentParentType =
+  "eventRecord" | "client" | "contract" | "vendor" | "delivery" | "closeout";
+
+function formatSize(bytes: number): string {
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  if (bytes >= 1024) return `${Math.round(bytes / 1024)} KB`;
+  return `${bytes} B`;
+}
+
+/** File attachments (PDFs, images, spreadsheets) for one parent record. */
+export function AttachmentsSection({
+  parentType,
+  parentId,
+}: {
+  parentType: AttachmentParentType;
+  parentId: string;
+}) {
+  const attachments = useQuery(api.fileStorage.listForParent, {
+    parentType,
+    parentId,
+  });
+  const generateUploadUrl = useMutation(api.fileStorage.generateUploadUrl);
+  const createAttachment = useCreateAttachment();
+  const removeAttachment = useAttachmentRemove();
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function upload(file: File) {
+    setBusy(true);
+    setError(null);
+    try {
+      const uploadUrl = await generateUploadUrl();
+      const response = await fetch(uploadUrl, {
+        method: "POST",
+        headers: { "Content-Type": file.type || "application/octet-stream" },
+        body: file,
+      });
+      if (!response.ok) throw new Error(`Upload failed (${response.status})`);
+      const { storageId } = (await response.json()) as { storageId: string };
+      await createAttachment({
+        parentType,
+        parentId,
+        fileName: file.name,
+        contentType: file.type || "application/octet-stream",
+        fileSize: file.size,
+        storageId,
+      });
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Upload failed");
+    } finally {
+      setBusy(false);
+      if (fileInput.current) fileInput.current.value = "";
+    }
+  }
+
+  return (
+    <section className="working-ledger" data-testid="attachments-section">
+      <div className="ledger-heading">
+        <div>
+          <p className="eyebrow">Documents</p>
+          <h2 className="text-lg font-semibold">Attachments</h2>
+        </div>
+        <div>
+          <input
+            ref={fileInput}
+            type="file"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) void upload(file);
+            }}
+          />
+          <button
+            type="button"
+            className="btn btn-ghost"
+            disabled={busy}
+            onClick={() => fileInput.current?.click()}
+          >
+            {busy ? "Uploading…" : "Attach file"}
+          </button>
+        </div>
+      </div>
+      {error ? (
+        <p className="mt-2 text-[13px] text-red-600" role="alert">
+          {error}
+        </p>
+      ) : null}
+      {attachments === undefined ? (
+        <p className="mt-3 text-[13px] text-ink-2">Loading attachments…</p>
+      ) : attachments.length === 0 ? (
+        <p className="mt-3 text-[13px] text-ink-2">No files attached yet.</p>
+      ) : (
+        <ul className="mt-3 divide-y">
+          {attachments.map((row) => (
+            <li
+              key={row._id}
+              className="flex items-center justify-between gap-3 py-2"
+            >
+              <div className="min-w-0">
+                {row.url ? (
+                  <a
+                    className="text-link text-[13px]"
+                    href={row.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {row.fileName}
+                  </a>
+                ) : (
+                  <span className="text-[13px]">{row.fileName}</span>
+                )}
+                <p className="text-[12px] text-ink-2">
+                  {formatSize(row.fileSize)}
+                  {row.uploadedAt
+                    ? ` · ${new Date(row.uploadedAt).toLocaleString()}`
+                    : ""}
+                  {row.uploadedById ? ` · uploaded by ${row.uploadedById}` : ""}
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={() =>
+                  void removeAttachment({
+                    docId: row._id,
+                    version: row.version,
+                  })
+                }
+              >
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
+  );
+}

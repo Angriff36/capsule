@@ -9,14 +9,24 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   const client = new ConvexHttpClient(deploymentUrl);
   void PACK_ID;
   void PACK_VERSION;
+  // skip Attachment: no create command in IR (2 rows unused)
   // skip AvailabilityWindow: no create command in IR (2 rows unused)
   // skip Client: no create command in IR (2 rows unused)
+  // skip ClientCommunication: no create command in IR (2 rows unused)
   // skip ClientContact: no create command in IR (2 rows unused)
+  // skip ClientMerge: no create command in IR (2 rows unused)
   // skip Contract: no create command in IR (2 rows unused)
+  // skip CorrectiveAction: no create command in IR (2 rows unused)
+  // skip CreditMemo: no create command in IR (2 rows unused)
   // skip Delivery: no create command in IR (2 rows unused)
   // skip Dish: no create command in IR (2 rows unused)
   // skip DishRecipe: no create command in IR (2 rows unused)
   // skip DishTask: no create command in IR (2 rows unused)
+  // skip EmailNotificationSubscription: no create command in IR (2 rows unused)
+  // skip Equipment: no create command in IR (2 rows unused)
+  // skip EquipmentMaintenanceTask: no create command in IR (2 rows unused)
+  // skip EquipmentReservation: no create command in IR (2 rows unused)
+  // skip EquipmentServiceEntry: no create command in IR (2 rows unused)
   // skip Event: no create command in IR (2 rows unused)
   // skip EventAllergenCheck: no create command in IR (2 rows unused)
   // skip EventAssignment: no create command in IR (2 rows unused)
@@ -25,12 +35,17 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip EventDishRecipeSeed: no create command in IR (2 rows unused)
   // skip EventGuest: no create command in IR (2 rows unused)
   // skip EventIngredientContribution: no create command in IR (2 rows unused)
+  // skip EventTemplate: no create command in IR (2 rows unused)
+  // skip EventTimelineActivity: no create command in IR (2 rows unused)
   // skip Incident: no create command in IR (2 rows unused)
   // skip Ingredient: no create command in IR (2 rows unused)
   // skip IngredientDemand: no create command in IR (2 rows unused)
+  // skip IngredientPriceObservation: no create command in IR (2 rows unused)
   // skip InventoryItem: no create command in IR (2 rows unused)
+  // skip InventoryLot: no create command in IR (2 rows unused)
   // skip InventoryReservation: no create command in IR (2 rows unused)
   // skip Invoice: no create command in IR (2 rows unused)
+  // skip Lead: no create command in IR (2 rows unused)
   // skip Menu: no create command in IR (2 rows unused)
   // skip MenuDish: no create command in IR (2 rows unused)
   // skip Organization: no create command in IR (2 rows unused)
@@ -42,11 +57,12 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip PayrollInput: no create command in IR (2 rows unused)
   // skip Person: no create command in IR (2 rows unused)
   // skip PrepTask: no create command in IR (2 rows unused)
+  // skip PrepTaskDependency: no create command in IR (2 rows unused)
   // skip ProductionBatch: no create command in IR (2 rows unused)
   // skip Proposal: no create command in IR (2 rows unused)
   // PurchaseNeed → api.mutations.PurchaseNeed_create
-  await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-1", "ingredientDemandId": "ingredientDemandId-purchase-need-1", "ingredientId": "ingredientId-purchase-need-1", "requiredQuantity": 1, "unit": "demo-unit-1", "purchasingWeekStart": 1767268800000 } as any);
-  await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-2", "ingredientDemandId": "ingredientDemandId-purchase-need-2", "ingredientId": "ingredientId-purchase-need-2", "requiredQuantity": 2, "unit": "demo-unit-2", "purchasingWeekStart": 1767355200000 } as any);
+  await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-1", "ingredientDemandId": "ingredientDemandId-purchase-need-1", "ingredientId": "ingredientId-purchase-need-1", "preferredVendorId": "preferredVendorId-purchase-need-1", "requiredQuantity": 1, "unit": "demo-unit-1", "purchasingWeekStart": 1767268800000 } as any);
+  await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-2", "ingredientDemandId": "ingredientDemandId-purchase-need-2", "ingredientId": "ingredientId-purchase-need-2", "preferredVendorId": "preferredVendorId-purchase-need-2", "requiredQuantity": 2, "unit": "demo-unit-2", "purchasingWeekStart": 1767355200000 } as any);
   // skip Qualification: no create command in IR (2 rows unused)
   // skip QualityCheck: no create command in IR (2 rows unused)
   // skip Recipe: no create command in IR (2 rows unused)
@@ -54,25 +70,45 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip RecipeImportLine: no create command in IR (2 rows unused)
   // skip RecipeIngredient: no create command in IR (2 rows unused)
   // skip RecipeStep: no create command in IR (2 rows unused)
+  // skip RecurringAvailability: no create command in IR (2 rows unused)
   // skip SavedReportDefinition: no create command in IR (2 rows unused)
   // skip Shift: no create command in IR (2 rows unused)
+  // skip ShiftSwapRequest: no create command in IR (2 rows unused)
+  // skip ShiftType: no create command in IR (2 rows unused)
   // skip SoftDeletable: not a Convex-persistent store (2 rows unused)
+  // skip StockCountLine: no create command in IR (2 rows unused)
+  // skip StockCountSession: no create command in IR (2 rows unused)
+  // skip StockTransfer: no create command in IR (2 rows unused)
   // skip StorageLocation: no create command in IR (2 rows unused)
+  // skip TaxRate: no create command in IR (2 rows unused)
   // skip TenantScoped: not a Convex-persistent store (2 rows unused)
+  // skip TimeOffRequest: no create command in IR (2 rows unused)
   // skip TimeRecord: no create command in IR (2 rows unused)
+  // skip TrainingCompletion: no create command in IR (2 rows unused)
+  // skip TrainingModule: no create command in IR (2 rows unused)
+  // skip Vehicle: no create command in IR (2 rows unused)
   // skip Vendor: no create command in IR (2 rows unused)
+  // skip VendorContact: no create command in IR (2 rows unused)
+  // skip VendorContract: no create command in IR (2 rows unused)
+  // skip VendorContractPriceTier: no create command in IR (2 rows unused)
   // skip VendorOrder: no create command in IR (2 rows unused)
   // skip VendorOrderLine: no create command in IR (2 rows unused)
   // skip VendorOrderLineDemand: no create command in IR (2 rows unused)
   // skip Venue: no create command in IR (2 rows unused)
   // skip WasteRecord: no create command in IR (2 rows unused)
   // skip WeeklyPurchasingConfig: no create command in IR (2 rows unused)
+  // skip WeeklyScheduleNotice: no create command in IR (2 rows unused)
 }
 
 export const MANIFEST_CONVEX_SEED_BINDING = {
   "packId": "capsule",
   "version": "1.0.0",
   "entities": [
+    {
+      "entity": "Attachment",
+      "createMutation": null,
+      "rowCount": 2
+    },
     {
       "entity": "AvailabilityWindow",
       "createMutation": null,
@@ -84,12 +120,32 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "ClientCommunication",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "ClientContact",
       "createMutation": null,
       "rowCount": 2
     },
     {
+      "entity": "ClientMerge",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "Contract",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "CorrectiveAction",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "CreditMemo",
       "createMutation": null,
       "rowCount": 2
     },
@@ -110,6 +166,31 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "DishTask",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "EmailNotificationSubscription",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "Equipment",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "EquipmentMaintenanceTask",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "EquipmentReservation",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "EquipmentServiceEntry",
       "createMutation": null,
       "rowCount": 2
     },
@@ -154,6 +235,16 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "EventTemplate",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "EventTimelineActivity",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "Incident",
       "createMutation": null,
       "rowCount": 2
@@ -169,7 +260,17 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "IngredientPriceObservation",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "InventoryItem",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "InventoryLot",
       "createMutation": null,
       "rowCount": 2
     },
@@ -180,6 +281,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "Invoice",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "Lead",
       "createMutation": null,
       "rowCount": 2
     },
@@ -239,6 +345,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "PrepTaskDependency",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "ProductionBatch",
       "createMutation": null,
       "rowCount": 2
@@ -289,6 +400,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "RecurringAvailability",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "SavedReportDefinition",
       "createMutation": null,
       "rowCount": 2
@@ -299,7 +415,32 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "ShiftSwapRequest",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "ShiftType",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "SoftDeletable",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "StockCountLine",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "StockCountSession",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "StockTransfer",
       "createMutation": null,
       "rowCount": 2
     },
@@ -309,7 +450,17 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "TaxRate",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "TenantScoped",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "TimeOffRequest",
       "createMutation": null,
       "rowCount": 2
     },
@@ -319,7 +470,37 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "TrainingCompletion",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "TrainingModule",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "Vehicle",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
       "entity": "Vendor",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "VendorContact",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "VendorContract",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "VendorContractPriceTier",
       "createMutation": null,
       "rowCount": 2
     },
@@ -350,6 +531,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "WeeklyPurchasingConfig",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "WeeklyScheduleNotice",
       "createMutation": null,
       "rowCount": 2
     }

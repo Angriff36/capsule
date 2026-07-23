@@ -1,0 +1,110 @@
+// Capsule sales/billing — named tax-rate configuration.
+// Invoice line applicability is snapshotted when an invoice is issued so
+// historical remittance reports keep the rate names and amounts that applied.
+
+entity TaxRate mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property required percentage: decimal(7, 4) = 0
+  property required appliesToFood: boolean = false
+  property required appliesToService: boolean = false
+  property required appliesToRental: boolean = false
+  property required active: boolean = true
+  property configuredAt: datetime?
+
+  computed appliesToAny: boolean = self.appliesToFood or self.appliesToService or self.appliesToRental
+
+  constraint taxRateComplete: self.configuredAt == null or (length(trim(self.name)) > 0 and self.percentage > 0 and self.percentage <= 100 and (self.appliesToFood or self.appliesToService or self.appliesToRental)) "Tax rates require a name, a percentage from 0 to 100, and at least one applicability"
+
+  default policy taxRateRead read: roleAllows(user.role, "financeAccess") "Finance staff may read tax rates"
+  default policy taxRateWrite write: roleAllows(user.role, "financeAccess") "Finance staff may maintain tax rates"
+  default policy taxRateExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute tax-rate commands"
+
+  command define(
+    name: string,
+    percentage: decimal(7, 4),
+    appliesToFood: boolean,
+    appliesToService: boolean,
+    appliesToRental: boolean
+  ) {
+    guard self.configuredAt == null
+    guard self.deletedAt == null
+    constraint defineTaxRateName: length(trim(name)) > 0 "Tax rate name is required"
+    constraint defineTaxRatePercentage: percentage > 0 and percentage <= 100 "Tax rate percentage must be greater than 0 and no more than 100"
+    constraint defineTaxRateApplicability: appliesToFood or appliesToService or appliesToRental "Select at least one line-item category"
+    mutate name = name
+    mutate percentage = percentage
+    mutate appliesToFood = appliesToFood
+    mutate appliesToService = appliesToService
+    mutate appliesToRental = appliesToRental
+    mutate active = true
+    mutate configuredAt = now()
+    emit TaxRateDefined {
+      taxRateId: self.id
+      tenantId: self.tenantId
+      name: name
+      percentage: percentage
+    }
+  }
+
+  command revise(
+    name: string,
+    percentage: decimal(7, 4),
+    appliesToFood: boolean,
+    appliesToService: boolean,
+    appliesToRental: boolean
+  ) {
+    guard self.configuredAt != null
+    guard self.deletedAt == null
+    constraint reviseTaxRateName: length(trim(name)) > 0 "Tax rate name is required"
+    constraint reviseTaxRatePercentage: percentage > 0 and percentage <= 100 "Tax rate percentage must be greater than 0 and no more than 100"
+    constraint reviseTaxRateApplicability: appliesToFood or appliesToService or appliesToRental "Select at least one line-item category"
+    mutate name = name
+    mutate percentage = percentage
+    mutate appliesToFood = appliesToFood
+    mutate appliesToService = appliesToService
+    mutate appliesToRental = appliesToRental
+    emit TaxRateRevised {
+      taxRateId: self.id
+      tenantId: self.tenantId
+      name: name
+      percentage: percentage
+    }
+  }
+
+  command setActive(active: boolean) {
+    guard self.configuredAt != null
+    guard self.deletedAt == null
+    mutate active = active
+    emit TaxRateActivationChanged {
+      taxRateId: self.id
+      tenantId: self.tenantId
+      active: active
+    }
+  }
+
+  store TaxRate in durable
+}
+
+event TaxRateDefined: "tax_rate.defined" {
+  taxRateId: string
+  tenantId: string
+  name: string
+  percentage: decimal(7, 4)
+}
+
+event TaxRateRevised: "tax_rate.revised" {
+  taxRateId: string
+  tenantId: string
+  name: string
+  percentage: decimal(7, 4)
+}
+
+event TaxRateActivationChanged: "tax_rate.activation_changed" {
+  taxRateId: string
+  tenantId: string
+  active: boolean
+}

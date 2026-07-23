@@ -12,6 +12,7 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
   property required menuId: uuid
   property required dishId: uuid
   property required sortOrder: int = 0
+  property sellingPrice: money(12, 2)?
   property course: string?
   property serviceStyle: string?
   property specialInstructions: string?
@@ -29,6 +30,7 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
     menuId: uuid,
     dishId: uuid,
     optional sortOrder: number,
+    optional sellingPrice: money(12, 2),
     optional course: string,
     optional serviceStyle: string,
     optional specialInstructions: string
@@ -37,9 +39,11 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.menu != null and self.menu.status == "draft"
     constraint addMenuMatch: menuId == self.menuId "Add menuId must match the seeded menu reference"
+    constraint addSellingPriceNonnegative: sellingPrice == null or sellingPrice >= 0 "Menu dish selling price cannot be negative"
     mutate menuId = menuId
     mutate dishId = dishId
     mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate sellingPrice = sellingPrice
     mutate course = course
     mutate serviceStyle = serviceStyle
     mutate specialInstructions = specialInstructions
@@ -50,6 +54,7 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
       menuId: menuId
       dishId: dishId
       sortOrder: sortOrder != null ? sortOrder : 0
+      sellingPrice: sellingPrice
       course: course
       serviceStyle: serviceStyle
     }
@@ -79,6 +84,24 @@ entity MenuDish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command updateSellingPrice(sellingPrice: money(12, 2)) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.menu != null and (self.menu.status == "draft" or self.menu.status == "published")
+    guard roleAllows(user.role, "kitchenManageAccess")
+    constraint sellingPriceNonnegative: sellingPrice >= 0 "Menu dish selling price cannot be negative"
+    compute previousSellingPrice = self.sellingPrice
+    mutate sellingPrice = sellingPrice
+    emit MenuDishSellingPriceUpdated {
+      menuDishId: self.id
+      tenantId: self.tenantId
+      menuId: self.menuId
+      dishId: self.dishId
+      previousSellingPrice: previousSellingPrice
+      sellingPrice: sellingPrice
+    }
+  }
+
   command remove(reason: string) {
     guard self.addedAt != null
     guard self.deletedAt == null
@@ -104,8 +127,18 @@ event MenuDishAdded: "menu_dish.added" {
   menuId: string
   dishId: string
   sortOrder: number
+  sellingPrice: money(12, 2)?
   course: string?
   serviceStyle: string?
+}
+
+event MenuDishSellingPriceUpdated: "menu_dish.selling_price_updated" {
+  menuDishId: string
+  tenantId: string
+  menuId: string
+  dishId: string
+  previousSellingPrice: money(12, 2)?
+  sellingPrice: money(12, 2)
 }
 
 event MenuDishDetailsUpdated: "menu_dish.details_updated" {

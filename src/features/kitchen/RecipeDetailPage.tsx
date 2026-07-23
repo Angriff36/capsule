@@ -6,6 +6,7 @@ import {
   useListDish,
   useListDishRecipe,
   useListIngredient,
+  useListIngredientPriceObservation,
   useListRecipeIngredient,
   useRecipeIngredientAdjustQuantity,
   useRecipeIngredientRemove,
@@ -14,11 +15,19 @@ import {
   useRecipeRetract,
   useRecipeReviseDraft,
 } from "../../lib/manifest-convex-react";
+import { useTrackRecent } from "../../lib/recents";
+import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
+import {
+  latestPriceByIngredient,
+  resolveIngredientPrice,
+} from "./IngredientPriceHistory";
+import { calculateRecipeCost } from "./RecipeCostCalculator";
+import { RecipeCostPanel } from "./RecipeCostPanel";
 
 const policy = new CulinaryLifecyclePolicy();
 const UNITS = [
@@ -46,7 +55,9 @@ function optional(value: FormDataEntryValue | null) {
 export function RecipeDetailPage() {
   const { id } = useParams();
   const recipe = useGetRecipe(id ?? "skip");
+  useTrackRecent("Recipe", recipe?.name);
   const ingredients = useListIngredient();
+  const priceObservations = useListIngredientPriceObservation();
   const lines = useListRecipeIngredient();
   const dishes = useListDish();
   const dishRecipes = useListDishRecipe();
@@ -58,9 +69,11 @@ export function RecipeDetailPage() {
   const adjustLine = useRecipeIngredientAdjustQuantity();
   const removeLine = useRecipeIngredientRemove();
   const [editing, setEditing] = useState(false);
+  const [targetYield, setTargetYield] = useState("");
   const [showLineForm, setShowLineForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const draftForm = useFormDraft(`recipe-revise:${id ?? "none"}`);
 
   if (!id) return <ErrorState title="Recipe not found" />;
   if (recipe === undefined)
@@ -91,9 +104,51 @@ export function RecipeDetailPage() {
     (dish) => dish.deletedAt == null && recipeDishIds.has(dish._id),
   );
   const actions = policy.recipeActions(String(recipe.status));
+  const targetYieldNumber = Number(targetYield);
+  const baseYield = Number(recipe.yieldQuantity);
+  const scaleFactor =
+    targetYield.trim() !== "" &&
+    Number.isFinite(targetYieldNumber) &&
+    targetYieldNumber > 0 &&
+    baseYield > 0
+      ? targetYieldNumber / baseYield
+      : null;
+  const scaled = (quantity: number) => {
+    const value = quantity * (scaleFactor ?? 1);
+    return Number.isInteger(value) ? String(value) : value.toFixed(2);
+  };
   const ingredientName = (ingredientId: string) =>
     ingredients?.find((ingredient) => ingredient._id === ingredientId)?.name ??
     "Unknown ingredient";
+  const latestPrices = latestPriceByIngredient(priceObservations ?? []);
+  const recipeCost = calculateRecipeCost({
+    lines: recipeLines.map((line) => ({
+      id: line._id,
+      ingredientId: line.ingredientId,
+      quantity: Number(line.quantity),
+      unit: line.unit,
+    })),
+    ingredients: (ingredients ?? [])
+      .filter((ingredient) => ingredient.deletedAt == null)
+      .map((ingredient) => {
+        const price = resolveIngredientPrice(
+          {
+            id: ingredient._id,
+            unit: ingredient.unit,
+            costPerUnit: ingredient.costPerUnit,
+          },
+          latestPrices.get(ingredient._id),
+        );
+        return {
+          id: ingredient._id,
+          name: ingredient.name,
+          unit: price.unit as typeof ingredient.unit,
+          costPerUnit: price.costPerUnit,
+        };
+      }),
+    batchMultiplier: Number(recipe.batchMultiplier),
+    yieldQuantity: Number(recipe.yieldQuantity),
+  });
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -123,6 +178,7 @@ export function RecipeDetailPage() {
         instructions: optional(data.get("instructions")),
         version: recipe.version,
       });
+      draftForm.clear();
       setEditing(false);
     });
   };
@@ -234,18 +290,64 @@ export function RecipeDetailPage() {
         </dl>
       </header>
 
+      <RecipeCostPanel
+        summary={recipeCost}
+        yieldUnit={recipe.yieldUnit}
+        loading={
+          ingredients === undefined ||
+          lines === undefined ||
+          priceObservations === undefined
+        }
+      />
+
       <div className="culinary-work-grid">
         <section className="culinary-section">
           <div className="culinary-section-heading">
             <h2>Composition</h2>
             <span>{recipeLines.length} lines</span>
           </div>
+          <div className="flex flex-wrap items-end gap-3">
+            <label className="field-label">
+              Scale to yield ({String(recipe.yieldUnit)})
+              <input
+                type="number"
+                min={0.01}
+                step="0.01"
+                className="input"
+                placeholder={String(recipe.yieldQuantity)}
+                value={targetYield}
+                onChange={(event) => setTargetYield(event.target.value)}
+                aria-label="Scale to yield"
+              />
+            </label>
+            {scaleFactor != null ? (
+              <>
+                <span className="font-mono text-[11px] text-ink-3">
+                  × {scaleFactor.toFixed(2)} of the canonical recipe (preview
+                  only — recipe is unchanged)
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setTargetYield("")}
+                >
+                  Reset
+                </button>
+              </>
+            ) : null}
+          </div>
           {recipeLines.length ? (
             <ul className="ingredient-list">
               {recipeLines.map((line) => (
                 <li key={line._id}>
                   <strong>
-                    {line.quantity} {String(line.unit)}
+                    {scaled(Number(line.quantity))} {String(line.unit)}
+                    {scaleFactor != null ? (
+                      <span className="font-mono text-[10px] text-ink-3">
+                        {" "}
+                        (base {line.quantity})
+                      </span>
+                    ) : null}
                   </strong>
                   <span>
                     <CulinaryEntityLink
@@ -387,11 +489,19 @@ export function RecipeDetailPage() {
       </div>
 
       {editing ? (
-        <RecipeEditForm
-          recipe={recipe}
-          busy={busy === "revise"}
-          onSubmit={submitRevision}
-        />
+        <>
+          <DraftRestoreBanner
+            draft={draftForm.draft}
+            onRestore={draftForm.restore}
+            onDiscard={draftForm.discard}
+          />
+          <RecipeEditForm
+            recipe={recipe}
+            busy={busy === "revise"}
+            onSubmit={submitRevision}
+            formRef={draftForm.formRef}
+          />
+        </>
       ) : null}
 
       <section className="culinary-section">
@@ -433,13 +543,15 @@ function RecipeEditForm({
   recipe,
   busy,
   onSubmit,
+  formRef,
 }: {
   recipe: any;
   busy: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+  formRef: (node: HTMLFormElement | null) => void;
 }) {
   return (
-    <form className="culinary-edit-form" onSubmit={onSubmit}>
+    <form className="culinary-edit-form" onSubmit={onSubmit} ref={formRef}>
       <div className="culinary-create-heading">
         <div>
           <p className="eyebrow">Draft editor</p>
