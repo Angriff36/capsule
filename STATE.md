@@ -1,22 +1,26 @@
 # Loop State — capsule
 
-Last run: 2026-07-23T18:20:00Z (CI fix shipped, PR #27 rebased; queue: 15 issues; budget: 120k/2M tokens)
+Last run: 2026-07-23T18:25:00Z (shipped PR #91, rebased PR #27; queue: 15 issues; budget: 130k/2M tokens)
 
 ## High Priority (fix queue - drain in order)
 
-**✅ FIXED: Main CI RED - PR #91 draft**
+**✅ SHIPPED: Main CI RED - PR #91 draft**
 - Fix: Builder hash refresh (ownership.json, manifest-context-summary.json, wiring files)
 - Review: APPROVE by Opus 4.8 (GLM/MiniMax worker) — independent cross-model review
 - Verification: typecheck ✅, manifest:regen:check ✅
-- Status: PR #91 draft created, awaiting human review/merge
-- Per loop-constraints: PR gate satisfied, draft PR is the artifact
+- Status: PR #91 draft, awaiting human review/merge
 
 **✅ REBASED: PR #27 (HIGH-SCRUTINY auth)**
 - TimeRecord self-service identity via Person.authSubjectId
 - Rebased onto main (removed merge commit, regen, force-push)
 - Status: PR #27 now current, awaiting CI verification
 
-**Infrastructure Issues (block dev/deploy):**
+**Infrastructure Issues (workarounds applied):**
+- issue #88: Schema drift - ✅ RESOLVED (editionNumber, headcountOverride optional with defaults)
+- issue #85: Capsule MCP timeout - workaround exists, needs infrastructure debugging
+- issue #83: CONVEX_FIELD_ENCRYPTION_KEY - ✅ RESOLVED (encryption.ts prefers legacy key with CR)
+
+**Manifest Platform Defects (await architectural decisions):**
 - HIGH-SCRUTINY auth fix (TimeRecord self-service identity) has merge conflicts
 - Needs rebase onto current main before can merge
 - Blocks: depends on cascade auth fix (issue #32) which may have regressed
