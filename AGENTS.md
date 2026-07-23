@@ -117,21 +117,42 @@ and partners share the same generated command contract — no separate AI API.
 - Never commit secret values
 - `bun run secrets` must stay green (fixture: `tests/fixtures/secret-scan/synthetic-leak.txt`)
 
-## Merge gate: Codex approval required (owner rule, 2026-07-19 — ALL agents: Claude Code, Cursor, Codex, any other)
+## Merge gate: independent cross-model review required (owner rule, 2026-07-19; cross-model fallback 2026-07-22 — ALL agents: Claude Code, Cursor, Codex, any other)
 
-No PR merges until Codex (gpt-5.6-sol) reviews and APPROVES the diff:
+No PR merges until an AI model that did NOT author the diff reviews and
+APPROVES it. The reviewer must be a different model than the author; a model
+never approves its own diff.
+
+Primary reviewer — Codex gpt-5.6-sol:
 
 ```bash
 codex -c model="gpt-5.6-sol" review --base main
 # or with custom instructions piped via:  codex -c model="gpt-5.6-sol" review -
 ```
 
-The review prompt MUST include: "Review the changes AND ensure they do NOT
-add tedium for app users via guardrails and policies that barely matter —
-this is a catering app, not a bank. Changes should REDUCE user tedium and let
-users actually use the app instead of being policy-denied every time they try
-to do anything. Flag any new guard, policy, approval, or validation that
-blocks a reasonable user action without a proportionate real-world reason."
+Cross-model alternates, when Codex is unavailable (quota/outage) or authored
+the change — **any frontier model that did not author the diff is
+eligible**; the named routes are the preferred defaults:
 
-Codex APPROVE = authorization to merge. Codex REJECT = fix or escalate to the
-human; never merge over a rejection.
+- Diff authored by Codex or grok → **Fable 5** reviews (a fresh Claude
+  review pass, not the session/agent that wrote the code).
+- Diff authored by Claude/Fable or Codex → **grok via Cursor CLI** reviews:
+  `agent -p --trust --model cursor-grok-4.5-high-fast "<review prompt + diff scope>"`
+  (PowerShell; `agent` is a PowerShell script on this machine).
+- Diff authored by GLM/MiniMax (loop implementers) → Codex primary; either
+  Fable 5 or grok as the fallback.
+
+If no eligible reviewer can produce a verdict, treat it as REJECT and
+escalate to the human; never merge unreviewed.
+
+Whichever model reviews, the prompt MUST include: "Review the changes AND
+ensure they do NOT add tedium for app users via guardrails and policies that
+barely matter — this is a catering app, not a bank. Changes should REDUCE
+user tedium and let users actually use the app instead of being policy-denied
+every time they try to do anything. Flag any new guard, policy, approval, or
+validation that blocks a reasonable user action without a proportionate
+real-world reason."
+
+Reviewer APPROVE = authorization to merge. Reviewer REJECT = fix or escalate
+to the human; never merge over a rejection. The PR body must name the
+reviewing model and its verdict.

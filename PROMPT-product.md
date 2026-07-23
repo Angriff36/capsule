@@ -8,7 +8,8 @@ checkout, never push main/merge, never commit secrets, never hand-edit
 generated files).
 
 THE PR GATE IS THE SAFETY BOUNDARY: every change is worktree-isolated,
-test-verified, Codex-reviewed, and ships as a draft PR the human approves.
+test-verified, cross-model reviewed, and ships as a draft PR the human
+approves.
 
 ## Iteration contract
 
@@ -32,19 +33,28 @@ test-verified, Codex-reviewed, and ships as a draft PR the human approves.
 5. Verify inside the worktree: `bun install` if needed, `bun run typecheck`,
    then the focused tests for what you changed. Tests fail → fix or record a
    failure (ledger + backlog status) and move on. NEVER disable tests.
-6. Codex gate:
+6. Review gate (cross-model — reviewer must be a different model than the
+   diff's author):
    `git diff main | codex exec -s read-only -c model="gpt-5.6-sol" "Review
    this diff against the backlog item. REJECT for: wrong scope, unrelated
    edits, secrets, hand-edited generated files, disabled tests,
    symptom-fixes, partial implementation. Also ensure it does NOT add user
    tedium via guards/policies that barely matter (catering app, not a bank).
    Verdict: APPROVE or REJECT with reasons."`
+   If Codex is unavailable (quota/outage) or authored the diff, use the same
+   prompt through a cross-model alternate — any frontier model that did not
+   author the diff is eligible: Fable 5 (fresh Claude review pass) or grok
+   via Cursor CLI
+   (`agent -p --trust --model cursor-grok-4.5-high-fast`, PowerShell);
+   either may review GLM/MiniMax-authored loop diffs. No verdict from ANY
+   eligible reviewer → treat as REJECT (never push unreviewed; escalate in
+   STATE.md).
    REJECT → log to ledger + backlog, leave worktree, exit iteration.
 7. APPROVE → commit in the worktree, `git push origin loop/<run-id>`,
    `gh pr create --draft`. PR body MUST include: verification evidence
-   (commands + results + Codex verdict) and the canonical-port note from the
-   backlog item. Items marked HIGH-SCRUTINY: prefix the PR title
-   "HIGH-SCRUTINY:".
+   (commands + results + the reviewing model and its verdict) and the
+   canonical-port note from the backlog item. Items marked HIGH-SCRUTINY:
+   prefix the PR title "HIGH-SCRUTINY:".
 8. Update `PRODUCT-BACKLOG.md`: item status → `in-pr #N`. Append a JSON
    entry to `loop-run-log.md` with `"source":"product-loop"`.
 9. Exit. Do not start a second item in the same iteration.
