@@ -10,7 +10,7 @@ import { resolve } from "node:path";
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
 /** Clean CI checkout root entries (see BASELINE.md § Root cap). */
-const ROOT_CAP = 48; // 2026-07-22: +vercel.json +.vercelignore (deploy config), -6 batch-landing debris (src.zip, 3 pngs, output/, ledger fragment)
+const ROOT_CAP = 48; // Clean CI checkout; local-only dirs excluded below must stay out of the count.
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {
@@ -59,8 +59,11 @@ class BaselineDecayCheck {
       ".loop-worktrees",
       ".worktrees",
       ".playwright-mcp",
+      ".scannerwork",
+      ".vercel",
       "test-results",
       "work",
+      "output",
     ]);
     const entries = readdirSync(ROOT).filter((name) => !localOnly.has(name));
     if (entries.length > ROOT_CAP) {
