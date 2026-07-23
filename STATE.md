@@ -1,8 +1,12 @@
 # Loop State — capsule
 
-Last run: 2026-07-23T18:15:00Z (CI fix shipped; queue: 15 issues; budget: 100k/2M tokens)
+Last run: 2026-07-23T18:45:00Z (issue #35 Claim Person id — PR #92 draft; issue closed)
 
 ## High Priority (fix queue - drain in order)
+
+**✅ FIXED: issue #35 PrepTask.claim Clerk→Person id — PR #92 draft**
+- Claim/Release use authContext.personId; issue closed; Builder ab7e49b preserves baselined seams
+- Review: APPROVE by composer-2.5-fast; awaiting human merge + local Convex deploy after merge
 
 **✅ FIXED: Main CI RED - PR #91 draft**
 - Fix: Builder hash refresh (ownership.json, manifest-context-summary.json, wiring files)

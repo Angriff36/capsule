@@ -26,6 +26,7 @@ import type * as lib_encryption from "../lib/encryption.js";
 import type * as lib_equipmentReservationAvailability from "../lib/equipmentReservationAvailability.js";
 import type * as lib_googleCalendar from "../lib/googleCalendar.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
+import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
 import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAvailability.js";
 import type * as mutations from "../mutations.js";
 import type * as personalDataExport from "../personalDataExport.js";
@@ -62,6 +63,7 @@ declare const fullApi: ApiFromModules<{
   "lib/equipmentReservationAvailability": typeof lib_equipmentReservationAvailability;
   "lib/googleCalendar": typeof lib_googleCalendar;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
+  "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;
   "lib/vehicleDeliveryAvailability": typeof lib_vehicleDeliveryAvailability;
   mutations: typeof mutations;
   personalDataExport: typeof personalDataExport;
