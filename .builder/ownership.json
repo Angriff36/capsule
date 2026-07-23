@@ -18,7 +18,8 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "6622e118165fde6568b8c3263e0985128841aef7f23121e7c2f079446b7bbb80"
+      "sha256": "6622e118165fde6568b8c3263e0985128841aef7f23121e7c2f079446b7bbb80",
+      "baselined": true
     },
     "convex/queries.ts": {
       "sha256": "2d0314791a57eef449720016f81881429ce53e111a2abedb405e2e94737153eb"
