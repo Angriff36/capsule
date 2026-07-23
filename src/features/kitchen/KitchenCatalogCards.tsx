@@ -5,7 +5,7 @@ import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryCatalogCardCopy } from "./culinary-studio/CulinaryCatalogCardCopy";
 import { CulinaryCatalogCardTone } from "./culinary-studio/CulinaryCatalogCardTone";
 import "./culinary-studio/CulinaryCatalogCards.css";
-import { DishPrimaryImage } from "./DishPrimaryImage";
+import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { KitchenCatalogLifecycleButtons } from "./KitchenCatalogLifecycleButtons";
 import {
   dishPath,

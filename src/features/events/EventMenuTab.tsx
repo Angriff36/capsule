@@ -10,7 +10,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
-import { DishPrimaryImage } from "../kitchen/DishPrimaryImage";
+import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { dishPath, recipePath } from "../kitchen/kitchenRoutes";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";

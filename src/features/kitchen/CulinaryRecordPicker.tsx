@@ -4,7 +4,7 @@ import {
   culinaryCanonicalMatcher,
   type CanonicalLike,
 } from "./CulinaryCanonicalMatcher";
-import { DishPrimaryImage } from "./DishPrimaryImage";
+import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 
 export type PickerDish = CanonicalLike & {
   description?: string | null;

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { StatusChip } from "../../../ui/primitives";
 import { AllergenIconRow } from "../AllergenIconRow";
-import { DishPrimaryImage } from "../DishPrimaryImage";
+import { DishPrimaryImage } from "../../attachments/DishPrimaryImage";
 import { eventDetailMenuPath, recipePath } from "../kitchenRoutes";
 import type { KitchenCommandDeckModel } from "./KitchenCommandDeckModel";
 import type {

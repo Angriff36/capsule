@@ -23,7 +23,7 @@ import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
-import { DishPrimaryImageUploader } from "./DishPrimaryImageUploader";
+import { DishPrimaryImageUploader } from "../attachments/DishPrimaryImageUploader";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { dishPath, kitchenCatalogPath, recipePath } from "./kitchenRoutes";
 

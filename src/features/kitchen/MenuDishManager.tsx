@@ -6,7 +6,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryRecordPicker, type PickerDish } from "./CulinaryRecordPicker";
-import { DishPrimaryImage } from "./DishPrimaryImage";
+import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 
 type MenuDishRow = {
   _id: string;
