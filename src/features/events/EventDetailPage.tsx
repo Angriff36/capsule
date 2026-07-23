@@ -51,6 +51,7 @@ import { EventMenuTab } from "./EventMenuTab";
 import { EventPhotosTab } from "./EventPhotosTab";
 import { EventSetupProgress } from "./EventSetupProgress";
 import { EventStaffingTab } from "./EventStaffingTab";
+import { EventTabErrorBoundary } from "./EventTabErrorBoundary";
 import { EventTimelineTab } from "./EventTimelineTab";
 import { FailureBanner } from "./FailureBanner";
 import { RecurringEventPanel } from "./RecurringEventPanel";
@@ -412,62 +413,82 @@ export function EventDetailPage() {
       <EventDetailTabs active={activeTab} onChange={setTab} />
 
       {activeTab === "menu" ? (
-        <EventMenuTab
-          eventId={event._id}
-          expectedHeadcount={Number(event.expectedHeadcount) || 0}
-        />
+        <EventTabErrorBoundary tabLabel="Menu" key="menu">
+          <EventMenuTab
+            eventId={event._id}
+            expectedHeadcount={Number(event.expectedHeadcount) || 0}
+          />
+        </EventTabErrorBoundary>
       ) : null}
       {activeTab === "equipment" ? (
-        <EventEquipmentPanel
-          eventId={event._id}
-          startsAt={event.startsAt}
-          endsAt={event.endsAt}
-        />
+        <EventTabErrorBoundary tabLabel="Equipment" key="equipment">
+          <EventEquipmentPanel
+            eventId={event._id}
+            startsAt={event.startsAt}
+            endsAt={event.endsAt}
+          />
+        </EventTabErrorBoundary>
       ) : null}
       {activeTab === "client" ? (
-        <EventClientTab
-          eventId={event._id}
-          eventTitle={event.title}
-          clientId={event.clientId}
-          primaryContactName={event.primaryContactName}
-          primaryContactEmail={event.primaryContactEmail}
-          primaryContactPhone={event.primaryContactPhone}
-          accessibilityNeeds={event.accessibilityNeeds}
-          serviceRequirements={event.serviceRequirements}
-          operationalRequirements={event.operationalRequirements}
-        />
+        <EventTabErrorBoundary tabLabel="Client Information" key="client">
+          <EventClientTab
+            eventId={event._id}
+            eventTitle={event.title}
+            clientId={event.clientId}
+            primaryContactName={event.primaryContactName}
+            primaryContactEmail={event.primaryContactEmail}
+            primaryContactPhone={event.primaryContactPhone}
+            accessibilityNeeds={event.accessibilityNeeds}
+            serviceRequirements={event.serviceRequirements}
+            operationalRequirements={event.operationalRequirements}
+          />
+        </EventTabErrorBoundary>
       ) : null}
-      {activeTab === "photos" ? <EventPhotosTab eventId={event._id} /> : null}
+      {activeTab === "photos" ? (
+        <EventTabErrorBoundary tabLabel="Event Photo Gallery" key="photos">
+          <EventPhotosTab eventId={event._id} />
+        </EventTabErrorBoundary>
+      ) : null}
       {activeTab === "timeline" ? (
-        <EventTimelineTab eventId={event._id} startsAt={event.startsAt} />
+        <EventTabErrorBoundary tabLabel="Timeline" key="timeline">
+          <EventTimelineTab eventId={event._id} startsAt={event.startsAt} />
+        </EventTabErrorBoundary>
       ) : null}
       {activeTab === "recurring" ? (
-        <RecurringEventPanel
-          eventId={event._id}
-          startsAt={event.startsAt}
-          version={version}
-          canConfigure={canRevise}
-          recurrenceFrequency={event.recurrenceFrequency}
-          recurrenceEndCondition={event.recurrenceEndCondition}
-          recurrenceEndsAt={event.recurrenceEndsAt}
-          recurrenceOccurrenceLimit={event.recurrenceOccurrenceLimit}
-          recurrenceNextStartsAt={event.recurrenceNextStartsAt}
-          recurrenceGeneratedCount={event.recurrenceGeneratedCount}
-          recurrenceActive={event.recurrenceActive}
-          recurrenceStoppedAt={event.recurrenceStoppedAt}
-          recurrenceCompletedAt={event.recurrenceCompletedAt}
-          recurrenceTemplateEventId={event.recurrenceTemplateEventId}
-          recurrenceSequence={event.recurrenceSequence}
-        />
+        <EventTabErrorBoundary tabLabel="Recurring Schedule" key="recurring">
+          <RecurringEventPanel
+            eventId={event._id}
+            startsAt={event.startsAt}
+            version={version}
+            canConfigure={canRevise}
+            recurrenceFrequency={event.recurrenceFrequency}
+            recurrenceEndCondition={event.recurrenceEndCondition}
+            recurrenceEndsAt={event.recurrenceEndsAt}
+            recurrenceOccurrenceLimit={event.recurrenceOccurrenceLimit}
+            recurrenceNextStartsAt={event.recurrenceNextStartsAt}
+            recurrenceGeneratedCount={event.recurrenceGeneratedCount}
+            recurrenceActive={event.recurrenceActive}
+            recurrenceStoppedAt={event.recurrenceStoppedAt}
+            recurrenceCompletedAt={event.recurrenceCompletedAt}
+            recurrenceTemplateEventId={event.recurrenceTemplateEventId}
+            recurrenceSequence={event.recurrenceSequence}
+          />
+        </EventTabErrorBoundary>
       ) : null}
       {activeTab === "staffing" ? (
-        <EventStaffingTab
-          eventId={event._id}
-          startsAt={event.startsAt}
-          endsAt={event.endsAt}
-        />
+        <EventTabErrorBoundary tabLabel="Staffing" key="staffing">
+          <EventStaffingTab
+            eventId={event._id}
+            startsAt={event.startsAt}
+            endsAt={event.endsAt}
+          />
+        </EventTabErrorBoundary>
       ) : null}
-      {activeTab === "margin" ? <EventMarginTab eventId={event._id} /> : null}
+      {activeTab === "margin" ? (
+        <EventTabErrorBoundary tabLabel="Margin" key="margin">
+          <EventMarginTab eventId={event._id} />
+        </EventTabErrorBoundary>
+      ) : null}
     </div>
   );
 }
