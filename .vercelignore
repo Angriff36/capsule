@@ -1,0 +1,11 @@
+/.loop-worktrees
+/.aboardai
+/.artifacts
+/.tmp
+/generated
+/diagrams
+/tests
+/docs
+/graphify-out
+/*.png
+/.claude

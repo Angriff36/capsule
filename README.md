@@ -38,3 +38,49 @@ bun run check
 ```
 
 Runs toolchain pin check, typecheck, Prettier (`format:check`), secret scan, tests with coverage ratchet, production build, and baseline decay checks. CI runs the same script (`.github/workflows/ci.yml`). See [`BASELINE.md`](BASELINE.md).
+
+## Deploying to Vercel (production)
+
+Live app: **https://capsule-tau-eight.vercel.app** (Vercel project `capsule`,
+team `ryans-projects-471134dd`, GitHub-linked, production branch `main`).
+Backend: Convex prod deployment **tangible-skunk-448**
+(https://tangible-skunk-448.convex.cloud — dashboard:
+https://dashboard.convex.dev/d/tangible-skunk-448). Auth: Clerk dev instance
+`golden-koi-11` (test keys — swap for a Clerk production instance before real
+customers).
+
+The app is TWO deployables. Ship the backend first, then the frontend:
+
+1. **Land the change on `main`** through a green-CI PR as usual.
+2. **Backend (only if `convex/` output or `src/**/*.manifest` changed):**
+   run `bun run manifest:regen` first when manifests changed, then
+   `npx convex deploy -y` — pushes functions/schema/indexes to
+   tangible-skunk-448. Backend env vars live on the deployment:
+   `npx convex env set KEY value --prod` (CLERK_JWT_ISSUER_DOMAIN is already
+   set to the golden-koi-11 issuer).
+3. **Frontend:** pushing/merging to `main` auto-deploys via the GitHub
+   integration. Manual alternative from a checkout:
+   `vercel deploy --prod --yes --archive=tgz` (`--archive` is REQUIRED — the
+   repo exceeds Vercel's 15k-file upload limit without it).
+
+Frontend env vars (`VITE_CONVEX_URL`, `VITE_CLERK_PUBLISHABLE_KEY`) are baked
+in at **build time** from the Vercel project's Production env — changing one
+requires a redeploy, and `vercel env add NAME production` to update.
+
+Config files that make deploys work (do not delete):
+
+- `vercel.json` — SPA rewrite of every route to `index.html`; without it any
+  client-side route 404s on refresh.
+- `.vercelignore` — keeps worktrees/transcripts/generated docs out of the
+  upload. Patterns are root-anchored (`/generated`) on purpose: a bare
+  `generated` also matches `src/generated` and breaks the build.
+- `package.json` `prepare` script ends in `|| exit 0` because Vercel's build
+  container has no `.git` and a bare `git config` there kills `bun install`.
+
+Adding a new public domain? Add it to Clerk's allowed origins too (Backend
+API `PATCH /v1/instance` with the sk key, or the Clerk dashboard), or OAuth
+sign-ins won't round-trip back to the app.
+
+Known confusion: several retired `capsule-pro-*` Vercel projects still exist
+with deployment protection ON — their URLs bounce to a Vercel login. The real
+app is `capsule-tau-eight` only.

@@ -36,7 +36,7 @@
     "manifest:compile": "manifest compile --merge",
     "manifest:regen": "bun scripts/manifest-regen.ts",
     "manifest:regen:check": "bun scripts/manifest-regen-check.ts",
-    "prepare": "git config core.hooksPath .githooks",
+    "prepare": "git config core.hooksPath .githooks || exit 0",
     "proof:emit": "bun scripts/emit-proof-kit.ts",
     "secrets": "bun scripts/check-secrets.ts",
     "seed": "bun scripts/seed-convex.ts",
