@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Client
+    participant InventoryItem as InventoryItem
+    participant EventBus
+    Client->>+InventoryItem: setExpiry(bestBeforeAt, useByAt)
+    Note over InventoryItem: Policies: inventoryItemRead, inventoryItemWrite, inventoryItemExecute
+    Note over InventoryItem: Guards (2)
+    InventoryItem->>InventoryItem: guard[0]: self.stockedAt != null
+    InventoryItem->>InventoryItem: guard[1]: self.deletedAt == null
+    InventoryItem->>InventoryItem: mutate.bestBeforeAt
+    InventoryItem->>InventoryItem: mutate.useByAt
+    InventoryItem->>EventBus: emit InventoryExpiryUpdated on inventory_item.expiry_updated
+    InventoryItem-->>-Client: void

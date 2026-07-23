@@ -1,0 +1,332 @@
+.live-profitability {
+  --profit-paper: #eef0e8;
+  --profit-ink: #17251f;
+  --profit-muted: #657069;
+  --profit-line: rgba(23, 37, 31, 0.16);
+  --profit-signal: #2d6955;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(45, 105, 85, 0.28);
+  background:
+    linear-gradient(90deg, rgba(45, 105, 85, 0.035) 1px, transparent 1px),
+    var(--profit-paper);
+  background-size: 36px 100%;
+  box-shadow: 0 16px 44px rgba(22, 38, 31, 0.09);
+  color: var(--profit-ink);
+}
+
+.live-profitability::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: var(--profit-signal);
+  content: "";
+}
+
+.live-profitability.is-negative {
+  --profit-signal: #a24532;
+}
+
+.live-profitability__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 25px 28px 18px;
+  border-bottom: 1px solid var(--profit-line);
+}
+
+.live-profitability__eyebrow,
+.live-profitability__header h2,
+.live-profitability__buckets p {
+  margin: 0;
+}
+
+.live-profitability__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--profit-signal);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.live-profitability__eyebrow span {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 14%, transparent);
+  animation: live-profit-pulse 2.4s ease-out infinite;
+}
+
+.live-profitability__header h2 {
+  margin-top: 6px;
+  font-family:
+    Archivo Variable,
+    sans-serif;
+  font-size: clamp(20px, 3vw, 29px);
+  font-variation-settings:
+    "wdth" 88,
+    "wght" 680;
+  letter-spacing: -0.035em;
+}
+
+.live-profitability__refresh {
+  color: var(--profit-muted);
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 10px;
+  text-align: right;
+}
+
+.live-profitability__scoreboard {
+  display: grid;
+  grid-template-columns: minmax(260px, 1.15fr) minmax(320px, 1fr);
+  gap: 1px;
+  background: var(--profit-line);
+}
+
+.live-profitability__margin,
+.live-profitability__flow {
+  background: color-mix(in srgb, var(--profit-paper) 94%, white);
+}
+
+.live-profitability__margin {
+  padding: 27px 28px 25px;
+}
+
+.live-profitability__margin > span,
+.live-profitability__flow span,
+.live-profitability__buckets p {
+  display: block;
+  color: var(--profit-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.live-profitability__margin strong {
+  display: block;
+  margin: 5px 0 2px;
+  color: var(--profit-signal);
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: clamp(37px, 6vw, 58px);
+  font-weight: 650;
+  letter-spacing: -0.075em;
+  line-height: 1;
+}
+
+.live-profitability__margin small,
+.live-profitability__flow small,
+.live-profitability__buckets small {
+  color: var(--profit-muted);
+  font-size: 10px;
+}
+
+.live-profitability__flow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.live-profitability__flow > div {
+  padding: 29px 22px 24px;
+}
+
+.live-profitability__flow > div + div {
+  border-left: 1px solid var(--profit-line);
+}
+
+.live-profitability__flow strong {
+  display: block;
+  margin: 9px 0 4px;
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: clamp(22px, 3vw, 31px);
+  letter-spacing: -0.055em;
+}
+
+.live-profitability__rail {
+  height: 7px;
+  margin: 23px 28px 0;
+  overflow: hidden;
+  background: rgba(23, 37, 31, 0.1);
+}
+
+.live-profitability__rail span {
+  display: block;
+  min-width: 2px;
+  height: 100%;
+  background: var(--profit-signal);
+  transition: width 420ms cubic-bezier(0.2, 0.75, 0.3, 1);
+}
+
+.live-profitability__rail-labels {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 28px 0;
+  color: var(--profit-muted);
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.live-profitability__buckets {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 24px 28px 27px;
+}
+
+.live-profitability__buckets article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  min-width: 0;
+  padding-right: 22px;
+}
+
+.live-profitability__buckets article + article {
+  padding-left: 22px;
+  border-left: 1px solid var(--profit-line);
+}
+
+.live-profitability__bucket-code {
+  color: color-mix(in srgb, var(--profit-signal) 65%, var(--profit-muted));
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 10px;
+}
+
+.live-profitability__buckets strong {
+  display: block;
+  margin: 4px 0 2px;
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 20px;
+  letter-spacing: -0.04em;
+}
+
+.live-profitability__buckets small {
+  display: block;
+  line-height: 1.45;
+}
+
+.live-profitability__notice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  margin: 0 28px 24px;
+  padding: 11px 13px;
+  border: 1px solid rgba(161, 101, 27, 0.25);
+  background: rgba(222, 174, 80, 0.12);
+  color: #725019;
+  font-size: 11px;
+}
+
+.live-profitability__footer {
+  padding: 13px 28px 15px;
+  border-top: 1px solid var(--profit-line);
+  background: rgba(45, 105, 85, 0.055);
+  color: var(--profit-muted);
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.live-profitability__loading {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr;
+  gap: 18px;
+  padding: 30px 28px;
+}
+
+.live-profitability__loading span {
+  height: 70px;
+  background: linear-gradient(
+    100deg,
+    rgba(23, 37, 31, 0.06) 30%,
+    rgba(255, 255, 255, 0.42) 50%,
+    rgba(23, 37, 31, 0.06) 70%
+  );
+  background-size: 240% 100%;
+  animation: live-profit-shimmer 1.4s linear infinite;
+}
+
+@keyframes live-profit-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 30%, transparent);
+  }
+  65%,
+  100% {
+    box-shadow: 0 0 0 7px color-mix(in srgb, currentColor 0%, transparent);
+  }
+}
+
+@keyframes live-profit-shimmer {
+  to {
+    background-position: -240% 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .live-profitability__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .live-profitability__refresh {
+    text-align: left;
+  }
+
+  .live-profitability__scoreboard,
+  .live-profitability__buckets {
+    grid-template-columns: 1fr;
+  }
+
+  .live-profitability__buckets {
+    gap: 18px;
+  }
+
+  .live-profitability__buckets article,
+  .live-profitability__buckets article + article {
+    padding: 0;
+    border-left: 0;
+  }
+
+  .live-profitability__notice {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 440px) {
+  .live-profitability__flow,
+  .live-profitability__loading {
+    grid-template-columns: 1fr;
+  }
+
+  .live-profitability__flow > div + div {
+    border-top: 1px solid var(--profit-line);
+    border-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-profitability__eyebrow span,
+  .live-profitability__loading span {
+    animation: none;
+  }
+
+  .live-profitability__rail span {
+    transition: none;
+  }
+}

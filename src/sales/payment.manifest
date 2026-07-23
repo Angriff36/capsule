@@ -1,6 +1,6 @@
 // Capsule sales/billing — Payment against Invoice.
 // Settlement applies to Invoice via reaction (replaces capsule-pro middleware).
-// Chargeback / partial-refund / accepted-not-applied deferred (OD040).
+// Chargeback / partial-refund / accepted-not-applied are not modeled yet (OD040).
 
 use "./invoice-core.manifest"
 
@@ -27,6 +27,8 @@ entity Payment mixin TenantScoped, SoftDeletable {
 
   property required invoiceId: uuid
   property required clientId: uuid
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
   property eventId: uuid?
   property required amount: money(12, 2) = 0
   property required method: PaymentMethodKind = "card"
@@ -42,6 +44,8 @@ entity Payment mixin TenantScoped, SoftDeletable {
 
   belongsTo invoice: Invoice fields [tenantId, invoiceId] references [tenantId, id]
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
   ref paymentMethod: PaymentMethod fields [tenantId, paymentMethodId] references [tenantId, id]
 
@@ -157,7 +161,52 @@ entity Payment mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Payment already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit PaymentClientMergeStaged {
+      paymentId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the payment client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit PaymentClientReassigned {
+      paymentId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
+  }
+
   store Payment in durable
+}
+
+event PaymentClientMergeStaged: "payment.client_merge_staged" {
+  paymentId: string
+  tenantId: string
+}
+
+event PaymentClientReassigned: "payment.client_reassigned" {
+  paymentId: string
+  tenantId: string
+  previousClientId: string
+  clientId: string
 }
 
 event PaymentRecorded: "payment.recorded" {

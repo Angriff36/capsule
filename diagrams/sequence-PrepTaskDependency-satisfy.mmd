@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Client
+    participant PrepTaskDependency as PrepTaskDependency
+    participant EventBus
+    Client->>+PrepTaskDependency: satisfy()
+    Note over PrepTaskDependency: Policies: prepTaskDependencyRead, prepTaskDependencyWrite, prepTaskDependencyExecute
+    Note over PrepTaskDependency: Guards (3)
+    PrepTaskDependency->>PrepTaskDependency: guard[0]: self.isSatisfied == false
+    PrepTaskDependency->>PrepTaskDependency: guard[1]: self.predecessorTask != null
+    PrepTaskDependency->>PrepTaskDependency: guard[2]: self.predecessorTask.status == #quot;completed#quot;
+    PrepTaskDependency->>PrepTaskDependency: mutate.isSatisfied
+    PrepTaskDependency->>EventBus: emit PrepTaskDependencySatisfied on prep_task_dependency.satisfied
+    PrepTaskDependency-->>-Client: void

@@ -7,6 +7,7 @@ import {
   useListIngredient,
   useListIngredientDemand,
   useListInventoryItem,
+  useListInventoryLot,
   useListInventoryReservation,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
@@ -36,6 +37,7 @@ export function EventInventoryPanel({
 }: Props) {
   const demands = useListIngredientDemand();
   const items = useListInventoryItem();
+  const inventoryLots = useListInventoryLot();
   const reservations = useListInventoryReservation();
   const ingredients = useListIngredient();
   const locations = useListStorageLocation();
@@ -85,12 +87,18 @@ export function EventInventoryPanel({
       item.locationId
     );
   };
+  const lotNumber = (inventoryLotId?: string | null) =>
+    inventoryLotId
+      ? (inventoryLots?.find((lot) => lot._id === inventoryLotId)
+          ?.supplierLotNumber ?? "Unknown lot")
+      : "Unattributed";
 
   const reserveStock = () => {
     if (
       !eligible ||
       demands === undefined ||
       items === undefined ||
+      inventoryLots === undefined ||
       reservations === undefined
     ) {
       return;
@@ -117,6 +125,7 @@ export function EventInventoryPanel({
           items: (items ?? []).map((item) => ({
             id: item._id,
             ingredientId: item.ingredientId,
+            locationId: item.locationId,
             quantityOnHand: Number(item.quantityOnHand),
             unit: String(item.unit),
             stockedAt: item.stockedAt,
@@ -125,12 +134,21 @@ export function EventInventoryPanel({
           reservations: (reservations ?? []).map((reservation) => ({
             id: reservation._id,
             inventoryItemId: reservation.inventoryItemId,
+            inventoryLotId: reservation.inventoryLotId,
             eventId: reservation.eventId,
             ingredientId: reservation.ingredientId,
             quantity: Number(reservation.quantity),
             status: String(reservation.status),
             version: reservation.version,
             deletedAt: reservation.deletedAt,
+          })),
+          lots: inventoryLots.map((lot) => ({
+            id: lot._id,
+            ingredientId: lot.ingredientId,
+            locationId: lot.locationId,
+            receiptQuantity: Number(lot.receiptQuantity),
+            receivedAt: lot.receivedAt,
+            deletedAt: lot.deletedAt,
           })),
         });
         setCreated(result.created);
@@ -189,6 +207,7 @@ export function EventInventoryPanel({
             quantityOnHand: Number(item.quantityOnHand),
             locationId: item.locationId,
             unit: String(item.unit),
+            useByAt: item.useByAt,
           })),
         });
         setLastIssue(
@@ -233,6 +252,7 @@ export function EventInventoryPanel({
               busy ||
               demands === undefined ||
               items === undefined ||
+              inventoryLots === undefined ||
               reservations === undefined ||
               eventDemands.length === 0
             }
@@ -302,6 +322,7 @@ export function EventInventoryPanel({
                 <tr>
                   <th className="py-1 pr-3 font-medium">Ingredient</th>
                   <th className="py-1 pr-3 font-medium">Location</th>
+                  <th className="py-1 pr-3 font-medium">Supplier lot</th>
                   <th className="py-1 pr-3 font-medium">Qty</th>
                   <th className="py-1 pr-3 font-medium">Status</th>
                   <th className="py-1 font-medium">Action</th>
@@ -315,6 +336,9 @@ export function EventInventoryPanel({
                     </td>
                     <td className="py-2 pr-3">
                       {locationName(reservation.inventoryItemId)}
+                    </td>
+                    <td className="py-2 pr-3 font-mono">
+                      {lotNumber(reservation.inventoryLotId)}
                     </td>
                     <td className="py-2 pr-3 font-mono">
                       {Number(reservation.quantity)}

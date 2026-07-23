@@ -59,6 +59,9 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
   belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
   belongsTo assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
+  // Keep this hasMany paired with PrepTaskDependency.dependentTask, which is
+  // intentionally the edge entity's first PrepTask relation for Convex inverse hydration.
+  hasMany incomingDependencies: PrepTaskDependency
 
   constraint prepNameComplete: self.claimedAt == null or length(trim(self.name)) > 0 "Prep tasks require a name once opened"
   constraint prepQuantityPositive: self.claimedAt == null or self.quantity > 0 "Prep quantity must be positive once opened"
@@ -256,6 +259,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     guard self.claimedAt != null
     guard self.assignedToId != null
     guard self.deletedAt == null
+    constraint startPredecessorsComplete: count_of(self.incomingDependencies, (dependency) => dependency.isSatisfied == false) == 0 "All predecessor prep tasks must be complete before this task can start"
     compute previousStatus = self.status
     mutate status = "in_progress"
     mutate startedAt = now()
@@ -370,6 +374,74 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   }
 
   store PrepTask in durable
+}
+
+// Directed sequencing edge: predecessorTask must complete before dependentTask starts.
+// Dependencies are declared while the dependent task is still waiting in the prep queue.
+entity PrepTaskDependency mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+
+  property required dependentTaskId: uuid
+  property required predecessorTaskId: uuid
+  property required isSatisfied: boolean = false
+
+  // dependentTask must remain first: PrepTask.incomingDependencies resolves this
+  // inverse edge when the generated start command hydrates its count_of constraint.
+  belongsTo dependentTask: PrepTask fields [tenantId, dependentTaskId] references [tenantId, id]
+  belongsTo predecessorTask: PrepTask fields [tenantId, predecessorTaskId] references [tenantId, id]
+
+  default policy prepTaskDependencyRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may read prep task dependencies"
+  default policy prepTaskDependencyWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may declare prep task dependencies"
+  default policy prepTaskDependencyExecute execute: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may execute prep task dependency commands"
+
+  command declare(dependentTaskId: uuid, predecessorTaskId: uuid) {
+    guard self.dependentTask != null
+    guard self.predecessorTask != null
+    guard self.dependentTask.status == "pending"
+    constraint dependencyTasksDistinct: dependentTaskId != predecessorTaskId "A prep task cannot depend on itself"
+    constraint dependencyEventAlign: self.dependentTask.eventId == self.predecessorTask.eventId "Predecessor prep tasks must belong to the same event"
+    mutate dependentTaskId = dependentTaskId
+    mutate predecessorTaskId = predecessorTaskId
+    mutate isSatisfied = self.predecessorTask.status == "completed"
+    emit PrepTaskDependencyDeclared {
+      prepTaskDependencyId: self.id
+      tenantId: self.tenantId
+      dependentTaskId: dependentTaskId
+      predecessorTaskId: predecessorTaskId
+      isSatisfied: self.predecessorTask.status == "completed"
+    }
+  }
+
+  command satisfy() {
+    guard self.isSatisfied == false
+    guard self.predecessorTask != null
+    guard self.predecessorTask.status == "completed"
+    mutate isSatisfied = true
+    emit PrepTaskDependencySatisfied {
+      prepTaskDependencyId: self.id
+      tenantId: self.tenantId
+      dependentTaskId: self.dependentTaskId
+      predecessorTaskId: self.predecessorTaskId
+    }
+  }
+
+  store PrepTaskDependency in durable
+}
+
+event PrepTaskDependencyDeclared: "prep_task_dependency.declared" {
+  prepTaskDependencyId: string
+  tenantId: string
+  dependentTaskId: string
+  predecessorTaskId: string
+  isSatisfied: boolean
+}
+
+event PrepTaskDependencySatisfied: "prep_task_dependency.satisfied" {
+  prepTaskDependencyId: string
+  tenantId: string
+  dependentTaskId: string
+  predecessorTaskId: string
 }
 
 event PrepTaskOpened: "prep_task.opened" {
@@ -507,6 +579,10 @@ event PrepTaskCancelled: "prep_task.cancelled" {
   status: PrepTaskStatus
   reason: string
 }
+
+// Completing a predecessor unlocks every task that directly depends on it.
+on PrepTaskCompleted fanOut PrepTaskDependency where predecessorTaskId = payload.prepTaskId
+  run satisfy
 
 // EventCancelled → cancel open prep work for that event.
 on EventCancelled fanOut PrepTask where eventId = payload.eventId

@@ -1,0 +1,362 @@
+.production-yield-stage {
+  --yield-ink: #1c3029;
+  --yield-sage: #416859;
+  --yield-red: #ad4e32;
+  --yield-amber: #bd7a2e;
+  --yield-paper: #f4f0e5;
+}
+
+.production-yield-masthead {
+  align-items: flex-end;
+}
+
+.production-yield-range {
+  min-width: 290px;
+  border-top: 4px solid var(--yield-sage);
+  padding: 14px 0 0 20px;
+  text-align: right;
+}
+
+.production-yield-range span,
+.production-yield-range small,
+.production-yield-range strong {
+  display: block;
+}
+
+.production-yield-range span,
+.production-yield-range small {
+  color: var(--ink-3);
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.production-yield-range strong {
+  margin: 6px 0 4px;
+  color: var(--yield-ink);
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 13px;
+}
+
+.production-yield-controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 28px;
+  border: 1px solid var(--line);
+  border-left: 5px solid var(--yield-sage);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(65, 104, 89, 0.025) 0,
+      rgba(65, 104, 89, 0.025) 1px,
+      transparent 1px,
+      transparent 24px
+    ),
+    var(--surface);
+  padding: 15px 18px;
+}
+
+.production-yield-controls p {
+  max-width: 540px;
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.55;
+  text-align: right;
+}
+
+.production-yield-switch {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.production-yield-switch button {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 7px 12px;
+  color: var(--ink-2);
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.production-yield-switch button:hover,
+.production-yield-switch button[aria-pressed="true"] {
+  border-color: var(--yield-sage);
+  background: var(--yield-sage);
+  color: white;
+}
+
+.production-yield-scorecard {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.production-yield-scorecard > div {
+  min-height: 124px;
+  border-left: 1px solid var(--line);
+  padding: 21px 20px 17px;
+}
+
+.production-yield-scorecard > div:first-child {
+  border-top: 5px solid var(--yield-sage);
+  border-left: 0;
+}
+
+.production-yield-scorecard > div.is-under {
+  box-shadow: inset 0 5px 0 var(--yield-red);
+}
+
+.production-yield-scorecard > div.is-over {
+  box-shadow: inset 0 5px 0 var(--yield-amber);
+}
+
+.production-yield-scorecard span,
+.production-yield-scorecard small,
+.production-yield-scorecard strong {
+  display: block;
+}
+
+.production-yield-scorecard span {
+  color: var(--ink-3);
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.production-yield-scorecard strong {
+  margin: 10px 0 7px;
+  color: var(--yield-ink);
+  font-family:
+    Archivo Variable,
+    sans-serif;
+  font-size: clamp(26px, 3vw, 39px);
+  font-weight: 720;
+  letter-spacing: -0.045em;
+}
+
+.production-yield-scorecard .is-under strong {
+  color: var(--yield-red);
+}
+
+.production-yield-scorecard .is-over strong {
+  color: var(--yield-amber);
+}
+
+.production-yield-scorecard small {
+  color: var(--ink-3);
+  font-size: 10px;
+}
+
+.production-yield-panel {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 20px;
+}
+
+.production-yield-panel-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 17px;
+}
+
+.production-yield-panel-heading h2 {
+  margin: 5px 0 0;
+  color: var(--yield-ink);
+  font-size: 25px;
+}
+
+.production-yield-key {
+  display: flex;
+  gap: 16px;
+  color: var(--ink-3);
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+
+.production-yield-key span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.production-yield-key i {
+  width: 18px;
+  height: 4px;
+  background: var(--yield-red);
+}
+
+.production-yield-key i.is-over {
+  background: var(--yield-amber);
+}
+
+.production-yield-table td:first-child {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 290px;
+}
+
+.production-yield-rank {
+  color: rgba(28, 48, 41, 0.35);
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.production-yield-recipe strong,
+.production-yield-recipe small,
+.production-yield-table td:nth-child(5) strong,
+.production-yield-table td:nth-child(5) small {
+  display: block;
+}
+
+.production-yield-recipe small {
+  max-width: 310px;
+  margin-top: 4px;
+  color: var(--ink-3);
+  font-size: 9px;
+}
+
+.production-yield-table tr.is-under {
+  background: rgba(173, 78, 50, 0.045);
+}
+
+.production-yield-percent {
+  display: block;
+  margin-bottom: 8px;
+  font-family:
+    IBM Plex Mono,
+    monospace;
+  font-size: 12px;
+}
+
+.production-yield-table tr.is-under .production-yield-percent {
+  color: var(--yield-red);
+}
+
+.production-yield-table tr.is-over .production-yield-percent {
+  color: var(--yield-amber);
+}
+
+.yield-variance-meter {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 150px;
+  height: 7px;
+  background: linear-gradient(
+    90deg,
+    rgba(173, 78, 50, 0.09) 0 49.5%,
+    var(--yield-ink) 49.5% 50.5%,
+    rgba(189, 122, 46, 0.09) 50.5% 100%
+  );
+}
+
+.yield-variance-half {
+  display: flex;
+  align-items: stretch;
+}
+
+.yield-variance-half.is-negative {
+  justify-content: flex-end;
+}
+
+.yield-variance-half i {
+  display: block;
+}
+
+.yield-variance-half.is-negative i {
+  background: var(--yield-red);
+}
+
+.yield-variance-half.is-positive i {
+  background: var(--yield-amber);
+}
+
+.production-yield-method-note {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 18px;
+  border-left: 3px solid var(--yield-sage);
+  background: rgba(65, 104, 89, 0.065);
+  padding: 16px 18px;
+}
+
+.production-yield-method-note p {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .production-yield-scorecard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .production-yield-scorecard > div:nth-child(3) {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+
+  .production-yield-scorecard > div:nth-child(4) {
+    border-top: 1px solid var(--line);
+  }
+}
+
+@media (max-width: 680px) {
+  .production-yield-masthead,
+  .production-yield-controls,
+  .production-yield-panel-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .production-yield-range,
+  .production-yield-controls p {
+    min-width: 0;
+    text-align: left;
+  }
+
+  .production-yield-switch {
+    flex-wrap: wrap;
+  }
+
+  .production-yield-scorecard {
+    grid-template-columns: 1fr;
+  }
+
+  .production-yield-scorecard > div,
+  .production-yield-scorecard > div:nth-child(4) {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+  }
+
+  .production-yield-key,
+  .production-yield-method-note {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+}

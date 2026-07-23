@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant EventTemplate as EventTemplate
+    participant EventBus
+    Client->>+EventTemplate: reactivate()
+    Note over EventTemplate: Policies: eventTemplateRead, eventTemplateWrite, eventTemplateExecute
+    Note over EventTemplate: Guards (2)
+    EventTemplate->>EventTemplate: guard[0]: self.status == #quot;archived#quot;
+    EventTemplate->>EventTemplate: guard[1]: self.deletedAt == null
+    EventTemplate->>EventTemplate: mutate.status
+    EventTemplate->>EventTemplate: mutate.archivedAt
+    EventTemplate->>EventTemplate: mutate.archiveReason
+    EventTemplate->>EventBus: emit EventTemplateReactivated on event_template.reactivated
+    EventTemplate-->>-Client: void

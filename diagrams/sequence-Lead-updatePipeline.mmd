@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant Lead as Lead
+    participant EventBus
+    Client->>+Lead: updatePipeline(stage, estimatedValue, probability)
+    Note over Lead: Policies: leadRead, leadWrite, leadExecute
+    Note over Lead: Guards (2)
+    Lead->>Lead: guard[0]: self.capturedAt != null
+    Lead->>Lead: guard[1]: self.deletedAt == null
+    Lead->>Lead: compute.previousStage
+    Lead->>Lead: mutate.stage
+    Lead->>Lead: mutate.estimatedValue
+    Lead->>Lead: mutate.probability
+    Lead->>EventBus: emit LeadPipelineUpdated on lead.pipeline_updated
+    Lead-->>-Client: void

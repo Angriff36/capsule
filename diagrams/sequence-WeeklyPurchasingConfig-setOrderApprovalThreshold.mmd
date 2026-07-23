@@ -1,0 +1,10 @@
+sequenceDiagram
+    participant Client
+    participant WeeklyPurchasingConfig as WeeklyPurchasingConfig
+    Client->>+WeeklyPurchasingConfig: setOrderApprovalThreshold(amount)
+    Note over WeeklyPurchasingConfig: Policies: weeklyPurchasingConfigRead, weeklyPurchasingConfigWrite, weeklyPurchasingConfigExecute
+    Note over WeeklyPurchasingConfig: Guards (2)
+    WeeklyPurchasingConfig->>WeeklyPurchasingConfig: guard[0]: self.deletedAt == null
+    WeeklyPurchasingConfig->>WeeklyPurchasingConfig: guard[1]: roleAllows(user.role, #quot;manageAccess#quot;)
+    WeeklyPurchasingConfig->>WeeklyPurchasingConfig: mutate.orderApprovalThresholdAmount
+    WeeklyPurchasingConfig-->>-Client: void

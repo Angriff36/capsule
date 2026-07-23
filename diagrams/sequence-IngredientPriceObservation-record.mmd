@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant IngredientPriceObservation as IngredientPriceObservation
+    Client->>+IngredientPriceObservation: record(ingredientId, vendorId, vendorOrderId, vendorOrderLineId, receiptQuantity, cumulativeReceivedQuantity, unit, unitPrice)
+    Note over IngredientPriceObservation: Policies: ingredientPriceObservationRead, ingredientPriceObservationWrite, ingredientPriceObservationExecute
+    Note over IngredientPriceObservation: Guards (2)
+    IngredientPriceObservation->>IngredientPriceObservation: guard[0]: self.observedAt == null or self.ingredientId == ingredien...
+    IngredientPriceObservation->>IngredientPriceObservation: guard[1]: self.deletedAt == null
+    IngredientPriceObservation->>IngredientPriceObservation: mutate.ingredientId
+    IngredientPriceObservation->>IngredientPriceObservation: mutate.vendorId
+    IngredientPriceObservation->>IngredientPriceObservation: mutate.vendorOrderId
+    IngredientPriceObservation->>IngredientPriceObservation: mutate.vendorOrderLineId
+    IngredientPriceObservation->>IngredientPriceObservation: mutate.receiptQuantity
+    IngredientPriceObservation->>IngredientPriceObservation: mutate.cumulativeReceivedQuantity
+    IngredientPriceObservation->>IngredientPriceObservation: mutate.unit
+    IngredientPriceObservation->>IngredientPriceObservation: mutate.unitPrice
+    IngredientPriceObservation->>IngredientPriceObservation: mutate.observedAt
+    IngredientPriceObservation-->>-Client: void

@@ -10,6 +10,7 @@ export type EventStockDemand = {
 export type EventStockItem = {
   id: string;
   ingredientId: string;
+  locationId?: string;
   quantityOnHand: number;
   unit: string;
   stockedAt?: number | null;
@@ -19,11 +20,21 @@ export type EventStockItem = {
 export type EventStockReservation = {
   id: string;
   inventoryItemId: string;
+  inventoryLotId?: string | null;
   eventId: string;
   ingredientId: string;
   quantity: number;
   status: string;
   version?: number;
+  deletedAt?: number | null;
+};
+
+export type EventStockLot = {
+  id: string;
+  ingredientId: string;
+  locationId: string;
+  receiptQuantity: number;
+  receivedAt?: number | null;
   deletedAt?: number | null;
 };
 
@@ -37,6 +48,7 @@ export type EventStockShortage = {
 
 export type EventStockReservationCreated = {
   inventoryItemId: string;
+  inventoryLotId?: string;
   ingredientId: string;
   quantity: number;
   unit: string;
@@ -51,6 +63,7 @@ export type EventStockReservationReleased = {
 type Ports = {
   createReservation: (input: {
     inventoryItemId: string;
+    inventoryLotId?: string;
     eventId: string;
     ingredientId: string;
     quantity: number;
@@ -65,6 +78,11 @@ type Ports = {
 
 type ItemAvailability = {
   item: EventStockItem;
+  available: number;
+};
+
+type LotAvailability = {
+  lot: EventStockLot;
   available: number;
 };
 
@@ -88,8 +106,13 @@ export class EventStockReservationCoordinator {
     demands: readonly EventStockDemand[];
     items: readonly EventStockItem[];
     reservations: readonly EventStockReservation[];
+    lots?: readonly EventStockLot[];
   }) {
     const availability = this.itemAvailability(input.items, input.reservations);
+    const lotAvailability = this.lotAvailability(
+      input.lots,
+      input.reservations,
+    );
     const created: EventStockReservationCreated[] = [];
     const shortages: EventStockShortage[] = [];
     const eventReservations = input.reservations.filter(
@@ -114,6 +137,7 @@ export class EventStockReservationCoordinator {
         need,
         alreadyActive: alreadyReserved,
         availability,
+        lotAvailability,
       });
       created.push(...topUp.created);
       if (topUp.shortfall > 0) {
@@ -140,6 +164,7 @@ export class EventStockReservationCoordinator {
     demands: readonly EventStockDemand[];
     items: readonly EventStockItem[];
     reservations: readonly EventStockReservation[];
+    lots?: readonly EventStockLot[];
   }) {
     const release = this.ports.releaseReservation;
     if (!release) {
@@ -159,6 +184,10 @@ export class EventStockReservationCoordinator {
     }
 
     const availability = this.itemAvailability(input.items, input.reservations);
+    const lotAvailability = this.lotAvailability(
+      input.lots,
+      input.reservations,
+    );
     const mutableReservations = eventReservations.map((row) => ({ ...row }));
     const created: EventStockReservationCreated[] = [];
     const released: EventStockReservationReleased[] = [];
@@ -204,6 +233,7 @@ export class EventStockReservationCoordinator {
           excess: currentActive - targetActive,
           activeRows,
           availability,
+          lotAvailability,
           release,
         });
         released.push(...releaseResult.released);
@@ -223,6 +253,7 @@ export class EventStockReservationCoordinator {
           need,
           alreadyActive: currentActive,
           availability,
+          lotAvailability,
         });
         created.push(...topUp.created);
         if (topUp.shortfall > 0) {
@@ -273,6 +304,7 @@ export class EventStockReservationCoordinator {
     excess: number;
     activeRows: EventStockReservation[];
     availability: ItemAvailability[];
+    lotAvailability: LotAvailability[] | null;
     release: NonNullable<Ports["releaseReservation"]>;
   }) {
     const released: EventStockReservationReleased[] = [];
@@ -297,6 +329,12 @@ export class EventStockReservationCoordinator {
         (candidate) => candidate.item.id === row.inventoryItemId,
       );
       if (entry) entry.available += row.quantity;
+      const lotEntry = row.inventoryLotId
+        ? input.lotAvailability?.find(
+            (candidate) => candidate.lot.id === row.inventoryLotId,
+          )
+        : undefined;
+      if (lotEntry) lotEntry.available += row.quantity;
 
       if (row.quantity <= remaining) {
         remaining -= row.quantity;
@@ -311,14 +349,17 @@ export class EventStockReservationCoordinator {
       if (keep > 0) {
         await this.ports.createReservation({
           inventoryItemId: row.inventoryItemId,
+          ...(row.inventoryLotId ? { inventoryLotId: row.inventoryLotId } : {}),
           eventId: input.eventId,
           ingredientId: input.ingredientId,
           quantity: keep,
           idempotencyKey: `event-stock-keep:${input.eventId}:${row.id}:${keep}`,
         });
         if (entry) entry.available -= keep;
+        if (lotEntry) lotEntry.available -= keep;
         recreated.push({
           inventoryItemId: row.inventoryItemId,
+          ...(row.inventoryLotId ? { inventoryLotId: row.inventoryLotId } : {}),
           ingredientId: input.ingredientId,
           quantity: keep,
           unit: input.unit,
@@ -336,6 +377,7 @@ export class EventStockReservationCoordinator {
     need: number;
     alreadyActive: number;
     availability: ItemAvailability[];
+    lotAvailability: LotAvailability[] | null;
   }) {
     const created: EventStockReservationCreated[] = [];
     let remaining = input.need;
@@ -348,6 +390,57 @@ export class EventStockReservationCoordinator {
           entry.available > 0,
       )
       .sort((left, right) => right.available - left.available);
+
+    if (input.lotAvailability) {
+      const lotCandidates = input.lotAvailability
+        .filter(
+          (candidate) =>
+            candidate.lot.ingredientId === input.ingredientId &&
+            candidate.available > 0 &&
+            candidates.some(
+              (entry) => entry.item.locationId === candidate.lot.locationId,
+            ),
+        )
+        .sort(
+          (left, right) =>
+            (left.lot.receivedAt ?? Number.MAX_SAFE_INTEGER) -
+              (right.lot.receivedAt ?? Number.MAX_SAFE_INTEGER) ||
+            left.lot.id.localeCompare(right.lot.id),
+        );
+
+      for (const candidate of lotCandidates) {
+        if (remaining <= 0) break;
+        const entry = candidates.find(
+          (item) => item.item.locationId === candidate.lot.locationId,
+        );
+        if (!entry || entry.available <= 0) continue;
+        const quantity = Math.min(
+          remaining,
+          entry.available,
+          candidate.available,
+        );
+        if (quantity <= 0) continue;
+        await this.ports.createReservation({
+          inventoryItemId: entry.item.id,
+          inventoryLotId: candidate.lot.id,
+          eventId: input.eventId,
+          ingredientId: input.ingredientId,
+          quantity,
+          idempotencyKey: `event-stock-reserve:${input.eventId}:${entry.item.id}:${candidate.lot.id}:${input.ingredientId}:${quantity}:${input.alreadyActive + reserved}`,
+        });
+        entry.available -= quantity;
+        candidate.available -= quantity;
+        remaining -= quantity;
+        reserved += quantity;
+        created.push({
+          inventoryItemId: entry.item.id,
+          inventoryLotId: candidate.lot.id,
+          ingredientId: input.ingredientId,
+          quantity,
+          unit: input.unit,
+        });
+      }
+    }
 
     for (const entry of candidates) {
       if (remaining <= 0) break;
@@ -392,6 +485,30 @@ export class EventStockReservationCoordinator {
         return {
           item,
           available: Math.max(0, item.quantityOnHand - reserved),
+        };
+      });
+  }
+
+  private lotAvailability(
+    lots: readonly EventStockLot[] | undefined,
+    reservations: readonly EventStockReservation[],
+  ): LotAvailability[] | null {
+    if (!lots) return null;
+    return lots
+      .filter((lot) => lot.deletedAt == null && lot.receiptQuantity > 0)
+      .map((lot) => {
+        const allocated = reservations
+          .filter(
+            (reservation) =>
+              reservation.inventoryLotId === lot.id &&
+              reservation.deletedAt == null &&
+              (reservation.status === "active" ||
+                reservation.status === "consumed"),
+          )
+          .reduce((sum, reservation) => sum + reservation.quantity, 0);
+        return {
+          lot,
+          available: Math.max(0, lot.receiptQuantity - allocated),
         };
       });
   }

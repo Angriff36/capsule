@@ -17,6 +17,9 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
 
   property required defaultVendorId: uuid
   property configuredAt: datetime?
+  // Vendor orders whose total exceeds this need manager approval before they
+  // are sent. Null disables the approval gate.
+  property orderApprovalThresholdAmount: money(12, 2)?
 
   belongsTo defaultVendor: Vendor fields [tenantId, defaultVendorId] references [tenantId, id]
 
@@ -32,6 +35,15 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
     mutate configuredAt = now()
   }
 
+  // Manager control on buyer spend — setting it is manage-gated so buyers
+  // cannot raise the ceiling on themselves. Null (or clearing) disables it.
+  command setOrderApprovalThreshold(optional amount: money(12, 2)) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "manageAccess")
+    constraint approvalThresholdNonnegative: amount == null or amount >= 0 "Approval threshold cannot be negative"
+    mutate orderApprovalThresholdAmount = amount
+  }
+
   command routeNeed(
     purchaseNeedId: uuid,
     eventId: uuid,
@@ -39,7 +51,8 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
     ingredientId: uuid,
     requiredQuantity: decimal(12, 4),
     unit: UnitOfMeasure,
-    purchasingWeekStart: datetime
+    purchasingWeekStart: datetime,
+    optional preferredVendorId: uuid
   ) {
     guard self.configuredAt != null
     guard self.deletedAt == null
@@ -52,7 +65,7 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
       requiredQuantity: requiredQuantity
       unit: unit
       purchasingWeekStart: purchasingWeekStart
-      vendorId: self.defaultVendorId
+      vendorId: preferredVendorId != null ? preferredVendorId : self.defaultVendorId
     }
   }
 
@@ -322,6 +335,7 @@ on PurchaseNeedOpened run WeeklyPurchasingConfig.routeNeed
     requiredQuantity: payload.requiredQuantity
     unit: payload.unit
     purchasingWeekStart: payload.purchasingWeekStart
+    preferredVendorId: payload.preferredVendorId
   }
 
 on PurchaseNeedReadyForWeeklyDraft run VendorOrder.ensureWeeklyDraft

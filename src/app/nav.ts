@@ -50,6 +50,12 @@ export const NAV_AREAS: NavArea[] = [
     icon: UsersIcon,
   },
   {
+    path: "/my",
+    label: "My Day",
+    group: "People",
+    icon: CalendarIcon,
+  },
+  {
     path: "/clients",
     label: "Clients & CRM",
     group: "People",
@@ -72,7 +78,6 @@ export const NAV_AREAS: NavArea[] = [
     label: "Facilities",
     group: "System",
     icon: BuildingIcon,
-    planned: "Facilities, equipment and maintenance work orders.",
   },
   {
     path: "/admin",

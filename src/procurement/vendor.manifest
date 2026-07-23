@@ -11,6 +11,13 @@ enum VendorStatus {
   terminated
 }
 
+enum VendorContactRole {
+  account_rep
+  dispatch
+  billing
+  general
+}
+
 // Tenant-scoped external supplier record (capsule-pro InventorySupplier).
 // Not a Capsule login role — procurement/receiving staff act on this record.
 entity Vendor mixin TenantScoped, SoftDeletable {
@@ -175,6 +182,95 @@ entity Vendor mixin TenantScoped, SoftDeletable {
   store Vendor in durable
 }
 
+// Named person at a vendor (account rep, dispatch, billing). Buyers use this
+// directory to know exactly who to call about lead time or substitutions.
+entity VendorContact mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required vendorId: uuid
+  property required searchable name: string
+  property required role: VendorContactRole = "general"
+  property encrypted email: string?
+  property encrypted phone: string?
+  property notes: string?
+  property addedAt: datetime?
+
+  belongsTo vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
+
+  default policy vendorContactRead read: roleAllows(user.role, "procurementAccess") "Procurement staff may read vendor contacts"
+  default policy vendorContactWrite write: roleAllows(user.role, "procurementAccess") "Procurement staff may write vendor contacts through commands"
+  default policy vendorContactExecute execute: roleAllows(user.role, "procurementAccess") "Procurement staff may execute vendor contact commands"
+
+  command add(
+    vendorId: uuid,
+    name: string,
+    optional role: VendorContactRole,
+    optional email: string,
+    optional phone: string,
+    optional notes: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard self.vendor != null and self.vendor.deletedAt == null
+    constraint addContactVendorMatch: vendorId == self.vendorId "Add contact vendorId must match the seeded vendor reference"
+    constraint addContactName: length(trim(name)) > 0 "Contact name is required"
+    mutate vendorId = vendorId
+    mutate name = name
+    mutate role = role != null ? role : "general"
+    mutate email = email
+    mutate phone = phone
+    mutate notes = notes
+    mutate addedAt = now()
+    emit VendorContactAdded {
+      vendorContactId: self.id
+      tenantId: self.tenantId
+      vendorId: vendorId
+      name: name
+      role: role != null ? role : "general"
+    }
+  }
+
+  command update(
+    name: string,
+    optional role: VendorContactRole,
+    optional email: string,
+    optional phone: string,
+    optional notes: string
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint updateContactName: length(trim(name)) > 0 "Contact name is required"
+    mutate name = name
+    mutate role = role != null ? role : self.role
+    mutate email = email != null ? email : self.email
+    mutate phone = phone != null ? phone : self.phone
+    mutate notes = notes != null ? notes : self.notes
+    emit VendorContactUpdated {
+      vendorContactId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      name: name
+      role: role != null ? role : self.role
+    }
+  }
+
+  command remove() {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    mutate deletedAt = now()
+    emit VendorContactRemoved {
+      vendorContactId: self.id
+      tenantId: self.tenantId
+      vendorId: self.vendorId
+      name: self.name
+    }
+  }
+
+  store VendorContact in durable
+}
+
 event VendorOnboarded: "vendor.onboarded" {
   vendorId: string
   tenantId: string
@@ -207,4 +303,27 @@ event VendorTerminated: "vendor.terminated" {
   tenantId: string
   name: string
   reason: string
+}
+
+event VendorContactAdded: "vendor.contact_added" {
+  vendorContactId: string
+  tenantId: string
+  vendorId: string
+  name: string
+  role: string
+}
+
+event VendorContactUpdated: "vendor.contact_updated" {
+  vendorContactId: string
+  tenantId: string
+  vendorId: string
+  name: string
+  role: string
+}
+
+event VendorContactRemoved: "vendor.contact_removed" {
+  vendorContactId: string
+  tenantId: string
+  vendorId: string
+  name: string
 }

@@ -9,7 +9,7 @@ Capsule is a live Manifest project assembled by Builder. Domain meaning lives in
 `src/**/*.manifest` and `manifest.config.yaml`. Builder-owned generated trees
 must not be hand-edited — regenerate them with the commands below.
 
-Related: [local-dev.md](./local-dev.md), [manifest-builder.md](../generation/manifest-builder.md), [command-idempotency.md](../generation/command-idempotency.md), [AGENTS.md](../../AGENTS.md).
+Related: [local-dev.md](./local-dev.md), [manifest-builder.md](../generation/manifest-builder.md), [manifest-cli-safety.md](../generation/manifest-cli-safety.md), [command-idempotency.md](../generation/command-idempotency.md), [AGENTS.md](../../AGENTS.md).
 
 ---
 
@@ -160,6 +160,12 @@ bun run codegen
 
 **Never hand-edit** Builder-owned paths. See `.builder/ownership.json` and
 [manifest-builder.md](../generation/manifest-builder.md).
+
+### Manifest CLI — what is safe to run here
+
+Bare `manifest …` is not the Convex regen path. Full inventory (safe vs unsafe,
+including why `diagram -o diagrams` fails ownership):
+[manifest-cli-safety.md](../generation/manifest-cli-safety.md).
 
 ---
 

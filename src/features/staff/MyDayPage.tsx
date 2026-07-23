@@ -1,0 +1,842 @@
+import { useUser } from "@clerk/react";
+import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
+import {
+  useAvailabilityWindowWithdraw,
+  useCreateAvailabilityWindow,
+  useCreateTimeRecord,
+  useListAvailabilityWindow,
+  useListDelivery,
+  useListEvent,
+  useListEventCloseout,
+  useListPackList,
+  useListPackListItem,
+  useListPerson,
+  useListPrepTask,
+  useListShift,
+  useListTimeRecord,
+  useListWeeklyScheduleNotice,
+  usePackListItemMarkMissing,
+  usePackListItemMarkPacked,
+  usePrepTaskClaim,
+  usePrepTaskComplete,
+  usePrepTaskRelease,
+  usePrepTaskStart,
+  useShiftComplete,
+  useShiftStart,
+  useTimeRecordClockOut,
+  useWeeklyScheduleNoticeAcknowledge,
+} from "../../lib/manifest-convex-react";
+import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  CLOSEOUT_EVIDENCE_CATEGORIES,
+  RecordPhotoCapture,
+} from "../attachments/RecordPhotoCapture";
+import { WorkforceFailureBanner } from "../workforce/WorkforceFailureBanner";
+import { ShiftSwapCard } from "./ShiftSwapCard";
+import { TimeOffRequestCard } from "./TimeOffRequestCard";
+import { WeeklyAvailabilityCard } from "./WeeklyAvailabilityCard";
+
+const PERSON_STORAGE_KEY = "capsule.my-day.personId";
+
+const dayLabel = (ms?: number | null) =>
+  ms == null
+    ? "Unscheduled"
+    : new Date(ms).toLocaleDateString([], {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+      });
+
+const timeLabel = (ms?: number | null) =>
+  ms == null
+    ? "—"
+    : new Date(ms).toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+      });
+
+/**
+ * Phone-first view for field staff: shifts, clock in/out, prep, packing,
+ * assigned deliveries, closeout photos, and time off. Rendered outside the
+ * admin AppShell so none of the admin-facing navigation appears.
+ */
+export function MyDayPage() {
+  const { user } = useUser();
+  const people = useListPerson();
+  const shifts = useListShift();
+  const scheduleNotices = useListWeeklyScheduleNotice();
+  const records = useListTimeRecord();
+  const tasks = useListPrepTask();
+  const deliveries = useListDelivery();
+  const closeouts = useListEventCloseout();
+  const events = useListEvent();
+  const packLists = useListPackList();
+  const packItems = useListPackListItem();
+  const windows = useListAvailabilityWindow();
+
+  const clockIn = useCreateTimeRecord();
+  const clockOut = useTimeRecordClockOut();
+  const startShift = useShiftStart();
+  const completeShift = useShiftComplete();
+  const acknowledgeSchedule = useWeeklyScheduleNoticeAcknowledge();
+  const claimTask = usePrepTaskClaim();
+  const releaseTask = usePrepTaskRelease();
+  const startTask = usePrepTaskStart();
+  const completeTask = usePrepTaskComplete();
+  const markItemPacked = usePackListItemMarkPacked();
+  const markItemMissing = usePackListItemMarkMissing();
+  const declareWindow = useCreateAvailabilityWindow();
+  const withdrawWindow = useAvailabilityWindowWithdraw();
+
+  const [storedPersonId, setStoredPersonId] = useState<string | null>(() =>
+    localStorage.getItem(PERSON_STORAGE_KEY),
+  );
+  const [showDeclare, setShowDeclare] = useState(false);
+  const [openPhotoKey, setOpenPhotoKey] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [failure, setFailure] = useState<unknown>(null);
+
+  const activePeople = (people ?? []).filter(
+    (person) => person.deletedAt == null && person.status === "active",
+  );
+  const me =
+    activePeople.find((person) => person.authSubjectId === user?.id) ??
+    activePeople.find((person) => person._id === storedPersonId);
+
+  const choosePerson = (id: string) => {
+    localStorage.setItem(PERSON_STORAGE_KEY, id);
+    setStoredPersonId(id);
+  };
+
+  const run = (key: string, work: () => Promise<void>) => {
+    setFailure(null);
+    setBusy(key);
+    void work()
+      .catch(setFailure)
+      .finally(() => setBusy(null));
+  };
+
+  if (people === undefined) {
+    return (
+      <MobileFrame>
+        <TableSkeleton rows={6} />
+      </MobileFrame>
+    );
+  }
+
+  if (!me) {
+    return (
+      <MobileFrame>
+        <section className="card px-4 py-4">
+          <p className="eyebrow">Who are you?</p>
+          <p className="mt-2 text-[13px] leading-relaxed text-ink-2">
+            Your sign-in is not linked to a staff profile yet. Pick your name
+            once — it is remembered on this phone.
+          </p>
+          <div className="mt-3 flex flex-col gap-2">
+            {activePeople.map((person) => (
+              <button
+                key={person._id}
+                className="btn btn-ghost w-full justify-start py-3 text-[15px]"
+                onClick={() => choosePerson(person._id)}
+              >
+                {person.givenName} {person.familyName}
+              </button>
+            ))}
+            {activePeople.length === 0 ? (
+              <p className="text-[13px] text-ink-3">
+                No active staff profiles exist in this workspace yet.
+              </p>
+            ) : null}
+          </div>
+        </section>
+      </MobileFrame>
+    );
+  }
+
+  const mine = <T extends { personId?: string; deletedAt?: number | null }>(
+    rows: T[] | undefined,
+  ) =>
+    (rows ?? []).filter(
+      (row) => row.deletedAt == null && row.personId === me._id,
+    );
+
+  const myShifts = mine(shifts)
+    .filter((row) => ["scheduled", "started"].includes(String(row.status)))
+    .sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0));
+
+  const openRecord = mine(records).find(
+    (row) => String(row.status) === "open" && row.clockInAt != null,
+  );
+
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  const endOfToday = new Date();
+  endOfToday.setHours(23, 59, 59, 999);
+  const myScheduleNotices = mine(scheduleNotices)
+    .filter(
+      (notice) =>
+        notice.publishedAt != null &&
+        notice.weekEndsAt >= startOfToday.getTime(),
+    )
+    .sort((a, b) => a.weekStartsAt - b.weekStartsAt);
+  const myTasks = (tasks ?? [])
+    .filter(
+      (task) =>
+        task.deletedAt == null &&
+        ["pending", "claimed", "in_progress"].includes(String(task.status)) &&
+        (task.dueAt == null || task.dueAt <= endOfToday.getTime()),
+    )
+    .sort(
+      (a, b) =>
+        (a.dueAt ?? Number.MAX_SAFE_INTEGER) -
+        (b.dueAt ?? Number.MAX_SAFE_INTEGER),
+    );
+
+  const packingLists = (packLists ?? []).filter(
+    (list) => list.deletedAt == null && String(list.status) === "packing",
+  );
+  const listName = (id: string) =>
+    packingLists.find((list) => list._id === id)?.name ?? "Pack list";
+  const openPackItems = (packItems ?? []).filter(
+    (item) =>
+      item.deletedAt == null &&
+      String(item.status) === "listed" &&
+      packingLists.some((list) => list._id === item.packListId),
+  );
+
+  const myDeliveries = (deliveries ?? [])
+    .filter(
+      (delivery) =>
+        delivery.deletedAt == null &&
+        delivery.driverId === me._id &&
+        (["scheduled", "in_transit"].includes(String(delivery.status)) ||
+          (String(delivery.status) === "delivered" &&
+            (delivery.deliveredAt ?? 0) >= startOfToday.getTime())),
+    )
+    .sort(
+      (a, b) =>
+        (a.windowStartsAt ?? Number.MAX_SAFE_INTEGER) -
+        (b.windowStartsAt ?? Number.MAX_SAFE_INTEGER),
+    );
+
+  const fieldCloseouts = (closeouts ?? [])
+    .filter(
+      (closeout) =>
+        closeout.deletedAt == null &&
+        (String(closeout.status) === "draft" ||
+          (closeout.finalizedAt ?? closeout.capturedAt ?? 0) >=
+            startOfToday.getTime()),
+    )
+    .sort(
+      (a, b) =>
+        (b.capturedAt ?? b._creationTime) - (a.capturedAt ?? a._creationTime),
+    )
+    .slice(0, 5);
+  const eventTitle = (eventId: string) =>
+    events?.find((event) => event._id === eventId)?.title ?? "Event closeout";
+
+  const myWindows = mine(windows)
+    .filter((row) => String(row.status) === "active")
+    .sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0));
+
+  const submitDeclare = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const toEpoch = (value: FormDataEntryValue | null) =>
+      new Date(String(value)).getTime();
+    run("declare", async () => {
+      await declareWindow({
+        personId: me._id,
+        startsAt: toEpoch(data.get("startsAt")),
+        endsAt: toEpoch(data.get("endsAt")),
+        kind: "available",
+        notes: String(data.get("notes") || "") || undefined,
+      });
+      setShowDeclare(false);
+    });
+  };
+
+  const loading =
+    shifts === undefined ||
+    scheduleNotices === undefined ||
+    records === undefined ||
+    tasks === undefined ||
+    deliveries === undefined ||
+    closeouts === undefined ||
+    events === undefined ||
+    packItems === undefined ||
+    windows === undefined;
+
+  return (
+    <MobileFrame
+      subtitle={`${me.givenName} ${me.familyName}`}
+      onSwitchPerson={
+        me.authSubjectId === user?.id
+          ? undefined
+          : () => {
+              localStorage.removeItem(PERSON_STORAGE_KEY);
+              setStoredPersonId(null);
+            }
+      }
+    >
+      {failure ? <WorkforceFailureBanner error={failure} /> : null}
+      {loading ? <TableSkeleton rows={8} /> : null}
+
+      <section className="card px-4 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="eyebrow">Time clock</p>
+            <p className="mt-1 text-[13px] text-ink-2">
+              {openRecord
+                ? `Clocked in at ${timeLabel(openRecord.clockInAt)}`
+                : "You are not clocked in."}
+            </p>
+          </div>
+        </div>
+        {openRecord ? (
+          <button
+            className="btn btn-primary mt-3 w-full py-3 text-[15px]"
+            disabled={busy != null}
+            onClick={() =>
+              run("clock-out", async () => {
+                await clockOut({
+                  docId: openRecord._id,
+                  version: openRecord.version,
+                });
+              })
+            }
+          >
+            {busy === "clock-out" ? "Clocking out…" : "Clock out"}
+          </button>
+        ) : (
+          <button
+            className="btn btn-primary mt-3 w-full py-3 text-[15px]"
+            disabled={busy != null}
+            onClick={() =>
+              run("clock-in", async () => {
+                await clockIn({ personId: me._id });
+              })
+            }
+          >
+            {busy === "clock-in" ? "Clocking in…" : "Clock in"}
+          </button>
+        )}
+      </section>
+
+      <section
+        className="card schedule-notice-card px-4 py-4"
+        data-testid="staff-schedule-notices"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="eyebrow">Published schedule</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-ink-2">
+              Review each shift summary and let your manager know you received
+              it.
+            </p>
+          </div>
+          <span className="schedule-notice-count">
+            {
+              myScheduleNotices.filter((notice) => !notice.acknowledgedAt)
+                .length
+            }
+          </span>
+        </div>
+
+        {myScheduleNotices.length === 0 ? (
+          <p className="mt-3 text-[13px] text-ink-3">
+            No published schedules are waiting for you.
+          </p>
+        ) : (
+          <ul className="mt-3 flex flex-col gap-3">
+            {myScheduleNotices.map((notice) => {
+              const canAcknowledge =
+                notice.recipientAuthSubjectId != null &&
+                notice.recipientAuthSubjectId === user?.id;
+              return (
+                <li key={notice._id} className="schedule-notice-item">
+                  <div className="schedule-notice-item-heading">
+                    <div>
+                      <strong>Week of {dayLabel(notice.weekStartsAt)}</strong>
+                      <small>
+                        {notice.shiftCount}{" "}
+                        {notice.shiftCount === 1 ? "shift" : "shifts"}
+                      </small>
+                    </div>
+                    {notice.acknowledgedAt ? (
+                      <span className="schedule-notice-received">Received</span>
+                    ) : (
+                      <span className="schedule-notice-new">New</span>
+                    )}
+                  </div>
+                  <p className="schedule-notice-summary">
+                    {notice.shiftSummary}
+                  </p>
+                  {notice.acknowledgedAt ? (
+                    <p className="schedule-notice-confirmation">
+                      Acknowledged {dayLabel(notice.acknowledgedAt)} at{" "}
+                      {timeLabel(notice.acknowledgedAt)}
+                    </p>
+                  ) : canAcknowledge ? (
+                    <button
+                      className="btn btn-primary mt-3 w-full py-3 text-[15px]"
+                      data-testid="acknowledge-schedule-action"
+                      disabled={busy != null}
+                      onClick={() =>
+                        run(`acknowledge:${notice._id}`, async () => {
+                          await acknowledgeSchedule({
+                            docId: notice._id,
+                            version: notice.version,
+                          });
+                        })
+                      }
+                    >
+                      {busy === `acknowledge:${notice._id}`
+                        ? "Acknowledging…"
+                        : "Acknowledge schedule"}
+                    </button>
+                  ) : (
+                    <p className="schedule-notice-link-help">
+                      Ask a manager to link this staff profile to your sign-in
+                      before acknowledging.
+                    </p>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section className="card px-4 py-4">
+        <p className="eyebrow">Upcoming shifts</p>
+        {myShifts.length === 0 ? (
+          <p className="mt-2 text-[13px] text-ink-3">No shifts scheduled.</p>
+        ) : (
+          <ul className="mt-2 flex flex-col divide-y divide-line-2">
+            {myShifts.map((shift) => (
+              <li key={shift._id} className="flex items-center gap-3 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-semibold">
+                    {dayLabel(shift.startsAt)}
+                  </p>
+                  <p className="text-[12.5px] text-ink-2">
+                    {timeLabel(shift.startsAt)} – {timeLabel(shift.endsAt)}
+                    {shift.role ? ` · ${shift.role}` : ""}
+                  </p>
+                </div>
+                <StatusChip status={String(shift.status)} />
+                {String(shift.status) === "scheduled" &&
+                shift.scheduledAt != null ? (
+                  <button
+                    className="btn btn-ghost btn-sm py-2"
+                    disabled={busy != null}
+                    onClick={() =>
+                      run(`shift:${shift._id}`, async () => {
+                        await startShift({
+                          docId: shift._id,
+                          version: shift.version,
+                        });
+                      })
+                    }
+                  >
+                    Start
+                  </button>
+                ) : null}
+                {String(shift.status) === "started" ? (
+                  <button
+                    className="btn btn-ghost btn-sm py-2"
+                    disabled={busy != null}
+                    onClick={() =>
+                      run(`shift:${shift._id}`, async () => {
+                        await completeShift({
+                          docId: shift._id,
+                          version: shift.version,
+                        });
+                      })
+                    }
+                  >
+                    Finish
+                  </button>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <ShiftSwapCard person={me} />
+
+      <section className="card px-4 py-4">
+        <p className="eyebrow">Today's prep</p>
+        {myTasks.length === 0 ? (
+          <p className="mt-2 text-[13px] text-ink-3">
+            No prep tasks due today.
+          </p>
+        ) : (
+          <ul className="mt-2 flex flex-col divide-y divide-line-2">
+            {myTasks.map((task) => {
+              const status = String(task.status);
+              const key = `task:${task._id}`;
+              const action =
+                status === "pending"
+                  ? {
+                      label: "Claim",
+                      work: () =>
+                        claimTask({ docId: task._id, version: task.version }),
+                    }
+                  : status === "claimed"
+                    ? {
+                        label: "Start",
+                        work: () =>
+                          startTask({ docId: task._id, version: task.version }),
+                      }
+                    : {
+                        label: "Done",
+                        work: () =>
+                          completeTask({
+                            docId: task._id,
+                            version: task.version,
+                          }),
+                      };
+              return (
+                <li key={task._id} className="flex items-center gap-3 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[14px] font-semibold">
+                      {task.name?.trim() || "Prep task"}
+                    </p>
+                    <p className="text-[12.5px] text-ink-2">
+                      {task.station ? `${task.station} · ` : ""}
+                      due {task.dueAt ? timeLabel(task.dueAt) : "today"}
+                    </p>
+                  </div>
+                  <StatusChip status={status} />
+                  <button
+                    className="btn btn-ghost btn-sm py-2"
+                    disabled={busy != null}
+                    onClick={() =>
+                      run(key, async () => void (await action.work()))
+                    }
+                  >
+                    {busy === key ? "…" : action.label}
+                  </button>
+                  {status === "claimed" ? (
+                    <button
+                      className="btn btn-ghost btn-sm py-2"
+                      disabled={busy != null}
+                      onClick={() =>
+                        run(`${key}:release`, async () => {
+                          await releaseTask({
+                            docId: task._id,
+                            version: task.version,
+                          });
+                        })
+                      }
+                    >
+                      Release
+                    </button>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
+
+      <section className="card px-4 py-4">
+        <p className="eyebrow">Pack list items</p>
+        {openPackItems.length === 0 ? (
+          <p className="mt-2 text-[13px] text-ink-3">
+            Nothing is waiting to be packed.
+          </p>
+        ) : (
+          <ul className="mt-2 flex flex-col divide-y divide-line-2">
+            {openPackItems.map((item) => (
+              <li key={item._id} className="flex items-center gap-3 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[14px] font-semibold">
+                    {item.description || "Item"}
+                  </p>
+                  <p className="text-[12.5px] text-ink-2">
+                    {listName(item.packListId)} · {item.requiredQuantity}{" "}
+                    {item.unit}
+                  </p>
+                </div>
+                <button
+                  className="btn btn-primary btn-sm py-2"
+                  disabled={busy != null}
+                  onClick={() =>
+                    run(`pack:${item._id}`, async () => {
+                      await markItemPacked({
+                        docId: item._id,
+                        version: item.version,
+                        packedQuantity: item.requiredQuantity,
+                      });
+                    })
+                  }
+                >
+                  Packed
+                </button>
+                <button
+                  className="btn btn-ghost btn-sm py-2"
+                  disabled={busy != null}
+                  onClick={() =>
+                    run(`pack:${item._id}:missing`, async () => {
+                      await markItemMissing({
+                        docId: item._id,
+                        version: item.version,
+                      });
+                    })
+                  }
+                >
+                  Missing
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      {myDeliveries.length > 0 ? (
+        <section className="card px-4 py-4" data-testid="my-deliveries">
+          <p className="eyebrow">Assigned deliveries</p>
+          <p className="mt-1 text-[12.5px] text-ink-3">
+            Capture proof at the drop-off so dispatch can see it immediately.
+          </p>
+          <ul className="mt-2 flex flex-col divide-y divide-line-2">
+            {myDeliveries.map((delivery) => {
+              const photoKey = `delivery:${delivery._id}`;
+              const photosOpen = openPhotoKey === photoKey;
+              return (
+                <li key={delivery._id} className="py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[14px] font-semibold">
+                        {delivery.destination}
+                      </p>
+                      <p className="text-[12.5px] text-ink-2">
+                        {dayLabel(delivery.windowStartsAt)} ·{" "}
+                        {timeLabel(delivery.windowStartsAt)}–
+                        {timeLabel(delivery.windowEndsAt)}
+                      </p>
+                    </div>
+                    <StatusChip status={String(delivery.status)} />
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm min-h-10"
+                      aria-expanded={photosOpen}
+                      onClick={() =>
+                        setOpenPhotoKey(photosOpen ? null : photoKey)
+                      }
+                    >
+                      {photosOpen ? "Close" : "Add photo"}
+                    </button>
+                  </div>
+                  {photosOpen ? (
+                    <div className="mt-3">
+                      <RecordPhotoCapture
+                        parentType="delivery"
+                        parentId={delivery._id}
+                        title="Proof of delivery"
+                        description="Photograph the completed drop-off, signed paperwork, or placement at the venue."
+                      />
+                    </div>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
+
+      {fieldCloseouts.length > 0 ? (
+        <section className="card px-4 py-4" data-testid="my-closeouts">
+          <p className="eyebrow">Venue closeouts</p>
+          <p className="mt-1 text-[12.5px] text-ink-3">
+            Capture venue, leftover-food, and equipment-return evidence before
+            the team leaves.
+          </p>
+          <ul className="mt-2 flex flex-col divide-y divide-line-2">
+            {fieldCloseouts.map((closeout) => {
+              const photoKey = `closeout:${closeout._id}`;
+              const photosOpen = openPhotoKey === photoKey;
+              return (
+                <li key={closeout._id} className="py-3">
+                  <div className="flex items-center gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[14px] font-semibold">
+                        {eventTitle(String(closeout.eventId))}
+                      </p>
+                      <p className="text-[12.5px] text-ink-2">
+                        {closeout.capturedAt
+                          ? `Captured ${new Date(closeout.capturedAt).toLocaleString()}`
+                          : "Ready for venue photos"}
+                      </p>
+                    </div>
+                    <StatusChip status={String(closeout.status)} />
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm min-h-10"
+                      aria-expanded={photosOpen}
+                      onClick={() =>
+                        setOpenPhotoKey(photosOpen ? null : photoKey)
+                      }
+                    >
+                      {photosOpen ? "Close" : "Add photo"}
+                    </button>
+                  </div>
+                  {photosOpen ? (
+                    <div className="mt-3">
+                      <RecordPhotoCapture
+                        parentType="closeout"
+                        parentId={closeout._id}
+                        title="Closeout evidence"
+                        description="Choose what the photo documents so the office can match it to a waste claim or credit adjustment."
+                        evidenceCategories={CLOSEOUT_EVIDENCE_CATEGORIES}
+                      />
+                    </div>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
+
+      <TimeOffRequestCard personId={me._id} busy={busy} run={run} />
+
+      <WeeklyAvailabilityCard personId={me._id} busy={busy} run={run} />
+
+      <section className="card px-4 py-4">
+        <div className="flex items-center justify-between">
+          <p className="eyebrow">Specific dates</p>
+          <button
+            className="btn btn-ghost btn-sm py-2"
+            onClick={() => setShowDeclare((value) => !value)}
+          >
+            {showDeclare ? "Close" : "Declare"}
+          </button>
+        </div>
+        <p className="mt-1 text-[12.5px] text-ink-3">
+          Add a one-time window when you can work outside your usual weekly
+          availability.
+        </p>
+        {showDeclare ? (
+          <form className="mt-3 flex flex-col gap-3" onSubmit={submitDeclare}>
+            <label className="field-label">
+              From
+              <input
+                name="startsAt"
+                className="input"
+                type="datetime-local"
+                required
+              />
+            </label>
+            <label className="field-label">
+              Until
+              <input
+                name="endsAt"
+                className="input"
+                type="datetime-local"
+                required
+              />
+            </label>
+            <label className="field-label">
+              Notes
+              <input name="notes" className="input" />
+            </label>
+            <button
+              className="btn btn-primary w-full py-3 text-[15px]"
+              disabled={busy != null}
+            >
+              {busy === "declare" ? "Adding…" : "Add availability"}
+            </button>
+          </form>
+        ) : null}
+        {myWindows.length === 0 ? (
+          <p className="mt-2 text-[13px] text-ink-3">
+            No date-specific windows declared.
+          </p>
+        ) : (
+          <ul className="mt-2 flex flex-col divide-y divide-line-2">
+            {myWindows.map((window) => (
+              <li key={window._id} className="flex items-center gap-3 py-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-semibold">
+                    {dayLabel(window.startsAt)}
+                    {window.kind === "unavailable" ? (
+                      <span className="ml-2 text-[12px] font-medium text-danger">
+                        Time off
+                      </span>
+                    ) : null}
+                  </p>
+                  <p className="text-[12.5px] text-ink-2">
+                    {timeLabel(window.startsAt)} – {timeLabel(window.endsAt)}
+                  </p>
+                </div>
+                <button
+                  className="btn btn-ghost btn-sm py-2"
+                  disabled={busy != null}
+                  onClick={() =>
+                    run(`window:${window._id}`, async () => {
+                      await withdrawWindow({
+                        docId: window._id,
+                        version: window.version,
+                      });
+                    })
+                  }
+                >
+                  Withdraw
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </MobileFrame>
+  );
+}
+
+function MobileFrame({
+  subtitle,
+  onSwitchPerson,
+  children,
+}: {
+  subtitle?: string;
+  onSwitchPerson?: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="min-h-dvh bg-canvas">
+      <header className="sticky top-0 z-10 flex items-center gap-2.5 border-b border-line-2 bg-canvas px-4 py-3">
+        <span className="grid h-6 w-6 place-items-center rounded-xs bg-accent font-mono text-[12px] font-bold text-white">
+          C
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-[13px] leading-tight font-semibold">My Day</p>
+          {subtitle ? (
+            <p className="truncate text-[11.5px] leading-tight text-ink-3">
+              {subtitle}
+            </p>
+          ) : null}
+        </div>
+        {onSwitchPerson ? (
+          <button
+            className="btn btn-ghost btn-sm py-2"
+            onClick={onSwitchPerson}
+          >
+            Switch
+          </button>
+        ) : null}
+        <Link className="btn btn-ghost btn-sm py-2" to="/">
+          Full app
+        </Link>
+      </header>
+      <main className="mx-auto flex max-w-md flex-col gap-4 px-4 py-5 pb-16">
+        {children}
+      </main>
+    </div>
+  );
+}

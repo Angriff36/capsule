@@ -18,6 +18,7 @@ Catering / event ops app: Vite + React, Convex, Clerk. Assembled from Manifest p
 | `docs/`                                                          | Architecture / systems / generation truth                             |
 | `diagrams/`                                                      | Manifest docs-diagrams companion                                      |
 | `.artifacts/`, `graphify-out/`                                   | Ignored scratch only                                                  |
+| `.aboardai/**`                                                   | AboardAI product board (features/kanban) — **never move or stash**    |
 
 ## Commands
 
@@ -46,7 +47,8 @@ bun run agent:mcp:verify # stdio tools/list proof (AC snake tools incl. recipe_d
 bun run agent:mcp:verify -- --live # same path + durable recipe_draft write
 ```
 
-Essential commands: [docs/commands.md](docs/commands.md). Full reference: [docs/operations/commands.md](docs/operations/commands.md).
+Essential commands: [docs/commands.md](docs/commands.md). Full reference: [docs/operations/commands.md](docs/operations/commands.md).  
+Manifest CLI safe vs unsafe in Capsule: [docs/generation/manifest-cli-safety.md](docs/generation/manifest-cli-safety.md).
 Agent enter prompt: [docs/generation/AGENT_PROMPT_ENTER_RECIPE.md](docs/generation/AGENT_PROMPT_ENTER_RECIPE.md).
 Agent MCP setup: [docs/generation/capsule-agent-mcp.md](docs/generation/capsule-agent-mcp.md).
 
@@ -92,9 +94,17 @@ bun run manifest:regen
 
 Builder plans, applies when conflict-free, and updates `.builder/ownership.json` in one transaction. Optional flags after `--` (e.g. `--install`).
 
-Do **not** use `manifest generate`, `manifest:build`, or `place-manifest-convex-react.ts` — blocked or absent; they bypass ownership.
+Do **not** use bare `manifest generate` / `manifest build`, `bun run manifest:build`, or `place-manifest-convex-react.ts` — they bypass Builder ownership. Preset may still emit `manifest:build` / `manifest:compile` in `package.json`; only `place-manifest-convex-react` is deny-guarded today. Regen path: `bun run manifest:regen` only.
 
 `bun run check` verifies owned files still match the ownership ledger. Pre-commit rejects commits that touch owned paths without updating ownership.
+
+**Sibling Builder (`BUILDER_DIR`):** Capsule pre-push / `manifest:regen-check`
+runs that checkout’s working tree. If you fix a Builder bug that Capsule’s
+regen gate needs (e.g. skip `.loop-worktrees` in `ManifestSourceTree`),
+**commit it in Builder immediately** as its own atomic commit. Do not leave it
+uncommitted or bulk-stash it with unrelated Builder WIP — that removes the fix
+from disk and breaks Capsule `git push`. See
+`docs/generation/manifest-builder.md` § Pre-push circular dependency.
 
 Import Convex API through `src/lib/api.ts`. Details: `docs/generation/manifest-builder.md`.
 

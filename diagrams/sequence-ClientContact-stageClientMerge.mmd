@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Client
+    participant ClientContact as ClientContact
+    participant EventBus
+    Client->>+ClientContact: stageClientMerge(clientMergeId, clientId)
+    Note over ClientContact: Policies: clientContactRead, clientContactWrite, clientContactExecute
+    Note over ClientContact: Guards (2)
+    ClientContact->>ClientContact: guard[0]: self.deletedAt == null
+    ClientContact->>ClientContact: guard[1]: roleAllows(user.role, #quot;adminAccess#quot;)
+    ClientContact->>ClientContact: mutate.clientMergeAuthorizationId
+    ClientContact->>ClientContact: mutate.mergeTargetClientId
+    ClientContact->>EventBus: emit ClientContactMergeStaged on client_contact.merge_staged
+    ClientContact-->>-Client: void

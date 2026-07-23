@@ -1,13 +1,16 @@
 import { OrganizationSwitcher, UserButton, useUser } from "@clerk/react";
 import { Link, useLocation } from "react-router-dom";
+import { NotificationTray } from "../../features/notifications/NotificationTray";
 import { WORKSPACE_NAME } from "../../lib/workspace";
-import { BellIcon, ChevronRightIcon, SearchIcon } from "../../ui/icons";
+import { ChevronRightIcon, GearIcon, SearchIcon } from "../../ui/icons";
 import { NAV_AREAS } from "../nav";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
+import { RecentsMenu } from "./RecentsMenu";
 
 function useBreadcrumbs(): Array<{ label: string; to?: string }> {
   const { pathname } = useLocation();
   if (pathname === "/") return [{ label: "Home" }];
+  if (pathname === "/settings/email") return [{ label: "Email settings" }];
   if (pathname.startsWith("/kitchen")) {
     const crumbs: Array<{ label: string; to?: string }> = [
       { label: "Kitchen", to: "/kitchen" },
@@ -25,30 +28,6 @@ function useBreadcrumbs(): Array<{ label: string; to?: string }> {
   if (pathname === `${area.path}/new`) crumbs.push({ label: "New" });
   else if (pathname !== area.path) crumbs.push({ label: "Detail" });
   return crumbs;
-}
-
-function Popover({
-  button,
-  label,
-  children,
-}: {
-  button: React.ReactNode;
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <details className="group relative">
-      <summary
-        className="flex h-8 cursor-pointer list-none items-center gap-2 rounded-xs border border-transparent px-2 text-ink-2 group-open:border-line-2 group-open:bg-inset hover:text-ink [&::-webkit-details-marker]:hidden"
-        aria-label={label}
-      >
-        {button}
-      </summary>
-      <div className="absolute top-9.5 right-0 z-30 w-64 rounded-sm border border-line-2 bg-panel p-3 shadow-[0_6px_24px_-8px_rgba(34,30,22,0.25)]">
-        {children}
-      </div>
-    </details>
-  );
 }
 
 export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
@@ -130,12 +109,9 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
           </span>
         </button>
 
-        <Popover label="Notifications" button={<BellIcon />}>
-          <p className="font-medium">Notifications</p>
-          <p className="mt-1.5 text-[12px] leading-relaxed text-ink-3">
-            Nothing unread. Activity feeds arrive with later product slices.
-          </p>
-        </Popover>
+        <RecentsMenu />
+
+        <NotificationTray />
 
         <AccountMenu />
       </div>
@@ -170,6 +146,14 @@ function AccountMenu() {
           {WORKSPACE_NAME}
         </p>
       </div>
+      <Link
+        to="/settings/email"
+        aria-label="Email notification settings"
+        title="Email notification settings"
+        className="grid h-8 w-8 place-items-center rounded-xs border border-transparent text-ink-3 transition-colors hover:border-line-2 hover:bg-inset hover:text-ink"
+      >
+        <GearIcon width={15} height={15} />
+      </Link>
       <UserButton />
     </div>
   );

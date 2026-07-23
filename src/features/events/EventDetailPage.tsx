@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import type { Id } from "../../lib/api";
 import {
   formatCount,
@@ -24,16 +25,34 @@ import {
   useEventSubmitForApproval,
   useGetEvent,
   useListClient,
+  useListDish,
+  useListEventAssignment,
+  useListEventDish,
+  useListEventTimelineActivity,
+  useListPerson,
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { ArrowLeftIcon } from "../../ui/icons";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, PageHeader, StatusChip } from "../../ui/primitives";
+import { useTenantBranding } from "../admin/tenantBranding";
+import { ClientCommunicationPanel } from "../clients/ClientCommunicationPanel";
+import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
+import { downloadBeoPdf } from "./beoPdf";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { EventDetailRevisePanels } from "./EventDetailRevisePanels";
+import { EventEquipmentPanel } from "./EventEquipmentPanel";
 import { EventGuestPanel } from "./EventGuestPanel";
+import { EventIncidentPanel } from "./EventIncidentPanel";
+import { EventTimelinePanel } from "./EventTimelinePanel";
 import { EventInventoryPanel } from "./EventInventoryPanel";
+import { LiveEventProfitabilityWidget } from "./LiveEventProfitabilityWidget";
+import { EventSetupProgress } from "./EventSetupProgress";
+import { RecurringEventPanel } from "./RecurringEventPanel";
+import { useTrackRecent } from "../../lib/recents";
+import { HoverPreview } from "../../ui/HoverPreview";
+import { ClientPreviewCard } from "../clients/ClientPreviewCard";
 import { FailureBanner } from "./FailureBanner";
 import { clientDisplayName } from "./clientName";
 import {
@@ -46,7 +65,14 @@ export function EventDetailPage() {
   const eventId = (id ?? "skip") as Id<"events"> | "skip";
   const event = useGetEvent(eventId);
   const clients = useListClient();
+  useTrackRecent("Event", event?.title);
+  const dishes = useListDish();
+  const eventAssignments = useListEventAssignment();
+  const eventDishes = useListEventDish();
+  const timelineActivities = useListEventTimelineActivity();
+  const people = useListPerson();
   const venues = useListVenue();
+  const { branding } = useTenantBranding();
   const submitForApproval = useEventSubmitForApproval();
   const approve = useEventApprove();
   const beginExecution = useEventBeginExecution();
@@ -66,6 +92,7 @@ export function EventDetailPage() {
   >(null);
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
+  const [pdfNotice, setPdfNotice] = useState<string | null>(null);
   const { loadingTooLong } = useSlowQuery(event);
 
   if (event === undefined) {
@@ -150,24 +177,132 @@ export function EventDetailPage() {
         }
         lead={
           <span className="font-mono text-[12px]">
-            {event.eventType} · {clientDisplayName(event.clientId, clients)}
+            {event.eventType} ·{" "}
+            {(() => {
+              const client = clients?.find((c) => c._id === event.clientId);
+              const name = clientDisplayName(event.clientId, clients);
+              if (!client) return name;
+              return (
+                <HoverPreview card={<ClientPreviewCard client={client} />}>
+                  <Link
+                    to={`/clients/${client._id}`}
+                    className="underline decoration-dotted underline-offset-2 hover:text-ink"
+                  >
+                    {name}
+                  </Link>
+                </HoverPreview>
+              );
+            })()}
             {event.startsAt != null ? ` · ${relativeDays(event.startsAt)}` : ""}
           </span>
         }
-        actions={eventLifecyclePolicy
-          .availableActions(String(event.stage))
-          .map((action) => (
-            <button
-              key={action.key}
-              type="button"
-              disabled={busy}
-              onClick={() => runAction(action.key)}
-              className={`btn ${action.kind === "primary" ? "btn-primary" : action.kind === "danger" ? "btn-danger" : "btn-ghost"}`}
-            >
-              {action.label}
-            </button>
-          ))}
+        actions={[
+          <EventClientPortalShare
+            key="client-portal-share"
+            eventId={event._id}
+          />,
+          <button
+            key="download-beo"
+            type="button"
+            className="btn btn-ghost"
+            disabled={
+              busy ||
+              clients === undefined ||
+              dishes === undefined ||
+              eventAssignments === undefined ||
+              eventDishes === undefined ||
+              people === undefined ||
+              timelineActivities === undefined
+            }
+            onClick={() => {
+              setPdfNotice(null);
+              void downloadBeoPdf({
+                event,
+                clientName: clientDisplayName(event.clientId, clients),
+                dishes: (eventDishes ?? [])
+                  .filter(
+                    (selection) =>
+                      selection.deletedAt == null &&
+                      selection.removedAt == null &&
+                      selection.eventId === event._id,
+                  )
+                  .map((selection) => ({
+                    selection,
+                    dish: dishes?.find((dish) => dish._id === selection.dishId),
+                  })),
+                timeline: (timelineActivities ?? []).filter(
+                  (activity) =>
+                    activity.eventId === event._id &&
+                    activity.scheduledAt != null &&
+                    activity.deletedAt == null,
+                ),
+                staff: (eventAssignments ?? [])
+                  .filter(
+                    (assignment) =>
+                      assignment.deletedAt == null &&
+                      assignment.eventId === event._id &&
+                      assignment.status !== "unassigned",
+                  )
+                  .map((assignment) => ({
+                    assignment,
+                    person: people?.find(
+                      (person) => person._id === assignment.personId,
+                    ),
+                  })),
+                branding,
+              })
+                .then(() => setPdfNotice("BEO PDF downloaded."))
+                .catch((error) => setFailure(classifyCommandFailure(error)));
+            }}
+          >
+            Download BEO
+          </button>,
+          <Link
+            key="save-as-template"
+            className="btn btn-ghost"
+            to={`/events/templates?fromEvent=${event._id}`}
+          >
+            Save as template
+          </Link>,
+          <Link
+            key="allergen-briefing"
+            className="btn btn-ghost"
+            to={`/events/${event._id}/allergen-briefing`}
+          >
+            Allergen briefing
+          </Link>,
+          ...eventLifecyclePolicy
+            .availableActions(String(event.stage))
+            .map((action) => (
+              <button
+                key={action.key}
+                type="button"
+                disabled={busy}
+                onClick={() => runAction(action.key)}
+                className={`btn ${action.kind === "primary" ? "btn-primary" : action.kind === "danger" ? "btn-danger" : "btn-ghost"}`}
+              >
+                {action.label}
+              </button>
+            )),
+        ]}
       />
+
+      <EventSetupProgress
+        eventId={event._id}
+        clientId={event.clientId}
+        clients={clients}
+        expectedHeadcount={event.expectedHeadcount}
+        eventDishes={eventDishes}
+        eventAssignments={eventAssignments}
+      />
+
+      <LiveEventProfitabilityWidget eventId={event._id} />
+
+      {pdfNotice ? (
+        <p className="text-[13px] text-ink-2" role="status">
+          {pdfNotice}
+        </p>
+      ) : null}
 
       {reasonFor ? (
         <form
@@ -221,36 +356,66 @@ export function EventDetailPage() {
       ) : null}
       {failure ? <FailureBanner failure={failure} /> : null}
 
-      <EventDetailRevisePanels
+      <div id="event-setup-basics" className="scroll-mt-4">
+        <EventDetailRevisePanels
+          eventId={event._id}
+          version={version}
+          busy={busy}
+          canRevise={canRevise}
+          canChangeHeadcount={canChangeHeadcount}
+          reviseBlockedReason={reviseBlockedReason}
+          headcountBlockedReason={headcountBlockedReason}
+          venuesLoading={venues === undefined}
+          activeVenues={activeVenues}
+          startsAt={event.startsAt}
+          endsAt={event.endsAt}
+          expectedHeadcount={event.expectedHeadcount}
+          venueId={event.venueId}
+          budgetAmount={event.budgetAmount}
+          quotedPrice={event.quotedPrice}
+          primaryContactName={event.primaryContactName}
+          primaryContactEmail={event.primaryContactEmail}
+          primaryContactPhone={event.primaryContactPhone}
+          accessibilityNeeds={event.accessibilityNeeds}
+          serviceRequirements={event.serviceRequirements}
+          operationalRequirements={event.operationalRequirements}
+          run={run}
+          onReschedule={reschedule}
+          onChangeHeadcount={changeHeadcount}
+          onChangeVenue={changeVenue}
+          onChangePricing={changePricing}
+          onChangePrimaryContact={changePrimaryContact}
+          onChangeRequirements={changeRequirements}
+        />
+      </div>
+
+      <RecurringEventPanel
         eventId={event._id}
-        version={version}
-        busy={busy}
-        canRevise={canRevise}
-        canChangeHeadcount={canChangeHeadcount}
-        reviseBlockedReason={reviseBlockedReason}
-        headcountBlockedReason={headcountBlockedReason}
-        venuesLoading={venues === undefined}
-        activeVenues={activeVenues}
         startsAt={event.startsAt}
-        endsAt={event.endsAt}
-        expectedHeadcount={event.expectedHeadcount}
-        venueId={event.venueId}
-        budgetAmount={event.budgetAmount}
-        quotedPrice={event.quotedPrice}
-        primaryContactName={event.primaryContactName}
-        primaryContactEmail={event.primaryContactEmail}
-        primaryContactPhone={event.primaryContactPhone}
-        accessibilityNeeds={event.accessibilityNeeds}
-        serviceRequirements={event.serviceRequirements}
-        operationalRequirements={event.operationalRequirements}
-        run={run}
-        onReschedule={reschedule}
-        onChangeHeadcount={changeHeadcount}
-        onChangeVenue={changeVenue}
-        onChangePricing={changePricing}
-        onChangePrimaryContact={changePrimaryContact}
-        onChangeRequirements={changeRequirements}
+        version={version}
+        canConfigure={canRevise}
+        recurrenceFrequency={event.recurrenceFrequency}
+        recurrenceEndCondition={event.recurrenceEndCondition}
+        recurrenceEndsAt={event.recurrenceEndsAt}
+        recurrenceOccurrenceLimit={event.recurrenceOccurrenceLimit}
+        recurrenceNextStartsAt={event.recurrenceNextStartsAt}
+        recurrenceGeneratedCount={event.recurrenceGeneratedCount}
+        recurrenceActive={event.recurrenceActive}
+        recurrenceStoppedAt={event.recurrenceStoppedAt}
+        recurrenceCompletedAt={event.recurrenceCompletedAt}
+        recurrenceTemplateEventId={event.recurrenceTemplateEventId}
+        recurrenceSequence={event.recurrenceSequence}
       />
+
+      <ClientCommunicationPanel
+        target={{
+          kind: "event",
+          eventId: event._id,
+          eventTitle: event.title,
+        }}
+      />
+
+      <EventTimelinePanel eventId={event._id} />
 
       <EventGuestPanel eventId={event._id} />
 
@@ -263,6 +428,16 @@ export function EventDetailPage() {
           setFailure(error == null ? null : classifyCommandFailure(error))
         }
       />
+
+      <EventEquipmentPanel
+        eventId={event._id}
+        startsAt={event.startsAt}
+        endsAt={event.endsAt}
+      />
+
+      <EventIncidentPanel eventId={event._id} />
+
+      <AttachmentsSection parentType="eventRecord" parentId={event._id} />
 
       <div className="sr-only">
         Current facts: {formatDate(event.startsAt)} {formatTime(event.startsAt)}

@@ -151,6 +151,10 @@ entity Organization mixin TenantScoped, SoftDeletable {
 
   property required searchable name: string
   property required status: OrganizationStatus = "active"
+  property brandDisplayName: string?
+  property brandAddress: string?
+  property brandPrimaryColor: string?
+  property brandAccentColor: string?
 
   computed isOperable: boolean = self.status == "active" and self.deletedAt == null
 
@@ -167,15 +171,29 @@ entity Organization mixin TenantScoped, SoftDeletable {
   // Stricter than default manageAccess: admin-only registration.
   // Named non-default policies do not attach to commands on Manifest 3.6.3 —
   // use a command guard (see docs/projection-blockers.md PB004).
-  command register(name: string) {
+  command register(
+    name: string,
+    optional brandDisplayName: string,
+    optional brandAddress: string,
+    optional brandPrimaryColor: string,
+    optional brandAccentColor: string
+  ) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "adminAccess")
     constraint registerName: length(trim(name)) > 0 "Organization name is required"
     mutate name = name
+    mutate brandDisplayName = brandDisplayName
+    mutate brandAddress = brandAddress
+    mutate brandPrimaryColor = brandPrimaryColor
+    mutate brandAccentColor = brandAccentColor
     emit OrganizationRegistered {
       organizationId: self.id
       tenantId: self.tenantId
       name: name
+      brandDisplayName: brandDisplayName
+      brandAddress: brandAddress
+      brandPrimaryColor: brandPrimaryColor
+      brandAccentColor: brandAccentColor
     }
   }
 
@@ -188,6 +206,28 @@ entity Organization mixin TenantScoped, SoftDeletable {
       organizationId: self.id
       tenantId: self.tenantId
       name: name
+    }
+  }
+
+  command configureBranding(
+    displayName: string,
+    address: string,
+    primaryColor: string,
+    accentColor: string
+  ) {
+    // Deleted tenant records cannot produce customer documents.
+    guard self.deletedAt == null
+    mutate brandDisplayName = displayName
+    mutate brandAddress = address
+    mutate brandPrimaryColor = primaryColor
+    mutate brandAccentColor = accentColor
+    emit OrganizationBrandingConfigured {
+      organizationId: self.id
+      tenantId: self.tenantId
+      displayName: displayName
+      address: address
+      primaryColor: primaryColor
+      accentColor: accentColor
     }
   }
 
@@ -229,6 +269,19 @@ event OrganizationRegistered: "organization.registered" {
   organizationId: string
   tenantId: string
   name: string
+  brandDisplayName: string?
+  brandAddress: string?
+  brandPrimaryColor: string?
+  brandAccentColor: string?
+}
+
+event OrganizationBrandingConfigured: "organization.branding_configured" {
+  organizationId: string
+  tenantId: string
+  displayName: string
+  address: string
+  primaryColor: string
+  accentColor: string
 }
 
 event OrganizationRenamed: "organization.renamed" {

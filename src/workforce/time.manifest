@@ -1,6 +1,5 @@
 // Capsule workforce-2 — TimeRecord + Qualification.
 // Compile entry: uses logistics packing head (PackList/Delivery + prior chain).
-// Training courses/sessions (TrainingModule/Assignment/Attempt) deferred — OD027.
 // Schedule/OpenShift remain deferred (OD024).
 
 use "../logistics/packing.manifest"
@@ -153,7 +152,6 @@ entity TimeRecord mixin TenantScoped, SoftDeletable {
 }
 
 // Certification/skill held by a Person (maps capsule-pro EmployeeCertification).
-// Training modules/assignments/attempts are distinct and deferred (OD027).
 // isExpired via now() omitted — time-dependent computeds are nondeterministic (OD028).
 entity Qualification mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
@@ -163,6 +161,7 @@ entity Qualification mixin TenantScoped, SoftDeletable {
   property required personId: uuid
   property required name: string = ""
   property certificationType: string?
+  property issuingBody: string?
   property issuedAt: datetime?
   property expiresAt: datetime?
   property documentRef: string?
@@ -174,7 +173,7 @@ entity Qualification mixin TenantScoped, SoftDeletable {
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
 
-  constraint qualificationGrantedComplete: self.grantedAt == null or (length(trim(self.name)) > 0 and self.issuedAt != null and (self.expiresAt == null or self.expiresAt > self.issuedAt)) "Granted qualifications require a name, issued date, and valid optional expiry"
+  constraint qualificationGrantedComplete: self.grantedAt == null or (length(trim(self.name)) > 0 and self.certificationType != null and length(trim(self.certificationType)) > 0 and self.issuingBody != null and length(trim(self.issuingBody)) > 0 and self.issuedAt != null and (self.expiresAt == null or self.expiresAt > self.issuedAt)) "Granted certifications require a name, type, issuing body, issue date, and valid optional expiry"
   constraint qualificationExpiryOrder: self.expiresAt == null or self.issuedAt == null or self.expiresAt > self.issuedAt "Qualification expiry must be after issued date"
 
   transition status from "active" to ["expired", "revoked"]
@@ -189,7 +188,8 @@ entity Qualification mixin TenantScoped, SoftDeletable {
     personId: uuid,
     name: string,
     issuedAt: datetime,
-    optional certificationType: string,
+    certificationType: string,
+    issuingBody: string,
     optional expiresAt: datetime,
     optional documentRef: string,
     optional notes: string
@@ -201,10 +201,13 @@ entity Qualification mixin TenantScoped, SoftDeletable {
     guard roleAllows(user.role, "workforceManageAccess")
     constraint grantPersonMatch: personId == self.personId "Grant personId must match the seeded person reference"
     constraint grantNamePresent: length(trim(name)) > 0 "Qualification name is required"
+    constraint grantTypePresent: length(trim(certificationType)) > 0 "Certification type is required"
+    constraint grantIssuingBodyPresent: length(trim(issuingBody)) > 0 "Issuing body is required"
     constraint grantExpiryOrder: expiresAt == null or expiresAt > issuedAt "Qualification expiry must be after issued date"
     mutate personId = personId
     mutate name = name
-    mutate certificationType = certificationType != null ? certificationType : self.certificationType
+    mutate certificationType = certificationType
+    mutate issuingBody = issuingBody
     mutate issuedAt = issuedAt
     mutate expiresAt = expiresAt != null ? expiresAt : self.expiresAt
     mutate documentRef = documentRef != null ? documentRef : self.documentRef
@@ -215,7 +218,8 @@ entity Qualification mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       personId: personId
       name: name
-      certificationType: certificationType != null ? certificationType : self.certificationType
+      certificationType: certificationType
+      issuingBody: issuingBody
       issuedAt: issuedAt
       expiresAt: expiresAt != null ? expiresAt : self.expiresAt
       status: "active"
@@ -304,7 +308,8 @@ event QualificationGranted: "qualification.granted" {
   tenantId: string
   personId: string
   name: string
-  certificationType: string?
+  certificationType: string
+  issuingBody: string
   issuedAt: datetime
   expiresAt: datetime?
   status: QualificationStatus

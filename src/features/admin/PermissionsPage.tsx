@@ -8,6 +8,8 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ErrorState, PageHeader, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
+import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { RolePermissionAudit } from "./RolePermissionAuditPanel";
 
 const CAPABILITIES = [
   ["kitchen", "Kitchen", "Recipes, dishes, menus, and prep work."],
@@ -25,6 +27,8 @@ const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
 
 export function PermissionsPage() {
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
+  const canEdit = ADMIN_ROLES.has(authStatus?.role ?? "");
+  const people = useQuery(api.queries.listPerson, canEdit ? {} : "skip");
   const rows = useListOrganizationCapabilitySetting();
   const createSetting = useCreateOrganizationCapabilitySetting();
   const setEnabled = useOrganizationCapabilitySettingSetEnabled();
@@ -34,7 +38,6 @@ export function PermissionsPage() {
     () => new Map((rows ?? []).map((row) => [row.capability, row])),
     [rows],
   );
-  const canEdit = ADMIN_ROLES.has(authStatus?.role ?? "");
 
   if (authStatus === undefined || rows === undefined) {
     return (
@@ -72,6 +75,7 @@ export function PermissionsPage() {
         title="Permissions"
         lead="These switches apply to everyone in this organization. Everything starts allowed."
       />
+      <AdminWorkspaceNav />
       {!canEdit && (
         <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-[13px] text-warn">
           Only an organization admin can change these settings.
@@ -110,6 +114,12 @@ export function PermissionsPage() {
           })}
         </div>
       </Section>
+      {canEdit ? (
+        <RolePermissionAudit
+          members={people ?? []}
+          loading={people === undefined}
+        />
+      ) : null}
     </div>
   );
 }

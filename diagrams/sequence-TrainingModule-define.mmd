@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant TrainingModule as TrainingModule
+    participant EventBus
+    Client->>+TrainingModule: define(name, category, passingScore, description)
+    Note over TrainingModule: Policies: trainingModuleRead, trainingModuleWrite, trainingModuleExecute
+    Note over TrainingModule: Guards (3)
+    TrainingModule->>TrainingModule: guard[0]: self.definedAt == null
+    TrainingModule->>TrainingModule: guard[1]: self.deletedAt == null
+    TrainingModule->>TrainingModule: guard[2]: roleAllows(user.role, #quot;workforceManageAccess#quot;)
+    TrainingModule->>TrainingModule: mutate.name
+    TrainingModule->>TrainingModule: mutate.category
+    TrainingModule->>TrainingModule: mutate.passingScore
+    TrainingModule->>TrainingModule: mutate.description
+    TrainingModule->>TrainingModule: mutate.status
+    TrainingModule->>TrainingModule: mutate.definedAt
+    TrainingModule->>EventBus: emit TrainingModuleDefined on training_module.defined
+    TrainingModule-->>-Client: void

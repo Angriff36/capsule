@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant Vehicle as Vehicle
+    participant EventBus
+    Client->>+Vehicle: register(make, model, registration, ownership, payloadCapacityKg, operationalStatus, statusNote)
+    Note over Vehicle: Policies: vehicleRead, vehicleWrite, vehicleExecute
+    Note over Vehicle: Guards (2)
+    Vehicle->>Vehicle: guard[0]: self.registeredAt == null
+    Vehicle->>Vehicle: guard[1]: self.deletedAt == null
+    Vehicle->>Vehicle: mutate.make
+    Vehicle->>Vehicle: mutate.model
+    Vehicle->>Vehicle: mutate.registration
+    Vehicle->>Vehicle: mutate.ownership
+    Vehicle->>Vehicle: mutate.payloadCapacityKg
+    Vehicle->>Vehicle: mutate.operationalStatus
+    Vehicle->>Vehicle: mutate.statusNote
+    Vehicle->>Vehicle: mutate.registeredAt
+    Vehicle->>Vehicle: mutate.statusChangedAt
+    Vehicle->>EventBus: emit VehicleRegistered on vehicle.registered
+    Vehicle-->>-Client: void

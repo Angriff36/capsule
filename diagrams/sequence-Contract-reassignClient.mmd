@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client
+    participant Contract as Contract
+    participant EventBus
+    Client->>+Contract: reassignClient()
+    Note over Contract: Policies: contractRead, contractWrite, contractExecute
+    Note over Contract: Guards (8)
+    Contract->>Contract: guard[0]: self.deletedAt == null
+    Contract->>Contract: guard[1]: roleAllows(user.role, #quot;adminAccess#quot;)
+    Contract->>Contract: guard[2]: self.clientMergeAuthorization != null
+    Contract->>Contract: guard[3]: self.clientMergeAuthorization.deletedAt == null
+    Contract->>Contract: guard[4]: self.clientMergeAuthorization.mergedAt != null
+    Contract->>Contract: guard[5]: self.mergeTargetClient != null
+    Contract->>Contract: guard[6]: self.mergeTargetClient.status == #quot;active#quot;
+    Contract->>Contract: guard[7]: self.mergeTargetClient.deletedAt == null
+    Contract->>Contract: compute.previousClientId
+    Contract->>Contract: mutate.clientId
+    Contract->>EventBus: emit ContractClientReassigned on contract.client_reassigned
+    Contract-->>-Client: void

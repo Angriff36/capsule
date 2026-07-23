@@ -1,0 +1,13 @@
+sequenceDiagram
+    participant Client
+    participant Contract as Contract
+    participant EventBus
+    Client->>+Contract: stageClientMerge(clientMergeId, clientId)
+    Note over Contract: Policies: contractRead, contractWrite, contractExecute
+    Note over Contract: Guards (2)
+    Contract->>Contract: guard[0]: self.deletedAt == null
+    Contract->>Contract: guard[1]: roleAllows(user.role, #quot;adminAccess#quot;)
+    Contract->>Contract: mutate.clientMergeAuthorizationId
+    Contract->>Contract: mutate.mergeTargetClientId
+    Contract->>EventBus: emit ContractClientMergeStaged on contract.client_merge_staged
+    Contract-->>-Client: void

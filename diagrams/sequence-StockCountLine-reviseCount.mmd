@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant StockCountLine as StockCountLine
+    participant EventBus
+    Client->>+StockCountLine: reviseCount(countedQuantity, countNote)
+    Note over StockCountLine: Policies: stockCountLineRead, stockCountLineWrite, stockCountLineExecute
+    Note over StockCountLine: Guards (3)
+    StockCountLine->>StockCountLine: guard[0]: self.status == #quot;counted#quot;
+    StockCountLine->>StockCountLine: guard[1]: self.deletedAt == null
+    StockCountLine->>StockCountLine: guard[2]: self.session != null and self.session.status == #quot;in_progr...
+    StockCountLine->>StockCountLine: compute.varianceQuantity
+    StockCountLine->>StockCountLine: mutate.countedQuantity
+    StockCountLine->>StockCountLine: mutate.varianceQuantity
+    StockCountLine->>StockCountLine: mutate.countNote
+    StockCountLine->>StockCountLine: mutate.countedById
+    StockCountLine->>StockCountLine: mutate.countedAt
+    StockCountLine->>EventBus: emit StockCountLineCountRevised on stock_count_line.count_revised
+    StockCountLine-->>-Client: void

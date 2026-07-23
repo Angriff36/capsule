@@ -1,7 +1,8 @@
 # Capsule commands (essentials)
 
 Run everything from the **Capsule repo root**.  
-Full reference: [operations/commands.md](./operations/commands.md).
+Full reference: [operations/commands.md](./operations/commands.md).  
+Manifest CLI safe vs unsafe: [generation/manifest-cli-safety.md](./generation/manifest-cli-safety.md).
 
 ---
 

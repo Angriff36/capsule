@@ -14,10 +14,12 @@ import {
   StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
+import { SavedViewsBar } from "../views/SavedViewsBar";
 import { clientDisplayName } from "./clientName";
 import { EVENT_STAGES, type EventStage, STAGE_LABEL } from "./eventStatus";
 
 type Tab = "all" | EventStage;
+type EventsView = { tab: Tab; search: string; dir: "asc" | "desc" };
 
 export function EventsListPage() {
   const navigate = useNavigate();
@@ -66,11 +68,21 @@ export function EventsListPage() {
       <PageHeader
         title="Events"
         lead="Every booking across the operation."
-        actions={
-          <Link to="/events/new" className="btn btn-primary">
+        actions={[
+          <Link key="capacity" to="/events/capacity" className="btn btn-ghost">
+            Capacity calendar
+          </Link>,
+          <Link
+            key="templates"
+            to="/events/templates"
+            className="btn btn-ghost"
+          >
+            Templates
+          </Link>,
+          <Link key="new" to="/events/new" className="btn btn-primary">
             <PlusIcon /> New event
-          </Link>
-        }
+          </Link>,
+        ]}
       />
 
       <div className="flex flex-wrap items-center gap-2">
@@ -106,12 +118,24 @@ export function EventsListPage() {
         />
         <button
           type="button"
-          className="btn btn-ghost btn-sm ml-auto font-mono"
+          className="btn btn-ghost btn-sm font-mono"
           onClick={() => setDir((d) => (d === "asc" ? "desc" : "asc"))}
           aria-label={`Sort by date, currently ${dir === "asc" ? "soonest first" : "latest first"}`}
         >
           Date {dir === "asc" ? "↑" : "↓"}
         </button>
+        <div className="ml-auto">
+          <SavedViewsBar<EventsView>
+            pageKey="events"
+            subjectArea="events"
+            currentState={{ tab, search, dir }}
+            onApply={(s) => {
+              setTab(s.tab);
+              setSearch(s.search);
+              setDir(s.dir);
+            }}
+          />
+        </div>
       </div>
 
       <div className="card overflow-x-auto">

@@ -2,10 +2,12 @@ import { readFileSync } from "node:fs";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import { PrepBoardPage } from "../src/features/production/PrepBoardPage";
 
 const manifest = vi.hoisted(() => ({
   tasks: [] as any[] | undefined,
+  dependencies: [] as any[] | undefined,
   checks: [] as any[] | undefined,
   events: [] as any[] | undefined,
   eventDishes: [] as any[] | undefined,
@@ -16,12 +18,14 @@ const manifest = vi.hoisted(() => ({
 
 vi.mock("../src/lib/manifest-convex-react", () => ({
   useListPrepTask: () => manifest.tasks,
+  useListPrepTaskDependency: () => manifest.dependencies,
   useListQualityCheck: () => manifest.checks,
   useListEvent: () => manifest.events,
   useListEventDish: () => manifest.eventDishes,
   useListDish: () => manifest.dishes,
   useListIngredient: () => manifest.ingredients,
   useCreatePrepTask: () => manifest.command,
+  useCreatePrepTaskDependency: () => manifest.command,
   useCreateQualityCheck: () => manifest.command,
   usePrepTaskCancel: () => manifest.command,
   usePrepTaskClaim: () => manifest.command,
@@ -44,12 +48,15 @@ vi.mock("../src/features/production/ProductionWorkspaceNav", () => ({
 }));
 
 function renderPage() {
-  return renderToStaticMarkup(createElement(PrepBoardPage));
+  return renderToStaticMarkup(
+    createElement(MemoryRouter, {}, createElement(PrepBoardPage)),
+  );
 }
 
 describe("PrepBoardPage presentation", () => {
   beforeEach(() => {
     manifest.tasks = [];
+    manifest.dependencies = [];
     manifest.checks = [];
     manifest.events = [];
     manifest.ingredients = [];

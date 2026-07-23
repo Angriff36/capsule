@@ -1,7 +1,9 @@
 /**
  * Enforces Builder-only regeneration for Capsule (convex-application preset).
  *
- * - Denies legacy `manifest generate` / `manifest:build` npm scripts.
+ * - Denies legacy invocations when called with `--deny <label>` (used by
+ *   `place-manifest-convex-react.ts`). Intended for `manifest:build` too, but
+ *   Builder still emits a live `manifest:build` script — do not run it.
  * - Denies direct `place-manifest-convex-react` (Manifest CLI layout shim).
  * - `check`: fails when on-disk Builder-owned files diverge from ownership digests.
  * - `check-staged`: pre-commit gate — owned-file commits must refresh ownership.json.

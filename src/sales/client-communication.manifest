@@ -1,0 +1,78 @@
+// Capsule sales — immutable manual call, email, and meeting history.
+
+enum ClientCommunicationMedium {
+  call
+  email
+  meeting
+}
+
+entity ClientCommunication mixin TenantScoped {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property clientContactId: uuid?
+  property eventId: uuid?
+  property occurredAt: datetime?
+  property required medium: ClientCommunicationMedium = "call"
+  property required summary: string = ""
+  // Auth subject from trusted runtime context, not a Person document id.
+  property authorId: string?
+  // Readable snapshot so history remains useful if identity details change.
+  property required authorName: string = ""
+  property recordedAt: datetime?
+
+  belongsTo clientContact: ClientContact fields [tenantId, clientContactId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint communicationComplete: self.recordedAt == null or (((self.clientContactId != null and self.eventId == null) or (self.clientContactId == null and self.eventId != null)) and self.occurredAt != null and length(trim(self.summary)) > 0 and self.authorId != null and length(trim(self.authorId)) > 0 and length(trim(self.authorName)) > 0) "Recorded communication requires one contact or event, date, summary, and author"
+
+  default policy clientCommunicationRead read: roleAllows(user.role, "staffAccess") "Staff may read client communication history"
+  default policy clientCommunicationWrite write: roleAllows(user.role, "staffAccess") "Staff may record client communication through commands"
+  default policy clientCommunicationExecute execute: roleAllows(user.role, "staffAccess") "Staff may record client communication"
+
+  command record(
+    optional clientContactId: uuid,
+    optional eventId: uuid,
+    occurredAt: datetime,
+    medium: ClientCommunicationMedium,
+    summary: string,
+    authorName: string
+  ) {
+    guard self.recordedAt == null
+    guard self.clientContactId == null or self.clientContact != null
+    guard self.eventId == null or self.event != null
+    constraint recordTarget: (clientContactId != null and eventId == null) or (clientContactId == null and eventId != null) "Choose one contact or event"
+    constraint recordSummary: length(trim(summary)) > 0 "Communication summary is required"
+    constraint recordAuthor: length(trim(authorName)) > 0 "Communication author is required"
+    mutate clientContactId = clientContactId
+    mutate eventId = eventId
+    mutate occurredAt = occurredAt
+    mutate medium = medium
+    mutate summary = summary
+    mutate authorId = user.id
+    mutate authorName = authorName
+    mutate recordedAt = now()
+    emit ClientCommunicationRecorded {
+      clientCommunicationId: self.id
+      tenantId: self.tenantId
+      clientContactId: clientContactId
+      eventId: eventId
+      occurredAt: occurredAt
+      medium: medium
+      authorId: user.id
+    }
+  }
+
+  store ClientCommunication in durable
+}
+
+event ClientCommunicationRecorded: "client_communication.recorded" {
+  clientCommunicationId: string
+  tenantId: string
+  clientContactId: string?
+  eventId: string?
+  occurredAt: datetime
+  medium: string
+  authorId: string
+}

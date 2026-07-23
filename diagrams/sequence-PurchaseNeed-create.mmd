@@ -2,13 +2,14 @@ sequenceDiagram
     participant Client
     participant PurchaseNeed as PurchaseNeed
     participant EventBus
-    Client->>+PurchaseNeed: create(eventId, ingredientDemandId, ingredientId, requiredQuantity, unit, purchasingWeekStart)
+    Client->>+PurchaseNeed: create(eventId, ingredientDemandId, ingredientId, requiredQuantity, unit, purchasingWeekStart, preferredVendorId)
     Note over PurchaseNeed: Policies: purchaseNeedRead, purchaseNeedWrite, purchaseNeedExecute
     Note over PurchaseNeed: Guards (2)
     PurchaseNeed->>PurchaseNeed: guard[0]: self.openedAt == null
     PurchaseNeed->>PurchaseNeed: guard[1]: self.deletedAt == null
     PurchaseNeed->>PurchaseNeed: mutate.requiredQuantity
     PurchaseNeed->>PurchaseNeed: mutate.purchasingWeekStart
+    PurchaseNeed->>PurchaseNeed: mutate.preferredVendorId
     PurchaseNeed->>PurchaseNeed: mutate.openedAt
     PurchaseNeed->>EventBus: emit PurchaseNeedOpened on purchase_need.opened
     PurchaseNeed-->>-Client: void

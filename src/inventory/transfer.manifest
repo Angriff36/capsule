@@ -1,0 +1,116 @@
+// Capsule inventory transfers — governed movement of stock between storage
+// locations. StockTransfer.record is the single transfer entry point: it
+// stores the durable audit row, and reactions drive the debit
+// (InventoryItem.transferOut → InventoryTransferredOut) and credit
+// (InventoryItem.transferIn → InventoryTransferredIn) on the two stock lines.
+
+use "./stock.manifest"
+
+// One completed movement of an ingredient quantity between two stock lines.
+// Immutable after record; the row itself is the transfer history for audit.
+entity StockTransfer mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required sourceInventoryItemId: uuid
+  property required destinationInventoryItemId: uuid
+  property required ingredientId: uuid
+  property required sourceLocationId: uuid
+  property required destinationLocationId: uuid
+  property required quantity: decimal(12, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property notes: string?
+  property transferredAt: datetime?
+
+  belongsTo sourceItem: InventoryItem fields [tenantId, sourceInventoryItemId] references [tenantId, id]
+  belongsTo destinationItem: InventoryItem fields [tenantId, destinationInventoryItemId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+  belongsTo sourceLocation: StorageLocation fields [tenantId, sourceLocationId] references [tenantId, id]
+  belongsTo destinationLocation: StorageLocation fields [tenantId, destinationLocationId] references [tenantId, id]
+
+  constraint transferQuantityPositive: self.transferredAt == null or self.quantity > 0 "Transfer quantity must be positive once recorded"
+
+  default policy stockTransferRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read stock transfers"
+  default policy stockTransferWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write stock transfers through commands"
+  default policy stockTransferExecute execute: roleAllows(user.role, "inventoryAccess") "Inventory staff may execute stock transfer commands"
+
+  command record(
+    sourceInventoryItemId: uuid,
+    destinationInventoryItemId: uuid,
+    ingredientId: uuid,
+    sourceLocationId: uuid,
+    destinationLocationId: uuid,
+    quantity: decimal(12, 4),
+    unit: UnitOfMeasure,
+    optional notes: string
+  ) {
+    guard self.transferredAt == null
+    guard self.deletedAt == null
+    guard self.sourceItem != null and self.sourceItem.stockedAt != null and self.sourceItem.deletedAt == null
+    guard self.destinationItem != null and self.destinationItem.stockedAt != null and self.destinationItem.deletedAt == null
+    constraint transferSourceMatch: sourceInventoryItemId == self.sourceInventoryItemId "Record sourceInventoryItemId must match the seeded source stock reference"
+    constraint transferDestinationMatch: destinationInventoryItemId == self.destinationInventoryItemId "Record destinationInventoryItemId must match the seeded destination stock reference"
+    constraint transferDistinctLines: sourceInventoryItemId != destinationInventoryItemId "Source and destination stock lines must differ"
+    constraint transferIngredientMatch: ingredientId == self.sourceItem.ingredientId "Transfer ingredientId must match the source stock ingredient"
+    constraint transferSameIngredient: self.sourceItem.ingredientId == self.destinationItem.ingredientId "Source and destination must hold the same ingredient"
+    constraint transferSourceLocationMatch: sourceLocationId == self.sourceItem.locationId "Transfer sourceLocationId must match the source stock location"
+    constraint transferDestinationLocationMatch: destinationLocationId == self.destinationItem.locationId "Transfer destinationLocationId must match the destination stock location"
+    constraint transferDistinctLocations: sourceLocationId != destinationLocationId "Source and destination locations must differ"
+    constraint transferSameUnit: self.sourceItem.unit == self.destinationItem.unit "Source and destination stock lines must use the same unit"
+    constraint transferRecordQuantityPositive: quantity > 0 "Transfer quantity must be positive"
+    constraint transferSourceAvailable: self.sourceItem.quantityOnHand >= quantity "Cannot transfer more than the source has on hand"
+    mutate sourceInventoryItemId = sourceInventoryItemId
+    mutate destinationInventoryItemId = destinationInventoryItemId
+    mutate ingredientId = ingredientId
+    mutate sourceLocationId = sourceLocationId
+    mutate destinationLocationId = destinationLocationId
+    mutate quantity = quantity
+    mutate unit = unit
+    mutate notes = notes != null ? notes : self.notes
+    mutate transferredAt = now()
+    emit StockTransferRecorded {
+      stockTransferId: self.id
+      tenantId: self.tenantId
+      sourceInventoryItemId: sourceInventoryItemId
+      destinationInventoryItemId: destinationInventoryItemId
+      ingredientId: ingredientId
+      sourceLocationId: sourceLocationId
+      destinationLocationId: destinationLocationId
+      quantity: quantity
+      unit: unit
+    }
+  }
+
+  store StockTransfer in durable
+}
+
+event StockTransferRecorded: "stock_transfer.recorded" {
+  stockTransferId: string
+  tenantId: string
+  sourceInventoryItemId: string
+  destinationInventoryItemId: string
+  ingredientId: string
+  sourceLocationId: string
+  destinationLocationId: string
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
+// Debit the source line (transferOut emits InventoryTransferredOut — the
+// ledger debit entry). record already re-checks availability in-transaction.
+on StockTransferRecorded run InventoryItem.transferOut
+  resolve payload.sourceInventoryItemId
+  params {
+    quantity: payload.quantity,
+    destinationLocationId: payload.destinationLocationId
+  }
+
+// Credit the destination line (transferIn emits InventoryTransferredIn — the
+// ledger credit entry).
+on StockTransferRecorded run InventoryItem.transferIn
+  resolve payload.destinationInventoryItemId
+  params {
+    quantity: payload.quantity,
+    sourceLocationId: payload.sourceLocationId
+  }

@@ -33,6 +33,12 @@
 
 ## Git
 
+- **NEVER switch branches, checkout, or commit in the human's main checkout
+  (C:\Projects\capsule).** AboardAI's board and the human's tools follow the
+  checkout's current branch — a branch switch blanks his workspace (happened
+  2026-07-22). ALL landing/batch/fix work happens in a worktree, no
+  exceptions, including batch commits of the shared tree's WIP.
+
 - The human works in this checkout; the tree often carries in-flight changes.
 - In the MAIN checkout: NEVER `git add`, commit, stash, checkout, or reset —
   the loop writes only STATE.md, loop-run-log.md, loop-budget.md,

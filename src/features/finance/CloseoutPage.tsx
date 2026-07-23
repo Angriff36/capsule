@@ -1,12 +1,17 @@
-import { useState, type FormEvent } from "react";
+import { Fragment, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
   useCreateEventCloseout,
   useEventCloseoutFinalize,
   useListEvent,
   useListEventCloseout,
+  useListInvoice,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  CLOSEOUT_EVIDENCE_CATEGORIES,
+  RecordPhotoCapture,
+} from "../attachments/RecordPhotoCapture";
 import {
   CloseoutCaptureForm,
   CloseoutCapturePayloadBuilder,
@@ -15,6 +20,7 @@ import { CloseoutLifecyclePolicy } from "./CloseoutLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { EventCostSummaryReport } from "./EventCostSummaryReport";
 
 const policy = new CloseoutLifecyclePolicy();
 const payloadBuilder = new CloseoutCapturePayloadBuilder();
@@ -22,6 +28,7 @@ const payloadBuilder = new CloseoutCapturePayloadBuilder();
 export function CloseoutPage() {
   const closeouts = useListEventCloseout();
   const events = useListEvent();
+  const invoices = useListInvoice();
   const createCloseout = useCreateEventCloseout();
   const finalize = useEventCloseoutFinalize();
   const [showCapture, setShowCapture] = useState(false);
@@ -29,6 +36,10 @@ export function CloseoutPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [summaryCloseoutId, setSummaryCloseoutId] = useState<string | null>(
+    null,
+  );
+  const [photoCloseoutId, setPhotoCloseoutId] = useState<string | null>(null);
 
   const activeCloseouts = (closeouts ?? []).filter(
     (row) => row.deletedAt == null,
@@ -48,6 +59,12 @@ export function CloseoutPage() {
 
   const eventFor = (id: string) => events?.find((event) => event._id === id);
   const eventTitle = (id: string) => eventFor(id)?.title ?? "Unknown event";
+  const summaryCloseout = activeCloseouts.find(
+    (row) => String(row._id) === summaryCloseoutId,
+  );
+  const summaryEvent = summaryCloseout
+    ? eventFor(String(summaryCloseout.eventId))
+    : undefined;
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -87,7 +104,8 @@ export function CloseoutPage() {
     });
   };
 
-  const loading = closeouts === undefined || events === undefined;
+  const loading =
+    closeouts === undefined || events === undefined || invoices === undefined;
 
   return (
     <div className="operations-stage supply-stage">
@@ -123,6 +141,15 @@ export function CloseoutPage() {
         <p className="mt-3 text-[13px] text-ink-2" role="status">
           {notice}
         </p>
+      ) : null}
+
+      {summaryCloseout && summaryEvent ? (
+        <EventCostSummaryReport
+          event={summaryEvent}
+          closeout={summaryCloseout}
+          invoices={invoices ?? []}
+          onClose={() => setSummaryCloseoutId(null)}
+        />
       ) : null}
 
       {showCapture ? (
@@ -178,72 +205,113 @@ export function CloseoutPage() {
                 {visibleRows.map((row) => {
                   const event = eventFor(String(row.eventId));
                   return (
-                    <tr key={row._id}>
-                      <td>
-                        <Link
-                          className="text-link"
-                          to={`/events/${String(row.eventId)}`}
-                        >
-                          <strong>{eventTitle(String(row.eventId))}</strong>
-                        </Link>
-                        <small>
-                          Revenue{" "}
-                          {Number(row.actualRevenue ?? 0).toLocaleString(
+                    <Fragment key={row._id}>
+                      <tr>
+                        <td>
+                          <Link
+                            className="text-link"
+                            to={`/events/${String(row.eventId)}`}
+                          >
+                            <strong>{eventTitle(String(row.eventId))}</strong>
+                          </Link>
+                          <small>
+                            Revenue{" "}
+                            {Number(row.actualRevenue ?? 0).toLocaleString(
+                              undefined,
+                              { style: "currency", currency: "USD" },
+                            )}
+                          </small>
+                        </td>
+                        <td>
+                          {Number(row.grossProfit ?? 0).toLocaleString(
                             undefined,
-                            { style: "currency", currency: "USD" },
+                            {
+                              style: "currency",
+                              currency: "USD",
+                            },
                           )}
-                        </small>
-                      </td>
-                      <td>
-                        {Number(row.grossProfit ?? 0).toLocaleString(
-                          undefined,
-                          {
-                            style: "currency",
-                            currency: "USD",
-                          },
-                        )}
-                      </td>
-                      <td>
-                        {row.actualHeadcount}/{row.expectedHeadcount}
-                      </td>
-                      <td>
-                        <StatusChip status={String(row.status)} />
-                      </td>
-                      <td>
-                        <div className="supply-row-actions">
-                          {policy
-                            .closeoutActions(String(row.status), row.capturedAt)
-                            .map((action) => (
-                              <button
-                                key={action.key}
+                        </td>
+                        <td>
+                          {row.actualHeadcount}/{row.expectedHeadcount}
+                        </td>
+                        <td>
+                          <StatusChip status={String(row.status)} />
+                        </td>
+                        <td>
+                          <div className="supply-row-actions">
+                            {policy
+                              .closeoutActions(
+                                String(row.status),
+                                row.capturedAt,
+                              )
+                              .map((action) => (
+                                <button
+                                  key={action.key}
+                                  className="btn btn-ghost btn-sm"
+                                  disabled={busy != null}
+                                  onClick={() => invokeFinalize(row)}
+                                >
+                                  {busy === `${row._id}:${action.key}`
+                                    ? "Working…"
+                                    : action.label}
+                                </button>
+                              ))}
+                            {event?.clientId ? (
+                              <Link
                                 className="btn btn-ghost btn-sm"
-                                disabled={busy != null}
-                                onClick={() => invokeFinalize(row)}
+                                to={FINANCE_ROUTES.issueInvoice({
+                                  clientId: String(event.clientId),
+                                  eventId: String(row.eventId),
+                                })}
                               >
-                                {busy === `${row._id}:${action.key}`
-                                  ? "Working…"
-                                  : action.label}
-                              </button>
-                            ))}
-                          {event?.clientId ? (
-                            <Link
+                                Issue invoice
+                              </Link>
+                            ) : null}
+                            <button
                               className="btn btn-ghost btn-sm"
-                              to={FINANCE_ROUTES.issueInvoice({
-                                clientId: String(event.clientId),
-                                eventId: String(row.eventId),
-                              })}
+                              type="button"
+                              onClick={() =>
+                                setSummaryCloseoutId(String(row._id))
+                              }
                             >
-                              Issue invoice
-                            </Link>
-                          ) : null}
-                          {String(row.status) === "finalized" ? (
-                            <span className="text-[12px] text-ink-3">
-                              Frozen
-                            </span>
-                          ) : null}
-                        </div>
-                      </td>
-                    </tr>
+                              Cost summary
+                            </button>
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              type="button"
+                              aria-expanded={photoCloseoutId === row._id}
+                              onClick={() =>
+                                setPhotoCloseoutId((current) =>
+                                  current === row._id ? null : row._id,
+                                )
+                              }
+                            >
+                              {photoCloseoutId === row._id
+                                ? "Hide photos"
+                                : "Photos"}
+                            </button>
+                            {String(row.status) === "finalized" ? (
+                              <span className="text-[12px] text-ink-3">
+                                Frozen
+                              </span>
+                            ) : null}
+                          </div>
+                        </td>
+                      </tr>
+                      {photoCloseoutId === row._id ? (
+                        <tr>
+                          <td colSpan={5} className="!p-3">
+                            <RecordPhotoCapture
+                              parentType="closeout"
+                              parentId={row._id}
+                              title="Closeout evidence"
+                              description="Attach venue, leftover-food, or equipment-return photos that support waste claims and credit adjustments."
+                              evidenceCategories={CLOSEOUT_EVIDENCE_CATEGORIES}
+                            />
+                          </td>
+                        </tr>
+                      ) : null}
+                    </Fragment>
                   );
                 })}
               </tbody>

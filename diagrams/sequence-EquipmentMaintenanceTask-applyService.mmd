@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant Client
+    participant EquipmentMaintenanceTask as EquipmentMaintenanceTask
+    participant EventBus
+    Client->>+EquipmentMaintenanceTask: applyService(completedAt, nextDueAt)
+    Note over EquipmentMaintenanceTask: Policies: maintenanceTaskRead, maintenanceTaskWrite, maintenanceTaskExecute
+    Note over EquipmentMaintenanceTask: Guards (2)
+    EquipmentMaintenanceTask->>EquipmentMaintenanceTask: guard[0]: self.scheduledAt != null
+    EquipmentMaintenanceTask->>EquipmentMaintenanceTask: guard[1]: self.deletedAt == null
+    EquipmentMaintenanceTask->>EquipmentMaintenanceTask: compute.isLatestService
+    EquipmentMaintenanceTask->>EquipmentMaintenanceTask: mutate.lastServicedAt
+    EquipmentMaintenanceTask->>EquipmentMaintenanceTask: mutate.nextDueAt
+    EquipmentMaintenanceTask->>EventBus: emit EquipmentMaintenanceAdvanced on equipment.maintenance_advanced
+    EquipmentMaintenanceTask-->>-Client: void

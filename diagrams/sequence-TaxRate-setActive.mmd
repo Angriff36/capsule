@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client
+    participant TaxRate as TaxRate
+    participant EventBus
+    Client->>+TaxRate: setActive(active)
+    Note over TaxRate: Policies: taxRateRead, taxRateWrite, taxRateExecute
+    Note over TaxRate: Guards (2)
+    TaxRate->>TaxRate: guard[0]: self.configuredAt != null
+    TaxRate->>TaxRate: guard[1]: self.deletedAt == null
+    TaxRate->>TaxRate: mutate.active
+    TaxRate->>EventBus: emit TaxRateActivationChanged on tax_rate.activation_changed
+    TaxRate-->>-Client: void

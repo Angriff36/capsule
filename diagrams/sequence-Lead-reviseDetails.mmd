@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client
+    participant Lead as Lead
+    participant EventBus
+    Client->>+Lead: reviseDetails(leadType, source, companyName, givenName, familyName, email, phone, notes)
+    Note over Lead: Policies: leadRead, leadWrite, leadExecute
+    Note over Lead: Guards (2)
+    Lead->>Lead: guard[0]: self.capturedAt != null
+    Lead->>Lead: guard[1]: self.deletedAt == null
+    Lead->>Lead: mutate.leadType
+    Lead->>Lead: mutate.companyName
+    Lead->>Lead: mutate.givenName
+    Lead->>Lead: mutate.familyName
+    Lead->>Lead: mutate.email
+    Lead->>Lead: mutate.phone
+    Lead->>Lead: mutate.source
+    Lead->>Lead: mutate.notes
+    Lead->>EventBus: emit LeadDetailsRevised on lead.details_revised
+    Lead-->>-Client: void

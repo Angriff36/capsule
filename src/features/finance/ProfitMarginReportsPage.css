@@ -1,0 +1,602 @@
+.profit-margin-stage {
+  --profit-green: #31574f;
+  --profit-green-soft: #dce9e3;
+  --profit-copper: #b96336;
+  --profit-ochre: #b18a32;
+  --profit-blue: #46627c;
+  --profit-plum: #715166;
+  gap: 1.35rem;
+}
+
+.profit-margin-masthead {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 0.4rem 0 0.25rem;
+}
+
+.profit-margin-masthead .btn {
+  flex: 0 0 auto;
+  min-width: 160px;
+}
+
+.profit-margin-controls {
+  display: grid;
+  grid-template-columns:
+    minmax(150px, 0.7fr) minmax(150px, 0.7fr) minmax(210px, 1fr)
+    minmax(240px, 1.35fr);
+  align-items: end;
+  overflow: hidden;
+  border: 1px solid var(--color-line-2);
+  background: var(--color-panel);
+}
+
+.profit-margin-controls > label,
+.profit-margin-controls > div {
+  display: grid;
+  min-height: 78px;
+  align-content: center;
+  gap: 0.4rem;
+  padding: 0.9rem 1rem;
+  border-left: 1px solid var(--color-line);
+  color: var(--color-ink-3);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.profit-margin-controls > :first-child {
+  border-left: 0;
+}
+
+.profit-margin-controls .input {
+  width: 100%;
+  min-width: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0;
+}
+
+.profit-switch,
+.profit-view-switch {
+  display: inline-flex;
+  width: fit-content;
+  overflow: hidden;
+  border: 1px solid var(--color-line-2);
+  border-radius: 3px;
+  background: var(--color-inset);
+}
+
+.profit-switch button,
+.profit-view-switch button {
+  border: 0;
+  border-left: 1px solid var(--color-line-2);
+  padding: 0.48rem 0.75rem;
+  background: transparent;
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: capitalize;
+  transition:
+    background 150ms ease,
+    color 150ms ease;
+}
+
+.profit-switch button:first-child,
+.profit-view-switch button:first-child {
+  border-left: 0;
+}
+
+.profit-switch button[aria-pressed="true"],
+.profit-view-switch button[aria-pressed="true"] {
+  background: var(--profit-green);
+  color: #fff;
+}
+
+.profit-range-stamp {
+  position: relative;
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 7px,
+      color-mix(in srgb, var(--profit-green) 5%, transparent) 7px,
+      color-mix(in srgb, var(--profit-green) 5%, transparent) 8px
+    ),
+    var(--color-inset);
+}
+
+.profit-range-stamp strong {
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 550;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.profit-range-error {
+  border-left: 3px solid var(--color-danger);
+  padding: 0.7rem 0.9rem;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: 11px;
+}
+
+.profit-margin-scorecard {
+  display: grid;
+  grid-template-columns: 1.15fr repeat(3, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--color-line-2);
+  border-top: 4px solid var(--profit-green);
+  background: var(--color-panel);
+  box-shadow: 0 20px 42px -38px
+    color-mix(in srgb, var(--color-ink) 65%, transparent);
+}
+
+.profit-margin-scorecard > div {
+  display: grid;
+  align-content: center;
+  min-height: 128px;
+  padding: 1.15rem 1.35rem;
+  border-left: 1px solid var(--color-line);
+}
+
+.profit-margin-scorecard > div:first-child {
+  border-left: 0;
+  background: linear-gradient(
+    135deg,
+    var(--profit-green-soft),
+    color-mix(in srgb, var(--profit-green-soft) 20%, transparent)
+  );
+}
+
+.profit-margin-scorecard span,
+.profit-margin-scorecard small {
+  color: var(--color-ink-3);
+}
+
+.profit-margin-scorecard span {
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.profit-margin-scorecard strong {
+  margin-top: 0.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.7rem);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+}
+
+.profit-margin-scorecard small {
+  margin-top: 0.55rem;
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+.profit-margin-scorecard .is-positive strong,
+.profit-table .is-positive {
+  color: var(--profit-green);
+}
+
+.profit-margin-scorecard .is-negative strong,
+.profit-table .is-negative {
+  color: var(--color-danger);
+}
+
+.profit-cost-ledger,
+.profit-segment-panel,
+.profit-margin-panel {
+  border: 1px solid var(--color-line-2);
+  background: var(--color-panel);
+}
+
+.profit-section-heading,
+.profit-results-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.profit-section-heading h2,
+.profit-results-heading h2 {
+  margin-top: 0.2rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.profit-section-heading > strong {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.profit-section-heading > span {
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+.profit-cost-band {
+  display: flex;
+  height: 14px;
+  margin: 1.25rem 1.25rem 0;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--color-inset);
+}
+
+.profit-cost-band i {
+  min-width: 0;
+  transition: width 280ms ease;
+}
+
+.profit-cost-band .is-food,
+.profit-cost-legend .is-food {
+  background: var(--profit-copper);
+}
+
+.profit-cost-band .is-labor,
+.profit-cost-legend .is-labor {
+  background: var(--profit-blue);
+}
+
+.profit-cost-band .is-equipment,
+.profit-cost-legend .is-equipment {
+  background: var(--profit-ochre);
+}
+
+.profit-cost-band .is-overhead,
+.profit-cost-legend .is-overhead {
+  background: var(--profit-plum);
+}
+
+.profit-cost-legend {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 1rem 1.25rem 1.25rem;
+}
+
+.profit-cost-legend > div {
+  display: grid;
+  grid-template-columns: 8px 1fr auto;
+  align-items: center;
+  gap: 0.35rem 0.55rem;
+  padding: 0.2rem 1rem;
+  border-left: 1px solid var(--color-line);
+}
+
+.profit-cost-legend > div:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.profit-cost-legend i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.profit-cost-legend span,
+.profit-cost-legend small {
+  color: var(--color-ink-3);
+  font-size: 9px;
+}
+
+.profit-cost-legend strong {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 550;
+  font-variant-numeric: tabular-nums;
+}
+
+.profit-cost-legend small {
+  grid-column: 2 / -1;
+}
+
+.profit-segment-grid {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.7fr) minmax(190px, 0.7fr) minmax(
+      300px,
+      1.4fr
+    );
+}
+
+.profit-segment-grid > article,
+.profit-segment-grid > ol {
+  min-height: 190px;
+  padding: 1.3rem;
+  border-left: 1px solid var(--color-line);
+}
+
+.profit-segment-grid > :first-child {
+  border-left: 0;
+}
+
+.profit-segment-grid article {
+  display: grid;
+  align-content: center;
+  background:
+    linear-gradient(150deg, transparent 55%, rgba(255, 255, 255, 0.4)),
+    var(--color-inset);
+}
+
+.profit-segment-grid article.is-best {
+  border-top: 3px solid var(--profit-green);
+}
+
+.profit-segment-grid article.is-watch {
+  border-top: 3px solid var(--profit-copper);
+}
+
+.profit-segment-grid article > span {
+  color: var(--color-ink-3);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.profit-segment-grid article h3 {
+  margin-top: 0.8rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.profit-segment-grid article > strong {
+  margin-top: 0.35rem;
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.profit-segment-grid article small {
+  margin-top: 0.55rem;
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.profit-segment-grid ol {
+  display: grid;
+  align-content: center;
+  gap: 0.35rem;
+  list-style: none;
+}
+
+.profit-segment-grid li {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.profit-segment-grid li:last-child {
+  border-bottom: 0;
+}
+
+.profit-segment-grid li > span {
+  color: var(--color-ink-3);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+.profit-segment-grid li div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.profit-segment-grid li strong {
+  font-size: 11px;
+}
+
+.profit-segment-grid li small {
+  color: var(--color-ink-3);
+  font-size: 9px;
+}
+
+.profit-segment-grid li b {
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.profit-view-switch button {
+  min-width: 82px;
+}
+
+.profit-table-wrap {
+  overflow-x: auto;
+}
+
+.profit-table {
+  width: 100%;
+  min-width: 940px;
+  border-collapse: collapse;
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.profit-table th {
+  padding: 0.7rem 0.8rem;
+  border-bottom: 1px solid var(--color-line-2);
+  background: var(--color-inset);
+  color: var(--color-ink-3);
+  font-size: 8px;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-align: right;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.profit-table th:first-child,
+.profit-table th:nth-child(2) {
+  text-align: left;
+}
+
+.profit-table td {
+  padding: 0.75rem 0.8rem;
+  border-bottom: 1px solid var(--color-line);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.profit-table td:first-child,
+.profit-table td:nth-child(2) {
+  text-align: left;
+}
+
+.profit-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.profit-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--profit-green-soft) 32%, transparent);
+}
+
+.profit-table td > strong,
+.profit-table td > small {
+  display: block;
+}
+
+.profit-table td > strong {
+  font-size: 11px;
+}
+
+.profit-table td > small {
+  margin-top: 0.2rem;
+  color: var(--color-ink-3);
+  font-size: 8px;
+}
+
+.profit-method-note {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 0.7rem 1.2rem;
+  border-left: 3px solid var(--profit-green);
+  padding: 0.95rem 1.1rem;
+  background: var(--color-inset);
+}
+
+.profit-method-note p {
+  color: var(--color-ink-2);
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.profit-method-note p + p {
+  grid-column: 2;
+  color: var(--color-ink-3);
+}
+
+@media (max-width: 900px) {
+  .profit-margin-controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profit-margin-controls > :nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .profit-margin-controls > :nth-child(4) {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .profit-margin-scorecard,
+  .profit-cost-legend {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profit-margin-scorecard > :nth-child(3),
+  .profit-cost-legend > :nth-child(3) {
+    border-left: 0;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .profit-segment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .profit-segment-grid > ol {
+    grid-column: 1 / -1;
+    border-top: 1px solid var(--color-line);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .profit-margin-masthead,
+  .profit-section-heading,
+  .profit-results-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .profit-margin-masthead .btn {
+    width: 100%;
+  }
+
+  .profit-margin-controls,
+  .profit-margin-scorecard,
+  .profit-cost-legend,
+  .profit-segment-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profit-margin-controls > label,
+  .profit-margin-controls > div,
+  .profit-margin-scorecard > div,
+  .profit-cost-legend > div,
+  .profit-segment-grid > article,
+  .profit-segment-grid > ol {
+    border-top: 1px solid var(--color-line);
+    border-left: 0;
+  }
+
+  .profit-margin-controls > :first-child,
+  .profit-margin-scorecard > :first-child,
+  .profit-cost-legend > :first-child {
+    border-top: 0;
+  }
+
+  .profit-segment-grid > ol {
+    grid-column: auto;
+  }
+
+  .profit-view-switch {
+    width: 100%;
+  }
+
+  .profit-view-switch button {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .profit-method-note {
+    grid-template-columns: 1fr;
+  }
+
+  .profit-method-note p + p {
+    grid-column: auto;
+  }
+}

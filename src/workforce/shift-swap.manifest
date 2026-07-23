@@ -1,0 +1,301 @@
+// Capsule workforce — staff-proposed reassignment of one scheduled Shift.
+// The requester confirms by proposing, the recipient accepts, and a workforce
+// manager approves before the linked Shift changes person.
+
+enum ShiftSwapRequestStatus {
+  pending_recipient
+  awaiting_manager
+  approved
+  declined
+  withdrawn
+  rejected
+}
+
+entity ShiftSwapRequest mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required shiftId: uuid
+  property required requesterPersonId: uuid
+  property required recipientPersonId: uuid
+  property shiftTypeId: uuid?
+  property sourceQualificationId: uuid?
+  property targetQualificationId: uuid?
+  property targetTrainingCompletionId: uuid?
+  property encrypted reason: string?
+  property required status: ShiftSwapRequestStatus = "pending_recipient"
+  property requesterConfirmedAt: datetime?
+  property recipientConfirmedAt: datetime?
+  property managerApprovedAt: datetime?
+  property declinedAt: datetime?
+  property withdrawnAt: datetime?
+  property rejectedAt: datetime?
+  property encrypted reviewNote: string?
+
+  belongsTo shift: Shift fields [tenantId, shiftId] references [tenantId, id]
+  belongsTo requesterPerson: Person fields [tenantId, requesterPersonId] references [tenantId, id]
+  belongsTo recipientPerson: Person fields [tenantId, recipientPersonId] references [tenantId, id]
+  belongsTo shiftType: ShiftType fields [tenantId, shiftTypeId] references [tenantId, id]
+  belongsTo sourceQualification: Qualification fields [tenantId, sourceQualificationId] references [tenantId, id]
+  belongsTo targetQualification: Qualification fields [tenantId, targetQualificationId] references [tenantId, id]
+  belongsTo targetTrainingCompletion: TrainingCompletion fields [tenantId, targetTrainingCompletionId] references [tenantId, id]
+
+  transition status from "pending_recipient" to ["awaiting_manager", "declined", "withdrawn"]
+  transition status from "awaiting_manager" to ["approved", "withdrawn", "rejected"]
+  transition status from "approved" to []
+  transition status from "declined" to []
+  transition status from "withdrawn" to []
+  transition status from "rejected" to []
+
+  default policy shiftSwapRequestRead read: roleAllows(user.role, "workforceAccess") "Workforce staff may read shift swap requests"
+  default policy shiftSwapRequestWrite write: roleAllows(user.role, "workforceAccess") "Workforce staff may update shift swap requests through commands"
+  default policy shiftSwapRequestExecute execute: roleAllows(user.role, "workforceAccess") "Workforce staff may execute shift swap request commands"
+
+  command propose(
+    shiftId: uuid,
+    requesterPersonId: uuid,
+    recipientPersonId: uuid,
+    optional shiftTypeId: uuid,
+    optional sourceQualificationId: uuid,
+    optional targetQualificationId: uuid,
+    optional targetTrainingCompletionId: uuid,
+    optional reason: string
+  ) {
+    guard self.requesterConfirmedAt == null
+    guard self.status == "pending_recipient"
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.shift != null and self.shift.deletedAt == null and self.shift.status == "scheduled"
+    guard self.shift.startsAt != null and self.shift.endsAt != null and self.shift.startsAt > now()
+    guard self.requesterPerson != null and self.requesterPerson.deletedAt == null and self.requesterPerson.status == "active"
+    guard self.requesterPerson.authSubjectId != null and self.requesterPerson.authSubjectId == user.id
+    guard self.recipientPerson != null and self.recipientPerson.deletedAt == null and self.recipientPerson.status == "active"
+    guard self.recipientPerson.authSubjectId != null
+    guard shiftTypeId == null or (self.shiftType != null and self.shiftType.deletedAt == null and self.shiftType.status == "active")
+    guard sourceQualificationId == null or (self.sourceQualification != null and self.sourceQualification.deletedAt == null and self.sourceQualification.status == "active")
+    guard targetQualificationId == null or (self.targetQualification != null and self.targetQualification.deletedAt == null and self.targetQualification.status == "active")
+    guard targetTrainingCompletionId == null or (self.targetTrainingCompletion != null and self.targetTrainingCompletion.deletedAt == null and self.targetTrainingCompletion.recordedAt != null)
+    constraint proposeShiftMatch: shiftId == self.shiftId "Swap shift must match the seeded shift reference"
+    constraint proposeRequesterMatch: requesterPersonId == self.requesterPersonId and self.shift.personId == requesterPersonId "Only the assigned staff member may propose this swap"
+    constraint proposeRecipientMatch: recipientPersonId == self.recipientPersonId "Swap recipient must match the seeded person reference"
+    constraint proposeDifferentPeople: requesterPersonId != recipientPersonId "Choose another staff member for the swap"
+    constraint proposeShiftTypeMatch: shiftTypeId == self.shift.shiftTypeId "Shift type must match the scheduled shift"
+    constraint proposeSourceQualificationMatch: sourceQualificationId == self.shift.requiredQualificationId "Source certification must match the scheduled shift"
+    constraint proposeSourceQualificationOwner: sourceQualificationId == null or self.sourceQualification.personId == requesterPersonId "Source certification must belong to the assigned staff member"
+    constraint proposeTargetQualificationRequired: sourceQualificationId == null or targetQualificationId != null "The recipient needs a matching active certification"
+    constraint proposeTargetQualificationOwner: targetQualificationId == null or self.targetQualification.personId == recipientPersonId "Replacement certification must belong to the recipient"
+    constraint proposeTargetQualificationName: sourceQualificationId == null or (self.targetQualification.name == self.sourceQualification.name and self.targetQualification.certificationType == self.sourceQualification.certificationType) "Recipient certification must match the shift requirement"
+    constraint proposeTargetQualificationValidity: targetQualificationId == null or self.targetQualification.expiresAt == null or self.targetQualification.expiresAt >= self.shift.endsAt "Recipient certification must remain valid through the shift"
+    constraint proposeTrainingRequired: shiftTypeId == null or self.shiftType.requiredTrainingModuleId == null or targetTrainingCompletionId != null "The recipient needs the training required by this shift type"
+    constraint proposeTrainingOwner: targetTrainingCompletionId == null or self.targetTrainingCompletion.personId == recipientPersonId "Training completion must belong to the recipient"
+    constraint proposeTrainingModule: targetTrainingCompletionId == null or self.targetTrainingCompletion.trainingModuleId == self.shiftType.requiredTrainingModuleId "Recipient training must match the shift type requirement"
+    mutate shiftId = shiftId
+    mutate requesterPersonId = requesterPersonId
+    mutate recipientPersonId = recipientPersonId
+    mutate shiftTypeId = shiftTypeId
+    mutate sourceQualificationId = sourceQualificationId
+    mutate targetQualificationId = targetQualificationId
+    mutate targetTrainingCompletionId = targetTrainingCompletionId
+    mutate reason = reason
+    mutate requesterConfirmedAt = now()
+    emit ShiftSwapProposed {
+      shiftSwapRequestId: self.id
+      tenantId: self.tenantId
+      shiftId: shiftId
+      requesterPersonId: requesterPersonId
+      recipientPersonId: recipientPersonId
+      status: "pending_recipient"
+    }
+  }
+
+  command accept() {
+    guard self.status == "pending_recipient"
+    guard self.requesterConfirmedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.recipientPerson != null and self.recipientPerson.deletedAt == null and self.recipientPerson.status == "active"
+    guard self.recipientPerson.authSubjectId != null and self.recipientPerson.authSubjectId == user.id
+    guard self.shift != null and self.shift.deletedAt == null and self.shift.status == "scheduled"
+    constraint acceptAssignmentCurrent: self.shift.personId == self.requesterPersonId "This shift is no longer assigned to the requester"
+    compute previousStatus = self.status
+    mutate status = "awaiting_manager"
+    mutate recipientConfirmedAt = now()
+    emit ShiftSwapAccepted {
+      shiftSwapRequestId: self.id
+      tenantId: self.tenantId
+      shiftId: self.shiftId
+      requesterPersonId: self.requesterPersonId
+      recipientPersonId: self.recipientPersonId
+      previousStatus: previousStatus
+      status: "awaiting_manager"
+    }
+  }
+
+  command decline(optional reviewNote: string) {
+    guard self.status == "pending_recipient"
+    guard self.requesterConfirmedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.recipientPerson != null and self.recipientPerson.authSubjectId != null and self.recipientPerson.authSubjectId == user.id
+    compute previousStatus = self.status
+    mutate status = "declined"
+    mutate declinedAt = now()
+    mutate reviewNote = reviewNote
+    emit ShiftSwapDeclined {
+      shiftSwapRequestId: self.id
+      tenantId: self.tenantId
+      shiftId: self.shiftId
+      previousStatus: previousStatus
+      status: "declined"
+    }
+  }
+
+  command withdraw() {
+    guard self.status == "pending_recipient" or self.status == "awaiting_manager"
+    guard self.requesterConfirmedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    guard self.requesterPerson != null and self.requesterPerson.authSubjectId != null and self.requesterPerson.authSubjectId == user.id
+    compute previousStatus = self.status
+    mutate status = "withdrawn"
+    mutate withdrawnAt = now()
+    emit ShiftSwapWithdrawn {
+      shiftSwapRequestId: self.id
+      tenantId: self.tenantId
+      shiftId: self.shiftId
+      previousStatus: previousStatus
+      status: "withdrawn"
+    }
+  }
+
+  command approve(optional reviewNote: string) {
+    guard self.status == "awaiting_manager"
+    guard self.requesterConfirmedAt != null and self.recipientConfirmedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    guard self.shift != null and self.shift.deletedAt == null and self.shift.status == "scheduled"
+    guard self.recipientPerson != null and self.recipientPerson.deletedAt == null and self.recipientPerson.status == "active"
+    guard self.recipientPerson.authSubjectId != null
+    guard self.shiftTypeId == null or (self.shiftType != null and self.shiftType.deletedAt == null and self.shiftType.status == "active")
+    guard self.sourceQualificationId == null or (self.sourceQualification != null and self.sourceQualification.deletedAt == null and self.sourceQualification.status == "active")
+    guard self.targetQualificationId == null or (self.targetQualification != null and self.targetQualification.deletedAt == null and self.targetQualification.status == "active")
+    guard self.targetTrainingCompletionId == null or (self.targetTrainingCompletion != null and self.targetTrainingCompletion.deletedAt == null and self.targetTrainingCompletion.recordedAt != null)
+    constraint approveAssignmentCurrent: self.shift.personId == self.requesterPersonId "This shift is no longer assigned to the requester"
+    constraint approveShiftTypeCurrent: self.shiftTypeId == self.shift.shiftTypeId "The shift type changed after this request was proposed"
+    constraint approveQualificationCurrent: self.sourceQualificationId == self.shift.requiredQualificationId "The shift certification requirement changed after this request was proposed"
+    constraint approveTargetQualificationRequired: self.sourceQualificationId == null or self.targetQualificationId != null "The recipient needs a matching active certification"
+    constraint approveTargetQualificationOwner: self.targetQualificationId == null or self.targetQualification.personId == self.recipientPersonId "Replacement certification must belong to the recipient"
+    constraint approveTargetQualificationName: self.sourceQualificationId == null or (self.targetQualification.name == self.sourceQualification.name and self.targetQualification.certificationType == self.sourceQualification.certificationType) "Recipient certification must match the shift requirement"
+    constraint approveTargetQualificationValidity: self.targetQualificationId == null or self.targetQualification.expiresAt == null or self.targetQualification.expiresAt >= self.shift.endsAt "Recipient certification must remain valid through the shift"
+    constraint approveTrainingRequired: self.shiftTypeId == null or self.shiftType.requiredTrainingModuleId == null or self.targetTrainingCompletionId != null "The recipient needs the training required by this shift type"
+    constraint approveTrainingOwner: self.targetTrainingCompletionId == null or self.targetTrainingCompletion.personId == self.recipientPersonId "Training completion must belong to the recipient"
+    constraint approveTrainingModule: self.targetTrainingCompletionId == null or self.targetTrainingCompletion.trainingModuleId == self.shiftType.requiredTrainingModuleId "Recipient training must match the shift type requirement"
+    compute previousStatus = self.status
+    mutate status = "approved"
+    mutate managerApprovedAt = now()
+    mutate reviewNote = reviewNote
+    emit ShiftSwapApproved {
+      shiftSwapRequestId: self.id
+      tenantId: self.tenantId
+      shiftId: self.shiftId
+      requesterPersonId: self.requesterPersonId
+      recipientPersonId: self.recipientPersonId
+      targetQualificationId: self.targetQualificationId
+      targetTrainingCompletionId: self.targetTrainingCompletionId
+      previousStatus: previousStatus
+      status: "approved"
+    }
+  }
+
+  command reject(optional reviewNote: string) {
+    guard self.status == "awaiting_manager"
+    guard self.requesterConfirmedAt != null and self.recipientConfirmedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    compute previousStatus = self.status
+    mutate status = "rejected"
+    mutate rejectedAt = now()
+    mutate reviewNote = reviewNote
+    emit ShiftSwapRejected {
+      shiftSwapRequestId: self.id
+      tenantId: self.tenantId
+      shiftId: self.shiftId
+      previousStatus: previousStatus
+      status: "rejected"
+    }
+  }
+
+  store ShiftSwapRequest in durable
+}
+
+event ShiftSwapProposed: "shift_swap.proposed" {
+  shiftSwapRequestId: string
+  tenantId: string
+  shiftId: string
+  requesterPersonId: string
+  recipientPersonId: string
+  status: ShiftSwapRequestStatus
+}
+
+event ShiftSwapAccepted: "shift_swap.accepted" {
+  shiftSwapRequestId: string
+  tenantId: string
+  shiftId: string
+  requesterPersonId: string
+  recipientPersonId: string
+  previousStatus: ShiftSwapRequestStatus
+  status: ShiftSwapRequestStatus
+}
+
+event ShiftSwapDeclined: "shift_swap.declined" {
+  shiftSwapRequestId: string
+  tenantId: string
+  shiftId: string
+  previousStatus: ShiftSwapRequestStatus
+  status: ShiftSwapRequestStatus
+}
+
+event ShiftSwapWithdrawn: "shift_swap.withdrawn" {
+  shiftSwapRequestId: string
+  tenantId: string
+  shiftId: string
+  previousStatus: ShiftSwapRequestStatus
+  status: ShiftSwapRequestStatus
+}
+
+event ShiftSwapApproved: "shift_swap.approved" {
+  shiftSwapRequestId: string
+  tenantId: string
+  shiftId: string
+  requesterPersonId: string
+  recipientPersonId: string
+  targetQualificationId: string?
+  targetTrainingCompletionId: string?
+  previousStatus: ShiftSwapRequestStatus
+  status: ShiftSwapRequestStatus
+}
+
+event ShiftSwapRejected: "shift_swap.rejected" {
+  shiftSwapRequestId: string
+  tenantId: string
+  shiftId: string
+  previousStatus: ShiftSwapRequestStatus
+  status: ShiftSwapRequestStatus
+}
+
+// Approval and assignment reassignment share one generated transaction. The
+// stage writes relation ids so the final Shift command can hydrate and verify
+// the durable authorization and recipient proofs before changing personId.
+on ShiftSwapApproved fanOut Shift where id = payload.shiftId
+  run stageApprovedSwap
+  params {
+    shiftSwapRequestId: payload.shiftSwapRequestId,
+    requesterPersonId: payload.requesterPersonId,
+    recipientPersonId: payload.recipientPersonId,
+    targetQualificationId: payload.targetQualificationId,
+    targetTrainingCompletionId: payload.targetTrainingCompletionId
+  }
+
+on ShiftSwapStaged run Shift.applyApprovedSwap
+  resolve payload.shiftId

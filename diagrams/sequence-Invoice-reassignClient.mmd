@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client
+    participant Invoice as Invoice
+    participant EventBus
+    Client->>+Invoice: reassignClient()
+    Note over Invoice: Policies: invoiceRead, invoiceWrite, invoiceExecute
+    Note over Invoice: Guards (8)
+    Invoice->>Invoice: guard[0]: self.deletedAt == null
+    Invoice->>Invoice: guard[1]: roleAllows(user.role, #quot;adminAccess#quot;)
+    Invoice->>Invoice: guard[2]: self.clientMergeAuthorization != null
+    Invoice->>Invoice: guard[3]: self.clientMergeAuthorization.deletedAt == null
+    Invoice->>Invoice: guard[4]: self.clientMergeAuthorization.mergedAt != null
+    Invoice->>Invoice: guard[5]: self.mergeTargetClient != null
+    Invoice->>Invoice: guard[6]: self.mergeTargetClient.status == #quot;active#quot;
+    Invoice->>Invoice: guard[7]: self.mergeTargetClient.deletedAt == null
+    Invoice->>Invoice: compute.previousClientId
+    Invoice->>Invoice: mutate.clientId
+    Invoice->>EventBus: emit InvoiceClientReassigned on invoice.client_reassigned
+    Invoice-->>-Client: void

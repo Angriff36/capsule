@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant Shift as Shift
+    participant EventBus
+    Client->>+Shift: stageApprovedSwap(shiftSwapRequestId, requesterPersonId, recipientPersonId, targetQualificationId, targetTrainingCompletionId)
+    Note over Shift: Policies: shiftRead, shiftWrite, shiftExecute
+    Note over Shift: Guards (5)
+    Shift->>Shift: guard[0]: self.status == #quot;scheduled#quot;
+    Shift->>Shift: guard[1]: self.scheduledAt != null
+    Shift->>Shift: guard[2]: self.deletedAt == null
+    Shift->>Shift: guard[3]: self.swapAuthorizationId == null
+    Shift->>Shift: guard[4]: roleAllows(user.role, #quot;workforceManageAccess#quot;)
+    Shift->>Shift: mutate.swapAuthorizationId
+    Shift->>Shift: mutate.swapTargetPersonId
+    Shift->>Shift: mutate.swapTargetQualificationId
+    Shift->>Shift: mutate.swapTargetTrainingCompletionId
+    Shift->>EventBus: emit ShiftSwapStaged on shift.swap_staged
+    Shift-->>-Client: void

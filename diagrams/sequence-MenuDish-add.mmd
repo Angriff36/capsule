@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant MenuDish as MenuDish
     participant EventBus
-    Client->>+MenuDish: add(menuId, dishId, sortOrder, course, serviceStyle, specialInstructions)
+    Client->>+MenuDish: add(menuId, dishId, sortOrder, sellingPrice, course, serviceStyle, specialInstructions)
     Note over MenuDish: Policies: menuDishRead, menuDishWrite, menuDishExecute
     Note over MenuDish: Guards (3)
     MenuDish->>MenuDish: guard[0]: self.addedAt == null
@@ -11,6 +11,7 @@ sequenceDiagram
     MenuDish->>MenuDish: mutate.menuId
     MenuDish->>MenuDish: mutate.dishId
     MenuDish->>MenuDish: mutate.sortOrder
+    MenuDish->>MenuDish: mutate.sellingPrice
     MenuDish->>MenuDish: mutate.course
     MenuDish->>MenuDish: mutate.serviceStyle
     MenuDish->>MenuDish: mutate.specialInstructions

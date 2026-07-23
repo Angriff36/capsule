@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant Equipment as Equipment
+    participant EventBus
+    Client->>+Equipment: retire(reason)
+    Note over Equipment: Policies: equipmentRead, equipmentWrite, equipmentExecute
+    Note over Equipment: Guards (4)
+    Equipment->>Equipment: guard[0]: self.status == #quot;active#quot;
+    Equipment->>Equipment: guard[1]: self.registeredAt != null
+    Equipment->>Equipment: guard[2]: self.deletedAt == null
+    Equipment->>Equipment: guard[3]: roleAllows(user.role, #quot;inventoryManageAccess#quot;) or roleAll...
+    Equipment->>Equipment: mutate.status
+    Equipment->>Equipment: mutate.retiredAt
+    Equipment->>Equipment: mutate.retirementReason
+    Equipment->>EventBus: emit EquipmentRetired on equipment.retired
+    Equipment-->>-Client: void

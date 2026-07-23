@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant ClientCommunication as ClientCommunication
+    participant EventBus
+    Client->>+ClientCommunication: record(clientContactId, eventId, occurredAt, medium, summary, authorName)
+    Note over ClientCommunication: Policies: clientCommunicationRead, clientCommunicationWrite, clientCommunicationExecute
+    Note over ClientCommunication: Guards (3)
+    ClientCommunication->>ClientCommunication: guard[0]: self.recordedAt == null
+    ClientCommunication->>ClientCommunication: guard[1]: self.clientContactId == null or self.clientContact != null
+    ClientCommunication->>ClientCommunication: guard[2]: self.eventId == null or self.event != null
+    ClientCommunication->>ClientCommunication: mutate.clientContactId
+    ClientCommunication->>ClientCommunication: mutate.eventId
+    ClientCommunication->>ClientCommunication: mutate.occurredAt
+    ClientCommunication->>ClientCommunication: mutate.medium
+    ClientCommunication->>ClientCommunication: mutate.summary
+    ClientCommunication->>ClientCommunication: mutate.authorId
+    ClientCommunication->>ClientCommunication: mutate.authorName
+    ClientCommunication->>ClientCommunication: mutate.recordedAt
+    ClientCommunication->>EventBus: emit ClientCommunicationRecorded on client_communication.recorded
+    ClientCommunication-->>-Client: void

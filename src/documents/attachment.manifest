@@ -1,0 +1,99 @@
+// Capsule documents — file attachments on Event, Client, Contract, Vendor,
+// Delivery, and Closeout records. Binary content lives in Convex file storage (authored seam
+// convex/fileStorage.ts issues upload URLs and resolves download URLs);
+// this entity records the metadata, uploader identity, and timestamp.
+
+use "../foundation/base.manifest"
+
+enum AttachmentParentType {
+  // "event" is a reserved word in Manifest, so the member is eventRecord.
+  eventRecord
+  client
+  contract
+  vendor
+  delivery
+  closeout
+}
+
+enum AttachmentEvidenceType {
+  venueCondition
+  leftoverFood
+  equipmentReturn
+}
+
+event AttachmentAdded: "attachment.added" {
+  attachmentId: string
+  tenantId: string
+  parentType: string
+  parentId: string
+  fileName: string
+}
+
+event AttachmentRemoved: "attachment.removed" {
+  attachmentId: string
+  tenantId: string
+}
+
+entity Attachment mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Not `indexed`: the Convex projection emits a by-index query typed
+  // v.string() that fails typecheck against an enum column's literal union.
+  property required parentType: AttachmentParentType = "eventRecord"
+  property required indexed parentId: string
+  property required fileName: string
+  property required contentType: string
+  property required fileSize: int = 0
+  property required storageId: string
+  property evidenceType: AttachmentEvidenceType?
+  property uploadedById: string?
+  property uploadedAt: datetime?
+
+  default policy attachmentRead read: roleAllows(user.role, "staffAccess") "Staff may read attachments"
+  default policy attachmentWrite write: roleAllows(user.role, "staffAccess") "Staff may write attachments through commands"
+  default policy attachmentExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute attachment commands"
+
+  command attach(
+    parentType: AttachmentParentType,
+    parentId: string,
+    fileName: string,
+    contentType: string,
+    fileSize: int,
+    storageId: string,
+    optional evidenceType: AttachmentEvidenceType
+  ) {
+    constraint attachParent: length(trim(parentId)) > 0 "Parent record is required"
+    constraint attachFileName: length(trim(fileName)) > 0 "File name is required"
+    constraint attachStorage: length(trim(storageId)) > 0 "Stored file reference is required"
+    constraint attachSize: fileSize >= 0 "File size cannot be negative"
+    mutate parentType = parentType
+    mutate parentId = parentId
+    mutate fileName = fileName
+    mutate contentType = contentType
+    mutate fileSize = fileSize
+    mutate storageId = storageId
+    mutate evidenceType = evidenceType
+    mutate uploadedById = user.id
+    mutate uploadedAt = now()
+    emit AttachmentAdded {
+      attachmentId: self.id
+      tenantId: self.tenantId
+      parentType: parentType
+      parentId: parentId
+      fileName: fileName
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    mutate deletedAt = now()
+    emit AttachmentRemoved {
+      attachmentId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Attachment in durable
+}

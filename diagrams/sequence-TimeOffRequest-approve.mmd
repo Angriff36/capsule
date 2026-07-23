@@ -1,0 +1,18 @@
+sequenceDiagram
+    participant Client
+    participant TimeOffRequest as TimeOffRequest
+    participant EventBus
+    Client->>+TimeOffRequest: approve(responseNote)
+    Note over TimeOffRequest: Policies: timeOffRequestRead, timeOffRequestWrite, timeOffRequestExecute
+    Note over TimeOffRequest: Guards (4)
+    TimeOffRequest->>TimeOffRequest: guard[0]: self.status == #quot;pending#quot;
+    TimeOffRequest->>TimeOffRequest: guard[1]: self.submittedAt != null
+    TimeOffRequest->>TimeOffRequest: guard[2]: self.deletedAt == null
+    TimeOffRequest->>TimeOffRequest: guard[3]: roleAllows(user.role, #quot;workforceManageAccess#quot;)
+    TimeOffRequest->>TimeOffRequest: compute.previousStatus
+    TimeOffRequest->>TimeOffRequest: mutate.status
+    TimeOffRequest->>TimeOffRequest: mutate.reviewedAt
+    TimeOffRequest->>TimeOffRequest: mutate.reviewedByAuthSubjectId
+    TimeOffRequest->>TimeOffRequest: mutate.responseNote
+    TimeOffRequest->>EventBus: emit TimeOffRequestApproved on time_off_request.approved
+    TimeOffRequest-->>-Client: void

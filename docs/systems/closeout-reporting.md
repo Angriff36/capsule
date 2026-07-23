@@ -19,7 +19,7 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
 | Route               | Outcome                                                              |
 | ------------------- | -------------------------------------------------------------------- |
 | `/finance/closeout` | Capture reconciled numbers for a closed-out event; finalize folio    |
-| `/finance/payroll`  | Prepare person/period payroll rollup; finalize or void               |
+| `/finance/payroll`  | Prepare/finalize rollups; compile and export a selected payroll period |
 | `/reports`          | Save/rename/share/archive/restore report definitions                 |
 
 **User outcomes proven**
@@ -33,16 +33,32 @@ Turn completed operational facts into a governed event closeout, payroll-ready i
 **Shipped**
 
 - EventCloseout capture/finalize
+- Categorized closeout photo evidence for venue condition, leftover food, and
+  equipment return, stored directly against the EventCloseout record for waste
+  and credit review
 - PayrollInput prepare/finalize/void (`financeManageAccess`)
+- Payroll period preview and UTF-8 CSV export for Gusto Smart Import, ADP
+  mapping, and Paychex mapping. Closed/corrected TimeRecords supply recorded
+  hours; finalized PayrollInputs supply reviewed regular/overtime totals and
+  expose their delta as the manual adjustment.
 - SavedReportDefinition library on `/reports` (create, rename, share, archive, restore)
 
 **Deferred**
 
 - Chart/result rendering for saved definitions (library stores config only)
-- Automatic aggregation from operational facts into closeout/payroll numbers
 - PayrollInput `hourlyRate` / `overtimeRate` / `grossAmount` entry — Manifest encrypts
   private money to ciphertext while Convex schema still declares `number` (proven insert
   failure); minutes + optional notes ship without those fields
+
+Payroll compilation is read-only: it does not materialize a second stored
+summary or submit payroll. ADP and Paychex companies may still need to map the
+export columns to their account-specific earning codes or import template.
+
+**Known blocker:** `finance_manager` does not currently have the
+`workforceAccess` capability required by the generated TimeRecord query, so its
+export omits clock-derived hours. Admin/owner roles can read both sources.
+[Issue #39](https://github.com/Angriff36/capsule/issues/39) tracks the Manifest
+policy correction and regeneration.
 
 ## Cross-system handoffs
 

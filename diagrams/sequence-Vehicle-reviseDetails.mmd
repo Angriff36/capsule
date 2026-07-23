@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant Vehicle as Vehicle
+    participant EventBus
+    Client->>+Vehicle: reviseDetails(make, model, registration, ownership, payloadCapacityKg)
+    Note over Vehicle: Policies: vehicleRead, vehicleWrite, vehicleExecute
+    Note over Vehicle: Guards (2)
+    Vehicle->>Vehicle: guard[0]: self.registeredAt != null
+    Vehicle->>Vehicle: guard[1]: self.deletedAt == null
+    Vehicle->>Vehicle: mutate.make
+    Vehicle->>Vehicle: mutate.model
+    Vehicle->>Vehicle: mutate.registration
+    Vehicle->>Vehicle: mutate.ownership
+    Vehicle->>Vehicle: mutate.payloadCapacityKg
+    Vehicle->>EventBus: emit VehicleDetailsRevised on vehicle.details_revised
+    Vehicle-->>-Client: void

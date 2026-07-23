@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant ClientMerge as ClientMerge
+    participant EventBus
+    Client->>+ClientMerge: merge(primaryClientId, duplicateClientId)
+    Note over ClientMerge: Policies: clientMergeRead, clientMergeWrite, clientMergeExecute
+    Note over ClientMerge: Guards (9)
+    ClientMerge->>ClientMerge: guard[0]: self.mergedAt == null
+    ClientMerge->>ClientMerge: guard[1]: self.deletedAt == null
+    ClientMerge->>ClientMerge: guard[2]: roleAllows(user.role, #quot;adminAccess#quot;)
+    ClientMerge->>ClientMerge: guard[3]: self.primaryClient != null
+    ClientMerge->>ClientMerge: guard[4]: self.duplicateClient != null
+    ClientMerge->>ClientMerge: guard[5]: self.primaryClient.status == #quot;active#quot;
+    ClientMerge->>ClientMerge: guard[6]: self.primaryClient.deletedAt == null
+    ClientMerge->>ClientMerge: guard[7]: self.duplicateClient.status == #quot;active#quot;
+    ClientMerge->>ClientMerge: guard[8]: self.duplicateClient.deletedAt == null
+    ClientMerge->>ClientMerge: mutate.primaryClientId
+    ClientMerge->>ClientMerge: mutate.duplicateClientId
+    ClientMerge->>ClientMerge: mutate.mergedAt
+    ClientMerge->>EventBus: emit ClientMergeCompleted on client_merge.completed
+    ClientMerge-->>-Client: void

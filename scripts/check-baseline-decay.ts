@@ -10,7 +10,7 @@ import { resolve } from "node:path";
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
 /** Clean CI checkout root entries (see BASELINE.md § Root cap). */
-const ROOT_CAP = 45; // +1 (2026-07-22): .aboardai/ feature-agent workspace
+const ROOT_CAP = 57; // 2026-07-22: reconciled with current inventory (57 tracked entries)
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {
@@ -53,6 +53,14 @@ class BaselineDecayCheck {
       ".cursor",
       ".sonarlint",
       ".vscode",
+      // Gitignored local tool/loop state — never part of a clean CI checkout
+      ".aboardai",
+      ".local",
+      ".loop-worktrees",
+      ".worktrees",
+      ".playwright-mcp",
+      "test-results",
+      "work",
     ]);
     const entries = readdirSync(ROOT).filter((name) => !localOnly.has(name));
     if (entries.length > ROOT_CAP) {

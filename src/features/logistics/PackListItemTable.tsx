@@ -21,6 +21,12 @@ interface PackListItemTableProps {
   itemActions: (status: string) => LogisticsAction[];
   onAdd: () => void;
   onInvokeItem: (item: PackListItemRow, key: string) => void;
+  canSelectItem: (item: PackListItemRow) => boolean;
+  isItemSelected: (id: string) => boolean;
+  allSelected: boolean;
+  onToggleItem: (id: string, on: boolean) => void;
+  onToggleAll: (on: boolean) => void;
+  selectableCount: number;
 }
 
 export function PackListItemTable({
@@ -32,6 +38,12 @@ export function PackListItemTable({
   itemActions,
   onAdd,
   onInvokeItem,
+  canSelectItem,
+  isItemSelected,
+  allSelected,
+  onToggleItem,
+  onToggleAll,
+  selectableCount,
 }: PackListItemTableProps) {
   if (loading) return <TableSkeleton rows={5} />;
   if (items.length === 0) {
@@ -61,6 +73,15 @@ export function PackListItemTable({
       <table className="supply-table">
         <thead>
           <tr>
+            <th className="w-8">
+              <input
+                type="checkbox"
+                aria-label="Select all pack items with bulk actions"
+                checked={allSelected}
+                disabled={busy != null || selectableCount === 0}
+                onChange={(event) => onToggleAll(event.target.checked)}
+              />
+            </th>
             <th>Description</th>
             <th>Required</th>
             <th>Packed</th>
@@ -71,6 +92,19 @@ export function PackListItemTable({
         <tbody>
           {items.map((item) => (
             <tr key={item._id}>
+              <td className="w-8">
+                {canSelectItem(item) ? (
+                  <input
+                    type="checkbox"
+                    aria-label={`Select ${item.description}`}
+                    checked={isItemSelected(item._id)}
+                    disabled={busy != null}
+                    onChange={(event) =>
+                      onToggleItem(item._id, event.target.checked)
+                    }
+                  />
+                ) : null}
+              </td>
               <td>
                 <strong>{item.description}</strong>
                 {dishName(item.dishId) ? (

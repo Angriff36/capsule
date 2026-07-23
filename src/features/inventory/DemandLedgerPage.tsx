@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import {
   useCreateIngredientDemand,
   useIngredientDemandFulfill,
@@ -9,7 +10,9 @@ import {
   useListPurchaseNeed,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
+import { HoverPreview } from "../../ui/HoverPreview";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { IngredientPreviewCard } from "../kitchen/IngredientPreviewCard";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
@@ -220,12 +223,19 @@ export function DemandLedgerPage() {
           <TableSkeleton rows={7} />
         ) : activeDemands.length === 0 ? (
           <div className="document-empty">
-            <p>No ingredient demand has been calculated.</p>
-            <span>Begin with an event and an active ingredient.</span>
-            <div className="mt-3 flex justify-center">
+            <p>No ingredient demand yet</p>
+            <span>
+              Demand is what service requires per ingredient. It generates
+              automatically when you approve an event with dishes — then flows
+              into purchasing. You can also calculate a line by hand.
+            </span>
+            <div className="mt-3 flex justify-center gap-2">
+              <Link to="/events" className="btn btn-primary btn-sm">
+                Go to events
+              </Link>
               <button
                 type="button"
-                className="btn btn-primary btn-sm"
+                className="btn btn-ghost btn-sm"
                 onClick={() => setShowCreate(true)}
               >
                 Calculate demand
@@ -255,7 +265,31 @@ export function DemandLedgerPage() {
                         <strong>{eventName(demand.eventId)}</strong>
                         <small>{demand.eventId.slice(-8)}</small>
                       </td>
-                      <td>{ingredientName(demand.ingredientId)}</td>
+                      <td>
+                        {(() => {
+                          const ingredient = ingredients?.find(
+                            (i) => i._id === demand.ingredientId,
+                          );
+                          if (!ingredient)
+                            return ingredientName(demand.ingredientId);
+                          return (
+                            <HoverPreview
+                              card={
+                                <IngredientPreviewCard
+                                  ingredient={ingredient}
+                                />
+                              }
+                            >
+                              <Link
+                                to={`/kitchen/ingredients/${ingredient._id}`}
+                                className="underline decoration-dotted underline-offset-2 hover:text-ink"
+                              >
+                                {ingredient.name}
+                              </Link>
+                            </HoverPreview>
+                          );
+                        })()}
+                      </td>
                       <td className="supply-number">
                         {demand.requiredQuantity} {demand.unit}
                       </td>

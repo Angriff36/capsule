@@ -12,6 +12,7 @@ sequenceDiagram
     IngredientDemand->>IngredientDemand: guard[4]: self.ingredient != null and self.ingredient.status == #quot;ac...
     IngredientDemand->>IngredientDemand: mutate.eventId
     IngredientDemand->>IngredientDemand: mutate.ingredientId
+    IngredientDemand->>IngredientDemand: mutate.preferredVendorId
     IngredientDemand->>IngredientDemand: mutate.requiredQuantity
     IngredientDemand->>IngredientDemand: mutate.unit
     IngredientDemand->>IngredientDemand: mutate.servings

@@ -14,7 +14,7 @@ Current generated boundary: **43 governed business entities**, **219 command cap
 | [Inventory](inventory.md)     | StorageLocation, InventoryItem, InventoryReservation, IngredientDemand, WasteRecord | `/inventory`                            | Shipping demand and stock ledgers; reaction limits remain explicit |
 | [Procurement](procurement.md) | Vendor, VendorOrder, VendorOrderLine, PurchaseNeed                                  | Inventory purchasing subworkspace       | Shipping queue and order folio; reaction limits remain explicit    |
 | Production & quality          | PrepTask, ProductionBatch, QualityCheck, Incident, EventAllergenCheck               | `/kitchen/prep`                         | Shipping prep board + quality fail→block proof                     |
-| Workforce                     | EventAssignment, Shift, AvailabilityWindow, TimeRecord, Qualification               | `/staff`                                | Shipping roster, time, qualifications + shift lifecycle proof      |
+| Workforce                     | EventAssignment, Shift, ShiftType, AvailabilityWindow, TimeRecord, Qualification, TrainingModule, TrainingCompletion | `/staff`, `/staff/training` | Shipping roster, time, qualifications, training + shift gates |
 | [Logistics](logistics.md)     | PackList, PackListItem, Delivery                                                    | `/logistics`                            | Shipping pack lists, load sheet, deliveries + lifecycle proof      |
 | Commercial & billing          | ClientContact, Proposal, Contract, Invoice, Payment, PaymentMethod                  | `/clients`, `/finance`                  | Slice 7 shipped; OD035/OD038 automation deferred                   |
 | Closeout & reporting          | EventCloseout, PayrollInput, SavedReportDefinition                                  | `/finance/closeout`, `/finance/payroll`, `/reports` | Closeout + payroll + report library shipped; chart render deferred |
@@ -37,7 +37,7 @@ Current generated boundary: **43 governed business entities**, **219 command cap
 - **Business:** Clients/Commercial, Finance/Closeout, Reports.
 - **System:** Organization settings and access surfaces that are actually backed by Organization, Person, Clerk, and authored seams.
 
-Facilities, equipment/work orders, notifications, API keys, leads/deals, marketing, knowledge base, vehicles/returns, training modules, and public proposal/signing flows existed or were planned in Capsule-Pro/Capsule-V2 but are not current canonical CapsuleX systems. They require an approved product decision and Manifest source before being promoted in navigation.
+API keys, marketing, knowledge base, vehicles/returns, and public proposal/signing flows existed or were planned in Capsule-Pro/Capsule-V2 but are not current canonical CapsuleX systems. They require an approved product decision and Manifest source before being promoted in navigation. Staff training is now canonical through `src/workforce/training.manifest` and `/staff/training`.
 
 ## Status meaning
 

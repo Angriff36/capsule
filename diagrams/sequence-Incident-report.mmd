@@ -17,6 +17,7 @@ sequenceDiagram
     Incident->>Incident: mutate.severity
     Incident->>Incident: mutate.category
     Incident->>Incident: mutate.description
+    Incident->>Incident: mutate.correctiveActionRequired
     Incident->>Incident: mutate.reportedById
     Incident->>Incident: mutate.reportedAt
     Incident->>EventBus: emit IncidentReported on incident.reported

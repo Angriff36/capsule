@@ -1,0 +1,22 @@
+sequenceDiagram
+    participant Client
+    participant InventoryLot as InventoryLot
+    Client->>+InventoryLot: record(supplierLotNumber, vendorOrderLineId, vendorOrderId, vendorId, ingredientId, ingredientDemandId, eventId, locationId, receiptQuantity, cumulativeReceivedQuantity, unit, unitCost)
+    Note over InventoryLot: Policies: inventoryLotRead, inventoryLotWrite, inventoryLotExecute
+    Note over InventoryLot: Guards (2)
+    InventoryLot->>InventoryLot: guard[0]: self.receivedAt == null or self.supplierLotNumber == supp...
+    InventoryLot->>InventoryLot: guard[1]: self.deletedAt == null
+    InventoryLot->>InventoryLot: mutate.supplierLotNumber
+    InventoryLot->>InventoryLot: mutate.vendorOrderLineId
+    InventoryLot->>InventoryLot: mutate.vendorOrderId
+    InventoryLot->>InventoryLot: mutate.vendorId
+    InventoryLot->>InventoryLot: mutate.ingredientId
+    InventoryLot->>InventoryLot: mutate.ingredientDemandId
+    InventoryLot->>InventoryLot: mutate.eventId
+    InventoryLot->>InventoryLot: mutate.locationId
+    InventoryLot->>InventoryLot: mutate.receiptQuantity
+    InventoryLot->>InventoryLot: mutate.cumulativeReceivedQuantity
+    InventoryLot->>InventoryLot: mutate.unit
+    InventoryLot->>InventoryLot: mutate.unitCost
+    InventoryLot->>InventoryLot: mutate.receivedAt
+    InventoryLot-->>-Client: void

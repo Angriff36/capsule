@@ -7,10 +7,13 @@ import {
   PurchaseNeedCancelLifecycle,
   PurchaseNeedMarkFulfilledLifecycle,
   PurchaseNeedMarkOrderedLifecycle,
+  VendorOrderApproveLifecycle,
   VendorOrderCancelLifecycle,
   VendorOrderConfirmLifecycle,
   VendorOrderMarkPartiallyReceivedLifecycle,
   VendorOrderMarkReceivedLifecycle,
+  VendorOrderRequestChangesLifecycle,
+  VendorOrderSubmitForApprovalLifecycle,
   VendorOrderSubmitLifecycle,
 } from "../../generated/manifest-wiring-bindings";
 
@@ -86,6 +89,21 @@ const NEED_ACTIONS = [
 
 const ORDER_ACTIONS = [
   { key: "submit", label: "Submit", lifecycle: VendorOrderSubmitLifecycle },
+  {
+    key: "submitForApproval",
+    label: "Send for approval",
+    lifecycle: VendorOrderSubmitForApprovalLifecycle,
+  },
+  {
+    key: "approve",
+    label: "Approve & submit",
+    lifecycle: VendorOrderApproveLifecycle,
+  },
+  {
+    key: "requestChanges",
+    label: "Request changes",
+    lifecycle: VendorOrderRequestChangesLifecycle,
+  },
   { key: "confirm", label: "Confirm", lifecycle: VendorOrderConfirmLifecycle },
   {
     key: "markPartiallyReceived",

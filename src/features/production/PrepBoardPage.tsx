@@ -1,12 +1,15 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import {
   useCreatePrepTask,
+  useCreatePrepTaskDependency,
   useCreateQualityCheck,
   useListDish,
   useListEvent,
   useListEventDish,
   useListIngredient,
   useListPrepTask,
+  useListPrepTaskDependency,
   useListQualityCheck,
   usePrepTaskCancel,
   usePrepTaskClaim,
@@ -19,7 +22,13 @@ import {
   useQualityCheckPass,
   useQualityCheckReinspect,
 } from "../../lib/manifest-convex-react";
+import {
+  BulkActionBar,
+  useBulkRun,
+  useBulkSelection,
+} from "../../ui/bulk-select";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
 import {
   PrepActionReasonForm,
@@ -28,6 +37,11 @@ import {
 import { ProductionFailureBanner } from "./ProductionFailureBanner";
 import { ProductionLifecyclePolicy } from "./ProductionLifecyclePolicy";
 import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
+import {
+  prepTaskDependencyLabel,
+  prepTaskDependencySummary,
+} from "./PrepTaskDependencies";
+import "./PrepTaskDependencies.css";
 
 const UNITS = [
   "each",
@@ -48,6 +62,13 @@ const UNITS = [
 
 const policy = new ProductionLifecyclePolicy();
 
+// Reason-free prep transitions safe to run in bulk.
+const BULK_PREP = [
+  { key: "claim", label: "Claim", verb: "claimed" },
+  { key: "start", label: "Start", verb: "started" },
+  { key: "complete", label: "Complete", verb: "completed" },
+] as const;
+
 interface ReasonRequest {
   action: PrepReasonAction;
   task: any;
@@ -55,12 +76,14 @@ interface ReasonRequest {
 
 export function PrepBoardPage() {
   const tasks = useListPrepTask();
+  const dependencies = useListPrepTaskDependency();
   const checks = useListQualityCheck();
   const events = useListEvent();
   const eventDishes = useListEventDish();
   const dishes = useListDish();
   const ingredients = useListIngredient();
   const createTask = useCreatePrepTask();
+  const createDependency = useCreatePrepTaskDependency();
   const claim = usePrepTaskClaim();
   const release = usePrepTaskRelease();
   const start = usePrepTaskStart();
@@ -73,14 +96,17 @@ export function PrepBoardPage() {
   const failCheck = useQualityCheckFail();
   const reinspectCheck = useQualityCheckReinspect();
   const [showCreate, setShowCreate] = useState(false);
+  const [selectedEventDishId, setSelectedEventDishId] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [reasonRequest, setReasonRequest] = useState<ReasonRequest | null>(
     null,
   );
+  const optimistic = useOptimisticStatus();
 
   const activeTasks = (tasks ?? []).filter((task) => task.deletedAt == null);
+  const activeDependencies = dependencies ?? [];
   const activeChecks = (checks ?? []).filter(
     (check) => check.deletedAt == null,
   );
@@ -116,22 +142,54 @@ export function PrepBoardPage() {
     if (stationOrder !== 0) return stationOrder;
     return eventName(left.eventId).localeCompare(eventName(right.eventId));
   });
+  const dependencyForTask = (taskId: string) =>
+    prepTaskDependencySummary(taskId, activeTasks, activeDependencies);
+  const selectedEventId = eventDishes?.find(
+    (row) => row._id === selectedEventDishId,
+  )?.eventId;
+  const predecessorCandidates = activeTasks.filter(
+    (task) =>
+      selectedEventId != null &&
+      task.eventId === selectedEventId &&
+      String(task.status) !== "cancelled",
+  );
+  const taskBulkKeys = (task: { _id: string; status: unknown }) => {
+    const available = new Set(
+      policy.prepActions(String(task.status)).map((action) => action.key),
+    );
+    const dependency = dependencyForTask(task._id);
+    return BULK_PREP.filter(
+      (action) =>
+        available.has(action.key) &&
+        (action.key !== "start" || !dependency.isBlocked),
+    );
+  };
+  const selectableTasks = orderedTasks.filter(
+    (task) => taskBulkKeys(task).length > 0,
+  );
+  const selection = useBulkSelection(selectableTasks);
+  const bulk = useBulkRun();
   const isLoading =
     tasks === undefined ||
     events === undefined ||
     eventDishes === undefined ||
     dishes === undefined ||
     ingredients === undefined ||
-    checks === undefined;
+    checks === undefined ||
+    dependencies === undefined;
 
   const run = async (
     key: string,
     work: () => Promise<void>,
     successMessage: string,
+    optimisticTarget?: { id: string; status?: string },
   ) => {
     setFailure(null);
     setNotice(null);
     setBusy(key);
+    if (optimisticTarget?.status) {
+      optimistic.begin(optimisticTarget.id, optimisticTarget.status);
+    }
     try {
       await work();
       setNotice(successMessage);
@@ -139,7 +197,26 @@ export function PrepBoardPage() {
       setFailure(error);
     } finally {
       setBusy(null);
+      if (optimisticTarget) optimistic.end(optimisticTarget.id);
     }
+  };
+
+  const runBulkPrep = (action: (typeof BULK_PREP)[number]) => {
+    const targets = selection.selected.filter((task) =>
+      taskBulkKeys(task).some((entry) => entry.key === action.key),
+    );
+    if (targets.length === 0) return;
+    void run(
+      `bulk-${action.key}`,
+      () =>
+        bulk.runBulk(targets, async (task) => {
+          const args = { docId: task._id, version: task.version };
+          if (action.key === "claim") await claim(args);
+          if (action.key === "start") await start(args);
+          if (action.key === "complete") await complete(args);
+        }),
+      `${targets.length} prep ${targets.length === 1 ? "task" : "tasks"} ${action.verb}.`,
+    ).then(() => selection.clear());
   };
 
   const submitTask = (event: FormEvent<HTMLFormElement>) => {
@@ -152,7 +229,7 @@ export function PrepBoardPage() {
         const eventDishId = String(data.get("eventDishId"));
         const eventDish = eventDishes?.find((row) => row._id === eventDishId);
         if (!eventDish) throw new Error("Select an event dish");
-        await createTask({
+        const created = await createTask({
           eventDishId,
           eventId: eventDish.eventId,
           name: String(data.get("name") ?? "").trim(),
@@ -162,7 +239,15 @@ export function PrepBoardPage() {
           station: String(data.get("station") || "") || undefined,
           notes: String(data.get("notes") || "") || undefined,
         });
+        const predecessorTaskIds = data.getAll("predecessorTaskId").map(String);
+        for (const predecessorTaskId of predecessorTaskIds) {
+          await createDependency({
+            dependentTaskId: created.docId,
+            predecessorTaskId,
+          });
+        }
         form.reset();
+        setSelectedEventDishId("");
         setShowCreate(false);
       },
       "Prep task opened and added to the production sheet.",
@@ -195,6 +280,7 @@ export function PrepBoardPage() {
         if (key === "unblock") await unblock(args);
       },
       messages[key] ?? "Prep task updated.",
+      { id: task._id, status: policy.prepNextStatus(key, String(task.status)) },
     );
   };
 
@@ -212,6 +298,10 @@ export function PrepBoardPage() {
       action === "markBlocked"
         ? "Prep task blocked with a reason for the team."
         : "Prep task cancelled and removed from active production.",
+      {
+        id: task._id,
+        status: policy.prepNextStatus(action, String(task.status)),
+      },
     );
   };
 
@@ -240,6 +330,10 @@ export function PrepBoardPage() {
         if (key === "reinspect") await reinspectCheck(args);
       },
       messages[key] ?? "Quality check updated.",
+      {
+        id: check._id,
+        status: policy.qualityNextStatus(key, String(check.status)),
+      },
     );
   };
 
@@ -255,15 +349,20 @@ export function PrepBoardPage() {
             service-ready completion.
           </p>
         </div>
-        <button
-          type="button"
-          className="btn btn-primary"
-          aria-expanded={showCreate}
-          aria-controls="prep-task-form"
-          onClick={() => setShowCreate((value) => !value)}
-        >
-          {showCreate ? "Close task form" : "Add prep task"}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link to="/kitchen/display" className="btn btn-ghost">
+            Kitchen display
+          </Link>
+          <button
+            type="button"
+            className="btn btn-primary"
+            aria-expanded={showCreate}
+            aria-controls="prep-task-form"
+            onClick={() => setShowCreate((value) => !value)}
+          >
+            {showCreate ? "Close task form" : "Add prep task"}
+          </button>
+        </div>
       </header>
       <KitchenBookNav />
       <ProductionWorkspaceNav />
@@ -339,7 +438,13 @@ export function PrepBoardPage() {
           <div className="supply-form-grid">
             <label className="field-label">
               Event dish
-              <select name="eventDishId" className="input" required>
+              <select
+                name="eventDishId"
+                className="input"
+                required
+                value={selectedEventDishId}
+                onChange={(event) => setSelectedEventDishId(event.target.value)}
+              >
                 <option value="">Select event dish</option>
                 {(eventDishes ?? [])
                   .filter(
@@ -412,6 +517,36 @@ export function PrepBoardPage() {
                 placeholder="e.g. Pipe filling; garnish just before service"
               />
             </label>
+            <fieldset className="prep-dependency-picker">
+              <legend>Must follow (optional)</legend>
+              <p>
+                Select earlier work that must be checked off before this task
+                can start.
+              </p>
+              {!selectedEventDishId ? (
+                <span>Select an event dish to see its prep tasks.</span>
+              ) : predecessorCandidates.length === 0 ? (
+                <span>No other prep tasks are available for this event.</span>
+              ) : (
+                <div className="prep-dependency-options">
+                  {predecessorCandidates.map((task) => (
+                    <label key={task._id}>
+                      <input
+                        type="checkbox"
+                        name="predecessorTaskId"
+                        value={task._id}
+                      />
+                      <span>
+                        <strong>{taskLabel(task)}</strong>
+                        <small>
+                          {task.station || "Unassigned"} · {String(task.status)}
+                        </small>
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              )}
+            </fieldset>
           </div>
         </form>
       ) : null}
@@ -448,18 +583,24 @@ export function PrepBoardPage() {
           <div className="document-empty">
             <p>The prep sheet is clear</p>
             <span>
-              No prep tasks have been opened for active events. Add the first
-              line when production is ready.
+              Prep tasks turn an approved event's dishes into kitchen work.
+              Approve an event to populate this board, or add the first line by
+              hand when production is ready.
             </span>
-            <button
-              type="button"
-              className="btn btn-primary mt-4"
-              aria-expanded={showCreate}
-              aria-controls="prep-task-form"
-              onClick={() => setShowCreate(true)}
-            >
-              Add first prep task
-            </button>
+            <div className="mt-4 flex justify-center gap-2">
+              <Link to="/events" className="btn btn-primary btn-sm">
+                Go to events
+              </Link>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                aria-expanded={showCreate}
+                aria-controls="prep-task-form"
+                onClick={() => setShowCreate(true)}
+              >
+                Add first prep task
+              </button>
+            </div>
           </div>
         ) : (
           <div className="supply-table-wrap">
@@ -470,6 +611,17 @@ export function PrepBoardPage() {
               </caption>
               <thead>
                 <tr>
+                  <th scope="col" className="w-8">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all prep tasks with bulk actions"
+                      checked={selection.allSelected}
+                      disabled={busy != null || selectableTasks.length === 0}
+                      onChange={(event) =>
+                        selection.toggleAll(event.target.checked)
+                      }
+                    />
+                  </th>
                   <th scope="col">Finish / station</th>
                   <th scope="col">Event / service</th>
                   <th scope="col">Prep item</th>
@@ -483,8 +635,23 @@ export function PrepBoardPage() {
                 {orderedTasks.map((task) => {
                   const actions = policy.prepActions(String(task.status));
                   const linked = checksForTask(task._id);
+                  const dependency = dependencyForTask(task._id);
+                  const bulkable = taskBulkKeys(task).length > 0;
                   return (
                     <tr key={task._id}>
+                      <td className="w-8">
+                        {bulkable ? (
+                          <input
+                            type="checkbox"
+                            aria-label={`Select ${taskLabel(task)}`}
+                            checked={selection.isSelected(task._id)}
+                            disabled={busy != null}
+                            onChange={(event) =>
+                              selection.toggle(task._id, event.target.checked)
+                            }
+                          />
+                        ) : null}
+                      </td>
                       <td>
                         <strong>{task.station || "Unassigned"}</strong>
                       </td>
@@ -501,9 +668,26 @@ export function PrepBoardPage() {
                         {task.quantity} {task.unit}
                       </td>
                       <td>
-                        <StatusChip status={String(task.status)} />
+                        <StatusChip
+                          status={optimistic.statusOf(
+                            task._id,
+                            String(task.status),
+                          )}
+                        />
                         {task.blockReason ? (
                           <small>{task.blockReason}</small>
+                        ) : null}
+                        {dependency.total > 0 ? (
+                          <small
+                            id={`prep-dependencies-${task._id}`}
+                            className={
+                              dependency.isBlocked
+                                ? "prep-dependency-state is-waiting"
+                                : "prep-dependency-state is-ready"
+                            }
+                          >
+                            {prepTaskDependencyLabel(dependency)}
+                          </small>
                         ) : null}
                       </td>
                       <td>
@@ -526,7 +710,12 @@ export function PrepBoardPage() {
                           ) : (
                             linked.map((check) => (
                               <div key={check._id}>
-                                <StatusChip status={String(check.status)} />
+                                <StatusChip
+                                  status={optimistic.statusOf(
+                                    check._id,
+                                    String(check.status),
+                                  )}
+                                />
                                 <div className="supply-row-actions">
                                   {policy
                                     .qualityActions(String(check.status))
@@ -564,8 +753,21 @@ export function PrepBoardPage() {
                               key={action.key}
                               type="button"
                               className="btn btn-ghost btn-sm"
-                              disabled={busy != null}
+                              disabled={
+                                busy != null ||
+                                (action.key === "start" && dependency.isBlocked)
+                              }
                               aria-busy={busy === `${task._id}:${action.key}`}
+                              aria-describedby={
+                                action.key === "start" && dependency.total > 0
+                                  ? `prep-dependencies-${task._id}`
+                                  : undefined
+                              }
+                              title={
+                                action.key === "start" && dependency.isBlocked
+                                  ? prepTaskDependencyLabel(dependency)
+                                  : undefined
+                              }
                               aria-expanded={
                                 action.key === "markBlocked" ||
                                 action.key === "cancel"
@@ -609,6 +811,30 @@ export function PrepBoardPage() {
           </div>
         ) : null}
       </section>
+
+      <BulkActionBar
+        count={selection.count}
+        noun="prep task"
+        progress={bulk.progress}
+        onClear={selection.clear}
+      >
+        {BULK_PREP.map((action) => {
+          const applicable = selection.selected.filter((task) =>
+            taskBulkKeys(task).some((entry) => entry.key === action.key),
+          ).length;
+          return (
+            <button
+              key={action.key}
+              type="button"
+              className="btn btn-primary btn-sm"
+              disabled={busy != null || applicable === 0}
+              onClick={() => runBulkPrep(action)}
+            >
+              {action.label} ({applicable})
+            </button>
+          );
+        })}
+      </BulkActionBar>
     </div>
   );
 }

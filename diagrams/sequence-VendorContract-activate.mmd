@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant VendorContract as VendorContract
+    participant EventBus
+    Client->>+VendorContract: activate()
+    Note over VendorContract: Policies: vendorContractRead, vendorContractWrite, vendorContractExecute
+    Note over VendorContract: Guards (4)
+    VendorContract->>VendorContract: guard[0]: self.draftedAt != null
+    VendorContract->>VendorContract: guard[1]: self.status == #quot;draft#quot;
+    VendorContract->>VendorContract: guard[2]: self.deletedAt == null
+    VendorContract->>VendorContract: guard[3]: self.startsAt != null and self.endsAt != null
+    VendorContract->>VendorContract: mutate.status
+    VendorContract->>VendorContract: mutate.activatedAt
+    VendorContract->>EventBus: emit VendorContractActivated on vendor_contract.activated
+    VendorContract-->>-Client: void

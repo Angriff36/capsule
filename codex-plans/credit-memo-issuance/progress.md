@@ -1,0 +1,38 @@
+# Credit Memo Issuance Progress
+
+## 2026-07-22
+- Read the supplied repository instructions and the planning, frontend-design, and Playwright skill instructions.
+- Pinned branch and HEAD and recorded the existing dirty checkout.
+- Created isolated planning files for this feature.
+- Next: trace the live invoice implementation and check overlapping files for concurrent mutation.
+- Traced the current Invoice model, generated hook naming, invoice detail operator flow, and commercial billing docs.
+- Captured overlap hashes and confirmed existing invoice work belongs to other feature slices.
+- Confirmed there is no pre-existing credit memo model to extend.
+- Rechecked overlapping file hashes after exploration; they remained stable.
+- Completed the domain/UI design and moved into scoped implementation.
+- Added authored `CreditMemo` domain source, invoice credit accounting commands/fields, and the root Manifest use.
+- Ran `bun run manifest:regen`; Builder applied the generated Convex/schema/client/contract/diagram updates with zero conflicts and a complete assembly report.
+- Inspected the generated create mutation and reactions: source recording and optional target application run in the same Convex transaction, and carry-forward has no target mutation.
+- Added the paid-invoice credit memo form, same-client target picker, available-credit summaries, balance fields, and related memo ledger to `InvoiceDetailPage` using generated hooks.
+- Formatted authored UI/docs, regenerated ownership after Manifest comment cleanup, and passed `bun run typecheck`.
+- Confirmed the normal local app requires a real Clerk/Convex session; planned an isolated disposable Vite harness for the required Playwright UI proof.
+- Created and ran a temporary Playwright/Vite harness against the real `InvoiceDetailPage` with disposable finance records.
+- Playwright passed both outcomes in 2.2s: a $75 carry-forward memo appeared as available client credit, and a $50 applied memo reduced the selected open invoice from $200 due to $150 while showing $50 applied credit.
+- Stopped the temporary server. Next: delete the temporary spec/harness, run focused commercial verification, then `bun run check`.
+- Deleted the temporary Playwright spec and entire harness after the passing run.
+- `bun run check:commercial-manifest` passed.
+- `bun run check` reached the event integration guard and stopped on unrelated untracked EventAllergenBriefing/EventIncident files that directly call Convex.
+- Detected and preserved concurrent client-merge additions to the new CreditMemo source; no attempt was made to overwrite or attribute them to this feature.
+- `bun run test -- tests/manifest-convex.contract.test.ts` passed all 322 generated contract tests.
+- Confirmed the unrelated event guard failure is already tracked at https://github.com/Angriff36/capsule/issues/40.
+- Reviewed the authored feature diff with `git diff --check`; no whitespace errors were found. Stopped source edits once the separate client-merge session became actively concurrent.
+- Independently reviewed the generated backend and found a miscompiled cumulative-credit constraint that referenced a nonexistent document field.
+- Corrected the authored Invoice constraint inline; regeneration and focused verification remain pending.
+- Ran `bun run manifest:regen`; Builder applied the correction with zero conflicts and a complete assembly report.
+- Confirmed the generated mutation now reads `doc.creditMemoAmount` with a null-to-zero fallback and no longer references `doc.priorCreditMemoAmount`.
+- `bun run typecheck`, `bun run check:commercial-manifest`, and focused `git diff --check` all passed after regeneration.
+- Focused existing suites passed: 3 files and 329 tests covering the commercial guard, generated Convex contract, and invoice/payment runtime proof.
+- `bun run build`, focused Prettier validation, and `bun run secrets` passed.
+- Re-ran `bun run check`; toolchain, ownership, proof emission/validation, and registry pin passed before the unrelated event guard failed on `EventAllergenBriefingPage.tsx` and `EventIncidentPanel.tsx`.
+- Confirmed the blocker is tracked at https://github.com/Angriff36/capsule/issues/40. Closed accidentally duplicated issue #48 as a duplicate of #40.
+- Completed the final feature-source/generated-output review and confirmed the temporary Playwright harness is absent.

@@ -9,14 +9,31 @@
  */
 
 import type * as authStatus from "../authStatus.js";
+import type * as clientPortal from "../clientPortal.js";
 import type * as computed from "../computed.js";
 import type * as crons from "../crons.js";
+import type * as emailNotifications from "../emailNotifications.js";
+import type * as equipmentCheckout from "../equipmentCheckout.js";
+import type * as fileStorage from "../fileStorage.js";
+import type * as googleCalendar from "../googleCalendar.js";
 import type * as http from "../http.js";
+import type * as inventoryAudit from "../inventoryAudit.js";
+import type * as invoicePayments from "../invoicePayments.js";
+import type * as invoiceReminders from "../invoiceReminders.js";
 import type * as lib_authContext from "../lib/authContext.js";
+import type * as lib_clientPortalToken from "../lib/clientPortalToken.js";
 import type * as lib_encryption from "../lib/encryption.js";
+import type * as lib_equipmentReservationAvailability from "../lib/equipmentReservationAvailability.js";
+import type * as lib_googleCalendar from "../lib/googleCalendar.js";
+import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
+import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAvailability.js";
 import type * as mutations from "../mutations.js";
+import type * as personalDataExport from "../personalDataExport.js";
 import type * as queries from "../queries.js";
+import type * as recurringEvents from "../recurringEvents.js";
 import type * as sagas from "../sagas.js";
+import type * as vehicleAssignment from "../vehicleAssignment.js";
+import type * as workforceScheduling from "../workforceScheduling.js";
 
 import type {
   ApiFromModules,
@@ -26,14 +43,31 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   authStatus: typeof authStatus;
+  clientPortal: typeof clientPortal;
   computed: typeof computed;
   crons: typeof crons;
+  emailNotifications: typeof emailNotifications;
+  equipmentCheckout: typeof equipmentCheckout;
+  fileStorage: typeof fileStorage;
+  googleCalendar: typeof googleCalendar;
   http: typeof http;
+  inventoryAudit: typeof inventoryAudit;
+  invoicePayments: typeof invoicePayments;
+  invoiceReminders: typeof invoiceReminders;
   "lib/authContext": typeof lib_authContext;
+  "lib/clientPortalToken": typeof lib_clientPortalToken;
   "lib/encryption": typeof lib_encryption;
+  "lib/equipmentReservationAvailability": typeof lib_equipmentReservationAvailability;
+  "lib/googleCalendar": typeof lib_googleCalendar;
+  "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
+  "lib/vehicleDeliveryAvailability": typeof lib_vehicleDeliveryAvailability;
   mutations: typeof mutations;
+  personalDataExport: typeof personalDataExport;
   queries: typeof queries;
+  recurringEvents: typeof recurringEvents;
   sagas: typeof sagas;
+  vehicleAssignment: typeof vehicleAssignment;
+  workforceScheduling: typeof workforceScheduling;
 }>;
 
 /**

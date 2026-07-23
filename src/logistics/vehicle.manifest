@@ -1,0 +1,168 @@
+// Capsule logistics — owned and leased delivery vehicle source records.
+// Scheduling, maintenance, and driver-assignment features reference this catalog.
+
+use "../foundation/base.manifest"
+
+enum VehicleOwnership {
+  owned
+  leased
+}
+
+enum VehicleOperationalStatus {
+  available
+  in_use
+  maintenance
+  out_of_service
+  retired
+}
+
+entity Vehicle mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, registration]
+  timestamps
+  versionProperty version: number
+
+  property required searchable make: string = ""
+  property required model: string = ""
+  property required registration: string = ""
+  property required ownership: VehicleOwnership = "owned"
+  property required payloadCapacityKg: int = 1
+  property required operationalStatus: VehicleOperationalStatus = "available"
+  property statusNote: string?
+  property registeredAt: datetime?
+  property statusChangedAt: datetime?
+
+  computed isOperational: boolean = self.operationalStatus == "available" or self.operationalStatus == "in_use"
+
+  constraint vehicleCapacityPositive: self.payloadCapacityKg > 0 "Vehicle payload capacity must be positive"
+  constraint registeredVehicleComplete: self.registeredAt == null or (length(trim(self.make)) > 0 and length(trim(self.model)) > 0 and length(trim(self.registration)) > 0) "Registered vehicles require make, model, and registration"
+
+  // Dispatchers need to move vehicles between real-world states without an
+  // approval workflow; every state may be corrected as operating facts change.
+  transition operationalStatus from "available" to ["in_use", "maintenance", "out_of_service", "retired"]
+  transition operationalStatus from "in_use" to ["available", "maintenance", "out_of_service", "retired"]
+  transition operationalStatus from "maintenance" to ["available", "in_use", "out_of_service", "retired"]
+  transition operationalStatus from "out_of_service" to ["available", "in_use", "maintenance", "retired"]
+  transition operationalStatus from "retired" to ["available", "in_use", "maintenance", "out_of_service"]
+
+  default policy vehicleRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read vehicles"
+  default policy vehicleWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write vehicles through commands"
+  default policy vehicleExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute vehicle commands"
+
+  command register(
+    make: string,
+    model: string,
+    registration: string,
+    ownership: VehicleOwnership,
+    payloadCapacityKg: int,
+    operationalStatus: VehicleOperationalStatus,
+    optional statusNote: string
+  ) {
+    guard self.registeredAt == null
+    guard self.deletedAt == null
+    constraint registerVehicleMake: length(trim(make)) > 0 "Vehicle make is required"
+    constraint registerVehicleModel: length(trim(model)) > 0 "Vehicle model is required"
+    constraint registerVehicleRegistration: length(trim(registration)) > 0 "Vehicle registration is required"
+    constraint registerVehicleCapacity: payloadCapacityKg > 0 "Vehicle payload capacity must be positive"
+    mutate make = make
+    mutate model = model
+    mutate registration = registration
+    mutate ownership = ownership
+    mutate payloadCapacityKg = payloadCapacityKg
+    mutate operationalStatus = operationalStatus
+    mutate statusNote = statusNote
+    mutate registeredAt = now()
+    mutate statusChangedAt = now()
+    emit VehicleRegistered {
+      vehicleId: self.id
+      tenantId: self.tenantId
+      make: make
+      model: model
+      registration: registration
+      ownership: ownership
+      payloadCapacityKg: payloadCapacityKg
+      operationalStatus: operationalStatus
+    }
+  }
+
+  command reviseDetails(
+    make: string,
+    model: string,
+    registration: string,
+    ownership: VehicleOwnership,
+    payloadCapacityKg: int
+  ) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    constraint reviseVehicleMake: length(trim(make)) > 0 "Vehicle make is required"
+    constraint reviseVehicleModel: length(trim(model)) > 0 "Vehicle model is required"
+    constraint reviseVehicleRegistration: length(trim(registration)) > 0 "Vehicle registration is required"
+    constraint reviseVehicleCapacity: payloadCapacityKg > 0 "Vehicle payload capacity must be positive"
+    mutate make = make
+    mutate model = model
+    mutate registration = registration
+    mutate ownership = ownership
+    mutate payloadCapacityKg = payloadCapacityKg
+    emit VehicleDetailsRevised {
+      vehicleId: self.id
+      tenantId: self.tenantId
+      make: make
+      model: model
+      registration: registration
+      ownership: ownership
+      payloadCapacityKg: payloadCapacityKg
+    }
+  }
+
+  command updateOperationalStatus(
+    operationalStatus: VehicleOperationalStatus,
+    optional statusNote: string
+  ) {
+    guard self.registeredAt != null
+    guard self.deletedAt == null
+    compute previousStatus = self.operationalStatus
+    mutate operationalStatus = operationalStatus
+    mutate statusNote = statusNote
+    mutate statusChangedAt = now()
+    emit VehicleOperationalStatusUpdated {
+      vehicleId: self.id
+      tenantId: self.tenantId
+      previousStatus: previousStatus
+      operationalStatus: operationalStatus
+      statusNote: statusNote
+      statusChangedAt: self.statusChangedAt
+    }
+  }
+
+  store Vehicle in durable
+}
+
+event VehicleRegistered: "vehicle.registered" {
+  vehicleId: string
+  tenantId: string
+  make: string
+  model: string
+  registration: string
+  ownership: VehicleOwnership
+  payloadCapacityKg: int
+  operationalStatus: VehicleOperationalStatus
+}
+
+event VehicleDetailsRevised: "vehicle.details_revised" {
+  vehicleId: string
+  tenantId: string
+  make: string
+  model: string
+  registration: string
+  ownership: VehicleOwnership
+  payloadCapacityKg: int
+}
+
+event VehicleOperationalStatusUpdated: "vehicle.operational_status_updated" {
+  vehicleId: string
+  tenantId: string
+  previousStatus: VehicleOperationalStatus
+  operationalStatus: VehicleOperationalStatus
+  statusNote: string?
+  statusChangedAt: datetime?
+}

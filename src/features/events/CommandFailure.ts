@@ -1,10 +1,58 @@
 export type CommandFailureCategory =
   "denied" | "validation" | "guard_blocked" | "conflict" | "unexpected";
 
+/** A corrective step the user can take directly from the failure banner. */
+export interface CommandFailureAction {
+  label: string;
+  /** Reload the page — the correct fix for stale/conflict/removed-record failures. */
+  reload?: boolean;
+}
+
 export interface CommandFailure {
   category: CommandFailureCategory;
   title: string;
   detail: string;
+  action?: CommandFailureAction;
+}
+
+const REFRESH_ACTION: CommandFailureAction = {
+  label: "Refresh & retry",
+  reload: true,
+};
+
+/** Turn a snake_case stage/state token into readable words ("pending_approval" -> "pending approval"). */
+function humanizeState(token: string): string {
+  return token.replace(/_/g, " ").trim();
+}
+
+/**
+ * Parse the generated "Invalid state transition" guard message into plain language.
+ * Raw shape: Invalid state transition for 'stage': 'A' -> 'B' is not
+ * allowed. Allowed from 'A': ['B', 'C']  (placeholder tokens - the real
+ * stage names come from the generated guard message at runtime)
+ */
+function stateTransitionFailure(detail: string): CommandFailure | null {
+  const match = detail.match(
+    /Invalid state transition for '[^']+':\s*'([^']+)'\s*->\s*'([^']+)'[^.]*\.\s*Allowed from '[^']+':\s*\[([^\]]*)\]/i,
+  );
+  if (!match) return null;
+  const [, from, to] = match;
+  const allowed = (match[3] ?? "")
+    .split(",")
+    .map((s) => s.replace(/['"\s]/g, ""))
+    .filter(Boolean)
+    .map(humanizeState);
+  const nextSteps =
+    allowed.length > 0
+      ? `From here you can move it to: ${allowed.join(", ")}.`
+      : `It's already ${humanizeState(from)} and can't change from here.`;
+  return {
+    category: "guard_blocked",
+    title: "Not ready for this step yet",
+    detail: `This can't move to "${humanizeState(to)}" while it's "${humanizeState(
+      from,
+    )}". ${nextSteps}`,
+  };
 }
 
 function messageOf(error: unknown): string {
@@ -47,7 +95,19 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
       category: "conflict",
       title: "This record changed elsewhere",
       detail:
-        "Refresh the page and try the action again. Your entered details are still valid.",
+        "Someone else updated this record while you were working. Refresh to load the latest, then try again — your entered details are still valid.",
+      action: REFRESH_ACTION,
+    };
+  }
+  const transition = stateTransitionFailure(detail);
+  if (transition) return transition;
+  if (/\bnot found\b/i.test(detail)) {
+    return {
+      category: "conflict",
+      title: "This record isn't available",
+      detail:
+        "It may have been removed, or it isn't part of your workspace. Refresh to see the current list.",
+      action: REFRESH_ACTION,
     };
   }
   if (/No tenant|authentication context|not authenticated/i.test(detail)) {

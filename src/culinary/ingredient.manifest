@@ -48,7 +48,11 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   property allergens: list<AllergenCode> = []
   property required costPerUnit: money(12, 2) = 0
   property category: string?
-  // Preferred vendor for automatic weekly draft consolidation (Manifest reactions).
+  // Kitchen-configured alternatives evaluated against live stock when demand
+  // cannot be fully reserved. Ranking is derived from allergens and unit cost.
+  property substituteIngredientIds: list<uuid> = []
+  // Ordered operator preference plus a scalar first choice for Manifest routing.
+  property preferredVendorIds: list<uuid> = []
   property preferredVendorId: uuid?
   property required status: IngredientStatus = "active"
   property introducedAt: datetime?
@@ -103,6 +107,22 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   command setPreferredVendor(optional preferredVendorId: uuid) {
     guard self.introducedAt != null
     guard self.deletedAt == null
+    mutate preferredVendorId = preferredVendorId
+  }
+
+  command configureSubstitutes(substituteIngredientIds: list<uuid>) {
+    guard self.introducedAt != null
+    guard self.deletedAt == null
+    mutate substituteIngredientIds = substituteIngredientIds
+  }
+
+  command setPreferredVendors(
+    preferredVendorIds: list<uuid>,
+    optional preferredVendorId: uuid
+  ) {
+    guard self.introducedAt != null
+    guard self.deletedAt == null
+    mutate preferredVendorIds = preferredVendorIds
     mutate preferredVendorId = preferredVendorId
   }
 

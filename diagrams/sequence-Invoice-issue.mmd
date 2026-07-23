@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant Invoice as Invoice
     participant EventBus
-    Client->>+Invoice: issue(clientId, invoiceNumber, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes)
+    Client->>+Invoice: issue(clientId, invoiceNumber, subtotal, taxAmount, discountAmount, total, eventId, paymentTermsDays, dueDate, notes, lineItems, taxBreakdown)
     Note over Invoice: Policies: invoiceRead, invoiceWrite, invoiceExecute
     Note over Invoice: Guards (4)
     Invoice->>Invoice: guard[0]: self.issuedAt == null
@@ -18,6 +18,10 @@ sequenceDiagram
     Invoice->>Invoice: mutate.total
     Invoice->>Invoice: mutate.amountPaid
     Invoice->>Invoice: mutate.amountDue
+    Invoice->>Invoice: mutate.amountCredited
+    Invoice->>Invoice: mutate.creditMemoAmount
+    Invoice->>Invoice: mutate.lineItems
+    Invoice->>Invoice: mutate.taxBreakdown
     Invoice->>Invoice: mutate.paymentTermsDays
     Invoice->>Invoice: mutate.dueDate
     Invoice->>Invoice: mutate.notes

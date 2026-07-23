@@ -1,0 +1,6 @@
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]: C
+    - generic [ref=e7]: Capsule
+  - heading "Checking your session…" [level=1] [ref=e8]
+  - paragraph [ref=e10]: Talking to the identity provider.

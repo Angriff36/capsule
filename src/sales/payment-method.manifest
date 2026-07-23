@@ -28,6 +28,8 @@ entity PaymentMethod mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property required clientId: uuid
+  property clientMergeAuthorizationId: uuid?
+  property mergeTargetClientId: uuid?
   property required methodType: PaymentMethodType = "card"
   property provider: string?
   property lastFour: string?
@@ -40,6 +42,8 @@ entity PaymentMethod mixin TenantScoped, SoftDeletable {
   property notes: string?
 
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
+  ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
 
   transition status from "active" to ["expired", "invalid", "fraudulent", "removed"]
   transition status from "expired" to ["active"]
@@ -157,7 +161,52 @@ entity PaymentMethod mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    constraint stageDistinctClient: clientId != self.clientId "Payment method already belongs to this client"
+    mutate clientMergeAuthorizationId = clientMergeId
+    mutate mergeTargetClientId = clientId
+    emit PaymentMethodClientMergeStaged {
+      paymentMethodId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command reassignClient() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "adminAccess")
+    guard self.clientMergeAuthorization != null
+    guard self.clientMergeAuthorization.deletedAt == null
+    guard self.clientMergeAuthorization.mergedAt != null
+    guard self.mergeTargetClient != null
+    guard self.mergeTargetClient.status == "active"
+    guard self.mergeTargetClient.deletedAt == null
+    constraint reassignAuthorizedSource: self.clientMergeAuthorization.duplicateClientId == self.clientId "Merge authorization does not match the payment-method client"
+    constraint reassignAuthorizedTarget: self.clientMergeAuthorization.primaryClientId == self.mergeTargetClientId "Merge authorization does not match the primary client"
+    compute previousClientId = self.clientId
+    mutate clientId = self.mergeTargetClientId
+    emit PaymentMethodClientReassigned {
+      paymentMethodId: self.id
+      tenantId: self.tenantId
+      previousClientId: previousClientId
+      clientId: self.mergeTargetClientId
+    }
+  }
+
   store PaymentMethod in durable
+}
+
+event PaymentMethodClientMergeStaged: "payment_method.client_merge_staged" {
+  paymentMethodId: string
+  tenantId: string
+}
+
+event PaymentMethodClientReassigned: "payment_method.client_reassigned" {
+  paymentMethodId: string
+  tenantId: string
+  previousClientId: string
+  clientId: string
 }
 
 event PaymentMethodRegistered: "payment_method.registered" {

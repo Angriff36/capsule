@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant WeeklyScheduleNotice as WeeklyScheduleNotice
+    participant EventBus
+    Client->>+WeeklyScheduleNotice: publishSchedule(personId, recipientAuthSubjectId, weekStartsAt, weekEndsAt, shiftCount, shiftSummary)
+    Note over WeeklyScheduleNotice: Policies: weeklyScheduleNoticeRead, weeklyScheduleNoticeWrite, weeklyScheduleNoticeExecute
+    Note over WeeklyScheduleNotice: Guards (4)
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: guard[0]: self.publishedAt == null
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: guard[1]: self.deletedAt == null
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: guard[2]: self.person != null
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: guard[3]: roleAllows(user.role, #quot;workforceManageAccess#quot;)
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: mutate.personId
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: mutate.recipientAuthSubjectId
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: mutate.weekStartsAt
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: mutate.weekEndsAt
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: mutate.shiftCount
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: mutate.shiftSummary
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: mutate.publishedAt
+    WeeklyScheduleNotice->>WeeklyScheduleNotice: mutate.acknowledgedAt
+    WeeklyScheduleNotice->>EventBus: emit WeeklySchedulePublished on weekly_schedule.published
+    WeeklyScheduleNotice-->>-Client: void

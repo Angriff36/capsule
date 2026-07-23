@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant Shift as Shift
     participant EventBus
-    Client->>+Shift: schedule(personId, startsAt, endsAt, eventId, role, notes)
+    Client->>+Shift: schedule(personId, startsAt, endsAt, eventId, role, shiftTypeId, requiredQualificationId, requiredTrainingCompletionId, notes)
     Note over Shift: Policies: shiftRead, shiftWrite, shiftExecute
     Note over Shift: Guards (5)
     Shift->>Shift: guard[0]: self.scheduledAt == null
@@ -15,6 +15,9 @@ sequenceDiagram
     Shift->>Shift: mutate.startsAt
     Shift->>Shift: mutate.endsAt
     Shift->>Shift: mutate.role
+    Shift->>Shift: mutate.shiftTypeId
+    Shift->>Shift: mutate.requiredQualificationId
+    Shift->>Shift: mutate.requiredTrainingCompletionId
     Shift->>Shift: mutate.notes
     Shift->>Shift: mutate.scheduledAt
     Shift->>EventBus: emit ShiftScheduled on shift.scheduled

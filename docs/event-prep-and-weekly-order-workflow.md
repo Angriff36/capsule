@@ -59,7 +59,7 @@ When the Event is **approved**:
 
 1. Compat fanOut may repair `purchaseEligibleEventId` on legacy calculated rows
 2. Manifest fanOut foreach-creates `PurchaseNeed` for eligible demand
-3. `WeeklyPurchasingConfig.routeNeed` ensures one shared `VendorOrder` DRAFT for the purchasing week + default vendor
+3. `WeeklyPurchasingConfig.routeNeed` uses each ingredient's first preferred vendor, falling back to the tenant default, and ensures the matching weekly `VendorOrder` DRAFT
 4. Lines consolidate identical ingredients; on-hand stock reduces the ordered quantity once across the week
 5. Needs stay `open` until the buyer submits the draft — approval never auto-submits
 6. Manifest also `PackList.open` (match `eventId` + `activeEventId`, else create) and fanOut `ProductionBatch.plan` per `EventDishRecipeSeed` (MCP-proved 2026-07-21 on local Convex after #8/#10/#11/#14)
@@ -73,6 +73,14 @@ When the Event is **approved**:
     owner is unset; also on `EventOwnerAssigned`)
 
 Headcount or dish changes revise contributions and reconcile the same draft (idempotent; no duplicate quantities).
+
+When receiving an order line, the buyer enters the actual unit price with the
+receipt quantity. `VendorOrderLine.recordReceipt` retains that price on the line
+and creates one immutable `IngredientPriceObservation` for the ingredient,
+vendor, order, and partial receipt. Ingredient price trends and Recipe costing
+use the newest confirmed observation; Ingredients without a receipt observation
+continue using their catalog cost. Physical stock receipt remains a separate
+generated Inventory command.
 
 ```
 EventDish + headcount
@@ -92,7 +100,8 @@ EventDish + headcount
 >
 > Proof: `tests/proofs/event-weekly-purchasing.runtime.test.ts`.
 
-- Configure one `WeeklyPurchasingConfig` per tenant (default vendor) before approve routes needs.
+- Rank preferred vendors on Ingredient detail when an ingredient should route to a specific supplier. The first vendor is the automatic default; the saved order remains editable.
+- Configure one `WeeklyPurchasingConfig` per tenant as the fallback before approve routes needs without an ingredient preference.
   Manifest declares `unique [tenantId]`, but `WeeklyPurchasingConfig_createViaConfigure`
   currently inserts without enforcing that uniqueness — repeated configure calls can leave
   multiple live config rows and ambiguous `routeNeed` vendors. Do not soft-ignore configure

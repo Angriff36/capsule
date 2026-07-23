@@ -2,7 +2,7 @@ sequenceDiagram
     participant Client
     participant Event as Event
     participant EventBus
-    Client->>+Event: planEngagement(clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, venueId, venueName, venueAddress, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId)
+    Client->>+Event: planEngagement(clientId, title, eventType, startsAt, endsAt, expectedHeadcount, primaryContactName, budgetAmount, quotedPrice, venueId, venueName, venueAddress, venueCapacity, primaryContactEmail, primaryContactPhone, accessibilityNeeds, serviceRequirements, operationalRequirements, assignedToId)
     Note over Event: Policies: eventRead, eventWrite, eventExecute
     Note over Event: Guards (3)
     Event->>Event: guard[0]: self.stage == #quot;planning#quot;
@@ -17,6 +17,7 @@ sequenceDiagram
     Event->>Event: mutate.venueId
     Event->>Event: mutate.venueName
     Event->>Event: mutate.venueAddress
+    Event->>Event: mutate.venueCapacity
     Event->>Event: mutate.expectedHeadcount
     Event->>Event: mutate.primaryContactName
     Event->>Event: mutate.primaryContactEmail

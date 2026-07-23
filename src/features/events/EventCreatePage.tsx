@@ -5,10 +5,14 @@ import {
   useCreateClient,
   useCreateEvent,
   useCreateVenue,
+  useGetEventTemplate,
   useListClient,
+  useListMenu,
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { ArrowLeftIcon } from "../../ui/icons";
+import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
+import { FieldError, useFieldValidation } from "../../ui/formValidation";
 import { PageHeader, Section, Skeleton } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
@@ -37,6 +41,15 @@ function lines(value: string): string[] | undefined {
   return values.length ? values : undefined;
 }
 
+function eventFieldRules(data: FormData): Record<string, string> {
+  const start = String(data.get("startsAt") ?? "");
+  const end = String(data.get("endsAt") ?? "");
+  if (start && end && new Date(end).getTime() <= new Date(start).getTime()) {
+    return { endsAt: "End must be after the start time." };
+  }
+  return {};
+}
+
 function venueAddress(venue: Doc<"venues"> | undefined): string | undefined {
   if (!venue) return undefined;
   return (
@@ -56,6 +69,12 @@ export function EventCreatePage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const prefillClientId = searchParams.get("clientId")?.trim() || "";
+  const templateId = searchParams.get("templateId")?.trim() || "";
+  const template = useGetEventTemplate(templateId || "skip");
+  const menus = useListMenu();
+  const templateMenuName = (menus ?? []).find(
+    (menu) => menu._id === template?.menuId,
+  )?.name;
   const clients = useListClient();
   const venues = useListVenue();
   const createClient = useCreateClient();
@@ -67,6 +86,9 @@ export function EventCreatePage() {
   const [showVenue, setShowVenue] = useState(false);
   const [busy, setBusy] = useState<"client" | "venue" | "event" | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const { errors, touched, formProps, handleSubmit } =
+    useFieldValidation(eventFieldRules);
+  const draftForm = useFormDraft("event-create");
 
   const activeClients = (clients ?? []).filter(
     (client) =>
@@ -147,6 +169,7 @@ export function EventCreatePage() {
         venueId,
         venueName: venue?.name,
         venueAddress: venueAddress(venue),
+        venueCapacity: venue?.capacity,
         title: String(data.get("title") ?? "").trim(),
         eventType: String(data.get("eventType") ?? "").trim(),
         startsAt: new Date(String(data.get("startsAt"))).getTime(),
@@ -169,6 +192,7 @@ export function EventCreatePage() {
           String(data.get("operationalRequirements") ?? ""),
         ),
       });
+      draftForm.clear();
       navigate(eventDetailPath(created.docId));
     });
   };
@@ -188,17 +212,27 @@ export function EventCreatePage() {
 
       {failure ? <FailureBanner failure={failure} /> : null}
 
+      <DraftRestoreBanner
+        draft={draftForm.draft}
+        onRestore={draftForm.restore}
+        onDiscard={draftForm.discard}
+      />
+
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.48fr)]">
         <form
+          key={template?._id ?? "blank"}
           id="event-create-form"
-          onSubmit={submitEvent}
+          ref={draftForm.formRef}
+          onSubmit={handleSubmit(submitEvent)}
           className="space-y-3"
+          {...formProps}
         >
           <Section title="Engagement">
             <div className="grid gap-3 p-3 sm:grid-cols-2">
               <label className="field-label sm:col-span-2">
                 Event title
                 <input name="title" className="input" required autoFocus />
+                <FieldError name="title" errors={errors} touched={touched} />
               </label>
               <label className="field-label">
                 Event type
@@ -207,6 +241,12 @@ export function EventCreatePage() {
                   className="input"
                   required
                   placeholder="Wedding, gala, corporate dinner…"
+                  defaultValue={template?.eventType ?? ""}
+                />
+                <FieldError
+                  name="eventType"
+                  errors={errors}
+                  touched={touched}
                 />
               </label>
               <label className="field-label">
@@ -216,9 +256,14 @@ export function EventCreatePage() {
                   type="number"
                   min={1}
                   max={100000}
-                  defaultValue={1}
+                  defaultValue={template?.defaultHeadcount ?? 1}
                   className="input"
                   required
+                />
+                <FieldError
+                  name="expectedHeadcount"
+                  errors={errors}
+                  touched={touched}
                 />
               </label>
               <label className="field-label">
@@ -229,6 +274,7 @@ export function EventCreatePage() {
                   className="input"
                   required
                 />
+                <FieldError name="startsAt" errors={errors} touched={touched} />
               </label>
               <label className="field-label">
                 Ends
@@ -238,6 +284,7 @@ export function EventCreatePage() {
                   className="input"
                   required
                 />
+                <FieldError name="endsAt" errors={errors} touched={touched} />
               </label>
             </div>
           </Section>
@@ -247,6 +294,11 @@ export function EventCreatePage() {
               <label className="field-label">
                 Name
                 <input name="primaryContactName" className="input" required />
+                <FieldError
+                  name="primaryContactName"
+                  errors={errors}
+                  touched={touched}
+                />
               </label>
               <label className="field-label">
                 Email
@@ -254,6 +306,11 @@ export function EventCreatePage() {
                   name="primaryContactEmail"
                   type="email"
                   className="input"
+                />
+                <FieldError
+                  name="primaryContactEmail"
+                  errors={errors}
+                  touched={touched}
                 />
               </label>
               <label className="field-label">
@@ -307,6 +364,11 @@ export function EventCreatePage() {
                   className="input"
                   required
                 />
+                <FieldError
+                  name="budgetAmount"
+                  errors={errors}
+                  touched={touched}
+                />
               </label>
               <label className="field-label">
                 Quoted price
@@ -319,12 +381,52 @@ export function EventCreatePage() {
                   className="input"
                   required
                 />
+                <FieldError
+                  name="quotedPrice"
+                  errors={errors}
+                  touched={touched}
+                />
               </label>
             </div>
           </Section>
         </form>
 
         <aside className="space-y-3 lg:sticky lg:top-4 lg:self-start">
+          {templateId ? (
+            <Section title="Template">
+              {template === undefined ? (
+                <div className="p-3">
+                  <Skeleton className="h-8" />
+                </div>
+              ) : template === null ? (
+                <p className="p-3 text-[12px] text-ink-3">
+                  This template no longer exists.
+                </p>
+              ) : (
+                <div className="space-y-1.5 p-3 text-[12px] text-ink-2">
+                  <p className="font-medium text-ink">{template.name}</p>
+                  <p>
+                    {template.eventType} · {String(template.clientType)} client
+                    · {template.defaultHeadcount} guests
+                  </p>
+                  {templateMenuName ? <p>Menu: {templateMenuName}</p> : null}
+                  {template.defaultStaffRoles?.length ? (
+                    <p>Staff: {template.defaultStaffRoles.join(", ")}</p>
+                  ) : null}
+                  {template.typicalEquipment?.length ? (
+                    <p>Equipment: {template.typicalEquipment.join(", ")}</p>
+                  ) : null}
+                  {template.notes ? (
+                    <p className="text-ink-3">{template.notes}</p>
+                  ) : null}
+                  <p className="pt-1 text-[11px] leading-relaxed text-ink-3">
+                    Event type and headcount are pre-filled from this template.
+                    Adjust anything before creating.
+                  </p>
+                </div>
+              )}
+            </Section>
+          ) : null}
           <Section title="Client">
             <div className="space-y-3 p-3">
               {clients === undefined ? (

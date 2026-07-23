@@ -10,8 +10,14 @@ import {
   useListClient,
   useListEvent,
   useListInvoice,
+  useListTaxRate,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
+import {
+  BulkActionBar,
+  useBulkRun,
+  useBulkSelection,
+} from "../../ui/bulk-select";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
@@ -48,6 +54,7 @@ export function InvoicesPage() {
   const invoices = useListInvoice();
   const clients = useListClient();
   const events = useListEvent();
+  const taxRates = useListTaxRate();
   const createInvoice = useCreateInvoice();
   const send = useInvoiceSend();
   const markViewed = useInvoiceMarkViewed();
@@ -83,6 +90,12 @@ export function InvoicesPage() {
         (row) =>
           !["paid", "voided", "written_off"].includes(String(row.status)),
       );
+
+  const canSend = (row: { status: unknown }) =>
+    policy.invoiceActions(String(row.status)).some((a) => a.key === "send");
+  const sendableRows = visibleRows.filter(canSend);
+  const selection = useBulkSelection(sendableRows);
+  const bulk = useBulkRun();
 
   const clearIssuePrefill = () => {
     if (!openFromLink && !prefillClientId && !prefillEventId) return;
@@ -123,6 +136,15 @@ export function InvoicesPage() {
     const total = money(data.get("total"));
     const eventId = String(data.get("eventId") || "").trim();
     const dueRaw = String(data.get("dueDate") || "").trim();
+    let lineItems: unknown;
+    let taxBreakdown: unknown;
+    try {
+      lineItems = JSON.parse(String(data.get("lineItems") || "[]"));
+      taxBreakdown = JSON.parse(String(data.get("taxBreakdown") || "[]"));
+    } catch {
+      setFailure(new Error("The calculated invoice lines could not be read."));
+      return;
+    }
     if (!clientId) {
       setFailure(new Error("Select a client before issuing an invoice."));
       return;
@@ -134,6 +156,10 @@ export function InvoicesPage() {
       setFailure(
         new Error("Invoice number and all money fields are required."),
       );
+      return;
+    }
+    if (!Array.isArray(lineItems) || lineItems.length === 0) {
+      setFailure(new Error("Add at least one invoice line."));
       return;
     }
     void run("issue-invoice", async () => {
@@ -148,6 +174,8 @@ export function InvoicesPage() {
         paymentTermsDays: Number(data.get("paymentTermsDays") || 30) || 30,
         dueDate: dueRaw ? new Date(dueRaw) : undefined,
         notes: String(data.get("notes") || "").trim() || undefined,
+        lineItems,
+        taxBreakdown,
       });
       form.reset();
       setShowIssue(false);
@@ -210,8 +238,25 @@ export function InvoicesPage() {
     })();
   };
 
+  const runBulkSend = () => {
+    const targets = selection.selected.filter(canSend);
+    if (targets.length === 0) return;
+    void run("bulk-send", async () => {
+      await bulk.runBulk(targets, async (row) => {
+        await send({ docId: row._id, version: row.version });
+      });
+      selection.clear();
+      setNotice(
+        `${targets.length} ${targets.length === 1 ? "invoice" : "invoices"} sent.`,
+      );
+    });
+  };
+
   const loading =
-    invoices === undefined || clients === undefined || events === undefined;
+    invoices === undefined ||
+    clients === undefined ||
+    events === undefined ||
+    taxRates === undefined;
 
   return (
     <div className="operations-stage supply-stage">
@@ -225,6 +270,9 @@ export function InvoicesPage() {
           </p>
         </div>
         <div className="supply-row-actions">
+          <Link className="btn btn-ghost" to={FINANCE_ROUTES.revenue}>
+            Revenue trends
+          </Link>
           <button
             className="btn btn-ghost"
             type="button"
@@ -274,6 +322,7 @@ export function InvoicesPage() {
         <InvoiceIssueForm
           clients={activeClients}
           events={events ?? []}
+          taxRates={taxRates ?? []}
           busy={busy === "issue-invoice"}
           onSubmit={submitIssue}
           defaultClientId={prefillClientId}
@@ -312,6 +361,17 @@ export function InvoicesPage() {
             <table className="supply-table">
               <thead>
                 <tr>
+                  <th className="w-8">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all sendable invoices"
+                      checked={selection.allSelected}
+                      disabled={busy != null || sendableRows.length === 0}
+                      onChange={(event) =>
+                        selection.toggleAll(event.target.checked)
+                      }
+                    />
+                  </th>
                   <th>Number</th>
                   <th>Client</th>
                   <th>Due</th>
@@ -322,6 +382,19 @@ export function InvoicesPage() {
               <tbody>
                 {visibleRows.map((row) => (
                   <tr key={row._id}>
+                    <td className="w-8">
+                      {canSend(row) ? (
+                        <input
+                          type="checkbox"
+                          aria-label={`Select invoice ${row.invoiceNumber || "draft"}`}
+                          checked={selection.isSelected(row._id)}
+                          disabled={busy != null}
+                          onChange={(event) =>
+                            selection.toggle(row._id, event.target.checked)
+                          }
+                        />
+                      ) : null}
+                    </td>
                     <td>
                       <Link
                         className="text-link"
@@ -377,6 +450,22 @@ export function InvoicesPage() {
           </div>
         )}
       </section>
+
+      <BulkActionBar
+        count={selection.count}
+        noun="invoice"
+        progress={bulk.progress}
+        onClear={selection.clear}
+      >
+        <button
+          type="button"
+          className="btn btn-primary btn-sm"
+          disabled={busy != null || selection.count === 0}
+          onClick={runBulkSend}
+        >
+          Send {selection.count}
+        </button>
+      </BulkActionBar>
     </div>
   );
 }

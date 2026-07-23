@@ -1,0 +1,19 @@
+sequenceDiagram
+    participant Client
+    participant EquipmentServiceEntry as EquipmentServiceEntry
+    participant EventBus
+    Client->>+EquipmentServiceEntry: record(maintenanceTaskId, equipmentId, technician, cost, completedAt, nextDueAt, notes)
+    Note over EquipmentServiceEntry: Policies: equipmentServiceRead, equipmentServiceWrite, equipmentServiceExecute
+    Note over EquipmentServiceEntry: Guards (4)
+    EquipmentServiceEntry->>EquipmentServiceEntry: guard[0]: self.loggedAt == null
+    EquipmentServiceEntry->>EquipmentServiceEntry: guard[1]: self.deletedAt == null
+    EquipmentServiceEntry->>EquipmentServiceEntry: guard[2]: self.maintenanceTask != null
+    EquipmentServiceEntry->>EquipmentServiceEntry: guard[3]: self.equipment != null
+    EquipmentServiceEntry->>EquipmentServiceEntry: mutate.technician
+    EquipmentServiceEntry->>EquipmentServiceEntry: mutate.cost
+    EquipmentServiceEntry->>EquipmentServiceEntry: mutate.notes
+    EquipmentServiceEntry->>EquipmentServiceEntry: mutate.completedAt
+    EquipmentServiceEntry->>EquipmentServiceEntry: mutate.nextDueAt
+    EquipmentServiceEntry->>EquipmentServiceEntry: mutate.loggedAt
+    EquipmentServiceEntry->>EventBus: emit EquipmentServiceRecorded on equipment.service_recorded
+    EquipmentServiceEntry-->>-Client: void

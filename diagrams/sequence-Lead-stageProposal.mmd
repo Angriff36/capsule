@@ -1,0 +1,11 @@
+sequenceDiagram
+    participant Client
+    participant Lead as Lead
+    Client->>+Lead: stageProposal(proposalId)
+    Note over Lead: Policies: leadRead, leadWrite, leadExecute
+    Note over Lead: Guards (3)
+    Lead->>Lead: guard[0]: self.capturedAt != null
+    Lead->>Lead: guard[1]: self.convertedAt != null
+    Lead->>Lead: guard[2]: self.deletedAt == null
+    Lead->>Lead: mutate.proposalId
+    Lead-->>-Client: void

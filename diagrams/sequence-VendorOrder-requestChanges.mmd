@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant VendorOrder as VendorOrder
+    participant EventBus
+    Client->>+VendorOrder: requestChanges(notes)
+    Note over VendorOrder: Policies: vendorOrderRead, vendorOrderWrite, vendorOrderExecute
+    Note over VendorOrder: Guards (3)
+    VendorOrder->>VendorOrder: guard[0]: self.status == #quot;pending_approval#quot;
+    VendorOrder->>VendorOrder: guard[1]: self.deletedAt == null
+    VendorOrder->>VendorOrder: guard[2]: roleAllows(user.role, #quot;manageAccess#quot;)
+    VendorOrder->>VendorOrder: mutate.status
+    VendorOrder->>VendorOrder: mutate.approvalNotes
+    VendorOrder->>VendorOrder: mutate.approvalRequestedAt
+    VendorOrder->>EventBus: emit VendorOrderChangesRequested on vendor_order.changes_requested
+    VendorOrder-->>-Client: void

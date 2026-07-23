@@ -3,7 +3,12 @@ import { NavLink } from "react-router-dom";
 const sections = [
   { label: "Demand", path: "/inventory/demand" },
   { label: "Stock book", path: "/inventory/stock" },
+  { label: "Counts", path: "/inventory/counts" },
+  { label: "Audit log", path: "/inventory/audit" },
+  { label: "Waste", path: "/inventory/waste" },
+  { label: "Lot trace", path: "/inventory/traceability" },
   { label: "Purchasing", path: "/inventory/purchasing" },
+  { label: "Contracts", path: "/inventory/contracts" },
 ] as const;
 
 export function InventoryWorkspaceNav() {

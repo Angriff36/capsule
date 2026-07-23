@@ -1,0 +1,223 @@
+// Capsule sales — prospective client inquiries before a formal account,
+// contact, or proposal exists. Downstream records are linked explicitly.
+
+enum LeadStage {
+  new
+  qualified
+  proposalSent
+  negotiating
+}
+
+entity Lead mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required leadType: ClientType = "company"
+  property searchable companyName: string?
+  property searchable givenName: string?
+  property searchable familyName: string?
+  property encrypted email: string?
+  property encrypted phone: string?
+  property required searchable source: string = ""
+  property required estimatedValue: money(12, 2) = 0
+  property required stage: LeadStage = "new"
+  property required probability: int = 10
+  property notes: string?
+  property clientId: uuid?
+  property clientContactId: uuid?
+  property proposalId: uuid?
+  property capturedAt: datetime?
+  property convertedAt: datetime?
+  property proposalLinkedAt: datetime?
+
+  ref client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref clientContact: ClientContact fields [tenantId, clientContactId] references [tenantId, id]
+  ref proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
+
+  computed displayName: string = self.leadType == "company" ? self.companyName : self.givenName + " " + self.familyName
+
+  constraint leadIdentityComplete: self.capturedAt == null or (self.leadType == "company" and self.companyName != null and length(trim(self.companyName)) > 0) or (self.leadType == "person" and self.givenName != null and length(trim(self.givenName)) > 0) "Company leads require a company name; person leads require a given name"
+  constraint leadSourceComplete: self.capturedAt == null or length(trim(self.source)) > 0 "Lead source is required"
+  constraint leadEstimatedValueNonnegative: self.estimatedValue >= 0 "Lead estimated value cannot be negative"
+  constraint leadProbabilityRange: self.probability >= 0 and self.probability <= 100 "Lead probability must be between 0 and 100"
+
+  default policy leadRead read: roleAllows(user.role, "salesAccess") "Sales staff may read leads"
+  default policy leadWrite write: roleAllows(user.role, "salesAccess") "Sales staff may update leads through commands"
+  default policy leadExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute lead commands"
+
+  command capture(
+    leadType: ClientType,
+    source: string,
+    estimatedValue: money(12, 2),
+    optional companyName: string,
+    optional givenName: string,
+    optional familyName: string,
+    optional email: string,
+    optional phone: string,
+    optional probability: number,
+    optional notes: string
+  ) {
+    guard self.capturedAt == null
+    guard self.deletedAt == null
+    constraint captureLeadIdentity: (leadType == "company" and companyName != null and length(trim(companyName)) > 0) or (leadType == "person" and givenName != null and length(trim(givenName)) > 0) "Company leads require a company name; person leads require a given name"
+    constraint captureLeadSource: length(trim(source)) > 0 "Lead source is required"
+    constraint captureLeadValue: estimatedValue >= 0 "Lead estimated value cannot be negative"
+    constraint captureLeadProbability: probability == null or (probability >= 0 and probability <= 100) "Lead probability must be between 0 and 100"
+    mutate leadType = leadType
+    mutate companyName = companyName
+    mutate givenName = givenName
+    mutate familyName = familyName
+    mutate email = email
+    mutate phone = phone
+    mutate source = source
+    mutate estimatedValue = estimatedValue
+    mutate stage = "new"
+    mutate probability = probability != null ? probability : 10
+    mutate notes = notes
+    mutate capturedAt = now()
+    emit LeadCaptured {
+      leadId: self.id
+      tenantId: self.tenantId
+      source: source
+      estimatedValue: estimatedValue
+      probability: probability != null ? probability : 10
+    }
+  }
+
+  command reviseDetails(
+    leadType: ClientType,
+    source: string,
+    optional companyName: string,
+    optional givenName: string,
+    optional familyName: string,
+    optional email: string,
+    optional phone: string,
+    optional notes: string
+  ) {
+    guard self.capturedAt != null
+    guard self.deletedAt == null
+    constraint reviseLeadIdentity: (leadType == "company" and companyName != null and length(trim(companyName)) > 0) or (leadType == "person" and givenName != null and length(trim(givenName)) > 0) "Company leads require a company name; person leads require a given name"
+    constraint reviseLeadSource: length(trim(source)) > 0 "Lead source is required"
+    mutate leadType = leadType
+    mutate companyName = companyName
+    mutate givenName = givenName
+    mutate familyName = familyName
+    mutate email = email
+    mutate phone = phone
+    mutate source = source
+    mutate notes = notes
+    emit LeadDetailsRevised {
+      leadId: self.id
+      tenantId: self.tenantId
+      source: source
+    }
+  }
+
+  command updatePipeline(stage: LeadStage, estimatedValue: money(12, 2), probability: number) {
+    guard self.capturedAt != null
+    guard self.deletedAt == null
+    constraint updateLeadValue: estimatedValue >= 0 "Lead estimated value cannot be negative"
+    constraint updateLeadProbability: probability >= 0 and probability <= 100 "Lead probability must be between 0 and 100"
+    compute previousStage = self.stage
+    mutate stage = stage
+    mutate estimatedValue = estimatedValue
+    mutate probability = probability
+    emit LeadPipelineUpdated {
+      leadId: self.id
+      tenantId: self.tenantId
+      previousStage: previousStage
+      stage: stage
+      estimatedValue: estimatedValue
+      probability: probability
+    }
+  }
+
+  // Two command steps let generated Convex hydrate and validate the newly
+  // linked tenant-scoped records. The UI performs both behind one button.
+  command stageConversion(clientId: uuid, optional clientContactId: uuid) {
+    guard self.capturedAt != null
+    guard self.deletedAt == null
+    mutate clientId = clientId
+    mutate clientContactId = clientContactId
+  }
+
+  command confirmConversion() {
+    guard self.capturedAt != null
+    guard self.deletedAt == null
+    guard self.client != null and self.client.status == "active" and self.client.deletedAt == null
+    constraint convertedLeadContactMatch: self.clientContact == null or (self.clientContact.clientId == self.clientId and self.clientContact.deletedAt == null) "Lead contact must belong to the converted client"
+    mutate convertedAt = now()
+    emit LeadConverted {
+      leadId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      clientContactId: self.clientContactId
+    }
+  }
+
+  command stageProposal(proposalId: uuid) {
+    guard self.capturedAt != null
+    guard self.convertedAt != null
+    guard self.deletedAt == null
+    mutate proposalId = proposalId
+  }
+
+  command confirmProposalSent() {
+    guard self.capturedAt != null
+    guard self.convertedAt != null
+    guard self.deletedAt == null
+    guard self.proposal != null and self.proposal.status == "sent" and self.proposal.deletedAt == null
+    constraint leadProposalClientMatch: self.proposal.clientId == self.clientId "Lead proposal must belong to the converted client"
+    compute previousStage = self.stage
+    mutate stage = "proposalSent"
+    mutate proposalLinkedAt = now()
+    emit LeadProposalLinked {
+      leadId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      proposalId: self.proposalId
+      previousStage: previousStage
+    }
+  }
+
+  store Lead in durable
+}
+
+event LeadCaptured: "lead.captured" {
+  leadId: string
+  tenantId: string
+  source: string
+  estimatedValue: decimal(12, 2)
+  probability: int
+}
+
+event LeadDetailsRevised: "lead.details_revised" {
+  leadId: string
+  tenantId: string
+  source: string
+}
+
+event LeadPipelineUpdated: "lead.pipeline_updated" {
+  leadId: string
+  tenantId: string
+  previousStage: LeadStage
+  stage: LeadStage
+  estimatedValue: decimal(12, 2)
+  probability: int
+}
+
+event LeadConverted: "lead.converted" {
+  leadId: string
+  tenantId: string
+  clientId: string?
+  clientContactId: string?
+}
+
+event LeadProposalLinked: "lead.proposal_linked" {
+  leadId: string
+  tenantId: string
+  clientId: string?
+  proposalId: string?
+  previousStage: LeadStage
+}

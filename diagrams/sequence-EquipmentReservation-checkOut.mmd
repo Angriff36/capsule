@@ -1,0 +1,15 @@
+sequenceDiagram
+    participant Client
+    participant EquipmentReservation as EquipmentReservation
+    participant EventBus
+    Client->>+EquipmentReservation: checkOut(condition, note)
+    Note over EquipmentReservation: Policies: equipmentReservationRead, equipmentReservationWrite, equipmentReservationExecute
+    Note over EquipmentReservation: Guards (2)
+    EquipmentReservation->>EquipmentReservation: guard[0]: self.status == #quot;reserved#quot;
+    EquipmentReservation->>EquipmentReservation: guard[1]: self.deletedAt == null
+    EquipmentReservation->>EquipmentReservation: mutate.status
+    EquipmentReservation->>EquipmentReservation: mutate.checkoutCondition
+    EquipmentReservation->>EquipmentReservation: mutate.checkoutNote
+    EquipmentReservation->>EquipmentReservation: mutate.checkedOutAt
+    EquipmentReservation->>EventBus: emit EquipmentCheckedOut on equipment.checked_out
+    EquipmentReservation-->>-Client: void

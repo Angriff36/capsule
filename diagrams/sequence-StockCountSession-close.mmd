@@ -1,0 +1,17 @@
+sequenceDiagram
+    participant Client
+    participant StockCountSession as StockCountSession
+    participant EventBus
+    Client->>+StockCountSession: close()
+    Note over StockCountSession: Policies: stockCountSessionRead, stockCountSessionWrite, stockCountSessionExecute
+    Note over StockCountSession: Guards (5)
+    StockCountSession->>StockCountSession: guard[0]: self.status == #quot;in_progress#quot;
+    StockCountSession->>StockCountSession: guard[1]: self.startedAt != null
+    StockCountSession->>StockCountSession: guard[2]: self.deletedAt == null
+    StockCountSession->>StockCountSession: guard[3]: count_of(self.lines, ...) == self.lineCount
+    StockCountSession->>StockCountSession: guard[4]: count_of(self.lines, ...) == 0
+    StockCountSession->>StockCountSession: mutate.status
+    StockCountSession->>StockCountSession: mutate.closedById
+    StockCountSession->>StockCountSession: mutate.closedAt
+    StockCountSession->>EventBus: emit StockCountSessionClosed on stock_count_session.closed
+    StockCountSession-->>-Client: void

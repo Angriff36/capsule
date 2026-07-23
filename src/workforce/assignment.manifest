@@ -1,6 +1,6 @@
 // Capsule workforce — EventAssignment (Person staffed onto an Event).
 // Compile chain: time.manifest → packing → … → this file → shift → availability.
-// Maps capsule-pro EventStaff. Training courses/sessions deferred (OD027).
+// Maps capsule-pro EventStaff. Reusable training records live in training.manifest.
 
 use "./shift.manifest"
 

@@ -20,10 +20,16 @@ enum IncidentSeverity {
 
 enum IncidentCategory {
   food_safety
+  allergen
   injury
   equipment
   service
   other
+}
+
+enum CorrectiveActionStatus {
+  open
+  closed
 }
 
 // Operational incident recorded at/for an Event, optionally linked to prep,
@@ -43,8 +49,13 @@ entity Incident mixin TenantScoped, SoftDeletable {
   property required description: string = ""
   property resolution: string?
   property dismissalReason: string?
-  property reportedById: uuid?
+  // Auth subject (user.id), not a Person doc id — a belongsTo Person here
+  // makes the column v.id("people") and every report fails (issue #35 class).
+  property reportedById: string?
   property required status: IncidentStatus = "open"
+  // Allergen response lock: true while a required corrective action is open.
+  // Nullable (not required+default) so pre-existing rows pass Convex schema validation.
+  property correctiveActionRequired: boolean?
   property reportedAt: datetime?
   property investigatingAt: datetime?
   property resolvedAt: datetime?
@@ -54,7 +65,6 @@ entity Incident mixin TenantScoped, SoftDeletable {
   belongsTo prepTask: PrepTask fields [tenantId, prepTaskId] references [tenantId, id]
   belongsTo delivery: Delivery fields [tenantId, deliveryId] references [tenantId, id]
   belongsTo shift: Shift fields [tenantId, shiftId] references [tenantId, id]
-  belongsTo reportedBy: Person fields [tenantId, reportedById] references [tenantId, id]
 
   constraint incidentDescriptionPresent: self.reportedAt == null or length(trim(self.description)) > 0 "Reported incidents require a description"
 
@@ -93,6 +103,7 @@ entity Incident mixin TenantScoped, SoftDeletable {
     mutate severity = severity
     mutate category = category
     mutate description = description
+    mutate correctiveActionRequired = category == "allergen"
     mutate reportedById = user.id
     mutate reportedAt = now()
     emit IncidentReported {
@@ -128,6 +139,7 @@ entity Incident mixin TenantScoped, SoftDeletable {
     guard self.status == "open" or self.status == "investigating"
     guard self.reportedAt != null
     guard self.deletedAt == null
+    constraint resolveCorrectiveActionClosed: self.correctiveActionRequired != true "Allergen incidents stay locked until the corrective action is closed"
     constraint resolveTextPresent: length(trim(resolution)) > 0 "Resolution is required"
     compute previousStatus = self.status
     mutate resolution = resolution
@@ -149,6 +161,7 @@ entity Incident mixin TenantScoped, SoftDeletable {
     guard self.reportedAt != null
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess") or roleAllows(user.role, "kitchenManageAccess")
+    constraint dismissCorrectiveActionClosed: self.correctiveActionRequired != true "Allergen incidents stay locked until the corrective action is closed"
     constraint dismissReasonPresent: length(trim(reason)) > 0 "Dismissal reason is required"
     compute previousStatus = self.status
     mutate dismissalReason = reason
@@ -165,7 +178,100 @@ entity Incident mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Reaction target for CorrectiveActionClosed — not a user-facing action.
+  // Idempotent (no lock guard): a throwing guard here would abort the
+  // corrective-action close that triggered it.
+  command clearCorrectiveActionLock() {
+    guard self.deletedAt == null
+    mutate correctiveActionRequired = false
+    emit IncidentCorrectiveActionCleared {
+      incidentId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      severity: self.severity
+      status: self.status
+    }
+  }
+
   store Incident in durable
+}
+
+// Required follow-up work for an allergen incident. Opened alongside the
+// incident report (the compiler has no child-creating reactions, so the app
+// layer opens it); closing it unlocks the incident via reaction.
+entity CorrectiveAction mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required incidentId: uuid
+  property required eventId: uuid
+  property required description: string = ""
+  property resolutionNotes: string?
+  // Auth subjects (user.id), not Person doc ids — see Incident.reportedById.
+  property openedById: string?
+  property closedById: string?
+  property required status: CorrectiveActionStatus = "open"
+  property openedAt: datetime?
+  property closedAt: datetime?
+
+  belongsTo incident: Incident fields [tenantId, incidentId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint correctiveDescriptionPresent: self.openedAt == null or length(trim(self.description)) > 0 "Corrective actions require a description"
+
+  transition status from "open" to ["closed"]
+  transition status from "closed" to []
+
+  default policy correctiveActionRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may read corrective actions"
+  default policy correctiveActionWrite write: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may write corrective actions through commands"
+  default policy correctiveActionExecute execute: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "kitchenAccess") "Event and kitchen staff may execute corrective action commands"
+
+  command open(incidentId: uuid, eventId: uuid, description: string) {
+    guard self.openedAt == null
+    guard self.status == "open"
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint openIncidentMatch: incidentId == self.incidentId "Open incidentId must match the seeded incident reference"
+    constraint openEventMatch: eventId == self.eventId "Open eventId must match the seeded event reference"
+    constraint openDescriptionPresent: length(trim(description)) > 0 "Corrective action description is required"
+    mutate incidentId = incidentId
+    mutate eventId = eventId
+    mutate description = description
+    mutate openedById = user.id
+    mutate openedAt = now()
+    emit CorrectiveActionOpened {
+      correctiveActionId: self.id
+      tenantId: self.tenantId
+      incidentId: incidentId
+      eventId: eventId
+      openedById: user.id
+      status: "open"
+    }
+  }
+
+  command close(resolutionNotes: string) {
+    guard self.status == "open"
+    guard self.openedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint closeNotesPresent: length(trim(resolutionNotes)) > 0 "Resolution notes are required"
+    mutate resolutionNotes = resolutionNotes
+    mutate closedById = user.id
+    mutate status = "closed"
+    mutate closedAt = now()
+    emit CorrectiveActionClosed {
+      correctiveActionId: self.id
+      tenantId: self.tenantId
+      incidentId: self.incidentId
+      eventId: self.eventId
+      closedById: user.id
+      status: "closed"
+      resolutionNotes: resolutionNotes
+    }
+  }
+
+  store CorrectiveAction in durable
 }
 
 event IncidentReported: "incident.reported" {
@@ -206,3 +312,34 @@ event IncidentDismissed: "incident.dismissed" {
   status: IncidentStatus
   reason: string
 }
+
+event IncidentCorrectiveActionCleared: "incident.corrective_action_cleared" {
+  incidentId: string
+  tenantId: string
+  eventId: string
+  severity: IncidentSeverity
+  status: IncidentStatus
+}
+
+event CorrectiveActionOpened: "corrective_action.opened" {
+  correctiveActionId: string
+  tenantId: string
+  incidentId: string
+  eventId: string
+  openedById: string
+  status: CorrectiveActionStatus
+}
+
+event CorrectiveActionClosed: "corrective_action.closed" {
+  correctiveActionId: string
+  tenantId: string
+  incidentId: string
+  eventId: string
+  closedById: string
+  status: CorrectiveActionStatus
+  resolutionNotes: string
+}
+
+// CorrectiveActionClosed → unlock the allergen incident for resolution.
+on CorrectiveActionClosed run Incident.clearCorrectiveActionLock
+  resolve payload.incidentId

@@ -76,12 +76,9 @@ entity EventCloseout mixin TenantScoped, SoftDeletable {
   transition status from "draft" to ["finalized"]
   transition status from "finalized" to []
 
-  // financeAccess OR eventManageAccess (NOT bare manageAccess - kitchen/
-  // logistics managers must stay excluded per the denial proof): the
-  // approve/closeout cascade runs as the acting event manager. 2026-07-22.
-  default policy eventCloseoutRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventManageAccess") "Finance staff and managers may read event closeouts"
-  default policy eventCloseoutWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventManageAccess") "Finance staff and managers may write event closeouts through commands"
-  default policy eventCloseoutExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventManageAccess") "Finance staff and managers may execute event closeout commands"
+  default policy eventCloseoutRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventManageAccess") "Finance staff and event coordinators may read event closeouts"
+  default policy eventCloseoutWrite write: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventManageAccess") "Finance staff and event coordinators may write event closeouts through commands"
+  default policy eventCloseoutExecute execute: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "eventManageAccess") "Finance staff and event coordinators may execute event closeout commands"
 
   command capture(
     eventId: uuid,

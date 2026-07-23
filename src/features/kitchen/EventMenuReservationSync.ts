@@ -2,6 +2,7 @@ import {
   EventStockReservationCoordinator,
   type EventStockDemand,
   type EventStockItem,
+  type EventStockLot,
   type EventStockReservation,
   type EventStockShortage,
 } from "../events/EventStockReservationCoordinator";
@@ -17,6 +18,7 @@ type DemandTarget = {
 type Ports = {
   createReservation: (input: {
     inventoryItemId: string;
+    inventoryLotId?: string;
     eventId: string;
     ingredientId: string;
     quantity: number;
@@ -40,6 +42,7 @@ export class EventMenuReservationSync {
     eventId: string;
     demandTargets: readonly DemandTarget[];
     items: readonly EventStockItem[];
+    lots: readonly EventStockLot[];
     reservations: readonly EventStockReservation[];
   }): Promise<{ shortages: EventStockShortage[] }> {
     const demands: EventStockDemand[] = input.demandTargets.map(
@@ -58,6 +61,7 @@ export class EventMenuReservationSync {
       eventId: input.eventId,
       demands,
       items: input.items,
+      lots: input.lots,
       reservations: input.reservations,
     });
     return { shortages: result.shortages };

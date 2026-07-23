@@ -32,6 +32,17 @@ package-lock.json
 *.min.js
 *.min.css
 
+# Runtime artifacts (AboardAI, Playwright MCP)
+.aboardai/
+.playwright-mcp/
+test-results/
+
+# Loop state files (preserve original formatting)
+loop-ledger-append.json
+loop-run-log.md
+loop-budget.md
+STATE.md
+
 generated/ir/
 
 generated/proof/

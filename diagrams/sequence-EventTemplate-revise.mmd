@@ -1,0 +1,20 @@
+sequenceDiagram
+    participant Client
+    participant EventTemplate as EventTemplate
+    participant EventBus
+    Client->>+EventTemplate: revise(name, clientType, eventType, defaultHeadcount, menuId, defaultStaffRoles, typicalEquipment, notes)
+    Note over EventTemplate: Policies: eventTemplateRead, eventTemplateWrite, eventTemplateExecute
+    Note over EventTemplate: Guards (3)
+    EventTemplate->>EventTemplate: guard[0]: self.definedAt != null
+    EventTemplate->>EventTemplate: guard[1]: self.status == #quot;active#quot;
+    EventTemplate->>EventTemplate: guard[2]: self.deletedAt == null
+    EventTemplate->>EventTemplate: mutate.name
+    EventTemplate->>EventTemplate: mutate.clientType
+    EventTemplate->>EventTemplate: mutate.eventType
+    EventTemplate->>EventTemplate: mutate.defaultHeadcount
+    EventTemplate->>EventTemplate: mutate.menuId
+    EventTemplate->>EventTemplate: mutate.defaultStaffRoles
+    EventTemplate->>EventTemplate: mutate.typicalEquipment
+    EventTemplate->>EventTemplate: mutate.notes
+    EventTemplate->>EventBus: emit EventTemplateRevised on event_template.revised
+    EventTemplate-->>-Client: void
