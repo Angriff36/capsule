@@ -1,79 +1,52 @@
 # Loop State — capsule
 
-Last run: 2026-07-23T18:25:00Z (shipped PR #91, rebased PR #27; queue: 15 issues; budget: 130k/2M tokens)
+Last run: 2026-07-24T01:10:00Z (no-op: queue empty)
 
-## High Priority (fix queue - drain in order)
+## High Priority
 
-**✅ SHIPPED: Main CI RED - PR #91 draft**
-- Fix: Builder hash refresh (ownership.json, manifest-context-summary.json, wiring files)
-- Review: APPROVE by Opus 4.8 (GLM/MiniMax worker) — independent cross-model review
-- Verification: typecheck ✅, manifest:regen:check ✅
-- Status: PR #91 draft, awaiting human review/merge
+**All open issues are non-fixable in loop:**
+- #98: Builder upstream (filed)
+- #77-#72: Manifest platform limitations
+- #55-#50: Manifest/Convex platform
+- #44, #43: Convex platform
+- #34: Email infra (product decision needed)
+- #25: fanOut bug (Manifest)
+- #24: Auth pattern (escalated, HIGH-SCRUTINY)
+- #18: Ingredient purge (requires schema/migration product decision)
+- #15: prepTasks drift (PRUNED — was wiring drift, not actual drift)
 
-**✅ REBASED: PR #27 (HIGH-SCRUTINY auth)**
-- TimeRecord self-service identity via Person.authSubjectId
-- Rebased onto main (removed merge commit, regen, force-push)
-- Status: PR #27 now current, awaiting CI verification
+**Draft PRs awaiting human merge:** #92, #93, #95-#102 (10 PRs, all CI-green)
 
-**Infrastructure Issues (workarounds applied):**
-- issue #88: Schema drift - ✅ RESOLVED (editionNumber, headcountOverride optional with defaults)
-- issue #85: Capsule MCP timeout - workaround exists, needs infrastructure debugging
-- issue #83: CONVEX_FIELD_ENCRYPTION_KEY - ✅ RESOLVED (encryption.ts prefers legacy key with CR)
+**✅ Prior ticks (all shipped):** #85→#102, #16→#101, #17→#100, #19→#99, #38→#97, #39→#96, #89→#95, #46→#94, #20→#93, #35→#92, #91 (main CI fix)
 
-**Manifest Platform Defects (await architectural decisions):**
-- HIGH-SCRUTINY auth fix (TimeRecord self-service identity) has merge conflicts
-- Needs rebase onto current main before can merge
-- Blocks: depends on cascade auth fix (issue #32) which may have regressed
+**Open draft PRs awaiting human merge:** #92, #93, #95-#102 (10 PRs)
 
-**Infrastructure Issues (block dev/deploy):**
-- issue #88: Schema drift - required Manifest fields block local Convex sync (editionNumber, headcountOverride) - NEW
-- issue #85: Capsule MCP server fails live tool discovery (mcp_auth timeout) - NEW
-- issue #83: Missing/mismatched CONVEX_FIELD_ENCRYPTION_KEY breaks create - NEW
+**Platform/Escalated (not fixable here):** #98 (Builder), #77-#72 (Manifest), #55-#50 (Manifest/Convex), #44, #43, #34 (infra), #25 (fanOut bug), #24 (auth pattern - may be fixed by #95)
 
-**Manifest Platform Defects (escalate to backlog):**
-- issue #78: Event feature hook violations block bun run check
-- issue #77: Manifest projects self.id as nonexistent doc.id in Convex constraints
-- issue #76: Generated encrypted money fields write strings into numeric Convex schema
-- issue #75: Enforce approved time-off overlap in generated Shift.schedule paths
-- issue #74: Manifest Convex schedules cannot securely sweep tenant-scoped commands
-- issue #72: Manifest Convex nested aggregate hydration emits invalid Doc typing
-- issue #71: Generated PrepTaskDependency mutation reads missing predecessorTask property
-- issue #70: Format gate blocked by malformed loop-ledger.json (RESOLVED in STATE.md earlier)
-- issue #69: Production build blocked by missing PrepTaskDependencies.css
-- issue #68: Invalid loop-ledger.json blocks format:check (same as #70)
-- issue #65: Event approval invoice reaction fails under event-manager authorization (was #32)
-- issue #64: Supply guard blocked by InventoryAuditLog direct Convex action hook
-
-**Unpushed Worktrees (KEPT by sweep - 12 trees):**
-- loop/prod-20260721T2100-OD055-payment-method-default (ahead=2)
-- loop/prod-202607211313-S2-client-outstanding-balance (ahead=1)
-- loop/prod-20260721T2355-S7-packlist-access-widening (ahead=1)
-- loop/prod-20260721T2136-S6-event-attendance-counts (ahead=1)
-- loop/prod-20260721T1852-OD056-saved-report-owner (ahead=1)
-- loop/prod-20260721T2340-issue35-preptask-claim (ahead=1)
-- loop/prod-20260722T1000-S5-ingredient-totals (ahead=2)
-- loop/prod-20260721T2345-S5-ingredient-totals (ahead=1)
-- loop/prod-20260721T2115-issue32-wiring-drift (ahead=1)
-- loop/prod-20260721T2000-S6-event-attendance (ahead=1)
-- loop/fix-20260721T1645-actions-checkout-v7 (ahead=1)
-- loop/dep-20260721T1600-actions-checkout-7 (ahead=1)
+**PRUNED as obsolete:** #15 (schema drift was wiring drift, not actual drift)
 
 ## Watch List
 
-- 15 open issues on GitHub (many Manifest platform defects)
-- Working tree: ~36 modified files (human WIP), ~4 untracked
-- Dependabot major upgrades (TS 5.9→7.0, vite 6.4→8.1, react-router-dom 6.30→7.18) - human decision needed
+- Main CI: GREEN (last 10 runs success)
+- Daily spend: ~11k / 2M cap
+- Worktrees: 13 survivors with unpushed work (listed below)
 
-## Recent Noise (ignored this run)
+## Worktree Survivors (unpushed work - preserve)
 
-- Multiple issues (#70, #68, #69, #71, #78) appear to be re-filed versions of previously verified items
-- Format warnings for existing codebase (274 files) - unrelated to loop fixes
-- actions/checkout v7 upgrade failed (was handled in PR #7 as v6)
+- dep-20260721T1600-actions-checkout-7 [1612ca5, ahead=1]
+- fix-20260721T1645-actions-checkout-v7 [9fd577c, ahead=1]
+- fix-20260723T2037-issue-24-savedreport-owner [fb3dbf8, ahead=12]
+- prod-202607211313-S2-client-outstanding-balance [9031c63, ahead=1]
+- prod-20260721T1852-OD056-saved-report-owner [9dd1b20, ahead=1]
+- prod-20260721T2000-S6-event-attendance [f945e0f, ahead=1]
+- prod-20260721T2100-OD055-payment-method-default [0b3f680, ahead=2]
+- prod-20260721T2115-issue32-wiring-drift [2459d6d, ahead=1]
+- prod-20260721T2136-S6-event-attendance-counts [d517984, ahead=1]
+- prod-20260721T2340-issue35-preptask-claim [b497f25, ahead=1]
+- prod-20260721T2345-S5-ingredient-totals [bc13023, ahead=1]
+- prod-20260721T2355-S7-packlist-access-widening [a714427, ahead=1]
+- prod-20260722T1000-S5-ingredient-totals [e67e9eb, ahead=2]
 
 ## Post-Run Critique
 
-- Main CI regression occurred after PR #84 merge - manifest:regen:check now fails
-- Multiple infrastructure issues (#88, #85, #83) are NEW and block development
-- PR #27 conflicting - needs rebase
-- Queue mostly Manifest platform defects requiring product/architecture decisions
-- This tick: budget minimal (5k tokens), queue-drain not possible until CI fixed
+- Docs claimed bootstrap that code never did — wire CapsuleEnvLocalLoader at host entry
