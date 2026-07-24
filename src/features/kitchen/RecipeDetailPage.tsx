@@ -1,7 +1,5 @@
-import { useQuery } from "convex/react";
 import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
-import { api } from "../../lib/api";
 import {
   useCreateRecipeIngredient,
   useGetRecipe,
@@ -20,13 +18,14 @@ import {
   useRecipeReviseDraft,
   useRecipeSnapshotCapture,
 } from "../../lib/manifest-convex-react";
+import { useTrackRecent } from "../../lib/recents";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   buildRecipeSnapshotData,
   planLineRestore,
   type RecipeSnapshotData,
 } from "./recipeSnapshot";
 import { RecipeVersionHistoryPanel } from "./RecipeVersionHistoryPanel";
-import { useTrackRecent } from "../../lib/recents";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
@@ -73,7 +72,7 @@ export function RecipeDetailPage() {
   const captureSnapshot = useRecipeSnapshotCapture();
   const snapshots = useListRecipeSnapshot();
   const people = useListPerson();
-  const authStatus = useQuery(api.authStatus.getAuthStatus, {});
+  const authStatus = useAuthStatus();
   const [editing, setEditing] = useState(false);
   const [targetYield, setTargetYield] = useState("");
   const [showLineForm, setShowLineForm] = useState(false);
