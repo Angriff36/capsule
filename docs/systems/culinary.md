@@ -46,7 +46,7 @@ Use a **culinary book** rather than a dashboard:
 
 ## Core workflows
 
-- Introduce and maintain Ingredient identity, unit, allergen classification, and cost; discontinue/reinstate.
+- Introduce and maintain Ingredient identity, unit, allergen classification, and cost; discontinue/reinstate for lifecycle; **Delete** (`Ingredient.purge`) soft-hides a row from the live catalog (not a hard DB wipe).
 - Price Recipes from the newest confirmed `IngredientPriceObservation` created by a vendor-line receipt, falling back to the Ingredient catalog cost until a receipt exists.
 - Draft/revise/publish/retract/retire Recipe versions; manage RecipeStep method lines and RecipeIngredient BOM lines.
 - Introduce/revise/portion/classify/retire/reinstate Dishes; attach/detach Recipes via DishRecipe.

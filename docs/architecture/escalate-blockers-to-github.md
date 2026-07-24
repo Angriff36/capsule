@@ -1,7 +1,7 @@
 ---
 source_of_truth: true
 created: 2026-07-21
-updated: 2026-07-21
+updated: 2026-07-23
 status: Binding for Capsule agents
 ---
 
@@ -22,8 +22,8 @@ Proven example (2026-07-21 kitchen wipe) — issues filed only after this rule:
 - Schema drift blocking cancel/remove/retire → [#15](https://github.com/Angriff36/capsule/issues/15)
 - Stale Capsule MCP capability catalog → [#16](https://github.com/Angriff36/capsule/issues/16)
 - enter-recipe idempotency returns retired recipe ids → [#17](https://github.com/Angriff36/capsule/issues/17)
-- `Ingredient.discontinue` ≠ wipe / no catalog reset → [#18](https://github.com/Angriff36/capsule/issues/18)
-- No `Recipe.reinstate` → [#19](https://github.com/Angriff36/capsule/issues/19)
+- `Ingredient.discontinue` ≠ wipe / no catalog reset → [#18](https://github.com/Angriff36/capsule/issues/18) (**resolved 2026-07-23:** use `Ingredient.purge` / Kitchen **Delete**; discontinue remains lifecycle-only)
+- No `Recipe.reinstate` → [#19](https://github.com/Angriff36/capsule/issues/19) (draft PR path; reinstate + enter-recipe reinstate shipped on loop branches)
 
 Agents had reminted JWT / switched CLI / reinstated ingredients and originally
 filed **zero** GitHub issues — that is the failure this rule forbids.
@@ -33,6 +33,11 @@ from document-hash idempotency (`CapsuleDocumentEnterCoordinator` +
 `CapsuleRecipeStatusLoader`). Dish.introduce can still return a retired dish
 via the same idempotency class — use a new key or extend the same check; see
 [#17](https://github.com/Angriff36/capsule/issues/17).
+
+**Catalog wipe note (2026-07-23):** Do not treat `Ingredient.discontinue` as a
+wipe. Kitchen catalog **Delete** maps to `Ingredient.purge` / `Dish.purge` /
+`Recipe.purge` (soft-hide with `deletedAt`). Reinstate from the list with
+**Show retired**.
 
 ## Rules
 

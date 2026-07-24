@@ -211,7 +211,8 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // One-click hide. Works on active or already-discontinued rows — no restore first.
+  // Catalog Delete / wipe stand-in (soft-hide). Prefer this over discontinue when
+  // clearing the live book — works on active or already-discontinued rows.
   command purge() {
     guard self.deletedAt == null
     guard roleAllows(user.role, "kitchenManageAccess")
