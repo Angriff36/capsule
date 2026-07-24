@@ -39,7 +39,7 @@ Current preset: `convex-application` **v1.3.5** (`package.json` → `manifestPre
 - `convex/auth.config.ts`, `convex/authStatus.ts`
 - Thin adapters such as `src/lib/api.ts`
 
-Generated Convex surfaces import `getAuthContext` from `./lib/authContext`. That module is fail-closed; customize identity → Capsule role mapping there only (prefer linked `Person.role`; IdP org-role claims are bootstrap fallback — see `docs/systems/auth.md`). Org capability kill-switches load as `disabledCapabilities` on the same auth object; `bun run manifest:regen` re-applies `scripts/apply-org-capability-check-role.ts` so generated `checkRole` honors those flags (and passes the auth object, not only `user.role`). That post-pass refreshes ownership digests for `convex/mutations.ts` / `convex/queries.ts` and **must preserve** `baselined: true` on those entries — stripping it makes `manifest-regen-check` treat the intentional patch as stale and blocks push.
+Generated Convex surfaces import `getAuthContext` from `./lib/authContext`. That module is fail-closed; customize identity → Capsule role mapping there only (prefer linked `Person.role`; IdP org-role claims are bootstrap fallback — see `docs/systems/auth.md`). Org capability kill-switches load as `disabledCapabilities` on the same auth object. Builder folds the Capsule `checkRole(user, …)` / `disabledCapabilities` transform into generated `convex/mutations.ts` and `convex/queries.ts` candidates before ownership planning; `scripts/apply-org-capability-check-role.ts` remains an idempotent post-pass safety net that refreshes digests **without** `baselined: true`. Stock generated surfaces must never be baselined — only `convex/lib/authContext.ts` may.
 
 ## Flow
 
@@ -182,7 +182,7 @@ Common failure modes (any agent, any session):
 
 If adopt dry-run refuses a path, read its classification (`identical` vs `baselined` vs `unproven`). Customized author seams (`convex/lib/authContext.ts`) should be **baselined** to current content so Builder stops treating your Clerk claim mapping as drift.
 
-**Never** mark stock generated surfaces (`convex/mutations.ts`, `convex/queries.ts`, `convex/schema.ts`, companions) as `baselined`. That freezes stale bytes forever: dry-run looks clean (0 modifications) while fresh candidates diverge. Only author seams belong in `baselined`.
+**Never** mark stock generated surfaces (`convex/mutations.ts`, `convex/queries.ts`, `convex/schema.ts`, generated hooks, Zod schemas, wiring, companions) as `baselined`. Builder rejects adopt-baseline for those paths. That freeze made dry-run look clean while EventLayoutSection exports never landed. Only the declared author seam `convex/lib/authContext.ts` may be baselined. Capsule-specific custom reads belong in separate authored Convex modules — not inside generated `queries.ts`.
 
 After recovery, commit `.builder/ownership.json` (and any new
 `.builder/baselines/*` blobs) together with regenerated files from `--apply`.

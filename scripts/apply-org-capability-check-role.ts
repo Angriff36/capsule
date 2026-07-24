@@ -102,12 +102,10 @@ function refreshOwnershipDigests(root: string, relPaths: string[]): void {
     if (!previous) continue;
     const abs = join(root, rel);
     const hash = createHash("sha256").update(readFileSync(abs)).digest("hex");
-    // Preserve adopt baselines — stripping `baselined` makes pre-push
-    // manifest-regen-check treat intentional checkRole patches as stale.
-    ownership.files[rel] =
-      previous.baselined === true
-        ? { sha256: hash, baselined: true }
-        : { sha256: hash };
+    // Stock generated surfaces must never keep baselined:true. Builder now
+    // emits the org-capability checkRole transform in candidates; this post-
+    // pass is an idempotent safety net and only refreshes digests.
+    ownership.files[rel] = { sha256: hash };
   }
   writeFileSync(
     ownershipPath,
