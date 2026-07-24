@@ -1,6 +1,5 @@
-import { useQuery } from "convex/react";
 import { useMemo, useState } from "react";
-import { api, type Id } from "../../lib/api";
+import { type Id } from "../../lib/api";
 import { formatDate, formatTime } from "../../lib/format";
 import {
   useCreateEventTimelineComment,
@@ -8,6 +7,7 @@ import {
   useListEventTimelineComment,
   useListPerson,
 } from "../../lib/manifest-convex-react";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { EventTabPanel } from "./EventTabPanel";
 import { FailureBanner } from "./FailureBanner";
@@ -21,7 +21,7 @@ type Props = {
 
 /** Event-wide staff discussion (Overview). Block questions live on Timeline. */
 export function EventTimelineCommentsPanel({ eventId }: Props) {
-  const authStatus = useQuery(api.authStatus.getAuthStatus, {});
+  const authStatus = useAuthStatus();
   const comments = useListEventTimelineComment();
   const people = useListPerson();
   const postComment = useCreateEventTimelineComment();
