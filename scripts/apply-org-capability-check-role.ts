@@ -95,13 +95,19 @@ function refreshOwnershipDigests(root: string, relPaths: string[]): void {
   if (!existsSync(ownershipPath)) return;
   const ownership = JSON.parse(readFileSync(ownershipPath, "utf8")) as {
     version: number;
-    files: Record<string, { sha256: string }>;
+    files: Record<string, { sha256: string; baselined?: boolean }>;
   };
   for (const rel of relPaths) {
-    if (!ownership.files[rel]) continue;
+    const previous = ownership.files[rel];
+    if (!previous) continue;
     const abs = join(root, rel);
     const hash = createHash("sha256").update(readFileSync(abs)).digest("hex");
-    ownership.files[rel] = { sha256: hash };
+    // Preserve adopt baselines — stripping `baselined` makes pre-push
+    // manifest-regen-check treat intentional checkRole patches as stale.
+    ownership.files[rel] =
+      previous.baselined === true
+        ? { sha256: hash, baselined: true }
+        : { sha256: hash };
   }
   writeFileSync(
     ownershipPath,
