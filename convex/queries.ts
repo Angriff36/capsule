@@ -6794,7 +6794,7 @@ export const listSavedReportDefinition = query({
     const __plainRows = rows;
     const __visibleRows: any[] = [];
     for (const __row of __plainRows) {
-      if (!__allowsRead("savedReportRead", "SavedReportDefinition", () => (((__row.ownerId === user.id) || (__row.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) continue;
+      if (!__allowsRead("savedReportRead", "SavedReportDefinition", () => (((__row.ownerId === user.personId) || (__row.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) continue;
       __visibleRows.push(__row);
     }
     return __visibleRows;
@@ -6813,7 +6813,7 @@ export const getSavedReportDefinition = query({
     const __rawDoc = doc;
     if (!__rawDoc) return __rawDoc;
     const __doc = __rawDoc;
-    if (!__allowsRead("savedReportRead", "SavedReportDefinition", () => (((__doc.ownerId === user.id) || (__doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) return null;
+    if (!__allowsRead("savedReportRead", "SavedReportDefinition", () => (((__doc.ownerId === user.personId) || (__doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) return null;
     return __doc;
   },
 });
@@ -6828,7 +6828,7 @@ export const listSavedReportDefinitionByTenantId = query({
     const __plainRows = rows;
     const __visibleRows: any[] = [];
     for (const __row of __plainRows) {
-      if (!__allowsRead("savedReportRead", "SavedReportDefinition", () => (((__row.ownerId === user.id) || (__row.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) continue;
+      if (!__allowsRead("savedReportRead", "SavedReportDefinition", () => (((__row.ownerId === user.personId) || (__row.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) continue;
       __visibleRows.push(__row);
     }
     return __visibleRows;
@@ -6847,7 +6847,7 @@ export const listSavedReportDefinitionByOwnerId = query({
     const __plainRows = rows;
     const __visibleRows: any[] = [];
     for (const __row of __plainRows) {
-      if (!__allowsRead("savedReportRead", "SavedReportDefinition", () => (((__row.ownerId === user.id) || (__row.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) continue;
+      if (!__allowsRead("savedReportRead", "SavedReportDefinition", () => (((__row.ownerId === user.personId) || (__row.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) continue;
       __visibleRows.push(__row);
     }
     return __visibleRows;
