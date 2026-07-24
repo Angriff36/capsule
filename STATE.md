@@ -1,35 +1,31 @@
 # Loop State — capsule
 
-Last run: 2026-07-24T01:10:00Z (no-op: queue empty)
+loop-pause-all
+
+Last run: 2026-07-24T03:15:42Z (PR #107 Fixes #55; CI green; issue closed)
+Paused: 2026-07-24T03:21:00Z — human requested stop loop
 
 ## High Priority
 
-**All open issues are non-fixable in loop:**
+**All remaining open issues are non-fixable in loop (platform / product):**
 - #98: Builder upstream (filed)
 - #77-#72: Manifest platform limitations
-- #55-#50: Manifest/Convex platform
+- #54-#50: Manifest/Convex platform
 - #44, #43: Convex platform
 - #34: Email infra (product decision needed)
 - #25: fanOut bug (Manifest)
-- #24: Auth pattern (escalated, HIGH-SCRUTINY)
-- #18: Ingredient purge (requires schema/migration product decision)
-- #15: prepTasks drift (PRUNED — was wiring drift, not actual drift)
 
-**Draft PRs awaiting human merge:** #92, #93, #95-#102 (10 PRs, all CI-green)
+**Draft PRs awaiting human merge:** #92, #93, #95–#107 (CI-green where last checked)
 
-**✅ Prior ticks (all shipped):** #85→#102, #16→#101, #17→#100, #19→#99, #38→#97, #39→#96, #89→#95, #46→#94, #20→#93, #35→#92, #91 (main CI fix)
+**✅ Recent ticks:** #55→#107, #15→#106, #18→#105, #24→#104 (+ prior)
 
-**Open draft PRs awaiting human merge:** #92, #93, #95-#102 (10 PRs)
-
-**Platform/Escalated (not fixable here):** #98 (Builder), #77-#72 (Manifest), #55-#50 (Manifest/Convex), #44, #43, #34 (infra), #25 (fanOut bug), #24 (auth pattern - may be fixed by #95)
-
-**PRUNED as obsolete:** #15 (schema drift was wiring drift, not actual drift)
+**Platform/Escalated (not Capsule-loop-fixable):** #98 (Builder), #77–#72 (Manifest), #54–#50, #44, #43, #34, #25
 
 ## Watch List
 
-- Main CI: GREEN (last 10 runs success)
-- Daily spend: ~11k / 2M cap
-- Worktrees: 13 survivors with unpushed work (listed below)
+- Main CI: GREEN (PR #107 check passed)
+- After merge of Manifest/Convex PRs: human `npx convex deploy -y`
+- Worktrees: survivors with unpushed work listed below
 
 ## Worktree Survivors (unpushed work - preserve)
 
@@ -49,4 +45,4 @@ Last run: 2026-07-24T01:10:00Z (no-op: queue empty)
 
 ## Post-Run Critique
 
-- Docs claimed bootstrap that code never did — wire CapsuleEnvLocalLoader at host entry
+- #55 needed surgical mutations patches (restore fanOut deletedAt filter + reinstate previousQuantity guard order) because Builder baseline/codegen quirks — keep baselined mutations until IR emits correctly

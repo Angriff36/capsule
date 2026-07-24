@@ -277,6 +277,55 @@
       "verdict": "NOOP",
       "timestamp": "2026-07-24T01:10:00Z",
       "reason": "All fixable work shipped to draft PRs (#92-#102, #27). CI GREEN (9/10 success). 20 open issues are all non-fixable: #98 Builder upstream, #77-#43 Manifest platform limitations, #34 email infra product decision, #25 fanOut bug, #24 auth pattern escalated HIGH-SCRUTINY, #18 schema/migration product decision, #15 PRUNED. No new actionable items."
+    },
+    {
+      "runId": "noop-20260724T0115",
+      "item": "queue empty - all items in-pr or blocked",
+      "verdict": "NOOP",
+      "timestamp": "2026-07-24T01:15:00Z",
+      "reason": "All 13 backlog items remain either in-pr (#27, #28, #31, #33, #36, #37) or blocked by Codex rejects (OD054, OD056, S6, S5), platform limitations (OD055, S7), or awaiting UI work (OD054). Escalation queue empty 2026-07-23 already present. No open items remain."
+    },
+    {
+      "item": "queue empty - all items in-pr or blocked",
+      "runId": "noop-20260724T0120",
+      "verdict": "NOOP",
+      "timestamp": "2026-07-24T01:20:00Z",
+      "reason": "All 13 backlog items remain either in-pr (#27, #28, #31, #33, #36, #37) or blocked by Codex rejects (OD054, OD056, S6, S5), platform limitations (OD055, S7), or awaiting UI work (OD054). Escalation queue empty 2026-07-24 already present. No open items remain."
+    },
+    {
+      "verdict": "NOOP",
+      "timestamp": "2026-07-23T19:00:50Z",
+      "reason": "All 13 backlog items remain in-pr (#27, #28, #31, #33, #36, #37) or blocked (OD054, OD056, S6, S5, OD055, S7). Escalation queue empty 2026-07-23 already present.",
+      "runId": "noop-2026-07-23T190050",
+      "item": "queue empty - all items in-pr or blocked"
+    },
+    {
+      "item": "issue #24 - savedReportDefinitions.ownerId stores Clerk user_ id",
+      "runId": "fix-20260723T2115-issue-24-savedreport-owner",
+      "timestamp": "2026-07-24T02:40:10Z",
+      "verdict": "SUCCESS",
+      "reason": "PR #104 draft. personId stamp + archive + proof link. composer-2.5-fast APPROVE. CI green. Closed #24. Coverage fix for OrgCapabilityNavPolicy."
+    },
+    {
+      "item": "issue #18 Ingredient.discontinue not wipe",
+      "runId": "fix-20260723T2143-issue-18-purge-docs",
+      "timestamp": "2026-07-24T02:47:45Z",
+      "verdict": "SUCCESS",
+      "reason": "PR #105. purge already shipped; docs+manifest comment; CI green; closed #18."
+    },
+    {
+      "item": "issue #15 prepTasks schema drift",
+      "runId": "fix-20260723T2150-issue-15-preptask-schema",
+      "timestamp": "2026-07-24T02:56:40Z",
+      "verdict": "SUCCESS",
+      "reason": "PR #106 optional yield/batch fields; CI green; closed #15"
+    },
+    {
+      "item": "issue #55 Undo reverse commands EventDish/WasteRecord",
+      "runId": "fix-20260723T2159-issue-55-undo-reverse",
+      "timestamp": "2026-07-24T03:15:42Z",
+      "verdict": "SUCCESS",
+      "reason": "PR #107 draft. restore/unvoid/reopen/reinstate + UI undo. composer-2.5-fast APPROVE. CI green. Closed #55."
     }
   ]
 }
