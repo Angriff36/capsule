@@ -18,11 +18,11 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "c7dc0d55e7770f1dd1149df02e8ccfea16f4111b9d3a823b53089473841d8327",
+      "sha256": "048b0744377a8d2767c0e1285668bfff360f4e56423d9b39b31eccece86f2b2a",
       "baselined": true
     },
     "convex/queries.ts": {
-      "sha256": "8002224b4c9e86cf665585c40259c5dbb385a494b43c55cc565c83cb095aef07",
+      "sha256": "922b366b4a3689b0d76468f6ffcdd793f09515b9ae0f6eb691bae7a8f0ef9d25",
       "baselined": true
     },
     "convex/sagas.ts": {
@@ -32,7 +32,7 @@
       "sha256": "8e2c2a20ac982326352def3f78884333bb35c1af72400489f78cde214c2192e7"
     },
     "manifest-context-summary.json": {
-      "sha256": "9b3e0a16c9d4272bffa5bdf6ece6e390567eede2a2a9dcc5de32fb101d06005a"
+      "sha256": "514243401fb311082369cf1b02290ac2ddba2b1369cd0402b4d54b92b29f8929"
     },
     "package.json": {
       "sha256": "739b255b25533cb083f60a1cd1af151bfbd7d6d38336b71d8691d91f7d748d2b",
@@ -48,10 +48,10 @@
       "sha256": "230fdd801753d1ab2003155b9a7283504f6ac1b47b7fb4ef0bd1dcb8614ed211"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "86dfc997142457348ba5ba2b5647fd9afa68a7d0b85ce779242669255b05690d"
+      "sha256": "c42723c1e1a3a2db1cdb180b38fb9f7be77b1bfc862832791dfd6c5960c62c00"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "d1132721eee0b975e4402bfa5967a2f8651738d9042352e7db817e73f0e9d87c"
+      "sha256": "9dcb0e47ece4612a381efb7d6e6ccd759b18bc7dbba02bb83be3cd7fa1f6414d"
     },
     "src/lib/manifest-convex-react.ts": {
       "sha256": "9aac8ba8c71309a7f1529da0271940387097d24457ea745955f8a9468bc65ead"
@@ -63,7 +63,7 @@
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "2d4f563909dabcf449061e28a2e3ca9322396cb30fb56e1111a91af4f9413b5a"
+      "sha256": "8cc95cb9d46082d5ce48e6699ca73e2eb19bc690e2692c98895f459b96e5af26"
     }
   },
   "package": {

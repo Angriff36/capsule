@@ -25131,14 +25131,14 @@ async function __runSavedReportDefinitionArchive(ctx: MutationCtx, { docId, vers
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
-    if (!((((doc.ownerId === user.id) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
+    if (!((((doc.ownerId === user.personId) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!(((doc.ownerId === user.id) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
+    if (!(((doc.ownerId === user.personId) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -25192,14 +25192,14 @@ async function __runSavedReportDefinitionChangeSharing(ctx: MutationCtx, { docId
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
-    if (!((((doc.ownerId === user.id) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
+    if (!((((doc.ownerId === user.personId) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!(((doc.ownerId === user.id) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
+    if (!(((doc.ownerId === user.personId) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -25240,20 +25240,20 @@ async function __runSavedReportDefinitionCreateDefinition(ctx: MutationCtx, { do
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
-    if (!((((doc.ownerId === user.id) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
+    if (!((((doc.ownerId === user.personId) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
     if (!((doc.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((doc.status === "active"))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((user.id != null))) throw new Error("Guard 3 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Report name is required");
     if (!((((chartType).trim()).length > 0))) throw new Error("Chart type is required");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
     const updates = {
-      ownerId: user.id,
+      ownerId: user.personId,
       name: name,
       subjectArea: subjectArea,
       chartType: chartType,
@@ -25264,8 +25264,8 @@ async function __runSavedReportDefinitionCreateDefinition(ctx: MutationCtx, { do
     };
     await ctx.db.patch(docId, updates as any);
     const __after: Record<string, any> = { ...doc, ...updates };
-    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, savedReportDefinitionId: docId, tenantId: __after.tenantId, ownerId: user.id, name: name, subjectArea: subjectArea, chartType: chartType, sharingScope: ((sharingScope != null) ? sharingScope : "owner_only"), status: "active", _subject: { entity: "SavedReportDefinition", command: "createDefinition", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "SavedReportDefinitionCreated", entity: "SavedReportDefinition", entityId: docId, payload: { savedReportDefinitionId: docId, tenantId: __after.tenantId, ownerId: user.id, name: name, subjectArea: subjectArea, chartType: chartType, sharingScope: ((sharingScope != null) ? sharingScope : "owner_only"), status: "active" }, createdAt: Date.now() });
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, savedReportDefinitionId: docId, tenantId: __after.tenantId, ownerId: user.personId, name: name, subjectArea: subjectArea, chartType: chartType, sharingScope: ((sharingScope != null) ? sharingScope : "owner_only"), status: "active", _subject: { entity: "SavedReportDefinition", command: "createDefinition", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "SavedReportDefinitionCreated", entity: "SavedReportDefinition", entityId: docId, payload: { savedReportDefinitionId: docId, tenantId: __after.tenantId, ownerId: user.personId, name: name, subjectArea: subjectArea, chartType: chartType, sharingScope: ((sharingScope != null) ? sharingScope : "owner_only"), status: "active" }, createdAt: Date.now() });
     return { ...doc, ...updates };
 }
 
@@ -25321,18 +25321,18 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
       name: args.name,
       subjectArea: args.subjectArea
     };
-    if (!((((__draft.ownerId === user.id) || (__draft.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
+    if (!((((__draft.ownerId === user.personId) || (__draft.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
     if (!((__draft.definedAt == null))) throw new Error("Guard 0 failed");
     if (!((__draft.status === "active"))) throw new Error("Guard 1 failed");
     if (!((__draft.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((user.id != null))) throw new Error("Guard 3 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Report name is required");
     if (!((((chartType).trim()).length > 0))) throw new Error("Chart type is required");
     const doc: Record<string, any> = {
       ...__draft,
-      ownerId: user.id,
+      ownerId: user.personId,
       name: name,
       subjectArea: subjectArea,
       chartType: chartType,
@@ -25342,8 +25342,8 @@ export const SavedReportDefinition_createViaCreateDefinition = mutation({
       version: 1,
     };
     const docId = await ctx.db.insert("savedReportDefinitions", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, savedReportDefinitionId: docId, tenantId: doc.tenantId, ownerId: user.id, name: doc.name, subjectArea: doc.subjectArea, chartType: doc.chartType, sharingScope: ((doc.sharingScope != null) ? doc.sharingScope : "owner_only"), status: "active", _subject: { entity: "SavedReportDefinition", command: "createDefinition", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "SavedReportDefinitionCreated", entity: "SavedReportDefinition", entityId: docId, payload: { savedReportDefinitionId: docId, tenantId: doc.tenantId, ownerId: user.id, name: doc.name, subjectArea: doc.subjectArea, chartType: doc.chartType, sharingScope: ((doc.sharingScope != null) ? doc.sharingScope : "owner_only"), status: "active" }, createdAt: Date.now() });
+    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, savedReportDefinitionId: docId, tenantId: doc.tenantId, ownerId: user.personId, name: doc.name, subjectArea: doc.subjectArea, chartType: doc.chartType, sharingScope: ((doc.sharingScope != null) ? doc.sharingScope : "owner_only"), status: "active", _subject: { entity: "SavedReportDefinition", command: "createDefinition", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "SavedReportDefinitionCreated", entity: "SavedReportDefinition", entityId: docId, payload: { savedReportDefinitionId: docId, tenantId: doc.tenantId, ownerId: user.personId, name: doc.name, subjectArea: doc.subjectArea, chartType: doc.chartType, sharingScope: ((doc.sharingScope != null) ? doc.sharingScope : "owner_only"), status: "active" }, createdAt: Date.now() });
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
       await __setCommandIdempotency(ctx, args.idempotencyKey, "SavedReportDefinition_createViaCreateDefinition", __result);
@@ -25358,14 +25358,14 @@ async function __runSavedReportDefinitionRename(ctx: MutationCtx, { docId, name,
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
-    if (!((((doc.ownerId === user.id) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
+    if (!((((doc.ownerId === user.personId) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!(((doc.ownerId === user.id) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
+    if (!(((doc.ownerId === user.personId) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
     if (!((((name).trim()).length > 0))) throw new Error("Report name is required");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
@@ -25407,14 +25407,14 @@ async function __runSavedReportDefinitionRestore(ctx: MutationCtx, { docId, vers
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
-    if (!((((doc.ownerId === user.id) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
+    if (!((((doc.ownerId === user.personId) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
     if (!((doc.status === "archived"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!(((doc.ownerId === user.id) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
+    if (!(((doc.ownerId === user.personId) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
     const previousStatus = doc.status;
     {
       const __cur = doc.status;
@@ -25468,14 +25468,14 @@ async function __runSavedReportDefinitionUpdateDefinition(ctx: MutationCtx, { do
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("SavedReportDefinition not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("SavedReportDefinition not found");
-    if (!((((doc.ownerId === user.id) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
+    if (!((((doc.ownerId === user.personId) || (doc.sharingScope !== "owner_only")) || checkRole(user, "manageAccess")))) throw new Error("Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write saved reports through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute saved report commands");
     if (!((doc.status === "active"))) throw new Error("Guard 0 failed");
     if (!((doc.definedAt != null))) throw new Error("Guard 1 failed");
     if (!((doc.deletedAt == null))) throw new Error("Guard 2 failed");
-    if (!((user.id != null))) throw new Error("Guard 3 failed");
-    if (!(((doc.ownerId === user.id) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
+    if (!((user.personId != null))) throw new Error("Guard 3 failed");
+    if (!(((doc.ownerId === user.personId) || checkRole(user, "manageAccess")))) throw new Error("Guard 4 failed");
     if (!(((chartType == null) || (((chartType).trim()).length > 0)))) throw new Error("Chart type cannot be blank");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
