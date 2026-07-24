@@ -364,6 +364,8 @@ export const DishTaskSchema = z.object({
   activeAt: z.coerce.date().nullable().optional(),
   retiredAt: z.coerce.date().nullable().optional(),
   retirementReason: z.string().nullable().optional(),
+  yieldQuantity: z.number().nullable().optional(),
+  batchMultiplier: z.number().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -1368,6 +1370,8 @@ export const PrepTaskSchema = z.object({
   cancellationReason: z.string().nullable().optional(),
   blockedAt: z.coerce.date().nullable().optional(),
   blockReason: z.string().nullable().optional(),
+  yieldQuantity: z.number().nullable().optional(),
+  batchMultiplier: z.number().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

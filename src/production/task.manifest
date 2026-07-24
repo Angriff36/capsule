@@ -50,6 +50,10 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   property cancellationReason: string?
   property blockedAt: datetime?
   property blockReason: string?
+  // Optional legacy fields observed on older live docs. Keeping them in schema
+  // so Event.cancel / EventDish.remove patches do not fail Convex validation.
+  property yieldQuantity: decimal(10, 2)?
+  property batchMultiplier: decimal(10, 4)?
 
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
