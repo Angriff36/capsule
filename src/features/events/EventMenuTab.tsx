@@ -4,10 +4,12 @@ import {
   useCreateEventDish,
   useEventDishAdjustServings,
   useEventDishRemove,
+  useEventDishRestore,
   useListDish,
   useListEventDish,
   useListRecipe,
 } from "../../lib/manifest-convex-react";
+import { useUndoToast } from "../../ui/useUndoToast";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
@@ -28,6 +30,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
   const removeDish = useEventDishRemove();
+  const restoreDish = useEventDishRestore();
+  const { notifyUndo, host: undoHost } = useUndoToast();
   const { ready: prepSyncReady, syncPrepForDish } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -58,6 +62,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
 
   return (
     <section className="space-y-4" data-testid="event-menu-tab">
+      {undoHost}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="font-display text-lg">Event menu</h2>
@@ -228,13 +233,32 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                         .prompt("Reason for removing this dish")
                         ?.trim();
                       if (!reason) return;
-                      void run(`remove:${selection._id}`, () =>
-                        removeDish({
-                          docId: selection._id,
+                      const removedId = selection._id;
+                      const removedName =
+                        dishes?.find((d) => d._id === selection.dishId)?.name ??
+                        "dish";
+                      const removedDishId = selection.dishId;
+                      const removedServings = selection.quantityServings;
+                      const removedInstructions = selection.specialInstructions;
+                      void run(`remove:${removedId}`, async () => {
+                        await removeDish({
+                          docId: removedId,
                           version: selection.version,
                           reason,
-                        }),
-                      );
+                        });
+                        notifyUndo(`Removed "${removedName}"`, async () => {
+                          await restoreDish({ docId: removedId });
+                          if (prepSyncReady) {
+                            await syncPrepForDish({
+                              id: removedId,
+                              eventId,
+                              dishId: removedDishId,
+                              quantityServings: removedServings,
+                              specialInstructions: removedInstructions,
+                            });
+                          }
+                        });
+                      });
                     }}
                   >
                     Remove

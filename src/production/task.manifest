@@ -72,7 +72,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   transition status from "in_progress" to ["completed", "blocked", "cancelled"]
   transition status from "blocked" to ["pending", "cancelled"]
   transition status from "completed" to []
-  transition status from "cancelled" to []
+  transition status from "cancelled" to ["pending"]
 
   default policy prepTaskRead read: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may read prep tasks"
   default policy prepTaskWrite write: roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess") "Kitchen and event managers may write prep tasks through commands"
@@ -400,6 +400,26 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Undo path for EventDish.restore — returns cancelled prep lines to the queue.
+  // Idempotent for non-cancelled rows so restore fanOut does not fail on completed prep.
+  // manageAccess included so the same manager who can EventDish.remove can undo.
+  command reopen() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenLeadAccess") or roleAllows(user.role, "kitchenAccess") or roleAllows(user.role, "manageAccess")
+    compute wasCancelled = self.status == "cancelled"
+    mutate status = wasCancelled ? "pending" : self.status
+    mutate cancelledAt = wasCancelled ? null : self.cancelledAt
+    mutate cancellationReason = wasCancelled ? null : self.cancellationReason
+    emit PrepTaskReopened {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      name: self.name
+      status: wasCancelled ? "pending" : self.status
+    }
+  }
+
   store PrepTask in durable
 }
 
@@ -621,6 +641,15 @@ event PrepTaskCancelled: "prep_task.cancelled" {
   reason: string
 }
 
+event PrepTaskReopened: "prep_task.reopened" {
+  prepTaskId: string
+  tenantId: string
+  eventDishId: string
+  eventId: string
+  name: string
+  status: PrepTaskStatus
+}
+
 // Completing a predecessor unlocks every task that directly depends on it.
 on PrepTaskCompleted fanOut PrepTaskDependency where predecessorTaskId = payload.prepTaskId
   run satisfy
@@ -634,3 +663,7 @@ on EventCancelled fanOut PrepTask where eventId = payload.eventId
 on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
   run cancel
   params { reason: payload.reason }
+
+// EventDish.restore → reopen prep lines cancelled by the remove cascade.
+on EventDishRestored fanOut PrepTask where eventDishId = payload.eventDishId
+  run reopen

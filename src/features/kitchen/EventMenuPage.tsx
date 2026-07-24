@@ -6,6 +6,7 @@ import {
   useCreateEventDish,
   useEventDishAdjustServings,
   useEventDishRemove,
+  useEventDishRestore,
   useInventoryReservationRelease,
   useListDish,
   useListDishRecipe,
@@ -27,6 +28,7 @@ import {
 import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
+import { useUndoToast } from "../../ui/useUndoToast";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { EventMenuStockShortageBanner } from "./EventMenuStockShortageBanner";
 import { EventMenuSyncController } from "./EventMenuSyncController";
@@ -55,6 +57,7 @@ export function EventMenuPage() {
   const refreshGeneratedTask = usePrepTaskRefreshGenerated();
   const adjustServings = useEventDishAdjustServings();
   const removeDish = useEventDishRemove();
+  const restoreDish = useEventDishRestore();
   const [searchParams] = useSearchParams();
   const [eventId, setEventId] = useState(searchParams.get("eventId") ?? "");
   const [templateMenuId, setTemplateMenuId] = useState("");
@@ -64,6 +67,7 @@ export function EventMenuPage() {
     [],
   );
   const { prompt, host } = useActionPrompt(busy != null);
+  const { notifyUndo, host: undoHost } = useUndoToast();
 
   const selectedEvent = events?.find((event) => event._id === eventId);
   const selections = (eventDishes ?? []).filter(
@@ -229,6 +233,7 @@ export function EventMenuPage() {
         onDismiss={() => setStockShortages([])}
       />
       {host}
+      {undoHost}
       <div className="event-menu-layout">
         <section>
           <div className="culinary-section-heading">
@@ -491,19 +496,38 @@ export function EventMenuPage() {
                           });
                           if (!reason) return;
                           void run(`remove:${selection._id}`, async () => {
+                            const removedId = selection._id;
+                            const removedName = dishName(selection.dishId);
+                            const removedEventId = selection.eventId;
+                            const removedDishId = selection.dishId;
+                            const removedServings = selection.quantityServings;
+                            const removedInstructions =
+                              selection.specialInstructions;
                             await removeDish({
-                              docId: selection._id,
+                              docId: removedId,
                               reason,
                               version: selection.version,
                             });
                             const shortages =
                               await menuSync().syncRecipeDemands(eventId, {
-                                id: selection._id,
-                                eventId: selection.eventId,
-                                dishId: selection.dishId,
+                                id: removedId,
+                                eventId: removedEventId,
+                                dishId: removedDishId,
                                 quantityServings: 0,
                               });
                             setStockShortages(shortages);
+                            notifyUndo(`Removed "${removedName}"`, async () => {
+                              await restoreDish({ docId: removedId });
+                              const restoredShortages =
+                                await menuSync().syncPrepForDish({
+                                  id: removedId,
+                                  eventId: removedEventId,
+                                  dishId: removedDishId,
+                                  quantityServings: removedServings,
+                                  specialInstructions: removedInstructions,
+                                });
+                              setStockShortages(restoredShortages);
+                            });
                           });
                         })();
                       }}

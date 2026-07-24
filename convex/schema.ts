@@ -661,6 +661,7 @@ export default defineSchema({
     servings: v.number(),
     purchasingWeekStart: v.optional(v.union(v.number(), v.null())),
     recordedAt: v.optional(v.union(v.number(), v.null())),
+    previousQuantity: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

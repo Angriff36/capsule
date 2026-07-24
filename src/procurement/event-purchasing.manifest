@@ -144,6 +144,8 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   property required servings: decimal(12, 4) = 0
   property purchasingWeekStart: datetime?
   property recordedAt: datetime?
+  // Set by retire so reinstate (EventDish.restore undo) can put quantity back.
+  property previousQuantity: decimal(12, 4)?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
   belongsTo eventDish: EventDish fields [tenantId, eventDishId] references [tenantId, id]
@@ -211,6 +213,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     guard self.recordedAt != null
     guard self.deletedAt == null
     constraint retireReason: length(trim(reason)) > 0 "Retire reason is required"
+    mutate previousQuantity = self.quantity
     mutate deletedAt = now()
     mutate quantity = 0
     emit EventIngredientContributionRecorded {
@@ -220,6 +223,29 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
       eventDishId: self.eventDishId
       ingredientId: self.ingredientId
       quantity: 0
+      unit: self.unit
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
+  // Undo for retire — used by EventDish.restore cascade.
+  // Constraint must use stored fields only: codegen evaluates constraints on
+  // `doc` before `compute` locals exist (doc.restoredQuantity would always fail).
+  command reinstate() {
+    guard self.recordedAt != null
+    guard self.deletedAt != null
+    guard self.previousQuantity != null
+    constraint reinstateQuantityPositive: self.previousQuantity > 0 "Cannot reinstate a contribution with no prior quantity"
+    mutate quantity = self.previousQuantity
+    mutate previousQuantity = null
+    mutate deletedAt = null
+    emit EventIngredientContributionRecorded {
+      contributionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      eventDishId: self.eventDishId
+      ingredientId: self.ingredientId
+      quantity: self.quantity
       unit: self.unit
       purchasingWeekStart: self.purchasingWeekStart
     }
@@ -327,6 +353,10 @@ on EventHeadcountChanged fanOut EventDish where eventId = payload.eventId
 on EventDishRemoved fanOut EventIngredientContribution where eventDishId = payload.eventDishId
   run retire
   params { reason: payload.reason }
+
+// EventDish.restore → reinstate contributions retired by the remove cascade.
+on EventDishRestored fanOut EventIngredientContribution where eventDishId = payload.eventDishId
+  run reinstate
 
 on EventIngredientContributionRecorded run IngredientDemand.syncFromContributions
   match eventId = payload.eventId, ingredientId = payload.ingredientId

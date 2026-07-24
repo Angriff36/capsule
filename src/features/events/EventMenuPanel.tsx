@@ -3,11 +3,13 @@ import {
   useCreateEventDish,
   useEventDishAdjustServings,
   useEventDishRemove,
+  useEventDishRestore,
   useEventDishSetHeadcountOverride,
   useListDish,
   useListEventDish,
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
+import { useUndoToast } from "../../ui/useUndoToast";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 
@@ -26,9 +28,11 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
   const adjustServings = useEventDishAdjustServings();
   const setHeadcountOverride = useEventDishSetHeadcountOverride();
   const removeDish = useEventDishRemove();
+  const restoreDish = useEventDishRestore();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
+  const { notifyUndo, host: undoHost } = useUndoToast();
 
   const selections = (eventDishes ?? []).filter(
     (item) => item.deletedAt == null && item.eventId === eventId,
@@ -95,6 +99,7 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
       </div>
       {failure ? <FailureBanner failure={failure} /> : null}
       {host}
+      {undoHost}
       <form onSubmit={submit} className="grid gap-3 sm:grid-cols-2">
         <label className="field-label sm:col-span-2">
           Dish
@@ -270,12 +275,17 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
                         tone: "danger",
                       });
                       if (!reason) return;
-                      void run(`remove:${selection._id}`, async () => {
+                      const removedId = selection._id;
+                      const removedName = dishName(selection.dishId);
+                      void run(`remove:${removedId}`, async () => {
                         await removeDish({
-                          docId: selection._id,
+                          docId: removedId,
                           reason,
                           version: selection.version,
                         });
+                        notifyUndo(`Removed "${removedName}"`, () =>
+                          restoreDish({ docId: removedId }),
+                        );
                       });
                     })();
                   }}

@@ -105,6 +105,7 @@ import {
   EventDishConfirmFromProposalParamsSchema,
   EventDishRecipeSeedSeedParamsSchema,
   EventDishRemoveParamsSchema,
+  EventDishRestoreParamsSchema,
   EventDishSetHeadcountOverrideParamsSchema,
   EventDishUpdateInstructionsParamsSchema,
   EventGuestAssignTableParamsSchema,
@@ -114,6 +115,7 @@ import {
   EventGuestRsvpDeclineParamsSchema,
   EventGuestWithdrawParamsSchema,
   EventIngredientContributionRecordParamsSchema,
+  EventIngredientContributionReinstateParamsSchema,
   EventIngredientContributionRetireParamsSchema,
   EventIngredientContributionReviseParamsSchema,
   EventPlanEngagementParamsSchema,
@@ -265,6 +267,7 @@ import {
   PrepTaskOpenParamsSchema,
   PrepTaskRefreshGeneratedParamsSchema,
   PrepTaskReleaseParamsSchema,
+  PrepTaskReopenParamsSchema,
   PrepTaskReviseParamsSchema,
   PrepTaskStartParamsSchema,
   PrepTaskUnblockParamsSchema,
@@ -426,6 +429,7 @@ import {
   VenueRegisterParamsSchema,
   VenueUpdateDetailsParamsSchema,
   WasteRecordRecordParamsSchema,
+  WasteRecordUnvoidParamsSchema,
   WasteRecordVoidRecordParamsSchema,
   WeeklyPurchasingConfigConfigureParamsSchema,
   WeeklyPurchasingConfigRouteNeedParamsSchema,
@@ -2057,6 +2061,16 @@ export function useEventDishRemove() {
   };
 }
 
+/** Mutation hook for EventDish.restore. */
+export function useEventDishRestore() {
+  const mutate = useMutation(api.mutations.EventDish_restore);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventDishRestoreParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for EventDish.setHeadcountOverride. */
 export function useEventDishSetHeadcountOverride() {
   const mutate = useMutation(api.mutations.EventDish_setHeadcountOverride);
@@ -2216,6 +2230,16 @@ export function useEventIngredientContributionRecord() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = EventIngredientContributionRecordParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for EventIngredientContribution.reinstate. */
+export function useEventIngredientContributionReinstate() {
+  const mutate = useMutation(api.mutations.EventIngredientContribution_reinstate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = EventIngredientContributionReinstateParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -4120,6 +4144,16 @@ export function usePrepTaskRelease() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = PrepTaskReleaseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for PrepTask.reopen. */
+export function usePrepTaskReopen() {
+  const mutate = useMutation(api.mutations.PrepTask_reopen);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = PrepTaskReopenParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -6561,6 +6595,16 @@ export function useWasteRecordRecord() {
   };
 }
 
+/** Mutation hook for WasteRecord.unvoid. */
+export function useWasteRecordUnvoid() {
+  const mutate = useMutation(api.mutations.WasteRecord_unvoid);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = WasteRecordUnvoidParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for WasteRecord.voidRecord. */
 export function useWasteRecordVoidRecord() {
   const mutate = useMutation(api.mutations.WasteRecord_voidRecord);
@@ -6684,4 +6728,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 708 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 712 as const;

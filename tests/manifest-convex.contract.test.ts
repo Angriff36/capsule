@@ -331,6 +331,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation EventDish_remove", () => {
     expect(typeof (mutations as any).EventDish_remove).toBe("function");
   });
+  it("exports mutation EventDish_restore", () => {
+    expect(typeof (mutations as any).EventDish_restore).toBe("function");
+  });
   it("exports mutation EventDish_setHeadcountOverride", () => {
     expect(typeof (mutations as any).EventDish_setHeadcountOverride).toBe("function");
   });
@@ -364,6 +367,9 @@ describe("Manifest Convex contract", () => {
   });
   it("exports mutation EventIngredientContribution_record", () => {
     expect(typeof (mutations as any).EventIngredientContribution_record).toBe("function");
+  });
+  it("exports mutation EventIngredientContribution_reinstate", () => {
+    expect(typeof (mutations as any).EventIngredientContribution_reinstate).toBe("function");
   });
   it("exports mutation EventIngredientContribution_retire", () => {
     expect(typeof (mutations as any).EventIngredientContribution_retire).toBe("function");
@@ -784,6 +790,9 @@ describe("Manifest Convex contract", () => {
   });
   it("exports mutation PrepTask_release", () => {
     expect(typeof (mutations as any).PrepTask_release).toBe("function");
+  });
+  it("exports mutation PrepTask_reopen", () => {
+    expect(typeof (mutations as any).PrepTask_reopen).toBe("function");
   });
   it("exports mutation PrepTask_revise", () => {
     expect(typeof (mutations as any).PrepTask_revise).toBe("function");
@@ -1280,6 +1289,9 @@ describe("Manifest Convex contract", () => {
   it("exports mutation WasteRecord_record", () => {
     expect(typeof (mutations as any).WasteRecord_record).toBe("function");
   });
+  it("exports mutation WasteRecord_unvoid", () => {
+    expect(typeof (mutations as any).WasteRecord_unvoid).toBe("function");
+  });
   it("exports mutation WasteRecord_voidRecord", () => {
     expect(typeof (mutations as any).WasteRecord_voidRecord).toBe("function");
   });
@@ -1303,4 +1315,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 432 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 436 as const;
