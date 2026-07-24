@@ -38,7 +38,7 @@ describe("Event planning foundation", () => {
   });
 
   it("navigates successful event creation directly to the real detail route", () => {
-    expect(eventDetailPath("event_123")).toBe("/events/event_123?tab=menu");
+    expect(eventDetailPath("event_123")).toBe("/events/event_123?tab=overview");
     expect(eventCreatePath({ clientId: "client_9" })).toBe(
       "/events/new?clientId=client_9",
     );
