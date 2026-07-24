@@ -540,6 +540,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   hasMany deliveries: Delivery
   hasMany assignments: EventAssignment
   hasMany timelineActivities: EventTimelineActivity
+  hasMany layoutSections: EventLayoutSection
 
   computed isTerminal: boolean = self.stage == "cancelled" or self.stage == "closed_out"
   computed isEditable: boolean = self.stage == "planning" or self.stage == "pending_approval" or self.stage == "approved"
@@ -1114,16 +1115,26 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   property category: string?
   property startsAt: datetime?
   property endsAt: datetime?
+  // Legacy single-string label; kept in sync with assigneeTeams + people for BEO/export.
   property responsibleParty: string?
+  // Team buckets: Everyone, FOH, BOH (multi-select with people).
+  property assigneeTeams: list<string> = []
+  // Individual staff Person ids assigned to this block (multi-select).
+  // Stored as string ids (Convex document ids), not RFC UUIDs.
+  property assigneePersonIds: list<string> = []
   property notes: string?
   // Site planning notes (parking, loading access, entrances, kitchen/bar location).
   property siteNotes: string?
+  // Manual battle-board order (drag-and-drop); lower sorts first.
+  // Optional so older timeline rows without the field still load.
+  property sortOrder: int = 0
   property scheduledAt: datetime?
 
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
   constraint timelineActivityNameComplete: self.scheduledAt == null or length(trim(self.name)) > 0 "Timeline activities require a name once scheduled"
   constraint timelineActivityWindowOrdered: self.startsAt == null or self.endsAt == null or self.endsAt >= self.startsAt "Timeline activity end must not precede its start"
+  constraint timelineActivitySortNonnegative: self.sortOrder >= 0 "Timeline activity sort order cannot be negative"
 
   default policy eventTimelineActivityRead read: roleAllows(user.role, "eventAccess") "Event staff may read the event timeline"
   default policy eventTimelineActivityWrite write: roleAllows(user.role, "eventAccess") "Event staff may write the event timeline through commands"
@@ -1137,12 +1148,16 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     optional responsibleParty: string,
     optional notes: string,
     optional category: string,
-    optional siteNotes: string
+    optional siteNotes: string,
+    optional sortOrder: number,
+    optional assigneeTeams: list<string>,
+    optional assigneePersonIds: list<string>
   ) {
     guard self.scheduledAt == null
     guard self.deletedAt == null
     constraint scheduleActivityName: length(trim(name)) > 0 "Activity name is required"
     constraint scheduleActivityWindow: endsAt == null or endsAt >= startsAt "Activity end must not precede its start"
+    constraint scheduleActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
     mutate eventId = eventId
     mutate name = name
     mutate startsAt = startsAt
@@ -1151,6 +1166,9 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     mutate notes = notes
     mutate category = category
     mutate siteNotes = siteNotes
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate assigneeTeams = assigneeTeams != null ? assigneeTeams : []
+    mutate assigneePersonIds = assigneePersonIds != null ? assigneePersonIds : []
     mutate scheduledAt = now()
     emit EventTimelineActivityScheduled {
       activityId: self.id
@@ -1168,11 +1186,15 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     optional responsibleParty: string,
     optional notes: string,
     optional category: string,
-    optional siteNotes: string
+    optional siteNotes: string,
+    optional sortOrder: number,
+    optional assigneeTeams: list<string>,
+    optional assigneePersonIds: list<string>
   ) {
     guard self.scheduledAt != null
     guard self.deletedAt == null
     constraint adjustActivityName: name == null or length(trim(name)) > 0 "Activity name cannot be blanked"
+    constraint adjustActivitySort: sortOrder == null or sortOrder >= 0 "Timeline activity sort order cannot be negative"
     mutate name = name != null ? name : self.name
     mutate startsAt = startsAt != null ? startsAt : self.startsAt
     mutate endsAt = endsAt != null ? endsAt : self.endsAt
@@ -1180,6 +1202,9 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
     mutate notes = notes != null ? notes : self.notes
     mutate category = category != null ? category : self.category
     mutate siteNotes = siteNotes != null ? siteNotes : self.siteNotes
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    mutate assigneeTeams = assigneeTeams != null ? assigneeTeams : self.assigneeTeams
+    mutate assigneePersonIds = assigneePersonIds != null ? assigneePersonIds : self.assigneePersonIds
     emit EventTimelineActivityAdjusted {
       activityId: self.id
       tenantId: self.tenantId
@@ -1201,14 +1226,19 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
 }
 
 // Staff discussion thread on the Event Timeline (battle-board) tab.
+// Optional activityId scopes a comment to one timeline block; null = event-level thread.
 entity EventTimelineComment mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
   versionProperty version: number
 
   property required eventId: uuid
+  // Optional timeline block id (Convex document id string).
+  property activityId: string?
   property required authorPersonId: uuid
   property required authorName: string = ""
+  // Stamped from trusted auth context on post; never accepted from the browser.
+  property authorAuthSubjectId: string?
   property required body: string = ""
   property postedAt: datetime?
 
@@ -1225,15 +1255,19 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
     eventId: uuid,
     authorPersonId: uuid,
     authorName: string,
-    body: string
+    body: string,
+    optional activityId: string
   ) {
     guard self.postedAt == null
     guard self.deletedAt == null
+    guard user.id != null
     constraint postTimelineCommentBody: length(trim(body)) > 0 "Comment text is required"
     constraint postTimelineCommentAuthor: length(trim(authorName)) > 0 "Author name is required"
     mutate eventId = eventId
+    mutate activityId = activityId
     mutate authorPersonId = authorPersonId
     mutate authorName = authorName
+    mutate authorAuthSubjectId = user.id
     mutate body = body
     mutate postedAt = now()
     emit EventTimelineCommentPosted {
@@ -1246,6 +1280,7 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
 
   command remove() {
     guard self.deletedAt == null
+    guard self.authorAuthSubjectId == user.id or roleAllows(user.role, "adminAccess")
     mutate deletedAt = now()
     emit EventTimelineCommentRemoved {
       commentId: self.id
@@ -1255,6 +1290,87 @@ entity EventTimelineComment mixin TenantScoped, SoftDeletable {
   }
 
   store EventTimelineComment in durable
+}
+
+// ---------------------------------------------------------------------------
+// EventLayoutSection — battle-board layout / setup area on an event
+// (Buffet, Bar, Kitchen, Parking, …) with free-text instructions.
+// ---------------------------------------------------------------------------
+
+entity EventLayoutSection mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required type: string = ""
+  property instructions: string?
+  property required sortOrder: int = 0
+  property addedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+
+  constraint layoutSectionTypeComplete: self.addedAt == null or length(trim(self.type)) > 0 "Layout section type is required once added"
+  constraint layoutSectionSortNonnegative: self.sortOrder >= 0 "Layout section sort order cannot be negative"
+
+  default policy eventLayoutSectionRead read: roleAllows(user.role, "eventAccess") "Event staff may read event layout sections"
+  default policy eventLayoutSectionWrite write: roleAllows(user.role, "eventAccess") "Event staff may write event layout sections through commands"
+  default policy eventLayoutSectionExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute event layout section commands"
+
+  command add(
+    eventId: uuid,
+    type: string,
+    optional instructions: string,
+    optional sortOrder: number
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    constraint addLayoutType: length(trim(type)) > 0 "Layout section type is required"
+    constraint addLayoutSort: sortOrder == null or sortOrder >= 0 "Layout section sort order cannot be negative"
+    mutate eventId = eventId
+    mutate type = type
+    mutate instructions = instructions
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate addedAt = now()
+    emit EventLayoutSectionAdded {
+      sectionId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+      type: type
+      sortOrder: sortOrder != null ? sortOrder : 0
+    }
+  }
+
+  command update(
+    optional type: string,
+    optional instructions: string,
+    optional sortOrder: number
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint updateLayoutType: type == null or length(trim(type)) > 0 "Layout section type cannot be blanked"
+    constraint updateLayoutSort: sortOrder == null or sortOrder >= 0 "Layout section sort order cannot be negative"
+    mutate type = type != null ? type : self.type
+    mutate instructions = instructions != null ? instructions : self.instructions
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    emit EventLayoutSectionUpdated {
+      sectionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    mutate deletedAt = now()
+    emit EventLayoutSectionRemoved {
+      sectionId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+    }
+  }
+
+  store EventLayoutSection in durable
 }
 
 event VenueRegistered: "venue.registered" {
@@ -1543,6 +1659,26 @@ event EventTimelineCommentPosted: "event_timeline_comment.posted" {
 
 event EventTimelineCommentRemoved: "event_timeline_comment.removed" {
   commentId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventLayoutSectionAdded: "event_layout_section.added" {
+  sectionId: string
+  tenantId: string
+  eventId: string
+  type: string
+  sortOrder: number
+}
+
+event EventLayoutSectionUpdated: "event_layout_section.updated" {
+  sectionId: string
+  tenantId: string
+  eventId: string
+}
+
+event EventLayoutSectionRemoved: "event_layout_section.removed" {
+  sectionId: string
   tenantId: string
   eventId: string
 }
