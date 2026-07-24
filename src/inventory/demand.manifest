@@ -316,7 +316,7 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
 
   transition status from "pending" to ["recorded"]
   transition status from "recorded" to ["voided"]
-  transition status from "voided" to []
+  transition status from "voided" to ["recorded"]
 
   default policy wasteRecordRead read: roleAllows(user.role, "inventoryAccess") "Inventory staff may read waste records"
   default policy wasteRecordWrite write: roleAllows(user.role, "inventoryAccess") "Inventory staff may write waste records through commands"
@@ -387,6 +387,27 @@ entity WasteRecord mixin TenantScoped, SoftDeletable {
       quantity: self.quantity
       unit: self.unit
       reason: reason
+    }
+  }
+
+  // Undo for voidRecord — returns to recorded and re-applies the waste decrement.
+  command unvoid() {
+    guard self.status == "voided"
+    guard self.voidedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "inventoryManageAccess")
+    mutate status = "recorded"
+    mutate voidedAt = null
+    mutate voidReason = null
+    emit WasteUnvoided {
+      wasteRecordId: self.id
+      tenantId: self.tenantId
+      ingredientId: self.ingredientId
+      locationId: self.locationId
+      eventId: self.eventId
+      inventoryItemId: self.inventoryItemId
+      quantity: self.quantity
+      unit: self.unit
     }
   }
 
@@ -479,6 +500,17 @@ event WasteVoided: "waste_record.voided" {
   reason: string
 }
 
+event WasteUnvoided: "waste_record.unvoided" {
+  wasteRecordId: string
+  tenantId: string
+  ingredientId: string
+  locationId: string
+  eventId: string?
+  inventoryItemId: string?
+  quantity: decimal(12, 4)
+  unit: UnitOfMeasure
+}
+
 // Waste decrements on-hand when a stock target is tied. Literal reason
 // because WasteRecorded.reason is WasteReason enum, not string.
 on WasteRecorded run InventoryItem.adjustQuantity
@@ -494,4 +526,12 @@ on WasteVoided run InventoryItem.adjustQuantity
   params {
     delta: payload.quantity,
     reason: payload.reason
+  }
+
+// Unvoid re-applies the waste decrement after a mistaken void.
+on WasteUnvoided run InventoryItem.adjustQuantity
+  resolve payload.inventoryItemId
+  params {
+    delta: 0 - payload.quantity,
+    reason: "Waste"
   }

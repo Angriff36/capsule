@@ -223,6 +223,23 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Undo for remove — restores the same EventDish id (not a new addToEvent row).
+  command restore() {
+    guard self.addedAt != null
+    guard self.deletedAt != null
+    guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
+    mutate deletedAt = null
+    mutate removedAt = null
+    emit EventDishRestored {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      quantityServings: self.quantityServings
+      purchasingWeekStart: self.purchasingWeekStart
+    }
+  }
+
   store EventDish in durable
 }
 
@@ -293,4 +310,13 @@ event EventDishRemoved: "event_dish.removed" {
   dishId: string
   previousQuantityServings: number
   reason: string
+}
+
+event EventDishRestored: "event_dish.restored" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  quantityServings: number
+  purchasingWeekStart: datetime?
 }

@@ -719,6 +719,7 @@ export const EventIngredientContributionSchema = z.object({
   servings: z.number().default(0),
   purchasingWeekStart: z.coerce.date().nullable().optional(),
   recordedAt: z.coerce.date().nullable().optional(),
+  previousQuantity: z.number().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });
@@ -3276,6 +3277,11 @@ export const EventDishRemoveParamsSchema = z.object({
 
 export type EventDishRemoveParams = z.infer<typeof EventDishRemoveParamsSchema>;
 
+// Command: restore on EventDish
+export const EventDishRestoreParamsSchema = z.object({});
+
+export type EventDishRestoreParams = z.infer<typeof EventDishRestoreParamsSchema>;
+
 // Command: setHeadcountOverride on EventDish
 export const EventDishSetHeadcountOverrideParamsSchema = z.object({
   headcountOverride: z.number().int(),
@@ -3363,6 +3369,11 @@ export const EventIngredientContributionRecordParamsSchema = z.object({
 });
 
 export type EventIngredientContributionRecordParams = z.infer<typeof EventIngredientContributionRecordParamsSchema>;
+
+// Command: reinstate on EventIngredientContribution
+export const EventIngredientContributionReinstateParamsSchema = z.object({});
+
+export type EventIngredientContributionReinstateParams = z.infer<typeof EventIngredientContributionReinstateParamsSchema>;
 
 // Command: retire on EventIngredientContribution
 export const EventIngredientContributionRetireParamsSchema = z.object({
@@ -4485,6 +4496,11 @@ export type PrepTaskRefreshGeneratedParams = z.infer<typeof PrepTaskRefreshGener
 export const PrepTaskReleaseParamsSchema = z.object({});
 
 export type PrepTaskReleaseParams = z.infer<typeof PrepTaskReleaseParamsSchema>;
+
+// Command: reopen on PrepTask
+export const PrepTaskReopenParamsSchema = z.object({});
+
+export type PrepTaskReopenParams = z.infer<typeof PrepTaskReopenParamsSchema>;
 
 // Command: revise on PrepTask
 export const PrepTaskReviseParamsSchema = z.object({
@@ -5855,6 +5871,11 @@ export const WasteRecordRecordParamsSchema = z.object({
 });
 
 export type WasteRecordRecordParams = z.infer<typeof WasteRecordRecordParamsSchema>;
+
+// Command: unvoid on WasteRecord
+export const WasteRecordUnvoidParamsSchema = z.object({});
+
+export type WasteRecordUnvoidParams = z.infer<typeof WasteRecordUnvoidParamsSchema>;
 
 // Command: voidRecord on WasteRecord
 export const WasteRecordVoidRecordParamsSchema = z.object({
