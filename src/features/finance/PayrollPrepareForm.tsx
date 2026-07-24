@@ -89,8 +89,8 @@ export function PayrollPrepareForm({
           </div>
         </div>
         <p className="text-[13px] text-ink-2">
-          No active people are available. Hire staff from the Staff workspace
-          first.
+          No active people are available. Hire team members under Admin →
+          Permissions first.
         </p>
       </form>
     );

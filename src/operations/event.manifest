@@ -1225,8 +1225,8 @@ entity EventTimelineActivity mixin TenantScoped, SoftDeletable {
   store EventTimelineActivity in durable
 }
 
-// Staff discussion thread on the Event Timeline (battle-board) tab.
-// Optional activityId scopes a comment to one timeline block; null = event-level thread.
+// Staff discussion: null activityId = event-level thread (Overview tab).
+// Optional activityId scopes a comment to one Timeline run-sheet block.
 entity EventTimelineComment mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps

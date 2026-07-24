@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import {
   formatCount,
@@ -7,23 +8,24 @@ import {
 } from "../../lib/format";
 import { StatusChip } from "../../ui/primitives";
 import { clientDisplayName } from "./clientName";
+import { EventTabPanel } from "./EventTabPanel";
 
 type ClientRow = { _id: string } | null | undefined;
 
 type Props = {
-  startsAt?: number | null;
-  endsAt?: number | null;
-  expectedHeadcount?: number | null;
-  budgetAmount?: number | null;
-  quotedPrice?: number | null;
-  venue?: { name: string } | null;
-  clientId: string;
-  clients: readonly ClientRow[] | undefined;
-  primaryContactName?: string | null;
-  stage: string;
+  readonly startsAt?: number | null;
+  readonly endsAt?: number | null;
+  readonly expectedHeadcount?: number | null;
+  readonly budgetAmount?: number | null;
+  readonly quotedPrice?: number | null;
+  readonly venue?: { name: string } | null;
+  readonly clientId: string;
+  readonly clients: readonly ClientRow[] | undefined;
+  readonly primaryContactName?: string | null;
+  readonly stage: string;
 };
 
-/** Persistent editable-context facts above Event detail tabs. */
+/** At-a-glance facts on the Event Overview tab. */
 export function EventDetailSummaryFacts({
   startsAt,
   endsAt,
@@ -37,34 +39,24 @@ export function EventDetailSummaryFacts({
   stage,
 }: Props) {
   return (
-    <dl className="grid gap-2 rounded-xs border border-line bg-surface px-3 py-3 sm:grid-cols-2 lg:grid-cols-4">
-      <div>
-        <dt className="text-[11px] uppercase text-ink-3">Start</dt>
-        <dd className="font-mono text-[13px]">
+    <EventTabPanel
+      eyebrow="At a glance"
+      title="Event facts"
+      description="Timing, headcount, venue, client, and commercial snapshot for this event."
+      testId="event-summary-facts"
+    >
+      <dl className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        <Fact label="Start">
           {formatDate(startsAt)} {formatTime(startsAt)}
-        </dd>
-      </div>
-      <div>
-        <dt className="text-[11px] uppercase text-ink-3">End</dt>
-        <dd className="font-mono text-[13px]">
+        </Fact>
+        <Fact label="End">
           {formatDate(endsAt)} {formatTime(endsAt)}
-        </dd>
-      </div>
-      <div>
-        <dt className="text-[11px] uppercase text-ink-3">Headcount</dt>
-        <dd className="font-mono text-[13px]">
-          {formatCount(expectedHeadcount)}
-        </dd>
-      </div>
-      <div>
-        <dt className="text-[11px] uppercase text-ink-3">Budget / quoted</dt>
-        <dd className="font-mono text-[13px]">
+        </Fact>
+        <Fact label="Headcount">{formatCount(expectedHeadcount)}</Fact>
+        <Fact label="Budget / quoted">
           {formatMoney(budgetAmount)} / {formatMoney(quotedPrice)}
-        </dd>
-      </div>
-      <div>
-        <dt className="text-[11px] uppercase text-ink-3">Venue</dt>
-        <dd className="text-[13px]">
+        </Fact>
+        <Fact label="Venue">
           {venue ? (
             <Link to="/facilities" className="underline">
               {venue.name}
@@ -72,26 +64,34 @@ export function EventDetailSummaryFacts({
           ) : (
             "—"
           )}
-        </dd>
-      </div>
-      <div>
-        <dt className="text-[11px] uppercase text-ink-3">Client</dt>
-        <dd className="text-[13px]">
+        </Fact>
+        <Fact label="Client">
           <Link to={`/clients/${clientId}`} className="underline">
             {clientDisplayName(clientId, clients as never)}
           </Link>
-        </dd>
-      </div>
-      <div>
-        <dt className="text-[11px] uppercase text-ink-3">Primary contact</dt>
-        <dd className="text-[13px]">{primaryContactName || "—"}</dd>
-      </div>
-      <div>
-        <dt className="text-[11px] uppercase text-ink-3">Status</dt>
-        <dd>
+        </Fact>
+        <Fact label="Primary contact">{primaryContactName || "—"}</Fact>
+        <Fact label="Status">
           <StatusChip status={stage} />
-        </dd>
-      </div>
-    </dl>
+        </Fact>
+      </dl>
+    </EventTabPanel>
+  );
+}
+
+function Fact({
+  label,
+  children,
+}: {
+  readonly label: string;
+  readonly children: ReactNode;
+}) {
+  return (
+    <div className="rounded-sm border border-line-2 bg-panel px-3 py-2.5">
+      <dt className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">
+        {label}
+      </dt>
+      <dd className="mt-1 font-mono text-[13px] text-ink">{children}</dd>
+    </div>
   );
 }

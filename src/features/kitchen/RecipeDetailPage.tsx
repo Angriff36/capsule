@@ -1,5 +1,7 @@
+import { useQuery } from "convex/react";
 import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { api } from "../../lib/api";
 import {
   useCreateRecipeIngredient,
   useGetRecipe,
@@ -7,14 +9,23 @@ import {
   useListDishRecipe,
   useListIngredient,
   useListIngredientPriceObservation,
+  useListPerson,
   useListRecipeIngredient,
+  useListRecipeSnapshot,
   useRecipeIngredientAdjustQuantity,
   useRecipeIngredientRemove,
   useRecipePublishVersion,
   useRecipePurge,
   useRecipeRetract,
   useRecipeReviseDraft,
+  useRecipeSnapshotCapture,
 } from "../../lib/manifest-convex-react";
+import {
+  buildRecipeSnapshotData,
+  planLineRestore,
+  type RecipeSnapshotData,
+} from "./recipeSnapshot";
+import { RecipeVersionHistoryPanel } from "./RecipeVersionHistoryPanel";
 import { useTrackRecent } from "../../lib/recents";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
@@ -28,6 +39,11 @@ import {
 } from "./IngredientPriceHistory";
 import { calculateRecipeCost } from "./RecipeCostCalculator";
 import { RecipeCostPanel } from "./RecipeCostPanel";
+import {
+  calculateRecipeNutrition,
+  toNutritionIngredient,
+} from "./RecipeNutrition";
+import { RecipeNutritionPanel } from "./RecipeNutritionPanel";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
 
 const policy = new CulinaryLifecyclePolicy();
@@ -54,6 +70,10 @@ export function RecipeDetailPage() {
   const createLine = useCreateRecipeIngredient();
   const adjustLine = useRecipeIngredientAdjustQuantity();
   const removeLine = useRecipeIngredientRemove();
+  const captureSnapshot = useRecipeSnapshotCapture();
+  const snapshots = useListRecipeSnapshot();
+  const people = useListPerson();
+  const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const [editing, setEditing] = useState(false);
   const [targetYield, setTargetYield] = useState("");
   const [showLineForm, setShowLineForm] = useState(false);
@@ -106,6 +126,89 @@ export function RecipeDetailPage() {
   const ingredientName = (ingredientId: string) =>
     ingredients?.find((ingredient) => ingredient._id === ingredientId)?.name ??
     "Unknown ingredient";
+
+  const myPersonId = authStatus?.personId ?? null;
+  const me = (people ?? []).find(
+    (person) => person._id === myPersonId && person.deletedAt == null,
+  );
+  const myName =
+    [me?.givenName, me?.familyName].filter(Boolean).join(" ") || "Unknown";
+
+  const currentData = buildRecipeSnapshotData(
+    recipe,
+    recipeLines,
+    ingredientName,
+  );
+
+  // Snapshot the recipe's state BEFORE a modification, so history holds the
+  // prior editions with author + timestamp. Capture failures never block edits.
+  const captureBefore = async (changeSummary: string) => {
+    try {
+      await captureSnapshot({
+        recipeId: recipe._id,
+        versionNumber: recipe.versionNumber,
+        capturedByName: myName,
+        changeSummary,
+        snapshot: JSON.stringify(currentData),
+      });
+    } catch {
+      // Non-fatal: the edit itself is the source of truth.
+    }
+  };
+
+  const restoreSnapshot = (
+    target: RecipeSnapshotData,
+    versionLabel: string,
+  ) => {
+    void run("restore", async () => {
+      await captureBefore(`Before restore to ${versionLabel}`);
+      await revise({
+        docId: recipe._id,
+        name: target.name,
+        yieldQuantity: target.yieldQuantity,
+        yieldUnit: target.yieldUnit as (typeof UNITS)[number],
+        batchMultiplier: target.batchMultiplier,
+        servesPerYield: target.servesPerYield,
+        category: target.category || undefined,
+        cuisine: target.cuisine || undefined,
+        description: target.description || undefined,
+        instructions: target.instructions || undefined,
+        version: recipe.version,
+      });
+      const plan = planLineRestore(currentData, target);
+      for (const add of plan.add) {
+        await createLine({
+          recipeId: recipe._id,
+          ingredientId: add.ingredientId,
+          quantity: add.quantity,
+          unit: add.unit as (typeof UNITS)[number],
+          sortOrder: 0,
+          prepNotes: add.prepNotes || undefined,
+        });
+      }
+      for (const change of plan.adjust) {
+        const line = recipeLines.find(
+          (l) => l.ingredientId === change.ingredientId,
+        );
+        if (!line) continue;
+        await adjustLine({
+          docId: line._id,
+          quantity: change.quantity,
+          unit: change.unit as (typeof UNITS)[number],
+          version: line.version,
+        });
+      }
+      for (const ingredientId of plan.remove) {
+        const line = recipeLines.find((l) => l.ingredientId === ingredientId);
+        if (!line) continue;
+        await removeLine({
+          docId: line._id,
+          reason: `Restored to ${versionLabel}`,
+          version: line.version,
+        });
+      }
+    });
+  };
   const latestPrices = latestPriceByIngredient(priceObservations ?? []);
   const recipeCost = calculateRecipeCost({
     lines: recipeLines.map((line) => ({
@@ -135,6 +238,27 @@ export function RecipeDetailPage() {
     batchMultiplier: Number(recipe.batchMultiplier),
     yieldQuantity: Number(recipe.yieldQuantity),
   });
+  const servesPerYield = Number(
+    (recipe as { servesPerYield?: number }).servesPerYield ?? 1,
+  );
+  const recipeNutrition = calculateRecipeNutrition({
+    lines: recipeLines.map((line) => ({
+      id: line._id,
+      ingredientId: line.ingredientId,
+      quantity: Number(line.quantity),
+      unit: line.unit,
+    })),
+    ingredients: (ingredients ?? [])
+      .filter((ingredient) => ingredient.deletedAt == null)
+      .map(toNutritionIngredient),
+    servesPerYield,
+  });
+  const nutritionCoverageNote =
+    recipeNutrition.totalLineCount === 0
+      ? "Add ingredient lines with nutrition to build a per-portion panel."
+      : recipeNutrition.isComplete
+        ? `Based on all ${recipeNutrition.totalLineCount} lines.`
+        : `Based on ${recipeNutrition.measuredLineCount} of ${recipeNutrition.totalLineCount} lines — add nutrition to the remaining ingredients for a complete panel.`;
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -152,6 +276,7 @@ export function RecipeDetailPage() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     void run("revise", async () => {
+      await captureBefore("Revised draft");
       await revise({
         docId: recipe._id,
         name: String(data.get("name") ?? "").trim(),
@@ -175,6 +300,7 @@ export function RecipeDetailPage() {
     const form = event.currentTarget;
     const data = new FormData(form);
     void run("line", async () => {
+      await captureBefore("Added ingredient line");
       await createLine({
         recipeId: recipe._id,
         ingredientId: String(data.get("ingredientId")),
@@ -288,6 +414,14 @@ export function RecipeDetailPage() {
         }
       />
 
+      <RecipeNutritionPanel
+        heading="Per-portion nutrition"
+        portionLabel={`per portion · serves ${servesPerYield}`}
+        totals={recipeNutrition.perPortion}
+        coverageNote={nutritionCoverageNote}
+        loading={ingredients === undefined || lines === undefined}
+      />
+
       <div className="culinary-work-grid">
         <section className="culinary-section">
           <div className="culinary-section-heading">
@@ -356,6 +490,7 @@ export function RecipeDetailPage() {
                         );
                         if (!Number.isFinite(quantity) || quantity <= 0) return;
                         void run(`adjust:${line._id}`, async () => {
+                          await captureBefore("Adjusted ingredient line");
                           await adjustLine({
                             docId: line._id,
                             quantity,
@@ -374,6 +509,7 @@ export function RecipeDetailPage() {
                         const reason = window.prompt("Removal reason")?.trim();
                         if (!reason) return;
                         void run(`remove:${line._id}`, async () => {
+                          await captureBefore("Removed ingredient line");
                           await removeLine({
                             docId: line._id,
                             reason,
@@ -491,6 +627,15 @@ export function RecipeDetailPage() {
           />
         </>
       ) : null}
+
+      <RecipeVersionHistoryPanel
+        recipeId={recipe._id}
+        snapshots={snapshots as never}
+        currentData={currentData}
+        canRestore={recipe.status === "draft"}
+        busy={busy != null}
+        onRestore={restoreSnapshot}
+      />
 
       <section className="culinary-section">
         <div className="culinary-section-heading">

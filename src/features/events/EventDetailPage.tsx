@@ -38,8 +38,6 @@ import { downloadBeoPdf } from "./beoPdf";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { clientDisplayName } from "./clientName";
 import { EventClientTab } from "./EventClientTab";
-import { EventDetailRevisePanels } from "./EventDetailRevisePanels";
-import { EventDetailSummaryFacts } from "./EventDetailSummaryFacts";
 import { EventDetailTabs } from "./EventDetailTabs";
 import { EventEquipmentPanel } from "./EventEquipmentPanel";
 import {
@@ -48,10 +46,12 @@ import {
 } from "./EventLifecyclePolicy";
 import { EventMarginTab } from "./EventMarginTab";
 import { EventMenuTab } from "./EventMenuTab";
+import { EventOverviewTab } from "./EventOverviewTab";
 import { EventPhotosTab } from "./EventPhotosTab";
-import { EventSetupProgress } from "./EventSetupProgress";
 import { EventStaffingTab } from "./EventStaffingTab";
 import { EventTabErrorBoundary } from "./EventTabErrorBoundary";
+import { EventWeatherPanel } from "./EventWeatherPanel";
+import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
 import { FailureBanner } from "./FailureBanner";
 import { RecurringEventPanel } from "./RecurringEventPanel";
@@ -304,21 +304,6 @@ export function EventDetailPage() {
         ]}
       />
 
-      <EventSetupProgress eventId={event._id} event={event} />
-
-      <EventDetailSummaryFacts
-        startsAt={event.startsAt}
-        endsAt={event.endsAt}
-        expectedHeadcount={event.expectedHeadcount}
-        budgetAmount={event.budgetAmount}
-        quotedPrice={event.quotedPrice}
-        venue={venue}
-        clientId={event.clientId}
-        clients={clients}
-        primaryContactName={event.primaryContactName}
-        stage={String(event.stage)}
-      />
-
       {pdfNotice ? (
         <p className="text-[13px] text-ink-2" role="status">
           {pdfNotice}
@@ -377,41 +362,50 @@ export function EventDetailPage() {
       ) : null}
       {failure ? <FailureBanner failure={failure} /> : null}
 
-      <div id="event-setup-basics" className="scroll-mt-4">
-        <EventDetailRevisePanels
-          eventId={event._id}
-          version={version}
-          busy={busy}
-          canRevise={canRevise}
-          canChangeHeadcount={canChangeHeadcount}
-          reviseBlockedReason={reviseBlockedReason}
-          headcountBlockedReason={headcountBlockedReason}
-          venuesLoading={venues === undefined}
-          activeVenues={activeVenues}
-          startsAt={event.startsAt}
-          endsAt={event.endsAt}
-          expectedHeadcount={event.expectedHeadcount}
-          venueId={event.venueId}
-          budgetAmount={event.budgetAmount}
-          quotedPrice={event.quotedPrice}
-          primaryContactName={event.primaryContactName}
-          primaryContactEmail={event.primaryContactEmail}
-          primaryContactPhone={event.primaryContactPhone}
-          accessibilityNeeds={event.accessibilityNeeds}
-          serviceRequirements={event.serviceRequirements}
-          operationalRequirements={event.operationalRequirements}
-          run={run}
-          onReschedule={reschedule}
-          onChangeHeadcount={changeHeadcount}
-          onChangeVenue={changeVenue}
-          onChangePricing={changePricing}
-          onChangePrimaryContact={changePrimaryContact}
-          onChangeRequirements={changeRequirements}
-        />
-      </div>
-
       <EventDetailTabs active={activeTab} onChange={setTab} />
 
+      {activeTab === "overview" ? (
+        <EventTabErrorBoundary tabLabel="Overview" key="overview">
+          <EventOverviewTab
+            eventId={event._id}
+            event={event}
+            version={version}
+            busy={busy}
+            canRevise={canRevise}
+            canChangeHeadcount={canChangeHeadcount}
+            reviseBlockedReason={reviseBlockedReason}
+            headcountBlockedReason={headcountBlockedReason}
+            venuesLoading={venues === undefined}
+            activeVenues={activeVenues}
+            venue={venue}
+            clients={clients}
+            clientId={event.clientId}
+            startsAt={event.startsAt}
+            endsAt={event.endsAt}
+            expectedHeadcount={event.expectedHeadcount}
+            venueId={event.venueId}
+            budgetAmount={event.budgetAmount}
+            quotedPrice={event.quotedPrice}
+            primaryContactName={event.primaryContactName}
+            primaryContactEmail={event.primaryContactEmail}
+            primaryContactPhone={event.primaryContactPhone}
+            accessibilityNeeds={event.accessibilityNeeds}
+            serviceRequirements={event.serviceRequirements}
+            operationalRequirements={event.operationalRequirements}
+            stage={String(event.stage)}
+            run={run}
+            onReschedule={reschedule}
+            onChangeHeadcount={changeHeadcount}
+            onChangeVenue={changeVenue}
+            onChangePricing={changePricing}
+            onChangePrimaryContact={changePrimaryContact}
+            onChangeRequirements={changeRequirements}
+          />
+          <div className="mt-4">
+            <EventWeatherPanel venue={venue} />
+          </div>
+        </EventTabErrorBoundary>
+      ) : null}
       {activeTab === "menu" ? (
         <EventTabErrorBoundary tabLabel="Menu" key="menu">
           <EventMenuTab
@@ -452,6 +446,11 @@ export function EventDetailPage() {
       {activeTab === "timeline" ? (
         <EventTabErrorBoundary tabLabel="Timeline" key="timeline">
           <EventTimelineTab eventId={event._id} startsAt={event.startsAt} />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "layouts" ? (
+        <EventTabErrorBoundary tabLabel="Layouts" key="layouts">
+          <EventLayoutsTab eventId={event._id} />
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "recurring" ? (

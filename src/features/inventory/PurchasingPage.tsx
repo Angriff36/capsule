@@ -6,7 +6,9 @@ import {
   useCreateVendorOrder,
   useListEvent,
   useListIngredient,
+  useListIngredientDemand,
   useListIngredientPriceObservation,
+  useListInventoryItem,
   useListPurchaseNeed,
   useListVendor,
   useListVendorContact,
@@ -29,6 +31,8 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { PurchasingCommandForm } from "./PurchasingCommandForm";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
+import { suggestOrderQuantity } from "./reorderSuggestion";
+import { SeasonalDemandForecast } from "./SeasonalDemandForecast";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { byVendorScore, computeVendorPerformance } from "./vendorPerformance";
@@ -42,6 +46,8 @@ export function PurchasingPage() {
   const lines = useListVendorOrderLine();
   const demandLinks = useListVendorOrderLineDemand();
   const ingredients = useListIngredient();
+  const inventoryItems = useListInventoryItem();
+  const demands = useListIngredientDemand();
   const events = useListEvent();
   const vendorContacts = useListVendorContact();
   const priceObservations = useListIngredientPriceObservation();
@@ -105,6 +111,8 @@ export function PurchasingPage() {
           link.ingredientDemandId === need.ingredientDemandId,
       );
     });
+  const reorderSuggestion = (need: any) =>
+    suggestOrderQuantity(need, inventoryItems ?? [], demands ?? []);
   const needCanCancel = (need: any) =>
     policy
       .purchaseNeedActions(String(need.status))
@@ -426,6 +434,7 @@ export function PurchasingPage() {
         isNeedSelected={selection.isSelected}
         onToggleNeed={selection.toggle}
         linkedLine={linkedLine}
+        reorderSuggestion={reorderSuggestion}
         ingredientName={ingredientName}
         eventName={eventName}
         onNeedAction={needAction}
@@ -517,6 +526,8 @@ export function PurchasingPage() {
           </div>
         )}
       </section>
+
+      <SeasonalDemandForecast />
 
       <BulkActionBar
         count={selection.count}

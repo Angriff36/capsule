@@ -112,6 +112,11 @@ const StaffUtilizationPage = lazy(() =>
     default: module.StaffUtilizationPage,
   })),
 );
+const PerformanceReviewsPage = lazy(() =>
+  import("../features/workforce/PerformanceReviewsPage").then((module) => ({
+    default: module.PerformanceReviewsPage,
+  })),
+);
 const PackListsPage = lazy(() =>
   import("../features/logistics/PackListsPage").then((module) => ({
     default: module.PackListsPage,
@@ -135,6 +140,11 @@ const VehicleFleetPage = lazy(() =>
 const VehicleSchedulePage = lazy(() =>
   import("../features/logistics/VehicleSchedulePage").then((module) => ({
     default: module.VehicleSchedulePage,
+  })),
+);
+const VehicleMaintenancePage = lazy(() =>
+  import("../features/logistics/VehicleMaintenancePage").then((module) => ({
+    default: module.VehicleMaintenancePage,
   })),
 );
 const RoutePlannerPage = lazy(() =>
@@ -540,6 +550,14 @@ export function App() {
               }
             />
             <Route
+              path="/staff/reviews"
+              element={
+                <SupplyRoute>
+                  <PerformanceReviewsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/staff/utilization"
               element={
                 <SupplyRoute>
@@ -596,6 +614,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <VehicleFleetPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/logistics/maintenance"
+              element={
+                <SupplyRoute>
+                  <VehicleMaintenancePage />
                 </SupplyRoute>
               }
             />

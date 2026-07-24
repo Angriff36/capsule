@@ -1,8 +1,12 @@
 import { Link } from "react-router-dom";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import type { ReorderSuggestion } from "./reorderSuggestion";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorContactRoleLabel } from "./vendorContactRoles";
 import type { VendorPerformance } from "./vendorPerformance";
+
+const formatQty = (value: number): string =>
+  Number.isInteger(value) ? String(value) : value.toFixed(2);
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -55,6 +59,7 @@ export type PurchasingQueueSplitProps = {
   isNeedSelected: (id: string) => boolean;
   onToggleNeed: (id: string, on: boolean) => void;
   linkedLine: (need: PurchaseNeed) => VendorOrderLine | undefined;
+  reorderSuggestion: (need: PurchaseNeed) => ReorderSuggestion | undefined;
   ingredientName: (id: string) => string;
   eventName: (id: string) => string;
   onNeedAction: (need: PurchaseNeed, key: string) => void;
@@ -74,6 +79,7 @@ export function PurchasingQueueSplit({
   isNeedSelected,
   onToggleNeed,
   linkedLine,
+  reorderSuggestion,
   ingredientName,
   eventName,
   onNeedAction,
@@ -113,6 +119,7 @@ export function PurchasingQueueSplit({
           <ul className="purchase-queue">
             {activeNeeds.map((need) => {
               const line = linkedLine(need);
+              const suggestion = reorderSuggestion(need);
               return (
                 <li key={need._id}>
                   {canSelectNeed(need) ? (
@@ -134,6 +141,22 @@ export function PurchasingQueueSplit({
                       {eventName(need.eventId)} · {need.requiredQuantity}{" "}
                       {need.unit}
                     </span>
+                    {suggestion && suggestion.suggestedQuantity > 0 ? (
+                      <small
+                        className="block text-ink-2"
+                        data-testid="reorder-suggestion"
+                        title={`Demand ${formatQty(suggestion.demand)} + par top-up ${formatQty(
+                          suggestion.parShortfall,
+                        )}${
+                          suggestion.bufferFraction > 0
+                            ? ` + ${Math.round(suggestion.bufferFraction * 100)}% variance buffer`
+                            : ""
+                        }`}
+                      >
+                        Suggest order: {formatQty(suggestion.suggestedQuantity)}{" "}
+                        {need.unit}
+                      </small>
+                    ) : null}
                   </div>
                   <StatusChip status={String(need.status)} />
                   <div className="supply-row-actions">

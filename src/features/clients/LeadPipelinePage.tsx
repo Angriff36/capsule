@@ -17,6 +17,7 @@ import { TableSkeleton } from "../../ui/primitives";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
+import { LeadSourceReport } from "./LeadSourceReport";
 import "./LeadPipelinePage.css";
 
 const STAGES = [
@@ -692,6 +693,8 @@ export function LeadPipelinePage() {
           );
         })}
       </section>
+
+      <LeadSourceReport leads={activeLeads} />
     </div>
   );
 }

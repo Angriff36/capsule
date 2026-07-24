@@ -64,6 +64,20 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
   property editionNumber: int? = 1
   property mergedIntoIngredientId: uuid?
 
+  // Nutrition per one `unit` of this ingredient. All optional so pre-field rows
+  // validate under Convex schema push; recipe/menu panels aggregate the values
+  // that are present and flag lines whose ingredient has none. Energy in kcal,
+  // macros + fiber + sugar in grams, sodium/calcium/iron in milligrams.
+  property caloriesPerUnit: decimal(10, 2)?
+  property proteinGramsPerUnit: decimal(10, 2)?
+  property carbsGramsPerUnit: decimal(10, 2)?
+  property fatGramsPerUnit: decimal(10, 2)?
+  property fiberGramsPerUnit: decimal(10, 2)?
+  property sugarGramsPerUnit: decimal(10, 2)?
+  property sodiumMgPerUnit: decimal(10, 2)?
+  property calciumMgPerUnit: decimal(10, 2)?
+  property ironMgPerUnit: decimal(10, 2)?
+
   hasMany recipeLines: RecipeIngredient
   hasMany stockLines: InventoryItem
   belongsTo canonicalIngredient: Ingredient fields [tenantId, canonicalIngredientId] references [tenantId, id]
@@ -161,6 +175,45 @@ entity Ingredient mixin TenantScoped, SoftDeletable {
       ingredientId: self.id
       tenantId: self.tenantId
       allergens: allergens
+    }
+  }
+
+  // Full nutrition panel per unit. The editor always sends every field, so an
+  // omitted param intentionally clears that value (null = "not recorded").
+  command setNutrition(
+    optional caloriesPerUnit: decimal(10, 2),
+    optional proteinGramsPerUnit: decimal(10, 2),
+    optional carbsGramsPerUnit: decimal(10, 2),
+    optional fatGramsPerUnit: decimal(10, 2),
+    optional fiberGramsPerUnit: decimal(10, 2),
+    optional sugarGramsPerUnit: decimal(10, 2),
+    optional sodiumMgPerUnit: decimal(10, 2),
+    optional calciumMgPerUnit: decimal(10, 2),
+    optional ironMgPerUnit: decimal(10, 2)
+  ) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint nutritionCaloriesNonnegative: caloriesPerUnit == null or caloriesPerUnit >= 0 "Calories cannot be negative"
+    constraint nutritionProteinNonnegative: proteinGramsPerUnit == null or proteinGramsPerUnit >= 0 "Protein cannot be negative"
+    constraint nutritionCarbsNonnegative: carbsGramsPerUnit == null or carbsGramsPerUnit >= 0 "Carbohydrates cannot be negative"
+    constraint nutritionFatNonnegative: fatGramsPerUnit == null or fatGramsPerUnit >= 0 "Fat cannot be negative"
+    constraint nutritionFiberNonnegative: fiberGramsPerUnit == null or fiberGramsPerUnit >= 0 "Fiber cannot be negative"
+    constraint nutritionSugarNonnegative: sugarGramsPerUnit == null or sugarGramsPerUnit >= 0 "Sugar cannot be negative"
+    constraint nutritionSodiumNonnegative: sodiumMgPerUnit == null or sodiumMgPerUnit >= 0 "Sodium cannot be negative"
+    constraint nutritionCalciumNonnegative: calciumMgPerUnit == null or calciumMgPerUnit >= 0 "Calcium cannot be negative"
+    constraint nutritionIronNonnegative: ironMgPerUnit == null or ironMgPerUnit >= 0 "Iron cannot be negative"
+    mutate caloriesPerUnit = caloriesPerUnit
+    mutate proteinGramsPerUnit = proteinGramsPerUnit
+    mutate carbsGramsPerUnit = carbsGramsPerUnit
+    mutate fatGramsPerUnit = fatGramsPerUnit
+    mutate fiberGramsPerUnit = fiberGramsPerUnit
+    mutate sugarGramsPerUnit = sugarGramsPerUnit
+    mutate sodiumMgPerUnit = sodiumMgPerUnit
+    mutate calciumMgPerUnit = calciumMgPerUnit
+    mutate ironMgPerUnit = ironMgPerUnit
+    emit IngredientNutritionSet {
+      ingredientId: self.id
+      tenantId: self.tenantId
     }
   }
 
@@ -286,6 +339,11 @@ event IngredientAllergensClassified: "ingredient.allergens_classified" {
   ingredientId: string
   tenantId: string
   allergens: list<AllergenCode>
+}
+
+event IngredientNutritionSet: "ingredient.nutrition_set" {
+  ingredientId: string
+  tenantId: string
 }
 
 event IngredientCostingUpdated: "ingredient.costing_updated" {

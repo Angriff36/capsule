@@ -9,6 +9,7 @@ import {
   useListIngredient,
   useListIngredientPriceObservation,
   useListMenuDish,
+  useListRecipe,
   useListRecipeIngredient,
   useMenuArchive,
   useMenuDishUpdateSellingPrice,
@@ -25,13 +26,21 @@ import { MenuDishManager } from "./MenuDishManager";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
 import { MenuProfitabilityPanel } from "./MenuProfitabilityPanel";
 import {
+  calculateRecipeNutrition,
+  sumPerGuestNutrition,
+  toNutritionIngredient,
+  type RecipeNutritionLineInput,
+} from "./RecipeNutrition";
+import { RecipeNutritionPanel } from "./RecipeNutritionPanel";
+import {
   allergenMatrixPath,
   kitchenCatalogPath,
   menuPath,
 } from "./kitchenRoutes";
 import { duplicateMenu } from "./menuTemplates";
 import { useTenantBranding } from "../admin/tenantBranding";
-import { downloadMenuPdf } from "./menuPdf";
+import { downloadMenuPdf, type MenuPdfLayout } from "./menuPdf";
+import { deriveAllergenRows } from "./AllergenMatrixPage";
 
 const policy = new CulinaryLifecyclePolicy();
 
@@ -43,6 +52,7 @@ export function MenuDetailPage() {
   const dishes = useListDish();
   const menuDishes = useListMenuDish();
   const dishRecipes = useListDishRecipe();
+  const recipes = useListRecipe();
   const recipeIngredients = useListRecipeIngredient();
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
@@ -57,6 +67,7 @@ export function MenuDetailPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [pdfLayout, setPdfLayout] = useState<MenuPdfLayout>("card");
   const selectedMenuDishes = useMemo(
     () =>
       (menuDishes ?? []).filter(
@@ -64,6 +75,20 @@ export function MenuDetailPage() {
       ),
     [id, menuDishes],
   );
+  const allergensByDish = useMemo(() => {
+    const rows = deriveAllergenRows({
+      dishIds: selectedMenuDishes.map((selection) => String(selection.dishId)),
+      dishes: dishes ?? [],
+      dishRecipes: dishRecipes ?? [],
+      recipeIngredients: recipeIngredients ?? [],
+      ingredients: ingredients ?? [],
+    });
+    const map = new Map<string, string[]>();
+    for (const { dish, sources } of rows) {
+      map.set(String(dish._id), [...sources.keys()]);
+    }
+    return map;
+  }, [selectedMenuDishes, dishes, dishRecipes, recipeIngredients, ingredients]);
   const profitability = useMemo(
     () =>
       buildMenuProfitability({
@@ -123,6 +148,65 @@ export function MenuDetailPage() {
     ingredients === undefined ||
     priceObservations === undefined;
 
+  // Per-guest nutrition = one portion of each recipe composing each dish on the
+  // menu. Operational estimate; it does not re-scale for dish-level recipe yields.
+  const menuNutrition = useMemo(() => {
+    const dishIds = new Set(
+      selectedMenuDishes.map((selection) => String(selection.dishId)),
+    );
+    const nutritionIngredients = (ingredients ?? [])
+      .filter((ingredient) => ingredient.deletedAt == null)
+      .map(toNutritionIngredient);
+    const linesByRecipe = new Map<string, RecipeNutritionLineInput[]>();
+    for (const line of recipeIngredients ?? []) {
+      if (line.deletedAt != null) continue;
+      const list = linesByRecipe.get(line.recipeId) ?? [];
+      list.push({
+        id: line._id,
+        ingredientId: line.ingredientId,
+        quantity: Number(line.quantity),
+        unit: line.unit,
+      });
+      linesByRecipe.set(line.recipeId, list);
+    }
+    const recipeById = new Map(
+      (recipes ?? []).map((recipe) => [recipe._id, recipe]),
+    );
+    const summaries = (dishRecipes ?? [])
+      .filter(
+        (attachment) =>
+          attachment.deletedAt == null &&
+          dishIds.has(String(attachment.dishId)),
+      )
+      .map((attachment) => {
+        const recipe = recipeById.get(attachment.recipeId);
+        return calculateRecipeNutrition({
+          lines: linesByRecipe.get(attachment.recipeId) ?? [],
+          ingredients: nutritionIngredients,
+          servesPerYield: Number(
+            (recipe as { servesPerYield?: number } | undefined)
+              ?.servesPerYield ?? 1,
+          ),
+        });
+      });
+    return sumPerGuestNutrition(summaries);
+  }, [
+    selectedMenuDishes,
+    dishRecipes,
+    recipes,
+    recipeIngredients,
+    ingredients,
+  ]);
+  const nutritionLoading =
+    dishRecipes === undefined ||
+    recipes === undefined ||
+    recipeIngredients === undefined ||
+    ingredients === undefined;
+  const menuNutritionNote =
+    menuNutrition.recipeCount === 0
+      ? "Add dishes with recipes to estimate per-guest nutrition."
+      : `Estimated across ${menuNutrition.recipeCount} recipe${menuNutrition.recipeCount === 1 ? "" : "s"} on this menu${menuNutrition.isComplete ? "" : ` (${menuNutrition.measuredRecipeCount} with recorded nutrition)`}.`;
+
   if (!id) return <ErrorState title="Menu not found" />;
   if (menu === undefined) {
     return (
@@ -179,6 +263,18 @@ export function MenuDetailPage() {
             <h1 className="culinary-title-compact">{menu.name}</h1>
           </div>
           <div className="flex flex-wrap gap-2">
+            <select
+              className="input"
+              aria-label="Menu PDF layout"
+              value={pdfLayout}
+              disabled={busy != null}
+              onChange={(event) =>
+                setPdfLayout(event.target.value as MenuPdfLayout)
+              }
+            >
+              <option value="card">Card layout</option>
+              <option value="buffet">Buffet list</option>
+            </select>
             <button
               type="button"
               className="btn btn-ghost"
@@ -190,9 +286,12 @@ export function MenuDetailPage() {
                 setNotice(null);
                 void downloadMenuPdf({
                   menu,
+                  layout: pdfLayout,
                   dishes: selectedMenuDishes.map((selection) => ({
                     selection,
                     dish: dishes?.find((dish) => dish._id === selection.dishId),
+                    allergens:
+                      allergensByDish.get(String(selection.dishId)) ?? [],
                   })),
                   branding,
                 })
@@ -354,6 +453,14 @@ export function MenuDetailPage() {
             setBusy(null);
           }
         }}
+      />
+
+      <RecipeNutritionPanel
+        heading="Per-guest nutrition"
+        portionLabel="per guest"
+        totals={menuNutrition.recipeCount > 0 ? menuNutrition.perGuest : null}
+        coverageNote={menuNutritionNote}
+        loading={nutritionLoading}
       />
     </article>
   );

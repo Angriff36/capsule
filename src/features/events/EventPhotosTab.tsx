@@ -3,21 +3,19 @@ import {
   RecordPhotoCapture,
 } from "../attachments/RecordPhotoCapture";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
+import { EventTabIntro } from "./EventTabIntro";
 
 type Props = {
-  eventId: string;
+  readonly eventId: string;
 };
 
 export function EventPhotosTab({ eventId }: Props) {
   return (
     <section className="space-y-4" data-testid="event-photos-tab">
-      <div>
-        <h2 className="font-display text-lg">Event photo gallery</h2>
-        <p className="text-[13px] text-ink-2">
-          Upload setup, food, service, and venue photos. Empty gallery starts
-          with the upload action below.
-        </p>
-      </div>
+      <EventTabIntro
+        title="Event photo gallery"
+        description="Upload setup, food, service, and venue photos. Empty gallery starts with the upload action below."
+      />
       <RecordPhotoCapture
         parentType="eventRecord"
         parentId={eventId}

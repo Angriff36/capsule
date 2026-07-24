@@ -71,7 +71,7 @@ export function TeamRolesPanel({
     const role = String(data.get("role") ?? "staff");
     const authSubjectId = String(data.get("authSubjectId") ?? "").trim();
     if (!givenName || !familyName || !email) {
-      setError("Given name, family name, and email are required.");
+      setError("First name, last name, and email are required.");
       return;
     }
     if (!PersonRoleDirectory.isAssignable(role)) {
@@ -157,11 +157,11 @@ export function TeamRolesPanel({
           onSubmit={(event) => void onHire(event)}
         >
           <label className="block text-[12px]">
-            <span className="meta-term">Given name</span>
+            <span className="meta-term">First name</span>
             <input name="givenName" className="input mt-1" required />
           </label>
           <label className="block text-[12px]">
-            <span className="meta-term">Family name</span>
+            <span className="meta-term">Last name</span>
             <input name="familyName" className="input mt-1" required />
           </label>
           <label className="block text-[12px]">

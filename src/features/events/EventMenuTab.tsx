@@ -15,6 +15,7 @@ import { dishPath, recipePath } from "../kitchen/kitchenRoutes";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
+import { RecipeStockSuggestions } from "./RecipeStockSuggestions";
 
 type Props = {
   eventId: string;
@@ -76,6 +77,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         </button>
       </div>
       {failure ? <FailureBanner failure={failure} /> : null}
+      <RecipeStockSuggestions />
       {showPicker ? (
         <CulinaryRecordPicker
           kind="dish"

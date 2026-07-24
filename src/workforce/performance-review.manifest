@@ -1,0 +1,84 @@
+// Capsule workforce — structured performance review entries per Person.
+// Rating dimensions (reliability, quality, teamwork), free-text notes, the
+// reviewer's identity, and a review date. Manager-only read visibility;
+// used as context for shift assignment and compensation decisions.
+
+use "../foundation/base.manifest"
+
+entity PerformanceReview mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required personId: uuid
+  property required reviewerId: uuid
+  property reviewDate: datetime?
+  property required reliabilityRating: int = 0
+  property required qualityRating: int = 0
+  property required teamworkRating: int = 0
+  property encrypted notes: string?
+  property recordedAt: datetime?
+
+  belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
+  belongsTo reviewer: Person fields [tenantId, reviewerId] references [tenantId, id]
+
+  // Ratings default to 0 on the draft; the strict 1..5 range is enforced by
+  // the record command. Once recorded, all three dimensions must be in range.
+  constraint reviewRatingsRange: self.recordedAt == null or (self.reliabilityRating >= 1 and self.reliabilityRating <= 5 and self.qualityRating >= 1 and self.qualityRating <= 5 and self.teamworkRating >= 1 and self.teamworkRating <= 5) "Recorded reviews require reliability, quality, and teamwork ratings between 1 and 5"
+
+  // Manager-only visibility: performance reviews inform shift assignment and
+  // compensation, so reads are gated to managers rather than all staff.
+  default policy performanceReviewRead read: roleAllows(user.role, "manageAccess") "Managers may read performance reviews"
+  default policy performanceReviewWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write performance reviews through commands"
+  default policy performanceReviewExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute performance review commands"
+
+  command record(
+    personId: uuid,
+    reviewerId: uuid,
+    reviewDate: datetime,
+    reliabilityRating: int,
+    qualityRating: int,
+    teamworkRating: int,
+    optional notes: string
+  ) {
+    guard self.recordedAt == null
+    guard self.deletedAt == null
+    guard self.person != null and self.person.status == "active"
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint recordReviewPersonMatch: personId == self.personId "Review person must match the selected staff member"
+    constraint recordReviewReliability: reliabilityRating >= 1 and reliabilityRating <= 5 "Reliability rating must be between 1 and 5"
+    constraint recordReviewQuality: qualityRating >= 1 and qualityRating <= 5 "Quality rating must be between 1 and 5"
+    constraint recordReviewTeamwork: teamworkRating >= 1 and teamworkRating <= 5 "Teamwork rating must be between 1 and 5"
+    mutate personId = personId
+    mutate reviewerId = reviewerId
+    mutate reviewDate = reviewDate
+    mutate reliabilityRating = reliabilityRating
+    mutate qualityRating = qualityRating
+    mutate teamworkRating = teamworkRating
+    mutate notes = notes
+    mutate recordedAt = now()
+    emit PerformanceReviewRecorded {
+      performanceReviewId: self.id
+      tenantId: self.tenantId
+      personId: personId
+      reviewerId: reviewerId
+      reviewDate: reviewDate
+      reliabilityRating: reliabilityRating
+      qualityRating: qualityRating
+      teamworkRating: teamworkRating
+    }
+  }
+
+  store PerformanceReview in durable
+}
+
+event PerformanceReviewRecorded: "performance_review.recorded" {
+  performanceReviewId: string
+  tenantId: string
+  personId: string
+  reviewerId: string
+  reviewDate: datetime
+  reliabilityRating: int
+  qualityRating: int
+  teamworkRating: int
+}

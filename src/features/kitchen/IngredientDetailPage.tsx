@@ -25,6 +25,7 @@ import { IngredientPriceTrendPanel } from "./IngredientPriceTrendPanel";
 import { VendorPriceComparisonPanel } from "./VendorPriceComparisonPanel";
 import { IngredientCostingEditor } from "./IngredientCostingEditor";
 import { IngredientDetailsEditor } from "./IngredientDetailsEditor";
+import { IngredientNutritionEditor } from "./IngredientNutritionEditor";
 import { IngredientSubstitutionEditor } from "./IngredientSubstitutionEditor";
 import { kitchenCatalogPath } from "./kitchenRoutes";
 
@@ -415,6 +416,12 @@ export function IngredientDetailPage() {
 
       <IngredientCostingEditor
         key={`costing:${ingredient._id}:${ingredient.version}`}
+        ingredient={ingredient}
+        onFailure={setFailure}
+      />
+
+      <IngredientNutritionEditor
+        key={`nutrition:${ingredient._id}:${ingredient.version}`}
         ingredient={ingredient}
         onFailure={setFailure}
       />

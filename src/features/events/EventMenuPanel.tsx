@@ -1,12 +1,23 @@
-import { useState, type FormEvent } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import {
   useCreateEventDish,
   useEventDishAdjustServings,
   useEventDishRemove,
   useEventDishSetHeadcountOverride,
   useListDish,
+  useListDishRecipe,
   useListEventDish,
+  useListIngredient,
+  useListRecipe,
+  useListRecipeIngredient,
 } from "../../lib/manifest-convex-react";
+import {
+  calculateRecipeNutrition,
+  sumPerGuestNutrition,
+  toNutritionIngredient,
+  type RecipeNutritionLineInput,
+} from "../kitchen/RecipeNutrition";
+import { RecipeNutritionPanel } from "../kitchen/RecipeNutritionPanel";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
@@ -22,6 +33,10 @@ type Props = {
 export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
   const dishes = useListDish();
   const eventDishes = useListEventDish();
+  const dishRecipes = useListDishRecipe();
+  const recipes = useListRecipe();
+  const recipeIngredients = useListRecipeIngredient();
+  const ingredients = useListIngredient();
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
   const setHeadcountOverride = useEventDishSetHeadcountOverride();
@@ -33,6 +48,68 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
   const selections = (eventDishes ?? []).filter(
     (item) => item.deletedAt == null && item.eventId === eventId,
   );
+
+  // Per-guest nutrition across the event's dishes → recipes. Operational
+  // estimate; it does not re-scale for dish-level recipe yields.
+  const eventNutrition = useMemo(() => {
+    const dishIds = new Set(
+      (eventDishes ?? [])
+        .filter((item) => item.deletedAt == null && item.eventId === eventId)
+        .map((item) => String(item.dishId)),
+    );
+    const nutritionIngredients = (ingredients ?? [])
+      .filter((ingredient) => ingredient.deletedAt == null)
+      .map(toNutritionIngredient);
+    const linesByRecipe = new Map<string, RecipeNutritionLineInput[]>();
+    for (const line of recipeIngredients ?? []) {
+      if (line.deletedAt != null) continue;
+      const list = linesByRecipe.get(line.recipeId) ?? [];
+      list.push({
+        id: line._id,
+        ingredientId: line.ingredientId,
+        quantity: Number(line.quantity),
+        unit: line.unit,
+      });
+      linesByRecipe.set(line.recipeId, list);
+    }
+    const recipeById = new Map(
+      (recipes ?? []).map((recipe) => [recipe._id, recipe]),
+    );
+    const summaries = (dishRecipes ?? [])
+      .filter(
+        (attachment) =>
+          attachment.deletedAt == null &&
+          dishIds.has(String(attachment.dishId)),
+      )
+      .map((attachment) => {
+        const recipe = recipeById.get(attachment.recipeId);
+        return calculateRecipeNutrition({
+          lines: linesByRecipe.get(attachment.recipeId) ?? [],
+          ingredients: nutritionIngredients,
+          servesPerYield: Number(
+            (recipe as { servesPerYield?: number } | undefined)
+              ?.servesPerYield ?? 1,
+          ),
+        });
+      });
+    return sumPerGuestNutrition(summaries);
+  }, [
+    eventDishes,
+    eventId,
+    dishRecipes,
+    recipes,
+    recipeIngredients,
+    ingredients,
+  ]);
+  const nutritionLoading =
+    dishRecipes === undefined ||
+    recipes === undefined ||
+    recipeIngredients === undefined ||
+    ingredients === undefined;
+  const eventNutritionNote =
+    eventNutrition.recipeCount === 0
+      ? "Add dishes with recipes to estimate per-guest nutrition."
+      : `Estimated across ${eventNutrition.recipeCount} recipe${eventNutrition.recipeCount === 1 ? "" : "s"} on this event${eventNutrition.isComplete ? "" : ` (${eventNutrition.measuredRecipeCount} with recorded nutrition)`}.`;
   const dishName = (dishId: string) =>
     dishes?.find((dish) => dish._id === dishId)?.name ?? "Unknown dish";
   const foodCostTotal = selections.reduce((total, item) => {
@@ -287,6 +364,14 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
           ))}
         </ul>
       )}
+
+      <RecipeNutritionPanel
+        heading="Per-guest nutrition"
+        portionLabel="per guest"
+        totals={eventNutrition.recipeCount > 0 ? eventNutrition.perGuest : null}
+        coverageNote={eventNutritionNote}
+        loading={nutritionLoading}
+      />
     </section>
   );
 }

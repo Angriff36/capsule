@@ -166,3 +166,278 @@ event VehicleOperationalStatusUpdated: "vehicle.operational_status_updated" {
   statusNote: string?
   statusChangedAt: datetime?
 }
+
+// Maintenance schedules track service either by elapsed time (oil interval in
+// days) or accrued mileage (service every N miles). The current odometer used
+// for mileage-based alerts is derived from the latest fuel or service reading.
+enum VehicleMaintenanceIntervalType {
+  time
+  mileage
+}
+
+// Immutable fuel + odometer reading, one per fill-up. Also the primary source
+// of the vehicle's current mileage for mileage-based service alerts.
+entity VehicleFuelLog mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required vehicleId: uuid
+  property required odometer: int = 0
+  property required fuelCost: money(12, 2) = 0
+  property filledAt: datetime?
+  property notes: string?
+  property loggedAt: datetime?
+
+  belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
+
+  constraint vehicleFuelComplete: self.loggedAt == null or (self.odometer >= 0 and self.fuelCost >= 0 and self.filledAt != null) "Fuel logs require a nonnegative odometer, nonnegative cost, and fill date"
+
+  default policy vehicleFuelRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read fuel logs"
+  default policy vehicleFuelWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may record fuel logs"
+  default policy vehicleFuelExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute fuel log commands"
+
+  command record(
+    vehicleId: uuid,
+    odometer: int,
+    fuelCost: money(12, 2),
+    filledAt: datetime,
+    optional notes: string
+  ) {
+    guard self.loggedAt == null
+    guard self.deletedAt == null
+    guard self.vehicle != null
+    constraint recordFuelVehicleMatch: vehicleId == self.vehicleId "Fuel log vehicle must match the selected vehicle"
+    constraint recordFuelOdometer: odometer >= 0 "Odometer reading cannot be negative"
+    constraint recordFuelCost: fuelCost >= 0 "Fuel cost cannot be negative"
+    constraint recordFuelTime: filledAt <= now() "Fuel fill time cannot be in the future"
+    mutate odometer = odometer
+    mutate fuelCost = fuelCost
+    mutate filledAt = filledAt
+    mutate notes = notes
+    mutate loggedAt = now()
+    emit VehicleFuelLogged {
+      fuelLogId: self.id
+      vehicleId: vehicleId
+      tenantId: self.tenantId
+      odometer: odometer
+      fuelCost: fuelCost
+      filledAt: filledAt
+    }
+  }
+
+  store VehicleFuelLog in durable
+}
+
+event VehicleFuelLogged: "vehicle.fuel_logged" {
+  fuelLogId: string
+  vehicleId: string
+  tenantId: string
+  odometer: int
+  fuelCost: money(12, 2)
+  filledAt: datetime
+}
+
+// Recurring service definition for one vehicle. Time-based schedules advance
+// nextDueAt from each service; mileage-based schedules advance nextDueMileage.
+// Backfilled older entries stay valid history without moving the live schedule
+// backwards (mirrors the EquipmentMaintenanceTask latest-service rule).
+entity VehicleMaintenanceSchedule mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required vehicleId: uuid
+  property required searchable taskName: string = ""
+  property required intervalType: VehicleMaintenanceIntervalType = "time"
+  property required intervalDays: int = 90
+  property required intervalMiles: int = 5000
+  property nextDueAt: datetime?
+  property nextDueMileage: int?
+  property lastServicedAt: datetime?
+  property lastServicedMileage: int?
+  property instructions: string?
+  property scheduledAt: datetime?
+
+  belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
+
+  constraint vehicleMaintenanceComplete: self.scheduledAt == null or (length(trim(self.taskName)) > 0 and ((self.intervalType == "time" and self.intervalDays > 0 and self.nextDueAt != null) or (self.intervalType == "mileage" and self.intervalMiles > 0 and self.nextDueMileage != null))) "Scheduled maintenance requires a task and a time or mileage interval with a due target"
+
+  default policy vehicleMaintenanceRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read vehicle maintenance"
+  default policy vehicleMaintenanceWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may update vehicle maintenance"
+  default policy vehicleMaintenanceExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute vehicle maintenance commands"
+
+  command schedule(
+    vehicleId: uuid,
+    taskName: string,
+    intervalType: VehicleMaintenanceIntervalType,
+    optional intervalDays: int,
+    optional intervalMiles: int,
+    optional nextDueAt: datetime,
+    optional nextDueMileage: int,
+    optional instructions: string
+  ) {
+    guard self.scheduledAt == null
+    guard self.deletedAt == null
+    guard self.vehicle != null
+    constraint scheduleMaintenanceVehicleMatch: vehicleId == self.vehicleId "Maintenance vehicle must match the selected vehicle"
+    constraint scheduleMaintenanceName: length(trim(taskName)) > 0 "Maintenance task is required"
+    constraint scheduleMaintenanceTarget: (intervalType == "time" and nextDueAt != null and (intervalDays == null or intervalDays > 0)) or (intervalType == "mileage" and nextDueMileage != null and (intervalMiles == null or intervalMiles > 0)) "Time schedules need a first due date; mileage schedules need a due odometer"
+    mutate taskName = taskName
+    mutate intervalType = intervalType
+    mutate intervalDays = intervalDays != null ? intervalDays : 90
+    mutate intervalMiles = intervalMiles != null ? intervalMiles : 5000
+    mutate nextDueAt = nextDueAt
+    mutate nextDueMileage = nextDueMileage
+    mutate instructions = instructions
+    mutate scheduledAt = now()
+    emit VehicleMaintenanceScheduled {
+      maintenanceScheduleId: self.id
+      vehicleId: vehicleId
+      tenantId: self.tenantId
+      taskName: taskName
+      intervalType: intervalType
+      nextDueAt: nextDueAt
+      nextDueMileage: nextDueMileage
+    }
+  }
+
+  command applyService(
+    completedAt: datetime,
+    odometer: int,
+    optional nextDueAt: datetime,
+    optional nextDueMileage: int
+  ) {
+    guard self.scheduledAt != null
+    guard self.deletedAt == null
+    compute isLatestService = self.lastServicedAt == null or completedAt >= self.lastServicedAt
+    mutate lastServicedAt = isLatestService ? completedAt : self.lastServicedAt
+    mutate lastServicedMileage = isLatestService ? odometer : self.lastServicedMileage
+    mutate nextDueAt = isLatestService ? nextDueAt : self.nextDueAt
+    mutate nextDueMileage = isLatestService ? nextDueMileage : self.nextDueMileage
+    emit VehicleMaintenanceAdvanced {
+      maintenanceScheduleId: self.id
+      vehicleId: self.vehicleId
+      tenantId: self.tenantId
+      completedAt: completedAt
+      nextDueAt: isLatestService ? nextDueAt : self.nextDueAt
+      nextDueMileage: isLatestService ? nextDueMileage : self.nextDueMileage
+    }
+  }
+
+  store VehicleMaintenanceSchedule in durable
+}
+
+event VehicleMaintenanceScheduled: "vehicle.maintenance_scheduled" {
+  maintenanceScheduleId: string
+  vehicleId: string
+  tenantId: string
+  taskName: string
+  intervalType: VehicleMaintenanceIntervalType
+  nextDueAt: datetime?
+  nextDueMileage: int?
+}
+
+event VehicleMaintenanceAdvanced: "vehicle.maintenance_advanced" {
+  maintenanceScheduleId: string
+  vehicleId: string
+  tenantId: string
+  completedAt: datetime
+  nextDueAt: datetime?
+  nextDueMileage: int?
+}
+
+// Immutable service completion record. Recording a service advances the linked
+// schedule in the same generated transaction via the reaction below.
+entity VehicleServiceEntry mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required maintenanceScheduleId: uuid
+  property indexed required vehicleId: uuid
+  property required vendor: string = ""
+  property required cost: money(12, 2) = 0
+  property required odometer: int = 0
+  property notes: string?
+  property completedAt: datetime?
+  property nextDueAt: datetime?
+  property nextDueMileage: int?
+  property loggedAt: datetime?
+
+  belongsTo maintenanceSchedule: VehicleMaintenanceSchedule fields [tenantId, maintenanceScheduleId] references [tenantId, id]
+  belongsTo vehicle: Vehicle fields [tenantId, vehicleId] references [tenantId, id]
+
+  constraint vehicleServiceComplete: self.loggedAt == null or (length(trim(self.vendor)) > 0 and self.cost >= 0 and self.odometer >= 0 and self.completedAt != null) "Completed service requires a vendor, nonnegative cost, odometer reading, and completion time"
+
+  default policy vehicleServiceRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read vehicle service history"
+  default policy vehicleServiceWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may record vehicle service"
+  default policy vehicleServiceExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute vehicle service commands"
+
+  command record(
+    maintenanceScheduleId: uuid,
+    vehicleId: uuid,
+    vendor: string,
+    cost: money(12, 2),
+    odometer: int,
+    completedAt: datetime,
+    optional nextDueAt: datetime,
+    optional nextDueMileage: int,
+    optional notes: string
+  ) {
+    guard self.loggedAt == null
+    guard self.deletedAt == null
+    guard self.maintenanceSchedule != null
+    guard self.vehicle != null
+    constraint recordServiceScheduleMatch: maintenanceScheduleId == self.maintenanceScheduleId "Service entry must match the selected maintenance schedule"
+    constraint recordServiceVehicleMatch: vehicleId == self.vehicleId and self.maintenanceSchedule.vehicleId == vehicleId "Service entry vehicle must match its maintenance schedule"
+    constraint recordServiceVendor: length(trim(vendor)) > 0 "Vendor is required"
+    constraint recordServiceCost: cost >= 0 "Service cost cannot be negative"
+    constraint recordServiceOdometer: odometer >= 0 "Odometer reading cannot be negative"
+    constraint recordServiceTime: completedAt <= now() "Service completion cannot be in the future"
+    mutate vendor = vendor
+    mutate cost = cost
+    mutate odometer = odometer
+    mutate completedAt = completedAt
+    mutate nextDueAt = nextDueAt
+    mutate nextDueMileage = nextDueMileage
+    mutate notes = notes
+    mutate loggedAt = now()
+    emit VehicleServiceRecorded {
+      serviceEntryId: self.id
+      maintenanceScheduleId: maintenanceScheduleId
+      vehicleId: vehicleId
+      tenantId: self.tenantId
+      vendor: vendor
+      cost: cost
+      odometer: odometer
+      completedAt: completedAt
+      nextDueAt: nextDueAt
+      nextDueMileage: nextDueMileage
+    }
+  }
+
+  store VehicleServiceEntry in durable
+}
+
+event VehicleServiceRecorded: "vehicle.service_recorded" {
+  serviceEntryId: string
+  maintenanceScheduleId: string
+  vehicleId: string
+  tenantId: string
+  vendor: string
+  cost: money(12, 2)
+  odometer: int
+  completedAt: datetime
+  nextDueAt: datetime?
+  nextDueMileage: int?
+}
+
+on VehicleServiceRecorded run VehicleMaintenanceSchedule.applyService
+  resolve payload.maintenanceScheduleId
+  params {
+    completedAt: payload.completedAt
+    odometer: payload.odometer
+    nextDueAt: payload.nextDueAt
+    nextDueMileage: payload.nextDueMileage
+  }

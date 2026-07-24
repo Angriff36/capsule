@@ -19,7 +19,7 @@ type Props = {
   readonly eventId: Id<"events">;
 };
 
-/** Staff discussion thread on the event Timeline tab. */
+/** Event-wide staff discussion (Overview). Block questions live on Timeline. */
 export function EventTimelineCommentsPanel({ eventId }: Props) {
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const comments = useListEventTimelineComment();
@@ -33,7 +33,12 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
   const eventComments = useMemo(
     () =>
       (comments ?? [])
-        .filter((row) => row.deletedAt == null && row.eventId === eventId)
+        .filter(
+          (row) =>
+            row.deletedAt == null &&
+            row.eventId === eventId &&
+            (row.activityId == null || row.activityId === ""),
+        )
         .sort((a, b) => Number(b.postedAt ?? 0) - Number(a.postedAt ?? 0)),
     [comments, eventId],
   );
@@ -64,8 +69,8 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
     <EventTabPanel
       eyebrow="Staff discussion"
       title="Comments"
-      description="Notes from the crew while planning the day."
-      testId="event-timeline-comments"
+      description="Day-level notes from the crew. Questions about a specific run-sheet block live on the Timeline tab."
+      testId="event-overview-comments"
     >
       {failure ? <FailureBanner failure={failure} /> : null}
       {me == null ? (

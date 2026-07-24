@@ -71,6 +71,10 @@ entity Person mixin TenantScoped, SoftDeletable {
   property required status: PersonStatus = "active"
   property hireDate: datetime?
   property terminationDate: datetime?
+  // Opt-in for high-urgency SMS alerts (delivery dispatched, event T-2h,
+  // critical allergen incident). Nullable so pre-existing rows pass Convex
+  // schema validation; treated as false when unset.
+  property smsAlertsOptIn: boolean?
 
   computed displayName: string = self.givenName + " " + self.familyName
   computed isAssignable: boolean = self.status == "active" and self.deletedAt == null
@@ -79,7 +83,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   // create/bootstrap seeds (empty defaults) and field-by-field mutates during
   // hire are not blocked mid-command (runtime validates each mutate patch).
   // Keep expression on one line — multiline parenthesized or-constraints fail parse.
-  constraint identityComplete: self.hireDate == null or (length(trim(self.givenName)) > 0 and length(trim(self.familyName)) > 0 and length(trim(self.email)) > 0) "Hired people require given name, family name, and email"
+  constraint identityComplete: self.hireDate == null or (length(trim(self.givenName)) > 0 and length(trim(self.familyName)) > 0 and length(trim(self.email)) > 0) "Hired people require first name, last name, and email"
 
   transition status from "active" to ["inactive", "terminated"]
   transition status from "inactive" to ["active", "terminated"]
@@ -100,8 +104,8 @@ entity Person mixin TenantScoped, SoftDeletable {
     optional authSubjectId: string
   ) {
     guard self.deletedAt == null
-    constraint hireGiven: length(trim(givenName)) > 0 "Given name is required"
-    constraint hireFamily: length(trim(familyName)) > 0 "Family name is required"
+    constraint hireGiven: length(trim(givenName)) > 0 "First name is required"
+    constraint hireFamily: length(trim(familyName)) > 0 "Last name is required"
     constraint hireEmail: length(trim(email)) > 0 "Email is required"
     mutate givenName = givenName
     mutate familyName = familyName
@@ -129,8 +133,8 @@ entity Person mixin TenantScoped, SoftDeletable {
   ) {
     guard self.status == "active"
     guard self.deletedAt == null
-    constraint correctGiven: length(trim(givenName)) > 0 "Given name is required"
-    constraint correctFamily: length(trim(familyName)) > 0 "Family name is required"
+    constraint correctGiven: length(trim(givenName)) > 0 "First name is required"
+    constraint correctFamily: length(trim(familyName)) > 0 "Last name is required"
     mutate givenName = givenName
     mutate familyName = familyName
     mutate phone = phone
@@ -139,6 +143,19 @@ entity Person mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       givenName: givenName
       familyName: familyName
+    }
+  }
+
+  // Set the high-urgency SMS alert opt-in. Uses the default workforce write
+  // policy (managers manage staff contact preferences); recording consent is
+  // a low-stakes preference edit, not a role/identity change.
+  command setSmsAlerts(optIn: boolean) {
+    guard self.deletedAt == null
+    mutate smsAlertsOptIn = optIn
+    emit PersonSmsAlertsChanged {
+      personId: self.id
+      tenantId: self.tenantId
+      optIn: optIn
     }
   }
 
@@ -210,6 +227,12 @@ event PersonRoleAssigned: "person.role_assigned" {
   personId: string
   tenantId: string
   role: string
+}
+
+event PersonSmsAlertsChanged: "person.sms_alerts_changed" {
+  personId: string
+  tenantId: string
+  optIn: boolean
 }
 
 event PersonDeactivated: "person.deactivated" {

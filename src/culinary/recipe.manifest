@@ -410,6 +410,61 @@ entity RecipeStep mixin TenantScoped, SoftDeletable {
   store RecipeStep in durable
 }
 
+// Recipe version history — an immutable snapshot of the full recipe (scalar
+// fields + ingredient lines) captured each time the recipe is modified. Gives
+// an ordered changelog with author + timestamp; the UI diffs two snapshots and
+// restores a prior one through the existing Recipe / RecipeIngredient commands.
+entity RecipeSnapshot mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required recipeId: uuid
+  property required versionNumber: int = 1
+  property required capturedByName: string = ""
+  // Stamped from trusted auth context on capture; never accepted from browser.
+  property capturedByAuthSubjectId: string?
+  property required changeSummary: string = ""
+  // JSON blob of the full recipe at capture time: name, category, cuisine,
+  // description, instructions, yields, batchMultiplier, servesPerYield, lines.
+  property required snapshot: string = "{}"
+  property capturedAt: datetime?
+
+  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+
+  default policy recipeSnapshotRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read recipe version history"
+  default policy recipeSnapshotWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write recipe snapshots through commands"
+  default policy recipeSnapshotExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute recipe snapshot commands"
+
+  command capture(
+    recipeId: uuid,
+    versionNumber: int,
+    capturedByName: string,
+    changeSummary: string,
+    snapshot: string
+  ) {
+    guard self.capturedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint captureSnapshotPayload: length(trim(snapshot)) > 0 "Snapshot payload is required"
+    mutate recipeId = recipeId
+    mutate versionNumber = versionNumber
+    mutate capturedByName = capturedByName
+    mutate capturedByAuthSubjectId = user.id
+    mutate changeSummary = changeSummary
+    mutate snapshot = snapshot
+    mutate capturedAt = now()
+    emit RecipeSnapshotCaptured {
+      snapshotId: self.id
+      tenantId: self.tenantId
+      recipeId: recipeId
+      versionNumber: versionNumber
+    }
+  }
+
+  store RecipeSnapshot in durable
+}
+
 event RecipeDrafted: "recipe.drafted" {
   recipeId: string
   tenantId: string
@@ -525,4 +580,11 @@ event RecipeStepRemoved: "recipe_step.removed" {
   tenantId: string
   recipeId: string
   reason: string
+}
+
+event RecipeSnapshotCaptured: "recipe_snapshot.captured" {
+  snapshotId: string
+  tenantId: string
+  recipeId: string
+  versionNumber: number
 }

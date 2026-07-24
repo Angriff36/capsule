@@ -39,6 +39,7 @@ import {
   shiftsInScheduleWeek,
   startOfScheduleWeek,
 } from "./weeklySchedule";
+import { SmsAlertOptInSection } from "./SmsAlertOptInSection";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -657,6 +658,8 @@ export function RosterPage() {
       ) : null}
 
       <AvailabilityGridSection people={activePeople} />
+
+      <SmsAlertOptInSection people={activePeople} />
 
       <section className="working-ledger">
         <div className="ledger-heading">
