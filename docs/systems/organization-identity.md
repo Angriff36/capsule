@@ -36,7 +36,7 @@ Organization lifecycle actions and role assignment are high-consequence administ
 
 ## Current status
 
-Generated queries, mutations, schema, and client capabilities exist. No authored Organization/Person workspace or routes exist. Clerk/AuthGate is shipping separately.
+Generated queries, mutations, schema, and client capabilities exist. Person hire and Capsule role assignment ship on **Admin → Permissions** (`/admin`) via `TeamRolesPanel` (`Person.hire` / `useCreatePerson`, plus `Person.assignRole`). Hire is admin/owner gated in that UI. A full Organization folio and broader Person lifecycle UI (correct identity, deactivate/reactivate/terminate) are not authored yet. Clerk/AuthGate is shipping separately.
 
 ## References
 

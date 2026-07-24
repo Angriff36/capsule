@@ -6,29 +6,29 @@ Current generated boundary: **43 governed business entities**, **219 command cap
 
 ## Operator systems
 
-| System owner                  | Governed entities                                                                   | Workspace / route family                | UI status                                                          |
-| ----------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------ |
-| Organization & identity       | Organization, Person                                                                | Organization/team settings              | Generated; no authored workspace                                   |
-| [Events](events.md)           | Client, Venue, Event, EventGuest                                                    | `/events`, `/events/new`, `/events/:id` | Verified planning foundation: create, revisions, lifecycle, guests |
-| [Culinary](culinary.md)       | Ingredient, Recipe, RecipeIngredient, Dish, Menu, EventDish                         | `/kitchen`                              | Shipping catalogs, recipe detail, menus, and event dish selection  |
-| [Inventory](inventory.md)     | StorageLocation, InventoryItem, InventoryReservation, IngredientDemand, WasteRecord | `/inventory`                            | Shipping demand and stock ledgers; reaction limits remain explicit |
-| [Procurement](procurement.md) | Vendor, VendorOrder, VendorOrderLine, PurchaseNeed                                  | Inventory purchasing subworkspace       | Shipping queue and order folio; reaction limits remain explicit    |
-| Production & quality          | PrepTask, ProductionBatch, QualityCheck, Incident, EventAllergenCheck               | `/kitchen/prep`                         | Shipping prep board + quality fail→block proof                     |
-| Workforce                     | EventAssignment, Shift, ShiftType, AvailabilityWindow, TimeRecord, Qualification, TrainingModule, TrainingCompletion | `/staff`, `/staff/training` | Shipping roster, time, qualifications, training + shift gates |
-| [Logistics](logistics.md)     | PackList, PackListItem, Delivery                                                    | `/logistics`                            | Shipping pack lists, load sheet, deliveries + lifecycle proof      |
-| Commercial & billing          | ClientContact, Proposal, Contract, Invoice, Payment, PaymentMethod                  | `/clients`, `/finance`                  | Slice 7 shipped; OD035/OD038 automation deferred                   |
-| Closeout & reporting          | EventCloseout, PayrollInput, SavedReportDefinition                                  | `/finance/closeout`, `/finance/payroll`, `/reports` | Closeout + payroll + report library shipped; chart render deferred |
+| System owner                  | Governed entities                                                                                                    | Workspace / route family                            | UI status                                                          |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------ |
+| Organization & identity       | Organization, Person                                                                                                 | `/admin` (Permissions → Team roles)                 | Shipping hire + role assign; Organization folio incomplete         |
+| [Events](events.md)           | Client, Venue, Event, EventGuest                                                                                     | `/events`, `/events/new`, `/events/:id`             | Verified planning foundation: create, revisions, lifecycle, guests |
+| [Culinary](culinary.md)       | Ingredient, Recipe, RecipeIngredient, Dish, Menu, EventDish                                                          | `/kitchen`                                          | Shipping catalogs, recipe detail, menus, and event dish selection  |
+| [Inventory](inventory.md)     | StorageLocation, InventoryItem, InventoryReservation, IngredientDemand, WasteRecord                                  | `/inventory`                                        | Shipping demand and stock ledgers; reaction limits remain explicit |
+| [Procurement](procurement.md) | Vendor, VendorOrder, VendorOrderLine, PurchaseNeed                                                                   | Inventory purchasing subworkspace                   | Shipping queue and order folio; reaction limits remain explicit    |
+| Production & quality          | PrepTask, ProductionBatch, QualityCheck, Incident, EventAllergenCheck                                                | `/kitchen/prep`                                     | Shipping prep board + quality fail→block proof                     |
+| Workforce                     | EventAssignment, Shift, ShiftType, AvailabilityWindow, TimeRecord, Qualification, TrainingModule, TrainingCompletion | `/staff`, `/staff/training`                         | Shipping roster, time, qualifications, training + shift gates      |
+| [Logistics](logistics.md)     | PackList, PackListItem, Delivery                                                                                     | `/logistics`                                        | Shipping pack lists, load sheet, deliveries + lifecycle proof      |
+| Commercial & billing          | ClientContact, Proposal, Contract, Invoice, Payment, PaymentMethod                                                   | `/clients`, `/finance`                              | Slice 7 shipped; OD035/OD038 automation deferred                   |
+| Closeout & reporting          | EventCloseout, PayrollInput, SavedReportDefinition                                                                   | `/finance/closeout`, `/finance/payroll`, `/reports` | Closeout + payroll + report library shipped; chart render deferred |
 
 `TenantScoped` and `SoftDeletable` are source mixins, not operator systems or standalone workspaces.
 
 ## Platform systems
 
-| System owner                                             | Scope                                                        | Status                                                                 |
-| -------------------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| [Authentication](auth.md)                                | Clerk session, membership, trusted Convex auth context       | Shipping                                                               |
-| [Navigation shell](navigation-shell.md)                  | Shell, command palette, route catalog, Home service desk     | Shipping; Home is role-shaped attention over queryable facts           |
-| [Manifest generation](../generation/manifest-builder.md) | Assembly and generated/authored boundary                     | Shipping                                                               |
-| Projection status                                        | Current generated capability and blockers                    | Not a public completion authority until its evidence page is published |
+| System owner                                             | Scope                                                    | Status                                                                 |
+| -------------------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------- |
+| [Authentication](auth.md)                                | Clerk session, membership, trusted Convex auth context   | Shipping                                                               |
+| [Navigation shell](navigation-shell.md)                  | Shell, command palette, route catalog, Home service desk | Shipping; Home is role-shaped attention over queryable facts           |
+| [Manifest generation](../generation/manifest-builder.md) | Assembly and generated/authored boundary                 | Shipping                                                               |
+| Projection status                                        | Current generated capability and blockers                | Not a public completion authority until its evidence page is published |
 
 ## Information architecture
 

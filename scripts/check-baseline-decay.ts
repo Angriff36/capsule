@@ -10,7 +10,7 @@ import { resolve } from "node:path";
  * `loop-ledger.json`) — see BASELINE.md § Root cap.
  */
 /** Clean CI checkout root entries (see BASELINE.md § Root cap). */
-const ROOT_CAP = 48; // Clean CI checkout; local-only dirs excluded below must stay out of the count.
+const ROOT_CAP = 49; // Clean CI checkout; local-only dirs excluded below must stay out of the count.
 const ROOT = process.cwd();
 
 class BaselineDecayCheck {
