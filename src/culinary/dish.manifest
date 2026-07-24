@@ -379,6 +379,10 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   property activeAt: datetime?
   property retiredAt: datetime?
   property retirementReason: string?
+  // Optional legacy fields observed on older live docs. Keeping them in schema
+  // so DishTask.retire patches do not fail Convex validation.
+  property yieldQuantity: decimal(10, 2)?
+  property batchMultiplier: decimal(10, 4)?
 
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
