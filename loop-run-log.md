@@ -180,3 +180,4 @@ Append one entry per run. Prune entries older than 30 days.
 {"run_id":"2026-07-24T03:15:42Z","pattern":"cursor-loop","source":"cursor-loop","duration_s":1200,"items_attempted":1,"actions_taken":1,"tokens_estimate":250000,"outcome":"fix-proposed","details":"PR #107 Fixes #55 EventDish.restore + WasteRecord.unvoid + Undo toast. composer-2.5-fast APPROVE. CI green. Closed #55."}
 {"run_id":"2026-07-24T03:21:20Z","pattern":"cursor-loop","source":"human-stop","outcome":"no-op","details":"loop-pause-all set; rearm sleepers cleared"}
 {"run_id":"2026-07-25T00:00:39Z","pattern":"product-loop","source":"product-loop","outcome":"no-op","details":"loop-pause-all in STATE.md — exiting immediately"}
+{"run_id":"2026-07-25T02:01:00Z","pattern":"product-loop","source":"product-loop","outcome":"PAUSED","details":"loop-pause-all in STATE.md — human requested stop 2026-07-24T03:21:00Z. Exiting immediately per iteration contract §1"}

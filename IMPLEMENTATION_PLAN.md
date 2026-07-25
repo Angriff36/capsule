@@ -1,13 +1,35 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (Self-Service Quote Builder DONE)
+**Updated:** 2026-07-25 (Venue Depth Discovered MORE COMPLETE — Slice 3 55%, onPremise/VenueNote/Logistics DONE)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-25 — Venue Depth Features Discovered MORE COMPLETE Than Expected:**
+
+**Status: ✅ Slice 3 (Venue/Reporting) now 55% complete (up from 45%)**
+
+**Discovered Already Implemented (plan incorrectly listed as missing):**
+- ✅ onPremise field exists at event.manifest:324 with full UI wiring (create/edit forms, read-only display added)
+- ✅ VenueNote entity (venue-note.manifest, 142 lines) with full VenueNotesPanel.tsx UI (268 lines)
+- ✅ Logistics fields: kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes (6 of 12 required fields)
+
+**Implemented Today:**
+- Added VenueNote_createViaPost to governed-creation-mappings.test.ts
+- Added premise type display (On/Off-Premise) to VenueDetailPage.tsx read-only view
+- Added logistics features section to VenueDetailPage.tsx read-only view
+- All 721 tests passing
+
+**Updated Priority Recommendations:**
+- Priority 17 venue work (onPremise, venueNotes, logistics) — DONE
+- Recommended next: Priority 28 (Reporting Foundation + Render Engine) for executive dashboards
+- Remaining venue work: Vendor Ecosystem (23), Layout Templates (21), additional logistics fields
+
+**Previous Update:**
 
 **2026-07-25 — Payment Reconciliation Fields DONE (Priority 15):**
 
@@ -2637,5 +2659,10 @@ The codebase includes several production-grade enhancements not explicitly in th
 4. ~~Priority 26: Hiring Pipeline~~ ✅ DONE — Full Candidate (318 lines) + Interview (258 lines) manifests, CandidatesPage + InterviewsPage UI, all routing wired
 5. ~~Priority 14: Self-Service Quote Builder~~ ✅ DONE — Full manifest, UI, routing, submitQuote action at /quote, 716 tests passing
 6. ~~Priority 15: Payment Reconciliation~~ ✅ DONE - Payment entity has reconciliation fields, commands for match/verify/dispute workflow, generated hooks available
-7. Priority 17: Venue Profile Full Depth (Large, high value but extensive work)
-8. Priority 28: Reporting Foundation + Render Engine (Large, enables all dashboards but less immediately valuable than basic filters)
+7. ~~Priority 17 venue features (onPremise, venueNotes, logistics fields)~~ ✅ DONE — Discovered already implemented, Slice 3 now 55% complete (up from 45%)
+8. **Priority 28: Reporting Foundation + Render Engine** (Large, High Impact) — **RECOMMENDED NEXT**
+   - Unblocks all 7 executive dashboards (35-41)
+   - Leadership visibility (Tim's KPIs, Sales Dashboard, Company Scorecard, L10, Comp Master)
+   - Higher business value than completing remaining venue depth
+9. Priority 21: Venue Layout Templates (Medium) — Reusable layouts reduce setup time
+10. Priority 23: Vendor Ecosystem (Medium) — Vendor coordination, approved vendor lists
