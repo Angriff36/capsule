@@ -1,13 +1,37 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-24 (Complete Gap Analysis Update)
+**Updated:** 2026-07-25 (Occasion + ReferralSource Entities Complete)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-25 — Foundation Entities Complete (Occasion + ReferralSource):**
+
+**Entities Implemented:**
+- ✅ Occasion entity at `src/operations/occasion.manifest` with TPP enum values (Wedding, Corporate Gala, etc.)
+- ✅ ReferralSource entity at `src/sales/referral-source.manifest` with common sources (Website, Referral, Phone, etc.)
+- ✅ Event.occasionId relation added (replaces free-text eventType)
+- ✅ Lead.referralSourceId relation added (alongside existing source field for flexibility)
+
+**UI Updates:**
+- ✅ EventCreatePage dropdown for Occasion selection (filtered to active, sorted by sortOrder)
+- ✅ LeadPipelinePage dropdown for ReferralSource selection (filtered to active, sorted by sortOrder)
+- ✅ EventPlanEngagementFormMapper updated to handle occasionId instead of eventType
+
+**Verification:**
+- All 662 tests passing
+- TypeScript typecheck passing
+- Schema regenerated with new entities and relations
+- Follows proven ServiceStyle pattern
+
+**Impact:**
+- Slice 0 Foundation: Now 3 of 8 critical entities DONE (ServiceStyle ✅, Occasion ✅, ReferralSource ✅)
+- Unblocks: Event categorization for reporting, lead source attribution for marketing ROI
+- Remaining foundation blockers: Sales Lock pipeline (Priority 3), Event Status pipeline (Priority 6)
 
 **2026-07-24 — Complete Gap Analysis Integration:**
 
@@ -17,12 +41,12 @@
 - All 46 entities, 62 features, 6 integrations, 8 dashboards verified against codebase
 
 **Entity Status Mapped:**
-- 23 entities confirmed DONE (Contact, Company, Inquiry, Deal, Event, Staff, PrepList, PrepTask, Menu Items, Recipes, Ingredients, Inventory, Stock Movement, Waste, Event Food Cost, Proposal Sections, Proposal Line Items, Staff Shift, Role, Salesperson)
+- 26 entities confirmed DONE (Contact, Company, Inquiry, Deal, Event, Staff, PrepList, PrepTask, Menu Items, Recipes, Ingredients, Inventory, Stock Movement, Waste, Event Food Cost, Proposal Sections, Proposal Line Items, Staff Shift, Role, Salesperson, **ServiceStyle**, **Occasion**, **ReferralSource**)
 - 8 entities PARTIAL (Event Status, Venue, Proposal, Share Link, Equipment Item, PackListItem, Equipment PackList, Event Layout, Performance Feedback, Integration Connection)
-- 15 entities NOT BUILT (Service Style, Occasion, Referral Source, Proposal Revision, Proposal Timeline Item, Proposal Enhancement, Signature/Acceptance Request, Venue Note, Venue Layout Template, Venue Vendor Relationship, Revenue Attribution, Role Scorecard, Candidate/Application, Interview, One-on-One, External Record Link, Import/Sync Run, Sync Error, Payment/Reconciliation Record, Message Thread, Message)
+- 12 entities NOT BUILT (Proposal Revision, Proposal Timeline Item, Proposal Enhancement, Signature/Acceptance Request, Venue Note, Venue Layout Template, Venue Vendor Relationship, Revenue Attribution, Role Scorecard, Candidate/Application, Interview, One-on-One, External Record Link, Import/Sync Run, Sync Error, Payment/Reconciliation Record, Message Thread, Message)
 
 **Feature Gap Analysis:**
-- Slice 0: 50% complete (Event detail ✅, PackList separation ✅, ServiceStyle ❌, Sales Lock ❌)
+- Slice 0: 69% complete (Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ❌)
 - Slice 1: 45% complete (Proposal lifecycle ✅, quote builder ❌, revisions ❌, templates ❌, acceptance ❌)
 - Slice 2: 0% complete (No import framework)
 - Slice 3: 30% complete (Venue basic ✅, management UI ❌, 7 dashboards ❌, revenue attribution ❌)
@@ -48,14 +72,14 @@
 
 | Slice | Status | Blockers | Completeness | Strongest Areas | Critical Gaps |
 |-------|--------|----------|--------------|-----------------|---------------|
-| **Slice 0** | 🟡 Partial | 1 | 65% | Event detail ✅, PackList separation ✅, ServiceStyle ✅ | Sales Lock pipeline ❌ |
+| **Slice 0** | 🟡 Partial | 1 | 69% | Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅ | Sales Lock pipeline ❌ |
 | **Slice 1** | 🟡 Partial | 3 | 45% | Proposal lifecycle ✅, menu selection ✅ | Quote builder ❌, revisions ❌, templates ❌, acceptance ❌ |
 | **Slice 2** | ❌ Not Built | 2 | 0% | — | Import framework ❌, datasets ❌, dashboard ❌, cutover ❌ |
 | **Slice 3** | 🟡 Partial | 2 | 30% | Venue entity basic ✅, saved report config ✅ | Venue management UI ❌, 7 dashboards ❌, revenue attribution ❌ |
 | **Slice 4** | ✅ Strong | 1 | 85% | Kitchen ✅, inventory ✅, staffing ✅, equipment ✅ | HR features ❌ (scorecards, hiring, 1-on-1s) |
 | **Slice 5** | 🟡 Partial | 2 | 60% | QuickBooks ✅, Calendar ✅, SMS ✅, Webhooks ✅ | Nowsta ❌, Social DMs ❌, Email threading ❌ |
 
-**Overall Assessment:** Slice 4 (Operations) is production-ready. Slice 0 critical path (ServiceStyle entity + Sales Lock pipeline) blocks 17+ dependent features across all slices. Slice 2 is entirely greenfield — zero import framework exists; prerequisite for TPP migration. Slice 3 has Venue entity but lacks all 7 executive dashboards, revenue attribution logic, and render engine. Slice 1: Quote builder NOT BUILT (client portal read-only); proposal system has full command surface but missing revisions snapshot, template system, digital acceptance, and timeline/logistics PDF sections.
+**Overall Assessment:** Slice 4 (Operations) is production-ready. Slice 0 foundation now 69% complete with ServiceStyle, Occasion, and ReferralSource entities DONE. Sales Lock pipeline remains the critical blocker (Priority 3). Slice 2 is entirely greenfield — zero import framework exists; prerequisite for TPP migration. Slice 3 has Venue entity but lacks all 7 executive dashboards, revenue attribution logic, and render engine. Slice 1: Quote builder NOT BUILT (client portal read-only); proposal system has full command surface but missing revisions snapshot, template system, digital acceptance, and timeline/logistics PDF sections.
 
 ---
 
@@ -118,15 +142,15 @@
 |--------|--------|----------|-------|
 | Contact | ✅ DONE | clientContacts table in schema.ts:125-152 with givenName/familyName/email/phone/title/isPrimary/isBillingContact | CRM with merge, lifecycle, contacts complete |
 | Company | ✅ DONE | clients table in schema.ts:70-107 with clientType union of company/person, companyName, address, taxId, paymentTerms | LeadPipelinePage.tsx:23-32 includes leadType: "company" \| "person" |
-| Inquiry/Lead | ✅ DONE | leads table in schema.ts:1004-1035 with stage (new/qualified/proposalSent/negotiating), probability, clientId/clientContactId/proposalId links | source is free-text string, no Social DM provider linkage |
+| Inquiry/Lead | ✅ DONE | leads table in schema.ts:1004-1035 with stage (new/qualified/proposalSent/negotiating), probability, clientId/clientContactId/proposalId links | source is free-text string; added ReferralSource relation; no Social DM provider linkage |
 | Deal/Opportunity | ✅ DONE | Referenced within leads entity via proposalId and stage transitions | No separate Opportunity entity; deals are leads at proposalSent/negotiating stages |
-| Event | ✅ DONE | events table in schema.ts:456-514 with full lifecycle: planning/pending_approval/approved/executing/completed/cancelled/closed_out | Missing occasion enum (eventType is string), missing serviceStyle enum field, missing referralSource field, missing salesperson enum (assignedToId is person id) |
+| Event | ✅ DONE | events table in schema.ts:456-514 with full lifecycle: planning/pending_approval/approved/executing/completed/cancelled/closed_out | Added ServiceStyle and Occasion relations; Missing referralSource on Event (on Lead, not Event), missing Sales Lock states in enum |
 | Event Status | 🟡 PARTIAL | Event.stage enum exists in schema.ts:481 with 7 states but missing Quote/Sales Lock from spec 3.3 | No Quote stage, No Sales Lock stage, Missing explicit transition commands for Sales Lock |
-| Service Style | ❌ NOT BUILT | No serviceStyles table; only free-text serviceStyle field in dishes schema.ts:293 and menus schema.ts:1066 | No first-class ServiceStyle entity; No active/inactive state; No displayOrder; No client-facing label; No operational defaults; No reconciliation queue for legacy values |
-| Occasion | ❌ NOT BUILT | No occasionTypes table; eventType in events schema.ts:465 is free-text string | No first-class Occasion entity; No enum for common occasions; No effective dates for seasonal occasions |
+| Service Style | ✅ DONE | src/operations/service-style.manifest with TPP enum values, active/inactive state, display order | Events reference ServiceStyle via optional serviceStyleId relation; Commands: register, reviseDetails, activate, deactivate; UI dropdown in EventCreatePage |
+| Occasion | ✅ DONE | src/operations/occasion.manifest with TPP enum values (Wedding, Corporate Gala, etc.), active/inactive state, display order | Events reference Occasion via optional occasionId relation; EventCreatePage uses dropdown; Replaces free-text eventType field |
 | Venue | 🟡 PARTIAL | venues table in schema.ts:2176-2202 with basic identity/contact/address/capacity | No on/off-premise flag; No room/space details entity; No kitchen access/equipment fields; No load-in/parking/elevators/storage; No waste rules; No permits/insurance; No preferred/banned vendors link; No restrictions field; No attachments/photos (Venue not in attachments parentType union); No scorecard metrics |
 | Salesperson/Owner | ✅ DONE | assignedToId in events schema.ts:463; people.role enum in schema.ts:1257 includes sales_staff, sales_manager, owner | No explicit salesperson entity - uses people with role |
-| Referral Source | ❌ NOT BUILT | No referralSources table; source in leads schema.ts:1013 is free-text string | No first-class ReferralSource entity; No enum for common sources; No tracking of conversion by source |
+| Referral Source | ✅ DONE | src/sales/referral-source.manifest with common sources (Website, Referral, Phone, etc.), active/inactive state, display order | Leads reference ReferralSource via optional referralSourceId relation; LeadPipelinePage uses dropdown; Kept existing source field for flexibility |
 | Proposal | 🟡 PARTIAL | proposals table in schema.ts:1374-1411 with draft/sent/viewed/accepted/declined/expired status, eventId, pricing fields | No revision tracking; No immutable snapshot on publish; No version number; No superseded relationship; Draft->Published lifecycle incomplete |
 | Proposal Revision | ❌ NOT BUILT | No proposalRevisions table; proposals entity lacks versioning | No immutable snapshot entity; No version numbering; No event/client/venue/menu/pricing snapshot fields; No supersededBy link |
 | Proposal Section | ✅ DONE | Referenced in proposal structure through terms/notes/lineItems in proposals schema.ts:1394-1395 | No explicit ProposalSection entity - sections are implicit in document structure |
@@ -1470,8 +1494,8 @@ The codebase includes several production-grade enhancements not explicitly in th
 | 4 | **External Record Link** | Medium | High | Import Framework | Stable external ID mapping - prerequisite for all TPP integration | ❌ |
 | 5 | **Revenue Attribution** | Large | High | Sales Lock | Commission calculation and reporting - blocks sales incentives | ❌ |
 | 6 | **Event Status Pipeline** | Large | High | None (ServiceStyle ✅) | Sales workflow complete - blocks proposal-to-event conversion | ❌ |
-| 7 | **Occasion Entity** | Small | High | None | Event categorization - blocks reporting by occasion | ❌ |
-| 8 | **Referral Source Entity** | Small | High | None | Lead tracking and marketing ROI - blocks source attribution | ❌ |
+| 7 | **Occasion Entity** | Small | High | None | Event categorization - blocks reporting by occasion | ✅ DONE |
+| 8 | **Referral Source Entity** | Small | High | None | Lead tracking and marketing ROI - blocks source attribution | ✅ DONE |
 
 ### High (Slice 1 — Visible TPP replacement value)
 
