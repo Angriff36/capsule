@@ -1,0 +1,364 @@
+import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
+import {
+  useCreateVenue,
+  useVenueDeactivate,
+  useVenueActivate,
+  useListVenue,
+} from "../../lib/manifest-convex-react";
+import { venueDetailPath } from "./facilitiesRoutes";
+import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
+
+const VENUE_TYPES = [
+  "client_site",
+  "banquet_hall",
+  "outdoor",
+  "office",
+  "private_home",
+  "other",
+] as const;
+
+type VenueType = (typeof VENUE_TYPES)[number];
+
+const VENUE_TYPE_LABELS: Record<VenueType, string> = {
+  client_site: "Client Site",
+  banquet_hall: "Banquet Hall",
+  outdoor: "Outdoor",
+  office: "Office",
+  private_home: "Private Home",
+  other: "Other",
+};
+
+export function VenuesPage() {
+  const venues = useListVenue();
+  const createVenue = useCreateVenue();
+  const deactivate = useVenueDeactivate();
+  const activate = useVenueActivate();
+
+  const [showForm, setShowForm] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [failure, setFailure] = useState<unknown>(null);
+
+  const rows = (venues ?? []).filter((item) => item.deletedAt == null);
+  const activeRows = rows.filter(
+    (item) => item.status === "active" || item.status === "inactive",
+  );
+
+  const run = async (key: string, work: () => Promise<void>) => {
+    setFailure(null);
+    setBusy(key);
+    try {
+      await work();
+    } catch (error) {
+      setFailure(error);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const element = event.currentTarget;
+    const data = new FormData(element);
+    void run("register", async () => {
+      await createVenue({
+        name: String(data.get("name") ?? "").trim(),
+        venueType: String(data.get("venueType")) as VenueType,
+        capacity: Number(data.get("capacity")),
+        addressLine1: String(data.get("addressLine1") ?? "").trim(),
+        city: String(data.get("city") ?? "").trim(),
+        region: String(data.get("region") ?? "").trim(),
+        postalCode: String(data.get("postalCode") ?? "").trim(),
+        country: String(data.get("country") ?? "").trim() || undefined,
+        accessNotes: String(data.get("accessNotes") ?? "").trim() || undefined,
+        cateringNotes:
+          String(data.get("cateringNotes") ?? "").trim() || undefined,
+        contactName: String(data.get("contactName") ?? "").trim() || undefined,
+        contactEmail:
+          String(data.get("contactEmail") ?? "").trim() || undefined,
+        contactPhone:
+          String(data.get("contactPhone") ?? "").trim() || undefined,
+      });
+      element.reset();
+      setShowForm(false);
+    });
+  };
+
+  const handleToggleStatus = (venue: (typeof rows)[number]) => {
+    const id = venue._id;
+    const key = `${id}:toggle`;
+    void run(key, async () => {
+      if (venue.status === "active") {
+        const reason = window.prompt("Reason for deactivation:");
+        if (!reason) return;
+        await deactivate({ docId: id, version: venue.version, reason });
+      } else {
+        await activate({ docId: id, version: venue.version });
+      }
+    });
+  };
+
+  if (venues === undefined) return <TableSkeleton rows={8} />;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Venues</h1>
+          <p className="text-sm text-gray-500">
+            {activeRows.length} venue{activeRows.length !== 1 ? "s" : ""}
+          </p>
+        </div>
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={() => setShowForm(!showForm)}
+        >
+          {showForm ? "Cancel" : "Add Venue"}
+        </button>
+      </div>
+
+      {failure && <SupplyFailureBanner error={failure} />}
+
+      {showForm && (
+        <form onSubmit={submit} className="space-y-4 rounded-md bg-gray-50 p-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Name *
+              </label>
+              <input
+                type="text"
+                name="name"
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                placeholder="Grand Ballroom"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Type *
+              </label>
+              <select
+                name="venueType"
+                required
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              >
+                {VENUE_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {VENUE_TYPE_LABELS[type]}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Capacity *
+              </label>
+              <input
+                type="number"
+                name="capacity"
+                required
+                min="1"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                placeholder="150"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Address Line 1
+              </label>
+              <input
+                type="text"
+                name="addressLine1"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                placeholder="123 Main St"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                City
+              </label>
+              <input
+                type="text"
+                name="city"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                placeholder="Springfield"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                State/Region
+              </label>
+              <input
+                type="text"
+                name="region"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                placeholder="IL"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Postal Code
+              </label>
+              <input
+                type="text"
+                name="postalCode"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                placeholder="62701"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Contact Name
+              </label>
+              <input
+                type="text"
+                name="contactName"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                placeholder="John Smith"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Contact Email
+              </label>
+              <input
+                type="email"
+                name="contactEmail"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                placeholder="john@example.com"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Contact Phone
+              </label>
+              <input
+                type="tel"
+                name="contactPhone"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                placeholder="(555) 123-4567"
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Access Notes
+            </label>
+            <textarea
+              name="accessNotes"
+              rows={2}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              placeholder="Loading dock available, stairs to second floor..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Catering Notes
+            </label>
+            <textarea
+              name="cateringNotes"
+              rows={2}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              placeholder="Kitchen available, equipment restrictions..."
+            />
+          </div>
+          <div className="flex justify-end">
+            <button
+              className="btn btn-primary"
+              type="submit"
+              disabled={busy === "register"}
+            >
+              {busy === "register" ? "Creating..." : "Create Venue"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {rows.length === 0 ? (
+        <div className="rounded-md bg-gray-50 p-8 text-center text-gray-500">
+          No venues yet. Click "Add Venue" to create one.
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-md border border-gray-200">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  Name
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  Type
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  Capacity
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  Location
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase text-gray-500">
+                  Status
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-medium uppercase text-gray-500">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white">
+              {rows.map((venue) => (
+                <tr key={venue._id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3">
+                    <Link
+                      to={venueDetailPath(venue._id)}
+                      className="font-medium text-blue-600 hover:text-blue-800"
+                    >
+                      {venue.name}
+                    </Link>
+                    {venue.contactName && (
+                      <div className="text-xs text-gray-500">
+                        {venue.contactName}
+                        {venue.contactPhone && ` • ${venue.contactPhone}`}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {VENUE_TYPE_LABELS[venue.venueType as VenueType] ||
+                      venue.venueType}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {venue.capacity ?? "—"}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-600">
+                    {[venue.city, venue.region].filter(Boolean).join(", ") ||
+                      "—"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <StatusChip
+                      status={venue.status === "active" ? "active" : "inactive"}
+                    />
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <button
+                      className="btn btn-ghost text-sm"
+                      type="button"
+                      onClick={() => handleToggleStatus(venue)}
+                      disabled={busy === `${venue._id}:toggle`}
+                    >
+                      {busy === `${venue._id}:toggle`
+                        ? "..."
+                        : venue.status === "active"
+                          ? "Deactivate"
+                          : "Activate"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}

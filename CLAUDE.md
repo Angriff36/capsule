@@ -143,7 +143,7 @@ Last: [first session]
 
 ## Last Session Bridge
 [auto-bridge snapshot @ 10 changes]
-Files: src/app/nav.ts (edit), src/ui/icons.tsx (edit), src/app/App.tsx (edit), src/features/import/importRoutes.ts (create), src/features/import/ImportRunDetailPage.tsx (create), src/features/import/ImportRunsPage.tsx (create), src/features/import/TppEventParser.ts (create), src/features/import/ImportTypes.ts (create), src/features/clientPortal/ClientPortalPage.tsx (edit)
+Files: src/features/facilities/VenueDetailPage.tsx (edit), src/features/facilities/VenueDetailPage.tsx (create), src/features/facilities/VenuesPage.tsx (create), src/features/facilities/facilitiesRoutes.ts (create), IMPLEMENTATION_PLAN.md (edit)
 
 # === END COGNILAYER ===
 
