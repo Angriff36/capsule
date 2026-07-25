@@ -1,0 +1,159 @@
+// Capsule event reference data — Occasion.
+// TPP common occasion codes for event categorization and reporting.
+// Events reference an Occasion type for operational defaults and analytics.
+
+// ---------------------------------------------------------------------------
+// Closed vocabularies
+// ---------------------------------------------------------------------------
+
+enum OccasionStatus {
+  active
+  inactive
+}
+
+// ---------------------------------------------------------------------------
+// Occasion — first-class event occasion type concept
+// ---------------------------------------------------------------------------
+
+entity Occasion mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Client-facing label (e.g., "Wedding", "Corporate Gala")
+  property required searchable name: string = ""
+  // Internal code/identifier for TPP mapping and system logic
+  property required code: string = ""
+  // Display order for UI pickers and sorting
+  property required sortOrder: int = 0
+  // Human-readable description for operational guidance
+  property description: string?
+  // Active/inactive state for retiring legacy values
+  property required status: OccasionStatus = "active"
+  property registeredAt: datetime?
+  property deactivatedAt: datetime?
+  property deactivationReason: string?
+
+  // Events using this occasion type (inverse relation)
+  hasMany events: Event
+
+  computed isActive: boolean = self.status == "active"
+
+  constraint occasionIdentityComplete: self.registeredAt == null or (length(trim(self.name)) > 0 and length(trim(self.code)) > 0) "Occasions require a name and code"
+  constraint occasionSortNonnegative: self.sortOrder >= 0 "Display order cannot be negative"
+  constraint occasionCodeUnique: self.registeredAt == null or count_of(query("Occasion"), (o) => o.tenantId == self.tenantId and o.code == self.code and o.id != self.id and o.deletedAt == null) == 0 "Occasion code must be unique within tenant"
+
+  transition status from "active" to ["inactive"]
+  transition status from "inactive" to ["active"]
+
+  default policy occasionRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read occasions"
+  default policy occasionWrite write: roleAllows(user.role, "eventManageAccess") "Event managers may write occasions through commands"
+  default policy occasionExecute execute: roleAllows(user.role, "eventManageAccess") "Event managers may execute occasion commands"
+
+  command register(
+    name: string,
+    code: string,
+    optional sortOrder: number,
+    optional description: string
+  ) {
+    guard self.registeredAt == null
+    guard self.deletedAt == null
+    constraint registerOccasionName: length(trim(name)) > 0 "Occasion name is required"
+    constraint registerOccasionCode: length(trim(code)) > 0 "Occasion code is required"
+    constraint registerOccasionSort: sortOrder == null or sortOrder >= 0 "Display order cannot be negative"
+    mutate name = name
+    mutate code = code
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate description = description
+    mutate status = "active"
+    mutate registeredAt = now()
+    emit OccasionRegistered {
+      occasionId: self.id
+      tenantId: self.tenantId
+      name: name
+      code: code
+      sortOrder: sortOrder != null ? sortOrder : 0
+    }
+  }
+
+  command reviseDetails(
+    name: string,
+    optional description: string,
+    optional sortOrder: number
+  ) {
+    guard self.registeredAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint reviseOccasionName: length(trim(name)) > 0 "Occasion name is required"
+    constraint reviseOccasionSort: sortOrder == null or sortOrder >= 0 "Display order cannot be negative"
+    mutate name = name
+    mutate description = description
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    emit OccasionDetailsRevised {
+      occasionId: self.id
+      tenantId: self.tenantId
+      name: name
+      sortOrder: sortOrder != null ? sortOrder : self.sortOrder
+    }
+  }
+
+  command deactivate(reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint deactivateOccasionReason: length(trim(reason)) > 0 "Deactivation reason is required"
+    mutate status = "inactive"
+    mutate deactivatedAt = now()
+    mutate deactivationReason = reason
+    emit OccasionDeactivated {
+      occasionId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command activate() {
+    guard self.status == "inactive"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    mutate status = "active"
+    mutate deactivatedAt = null
+    mutate deactivationReason = null
+    emit OccasionActivated {
+      occasionId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Occasion in durable
+}
+
+// ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+
+event OccasionRegistered: "occasion.registered" {
+  occasionId: string
+  tenantId: string
+  name: string
+  code: string
+  sortOrder: number
+}
+
+event OccasionDetailsRevised: "occasion.details_revised" {
+  occasionId: string
+  tenantId: string
+  name: string
+  sortOrder: number
+}
+
+event OccasionDeactivated: "occasion.deactivated" {
+  occasionId: string
+  tenantId: string
+  reason: string
+}
+
+event OccasionActivated: "occasion.activated" {
+  occasionId: string
+  tenantId: string
+}

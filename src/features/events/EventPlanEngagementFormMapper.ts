@@ -5,7 +5,7 @@ export type EventPlanEngagementFormInput = {
   venueId: string;
   venue: Doc<"venues"> | undefined;
   title: string;
-  eventType: string;
+  occasionId: string;
   startsAtRaw: string;
   endsAtRaw: string;
   expectedHeadcountRaw: FormDataEntryValue | null;
@@ -33,10 +33,8 @@ export class EventPlanEngagementFormMapper {
     this.requireIds(input.clientId, input.venueId);
     const schedule = this.parseSchedule(input);
     const title = input.title.trim();
-    const eventType = input.eventType.trim();
     const primaryContactName = input.primaryContactName.trim();
     if (!title) throw new Error("Event title is required.");
-    if (!eventType) throw new Error("Event type is required.");
     if (!primaryContactName) {
       throw new Error("Primary contact name is required.");
     }
@@ -45,7 +43,6 @@ export class EventPlanEngagementFormMapper {
       clientId: input.clientId as Id<"clients">,
       venueId: input.venueId as Id<"venues">,
       title,
-      eventType,
       startsAt: schedule.startsAt,
       endsAt: schedule.endsAt,
       expectedHeadcount: schedule.expectedHeadcount,
@@ -53,6 +50,7 @@ export class EventPlanEngagementFormMapper {
       budgetAmount: schedule.budgetAmount,
       quotedPrice: schedule.quotedPrice,
     };
+    this.assignOptionalOccasionField(args, input.occasionId);
     this.assignOptionalVenueFields(args, input.venue);
     this.assignOptionalContactFields(args, input);
     return args;
@@ -98,6 +96,16 @@ export class EventPlanEngagementFormMapper {
     }
 
     return { startsAt, endsAt, expectedHeadcount, budgetAmount, quotedPrice };
+  }
+
+  private assignOptionalOccasionField(
+    args: Record<string, unknown>,
+    occasionId: string,
+  ): void {
+    const trimmed = occasionId.trim();
+    if (trimmed) {
+      args.occasionId = trimmed;
+    }
   }
 
   private assignOptionalVenueFields(

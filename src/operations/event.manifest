@@ -3,6 +3,7 @@
 
 use "../identity/person.manifest"
 use "./service-style.manifest"
+use "./occasion.manifest"
 
 // ---------------------------------------------------------------------------
 // Closed vocabularies
@@ -478,6 +479,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   property clientMergeAuthorizationId: uuid?
   property mergeTargetClientId: uuid?
   property serviceStyleId: uuid?
+  property occasionId: uuid?
   property venueId: uuid?
   property assignedToId: uuid?
   property required searchable title: string = ""
@@ -529,6 +531,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
   ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
+  ref occasion: Occasion fields [tenantId, occasionId] references [tenantId, id]
   ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
   ref recurrenceTemplateEvent: Event fields [tenantId, recurrenceTemplateEventId] references [tenantId, id]
@@ -601,6 +604,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     budgetAmount: money(12, 2),
     quotedPrice: money(12, 2),
     optional serviceStyleId: uuid,
+    optional occasionId: uuid,
     optional venueId: uuid,
     optional venueName: string,
     optional venueAddress: string,
@@ -629,6 +633,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate endsAt = endsAt
     mutate purchasingWeekStart = startsAt
     mutate serviceStyleId = serviceStyleId
+    mutate occasionId = occasionId
     mutate venueId = venueId
     mutate venueName = venueName
     mutate venueAddress = venueAddress

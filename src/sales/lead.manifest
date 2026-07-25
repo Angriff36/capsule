@@ -20,6 +20,7 @@ entity Lead mixin TenantScoped, SoftDeletable {
   property encrypted email: string?
   property encrypted phone: string?
   property required searchable source: string = ""
+  property referralSourceId: uuid?
   property required estimatedValue: money(12, 2) = 0
   property required stage: LeadStage = "new"
   property required probability: int = 10
@@ -34,6 +35,7 @@ entity Lead mixin TenantScoped, SoftDeletable {
   ref client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientContact: ClientContact fields [tenantId, clientContactId] references [tenantId, id]
   ref proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
+  ref referralSource: ReferralSource fields [tenantId, referralSourceId] references [tenantId, id]
 
   computed displayName: string = self.leadType == "company" ? self.companyName : self.givenName + " " + self.familyName
 
@@ -49,6 +51,7 @@ entity Lead mixin TenantScoped, SoftDeletable {
   command capture(
     leadType: ClientType,
     source: string,
+    optional referralSourceId: uuid,
     estimatedValue: money(12, 2),
     optional companyName: string,
     optional givenName: string,
@@ -71,6 +74,7 @@ entity Lead mixin TenantScoped, SoftDeletable {
     mutate email = email
     mutate phone = phone
     mutate source = source
+    mutate referralSourceId = referralSourceId
     mutate estimatedValue = estimatedValue
     mutate stage = "new"
     mutate probability = probability != null ? probability : 10
@@ -88,6 +92,7 @@ entity Lead mixin TenantScoped, SoftDeletable {
   command reviseDetails(
     leadType: ClientType,
     source: string,
+    optional referralSourceId: uuid,
     optional companyName: string,
     optional givenName: string,
     optional familyName: string,
@@ -106,6 +111,7 @@ entity Lead mixin TenantScoped, SoftDeletable {
     mutate email = email
     mutate phone = phone
     mutate source = source
+    mutate referralSourceId = referralSourceId
     mutate notes = notes
     emit LeadDetailsRevised {
       leadId: self.id

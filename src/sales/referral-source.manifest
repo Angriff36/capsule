@@ -1,0 +1,160 @@
+// Capsule sales reference data — Referral Source.
+// Leads reference how they found the business for attribution and reporting.
+// Common codes: website, referral, phone, email, venue_partner, social_media,
+// google_ads, yelp, wedding_wire, the_knot, other.
+
+// ---------------------------------------------------------------------------
+// Closed vocabularies
+// ---------------------------------------------------------------------------
+
+enum ReferralSourceStatus {
+  active
+  inactive
+}
+
+// ---------------------------------------------------------------------------
+// ReferralSource — first-class lead referral source concept
+// ---------------------------------------------------------------------------
+
+entity ReferralSource mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Client-facing label (e.g., "Website", "Referral", "Venue Partner")
+  property required searchable name: string = ""
+  // Internal code/identifier for system logic and reporting
+  property required code: string = ""
+  // Display order for UI pickers and sorting
+  property required sortOrder: int = 0
+  // Human-readable description for operational guidance
+  property description: string?
+  // Active/inactive state for retiring legacy values
+  property required status: ReferralSourceStatus = "active"
+  property registeredAt: datetime?
+  property deactivatedAt: datetime?
+  property deactivationReason: string?
+
+  // Leads using this referral source (inverse relation)
+  hasMany leads: Lead
+
+  computed isActive: boolean = self.status == "active"
+
+  constraint referralSourceIdentityComplete: self.registeredAt == null or (length(trim(self.name)) > 0 and length(trim(self.code)) > 0) "Referral sources require a name and code"
+  constraint referralSourceSortNonnegative: self.sortOrder >= 0 "Display order cannot be negative"
+  constraint referralSourceCodeUnique: self.registeredAt == null or count_of(query("ReferralSource"), (s) => s.tenantId == self.tenantId and s.code == self.code and s.id != self.id and s.deletedAt == null) == 0 "Referral source code must be unique within tenant"
+
+  transition status from "active" to ["inactive"]
+  transition status from "inactive" to ["active"]
+
+  default policy referralSourceRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read referral sources"
+  default policy referralSourceWrite write: roleAllows(user.role, "salesManageAccess") "Sales managers may write referral sources through commands"
+  default policy referralSourceExecute execute: roleAllows(user.role, "salesManageAccess") "Sales managers may execute referral source commands"
+
+  command register(
+    name: string,
+    code: string,
+    optional sortOrder: number,
+    optional description: string
+  ) {
+    guard self.registeredAt == null
+    guard self.deletedAt == null
+    constraint registerReferralSourceName: length(trim(name)) > 0 "Referral source name is required"
+    constraint registerReferralSourceCode: length(trim(code)) > 0 "Referral source code is required"
+    constraint registerReferralSourceSort: sortOrder == null or sortOrder >= 0 "Display order cannot be negative"
+    mutate name = name
+    mutate code = code
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate description = description
+    mutate status = "active"
+    mutate registeredAt = now()
+    emit ReferralSourceRegistered {
+      referralSourceId: self.id
+      tenantId: self.tenantId
+      name: name
+      code: code
+      sortOrder: sortOrder != null ? sortOrder : 0
+    }
+  }
+
+  command reviseDetails(
+    name: string,
+    optional description: string,
+    optional sortOrder: number
+  ) {
+    guard self.registeredAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint reviseReferralSourceName: length(trim(name)) > 0 "Referral source name is required"
+    constraint reviseReferralSourceSort: sortOrder == null or sortOrder >= 0 "Display order cannot be negative"
+    mutate name = name
+    mutate description = description
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    emit ReferralSourceDetailsRevised {
+      referralSourceId: self.id
+      tenantId: self.tenantId
+      name: name
+      sortOrder: sortOrder != null ? sortOrder : self.sortOrder
+    }
+  }
+
+  command deactivate(reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesManageAccess")
+    constraint deactivateReferralSourceReason: length(trim(reason)) > 0 "Deactivation reason is required"
+    mutate status = "inactive"
+    mutate deactivatedAt = now()
+    mutate deactivationReason = reason
+    emit ReferralSourceDeactivated {
+      referralSourceId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command activate() {
+    guard self.status == "inactive"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesManageAccess")
+    mutate status = "active"
+    mutate deactivatedAt = null
+    mutate deactivationReason = null
+    emit ReferralSourceActivated {
+      referralSourceId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store ReferralSource in durable
+}
+
+// ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+
+event ReferralSourceRegistered: "referral_source.registered" {
+  referralSourceId: string
+  tenantId: string
+  name: string
+  code: string
+  sortOrder: number
+}
+
+event ReferralSourceDetailsRevised: "referral_source.details_revised" {
+  referralSourceId: string
+  tenantId: string
+  name: string
+  sortOrder: number
+}
+
+event ReferralSourceDeactivated: "referral_source.deactivated" {
+  referralSourceId: string
+  tenantId: string
+  reason: string
+}
+
+event ReferralSourceActivated: "referral_source.activated" {
+  referralSourceId: string
+  tenantId: string
+}

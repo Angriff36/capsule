@@ -11,6 +11,7 @@ import {
   useLeadStageProposal,
   useLeadUpdatePipeline,
   useListLead,
+  useListReferralSource,
   useProposalSend,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
@@ -89,6 +90,7 @@ function dateValue(value: FormDataEntryValue | null): number | undefined {
 
 export function LeadPipelinePage() {
   const leads = useListLead();
+  const referralSources = useListReferralSource();
   const createLead = useCreateLead();
   const updatePipeline = useLeadUpdatePipeline();
   const createClient = useCreateClient();
@@ -110,6 +112,17 @@ export function LeadPipelinePage() {
   const activeLeads = ((leads ?? []) as LeadRow[]).filter(
     (lead) => lead.deletedAt == null && lead.capturedAt != null,
   );
+
+  const activeReferralSources = (
+    (referralSources ?? []) as Array<{
+      _id: string;
+      name: string;
+      status: string;
+      sortOrder?: number | null;
+    }>
+  )
+    .filter((source) => source.status === "active")
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
 
   const metrics = useMemo(() => {
     const faceValue = activeLeads.reduce(
@@ -155,6 +168,7 @@ export function LeadPipelinePage() {
       setFailure(new Error("Estimated value and probability must be numbers."));
       return;
     }
+    const referralSourceId = optional(data.get("referralSourceId"));
     void run("capture", async () => {
       await createLead({
         leadType,
@@ -164,6 +178,7 @@ export function LeadPipelinePage() {
         email: optional(data.get("email")),
         phone: optional(data.get("phone")),
         source: String(data.get("source") ?? "").trim(),
+        referralSourceId,
         estimatedValue,
         probability,
         notes: optional(data.get("notes")),
@@ -401,15 +416,18 @@ export function LeadPipelinePage() {
             ) : null}
             <label>
               Source
-              <input name="source" list="lead-sources" required />
-              <datalist id="lead-sources">
-                <option value="Website" />
-                <option value="Referral" />
-                <option value="Phone" />
-                <option value="Email" />
-                <option value="Venue partner" />
-                <option value="Social" />
-              </datalist>
+              <input name="source" required />
+            </label>
+            <label>
+              Referral source
+              <select name="referralSourceId">
+                <option value="">None</option>
+                {activeReferralSources.map((source) => (
+                  <option key={source._id} value={source._id}>
+                    {source.name}
+                  </option>
+                ))}
+              </select>
             </label>
             <label>
               Estimated value

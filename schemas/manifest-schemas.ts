@@ -488,6 +488,7 @@ export const EventSchema = z.object({
   clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
   mergeTargetClientId: z.string().uuid().nullable().optional(),
   serviceStyleId: z.string().uuid().nullable().optional(),
+  occasionId: z.string().uuid().nullable().optional(),
   venueId: z.string().uuid().nullable().optional(),
   assignedToId: z.string().uuid().nullable().optional(),
   title: z.string().default(""),
@@ -1100,6 +1101,7 @@ export const LeadSchema = z.object({
   email: z.string().nullable().optional(),
   phone: z.string().nullable().optional(),
   source: z.string().default(""),
+  referralSourceId: z.string().uuid().nullable().optional(),
   estimatedValue: z.number().min(0).default(0),
   stage: z.enum(["new", "qualified", "proposalSent", "negotiating"]).default("new"),
   probability: z.number().int().default(10),
@@ -1172,6 +1174,31 @@ export const MenuDishSchema = z.object({
 });
 
 export type MenuDish = z.infer<typeof MenuDishSchema>;
+
+// Entity: Occasion
+export const OccasionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  code: z.string().default(""),
+  sortOrder: z.number().int().min(0).default(0),
+  description: z.string().nullable().optional(),
+  status: z.enum(["active", "inactive"]).default("active"),
+  registeredAt: z.coerce.date().nullable().optional(),
+  deactivatedAt: z.coerce.date().nullable().optional(),
+  deactivationReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: Occasion
+export const OccasionComputedSchema = OccasionSchema.extend({
+  isActive: z.boolean(),
+});
+
+export type Occasion = z.infer<typeof OccasionSchema>;
+export type OccasionWithComputed = z.infer<typeof OccasionComputedSchema>;
 
 // Entity: Organization
 export const OrganizationSchema = z.object({
@@ -1781,6 +1808,31 @@ export const RecurringAvailabilitySchema = z.object({
 });
 
 export type RecurringAvailability = z.infer<typeof RecurringAvailabilitySchema>;
+
+// Entity: ReferralSource
+export const ReferralSourceSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  code: z.string().default(""),
+  sortOrder: z.number().int().min(0).default(0),
+  description: z.string().nullable().optional(),
+  status: z.enum(["active", "inactive"]).default("active"),
+  registeredAt: z.coerce.date().nullable().optional(),
+  deactivatedAt: z.coerce.date().nullable().optional(),
+  deactivationReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: ReferralSource
+export const ReferralSourceComputedSchema = ReferralSourceSchema.extend({
+  isActive: z.boolean(),
+});
+
+export type ReferralSource = z.infer<typeof ReferralSourceSchema>;
+export type ReferralSourceWithComputed = z.infer<typeof ReferralSourceComputedSchema>;
 
 // Entity: SavedReportDefinition
 export const SavedReportDefinitionSchema = z.object({
@@ -3255,6 +3307,7 @@ export const EventPlanEngagementParamsSchema = z.object({
   budgetAmount: z.number(),
   quotedPrice: z.number(),
   serviceStyleId: z.string().min(1).optional(),
+  occasionId: z.string().min(1).optional(),
   venueId: z.string().min(1).optional(),
   venueName: z.string().optional(),
   venueAddress: z.string().optional(),
@@ -4142,6 +4195,7 @@ export type InvoiceWriteOffParams = z.infer<typeof InvoiceWriteOffParamsSchema>;
 export const LeadCaptureParamsSchema = z.object({
   leadType: z.enum(["company", "person"]),
   source: z.string(),
+  referralSourceId: z.string().min(1).optional(),
   estimatedValue: z.number(),
   companyName: z.string().optional(),
   givenName: z.string().optional(),
@@ -4168,6 +4222,7 @@ export type LeadConfirmProposalSentParams = z.infer<typeof LeadConfirmProposalSe
 export const LeadReviseDetailsParamsSchema = z.object({
   leadType: z.enum(["company", "person"]),
   source: z.string(),
+  referralSourceId: z.string().min(1).optional(),
   companyName: z.string().optional(),
   givenName: z.string().optional(),
   familyName: z.string().optional(),
@@ -4296,6 +4351,37 @@ export const MenuDishUpdateSellingPriceParamsSchema = z.object({
 });
 
 export type MenuDishUpdateSellingPriceParams = z.infer<typeof MenuDishUpdateSellingPriceParamsSchema>;
+
+// Command: activate on Occasion
+export const OccasionActivateParamsSchema = z.object({});
+
+export type OccasionActivateParams = z.infer<typeof OccasionActivateParamsSchema>;
+
+// Command: deactivate on Occasion
+export const OccasionDeactivateParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type OccasionDeactivateParams = z.infer<typeof OccasionDeactivateParamsSchema>;
+
+// Command: register on Occasion
+export const OccasionRegisterParamsSchema = z.object({
+  name: z.string(),
+  code: z.string(),
+  sortOrder: z.number().optional(),
+  description: z.string().optional(),
+});
+
+export type OccasionRegisterParams = z.infer<typeof OccasionRegisterParamsSchema>;
+
+// Command: reviseDetails on Occasion
+export const OccasionReviseDetailsParamsSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  sortOrder: z.number().optional(),
+});
+
+export type OccasionReviseDetailsParams = z.infer<typeof OccasionReviseDetailsParamsSchema>;
 
 // Command: configureBranding on Organization
 export const OrganizationConfigureBrandingParamsSchema = z.object({
@@ -5278,6 +5364,37 @@ export type RecurringAvailabilityDeclareParams = z.infer<typeof RecurringAvailab
 export const RecurringAvailabilityWithdrawParamsSchema = z.object({});
 
 export type RecurringAvailabilityWithdrawParams = z.infer<typeof RecurringAvailabilityWithdrawParamsSchema>;
+
+// Command: activate on ReferralSource
+export const ReferralSourceActivateParamsSchema = z.object({});
+
+export type ReferralSourceActivateParams = z.infer<typeof ReferralSourceActivateParamsSchema>;
+
+// Command: deactivate on ReferralSource
+export const ReferralSourceDeactivateParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type ReferralSourceDeactivateParams = z.infer<typeof ReferralSourceDeactivateParamsSchema>;
+
+// Command: register on ReferralSource
+export const ReferralSourceRegisterParamsSchema = z.object({
+  name: z.string(),
+  code: z.string(),
+  sortOrder: z.number().optional(),
+  description: z.string().optional(),
+});
+
+export type ReferralSourceRegisterParams = z.infer<typeof ReferralSourceRegisterParamsSchema>;
+
+// Command: reviseDetails on ReferralSource
+export const ReferralSourceReviseDetailsParamsSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  sortOrder: z.number().optional(),
+});
+
+export type ReferralSourceReviseDetailsParams = z.infer<typeof ReferralSourceReviseDetailsParamsSchema>;
 
 // Command: archive on SavedReportDefinition
 export const SavedReportDefinitionArchiveParamsSchema = z.object({});

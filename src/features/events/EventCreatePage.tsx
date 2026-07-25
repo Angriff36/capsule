@@ -8,6 +8,7 @@ import {
   useGetEventTemplate,
   useListClient,
   useListMenu,
+  useListOccasion,
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { ArrowLeftIcon } from "../../ui/icons";
@@ -71,6 +72,7 @@ export function EventCreatePage() {
   )?.name;
   const clients = useListClient();
   const venues = useListVenue();
+  const occasions = useListOccasion();
   const createClient = useCreateClient();
   const createVenue = useCreateVenue();
   const createEvent = useCreateEvent();
@@ -80,6 +82,7 @@ export function EventCreatePage() {
   const [showVenue, setShowVenue] = useState(false);
   const [busy, setBusy] = useState<"client" | "venue" | "event" | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const [occasionId, setOccasionId] = useState("");
   const { errors, touched, formProps, handleSubmit } =
     useFieldValidation(eventFieldRules);
   const draftForm = useFormDraft("event-create");
@@ -96,6 +99,9 @@ export function EventCreatePage() {
       venue.status === "active" &&
       venue.registeredAt != null,
   );
+  const activeOccasions = (occasions ?? [])
+    .filter((occasion) => occasion.status === "active")
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   const selectedVenue = activeVenues.find((venue) => venue._id === venueId);
 
   const run = async (
@@ -171,7 +177,7 @@ export function EventCreatePage() {
         venueId,
         venue,
         title: String(data.get("title") ?? ""),
-        eventType: String(data.get("eventType") ?? ""),
+        occasionId,
         startsAtRaw: String(data.get("startsAt") ?? ""),
         endsAtRaw: String(data.get("endsAt") ?? ""),
         expectedHeadcountRaw: data.get("expectedHeadcount"),
@@ -230,19 +236,20 @@ export function EventCreatePage() {
                 <FieldError name="title" errors={errors} touched={touched} />
               </label>
               <label className="field-label">
-                Event type
-                <input
-                  name="eventType"
+                Occasion
+                <select
+                  value={occasionId}
+                  onChange={(event) => setOccasionId(event.target.value)}
                   className="input"
-                  required
-                  placeholder="Wedding, gala, corporate dinner…"
-                  defaultValue={template?.eventType ?? ""}
-                />
-                <FieldError
-                  name="eventType"
-                  errors={errors}
-                  touched={touched}
-                />
+                  form="event-create-form"
+                >
+                  <option value="">Select an occasion</option>
+                  {activeOccasions.map((occasion) => (
+                    <option key={occasion._id} value={occasion._id}>
+                      {occasion.name}
+                    </option>
+                  ))}
+                </select>
               </label>
               <label className="field-label">
                 Expected headcount
@@ -401,8 +408,8 @@ export function EventCreatePage() {
                 <div className="space-y-1.5 p-3 text-[12px] text-ink-2">
                   <p className="font-medium text-ink">{template.name}</p>
                   <p>
-                    {template.eventType} · {String(template.clientType)} client
-                    · {template.defaultHeadcount} guests
+                    {String(template.clientType)} client ·{" "}
+                    {template.defaultHeadcount} guests
                   </p>
                   {templateMenuName ? <p>Menu: {templateMenuName}</p> : null}
                   {template.defaultStaffRoles?.length ? (
@@ -415,8 +422,8 @@ export function EventCreatePage() {
                     <p className="text-ink-3">{template.notes}</p>
                   ) : null}
                   <p className="pt-1 text-[11px] leading-relaxed text-ink-3">
-                    Event type and headcount are pre-filled from this template.
-                    Adjust anything before creating.
+                    Headcount is pre-filled from this template. Adjust anything
+                    before creating.
                   </p>
                 </div>
               )}
