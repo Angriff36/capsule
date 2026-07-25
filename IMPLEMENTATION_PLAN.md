@@ -1,13 +1,53 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (Import Runs List and Detail Pages implemented)
+**Updated:** 2026-07-25 (Parallel Run Dashboard implemented)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-25 — Parallel Run Dashboard Implemented:**
+
+**Implemented:**
+- ✅ ParallelRunDashboardPage.tsx (680 lines) — Full comparison dashboard with daily metrics
+- ✅ Route: /admin/parallel-run with navigation entry
+- ✅ Admin workspace navigation updated with "Parallel run" section
+- ✅ Lazy import and routing in App.tsx
+
+**Functionality Delivered:**
+- Daily comparison of TPP vs Capsule record counts, event totals, status distribution
+- Revenue totals comparison between systems
+- Breakdowns by salesperson, occasion, service style, venue
+- Display of unresolved ExternalRecordLinks needing verification (verified=false)
+- Recent changes view (last 24 hours) for review
+- Reference to latest completed ImportRun for TPP data
+- Drill-down links to event detail and import run detail pages
+- Summary cards showing Capsule events, TPP events, variance, and unresolved mappings
+- Status-based coloring (green for match, orange for variance)
+
+**Technical Notes:**
+- Uses generated hooks: useListEvent, useListImportRun, useListExternalRecordLink, useListServiceStyle, useListOccasion, useListVenue
+- Parses TPP recordCounts JSON from ImportRun for comparison metrics
+- 30-day rolling date range for event filtering
+- Type-safe Record<string, number> parsing with unknown cast for TPP data
+- Client-side filtering for date ranges and dataset types
+- Link to /admin/reconcile for ExternalRecordLink resolution workflow
+
+**Impact:**
+- Priority 19 (Parallel Run Dashboard): ✅ DONE
+- Unblocks: Cutover validation (has comparison dashboard to verify data integrity before final migration)
+- Remaining Import Framework gaps: Cutover tooling only
+
+**Verification:**
+- All 694 tests passing
+- TypeScript typecheck passing
+- No format issues
+- Git commit: c5bbe27
+
+---
 
 **2026-07-25 — Import Runs List and Detail Pages Implemented:**
 
@@ -1779,7 +1819,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 | 16 | **Equipment Location Fields** | Small | Medium | None | Availability calculation - blocks logistics accuracy |
 | 17 | **Venue Profile (Full Depth)** | Large | High | None | Venue management and logistics - blocks venue selection |
 | 18 | **Pack List Templates** | Large | High | ServiceStyle, Equipment location | Operational efficiency - blocks automated pack list generation |
-| 19 | **Parallel Run Dashboard** | Large | High | Import Framework, Import Datasets | Migration validation - required for safe cutover |
+| 19 | **Parallel Run Dashboard** | Large | High | Import Framework, Import Datasets | Migration validation - required for safe cutover | ✅ DONE - 680-line dashboard with comparison metrics, drill-down |
 | 20 | **TPP Bridge** | Large | High | Import Framework, Proposal Revisions | Legacy proposal migration - blocks historical proposal access |
 | 21 | **Venue Layout Templates** | Medium | Medium | Venue Profile | Operational efficiency - reusable layouts reduce setup time |
 | 22 | **Venue Notes Entity** | Medium | Medium | Venue Profile | Knowledge base - institutional memory about venues |
