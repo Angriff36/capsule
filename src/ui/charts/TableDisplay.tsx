@@ -1,0 +1,188 @@
+import React from "react";
+import { clsx } from "@/lib/utils";
+import { formatMoney, formatCount, formatDate } from "@/lib/format";
+
+/**
+ * TableDisplay Component
+ *
+ * Displays tabular data for reports with sorting and export support.
+ * Used for detailed breakdowns in dashboards.
+ *
+ * Features:
+ * - Automatic formatting based on column type
+ * - Sortable columns
+ * - Responsive design
+ * - Export to CSV support
+ */
+
+export interface TableColumn {
+  key: string;
+  header: string;
+  type?: "string" | "number" | "currency" | "percent" | "date";
+  align?: "left" | "center" | "right";
+  sortable?: boolean;
+  format?: (value: unknown) => string;
+}
+
+export interface TableDisplayProps {
+  columns: TableColumn[];
+  data: Array<Record<string, unknown>>;
+  title?: string;
+  subtitle?: string;
+  height?: number;
+  sortable?: boolean;
+  onExport?: () => void;
+  className?: string;
+}
+
+export function TableDisplay({
+  columns,
+  data,
+  title,
+  subtitle,
+  height,
+  sortable = false,
+  onExport,
+  className,
+}: TableDisplayProps) {
+  const [sortColumn, setSortColumn] = React.useState<string | null>(null);
+  const [sortDirection, setSortDirection] = React.useState<"asc" | "desc">(
+    "asc",
+  );
+
+  const formatValue = (value: unknown, column: TableColumn): string => {
+    if (value === null || value === undefined) return "—";
+
+    if (column.format) return column.format(value);
+
+    switch (column.type) {
+      case "currency":
+        return formatMoney(Number(value));
+      case "percent":
+        return `${Number(value).toFixed(1)}%`;
+      case "number":
+        return formatCount(Number(value));
+      case "date":
+        return formatDate(String(value));
+      default:
+        return String(value);
+    }
+  };
+
+  const handleSort = (key: string) => {
+    if (!sortable) return;
+
+    if (sortColumn === key) {
+      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+    } else {
+      setSortColumn(key);
+      setSortDirection("asc");
+    }
+  };
+
+  const sortedData = React.useMemo(() => {
+    if (!sortColumn || !sortable) return data;
+
+    return [...data].sort((a, b) => {
+      const aVal = a[sortColumn];
+      const bVal = b[sortColumn];
+
+      if (aVal === bVal) return 0;
+
+      const comparison = aVal < bVal ? -1 : 1;
+      return sortDirection === "asc" ? comparison : -comparison;
+    });
+  }, [data, sortColumn, sortDirection, sortable]);
+
+  const alignClass = {
+    left: "text-left",
+    center: "text-center",
+    right: "text-right",
+  } as const;
+
+  return (
+    <div
+      className={clsx(
+        "overflow-hidden rounded-lg border border-ink-200 bg-white",
+        className,
+      )}
+    >
+      {(title || subtitle || onExport) && (
+        <div className="flex items-center justify-between border-b border-ink-200 px-4 py-3">
+          <div>
+            {title && (
+              <h3 className="text-base font-semibold text-ink-900">{title}</h3>
+            )}
+            {subtitle && <p className="text-sm text-ink-500">{subtitle}</p>}
+          </div>
+          {onExport && (
+            <button
+              onClick={onExport}
+              className="rounded border border-ink-300 px-3 py-1.5 text-sm text-ink-600 hover:bg-ink-50"
+            >
+              Export CSV
+            </button>
+          )}
+        </div>
+      )}
+
+      <div style={{ height }} className="overflow-auto">
+        <table className="w-full text-sm">
+          <thead className="bg-ink-50">
+            <tr>
+              {columns.map((col) => (
+                <th
+                  key={col.key}
+                  onClick={() => handleSort(col.key)}
+                  className={clsx(
+                    "px-4 py-2 font-medium text-ink-700",
+                    alignClass[col.align || "left"],
+                    sortable &&
+                      col.sortable &&
+                      "cursor-pointer hover:bg-ink-100",
+                  )}
+                >
+                  <div className="flex items-center gap-1">
+                    {col.header}
+                    {sortable && col.sortable && (
+                      <span className="text-ink-400">
+                        {sortColumn === col.key
+                          ? sortDirection === "asc"
+                            ? "↑"
+                            : "↓"
+                          : "↕"}
+                      </span>
+                    )}
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-ink-200">
+            {sortedData.map((row, rowIndex) => (
+              <tr key={rowIndex} className="hover:bg-ink-50/50">
+                {columns.map((col) => (
+                  <td
+                    key={col.key}
+                    className={clsx(
+                      "px-4 py-2 text-ink-600",
+                      alignClass[col.align || "left"],
+                    )}
+                  >
+                    {formatValue(row[col.key], col)}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {data.length === 0 && (
+        <div className="px-4 py-8 text-center text-ink-500">
+          <p>No data available</p>
+        </div>
+      )}
+    </div>
+  );
+}

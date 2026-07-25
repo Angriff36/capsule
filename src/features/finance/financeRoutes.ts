@@ -51,4 +51,11 @@ export const FINANCE_ROUTES = {
   revenueAttribution: "/finance/attribution",
   revenueAttributionDetail: (id: string, mode?: string) =>
     mode ? `/finance/attribution/${id}/${mode}` : `/finance/attribution/${id}`,
+  salesDashboard: "/reports/sales",
+  timsKpis: "/reports/tims-kpis",
+  scorecard: "/reports/scorecard",
+  l10: "/reports/l10",
+  avgEventValue: "/reports/avg-event-value",
+  compMaster: "/reports/comp-master",
+  mangia: "/reports/mangia",
 } as const;

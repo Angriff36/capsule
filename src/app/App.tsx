@@ -229,6 +229,45 @@ const ReportsPage = lazy(() =>
     default: module.ReportsPage,
   })),
 );
+const SalesDashboardPage = lazy(() =>
+  import("../features/reports/SalesDashboardPage").then((module) => ({
+    default: module.SalesDashboardPage,
+  })),
+);
+const TimsKPIsDashboardPage = lazy(() =>
+  import("../features/reports/TimsKPIsDashboardPage").then((module) => ({
+    default: module.TimsKPIsDashboardPage,
+  })),
+);
+const CompanyScorecardDashboardPage = lazy(() =>
+  import("../features/reports/CompanyScorecardDashboardPage").then(
+    (module) => ({
+      default: module.CompanyScorecardDashboardPage,
+    }),
+  ),
+);
+const L10DashboardPage = lazy(() =>
+  import("../features/reports/L10DashboardPage").then((module) => ({
+    default: module.L10DashboardPage,
+  })),
+);
+const AvgEventValueGrowthDashboardPage = lazy(() =>
+  import("../features/reports/AvgEventValueGrowthDashboardPage").then(
+    (module) => ({
+      default: module.AvgEventValueGrowthDashboardPage,
+    }),
+  ),
+);
+const CompMasterDashboardPage = lazy(() =>
+  import("../features/reports/CompMasterDashboardPage").then((module) => ({
+    default: module.CompMasterDashboardPage,
+  })),
+);
+const MangiaDashboardPage = lazy(() =>
+  import("../features/reports/MangiaDashboardPage").then((module) => ({
+    default: module.MangiaDashboardPage,
+  })),
+);
 const ClientsPage = lazy(() =>
   import("../features/clients/ClientsPage").then((module) => ({
     default: module.ClientsPage,
@@ -816,6 +855,62 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ReportsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/reports/sales"
+              element={
+                <SupplyRoute>
+                  <SalesDashboardPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/reports/tims-kpis"
+              element={
+                <SupplyRoute>
+                  <TimsKPIsDashboardPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/reports/scorecard"
+              element={
+                <SupplyRoute>
+                  <CompanyScorecardDashboardPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/reports/l10"
+              element={
+                <SupplyRoute>
+                  <L10DashboardPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/reports/avg-event-value"
+              element={
+                <SupplyRoute>
+                  <AvgEventValueGrowthDashboardPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/reports/comp-master"
+              element={
+                <SupplyRoute>
+                  <CompMasterDashboardPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/reports/mangia"
+              element={
+                <SupplyRoute>
+                  <MangiaDashboardPage />
                 </SupplyRoute>
               }
             />
