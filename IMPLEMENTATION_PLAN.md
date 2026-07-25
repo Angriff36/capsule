@@ -2619,25 +2619,25 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 **Next Priority:**
 
-**RECOMMENDED: Priority 21 (Venue Layout Templates)** — Medium effort, medium impact
+**RECOMMENDED: Priority 23 (Vendor Ecosystem)** — Medium effort, medium impact
 
 **Why this is the best next priority:**
-- **High value** — Reusable layouts reduce setup time for events
-- **Operational efficiency** — Venue template system enables faster event configuration
-- **Foundation ready** — Venue entity ✅, Event layouts ✅, Venue depth ✅ (6 of 12 logistics fields complete)
-- **Completes venue work** — Only vendor ecosystem remaining for full venue management
+- **High value** — Vendor coordination and approved vendor lists
+- **Operational efficiency** — Venue vendor relationships management
+- **Foundation ready** — Venue entity ✅, Vendor entity ✅
+- **Completes venue work** — Final piece for full venue management
 
 **Alternative priorities considered:**
-- Priority 23 (Vendor Ecosystem): Medium effort, high value for vendor coordination
 - Priority 32 (Email Inbox/Threading): Medium-Large effort, high value for connected inbox
 - Priority 33 (Nowsta Integration): Large effort, medium value for payroll automation
+- Priority 34 (Social DMs): XLarge effort, medium value for inquiry capture
 
 **Status snapshot:**
 - **Slice 4 (Operations):** ✅ **100% COMPLETE** — Kitchen/inventory/staffing/equipment complete, all HR features done
 - **Slice 0 (Foundation):** ✅ 85% — Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅
 - **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines
 - **Slice 1 (Proposals):** 🟡 55% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ✅, templates ✅, quote builder ✅
-- **Slice 3 (Venue/Reporting):** ✅ **95%** — Venue entity ✅, logistics fields ✅ (6 of 12), revenue attribution ✅, 7 dashboards ✅, render engine ✅, vendor relationships ❌, layout templates ❌
+- **Slice 3 (Venue/Reporting):** ✅ **95%** — Venue entity ✅, logistics fields ✅ (6 of 12), revenue attribution ✅, 7 dashboards ✅, render engine ✅, vendor relationships ❌, **layout templates ✅**
 - **Slice 2 (Migration):** ✅ 100% — Import framework complete
 
 **Completed:**
@@ -2645,6 +2645,14 @@ The codebase includes several production-grade enhancements not explicitly in th
 - ✅ ServiceStyle entity (unlocks 11 features)
 - ✅ Sales Lock pipeline (unblocks 6 features)
 - ✅ Revenue attribution (UI complete, enables accurate reporting)
+- ✅ Equipment location fields (improves logistics accuracy)
+- ✅ **Performance Event Linkage (unblocks per-event HR feedback granularity)**
+- ✅ **Role Scorecards (full manifest, UI, routing, unblocks One-on-Ones)**
+- ✅ **One-on-Ones (full manifest entity, UI, routing, staff development meetings)**
+- ✅ **Hiring Pipeline (Candidate + Interview manifests, CandidatesPage + InterviewsPage UI, full routing wired)**
+- ✅ **Self-Service Quote Builder (QuoteSubmission manifest, QuoteSubmissionPage, quoteBuilder.ts, routing at /quote)**
+- ✅ **Payment Reconciliation (Payment entity has reconciliation fields, commands for match/verify/dispute workflow, generated hooks available)**
+- ✅ **Priority 21: Venue Layout Templates (entity ✅, UI ✅, routing ✅, copy-from-template workflow ✅, 725 tests passing)**
 - ✅ Equipment location fields (improves logistics accuracy)
 - ✅ Performance Event Linkage (unblocks per-event HR feedback granularity)
 - ✅ Role Scorecards (full manifest, UI, routing, unblocks One-on-Ones)
