@@ -53,6 +53,21 @@
 - Generated hooks working
 - Form validation complete
 
+---
+
+**Session Summary — 2026-07-25:**
+
+**Completed:**
+- ✅ Proposal Templates (Priority 11) — Manifest and UI fully wired at /clients/proposals/templates
+- ✅ All 708 tests passing
+- ✅ Git tag v0.0.2 created
+- ✅ Slice 1 (Proposals) now ~50% complete (up from 45%)
+
+**Next Priority — Self-Service Quote Builder (Priority 14, Large effort):**
+- Mobile-first public quote form → Contact/Company → Lead → Event → Proposal
+- Dependencies ready: ServiceStyle ✅, Occasion ✅, Menu pricing ✅
+- Alternative Medium items: Venue Layout Templates (21), Venue Notes Entity (22), Vendor Ecosystem (23)
+
 **Previous Update:**
 
 **2026-07-25 — Hiring Pipeline Discovery (Priority 26):**
@@ -2391,7 +2406,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 ---
 
-**Last updated:** 2026-07-25 (Proposal Templates UI Wired)
+**Last updated:** 2026-07-25 (Session Summary — Templates complete, Quote Builder scoped)
 **Spec version:** capsule-complete-feature-spec.md
 **Verification:** All 101 spec items verified against actual source code
 **Status snapshot:**
