@@ -2,9 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import {
   useListEvent,
   useListEventCloseout,
+  useListVenue,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { ReportFilterBar } from "./ReportFilterBar";
+import { useFinanceReportFilters } from "./useFinanceReportFilters";
 import {
   buildFoodCostReport,
   type FoodCostCloseout,
@@ -166,26 +169,56 @@ function FoodCostTrend({
 export function FoodCostPercentageDashboard({
   closeouts,
   events,
+  venueMap,
   loading = false,
   now,
+  venuePremiseFilter = "all",
 }: {
   closeouts: readonly FoodCostCloseout[];
   events: readonly FoodCostEvent[];
+  venueMap?: Map<string, boolean | null | undefined>;
   loading?: boolean;
   now: Date;
+  venuePremiseFilter?: "on" | "off" | "all";
 }) {
   const [granularity, setGranularity] = useState<FoodCostGranularity>("month");
   const [target, setTarget] = useState(initialTarget);
+
+  // Filter events by venue premise
+  const filteredEvents = useMemo(() => {
+    if (!venueMap || venuePremiseFilter === "all") return events;
+
+    return events.filter((event) => {
+      if (!event.venueId) return false;
+
+      const venueOnPremise = venueMap.get(String(event.venueId));
+      if (venuePremiseFilter === "on") return venueOnPremise === true;
+      if (venuePremiseFilter === "off") return venueOnPremise === false;
+      return true;
+    });
+  }, [events, venueMap, venuePremiseFilter]);
+
+  // Build filtered event IDs set for closeout filtering
+  const filteredEventIds = useMemo(() => {
+    return new Set(filteredEvents.map((e) => String(e._id)));
+  }, [filteredEvents]);
+
+  // Filter closeouts by filtered events
+  const filteredCloseouts = useMemo(() => {
+    if (venuePremiseFilter === "all") return closeouts;
+    return closeouts.filter((c) => filteredEventIds.has(String(c.eventId)));
+  }, [closeouts, filteredEventIds, venuePremiseFilter]);
+
   const report = useMemo(
     () =>
       buildFoodCostReport({
-        closeouts,
-        events,
+        closeouts: filteredCloseouts,
+        events: filteredEvents,
         granularity,
         targetPercentage: target,
         now,
       }),
-    [closeouts, events, granularity, now, target],
+    [filteredCloseouts, filteredEvents, granularity, now, target],
   );
   const inclusiveRangeEnd = new Date(report.rangeEnd);
   inclusiveRangeEnd.setDate(inclusiveRangeEnd.getDate() - 1);
@@ -464,14 +497,61 @@ function FoodCostReportBody({
 export function FoodCostPercentagePage() {
   const closeouts = useListEventCloseout();
   const events = useListEvent();
+  const venues = useListVenue();
   const now = useMemo(() => new Date(), []);
 
+  // Build venue lookup map for onPremise filtering
+  const venueMap = useMemo(() => {
+    const map = new Map<string, boolean | null | undefined>();
+    for (const venue of venues ?? []) {
+      if (venue._id && venue.onPremise !== undefined) {
+        map.set(String(venue._id), venue.onPremise);
+      }
+    }
+    return map;
+  }, [venues]);
+
   return (
-    <FoodCostPercentageDashboard
+    <FoodCostPercentagePageWithFilters
       closeouts={closeouts ?? []}
       events={events ?? []}
+      venueMap={venueMap}
       loading={closeouts === undefined || events === undefined}
       now={now}
     />
+  );
+}
+
+function FoodCostPercentagePageWithFilters({
+  closeouts,
+  events,
+  venueMap,
+  loading,
+  now,
+}: {
+  closeouts: readonly FoodCostCloseout[];
+  events: readonly FoodCostEvent[];
+  venueMap: Map<string, boolean | null | undefined>;
+  loading: boolean;
+  now: Date;
+}) {
+  const { filters } = useFinanceReportFilters();
+
+  return (
+    <>
+      <ReportFilterBar
+        showVenuePremise={true}
+        showTarget={false}
+        showView={false}
+      />
+      <FoodCostPercentageDashboard
+        closeouts={closeouts}
+        events={events}
+        venueMap={venueMap}
+        loading={loading}
+        now={now}
+        venuePremiseFilter={filters.venuePremise}
+      />
+    </>
   );
 }

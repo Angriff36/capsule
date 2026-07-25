@@ -7,6 +7,7 @@ export type FoodCostEvent = {
   title?: string | null;
   eventType?: string | null;
   startsAt?: DateValue;
+  venueId?: string | null; // For venue premise filtering
 };
 
 export type FoodCostCloseout = {
