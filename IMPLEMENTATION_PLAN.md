@@ -1,0 +1,1614 @@
+# Capsule Pro — Implementation Plan
+
+**Generated:** 2026-07-24
+**Updated:** 2026-07-24 (Complete Gap Analysis Update)
+**Source:** `specs/capsule-complete-feature-spec.md`
+**Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
+
+---
+
+## Changes This Update
+
+**2026-07-24 — Complete Gap Analysis Integration:**
+
+**Comprehensive Inventory:**
+- 101 total spec items catalogued (42 done, 28 partial, 31 not built)
+- 67% overall completeness
+- All 46 entities, 62 features, 6 integrations, 8 dashboards verified against codebase
+
+**Entity Status Mapped:**
+- 23 entities confirmed DONE (Contact, Company, Inquiry, Deal, Event, Staff, PrepList, PrepTask, Menu Items, Recipes, Ingredients, Inventory, Stock Movement, Waste, Event Food Cost, Proposal Sections, Proposal Line Items, Staff Shift, Role, Salesperson)
+- 8 entities PARTIAL (Event Status, Venue, Proposal, Share Link, Equipment Item, PackListItem, Equipment PackList, Event Layout, Performance Feedback, Integration Connection)
+- 15 entities NOT BUILT (Service Style, Occasion, Referral Source, Proposal Revision, Proposal Timeline Item, Proposal Enhancement, Signature/Acceptance Request, Venue Note, Venue Layout Template, Venue Vendor Relationship, Revenue Attribution, Role Scorecard, Candidate/Application, Interview, One-on-One, External Record Link, Import/Sync Run, Sync Error, Payment/Reconciliation Record, Message Thread, Message)
+
+**Feature Gap Analysis:**
+- Slice 0: 50% complete (Event detail ✅, PackList separation ✅, ServiceStyle ❌, Sales Lock ❌)
+- Slice 1: 45% complete (Proposal lifecycle ✅, quote builder ❌, revisions ❌, templates ❌, acceptance ❌)
+- Slice 2: 0% complete (No import framework)
+- Slice 3: 30% complete (Venue basic ✅, management UI ❌, 7 dashboards ❌, revenue attribution ❌)
+- Slice 4: 85% complete (Kitchen ✅, inventory ✅, staffing ✅, equipment 🟡, HR features ❌)
+- Slice 5: 60% complete (QuickBooks ✅, Calendar ✅, SMS ✅, Nowsta ❌, Social ❌)
+
+**Code Evidence Verification:**
+- All spec items verified with file:line references from convex/schema.ts and feature directories
+- EventStage enum confirmed at schema.ts:481 (planning/pending_approval/approved/executing/completed/cancelled/closed_out)
+- ServiceStyle confirmed absent (only free-text serviceStyle in dishes schema.ts:293 and menus schema.ts:1066)
+- Sales Lock states confirmed missing from EventStage enum
+- Venue entity basic at schema.ts:2176-2202 (missing logistics/vendor/scorecard depth)
+
+**Priority Sequencing:**
+- Import framework (#1) blocks all Slice 2 migration work
+- Service Style entity (#3) blocks 11 downstream features
+- Sales Lock pipeline (#4) blocks sales workflow and proposal acceptance
+- Revenue attribution (#6) blocks sales dashboards and commission tracking
+
+---
+
+## Summary Status by Slice
+
+| Slice | Status | Blockers | Completeness | Strongest Areas | Critical Gaps |
+|-------|--------|----------|--------------|-----------------|---------------|
+| **Slice 0** | 🟡 Partial | 1 | 65% | Event detail ✅, PackList separation ✅, ServiceStyle ✅ | Sales Lock pipeline ❌ |
+| **Slice 1** | 🟡 Partial | 3 | 45% | Proposal lifecycle ✅, menu selection ✅ | Quote builder ❌, revisions ❌, templates ❌, acceptance ❌ |
+| **Slice 2** | ❌ Not Built | 2 | 0% | — | Import framework ❌, datasets ❌, dashboard ❌, cutover ❌ |
+| **Slice 3** | 🟡 Partial | 2 | 30% | Venue entity basic ✅, saved report config ✅ | Venue management UI ❌, 7 dashboards ❌, revenue attribution ❌ |
+| **Slice 4** | ✅ Strong | 1 | 85% | Kitchen ✅, inventory ✅, staffing ✅, equipment ✅ | HR features ❌ (scorecards, hiring, 1-on-1s) |
+| **Slice 5** | 🟡 Partial | 2 | 60% | QuickBooks ✅, Calendar ✅, SMS ✅, Webhooks ✅ | Nowsta ❌, Social DMs ❌, Email threading ❌ |
+
+**Overall Assessment:** Slice 4 (Operations) is production-ready. Slice 0 critical path (ServiceStyle entity + Sales Lock pipeline) blocks 17+ dependent features across all slices. Slice 2 is entirely greenfield — zero import framework exists; prerequisite for TPP migration. Slice 3 has Venue entity but lacks all 7 executive dashboards, revenue attribution logic, and render engine. Slice 1: Quote builder NOT BUILT (client portal read-only); proposal system has full command surface but missing revisions snapshot, template system, digital acceptance, and timeline/logistics PDF sections.
+
+---
+
+## Shared Wiring Patterns (All Slices)
+
+### Utilities
+
+| File | Purpose | Import Pattern |
+|------|---------|----------------|
+| `src/lib/api.ts` | Single Convex import point | `import { api, Doc, Id } from '@/lib/api'` |
+| `src/lib/workspace.ts` | Workspace constants | `TENANT_PLACEHOLDER` for create commands |
+| `src/lib/useAuthStatus.ts` | Auth query hook | **MUST use** instead of convex/react in event features |
+| `src/lib/format.ts` | Date/time/money formatting | `formatDate`, `formatTime`, `formatMoney` |
+| `src/lib/currency.ts` | Currency utilities | `SUPPORTED_CURRENCY_CODES`, `CURRENCY_LABEL` |
+| `src/lib/recents.ts` | localStorage recent records | `pushRecent`, `useRecents`, `useTrackRecent` |
+| `src/lib/eventRecurrence.ts` | Recurring event calculations | `recurringEventStartsAt`, `recurrenceIncludesSequence` |
+| `src/lib/invoicePaymentActions.ts` | Stripe payment-link actions | `useInvoicePaymentActions` |
+| `src/lib/recurringEventActions.ts` | Scheduler-arming action hook | `useConfigureRecurringEvent` |
+| `src/lib/manifest-convex-react.ts` | Generated React hooks | All useQuery/useMutation hooks (auto-generated) |
+
+### Patterns
+
+| Pattern | Description | Example |
+|---------|-------------|---------|
+| Commands/mutations | `use[Entity][Action]` from generated hooks | `useCreateEvent`, `useEventGuestCheckIn` |
+| Queries | `use[Entity]` or `useQuery(api.queries.*)` | `useListEvent`, `useQuery(api.queries.listEventGuestByEventId)` |
+| Auth | `useAuthStatus()` for auth status | **NEVER** import convex/react directly in event features |
+| Command args | `CleanCommandArgs.from()` to strip undefined/null/empty | `CleanCommandArgs.from({ name: value })` |
+| Error handling | `classifyCommandFailure(error)` returns {category, title, detail, action} | Display via FailureBanner |
+| Entity IDs | `Id<"entity">` type from api.ts | `(id ?? "skip") as Id<"events"> | "skip"` |
+| Optimistic ID | `"skip"` string for optional/missing IDs | Avoids undefined issues |
+| Form validation | `useFieldValidation(crossFieldRules)` | Native browser validation + FieldError |
+| Form draft | `useFormDraft(key)` | localStorage persistence + beforeunload guard |
+| Slow queries | `useSlowQuery(value, timeoutMs)` | Returns {loading, loadingTooLong} |
+| Action prompt | `useActionPrompt(busy)` | User confirmations/reasons/fields |
+| Bulk operations | `useBulkSelection(rows)`, `useBulkRun()` | Multi-select checkboxes, sequential async work |
+| Lifecycle policy | `*LifecyclePolicy` classes filter actions by status | WorkforceLifecyclePolicy, EventGuestPolicy |
+| Route helpers | `*Routes.ts` files per feature | [entity]DetailPath(id, tab?), parse[Entity]DetailTab |
+
+### Anti-Patterns (Never Do)
+
+- NEVER import convex/react directly in event features — use useAuthStatus() from src/lib/useAuthStatus.ts
+- NEVER hand-edit generated files in convex/_generated/ or src/lib/manifest-convex-react.ts
+- NEVER use taskkill //F //IM node.exe — kills Claude Code CLI too. Use npx kill-port PORT
+- NEVER pass undefined/null to Convex mutations — use CleanCommandArgs.from()
+- NEVER create independent form validation logic — use useFieldValidation() hook
+- NEVER implement draft persistence manually — use useFormDraft() hook
+- NEVER invent new authentication patterns — workspace identity from server-side auth context only
+- NEVER skip optimistic version handling — always pass version from doc to mutations
+- NEVER use npm or yarn — use pnpm (preferred) or bun
+- NEVER touch .env.local, credentials, .artifacts/ dumps
+
+---
+
+## Detailed Status by Spec Section
+
+### Foundation Entities (§2.1-2.3)
+
+| Entity | Status | Evidence | Notes |
+|--------|--------|----------|-------|
+| Contact | ✅ DONE | clientContacts table in schema.ts:125-152 with givenName/familyName/email/phone/title/isPrimary/isBillingContact | CRM with merge, lifecycle, contacts complete |
+| Company | ✅ DONE | clients table in schema.ts:70-107 with clientType union of company/person, companyName, address, taxId, paymentTerms | LeadPipelinePage.tsx:23-32 includes leadType: "company" \| "person" |
+| Inquiry/Lead | ✅ DONE | leads table in schema.ts:1004-1035 with stage (new/qualified/proposalSent/negotiating), probability, clientId/clientContactId/proposalId links | source is free-text string, no Social DM provider linkage |
+| Deal/Opportunity | ✅ DONE | Referenced within leads entity via proposalId and stage transitions | No separate Opportunity entity; deals are leads at proposalSent/negotiating stages |
+| Event | ✅ DONE | events table in schema.ts:456-514 with full lifecycle: planning/pending_approval/approved/executing/completed/cancelled/closed_out | Missing occasion enum (eventType is string), missing serviceStyle enum field, missing referralSource field, missing salesperson enum (assignedToId is person id) |
+| Event Status | 🟡 PARTIAL | Event.stage enum exists in schema.ts:481 with 7 states but missing Quote/Sales Lock from spec 3.3 | No Quote stage, No Sales Lock stage, Missing explicit transition commands for Sales Lock |
+| Service Style | ❌ NOT BUILT | No serviceStyles table; only free-text serviceStyle field in dishes schema.ts:293 and menus schema.ts:1066 | No first-class ServiceStyle entity; No active/inactive state; No displayOrder; No client-facing label; No operational defaults; No reconciliation queue for legacy values |
+| Occasion | ❌ NOT BUILT | No occasionTypes table; eventType in events schema.ts:465 is free-text string | No first-class Occasion entity; No enum for common occasions; No effective dates for seasonal occasions |
+| Venue | 🟡 PARTIAL | venues table in schema.ts:2176-2202 with basic identity/contact/address/capacity | No on/off-premise flag; No room/space details entity; No kitchen access/equipment fields; No load-in/parking/elevators/storage; No waste rules; No permits/insurance; No preferred/banned vendors link; No restrictions field; No attachments/photos (Venue not in attachments parentType union); No scorecard metrics |
+| Salesperson/Owner | ✅ DONE | assignedToId in events schema.ts:463; people.role enum in schema.ts:1257 includes sales_staff, sales_manager, owner | No explicit salesperson entity - uses people with role |
+| Referral Source | ❌ NOT BUILT | No referralSources table; source in leads schema.ts:1013 is free-text string | No first-class ReferralSource entity; No enum for common sources; No tracking of conversion by source |
+| Proposal | 🟡 PARTIAL | proposals table in schema.ts:1374-1411 with draft/sent/viewed/accepted/declined/expired status, eventId, pricing fields | No revision tracking; No immutable snapshot on publish; No version number; No superseded relationship; Draft->Published lifecycle incomplete |
+| Proposal Revision | ❌ NOT BUILT | No proposalRevisions table; proposals entity lacks versioning | No immutable snapshot entity; No version numbering; No event/client/venue/menu/pricing snapshot fields; No supersededBy link |
+| Proposal Section | ✅ DONE | Referenced in proposal structure through terms/notes/lineItems in proposals schema.ts:1394-1395 | No explicit ProposalSection entity - sections are implicit in document structure |
+| Proposal Line Item | ✅ DONE | Referenced through proposalDishSelections in schema.ts:1412-1431 with quantity/servings/course/serviceStyle | Pricing basis only implicit, no explicit per-person/quantity/flat/percentage/package enum |
+| Proposal Timeline Item | ❌ NOT BUILT | eventTimelineActivities table exists in schema.ts:732-753 but NOT linked to proposals | No link from proposal revisions to timeline; No run-of-show detail snapshotting in proposals |
+| Proposal Enhancement | ❌ NOT BUILT | No proposalEnhancements table | No upgrades/add-ons entity; No link to proposal revisions |
+| Share Link | 🟡 PARTIAL | clientPortal.ts exists with createShareToken action | No deck/proposal sharing (event portal only); No version tracking; No expiry field; No revocation tracking; No first/last view recording; No viewer identity |
+| Signature/Acceptance Request | ❌ NOT BUILT | No signatureRequests table; no e-sign provider webhook handlers | No recipient field; No proposalRevision link; No status (requested/expired/completed); No provider IDs for DocuSign/helloSign/etc; No signed artifact reference; No duplicate accept prevention |
+| Staff Shift/Assignment | ✅ DONE | eventAssignments in schema.ts:536-558 (role, startsAt/endsAt, status), shifts in schema.ts:1668-1704 | Rate/pay references are implicit in payrollInputs not explicit in assignments |
+| PrepList | ✅ DONE | prepTasks in schema.ts:1272-1315 with category/taskType/quantity/unit/station/dueAt/assignedToId/status/dependencies | No dedicated PrepList parent entity - tasks link to eventDish/event directly |
+| PrepTask | ✅ DONE | prepTasks in schema.ts:1272-1315 with full task data, prepTaskComments in schema.ts:1316-1340, prepTaskDependencies in schema.ts:1341-1351 | Complete task data with comments and dependencies |
+| Equipment PackList | 🟡 PARTIAL | packLists in schema.ts:1105-1127, packListItems in schema.ts:1128-1149 | No template linkage; No service-style linkage; No event-type/occasion linkage; No guest-count band linkage |
+| PackListItem | 🟡 PARTIAL | packListItems in schema.ts:1128-1149 with description/requiredQuantity/packedQuantity/unit/status | No grouping field; Dish link exists but no EquipmentItem link |
+| Equipment Item | 🟡 PARTIAL | equipments in schema.ts:375-393 with category/quantity/condition/ownership/value | No location field (homeLocation/currentLocation); No maintenance status link to equipmentMaintenanceTasks |
+| Event Layout | 🟡 PARTIAL | eventLayoutSections in schema.ts:672-685 with type/instructions/sortOrder | No venue template selection; No custom snapshot field; No link to venue layout templates |
+| Venue Logistics Snapshot | ❌ NOT BUILT | No venueLogisticsSnapshots table; event snapshots only capture name/address/capacity | No venue info snapshot at proposal publication; No logistics field snapshot; No load-in/parking/storage snapshot |
+| Menu Category | ✅ DONE | menus in schema.ts:1036-1057 with category field; MenuCategory implicit in Menu.category | No explicit MenuCategory entity - categories are strings |
+| Menu Item | ✅ DONE | dishes in schema.ts:286-316 with name/description/category/course/serviceStyle/portionSize/dietaryTags/allergenSummary/active/retired | No effective date ranges for seasonal items; No price history within Dish (price is in menuDishes) |
+| Menu Price/Season | ✅ DONE | menuDishes in schema.ts:1058-1076 with sellingPrice addedAt/removedAt; menus have pricePerPerson/basePrice | No explicit price history table - tracking via addedAt/removedAt |
+| Recipe | ✅ DONE | recipes in schema.ts:1501-1524 with versionNumber/yieldQuantity/yieldUnit/status/draft/published/retired | Complete with versioning, BOM, steps |
+| Ingredient | ✅ DONE | ingredients in schema.ts:799-833 with name/unit/allergens/costPerUnit/category/substitutes/preferredVendors | Complete with allergens, cost, substitutions |
+| Inventory Item | ✅ DONE | inventoryItems in schema.ts:886-906 with item/unit/location/quantityOnHand/parLevel/reorderThreshold | Complete with on-hand, par, reorder thresholds |
+| Stock Movement | ✅ DONE | inventoryLots in schema.ts:907-935 (receipts), stockTransfers in schema.ts:1814-1835, inventoryReservations in schema.ts:936-957 | No unified stockMovement table - uses separate tables for each operation type |
+| Waste Entry | ✅ DONE | wasteRecords in schema.ts:2203-2227 with item/ingredient/quantity/unit/reason/cost/event/location/status/notes/recordedAt/voidedAt | Complete with void capability and audit trail |
+| Event Food Cost | ✅ DONE | eventCloseouts in schema.ts:559-587 with actualIngredientCost/actualWasteCost/budgetedCost/costVariance/grossProfit | No costPerGuest field in eventCloseouts |
+| Venue Profile | 🟡 PARTIAL | venues table in schema.ts:2176-2202 has basic identity/contact/address/capacity | No management UI; Missing logistics depth; Missing vendor/scorecard fields |
+| Venue Note | ❌ NOT BUILT | No venueNotes table; only free-text accessNotes/cateringNotes in venues schema.ts:2190-2191 | No Note entity; No author/time tracking; No category/pin/priority; No visibility controls; No archive status; No optional Event reference |
+| Venue Layout Template | ❌ NOT BUILT | No venueLayoutTemplates table | No reusable venue layout entity; No link to venue; No layout definition schema |
+| Venue Vendor Relationship | ❌ NOT BUILT | No venueVendorRelationships table; preferredVendor only on Ingredient/PurchaseNeed | No Venue <-> Vendor link entity; No category field; No preferred/approved/restricted/banned enum; No contacts; No effective dates; No insurance/compliance references; No notes |
+| Revenue Attribution/Split | ❌ NOT BUILT | No revenueAttributions table | No Event/Venue/Salesperson/referral/partner link model; No percent or fixed allocation fields; No effective dates; No reason/type/source fields; No approval/reference fields; No validation that total allocated doesn't exceed allowed basis |
+| Staff Member | ✅ DONE | people in schema.ts:1250-1268 with role/employmentType/status/hireDate/terminationDate/smsAlertsOptIn | Role is enum, not linked to Role entity; No explicit rate/pay fields in people (in payrollInputs) |
+| Role | ✅ DONE | people.role enum in schema.ts:1257 with 27 roles from staff to system | Open strings NOT used - roles are fixed enum |
+| Role Scorecard | ❌ NOT BUILT | No roleScorecards table | No measurable expectations per role; No version/effective dates; No active state field |
+| Candidate/Application | ❌ NOT BUILT | No candidates table | No source IDs; No raw response references; No KM interview tool JSON mapping |
+| Interview | ❌ NOT BUILT | No interviews table | No pipeline stages; No source IDs; No raw response references |
+| Performance Feedback | 🟡 PARTIAL | performanceReviews in schema.ts:1232-1249 with personId/reviewerId/reliabilityRating/qualityRating/teamworkRating/notes | No eventId field (periodic, not per-event); No role/scorecard link; No strengths/opportunities fields; No follow-up tracking |
+| One-on-One | ❌ NOT BUILT | No oneOnOnes table | No period field; No participants; No agenda; No goals; No wins/strengths; No areas of opportunity; No decisions; No follow-up actions with owners/dates |
+| External Record Link | ❌ NOT BUILT | No externalRecordLinks table | No source system + record type + stable external ID → Capsule entity ID mapping; No raw source data storage; No artifact reference |
+| Import/Sync Run | ❌ NOT BUILT | No importRuns table | No source/dataset fields; No started/completed times; No counts/checksum/version; No actor tracking; No status/errors |
+| Sync Error | ❌ NOT BUILT | No syncErrors table | No retryable error queue |
+| Payment/Reconciliation Record | 🟡 PARTIAL | payments in schema.ts:1150-1179 with amount/method/status/invoiceId/eventId | No external transaction ID field; No source field for import tracking; No reconciliation state field; No QuickBooks/Nowsta link IDs |
+| Message Thread | 🟡 PARTIAL | clientCommunications in schema.ts:108-124 with manual logging, no connected inbox | No Contact linkage; No provider account field; No thread ID/message IDs; No sender identity; No timestamps from provider; No text/media metadata; No raw payload reference |
+| Message | ❌ NOT BUILT | No messages table | No thread ID; No message ID; No sender identity; No timestamp; No text/media metadata; No raw payload reference |
+| Integration Connection | 🟡 PARTIAL | Integration credentials scattered: qboConnections, googleCalendarConnections | No unified integrationConnections table; No tenant/provider/status schema; No encrypted credentials/reference; No scopes tracking; No last successful sync |
+
+---
+
+## Slice 0 — Foundation Blockers
+
+**Objective:** Make the event lifecycle trustworthy and complete. Every later workflow depends on these.
+
+### ✅ 3.1 Event Detail Crash — DONE
+
+**Evidence:**
+- EventDetailPage.tsx — Full event detail with tabs, lifecycle actions, reads event.stage correctly
+- EventLifecyclePolicy.ts:93-128 — Lifecycle policy with availableActions() for each stage
+- eventStatus.ts:2-22 — EventStage enum with 7 states
+
+**Lifecycle actions implemented:** submitForApproval, approve, beginExecution, complete, closeOut, cancel, returnToPlanning
+
+**Acceptance criteria met:**
+- Every authorized event detail URL loads from live data
+- Trace is_active failure to canonical source and repair
+- Backfill existing rows with correct active default
+- List and detail reads agree
+- Missing events return normal not-found state
+- Unauthorized/cross-tenant access does not reveal existence
+
+---
+
+### ✅ 3.2 Service Style Entity — DONE
+
+**Evidence:**
+- src/operations/service-style.manifest — Full ServiceStyle entity with TPP enum values
+- Event.serviceStyleId relation added to event.manifest
+- Commands: register, reviseDetails, activate, deactivate
+- Events: ServiceStyleRegistered, ServiceStyleDetailsRevised, ServiceStyleActivated, ServiceStyleDeactivated
+- Generated Convex schema, queries, mutations, HTTP handlers
+- All 654 tests passing
+
+**Acceptance criteria met:**
+- ServiceStyle entity with TPP values (Full Service, Limited Service, Drop Off, Vending)
+- Active/inactive state (ServiceStyleStatus enum)
+- Display order (sortOrder field for UI ordering)
+- Client-facing label (name field)
+- Operational defaults available via code field
+- Events reference ServiceStyle via optional serviceStyleId relation
+- Event.planEngagement command accepts serviceStyleId parameter
+
+**Next steps:**
+- ✅ Entity and Event relation complete
+- 🟡 Service Style management UI (task #3)
+- 🟡 Migrate free-text serviceStyle fields on MenuDish/EventDish/ProposalDishSelection to use ServiceStyle relation
+- 🟡 Build reconciliation queue for unknown legacy values (TPP import)
+- 🟡 Wire to proposal logic, templates, reports
+
+**Estimated effort:** Medium (entity + migration + UI wiring + dependent features) — ✅ Entity complete
+
+**Dependencies:** None (foundation entity) — ✅ Complete
+
+**Dependents:** 11 features across slices 0, 1, 2, 3, 4
+
+---
+
+### ❌ 3.3 Sales Lock + Event Status Pipeline — NOT BUILT (CRITICAL BLOCKER)
+
+**Spec requirement:** Quote → Sales Lock → Confirmed → Final → Complete lifecycle with explicit transition commands, guards, completeness checks, audit log
+
+**Current gap:**
+- EventStage enum = planning/pending_approval/approved/executing/completed/cancelled/closed_out (event.manifest:20-28)
+- Missing: Quote, Sales Lock, Final, Complete states
+- NO explicit transition commands with guards
+- NO completeness checks at gates
+- NO EventStatusTransition audit log entity
+
+**Evidence:**
+- event.manifest lacks required states
+- EventLifecyclePolicy.ts:13-78 implements current lifecycle only
+- NO Sales Lock distinction from Confirmed
+- Current completed ≠ spec's complete distinction
+
+**Impact:**
+- Cannot represent Quote phase
+- Cannot gate on Sales Lock
+- No Final freeze for reporting
+- No Complete distinction from executed
+- Blocks: §4.1 Event creation, §5 Proposal system, §7.3 Revenue attribution, §9.1 Staffing, §11.2 Pack templates
+
+**Next steps:**
+1. Extend EventStage enum with: quote, sales_lock, final, complete
+2. Add transition commands: lockForSales, confirm, finalize, complete
+3. Implement guards: prevent illegal skips/regressions
+4. Add completeness checks at each gate (date, client, service style, venue)
+5. Emit typed events for downstream reactions
+6. Create EventStatusTransition audit log entity
+
+**Estimated effort:** Large (state machine + guards + migration + event reactions + audit)
+
+**Dependencies:** Service Style entity (for completeness checks)
+
+**Dependents:** 6 features across slices 1, 3, 4
+
+---
+
+### 🟡 3.4 Event Creation Fields — PARTIAL
+
+**Done:**
+- Date/guests/venue present in Event entity
+- EventCreatePage.tsx:195-387 with form
+- Fields: title, eventType (free-text), expectedHeadcount, startsAt/endsAt, primary contact (name/email/phone), accessibility needs, service requirements, operational requirements, budget amount, quoted price, client selection, venue selection
+
+**Gaps:**
+- NO occasion enum (free-text eventType only at EventCreatePage.tsx:233-246)
+- NO service-style enum (ServiceStyle entity not built)
+- NO labeled salesperson field
+- NO referral source tracking
+
+**Estimated effort:** Small-Medium
+
+**Dependencies:** Service Style entity (Slice 0)
+
+---
+
+### ✅ 3.5 Equipment PackList ≠ PrepList — DONE
+
+**Evidence:**
+- PackList/PackListItem entities in schema (lines 1105-1149)
+- Separate from food PrepTask entity (convex/schema.ts:1272-1320)
+- Full CRUD commands: useCreatePackList, usePackListStartPacking, usePackListMarkPacked, usePackListMarkLoaded, usePackListDispatch
+- PackListsPage.tsx:21-271, PackListDetailPage.tsx:35-396
+
+**Acceptance criteria met:**
+- Food preparation (PrepList/PrepTask) and equipment packing (PackList/PackListItem) are separate systems
+- Event may have both simultaneously
+- Separate pages, commands, templates, reports, permissions, imports
+
+**Remaining:** Not yet linked to Equipment catalog (see §11.1), no templates (see §11.2)
+
+---
+
+## Slice 1 — Proposal Wedge
+
+**Objective:** Deliver the first visible TPP replacement value. Live menu pricing, proposal revisions, builder, TPP bridge, share links, acceptance.
+
+### 🟡 4.2 Online Menu Pricing — PARTIAL
+
+**Done:**
+- MenuDish.sellingPrice exists in menu.manifest
+- Pricing engine internal
+- ProposalMenuSelectionPanel.tsx reads from published menus
+
+**Gap:**
+- Client portal omits pricing display
+- ClientPortalPage.tsx:238-264 menu rendering omits pricing
+- Spec explicitly notes: "client portal omits it"
+
+**Next step:** Expose sellingPrice in client portal queries/components (or intentionally omit per product decision)
+
+**Estimated effort:** Small (UI only, if decision is to show)
+
+---
+
+### ❌ 4.3 Self-Service Quote Builder — NOT BUILT
+
+**Spec requirement:** Mobile flow (contact, event details, menu selections, consent), creates Contact/Company, Inquiry/Lead, Event/Deal, generates draft proposal, deduplication
+
+**Current gap:**
+- Client portal is read-only (ClientPortalPage.tsx)
+- clientPortal.ts:42-363 — Query-only, no mutations
+- NO public-facing quote form
+- NO draft proposal generation from web
+- EventCreatePage.tsx:1-656 — Authenticated staff form, not public
+- ProposalsPage.tsx:1-526 — Internal-only
+- contactDedup.ts:1-108 — Client duplicate detection only, no submission-idempotency key
+
+**Evidence:**
+- No quote builder page in src/features/clients/
+- No client-writable portal
+- No submission deduplication for leads
+
+**Acceptance criteria NOT met:**
+- NO flow collecting contact details, event date, occasion, guest count, service style, venue/location, menu selections, enhancements, consent
+- NO validation of availability/eligibility rules
+- NO Inquiry/Lead creation from web submission
+- NO draft proposal/estimate generation from same pricing engine
+- NO submission deduplication by stable key
+- NO mobile client submit-once capability
+
+**Next steps:**
+1. Design mobile-first quote form (public)
+2. Wire to Proposal.draft command
+3. Implement submission deduplication (SubmissionDeduplicationKey entity)
+4. Create Contact/Company/Inquiry/Lead cascade
+5. Integrate with Service Style entity
+6. Integrate with Menu pricing engine
+
+**Estimated effort:** Large (new feature, client-facing, authentication, deduplication)
+
+**Dependencies:** Service Style entity, Proposal revisions
+
+---
+
+### ✅ 5.1 Proposal Lifecycle — DONE (Command Surface)
+
+**Evidence:**
+- proposal.manifest:9-16 — ProposalStatus enum: draft, sent, viewed, accepted, declined, expired
+- proposal.manifest:70-198 — Commands: draft(), send(), markViewed(), accept(), decline(), expire()
+- ProposalsPage.tsx:158-235 — invoke() handles all state transitions
+- proposal.manifest:28 — eventId: uuid? (optional, not required)
+- ProposalDishSelection sub-entity with commands
+- PDF generation: proposalPdf.ts
+
+**Gaps:**
+- NO explicit revision snapshot entity (ProposalRevision not built)
+- NO "superseded" state mentioned in spec
+- NO template system
+- Not fully event-driven
+
+**Acceptance criteria:**
+- Lifecycle states: ✅ (except superseded)
+- Transition commands: ✅
+- UI lifecycle actions: ✅
+- Proposal belongs to Event: 🟡 (optional)
+- Revisions snapshot: ❌ (see §5.6)
+
+**Estimated effort:** Medium (for revisions + event emission)
+
+---
+
+### ❌ 5.2 Timeline / Venue-Logistics / Enhancements Sections — NOT BUILT
+
+**Spec requirement:** Timeline/run-of-show section, Venue logistics snapshot section, Enhancements/upgrades section in proposal PDF
+
+**Current gap:**
+- PDF (proposalPdf.ts:79-286) has: Cover/brand, Event summary, Menu sections, Pricing summary, Terms
+- NO timeline data structure
+- NO venue logistics snapshot (only name/address)
+- NO enhancement entity
+- NO acceptance CTA button
+
+**Evidence:**
+- proposalPdf.ts lacks timeline, logistics, enhancements rendering
+- No ProposalTimelineItem, ProposalEnhancement entities
+
+**Required PDF sections (spec §5.2):**
+- ✅ Cover/brand and event summary
+- ✅ Menu sections with descriptions/quantities/prices
+- ❌ Timeline/run-of-show
+- ❌ Venue logistics snapshot (only basic name/address currently)
+- ❌ Enhancements/upgrades
+- ✅ Pricing summary with fees/taxes/discounts/deposits/payment schedule
+- ✅ Terms
+- ❌ Acceptance/signature CTA button
+
+**Dependencies:** Venue profile depth (§8.1), Event layouts (§8.2)
+
+**Estimated effort:** Medium (data model + PDF rendering)
+
+---
+
+### 🟡 5.3 TPP Bridge — PARTIAL
+
+**Done:**
+- lead.manifest:159-164 — Lead.stageProposal command
+- lead.manifest:166-182 — Lead.confirmProposalSent (updates stage to proposalSent)
+- Proposal can create from lead
+
+**Gaps:**
+- NO import framework (Slice 2)
+- NO direct event→proposal command (imported TPP Event uses same create proposal command)
+- Legacy field reconciliation not surfaced
+- Missing menu or venue mappings not surfaced before publication
+
+**Dependencies:** Migration framework (Slice 2)
+
+**Estimated effort:** Medium (depends on Slice 2)
+
+---
+
+### ❌ 5.4 Pricing Behavior — PARTIAL
+
+**Done:**
+- proposalPdf.ts:192-194 — per-person pricing calculation
+- proposal.manifest:36-39 — subtotal, taxAmount, discountAmount
+- Discounts, service charges, taxability exist
+
+**Gaps:**
+- NO line item types (per person, quantity/unit, flat fee, percentage, package)
+- Only flat subtotal/tax/discount
+- NO snapshot pricing at publication (no revision system)
+- NO authorization for overrides (no reason required)
+- proposalPdf.ts has no override authorization UI
+
+**Dependencies:** Proposal revisions, Money/decimal utilities
+
+**Estimated effort:** Medium (line item types + override auth)
+
+---
+
+### ❌ 5.5 Digital Acceptance/Signature — NOT BUILT
+
+**Spec requirement:** Acceptance/Signature Request record (recipient, proposal revision, status, times, provider IDs, signed artifact), provider-neutral, supports e-sign webhooks, records exact revision/terms version, idempotent callback
+
+**Current gap:**
+- NO signature/acceptance entity
+- PDF has no CTA button
+- Only internal Proposal.accept() command
+- NO e-sign provider integration
+
+**Evidence:**
+- No SignatureRequest or AcceptanceRequest entity
+- proposalPdf.ts has no CTA button or signature field
+- Proposal.accept is internal-only
+
+**Next steps:**
+1. Design ProposalAcceptance entity
+2. Wire webhook handler for e-sign provider
+3. Add functional CTA to PDF
+4. Record exact revision accepted
+
+**Dependencies:** Proposal revisions, share links
+
+**Estimated effort:** Medium-Large
+
+---
+
+### 🟡 4.6 Social Sharing / Share Links — PARTIAL
+
+**Done:**
+- clientPortal.ts:22 — createShareToken() action
+- ClientPortalPage.tsx:91-102 — token-based portal access
+- Tokens reference specific eventId
+
+**Gaps:**
+- NO proposal-specific share links
+- NO revocation mechanism (once created, tokens cannot be revoked)
+- NO deck sharing
+- NO share tracking (views, identity)
+
+**Next steps:**
+1. Extend share tokens to proposals/decks
+2. Add revocation mechanism
+3. Implement ShareTracking entity
+
+**Estimated effort:** Small-Medium
+
+**Dependencies:** Proposal revisions
+
+---
+
+### ❌ 5.5 Proposal Template System — NOT BUILT
+
+**Spec requirement:** Reusable proposal templates (menu presets, terms, sections), template selection during creation, template library management, reorder sections, show/hide sections
+
+**Current gap:**
+- NO template entity
+- NO library
+- Proposals drafted from scratch
+- proposalPdf.ts has fixed section order — no reordering
+- NO configuration mechanism
+
+**Evidence:**
+- Schema lacks proposalTemplates entity
+- No template selection UI
+
+**Next steps:**
+1. Design ProposalTemplate entity
+2. Create template library UI
+3. Wire to proposal draft flow
+4. Implement section reorder/edit controls
+
+**Dependencies:** Event spine, Menu catalog, Venue data, Pricing engine
+
+**Estimated effort:** Medium-Large
+
+---
+
+### ❌ 5.6 Proposal Revisions Snapshot — NOT BUILT
+
+**Spec requirement:** Immutable revision snapshots (version number, timestamp, actor), event/client/venue/menu/pricing details, historical revisions reproducible for accepted proposals, superseded/expired tracking
+
+**Current gap:**
+- Only version field on proposals
+- NO snapshot entity
+- NO history tracking
+- Later edits mutate draft, no immutable record
+
+**Evidence:**
+- Schema lacks proposalRevisions entity
+
+**Next steps:**
+1. Design ProposalRevision entity
+2. Implement snapshot on publish
+3. Track revision history
+4. Ensure reproducibility
+
+**Estimated effort:** Medium
+
+---
+
+## Slice 2 — TPP Migration and Parallel Run
+
+**Objective:** Repeatable, measurable import with daily comparison dashboard before full cutover.
+
+### ❌ 6.1 Import Framework — NOT BUILT
+
+**Spec requirement:** Durable Import Run (source, dataset, times, counts, checksum, actor, status, errors), External Record Link (source + record type + external ID → Capsule ID), idempotent imports, manual Capsule changes follow field ownership rules, conflicts → review queue
+
+**Current gap:**
+- NO import framework in src/
+- Only import-related code is RecipeImport for culinary feature (pattern exists)
+
+**Evidence:**
+- NO ImportRun, ImportJob, ExternalRecordLink, or ExternalRecord entities in schema
+- Search returns no import framework files
+- src/culinary/recipe-import.manifest — Recipe-specific only
+
+**Related but NOT TPP Migration:**
+- src/features/kitchen/import/* — Recipe-specific import UI/parsers (10 files, all Recipe* prefixed)
+- src/logistics/pack-list.manifest — PackList entity exists but no TPP extraction
+
+**Estimated effort:** Large (new subsystem)
+
+---
+
+### ❌ 6.2 Required Datasets — NOT BUILT
+
+**Datasets:**
+- 2,103 Events (27-field mapping documented)
+- Contacts (name, email, phone, company, address)
+- Pipeline/deals, stages, close history
+- Menu catalog, categories, prices
+- Equipment Pack Lists (browser-extracted, see §6.3)
+- Venues (addresses, capacity, contacts, notes)
+- Payments (TPP, QuickBooks, Nowsta reconciliation)
+
+**Dependencies:** Import framework, field mappings from existing docs
+
+**Estimated effort:** Large (data work)
+
+---
+
+### ❌ 6.3 Browser-Extracted Pack Lists — NOT BUILT
+
+**Spec requirement:** Extractor records source event ID, page/version, extraction time, items, errors; resumable and idempotent; imports map to PackList/PackListItem only; unrecognized items remain as free-text
+
+**Current gap:** TPP has no bulk export; custom extractor needed
+
+**Dependencies:** Import framework, PackList entity (✅ exists)
+
+**Estimated effort:** Medium-Large
+
+---
+
+### ❌ 6.4 Payment Reconciliation — NOT BUILT
+
+**Spec requirement:** Imported payments (source, external ID, amount, date, type, event/client reference, reconciliation state), match by provider IDs first, then deterministic rules, heuristics suggest but don't silently finalize
+
+**Dependencies:** Import framework, Payment entity (✅ exists via sales/payment.manifest)
+
+**Estimated effort:** Medium
+
+---
+
+### ❌ 6.5 Parallel Run Dashboard — NOT BUILT
+
+**Spec requirement:** Daily comparison (record counts, event totals, status distribution, revenue, salesperson, occasion, service style, venue), newly created/changed records, unresolved mappings, drillable to source + Capsule records, assignable/resolvable
+
+**Dependencies:** Import framework, Service Style, Venue depth
+
+**Estimated effort:** Medium-Large
+
+---
+
+### ❌ 6.6 Cutover — NOT BUILT
+
+**Spec requirement:** Final delta import, zero critical unresolved mappings, business validation of event flow + reports, provider/integration readiness, rollback/archive plan, TPP read-only/archive after go/no-go
+
+**Dependencies:** All previous Slice 2 work, full integration health
+
+**Estimated effort:** Large (operational)
+
+---
+
+## Slice 3 — Venue and Reporting Core
+
+**Objective:** Wire Venue depth and move all dashboards onto live data.
+
+### ❌ 8.1 Venue Management UI — NOT BUILT
+
+**Done:**
+- Backend Venue entity in schema with name, venueType, capacity, address, accessNotes, cateringNotes, contact (name/email/phone), status
+
+**Gaps:**
+- NO management UI
+- Missing: logistics depth, vendor ecosystem, scorecard metrics, on/off-premise flag, kitchen access, equipment details, power/water, load-in path/times, parking, elevators/stairs, storage, waste rules, permits/insurance, preferred/banned vendors
+
+**Evidence:**
+- Schema venues.manifest has basic fields only (lines 2176-2202)
+- venueType enum: client_site, banquet_hall, outdoor, office, private_home, other (NO on/off-premise flag)
+- NO operations/vendor fields
+- NO Venue*Page.tsx files in src/features/
+
+**Next steps:**
+1. Create VenuePages
+2. Extend Venue entity for operations fields
+3. Add on/off-premise classification
+4. Add VenueCapacity, VenueVendorRule entities
+
+**Estimated effort:** Medium-Large
+
+---
+
+### ❌ 8.2 Venue Operations Fields — NOT BUILT
+
+**Spec requirement:** Logistics depth (kitchen access, equipment, power/water, load-in path/times, parking, elevators/stairs, storage, waste rules, permits/insurance), vendor ecosystem, scorecard metrics, on/off-premise flag
+
+**Current gap:** Basic venue entity only
+
+**Dependencies:** Venue Management UI
+
+**Estimated effort:** Medium
+
+---
+
+### 🟡 8.3 Event Layouts / Logistics Snapshot — PARTIAL
+
+**Done:**
+- Events snapshot venue name/address/capacity
+- eventLayoutSections entity exists (schema lines 672-683)
+- EventLayoutsTab.tsx:9-20 exists
+
+**Gaps:**
+- NO venue-derived layout templates
+- NO template system
+- Event layouts are event-specific only
+
+**Dependencies:** Venue profile depth
+
+**Estimated effort:** Medium
+
+---
+
+### 🟡 8.4 Venue Notes — PARTIAL
+
+**Done:**
+- Venue.accessNotes/cateringNotes free-text
+
+**Gaps:**
+- NO Note entity
+- NO author/time, category, pin/priority, visibility, archive
+- Notes not linked directly to Venue
+
+**Dependencies:** Venue profile, Note entity
+
+**Estimated effort:** Small-Medium
+
+---
+
+### ❌ 8.5 Venue Vendor Ecosystem — NOT BUILT
+
+**Spec requirement:** Venue ↔ Vendor relationship (category, preferred/approved/restricted/banned, contacts, effective dates, insurance/compliance, notes), event/proposal workflow warns/blocks on banned vendors
+
+**Current gap:**
+- NO venueVendor or venueVendorRelationship table
+- Vendors (schema.ts:2016-2040) have no venue relation
+- preferredVendor only on Ingredient/PurchaseNeed
+
+**Dependencies:** Vendor entity (✅ exists via procurement/vendor.manifest)
+
+**Estimated effort:** Medium
+
+---
+
+### ❌ 7.3 / 8.6 Revenue Attribution + Splits — NOT BUILT
+
+**Spec requirement:** Revenue Attribution/Split model (percent or fixed allocations, effective dates, reason/type, approval), total allocated ≤ allowed basis, reports (gross, venue-attributed, commissions/splits, net retained, unmapped), historical events use snapshotted attribution, venue commission and split terms versioned
+
+**Current gap:**
+- Revenue breaks down by event_type/client/service_line only
+- NO venue dimension
+- NO commission/split logic
+- NO versioned venue terms entity
+
+**Evidence:**
+- ProfitMarginReportsPage.tsx — event/client profit margin only, no venue dimension
+- No VenueCommissionTerm or VenueRevenueSplit entities
+
+**Dependencies:** Event completion freeze, Venue depth
+
+**Estimated effort:** Large
+
+---
+
+### 🟡 7.1 Reporting Foundation — PARTIAL
+
+**Done:**
+- SavedReportDefinition entity (config-only) in schema.ts:1648-1667
+- Fields: subjectArea, chartType, sharingScope, definition
+- ReportsPage.tsx:1-314 exists
+- Bespoke live reports: revenue, profit-margin, food-cost, staff-util, production-yield
+
+**Gap:**
+- NO render engine
+- Report UI explicitly states "Chart result rendering is not part of this slice"
+- Spec requires: "Every metric declares: data source, date basis, inclusion statuses, tenant scope, filters, drill-down"
+
+**Next steps:**
+1. Build report render engine
+2. Wire live data to dashboards
+3. Implement metric declarations
+4. Implement drill-down
+
+**Estimated effort:** Medium-Large
+
+---
+
+### ❌ 7.2 Common Report Filters — PARTIAL
+
+**Done:**
+- Date range, event status filters exist in finance reports
+- venueType enum exists
+
+**Gaps:**
+- NO on/off-premise flag (venueType enum has no on/off-premise)
+- Filter state shareable where app conventions allow
+- Exports reflect same filtered dataset (not verified)
+
+**Estimated effort:** Small-Medium
+
+**Dependencies:** On/off-premise venue classification (§8.1)
+
+---
+
+### ❌ 7.4 Named Dashboards — NOT BUILT (All 7 Confirmed Absent)
+
+**Dashboards (all 7 confirmed absent):**
+1. Tim's KPIs — Replicate TPP KPIs, record-level reconciliation
+2. Company Scorecard — Metrics, target, actual, trend, owner, status
+3. L10 — Scorecard, rocks/priorities, issues, action items, history
+4. Avg Event Value Growth — Trend, mix, drivers, drill-down
+5. Comp Master — Compensation deliverables status/evidence
+6. Sales Dashboard — Pipeline, booked revenue, conversion, avg value, activity/ownership, 3% basis
+7. Mangia Round 4 — Measures + visual hierarchy on live data
+
+**Evidence:**
+- NO dashboard pages in src/features/
+- SavedReportDefinition is config-only
+- NO render engine
+- Search for "Tim.*KPI|Company.*Scorecard|L10|Comp.*Master|Mangia" returns zero matches
+- No ScorecardMetric, Rock, Priority, Issue, ActionItem, MeetingPeriod, CompensationDeliverable entities
+
+**Dependencies:** Reporting foundation, revenue attribution, venue depth, TPP KPI definitions
+
+**Estimated effort:** Large (7 dashboards + render engine + entities)
+
+---
+
+## Slice 4 — Operations
+
+**Objective:** Ship staffing/HR, kitchen, and equipment on the event spine. **This is the most complete slice.**
+
+### ✅ 9.1 Event Staffing — DONE
+
+**Evidence:**
+- shift.manifest + assignment.manifest
+- EventAssignment lifecycle: assign, confirm, checkIn, checkOut, markNoShow, unassign
+- EventStaffNeed: postOpen, claim, fill, releaseClaim, cancel
+- Shift entity with advanced scheduling: schedule, start, complete, cancel, markNoShow, stageApprovedSwap, applyApprovedSwap
+- Auto-seed on approval
+- RosterPage.tsx:1-926 with full UI
+- weeklySchedule.ts, overtimeProjection.ts, workforceScheduling.ts
+
+**Acceptance criteria met:**
+- Events have shifts/requirements and staff assignments with role, scheduled start/end, location, status, rate/pay references
+- Commands: draft requirement, assign, unassign, publish, acknowledge, decline, check in/out
+- Guards prevent overlapping assignments, assignment of inactive/unqualified staff, staffing cancelled/completed event
+- Event date/time/location changes emit events
+- Operations can build/publish event crew from Event record
+- Operations can staff event on mobile
+- Staff can acknowledge
+- Conflicts visible
+- Same people/roles feed Nowsta integration (when built)
+
+**Intentionally deferred:** Open-shift bidding (shift.manifest:4)
+
+---
+
+### ❌ 9.2 Role Scorecards — NOT BUILT
+
+**Spec requirement:** Role Scorecard entity (measurable expectations per role, version/effective dates, active state), event feedback + 1-on-ones reference applicable scorecard version, historical assessments remain interpretable
+
+**Current gap:**
+- NO scorecard entity
+- Roles are open strings (RosterPage.tsx:486 — "server" placeholder)
+
+**Evidence:**
+- NO RoleScorecard entity found
+- Search returns only spec files
+
+**Next steps:**
+1. Design RoleScorecard entity
+2. Implement versioning
+3. Wire to feedback and 1-on-ones
+4. Create measurable expectations per role
+
+**Estimated effort:** Medium
+
+**Dependencies:** Staff roles (§9.1), Performance tracking (§9.4), One-on-ones (§9.5)
+
+---
+
+### ❌ 9.3 Hiring Pipeline — NOT BUILT
+
+**Spec requirement:** Map KM interview tool JSON to candidate/interview model, preserve source IDs, raw response references, pipeline (application → screening → interview → decision/offer → hired/rejected), re-import updates without duplication
+
+**Current gap:**
+- NO candidate/interview entity
+- NO KM JSON mapping
+
+**Estimated effort:** Medium-Large
+
+**Dependencies:** Existing KM export format
+
+---
+
+### 🟡 9.4 Performance Tracking — PARTIAL
+
+**Done:**
+- PerformanceReviewsPage.tsx exists
+- PerformanceReview entity with 1-5 ratings, notes, manager-only access
+- Restrict visibility according to HR permissions
+
+**Gaps:**
+- NO eventId — periodic, not per-event
+- workforce/performanceReview.manifest has NO event relation
+- PerformanceFeedback not linked to Event
+- Staff-facing views incomplete
+
+**Evidence:**
+- Schema lacks eventId in performanceReview.manifest
+- Cannot track per-event feedback vs periodic reviews only
+
+**Impact:** Cannot track per-event feedback for staff evaluation granularity
+
+**Next step:** Add eventId relation, enable per-event feedback
+
+**Estimated effort:** Small-Medium
+
+**Dependencies:** Staff Member entity, Event entity, Role scorecards
+
+---
+
+### ❌ 9.5 Monthly One-on-Ones — NOT BUILT
+
+**Spec requirement:** One-on-One entity (period, participants, agenda, goals, wins/strengths, opportunities, decisions, follow-ups with owners/dates), open actions appear in next meeting, closable without rewriting prior record
+
+**Current gap:**
+- NO 1-on-1/goals/strengths/decision entities
+- NO follow-up action tracking
+
+**Estimated effort:** Medium
+
+**Dependencies:** Staff Member entity (✅ exists)
+
+---
+
+### ✅ 10.1 Menu Management — DONE
+
+**Evidence:**
+- menu.manifest (category, pricing, template, lifecycle)
+- MenuDetailPage.tsx:1-60 with full UI
+- MenuDishManager.tsx with dish management
+- menuTemplates.ts, menuPdf.ts with PDF export
+- menus, menuDishes tables in schema
+
+**Acceptance criteria met:**
+- Manage categories, client-visible Menu Items, descriptions, dietary/allergen data, service-style availability, seasonal/effective dates, active state, price history
+- Public menu, quote builder, proposal builder, recipes, reports all use this catalog
+- Seasonal implied by effective dates (no dedicated construct)
+
+---
+
+### ✅ 10.2 Recipe Management — DONE
+
+**Evidence:**
+- recipe.manifest (versions, BOM, steps, snapshots)
+- RecipeDetailPage.tsx:1-60 with version control, cost calculation, nutrition
+- RecipeVersionHistoryPanel.tsx with version history
+- RecipeSnapshot.ts, recipeSnapshot.ts with snapshot/restore
+- RecipeImportPage.tsx with import pipeline
+- recipes, dishRecipes tables in schema
+
+**Acceptance criteria met:**
+- Recipes versioned with yield, units, ingredients, prep instructions, allergens, stations, active/effective state
+- Event or published Proposal references stable recipe/menu snapshot
+- Import pipeline with CSV parser, ingredient matcher
+- Snapshot history with restore capability
+
+---
+
+### ✅ 10.3 Food Cost — DONE
+
+**Evidence:**
+- RecipeCostPanel.tsx with live cost display
+- RecipeCostCalculator.ts with event food cost calculation
+- MenuProfitabilityPanel.tsx, MenuProfitabilityAnalysis.ts
+- Computed liveBatchCost/liveCostPerGuest
+- IngredientPriceHistory.ts with price observations
+- Food cost % UI
+
+**Acceptance criteria met:**
+- Calculate estimated Event food cost from guest count, selected menu items, recipe yields, ingredient costs, approved waste/yield assumptions
+- Track actual cost from purchases/stock movement or best available actual source
+- Show estimated, actual, variance, cost per guest, margin
+
+---
+
+### ✅ 10.4 Waste Tracking — DONE
+
+**Evidence:**
+- demand.manifest WasteRecord entity with reason enum (spoilage, prep_error, overproduction, dropped, date_expired, quality_reject, other), costImpact, voidRecord command
+- WasteRecordForm.tsx:1-50 with UI
+- WasteCostReportPage.tsx:1-30 with reporting
+- On-hand decrement integration
+
+**Acceptance criteria met:**
+- Waste Entry records item/ingredient, quantity/unit, reason, cost, event/location, recorder, time, notes, approval/void state
+- Voiding is command with reason, records not silently deleted
+- Waste rolls into event and aggregate food-cost reporting
+
+---
+
+### ✅ 10.5 Inventory — DONE
+
+**Evidence:**
+- stock.manifest (on-hand/par/reorder, movements, reservations w/ event release)
+- StockBookPage.tsx:1-50 with UI
+- StockCountPage.tsx:1-60 with physical count workflow
+- InventoryAuditLogPage.tsx, inventoryAudit.ts
+- inventoryItems, inventoryLots, inventoryReservations tables in schema
+- InventoryWorkspaceNav.tsx
+- EventMenuStockShortageBanner.tsx for shortage detection
+- inventoryAuditIntegrity.ts for audit chain
+
+**Acceptance criteria met:**
+- Inventory supports item, unit, location, on-hand/available quantities, receipts, issues/consumption, transfers, counts/adjustments, reorder thresholds, audit history
+- Stock-changing commands validate quantity and preserve movement ledger
+- Event consumption references Event without forcing equipment inventory into same model
+
+---
+
+### ✅ 10.6 PrepList — DONE
+
+**Evidence:**
+- PrepList remains food-preparation work (separate from Equipment PackList per §3.4)
+- PrepTask entity in schema (lines 1272-1320) with status, assignee, dependencies
+- KitchenDashboardPage.tsx with command deck
+- KitchenPrepAssignManager.ts with assignment management
+- DishPrepTasksPanel.tsx with task display
+- EventPrepTaskSynchronizer.ts for event-specific generation
+- EventMenuPage.tsx
+
+**Acceptance criteria met:**
+- Generate from finalized menu/recipe snapshots
+- Tasks by station, quantity/yield, due time, assignee, status, dependencies
+- Changes to finalized menu mark affected prep work for review
+- Priced menu selection can become proposal
+- Finalized event can generate food prep
+- Completed event shows estimated-versus-actual food cost
+
+---
+
+### 🟡 11.1 Equipment Inventory — PARTIAL
+
+**Done:**
+- Ownership (owned/rental) + condition + value present
+- EquipmentCatalogPage.tsx:1-343 with UI
+- EquipmentCategory, EquipmentCondition
+
+**Gaps:**
+- NO location fields (homeLocation, currentLocation)
+- NO serialized assets vs bulk-count distinction (per spec)
+
+**Evidence:**
+- Schema equipments.manifest lacks location fields
+- PackListsPage.tsx, PackListDetailPage.tsx for pack operations
+- logisticsRoutes.ts
+
+**Impact:** Blocks availability accuracy and logistics planning
+
+**Next step:** Add homeLocation/currentLocation fields
+
+**Estimated effort:** Small
+
+**Dependencies:** Separation from food inventory (§10.5)
+
+---
+
+### 🟡 11.2 Pack List Templates — PARTIAL
+
+**Done:**
+- Per-event PackList (auto-opens on approval)
+- PackListsPage.tsx with UI
+- PackListItemForm.tsx, PackListItemTable.tsx
+- packListUnits.ts
+
+**Gaps:**
+- NO template entity
+- NO service-style linkage
+- NO variation by service style, event type/occasion, guest-count band, venue requirement
+
+**Dependencies:** Service Style entity (Slice 0)
+
+**Estimated effort:** Medium
+
+**Dependencies:** Service Style (§3.2), Equipment catalog (§11.1), Venue logistics (§8.2)
+
+---
+
+### ✅ 11.3 Availability & Movement — DONE
+
+**Evidence:**
+- EquipmentReservation lifecycle (reserved→checked_out→returned)
+- Availability calculation (equipmentReservationAvailability.ts)
+- DeliveriesPage.tsx:34-460
+- LogisticsLifecyclePolicy.ts
+- equipmentCheckout.ts, vehicleAssignment.ts
+- equipmentReservations table with full lifecycle
+
+**Acceptance criteria met:**
+- Commands: reserve/allocate, pack, check out/load, return/check in, mark missing/damaged, transfer, release
+- Availability accounts for overlapping event reservations, current movement, maintenance blocks, bulk quantities
+- Conflicts visible before Final status
+
+---
+
+### ✅ 11.4 Maintenance — DONE
+
+**Evidence:**
+- EquipmentMaintenanceTask + immutable EquipmentServiceEntry
+- EquipmentMaintenanceBoard.tsx:32-471 with UI
+- VehicleMaintenancePage.tsx:84-840 (for vehicles)
+- equipmentMaintenanceTasks, equipmentServiceEntries tables in schema
+- Out-of-service asset cannot be newly allocated unless authorized override
+
+**Acceptance criteria met:**
+- Maintenance Tasks record issue, severity, item, opened/due/completed dates, owner/vendor, cost, notes, out-of-service state
+- Immutable service entries
+
+---
+
+## Slice 5 — Provider Integrations and Cutover
+
+**Objective:** Connect providers through shared integration contract, complete parallel run, cutover.
+
+### ✅ 12.2 QuickBooks — DONE
+
+**Evidence:**
+- qboSync.ts:28,466 — Full implementation (953 lines)
+- lib/qboSync.ts — Helper library (481 lines)
+- Total: 1,434 lines
+- OAuth flow, encrypted refresh token storage
+- Customer deduplication, invoice sync, payment sync
+- Refresh token rotation on each sync
+- Stable QBO entity IDs stored in ledger
+- Reconciliation queue with 5-minute polling, 15-minute retry
+- IntegationsPage.tsx:370-469 with UI
+
+**Acceptance criteria met:**
+- Define ownership rules for customers/contacts, invoices, payments, taxes, account references before syncing
+- Stable external IDs prevent duplicate customers, invoices, payments
+- Event/proposal/payment commands enqueue accounting work
+- Worker records provider result and reconciliation state
+- Conflicts and unmatched payments appear in reconciliation queue
+
+---
+
+### ❌ 12.3 Nowsta — NOT BUILT
+
+**Spec requirement:** Use Capsule Staff Members, roles, shifts, assignments, approved time/pay as source, sync external worker/shift IDs, status, payroll result, idempotent, conflicting edits shown
+
+**Current gap:**
+- NO Nowsta integration code
+- Payroll supports Gusto, ADP, Paychex only via CSV export
+- payrollExport.ts with CSV formats only
+- NO staff member → external worker ID sync
+
+**Evidence:**
+- NO nowsta.ts or similar in src/integrations/
+- Payroll helpers reference Gusto/ADP/Paychex
+- No NowstaConnection, NowstaWorker, NowstaShift entities
+
+**Estimated effort:** Large (OAuth + sync + reconciliation)
+
+**Dependencies:** Staffing (§9.1), Integration Connection entity (§12.1)
+
+---
+
+### ✅ 12.4 Google Calendar — DONE
+
+**Evidence:**
+- googleCalendar.ts:21,742 — Full implementation (725 lines)
+- lib/googleCalendar.ts — Helper library (419 lines)
+- Total: 1,144 lines
+- OAuth flow, encrypted refresh token storage
+- Stable calendar event IDs via SHA-256 digest of capsule-event:{eventId}
+- Signature-based change detection (prevents update loops)
+- Eligible stage filtering (approved/executing/completed/closed_out)
+- Event deletion on ineligibility
+- 1-minute sync interval, 15-minute retry
+- IntegationsPage.tsx:270-368 with UI
+
+**Acceptance criteria met:**
+- Create one calendar event per Capsule Event/calendar target using stable external ID
+- Update material changes, cancel/remove according to policy
+- Prevent update loops with source/version metadata
+- Calendar failure never pretends Capsule Event failed
+- Shows pending/error and supports retry
+
+---
+
+### 🟡 12.5 Email — PARTIAL (Transactional Only)
+
+**Done:**
+- Manual client-communication log
+- Outbound transactional email via emailNotifications.ts:101
+- Categories: event_updates, invoice_reminders, low_stock_alerts, shift_changes
+- Organization branding integration
+- Provider-neutral delivery gate
+
+**Gaps:**
+- NO connected inbox
+- NO threading entities (MessageThread, EmailThread)
+- NO provider message IDs
+- NO reply linkage
+- NO bounce/failed state tracking
+- NO webhook ingestion for inbound email
+
+**Evidence:**
+- NO MessageThread or EmailThread entities in schema
+- NO inbox integration code
+- EmailNotificationSubscriptions entity exists for preferences
+
+**Impact:** Cannot track email conversations, no reply threading
+
+**Next steps:**
+1. Design MessageThread/EmailThread entity
+2. Wire inbox provider
+3. Implement reply tracking
+4. Add bounce/failed state tracking
+
+**Dependencies:** Integration Connection entity (§12.1)
+
+**Estimated effort:** Medium-Large
+
+---
+
+### ✅ 12.6 SMS — DONE
+
+**Evidence:**
+- smsAlerts.ts:15,093 — Full implementation (512 lines)
+- Three trigger types: event_soon, delivery_dispatched, allergen_incident
+- Poll-based scanner with deduplication
+- Opt-in system via Person.smsAlertsOptIn
+- Phone validation, encrypted storage
+- Organization toggle via manifestEvents
+- Deduplication against manifestEvents ledger
+- 5-minute scan interval, max 100 sends per scan
+- Twilio integration (lib/twilio.ts)
+- IntegationsPage.tsx:471-549 with UI
+
+**Acceptance criteria met:**
+- Same thread and delivery model as Email
+- Phone validation, consent/opt-out, quiet-hour/business rules
+- Provider IDs, delivery/failure status
+- Reminders and confirmations scheduled/deduplicated so retries cannot send duplicates
+
+---
+
+### ❌ 12.7 Social Media — NOT BUILT
+
+**Spec requirement:** Inbound DMs follow inquiry-capture spec (§4.4, §6.1), outbound replies linked to source thread, provider message IDs, provider-specific limits/unsupported types as actionable errors
+
+**Current gap:**
+- NO social/DM integration
+- Lead.source is free-text only
+- NO ProviderAccount, MessageThread, Message entities
+- NO webhook ingestion
+- NO thread/message ID tracking
+
+**Evidence:**
+- NO social media integration files
+- Lead.source free-text only
+
+**Dependencies:** Social DM inquiry capture (§4.4, §6.1), Integration Connection (§12.1)
+
+**Estimated effort:** Large (provider-specific: Instagram, TikTok, Facebook)
+
+---
+
+### 🟡 12.1 Common Integration Contract — PARTIAL (Functional But No Unified Entity)
+
+**Done:**
+- QuickBooks, Calendar, SMS follow similar patterns via manifestEvents ledger
+- Outbound webhooks with webhookIntegrations.ts:910
+- Three subscribable events: EventApproved, InvoicePaymentApplied, DeliveryTransitStarted
+- HMAC signature verification
+- Delivery ledger with attempt counting
+- Encrypted credential storage (encrypt/decrypt in lib/encryption.ts)
+- HMAC-signed OAuth state tokens
+- Self-scheduling reconcile actions with exponential backoff
+- WebhooksSection.tsx:1-345 with UI
+
+**Gaps:**
+- NO generic Integration Connection entity
+- Separate GoogleCalendarConnection and QuickBooksConnection with NO common contract
+- NO External Record Link standard for imports
+- NO durable Sync Run/Job pattern
+- Each integration defines its own connection pattern
+
+**Evidence:**
+- manifestEvents used in all: qboSync.ts:236, googleCalendar.ts:233, smsAlerts.ts:235
+- Separate connection entities exist
+- NO unified IntegrationConnection contract
+
+**Impact:** Each integration rolls own pattern; harder to add new providers
+
+**Next step:** Design shared integration entities, apply to all providers
+
+**Estimated effort:** Medium (refactor)
+
+---
+
+## Cross-Cutting Concerns
+
+### ✅ 4.5 Mobile-First Field Use — DONE
+
+**Evidence:**
+- index.html viewport meta: <meta name="viewport" content="width=device-width, initial-scale=1.0">
+- Tailwind mobile-first throughout: max-sm:, md:, lg:, max-md:, sm:
+- Touch targets: min-h-10 on buttons, responsive grid layouts
+- Sidebar hides on mobile (max-md:hidden), hamburger menu present
+- Event detail prioritizes next action, time/location, contact, service style, proposal status, staffing, prep, pack list, critical notes
+- Large tables become cards or horizontally constrained summaries
+
+**Acceptance criteria met:**
+- Critical event pages work at phone width with touch targets
+- Readable status, sticky primary actions, compact list filters
+- No hover-only controls
+- Kayden/Josh can create or update event, view proposal, confirm logistics, operate staffing/prep/packing from phone without switching to desktop
+
+---
+
+### ✅ 13 Completion Tests and Proof — STRONG
+
+**Evidence:**
+- 65 test files
+- 650 tests passing
+- Slice contracts proven:
+  - tests/culinary-slice-contract.test.ts — Kitchen wiring, generated hooks, lifecycle metadata
+  - tests/supply-slice-contract.test.ts — Inventory/demand/stock/purchasing wiring
+- Per-slice integration guards: event, culinary, supply, production, workforce, logistics, commercial, closeout, payroll
+- Runtime proofs: invoice-payment-lifecycle, pack-list-delivery, event-closeout, payroll-input, recipe-import, ingredient-demand-confirm, event-approve-opens-packlist
+- Integration guards verify generated APIs remain authoritative
+- No flaky/skipped tests detected
+- No TODO/FIXME/XXX comments in production code
+- No @ts-expect-error/@ts-ignore/@ts-nocheck in src/
+- Format: Minor — one workflow file needs Prettier (non-production)
+
+**Verdict:** Strong test coverage, slice contracts proven
+
+---
+
+## Intentionally Deferred Features
+
+The following features are marked as deferred (via ponytail comments or spec notes) and are NOT considered incomplete:
+
+- **Open-shift bidding** (shift.manifest:4) — Staff bidding on open shifts
+- **Payment edge cases** (OD040) — Complex payment scenarios
+- **Invoice line itemization** — Detailed invoice breakdown
+- **Station entity** — Kitchen station assignments (no dedicated construct)
+- **Coverage math** — Staffing coverage calculations
+
+---
+
+## Technical Debt Identified
+
+### Minimal Debt
+
+- **Format:** One workflow file needs Prettier run (.claude/workflows/implementation-gap-analysis.js, non-production)
+- **Coverage:** Auth/navigation coverage threshold at 100% (monitored, ratchet-only-upward)
+- **Seed script:** seed-convex.ts has 80+ intentional skip comments for entities without create commands in IR (expected, not debt)
+
+### Architectural Debt
+
+**High Priority:**
+- **ServiceStyle entity missing** — Blocks 11 downstream features; foundation gap
+- **Sales Lock pipeline missing** — Event lifecycle incomplete; gates revenue recognition
+- **Import framework absent** — Entire Slice 2 blocked; TPP migration impossible
+- **Revenue attribution absent** — Venue reporting broken; commission tracking missing
+- **Equipment location fields missing** — Availability calculations inaccurate; logistics planning degraded
+- **Performance reviews periodic only** — NO eventId relation; cannot track per-event feedback
+
+**Medium Priority:**
+- **Separate connection entities** (GoogleCalendarConnection, QuickBooksConnection) — Should unify under IntegrationConnection
+- **No External Record Link standard** — Needed for import framework and social threading
+- **No durable Sync Run/Job pattern** — Needed for all long-running integrations
+- **MessageThread entity missing** — Email/social threading impossible
+- **ProposalRevision entity missing** — Version tracking broken; acceptance tracking incomplete
+- **Venue management UI missing** — Cannot manage venue profiles; operational knowledge locked in tribal knowledge
+
+**Low Priority (Intentional Simplifications via Ponytail):**
+- No toast library (useUndoToast.tsx:9) — Reuses inline notice style
+- Native browser validation only (formValidation.tsx:3) — No custom validation library
+- Uncontrolled form draft persistence (formDraft.tsx:3) — Delegated input handling
+- Per-browser localStorage recents (recents.ts:4) — Not per-account scoped
+- Single summary line for QBO invoice (qboSync.ts:200) — ItemRef required by QBO
+- Read-side retention window for messages (MessagesPage.tsx:47) — Purge cron TBD
+- Native prompt/confirm (SavedViewsBar.tsx:67) — No lightweight text-input modal
+- Offline bridge for mobile (offlineStore.ts:3) — Venue wifi constraints
+- Flat city-driving estimates (routePlanner.ts:12) — Swap for routing API if precision matters
+- Browser print for PDF (ContractDocumentPage.tsx:14, EventAllergenBriefingPage.tsx:14) — No PDF library
+- Coverage = demand-weighted average (RecipeStockSuggestions.tsx:20) — Read-side derivation
+- Add-only checkpoint (EventMenuPanel.tsx:30) — Reuses EventDish commands
+- Fixed 30-min bar for activities (EventTimelineGanttStrip.tsx:6) — No end time handling
+- Self-check runs only under direct import (recipeSnapshot.ts:180) — Not automated
+- On-time = fully received by week end (vendorPerformance.ts:48) — Fixed schedule
+- 50% ceiling for reorder (reorderSuggestion.ts:13) — Per-tenant knob TBD
+- Projection = historical demand in quarter (SeasonalDemandForecast.tsx:31) — Simple model
+
+**Verdict:** Technical debt is well-controlled. No orphaned TODOs, no suppressed type errors, strong test coverage (650 tests passing), clean mobile-first implementation. Primary gaps are **feature incompleteness per the spec** (ServiceStyle entity, Sales Lock pipeline, TPP migration, Venue depth, 7 dashboards) not code hygiene issues. 18 intentional simplifications documented via ponytail comments reflect pragmatic technical choices.
+
+---
+
+## Bonus Features Beyond Spec
+
+The codebase includes several production-grade enhancements not explicitly in the original specification:
+
+### Logistics Enhancements
+- **Vehicle Fleet Management** — Full fleet catalog, maintenance scheduling, fuel logging, operational status
+- **Delivery Operations** — Delivery lifecycle, driver assignment, photo proof
+- **Route Planning** — Geocoding, nearest-neighbor optimization, distance estimates
+- **Vehicle Scheduling** — Day view, timeline visualization, unassigned delivery queue
+
+### Kitchen Enhancements
+- **Advanced Nutrition Analysis** — Full nutritional calculation per ingredient and recipe
+- **Allergen Management** — Comprehensive allergen matrix with visual indicators
+- **Vendor Management** — Vendor contracts, ordering, price trend analysis
+- **Command Deck Interface** — 7-day horizon planning, crew workload display, task assignment
+
+### Inventory Enhancements
+- **Lot-Level Traceability** — Recall response system linking supplier lots to events/clients
+- **Vendor Performance Scoring** — Delivery/price/quality metrics
+- **Seasonal Demand Forecasting** — Demand prediction
+- **Camera Barcode Scanning** — Native browser BarcodeDetector integration
+
+### Workforce Enhancements
+- **Staff Utilization Dashboard** — Advanced analytics with demand bucketing
+- **Staff Messaging System** — In-app messaging with 90-day retention
+- **Advanced Overtime Projection** — Configurable thresholds
+- **Training Gates** — Preventing untrained staff scheduling
+
+### Event Enhancements
+- **Event Photo Gallery** — Photo management per event
+- **Incident Panel** — Incident tracking and reporting
+- **Guest Panel** — Guest management with guest policy
+- **Allergen Briefing** — Per-event allergen summary
+- **Event Templates** — Reusable event templates
+- **Weather Panel** — Weather integration for events
+- **Timeline Comments/Block Questions** — Collaborative timeline planning
+
+### Admin Enhancements
+- **Webhooks System** — Extensible outbound webhooks with HMAC signing
+- **Personal Data Export** — GDPR compliance tooling (JSON/CSV)
+- **Role Permission Audit** — Least-privilege security auditing
+- **Multi-Brand Capability** — Tenant branding foundation
+
+---
+
+## Priority Sequencing
+
+**Critical Dependency Chains:**
+
+1. **ServiceStyle Entity** → Blocks 11 features: Event creation (4.1), Quote builder (4.3), Proposal logic (5), TPP import (6.2), Report filters (7.2), Venue filtering (8.1), Pack templates (11.2), Role scorecards (9.2)
+2. **Sales Lock Pipeline** → Blocks 6 features: Event lifecycle (4.1), Proposals (5), Revenue attribution (7.3), Staffing (9.1), Equipment reservations (11.3), TPP status mapping
+3. **Venue Depth** → Blocks 5 features: Proposal timeline sections (5.2), Layout templates (8.3), Vendor ecosystem (8.5), Revenue attribution (7.3), Event logistics (8.2)
+4. **Import Framework** → Blocks all Slice 2 (migration) plus external record links for social threading
+5. **Revenue Attribution** → Blocks: Venue reporting (7.3), Sales dashboards (7.4), Commission tracking
+6. **Equipment Location** → Blocks: Availability accuracy (11.3), Logistics planning
+7. **Performance eventId** → Blocks: Per-event feedback (9.4), Staff evaluation granularity
+
+### Immediate (Slice 0 blockers — Foundation)
+
+| Priority | Item | Effort | Impact | Dependencies | Why First | Status |
+|----------|------|--------|--------|--------------|-----------|--------|
+| 1 | **Import Framework** | XLarge | Critical | None | Foundation for entire TPP migration - blocks Slice 2 | ❌ |
+| 2 | **Import Datasets** | XLarge | Critical | Import Framework | Events/Contacts/Leads/Menu/Venues/Payments import - 2,103 TPP events need migration path | ❌ |
+| ~~3~~ | **Service Style Entity** | Medium | High | None | Foundational enum for operations - blocks 11 downstream features | ✅ DONE |
+| 3 | **Sales Lock Pipeline** | Large | High | None (ServiceStyle ✅) | Quote → Sales Lock → Confirmed pipeline is core sales workflow | ❌ |
+| 4 | **External Record Link** | Medium | High | Import Framework | Stable external ID mapping - prerequisite for all TPP integration | ❌ |
+| 5 | **Revenue Attribution** | Large | High | Sales Lock | Commission calculation and reporting - blocks sales incentives | ❌ |
+| 6 | **Event Status Pipeline** | Large | High | None (ServiceStyle ✅) | Sales workflow complete - blocks proposal-to-event conversion | ❌ |
+| 7 | **Occasion Entity** | Small | High | None | Event categorization - blocks reporting by occasion | ❌ |
+| 8 | **Referral Source Entity** | Small | High | None | Lead tracking and marketing ROI - blocks source attribution | ❌ |
+
+### High (Slice 1 — Visible TPP replacement value)
+
+| Priority | Item | Effort | Impact | Dependencies | Why |
+|----------|------|--------|--------|--------------|-----|
+| 10 | **Proposal Revisions** | Large | High | Sales Lock | Enables proper version tracking for acceptance |
+| 11 | **Proposal Builder/Templates** | XLarge | High | Revisions, Venue, Event layouts | Client-facing proposal documents - core sales deliverable |
+| 12 | **Digital Acceptance** | Large | High | Revisions | Contract workflow - blocks e-sign integration |
+| 13 | **Timeline/Logistics PDF Sections** | Medium | High | Venue depth | Completes proposal PDF - wedding-magazine quality |
+| 14 | **Self-Service Quote Builder** | Large | High | ServiceStyle, Occasion | Client portal enhancement - mobile self-service for leads |
+| 15 | **Payment Reconciliation** | Medium | High | External Record Link, Import Framework | Payment matching and reconciliation - blocks TPP payment import |
+
+### Foundation (Slice 4 — Already strong, polish needed)
+
+| Priority | Item | Effort | Impact | Dependencies | Why |
+|----------|------|--------|--------|--------------|-----|
+| 16 | **Equipment Location Fields** | Small | Medium | None | Availability calculation - blocks logistics accuracy |
+| 17 | **Venue Profile (Full Depth)** | Large | High | None | Venue management and logistics - blocks venue selection |
+| 18 | **Pack List Templates** | Large | High | ServiceStyle, Equipment location | Operational efficiency - blocks automated pack list generation |
+| 19 | **Parallel Run Dashboard** | Large | High | Import Framework, Import Datasets | Migration validation - required for safe cutover |
+| 20 | **TPP Bridge** | Large | High | Import Framework, Proposal Revisions | Legacy proposal migration - blocks historical proposal access |
+| 21 | **Venue Layout Templates** | Medium | Medium | Venue Profile | Operational efficiency - reusable layouts reduce setup time |
+| 22 | **Venue Notes Entity** | Medium | Medium | Venue Profile | Knowledge base - institutional memory about venues |
+| 23 | **Vendor Ecosystem** | Medium | Medium | Venue Profile | Vendor coordination - blocks approved vendor lists |
+| 24 | **Role Scorecards** | Medium | Medium | Performance tracking | HR management - defines measurable expectations |
+| 25 | **Performance Event Linkage** | Small-Medium | Medium | None | Per-event feedback vs periodic only - HR evaluation granularity |
+| 26 | **Hiring Pipeline** | Large | Medium | None | HR operations - tracks candidates through stages |
+| 27 | **One-on-Ones** | Medium | Medium | Role Scorecards | Staff development - structured manager meetings |
+
+### Medium (Slice 3 — Operational intelligence)
+
+| Priority | Item | Effort | Impact | Dependencies | Why |
+|----------|------|--------|--------|--------------|-----|
+| 28 | **Reporting Foundation + Render Engine** | Large | High | None | Enables all dashboards - leadership visibility |
+| 29 | **Common Report Filters** | Small-Medium | High | Venue on/off flag | On/off-premise flag; filter state sharing |
+| 30 | **Cutover Tooling** | Large | Critical | Import Framework, Parallel Run Dashboard | Production migration execution - final step with rollback |
+
+### Large (Slice 2 — Migration enabler)
+
+| Priority | Item | Effort | Impact | Dependencies | Why |
+|----------|------|--------|--------|--------------|-----|
+| 31 | **Browser-Extracted Pack Lists** | Large | High | Import Framework, Pack Templates | Data migration - extracts TPP pack lists from browser |
+
+### Provider (Slice 5 — Integration completion)
+
+| Priority | Item | Effort | Impact | Dependencies | Why |
+|----------|------|--------|--------|--------------|-----|
+| 32 | **Email Inbox/Threading** | Medium-Large | High | Integration Contract | Connected inbox; reply tracking; conversation history |
+| 33 | **Nowsta Integration** | Large | Medium | Integration Contract | Payroll automation; eliminates CSV export |
+| 34 | **Social DMs** | XLarge | Medium | Import Framework, Integration Contract | Inquiry capture; provider-specific |
+
+### Nice-to-Have (Executive dashboards — Slice 3)
+
+| Priority | Item | Effort | Impact | Dependencies | Why |
+|----------|------|--------|--------|--------------|-----|
+| 35 | **Tim's KPIs Dashboard** | Large | High | Render Engine, Revenue Attribution | Leadership visibility; TPP parity; record-level reconciliation |
+| 36 | **Sales Dashboard** | Medium | High | Render Engine, Revenue Attribution | Pipeline visibility; conversion tracking; 3% compensation basis |
+| 37 | **Company Scorecard** | Medium | High | Render Engine | Executive metrics; targets vs actual; trend tracking |
+| 38 | **Avg Event Value Growth** | Medium | Medium | Render Engine, ServiceStyle | Sales analytics; trend analysis; driver identification |
+| 39 | **Comp Master Dashboard** | Medium | Medium | Render Engine | Compensation tracking; deliverables status |
+| 40 | **L10 Dashboard** | Medium | Medium | Render Engine | Meeting management; rocks/issues tracking |
+| 41 | **Mangia Dashboard Round 4** | Large | Medium | Render Engine | Operational metrics; visual hierarchy |
+
+---
+
+## Implementation Notes
+
+### Evidence vs. Done
+- ✅ means "core behavior exists per spec"
+- 🟡 means "partial implementation" with specific gaps noted
+- ❌ means "not built"
+- Each item still needs per-slice wiring/command/UI proof per §13
+
+### Dependencies
+- Items listed as dependencies are prerequisites, not blockers
+- Where parallel work is possible, note the dependency but don't serialize unnecessarily
+- Service Style entity is the most common dependency — prioritize it
+- Sales Lock pipeline blocks multiple revenue-sensitive features
+
+### Manifest Ownership
+- All Manifest edits go through bun run manifest:regen
+- Do not hand-edit generated artifacts
+- Generated files are in .convex/_generated/
+
+### Verification
+- Run bun run check before claiming work complete
+- CI runs the same gate
+- Per §13: Manifest proof → Command tests → Store proof → UI proof → Wiring proof → External proof → Repo gate
+
+### Git Workflow
+- Commit often, small atomic changes
+- Format: [type] what and why
+- Use git status --short before modifying files
+- Preserve unrelated user changes
+
+### Hidden Dependencies Discovered
+- **Service Style** affects: proposals (§5), templates (§11.2), reports (§7), imports (§6.2), venue filtering (§8.1), pack templates (§11.2), role scorecards (§9.2), event creation (§4.1)
+- **Sales Lock** affects: event creation (§4.1), proposals (§5), revenue attribution (§7.3), staffing (§9.1), equipment reservations (§11.3)
+- **Venue depth** blocks: proposal timeline sections (§5.2), layout templates (§8.3), vendor ecosystem (§8.5), revenue attribution (§7.3), event logistics (§8.2)
+- **Revenue attribution** blocks: venue reporting (§7.3), sales dashboards (§7.4), commission tracking
+- **Equipment location fields** block: availability accuracy (§11.3), logistics planning
+- **Performance tracking eventId** blocks: per-event feedback (§9.4), staff evaluation granularity
+- **Import framework** blocks: all TPP migration (§6), external record links for integrations (§12)
+
+---
+
+**Last updated:** 2026-07-24 (Complete Gap Analysis Update)
+**Spec version:** capsule-complete-feature-spec.md
+**Verification:** All 101 spec items verified against actual source code
+**Status snapshot:**
+- **Slice 4 (Operations):** ✅ 85% production-ready — Kitchen/inventory/staffing/equipment complete, exceeds spec with 24 bonus features
+- **Slice 0 (Foundation):** 🟡 50% — Event detail ✅, PackList separation ✅, ServiceStyle ❌ (blocks 11 features), Sales Lock ❌ (blocks 6 features)
+- **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines, MCP bridge ✅ 461 lines, Nowsta ❌, Social DMs ❌
+- **Slice 1 (Proposals):** 🟡 45% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ❌, templates ❌, acceptance ❌, timeline sections ❌, quote builder ❌
+- **Slice 3 (Venue/Reporting):** 🟡 30% — Venue entity basic ✅, management UI ❌, 7 dashboards ❌, revenue attribution ❌, render engine ❌
+- **Slice 2 (Migration):** ❌ 0% — Entirely greenfield, NO import framework (ImportRun, ExternalRecordLink, reconciliation, dashboard, cutover)
+
+**Critical Blockers:**
+1. Import framework (foundation) — Entire Slice 2 blocked
+2. ServiceStyle entity (foundation) — 11 downstream features blocked
+3. Sales Lock pipeline — 6 features blocked
+4. Revenue attribution — Venue reporting, sales dashboards blocked
+5. Venue depth — 5 features blocked
+6. Equipment location — Availability/logistics degraded
+7. Performance eventId — Per-event feedback impossible
+
+**Technical Health:**
+- Test coverage: ✅ 65 test files, 650 tests passing, slice contracts proven
+- Code hygiene: ✅ Zero TODO/FIXME/XXX comments, no @ts-expect-error/@ts-ignore, no test.skip patterns
+- Mobile-first: ✅ Viewport meta set, Tailwind mobile-first throughout, touch targets, responsive breakpoints
+- Ponytail comments: ✅ 18 intentional simplifications documented (toast lib, browser validation, form draft, etc.)
+- Integrations: ✅ QuickBooks/Calendar/SMS/Webhooks production-complete, MCP bridge 100% complete
+- Bonus features: ✅ 24 production-grade enhancements beyond spec
+
+**Next Priority:**
+1. Import framework (enables Slice 2 migration)
+2. ServiceStyle entity (unlocks 11 features)
+3. Sales Lock pipeline (unlocks 6 features)
+4. Revenue attribution (enables accurate reporting)
+5. Equipment location fields (improves logistics accuracy)
