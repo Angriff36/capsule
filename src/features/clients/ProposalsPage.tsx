@@ -4,6 +4,8 @@ import {
   useCreateProposal,
   useListClient,
   useListEvent,
+  useListEventTimelineActivity,
+  useListVenue,
   useListProposal,
   useProposalAccept,
   useProposalDecline,
@@ -21,7 +23,12 @@ import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
-import { downloadProposalPdf } from "./proposalPdf";
+import {
+  downloadProposalPdf,
+  transformTimelineActivities,
+  transformVenueLogistics,
+  type ProposalPdfRecord,
+} from "./proposalPdf";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 
 // Event stages the acceptance cascade can feed dishes into (matches the
@@ -65,13 +72,15 @@ export function ProposalsPage() {
   const { branding } = useTenantBranding();
   const proposals = useListProposal();
   const clients = useListClient();
+  const events = useListEvent();
+  const timelineActivities = useListEventTimelineActivity();
+  const venues = useListVenue();
   const createProposal = useCreateProposal();
   const send = useProposalSend();
   const markViewed = useProposalMarkViewed();
   const accept = useProposalAccept();
   const decline = useProposalDecline();
   const expire = useProposalExpire();
-  const events = useListEvent();
   const [showDraft, setShowDraft] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
@@ -462,8 +471,34 @@ export function ProposalsPage() {
                         type="button"
                         disabled={busy != null}
                         onClick={() => {
+                          // Enrich proposal with timeline and venue logistics data
+                          const event = events?.find(
+                            (e) => e._id === row.eventId,
+                          );
+                          const eventTimelineItems =
+                            event && timelineActivities
+                              ? timelineActivities.filter(
+                                  (a) =>
+                                    a.eventId === event._id &&
+                                    a.deletedAt == null,
+                                )
+                              : [];
+                          const venue =
+                            event?.venueId && venues
+                              ? venues.find((v) => v._id === event.venueId)
+                              : null;
+
+                          const enrichedProposal: ProposalPdfRecord = {
+                            ...row,
+                            timelineItems:
+                              transformTimelineActivities(eventTimelineItems),
+                            venueLogistics: event
+                              ? transformVenueLogistics(venue || null, event)
+                              : undefined,
+                          };
+
                           void downloadProposalPdf({
-                            proposal: row,
+                            proposal: enrichedProposal,
                             clientName: clientDisplayName(
                               row.clientId,
                               clients,

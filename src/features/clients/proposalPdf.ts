@@ -93,6 +93,85 @@ const cleanLabel = (value: unknown) =>
     .replace(/[^A-Za-z0-9_-]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
+// Format timestamp to "HH:MM AM/PM" time string
+const formatTime = (timestamp: number | null | undefined): string => {
+  if (timestamp == null) return "";
+  const date = new Date(
+    typeof timestamp === "number" ? timestamp : Number(timestamp),
+  );
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
+// Transform EventTimelineActivity records to TimelineItem shape for PDF
+export function transformTimelineActivities(
+  activities: Array<{
+    startsAt?: number | null;
+    name?: string | null;
+    notes?: string | null;
+    siteNotes?: string | null;
+    sortOrder?: number | null;
+    deletedAt?: number | null;
+  }>,
+): TimelineItem[] {
+  return activities
+    .filter((a) => a.deletedAt == null && a.startsAt != null && a.name != null)
+    .sort((a, b) => {
+      const sortA = a.sortOrder ?? 0;
+      const sortB = b.sortOrder ?? 0;
+      if (sortA !== sortB) return sortA - sortB;
+      return (a.startsAt ?? 0) - (b.startsAt ?? 0);
+    })
+    .map((activity) => ({
+      time: formatTime(activity.startsAt),
+      activity: activity.name!,
+      description:
+        (activity.notes || activity.siteNotes || undefined)?.trim() ||
+        undefined,
+    }));
+}
+
+// Transform Venue record + Event data to VenueLogistics shape for PDF
+export function transformVenueLogistics(
+  venue:
+    | {
+        accessNotes?: string | null;
+        cateringNotes?: string | null;
+        contactName?: string | null;
+        contactEmail?: string | null;
+        contactPhone?: string | null;
+        address?: string | null;
+      }
+    | null
+    | undefined,
+  event: {
+    operationalRequirements?: string | null;
+    venueAddress?: string | null;
+  },
+): VenueLogistics {
+  const loadIn = venue?.accessNotes?.trim() || undefined;
+  const accessParts = [
+    venue?.address?.trim() || event?.venueAddress || undefined,
+    venue?.contactName?.trim() || undefined,
+    [venue?.contactEmail?.trim(), venue?.contactPhone?.trim()]
+      .filter(Boolean)
+      .join(" / ") || undefined,
+  ].filter(Boolean);
+  const access = accessParts.length > 0 ? accessParts.join(" — ") : undefined;
+  const restrictions = event?.operationalRequirements?.trim() || undefined;
+  const notes = venue?.cateringNotes?.trim() || undefined;
+  const contact =
+    [venue?.contactName?.trim(), venue?.contactPhone?.trim()]
+      .filter(Boolean)
+      .join(" — ") || undefined;
+
+  return { loadIn, access, restrictions, notes, contact };
+}
+
 export function proposalPdfFileName(proposal: ProposalPdfRecord): string {
   const label =
     cleanLabel(proposal.proposalNumber) ||

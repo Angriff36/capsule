@@ -1,13 +1,164 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (Parallel Run Dashboard implemented)
+**Updated:** 2026-07-25 (Timeline/Logistics PDF Sections Complete)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-25 — Timeline/Logistics PDF Sections Complete (Priority 13):**
+
+**Status: ✅ DONE — PDF rendering and data wiring for timeline and venue logistics**
+
+**Implemented:**
+- ✅ proposalPdf.ts (lines 95-145) — Transformation helper functions added
+- ✅ `transformTimelineActivities()` — Converts EventTimelineActivity to TimelineItem[]
+- ✅ `transformVenueLogistics()` — Converts Venue + Event to VenueLogistics shape
+- ✅ `formatTime()` — Converts timestamp to "HH:MM AM/PM" format
+- ✅ ProposalsPage.tsx download handler — Enriched with timeline and venue data
+- ✅ ClientPortalPage.tsx download handler — Enriched with timeline data
+
+**Timeline Section (proposalPdf.ts:290-329):**
+- Renders from EventTimelineActivity records linked to proposal's event
+- Displays time, activity name, and optional description
+- Filters deleted activities and null start times
+- Sorted by sortOrder then startsAt
+- Conditional rendering (only when timeline data exists)
+
+**Venue Logistics Section (proposalPdf.ts:259-288):**
+- Renders from Venue record (accessNotes, cateringNotes, contact fields)
+- Includes event operationalRequirements as restrictions
+- Combines address, contact name, phone for access string
+- Conditional rendering (only when venue logistics data exists)
+
+**Data Fetching:**
+- Operator UI: `useListEventTimelineActivity()`, `useListVenue()`
+- Client portal: `documents.beo.timeline` from clientPortal query
+- Venue data limited to snapshot fields in client portal (no access/catering notes)
+
+**Impact:**
+- Priority 13 (Timeline/Logistics PDF): ✅ DONE
+- Completes spec §5.2 required PDF sections (timeline, venue logistics)
+- Remaining: Enhancements section (awaiting entity), acceptance CTA button
+
+**Verification:**
+- All 700 tests passing
+- No new format issues
+
+**Previous Update:**
+
+**2026-07-25 — Proposal Revisions Implemented (Priority 10):**
+
+**Status: ✅ DONE — Immutable proposal revision snapshot system**
+
+**Implemented:**
+- ✅ src/sales/proposal-revision.manifest (152 lines) — ProposalRevision entity with capture command
+- ✅ src/sales/proposal.manifest — Added superseded status and fields
+- ✅ convex/lib/proposalRevision.ts (152 lines) — Snapshot building and capture seam code
+- ✅ Tests updated for new createVia selection
+
+**ProposalRevision Entity:**
+- Fields: proposalId, revisionNumber, changeSummary, capturedByName, capturedAt, snapshot (JSON)
+- Immutable once captured (guard pattern)
+- Captures: all proposal fields, client name, dish selections with names/descriptions, frozen pricing
+- Commands: capture(proposalId, revisionNumber, capturedByName, changeSummary, snapshot)
+- Queries: listByProposal, getLatest
+
+**Proposal Entity Enhancements:**
+- Added `superseded` to ProposalStatus enum
+- Added fields: supersededAt, supersedeReason, supersededById, replacesProposalId
+- Added transitions: sent/viewed → superseded
+- Added supersede(revisedById, reason) command
+- Added ProposalSuperseded event
+
+**Snapshot Data Structure:**
+- Proposal: All core fields (title, event details, venue, totals, terms, status, timestamps)
+- Client: ID and name (for PDF header)
+- Dish Selections: Full array with dish names/descriptions, menu references, quantities, courses, service styles
+- Tenant: Name for branding
+
+**Seam Code (convex/lib/proposalRevision.ts):**
+- buildProposalRevisionSnapshot() — Builds JSON snapshot from live data
+- captureProposalRevision internal mutation — Creates revision with auto-incremented version number
+- Resolves client name, dish names, menu names for snapshot
+- Author tracking from auth context
+
+**Impact:**
+- Priority 10 (Proposal Revisions): ✅ DONE
+- Unblocks: Digital Acceptance (can record exact revision accepted), Proposal Templates (version tracking), Timeline/Logistics PDF sections (snapshots)
+- Remaining: UI layer (revision history tab, diff view, restore capability)
+
+**Verification:**
+- All 700 tests passing
+- TypeScript typecheck passing
+- No format issues
+
+**Previous Update:**
+
+**2026-07-25 — TPP Migration Cutover Tooling Complete (Priority 30):**
+
+**Status: ✅ DONE — Full cutover validation and go/no-go gate implemented**
+
+**Implemented:**
+- ✅ convex/cutover.ts (632 lines) — Complete validation service with 5 checks
+- ✅ src/admin/cutover-decision.manifest (56 lines) — CutoverDecision entity
+- ✅ src/features/admin/import/CutoverPage.tsx (502 lines) — Full cutover UI
+- ✅ Route: /admin/cutover with navigation entry in AdminWorkspaceNav
+- ✅ Lazy import and routing in App.tsx
+
+**Validation Checks (all 5 implemented):**
+- ✅ Final delta import — validates latest import run completed + recent
+- ✅ Zero critical mappings — counts unverified TPP legacy external record links
+- ✅ Business validation — checks business approval flag and reason
+- ✅ Provider readiness — validates integrations healthy
+- ✅ Rollback plan — requires documented rollback plan before go
+
+**Cutover Workflow Commands:**
+- ✅ recordApprovals() — Set business approved + rollback plan
+- ✅ execute() — Execute GO/NO-GO decision with atomic validation
+- ✅ setTppReadOnly() — Mark TPP read-only after GO
+- ✅ rollback() — Emergency rollback from GO to rolled_back
+
+**Functionality Delivered:**
+- Displays all 5 validation checks with pass/fail status
+- Shows blockers and warnings preventing cutover
+- Executes go/no-go decisions with confirmation dialog
+- Set TPP read-only action after go decision
+- Emergency rollback action with reason prompt
+- Shows latest import run details for validation
+- Displays unresolved external record link counts by source system
+- Complete cutover decision status tracking (not_started → validating → ready_for_go → go/no_go → rolled_back)
+
+**Technical Notes:**
+- Follows spec §6.6 completely
+- Role-based guards (adminAccess required for decisions)
+- Tenant-scoped cutover decisions
+- Events: CutoverDecisionExecuted, TppReadOnlySet, CutoverRolledBack
+- Atomic validation at go/no-go execution (re-runs all checks)
+- Timestamp tracking: decidedAt, tppReadOnlyAt
+
+**Impact:**
+- Priority 30 (Cutover Tooling): ✅ DONE
+- **Slice 2 (TPP Migration): NOW 100% COMPLETE** — All components implemented:
+  - ✅ Import Framework (ExternalRecordLink + ImportRun entities)
+  - ✅ Import Execution Layer (importCoordinator, tppParser, importPipeline)
+  - ✅ Reconciliation Queue UI
+  - ✅ Import Runs List and Detail Pages
+  - ✅ Parallel Run Dashboard
+  - ✅ Cutover Tooling (final step)
+- Unblocks: Full TPP migration execution from legacy to Capsule
+- Remaining migration work: Data loading and operational execution only
+
+**Verification:**
+- All 698 tests passing
+- TypeScript typecheck passing
+- No format issues
+- Ready to commit
+
+**Previous Update:**
 
 **2026-07-25 — Parallel Run Dashboard Implemented:**
 
@@ -338,7 +489,7 @@
 |-------|--------|----------|--------------|-----------------|---------------|
 | **Slice 0** | ✅ Strong | 0 | 85% | Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅ | Event creation fields partial (occasion/service-style now wired) |
 | **Slice 1** | 🟡 Partial | 3 | 45% | Proposal lifecycle ✅, menu selection ✅ | Quote builder ❌, revisions ❌, templates ❌, acceptance ❌ |
-| **Slice 2** | 🟡 Partial | 2 | 5-10% | ExternalRecordLink ✅, ImportRun ✅ | Dataset definitions ❌, reconciliation queue ❌, dashboard ❌, cutover ❌ |
+| **Slice 2** | ✅ Complete | 0 | 100% | ExternalRecordLink ✅, ImportRun ✅, Execution layer ✅, Reconciliation UI ✅, Dashboard ✅, Cutover ✅ | None - full TPP migration framework ready for data loading and execution |
 | **Slice 3** | 🟡 Partial | 2 | 40% | Venue entity basic ✅, Venue management UI ✅ (basic), saved report config ✅ | Venue depth ❌, 7 dashboards ❌, revenue attribution ❌ |
 | **Slice 4** | ✅ Strong | 1 | 85% | Kitchen ✅, inventory ✅, staffing ✅, equipment ✅ | HR features ❌ (scorecards, hiring, 1-on-1s) |
 | **Slice 5** | 🟡 Partial | 2 | 60% | QuickBooks ✅, Calendar ✅, SMS ✅, Webhooks ✅ | Nowsta ❌, Social DMs ❌, Email threading ❌ |
@@ -684,34 +835,55 @@
 
 ---
 
-### ❌ 5.2 Timeline / Venue-Logistics / Enhancements Sections — NOT BUILT
+### ✅ 5.2 Timeline / Venue-Logistics / Enhancements Sections — DONE
 
 **Spec requirement:** Timeline/run-of-show section, Venue logistics snapshot section, Enhancements/upgrades section in proposal PDF
 
-**Current gap:**
-- PDF (proposalPdf.ts:79-286) has: Cover/brand, Event summary, Menu sections, Pricing summary, Terms
-- NO timeline data structure
-- NO venue logistics snapshot (only name/address)
-- NO enhancement entity
-- NO acceptance CTA button
+**Implemented:**
+- ✅ proposalPdf.ts (lines 259-329) — Timeline and venue logistics PDF rendering complete
+- ✅ `transformTimelineActivities()` helper — Converts EventTimelineActivity to TimelineItem[]
+- ✅ `transformVenueLogistics()` helper — Converts Venue + Event to VenueLogistics shape
+- ✅ ProposalsPage.tsx download handler enriched with timeline and venue data
+- ✅ ClientPortalPage.tsx download handler enriched with timeline data
 
-**Evidence:**
-- proposalPdf.ts lacks timeline, logistics, enhancements rendering
-- No ProposalTimelineItem, ProposalEnhancement entities
+**Timeline Section:**
+- Renders from EventTimelineActivity records linked to proposal's event
+- Displays time, activity name, and optional description
+- Filters out deleted activities and those without start times
+- Sorted by sortOrder then startsAt
+- Conditional rendering (only when timeline data exists)
 
-**Required PDF sections (spec §5.2):**
-- ✅ Cover/brand and event summary
-- ✅ Menu sections with descriptions/quantities/prices
-- ❌ Timeline/run-of-show
-- ❌ Venue logistics snapshot (only basic name/address currently)
-- ❌ Enhancements/upgrades
-- ✅ Pricing summary with fees/taxes/discounts/deposits/payment schedule
-- ✅ Terms
-- ❌ Acceptance/signature CTA button
+**Venue Logistics Section:**
+- Renders from Venue record (accessNotes, cateringNotes, contact fields)
+- Includes event operationalRequirements as restrictions
+- Combines address, contact name, phone for access string
+- Conditional rendering (only when venue logistics data exists)
 
-**Dependencies:** Venue profile depth (§8.1), Event layouts (§8.2)
+**Enhancements Section:**
+- PDF rendering already exists (lines 331-376)
+- Awaits Enhancement entity and data wiring
 
-**Estimated effort:** Medium (data model + PDF rendering)
+**Data Sources:**
+- EventTimelineActivity fetched via `useListEventTimelineActivity()` in operator UI
+- Venue data fetched via `useListVenue()` in operator UI
+- Client portal uses `documents.beo.timeline` from `clientPortal.getEvent` query
+- Client portal limited to event snapshot fields for venue logistics
+
+**Acceptance criteria met:**
+- Timeline section renders in PDF when event has timeline activities
+- Venue logistics section renders when venue or event has logistics data
+- Both sections are conditional (no empty sections)
+- Operator download includes full venue details (access notes, catering notes, contacts)
+- Client portal download includes timeline and basic venue info
+
+**Remaining Gaps:**
+- Enhancements section exists in PDF but no Enhancement entity or data wiring
+- No ProposalTimelineItem entity (uses EventTimelineActivity directly)
+- No VenueLogisticsSnapshot entity (uses Venue + Event data live)
+
+**Dependencies:** Venue profile depth (§8.1) for richer logistics data
+
+**Estimated effort:** ✅ DONE (PDF rendering + data wiring complete)
 
 ---
 
@@ -1791,7 +1963,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 | Priority | Item | Effort | Impact | Dependencies | Why First | Status |
 |----------|------|--------|--------|--------------|-----------|--------|
-| 1 | **Import Framework** | Large | Critical | None | Foundation for entire TPP migration - blocks Slice 2 | 🟡 Entities ✅, execution ✅, Reconciliation Queue UI ✅ - remaining gaps: import runs pages, dashboard, cutover |
+| ~~1~~ | **Import Framework** | Large | Critical | None | Foundation for entire TPP migration - blocks Slice 2 | ✅ DONE - All components complete: ExternalRecordLink, ImportRun, execution layer, reconciliation UI, import runs pages, dashboard, cutover |
 | 2 | **Import Datasets** | Medium | Critical | None | Events/Contacts/Leads/Menu/Venues/Payments import - 2,103 TPP events | ✅ DONE - 6 datasets with 91 fields mapped |
 | ~~3~~ | **Service Style Entity** | Medium | High | None | Foundational enum for operations - blocks 11 downstream features | ✅ DONE |
 | ~~3~~ | **Sales Lock Pipeline** | Medium | High | None (ServiceStyle ✅) | Quote → Sales Lock → Confirmed pipeline is core sales workflow | ✅ DONE |
@@ -1808,7 +1980,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 | 10 | **Proposal Revisions** | Large | High | Sales Lock | Enables proper version tracking for acceptance |
 | 11 | **Proposal Builder/Templates** | XLarge | High | Revisions, Venue, Event layouts | Client-facing proposal documents - core sales deliverable |
 | 12 | **Digital Acceptance** | Large | High | Revisions | Contract workflow - blocks e-sign integration |
-| 13 | **Timeline/Logistics PDF Sections** | Medium | High | Venue depth | Completes proposal PDF - wedding-magazine quality |
+| ~~13~~ | **Timeline/Logistics PDF Sections** | Medium | High | Venue depth | Completes proposal PDF - wedding-magazine quality | ✅ DONE |
 | 14 | **Self-Service Quote Builder** | Large | High | ServiceStyle, Occasion | Client portal enhancement - mobile self-service for leads |
 | 15 | **Payment Reconciliation** | Medium | High | External Record Link, Import Framework | Payment matching and reconciliation - blocks TPP payment import |
 
@@ -1835,7 +2007,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 |----------|------|--------|--------|--------------|-----|
 | 28 | **Reporting Foundation + Render Engine** | Large | High | None | Enables all dashboards - leadership visibility |
 | 29 | **Common Report Filters** | Small-Medium | High | Venue on/off flag | On/off-premise flag; filter state sharing |
-| 30 | **Cutover Tooling** | Large | Critical | Import Framework, Parallel Run Dashboard | Production migration execution - final step with rollback |
+| ~~30~~ | **Cutover Tooling** | Large | Critical | Import Framework, Parallel Run Dashboard | Production migration execution - final step with rollback | ✅ DONE |
 
 ### Large (Slice 2 — Migration enabler)
 

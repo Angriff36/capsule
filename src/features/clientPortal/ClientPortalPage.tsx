@@ -7,6 +7,10 @@ import type {
   ContractPdfRecord,
 } from "../clients/contractPdf";
 import type { ProposalPdfRecord } from "../clients/proposalPdf";
+import {
+  transformTimelineActivities,
+  transformVenueLogistics,
+} from "../clients/proposalPdf";
 import type {
   BeoDishLine,
   BeoEventRecord,
@@ -414,8 +418,32 @@ function ClientPortalDocumentLibrary({
                 runDownload(key, async () => {
                   const { downloadProposalPdf } =
                     await import("../clients/proposalPdf");
+                  // Enrich proposal with timeline data from portal
+                  const timelineItems = documents.beo?.timeline
+                    ? transformTimelineActivities(
+                        documents.beo.timeline.map((t) => ({
+                          startsAt: t.startsAt,
+                          name: t.name,
+                          notes: t.notes,
+                          deletedAt: null,
+                        })),
+                      )
+                    : undefined;
+                  // Use event data for venue logistics (limited to snapshot fields)
+                  const venueLogistics = documents.beo?.event
+                    ? transformVenueLogistics(null, {
+                        operationalRequirements:
+                          documents.beo.event.operationalRequirements || null,
+                        venueAddress: documents.beo.event.venueAddress || null,
+                      })
+                    : undefined;
+
                   await downloadProposalPdf({
-                    proposal,
+                    proposal: {
+                      ...proposal,
+                      timelineItems,
+                      venueLogistics,
+                    },
                     clientName: documents.clientName,
                     branding,
                   });
