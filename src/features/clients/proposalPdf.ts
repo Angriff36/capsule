@@ -22,6 +22,32 @@ export interface ProposalPdfRecord {
   expiresAt?: number | null;
   notes?: string | null;
   terms?: string | null;
+  // Optional sections for timeline, logistics, enhancements
+  timelineItems?: TimelineItem[];
+  venueLogistics?: VenueLogistics;
+  enhancements?: Enhancement[];
+  // Acceptance URL for CTA
+  acceptanceUrl?: string;
+}
+
+export interface TimelineItem {
+  time: string;
+  activity: string;
+  description?: string;
+}
+
+export interface VenueLogistics {
+  loadIn?: string;
+  access?: string;
+  restrictions?: string;
+  notes?: string;
+  contact?: string;
+}
+
+export interface Enhancement {
+  name: string;
+  description?: string;
+  price?: number;
 }
 
 export interface ProposalPdfInput {
@@ -230,6 +256,104 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   }
   y += menuHeight + 16;
 
+  // Venue logistics section (if provided).
+  if (proposal.venueLogistics != null) {
+    sectionLabel("Venue logistics");
+    const logistics = [
+      ["Load-in", proposal.venueLogistics.loadIn ?? ""],
+      ["Access", proposal.venueLogistics.access ?? ""],
+      ["Restrictions", proposal.venueLogistics.restrictions ?? ""],
+      ["Special notes", proposal.venueLogistics.notes ?? ""],
+      ["Contact", proposal.venueLogistics.contact ?? ""],
+    ].filter(([, value]) => value.trim() !== "") as Array<[string, string]>;
+    if (logistics.length > 0) {
+      for (const [label, value] of logistics) {
+        ensureSpace(20);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(8);
+        doc.setTextColor(...MUTED);
+        doc.text(label.toUpperCase(), MARGIN, y);
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(9);
+        doc.setTextColor(...INK);
+        const lines = doc.splitTextToSize(
+          value,
+          CONTENT_WIDTH - 80,
+        ) as string[];
+        doc.text(lines, MARGIN + 80, y);
+        y += lines.length * 14 + 6;
+      }
+      y += 8;
+    }
+  }
+
+  // Timeline section (if provided).
+  if (proposal.timelineItems != null && proposal.timelineItems.length > 0) {
+    sectionLabel("Timeline");
+    for (const item of proposal.timelineItems) {
+      ensureSpace(32);
+      doc.setFillColor(251, 250, 247);
+      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 24, 4, 4, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(...brand);
+      doc.text(item.time, MARGIN + 12, y + 10);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(...INK);
+      doc.text(item.activity, MARGIN + 96, y + 10);
+      if (item.description != null && item.description.trim() !== "") {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(...MUTED);
+        const descLines = doc.splitTextToSize(
+          item.description,
+          CONTENT_WIDTH - 108,
+        ) as string[];
+        doc.text(descLines, MARGIN + 96, y + 22);
+        y += Math.max(24, descLines.length * 12 + 12);
+      } else {
+        y += 24;
+      }
+    }
+    y += 8;
+  }
+
+  // Enhancements section (if provided).
+  if (proposal.enhancements != null && proposal.enhancements.length > 0) {
+    sectionLabel("Enhancements & upgrades");
+    for (const enhancement of proposal.enhancements) {
+      ensureSpace(32);
+      doc.setFillColor(251, 250, 247);
+      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 24, 4, 4, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(...INK);
+      const nameWithPrice =
+        enhancement.price != null
+          ? `${enhancement.name} (+${usd(enhancement.price)})`
+          : enhancement.name;
+      doc.text(nameWithPrice, MARGIN + 12, y + 10);
+      if (
+        enhancement.description != null &&
+        enhancement.description.trim() !== ""
+      ) {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(...MUTED);
+        const descLines = doc.splitTextToSize(
+          enhancement.description,
+          CONTENT_WIDTH - 24,
+        ) as string[];
+        doc.text(descLines, MARGIN + 12, y + 22);
+        y += Math.max(24, descLines.length * 12 + 12);
+      } else {
+        y += 24;
+      }
+    }
+    y += 8;
+  }
+
   // Estimate summary.
   sectionLabel("Estimate");
   const summaryRows: Array<[string, string, boolean?]> = [
@@ -261,6 +385,60 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   writeParagraph(
     terms || "No additional terms were provided for this proposal.",
   );
+
+  // Next steps / CTA section.
+  if (proposal.acceptanceUrl != null) {
+    sectionLabel("Next steps");
+    ensureSpace(60);
+    doc.setFillColor(251, 250, 247);
+    doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 54, 6, 6, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(10);
+    doc.setTextColor(...brand);
+    doc.text("To accept this proposal:", MARGIN + 14, y + 12);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...INK);
+    const steps = [
+      "1. Review all details above",
+      "2. Contact us with any questions",
+      "3. Confirm your acceptance by phone or email",
+    ];
+    let stepY = y + 26;
+    for (const step of steps) {
+      doc.text(step, MARGIN + 14, stepY);
+      stepY += 11;
+    }
+    doc.setFont("helvetica", "italic");
+    doc.setFontSize(8);
+    doc.setTextColor(...MUTED);
+    doc.text(
+      "We'll follow up to confirm your booking and finalize details.",
+      MARGIN + 14,
+      stepY + 4,
+    );
+    y += 66;
+  } else {
+    // Generic next steps when no URL provided.
+    sectionLabel("Next steps");
+    ensureSpace(40);
+    doc.setFillColor(251, 250, 247);
+    doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 34, 6, 6, "F");
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(...INK);
+    doc.text(
+      "To proceed with this proposal, please contact us to discuss details and confirm your booking.",
+      MARGIN + 14,
+      y + 10,
+    );
+    doc.text(
+      "We look forward to working with you on your event!",
+      MARGIN + 14,
+      y + 22,
+    );
+    y += 46;
+  }
 
   // Footer on every page, including pages introduced by long menu/terms copy.
   const pageCount = doc.getNumberOfPages();
