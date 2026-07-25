@@ -1,13 +1,88 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (Role Scorecards Complete)
+**Updated:** 2026-07-25 (Hiring Pipeline Complete)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-25 — Hiring Pipeline Discovery (Priority 26):**
+
+**Status: ✅ DONE — Full implementation discovered during gap analysis**
+
+**Already Implemented:**
+- ✅ src/workforce/candidate.manifest — Complete Candidate entity (318 lines)
+- ✅ src/workforce/interview.manifest — Complete Interview entity (258 lines)
+- ✅ Candidate pipeline: application → screening → interview → decision → offer → hired/rejected/withdrawn
+- ✅ Interview scheduling: schedule, complete, cancel, reschedule with outcomes
+- ✅ Source tracking: km_interview_tool, careers_page, referral, linkedin, indeed, recruiter, other
+- ✅ Source IDs for deduplication and raw response references (KM JSON mapping)
+- ✅ CandidatesPage.tsx — Full UI with CRUD operations (apply command, advance pipeline, reject, withdraw, hire)
+- ✅ InterviewsPage.tsx — Full UI with scheduling (schedule, complete, cancel, reschedule, update)
+- ✅ Both manifests wired in app.manifest (lines 76-77)
+- ✅ Routing: Wired in App.tsx at /staff/candidates and /staff/interviews
+- ✅ Navigation: Entries in workforceRoutes.ts
+
+**Technical Notes:**
+- Candidate supports full lifecycle with stage transitions and validation
+- Interview supports multiple types: phone_screen, video_interview, in_person, practical, other
+- Interview outcomes: pass, fail, strong_pass, no_show, cancelled, pending
+- Constraints enforce business rules (hired requires Person link, rejected requires reason)
+- Multiple interviewers per interview stored as JSON array
+- Rating system 1-5 for completed interviews
+- Audit trail with advancedById/advancedAt for pipeline movements
+- Events emitted for all state changes: CandidateApplied, CandidateAdvanced, CandidateHired, InterviewScheduled, InterviewCompleted, etc.
+
+**Impact:**
+- Priority 26 (Hiring Pipeline): ✅ DONE (discovered complete)
+- Slice 4 (Operations): Now **100% COMPLETE** — All HR features done (Performance event linkage ✅, Role Scorecards ✅, One-on-Ones ✅, Hiring Pipeline ✅)
+- Unblocks: Full candidate tracking from application through hire
+
+**Verification:**
+- All core commands working through UI
+- Generated hooks available (useCandidate*, useInterview*)
+- Schema regenerated successfully with manifests
+
+**Previous Update:**
+
+**2026-07-25 — One-on-Ones Discovery (Priority 27):**
+
+**Status: ✅ DONE — Full implementation discovered during gap analysis**
+
+**Already Implemented:**
+- ✅ src/workforce/one-on-one.manifest — Complete OneOnOne entity (239 lines)
+- ✅ OneOnOnesPage.tsx — Full UI with CRUD operations (572 lines)
+- ✅ Commands: schedule, complete, cancel, revise
+- ✅ Versioning: versionProperty for optimistic concurrency
+- ✅ Meeting content: agenda, goals, wins, opportunities, decisions, followUpActions
+- ✅ Events: OneOnOneScheduled, OneOnOneCompleted, OneOnOneCancelled, OneOnOneRevised
+- ✅ Policies: oneOnOneRead, oneOnOneWrite, oneOnOneExecute (manager-only access)
+- ✅ Routing: Wired in App.tsx at /staff/one-on-ones
+- ✅ Navigation: Entry in workforceRoutes.ts
+
+**Technical Notes:**
+- Entity supports scheduled → completed/cancelled lifecycle
+- Manager and staff member must be different people (constraint enforced)
+- RoleScorecard reference for expectations context
+- Follow-up actions stored as JSON array with owners and due dates
+- Previous/next meeting references for continuity across meetings
+- Completed meetings require completion time and facilitator
+- Open actions carry forward without rewriting prior records
+
+**Impact:**
+- Priority 27 (One-on-Ones): ✅ DONE (discovered complete)
+- Slice 4 (Operations): Now 95% complete (HR features nearly done)
+- Remaining HR work: Hiring pipeline (Priority 26) only
+
+**Verification:**
+- All 709 tests passing
+- Typecheck passing
+- No format issues
+
+**Previous Update:**
 
 **2026-07-25 — Role Scorecards Discovery (Priority 24):**
 
@@ -2191,7 +2266,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 | ~~24~~ | **Role Scorecards** | Medium | Medium | Performance tracking | HR management - defines measurable expectations | ✅ DONE - Full manifest entity (role-scorecard.manifest), RoleScorecardsPage UI with CRUD, wired in App.tsx route /staff/scorecards, navigation in workforceRoutes.ts |
 | ~~25~~ | **Performance Event Linkage** | Small-Medium | Medium | None | Per-event feedback vs periodic only - HR evaluation granularity | ✅ DONE - eventId relation added to PerformanceReview entity, Event dropdown in PerformanceReviewsPage.tsx, all 704 tests passing |
 | 26 | **Hiring Pipeline** | Large | Medium | None | HR operations - tracks candidates through stages |
-| 27 | **One-on-Ones** | Medium | Medium | Role Scorecards | Staff development - structured manager meetings |
+| ~~27~~ | **One-on-Ones** | Medium | Medium | Role Scorecards | Staff development - structured manager meetings | ✅ DONE - Full manifest entity (one-on-one.manifest), OneOnOnesPage UI with CRUD, wired in App.tsx route /staff/one-on-ones, navigation in workforceRoutes.ts, all 709 tests passing |
 
 ### Medium (Slice 3 — Operational intelligence)
 
@@ -2270,16 +2345,16 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 ---
 
-**Last updated:** 2026-07-25 (Common Report Filters Complete)
+**Last updated:** 2026-07-25 (Hiring Pipeline Complete)
 **Spec version:** capsule-complete-feature-spec.md
 **Verification:** All 101 spec items verified against actual source code
 **Status snapshot:**
-- **Slice 4 (Operations):** ✅ 85% production-ready — Kitchen/inventory/staffing/equipment complete, exceeds spec with 24 bonus features
+- **Slice 4 (Operations):** ✅ **100% COMPLETE** — All HR features done (Performance event linkage ✅, Role Scorecards ✅, One-on-Ones ✅, Hiring Pipeline ✅), exceeds spec with 24 bonus features
 - **Slice 0 (Foundation):** ✅ 85% — Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅ (complete, unblocks 6 features)
 - **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines, MCP bridge ✅ 461 lines, Nowsta ❌, Social DMs ❌
-- **Slice 1 (Proposals):** 🟡 45% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ❌, templates ❌, acceptance ❌, timeline sections ❌, quote builder ❌
-- **Slice 3 (Venue/Reporting):** 🟡 40% — Venue entity basic ✅, management UI ✅ basic, 7 dashboards ❌, revenue attribution ❌, render engine ❌
-- **Slice 2 (Migration):** 🟡 5-10% — ExternalRecordLink ✅ (398 lines), ImportRun ✅, remaining gaps: dataset definitions, reconciliation queue, dashboard, cutover
+- **Slice 1 (Proposals):** 🟡 45% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ✅, acceptance ✅, timeline sections ✅, templates ❌, quote builder ❌
+- **Slice 3 (Venue/Reporting):** ✅ 45% — Venue entity basic ✅, management UI ✅ basic, revenue attribution ✅, common filters ✅, 7 dashboards ❌, render engine ❌
+- **Slice 2 (Migration):** ✅ 100% — ExternalRecordLink ✅, ImportRun ✅, execution layer ✅, reconciliation UI ✅, dashboard ✅, cutover ✅
 
 **Critical Blockers:**
 1. ~~Import framework wiring (foundation)~~ — ExternalRecordLink ✅, ImportRun ✅, execution layer ✅, reconciliation UI ✅, dashboard ✅, cutover ✅ — NOW COMPLETE
@@ -2300,21 +2375,21 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 **Next Priority:**
 
-**RECOMMENDED: Priority 29 (Common Report Filters)** — Small-Medium effort, medium-high impact
+**RECOMMENDED: Priority 11 (Proposal Builder/Templates)** — XLarge effort, high impact
 
 **Why this is the best next priority:**
-- **Small-Medium effort** — Add on/off-premise venue classification, wire filter sharing across reports
-- **Medium-high impact** — Enables venue-specific reporting for operations and sales
-- **Foundation for dashboards** — Prerequisite for all 7 executive dashboards (Slice 3)
-- **Quick win** — Venue classification is straightforward filter enhancement
+- **High impact** — Client-facing proposal documents are the first visible TPP replacement value
+- **Core sales deliverable** — Weddings and large events require wedding-magazine quality proposals
+- **Unblocks multiple features** — Templates enable reusable proposal sections and faster quote creation
+- **Foundation ready** — ServiceStyle ✅, Occasion ✅, Venue depth ✅, Event layouts ✅, Proposal revisions ✅, Timeline sections ✅, Digital acceptance ✅
 
 **Alternative priorities considered:**
+- Priority 14 (Self-Service Quote Builder): Large effort, high value but depends on Proposal Builder/Templates
 - Priority 17 (Venue Profile Full Depth): Large effort, high value but extensive operations fields and vendor ecosystem work
-- Priority 28 (Reporting Foundation + Render Engine): Large effort, enables all dashboards but less immediately valuable than basic filters
-- Priority 24 (Role Scorecards): Medium effort, but depends on Performance Event Linkage (now ✅ complete, so unblocked)
+- Priority 28 (Reporting Foundation + Render Engine): Large effort, enables all dashboards but less immediately valuable than core sales workflow
 
 **Status snapshot:**
-- **Slice 4 (Operations):** ✅ 85% production-ready — Kitchen/inventory/staffing/equipment complete
+- **Slice 4 (Operations):** ✅ 95% production-ready — Kitchen/inventory/staffing/equipment complete, HR features nearly done (Role Scorecards ✅, One-on-Ones ✅, Hiring Pipeline remaining)
 - **Slice 0 (Foundation):** ✅ 85% — Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅
 - **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines
 - **Slice 1 (Proposals):** 🟡 45% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ❌, templates ❌
@@ -2324,15 +2399,20 @@ The codebase includes several production-grade enhancements not explicitly in th
 **Completed:**
 - ✅ Import framework wiring (ExternalRecordLink ✅, ImportRun ✅, execution layer ✅, reconciliation UI ✅, dashboard ✅, cutover ✅)
 - ✅ ServiceStyle entity (unlocks 11 features)
-- ✅ Sales Lock pipeline (unlocks 6 features)
+- ✅ Sales Lock pipeline (unblocks 6 features)
 - ✅ Revenue attribution (UI complete, enables accurate reporting)
 - ✅ Equipment location fields (improves logistics accuracy)
 - ✅ Performance Event Linkage (unblocks per-event HR feedback granularity)
 - ✅ Role Scorecards (full manifest, UI, routing, unblocks One-on-Ones)
+- ✅ One-on-Ones (full manifest entity, UI, routing, staff development meetings)
+- ✅ Hiring Pipeline (Candidate + Interview manifests, CandidatesPage + InterviewsPage UI, full routing wired)
 
 **Next recommended:**
 1. ~~Priority 29: Common Report Filters~~ ✅ DONE — ReportFilterBar with venuePremise filter, FoodCostPercentagePage wired, remaining: apply to other report pages
 2. ~~Priority 24: Role Scorecards~~ ✅ DONE — Full manifest, UI, routing complete
-3. Priority 27: One-on-Ones (Medium, now unblocked after Role Scorecards ✅)
-4. Priority 17: Venue Profile Full Depth (Large, high value but extensive work)
-5. Priority 28: Reporting Foundation + Render Engine (Large, enables all dashboards but less immediately valuable than basic filters)
+3. ~~Priority 27: One-on-Ones~~ ✅ DONE — Full manifest entity (one-on-one.manifest), OneOnOnesPage UI with CRUD, wired in App.tsx route /staff/one-on-ones, all 709 tests passing
+4. ~~Priority 26: Hiring Pipeline~~ ✅ DONE — Full Candidate (318 lines) + Interview (258 lines) manifests, CandidatesPage + InterviewsPage UI, all routing wired
+5. Priority 17: Venue Profile Full Depth (Large, high value but extensive work)
+6. Priority 28: Reporting Foundation + Render Engine (Large, enables all dashboards but less immediately valuable than basic filters)
+7. Priority 11: Proposal Builder/Templates (XLarge, high impact — Client-facing proposal documents)
+8. Priority 14: Self-Service Quote Builder (Large, high impact — Mobile client self-service for leads)
