@@ -20,6 +20,22 @@ enum PaymentMethodKind {
   other
 }
 
+enum PaymentReconciliationStatus {
+  unreconciled
+  matched
+  disputed
+  verified
+}
+
+enum PaymentExternalSource {
+  tpp_legacy
+  quickbooks_online
+  nowsta
+  stripe
+  manual
+  other
+}
+
 entity Payment mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -41,6 +57,15 @@ entity Payment mixin TenantScoped, SoftDeletable {
   property refundedAt: datetime?
   property failureReason: string?
   property refundReason: string?
+
+  // Reconciliation fields for TPP/QuickBooks/Nowsta payment matching per spec §6.4
+  property required reconciliationStatus: PaymentReconciliationStatus = "unreconciled"
+  property externalSource: PaymentExternalSource?
+  property externalPaymentId: string?
+  property providerTransactionIds: string?      // JSON: { qbo: "...", nowsta: "...", stripe: "..." }
+  property reconciliationDetails: string?       // JSON: { matchedAt, matchConfidence, lastReconciledAt, reconciledBy, notes }
+  property reconciledAt: datetime?
+  property reconciledByUserId: string?
 
   belongsTo invoice: Invoice fields [tenantId, invoiceId] references [tenantId, id]
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
@@ -194,6 +219,72 @@ entity Payment mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // markMatched - Mark payment as matched to external source (TPP/QBO/Nowsta)
+  command markMatched(
+    source: PaymentExternalSource,
+    externalPaymentId: string,
+    optional providerTransactionIds: string,
+    optional notes: string
+  ) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "financeAccess")
+    constraint matchRequiresExternalId: length(trim(externalPaymentId)) > 0 "External payment ID is required for matching"
+    mutate reconciliationStatus = "matched"
+    mutate externalSource = source
+    mutate externalPaymentId = externalPaymentId
+    mutate providerTransactionIds = providerTransactionIds != null ? providerTransactionIds : self.providerTransactionIds
+    mutate reconciliationDetails = notes != null ? notes : self.reconciliationDetails
+    emit PaymentMatched {
+      paymentId: self.id
+      tenantId: self.tenantId
+      source: source
+      externalPaymentId: externalPaymentId
+      amount: self.amount
+    }
+  }
+
+  // verifyReconciliation - Verify payment reconciliation as correct
+  command verifyReconciliation(optional notes: string) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "financeAccess")
+    guard self.reconciliationStatus == "matched"
+    mutate reconciliationStatus = "verified"
+    mutate reconciledAt = now()
+    mutate reconciledByUserId = user.id
+    mutate reconciliationDetails = notes != null ? notes : self.reconciliationDetails
+    emit PaymentReconciliationVerified {
+      paymentId: self.id
+      tenantId: self.tenantId
+      externalPaymentId: self.externalPaymentId != null ? self.externalPaymentId : ""
+      amount: self.amount
+    }
+  }
+
+  // disputeReconciliation - Dispute payment reconciliation
+  command disputeReconciliation(reason: string) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "financeAccess")
+    constraint disputeRequiresReason: length(trim(reason)) > 0 "Dispute reason is required"
+    mutate reconciliationStatus = "disputed"
+    mutate reconciliationDetails = reason
+    emit PaymentReconciliationDisputed {
+      paymentId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  // updateProviderTransactionIds - Update provider transaction IDs (QBO, Nowsta, etc.)
+  command updateProviderTransactionIds(providerTransactionIds: string) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "financeAccess")
+    mutate providerTransactionIds = providerTransactionIds
+    emit PaymentProviderIdsUpdated {
+      paymentId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   store Payment in durable
 }
 
@@ -251,6 +342,32 @@ event PaymentRefunded: "payment.refunded" {
   clientId: string
   amount: money(12, 2)
   reason: string
+}
+
+event PaymentMatched: "payment.matched" {
+  paymentId: string
+  tenantId: string
+  source: PaymentExternalSource
+  externalPaymentId: string
+  amount: money(12, 2)
+}
+
+event PaymentReconciliationVerified: "payment.reconciliation_verified" {
+  paymentId: string
+  tenantId: string
+  externalPaymentId: string
+  amount: money(12, 2)
+}
+
+event PaymentReconciliationDisputed: "payment.reconciliation_disputed" {
+  paymentId: string
+  tenantId: string
+  reason: string
+}
+
+event PaymentProviderIdsUpdated: "payment.provider_ids_updated" {
+  paymentId: string
+  tenantId: string
 }
 
 // Settled payments apply to the invoice (replaces capsule-pro middleware).
