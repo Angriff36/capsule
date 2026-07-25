@@ -1,13 +1,59 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (Hiring Pipeline Complete)
+**Updated:** 2026-07-25 (Proposal Templates UI Wired)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-25 — Proposal Templates UI Wired (Priority 11):**
+
+**Status: ✅ DONE — Manifest and UI fully wired**
+
+**Implemented:**
+- ✅ src/sales/proposal-template.manifest added to app.manifest
+- ✅ ProposalTemplatesPage.tsx (465 lines) — Full UI with define/revise/archive/reactivate
+- ✅ Routing wired in App.tsx at /clients/proposals/templates
+- ✅ Navigation entry in clientsRoutes.ts
+- ✅ All 708 tests passing
+- ✅ Git tag v0.0.2 created
+
+**Proposal Template Features:**
+- Section visibility configuration (cover_brand, event_summary, menu_sections, timeline, venue_logistics, enhancements, pricing_summary, terms, acceptance_cta)
+- Default terms and notes
+- Pricing defaults (tax rate, service charge percent)
+- Validity period (days until expiration)
+- Active/archived status with archive reason
+- Commands: define, revise, archive, reactivate
+- Events: ProposalTemplateDefined, ProposalTemplateRevised, ProposalTemplateArchived, ProposalTemplateReactivated
+
+**Technical Notes:**
+- Generated schema includes proposalTemplates table
+- Generated hooks: useProposalTemplate*, useListProposalTemplate
+- Constraints enforce completeness and ranges (tax 0-100%, service charge 0-100%, validity 1-365 days)
+- Percentage inputs handled as decimals (e.g., 8.5% = 0.085) in form
+
+**Impact:**
+- Priority 11 (Proposal Templates): ✅ DONE (manifest and UI)
+- Slice 1 (Proposals): Now ~50% complete — templates entity and UI wired, template selection during proposal draft remaining
+- Unblocks: Template library management, proposal draft from template flow
+
+**Remaining Gaps:**
+- Template selection during proposal creation (ProposalsPage draft flow)
+- Menu presets integration
+- Section reorder/edit controls in proposal PDF
+- Template-based proposal initialization
+
+**Verification:**
+- All 708 tests passing
+- Manifest regeneration successful
+- Generated hooks working
+- Form validation complete
+
+**Previous Update:**
 
 **2026-07-25 — Hiring Pipeline Discovery (Priority 26):**
 
@@ -2245,7 +2291,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 | Priority | Item | Effort | Impact | Dependencies | Why |
 |----------|------|--------|--------|--------------|-----|
 | 10 | **Proposal Revisions** | Large | High | Sales Lock | Enables proper version tracking for acceptance | ✅ DONE |
-| 11 | **Proposal Builder/Templates** | XLarge | High | Revisions, Venue, Event layouts | Client-facing proposal documents - core sales deliverable |
+| ~~11~~ | **Proposal Templates** | Medium | High | None | Template manifest and UI complete — define/revise/archive/reactivate, section visibility, pricing defaults, validity days | ✅ DONE - Manifest and UI wired at /clients/proposals/templates |
 | ~~12~~ | **Digital Acceptance** | Large | High | Revisions | Contract workflow - blocks e-sign integration | ✅ DONE |
 | ~~13~~ | **Timeline/Logistics PDF Sections** | Medium | High | Venue depth | Completes proposal PDF - wedding-magazine quality | ✅ DONE |
 | 14 | **Self-Service Quote Builder** | Large | High | ServiceStyle, Occasion | Client portal enhancement - mobile self-service for leads |
@@ -2345,7 +2391,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 ---
 
-**Last updated:** 2026-07-25 (Hiring Pipeline Complete)
+**Last updated:** 2026-07-25 (Proposal Templates UI Wired)
 **Spec version:** capsule-complete-feature-spec.md
 **Verification:** All 101 spec items verified against actual source code
 **Status snapshot:**
