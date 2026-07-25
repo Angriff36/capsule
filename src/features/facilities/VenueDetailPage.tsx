@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import {
   useGetVenue,
   useVenueUpdateDetails,
@@ -33,7 +33,6 @@ const VENUE_TYPE_LABELS: Record<VenueType, string> = {
 
 export function VenueDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const venue = useGetVenue(id ?? "skip");
 
   const updateDetails = useVenueUpdateDetails();
@@ -165,7 +164,7 @@ export function VenueDetailPage() {
         />
       </div>
 
-      {failure && <SupplyFailureBanner error={failure} />}
+      {failure != null && <SupplyFailureBanner error={failure} />}
 
       {/* Venue Header */}
       <div className="rounded-md bg-white p-6 shadow-sm">

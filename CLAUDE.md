@@ -143,7 +143,7 @@ Last: [first session]
 
 ## Last Session Bridge
 [auto-bridge snapshot @ 10 changes]
-Files: src/features/facilities/VenueDetailPage.tsx (edit), src/features/facilities/VenueDetailPage.tsx (create), src/features/facilities/VenuesPage.tsx (create), src/features/facilities/facilitiesRoutes.ts (create), IMPLEMENTATION_PLAN.md (edit)
+Files: IMPLEMENTATION_PLAN.md (edit), src/features/admin/AdminWorkspaceNav.tsx (edit), src/features/admin/import/ExternalRecordsReconcilePage.tsx (create), src/app/App.tsx (edit), src/features/admin/import/importRoutes.ts (create), convex/queries.ts (edit)
 
 # === END COGNILAYER ===
 

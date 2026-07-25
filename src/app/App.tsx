@@ -278,8 +278,20 @@ const IntegrationsPage = lazy(() =>
   })),
 );
 const ExternalRecordsReconcilePage = lazy(() =>
-  import("../features/admin/import/ExternalRecordsReconcilePage").then((module) => ({
-    default: module.ExternalRecordsReconcilePage,
+  import("../features/admin/import/ExternalRecordsReconcilePage").then(
+    (module) => ({
+      default: module.ExternalRecordsReconcilePage,
+    }),
+  ),
+);
+const ImportRunsListPage = lazy(() =>
+  import("../features/admin/import/ImportRunsListPage").then((module) => ({
+    default: module.ImportRunsListPage,
+  })),
+);
+const ImportRunDetailPage = lazy(() =>
+  import("../features/admin/import/ImportRunDetailPage").then((module) => ({
+    default: module.ImportRunDetailPage,
   })),
 );
 const MyDayPage = lazy(() =>
@@ -831,6 +843,22 @@ export function App() {
               element={
                 <SupplyRoute>
                   <IntegrationsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/imports"
+              element={
+                <SupplyRoute>
+                  <ImportRunsListPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/imports/:id"
+              element={
+                <SupplyRoute>
+                  <ImportRunDetailPage />
                 </SupplyRoute>
               }
             />

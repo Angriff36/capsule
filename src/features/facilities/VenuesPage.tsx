@@ -119,7 +119,7 @@ export function VenuesPage() {
         </button>
       </div>
 
-      {failure && <SupplyFailureBanner error={failure} />}
+      {failure != null && <SupplyFailureBanner error={failure} />}
 
       {showForm && (
         <form onSubmit={submit} className="space-y-4 rounded-md bg-gray-50 p-4">
