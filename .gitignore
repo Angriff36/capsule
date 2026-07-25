@@ -3,6 +3,8 @@ node_modules.old*/
 .convex/
 .env
 .env.local
+.env.production
+.env.*.local
 dist/
 .DS_Store
 *.log
