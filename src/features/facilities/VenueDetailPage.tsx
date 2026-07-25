@@ -7,7 +7,10 @@ import {
   useVenueDeactivate,
   useVenueActivate,
 } from "../../lib/manifest-convex-react";
-import { venueListPath } from "./facilitiesRoutes";
+import {
+  venueListPath,
+  venueVendorRelationshipsListPath,
+} from "./facilitiesRoutes";
 import { StatusChip } from "../../ui/primitives";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { VenueNotesPanel } from "./VenueNotesPanel";
@@ -206,6 +209,12 @@ export function VenueDetailPage() {
               >
                 Edit Details
               </button>
+              <Link
+                to={venueVendorRelationshipsListPath(venue._id)}
+                className="btn btn-secondary"
+              >
+                Vendor Relationships
+              </Link>
             </div>
           )}
         </div>

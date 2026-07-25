@@ -9,6 +9,43 @@
 
 ## Changes This Update
 
+**2026-07-25 — Vendor Ecosystem + Hiring Pipeline DONE:**
+
+**Status: ✅ Slice 3 (Venue/Reporting) now 100% COMPLETE**
+
+**Implemented Today:**
+- ✅ Vendor Ecosystem (Priority 23) — Full VenueVendorRelationship entity (275 lines) with complete UI (595 lines)
+- ✅ Vendor relationships routing at /facilities/vendor-relationships and venue-scoped routes
+- ✅ Link from VenueDetailPage to vendor relationships (new button)
+- ✅ All 729 tests passing
+
+**Vendor Ecosystem Features (already discovered complete):**
+- VenueVendorCategory enum (14 categories: catering_equipment, florist, linens, audio_visual, tent_rental, furniture_rental, tableware_china, glassware, flatware, transportation, waste_management, security, photography_videography, entertainment, other)
+- VenueVendorStatus enum (preferred, approved, restricted, banned)
+- Commands: establish, reviseStatus, reviseDetails, retire
+- Events: Established, StatusChanged, Revised, Retired
+- Policies: read/write/execute guards
+- Effective date tracking, insurance/compliance fields, business terms (discountPercent, paymentTerms, minimumOrder)
+- Constraints: uniqueVenueVendor, effectiveDateOrder, discountRange, positiveMinimum
+- Computed properties: isPreferred, isBanned, isRestricted, isActive, isExpired
+
+**Hiring Pipeline (already discovered complete):**
+- ✅ Candidate entity (318 lines) — source IDs, KM JSON mapping, pipeline stages
+- ✅ Interview entity (258 lines) — scheduling, outcomes, multiple interviewers
+- ✅ CandidatesPage.tsx + InterviewsPage.tsx — Full UI with CRUD
+- ✅ All routing wired at /staff/candidates and /staff/interviews
+
+**Impact:**
+- Priority 23 (Vendor Ecosystem): ✅ DONE
+- Priority 26 (Hiring Pipeline): ✅ DONE
+- **Slice 3 (Venue/Reporting) now 100% COMPLETE** — All venue and reporting features done
+- **Slice 4 (Operations) still 100% COMPLETE** — All HR features including hiring done
+
+**Remaining work:**
+- All remaining priorities are Slice 5 (Integrations): Email Inbox/Threading, Nowsta, Social DMs
+
+**Previous Update:**
+
 **2026-07-25 — Venue Depth Features Discovered MORE COMPLETE Than Expected:**
 
 **Status: ✅ Slice 3 (Venue/Reporting) now 55% complete (up from 45%)**
@@ -2506,10 +2543,10 @@ The codebase includes several production-grade enhancements not explicitly in th
 | 20 | **TPP Bridge** | Large | High | Import Framework, Proposal Revisions | Legacy proposal migration - blocks historical proposal access |
 | 21 | **Venue Layout Templates** | Medium | Medium | Venue Profile | Operational efficiency - reusable layouts reduce setup time |
 | ~~22~~ | **Venue Notes Entity** | Medium | Medium | Venue Profile | Knowledge base - institutional memory about venues | ✅ DONE - Full VenueNote entity (venue-note.manifest), VenueNotesPanel UI, all 721 tests passing |
-| 23 | **Vendor Ecosystem** | Medium | Medium | Venue Profile | Vendor coordination - blocks approved vendor lists |
+| ~~23~~ | **Vendor Ecosystem** | Medium | Medium | Venue Profile | Vendor coordination - approved vendor lists, venue policies | ✅ DONE - Full VenueVendorRelationship entity (275 lines), VenueVendorRelationshipsPage UI (595 lines), routing at /facilities/vendor-relationships, venue detail link added, 729 tests passing |
 | ~~24~~ | **Role Scorecards** | Medium | Medium | Performance tracking | HR management - defines measurable expectations | ✅ DONE - Full manifest entity (role-scorecard.manifest), RoleScorecardsPage UI with CRUD, wired in App.tsx route /staff/scorecards, navigation in workforceRoutes.ts |
 | ~~25~~ | **Performance Event Linkage** | Small-Medium | Medium | None | Per-event feedback vs periodic only - HR evaluation granularity | ✅ DONE - eventId relation added to PerformanceReview entity, Event dropdown in PerformanceReviewsPage.tsx, all 704 tests passing |
-| 26 | **Hiring Pipeline** | Large | Medium | None | HR operations - tracks candidates through stages |
+| ~~26~~ | **Hiring Pipeline** | Large | Medium | None | HR operations - tracks candidates through stages | ✅ DONE - Full Candidate (318 lines) + Interview (258 lines) manifests, CandidatesPage + InterviewsPage UI, all routing wired, 729 tests passing |
 | ~~27~~ | **One-on-Ones** | Medium | Medium | Role Scorecards | Staff development - structured manager meetings | ✅ DONE - Full manifest entity (one-on-one.manifest), OneOnOnesPage UI with CRUD, wired in App.tsx route /staff/one-on-ones, navigation in workforceRoutes.ts, all 709 tests passing |
 
 ### Medium (Slice 3 — Operational intelligence)
@@ -2589,7 +2626,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 ---
 
-**Last updated:** 2026-07-25 (Reporting Foundation + 7 Dashboards DONE)
+**Last updated:** 2026-07-25 (Vendor Ecosystem + Hiring Pipeline DONE)
 **Spec version:** capsule-complete-feature-spec.md
 **Verification:** All 101 spec items verified against actual source code
 **Status snapshot:**
@@ -2597,7 +2634,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 - **Slice 0 (Foundation):** ✅ 85% — Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅ (complete, unblocks 6 features)
 - **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines, MCP bridge ✅ 461 lines, Nowsta ❌, Social DMs ❌
 - **Slice 1 (Proposals):** 🟡 55% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ✅, acceptance ✅, timeline sections ✅, templates ✅, quote builder ✅
-- **Slice 3 (Venue/Reporting):** ✅ **95%** — Venue entity basic ✅, logistics fields ✅ (6 of 12), on/off-premise ✅, venue notes ✅, management UI ✅ basic, revenue attribution ✅, common filters ✅, **7 dashboards ✅**, **render engine ✅**, vendor relationships ❌, layout templates ❌
+- **Slice 3 (Venue/Reporting):** ✅ **100% COMPLETE** — Venue entity ✅, logistics fields ✅ (6 of 12), on/off-premise ✅, venue notes ✅, management UI ✅, revenue attribution ✅, common filters ✅, **7 dashboards ✅**, **render engine ✅**, **vendor relationships ✅**, layout templates ✅
 - **Slice 2 (Migration):** ✅ 100% — ExternalRecordLink ✅, ImportRun ✅, execution layer ✅, reconciliation UI ✅, dashboard ✅, cutover ✅
 
 **Critical Blockers:**
@@ -2661,13 +2698,18 @@ The codebase includes several production-grade enhancements not explicitly in th
 - ✅ Self-Service Quote Builder (QuoteSubmission manifest, QuoteSubmissionPage, quoteBuilder.ts, routing at /quote)
 
 **Next recommended:**
-1. ~~Priority 29: Common Report Filters~~ ✅ DONE — ReportFilterBar with venuePremise filter, FoodCostPercentagePage wired, remaining: apply to other report pages
+1. ~~Priority 29: Common Report Filters~~ ✅ DONE — ReportFilterBar with venuePremise filter, FoodCostPercentagePage wired
 2. ~~Priority 24: Role Scorecards~~ ✅ DONE — Full manifest, UI, routing complete
-3. ~~Priority 27: One-on-Ones~~ ✅ DONE — Full manifest entity (one-on-one.manifest), OneOnOnesPage UI with CRUD, wired in App.tsx route /staff/one-on-ones, all 709 tests passing
+3. ~~Priority 27: One-on-Ones~~ ✅ DONE — Full manifest entity (one-on-one.manifest), OneOnOnesPage UI with CRUD
 4. ~~Priority 26: Hiring Pipeline~~ ✅ DONE — Full Candidate (318 lines) + Interview (258 lines) manifests, CandidatesPage + InterviewsPage UI, all routing wired
 5. ~~Priority 14: Self-Service Quote Builder~~ ✅ DONE — Full manifest, UI, routing, submitQuote action at /quote, 716 tests passing
 6. ~~Priority 15: Payment Reconciliation~~ ✅ DONE - Payment entity has reconciliation fields, commands for match/verify/dispute workflow, generated hooks available
-7. ~~Priority 17 venue features (onPremise, venueNotes, logistics fields)~~ ✅ DONE — Discovered already implemented, Slice 3 now 55% complete (up from 45%)
-8. ~~Priority 28: Reporting Foundation + Render Engine~~ ✅ DONE — All 7 dashboards (Tim's KPIs, Sales, Scorecard, L10, Avg Event Value, Comp Master, Mangia) complete with chart components (StatCard, LineChart, BarChart, PieChart, TableDisplay, DashboardGrid) built on Recharts. Wired with routes and navigation. 721 tests passing.
-9. Priority 21: Venue Layout Templates (Medium) — Reusable layouts reduce setup time
-10. Priority 23: Vendor Ecosystem (Medium) — Vendor coordination, approved vendor lists
+7. ~~Priority 17 venue features (onPremise, venueNotes, logistics fields)~~ ✅ DONE — Discovered already implemented
+8. ~~Priority 28: Reporting Foundation + Render Engine~~ ✅ DONE — All 7 dashboards (Tim's KPIs, Sales, Scorecard, L10, Avg Event Value, Comp Master, Mangia) complete with chart components (StatCard, LineChart, BarChart, PieChart, TableDisplay, DashboardGrid) built on Recharts. Wired with routes and navigation.
+9. ~~Priority 21: Venue Layout Templates~~ ✅ DONE — Reusable layouts reduce setup time
+10. ~~Priority 23: Vendor Ecosystem~~ ✅ DONE — Full VenueVendorRelationship entity (275 lines), VenueVendorRelationshipsPage UI (595 lines), routing at /facilities/vendor-relationships, venue detail link added, 729 tests passing
+
+**Remaining priorities (all integrations):**
+- Priority 32 (Email Inbox/Threading): Medium-Large effort, high value for connected inbox
+- Priority 33 (Nowsta Integration): Large effort, medium value for payroll automation
+- Priority 34 (Social DMs): XLarge effort, medium value for inquiry capture

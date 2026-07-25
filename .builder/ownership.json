@@ -2,13 +2,13 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "97c2ee43e3af9cea82c2d7670d0774705e1e5b048970e0bf335e91ffc7f2835e"
+      "sha256": "df526be68dbf812c1cd8cfb50b313b36bca8aa3b9c079d8b08f668800cbc6255"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
     },
     "convex/http.ts": {
-      "sha256": "3756c5537c27310aea90b8696cf0783bb497c0bff86de06306e63f479a845481"
+      "sha256": "9e15a4416c1c9309121bb3f5796523ebae0d5eaecbfd1c906eef4997a0bf13ec"
     },
     "convex/lib/authContext.ts": {
       "sha256": "4669aa49562a10836af801b874bbef5a2f4ab41d106ec44bce8e758ab364d715",
@@ -18,49 +18,49 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "cea77a273649096afbd2aa98e47732a75e6cae10c7379f88d5a2f82874dd6bd3"
+      "sha256": "cdb35c5688796e775d0e7eeaa90c1a0b7a32d37bdcd8db6682c60978e232e4f9"
     },
     "convex/queries.ts": {
-      "sha256": "65b44b054bdd753558ac561a811cf9814123de398579d56df1ed7523e6d41001"
+      "sha256": "149f282abe23a082130d7a5cdba8edb8d08792189ba37c32599afa52adfa7560"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "a30f6bc4abecb15163647d9102eddcc06c2c833b114ad09b1374fedb1d34a38b"
+      "sha256": "7dd376222d3a3691273e2269b747f0a6fd50df9e97c8171a38ce84d2ac4eb498"
     },
     "manifest-context-summary.json": {
-      "sha256": "f95d209ea6f5eed4a0bd4504055464155c2c93ced1b4135a1cd7cbb5017b7116"
+      "sha256": "a204ff89283afed44a237fb74ba9d06ad1e773ac045de71a13a1b65e6e64c158"
     },
     "package.json": {
-      "sha256": "739b255b25533cb083f60a1cd1af151bfbd7d6d38336b71d8691d91f7d748d2b"
+      "sha256": "d8faaf4bff09ffbbf9034cda4e9bd04de66e16fe9d7d5c6b4707275073216665"
     },
     "PRESET.md": {
       "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "89b9ef0774fb130af46b183fe5b548ec073a2a99121e2ce98dcf6ae94608acfc"
+      "sha256": "84ee66e45fec1904010e55472c597e8614f5f9d0038d27f865ff7c7112ab4b21"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "38530e5b3418ee3f4c1bd2a9292a1830aff1677b9b3ad02d6bc59e6e24dfda5c"
+      "sha256": "3d77451dd81073f3ead75283c37d7ee2f84c8f617ce57dd29e805e2d4142beb3"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "a32f6250d4e92f93a9bb006e08aaa3da8b7dde6376d75145247a3628756becc7"
+      "sha256": "f2a0f347142f2628ae39885e4d98752408de2de47b3f8d6959b5aed6744a3b2d"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "bded1d4894a8384d8baba9e7dee82401111aec02fa82c230235de5c5174e4743"
+      "sha256": "3e59ed227c20506eaa9d5fca4eaee479e06f090901cce12804fc433ad8c1ec46"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "0344e415abe006f5097d6fd5446182d30ad47289d09a5b03d7fd4a675ee2968b"
+      "sha256": "d59b2b6e67fb1f34583be9a29b55aac77b1c67c3215a735ccc33a6b65dc015ba"
     },
     "tests/manifest-convex.contract.test.ts": {
-      "sha256": "682584858ffaad30e50a81394c8bfc77652decb3b14cf7299d7f3b6ff1faade6"
+      "sha256": "b58d1cad6d373b39393f6bbfac89d39093bd78680777f97320adc283822a52fb"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "cbe85df5647e2bb5a6ef591a2f1408026af4801209b3fd93de2b837e7a050c29"
+      "sha256": "ad8f8df682f559883c3fced4212892ce93682d28f1305f646863a5118946b7f3"
     }
   },
   "package": {
@@ -122,7 +122,9 @@
       "src/operations/event.manifest",
       "src/operations/occasion.manifest",
       "src/operations/service-style.manifest",
+      "src/operations/venue-layout-template.manifest",
       "src/operations/venue-note.manifest",
+      "src/operations/venue-vendor-relationship.manifest",
       "src/procurement/event-purchasing.manifest",
       "src/procurement/order.manifest",
       "src/procurement/purchase-need.manifest",

@@ -1,0 +1,274 @@
+// Venue Vendor Ecosystem — relationships between venues and vendors.
+//
+// A Venue can have multiple vendor relationships (e.g., catering equipment rental,
+// florist, audio/visual, linens). Each relationship tracks category, status
+// (preferred/approved/restricted/banned), contacts, effective dates, insurance/
+// compliance references, and notes.
+//
+// Event/proposal workflows warn or block when a banned vendor is selected.
+
+use "../procurement/vendor.manifest"
+use "./event.manifest"
+
+// ---------------------------------------------------------------------------
+// Closed vocabularies
+// ---------------------------------------------------------------------------
+
+// Vendor relationship categories for venue-specific vendor lists
+enum VenueVendorCategory {
+  catering_equipment
+  florist
+  linens
+  audio_visual
+  tent_rental
+  furniture_rental
+  tableware_china
+  glassware
+  flatware
+  transportation
+  waste_management
+  security
+  photography_videography
+  entertainment
+  other
+}
+
+// Relationship status determines venue policy toward this vendor
+enum VenueVendorStatus {
+  // Venue's preferred vendor for this category
+  preferred
+  // Approved for use but not preferred
+  approved
+  // Restricted (requires approval before use)
+  restricted
+  // Banned (cannot be used at this venue)
+  banned
+}
+
+// ---------------------------------------------------------------------------
+// VenueVendorRelationship — venue-specific vendor policy
+// ---------------------------------------------------------------------------
+
+entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Identity
+  property required venueId: uuid
+  property required vendorId: uuid
+
+  // Classification
+  property required category: VenueVendorCategory
+  property required status: VenueVendorStatus = "approved"
+
+  // Effective dates
+  property effectiveFrom: datetime?
+  property effectiveUntil: datetime?
+
+  // Contact at vendor (optional - references VendorContact.id)
+  property primaryContactId: uuid?
+
+  // Insurance/compliance
+  property insuranceCertificate: string?
+  property insuranceExpiry: datetime?
+  property complianceNotes: string?
+
+  // Business terms
+  property discountPercent: float?    // Venue discount for this vendor (0-100)
+  property paymentTerms: string?      // Special payment terms
+  property minimumOrder: money?       // Minimum order amount
+
+  // Notes
+  property notes: string?
+
+  // Audit
+  property establishedByPersonId: uuid?
+  property revisedByPersonId: uuid?
+  property revisedAt: datetime?
+
+  ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
+  ref vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
+  ref primaryContact: VendorContact fields [tenantId, vendorId, primaryContactId] references [tenantId, vendorId, id]
+  ref establishedBy: Person fields [tenantId, establishedByPersonId] references [tenantId, id]
+  ref revisedBy: Person fields [tenantId, revisedByPersonId] references [tenantId, id]
+
+  computed isPreferred: boolean = self.status == "preferred"
+  computed isBanned: boolean = self.status == "banned"
+  computed isRestricted: boolean = self.status == "restricted"
+  computed isActive: boolean = self.effectiveFrom == null or self.effectiveFrom <= now()
+  computed isExpired: boolean = self.effectiveUntil != null and self.effectiveUntil < now()
+
+  constraint uniqueVenueVendor: self.venueId != null and self.vendorId != null and self.category != null "Venue, vendor, and category are required"
+  constraint effectiveDateOrder: self.effectiveFrom == null or self.effectiveUntil == null or self.effectiveFrom <= self.effectiveUntil "Effective from must be before effective until"
+  constraint discountRange: self.discountPercent == null or (self.discountPercent >= 0 and self.discountPercent <= 100) "Discount percent must be between 0 and 100"
+  constraint positiveMinimum: self.minimumOrder == null or self.minimumOrder >= 0 "Minimum order cannot be negative"
+
+  // Status transitions: bidirectional between all states
+  transition status from "preferred" to ["approved", "restricted", "banned"]
+  transition status from "approved" to ["preferred", "restricted", "banned"]
+  transition status from "restricted" to ["preferred", "approved", "banned"]
+  transition status from "banned" to ["preferred", "approved", "restricted"]
+
+  // Read: facility staff can read relationships
+  default policy venueVendorRelationshipRead read: roleAllows(user.role, "facilityAccess") "Facility staff may read venue vendor relationships"
+  // Write: facility managers can establish/revise relationships
+  default policy venueVendorRelationshipWrite write: roleAllows(user.role, "facilityManageAccess") "Facility managers may write venue vendor relationships"
+  // Execute: facility managers can change status
+  default policy venueVendorRelationshipExecute execute: roleAllows(user.role, "facilityManageAccess") "Facility managers may execute relationship commands"
+
+  command establish(
+    venueId: string,
+    vendorId: string,
+    category: VenueVendorCategory,
+    optional status: VenueVendorStatus,
+    optional effectiveFrom: string,
+    optional effectiveUntil: string,
+    optional primaryContactId: string,
+    optional insuranceCertificate: string,
+    optional insuranceExpiry: string,
+    optional complianceNotes: string,
+    optional discountPercent: float,
+    optional paymentTerms: string,
+    optional minimumOrder: money,
+    optional notes: string,
+    optional establishedByPersonId: string
+  ) {
+    guard self.createdAt == null
+    guard self.deletedAt == null
+    constraint establishVenue: venueId != null and length(trim(venueId)) > 0 "Venue is required"
+    constraint establishVendor: vendorId != null and length(trim(vendorId)) > 0 "Vendor is required"
+    mutate venueId = venueId
+    mutate vendorId = vendorId
+    mutate category = category
+    mutate status = status != null ? status : "approved"
+    mutate effectiveFrom = effectiveFrom
+    mutate effectiveUntil = effectiveUntil
+    mutate primaryContactId = primaryContactId
+    mutate insuranceCertificate = insuranceCertificate
+    mutate insuranceExpiry = insuranceExpiry
+    mutate complianceNotes = complianceNotes
+    mutate discountPercent = discountPercent
+    mutate paymentTerms = paymentTerms
+    mutate minimumOrder = minimumOrder
+    mutate notes = notes
+    mutate establishedByPersonId = establishedByPersonId
+    emit VenueVendorRelationshipEstablished {
+      relationshipId: self.id
+      tenantId: self.tenantId
+      venueId: venueId
+      vendorId: vendorId
+      category: category
+      status: status != null ? status : "approved"
+    }
+  }
+
+  command reviseStatus(
+    status: VenueVendorStatus
+  ) {
+    guard self.deletedAt == null
+    mutate status = status
+    emit VenueVendorRelationshipStatusChanged {
+      relationshipId: self.id
+      tenantId: self.tenantId
+      venueId: self.venueId
+      vendorId: self.vendorId
+      oldStatus: self.status
+      newStatus: status
+    }
+  }
+
+  command reviseDetails(
+    optional category: VenueVendorCategory,
+    optional effectiveFrom: string,
+    optional effectiveUntil: string,
+    optional primaryContactId: string,
+    optional insuranceCertificate: string,
+    optional insuranceExpiry: string,
+    optional complianceNotes: string,
+    optional discountPercent: float,
+    optional paymentTerms: string,
+    optional minimumOrder: money,
+    optional notes: string,
+    optional revisedByPersonId: string
+  ) {
+    guard self.deletedAt == null
+    constraint reviseEffectiveDates: (effectiveFrom == null or effectiveUntil == null or effectiveFrom <= effectiveUntil) "Effective from must be before effective until"
+    constraint reviseDiscount: discountPercent == null or (discountPercent >= 0 and discountPercent <= 100) "Discount percent must be between 0 and 100"
+    mutate category = category != null ? category : self.category
+    mutate effectiveFrom = effectiveFrom != null ? effectiveFrom : self.effectiveFrom
+    mutate effectiveUntil = effectiveUntil != null ? effectiveUntil : self.effectiveUntil
+    mutate primaryContactId = primaryContactId != null ? primaryContactId : self.primaryContactId
+    mutate insuranceCertificate = insuranceCertificate != null ? insuranceCertificate : self.insuranceCertificate
+    mutate insuranceExpiry = insuranceExpiry != null ? insuranceExpiry : self.insuranceExpiry
+    mutate complianceNotes = complianceNotes != null ? complianceNotes : self.complianceNotes
+    mutate discountPercent = discountPercent != null ? discountPercent : self.discountPercent
+    mutate paymentTerms = paymentTerms != null ? paymentTerms : self.paymentTerms
+    mutate minimumOrder = minimumOrder != null ? minimumOrder : self.minimumOrder
+    mutate notes = notes != null ? notes : self.notes
+    mutate revisedByPersonId = revisedByPersonId != null ? revisedByPersonId : self.revisedByPersonId
+    mutate revisedAt = now()
+    emit VenueVendorRelationshipRevised {
+      relationshipId: self.id
+      tenantId: self.tenantId
+      venueId: self.venueId
+      vendorId: self.vendorId
+      revisedBy: revisedByPersonId != null ? revisedByPersonId : self.revisedByPersonId
+    }
+  }
+
+  command retire(
+    reason: string
+  ) {
+    guard self.deletedAt == null
+    constraint retireReason: length(trim(reason)) > 0 "Retirement reason is required"
+    mutate deletedAt = now()
+    emit VenueVendorRelationshipRetired {
+      relationshipId: self.id
+      tenantId: self.tenantId
+      venueId: self.venueId
+      vendorId: self.vendorId
+      reason: reason
+    }
+  }
+
+  store VenueVendorRelationship in durable
+}
+
+// ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+
+event VenueVendorRelationshipEstablished: "venue_vendor_relationship.established" {
+  relationshipId: string
+  tenantId: string
+  venueId: string
+  vendorId: string
+  category: string
+  status: string
+}
+
+event VenueVendorRelationshipStatusChanged: "venue_vendor_relationship.status_changed" {
+  relationshipId: string
+  tenantId: string
+  venueId: string
+  vendorId: string
+  oldStatus: string
+  newStatus: string
+}
+
+event VenueVendorRelationshipRevised: "venue_vendor_relationship.revised" {
+  relationshipId: string
+  tenantId: string
+  venueId: string
+  vendorId: string
+  revisedBy: string?
+}
+
+event VenueVendorRelationshipRetired: "venue_vendor_relationship.retired" {
+  relationshipId: string
+  tenantId: string
+  venueId: string
+  vendorId: string
+  reason: string
+}

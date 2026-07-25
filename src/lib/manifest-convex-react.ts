@@ -500,6 +500,10 @@ import {
   VenueCommissionTermRetireParamsSchema,
   VenueCommissionTermReviseParamsSchema,
   VenueDeactivateParamsSchema,
+  VenueLayoutTemplateActivateParamsSchema,
+  VenueLayoutTemplateDefineParamsSchema,
+  VenueLayoutTemplateRetireParamsSchema,
+  VenueLayoutTemplateReviseParamsSchema,
   VenueNotePinParamsSchema,
   VenueNotePostParamsSchema,
   VenueNoteRemoveParamsSchema,
@@ -1229,12 +1233,10 @@ export function useCutoverDecisionSetTppReadOnly() {
 
 /** Governed creation hook for CutoverDecision.execute. */
 export function useCreateCutoverDecision() {
-  const mutate = useMutation(api.mutations.CutoverDecision_createViaExecute);
+  const mutate = useMutation(api.mutations.CutoverDecision_execute);
   return (args: any) => {
-    const { idempotencyKey, ...params } = args ?? {};
-    const parsed = CutoverDecisionExecuteParamsSchema.parse(params) as Record<string, unknown>;
-    const body = __convexArgsFromZod(parsed);
-    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+    const { docId, decision, reason } = args ?? {};
+    return mutate({ docId, decision, reason } as any);
   };
 }
 
@@ -7748,6 +7750,67 @@ export function useCreateVenueCommissionTerm() {
   };
 }
 
+/** Reactive list for VenueLayoutTemplate. */
+export function useListVenueLayoutTemplate() {
+  return useQuery(api.queries.listVenueLayoutTemplate);
+}
+
+/** Reactive get-by-id for VenueLayoutTemplate. Pass "skip" to suspend. */
+export function useGetVenueLayoutTemplate(id: string | "skip") {
+  return useQuery(api.queries.getVenueLayoutTemplate, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for VenueLayoutTemplate.activate. */
+export function useVenueLayoutTemplateActivate() {
+  const mutate = useMutation(api.mutations.VenueLayoutTemplate_activate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueLayoutTemplateActivateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VenueLayoutTemplate.define. */
+export function useVenueLayoutTemplateDefine() {
+  const mutate = useMutation(api.mutations.VenueLayoutTemplate_define);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueLayoutTemplateDefineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VenueLayoutTemplate.retire. */
+export function useVenueLayoutTemplateRetire() {
+  const mutate = useMutation(api.mutations.VenueLayoutTemplate_retire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueLayoutTemplateRetireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VenueLayoutTemplate.revise. */
+export function useVenueLayoutTemplateRevise() {
+  const mutate = useMutation(api.mutations.VenueLayoutTemplate_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueLayoutTemplateReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for VenueLayoutTemplate.define. */
+export function useCreateVenueLayoutTemplate() {
+  const mutate = useMutation(api.mutations.VenueLayoutTemplate_createViaDefine);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueLayoutTemplateDefineParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for VenueNote. */
 export function useListVenueNote() {
   return useQuery(api.queries.listVenueNote);
@@ -7962,4 +8025,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 846 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 853 as const;
