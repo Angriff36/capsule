@@ -1,0 +1,209 @@
+// Capsule sales — self-service quote submission from public web form.
+// Tracks deduplication for submit-once enforcement and links created entities.
+
+enum QuoteSubmissionStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+entity QuoteSubmission mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Deduplication key - normalized email + event date + tenantId hash
+  // Ensures submit-once behavior even if user submits multiple times
+  property dedupKey: string
+
+  // Submission metadata
+  property status: QuoteSubmissionStatus = "pending"
+  property submittedAt: datetime = now()
+
+  // Contact information (from form)
+  property clientName: string
+  property email: string
+  property phone: string?
+
+  // Event details (from form)
+  property eventDate: date
+  property eventEndTime: date?
+  property guestCount: int = 0
+  property serviceStyleId: uuid?
+  property occasionId: uuid?
+
+  // Venue information (from form)
+  property searchable venueName: string?
+  property searchable venueAddress: string?
+
+  // Menu preferences (from form - MVP uses text/categories)
+  property menuPreferences: string?
+  property dietaryRestrictions: string?
+
+  // Additional notes and consent
+  property notes: string?
+  property consentGrantedAt: datetime = now()
+
+  // Links to created entities (populated during processing)
+  property clientId: uuid?
+  property leadId: uuid?
+  property eventId: uuid?
+  property proposalId: uuid?
+
+  // Processing metadata
+  property completedAt: datetime?
+  property errorMessage: string?
+  property processingErrors: string?
+
+  // Relations to created entities
+  ref client: Client fields [tenantId, clientId] references [tenantId, id]
+  ref lead: Lead fields [tenantId, leadId] references [tenantId, id]
+  ref event: Event fields [tenantId, eventId] references [tenantId, id]
+  ref proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
+  ref serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
+  ref occasion: Occasion fields [tenantId, occasionId] references [tenantId, id]
+
+  // Constraints
+  constraint dedupKeyPresent: length(trim(self.dedupKey)) > 0 "Deduplication key is required"
+  constraint clientNamePresent: length(trim(self.clientName)) > 0 "Client name is required"
+  constraint emailPresent: length(trim(self.email)) > 0 "Email address is required"
+  constraint guestCountPositive: self.guestCount > 0 "Guest count must be positive"
+  constraint consentRequired: self.consentGrantedAt != null "Data processing consent is required"
+
+  // Policies - public access for quote submission
+  default policy quoteSubmissionRead read: true "Anyone may read quote submission status by ID"
+  default policy quoteSubmissionWrite write: roleAllows(user.role, "salesAccess") "Only sales staff may update quote submissions"
+  default policy quoteSubmissionExecute execute: true "Anyone may execute quote submission commands (public form)"
+
+  command create(
+    dedupKey: string,
+    clientName: string,
+    email: string,
+    phone: string,
+    eventDate: date,
+    eventEndTime: date,
+    guestCount: number,
+    serviceStyleId: uuid,
+    occasionId: uuid,
+    venueName: string,
+    venueAddress: string,
+    menuPreferences: string,
+    dietaryRestrictions: string,
+    notes: string
+  ) {
+    guard self.submittedAt == null "Quote submission already exists"
+    guard self.deletedAt == null "Cannot create a deleted quote submission"
+
+    // Validate inputs
+    constraint createDedupKey: length(trim(dedupKey)) > 0 "Deduplication key is required"
+    constraint createClientName: length(trim(clientName)) > 0 "Client name is required"
+    constraint createEmail: length(trim(email)) > 0 "Email address is required"
+    constraint createGuestCount: guestCount > 0 "Guest count must be positive"
+
+    mutate dedupKey = dedupKey
+    mutate clientName = clientName
+    mutate email = email
+    mutate phone = phone
+    mutate eventDate = eventDate
+    mutate eventEndTime = eventEndTime
+    mutate guestCount = guestCount
+    mutate serviceStyleId = serviceStyleId
+    mutate occasionId = occasionId
+    mutate venueName = venueName
+    mutate venueAddress = venueAddress
+    mutate menuPreferences = menuPreferences
+    mutate dietaryRestrictions = dietaryRestrictions
+    mutate notes = notes
+    mutate submittedAt = now()
+    mutate consentGrantedAt = now()
+    mutate status = "pending"
+
+    emit QuoteSubmitted {
+      submissionId: self.id
+      tenantId: self.tenantId
+      dedupKey: dedupKey
+      clientName: clientName
+      email: email
+      eventDate: eventDate
+      guestCount: guestCount
+    }
+  }
+
+  command startProcessing() {
+    guard self.submittedAt != null "Quote submission must be created first"
+    guard self.status == "pending" "Only pending submissions can be processed"
+    guard self.deletedAt == null "Cannot process a deleted quote submission"
+
+    mutate status = "processing"
+  }
+
+  command complete(
+    clientId: uuid,
+    leadId: uuid,
+    eventId: uuid,
+    proposalId: uuid
+  ) {
+    guard self.status == "processing" "Only processing submissions can be completed"
+    guard self.deletedAt == null "Cannot complete a deleted quote submission"
+
+    mutate status = "completed"
+    mutate completedAt = now()
+    mutate clientId = clientId
+    mutate leadId = leadId
+    mutate eventId = eventId
+    mutate proposalId = proposalId
+
+    emit QuoteProcessingCompleted {
+      submissionId: self.id
+      tenantId: self.tenantId
+      clientId: clientId
+      leadId: leadId
+      eventId: eventId
+      proposalId: proposalId
+    }
+  }
+
+  command fail(errorMessage: string, processingErrors: string) {
+    guard self.status == "processing" "Only processing submissions can be marked as failed"
+    guard self.deletedAt == null "Cannot fail a deleted quote submission"
+
+    mutate status = "failed"
+    mutate completedAt = now()
+    mutate errorMessage = errorMessage
+    mutate processingErrors = processingErrors
+
+    emit QuoteProcessingFailed {
+      submissionId: self.id
+      tenantId: self.tenantId
+      errorMessage: errorMessage
+    }
+  }
+
+  store QuoteSubmission in durable
+}
+
+event QuoteSubmitted: "quote.submitted" {
+  submissionId: string
+  tenantId: string
+  dedupKey: string
+  clientName: string
+  email: string
+  eventDate: date
+  guestCount: int
+}
+
+event QuoteProcessingCompleted: "quote.processing_completed" {
+  submissionId: string
+  tenantId: string
+  clientId: string?
+  leadId: string?
+  eventId: string?
+  proposalId: string?
+}
+
+event QuoteProcessingFailed: "quote.processing_failed" {
+  submissionId: string
+  tenantId: string
+  errorMessage: string
+}

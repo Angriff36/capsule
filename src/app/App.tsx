@@ -2,6 +2,7 @@ import { Component, lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Route, Routes, useMatch } from "react-router-dom";
 import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
+import { QuoteSubmissionPage } from "../features/sales/QuoteSubmissionPage";
 import { EventAllergenBriefingPage } from "../features/events/EventAllergenBriefingPage";
 import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlannerPage";
 import { EventCreatePage } from "../features/events/EventCreatePage";
@@ -372,6 +373,7 @@ class AppErrorBoundary extends Component<
 export function App() {
   const clientPortalMatch = useMatch("/portal/events/:token");
   const acceptanceMatch = useMatch("/accept/:callbackToken");
+  const quoteMatch = useMatch("/quote");
 
   if (clientPortalMatch?.params.token) {
     return (
@@ -385,6 +387,14 @@ export function App() {
     return (
       <AppErrorBoundary>
         <ProposalAcceptancePage />
+      </AppErrorBoundary>
+    );
+  }
+
+  if (quoteMatch) {
+    return (
+      <AppErrorBoundary>
+        <QuoteSubmissionPage />
       </AppErrorBoundary>
     );
   }
