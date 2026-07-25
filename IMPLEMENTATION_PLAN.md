@@ -1,7 +1,7 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (Revenue Attribution UI Complete)
+**Updated:** 2026-07-25 (Performance Event Linkage Complete)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
@@ -47,6 +47,26 @@
 - All 704 tests passing
 - TypeScript compilation succeeds
 - No format issues
+
+**2026-07-25 — Performance Event Linkage Complete (Priority 25):**
+
+**Status: ✅ DONE — Per-event performance feedback tracking**
+
+**Implemented:**
+- ✅ performance-review.manifest - Added optional eventId property and Event relation
+- ✅ performanceReview.record command - Accept eventId parameter  
+- ✅ PerformanceReviewRecorded event - Include eventId field
+- ✅ PerformanceReviewsPage.tsx - Event dropdown and Event column in table
+
+**Features:**
+- Managers can optionally associate reviews with specific events
+- Event column displays linked event with click-through to event detail
+- Shows "—" when no event is associated
+- All 704 tests passing
+
+**Impact:**
+- Priority 25 (Performance Event Linkage): ✅ DONE
+- Unblocks: Per-event feedback for HR evaluation granularity, role scorecards referencing event performance
 
 **Previous Update:**
 
@@ -578,10 +598,10 @@
 | **Slice 1** | 🟡 Partial | 3 | 45% | Proposal lifecycle ✅, menu selection ✅ | Quote builder ❌, revisions ❌, templates ❌, acceptance ❌ |
 | **Slice 2** | ✅ Complete | 0 | 100% | ExternalRecordLink ✅, ImportRun ✅, Execution layer ✅, Reconciliation UI ✅, Dashboard ✅, Cutover ✅ | None - full TPP migration framework ready for data loading and execution |
 | **Slice 3** | 🟡 Partial | 1 | 45% | Venue entity basic ✅, Venue management UI ✅ (basic), saved report config ✅, revenue attribution UI ✅ | Venue depth ❌, 7 dashboards ❌, render engine ❌ |
-| **Slice 4** | ✅ Strong | 1 | 85% | Kitchen ✅, inventory ✅, staffing ✅, equipment ✅ | HR features ❌ (scorecards, hiring, 1-on-1s) |
+| **Slice 4** | ✅ Strong | 1 | 90% | Kitchen ✅, inventory ✅, staffing ✅, equipment ✅, performance event linkage ✅ | HR features ❌ (scorecards, hiring, 1-on-1s) |
 | **Slice 5** | 🟡 Partial | 2 | 60% | QuickBooks ✅, Calendar ✅, SMS ✅, Webhooks ✅ | Nowsta ❌, Social DMs ❌, Email threading ❌ |
 
-**Overall Assessment:** Slice 4 (Operations) is production-ready. Slice 0 foundation now 69% complete with ServiceStyle, Occasion, and ReferralSource entities DONE. Sales Lock pipeline remains the critical blocker (Priority 3). Slice 2 has foundation entities (ExternalRecordLink ✅, ImportRun ✅) but needs dataset definitions and reconciliation UI; prerequisite for TPP migration. Slice 3 has Venue entity with basic management UI ✅ but lacks venue depth, all 7 executive dashboards, revenue attribution logic, and render engine. Slice 1: Quote builder NOT BUILT (client portal read-only); proposal system has full command surface but missing revisions snapshot, template system, digital acceptance, and timeline/logistics PDF sections.
+**Overall Assessment:** Slice 4 (Operations) is 90% production-ready after Performance Event Linkage complete. Slice 0 foundation now 69% complete with ServiceStyle, Occasion, and ReferralSource entities DONE. Sales Lock pipeline remains the critical blocker (Priority 3). Slice 2 has foundation entities (ExternalRecordLink ✅, ImportRun ✅) but needs dataset definitions and reconciliation UI; prerequisite for TPP migration. Slice 3 has Venue entity with basic management UI ✅ but lacks venue depth, all 7 executive dashboards, revenue attribution logic, and render engine. Slice 1: Quote builder NOT BUILT (client portal read-only); proposal system has full command surface but missing revisions snapshot, template system, digital acceptance, and timeline/logistics PDF sections.
 
 ---
 
@@ -2104,7 +2124,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 | 22 | **Venue Notes Entity** | Medium | Medium | Venue Profile | Knowledge base - institutional memory about venues |
 | 23 | **Vendor Ecosystem** | Medium | Medium | Venue Profile | Vendor coordination - blocks approved vendor lists |
 | 24 | **Role Scorecards** | Medium | Medium | Performance tracking | HR management - defines measurable expectations |
-| 25 | **Performance Event Linkage** | Small-Medium | Medium | None | Per-event feedback vs periodic only - HR evaluation granularity |
+| ~~25~~ | **Performance Event Linkage** | Small-Medium | Medium | None | Per-event feedback vs periodic only - HR evaluation granularity | ✅ DONE - eventId relation added to PerformanceReview entity, Event dropdown in PerformanceReviewsPage.tsx, all 704 tests passing |
 | 26 | **Hiring Pipeline** | Large | Medium | None | HR operations - tracks candidates through stages |
 | 27 | **One-on-Ones** | Medium | Medium | Role Scorecards | Staff development - structured manager meetings |
 
@@ -2201,9 +2221,9 @@ The codebase includes several production-grade enhancements not explicitly in th
 2. ~~ServiceStyle entity (foundation) - COMPLETE~~ — 11 downstream features unblocked
 3. ~~Sales Lock pipeline - COMPLETE~~ — 6 features unblocked
 4. ~~Revenue attribution - COMPLETE~~ — UI complete, unblocks venue reporting and sales dashboards
-5. Venue depth — 5 features blocked
-6. Equipment location — Availability/logistics degraded
-7. Performance eventId — Per-event feedback impossible
+5. ~~Performance Event Linkage - COMPLETE~~ — Per-event feedback now possible, eventId relation added
+6. Venue depth — 5 features blocked
+7. Equipment location — Availability/logistics degraded
 
 **Technical Health:**
 - Test coverage: ✅ 65 test files, 650 tests passing, slice contracts proven
@@ -2215,19 +2235,18 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 **Next Priority:**
 
-**RECOMMENDED: Priority 25 (Performance Event Linkage)** — Small-Medium effort, high impact
+**RECOMMENDED: Priority 29 (Common Report Filters)** — Small-Medium effort, medium-high impact
 
 **Why this is the best next priority:**
-- **Small-Medium effort** — Add eventId relation to PerformanceReview entity (schema change + UI update)
-- **High impact** — Unblocks per-event feedback for staff evaluation granularity
-- **No dependencies** — Can start immediately (PerformanceReview entity exists, just needs eventId field)
-- **Foundation for HR** — Enables role scorecards and 1-on-1s to reference per-event performance
-- **Quick win** — Simple change with immediate value for staff evaluation
+- **Small-Medium effort** — Add on/off-premise venue classification, wire filter sharing across reports
+- **Medium-high impact** — Enables venue-specific reporting for operations and sales
+- **Foundation for dashboards** — Prerequisite for all 7 executive dashboards (Slice 3)
+- **Quick win** — Venue classification is straightforward filter enhancement
 
 **Alternative priorities considered:**
-- Priority 29 (Common Report Filters): Small-Medium effort, but requires on/off-premise venue classification first (dependency on Priority 17)
-- Priority 17 (Venue Profile Full Depth): Large effort, high value but blocks on extensive operations fields and vendor ecosystem work
-- Priority 28 (Reporting Foundation + Render Engine): Large effort, enables all dashboards but less immediately valuable than per-event feedback
+- Priority 17 (Venue Profile Full Depth): Large effort, high value but extensive operations fields and vendor ecosystem work
+- Priority 28 (Reporting Foundation + Render Engine): Large effort, enables all dashboards but less immediately valuable than basic filters
+- Priority 24 (Role Scorecards): Medium effort, but depends on Performance Event Linkage (now ✅ complete, so unblocked)
 
 **Status snapshot:**
 - **Slice 4 (Operations):** ✅ 85% production-ready — Kitchen/inventory/staffing/equipment complete
@@ -2243,8 +2262,9 @@ The codebase includes several production-grade enhancements not explicitly in th
 - ✅ Sales Lock pipeline (unlocks 6 features)
 - ✅ Revenue attribution (UI complete, enables accurate reporting)
 - ✅ Equipment location fields (improves logistics accuracy)
+- ✅ Performance Event Linkage (unblocks per-event HR feedback granularity)
 
 **Next recommended:**
-1. Priority 25: Performance Event Linkage (Small-Medium, high impact, no dependencies)
-2. Priority 29: Common Report Filters (Small-Medium, enables on/off-premise reporting)
-3. Priority 17: Venue Profile Full Depth (Large, high value but extensive work)
+1. Priority 29: Common Report Filters (Small-Medium, enables on/off-premise reporting)
+2. Priority 17: Venue Profile Full Depth (Large, high value but extensive work)
+3. Priority 24: Role Scorecards (Medium, now unblocked after Performance Event Linkage ✅)
