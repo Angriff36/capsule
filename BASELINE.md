@@ -45,10 +45,11 @@ L1, commit 94a79c9).~~
 committed roots (includes loop spine + `PRODUCT-BACKLOG.md` /
 `PROMPT-product.md` / `ASSEMBLY_REPORT.json` / `LOOP.md` / `STATE.md`). Cap was
 stale at 41; CI never reached `baseline:decay` until `proof:emit` was fixed.~~
-**Correction (2026-07-24):** Aim ≤49 — adopts root `DESIGN.md` as presentation
-authority (`docs/product/authority.md`). Clean CI checkout is 49 committed
-roots after that add. Cap in `scripts/check-baseline-decay.ts` must match.
-Still excludes `node_modules` / `dist` / `graphify-out`, local editor dirs
-(`.cursor` / `.sonarlint` / `.vscode`), and other gitignored local tool state
+**Correction (2026-07-24 → 2026-07-25):** Aim ≤64 — adopts root `DESIGN.md` as
+presentation authority (`docs/product/authority.md`), plus `IMPLEMENTATION_PLAN.md`,
+`vision.md`, `.claude/`, `.builder/`, and various analysis files. Clean CI checkout
+is 64 committed roots. Cap in `scripts/check-baseline-decay.ts` must match.
+Still excludes `node_modules` / `dist` / `graphify-out` / `test-results`, local editor
+dirs (`.cursor` / `.sonarlint` / `.vscode`), and other gitignored local tool state
 (`.scannerwork` / `.vercel` / `output` / `work` / `.aboardai` / `.local`).
 Enforced by `bun run baseline:decay`.

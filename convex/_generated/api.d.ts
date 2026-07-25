@@ -12,6 +12,7 @@ import type * as authStatus from "../authStatus.js";
 import type * as clientPortal from "../clientPortal.js";
 import type * as computed from "../computed.js";
 import type * as crons from "../crons.js";
+import type * as cutover from "../cutover.js";
 import type * as emailNotifications from "../emailNotifications.js";
 import type * as equipmentCheckout from "../equipmentCheckout.js";
 import type * as fileStorage from "../fileStorage.js";
@@ -56,6 +57,7 @@ declare const fullApi: ApiFromModules<{
   clientPortal: typeof clientPortal;
   computed: typeof computed;
   crons: typeof crons;
+  cutover: typeof cutover;
   emailNotifications: typeof emailNotifications;
   equipmentCheckout: typeof equipmentCheckout;
   fileStorage: typeof fileStorage;

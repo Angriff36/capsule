@@ -301,6 +301,11 @@ const ParallelRunDashboardPage = lazy(() =>
     }),
   ),
 );
+const CutoverPage = lazy(() =>
+  import("../features/admin/import/CutoverPage").then((module) => ({
+    default: module.CutoverPage,
+  })),
+);
 const MyDayPage = lazy(() =>
   import("../features/staff/MyDayPage").then((module) => ({
     default: module.MyDayPage,
@@ -882,6 +887,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ExternalRecordsReconcilePage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/cutover"
+              element={
+                <SupplyRoute>
+                  <CutoverPage />
                 </SupplyRoute>
               }
             />

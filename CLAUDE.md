@@ -143,7 +143,7 @@ Last: [first session]
 
 ## Last Session Bridge
 [auto-bridge snapshot @ 10 changes]
-Files: IMPLEMENTATION_PLAN.md (edit), src/features/admin/AdminWorkspaceNav.tsx (edit), src/features/admin/import/ExternalRecordsReconcilePage.tsx (create), src/app/App.tsx (edit), src/features/admin/import/importRoutes.ts (create), convex/queries.ts (edit)
+Files: convex/cutover.ts (edit), src/app/App.tsx (edit), src/features/admin/AdminWorkspaceNav.tsx (edit), src/features/admin/import/CutoverPage.tsx (create), convex/cutover.ts (create)
 
 # === END COGNILAYER ===
 

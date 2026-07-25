@@ -48,7 +48,9 @@ const CONFLICT_STATUS_LABELS: Record<string, string> = {
 };
 
 export function ExternalRecordsReconcilePage() {
-  const [selectedSourceSystem, setSelectedSourceSystem] = useState<string | null>(null);
+  const [selectedSourceSystem, setSelectedSourceSystem] = useState<
+    string | null
+  >(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -113,7 +115,9 @@ export function ExternalRecordsReconcilePage() {
       setNotice(`Verified ${selectedIds.size} record(s) successfully.`);
       setSelectedIds(new Set());
     } catch (cause: unknown) {
-      setError(cause instanceof Error ? cause.message : "Failed to verify records.");
+      setError(
+        cause instanceof Error ? cause.message : "Failed to verify records.",
+      );
     } finally {
       setBusy(false);
     }
@@ -137,7 +141,9 @@ export function ExternalRecordsReconcilePage() {
       setNotice(`Skipped ${selectedIds.size} record(s).`);
       setSelectedIds(new Set());
     } catch (cause: unknown) {
-      setError(cause instanceof Error ? cause.message : "Failed to skip records.");
+      setError(
+        cause instanceof Error ? cause.message : "Failed to skip records.",
+      );
     } finally {
       setBusy(false);
     }
@@ -150,8 +156,8 @@ export function ExternalRecordsReconcilePage() {
           <p className="eyebrow">Import · Reconciliation</p>
           <h1 className="display-title mt-2">External Record Links</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Review and verify external system records mapped to Capsule entities.
-            Unverified records appear here after import runs.
+            Review and verify external system records mapped to Capsule
+            entities. Unverified records appear here after import runs.
           </p>
         </div>
       </header>
@@ -163,7 +169,10 @@ export function ExternalRecordsReconcilePage() {
       ) : null}
 
       {notice ? (
-        <p className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok" role="status">
+        <p
+          className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok"
+          role="status"
+        >
           {notice}
           <button
             type="button"
@@ -179,7 +188,10 @@ export function ExternalRecordsReconcilePage() {
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-3 p-4 border-b border-line">
           <div>
-            <label htmlFor="source-system-filter" className="block text-sm font-medium text-ink-2 mb-1">
+            <label
+              htmlFor="source-system-filter"
+              className="block text-sm font-medium text-ink-2 mb-1"
+            >
               Source System
             </label>
             <select
@@ -244,17 +256,26 @@ export function ExternalRecordsReconcilePage() {
                 <th className="text-left py-3 px-4 font-medium">
                   <input
                     type="checkbox"
-                    checked={selectedIds.size === filteredRecords.length && filteredRecords.length > 0}
+                    checked={
+                      selectedIds.size === filteredRecords.length &&
+                      filteredRecords.length > 0
+                    }
                     onChange={toggleAll}
                     className="w-4 h-4"
                   />
                 </th>
-                <th className="text-left py-3 px-4 font-medium">Source System</th>
+                <th className="text-left py-3 px-4 font-medium">
+                  Source System
+                </th>
                 <th className="text-left py-3 px-4 font-medium">Record Type</th>
                 <th className="text-left py-3 px-4 font-medium">External ID</th>
-                <th className="text-left py-3 px-4 font-medium">Capsule Entity</th>
+                <th className="text-left py-3 px-4 font-medium">
+                  Capsule Entity
+                </th>
                 <th className="text-left py-3 px-4 font-medium">Capsule ID</th>
-                <th className="text-left py-3 px-4 font-medium">Conflict Status</th>
+                <th className="text-left py-3 px-4 font-medium">
+                  Conflict Status
+                </th>
                 <th className="text-left py-3 px-4 font-medium">Created</th>
               </tr>
             </thead>
@@ -267,7 +288,10 @@ export function ExternalRecordsReconcilePage() {
                 </tr>
               ) : (
                 filteredRecords.map((record) => (
-                  <tr key={record._id} className="border-b border-line hover:bg-slate-50">
+                  <tr
+                    key={record._id}
+                    className="border-b border-line hover:bg-slate-50"
+                  >
                     <td className="py-3 px-4">
                       <input
                         type="checkbox"
@@ -277,31 +301,41 @@ export function ExternalRecordsReconcilePage() {
                       />
                     </td>
                     <td className="py-3 px-4">
-                      {SOURCE_SYSTEM_LABELS[record.sourceSystem] || record.sourceSystem}
+                      {SOURCE_SYSTEM_LABELS[record.sourceSystem] ||
+                        record.sourceSystem}
                     </td>
                     <td className="py-3 px-4">
-                      {RECORD_TYPE_LABELS[record.capsuleEntity] || record.capsuleEntity}
+                      {RECORD_TYPE_LABELS[record.capsuleEntity] ||
+                        record.capsuleEntity}
                     </td>
                     <td className="py-3 px-4 font-mono text-xs">
                       {record.externalId}
                     </td>
                     <td className="py-3 px-4">
-                      {RECORD_TYPE_LABELS[record.capsuleEntity] || record.capsuleEntity}
+                      {RECORD_TYPE_LABELS[record.capsuleEntity] ||
+                        record.capsuleEntity}
                     </td>
                     <td className="py-3 px-4 font-mono text-xs">
-                      {record.capsuleId || <span className="text-ink-3 italic">Unlinked</span>}
+                      {record.capsuleId || (
+                        <span className="text-ink-3 italic">Unlinked</span>
+                      )}
                     </td>
                     <td className="py-3 px-4">
                       {record.conflictStatus !== "resolved" ? (
                         <StatusChip
-                          status={CONFLICT_STATUS_LABELS[record.conflictStatus] || record.conflictStatus}
+                          status={
+                            CONFLICT_STATUS_LABELS[record.conflictStatus] ||
+                            record.conflictStatus
+                          }
                         />
                       ) : (
                         <span className="text-ink-2">—</span>
                       )}
                     </td>
                     <td className="py-3 px-4 text-ink-2">
-                      {record.createdAt ? new Date(record.createdAt).toLocaleDateString() : "—"}
+                      {record.createdAt
+                        ? new Date(record.createdAt).toLocaleDateString()
+                        : "—"}
                     </td>
                   </tr>
                 ))
@@ -321,13 +355,26 @@ export function ExternalRecordsReconcilePage() {
         <div className="p-4">
           <h3 className="font-medium text-sm mb-2">Actions</h3>
           <ul className="text-sm text-ink-2 space-y-1">
-            <li>• <strong>Verify</strong>: Confirm the mapping is correct. The record will be marked as verified and won't appear in this queue.</li>
-            <li>• <strong>Skip</strong>: Mark as resolved with a note. Use this for records that shouldn't be imported or need manual review later.</li>
+            <li>
+              • <strong>Verify</strong>: Confirm the mapping is correct. The
+              record will be marked as verified and won't appear in this queue.
+            </li>
+            <li>
+              • <strong>Skip</strong>: Mark as resolved with a note. Use this
+              for records that shouldn't be imported or need manual review
+              later.
+            </li>
           </ul>
           <h3 className="font-medium text-sm mb-2 mt-4">Status Guide</h3>
           <ul className="text-sm text-ink-2 space-y-1">
-            <li>• Records with <strong>Conflict</strong> status require resolution before they can be verified.</li>
-            <li>• Filter by source system to focus on specific imports (TPP Legacy, QuickBooks, etc.).</li>
+            <li>
+              • Records with <strong>Conflict</strong> status require resolution
+              before they can be verified.
+            </li>
+            <li>
+              • Filter by source system to focus on specific imports (TPP
+              Legacy, QuickBooks, etc.).
+            </li>
             <li>• Select multiple records to perform bulk actions.</li>
           </ul>
         </div>

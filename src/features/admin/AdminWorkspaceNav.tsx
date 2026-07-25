@@ -9,6 +9,7 @@ const sections = [
   { label: "Import runs", path: "/admin/imports" },
   { label: "Parallel run", path: "/admin/parallel-run" },
   { label: "Reconcile records", path: "/admin/reconcile" },
+  { label: "Cutover", path: "/admin/cutover" },
 ] as const;
 
 export function AdminWorkspaceNav() {
