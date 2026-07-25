@@ -12,6 +12,7 @@ entity PerformanceReview mixin TenantScoped, SoftDeletable {
 
   property required personId: uuid
   property required reviewerId: uuid
+  property eventId: uuid?
   property reviewDate: datetime?
   property required reliabilityRating: int = 0
   property required qualityRating: int = 0
@@ -21,6 +22,7 @@ entity PerformanceReview mixin TenantScoped, SoftDeletable {
 
   belongsTo person: Person fields [tenantId, personId] references [tenantId, id]
   belongsTo reviewer: Person fields [tenantId, reviewerId] references [tenantId, id]
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
   // Ratings default to 0 on the draft; the strict 1..5 range is enforced by
   // the record command. Once recorded, all three dimensions must be in range.
@@ -35,6 +37,7 @@ entity PerformanceReview mixin TenantScoped, SoftDeletable {
   command record(
     personId: uuid,
     reviewerId: uuid,
+    eventId: uuid?,
     reviewDate: datetime,
     reliabilityRating: int,
     qualityRating: int,
@@ -51,6 +54,7 @@ entity PerformanceReview mixin TenantScoped, SoftDeletable {
     constraint recordReviewTeamwork: teamworkRating >= 1 and teamworkRating <= 5 "Teamwork rating must be between 1 and 5"
     mutate personId = personId
     mutate reviewerId = reviewerId
+    mutate eventId = eventId
     mutate reviewDate = reviewDate
     mutate reliabilityRating = reliabilityRating
     mutate qualityRating = qualityRating
@@ -62,6 +66,7 @@ entity PerformanceReview mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       personId: personId
       reviewerId: reviewerId
+      eventId: eventId
       reviewDate: reviewDate
       reliabilityRating: reliabilityRating
       qualityRating: qualityRating
@@ -77,6 +82,7 @@ event PerformanceReviewRecorded: "performance_review.recorded" {
   tenantId: string
   personId: string
   reviewerId: string
+  eventId: string?
   reviewDate: datetime
   reliabilityRating: int
   qualityRating: int

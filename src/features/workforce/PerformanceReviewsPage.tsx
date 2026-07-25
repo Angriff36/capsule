@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from "react";
+import { Link } from "react-router-dom";
 import {
   useCreatePerformanceReview,
   useListPerformanceReview,
   useListPerson,
+  useListEvent,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
@@ -21,6 +23,7 @@ function localDateEpoch(value: FormDataEntryValue | null) {
 export function PerformanceReviewsPage() {
   const reviews = useListPerformanceReview();
   const people = useListPerson();
+  const events = useListEvent();
   const createReview = useCreatePerformanceReview();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -38,6 +41,12 @@ export function PerformanceReviewsPage() {
     return person ? `${person.givenName} ${person.familyName}` : "Unknown";
   };
 
+  const eventName = (id: string | null | undefined) => {
+    if (!id) return null;
+    const event = events?.find((row) => row._id === id);
+    return event ? event.title : "Unknown";
+  };
+
   const average = (row: (typeof recordedReviews)[number]) =>
     (row.reliabilityRating + row.qualityRating + row.teamworkRating) / 3;
 
@@ -52,6 +61,7 @@ export function PerformanceReviewsPage() {
         await createReview({
           personId: String(data.get("personId")),
           reviewerId: String(data.get("reviewerId")),
+          eventId: (data.get("eventId") as string | null) || undefined,
           reviewDate: localDateEpoch(data.get("reviewDate")),
           reliabilityRating: Number(data.get("reliabilityRating")),
           qualityRating: Number(data.get("qualityRating")),
@@ -127,6 +137,18 @@ export function PerformanceReviewsPage() {
               </select>
             </label>
             <label className="field-label">
+              Event (optional)
+              <select name="eventId" className="input">
+                <option value="">No specific event</option>
+                {events?.map((event) => (
+                  <option key={event._id} value={event._id}>
+                    {event.title} —{" "}
+                    {new Date(event.startsAt ?? 0).toLocaleDateString()}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="field-label">
               Review date
               <input name="reviewDate" className="input" type="date" required />
             </label>
@@ -180,6 +202,7 @@ export function PerformanceReviewsPage() {
                 <tr>
                   <th>Person</th>
                   <th>Reviewer</th>
+                  <th>Event</th>
                   <th>Date</th>
                   <th>Reliability</th>
                   <th>Quality</th>
@@ -197,6 +220,18 @@ export function PerformanceReviewsPage() {
                         <strong>{personName(row.personId)}</strong>
                       </td>
                       <td>{personName(row.reviewerId)}</td>
+                      <td>
+                        {row.eventId ? (
+                          <Link
+                            to={`/events/${row.eventId}`}
+                            className="link-color"
+                          >
+                            {eventName(row.eventId)}
+                          </Link>
+                        ) : (
+                          <span className="text-ink-2">—</span>
+                        )}
+                      </td>
                       <td>
                         {row.reviewDate
                           ? new Date(row.reviewDate).toLocaleDateString()
