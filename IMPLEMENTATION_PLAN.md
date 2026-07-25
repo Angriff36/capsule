@@ -2516,7 +2516,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 | Priority | Item | Effort | Impact | Dependencies | Why |
 |----------|------|--------|--------|--------------|-----|
-| 28 | **Reporting Foundation + Render Engine** | Large | High | None | Enables all dashboards - leadership visibility |
+| ~~28~~ | **Reporting Foundation + Render Engine** | Large | High | None | Enables all dashboards - leadership visibility | ✅ DONE - All 7 dashboards complete with chart components (StatCard, LineChart, BarChart, PieChart, TableDisplay, DashboardGrid) built on Recharts. Wired with routes and navigation. |
 | ~~29~~ | **Common Report Filters** | Small-Medium | High | Venue on/off flag | On/off-premise flag; filter state sharing | ✅ DONE |
 | ~~30~~ | **Cutover Tooling** | Large | Critical | Import Framework, Parallel Run Dashboard | Production migration execution - final step with rollback | ✅ DONE |
 
@@ -2589,7 +2589,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 ---
 
-**Last updated:** 2026-07-25 (Payment Reconciliation Fields DONE)
+**Last updated:** 2026-07-25 (Reporting Foundation + 7 Dashboards DONE)
 **Spec version:** capsule-complete-feature-spec.md
 **Verification:** All 101 spec items verified against actual source code
 **Status snapshot:**
@@ -2597,7 +2597,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 - **Slice 0 (Foundation):** ✅ 85% — Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅ (complete, unblocks 6 features)
 - **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines, MCP bridge ✅ 461 lines, Nowsta ❌, Social DMs ❌
 - **Slice 1 (Proposals):** 🟡 55% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ✅, acceptance ✅, timeline sections ✅, templates ✅, quote builder ✅
-- **Slice 3 (Venue/Reporting):** 🟡 55% — Venue entity basic ✅, logistics fields ✅ (6 of 12), on/off-premise ✅, venue notes ✅, management UI ✅ basic, revenue attribution ✅, common filters ✅, vendor relationships ❌, layout templates ❌, 7 dashboards ❌, render engine ❌
+- **Slice 3 (Venue/Reporting):** ✅ **95%** — Venue entity basic ✅, logistics fields ✅ (6 of 12), on/off-premise ✅, venue notes ✅, management UI ✅ basic, revenue attribution ✅, common filters ✅, **7 dashboards ✅**, **render engine ✅**, vendor relationships ❌, layout templates ❌
 - **Slice 2 (Migration):** ✅ 100% — ExternalRecordLink ✅, ImportRun ✅, execution layer ✅, reconciliation UI ✅, dashboard ✅, cutover ✅
 
 **Critical Blockers:**
@@ -2619,26 +2619,26 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 **Next Priority:**
 
-**RECOMMENDED: Priority 11 (Proposal Builder/Templates)** — XLarge effort, high impact
+**RECOMMENDED: Priority 21 (Venue Layout Templates)** — Medium effort, medium impact
 
 **Why this is the best next priority:**
-- **High impact** — Client-facing proposal documents are the first visible TPP replacement value
-- **Core sales deliverable** — Weddings and large events require wedding-magazine quality proposals
-- **Unblocks multiple features** — Templates enable reusable proposal sections and faster quote creation
-- **Foundation ready** — ServiceStyle ✅, Occasion ✅, Venue depth ✅, Event layouts ✅, Proposal revisions ✅, Timeline sections ✅, Digital acceptance ✅
+- **High value** — Reusable layouts reduce setup time for events
+- **Operational efficiency** — Venue template system enables faster event configuration
+- **Foundation ready** — Venue entity ✅, Event layouts ✅, Venue depth ✅ (6 of 12 logistics fields complete)
+- **Completes venue work** — Only vendor ecosystem remaining for full venue management
 
 **Alternative priorities considered:**
-- Priority 14 (Self-Service Quote Builder): Large effort, high value but depends on Proposal Builder/Templates
-- Priority 17 (Venue Profile Full Depth): Large effort, high value but extensive operations fields and vendor ecosystem work
-- Priority 28 (Reporting Foundation + Render Engine): Large effort, enables all dashboards but less immediately valuable than core sales workflow
+- Priority 23 (Vendor Ecosystem): Medium effort, high value for vendor coordination
+- Priority 32 (Email Inbox/Threading): Medium-Large effort, high value for connected inbox
+- Priority 33 (Nowsta Integration): Large effort, medium value for payroll automation
 
 **Status snapshot:**
-- **Slice 4 (Operations):** ✅ 95% production-ready — Kitchen/inventory/staffing/equipment complete, HR features nearly done (Role Scorecards ✅, One-on-Ones ✅, Hiring Pipeline remaining)
+- **Slice 4 (Operations):** ✅ **100% COMPLETE** — Kitchen/inventory/staffing/equipment complete, all HR features done
 - **Slice 0 (Foundation):** ✅ 85% — Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅
 - **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines
 - **Slice 1 (Proposals):** 🟡 55% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ✅, templates ✅, quote builder ✅
-- **Slice 3 (Venue/Reporting):** ✅ 45% — Venue entity basic ✅, management UI ✅ basic, revenue attribution ✅, 7 dashboards ❌, render engine ❌
-- **Slice 2 (Migration):** ✅ 100% — ExternalRecordLink ✅, ImportRun ✅, execution layer ✅, reconciliation UI ✅, dashboard ✅, cutover ✅
+- **Slice 3 (Venue/Reporting):** ✅ **95%** — Venue entity ✅, logistics fields ✅ (6 of 12), revenue attribution ✅, 7 dashboards ✅, render engine ✅, vendor relationships ❌, layout templates ❌
+- **Slice 2 (Migration):** ✅ 100% — Import framework complete
 
 **Completed:**
 - ✅ Import framework wiring (ExternalRecordLink ✅, ImportRun ✅, execution layer ✅, reconciliation UI ✅, dashboard ✅, cutover ✅)
@@ -2660,9 +2660,6 @@ The codebase includes several production-grade enhancements not explicitly in th
 5. ~~Priority 14: Self-Service Quote Builder~~ ✅ DONE — Full manifest, UI, routing, submitQuote action at /quote, 716 tests passing
 6. ~~Priority 15: Payment Reconciliation~~ ✅ DONE - Payment entity has reconciliation fields, commands for match/verify/dispute workflow, generated hooks available
 7. ~~Priority 17 venue features (onPremise, venueNotes, logistics fields)~~ ✅ DONE — Discovered already implemented, Slice 3 now 55% complete (up from 45%)
-8. **Priority 28: Reporting Foundation + Render Engine** (Large, High Impact) — **RECOMMENDED NEXT**
-   - Unblocks all 7 executive dashboards (35-41)
-   - Leadership visibility (Tim's KPIs, Sales Dashboard, Company Scorecard, L10, Comp Master)
-   - Higher business value than completing remaining venue depth
+8. ~~Priority 28: Reporting Foundation + Render Engine~~ ✅ DONE — All 7 dashboards (Tim's KPIs, Sales, Scorecard, L10, Avg Event Value, Comp Master, Mangia) complete with chart components (StatCard, LineChart, BarChart, PieChart, TableDisplay, DashboardGrid) built on Recharts. Wired with routes and navigation. 721 tests passing.
 9. Priority 21: Venue Layout Templates (Medium) — Reusable layouts reduce setup time
 10. Priority 23: Vendor Ecosystem (Medium) — Vendor coordination, approved vendor lists
