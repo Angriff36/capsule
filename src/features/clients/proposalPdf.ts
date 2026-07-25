@@ -291,9 +291,18 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   if (proposal.timelineItems != null && proposal.timelineItems.length > 0) {
     sectionLabel("Timeline");
     for (const item of proposal.timelineItems) {
-      ensureSpace(32);
+      // Calculate card height based on content.
+      let cardHeight = 24;
+      if (item.description != null && item.description.trim() !== "") {
+        const descLines = doc.splitTextToSize(
+          item.description,
+          CONTENT_WIDTH - 108,
+        ) as string[];
+        cardHeight = Math.max(24, 18 + descLines.length * 12);
+      }
+      ensureSpace(cardHeight + 12);
       doc.setFillColor(251, 250, 247);
-      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 24, 4, 4, "F");
+      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, cardHeight, 4, 4, "F");
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10);
       doc.setTextColor(...brand);
@@ -311,9 +320,9 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
           CONTENT_WIDTH - 108,
         ) as string[];
         doc.text(descLines, MARGIN + 96, y + 22);
-        y += Math.max(24, descLines.length * 12 + 12);
+        y += cardHeight + 6;
       } else {
-        y += 24;
+        y += cardHeight + 6;
       }
     }
     y += 8;
@@ -323,9 +332,21 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   if (proposal.enhancements != null && proposal.enhancements.length > 0) {
     sectionLabel("Enhancements & upgrades");
     for (const enhancement of proposal.enhancements) {
-      ensureSpace(32);
+      // Calculate card height based on content.
+      let cardHeight = 24;
+      if (
+        enhancement.description != null &&
+        enhancement.description.trim() !== ""
+      ) {
+        const descLines = doc.splitTextToSize(
+          enhancement.description,
+          CONTENT_WIDTH - 24,
+        ) as string[];
+        cardHeight = Math.max(24, 18 + descLines.length * 12);
+      }
+      ensureSpace(cardHeight + 12);
       doc.setFillColor(251, 250, 247);
-      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 24, 4, 4, "F");
+      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, cardHeight, 4, 4, "F");
       doc.setFont("helvetica", "bold");
       doc.setFontSize(10);
       doc.setTextColor(...INK);
@@ -346,9 +367,9 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
           CONTENT_WIDTH - 24,
         ) as string[];
         doc.text(descLines, MARGIN + 12, y + 22);
-        y += Math.max(24, descLines.length * 12 + 12);
+        y += cardHeight + 6;
       } else {
-        y += 24;
+        y += cardHeight + 6;
       }
     }
     y += 8;
@@ -389,9 +410,9 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
   // Next steps / CTA section.
   if (proposal.acceptanceUrl != null) {
     sectionLabel("Next steps");
-    ensureSpace(60);
+    ensureSpace(70);
     doc.setFillColor(251, 250, 247);
-    doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 54, 6, 6, "F");
+    doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, 64, 6, 6, "F");
     doc.setFont("helvetica", "bold");
     doc.setFontSize(10);
     doc.setTextColor(...brand);
@@ -402,22 +423,34 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
     const steps = [
       "1. Review all details above",
       "2. Contact us with any questions",
-      "3. Confirm your acceptance by phone or email",
+      "3. Confirm your acceptance:",
     ];
     let stepY = y + 26;
     for (const step of steps) {
       doc.text(step, MARGIN + 14, stepY);
       stepY += 11;
     }
+    // Render acceptance URL as visible text.
+    doc.setTextColor(...accent);
+    doc.setFont("helvetica", "bold");
+    const displayUrl =
+      proposal.acceptanceUrl.length > 60
+        ? proposal.acceptanceUrl.slice(0, 57) + "..."
+        : proposal.acceptanceUrl;
+    doc.text(displayUrl, MARGIN + 30, stepY);
+    // Add clickable link annotation.
+    doc.link(MARGIN + 14, y - 6, CONTENT_WIDTH - 28, 64, {
+      url: proposal.acceptanceUrl,
+    });
     doc.setFont("helvetica", "italic");
     doc.setFontSize(8);
     doc.setTextColor(...MUTED);
     doc.text(
-      "We'll follow up to confirm your booking and finalize details.",
+      "Click the link above or contact us to confirm your booking.",
       MARGIN + 14,
-      stepY + 4,
+      stepY + 14,
     );
-    y += 66;
+    y += 76;
   } else {
     // Generic next steps when no URL provided.
     sectionLabel("Next steps");
