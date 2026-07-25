@@ -1591,30 +1591,29 @@
 - ✅ Access notes and catering notes
 
 **Gaps (Basic Venue UI):**
-- ❌ On/off-premise classification flag (venueType enum exists but lacks on/off distinction)
+- ~~❌ On/off-premise classification flag~~ ✅ **DONE** — onPremise field exists at event.manifest:324, wired in create/edit forms, read-only display added 2026-07-25
 
 **Evidence:**
-- src/features/facilities/VenuesPage.tsx — Full venue list UI
-- src/features/facilities/VenueDetailPage.tsx — Full venue detail UI
-- src/features/facilities/facilitiesRoutes.ts — Venue routing with paths
-- src/operations/event.manifest lines 305-468 — Complete Venue entity definition
-- Generated Convex schema, mutations, queries, and React hooks
-- All 680 tests passing
+- src/features/facilities/VenuesPage.tsx — Full venue list UI with onPremise checkbox in create form (line 69)
+- src/features/facilities/VenueDetailPage.tsx — Full venue detail UI with onPremise checkbox in edit form (line 94), premise type in read-only display (added 2026-07-25)
+- src/features/finance/FoodCostPercentagePage.tsx — Finance filtering by venue.onPremise (lines 503-508)
+- src/operations/event.manifest lines 324-329 — Complete logistics fields: onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes
+- All 721 tests passing (2026-07-25)
 
 **Remaining Depth (§8.2-8.5):**
 - ❌ Room/space details entity
-- ❌ Kitchen access/equipment fields
+- ✅ ~~Kitchen access/equipment fields~~ **DONE** — kitchenAccess: string? (event.manifest:325)
 - ❌ Power/water fields
-- ❌ Load-in path/times fields
-- ❌ Parking fields
-- ❌ Elevators/stairs fields
-- ❌ Storage fields
+- ❌ Load-in path/times fields (use logisticsNotes for now)
+- ✅ ~~Parking fields~~ **DONE** — parkingAvailable: boolean? (event.manifest:326)
+- 🟡 ~~Elevators/stairs fields~~ **PARTIAL** — hasFreightElevator: boolean? only (no stairs field)
+- ✅ ~~Storage fields~~ **DONE** — storageAvailable: boolean? (event.manifest:328)
 - ❌ Waste rules fields
 - ❌ Permits/insurance fields
 - ❌ Vendor ecosystem relationships (§8.4)
-- ❌ Venue notes entity (§8.3)
-- ❌ Revenue attribution (§8.5)
-- 🟡 Layout templates (§8.2) — eventLayoutSections exists but no venue template system
+- ✅ ~~Venue notes entity (§8.3)~~ **DONE** — Full VenueNote entity (venue-note.manifest) with VenueNotesPanel.tsx UI
+- ✅ Revenue attribution (§8.5) — **DONE** — Full RevenueAttribution and VenueCommissionTerm entities with UI
+- ❌ Layout templates (§8.2) — eventLayoutSections exists but no reusable venue template system
 
 **Next steps:**
 1. Add on/off-premise classification to venueType enum or Venue entity
@@ -1628,11 +1627,25 @@
 
 ---
 
-### ❌ 8.2 Venue Operations Fields — NOT BUILT
+### 🟡 8.2 Venue Operations Fields — PARTIAL (2026-07-25: 6 of 12 logistics fields exist)
 
 **Spec requirement:** Logistics depth (kitchen access, equipment, power/water, load-in path/times, parking, elevators/stairs, storage, waste rules, permits/insurance), vendor ecosystem, scorecard metrics, on/off-premise flag
 
-**Current gap:** Basic venue entity only
+**Implemented (6 fields):**
+- ✅ onPremise: boolean? (event.manifest:324) — On/Off-premise classification
+- ✅ kitchenAccess: string? (event.manifest:325) — Kitchen access notes
+- ✅ parkingAvailable: boolean? (event.manifest:326) — Parking availability flag
+- ✅ hasFreightElevator: boolean? (event.manifest:327) — Freight elevator availability
+- ✅ storageAvailable: boolean? (event.manifest:328) — Storage availability flag
+- ✅ logisticsNotes: string? (event.manifest:329) — General logistics notes
+
+**Remaining gaps (6 items):**
+- ❌ Power/water utility fields
+- ❌ Load-in path/times as structured fields (use logisticsNotes for now)
+- ❌ Elevators/stairs beyond freight elevator
+- ❌ Waste rules fields
+- ❌ Permits/insurance fields
+- ❌ Room/space details sub-entity
 
 **Dependencies:** Basic Venue Management UI ✅ complete (needs operations fields)
 
@@ -1658,17 +1671,32 @@
 
 ---
 
-### 🟡 8.4 Venue Notes — PARTIAL
+### ✅ 8.4 Venue Notes — DONE (2026-07-25)
 
 **Done:**
-- Venue.accessNotes/cateringNotes free-text
+- ✅ Venue.accessNotes/cateringNotes free-text (basic venue notes)
+- ✅ VenueNote entity (venue-note.manifest) — Full structured notes with:
+  - Categories: access, logistics, catering, equipment, staffing, restrictions, policies, weather_contingency, other
+  - Visibility levels: public, internal, management_only
+  - Pin/unpin functionality
+  - Author attribution with personId and name
+  - Optional eventId linking (notes can be about a venue in general or a specific event)
+  - Timestamps and versioning
+  - Commands: post, revise, remove, pin, unpin
+- ✅ VenueNotesPanel.tsx — Full UI (268 lines) with:
+  - Post note form with category and visibility selection
+  - Notes list sorted by pinned then date descending
+  - Pin/unpin and remove actions for authors and admins
+  - Public/internal/management visibility badges
+- ✅ Generated hooks: useCreateVenueNote, useVenueNoteRemove, useVenueNoteRevise, useVenueNotePin, useVenueNoteUnpin, useListVenueNote
+- ✅ All 721 tests passing
 
-**Gaps:**
-- NO Note entity
-- NO author/time, category, pin/priority, visibility, archive
-- Notes not linked directly to Venue
+**Evidence:**
+- src/operations/venue-note.manifest — Complete VenueNote entity (142 lines)
+- src/features/facilities/VenueNotesPanel.tsx — Full UI
+- convex/schema.ts lines 2526-2546 — venueNotes table definition
 
-**Dependencies:** Venue profile, Note entity
+**Remaining gaps:** None — venue notes fully implemented
 
 **Estimated effort:** Small-Medium
 
@@ -2455,7 +2483,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 | 19 | **Parallel Run Dashboard** | Large | High | Import Framework, Import Datasets | Migration validation - required for safe cutover | ✅ DONE - 680-line dashboard with comparison metrics, drill-down |
 | 20 | **TPP Bridge** | Large | High | Import Framework, Proposal Revisions | Legacy proposal migration - blocks historical proposal access |
 | 21 | **Venue Layout Templates** | Medium | Medium | Venue Profile | Operational efficiency - reusable layouts reduce setup time |
-| 22 | **Venue Notes Entity** | Medium | Medium | Venue Profile | Knowledge base - institutional memory about venues |
+| ~~22~~ | **Venue Notes Entity** | Medium | Medium | Venue Profile | Knowledge base - institutional memory about venues | ✅ DONE - Full VenueNote entity (venue-note.manifest), VenueNotesPanel UI, all 721 tests passing |
 | 23 | **Vendor Ecosystem** | Medium | Medium | Venue Profile | Vendor coordination - blocks approved vendor lists |
 | ~~24~~ | **Role Scorecards** | Medium | Medium | Performance tracking | HR management - defines measurable expectations | ✅ DONE - Full manifest entity (role-scorecard.manifest), RoleScorecardsPage UI with CRUD, wired in App.tsx route /staff/scorecards, navigation in workforceRoutes.ts |
 | ~~25~~ | **Performance Event Linkage** | Small-Medium | Medium | None | Per-event feedback vs periodic only - HR evaluation granularity | ✅ DONE - eventId relation added to PerformanceReview entity, Event dropdown in PerformanceReviewsPage.tsx, all 704 tests passing |
@@ -2547,7 +2575,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 - **Slice 0 (Foundation):** ✅ 85% — Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅ (complete, unblocks 6 features)
 - **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines, MCP bridge ✅ 461 lines, Nowsta ❌, Social DMs ❌
 - **Slice 1 (Proposals):** 🟡 55% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ✅, acceptance ✅, timeline sections ✅, templates ✅, quote builder ✅
-- **Slice 3 (Venue/Reporting):** ✅ 45% — Venue entity basic ✅, management UI ✅ basic, revenue attribution ✅, common filters ✅, 7 dashboards ❌, render engine ❌
+- **Slice 3 (Venue/Reporting):** 🟡 55% — Venue entity basic ✅, logistics fields ✅ (6 of 12), on/off-premise ✅, venue notes ✅, management UI ✅ basic, revenue attribution ✅, common filters ✅, vendor relationships ❌, layout templates ❌, 7 dashboards ❌, render engine ❌
 - **Slice 2 (Migration):** ✅ 100% — ExternalRecordLink ✅, ImportRun ✅, execution layer ✅, reconciliation UI ✅, dashboard ✅, cutover ✅
 
 **Critical Blockers:**
