@@ -70,6 +70,7 @@ describe("governed creation mappings", () => {
       "ProductionBatch_createViaPlan",
       "ProposalDishSelection_createViaSelect",
       "ProposalRevision_createViaCapture",
+      "ProposalTemplate_createViaDefine",
       "Proposal_createViaDraft",
       "Qualification_createViaGrant",
       "QualityCheck_createViaOpen",

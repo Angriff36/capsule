@@ -1,0 +1,211 @@
+// Capsule sales — reusable proposal templates. A proposal template defines
+// default terms, section visibility, and styling preferences for proposals.
+// Staff can create proposals from templates to maintain consistency and speed
+// up the sales process.
+
+use "./proposal.manifest"
+
+enum ProposalTemplateStatus {
+  active
+  archived
+}
+
+// Proposal section identifiers for visibility control
+enum ProposalSection {
+  cover_brand
+  event_summary
+  menu_sections
+  timeline
+  venue_logistics
+  enhancements
+  pricing_summary
+  terms
+  acceptance_cta
+}
+
+entity ProposalTemplate mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Template identity
+  property required searchable name: string = ""
+  property description: string?
+
+  // Section visibility configuration (JSON array of section IDs to show)
+  property visibleSections: list<string> = []
+
+  // Default proposal content
+  property defaultTerms: string?
+  property defaultNotes: string?
+
+  // Pricing defaults (optional overrides - as decimal percentages, e.g., 0.085 for 8.5%)
+  property defaultTaxRate: decimal(7, 4)?
+  property defaultServiceChargePercent: decimal(7, 4)?
+
+  // Expiration policy (days until proposal expires, null for no default)
+  property validityDays: int?
+
+  // Template status
+  property required status: ProposalTemplateStatus = "active"
+  property definedAt: datetime?
+  property archivedAt: datetime?
+  property archiveReason: string?
+
+  computed isActive: boolean = self.status == "active"
+
+  constraint templateComplete: self.definedAt == null or (length(trim(self.name)) > 0) "Defined templates require a name"
+  constraint validityDaysRange: self.validityDays == null or (self.validityDays >= 1 and self.validityDays <= 365) "Validity days must be between 1 and 365"
+  constraint taxRateRange: self.defaultTaxRate == null or (self.defaultTaxRate >= 0 and self.defaultTaxRate <= 1) "Tax rate must be between 0 and 1 (100%)"
+  constraint serviceChargeRange: self.defaultServiceChargePercent == null or (self.defaultServiceChargePercent >= 0 and self.defaultServiceChargePercent <= 1) "Service charge must be between 0 and 1 (100%)"
+
+  transition status from "active" to ["archived"]
+  transition status from "archived" to ["active"]
+
+  default policy proposalTemplateRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposal templates"
+  default policy proposalTemplateWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposal templates through commands"
+  default policy proposalTemplateExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal template commands"
+
+  command define(
+    name: string,
+    optional description: string,
+    optional visibleSections: list<string>,
+    optional defaultTerms: string,
+    optional defaultNotes: string,
+    optional defaultTaxRate: decimal(7, 4),
+    optional defaultServiceChargePercent: decimal(7, 4),
+    optional validityDays: int
+  ) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint defineTemplateName: length(trim(name)) > 0 "Template name is required"
+    constraint defineTaxRate: defaultTaxRate == null or (defaultTaxRate >= 0 and defaultTaxRate <= 1) "Tax rate must be between 0 and 100%"
+    constraint defineServiceCharge: defaultServiceChargePercent == null or (defaultServiceChargePercent >= 0 and defaultServiceChargePercent <= 1) "Service charge must be between 0 and 100%"
+    constraint defineValidityDays: validityDays == null or (validityDays >= 1 and validityDays <= 365) "Validity days must be between 1 and 365"
+    mutate name = name
+    mutate description = description
+    mutate visibleSections = visibleSections != null ? visibleSections : []
+    mutate defaultTerms = defaultTerms
+    mutate defaultNotes = defaultNotes
+    mutate defaultTaxRate = defaultTaxRate
+    mutate defaultServiceChargePercent = defaultServiceChargePercent
+    mutate validityDays = validityDays
+    mutate definedAt = now()
+    mutate definedById = user.id
+    emit ProposalTemplateDefined {
+      templateId: self.id
+      tenantId: self.tenantId
+      name: name
+      visibleSections: visibleSections != null ? visibleSections : []
+    }
+  }
+
+  command revise(
+    name: string,
+    optional description: string,
+    optional visibleSections: list<string>,
+    optional defaultTerms: string,
+    optional defaultNotes: string,
+    optional defaultTaxRate: decimal(7, 4),
+    optional defaultServiceChargePercent: decimal(7, 4),
+    optional validityDays: int
+  ) {
+    guard self.definedAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint reviseTemplateName: length(trim(name)) > 0 "Template name is required"
+    constraint reviseTaxRate: defaultTaxRate == null or (defaultTaxRate >= 0 and defaultTaxRate <= 1) "Tax rate must be between 0 and 100%"
+    constraint reviseServiceCharge: defaultServiceChargePercent == null or (defaultServiceChargePercent >= 0 and defaultServiceChargePercent <= 1) "Service charge must be between 0 and 100%"
+    constraint reviseValidityDays: validityDays == null or (validityDays >= 1 and validityDays <= 365) "Validity days must be between 1 and 365"
+    mutate name = name
+    mutate description = description
+    mutate visibleSections = visibleSections != null ? visibleSections : self.visibleSections
+    mutate defaultTerms = defaultTerms != null ? defaultTerms : self.defaultTerms
+    mutate defaultNotes = defaultNotes != null ? defaultNotes : self.defaultNotes
+    mutate defaultTaxRate = defaultTaxRate
+    mutate defaultServiceChargePercent = defaultServiceChargePercent
+    mutate validityDays = validityDays
+    mutate updatedAt = now()
+    mutate updatedById = user.id
+    emit ProposalTemplateRevised {
+      templateId: self.id
+      tenantId: self.tenantId
+      name: name
+      visibleSections: visibleSections != null ? visibleSections : self.visibleSections
+    }
+  }
+
+  command archive(reason: string) {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint archiveTemplateReason: length(trim(reason)) > 0 "Archive reason is required"
+    mutate status = "archived"
+    mutate archivedAt = now()
+    mutate archiveReason = reason
+    mutate archivedById = user.id
+    emit ProposalTemplateArchived {
+      templateId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "archived"
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = "active"
+    mutate archivedAt = null
+    mutate archiveReason = null
+    mutate reactivatedAt = now()
+    mutate reactivatedById = user.id
+    emit ProposalTemplateReactivated {
+      templateId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store ProposalTemplate in durable
+}
+
+event ProposalTemplateDefined: "proposal_template.defined" {
+  templateId: string
+  tenantId: string
+  name: string
+  visibleSections: list<string>
+}
+
+event ProposalTemplateRevised: "proposal_template.revised" {
+  templateId: string
+  tenantId: string
+  name: string
+  visibleSections: list<string>
+}
+
+event ProposalTemplateArchived: "proposal_template.archived" {
+  templateId: string
+  tenantId: string
+  reason: string
+}
+
+event ProposalTemplateReactivated: "proposal_template.reactivated" {
+  templateId: string
+  tenantId: string
+}
+
+// Query helpers for commonly-used filters
+query listActive(): ProposalTemplate[] {
+  filter self.deletedAt == null
+  filter self.status == "active"
+  sort self.name asc
+}
+
+query listByStatus(status: ProposalTemplateStatus): ProposalTemplate[] {
+  filter self.deletedAt == null
+  filter self.status == status
+  sort self.name asc
+}

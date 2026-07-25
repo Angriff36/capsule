@@ -11,10 +11,11 @@ import {
 import { NAV_AREAS } from "../src/app/nav";
 
 describe("Clients CRM routes and lifecycle bindings", () => {
-  it("exposes accounts, proposals, and contracts sections", () => {
+  it("exposes accounts, proposals, proposal templates, and contracts sections", () => {
     expect(CLIENTS_SECTIONS.map((section) => section.path)).toEqual([
       "/clients",
       "/clients/proposals",
+      "/clients/proposals/templates",
       "/clients/contracts",
       "/clients/retention",
     ]);

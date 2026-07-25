@@ -243,6 +243,11 @@ const ProposalsPage = lazy(() =>
     default: module.ProposalsPage,
   })),
 );
+const ProposalTemplatesPage = lazy(() =>
+  import("../features/clients/ProposalTemplatesPage").then((module) => ({
+    default: module.ProposalTemplatesPage,
+  })),
+);
 const ContractsPage = lazy(() =>
   import("../features/clients/ContractsPage").then((module) => ({
     default: module.ContractsPage,
@@ -825,6 +830,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ProposalsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/proposals/templates"
+              element={
+                <SupplyRoute>
+                  <ProposalTemplatesPage />
                 </SupplyRoute>
               }
             />

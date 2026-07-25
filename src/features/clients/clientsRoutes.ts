@@ -7,6 +7,11 @@ export const CLIENTS_PIPELINE_SECTION = {
 export const CLIENTS_SECTIONS = [
   { key: "accounts", label: "Accounts", path: "/clients" },
   { key: "proposals", label: "Proposals", path: "/clients/proposals" },
+  {
+    key: "proposalTemplates",
+    label: "Proposal Templates",
+    path: "/clients/proposals/templates",
+  },
   { key: "contracts", label: "Contracts", path: "/clients/contracts" },
   { key: "retention", label: "Retention", path: "/clients/retention" },
 ] as const;
@@ -18,6 +23,7 @@ export const CLIENTS_ROUTES = {
   pipeline: "/clients/pipeline",
   detail: (id: string) => `/clients/${id}`,
   proposals: "/clients/proposals",
+  proposalTemplates: "/clients/proposals/templates",
   contracts: "/clients/contracts",
   retention: "/clients/retention",
   contractDocument: (id: string) => `/clients/contracts/${id}/document`,

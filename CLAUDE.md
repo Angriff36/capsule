@@ -143,7 +143,7 @@ Last: [first session]
 
 ## Last Session Bridge
 [auto-bridge snapshot @ 10 changes]
-Files: src/features/finance/RevenueAttributionsPage.tsx (edit), src/features/finance/VenueCommissionTermsPage.tsx (edit), src/app/App.tsx (edit), src/features/finance/FinanceWorkspaceNav.tsx (edit), src/features/finance/financeRoutes.ts (edit), src/features/finance/RevenueAttributionDetailPage.tsx (create), src/features/finance/RevenueAttributionsPage.tsx (create), src/features/finance/VenueCommissionTermsPage.tsx (create)
+Files: src/app.manifest (edit), src/sales/proposal-template.manifest (edit)
 
 # === END COGNILAYER ===
 
