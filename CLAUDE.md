@@ -143,7 +143,7 @@ Last: [first session]
 
 ## Last Session Bridge
 [auto-bridge snapshot @ 10 changes]
-Files: src/features/facilities/VenuesPage.tsx (edit), src/features/facilities/VenueDetailPage.tsx (edit), src/operations/event.manifest (edit)
+Files: src/features/facilities/VenueNotesPanel.tsx (create), src/operations/venue-note.manifest (edit), src/app.manifest (edit), src/operations/venue-note.manifest (create)
 
 # === END COGNILAYER ===
 

@@ -522,11 +522,63 @@ export function VenueDetailPage() {
             </dd>
           </div>
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
+            <dt className="text-sm font-medium text-gray-500">Premise Type</dt>
+            <dd className="col-span-2 text-sm text-gray-900">
+              {venue.onPremise === true
+                ? "On-Premise"
+                : venue.onPremise === false
+                  ? "Off-Premise"
+                  : "Not specified"}
+            </dd>
+          </div>
+          <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
             <dt className="text-sm font-medium text-gray-500">Capacity</dt>
             <dd className="col-span-2 text-sm text-gray-900">
               {venue.capacity ?? "Not set"}
             </dd>
           </div>
+          {/* Logistics features */}
+          {(venue.kitchenAccess ||
+            venue.parkingAvailable !== undefined ||
+            venue.hasFreightElevator !== undefined ||
+            venue.storageAvailable !== undefined ||
+            venue.logisticsNotes) && (
+            <div className="mt-4 rounded-md bg-gray-50 p-3">
+              <dt className="text-sm font-medium text-gray-700 mb-2">
+                Logistics Features
+              </dt>
+              <div className="space-y-1 text-sm text-gray-900">
+                {venue.kitchenAccess && (
+                  <div>
+                    <span className="font-medium">Kitchen Access:</span>{" "}
+                    {venue.kitchenAccess}
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  {venue.parkingAvailable !== undefined && (
+                    <span>
+                      {venue.parkingAvailable ? "✓" : "✗"} Parking Available
+                    </span>
+                  )}
+                  {venue.hasFreightElevator !== undefined && (
+                    <span>
+                      {venue.hasFreightElevator ? "✓" : "✗"} Freight Elevator
+                    </span>
+                  )}
+                  {venue.storageAvailable !== undefined && (
+                    <span>
+                      {venue.storageAvailable ? "✓" : "✗"} Storage Available
+                    </span>
+                  )}
+                </div>
+                {venue.logisticsNotes && (
+                  <div className="whitespace-pre-wrap text-gray-700">
+                    {venue.logisticsNotes}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
             <dt className="text-sm font-medium text-gray-500">Address</dt>
             <dd className="col-span-2 text-sm text-gray-900">
