@@ -2106,35 +2106,6 @@ export const ShiftTypeSchema = z.object({
 
 export type ShiftType = z.infer<typeof ShiftTypeSchema>;
 
-// Entity: SignatureRequest
-export const SignatureRequestSchema = z.object({
-  id: z.string().uuid(),
-  tenantId: z.string(),
-  deletedAt: z.coerce.date().nullable().optional(),
-  proposalRevisionId: z.string().uuid(),
-  recipientEmail: z.string(),
-  recipientName: z.string(),
-  recipientPersonId: z.string().uuid().nullable().optional(),
-  recipientContactId: z.string().uuid().nullable().optional(),
-  status: z.enum(["requested", "expired", "completed", "revoked"]).default("requested"),
-  provider: z.enum(["internal", "docusign", "hellosign", "pandadoc", "other"]).default("internal"),
-  providerIds: z.string().nullable().optional(),
-  callbackToken: z.string().nullable().optional(),
-  requestedAt: z.coerce.date().nullable().optional(),
-  expiresAt: z.coerce.date().nullable().optional(),
-  completedAt: z.coerce.date().nullable().optional(),
-  expiredAt: z.coerce.date().nullable().optional(),
-  revokedAt: z.coerce.date().nullable().optional(),
-  signedArtifactReference: z.string().nullable().optional(),
-  signerIpAddress: z.string().nullable().optional(),
-  signerUserAgent: z.string().nullable().optional(),
-  requestedByPersonId: z.string().uuid().nullable().optional(),
-  createdAt: z.coerce.date().optional(),
-  updatedAt: z.coerce.date().optional(),
-});
-
-export type SignatureRequest = z.infer<typeof SignatureRequestSchema>;
-
 // Entity: SoftDeletable
 export const SoftDeletableSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
@@ -6076,41 +6047,6 @@ export type ShiftTypeReactivateParams = z.infer<typeof ShiftTypeReactivateParams
 export const ShiftTypeRetireParamsSchema = z.object({});
 
 export type ShiftTypeRetireParams = z.infer<typeof ShiftTypeRetireParamsSchema>;
-
-// Command: complete on SignatureRequest
-export const SignatureRequestCompleteParamsSchema = z.object({
-  callbackToken: z.string(),
-  signedArtifactReference: z.string(),
-  signerIpAddress: z.string().optional(),
-  signerUserAgent: z.string().optional(),
-});
-
-export type SignatureRequestCompleteParams = z.infer<typeof SignatureRequestCompleteParamsSchema>;
-
-// Command: expire on SignatureRequest
-export const SignatureRequestExpireParamsSchema = z.object({});
-
-export type SignatureRequestExpireParams = z.infer<typeof SignatureRequestExpireParamsSchema>;
-
-// Command: requestSignature on SignatureRequest
-export const SignatureRequestRequestSignatureParamsSchema = z.object({
-  proposalRevisionId: z.string().min(1),
-  recipientEmail: z.string(),
-  recipientName: z.string(),
-  recipientPersonId: z.string().min(1).optional(),
-  recipientContactId: z.string().uuid().optional(),
-  provider: z.enum(["internal", "docusign", "hellosign", "pandadoc", "other"]).optional(),
-  expiresAt: z.coerce.date().optional(),
-});
-
-export type SignatureRequestRequestSignatureParams = z.infer<typeof SignatureRequestRequestSignatureParamsSchema>;
-
-// Command: revoke on SignatureRequest
-export const SignatureRequestRevokeParamsSchema = z.object({
-  revokeReason: z.string(),
-});
-
-export type SignatureRequestRevokeParams = z.infer<typeof SignatureRequestRevokeParamsSchema>;
 
 // Command: markRead on StaffMessage
 export const StaffMessageMarkReadParamsSchema = z.object({});

@@ -1,6 +1,7 @@
 import { Component, lazy, Suspense, type ReactNode } from "react";
 import { Navigate, Route, Routes, useMatch } from "react-router-dom";
 import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
+import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
 import { EventAllergenBriefingPage } from "../features/events/EventAllergenBriefingPage";
 import { EventCapacityPlannerPage } from "../features/events/EventCapacityPlannerPage";
 import { EventCreatePage } from "../features/events/EventCreatePage";
@@ -182,6 +183,21 @@ const TaxRatesPage = lazy(() =>
     default: module.TaxRatesPage,
   })),
 );
+const VenueCommissionTermsPage = lazy(() =>
+  import("../features/finance/VenueCommissionTermsPage").then((module) => ({
+    default: module.VenueCommissionTermsPage,
+  })),
+);
+const RevenueAttributionsPage = lazy(() =>
+  import("../features/finance/RevenueAttributionsPage").then((module) => ({
+    default: module.RevenueAttributionsPage,
+  })),
+);
+const RevenueAttributionDetailPage = lazy(() =>
+  import("../features/finance/RevenueAttributionDetailPage").then((module) => ({
+    default: module.RevenueAttributionDetailPage,
+  })),
+);
 const PaymentsPage = lazy(() =>
   import("../features/finance/PaymentsPage").then((module) => ({
     default: module.PaymentsPage,
@@ -350,10 +366,20 @@ class AppErrorBoundary extends Component<
 
 export function App() {
   const clientPortalMatch = useMatch("/portal/events/:token");
+  const acceptanceMatch = useMatch("/accept/:callbackToken");
+
   if (clientPortalMatch?.params.token) {
     return (
       <AppErrorBoundary>
         <ClientPortalPage token={clientPortalMatch.params.token} />
+      </AppErrorBoundary>
+    );
+  }
+
+  if (acceptanceMatch?.params.callbackToken) {
+    return (
+      <AppErrorBoundary>
+        <ProposalAcceptancePage />
       </AppErrorBoundary>
     );
   }
@@ -703,6 +729,30 @@ export function App() {
               element={
                 <SupplyRoute>
                   <TaxRatesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/commission-terms"
+              element={
+                <SupplyRoute>
+                  <VenueCommissionTermsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/attribution"
+              element={
+                <SupplyRoute>
+                  <RevenueAttributionsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/finance/attribution/:id/:mode?"
+              element={
+                <SupplyRoute>
+                  <RevenueAttributionDetailPage />
                 </SupplyRoute>
               }
             />

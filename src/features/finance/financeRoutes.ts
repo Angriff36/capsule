@@ -47,4 +47,8 @@ export const FINANCE_ROUTES = {
   closeout: "/finance/closeout",
   payroll: "/finance/payroll",
   tips: "/finance/tips",
+  venueCommissionTerms: "/finance/commission-terms",
+  revenueAttribution: "/finance/attribution",
+  revenueAttributionDetail: (id: string, mode?: string) =>
+    mode ? `/finance/attribution/${id}/${mode}` : `/finance/attribution/${id}`,
 } as const;

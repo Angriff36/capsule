@@ -74,7 +74,6 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip ProductionBatch: no create command in IR (2 rows unused)
   // skip Proposal: no create command in IR (2 rows unused)
   // skip ProposalDishSelection: no create command in IR (2 rows unused)
-  // skip ProposalRevision: no create command in IR (2 rows unused)
   // PurchaseNeed → api.mutations.PurchaseNeed_create
   await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-1", "ingredientDemandId": "ingredientDemandId-purchase-need-1", "ingredientId": "ingredientId-purchase-need-1", "preferredVendorId": "preferredVendorId-purchase-need-1", "requiredQuantity": 1, "unit": "demo-unit-1", "purchasingWeekStart": 1767268800000 } as any);
   await client.mutation(api.mutations.PurchaseNeed_create, { "eventId": "eventId-purchase-need-2", "ingredientDemandId": "ingredientDemandId-purchase-need-2", "ingredientId": "ingredientId-purchase-need-2", "preferredVendorId": "preferredVendorId-purchase-need-2", "requiredQuantity": 2, "unit": "demo-unit-2", "purchasingWeekStart": 1767355200000 } as any);
@@ -96,7 +95,6 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip Shift: no create command in IR (2 rows unused)
   // skip ShiftSwapRequest: no create command in IR (2 rows unused)
   // skip ShiftType: no create command in IR (2 rows unused)
-  // skip SignatureRequest: no create command in IR (2 rows unused)
   // skip SoftDeletable: not a Convex-persistent store (2 rows unused)
   // skip StaffMessage: no create command in IR (2 rows unused)
   // skip StockCountLine: no create command in IR (2 rows unused)
@@ -457,11 +455,6 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
-      "entity": "ProposalRevision",
-      "createMutation": null,
-      "rowCount": 2
-    },
-    {
       "entity": "PurchaseNeed",
       "createMutation": "PurchaseNeed_create",
       "rowCount": 2
@@ -543,11 +536,6 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "ShiftType",
-      "createMutation": null,
-      "rowCount": 2
-    },
-    {
-      "entity": "SignatureRequest",
       "createMutation": null,
       "rowCount": 2
     },

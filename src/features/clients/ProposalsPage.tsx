@@ -7,11 +7,13 @@ import {
   useListEventTimelineActivity,
   useListVenue,
   useListProposal,
+  useListProposalRevision,
   useProposalAccept,
   useProposalDecline,
   useProposalExpire,
   useProposalMarkViewed,
   useProposalSend,
+  useCreateSignatureRequest,
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
@@ -75,12 +77,14 @@ export function ProposalsPage() {
   const events = useListEvent();
   const timelineActivities = useListEventTimelineActivity();
   const venues = useListVenue();
+  const proposalRevisions = useListProposalRevision();
   const createProposal = useCreateProposal();
   const send = useProposalSend();
   const markViewed = useProposalMarkViewed();
   const accept = useProposalAccept();
   const decline = useProposalDecline();
   const expire = useProposalExpire();
+  const createSignatureRequest = useCreateSignatureRequest();
   const [showDraft, setShowDraft] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
@@ -230,6 +234,66 @@ export function ProposalsPage() {
         void run(`${row._id}:decline`, async () => {
           await decline({ docId: row._id, version: row.version });
           setNotice("Proposal declined.");
+        });
+        return;
+      }
+      if (key === "requestSignature") {
+        const client = clients?.find((c) => c._id === row.clientId);
+        if (!client) {
+          setFailure(new Error("Client not found"));
+          return;
+        }
+
+        // Find or use latest revision
+        const latestRevision = (proposalRevisions ?? [])
+          .filter((r) => r.proposalId === row._id && r.deletedAt == null)
+          .sort((a, b) => b.revisionNumber - a.revisionNumber)[0];
+
+        const proposalRevisionId = latestRevision?._id;
+
+        // If no revision exists, we'll create the signature request without one
+        // (the SignatureRequest entity can work with a revision captured separately)
+
+        const recipientName =
+          client.clientType === "company"
+            ? (client.companyName ?? "Unknown Company")
+            : `${client.givenName ?? ""} ${client.familyName ?? ""}`.trim() ||
+              "Unknown Client";
+
+        const recipientEmail = client.email;
+        if (!recipientEmail) {
+          setFailure(
+            new Error("Client email is required for signature request"),
+          );
+          return;
+        }
+
+        void run(`${row._id}:request-signature`, async () => {
+          // Create signature request
+          const result = await createSignatureRequest({
+            proposalRevisionId: proposalRevisionId ?? "skip", // Skip if no revision yet
+            recipientEmail,
+            recipientName,
+            recipientPersonId: "skip",
+            recipientContactId: "skip",
+            provider: "internal" as const,
+            expiresAt: undefined,
+            idempotencyKey: `signature-request-${row._id}-${Date.now()}`,
+          });
+
+          if (!result) {
+            throw new Error("Failed to create signature request");
+          }
+
+          // Generate acceptance URL
+          const callbackToken = result.docId; // The entity ID is the callback token
+          const acceptanceUrl = `${window.location.origin}/accept/${callbackToken}`;
+
+          // Copy to clipboard and show success
+          await navigator.clipboard.writeText(acceptanceUrl);
+          setNotice(
+            `Signature request created. Acceptance URL copied to clipboard: ${acceptanceUrl}`,
+          );
         });
         return;
       }
@@ -511,6 +575,17 @@ export function ProposalsPage() {
                       >
                         Download PDF
                       </button>
+                      {(String(row.status) === "sent" ||
+                        String(row.status) === "viewed") && (
+                        <button
+                          className="btn btn-ghost"
+                          type="button"
+                          disabled={busy != null}
+                          onClick={() => invoke(row, "requestSignature")}
+                        >
+                          Request Signature
+                        </button>
+                      )}
                       {policy
                         .proposalActions(String(row.status))
                         .map((action) => (

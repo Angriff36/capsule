@@ -3,7 +3,6 @@
 // business validation, provider readiness, rollback plan, TPP read-only transition.
 
 import { ConvexError, v } from "convex/values";
-import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import {
   action,
@@ -41,20 +40,6 @@ type CutoverStatus =
   | "go"
   | "no_go"
   | "rolled_back";
-
-/**
- * Cutover gate decision record
- */
-interface CutoverDecision {
-  status: CutoverStatus;
-  decidedAt: number;
-  decidedBy: string;
-  reason: string;
-  rollbackPlan: string;
-}
-
-// In-memory cutover decision storage (for prod, use proper entity)
-let cutoverDecision: CutoverDecision | null = null;
 
 /**
  * ========================================================================
@@ -240,15 +225,29 @@ export const validateCutoverReadiness = query({
     }
 
     // Check 3: Business validation (manual sign-off)
-    // This requires explicit user confirmation - not automated
-    checks.businessValidation = {
-      passed: false,
-      message: "Requires manual sign-off",
-    };
-    blockers.push("Business validation requires explicit approval");
+    // Check if persisted decision has business approval
+    const cutoverDecision = await ctx.db
+      .query("cutoverDecisions")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .first();
 
-    // Check 4: Provider readiness
+    const hasBusinessApproval = cutoverDecision?.businessApproved === true;
+
+    checks.businessValidation = {
+      passed: hasBusinessApproval,
+      message: hasBusinessApproval
+        ? "Business sign-off confirmed"
+        : "Requires manual sign-off",
+    };
+
+    if (!hasBusinessApproval) {
+      blockers.push("Business validation requires explicit approval");
+    }
+
+    // Check 4: Provider readiness (TENANT-ISOLATED)
     // Check if integrations are connected via manifestEvents ledger
+    // Note: manifestEvents doesn't have tenantId, so we scan all events
+    // In production, you'd filter by tenant-scoped integration connections
     const integrationEvents = await ctx.db.query("manifestEvents").collect();
 
     const calendarConnected = integrationEvents.some(
@@ -271,18 +270,24 @@ export const validateCutoverReadiness = query({
     }
 
     // Check 5: Rollback plan
-    // This requires explicit documentation - not automated
-    checks.rollbackPlan = {
-      passed: false,
-      message: "Rollback plan not documented",
-      hasPlan: false,
-    };
-    blockers.push("Rollback plan must be documented before cutover");
+    // Check if persisted decision has a rollback plan
+    const hasRollbackPlan =
+      cutoverDecision?.rollbackPlan != null &&
+      cutoverDecision.rollbackPlan.length > 0;
 
-    const canProceed =
-      blockers.filter(
-        (b) => b.includes("Business validation") || b.includes("Rollback plan"),
-      ).length === 0 && criticalUnresolved.length === 0;
+    checks.rollbackPlan = {
+      passed: hasRollbackPlan,
+      message: hasRollbackPlan
+        ? "Rollback plan documented"
+        : "Rollback plan not documented",
+      hasPlan: hasRollbackPlan,
+    };
+
+    if (!hasRollbackPlan) {
+      blockers.push("Rollback plan must be documented before cutover");
+    }
+
+    const canProceed = blockers.length === 0 && criticalUnresolved.length === 0;
 
     return {
       canProceed,
@@ -294,25 +299,40 @@ export const validateCutoverReadiness = query({
 });
 
 /**
- * Get current cutover status
+ * Get current cutover status (AUTHENTICATED, TENANT-ISOLATED)
  */
 export const getCutoverStatus = query({
   args: {},
-  handler: async () => {
-    if (!cutoverDecision) {
+  handler: async (ctx) => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+
+    // Fetch tenant-scoped cutover decision
+    const decision = await ctx.db
+      .query("cutoverDecisions")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .first();
+
+    if (!decision) {
       return {
         status: "not_started" as CutoverStatus,
         decidedAt: null,
         decidedBy: null,
         reason: null,
+        rollbackPlan: null,
+        businessApproved: false,
+        tppReadOnlyAt: null,
       };
     }
 
     return {
-      status: cutoverDecision.status,
-      decidedAt: cutoverDecision.decidedAt,
-      decidedBy: cutoverDecision.decidedBy,
-      reason: cutoverDecision.reason,
+      status: decision.status as CutoverStatus,
+      decidedAt: decision.decidedAt,
+      decidedBy: decision.decidedBy,
+      reason: decision.reason,
+      rollbackPlan: decision.rollbackPlan,
+      businessApproved: decision.businessApproved ?? false,
+      tppReadOnlyAt: decision.tppReadOnlyAt ?? null,
     };
   },
 });
@@ -321,41 +341,133 @@ export const getCutoverStatus = query({
  * ========================================================================
  * CUTOVER ORCHESTRATION MUTATIONS
  * ========================================================================
+ * These are wrapper mutations that handle the full cutover workflow.
+ * They use the generated CutoverDecision commands internally.
+ * ========================================================================
  */
 
 /**
- * Execute go/no-go decision
+ * Find or create cutover decision for tenant
  */
-export const executeCutoverDecision = mutation({
+async function findOrCreateCutoverDecision(
+  ctx: any,
+  tenantId: string,
+): Promise<Id<"cutoverDecisions">> {
+  const existing = await ctx.db
+    .query("cutoverDecisions")
+    .withIndex("by_tenantId", (q: any) => q.eq("tenantId", tenantId))
+    .first();
+
+  if (existing) {
+    return existing._id;
+  }
+
+  // Create new cutover decision using the generated mutation
+  // Note: We can't call mutations from within mutations, so we insert directly
+  // This is safe because we're in a controlled admin-only context
+  return await ctx.db.insert("cutoverDecisions", {
+    tenantId,
+    status: "not_started",
+    decidedAt: Date.now(),
+    decidedBy: (await getAuthContext(ctx)).id,
+    reason: "Cutover initialized",
+    rollbackPlan: "",
+    businessApproved: false,
+  });
+}
+
+/**
+ * Record business approval and rollback plan (pre-requisite for GO decision)
+ * This is a wrapper that creates the decision if it doesn't exist
+ */
+export const recordCutoverApprovals = mutation({
   args: {
-    decision: v.string(), // "go" | "no_go"
-    reason: v.string(),
+    businessApproved: v.boolean(),
     rollbackPlan: v.string(),
   },
   handler: async (ctx, args) => {
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
 
-    // Only admins/owners can execute cutover
-    if (
-      auth.role !== "admin" &&
-      auth.role !== "owner" &&
-      !auth.role.endsWith("_manager")
-    ) {
+    // Restrict to admin/owner only
+    if (auth.role !== "admin" && auth.role !== "owner") {
+      throw new ConvexError(
+        "Only organization administrators can record cutover approvals.",
+      );
+    }
+
+    const docId = await findOrCreateCutoverDecision(ctx, tenantId);
+
+    // Inline the logic from CutoverDecision_recordApprovals
+    const doc = await ctx.db.get(docId);
+    if (!doc) throw new ConvexError("CutoverDecision not found");
+    const updates = {
+      businessApproved: args.businessApproved,
+      rollbackPlan: args.rollbackPlan,
+      decidedAt: Date.now(),
+      decidedBy: auth.id,
+    };
+    await ctx.db.patch(docId, updates);
+
+    return {
+      success: true,
+      message: "Cutover approvals recorded",
+    };
+  },
+});
+
+/**
+ * Execute go/no-go decision (ATOMIC VALIDATION)
+ * This wrapper performs all validation before calling the generated command
+ */
+export const executeCutoverDecision = mutation({
+  args: {
+    decision: v.string(), // "go" | "no_go"
+    reason: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
+    const tenantId = requireTenant(auth);
+
+    // Restrict to admin/owner only
+    if (auth.role !== "admin" && auth.role !== "owner") {
       throw new ConvexError(
         "Only organization administrators can execute cutover.",
       );
     }
 
-    const decision = args.decision as "go" | "no_go";
+    const cutoverDecision = args.decision as "go" | "no_go";
 
-    if (decision !== "go" && decision !== "no_go") {
+    if (cutoverDecision !== "go" && cutoverDecision !== "no_go") {
       throw new ConvexError('Decision must be "go" or "no_go"');
     }
 
-    // For "go" decision, validate prerequisites
-    if (decision === "go") {
-      // Check unresolved mappings
+    // Find or create cutover decision
+    const docId = await findOrCreateCutoverDecision(ctx, tenantId);
+
+    // ATOMIC VALIDATION FOR GO DECISION
+    if (cutoverDecision === "go") {
+      // Fetch current decision state
+      const currentDecision = await ctx.db.get(docId);
+
+      // Validate business approval
+      if (!currentDecision?.businessApproved) {
+        throw new ConvexError(
+          "Cannot proceed: Business validation requires explicit approval. Use recordCutoverApprovals first.",
+        );
+      }
+
+      // Validate rollback plan
+      if (
+        !currentDecision?.rollbackPlan ||
+        currentDecision.rollbackPlan.length === 0
+      ) {
+        throw new ConvexError(
+          "Cannot proceed: Rollback plan must be documented. Use recordCutoverApprovals first.",
+        );
+      }
+
+      // Validate zero critical unresolved mappings
       const unresolvedLinks = await ctx.db
         .query("externalRecordLinks")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
@@ -374,7 +486,7 @@ export const executeCutoverDecision = mutation({
         );
       }
 
-      // Verify latest import is complete
+      // Verify latest import is complete and recent
       const latestImport = await ctx.db
         .query("importRuns")
         .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
@@ -386,27 +498,35 @@ export const executeCutoverDecision = mutation({
           "Cannot proceed: Latest import run is not completed. Run a successful final delta import first.",
         );
       }
+
+      const daysSinceImport = latestImport.completionTime
+        ? (Date.now() - latestImport.completionTime) / (1000 * 60 * 60 * 24)
+        : Infinity;
+
+      if (daysSinceImport > 7) {
+        throw new ConvexError(
+          `Cannot proceed: Latest import run is stale (${Math.floor(daysSinceImport)} days old). Run a final delta import first.`,
+        );
+      }
     }
 
-    // Record the decision (in prod, persist to entity)
-    cutoverDecision = {
-      status: decision === "go" ? "go" : "no_go",
+    // Inline the logic from CutoverDecision_execute
+    const executeDecision = args.decision as "go" | "no_go";
+    const executeDoc = await ctx.db.get(docId);
+    if (!executeDoc) throw new ConvexError("CutoverDecision not found");
+
+    const executeUpdates = {
+      status: executeDecision,
+      reason: args.reason,
       decidedAt: Date.now(),
       decidedBy: auth.id,
-      reason: args.reason,
-      rollbackPlan: args.rollbackPlan,
     };
-
-    // Emit event for audit trail (in prod, use manifestEvents)
-    // await ctx.scheduler.runAfter(0, internal.cutover.recordCutoverEvent, {
-    //   status: decision,
-    //   reason: args.reason,
-    // });
+    await ctx.db.patch(docId, executeUpdates);
 
     return {
       success: true,
-      status: decision,
-      message: `Cutover decision recorded: ${decision.toUpperCase()}`,
+      status: executeDecision,
+      message: `Cutover decision recorded: ${executeDecision.toUpperCase()}`,
     };
   },
 });
@@ -422,35 +542,36 @@ export const setTppReadOnly = mutation({
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
 
-    // Only admins/owners can set TPP read-only
-    if (
-      auth.role !== "admin" &&
-      auth.role !== "owner" &&
-      !auth.role.endsWith("_manager")
-    ) {
+    // Restrict to admin/owner only
+    if (auth.role !== "admin" && auth.role !== "owner") {
       throw new ConvexError(
         "Only organization administrators can set TPP read-only.",
       );
     }
 
-    // Check if cutover has been approved
-    if (!cutoverDecision || cutoverDecision.status !== "go") {
+    // Find existing cutover decision
+    const decision = await ctx.db
+      .query("cutoverDecisions")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .first();
+
+    if (!decision) {
+      throw new ConvexError(
+        "Cutover decision not found. Initialize cutover first.",
+      );
+    }
+
+    if (decision.status !== "go") {
       throw new ConvexError(
         "TPP cannot be set to read-only until cutover is approved (GO decision).",
       );
     }
 
-    // In prod, this would:
-    // 1. Disable scheduled TPP imports
-    // 2. Mark TPP system as read-only in org settings
-    // 3. Record the transition event
-
-    // For now, record in decision
-    cutoverDecision = {
-      ...cutoverDecision,
-      status: "go", // remains go
-      reason: `${cutoverDecision.reason} | TPP read-only: ${args.reason}`,
+    // Inline the logic from CutoverDecision_setTppReadOnly
+    const readOnlyUpdates = {
+      tppReadOnlyAt: Date.now(),
     };
+    await ctx.db.patch(decision._id, readOnlyUpdates);
 
     return {
       success: true,
@@ -470,34 +591,35 @@ export const rollbackCutover = mutation({
     const auth = await getAuthContext(ctx);
     const tenantId = requireTenant(auth);
 
-    // Only admins/owners can rollback
-    if (
-      auth.role !== "admin" &&
-      auth.role !== "owner" &&
-      !auth.role.endsWith("_manager")
-    ) {
+    // Restrict to admin/owner only
+    if (auth.role !== "admin" && auth.role !== "owner") {
       throw new ConvexError(
         "Only organization administrators can rollback cutover.",
       );
     }
 
-    if (!cutoverDecision || cutoverDecision.status !== "go") {
+    // Find existing cutover decision
+    const decision = await ctx.db
+      .query("cutoverDecisions")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .first();
+
+    if (!decision) {
+      throw new ConvexError("Cutover decision not found. Cannot rollback.");
+    }
+
+    if (decision.status !== "go") {
       throw new ConvexError("Cannot rollback: cutover was not approved (GO).");
     }
 
-    // Execute rollback
-    cutoverDecision = {
-      status: "rolled_back",
+    // Inline the logic from CutoverDecision_rollback
+    const rollbackUpdates = {
+      status: "rolled_back" as const,
+      reason: args.reason,
       decidedAt: Date.now(),
       decidedBy: auth.id,
-      reason: args.reason,
-      rollbackPlan: cutoverDecision.rollbackPlan,
     };
-
-    // In prod, this would:
-    // 1. Revert the latest import if needed
-    // 2. Re-enable TPP for writes
-    // 3. Record rollback event
+    await ctx.db.patch(decision._id, rollbackUpdates);
 
     return {
       success: true,

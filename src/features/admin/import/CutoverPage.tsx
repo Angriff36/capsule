@@ -87,7 +87,6 @@ export function CutoverPage() {
           decision === "go"
             ? `Cutover approved - all checks passed. Rollback plan: ${rollbackPlan}`
             : `Cutover rejected - ${rollbackPlan}`,
-        rollbackPlan,
       });
       window.location.reload();
     } catch (err) {

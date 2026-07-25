@@ -13,6 +13,7 @@ enum ProposalStatus {
   accepted
   declined
   expired
+  superseded
 }
 
 // Sales offer for a Client. Line items omitted in this trio (send requires a
@@ -48,20 +49,29 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property declinedAt: datetime?
   property expiredAt: datetime?
 
+  // Revision tracking fields - superseded proposals when creating new revisions
+  property supersededAt: datetime?
+  property supersedeReason: string?
+  property supersededById: uuid?
+  property replacesProposalId: uuid?  // Links to the proposal this revision replaces
+
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
   ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
+  ref supersededBy: Proposal fields [tenantId, supersededById] references [tenantId, id]
+  ref replacesProposal: Proposal fields [tenantId, replacesProposalId] references [tenantId, id]
 
   constraint proposalDraftComplete: self.draftedAt == null or (length(trim(self.title)) > 0 and self.guestCount >= 0 and self.subtotal >= 0 and self.taxAmount >= 0 and self.discountAmount >= 0 and self.total >= 0) "Drafted proposals require a title and non-negative money and guest counts"
   constraint proposalTotalsConsistent: self.draftedAt == null or self.total == self.subtotal + self.taxAmount - self.discountAmount "Proposal total must equal subtotal plus tax minus discount"
 
   transition status from "draft" to ["sent"]
-  transition status from "sent" to ["viewed", "accepted", "declined", "expired"]
-  transition status from "viewed" to ["accepted", "declined", "expired"]
+  transition status from "sent" to ["viewed", "accepted", "declined", "expired", "superseded"]
+  transition status from "viewed" to ["accepted", "declined", "expired", "superseded"]
   transition status from "accepted" to []
   transition status from "declined" to []
   transition status from "expired" to []
+  transition status from "superseded" to []
 
   default policy proposalRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposals"
   default policy proposalWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposals through commands"
@@ -197,6 +207,25 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     }
   }
 
+  command supersede(revisedById: uuid, reason: string) {
+    // Mark this proposal as superseded by a newer revision
+    // Only sent/viewed proposals can be superseded (not terminal states)
+    guard self.status == "sent" or self.status == "viewed"
+    guard self.deletedAt == null
+    constraint supersedeDistinct: revisedById != self.id "A proposal cannot supersede itself"
+    mutate status = "superseded"
+    mutate supersededAt = now()
+    mutate supersedeReason = reason
+    mutate supersededById = revisedById
+    emit ProposalSuperseded {
+      proposalId: self.id
+      tenantId: self.tenantId
+      supersededById: revisedById
+      reason: reason
+      supersededAt: now()
+    }
+  }
+
   command stageClientMerge(clientMergeId: uuid, clientId: uuid) {
     guard self.deletedAt == null
     guard roleAllows(user.role, "adminAccess")
@@ -297,4 +326,12 @@ event ProposalExpired: "proposal.expired" {
   proposalId: string
   tenantId: string
   clientId: string
+}
+
+event ProposalSuperseded: "proposal.superseded" {
+  proposalId: string
+  tenantId: string
+  supersededById: string
+  reason: string
+  supersededAt: datetime
 }

@@ -1,0 +1,274 @@
+// Capsule Digital Acceptance — SignatureRequest for proposal acceptance.
+// Provider-neutral Acceptance/Signature Request record per spec §5.5. Enables
+// internal click-to-accept or external e-sign provider integration (DocuSign,
+// HelloSign, etc.) with idempotent webhooks. Records exact proposal revision
+// and terms version; prevents acceptance of superseded or revoked revisions.
+
+use "../identity/person.manifest"
+use "./proposal-revision.manifest"
+
+// ---------------------------------------------------------------------------
+// Closed vocabularies
+// ---------------------------------------------------------------------------
+
+enum SignatureRequestStatus {
+  requested
+  expired
+  completed
+  revoked
+}
+
+enum SignatureProvider {
+  internal  // Click-to-accept in Capsule UI
+  docusign
+  hellosign
+  pandadoc
+  other
+}
+
+// ---------------------------------------------------------------------------
+// SignatureRequest — Acceptance/Signature request for proposal revision
+// ---------------------------------------------------------------------------
+
+entity SignatureRequest mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // The proposal revision being accepted (immutable reference)
+  property required proposalRevisionId: uuid
+
+  // Recipient information
+  property required recipientEmail: string
+  property required recipientName: string
+  property recipientPersonId: uuid?  // Null for client contacts without Person record
+  property recipientContactId: uuid?  // ClientContact if recipient is a client contact
+
+  // Request metadata
+  property required status: SignatureRequestStatus = "requested"
+  property required provider: SignatureProvider = "internal"
+  property providerIds: string?  // JSON blob for provider-specific IDs (documentId, envelopeId, etc.)
+  property callbackToken: string?  // Idempotency token for webhook callbacks
+
+  // Timestamps
+  property requestedAt: datetime?
+  property expiresAt: datetime?
+  property completedAt: datetime?
+  property expiredAt: datetime?
+  property revokedAt: datetime?
+
+  // Signed artifact
+  property signedArtifactReference: string?  // URL or storage reference to signed document
+  property signerIpAddress: string?  // For audit trail
+  property signerUserAgent: string?  // For audit trail
+
+  // Requestor
+  property requestedByPersonId: uuid?
+
+  belongsTo proposalRevision: ProposalRevision fields [tenantId, proposalRevisionId] references [tenantId, id]
+  ref recipientPerson: Person fields [tenantId, recipientPersonId] references [tenantId, id]
+  ref requestedBy: Person fields [tenantId, requestedByPersonId] references [tenantId, id]
+
+  constraint recipientEmailValid: self.recipientEmail != null and length(trim(self.recipientEmail)) > 0 "Recipient email is required"
+  constraint recipientNameValid: self.recipientName != null and length(trim(self.recipientName)) > 0 "Recipient name is required"
+  constraint callbackTokenUnique: self.callbackToken == null or length(trim(self.callbackToken)) > 0 "Callback token must not be empty"
+  constraint completedHasArtifact: self.status == "completed" and self.signedArtifactReference != null or self.status != "completed" "Completed status requires signed artifact reference"
+
+  transition status from "requested" to ["completed", "expired", "revoked"]
+  transition status from "completed" to []
+  transition status from "expired" to []
+  transition status from "revoked" to []
+
+  default policy signatureRequestRead read: roleAllows(user.role, "salesAccess") "Sales staff may read signature requests"
+  default policy signatureRequestWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write signature requests through commands"
+  default policy signatureRequestExecute execute: roleAllows(user.role, "salesAccess") or roleAllows(user.role, "clientAccess") "Sales staff and clients may execute signature request commands"
+
+  command requestSignature(
+    proposalRevisionId: uuid,
+    recipientEmail: string,
+    recipientName: string,
+    optional recipientPersonId: uuid,
+    optional recipientContactId: uuid,
+    optional provider: SignatureProvider,
+    optional expiresAt: datetime
+  ) {
+    guard self.deletedAt == null
+    guard self.requestedAt == null "Request already initiated"
+    guard user.id != null
+
+    // Validate proposal revision exists and is not from a superseded proposal
+    guard self.proposalRevision != null "Proposal revision not found"
+
+    mutate proposalRevisionId = proposalRevisionId
+    mutate recipientEmail = recipientEmail
+    mutate recipientName = recipientName
+    mutate recipientPersonId = recipientPersonId
+    mutate recipientContactId = recipientContactId
+    mutate provider = provider != null ? provider : "internal"
+    mutate expiresAt = expiresAt != null ? expiresAt : now() + (30 * 24 * 60 * 60 * 1000)  // Default 30 days
+    // Use entity ID as the callback token for idempotent webhooks
+    mutate callbackToken = self.id
+    mutate status = "requested"
+    mutate requestedAt = now()
+    mutate requestedByPersonId = user.id
+
+    emit SignatureRequested {
+      signatureRequestId: self.id
+      tenantId: self.tenantId
+      proposalRevisionId: proposalRevisionId
+      recipientEmail: recipientEmail
+      recipientName: recipientName
+      provider: provider != null ? provider : "internal"
+      expiresAt: expiresAt != null ? expiresAt : now() + (30 * 24 * 60 * 60 * 1000)
+    }
+  }
+
+  command complete(
+    callbackToken: string,
+    signedArtifactReference: string,
+    optional signerIpAddress: string,
+    optional signerUserAgent: string
+  ) {
+    guard self.deletedAt == null
+    guard self.status == "requested" "Can only complete pending requests"
+    guard self.requestedAt != null "Request must be initiated"
+    guard self.expiresAt == null or now() < self.expiresAt "Request has expired"
+
+    // Idempotency check - callback token must match
+    guard self.callbackToken == callbackToken "Invalid callback token"
+
+    mutate status = "completed"
+    mutate completedAt = now()
+    mutate signedArtifactReference = signedArtifactReference
+    mutate signerIpAddress = signerIpAddress
+    mutate signerUserAgent = signerUserAgent
+
+    emit SignatureCompleted {
+      signatureRequestId: self.id
+      tenantId: self.tenantId
+      proposalRevisionId: self.proposalRevisionId
+      recipientEmail: self.recipientEmail
+      recipientName: self.recipientName
+      signedAt: now()
+      signedArtifactReference: signedArtifactReference
+    }
+  }
+
+  command expire() {
+    guard self.deletedAt == null
+    guard self.status == "requested" "Can only expire pending requests"
+    guard self.requestedAt != null "Request must be initiated"
+    guard self.expiresAt != null and now() >= self.expiresAt "Only expired requests can be marked expired"
+
+    mutate status = "expired"
+    mutate expiredAt = now()
+
+    emit SignatureExpired {
+      signatureRequestId: self.id
+      tenantId: self.tenantId
+      proposalRevisionId: self.proposalRevisionId
+      recipientEmail: self.recipientEmail
+      expiredAt: now()
+    }
+  }
+
+  command revoke(revokeReason: string) {
+    guard self.deletedAt == null
+    guard self.status == "requested" "Can only revoke pending requests"
+    guard self.requestedAt != null "Request must be initiated"
+    guard roleAllows(user.role, "salesAccess") or roleAllows(user.role, "salesManageAccess") "Only sales staff can revoke signature requests"
+    guard length(trim(revokeReason)) > 0 "Revoke reason is required"
+
+    mutate status = "revoked"
+    mutate revokedAt = now()
+
+    emit SignatureRevoked {
+      signatureRequestId: self.id
+      tenantId: self.tenantId
+      proposalRevisionId: self.proposalRevisionId
+      revokedByPersonId: user.id != null ? user.id : ""
+      revokeReason: revokeReason
+      revokedAt: now()
+    }
+  }
+
+  store SignatureRequest in durable
+}
+
+// ---------------------------------------------------------------------------
+// Queries
+// ---------------------------------------------------------------------------
+
+query findByProposalRevision(proposalRevisionId: uuid): SignatureRequest[] {
+  assert proposalRevisionId != null
+  filter self.proposalRevisionId == proposalRevisionId
+  filter self.deletedAt == null
+  sort self.requestedAt desc
+}
+
+query findByRecipient(recipientEmail: string): SignatureRequest[] {
+  assert recipientEmail != null
+  filter self.recipientEmail == recipientEmail
+  filter self.deletedAt == null
+  sort self.requestedAt desc
+}
+
+query pendingRequests(proposalRevisionId: uuid): SignatureRequest {
+  assert proposalRevisionId != null
+  filter self.proposalRevisionId == proposalRevisionId
+  filter self.status == "requested"
+  filter self.deletedAt == null
+  filter self.expiresAt == null or now() < self.expiresAt
+  sort self.requestedAt desc
+  limit 1
+}
+
+query pendingByToken(callbackToken: string): SignatureRequest {
+  assert callbackToken != null
+  filter self.callbackToken == callbackToken
+  filter self.status == "requested"
+  filter self.deletedAt == null
+  filter self.expiresAt == null or now() < self.expiresAt
+  limit 1
+}
+
+// ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+
+event SignatureRequested: "signature_request.requested" {
+  signatureRequestId: string
+  tenantId: string
+  proposalRevisionId: string
+  recipientEmail: string
+  recipientName: string
+  provider: SignatureProvider
+  expiresAt: datetime
+}
+
+event SignatureCompleted: "signature_request.completed" {
+  signatureRequestId: string
+  tenantId: string
+  proposalRevisionId: string
+  recipientEmail: string
+  recipientName: string
+  signedAt: datetime
+  signedArtifactReference: string
+}
+
+event SignatureExpired: "signature_request.expired" {
+  signatureRequestId: string
+  tenantId: string
+  proposalRevisionId: string
+  recipientEmail: string
+  expiredAt: datetime
+}
+
+event SignatureRevoked: "signature_request.revoked" {
+  signatureRequestId: string
+  tenantId: string
+  proposalRevisionId: string
+  revokedByPersonId: string
+  revokeReason: string
+  revokedAt: datetime
+}

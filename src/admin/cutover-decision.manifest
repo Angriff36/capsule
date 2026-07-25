@@ -1,0 +1,55 @@
+enum CutoverStatus {
+  not_started
+  validating
+  ready_for_go
+  go
+  no_go
+  rolled_back
+}
+
+enum CutoverDecisionType {
+  go
+  no_go
+}
+
+entity CutoverDecision mixin TenantScoped {
+  key [tenantId, id]
+  property required status: CutoverStatus = "not_started"
+  property required decidedAt: int
+  property required decidedBy: string
+  property required reason: string
+  property required rollbackPlan: string
+  property businessApproved: boolean = false
+  property tppReadOnlyAt: int?
+  default policy cutoverDecisionRead read: user.id != null "Authenticated staff may read cutover decisions"
+  default policy cutoverDecisionWrite write: user.id != null "Authenticated staff may write cutover decisions"
+  default policy cutoverDecisionExecute execute: user.id != null "Authenticated staff may execute cutover decision commands"
+  command recordApprovals(businessApproved: boolean, rollbackPlan: string) {
+    guard roleAllows(user.role, "adminAccess")
+    mutate businessApproved = businessApproved
+    mutate rollbackPlan = rollbackPlan
+    mutate decidedAt = context.timestamp
+    mutate decidedBy = user.id
+  }
+  command execute(decision: CutoverDecisionType, reason: string) {
+    guard roleAllows(user.role, "adminAccess")
+    mutate status = decision
+    mutate reason = reason
+    mutate decidedAt = context.timestamp
+    mutate decidedBy = user.id
+  }
+  command setTppReadOnly(reason: string) {
+    guard status == "go"
+    guard roleAllows(user.role, "adminAccess")
+    mutate tppReadOnlyAt = context.timestamp
+  }
+  command rollback(reason: string) {
+    guard status == "go"
+    guard roleAllows(user.role, "adminAccess")
+    mutate status = "rolled_back"
+    mutate reason = reason
+    mutate decidedAt = context.timestamp
+    mutate decidedBy = user.id
+  }
+  store CutoverDecision in durable
+}

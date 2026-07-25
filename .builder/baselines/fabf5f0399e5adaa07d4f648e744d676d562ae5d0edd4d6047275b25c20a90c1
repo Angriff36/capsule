@@ -96,7 +96,6 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip Shift: no create command in IR (2 rows unused)
   // skip ShiftSwapRequest: no create command in IR (2 rows unused)
   // skip ShiftType: no create command in IR (2 rows unused)
-  // skip SignatureRequest: no create command in IR (2 rows unused)
   // skip SoftDeletable: not a Convex-persistent store (2 rows unused)
   // skip StaffMessage: no create command in IR (2 rows unused)
   // skip StockCountLine: no create command in IR (2 rows unused)
@@ -543,11 +542,6 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "ShiftType",
-      "createMutation": null,
-      "rowCount": 2
-    },
-    {
-      "entity": "SignatureRequest",
       "createMutation": null,
       "rowCount": 2
     },

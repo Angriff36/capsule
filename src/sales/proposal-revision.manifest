@@ -1,0 +1,140 @@
+// Proposal Revisions - Immutable snapshot history for proposals
+
+entity ProposalRevision mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Parent proposal this revision belongs to
+  property required proposalId: uuid
+
+  // Sequential revision number (1, 2, 3, ...)
+  property required revisionNumber: int = 1
+
+  // Human-readable description of what changed (e.g., "Initial proposal", "Updated menu selection")
+  property required changeSummary: string = ""
+
+  // Who captured this revision (display name, passed from caller)
+  property required capturedByName: string = ""
+
+  // Auth subject ID of who captured (from trusted runtime context)
+  property capturedByAuthSubjectId: string?
+
+  // When this revision was captured (null until capture() is called)
+  property capturedAt: datetime?
+
+  // JSON blob containing full proposal state at capture time
+  property required snapshot: string = "{}"
+
+  belongsTo proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
+
+  default policy proposalRevisionRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposal revisions"
+  default policy proposalRevisionWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposal revisions through commands"
+  default policy proposalRevisionExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal revision commands"
+
+  command capture(
+    proposalId: uuid,
+    revisionNumber: int,
+    capturedByName: string,
+    changeSummary: string,
+    snapshot: string
+  ) {
+    // Capture a proposal revision - immutable once created
+    // Called from Proposal.send() to snapshot proposal state at send time
+
+    guard self.capturedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint captureSnapshotPayload: length(trim(snapshot)) > 0 "Snapshot payload is required"
+    mutate proposalId = proposalId
+    mutate revisionNumber = revisionNumber
+    mutate capturedByName = capturedByName
+    mutate capturedByAuthSubjectId = user.id
+    mutate changeSummary = changeSummary
+    mutate snapshot = snapshot
+    mutate capturedAt = now()
+    emit ProposalRevisionCaptured {
+      revisionId: self.id
+      tenantId: self.tenantId
+      proposalId: proposalId
+      revisionNumber: revisionNumber
+      changeSummary: changeSummary
+      capturedByName: capturedByName
+      capturedAt: now()
+    }
+  }
+
+  store ProposalRevision in durable
+}
+
+query listByProposal(proposalId: uuid): ProposalRevision[] {
+  assert proposalId != null
+  filter self.proposalId == proposalId
+  filter self.deletedAt == null
+  sort self.capturedAt desc
+}
+
+query getLatest(proposalId: uuid): ProposalRevision {
+  assert proposalId != null
+  filter self.proposalId == proposalId
+  filter self.deletedAt == null
+  filter self.capturedAt != null
+  sort self.capturedAt desc
+  limit 1
+}
+
+event ProposalRevisionCaptured: "proposal_revision.captured" {
+  revisionId: string
+  tenantId: string
+  proposalId: string
+  revisionNumber: int
+  changeSummary: string
+  capturedByName: string
+  capturedAt: datetime
+}
+
+// TypeScript types for the snapshot JSON structure
+// (These are comments for codegen reference)
+//
+// type ProposalRevisionSnapshot = {
+//   proposal: {
+//     id: string
+//     proposalNumber: string | null
+//     title: string
+//     eventDate: number | null
+//     eventType: string | null
+//     guestCount: number
+//     venueName: string | null
+//     venueAddress: string | null
+//     subtotal: number
+//     taxAmount: number
+//     discountAmount: number
+//     total: number
+//     expiresAt: number | null
+//     notes: string | null
+//     terms: string | null
+//     status: ProposalStatus
+//     draftedAt: number | null
+//     sentAt: number | null
+//   }
+//   client: {
+//     id: string
+//     name: string
+//   }
+//   dishSelections: Array<{
+//     id: string
+//     menuId: string
+//     menuName: string
+//     dishId: string
+//     dishName: string
+//     dishDescription: string | null
+//     quantityServings: number
+//     course: string | null
+//     serviceStyle: string | null
+//     specialInstructions: string | null
+//     selectedAt: number | null
+//   }>
+//   tenant: {
+//     name: string
+//   }
+// }

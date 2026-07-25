@@ -409,10 +409,6 @@ import {
   ShiftTypeDefineParamsSchema,
   ShiftTypeReactivateParamsSchema,
   ShiftTypeRetireParamsSchema,
-  SignatureRequestCompleteParamsSchema,
-  SignatureRequestExpireParamsSchema,
-  SignatureRequestRequestSignatureParamsSchema,
-  SignatureRequestRevokeParamsSchema,
   StaffMessageMarkReadParamsSchema,
   StaffMessageSendParamsSchema,
   StockCountLineConfirmLedgerMatchParamsSchema,
@@ -6266,67 +6262,6 @@ export function useCreateShiftType() {
   };
 }
 
-/** Reactive list for SignatureRequest. */
-export function useListSignatureRequest() {
-  return useQuery(api.queries.listSignatureRequest);
-}
-
-/** Reactive get-by-id for SignatureRequest. Pass "skip" to suspend. */
-export function useGetSignatureRequest(id: string | "skip") {
-  return useQuery(api.queries.getSignatureRequest, id === "skip" ? "skip" : { id: id as any });
-}
-
-/** Mutation hook for SignatureRequest.complete. */
-export function useSignatureRequestComplete() {
-  const mutate = useMutation(api.mutations.SignatureRequest_complete);
-  return (args: any) => {
-    const { docId, version, idempotencyKey, ...params } = args ?? {};
-    const parsed = SignatureRequestCompleteParamsSchema.parse(params) as Record<string, unknown>;
-    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
-  };
-}
-
-/** Mutation hook for SignatureRequest.expire. */
-export function useSignatureRequestExpire() {
-  const mutate = useMutation(api.mutations.SignatureRequest_expire);
-  return (args: any) => {
-    const { docId, version, idempotencyKey, ...params } = args ?? {};
-    const parsed = SignatureRequestExpireParamsSchema.parse(params) as Record<string, unknown>;
-    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
-  };
-}
-
-/** Mutation hook for SignatureRequest.requestSignature. */
-export function useSignatureRequestRequestSignature() {
-  const mutate = useMutation(api.mutations.SignatureRequest_requestSignature);
-  return (args: any) => {
-    const { docId, version, idempotencyKey, ...params } = args ?? {};
-    const parsed = SignatureRequestRequestSignatureParamsSchema.parse(params) as Record<string, unknown>;
-    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
-  };
-}
-
-/** Mutation hook for SignatureRequest.revoke. */
-export function useSignatureRequestRevoke() {
-  const mutate = useMutation(api.mutations.SignatureRequest_revoke);
-  return (args: any) => {
-    const { docId, version, idempotencyKey, ...params } = args ?? {};
-    const parsed = SignatureRequestRevokeParamsSchema.parse(params) as Record<string, unknown>;
-    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
-  };
-}
-
-/** Governed creation hook for SignatureRequest.requestSignature. */
-export function useCreateSignatureRequest() {
-  const mutate = useMutation(api.mutations.SignatureRequest_createViaRequestSignature);
-  return (args: any) => {
-    const { idempotencyKey, ...params } = args ?? {};
-    const parsed = SignatureRequestRequestSignatureParamsSchema.parse(params) as Record<string, unknown>;
-    const body = __convexArgsFromZod(parsed);
-    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
-  };
-}
-
 /** Reactive list for StaffMessage. */
 export function useListStaffMessage() {
   return useQuery(api.queries.listStaffMessage);
@@ -7723,4 +7658,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 821 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 814 as const;
