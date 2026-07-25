@@ -321,6 +321,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property accessNotes: string?
   property cateringNotes: string?
   property required capacity: int = 0
+  property onPremise: boolean?
   property required status: VenueStatus = "active"
   property registeredAt: datetime?
   property deactivatedAt: datetime?
@@ -344,6 +345,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
     name: string,
     venueType: VenueType,
     capacity: number,
+    optional onPremise: boolean,
     optional addressLine1: string,
     optional addressLine2: string,
     optional city: string,
@@ -364,6 +366,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
     mutate name = name
     mutate venueType = venueType
     mutate capacity = capacity
+    mutate onPremise = onPremise
     mutate addressLine1 = addressLine1
     mutate addressLine2 = addressLine2
     mutate city = city
@@ -382,12 +385,14 @@ entity Venue mixin TenantScoped, SoftDeletable {
       name: name
       venueType: venueType
       capacity: capacity
+      onPremise: onPremise
     }
   }
 
   command updateDetails(
     name: string,
     venueType: VenueType,
+    optional onPremise: boolean,
     optional addressLine1: string,
     optional addressLine2: string,
     optional city: string,
@@ -405,6 +410,7 @@ entity Venue mixin TenantScoped, SoftDeletable {
     constraint updateVenueName: length(trim(name)) > 0 "Venue name is required"
     mutate name = name
     mutate venueType = venueType
+    mutate onPremise = onPremise
     mutate addressLine1 = addressLine1
     mutate addressLine2 = addressLine2
     mutate city = city

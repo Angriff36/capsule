@@ -90,6 +90,7 @@ export function VenueDetailPage() {
         version: venue.version,
         name: String(data.get("name") ?? "").trim(),
         venueType: String(data.get("venueType")) as VenueType,
+        onPremise: data.get("onPremise") === "on",
         addressLine1:
           String(data.get("addressLine1") ?? "").trim() || undefined,
         addressLine2:
@@ -237,6 +238,22 @@ export function VenueDetailPage() {
                   </option>
                 ))}
               </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                On-Premise Venue
+              </label>
+              <div className="mt-2 flex items-center">
+                <input
+                  type="checkbox"
+                  name="onPremise"
+                  defaultChecked={venue.onPremise ?? false}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <span className="ml-2 text-sm text-gray-600">
+                  Check if this is an on-premise venue (catering at venue)
+                </span>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700">

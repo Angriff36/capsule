@@ -142,8 +142,8 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-[Emergency bridge — running bridge was not updated]
-Files: IMPLEMENTATION_PLAN.md (edit)
+[auto-bridge snapshot @ 10 changes]
+Files: IMPLEMENTATION_PLAN.md (edit), src/sales/payment.manifest (edit)
 
 # === END COGNILAYER ===
 
