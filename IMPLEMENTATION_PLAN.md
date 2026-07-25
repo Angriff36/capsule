@@ -1,13 +1,32 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (Occasion + ReferralSource Entities Complete)
+**Updated:** 2026-07-25 (Equipment Location Fields Complete)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-25 — Equipment Location Fields Complete:**
+
+**Implemented:**
+- ✅ `homeLocation: string?` and `currentLocation: string?` fields added to Equipment entity
+- ✅ `reviseDetails` command updated to accept location parameters
+- ✅ Generated schema includes both optional string fields (convex/schema.ts:387-388)
+- ✅ All 680 tests passing
+- ✅ TypeScript typecheck passing
+
+**Impact:**
+- Equipment Inventory (§11.1) now has location tracking foundation
+- Unblocks venue-based availability calculations (future work)
+- Logistics planning can now track equipment home/current locations
+
+**Verification:**
+- Schema regenerated with location fields
+- Full test suite passes (680 tests)
+- No breaking changes to existing equipment functionality
 
 **2026-07-25 — Foundation Entities Complete (Occasion + ReferralSource):**
 
@@ -1064,27 +1083,28 @@
 
 ---
 
-### 🟡 11.1 Equipment Inventory — PARTIAL
+### ✅ 11.1 Equipment Inventory — Location Fields DONE
 
 **Done:**
 - Ownership (owned/rental) + condition + value present
 - EquipmentCatalogPage.tsx:1-343 with UI
 - EquipmentCategory, EquipmentCondition
-
-**Gaps:**
-- NO location fields (homeLocation, currentLocation)
-- NO serialized assets vs bulk-count distinction (per spec)
+- **homeLocation + currentLocation fields added to Equipment entity** (2026-07-25)
+- **reviseDetails command updated to accept location parameters**
+- **Generated schema includes both optional string fields**
 
 **Evidence:**
-- Schema equipments.manifest lacks location fields
-- PackListsPage.tsx, PackListDetailPage.tsx for pack operations
-- logisticsRoutes.ts
+- `src/facilities/equipment.manifest` lines 49-50: `homeLocation: string?`, `currentLocation: string?`
+- `convex/schema.ts` lines 387-388: Generated fields in schema
+- `useEquipmentReviseDetails` hook accepts homeLocation/currentLocation parameters
 
-**Impact:** Blocks availability accuracy and logistics planning
+**Gaps:**
+- NO serialized assets vs bulk-count distinction (per spec)
+- Location fields not yet used in availability calculations (future work)
 
-**Next step:** Add homeLocation/currentLocation fields
+**Impact:** Unblocks logistics planning; fields ready for venue-based availability logic
 
-**Estimated effort:** Small
+**Estimated effort:** Small ✅ Complete
 
 **Dependencies:** Separation from food inventory (§10.5)
 

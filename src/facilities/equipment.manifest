@@ -46,6 +46,8 @@ entity Equipment mixin TenantScoped, SoftDeletable {
   property required condition: EquipmentCondition = "good"
   property required status: EquipmentStatus = "active"
   property conditionNote: string?
+  property homeLocation: string?
+  property currentLocation: string?
   property registeredAt: datetime?
   property retiredAt: datetime?
   property retirementReason: string?
@@ -105,7 +107,9 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     name: string,
     category: string,
     optional ownership: EquipmentOwnership,
-    optional purchaseValue: money(12, 2)
+    optional purchaseValue: money(12, 2),
+    optional homeLocation: string,
+    optional currentLocation: string
   ) {
     guard self.registeredAt != null
     guard self.status == "active"
@@ -117,6 +121,8 @@ entity Equipment mixin TenantScoped, SoftDeletable {
     mutate category = category
     mutate ownership = ownership != null ? ownership : self.ownership
     mutate purchaseValue = purchaseValue != null ? purchaseValue : self.purchaseValue
+    mutate homeLocation = homeLocation != null ? homeLocation : self.homeLocation
+    mutate currentLocation = currentLocation != null ? currentLocation : self.currentLocation
     emit EquipmentDetailsRevised {
       equipmentId: self.id
       tenantId: self.tenantId

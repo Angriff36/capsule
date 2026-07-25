@@ -143,7 +143,7 @@ Last: [first session]
 
 ## Last Session Bridge
 [auto-bridge snapshot @ 10 changes]
-Files: src/operations/event.manifest (edit), tests/proofs/event-closeout-lifecycle.runtime.test.ts (edit), src/import/external-record-link.manifest (edit), src/import/external-record-link.manifest (create)
+Files: src/app/nav.ts (edit), src/ui/icons.tsx (edit), src/app/App.tsx (edit), src/features/import/importRoutes.ts (create), src/features/import/ImportRunDetailPage.tsx (create), src/features/import/ImportRunsPage.tsx (create), src/features/import/TppEventParser.ts (create), src/features/import/ImportTypes.ts (create), src/features/clientPortal/ClientPortalPage.tsx (edit)
 
 # === END COGNILAYER ===
 

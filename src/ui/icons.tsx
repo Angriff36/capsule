@@ -124,3 +124,6 @@ export const WifiOffIcon = icon(
     <circle cx="8" cy="12" r="0.8" fill="currentColor" stroke="none" />
   </>,
 );
+export const DownloadIcon = icon(
+  <path d="M12 9v6M9 12l3 3 3-3M3 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />,
+);

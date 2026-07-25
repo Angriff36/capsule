@@ -26,10 +26,13 @@ const PORTAL_STAGES: EventStage[] = [
 ];
 
 const STAGE_NOTE: Record<EventStage, string> = {
+  quote: "A preliminary quote has been prepared for your event.",
   planning: "Your catering team is shaping the event details.",
   pending_approval: "The plan is in its final confirmation pass.",
   approved: "The event plan is confirmed and moving into preparation.",
+  sales_lock: "Event is locked for sales coordination.",
   executing: "Your event is in service now.",
+  final: "Service is complete. The team is finalizing details.",
   completed: "Service is complete. The team is wrapping up.",
   cancelled: "This event is no longer moving forward.",
   closed_out: "Your event is complete and fully wrapped up.",
