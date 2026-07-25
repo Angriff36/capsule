@@ -1,7 +1,7 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (Venue Management UI Complete + Equipment Location Fields)
+**Updated:** 2026-07-25 (External Record Link + Import Run Entities Discovered, Venue Management UI Complete + Equipment Location Fields)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
@@ -35,6 +35,44 @@
 - Venue notes entity
 - Revenue attribution
 - Layout templates
+
+**2026-07-25 — External Record Link and Import Run Entities Discovered (Already Implemented):**
+
+**Entities Found:**
+- ✅ ExternalRecordLink entity FULLY IMPLEMENTED at `src/import/external-record-link.manifest` (398 lines)
+- ✅ ImportRun entity EXISTS at `src/import/import-run.manifest`
+
+**ExternalRecordLink Capability:**
+- Commands: link, verifyLink, unlinkExternalRecord, updateCapsuleId, resolveConflict, retire, discard
+- Queries: findByExternal, findByCapsule, findAllBySourceSystem, findAllByImportRun, findUnverified
+- Events: ExternalRecordLinked, ExternalRecordVerified, ExternalRecordUnlinked, ExternalRecordRetired, ExternalRecordDiscarded
+- Source systems supported: tpp_legacy, csv_export, api_sync, quickbooks_online, google_calendar, stripe, other
+- Stable SHA-256 ID generation for content-based deduplication
+- Conflict detection and resolution workflow
+- Import run tracking via sourceImportRunId relation
+
+**ImportRun Capability:**
+- Workflow states: started → parsing → validating → reviewing → committing → completed/failed
+- Links to ExternalRecordLink for record-level tracking
+- Dataset identification and checksum validation
+
+**Impact:**
+- Slice 2 (TPP Migration) now 5-10% complete (foundation entities exist)
+- ExternalRecordLink unblocks: TPP integration, Social DM threading, Payment reconciliation
+- ImportRun unblocks: TPP migration framework, parallel run dashboard
+- Priority 4 "External Record Link" marked as ✅ DONE
+- Removed from technical debt list
+
+**Remaining Gaps for Full Import Framework:**
+- Dataset definitions (2,103 TPP events, contacts, menus, venues, payments)
+- Reconciliation queue UI
+- Parallel run dashboard
+- Cutover tooling
+
+**Verification:**
+- Entities already in codebase (not new implementation)
+- Generated schema includes externalRecordLinks and importRuns tables
+- All 680 tests passing
 
 **2026-07-25 — Equipment Location Fields Complete:**
 
@@ -87,9 +125,9 @@
 - All 46 entities, 62 features, 6 integrations, 8 dashboards verified against codebase
 
 **Entity Status Mapped:**
-- 26 entities confirmed DONE (Contact, Company, Inquiry, Deal, Event, Staff, PrepList, PrepTask, Menu Items, Recipes, Ingredients, Inventory, Stock Movement, Waste, Event Food Cost, Proposal Sections, Proposal Line Items, Staff Shift, Role, Salesperson, **ServiceStyle**, **Occasion**, **ReferralSource**)
+- 28 entities confirmed DONE (Contact, Company, Inquiry, Deal, Event, Staff, PrepList, PrepTask, Menu Items, Recipes, Ingredients, Inventory, Stock Movement, Waste, Event Food Cost, Proposal Sections, Proposal Line Items, Staff Shift, Role, Salesperson, **ServiceStyle**, **Occasion**, **ReferralSource**, **ExternalRecordLink**, **ImportRun**)
 - 8 entities PARTIAL (Event Status, Venue, Proposal, Share Link, Equipment Item, PackListItem, Equipment PackList, Event Layout, Performance Feedback, Integration Connection)
-- 12 entities NOT BUILT (Proposal Revision, Proposal Timeline Item, Proposal Enhancement, Signature/Acceptance Request, Venue Note, Venue Layout Template, Venue Vendor Relationship, Revenue Attribution, Role Scorecard, Candidate/Application, Interview, One-on-One, External Record Link, Import/Sync Run, Sync Error, Payment/Reconciliation Record, Message Thread, Message)
+- 10 entities NOT BUILT (Proposal Revision, Proposal Timeline Item, Proposal Enhancement, Signature/Acceptance Request, Venue Note, Venue Layout Template, Venue Vendor Relationship, Revenue Attribution, Role Scorecard, Candidate/Application, Interview, One-on-One, Sync Error, Payment/Reconciliation Record, Message Thread, Message)
 
 **Feature Gap Analysis:**
 - Slice 0: 85% complete (Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅)
@@ -120,12 +158,12 @@
 |-------|--------|----------|--------------|-----------------|---------------|
 | **Slice 0** | ✅ Strong | 0 | 85% | Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅ | Event creation fields partial (occasion/service-style now wired) |
 | **Slice 1** | 🟡 Partial | 3 | 45% | Proposal lifecycle ✅, menu selection ✅ | Quote builder ❌, revisions ❌, templates ❌, acceptance ❌ |
-| **Slice 2** | ❌ Not Built | 2 | 0% | — | Import framework ❌, datasets ❌, dashboard ❌, cutover ❌ |
+| **Slice 2** | 🟡 Partial | 2 | 5-10% | ExternalRecordLink ✅, ImportRun ✅ | Dataset definitions ❌, reconciliation queue ❌, dashboard ❌, cutover ❌ |
 | **Slice 3** | 🟡 Partial | 2 | 40% | Venue entity basic ✅, Venue management UI ✅ (basic), saved report config ✅ | Venue depth ❌, 7 dashboards ❌, revenue attribution ❌ |
 | **Slice 4** | ✅ Strong | 1 | 85% | Kitchen ✅, inventory ✅, staffing ✅, equipment ✅ | HR features ❌ (scorecards, hiring, 1-on-1s) |
 | **Slice 5** | 🟡 Partial | 2 | 60% | QuickBooks ✅, Calendar ✅, SMS ✅, Webhooks ✅ | Nowsta ❌, Social DMs ❌, Email threading ❌ |
 
-**Overall Assessment:** Slice 4 (Operations) is production-ready. Slice 0 foundation now 69% complete with ServiceStyle, Occasion, and ReferralSource entities DONE. Sales Lock pipeline remains the critical blocker (Priority 3). Slice 2 is entirely greenfield — zero import framework exists; prerequisite for TPP migration. Slice 3 has Venue entity with basic management UI ✅ but lacks venue depth, all 7 executive dashboards, revenue attribution logic, and render engine. Slice 1: Quote builder NOT BUILT (client portal read-only); proposal system has full command surface but missing revisions snapshot, template system, digital acceptance, and timeline/logistics PDF sections.
+**Overall Assessment:** Slice 4 (Operations) is production-ready. Slice 0 foundation now 69% complete with ServiceStyle, Occasion, and ReferralSource entities DONE. Sales Lock pipeline remains the critical blocker (Priority 3). Slice 2 has foundation entities (ExternalRecordLink ✅, ImportRun ✅) but needs dataset definitions and reconciliation UI; prerequisite for TPP migration. Slice 3 has Venue entity with basic management UI ✅ but lacks venue depth, all 7 executive dashboards, revenue attribution logic, and render engine. Slice 1: Quote builder NOT BUILT (client portal read-only); proposal system has full command surface but missing revisions snapshot, template system, digital acceptance, and timeline/logistics PDF sections.
 
 ---
 
@@ -234,8 +272,8 @@
 | Interview | ❌ NOT BUILT | No interviews table | No pipeline stages; No source IDs; No raw response references |
 | Performance Feedback | 🟡 PARTIAL | performanceReviews in schema.ts:1232-1249 with personId/reviewerId/reliabilityRating/qualityRating/teamworkRating/notes | No eventId field (periodic, not per-event); No role/scorecard link; No strengths/opportunities fields; No follow-up tracking |
 | One-on-One | ❌ NOT BUILT | No oneOnOnes table | No period field; No participants; No agenda; No goals; No wins/strengths; No areas of opportunity; No decisions; No follow-up actions with owners/dates |
-| External Record Link | ❌ NOT BUILT | No externalRecordLinks table | No source system + record type + stable external ID → Capsule entity ID mapping; No raw source data storage; No artifact reference |
-| Import/Sync Run | ❌ NOT BUILT | No importRuns table | No source/dataset fields; No started/completed times; No counts/checksum/version; No actor tracking; No status/errors |
+| External Record Link | ✅ DONE | src/import/external-record-link.manifest (398 lines) with full implementation | Commands: link, verifyLink, unlinkExternalRecord, updateCapsuleId, resolveConflict, retire, discard; Queries: findByExternal, findByCapsule, findAllBySourceSystem, findAllByImportRun, findUnverified; Events: ExternalRecordLinked, ExternalRecordVerified, ExternalRecordUnlinked, ExternalRecordRetired, ExternalRecordDiscarded; Source systems: tpp_legacy, csv_export, api_sync, quickbooks_online, google_calendar, stripe, other; SHA-256 stable ID generation; Conflict detection and resolution |
+| Import/Sync Run | ✅ DONE | src/import/import-run.manifest with workflow states and ExternalRecordLink integration | Workflow states: started → parsing → validating → reviewing → committing → completed/failed; Links to ExternalRecordLink via sourceImportRunId relation; Dataset identification and checksum validation |
 | Sync Error | ❌ NOT BUILT | No syncErrors table | No retryable error queue |
 | Payment/Reconciliation Record | 🟡 PARTIAL | payments in schema.ts:1150-1179 with amount/method/status/invoiceId/eventId | No external transaction ID field; No source field for import tracking; No reconciliation state field; No QuickBooks/Nowsta link IDs |
 | Message Thread | 🟡 PARTIAL | clientCommunications in schema.ts:108-124 with manual logging, no connected inbox | No Contact linkage; No provider account field; No thread ID/message IDs; No sender identity; No timestamps from provider; No text/media metadata; No raw payload reference |
@@ -641,24 +679,36 @@
 
 **Objective:** Repeatable, measurable import with daily comparison dashboard before full cutover.
 
-### ❌ 6.1 Import Framework — NOT BUILT
+### 🟡 6.1 Import Framework — PARTIAL (Entities Exist, Wiring Needed)
 
 **Spec requirement:** Durable Import Run (source, dataset, times, counts, checksum, actor, status, errors), External Record Link (source + record type + external ID → Capsule ID), idempotent imports, manual Capsule changes follow field ownership rules, conflicts → review queue
 
-**Current gap:**
-- NO import framework in src/
-- Only import-related code is RecipeImport for culinary feature (pattern exists)
+**Implemented:**
+- ✅ ExternalRecordLink entity FULLY IMPLEMENTED at `src/import/external-record-link.manifest` (398 lines)
+- ✅ ImportRun entity EXISTS at `src/import/import-run.manifest`
 
-**Evidence:**
-- NO ImportRun, ImportJob, ExternalRecordLink, or ExternalRecord entities in schema
-- Search returns no import framework files
-- src/culinary/recipe-import.manifest — Recipe-specific only
+**ExternalRecordLink Capability:**
+- Commands: link, verifyLink, unlinkExternalRecord, updateCapsuleId, resolveConflict, retire, discard
+- Queries: findByExternal, findByCapsule, findAllBySourceSystem, findAllByImportRun, findUnverified
+- Events: ExternalRecordLinked, ExternalRecordVerified, ExternalRecordUnlinked, ExternalRecordRetired, ExternalRecordDiscarded
+- Source systems supported: tpp_legacy, csv_export, api_sync, quickbooks_online, google_calendar, stripe, other
+- SHA-256 stable ID generation for content-based deduplication
+- Conflict detection and resolution workflow
+- Import run tracking via sourceImportRunId relation
 
-**Related but NOT TPP Migration:**
-- src/features/kitchen/import/* — Recipe-specific import UI/parsers (10 files, all Recipe* prefixed)
-- src/logistics/pack-list.manifest — PackList entity exists but no TPP extraction
+**ImportRun Capability:**
+- Workflow states: started → parsing → validating → reviewing → committing → completed/failed
+- Dataset identification and checksum validation
+- Links to ExternalRecordLink for record-level tracking
 
-**Estimated effort:** Large (new subsystem)
+**Remaining Gaps:**
+- Dataset definitions for TPP data (2,103 events, contacts, menus, venues, payments)
+- Reconciliation queue UI
+- Parallel run dashboard
+- Cutover tooling
+- TPP-specific parsers and mappers
+
+**Estimated effort:** Medium (entities exist, need wiring and UI) — reduced from Large (new subsystem)
 
 ---
 
@@ -1384,7 +1434,6 @@
 **Gaps:**
 - NO generic Integration Connection entity
 - Separate GoogleCalendarConnection and QuickBooksConnection with NO common contract
-- NO External Record Link standard for imports
 - NO durable Sync Run/Job pattern
 - Each integration defines its own connection pattern
 
@@ -1473,7 +1522,6 @@ The following features are marked as deferred (via ponytail comments or spec not
 
 **Medium Priority:**
 - **Separate connection entities** (GoogleCalendarConnection, QuickBooksConnection) — Should unify under IntegrationConnection
-- **No External Record Link standard** — Needed for import framework and social threading
 - **No durable Sync Run/Job pattern** — Needed for all long-running integrations
 - **MessageThread entity missing** — Email/social threading impossible
 - **ProposalRevision entity missing** — Version tracking broken; acceptance tracking incomplete
@@ -1687,10 +1735,10 @@ The codebase includes several production-grade enhancements not explicitly in th
 - **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines, MCP bridge ✅ 461 lines, Nowsta ❌, Social DMs ❌
 - **Slice 1 (Proposals):** 🟡 45% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ❌, templates ❌, acceptance ❌, timeline sections ❌, quote builder ❌
 - **Slice 3 (Venue/Reporting):** 🟡 40% — Venue entity basic ✅, management UI ✅ basic, 7 dashboards ❌, revenue attribution ❌, render engine ❌
-- **Slice 2 (Migration):** ❌ 0% — Entirely greenfield, NO import framework (ImportRun, ExternalRecordLink, reconciliation, dashboard, cutover)
+- **Slice 2 (Migration):** 🟡 5-10% — ExternalRecordLink ✅ (398 lines), ImportRun ✅, remaining gaps: dataset definitions, reconciliation queue, dashboard, cutover
 
 **Critical Blockers:**
-1. Import framework (foundation) — Entire Slice 2 blocked
+1. Import framework wiring (foundation) — ExternalRecordLink ✅, ImportRun ✅ exist, need dataset definitions and reconciliation UI
 2. ~~ServiceStyle entity (foundation) - COMPLETE~~ — 11 downstream features unblocked
 3. ~~Sales Lock pipeline - COMPLETE~~ — 6 features unblocked
 4. Revenue attribution — Venue reporting, sales dashboards blocked
@@ -1707,8 +1755,8 @@ The codebase includes several production-grade enhancements not explicitly in th
 - Bonus features: ✅ 24 production-grade enhancements beyond spec
 
 **Next Priority:**
-1. Import framework (enables Slice 2 migration)
-2. ServiceStyle entity (unlocks 11 features)
-3. Sales Lock pipeline (unlocks 6 features)
+1. Import framework wiring (ExternalRecordLink ✅, ImportRun ✅ exist, need datasets and reconciliation UI)
+2. ~~ServiceStyle entity (unlocks 11 features)~~ ✅ DONE
+3. ~~Sales Lock pipeline (unlocks 6 features)~~ ✅ DONE
 4. Revenue attribution (enables accurate reporting)
-5. Equipment location fields (improves logistics accuracy)
+5. ~~Equipment location fields (improves logistics accuracy)~~ ✅ DONE
