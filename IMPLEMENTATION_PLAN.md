@@ -1,13 +1,78 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (Performance Event Linkage Complete)
+**Updated:** 2026-07-25 (Role Scorecards Complete)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-25 — Role Scorecards Discovery (Priority 24):**
+
+**Status: ✅ DONE — Full implementation discovered during gap analysis**
+
+**Already Implemented:**
+- ✅ src/workforce/role-scorecard.manifest — Complete RoleScorecard entity (205 lines)
+- ✅ RoleScorecardsPage.tsx — Full UI with CRUD operations (533 lines)
+- ✅ Commands: define, activate, retire, revise
+- ✅ Versioning: versionNumber, versionLabel, effectiveDate
+- ✅ Measurable expectations: skills, responsibilities, standards, certifications
+- ✅ Events: RoleScorecardDefined, RoleScorecardActivated, RoleScorecardRetired, RoleScorecardRevised
+- ✅ Policies: roleScorecardRead, roleScorecardWrite, roleScorecardExecute
+- ✅ Routing: Wired in App.tsx at /staff/scorecards
+- ✅ Navigation: Entry in workforceRoutes.ts
+
+**Technical Notes:**
+- Entity supports draft → active → retired lifecycle
+- Versioning ensures historical assessments remain interpretable
+- Skills/responsibilities/standards stored as JSON arrays
+- Applicable scope filters scorecards by team/area
+- Integrates with PerformanceReview via eventId relation (Priority 25 ✅)
+
+**Impact:**
+- Priority 24 (Role Scorecards): ✅ DONE (discovered complete)
+- Unblocks: One-on-Ones (Priority 27) — staff development meetings
+- Slice 4 (Operations): Now 90% complete (HR features progressing)
+
+**Verification:**
+- All 704 tests passing
+- Typecheck passing
+- No format issues
+
+**Previous Update:**
+
+**2026-07-25 — Common Report Filters Complete (Priority 29):**
+
+**Status: ✅ DONE — On/off-premise venue filtering for finance reports**
+
+**Implemented:**
+- ✅ ReportFilterBar.tsx — Reusable filter bar component with venuePremise option
+- ✅ useFinanceReportFilters.ts — Shared filter hook with URLSearchParams for shareable state
+- ✅ FoodCostPercentagePage.tsx — Wired venue premise filtering
+- ✅ foodCostPercentage.ts — Extended FoodCostEvent type with venueId
+- ✅ Events filtered by venue.onPremise attribute
+- ✅ Closeouts filtered to only include filtered events
+
+**Technical Notes:**
+- Venue entity already has onPremise: boolean? field (event.manifest:324)
+- Filter state is shareable via URLSearchParams (existing implementation)
+- Export CSV respects filter (only filtered events/closeouts passed to buildFoodCostReport)
+- ReportFilterBar can be reused across all finance report pages
+
+**Impact:**
+- Priority 29 (Common Report Filters): ✅ DONE
+- Unblocks: Venue-specific reporting for operations and sales
+- Foundation for: All 7 executive dashboards (Slice 3)
+- Remaining: Apply ReportFilterBar to other report pages (ProfitMargin, RevenueTrends, etc.)
+
+**Verification:**
+- All 704 tests passing
+- Format check passing
+- Commit: 4df2d6a
+
+**Previous Update:**
 
 **2026-07-25 — Revenue Attribution UI Complete (Priority 5):**
 
@@ -2123,7 +2188,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 | 21 | **Venue Layout Templates** | Medium | Medium | Venue Profile | Operational efficiency - reusable layouts reduce setup time |
 | 22 | **Venue Notes Entity** | Medium | Medium | Venue Profile | Knowledge base - institutional memory about venues |
 | 23 | **Vendor Ecosystem** | Medium | Medium | Venue Profile | Vendor coordination - blocks approved vendor lists |
-| 24 | **Role Scorecards** | Medium | Medium | Performance tracking | HR management - defines measurable expectations |
+| ~~24~~ | **Role Scorecards** | Medium | Medium | Performance tracking | HR management - defines measurable expectations | ✅ DONE - Full manifest entity (role-scorecard.manifest), RoleScorecardsPage UI with CRUD, wired in App.tsx route /staff/scorecards, navigation in workforceRoutes.ts |
 | ~~25~~ | **Performance Event Linkage** | Small-Medium | Medium | None | Per-event feedback vs periodic only - HR evaluation granularity | ✅ DONE - eventId relation added to PerformanceReview entity, Event dropdown in PerformanceReviewsPage.tsx, all 704 tests passing |
 | 26 | **Hiring Pipeline** | Large | Medium | None | HR operations - tracks candidates through stages |
 | 27 | **One-on-Ones** | Medium | Medium | Role Scorecards | Staff development - structured manager meetings |
@@ -2133,7 +2198,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 | Priority | Item | Effort | Impact | Dependencies | Why |
 |----------|------|--------|--------|--------------|-----|
 | 28 | **Reporting Foundation + Render Engine** | Large | High | None | Enables all dashboards - leadership visibility |
-| 29 | **Common Report Filters** | Small-Medium | High | Venue on/off flag | On/off-premise flag; filter state sharing |
+| ~~29~~ | **Common Report Filters** | Small-Medium | High | Venue on/off flag | On/off-premise flag; filter state sharing | ✅ DONE |
 | ~~30~~ | **Cutover Tooling** | Large | Critical | Import Framework, Parallel Run Dashboard | Production migration execution - final step with rollback | ✅ DONE |
 
 ### Large (Slice 2 — Migration enabler)
@@ -2205,7 +2270,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 ---
 
-**Last updated:** 2026-07-25 (Revenue Attribution UI Complete)
+**Last updated:** 2026-07-25 (Common Report Filters Complete)
 **Spec version:** capsule-complete-feature-spec.md
 **Verification:** All 101 spec items verified against actual source code
 **Status snapshot:**
@@ -2263,8 +2328,11 @@ The codebase includes several production-grade enhancements not explicitly in th
 - ✅ Revenue attribution (UI complete, enables accurate reporting)
 - ✅ Equipment location fields (improves logistics accuracy)
 - ✅ Performance Event Linkage (unblocks per-event HR feedback granularity)
+- ✅ Role Scorecards (full manifest, UI, routing, unblocks One-on-Ones)
 
 **Next recommended:**
-1. Priority 29: Common Report Filters (Small-Medium, enables on/off-premise reporting)
-2. Priority 17: Venue Profile Full Depth (Large, high value but extensive work)
-3. Priority 24: Role Scorecards (Medium, now unblocked after Performance Event Linkage ✅)
+1. ~~Priority 29: Common Report Filters~~ ✅ DONE — ReportFilterBar with venuePremise filter, FoodCostPercentagePage wired, remaining: apply to other report pages
+2. ~~Priority 24: Role Scorecards~~ ✅ DONE — Full manifest, UI, routing complete
+3. Priority 27: One-on-Ones (Medium, now unblocked after Role Scorecards ✅)
+4. Priority 17: Venue Profile Full Depth (Large, high value but extensive work)
+5. Priority 28: Reporting Foundation + Render Engine (Large, enables all dashboards but less immediately valuable than basic filters)
