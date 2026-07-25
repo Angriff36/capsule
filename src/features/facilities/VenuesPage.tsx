@@ -67,6 +67,13 @@ export function VenuesPage() {
         venueType: String(data.get("venueType")) as VenueType,
         capacity: Number(data.get("capacity")),
         onPremise: data.get("onPremise") === "on",
+        kitchenAccess:
+          String(data.get("kitchenAccess") ?? "").trim() || undefined,
+        parkingAvailable: data.get("parkingAvailable") === "on",
+        hasFreightElevator: data.get("hasFreightElevator") === "on",
+        storageAvailable: data.get("storageAvailable") === "on",
+        logisticsNotes:
+          String(data.get("logisticsNotes") ?? "").trim() || undefined,
         addressLine1: String(data.get("addressLine1") ?? "").trim(),
         city: String(data.get("city") ?? "").trim(),
         region: String(data.get("region") ?? "").trim(),
@@ -166,6 +173,56 @@ export function VenuesPage() {
                 <span className="ml-2 text-sm text-gray-600">
                   Check if this is an on-premise venue
                 </span>
+              </div>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Logistics Information
+              </label>
+              <div className="mt-2 space-y-2">
+                <div>
+                  <label className="block text-xs text-gray-600">
+                    Kitchen Access
+                  </label>
+                  <input
+                    type="text"
+                    name="kitchenAccess"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                    placeholder="e.g., Full kitchen, warming station only, no kitchen"
+                  />
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="parkingAvailable"
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span className="ml-2 text-xs text-gray-600">
+                      Parking Available
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="hasFreightElevator"
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span className="ml-2 text-xs text-gray-600">
+                      Freight Elevator
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="storageAvailable"
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span className="ml-2 text-xs text-gray-600">
+                      Storage Available
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
             <div>
@@ -279,6 +336,17 @@ export function VenuesPage() {
               rows={2}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
               placeholder="Kitchen available, equipment restrictions..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Logistics Notes (load-in, waste, permits, etc.)
+            </label>
+            <textarea
+              name="logisticsNotes"
+              rows={2}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              placeholder="Loading dock access, stairs to second floor, dumpster location..."
             />
           </div>
           <div className="flex justify-end">

@@ -143,7 +143,7 @@ Last: [first session]
 
 ## Last Session Bridge
 [auto-bridge snapshot @ 10 changes]
-Files: IMPLEMENTATION_PLAN.md (edit), src/sales/payment.manifest (edit)
+Files: src/features/facilities/VenuesPage.tsx (edit), src/features/facilities/VenueDetailPage.tsx (edit), src/operations/event.manifest (edit)
 
 # === END COGNILAYER ===
 

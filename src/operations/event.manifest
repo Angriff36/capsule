@@ -322,6 +322,11 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property cateringNotes: string?
   property required capacity: int = 0
   property onPremise: boolean?
+  property kitchenAccess: string?
+  property parkingAvailable: boolean?
+  property hasFreightElevator: boolean?
+  property storageAvailable: boolean?
+  property logisticsNotes: string?
   property required status: VenueStatus = "active"
   property registeredAt: datetime?
   property deactivatedAt: datetime?
@@ -346,6 +351,11 @@ entity Venue mixin TenantScoped, SoftDeletable {
     venueType: VenueType,
     capacity: number,
     optional onPremise: boolean,
+    optional kitchenAccess: string,
+    optional parkingAvailable: boolean,
+    optional hasFreightElevator: boolean,
+    optional storageAvailable: boolean,
+    optional logisticsNotes: string,
     optional addressLine1: string,
     optional addressLine2: string,
     optional city: string,
@@ -367,6 +377,11 @@ entity Venue mixin TenantScoped, SoftDeletable {
     mutate venueType = venueType
     mutate capacity = capacity
     mutate onPremise = onPremise
+    mutate kitchenAccess = kitchenAccess
+    mutate parkingAvailable = parkingAvailable
+    mutate hasFreightElevator = hasFreightElevator
+    mutate storageAvailable = storageAvailable
+    mutate logisticsNotes = logisticsNotes
     mutate addressLine1 = addressLine1
     mutate addressLine2 = addressLine2
     mutate city = city
@@ -393,6 +408,11 @@ entity Venue mixin TenantScoped, SoftDeletable {
     name: string,
     venueType: VenueType,
     optional onPremise: boolean,
+    optional kitchenAccess: string,
+    optional parkingAvailable: boolean,
+    optional hasFreightElevator: boolean,
+    optional storageAvailable: boolean,
+    optional logisticsNotes: string,
     optional addressLine1: string,
     optional addressLine2: string,
     optional city: string,
@@ -411,6 +431,11 @@ entity Venue mixin TenantScoped, SoftDeletable {
     mutate name = name
     mutate venueType = venueType
     mutate onPremise = onPremise
+    mutate kitchenAccess = kitchenAccess
+    mutate parkingAvailable = parkingAvailable
+    mutate hasFreightElevator = hasFreightElevator
+    mutate storageAvailable = storageAvailable
+    mutate logisticsNotes = logisticsNotes
     mutate addressLine1 = addressLine1
     mutate addressLine2 = addressLine2
     mutate city = city

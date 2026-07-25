@@ -1,0 +1,143 @@
+// VenueNote — structured notes about venues for institutional memory.
+// Optional eventId links a note to a specific event at that venue.
+
+enum VenueNoteCategory {
+  access
+  logistics
+  catering
+  equipment
+  staffing
+  restrictions
+  policies
+  weather_contingency
+  other
+}
+
+enum VenueNoteVisibility {
+  public
+  internal
+  management_only
+}
+
+entity VenueNote mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required venueId: uuid
+  // Optional: link to a specific event that prompted this note
+  property eventId: uuid?
+  property required authorPersonId: uuid
+  property required authorName: string = ""
+  // Stamped from trusted auth context on post; never accepted from the browser
+  property authorAuthSubjectId: string?
+  property required category: VenueNoteCategory = "other"
+  property required content: string = ""
+  property isPinned: boolean = false
+  property required visibility: VenueNoteVisibility = "internal"
+  property postedAt: datetime?
+
+  belongsTo venue: Venue fields [tenantId, venueId] references [tenantId, id]
+  belongsTo event: Event? fields [tenantId, eventId] references [tenantId, id]
+  belongsTo author: Person fields [tenantId, authorPersonId] references [tenantId, id]
+
+  constraint venueNoteContent: self.postedAt == null or length(trim(self.content)) > 0 "Note content is required"
+
+  default policy venueNoteRead read: roleAllows(user.role, "eventAccess") "Event staff may read venue notes"
+  default policy venueNoteWrite write: roleAllows(user.role, "eventAccess") "Event staff may write venue notes through commands"
+  default policy venueNoteExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute venue note commands"
+
+  command post(
+    venueId: uuid,
+    optional eventId: uuid,
+    authorPersonId: uuid,
+    authorName: string,
+    category: VenueNoteCategory,
+    content: string,
+    optional visibility: VenueNoteVisibility,
+    optional isPinned: boolean
+  ) {
+    guard self.postedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint postVenueNoteContent: length(trim(content)) > 0 "Note content is required"
+    constraint postVenueNoteAuthor: length(trim(authorName)) > 0 "Author name is required"
+    mutate venueId = venueId
+    mutate eventId = eventId
+    mutate authorPersonId = authorPersonId
+    mutate authorName = authorName
+    mutate authorAuthSubjectId = user.id
+    mutate category = category
+    mutate content = content
+    mutate visibility = visibility
+    mutate isPinned = isPinned
+    mutate postedAt = now()
+    emit VenueNotePosted {
+      noteId: self.id
+      tenantId: self.tenantId
+      venueId: venueId
+      eventId: eventId
+      category: category
+      isPinned: isPinned
+    }
+  }
+
+  command revise(
+    content: string,
+    optional category: VenueNoteCategory,
+    optional visibility: VenueNoteVisibility
+  ) {
+    guard self.postedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint reviseVenueNoteContent: length(trim(content)) > 0 "Note content is required"
+    mutate content = content
+    mutate category = category
+    mutate visibility = visibility
+    emit VenueNoteRevised {
+      noteId: self.id
+      tenantId: self.tenantId
+      venueId: self.venueId
+      category: category
+      visibility: visibility
+    }
+  }
+
+  command pin() {
+    guard self.postedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate isPinned = true
+    emit VenueNotePinned {
+      noteId: self.id
+      tenantId: self.tenantId
+      venueId: self.venueId
+    }
+  }
+
+  command unpin() {
+    guard self.postedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate isPinned = false
+    emit VenueNoteUnpinned {
+      noteId: self.id
+      tenantId: self.tenantId
+      venueId: self.venueId
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    guard self.authorAuthSubjectId == user.id or roleAllows(user.role, "adminAccess")
+    mutate deletedAt = now()
+    emit VenueNoteRemoved {
+      noteId: self.id
+      tenantId: self.tenantId
+      venueId: self.venueId
+      eventId: self.eventId
+    }
+  }
+
+  store VenueNote in durable
+}
