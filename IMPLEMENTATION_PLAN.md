@@ -1,13 +1,44 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (Revenue Attribution + ImportDataset manifests wired, research completed)
+**Updated:** 2026-07-25 (Import Framework execution layer implemented)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-25 — Import Framework Execution Layer Implemented:**
+
+**Implemented:**
+- ✅ `convex/importCoordinator.ts` (847 lines) — Main import orchestrator coordinating parsing, validation, review, commit phases
+- ✅ `convex/tppParser.ts` — TPP data parser with field mapping transformations
+- ✅ `convex/importPipeline.ts` — Import pipeline definition with stage transitions, validation rules, and error strategies
+- ✅ Public API: startImport, getImportRunStatus, listImportRuns, parseTppImport, validateImport, beginReview, approveReview, finalizeImport
+- ✅ Internal API: loadImportContext, progressImportStage, parseTppData, validateParsedData, commitImport
+- ✅ All Convex codegen successful with TypeScript passing
+- ✅ All 694 tests passing
+
+**Functionality Delivered:**
+- Import run lifecycle: started → parsing → validating → reviewing → committing → completed/failed
+- TPP data parsing for events, contacts, venues, payments with field mapping transformations
+- Record counts tracking and validation
+- Error handling with retry strategies per stage
+- Stage transition validation with preconditions
+- Failure and revert support
+
+**Impact:**
+- Priority 1 (Import Framework): Execution layer ✅ DONE, remaining gaps are UI (reconciliation queue, parallel run dashboard)
+- Unblocks TPP migration framework - can now orchestrate imports end-to-end
+- Provides foundation for reconciliation queue UI and parallel run dashboard
+
+**Remaining Gaps (Import Framework):**
+- Reconciliation queue UI (frontend for reviewing unverified ExternalRecordLinks)
+- Parallel run dashboard (daily comparison of TPP vs Capsule data)
+- Cutover tooling (final delta import, zero critical unresolved mappings validation)
+
+**Previous Updates:**
 
 **2026-07-25 — Revenue Attribution + ImportDataset Manifests Wired:**
 
