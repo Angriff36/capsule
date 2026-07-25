@@ -487,6 +487,7 @@ export const EventSchema = z.object({
   clientId: z.string().uuid(),
   clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
   mergeTargetClientId: z.string().uuid().nullable().optional(),
+  serviceStyleId: z.string().uuid().nullable().optional(),
   venueId: z.string().uuid().nullable().optional(),
   assignedToId: z.string().uuid().nullable().optional(),
   title: z.string().default(""),
@@ -1801,6 +1802,31 @@ export const SavedReportDefinitionSchema = z.object({
 });
 
 export type SavedReportDefinition = z.infer<typeof SavedReportDefinitionSchema>;
+
+// Entity: ServiceStyle
+export const ServiceStyleSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  name: z.string().default(""),
+  code: z.string().default(""),
+  sortOrder: z.number().int().min(0).default(0),
+  description: z.string().nullable().optional(),
+  status: z.enum(["active", "inactive"]).default("active"),
+  registeredAt: z.coerce.date().nullable().optional(),
+  deactivatedAt: z.coerce.date().nullable().optional(),
+  deactivationReason: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+// Computed: ServiceStyle
+export const ServiceStyleComputedSchema = ServiceStyleSchema.extend({
+  isActive: z.boolean(),
+});
+
+export type ServiceStyle = z.infer<typeof ServiceStyleSchema>;
+export type ServiceStyleWithComputed = z.infer<typeof ServiceStyleComputedSchema>;
 
 // Entity: Shift
 export const ShiftSchema = z.object({
@@ -3228,6 +3254,7 @@ export const EventPlanEngagementParamsSchema = z.object({
   primaryContactName: z.string(),
   budgetAmount: z.number(),
   quotedPrice: z.number(),
+  serviceStyleId: z.string().min(1).optional(),
   venueId: z.string().min(1).optional(),
   venueName: z.string().optional(),
   venueAddress: z.string().optional(),
@@ -5295,6 +5322,37 @@ export const SavedReportDefinitionUpdateDefinitionParamsSchema = z.object({
 });
 
 export type SavedReportDefinitionUpdateDefinitionParams = z.infer<typeof SavedReportDefinitionUpdateDefinitionParamsSchema>;
+
+// Command: activate on ServiceStyle
+export const ServiceStyleActivateParamsSchema = z.object({});
+
+export type ServiceStyleActivateParams = z.infer<typeof ServiceStyleActivateParamsSchema>;
+
+// Command: deactivate on ServiceStyle
+export const ServiceStyleDeactivateParamsSchema = z.object({
+  reason: z.string(),
+});
+
+export type ServiceStyleDeactivateParams = z.infer<typeof ServiceStyleDeactivateParamsSchema>;
+
+// Command: register on ServiceStyle
+export const ServiceStyleRegisterParamsSchema = z.object({
+  name: z.string(),
+  code: z.string(),
+  sortOrder: z.number().optional(),
+  description: z.string().optional(),
+});
+
+export type ServiceStyleRegisterParams = z.infer<typeof ServiceStyleRegisterParamsSchema>;
+
+// Command: reviseDetails on ServiceStyle
+export const ServiceStyleReviseDetailsParamsSchema = z.object({
+  name: z.string(),
+  description: z.string().optional(),
+  sortOrder: z.number().optional(),
+});
+
+export type ServiceStyleReviseDetailsParams = z.infer<typeof ServiceStyleReviseDetailsParamsSchema>;
 
 // Command: applyApprovedSwap on Shift
 export const ShiftApplyApprovedSwapParamsSchema = z.object({});

@@ -82,6 +82,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip RecipeStep: no create command in IR (2 rows unused)
   // skip RecurringAvailability: no create command in IR (2 rows unused)
   // skip SavedReportDefinition: no create command in IR (2 rows unused)
+  // skip ServiceStyle: no create command in IR (2 rows unused)
   // skip Shift: no create command in IR (2 rows unused)
   // skip ShiftSwapRequest: no create command in IR (2 rows unused)
   // skip ShiftType: no create command in IR (2 rows unused)
@@ -470,6 +471,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "SavedReportDefinition",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "ServiceStyle",
       "createMutation": null,
       "rowCount": 2
     },

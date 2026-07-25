@@ -2,6 +2,7 @@
 // EventDish is authored in src/culinary/event-dish.manifest (culinary slice).
 
 use "../identity/person.manifest"
+use "./service-style.manifest"
 
 // ---------------------------------------------------------------------------
 // Closed vocabularies
@@ -476,6 +477,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   property required clientId: uuid
   property clientMergeAuthorizationId: uuid?
   property mergeTargetClientId: uuid?
+  property serviceStyleId: uuid?
   property venueId: uuid?
   property assignedToId: uuid?
   property required searchable title: string = ""
@@ -526,6 +528,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   belongsTo client: Client fields [tenantId, clientId] references [tenantId, id]
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
   ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
+  ref serviceStyle: ServiceStyle fields [tenantId, serviceStyleId] references [tenantId, id]
   ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
   ref recurrenceTemplateEvent: Event fields [tenantId, recurrenceTemplateEventId] references [tenantId, id]
@@ -597,6 +600,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     primaryContactName: string,
     budgetAmount: money(12, 2),
     quotedPrice: money(12, 2),
+    optional serviceStyleId: uuid,
     optional venueId: uuid,
     optional venueName: string,
     optional venueAddress: string,
@@ -624,6 +628,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate startsAt = startsAt
     mutate endsAt = endsAt
     mutate purchasingWeekStart = startsAt
+    mutate serviceStyleId = serviceStyleId
     mutate venueId = venueId
     mutate venueName = venueName
     mutate venueAddress = venueAddress
@@ -643,6 +648,7 @@ entity Event mixin TenantScoped, SoftDeletable {
       eventId: self.id
       tenantId: self.tenantId
       clientId: clientId
+      serviceStyleId: serviceStyleId
       venueId: venueId
       venueCapacity: venueCapacity
       startsAt: startsAt
@@ -1455,6 +1461,7 @@ event EventPlanned: "event.planned" {
   eventId: string
   tenantId: string
   clientId: string
+  serviceStyleId: string?
   venueId: string?
   venueCapacity: number?
   startsAt: datetime

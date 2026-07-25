@@ -78,6 +78,7 @@ describe("governed creation mappings", () => {
       "Recipe_createViaDraft",
       "RecurringAvailability_createViaDeclare",
       "SavedReportDefinition_createViaCreateDefinition",
+      "ServiceStyle_createViaRegister",
       "ShiftSwapRequest_createViaPropose",
       "ShiftType_createViaDefine",
       "Shift_createViaSchedule",

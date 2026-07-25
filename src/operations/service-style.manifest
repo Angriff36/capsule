@@ -1,0 +1,159 @@
+// Capsule event reference data — Service Style.
+// TPP migration requires: Full Service, Limited Service, Drop Off, Vending.
+// Events reference a Service Style for operational defaults and reporting.
+
+// ---------------------------------------------------------------------------
+// Closed vocabularies
+// ---------------------------------------------------------------------------
+
+enum ServiceStyleStatus {
+  active
+  inactive
+}
+
+// ---------------------------------------------------------------------------
+// ServiceStyle — first-class event service style concept
+// ---------------------------------------------------------------------------
+
+entity ServiceStyle mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Client-facing label (e.g., "Full Service", "Limited Service")
+  property required searchable name: string = ""
+  // Internal code/identifier for TPP mapping and system logic
+  property required code: string = ""
+  // Display order for UI pickers and sorting
+  property required sortOrder: int = 0
+  // Human-readable description for operational guidance
+  property description: string?
+  // Active/inactive state for retiring legacy values
+  property required status: ServiceStyleStatus = "active"
+  property registeredAt: datetime?
+  property deactivatedAt: datetime?
+  property deactivationReason: string?
+
+  // Events using this service style (inverse relation)
+  hasMany events: Event
+
+  computed isActive: boolean = self.status == "active"
+
+  constraint serviceStyleIdentityComplete: self.registeredAt == null or (length(trim(self.name)) > 0 and length(trim(self.code)) > 0) "Service styles require a name and code"
+  constraint serviceStyleSortNonnegative: self.sortOrder >= 0 "Display order cannot be negative"
+  constraint serviceStyleCodeUnique: self.registeredAt == null or count_of(query("ServiceStyle"), (s) => s.tenantId == self.tenantId and s.code == self.code and s.id != self.id and s.deletedAt == null) == 0 "Service style code must be unique within tenant"
+
+  transition status from "active" to ["inactive"]
+  transition status from "inactive" to ["active"]
+
+  default policy serviceStyleRead read: roleAllows(user.role, "eventAccess") or roleAllows(user.role, "salesAccess") "Event and sales staff may read service styles"
+  default policy serviceStyleWrite write: roleAllows(user.role, "eventManageAccess") "Event managers may write service styles through commands"
+  default policy serviceStyleExecute execute: roleAllows(user.role, "eventManageAccess") "Event managers may execute service style commands"
+
+  command register(
+    name: string,
+    code: string,
+    optional sortOrder: number,
+    optional description: string
+  ) {
+    guard self.registeredAt == null
+    guard self.deletedAt == null
+    constraint registerServiceStyleName: length(trim(name)) > 0 "Service style name is required"
+    constraint registerServiceStyleCode: length(trim(code)) > 0 "Service style code is required"
+    constraint registerServiceStyleSort: sortOrder == null or sortOrder >= 0 "Display order cannot be negative"
+    mutate name = name
+    mutate code = code
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate description = description
+    mutate status = "active"
+    mutate registeredAt = now()
+    emit ServiceStyleRegistered {
+      serviceStyleId: self.id
+      tenantId: self.tenantId
+      name: name
+      code: code
+      sortOrder: sortOrder != null ? sortOrder : 0
+    }
+  }
+
+  command reviseDetails(
+    name: string,
+    optional description: string,
+    optional sortOrder: number
+  ) {
+    guard self.registeredAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint reviseServiceStyleName: length(trim(name)) > 0 "Service style name is required"
+    constraint reviseServiceStyleSort: sortOrder == null or sortOrder >= 0 "Display order cannot be negative"
+    mutate name = name
+    mutate description = description
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    emit ServiceStyleDetailsRevised {
+      serviceStyleId: self.id
+      tenantId: self.tenantId
+      name: name
+      sortOrder: sortOrder != null ? sortOrder : self.sortOrder
+    }
+  }
+
+  command deactivate(reason: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    constraint deactivateServiceStyleReason: length(trim(reason)) > 0 "Deactivation reason is required"
+    mutate status = "inactive"
+    mutate deactivatedAt = now()
+    mutate deactivationReason = reason
+    emit ServiceStyleDeactivated {
+      serviceStyleId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command activate() {
+    guard self.status == "inactive"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    mutate status = "active"
+    mutate deactivatedAt = null
+    mutate deactivationReason = null
+    emit ServiceStyleActivated {
+      serviceStyleId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store ServiceStyle in durable
+}
+
+// ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+
+event ServiceStyleRegistered: "service_style.registered" {
+  serviceStyleId: string
+  tenantId: string
+  name: string
+  code: string
+  sortOrder: number
+}
+
+event ServiceStyleDetailsRevised: "service_style.details_revised" {
+  serviceStyleId: string
+  tenantId: string
+  name: string
+  sortOrder: number
+}
+
+event ServiceStyleDeactivated: "service_style.deactivated" {
+  serviceStyleId: string
+  tenantId: string
+  reason: string
+}
+
+event ServiceStyleActivated: "service_style.activated" {
+  serviceStyleId: string
+  tenantId: string
+}

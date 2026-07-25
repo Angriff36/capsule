@@ -346,6 +346,10 @@ import {
   SavedReportDefinitionRenameParamsSchema,
   SavedReportDefinitionRestoreParamsSchema,
   SavedReportDefinitionUpdateDefinitionParamsSchema,
+  ServiceStyleActivateParamsSchema,
+  ServiceStyleDeactivateParamsSchema,
+  ServiceStyleRegisterParamsSchema,
+  ServiceStyleReviseDetailsParamsSchema,
   ShiftApplyApprovedSwapParamsSchema,
   ShiftCancelParamsSchema,
   ShiftCompleteParamsSchema,
@@ -5363,6 +5367,67 @@ export function useCreateSavedReportDefinition() {
   };
 }
 
+/** Reactive list for ServiceStyle. */
+export function useListServiceStyle() {
+  return useQuery(api.queries.listServiceStyle);
+}
+
+/** Reactive get-by-id for ServiceStyle. Pass "skip" to suspend. */
+export function useGetServiceStyle(id: string | "skip") {
+  return useQuery(api.queries.getServiceStyle, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ServiceStyle.activate. */
+export function useServiceStyleActivate() {
+  const mutate = useMutation(api.mutations.ServiceStyle_activate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ServiceStyleActivateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ServiceStyle.deactivate. */
+export function useServiceStyleDeactivate() {
+  const mutate = useMutation(api.mutations.ServiceStyle_deactivate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ServiceStyleDeactivateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ServiceStyle.register. */
+export function useServiceStyleRegister() {
+  const mutate = useMutation(api.mutations.ServiceStyle_register);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ServiceStyleRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ServiceStyle.reviseDetails. */
+export function useServiceStyleReviseDetails() {
+  const mutate = useMutation(api.mutations.ServiceStyle_reviseDetails);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ServiceStyleReviseDetailsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for ServiceStyle.register. */
+export function useCreateServiceStyle() {
+  const mutate = useMutation(api.mutations.ServiceStyle_createViaRegister);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = ServiceStyleRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for Shift. */
 export function useListShift() {
   return useQuery(api.queries.listShift);
@@ -6931,4 +6996,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 737 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 744 as const;
