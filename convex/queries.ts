@@ -3943,6 +3943,26 @@ export const listExternalRecordLinkBySourceImportRunId = query({
   },
 });
 
+export const listUnverifiedExternalRecordLinks = query({
+  args: { sourceSystem: v.optional(v.union(v.literal("tpp_legacy"), v.literal("csv_export"), v.literal("api_sync"), v.literal("quickbooks_online"), v.literal("google_calendar"), v.literal("stripe"), v.literal("other"))) },
+  handler: async (ctx, { sourceSystem }) => {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = (__auth.user ?? __auth) as any;
+    if (!__allowsRead("externalRecordLinkRead", "ExternalRecordLink", () => checkRole(user, "importAccess"))) return [];
+    const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
+    let rows = await ctx.db.query("externalRecordLinks").withIndex("by_tenantId", (q) => q.eq("tenantId", __tenant)).collect();
+    rows = rows.filter((d) => (d as any).deletedAt == null);
+    // Filter for unverified records
+    rows = rows.filter((d) => (d as any).verified === false);
+    // Optionally filter by source system
+    if (sourceSystem) {
+      rows = rows.filter((d) => (d as any).sourceSystem === sourceSystem);
+    }
+    const __plainRows = rows;
+    return __plainRows;
+  },
+});
+
 export const listImportDataset = query({
   args: {},
   handler: async (ctx) => {

@@ -6,6 +6,7 @@ const sections = [
   { label: "Branding", path: "/admin/branding" },
   { label: "Data exports", path: "/admin/data-export" },
   { label: "Integrations", path: "/admin/integrations" },
+  { label: "Reconcile records", path: "/admin/reconcile" },
 ] as const;
 
 export function AdminWorkspaceNav() {

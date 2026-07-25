@@ -277,6 +277,11 @@ const IntegrationsPage = lazy(() =>
     default: module.IntegrationsPage,
   })),
 );
+const ExternalRecordsReconcilePage = lazy(() =>
+  import("../features/admin/import/ExternalRecordsReconcilePage").then((module) => ({
+    default: module.ExternalRecordsReconcilePage,
+  })),
+);
 const MyDayPage = lazy(() =>
   import("../features/staff/MyDayPage").then((module) => ({
     default: module.MyDayPage,
@@ -826,6 +831,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <IntegrationsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/reconcile"
+              element={
+                <SupplyRoute>
+                  <ExternalRecordsReconcilePage />
                 </SupplyRoute>
               }
             />
