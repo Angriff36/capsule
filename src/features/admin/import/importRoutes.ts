@@ -19,3 +19,8 @@ export const reconcilePath = () => "/admin/reconcile";
  * Path to import datasets management
  */
 export const importDatasetsPath = () => "/admin/import-datasets";
+
+/**
+ * Path to parallel run dashboard
+ */
+export const parallelRunDashboardPath = () => "/admin/parallel-run";

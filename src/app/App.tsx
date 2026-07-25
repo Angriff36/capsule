@@ -294,6 +294,13 @@ const ImportRunDetailPage = lazy(() =>
     default: module.ImportRunDetailPage,
   })),
 );
+const ParallelRunDashboardPage = lazy(() =>
+  import("../features/admin/import/ParallelRunDashboardPage").then(
+    (module) => ({
+      default: module.ParallelRunDashboardPage,
+    }),
+  ),
+);
 const MyDayPage = lazy(() =>
   import("../features/staff/MyDayPage").then((module) => ({
     default: module.MyDayPage,
@@ -859,6 +866,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ImportRunDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/admin/parallel-run"
+              element={
+                <SupplyRoute>
+                  <ParallelRunDashboardPage />
                 </SupplyRoute>
               }
             />

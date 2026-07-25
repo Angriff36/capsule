@@ -7,6 +7,7 @@ const sections = [
   { label: "Data exports", path: "/admin/data-export" },
   { label: "Integrations", path: "/admin/integrations" },
   { label: "Import runs", path: "/admin/imports" },
+  { label: "Parallel run", path: "/admin/parallel-run" },
   { label: "Reconcile records", path: "/admin/reconcile" },
 ] as const;
 
