@@ -452,6 +452,21 @@ describe("Manifest Convex contract", () => {
   it("exports mutation ExternalRecordLink_verifyLink", () => {
     expect(typeof (mutations as any).ExternalRecordLink_verifyLink).toBe("function");
   });
+  it("exports mutation ImportDataset_activate", () => {
+    expect(typeof (mutations as any).ImportDataset_activate).toBe("function");
+  });
+  it("exports mutation ImportDataset_deactivate", () => {
+    expect(typeof (mutations as any).ImportDataset_deactivate).toBe("function");
+  });
+  it("exports mutation ImportDataset_recordLastImport", () => {
+    expect(typeof (mutations as any).ImportDataset_recordLastImport).toBe("function");
+  });
+  it("exports mutation ImportDataset_register", () => {
+    expect(typeof (mutations as any).ImportDataset_register).toBe("function");
+  });
+  it("exports mutation ImportDataset_updateConfig", () => {
+    expect(typeof (mutations as any).ImportDataset_updateConfig).toBe("function");
+  });
   it("exports mutation ImportRun_approveReview", () => {
     expect(typeof (mutations as any).ImportRun_approveReview).toBe("function");
   });
@@ -1100,6 +1115,24 @@ describe("Manifest Convex contract", () => {
   it("exports mutation ReferralSource_reviseDetails", () => {
     expect(typeof (mutations as any).ReferralSource_reviseDetails).toBe("function");
   });
+  it("exports mutation RevenueAttribution_apply", () => {
+    expect(typeof (mutations as any).RevenueAttribution_apply).toBe("function");
+  });
+  it("exports mutation RevenueAttribution_approve", () => {
+    expect(typeof (mutations as any).RevenueAttribution_approve).toBe("function");
+  });
+  it("exports mutation RevenueAttribution_create", () => {
+    expect(typeof (mutations as any).RevenueAttribution_create).toBe("function");
+  });
+  it("exports mutation RevenueAttribution_reject", () => {
+    expect(typeof (mutations as any).RevenueAttribution_reject).toBe("function");
+  });
+  it("exports mutation RevenueAttribution_requestApproval", () => {
+    expect(typeof (mutations as any).RevenueAttribution_requestApproval).toBe("function");
+  });
+  it("exports mutation RevenueAttribution_update", () => {
+    expect(typeof (mutations as any).RevenueAttribution_update).toBe("function");
+  });
   it("exports mutation SavedReportDefinition_archive", () => {
     expect(typeof (mutations as any).SavedReportDefinition_archive).toBe("function");
   });
@@ -1400,6 +1433,15 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Venue_updateDetails", () => {
     expect(typeof (mutations as any).Venue_updateDetails).toBe("function");
   });
+  it("exports mutation VenueCommissionTerm_define", () => {
+    expect(typeof (mutations as any).VenueCommissionTerm_define).toBe("function");
+  });
+  it("exports mutation VenueCommissionTerm_retire", () => {
+    expect(typeof (mutations as any).VenueCommissionTerm_retire).toBe("function");
+  });
+  it("exports mutation VenueCommissionTerm_revise", () => {
+    expect(typeof (mutations as any).VenueCommissionTerm_revise).toBe("function");
+  });
   it("exports mutation WasteRecord_record", () => {
     expect(typeof (mutations as any).WasteRecord_record).toBe("function");
   });
@@ -1426,4 +1468,4 @@ describe("Manifest Convex contract", () => {
   });
 });
 
-export const MANIFEST_CONTRACT_TEST_COUNT = 473 as const;
+export const MANIFEST_CONTRACT_TEST_COUNT = 487 as const;

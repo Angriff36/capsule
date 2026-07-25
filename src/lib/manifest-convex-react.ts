@@ -150,6 +150,11 @@ import {
   ExternalRecordLinkUnlinkExternalRecordParamsSchema,
   ExternalRecordLinkUpdateCapsuleIdParamsSchema,
   ExternalRecordLinkVerifyLinkParamsSchema,
+  ImportDatasetActivateParamsSchema,
+  ImportDatasetDeactivateParamsSchema,
+  ImportDatasetRecordLastImportParamsSchema,
+  ImportDatasetRegisterParamsSchema,
+  ImportDatasetUpdateConfigParamsSchema,
   ImportRunApproveReviewParamsSchema,
   ImportRunBeginReviewParamsSchema,
   ImportRunCommitParamsSchema,
@@ -366,6 +371,12 @@ import {
   ReferralSourceDeactivateParamsSchema,
   ReferralSourceRegisterParamsSchema,
   ReferralSourceReviseDetailsParamsSchema,
+  RevenueAttributionApplyParamsSchema,
+  RevenueAttributionApproveParamsSchema,
+  RevenueAttributionCreateParamsSchema,
+  RevenueAttributionRejectParamsSchema,
+  RevenueAttributionRequestApprovalParamsSchema,
+  RevenueAttributionUpdateParamsSchema,
   SavedReportDefinitionArchiveParamsSchema,
   SavedReportDefinitionChangeSharingParamsSchema,
   SavedReportDefinitionCreateDefinitionParamsSchema,
@@ -463,6 +474,9 @@ import {
   VendorUpdateDetailsParamsSchema,
   VenueActivateParamsSchema,
   VenueChangeCapacityParamsSchema,
+  VenueCommissionTermDefineParamsSchema,
+  VenueCommissionTermRetireParamsSchema,
+  VenueCommissionTermReviseParamsSchema,
   VenueDeactivateParamsSchema,
   VenueRegisterParamsSchema,
   VenueUpdateDetailsParamsSchema,
@@ -2685,6 +2699,66 @@ export function useCreateExternalRecordLink() {
     const parsed = ExternalRecordLinkDiscardParamsSchema.parse(params) as Record<string, unknown>;
     const body = __convexArgsFromZod(parsed);
     return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
+/** Reactive list for ImportDataset. */
+export function useListImportDataset() {
+  return useQuery(api.queries.listImportDataset);
+}
+
+/** Reactive get-by-id for ImportDataset. Pass "skip" to suspend. */
+export function useGetImportDataset(id: string | "skip") {
+  return useQuery(api.queries.getImportDataset, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for ImportDataset.activate. */
+export function useImportDatasetActivate() {
+  const mutate = useMutation(api.mutations.ImportDataset_activate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ImportDatasetActivateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ImportDataset.deactivate. */
+export function useImportDatasetDeactivate() {
+  const mutate = useMutation(api.mutations.ImportDataset_deactivate);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ImportDatasetDeactivateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ImportDataset.recordLastImport. */
+export function useImportDatasetRecordLastImport() {
+  const mutate = useMutation(api.mutations.ImportDataset_recordLastImport);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ImportDatasetRecordLastImportParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ImportDataset.register. */
+export function useImportDatasetRegister() {
+  const mutate = useMutation(api.mutations.ImportDataset_register);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ImportDatasetRegisterParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for ImportDataset.updateConfig. */
+export function useImportDatasetUpdateConfig() {
+  const mutate = useMutation(api.mutations.ImportDataset_updateConfig);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ImportDatasetUpdateConfigParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
 
@@ -5645,6 +5719,76 @@ export function useCreateReferralSource() {
   };
 }
 
+/** Reactive list for RevenueAttribution. */
+export function useListRevenueAttribution() {
+  return useQuery(api.queries.listRevenueAttribution);
+}
+
+/** Reactive get-by-id for RevenueAttribution. Pass "skip" to suspend. */
+export function useGetRevenueAttribution(id: string | "skip") {
+  return useQuery(api.queries.getRevenueAttribution, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for RevenueAttribution.apply. */
+export function useRevenueAttributionApply() {
+  const mutate = useMutation(api.mutations.RevenueAttribution_apply);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RevenueAttributionApplyParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RevenueAttribution.approve. */
+export function useRevenueAttributionApprove() {
+  const mutate = useMutation(api.mutations.RevenueAttribution_approve);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RevenueAttributionApproveParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RevenueAttribution.create. */
+export function useRevenueAttributionCreate() {
+  const mutate = useMutation(api.mutations.RevenueAttribution_create);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RevenueAttributionCreateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RevenueAttribution.reject. */
+export function useRevenueAttributionReject() {
+  const mutate = useMutation(api.mutations.RevenueAttribution_reject);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RevenueAttributionRejectParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RevenueAttribution.requestApproval. */
+export function useRevenueAttributionRequestApproval() {
+  const mutate = useMutation(api.mutations.RevenueAttribution_requestApproval);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RevenueAttributionRequestApprovalParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for RevenueAttribution.update. */
+export function useRevenueAttributionUpdate() {
+  const mutate = useMutation(api.mutations.RevenueAttribution_update);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = RevenueAttributionUpdateParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Reactive list for SavedReportDefinition. */
 export function useListSavedReportDefinition() {
   return useQuery(api.queries.listSavedReportDefinition);
@@ -7212,6 +7356,57 @@ export function useCreateVenue() {
   };
 }
 
+/** Reactive list for VenueCommissionTerm. */
+export function useListVenueCommissionTerm() {
+  return useQuery(api.queries.listVenueCommissionTerm);
+}
+
+/** Reactive get-by-id for VenueCommissionTerm. Pass "skip" to suspend. */
+export function useGetVenueCommissionTerm(id: string | "skip") {
+  return useQuery(api.queries.getVenueCommissionTerm, id === "skip" ? "skip" : { id: id as any });
+}
+
+/** Mutation hook for VenueCommissionTerm.define. */
+export function useVenueCommissionTermDefine() {
+  const mutate = useMutation(api.mutations.VenueCommissionTerm_define);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueCommissionTermDefineParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VenueCommissionTerm.retire. */
+export function useVenueCommissionTermRetire() {
+  const mutate = useMutation(api.mutations.VenueCommissionTerm_retire);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueCommissionTermRetireParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for VenueCommissionTerm.revise. */
+export function useVenueCommissionTermRevise() {
+  const mutate = useMutation(api.mutations.VenueCommissionTerm_revise);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueCommissionTermReviseParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Governed creation hook for VenueCommissionTerm.define. */
+export function useCreateVenueCommissionTerm() {
+  const mutate = useMutation(api.mutations.VenueCommissionTerm_createViaDefine);
+  return (args: any) => {
+    const { idempotencyKey, ...params } = args ?? {};
+    const parsed = VenueCommissionTermDefineParamsSchema.parse(params) as Record<string, unknown>;
+    const body = __convexArgsFromZod(parsed);
+    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
+  };
+}
+
 /** Reactive list for WasteRecord. */
 export function useListWasteRecord() {
   return useQuery(api.queries.listWasteRecord);
@@ -7355,4 +7550,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 781 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 802 as const;

@@ -1,13 +1,46 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-25 (External Record Link + Import Run Entities Discovered, Venue Management UI Complete + Equipment Location Fields)
+**Updated:** 2026-07-25 (Revenue Attribution + ImportDataset manifests wired, research completed)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-25 — Revenue Attribution + ImportDataset Manifests Wired:**
+
+**Wired:**
+- ✅ `use "./finance/revenue-attribution.manifest"` added to app.manifest
+- ✅ `use "./import/import-dataset.manifest"` added to app.manifest
+- ✅ Manifest regeneration successful - all 694 tests pass
+- ✅ Entities now in schema: importDatasets (line 804), revenueAttributions (line 1761), venueCommissionTerms (line 2371)
+- ✅ React hooks generated: useRevenueAttribution*, useVenueCommissionTerm*, useImportDataset*
+
+**Research Findings:**
+- **ImportDataset entity EXISTS** with 6 complete TPP field mappings (91 fields total):
+  - TPP_EVENT_MAPPINGS (27 fields)
+  - TPP_CONTACT_MAPPINGS (11 fields)
+  - TPP_COMPANY_MAPPINGS (11 fields)
+  - TPP_LEAD_MAPPINGS (14 fields)
+  - TPP_VENUE_MAPPINGS (17 fields)
+  - TPP_PAYMENT_MAPPINGS (11 fields)
+- **RevenueAttribution manifest EXISTS** (330 lines) with:
+  - VenueCommissionTerm entity - define/revise/retire commands
+  - RevenueAttribution entity - create/approve/reject/apply workflow
+  - Was NOT wired to app.manifest (now fixed)
+
+**Impact:**
+- Priority 5 (Revenue Attribution): ✅ Manifest wired, remaining gaps are UI/reporting integration
+- Priority 1-2 (Import Framework): Dataset definitions ✅ DONE, remaining gaps are execution code + UI
+- All 694 tests passing
+
+**Remaining Gaps:**
+- Revenue Attribution: UI layer, Event snapshot field, venue reporting integration
+- Import Framework: Parser/transformer code, Import coordinator, Reconciliation queue UI, Parallel run dashboard
+
+**Previous Updates:**
 
 **2026-07-25 — Venue Management UI Complete (Basic):**
 
@@ -120,8 +153,8 @@
 **2026-07-24 — Complete Gap Analysis Integration:**
 
 **Comprehensive Inventory:**
-- 101 total spec items catalogued (42 done, 28 partial, 31 not built)
-- 67% overall completeness
+- 101 total spec items catalogued (44 done, 28 partial, 29 not built)
+- 69% overall completeness
 - All 46 entities, 62 features, 6 integrations, 8 dashboards verified against codebase
 
 **Entity Status Mapped:**
@@ -1611,12 +1644,12 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 | Priority | Item | Effort | Impact | Dependencies | Why First | Status |
 |----------|------|--------|--------|--------------|-----------|--------|
-| 1 | **Import Framework** | XLarge | Critical | None | Foundation for entire TPP migration - blocks Slice 2 | ❌ |
-| 2 | **Import Datasets** | XLarge | Critical | Import Framework | Events/Contacts/Leads/Menu/Venues/Payments import - 2,103 TPP events need migration path | ❌ |
+| 1 | **Import Framework** | Large | Critical | None | Foundation for entire TPP migration - blocks Slice 2 | 🟡 Entities ✅, need execution + UI |
+| 2 | **Import Datasets** | Medium | Critical | None | Events/Contacts/Leads/Menu/Venues/Payments import - 2,103 TPP events | ✅ DONE - 6 datasets with 91 fields mapped |
 | ~~3~~ | **Service Style Entity** | Medium | High | None | Foundational enum for operations - blocks 11 downstream features | ✅ DONE |
 | ~~3~~ | **Sales Lock Pipeline** | Medium | High | None (ServiceStyle ✅) | Quote → Sales Lock → Confirmed pipeline is core sales workflow | ✅ DONE |
 | 4 | **External Record Link** | Medium | High | Import Framework | Stable external ID mapping - prerequisite for all TPP integration | ✅ DONE |
-| 5 | **Revenue Attribution** | Large | High | Sales Lock | Commission calculation and reporting - blocks sales incentives | ❌ |
+| 5 | **Revenue Attribution** | Medium | High | Sales Lock | Commission calculation and reporting - blocks sales incentives | 🟡 Manifest ✅ wired, need UI + reporting |
 | 6 | **Event Status Pipeline** | Large | High | None (ServiceStyle ✅) | Sales workflow complete - blocks proposal-to-event conversion | ✅ Sales Lock DONE |
 | 7 | **Occasion Entity** | Small | High | None | Event categorization - blocks reporting by occasion | ✅ DONE |
 | 8 | **Referral Source Entity** | Small | High | None | Lead tracking and marketing ROI - blocks source attribution | ✅ DONE |
@@ -1726,7 +1759,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 ---
 
-**Last updated:** 2026-07-24 (Complete Gap Analysis Update)
+**Last updated:** 2026-07-25 (External Record Link + Import Run Entities Discovered)
 **Spec version:** capsule-complete-feature-spec.md
 **Verification:** All 101 spec items verified against actual source code
 **Status snapshot:**

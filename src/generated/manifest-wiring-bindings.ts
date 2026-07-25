@@ -6,7 +6,7 @@
  * trusted-context injection helpers, and invalidation metadata.
  */
 
-export const WIRING_CONTRACT_HASH = "02b2674c6e44510a2eabac4a11423d05bf3829b1efadd2949ed73d27472c4d35:0316c79111f8aecc2a5b6841ff2be359239be8cb207727655dcf8ba4ccd2c3e4:063098d983627c3f373f099c9ce3c6eccd5000574581d3ecb66c7c30a83b04ec:0a9f778281608cd26bb45eaeabccf8dc2ec51f97fb5a4f3b637ddca88919dcf6:0f5f4fe542932fa133ec9d857a43dd1f154fd5915cb9104048bed9f9180b34f1:1854a8f2359e581edc177de41a884783adcbcc85bfca1efe56fa53942d9bb922:1b133d69870f688ffa7bf0bb784275c18b7a9bf5d73d40624b1957b5c366a9c2:2384313b99425303fa556c75f79b9884d057d3bd6071ee748d39d560060d170f:24a28a86ed8d5207cebd1e31bc068bb1065c0f925e17f683711d771b797f0a94:32f51dd9ae7a652a2973f8589a259c355bb6c65bbfb7abed64f0777d35083bce:34acaa884f2cf0bb9e2bb301781e0b8493bb0020d7ff964d1b4c874b7e892f34:3c22302c6a65bf6ab32c3c77bbd6ac1134cef0bc1a0ce748aa239dc8b696540b:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:3e7c1710e05670a2800bffb82dbf3607cde483da977fc26484f9708d71054db2:49e8712d17029f56c9fbcfe07725636976ab9e9162711104778f495c48f4f66a:4c9eaacf7e582b38d786ebc07601a7158093608fb2a3eddb96b2c0e3ef1758c8:57b83c655e43c341dadff6f6967aed2edcaa7401db6e3e813b941c9d9ec1f7ee:705fb9a16c3bddd295768d079b57b1272fffaf490f1e110d81dae9c7a757b0ca:741f7b32bdcb02c6ece79e9101843062251ece4010aed363c0c0a185af61fb93:74309d55c80d2fe6f8488e07b3e96290a95697e34c092c4f464ffb91887e284b:76f3b82292116de4dbcfe21d903e47ad0a04b69d54679ae3a8bc2176a74efb3d:788d143b59b9b6205de60fe37f24334de9c471745e2f08ffc4d9879fc50b82fc:78a1a1ef98dd0a4fb7bbb8321593d992a18018ba7d0fcb7db95533b2e5431865:7abe26602908cb318bd00232566db7324fb3e990f90df331908805bcb4ca8c33:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:7c98b7bacc251bd7f43978c12988839d763faedf6b6b6a50bfd35beb7cdb233b:84f9853e498082ac21fa58b27383a008c9c068919870193687d10bbaae2301e5:889487f2a4623ddc90c5d30da2946baf50b962592b3f833e3125a39ddc5285f2:900775182df3a259afebb9c31862eadafc6bbdec6d8f3fd5dd55001e14f6f589:958091e288297c8b8bdbbf0fbd383e231003b1a101617aece4d70238e12ef7d2:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:9777421206ff334a428574cde3670caa254bfa45e129d193cc2406a46ee98d58:990435c424b523765049393bedc227dd78fbcfb27bc44158dd76679131479b95:99e45585b09a26372cc3d0ed2e0576c48e75a8f265ffe9b46a577e6064ce2824:9a8e0b7ff8934904da0db020db63cec868c55b9d0a363ab0a5da0192c7e66650:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:9c372a5b41f6c96b9358fb426fe08a13e4d6ad67e34abd6c23f6ceb2c283f33b:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a098daa45bf91fe196343d87a406f96e8f9b9b8b60fdca74c5ed1c93d19a8b2d:a6dbe41f222f0347df0d920ce626dc570486af22a53af2d4fbe8fe0fe1eceb17:a6e2566eb5317f08df2d2d26a7da7cc66765fd6b34efa7f2f73f19a9a3e53f4c:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:a7c16c5034498040d967f3e5b6674e39a675a9f1a54dd6a8d3649ecc5184da49:ab1035f2ef64bd1e8a528c1fd8093c5fb127d6a1f9513e8bad07698965844607:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:af8621f72e2503cc31287616f1b27651d798fb19675b92ff9c5b8cf2de5bb8f2:afa1e278498ccf80b0c3f4f4781b2e77d30790d5bb863a52118600e991730dd3:b0c79dec26d22dd1d5d2669adfbfeb7111dd55a2aab46ca6108ed06c500bfa65:b84efd99bf9cc24012aa4878eeb9a1227dec1c71a2964b544fded5923266471a:baf09f81826c20997d670f15d16728a5ff0aa7dc6a9972bb005ceead8bf7433f:c528b857150850921f366b153c76ef9ffe2c364d55f18f9d91f851d138564c36:c54123d5af5c91f635e4a8c0d066bb6024aeb2740e781b831ca97b831d10016d:c5c3cb8a23265c76b507a7206d6a5353cead202dadcbc117b937c6082e568123:cabb3d721184454e6197c3b51ad513712b04642b05775eb540a53f807159e2e7:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:cfd3f63f28e209efbcb595ad4213aefe472f404b76538660d27817a45ea19e4e:d080d946752ebc2d1a2f66ce735d3a61e44af93a4b43293cfc32aadcbf0a93a9:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:e6371e5a54a60125d23ec584d9372eb3d6390fb47d9c02d692e9c3e81e54f054:e74b9b5daa7d95fce8cdb2c07b6aa64c2324ceacb79698bf2d1dee829c408cdc:ea70c7aadfb8e4901c56bec7a5d9fb2d54019326589f6c33e40d38e9ab95c0f9:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f7ea0484a3d9fd77faee9e11de0f26369930bef4d4f8df587104394601b2bdef:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321:f9416be6404f3534e9810933f0b9bedad6b7280982da3a18434d0cbce353ae6a";
+export const WIRING_CONTRACT_HASH = "02b2674c6e44510a2eabac4a11423d05bf3829b1efadd2949ed73d27472c4d35:0316c79111f8aecc2a5b6841ff2be359239be8cb207727655dcf8ba4ccd2c3e4:063098d983627c3f373f099c9ce3c6eccd5000574581d3ecb66c7c30a83b04ec:0a9f778281608cd26bb45eaeabccf8dc2ec51f97fb5a4f3b637ddca88919dcf6:0f5f4fe542932fa133ec9d857a43dd1f154fd5915cb9104048bed9f9180b34f1:10a4578b3480dd31d00e465253a2acaa870b3601494a81fb52be4b7d0695fb50:1854a8f2359e581edc177de41a884783adcbcc85bfca1efe56fa53942d9bb922:2384313b99425303fa556c75f79b9884d057d3bd6071ee748d39d560060d170f:24a28a86ed8d5207cebd1e31bc068bb1065c0f925e17f683711d771b797f0a94:32f51dd9ae7a652a2973f8589a259c355bb6c65bbfb7abed64f0777d35083bce:333e9f62f3a0b49dd08db012882eb22057ed1490e30f1a3be80996a3dd5ed7d5:34acaa884f2cf0bb9e2bb301781e0b8493bb0020d7ff964d1b4c874b7e892f34:35df28be095b174193ecd7bace2ee8c7ad5d83466ebc19add995eae5bfec3c21:3c22302c6a65bf6ab32c3c77bbd6ac1134cef0bc1a0ce748aa239dc8b696540b:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:3e7c1710e05670a2800bffb82dbf3607cde483da977fc26484f9708d71054db2:49e8712d17029f56c9fbcfe07725636976ab9e9162711104778f495c48f4f66a:4c9eaacf7e582b38d786ebc07601a7158093608fb2a3eddb96b2c0e3ef1758c8:57b83c655e43c341dadff6f6967aed2edcaa7401db6e3e813b941c9d9ec1f7ee:705fb9a16c3bddd295768d079b57b1272fffaf490f1e110d81dae9c7a757b0ca:741f7b32bdcb02c6ece79e9101843062251ece4010aed363c0c0a185af61fb93:74309d55c80d2fe6f8488e07b3e96290a95697e34c092c4f464ffb91887e284b:76f3b82292116de4dbcfe21d903e47ad0a04b69d54679ae3a8bc2176a74efb3d:788d143b59b9b6205de60fe37f24334de9c471745e2f08ffc4d9879fc50b82fc:78a1a1ef98dd0a4fb7bbb8321593d992a18018ba7d0fcb7db95533b2e5431865:7abe26602908cb318bd00232566db7324fb3e990f90df331908805bcb4ca8c33:7b2cc0e31b7c4c06582c7a72587c5c3782c0bf4344483952e25d8c01315e541c:7c98b7bacc251bd7f43978c12988839d763faedf6b6b6a50bfd35beb7cdb233b:84f9853e498082ac21fa58b27383a008c9c068919870193687d10bbaae2301e5:889487f2a4623ddc90c5d30da2946baf50b962592b3f833e3125a39ddc5285f2:900775182df3a259afebb9c31862eadafc6bbdec6d8f3fd5dd55001e14f6f589:958091e288297c8b8bdbbf0fbd383e231003b1a101617aece4d70238e12ef7d2:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:9777421206ff334a428574cde3670caa254bfa45e129d193cc2406a46ee98d58:990435c424b523765049393bedc227dd78fbcfb27bc44158dd76679131479b95:99e45585b09a26372cc3d0ed2e0576c48e75a8f265ffe9b46a577e6064ce2824:9a8e0b7ff8934904da0db020db63cec868c55b9d0a363ab0a5da0192c7e66650:9bd7fd575269fab78b265cc37ab2403ee389301a73457196d27e730ee6700254:9c372a5b41f6c96b9358fb426fe08a13e4d6ad67e34abd6c23f6ceb2c283f33b:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a098daa45bf91fe196343d87a406f96e8f9b9b8b60fdca74c5ed1c93d19a8b2d:a6dbe41f222f0347df0d920ce626dc570486af22a53af2d4fbe8fe0fe1eceb17:a6e2566eb5317f08df2d2d26a7da7cc66765fd6b34efa7f2f73f19a9a3e53f4c:a75dc45988f7fcf22fc8397fd340666ff31cde4af8653c561f65d43ff418898d:a7c16c5034498040d967f3e5b6674e39a675a9f1a54dd6a8d3649ecc5184da49:ab1035f2ef64bd1e8a528c1fd8093c5fb127d6a1f9513e8bad07698965844607:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:af8621f72e2503cc31287616f1b27651d798fb19675b92ff9c5b8cf2de5bb8f2:afa1e278498ccf80b0c3f4f4781b2e77d30790d5bb863a52118600e991730dd3:b0c79dec26d22dd1d5d2669adfbfeb7111dd55a2aab46ca6108ed06c500bfa65:b84efd99bf9cc24012aa4878eeb9a1227dec1c71a2964b544fded5923266471a:baf09f81826c20997d670f15d16728a5ff0aa7dc6a9972bb005ceead8bf7433f:c528b857150850921f366b153c76ef9ffe2c364d55f18f9d91f851d138564c36:c54123d5af5c91f635e4a8c0d066bb6024aeb2740e781b831ca97b831d10016d:c5c3cb8a23265c76b507a7206d6a5353cead202dadcbc117b937c6082e568123:cabb3d721184454e6197c3b51ad513712b04642b05775eb540a53f807159e2e7:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:cfa8c6c27621f38fe254c8657e8c8215fcdcb6e1ef47b0d6308bf34f436af3b2:cfd3f63f28e209efbcb595ad4213aefe472f404b76538660d27817a45ea19e4e:d080d946752ebc2d1a2f66ce735d3a61e44af93a4b43293cfc32aadcbf0a93a9:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:e6371e5a54a60125d23ec584d9372eb3d6390fb47d9c02d692e9c3e81e54f054:e74b9b5daa7d95fce8cdb2c07b6aa64c2324ceacb79698bf2d1dee829c408cdc:ea70c7aadfb8e4901c56bec7a5d9fb2d54019326589f6c33e40d38e9ab95c0f9:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f7ea0484a3d9fd77faee9e11de0f26369930bef4d4f8df587104394601b2bdef:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321:f9416be6404f3534e9810933f0b9bedad6b7280982da3a18434d0cbce353ae6a";
 
 // --- Announcement.post ---
 export interface AnnouncementPostClientInput {
@@ -6894,6 +6894,215 @@ export const ExternalRecordLinkVerifyLinkInvalidation = [
     "kind": "entityDetail",
     "entity": "ExternalRecordLink",
     "queryKeyHint": "queryKeys.externalRecordLink.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ImportDataset.activate ---
+export type ImportDatasetActivateClientInput = Record<string, never>;
+
+export const ImportDatasetActivateCapability = {
+  capabilityId: "ImportDataset.activate",
+  entity: "ImportDataset",
+  command: "activate",
+  route: "/api/manifest/ImportDataset/commands/activate",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["ImportDatasetActivated"],
+} as const;
+
+/**
+ * Build command input for ImportDataset.activate.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindImportDatasetActivateInput(client: ImportDatasetActivateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ImportDataset.activate. */
+export const ImportDatasetActivateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ImportDataset",
+    "queryKeyHint": "queryKeys.importDataset.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportDataset",
+    "queryKeyHint": "queryKeys.importDataset.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ImportDataset.deactivate ---
+export type ImportDatasetDeactivateClientInput = Record<string, never>;
+
+export const ImportDatasetDeactivateCapability = {
+  capabilityId: "ImportDataset.deactivate",
+  entity: "ImportDataset",
+  command: "deactivate",
+  route: "/api/manifest/ImportDataset/commands/deactivate",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: ["ImportDatasetDeactivated"],
+} as const;
+
+/**
+ * Build command input for ImportDataset.deactivate.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindImportDatasetDeactivateInput(client: ImportDatasetDeactivateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ImportDataset.deactivate. */
+export const ImportDatasetDeactivateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ImportDataset",
+    "queryKeyHint": "queryKeys.importDataset.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportDataset",
+    "queryKeyHint": "queryKeys.importDataset.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ImportDataset.recordLastImport ---
+export interface ImportDatasetRecordLastImportClientInput {
+  importRunId: string;
+}
+
+export const ImportDatasetRecordLastImportCapability = {
+  capabilityId: "ImportDataset.recordLastImport",
+  entity: "ImportDataset",
+  command: "recordLastImport",
+  route: "/api/manifest/ImportDataset/commands/recordLastImport",
+  instanceCommand: true,
+  clientParameterNames: ["importRunId"],
+  serverParameterNames: [],
+  emits: ["ImportDatasetLastImportRecorded"],
+} as const;
+
+/**
+ * Build command input for ImportDataset.recordLastImport.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindImportDatasetRecordLastImportInput(client: ImportDatasetRecordLastImportClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ImportDataset.recordLastImport. */
+export const ImportDatasetRecordLastImportInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ImportDataset",
+    "queryKeyHint": "queryKeys.importDataset.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportDataset",
+    "queryKeyHint": "queryKeys.importDataset.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ImportDataset.register ---
+export interface ImportDatasetRegisterClientInput {
+  /** Allowed: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "invoices" | "proposals" */
+  datasetCategory: "events" | "contacts" | "leads" | "menus" | "venues" | "payments" | "invoices" | "proposals";
+  /** Allowed: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location" */
+  targetEntity: "event_record" | "contact" | "lead" | "menu" | "venue" | "payment" | "invoice" | "contract" | "proposal" | "client" | "vendor" | "person" | "task" | "batch" | "order" | "delivery" | "stock" | "location";
+  config: string;
+  name?: string;
+  description?: string;
+  schemaVersion?: string;
+  importOrder?: number;
+  dependsOn?: string;
+  uniqueKeyFields?: string;
+}
+
+export const ImportDatasetRegisterCapability = {
+  capabilityId: "ImportDataset.register",
+  entity: "ImportDataset",
+  command: "register",
+  route: "/api/manifest/ImportDataset/commands/register",
+  instanceCommand: true,
+  clientParameterNames: ["datasetCategory","targetEntity","config","name","description","schemaVersion","importOrder","dependsOn","uniqueKeyFields"],
+  serverParameterNames: [],
+  emits: ["ImportDatasetRegistered"],
+} as const;
+
+/**
+ * Build command input for ImportDataset.register.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindImportDatasetRegisterInput(client: ImportDatasetRegisterClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ImportDataset.register. */
+export const ImportDatasetRegisterInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ImportDataset",
+    "queryKeyHint": "queryKeys.importDataset.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportDataset",
+    "queryKeyHint": "queryKeys.importDataset.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- ImportDataset.updateConfig ---
+export interface ImportDatasetUpdateConfigClientInput {
+  config: string;
+  fieldMappingCount?: number;
+  name?: string;
+  description?: string;
+}
+
+export const ImportDatasetUpdateConfigCapability = {
+  capabilityId: "ImportDataset.updateConfig",
+  entity: "ImportDataset",
+  command: "updateConfig",
+  route: "/api/manifest/ImportDataset/commands/updateConfig",
+  instanceCommand: true,
+  clientParameterNames: ["config","fieldMappingCount","name","description"],
+  serverParameterNames: [],
+  emits: ["ImportDatasetConfigUpdated"],
+} as const;
+
+/**
+ * Build command input for ImportDataset.updateConfig.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindImportDatasetUpdateConfigInput(client: ImportDatasetUpdateConfigClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful ImportDataset.updateConfig. */
+export const ImportDatasetUpdateConfigInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "ImportDataset",
+    "queryKeyHint": "queryKeys.importDataset.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "ImportDataset",
+    "queryKeyHint": "queryKeys.importDataset.detail(id)",
     "label": "entity detail"
   }
 ] as const;
@@ -17248,6 +17457,329 @@ export const ReferralSourceReviseDetailsInvalidation = [
   }
 ] as const;
 
+// --- RevenueAttribution.apply ---
+export interface RevenueAttributionApplyClientInput {
+  eventRevenue: number;
+}
+
+export const RevenueAttributionApplyCapability = {
+  capabilityId: "RevenueAttribution.apply",
+  entity: "RevenueAttribution",
+  command: "apply",
+  route: "/api/manifest/RevenueAttribution/commands/apply",
+  instanceCommand: true,
+  clientParameterNames: ["eventRevenue"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for RevenueAttribution.apply.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRevenueAttributionApplyInput(client: RevenueAttributionApplyClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RevenueAttribution.apply. */
+export const RevenueAttributionApplyInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RevenueAttribution.apply. */
+export const RevenueAttributionApplyLifecycle = [
+  {
+    "property": "status",
+    "from": "approved",
+    "to": "applied",
+    "proven": true
+  }
+] as const;
+
+// --- RevenueAttribution.approve ---
+export type RevenueAttributionApproveClientInput = Record<string, never>;
+
+export const RevenueAttributionApproveCapability = {
+  capabilityId: "RevenueAttribution.approve",
+  entity: "RevenueAttribution",
+  command: "approve",
+  route: "/api/manifest/RevenueAttribution/commands/approve",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for RevenueAttribution.approve.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRevenueAttributionApproveInput(client: RevenueAttributionApproveClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RevenueAttribution.approve. */
+export const RevenueAttributionApproveInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RevenueAttribution.approve. */
+export const RevenueAttributionApproveLifecycle = [
+  {
+    "property": "status",
+    "from": "draft",
+    "to": "approved",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "pending_approval",
+    "to": "approved",
+    "proven": true
+  }
+] as const;
+
+// --- RevenueAttribution.create ---
+export interface RevenueAttributionCreateClientInput {
+  eventId: string;
+  /** Allowed: "venue_commission" | "sales_commission" | "referral_fee" | "partner_split" | "other" */
+  attributionType: "venue_commission" | "sales_commission" | "referral_fee" | "partner_split" | "other";
+  /** Allowed: "percent" | "fixed" */
+  allocationMethod: "percent" | "fixed";
+  percentBasis?: number;
+  fixedAmount?: number;
+  venueId?: string;
+  salespersonId?: string;
+  referralSourceId?: string;
+  partnerPersonId?: string;
+  partnerClientId?: string;
+  effectiveStartDate?: string;
+  effectiveEndDate?: string;
+  reason?: string;
+}
+
+export const RevenueAttributionCreateCapability = {
+  capabilityId: "RevenueAttribution.create",
+  entity: "RevenueAttribution",
+  command: "create",
+  route: "/api/manifest/RevenueAttribution/commands/create",
+  instanceCommand: false,
+  clientParameterNames: ["eventId","attributionType","allocationMethod","percentBasis","fixedAmount","venueId","salespersonId","referralSourceId","partnerPersonId","partnerClientId","effectiveStartDate","effectiveEndDate","reason"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for RevenueAttribution.create.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRevenueAttributionCreateInput(client: RevenueAttributionCreateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RevenueAttribution.create. */
+export const RevenueAttributionCreateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RevenueAttribution.create. */
+export const RevenueAttributionCreateLifecycle = [
+  {
+    "property": "status",
+    "from": "pending_approval",
+    "to": "draft",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "rejected",
+    "to": "draft",
+    "proven": true
+  }
+] as const;
+
+// --- RevenueAttribution.reject ---
+export interface RevenueAttributionRejectClientInput {
+  rejectionReason: string;
+}
+
+export const RevenueAttributionRejectCapability = {
+  capabilityId: "RevenueAttribution.reject",
+  entity: "RevenueAttribution",
+  command: "reject",
+  route: "/api/manifest/RevenueAttribution/commands/reject",
+  instanceCommand: true,
+  clientParameterNames: ["rejectionReason"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for RevenueAttribution.reject.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRevenueAttributionRejectInput(client: RevenueAttributionRejectClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RevenueAttribution.reject. */
+export const RevenueAttributionRejectInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RevenueAttribution.reject. */
+export const RevenueAttributionRejectLifecycle = [
+  {
+    "property": "status",
+    "from": "draft",
+    "to": "rejected",
+    "proven": true
+  },
+  {
+    "property": "status",
+    "from": "pending_approval",
+    "to": "rejected",
+    "proven": true
+  }
+] as const;
+
+// --- RevenueAttribution.requestApproval ---
+export type RevenueAttributionRequestApprovalClientInput = Record<string, never>;
+
+export const RevenueAttributionRequestApprovalCapability = {
+  capabilityId: "RevenueAttribution.requestApproval",
+  entity: "RevenueAttribution",
+  command: "requestApproval",
+  route: "/api/manifest/RevenueAttribution/commands/requestApproval",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for RevenueAttribution.requestApproval.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRevenueAttributionRequestApprovalInput(client: RevenueAttributionRequestApprovalClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RevenueAttribution.requestApproval. */
+export const RevenueAttributionRequestApprovalInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+/** Proven lifecycle transitions for RevenueAttribution.requestApproval. */
+export const RevenueAttributionRequestApprovalLifecycle = [
+  {
+    "property": "status",
+    "from": "draft",
+    "to": "pending_approval",
+    "proven": true
+  }
+] as const;
+
+// --- RevenueAttribution.update ---
+export interface RevenueAttributionUpdateClientInput {
+  percentBasis?: number;
+  fixedAmount?: number;
+  effectiveStartDate?: string;
+  effectiveEndDate?: string;
+  reason?: string;
+  notes?: string;
+}
+
+export const RevenueAttributionUpdateCapability = {
+  capabilityId: "RevenueAttribution.update",
+  entity: "RevenueAttribution",
+  command: "update",
+  route: "/api/manifest/RevenueAttribution/commands/update",
+  instanceCommand: true,
+  clientParameterNames: ["percentBasis","fixedAmount","effectiveStartDate","effectiveEndDate","reason","notes"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for RevenueAttribution.update.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindRevenueAttributionUpdateInput(client: RevenueAttributionUpdateClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful RevenueAttribution.update. */
+export const RevenueAttributionUpdateInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "RevenueAttribution",
+    "queryKeyHint": "queryKeys.revenueAttribution.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- SavedReportDefinition.archive ---
 export type SavedReportDefinitionArchiveClientInput = Record<string, never>;
 
@@ -22074,6 +22606,131 @@ export const VenueUpdateDetailsInvalidation = [
   }
 ] as const;
 
+// --- VenueCommissionTerm.define ---
+export interface VenueCommissionTermDefineClientInput {
+  venueId: string;
+  commissionPercent: number;
+  /** Must not be "". */
+  effectiveStartDate: string & { readonly __nonEmpty?: true };
+  effectiveEndDate?: string;
+  notes?: string;
+}
+
+export const VenueCommissionTermDefineCapability = {
+  capabilityId: "VenueCommissionTerm.define",
+  entity: "VenueCommissionTerm",
+  command: "define",
+  route: "/api/manifest/VenueCommissionTerm/commands/define",
+  instanceCommand: true,
+  clientParameterNames: ["venueId","commissionPercent","effectiveStartDate","effectiveEndDate","notes"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for VenueCommissionTerm.define.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVenueCommissionTermDefineInput(client: VenueCommissionTermDefineClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VenueCommissionTerm.define. */
+export const VenueCommissionTermDefineInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VenueCommissionTerm",
+    "queryKeyHint": "queryKeys.venueCommissionTerm.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VenueCommissionTerm",
+    "queryKeyHint": "queryKeys.venueCommissionTerm.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- VenueCommissionTerm.retire ---
+export type VenueCommissionTermRetireClientInput = Record<string, never>;
+
+export const VenueCommissionTermRetireCapability = {
+  capabilityId: "VenueCommissionTerm.retire",
+  entity: "VenueCommissionTerm",
+  command: "retire",
+  route: "/api/manifest/VenueCommissionTerm/commands/retire",
+  instanceCommand: true,
+  clientParameterNames: [],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for VenueCommissionTerm.retire.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVenueCommissionTermRetireInput(client: VenueCommissionTermRetireClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VenueCommissionTerm.retire. */
+export const VenueCommissionTermRetireInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VenueCommissionTerm",
+    "queryKeyHint": "queryKeys.venueCommissionTerm.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VenueCommissionTerm",
+    "queryKeyHint": "queryKeys.venueCommissionTerm.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
+// --- VenueCommissionTerm.revise ---
+export interface VenueCommissionTermReviseClientInput {
+  commissionPercent?: number;
+  effectiveEndDate?: string;
+  notes?: string;
+}
+
+export const VenueCommissionTermReviseCapability = {
+  capabilityId: "VenueCommissionTerm.revise",
+  entity: "VenueCommissionTerm",
+  command: "revise",
+  route: "/api/manifest/VenueCommissionTerm/commands/revise",
+  instanceCommand: true,
+  clientParameterNames: ["commissionPercent","effectiveEndDate","notes"],
+  serverParameterNames: [],
+  emits: [],
+} as const;
+
+/**
+ * Build command input for VenueCommissionTerm.revise.
+ * Client fields only; server-owned fields are injected separately.
+ */
+export function bindVenueCommissionTermReviseInput(client: VenueCommissionTermReviseClientInput): Record<string, unknown> {
+  return { ...client };
+}
+
+/** Invalidation targets after a successful VenueCommissionTerm.revise. */
+export const VenueCommissionTermReviseInvalidation = [
+  {
+    "kind": "entityList",
+    "entity": "VenueCommissionTerm",
+    "queryKeyHint": "queryKeys.venueCommissionTerm.lists()",
+    "label": "entity list"
+  },
+  {
+    "kind": "entityDetail",
+    "entity": "VenueCommissionTerm",
+    "queryKeyHint": "queryKeys.venueCommissionTerm.detail(id)",
+    "label": "entity detail"
+  }
+] as const;
+
 // --- WasteRecord.record ---
 export interface WasteRecordRecordClientInput {
   ingredientId: string;
@@ -22595,6 +23252,11 @@ export const ALL_CAPABILITY_IDS = [
   "ExternalRecordLink.unlinkExternalRecord",
   "ExternalRecordLink.updateCapsuleId",
   "ExternalRecordLink.verifyLink",
+  "ImportDataset.activate",
+  "ImportDataset.deactivate",
+  "ImportDataset.recordLastImport",
+  "ImportDataset.register",
+  "ImportDataset.updateConfig",
   "ImportRun.approveReview",
   "ImportRun.beginReview",
   "ImportRun.commit",
@@ -22811,6 +23473,12 @@ export const ALL_CAPABILITY_IDS = [
   "ReferralSource.deactivate",
   "ReferralSource.register",
   "ReferralSource.reviseDetails",
+  "RevenueAttribution.apply",
+  "RevenueAttribution.approve",
+  "RevenueAttribution.create",
+  "RevenueAttribution.reject",
+  "RevenueAttribution.requestApproval",
+  "RevenueAttribution.update",
   "SavedReportDefinition.archive",
   "SavedReportDefinition.changeSharing",
   "SavedReportDefinition.createDefinition",
@@ -22911,6 +23579,9 @@ export const ALL_CAPABILITY_IDS = [
   "Venue.deactivate",
   "Venue.register",
   "Venue.updateDetails",
+  "VenueCommissionTerm.define",
+  "VenueCommissionTerm.retire",
+  "VenueCommissionTerm.revise",
   "WasteRecord.record",
   "WasteRecord.voidRecord",
   "WeeklyPurchasingConfig.configure",

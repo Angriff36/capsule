@@ -44,6 +44,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip EventTimelineActivity: no create command in IR (2 rows unused)
   // skip EventTimelineComment: no create command in IR (2 rows unused)
   // skip ExternalRecordLink: no create command in IR (2 rows unused)
+  // skip ImportDataset: no create command in IR (2 rows unused)
   // skip ImportRun: no create command in IR (2 rows unused)
   // skip Incident: no create command in IR (2 rows unused)
   // skip Ingredient: no create command in IR (2 rows unused)
@@ -85,6 +86,9 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip RecipeStep: no create command in IR (2 rows unused)
   // skip RecurringAvailability: no create command in IR (2 rows unused)
   // skip ReferralSource: no create command in IR (2 rows unused)
+  // RevenueAttribution → api.mutations.RevenueAttribution_create
+  await client.mutation(api.mutations.RevenueAttribution_create, { "eventId": "eventId-revenue-attribution-1", "attributionType": "demo-attributionType-1", "allocationMethod": "demo-allocationMethod-1", "venueId": "venueId-revenue-attribution-1", "salespersonId": "salespersonId-revenue-attribution-1", "referralSourceId": "referralSourceId-revenue-attribution-1", "partnerPersonId": "partnerPersonId-revenue-attribution-1", "partnerClientId": "partnerClientId-revenue-attribution-1", "percentBasis": 1, "fixedAmount": 1, "effectiveStartDate": 1767268800000, "effectiveEndDate": 1767268800000, "reason": "demo-reason-1" } as any);
+  await client.mutation(api.mutations.RevenueAttribution_create, { "eventId": "eventId-revenue-attribution-2", "attributionType": "demo-attributionType-2", "allocationMethod": "demo-allocationMethod-2", "venueId": "venueId-revenue-attribution-2", "salespersonId": "salespersonId-revenue-attribution-2", "referralSourceId": "referralSourceId-revenue-attribution-2", "partnerPersonId": "partnerPersonId-revenue-attribution-2", "partnerClientId": "partnerClientId-revenue-attribution-2", "percentBasis": 2, "fixedAmount": 2, "effectiveStartDate": 1767355200000, "effectiveEndDate": 1767355200000, "reason": "demo-reason-2" } as any);
   // skip SavedReportDefinition: no create command in IR (2 rows unused)
   // skip ServiceStyle: no create command in IR (2 rows unused)
   // skip Shift: no create command in IR (2 rows unused)
@@ -114,6 +118,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip VendorOrderLine: no create command in IR (2 rows unused)
   // skip VendorOrderLineDemand: no create command in IR (2 rows unused)
   // skip Venue: no create command in IR (2 rows unused)
+  // skip VenueCommissionTerm: no create command in IR (2 rows unused)
   // skip WasteRecord: no create command in IR (2 rows unused)
   // skip WeeklyPurchasingConfig: no create command in IR (2 rows unused)
   // skip WeeklyScheduleNotice: no create command in IR (2 rows unused)
@@ -295,6 +300,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "ExternalRecordLink",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "ImportDataset",
       "createMutation": null,
       "rowCount": 2
     },
@@ -494,6 +504,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
       "rowCount": 2
     },
     {
+      "entity": "RevenueAttribution",
+      "createMutation": "RevenueAttribution_create",
+      "rowCount": 2
+    },
+    {
       "entity": "SavedReportDefinition",
       "createMutation": null,
       "rowCount": 2
@@ -635,6 +650,11 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "Venue",
+      "createMutation": null,
+      "rowCount": 2
+    },
+    {
+      "entity": "VenueCommissionTerm",
       "createMutation": null,
       "rowCount": 2
     },

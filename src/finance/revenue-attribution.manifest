@@ -1,0 +1,329 @@
+// Capsule revenue attribution — RevenueAttribution and VenueCommissionTerm.
+// Enables percent/fixed revenue splits to venues, salespeople, partners with
+// effective-dated versioning and approval workflow. Unblocks commission
+// tracking and venue-specific reporting (§7.3/8.6).
+
+use "../identity/person.manifest"
+use "../operations/event.manifest"
+use "../sales/referral-source.manifest"
+
+// ========== VenueCommissionTerm ==========
+
+enum VenueTermStatus {
+  active
+  retired
+}
+
+entity VenueCommissionTerm mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required venueId: uuid
+  property required commissionPercent: decimal(5, 2) = 0
+  property required effectiveStartDate: datetime
+  property effectiveEndDate: datetime?
+  property notes: string?
+  property definedAt: datetime?
+  property retiredAt: datetime?
+  property required status: VenueTermStatus = "active"
+
+  belongsTo venue: Venue fields [tenantId, venueId] references [tenantId, id]
+
+  constraint commissionPercentValid: self.commissionPercent >= 0 and self.commissionPercent <= 100 "Commission percent must be between 0 and 100"
+
+  default policy venueTermRead read: roleAllows(user.role, "financeAccess") "Finance staff may read venue commission terms"
+  default policy venueTermWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write venue commission terms"
+  default policy venueTermExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute venue term commands"
+
+  command define(
+    venueId: uuid,
+    commissionPercent: decimal(5, 2),
+    effectiveStartDate: datetime,
+    optional effectiveEndDate: datetime,
+    optional notes: string
+  ) {
+    guard self.deletedAt == null
+    guard self.definedAt == null
+
+    mutate venueId = venueId
+    mutate commissionPercent = commissionPercent
+    mutate effectiveStartDate = effectiveStartDate
+    mutate effectiveEndDate = effectiveEndDate
+    mutate notes = notes
+    mutate definedAt = now()
+  }
+
+  command revise(
+    optional commissionPercent: decimal(5, 2),
+    optional effectiveEndDate: datetime,
+    optional notes: string
+  ) {
+    guard self.deletedAt == null
+    guard self.definedAt != null
+    guard self.retiredAt == null "Cannot revise retired terms"
+    guard commissionPercent == null or (commissionPercent >= 0 and commissionPercent <= 100) "Commission percent must be between 0 and 100"
+
+    mutate commissionPercent = commissionPercent != null ? commissionPercent : self.commissionPercent
+    mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : self.effectiveEndDate
+    mutate notes = notes != null ? notes : self.notes
+  }
+
+  command retire() {
+    guard self.deletedAt == null
+    guard self.definedAt != null
+    guard self.retiredAt == null "Already retired"
+
+    mutate retiredAt = now()
+    mutate effectiveEndDate = now()
+    mutate status = "retired"
+  }
+
+  store VenueCommissionTerm in durable
+}
+
+// ========== RevenueAttribution ==========
+
+enum AttributionType {
+  venue_commission
+  sales_commission
+  referral_fee
+  partner_split
+  other
+}
+
+enum AllocationMethod {
+  percent
+  fixed
+}
+
+enum AttributionStatus {
+  draft
+  pending_approval
+  approved
+  rejected
+  applied
+}
+
+entity RevenueAttribution mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required eventId: uuid
+  property required attributionType: AttributionType = "venue_commission"
+  property required allocationMethod: AllocationMethod = "percent"
+
+  property venueId: uuid?
+  property salespersonId: uuid?
+  property referralSourceId: uuid?
+  property partnerPersonId: uuid?
+  property partnerClientId: uuid?
+
+  property required percentBasis: decimal(5, 2) = 0
+  property required fixedAmount: money(12, 2) = 0
+  property required allocatedAmount: money(12, 2) = 0
+
+  property effectiveStartDate: datetime?
+  property effectiveEndDate: datetime?
+
+  property required status: AttributionStatus = "draft"
+  property requestedById: uuid?
+  property requestedAt: datetime?
+  property approvedById: uuid?
+  property approvedAt: datetime?
+  property rejectionReason: string?
+
+  property reason: string?
+  property notes: string?
+  property appliedAt: datetime?
+
+  belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
+  ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
+  ref salesperson: Person fields [tenantId, salespersonId] references [tenantId, id]
+  ref referralSource: ReferralSource fields [tenantId, referralSourceId] references [tenantId, id]
+  ref partnerPerson: Person fields [tenantId, partnerPersonId] references [tenantId, id]
+  ref partnerClient: Client fields [tenantId, partnerClientId] references [tenantId, id]
+  ref requestedBy: Person fields [tenantId, requestedById] references [tenantId, id]
+  ref approvedBy: Person fields [tenantId, approvedById] references [tenantId, id]
+
+  constraint percentBasisValid: self.allocationMethod != "percent" or (self.percentBasis > 0 and self.percentBasis <= 100) "Percent basis must be between 0 and 100"
+
+  constraint allocationNonnegative: self.allocatedAmount >= 0 "Allocated amount cannot be negative"
+
+  constraint approvalConsistent: self.status == "approved" and self.approvedAt != null and self.approvedById != null or self.status != "approved" "Approved status requires approver and timestamp"
+
+  transition status from "draft" to ["pending_approval", "approved", "rejected"]
+  transition status from "pending_approval" to ["approved", "rejected", "draft"]
+  transition status from "approved" to ["applied"]
+  transition status from "rejected" to ["draft"]
+  transition status from "applied" to []
+
+  default policy attributionRead read: roleAllows(user.role, "financeAccess") or roleAllows(user.role, "salesAccess") "Finance and sales staff may read attributions"
+  default policy attributionWrite write: roleAllows(user.role, "financeAccess") "Finance staff may write attributions"
+  default policy attributionExecute execute: roleAllows(user.role, "financeAccess") "Finance staff may execute attribution commands"
+
+  command create(
+    eventId: uuid,
+    attributionType: AttributionType,
+    allocationMethod: AllocationMethod,
+    optional percentBasis: decimal(5, 2),
+    optional fixedAmount: money(12, 2),
+    optional venueId: uuid,
+    optional salespersonId: uuid,
+    optional referralSourceId: uuid,
+    optional partnerPersonId: uuid,
+    optional partnerClientId: uuid,
+    optional effectiveStartDate: datetime,
+    optional effectiveEndDate: datetime,
+    optional reason: string
+  ) {
+    guard self.deletedAt == null
+    guard user.id != null
+
+    mutate eventId = eventId
+    mutate attributionType = attributionType
+    mutate allocationMethod = allocationMethod
+    mutate percentBasis = percentBasis != null ? percentBasis : 0
+    mutate fixedAmount = fixedAmount != null ? fixedAmount : 0
+    mutate venueId = venueId
+    mutate salespersonId = salespersonId
+    mutate referralSourceId = referralSourceId
+    mutate partnerPersonId = partnerPersonId
+    mutate partnerClientId = partnerClientId
+    mutate effectiveStartDate = effectiveStartDate
+    mutate effectiveEndDate = effectiveEndDate
+    mutate reason = reason
+    mutate status = "draft"
+    mutate requestedById = user.id
+    mutate requestedAt = now()
+  }
+
+  command requestApproval() {
+    guard self.deletedAt == null
+    guard self.status == "draft"
+
+    mutate status = "pending_approval"
+  }
+
+  command approve() {
+    guard self.deletedAt == null
+    guard self.status == "pending_approval"
+    guard roleAllows(user.role, "financeAccess") or roleAllows(user.role, "salesManageAccess")
+    guard user.id != null
+
+    mutate status = "approved"
+    mutate approvedById = user.id
+    mutate approvedAt = now()
+  }
+
+  command reject(rejectionReason: string) {
+    guard self.deletedAt == null
+    guard self.status == "pending_approval"
+    guard roleAllows(user.role, "financeAccess") or roleAllows(user.role, "salesManageAccess")
+    guard length(trim(rejectionReason)) > 0 "Rejection reason is required"
+
+    mutate status = "rejected"
+    mutate rejectionReason = rejectionReason
+  }
+
+  command apply(eventRevenue: money(12, 2)) {
+    guard self.deletedAt == null
+    guard self.status == "approved"
+    guard eventRevenue >= 0 "Event revenue cannot be negative"
+
+    compute allocation = self.allocationMethod == "percent" ? round((eventRevenue * self.percentBasis) / 100, 2) : self.fixedAmount
+
+    mutate allocatedAmount = allocation
+    mutate appliedAt = now()
+    mutate status = "applied"
+  }
+
+  command update(
+    optional percentBasis: decimal(5, 2),
+    optional fixedAmount: money(12, 2),
+    optional effectiveStartDate: datetime,
+    optional effectiveEndDate: datetime,
+    optional reason: string,
+    optional notes: string
+  ) {
+    guard self.deletedAt == null
+    guard self.status == "draft" or self.status == "rejected"
+    guard percentBasis == null or (percentBasis > 0 and percentBasis <= 100) "Percent basis must be between 0 and 100"
+    guard fixedAmount == null or fixedAmount >= 0 "Fixed amount cannot be negative"
+
+    mutate percentBasis = percentBasis != null ? percentBasis : self.percentBasis
+    mutate fixedAmount = fixedAmount != null ? fixedAmount : self.fixedAmount
+    mutate effectiveStartDate = effectiveStartDate != null ? effectiveStartDate : self.effectiveStartDate
+    mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : self.effectiveEndDate
+    mutate reason = reason != null ? reason : self.reason
+    mutate notes = notes != null ? notes : self.notes
+  }
+
+  store RevenueAttribution in durable
+}
+
+// ========== Events ==========
+
+event VenueCommissionTermDefined: "venue_commission_term.defined" {
+  venueCommissionTermId: string
+  tenantId: string
+  venueId: string
+  commissionPercent: decimal(5, 2)
+  effectiveStartDate: datetime
+}
+
+event VenueCommissionTermRevised: "venue_commission_term.revised" {
+  venueCommissionTermId: string
+  tenantId: string
+  venueId: string
+}
+
+event VenueCommissionTermRetired: "venue_commission_term.retired" {
+  venueCommissionTermId: string
+  tenantId: string
+  venueId: string
+}
+
+event RevenueAttributionCreated: "revenue_attribution.created" {
+  revenueAttributionId: string
+  tenantId: string
+  eventId: string
+  attributionType: AttributionType
+  allocationMethod: AllocationMethod
+  status: AttributionStatus
+}
+
+event RevenueAttributionApprovalRequested: "revenue_attribution.approval_requested" {
+  revenueAttributionId: string
+  tenantId: string
+  eventId: string
+}
+
+event RevenueAttributionApproved: "revenue_attribution.approved" {
+  revenueAttributionId: string
+  tenantId: string
+  eventId: string
+  approvedById: string
+}
+
+event RevenueAttributionRejected: "revenue_attribution.rejected" {
+  revenueAttributionId: string
+  tenantId: string
+  eventId: string
+  rejectionReason: string
+}
+
+event RevenueAttributionUpdated: "revenue_attribution.updated" {
+  revenueAttributionId: string
+  tenantId: string
+  eventId: string
+}
+
+event RevenueAttributionApplied: "revenue_attribution.applied" {
+  revenueAttributionId: string
+  tenantId: string
+  eventId: string
+  eventRevenue: money(12, 2)
+  allocatedAmount: money(12, 2)
+}

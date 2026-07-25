@@ -1,0 +1,449 @@
+// Capsule import dataset — defines TPP field mappings for import framework.
+// Each dataset specifies: source fields → Capsule entity fields, validation rules, transformations.
+// Enables systematic TPP migration with clear field ownership and reproducible mappings.
+
+use "./import-run.manifest"
+
+// Dataset types matching ImportDatasetType enum
+// These define WHAT to import from TPP legacy system
+enum DatasetCategory {
+  events           // TPP Events → Capsule Events
+  contacts         // TPP Contacts → Capsule Contact/Company
+  leads            // TPP Leads/Opportunities → Capsule Leads
+  menus            // TPP Menus/Dishes → Capsule Menus/Dishes
+  venues           // TPP Venues → Capsule Venues
+  payments         // TPP Payments → Capsule Payments
+  invoices         // TPP Invoices → Capsule Invoices
+  proposals        // TPP Proposals → Capsule Proposals
+}
+
+// Field mapping types
+enum MappingType {
+  directCopy       // Direct field copy (string → string)
+  transformValue   // Requires transformation (e.g., date format, enum mapping)
+  lookupReference  // Requires lookup reference (e.g., clientId from external ID)
+  computedField    // Computed field (e.g., duration from start/end dates)
+  skipField        // Skip this field (not mapped)
+}
+
+// Validation rule types
+enum ValidationRule {
+  fieldRequired    // Field must be present
+  formatCheck      // Field must match format (email, date, phone)
+  rangeCheck       // Numeric value in range
+  enumCheck        // Value must be in enum
+  lookupCheck      // Reference must exist
+  uniqueCheck      // Value must be unique within dataset
+}
+
+// Field mapping definition
+interface FieldMapping {
+  sourceField: string           // TPP field name
+  targetField: string           // Capsule entity field
+  mappingType: MappingType
+  required: boolean             // Whether field is required for import
+  validationRules: ValidationRule[]
+  transformation?: string       // Transformation rule name (for MappingType.transform)
+  defaultValue?: string         // Default value if source is empty
+}
+
+// Dataset configuration
+interface DatasetConfig {
+  datasetCategory: DatasetCategory
+  targetEntity: CapsuleEntityType  // From external-record-link.manifest
+  fieldMappings: FieldMapping[]
+  uniqueKey: string[]              // Fields that form unique key
+  importOrder: number               // Import order (1 = first, for dependencies)
+  dependsOn: DatasetCategory[]     // Datasets that must be imported first
+}
+
+// ImportDataset entity — defines dataset configurations for TPP migration
+entity ImportDataset mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required datasetCategory: DatasetCategory = "events"
+  property required targetEntity: CapsuleEntityType = "event_record"
+  property required config: string = "{}"              // JSON: DatasetConfig
+  property required active: boolean = true
+  property required importOrder: int = 1
+  property required fieldMappingCount: int = 0
+  property required dependsOn: string = "[]"           // JSON: DatasetCategory[]
+  property required uniqueKeyFields: string = "[]"      // JSON: string[]
+
+  // Metadata
+  property name: string?
+  property description: string?
+  property schemaVersion: string?       // Dataset schema version (renamed to avoid conflict with entity version)
+  property lastImportRunId: string?     // Reference to last successful import
+
+  // Constraints
+  constraint datasetCategoryValid: self.datasetCategory != null "Dataset category is required"
+  constraint configValid: length(trim(self.config)) > 0 "Dataset config is required"
+  constraint importOrderPositive: self.importOrder > 0 "Import order must be positive"
+
+  // Policies
+  default policy importDatasetRead read: roleAllows(user.role, "importAccess") "Staff may read import datasets"
+  default policy importDatasetWrite write: roleAllows(user.role, "importAccess") "Staff may write import datasets"
+
+  // register - Create a new dataset definition
+  command register(
+    datasetCategory: DatasetCategory,
+    targetEntity: CapsuleEntityType,
+    config: string,
+    optional name: string,
+    optional description: string,
+    optional schemaVersion: string,
+    optional importOrder: int,
+    optional dependsOn: string,
+    optional uniqueKeyFields: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt == null
+    constraint datasetCategoryValid: datasetCategory != null "Dataset category is required"
+    constraint configPresent: length(trim(config)) > 0 "Dataset config is required"
+    mutate datasetCategory = datasetCategory
+    mutate targetEntity = targetEntity
+    mutate config = config
+    mutate name = name
+    mutate description = description
+    mutate schemaVersion = schemaVersion
+    mutate importOrder = importOrder != null ? importOrder : 1
+    mutate dependsOn = dependsOn != null ? dependsOn : "[]"
+    mutate uniqueKeyFields = uniqueKeyFields != null ? uniqueKeyFields : "[]"
+    mutate active = true
+    mutate fieldMappingCount = 0  // Will be computed from config
+    emit ImportDatasetRegistered {
+      importDatasetId: self.id
+      tenantId: self.tenantId
+      datasetCategory: datasetCategory
+      targetEntity: targetEntity
+      name: name != null ? name : ""
+    }
+  }
+
+  // updateConfig - Update dataset configuration
+  command updateConfig(
+    config: string,
+    optional fieldMappingCount: number,
+    optional name: string,
+    optional description: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    constraint configPresent: length(trim(config)) > 0 "Dataset config is required"
+    mutate config = config
+    mutate fieldMappingCount = fieldMappingCount != null ? fieldMappingCount : self.fieldMappingCount
+    mutate name = name != null ? name : self.name
+    mutate description = description != null ? description : self.description
+    emit ImportDatasetConfigUpdated {
+      importDatasetId: self.id
+      tenantId: self.tenantId
+      datasetCategory: self.datasetCategory
+      fieldMappingCount: fieldMappingCount != null ? fieldMappingCount : self.fieldMappingCount
+    }
+  }
+
+  // activate - Enable dataset for import
+  command activate() {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    mutate active = true
+    emit ImportDatasetActivated {
+      importDatasetId: self.id
+      tenantId: self.tenantId
+      datasetCategory: self.datasetCategory
+    }
+  }
+
+  // deactivate - Disable dataset from import
+  command deactivate() {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    mutate active = false
+    emit ImportDatasetDeactivated {
+      importDatasetId: self.id
+      tenantId: self.tenantId
+      datasetCategory: self.datasetCategory
+    }
+  }
+
+  // recordLastImport - Update reference to last successful import
+  command recordLastImport(importRunId: string) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    constraint importRunPresent: length(trim(importRunId)) > 0 "Import run ID is required"
+    mutate lastImportRunId = importRunId
+    emit ImportDatasetLastImportRecorded {
+      importDatasetId: self.id
+      tenantId: self.tenantId
+      datasetCategory: self.datasetCategory
+      importRunId: importRunId
+    }
+  }
+
+  store ImportDataset in durable
+}
+
+// Queries
+query findByCategory(
+  tenantId: string,
+  datasetCategory: DatasetCategory
+): ImportDataset {
+  assert tenantId != null
+  assert datasetCategory != null
+  filter self.tenantId == tenantId
+  filter self.datasetCategory == datasetCategory
+  filter self.deletedAt == null
+  limit 1
+}
+
+query listActiveByTenant(tenantId: string): ImportDataset[] {
+  assert tenantId != null
+  filter self.tenantId == tenantId
+  filter self.active == true
+  filter self.deletedAt == null
+  sort self.importOrder asc
+}
+
+query listByImportOrder(tenantId: string): ImportDataset[] {
+  assert tenantId != null
+  filter self.tenantId == tenantId
+  filter self.deletedAt == null
+  sort self.importOrder asc
+}
+
+// Events
+event ImportDatasetRegistered: "import_dataset.registered" {
+  importDatasetId: string
+  tenantId: string
+  datasetCategory: DatasetCategory
+  targetEntity: CapsuleEntityType
+  name: string
+}
+
+event ImportDatasetConfigUpdated: "import_dataset.config_updated" {
+  importDatasetId: string
+  tenantId: string
+  datasetCategory: DatasetCategory
+  fieldMappingCount: number
+}
+
+event ImportDatasetActivated: "import_dataset.activated" {
+  importDatasetId: string
+  tenantId: string
+  datasetCategory: DatasetCategory
+}
+
+event ImportDatasetDeactivated: "import_dataset.deactivated" {
+  importDatasetId: string
+  tenantId: string
+  datasetCategory: DatasetCategory
+}
+
+event ImportDatasetLastImportRecorded: "import_dataset.last_import_recorded" {
+  importDatasetId: string
+  tenantId: string
+  datasetCategory: DatasetCategory
+  importRunId: string
+}
+
+// ============================================================================
+// TPP EVENT DATASET CONFIGURATION (27 fields)
+// ============================================================================
+
+// Event field mappings: TPP → Capsule
+// TPP has 27 event fields per spec §6.2
+const TPP_EVENT_MAPPINGS: DatasetConfig = {
+  datasetCategory: "events",
+  targetEntity: "event_record",
+  uniqueKey: ["tpp_event_id"],
+  importOrder: 3,  // After contacts, venues
+  dependsOn: ["contacts", "venues"],
+  fieldMappings: [
+    // Identity fields
+    { sourceField: "EventID", targetField: "externalId", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "EventName", targetField: "title", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "EventType", targetField: "occasionId", mappingType: "lookupReference", required: false, validationRules: [""], transformation: "mapOccasion" },
+    { sourceField: "ServiceStyle", targetField: "serviceStyleId", mappingType: "lookupReference", required: false, validationRules: [""], transformation: "mapServiceStyle" },
+
+    // Date/time fields
+    { sourceField: "EventDate", targetField: "startsAt", mappingType: "transformValue", required: true, validationRules: [""], transformation: "parseDateTime" },
+    { sourceField: "StartTime", targetField: "startsAt", mappingType: "transformValue", required: true, validationRules: [""], transformation: "mergeDateTime" },
+    { sourceField: "EndTime", targetField: "endsAt", mappingType: "transformValue", required: true, validationRules: [""], transformation: "mergeDateTime" },
+    { sourceField: "SetupTime", targetField: "setupDuration", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDuration" },
+    { sourceField: "TeardownTime", targetField: "teardownDuration", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDuration" },
+
+    // Guest/headcount fields
+    { sourceField: "GuaranteedCount", targetField: "guaranteedHeadcount", mappingType: "directCopy", required: false, validationRules: [""] },
+    { sourceField: "ExpectedCount", targetField: "expectedHeadcount", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "ActualCount", targetField: "actualHeadcount", mappingType: "directCopy", required: false, validationRules: [""] },
+
+    // Venue/location fields
+    { sourceField: "VenueID", targetField: "venueId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "VenueName", targetField: "venueName", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "LocationAddress", targetField: "locationAddress", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "LocationCity", targetField: "locationCity", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "LocationState", targetField: "locationState", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "LocationZip", targetField: "locationPostalCode", mappingType: "directCopy", required: false, validationRules: [] },
+
+    // Client/contact fields
+    { sourceField: "ClientID", targetField: "clientId", mappingType: "lookupReference", required: true, validationRules: [""] },
+    { sourceField: "PrimaryContactID", targetField: "primaryContactId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "SalespersonID", targetField: "assignedToId", mappingType: "lookupReference", required: false, validationRules: [""] },
+
+    // Financial fields
+    { sourceField: "TotalRevenue", targetField: "quotedRevenue", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseMoney" },
+    { sourceField: "DepositAmount", targetField: "depositAmount", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseMoney" },
+    { sourceField: "BudgetAmount", targetField: "budgetAmount", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseMoney" },
+
+    // Status/workflow fields
+    { sourceField: "EventStatus", targetField: "stage", mappingType: "transformValue", required: true, validationRules: [""], transformation: "mapEventStage" },
+    { sourceField: "Probability", targetField: "probability", mappingType: "directCopy", required: false, validationRules: [""] },
+
+    // Notes/metadata
+    { sourceField: "EventNotes", targetField: "notes", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "SpecialRequirements", targetField: "operationalRequirements", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "AccessibilityNeeds", targetField: "accessibilityRequirements", mappingType: "directCopy", required: false, validationRules: [] },
+
+    // Timestamps
+    { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" },
+    { sourceField: "ModifiedDate", targetField: "updatedAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" }
+  ]
+}
+
+// ============================================================================
+// TPP CONTACT DATASET CONFIGURATION
+// ============================================================================
+
+const TPP_CONTACT_MAPPINGS: DatasetConfig = {
+  datasetCategory: "contacts",
+  targetEntity: "contact",
+  uniqueKey: ["tpp_contact_id"],
+  importOrder: 1,  // First (no dependencies)
+  dependsOn: [],
+  fieldMappings: [
+    { sourceField: "ContactID", targetField: "externalId", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "FirstName", targetField: "givenName", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "LastName", targetField: "familyName", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "Email", targetField: "email", mappingType: "directCopy", required: false, validationRules: [""] },
+    { sourceField: "Phone", targetField: "phone", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "Mobile", targetField: "mobile", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "Title", targetField: "title", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "CompanyID", targetField: "companyId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "IsPrimary", targetField: "isPrimary", mappingType: "transformValue", required: false, validationRules: [], transformation: "parseBoolean" },
+    { sourceField: "IsBilling", targetField: "isBillingContact", mappingType: "transformValue", required: false, validationRules: [], transformation: "parseBoolean" },
+    { sourceField: "Notes", targetField: "notes", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" }
+  ]
+}
+
+// ============================================================================
+// TPP COMPANY/CLIENT DATASET CONFIGURATION
+// ============================================================================
+
+const TPP_COMPANY_MAPPINGS: DatasetConfig = {
+  datasetCategory: "contacts",
+  targetEntity: "client",
+  uniqueKey: ["tpp_company_id"],
+  importOrder: 1,  // First (parallel with contacts)
+  dependsOn: [],
+  fieldMappings: [
+    { sourceField: "CompanyID", targetField: "externalId", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "CompanyName", targetField: "companyName", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "ClientType", targetField: "clientType", mappingType: "transformValue", required: false, validationRules: [""], transformation: "mapClientType" },
+    { sourceField: "BillingAddress", targetField: "billingAddress", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "City", targetField: "city", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "State", targetField: "state", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "ZipCode", targetField: "postalCode", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "TaxId", targetField: "taxId", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "PaymentTerms", targetField: "paymentTerms", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "Notes", targetField: "notes", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" }
+  ]
+}
+
+// ============================================================================
+// TPP LEAD/OPPORTUNITY DATASET CONFIGURATION
+// ============================================================================
+
+const TPP_LEAD_MAPPINGS: DatasetConfig = {
+  datasetCategory: "leads",
+  targetEntity: "lead",
+  uniqueKey: ["tpp_lead_id"],
+  importOrder: 2,  // After contacts/companies
+  dependsOn: ["contacts"],
+  fieldMappings: [
+    { sourceField: "LeadID", targetField: "externalId", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "OpportunityName", targetField: "name", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "ClientID", targetField: "clientId", mappingType: "lookupReference", required: true, validationRules: [""] },
+    { sourceField: "PrimaryContactID", targetField: "clientContactId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "Stage", targetField: "stage", mappingType: "transformValue", required: true, validationRules: [""], transformation: "mapLeadStage" },
+    { sourceField: "Probability", targetField: "probability", mappingType: "directCopy", required: false, validationRules: [""] },
+    { sourceField: "EstimatedValue", targetField: "estimatedValue", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseMoney" },
+    { sourceField: "EventDate", targetField: "eventDate", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" },
+    { sourceField: "Source", targetField: "source", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "ReferralSource", targetField: "referralSourceId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "SalespersonID", targetField: "assignedToId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "ProposalID", targetField: "proposalId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" },
+    { sourceField: "CloseDate", targetField: "closedAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" }
+  ]
+}
+
+// ============================================================================
+// TPP VENUE DATASET CONFIGURATION
+// ============================================================================
+
+const TPP_VENUE_MAPPINGS: DatasetConfig = {
+  datasetCategory: "venues",
+  targetEntity: "venue",
+  uniqueKey: ["tpp_venue_id"],
+  importOrder: 1,  // First (no dependencies)
+  dependsOn: [],
+  fieldMappings: [
+    { sourceField: "VenueID", targetField: "externalId", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "VenueName", targetField: "name", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "VenueType", targetField: "venueType", mappingType: "transformValue", required: false, validationRules: [""], transformation: "mapVenueType" },
+    { sourceField: "Address", targetField: "address", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "City", targetField: "city", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "State", targetField: "state", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "ZipCode", targetField: "postalCode", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "Capacity", targetField: "capacity", mappingType: "directCopy", required: false, validationRules: [""] },
+    { sourceField: "ContactName", targetField: "contactName", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "ContactPhone", targetField: "contactPhone", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "ContactEmail", targetField: "contactEmail", mappingType: "directCopy", required: false, validationRules: [""] },
+    { sourceField: "AccessNotes", targetField: "accessNotes", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "CateringNotes", targetField: "cateringNotes", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "LoadInInstructions", targetField: "loadInInstructions", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "ParkingInfo", targetField: "parkingInfo", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" }
+  ]
+}
+
+// ============================================================================
+// TPP PAYMENT DATASET CONFIGURATION
+// ============================================================================
+
+const TPP_PAYMENT_MAPPINGS: DatasetConfig = {
+  datasetCategory: "payments",
+  targetEntity: "payment",
+  uniqueKey: ["tpp_payment_id"],
+  importOrder: 4,  // After events, invoices
+  dependsOn: ["events", "invoices"],
+  fieldMappings: [
+    { sourceField: "PaymentID", targetField: "externalId", mappingType: "directCopy", required: true, validationRules: [""] },
+    { sourceField: "InvoiceID", targetField: "invoiceId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "EventID", targetField: "eventId", mappingType: "lookupReference", required: false, validationRules: [""] },
+    { sourceField: "PaymentDate", targetField: "paidAt", mappingType: "transformValue", required: true, validationRules: [""], transformation: "parseDateTime" },
+    { sourceField: "PaymentAmount", targetField: "amount", mappingType: "transformValue", required: true, validationRules: [""], transformation: "parseMoney" },
+    { sourceField: "PaymentMethod", targetField: "method", mappingType: "transformValue", required: true, validationRules: [""], transformation: "mapPaymentMethod" },
+    { sourceField: "PaymentType", targetField: "paymentType", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "Reference", targetField: "reference", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "Notes", targetField: "notes", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "Reconciled", targetField: "reconciled", mappingType: "transformValue", required: false, validationRules: [], transformation: "parseBoolean" },
+    { sourceField: "QuickBooksTransactionId", targetField: "qboTransactionId", mappingType: "directCopy", required: false, validationRules: [] },
+    { sourceField: "CreatedDate", targetField: "createdAt", mappingType: "transformValue", required: false, validationRules: [""], transformation: "parseDateTime" }
+  ]
+}

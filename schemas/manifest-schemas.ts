@@ -869,6 +869,29 @@ export const ExternalRecordLinkSchema = z.object({
 
 export type ExternalRecordLink = z.infer<typeof ExternalRecordLinkSchema>;
 
+// Entity: ImportDataset
+export const ImportDatasetSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]).default("events"),
+  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location"]).default("event_record"),
+  config: z.string().default("{}"),
+  active: z.boolean().default(true),
+  importOrder: z.number().int().min(1).default(1),
+  fieldMappingCount: z.number().int().default(0),
+  dependsOn: z.string().default("[]"),
+  uniqueKeyFields: z.string().default("[]"),
+  name: z.string().nullable().optional(),
+  description: z.string().nullable().optional(),
+  schemaVersion: z.string().nullable().optional(),
+  lastImportRunId: z.string().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type ImportDataset = z.infer<typeof ImportDatasetSchema>;
+
 // Entity: ImportRun
 export const ImportRunSchema = z.object({
   id: z.string().uuid(),
@@ -1892,6 +1915,39 @@ export const ReferralSourceComputedSchema = ReferralSourceSchema.extend({
 export type ReferralSource = z.infer<typeof ReferralSourceSchema>;
 export type ReferralSourceWithComputed = z.infer<typeof ReferralSourceComputedSchema>;
 
+// Entity: RevenueAttribution
+export const RevenueAttributionSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  eventId: z.string().uuid(),
+  attributionType: z.enum(["venue_commission", "sales_commission", "referral_fee", "partner_split", "other"]).default("venue_commission"),
+  allocationMethod: z.enum(["percent", "fixed"]).default("percent"),
+  venueId: z.string().uuid().nullable().optional(),
+  salespersonId: z.string().uuid().nullable().optional(),
+  referralSourceId: z.string().uuid().nullable().optional(),
+  partnerPersonId: z.string().uuid().nullable().optional(),
+  partnerClientId: z.string().uuid().nullable().optional(),
+  percentBasis: z.number().default(0),
+  fixedAmount: z.number().default(0),
+  allocatedAmount: z.number().min(0).default(0),
+  effectiveStartDate: z.coerce.date().nullable().optional(),
+  effectiveEndDate: z.coerce.date().nullable().optional(),
+  status: z.enum(["draft", "pending_approval", "approved", "rejected", "applied"]).default("draft"),
+  requestedById: z.string().uuid().nullable().optional(),
+  requestedAt: z.coerce.date().nullable().optional(),
+  approvedById: z.string().uuid().nullable().optional(),
+  approvedAt: z.coerce.date().nullable().optional(),
+  rejectionReason: z.string().nullable().optional(),
+  reason: z.string().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  appliedAt: z.coerce.date().nullable().optional(),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type RevenueAttribution = z.infer<typeof RevenueAttributionSchema>;
+
 // Entity: SavedReportDefinition
 export const SavedReportDefinitionSchema = z.object({
   id: z.string().uuid(),
@@ -2548,6 +2604,25 @@ export const VenueComputedSchema = VenueSchema.extend({
 
 export type Venue = z.infer<typeof VenueSchema>;
 export type VenueWithComputed = z.infer<typeof VenueComputedSchema>;
+
+// Entity: VenueCommissionTerm
+export const VenueCommissionTermSchema = z.object({
+  id: z.string().uuid(),
+  tenantId: z.string(),
+  deletedAt: z.coerce.date().nullable().optional(),
+  venueId: z.string().uuid(),
+  commissionPercent: z.number().default(0),
+  effectiveStartDate: z.coerce.date(),
+  effectiveEndDate: z.coerce.date().nullable().optional(),
+  notes: z.string().nullable().optional(),
+  definedAt: z.coerce.date().nullable().optional(),
+  retiredAt: z.coerce.date().nullable().optional(),
+  status: z.enum(["active", "retired"]).default("active"),
+  createdAt: z.coerce.date().optional(),
+  updatedAt: z.coerce.date().optional(),
+});
+
+export type VenueCommissionTerm = z.infer<typeof VenueCommissionTermSchema>;
 
 // Entity: WasteRecord
 export const WasteRecordSchema = z.object({
@@ -3883,6 +3958,48 @@ export const ExternalRecordLinkVerifyLinkParamsSchema = z.object({
 });
 
 export type ExternalRecordLinkVerifyLinkParams = z.infer<typeof ExternalRecordLinkVerifyLinkParamsSchema>;
+
+// Command: activate on ImportDataset
+export const ImportDatasetActivateParamsSchema = z.object({});
+
+export type ImportDatasetActivateParams = z.infer<typeof ImportDatasetActivateParamsSchema>;
+
+// Command: deactivate on ImportDataset
+export const ImportDatasetDeactivateParamsSchema = z.object({});
+
+export type ImportDatasetDeactivateParams = z.infer<typeof ImportDatasetDeactivateParamsSchema>;
+
+// Command: recordLastImport on ImportDataset
+export const ImportDatasetRecordLastImportParamsSchema = z.object({
+  importRunId: z.string(),
+});
+
+export type ImportDatasetRecordLastImportParams = z.infer<typeof ImportDatasetRecordLastImportParamsSchema>;
+
+// Command: register on ImportDataset
+export const ImportDatasetRegisterParamsSchema = z.object({
+  datasetCategory: z.enum(["events", "contacts", "leads", "menus", "venues", "payments", "invoices", "proposals"]),
+  targetEntity: z.enum(["event_record", "contact", "lead", "menu", "venue", "payment", "invoice", "contract", "proposal", "client", "vendor", "person", "task", "batch", "order", "delivery", "stock", "location"]),
+  config: z.string(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  schemaVersion: z.string().optional(),
+  importOrder: z.number().int().optional(),
+  dependsOn: z.string().optional(),
+  uniqueKeyFields: z.string().optional(),
+});
+
+export type ImportDatasetRegisterParams = z.infer<typeof ImportDatasetRegisterParamsSchema>;
+
+// Command: updateConfig on ImportDataset
+export const ImportDatasetUpdateConfigParamsSchema = z.object({
+  config: z.string(),
+  fieldMappingCount: z.number().optional(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+});
+
+export type ImportDatasetUpdateConfigParams = z.infer<typeof ImportDatasetUpdateConfigParamsSchema>;
 
 // Command: approveReview on ImportRun
 export const ImportRunApproveReviewParamsSchema = z.object({
@@ -5598,6 +5715,61 @@ export const ReferralSourceReviseDetailsParamsSchema = z.object({
 
 export type ReferralSourceReviseDetailsParams = z.infer<typeof ReferralSourceReviseDetailsParamsSchema>;
 
+// Command: apply on RevenueAttribution
+export const RevenueAttributionApplyParamsSchema = z.object({
+  eventRevenue: z.number(),
+});
+
+export type RevenueAttributionApplyParams = z.infer<typeof RevenueAttributionApplyParamsSchema>;
+
+// Command: approve on RevenueAttribution
+export const RevenueAttributionApproveParamsSchema = z.object({});
+
+export type RevenueAttributionApproveParams = z.infer<typeof RevenueAttributionApproveParamsSchema>;
+
+// Command: create on RevenueAttribution
+export const RevenueAttributionCreateParamsSchema = z.object({
+  eventId: z.string().min(1),
+  attributionType: z.enum(["venue_commission", "sales_commission", "referral_fee", "partner_split", "other"]),
+  allocationMethod: z.enum(["percent", "fixed"]),
+  percentBasis: z.number().optional(),
+  fixedAmount: z.number().optional(),
+  venueId: z.string().min(1).optional(),
+  salespersonId: z.string().min(1).optional(),
+  referralSourceId: z.string().min(1).optional(),
+  partnerPersonId: z.string().min(1).optional(),
+  partnerClientId: z.string().min(1).optional(),
+  effectiveStartDate: z.coerce.date().optional(),
+  effectiveEndDate: z.coerce.date().optional(),
+  reason: z.string().optional(),
+});
+
+export type RevenueAttributionCreateParams = z.infer<typeof RevenueAttributionCreateParamsSchema>;
+
+// Command: reject on RevenueAttribution
+export const RevenueAttributionRejectParamsSchema = z.object({
+  rejectionReason: z.string(),
+});
+
+export type RevenueAttributionRejectParams = z.infer<typeof RevenueAttributionRejectParamsSchema>;
+
+// Command: requestApproval on RevenueAttribution
+export const RevenueAttributionRequestApprovalParamsSchema = z.object({});
+
+export type RevenueAttributionRequestApprovalParams = z.infer<typeof RevenueAttributionRequestApprovalParamsSchema>;
+
+// Command: update on RevenueAttribution
+export const RevenueAttributionUpdateParamsSchema = z.object({
+  percentBasis: z.number().optional(),
+  fixedAmount: z.number().optional(),
+  effectiveStartDate: z.coerce.date().optional(),
+  effectiveEndDate: z.coerce.date().optional(),
+  reason: z.string().optional(),
+  notes: z.string().optional(),
+});
+
+export type RevenueAttributionUpdateParams = z.infer<typeof RevenueAttributionUpdateParamsSchema>;
+
 // Command: archive on SavedReportDefinition
 export const SavedReportDefinitionArchiveParamsSchema = z.object({});
 
@@ -6472,6 +6644,31 @@ export const VenueUpdateDetailsParamsSchema = z.object({
 });
 
 export type VenueUpdateDetailsParams = z.infer<typeof VenueUpdateDetailsParamsSchema>;
+
+// Command: define on VenueCommissionTerm
+export const VenueCommissionTermDefineParamsSchema = z.object({
+  venueId: z.string().min(1),
+  commissionPercent: z.number(),
+  effectiveStartDate: z.coerce.date(),
+  effectiveEndDate: z.coerce.date().optional(),
+  notes: z.string().optional(),
+});
+
+export type VenueCommissionTermDefineParams = z.infer<typeof VenueCommissionTermDefineParamsSchema>;
+
+// Command: retire on VenueCommissionTerm
+export const VenueCommissionTermRetireParamsSchema = z.object({});
+
+export type VenueCommissionTermRetireParams = z.infer<typeof VenueCommissionTermRetireParamsSchema>;
+
+// Command: revise on VenueCommissionTerm
+export const VenueCommissionTermReviseParamsSchema = z.object({
+  commissionPercent: z.number().optional(),
+  effectiveEndDate: z.coerce.date().optional(),
+  notes: z.string().optional(),
+});
+
+export type VenueCommissionTermReviseParams = z.infer<typeof VenueCommissionTermReviseParamsSchema>;
 
 // Command: record on WasteRecord
 export const WasteRecordRecordParamsSchema = z.object({
