@@ -143,7 +143,7 @@ Last: [first session]
 
 ## Last Session Bridge
 [auto-bridge snapshot @ 10 changes]
-Files: src/features/finance/RevenueTrendsPage.tsx (edit), src/lib/format.ts (edit), src/foundation/base.manifest (edit), src/sales/invoice-core.manifest (edit)
+Files: src/operations/event.manifest (edit), tests/proofs/event-closeout-lifecycle.runtime.test.ts (edit), src/import/external-record-link.manifest (edit), src/import/external-record-link.manifest (create)
 
 # === END COGNILAYER ===
 

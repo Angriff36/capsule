@@ -2,10 +2,13 @@ import type { ReactNode } from "react";
 import { type EventStage, STAGE_LABEL } from "../features/events/eventStatus";
 
 const STAGE_CHIP: Record<EventStage, string> = {
+  quote: "border-line-2 bg-mute-soft text-ink-2",
   planning: "border-line-2 bg-mute-soft text-ink-2",
   pending_approval: "border-warn/30 bg-warn-soft text-warn",
   approved: "border-ok/30 bg-ok-soft text-ok",
+  sales_lock: "border-brand/30 bg-brand-soft text-brand",
   executing: "border-info/30 bg-info-soft text-info",
+  final: "border-info/30 bg-info-soft text-info",
   completed: "border-info/30 bg-info-soft text-info",
   cancelled: "border-danger/30 bg-danger-soft text-danger",
   closed_out: "border-line-2 bg-inset text-ink-3",

@@ -42,6 +42,7 @@ describe("governed creation mappings", () => {
       "EventTimelineActivity_createViaSchedule",
       "EventTimelineComment_createViaPost",
       "Event_createViaPlanEngagement",
+      "ExternalRecordLink_createViaDiscard",
       "Incident_createViaReport",
       "IngredientDemand_createViaCalculate",
       "IngredientPriceObservation_createViaRecord",

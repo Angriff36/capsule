@@ -5,6 +5,9 @@ import {
   EventCancelLifecycle,
   EventCloseOutLifecycle,
   EventCompleteLifecycle,
+  EventConfirmSalesLockLifecycle,
+  EventFinalizeEventLifecycle,
+  EventLockForSalesLifecycle,
   EventReturnToPlanningLifecycle,
   EventSubmitForApprovalLifecycle,
 } from "../../generated/manifest-wiring-bindings";
@@ -14,6 +17,9 @@ export type EventLifecycleActionKey =
   | "submitForApproval"
   | "returnToPlanning"
   | "approve"
+  | "lockForSales"
+  | "confirmSalesLock"
+  | "finalizeEvent"
   | "beginExecution"
   | "complete"
   | "closeOut"
@@ -51,6 +57,24 @@ const ACTIONS: ReadonlyArray<
     lifecycle: EventApproveLifecycle,
   },
   {
+    key: "lockForSales",
+    label: "Lock for sales",
+    kind: "primary",
+    lifecycle: EventLockForSalesLifecycle,
+  },
+  {
+    key: "confirmSalesLock",
+    label: "Confirm sales lock",
+    kind: "primary",
+    lifecycle: EventConfirmSalesLockLifecycle,
+  },
+  {
+    key: "finalizeEvent",
+    label: "Finalize event",
+    kind: "primary",
+    lifecycle: EventFinalizeEventLifecycle,
+  },
+  {
     key: "beginExecution",
     label: "Begin execution",
     kind: "primary",
@@ -81,6 +105,7 @@ const PLANNING_REVISION_STAGES = new Set<string>(
   [
     ...EventSubmitForApprovalLifecycle,
     ...EventApproveLifecycle,
+    ...EventLockForSalesLifecycle,
     ...EventBeginExecutionLifecycle,
   ].map((transition) => transition.from),
 );
@@ -114,10 +139,13 @@ export class EventLifecyclePolicy {
 
   assertStage(stage: string): stage is EventStage {
     return (
+      stage === "quote" ||
       stage === "planning" ||
       stage === "pending_approval" ||
       stage === "approved" ||
+      stage === "sales_lock" ||
       stage === "executing" ||
+      stage === "final" ||
       stage === "completed" ||
       stage === "cancelled" ||
       stage === "closed_out"

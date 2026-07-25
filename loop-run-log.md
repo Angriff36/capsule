@@ -8,6 +8,19 @@ Append one entry per run. Prune entries older than 30 days.
 {
   "run_id": "2026-06-09T08:15:00Z",
   "pattern": "daily-triage",
+```
+
+## Runs
+
+```json
+{
+  "run_id": "2026-07-24T20:00:42Z",
+  "pattern": "daily-triage",
+  "source": "product-loop",
+  "verdict": "NOOP",
+  "reason": "STATE.md contains loop-pause-all - exiting immediately per contract"
+}
+```
   "duration_s": 45,
   "items_found": 4,
   "actions_taken": 1,
@@ -35,6 +48,15 @@ Append one entry per run. Prune entries older than 30 days.
 ```
 
 <!-- Loop appends below this line -->
+```json
+{
+  "run_id": "2026-07-25T02:00:28Z",
+  "pattern": "product-loop",
+  "source": "product-loop",
+  "verdict": "PAUSED",
+  "reason": "STATE.md contains loop-pause-all - exiting immediately per contract"
+}
+```
 {"run_id":"2026-07-22T11:01:15Z","pattern":"product-loop","source":"product-loop","duration_s":12,"items_attempted":0,"actions_taken":0,"escalations":0,"rejections":0,"tokens_estimate":4000,"outcome":"no-op","details":"Queue empty - all 13 backlog items are in-pr (OD052 #27, S1 #28, S2 #31, S3 #33, S8 #36, S9 #37) or blocked by Codex rejects (OD054, OD056, S6, S5), platform limitations (OD055, S7), or awaiting UI work (OD054). Escalation recorded in PRODUCT-BACKLOG.md."}
 {"run_id":"2026-07-22T16:03:11Z","pattern":"product-loop","source":"product-loop","duration_s":8,"items_attempted":0,"actions_taken":0,"escalations":0,"rejections":0,"tokens_estimate":3000,"outcome":"no-op","details":"Queue empty - all 12 backlog items in-pr or blocked. PRs awaiting human review/merge: #27 OD052, #28 S1, #31 S2, #33 S3, #36 S8, #37 S9. Blocked items: OD054 (1/3), OD055 (1/3), OD056 (1/3), S6 (1/3), S5 (1/3), S7 (1/3). Escalation already recorded from 2026-07-21 resolution."}
 {"run_id":"2026-07-22T17:00:00Z","pattern":"product-loop","source":"product-loop","duration_s":10,"items_attempted":0,"actions_taken":0,"escalations":0,"rejections":0,"tokens_estimate":3000,"outcome":"no-op","details":"Queue empty - all 12 backlog items in-pr or blocked. PRs awaiting human review/merge: #27 OD052, #28 S1, #31 S2, #33 S3, #36 S8, #37 S9. Blocked items: OD054 (1/3), OD055 (1/3), OD056 (1/3), S6 (1/3), S5 (1/3), S7 (1/3). Escalation already recorded from 2026-07-21 resolution."}
@@ -157,3 +179,4 @@ Append one entry per run. Prune entries older than 30 days.
 {"run_id":"2026-07-24T02:56:40Z","pattern":"cursor-loop","outcome":"fix-proposed","details":"PR #106 Fixes #15 prep/dish task legacy yield fields. CI green. Closed #15."}
 {"run_id":"2026-07-24T03:15:42Z","pattern":"cursor-loop","source":"cursor-loop","duration_s":1200,"items_attempted":1,"actions_taken":1,"tokens_estimate":250000,"outcome":"fix-proposed","details":"PR #107 Fixes #55 EventDish.restore + WasteRecord.unvoid + Undo toast. composer-2.5-fast APPROVE. CI green. Closed #55."}
 {"run_id":"2026-07-24T03:21:20Z","pattern":"cursor-loop","source":"human-stop","outcome":"no-op","details":"loop-pause-all set; rearm sleepers cleared"}
+{"run_id":"2026-07-25T00:00:39Z","pattern":"product-loop","source":"product-loop","outcome":"no-op","details":"loop-pause-all in STATE.md — exiting immediately"}

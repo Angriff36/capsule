@@ -60,9 +60,15 @@ describe("Event planning foundation", () => {
     ).toEqual(["returnToPlanning", "approve", "cancel"]);
     expect(
       policy.availableActions("approved").map((action) => action.key),
-    ).toEqual(["returnToPlanning", "beginExecution", "cancel"]);
+    ).toEqual(["lockForSales", "cancel"]);
+    expect(
+      policy.availableActions("sales_lock").map((action) => action.key),
+    ).toEqual(["confirmSalesLock", "beginExecution", "cancel"]);
     expect(
       policy.availableActions("executing").map((action) => action.key),
+    ).toEqual(["finalizeEvent", "cancel"]);
+    expect(
+      policy.availableActions("final").map((action) => action.key),
     ).toEqual(["complete", "cancel"]);
     expect(
       policy.availableActions("completed").map((action) => action.key),

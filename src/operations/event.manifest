@@ -20,10 +20,13 @@ enum ClientStatus {
 }
 
 enum EventStage {
+  quote
   planning
   pending_approval
   approved
+  sales_lock
   executing
+  final
   completed
   cancelled
   closed_out
@@ -511,6 +514,8 @@ entity Event mixin TenantScoped, SoftDeletable {
   property completedAt: datetime?
   property cancelledAt: datetime?
   property closedOutAt: datetime?
+  property salesLockedAt: datetime?
+  property finalizedAt: datetime?
   property cancellationReason: string?
   property recurrenceFrequency: EventRecurrenceFrequency?
   property recurrenceEndCondition: EventRecurrenceEndCondition?
@@ -579,10 +584,14 @@ entity Event mixin TenantScoped, SoftDeletable {
   constraint validRecurrenceCount: self.recurrenceGeneratedCount == null or self.recurrenceGeneratedCount >= 1 "Recurring event generated count cannot be below one"
   constraint validRecurrenceSequence: self.recurrenceSequence == null or self.recurrenceSequence >= 2 "Recurring event instances must follow the source event"
 
+  // Quote → Planning → Pending Approval → Approved → Sales Lock → Executing → Final → Complete → Close Out lifecycle
+  transition stage from "quote" to ["planning", "cancelled"]
   transition stage from "planning" to ["pending_approval", "cancelled"]
   transition stage from "pending_approval" to ["planning", "approved", "cancelled"]
-  transition stage from "approved" to ["planning", "executing", "cancelled"]
-  transition stage from "executing" to ["completed", "cancelled"]
+  transition stage from "approved" to ["sales_lock", "cancelled"]
+  transition stage from "sales_lock" to ["executing", "cancelled"]
+  transition stage from "executing" to ["final", "cancelled"]
+  transition stage from "final" to ["completed", "cancelled"]
   transition stage from "completed" to ["closed_out"]
   transition stage from "cancelled" to []
   transition stage from "closed_out" to []
@@ -908,7 +917,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command beginExecution() {
-    guard self.stage == "approved"
+    guard self.stage == "approved" or self.stage == "sales_lock"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventAccess")
     // Manifest 3.6.3 rejects computed-property references in guards (PB007).
@@ -923,7 +932,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   }
 
   command complete() {
-    guard self.stage == "executing"
+    guard self.stage == "final"
     guard self.deletedAt == null
     guard roleAllows(user.role, "eventManageAccess")
     mutate stage = "completed"
@@ -963,6 +972,60 @@ entity Event mixin TenantScoped, SoftDeletable {
       expectedHeadcount: self.expectedHeadcount
       quotedPrice: self.quotedPrice
       budgetAmount: self.budgetAmount
+    }
+  }
+
+  // Sales Lock pipeline commands per spec §3.3
+  command lockForSales() {
+    guard self.stage == "approved"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesAccess")
+    // Completeness check: event must have essential data before sales lock
+    guard self.clientId != null
+    guard self.plannedAt != null
+    guard self.startsAt != null
+    guard self.endsAt != null
+    guard self.expectedHeadcount > 0
+    mutate stage = "sales_lock"
+    mutate salesLockedAt = now()
+    emit EventSalesLocked {
+      eventId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      expectedHeadcount: self.expectedHeadcount
+      quotedPrice: self.quotedPrice
+      startsAt: self.startsAt
+      endsAt: self.endsAt
+    }
+  }
+
+  command confirmSalesLock() {
+    guard self.stage == "sales_lock"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "salesAccess")
+    mutate stage = "executing"
+    mutate executionStartedAt = now()
+    emit EventSalesLockConfirmed {
+      eventId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      startsAt: self.startsAt
+    }
+  }
+
+  command finalizeEvent() {
+    guard self.stage == "executing"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "eventManageAccess")
+    // Freeze reporting snapshot - event must be complete before finalization
+    mutate stage = "final"
+    mutate finalizedAt = now()
+    emit EventFinalized {
+      eventId: self.id
+      tenantId: self.tenantId
+      clientId: self.clientId
+      expectedHeadcount: self.expectedHeadcount
+      quotedPrice: self.quotedPrice
     }
   }
 

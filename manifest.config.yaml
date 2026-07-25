@@ -19,7 +19,7 @@ projections:
       includeTenantFilter: true
       # Fold resolved computeds into list/get returns (documented helpers|inline).
       # Default helpers requires callers to invoke convex/computed.ts; the event
-      # menu UI reads estimatedCost/requiredBatches from listEventDish rows.
+      # menu UI reads estimatedCost/requiredCost/requiredBatches from listEvent rows.
       computedProperties: inline
       # Builder-only: stop emitting diagrams/** mermaid companions on regen.
       # Manifest still lists mermaid as a compatible companion; Capsule does not

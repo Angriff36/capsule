@@ -1,0 +1,274 @@
+// Capsule import run — durable import workflow for external system datasets.
+
+enum ImportSourceSystem {
+  tpp_legacy
+  csv_export
+  api_sync
+}
+
+enum ImportDatasetType {
+  events
+  contacts
+  leads
+  menus
+  venues
+  payments
+}
+
+enum ImportRunStatus {
+  started
+  parsing
+  validating
+  reviewing
+  committing
+  completed
+  failed
+  reverted
+}
+
+entity ImportRun mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required sourceSystem: ImportSourceSystem = "tpp_legacy"
+  property required datasetType: ImportDatasetType = "events"
+  property required status: ImportRunStatus = "started"
+  property startTime: datetime?
+  property endTime: datetime?
+  property completionTime: datetime?
+  property parsedAt: datetime?
+  property validatedAt: datetime?
+  property reviewStartedAt: datetime?
+  property reviewApprovedAt: datetime?
+  property commitStartedAt: datetime?
+  property revertedAt: datetime?
+  property required recordCounts: string = "{}"
+  property checksum: string?
+  property required actorId: string = ""
+  property failureDetails: string?
+
+  constraint recordCountsPresent: self.recordCounts != null "Record counts must be present"
+
+  transition status from "started" to ["parsing", "failed"]
+  transition status from "parsing" to ["validating", "failed"]
+  transition status from "validating" to ["reviewing", "failed"]
+  transition status from "reviewing" to ["committing", "failed"]
+  transition status from "committing" to ["completed", "failed"]
+  transition status from "completed" to ["reverted"]
+  transition status from "failed" to []
+  transition status from "reverted" to []
+
+  default policy importRunRead read: roleAllows(user.role, "importAccess") "Staff may read import runs"
+  default policy importRunWrite write: roleAllows(user.role, "importAccess") "Staff may write import runs through commands"
+  default policy importRunExecute execute: roleAllows(user.role, "importAccess") "Staff may execute import run commands"
+
+  command start(
+    sourceSystem: ImportSourceSystem,
+    datasetType: ImportDatasetType,
+    optional actorId: string,
+    optional checksum: string
+  ) {
+    guard self.deletedAt == null
+    guard self.status == "started"
+    constraint startActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    mutate sourceSystem = sourceSystem
+    mutate datasetType = datasetType
+    mutate actorId = actorId != null ? actorId : ""
+    mutate checksum = checksum
+    mutate startTime = now()
+    mutate status = "started"
+    emit ImportRunStarted {
+      importRunId: self.id
+      tenantId: self.tenantId
+      sourceSystem: sourceSystem
+      datasetType: datasetType
+      actorId: actorId != null ? actorId : ""
+    }
+  }
+
+  command recordParse(
+    recordCounts: string,
+    optional actorId: string
+  ) {
+    guard self.status == "started"
+    guard self.deletedAt == null
+    constraint recordParseCountsPresent: recordCounts != null "Record counts are required"
+    constraint recordParseActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    mutate recordCounts = recordCounts
+    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate parsedAt = now()
+    mutate status = "parsing"
+    emit ImportRunParsed {
+      importRunId: self.id
+      tenantId: self.tenantId
+      recordCounts: recordCounts
+      actorId: actorId != null ? actorId : self.actorId
+    }
+  }
+
+  command validate(optional actorId: string) {
+    guard self.status == "parsing"
+    guard self.parsedAt != null
+    guard self.deletedAt == null
+    constraint validateActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate validatedAt = now()
+    mutate status = "validating"
+    emit ImportRunValidated {
+      importRunId: self.id
+      tenantId: self.tenantId
+      actorId: actorId != null ? actorId : self.actorId
+    }
+  }
+
+  command beginReview(optional actorId: string) {
+    guard self.status == "validating"
+    guard self.validatedAt != null
+    guard self.deletedAt == null
+    constraint beginReviewActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate reviewStartedAt = now()
+    mutate status = "reviewing"
+    emit ImportRunReviewStarted {
+      importRunId: self.id
+      tenantId: self.tenantId
+      actorId: actorId != null ? actorId : self.actorId
+    }
+  }
+
+  command approveReview(
+    finalRecordCounts: string,
+    optional actorId: string
+  ) {
+    guard self.status == "reviewing"
+    guard self.reviewStartedAt != null
+    guard self.deletedAt == null
+    constraint approveReviewCountsPresent: finalRecordCounts != null "Final record counts are required"
+    constraint approveReviewActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    mutate recordCounts = finalRecordCounts
+    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate reviewApprovedAt = now()
+    mutate status = "committing"
+    emit ImportRunReviewApproved {
+      importRunId: self.id
+      tenantId: self.tenantId
+      finalRecordCounts: finalRecordCounts
+      actorId: actorId != null ? actorId : self.actorId
+    }
+  }
+
+  command commit(optional actorId: string) {
+    guard self.status == "committing"
+    guard self.reviewApprovedAt != null
+    guard self.deletedAt == null
+    constraint commitActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate commitStartedAt = now()
+    mutate completionTime = now()
+    mutate endTime = now()
+    mutate status = "completed"
+    emit ImportRunCommitted {
+      importRunId: self.id
+      tenantId: self.tenantId
+      recordCounts: self.recordCounts
+      actorId: actorId != null ? actorId : self.actorId
+    }
+  }
+
+  command markFailed(
+    failureDetails: string,
+    optional actorId: string
+  ) {
+    guard self.status != "completed"
+    guard self.status != "reverted"
+    guard self.deletedAt == null
+    constraint markFailedDetailsPresent: length(trim(failureDetails)) > 0 "Failure details are required"
+    constraint markFailedActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    compute previousStatus = self.status
+    mutate failureDetails = failureDetails
+    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate endTime = now()
+    mutate status = "failed"
+    emit ImportRunFailed {
+      importRunId: self.id
+      tenantId: self.tenantId
+      previousStatus: previousStatus
+      failureDetails: failureDetails
+      actorId: actorId != null ? actorId : self.actorId
+    }
+  }
+
+  command revert(optional actorId: string) {
+    guard self.status == "completed"
+    guard self.completionTime != null
+    guard self.deletedAt == null
+    constraint revertActorPresent: actorId == null or length(trim(actorId)) > 0 "Actor id must be non-empty when present"
+    mutate actorId = actorId != null ? actorId : self.actorId
+    mutate revertedAt = now()
+    mutate endTime = now()
+    mutate status = "reverted"
+    emit ImportRunReverted {
+      importRunId: self.id
+      tenantId: self.tenantId
+      actorId: actorId != null ? actorId : self.actorId
+    }
+  }
+
+  store ImportRun in durable
+}
+
+event ImportRunStarted: "import_run.started" {
+  importRunId: string
+  tenantId: string
+  sourceSystem: ImportSourceSystem
+  datasetType: ImportDatasetType
+  actorId: string
+}
+
+event ImportRunParsed: "import_run.parsed" {
+  importRunId: string
+  tenantId: string
+  recordCounts: string
+  actorId: string
+}
+
+event ImportRunValidated: "import_run.validated" {
+  importRunId: string
+  tenantId: string
+  actorId: string
+}
+
+event ImportRunReviewStarted: "import_run.review_started" {
+  importRunId: string
+  tenantId: string
+  actorId: string
+}
+
+event ImportRunReviewApproved: "import_run.review_approved" {
+  importRunId: string
+  tenantId: string
+  finalRecordCounts: string
+  actorId: string
+}
+
+event ImportRunCommitted: "import_run.committed" {
+  importRunId: string
+  tenantId: string
+  recordCounts: string
+  actorId: string
+}
+
+event ImportRunFailed: "import_run.failed" {
+  importRunId: string
+  tenantId: string
+  previousStatus: ImportRunStatus
+  failureDetails: string
+  actorId: string
+}
+
+event ImportRunReverted: "import_run.reverted" {
+  importRunId: string
+  tenantId: string
+  actorId: string
+}

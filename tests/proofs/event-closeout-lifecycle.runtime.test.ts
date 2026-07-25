@@ -101,22 +101,31 @@ async function seedClosedOutEvent(
       version: (pack as { version?: number }).version,
     });
   }
-  await proof.executeCommand(events, api.mutations.Event_beginExecution, {
+  // Sales Lock pipeline: approved → sales_lock → executing (requires salesAccess)
+  await proof.executeCommand(sales, api.mutations.Event_lockForSales, {
     docId: event.docId,
     version: 3,
   });
-  await proof.executeCommand(events, api.mutations.Event_complete, {
+  await proof.executeCommand(events, api.mutations.Event_beginExecution, {
     docId: event.docId,
     version: 4,
   });
-  await proof.executeCommand(events, api.mutations.Event_closeOut, {
+  await proof.executeCommand(events, api.mutations.Event_finalizeEvent, {
     docId: event.docId,
     version: 5,
+  });
+  await proof.executeCommand(events, api.mutations.Event_complete, {
+    docId: event.docId,
+    version: 6,
+  });
+  await proof.executeCommand(events, api.mutations.Event_closeOut, {
+    docId: event.docId,
+    version: 7,
   });
   const closed = await events.run(async (ctx) =>
     ctx.db.get(event.docId as never),
   );
-  expect(closed).toMatchObject({ stage: "closed_out", version: 6 });
+  expect(closed).toMatchObject({ stage: "closed_out", version: 8 });
   return event.docId;
 }
 

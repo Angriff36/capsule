@@ -1,0 +1,3538 @@
+[
+  {
+    "capability_id": "Announcement.post",
+    "entity": "Announcement",
+    "command": "post",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "Announcement.remove",
+    "entity": "Announcement",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "AnnouncementDismissal.dismiss",
+    "entity": "AnnouncementDismissal",
+    "command": "dismiss",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Attachment.attach",
+    "entity": "Attachment",
+    "command": "attach",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "Attachment.remove",
+    "entity": "Attachment",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Attachment.setSurveySelection",
+    "entity": "Attachment",
+    "command": "setSurveySelection",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "AvailabilityWindow.declare",
+    "entity": "AvailabilityWindow",
+    "command": "declare",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "AvailabilityWindow.withdraw",
+    "entity": "AvailabilityWindow",
+    "command": "withdraw",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Client.archive",
+    "entity": "Client",
+    "command": "archive",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Client.assignOwner",
+    "entity": "Client",
+    "command": "assignOwner",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Client.changeBillingProfile",
+    "entity": "Client",
+    "command": "changeBillingProfile",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "Client.changeContact",
+    "entity": "Client",
+    "command": "changeContact",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "Client.markMerged",
+    "entity": "Client",
+    "command": "markMerged",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Client.reactivate",
+    "entity": "Client",
+    "command": "reactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Client.register",
+    "entity": "Client",
+    "command": "register",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (18 client, 0 server)"
+  },
+  {
+    "capability_id": "Client.stageClientMerge",
+    "entity": "Client",
+    "command": "stageClientMerge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientCommunication.record",
+    "entity": "ClientCommunication",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientContact.add",
+    "entity": "ClientContact",
+    "command": "add",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (10 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientContact.reassignClient",
+    "entity": "ClientContact",
+    "command": "reassignClient",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientContact.remove",
+    "entity": "ClientContact",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientContact.setPrimary",
+    "entity": "ClientContact",
+    "command": "setPrimary",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientContact.stageClientMerge",
+    "entity": "ClientContact",
+    "command": "stageClientMerge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientContact.updateDetails",
+    "entity": "ClientContact",
+    "command": "updateDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientMerge.merge",
+    "entity": "ClientMerge",
+    "command": "merge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientOutreachTask.complete",
+    "entity": "ClientOutreachTask",
+    "command": "complete",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientOutreachTask.dismiss",
+    "entity": "ClientOutreachTask",
+    "command": "dismiss",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "ClientOutreachTask.open",
+    "entity": "ClientOutreachTask",
+    "command": "open",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Contract.draft",
+    "entity": "Contract",
+    "command": "draft",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "Contract.expire",
+    "entity": "Contract",
+    "command": "expire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Contract.markViewed",
+    "entity": "Contract",
+    "command": "markViewed",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Contract.markVoided",
+    "entity": "Contract",
+    "command": "markVoided",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Contract.reassignClient",
+    "entity": "Contract",
+    "command": "reassignClient",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Contract.send",
+    "entity": "Contract",
+    "command": "send",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Contract.sign",
+    "entity": "Contract",
+    "command": "sign",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Contract.stageClientMerge",
+    "entity": "Contract",
+    "command": "stageClientMerge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "CorrectiveAction.close",
+    "entity": "CorrectiveAction",
+    "command": "close",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "CorrectiveAction.open",
+    "entity": "CorrectiveAction",
+    "command": "open",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "CreditMemo.issue",
+    "entity": "CreditMemo",
+    "command": "issue",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "CreditMemo.reassignClient",
+    "entity": "CreditMemo",
+    "command": "reassignClient",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "CreditMemo.stageClientMerge",
+    "entity": "CreditMemo",
+    "command": "stageClientMerge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Delivery.cancel",
+    "entity": "Delivery",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Delivery.confirmDelivery",
+    "entity": "Delivery",
+    "command": "confirmDelivery",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Delivery.markFailed",
+    "entity": "Delivery",
+    "command": "markFailed",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Delivery.schedule",
+    "entity": "Delivery",
+    "command": "schedule",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "Delivery.startTransit",
+    "entity": "Delivery",
+    "command": "startTransit",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.classifyAllergens",
+    "entity": "Dish",
+    "command": "classifyAllergens",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.clearPrimaryImage",
+    "entity": "Dish",
+    "command": "clearPrimaryImage",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.introduce",
+    "entity": "Dish",
+    "command": "introduce",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.linkAsEdition",
+    "entity": "Dish",
+    "command": "linkAsEdition",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.mergeInto",
+    "entity": "Dish",
+    "command": "mergeInto",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.purge",
+    "entity": "Dish",
+    "command": "purge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.reinstate",
+    "entity": "Dish",
+    "command": "reinstate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.retire",
+    "entity": "Dish",
+    "command": "retire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.reviseDetails",
+    "entity": "Dish",
+    "command": "reviseDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.setPrimaryImage",
+    "entity": "Dish",
+    "command": "setPrimaryImage",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\attachments\\DishPrimaryImageUploader.tsx",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.setPrimaryRecipe",
+    "entity": "Dish",
+    "command": "setPrimaryRecipe",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Dish.updatePortioning",
+    "entity": "Dish",
+    "command": "updatePortioning",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "DishRecipe.attach",
+    "entity": "DishRecipe",
+    "command": "attach",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "DishRecipe.detach",
+    "entity": "DishRecipe",
+    "command": "detach",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "DishTask.add",
+    "entity": "DishTask",
+    "command": "add",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (10 client, 0 server)"
+  },
+  {
+    "capability_id": "DishTask.retire",
+    "entity": "DishTask",
+    "command": "retire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "DishTask.revise",
+    "entity": "DishTask",
+    "command": "revise",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "EmailNotificationSubscription.configure",
+    "entity": "EmailNotificationSubscription",
+    "command": "configure",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "EmailNotificationSubscription.updateSubscriptions",
+    "entity": "EmailNotificationSubscription",
+    "command": "updateSubscriptions",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "Equipment.reactivate",
+    "entity": "Equipment",
+    "command": "reactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Equipment.recount",
+    "entity": "Equipment",
+    "command": "recount",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Equipment.register",
+    "entity": "Equipment",
+    "command": "register",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "Equipment.retire",
+    "entity": "Equipment",
+    "command": "retire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Equipment.reviseDetails",
+    "entity": "Equipment",
+    "command": "reviseDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "Equipment.updateCondition",
+    "entity": "Equipment",
+    "command": "updateCondition",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "EquipmentMaintenanceTask.applyService",
+    "entity": "EquipmentMaintenanceTask",
+    "command": "applyService",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "EquipmentMaintenanceTask.schedule",
+    "entity": "EquipmentMaintenanceTask",
+    "command": "schedule",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "EquipmentReservation.cancel",
+    "entity": "EquipmentReservation",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EquipmentReservation.checkOut",
+    "entity": "EquipmentReservation",
+    "command": "checkOut",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "EquipmentReservation.markReturned",
+    "entity": "EquipmentReservation",
+    "command": "markReturned",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "EquipmentServiceEntry.record",
+    "entity": "EquipmentServiceEntry",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.approve",
+    "entity": "Event",
+    "command": "approve",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\inventory\\SupplyLifecyclePolicy.ts, src\\features\\kitchen\\EventPrepTaskSynchronizer.ts",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.assignOwner",
+    "entity": "Event",
+    "command": "assignOwner",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.beginExecution",
+    "entity": "Event",
+    "command": "beginExecution",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.cancel",
+    "entity": "Event",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.changeHeadcount",
+    "entity": "Event",
+    "command": "changeHeadcount",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.changePricing",
+    "entity": "Event",
+    "command": "changePricing",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.changePrimaryContact",
+    "entity": "Event",
+    "command": "changePrimaryContact",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.changeRequirements",
+    "entity": "Event",
+    "command": "changeRequirements",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.changeVenue",
+    "entity": "Event",
+    "command": "changeVenue",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.closeOut",
+    "entity": "Event",
+    "command": "closeOut",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.complete",
+    "entity": "Event",
+    "command": "complete",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.configureRecurrence",
+    "entity": "Event",
+    "command": "configureRecurrence",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.planEngagement",
+    "entity": "Event",
+    "command": "planEngagement",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\events\\EventPlanEngagementFormMapper.ts",
+    "ownership_summary": "clientOnly (19 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.reassignClient",
+    "entity": "Event",
+    "command": "reassignClient",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.reschedule",
+    "entity": "Event",
+    "command": "reschedule",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.returnToPlanning",
+    "entity": "Event",
+    "command": "returnToPlanning",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.stageClientMerge",
+    "entity": "Event",
+    "command": "stageClientMerge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.stopRecurrence",
+    "entity": "Event",
+    "command": "stopRecurrence",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Event.submitForApproval",
+    "entity": "Event",
+    "command": "submitForApproval",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventAllergenCheck.record",
+    "entity": "EventAllergenCheck",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "EventAssignment.assign",
+    "entity": "EventAssignment",
+    "command": "assign",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "EventAssignment.checkIn",
+    "entity": "EventAssignment",
+    "command": "checkIn",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventAssignment.checkOut",
+    "entity": "EventAssignment",
+    "command": "checkOut",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventAssignment.confirm",
+    "entity": "EventAssignment",
+    "command": "confirm",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventAssignment.markNoShow",
+    "entity": "EventAssignment",
+    "command": "markNoShow",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventAssignment.unassign",
+    "entity": "EventAssignment",
+    "command": "unassign",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventCloseout.capture",
+    "entity": "EventCloseout",
+    "command": "capture",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (17 client, 0 server)"
+  },
+  {
+    "capability_id": "EventCloseout.finalize",
+    "entity": "EventCloseout",
+    "command": "finalize",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventDish.addToEvent",
+    "entity": "EventDish",
+    "command": "addToEvent",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\events\\EventMenuPanel.tsx",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "EventDish.adjustServings",
+    "entity": "EventDish",
+    "command": "adjustServings",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventDish.changeCourse",
+    "entity": "EventDish",
+    "command": "changeCourse",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "EventDish.confirmFromProposal",
+    "entity": "EventDish",
+    "command": "confirmFromProposal",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\clients\\ProposalsPage.tsx",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "EventDish.remove",
+    "entity": "EventDish",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventDish.setHeadcountOverride",
+    "entity": "EventDish",
+    "command": "setHeadcountOverride",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventDish.updateInstructions",
+    "entity": "EventDish",
+    "command": "updateInstructions",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventDishRecipeSeed.seed",
+    "entity": "EventDishRecipeSeed",
+    "command": "seed",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "EventGuest.assignTable",
+    "entity": "EventGuest",
+    "command": "assignTable",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\events\\EventGuestPolicy.ts",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventGuest.checkIn",
+    "entity": "EventGuest",
+    "command": "checkIn",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\events\\EventGuestPolicy.ts",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventGuest.invite",
+    "entity": "EventGuest",
+    "command": "invite",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "EventGuest.rsvpConfirm",
+    "entity": "EventGuest",
+    "command": "rsvpConfirm",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventGuest.rsvpDecline",
+    "entity": "EventGuest",
+    "command": "rsvpDecline",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventGuest.withdraw",
+    "entity": "EventGuest",
+    "command": "withdraw",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\events\\EventGuestPolicy.ts",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventIngredientContribution.record",
+    "entity": "EventIngredientContribution",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "EventIngredientContribution.retire",
+    "entity": "EventIngredientContribution",
+    "command": "retire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventIngredientContribution.revise",
+    "entity": "EventIngredientContribution",
+    "command": "revise",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "EventLayoutSection.add",
+    "entity": "EventLayoutSection",
+    "command": "add",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "EventLayoutSection.remove",
+    "entity": "EventLayoutSection",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventLayoutSection.update",
+    "entity": "EventLayoutSection",
+    "command": "update",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "EventStaffNeed.cancel",
+    "entity": "EventStaffNeed",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventStaffNeed.claim",
+    "entity": "EventStaffNeed",
+    "command": "claim",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventStaffNeed.fill",
+    "entity": "EventStaffNeed",
+    "command": "fill",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventStaffNeed.postOpen",
+    "entity": "EventStaffNeed",
+    "command": "postOpen",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "EventStaffNeed.releaseClaim",
+    "entity": "EventStaffNeed",
+    "command": "releaseClaim",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventTemplate.archive",
+    "entity": "EventTemplate",
+    "command": "archive",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "EventTemplate.define",
+    "entity": "EventTemplate",
+    "command": "define",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "EventTemplate.reactivate",
+    "entity": "EventTemplate",
+    "command": "reactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventTemplate.revise",
+    "entity": "EventTemplate",
+    "command": "revise",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "EventTimelineActivity.adjust",
+    "entity": "EventTimelineActivity",
+    "command": "adjust",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (10 client, 0 server)"
+  },
+  {
+    "capability_id": "EventTimelineActivity.remove",
+    "entity": "EventTimelineActivity",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "EventTimelineActivity.schedule",
+    "entity": "EventTimelineActivity",
+    "command": "schedule",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (11 client, 0 server)"
+  },
+  {
+    "capability_id": "EventTimelineComment.post",
+    "entity": "EventTimelineComment",
+    "command": "post",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "EventTimelineComment.remove",
+    "entity": "EventTimelineComment",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Incident.beginInvestigation",
+    "entity": "Incident",
+    "command": "beginInvestigation",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Incident.clearCorrectiveActionLock",
+    "entity": "Incident",
+    "command": "clearCorrectiveActionLock",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Incident.dismiss",
+    "entity": "Incident",
+    "command": "dismiss",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Incident.markResolved",
+    "entity": "Incident",
+    "command": "markResolved",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Incident.report",
+    "entity": "Incident",
+    "command": "report",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.classifyAllergens",
+    "entity": "Ingredient",
+    "command": "classifyAllergens",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.configureSubstitutes",
+    "entity": "Ingredient",
+    "command": "configureSubstitutes",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.discontinue",
+    "entity": "Ingredient",
+    "command": "discontinue",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.introduce",
+    "entity": "Ingredient",
+    "command": "introduce",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.linkAsEdition",
+    "entity": "Ingredient",
+    "command": "linkAsEdition",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.mergeInto",
+    "entity": "Ingredient",
+    "command": "mergeInto",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.purge",
+    "entity": "Ingredient",
+    "command": "purge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.reinstate",
+    "entity": "Ingredient",
+    "command": "reinstate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.setNutrition",
+    "entity": "Ingredient",
+    "command": "setNutrition",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.setPreferredVendor",
+    "entity": "Ingredient",
+    "command": "setPreferredVendor",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.setPreferredVendors",
+    "entity": "Ingredient",
+    "command": "setPreferredVendors",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.updateCosting",
+    "entity": "Ingredient",
+    "command": "updateCosting",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Ingredient.updateDetails",
+    "entity": "Ingredient",
+    "command": "updateDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "IngredientDemand.calculate",
+    "entity": "IngredientDemand",
+    "command": "calculate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "IngredientDemand.confirm",
+    "entity": "IngredientDemand",
+    "command": "confirm",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\inventory\\SupplyLifecyclePolicy.ts",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "IngredientDemand.ensurePurchaseEligible",
+    "entity": "IngredientDemand",
+    "command": "ensurePurchaseEligible",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "IngredientDemand.fulfill",
+    "entity": "IngredientDemand",
+    "command": "fulfill",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "IngredientDemand.markReleased",
+    "entity": "IngredientDemand",
+    "command": "markReleased",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\events\\EventStockIssueCoordinator.ts",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "IngredientDemand.recalculate",
+    "entity": "IngredientDemand",
+    "command": "recalculate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "IngredientDemand.supersede",
+    "entity": "IngredientDemand",
+    "command": "supersede",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "IngredientDemand.syncFromContributions",
+    "entity": "IngredientDemand",
+    "command": "syncFromContributions",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "IngredientPriceObservation.record",
+    "entity": "IngredientPriceObservation",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryItem.adjustQuantity",
+    "entity": "InventoryItem",
+    "command": "adjustQuantity",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryItem.open",
+    "entity": "InventoryItem",
+    "command": "open",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryItem.receiveStock",
+    "entity": "InventoryItem",
+    "command": "receiveStock",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryItem.recount",
+    "entity": "InventoryItem",
+    "command": "recount",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryItem.remove",
+    "entity": "InventoryItem",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryItem.setExpiry",
+    "entity": "InventoryItem",
+    "command": "setExpiry",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryItem.transferIn",
+    "entity": "InventoryItem",
+    "command": "transferIn",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryItem.transferOut",
+    "entity": "InventoryItem",
+    "command": "transferOut",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryItem.updateLevels",
+    "entity": "InventoryItem",
+    "command": "updateLevels",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryLot.record",
+    "entity": "InventoryLot",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (12 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryReservation.consume",
+    "entity": "InventoryReservation",
+    "command": "consume",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\events\\EventStockIssueCoordinator.ts",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryReservation.release",
+    "entity": "InventoryReservation",
+    "command": "release",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "InventoryReservation.reserve",
+    "entity": "InventoryReservation",
+    "command": "reserve",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.applyCredit",
+    "entity": "Invoice",
+    "command": "applyCredit",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.applyPayment",
+    "entity": "Invoice",
+    "command": "applyPayment",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.issue",
+    "entity": "Invoice",
+    "command": "issue",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (14 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.markDepositPaid",
+    "entity": "Invoice",
+    "command": "markDepositPaid",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.markOverdue",
+    "entity": "Invoice",
+    "command": "markOverdue",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.markViewed",
+    "entity": "Invoice",
+    "command": "markViewed",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.markVoided",
+    "entity": "Invoice",
+    "command": "markVoided",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.reassignClient",
+    "entity": "Invoice",
+    "command": "reassignClient",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.recordCreditMemo",
+    "entity": "Invoice",
+    "command": "recordCreditMemo",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.recordRefund",
+    "entity": "Invoice",
+    "command": "recordRefund",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.send",
+    "entity": "Invoice",
+    "command": "send",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.sendBalanceReminder",
+    "entity": "Invoice",
+    "command": "sendBalanceReminder",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.setDeposit",
+    "entity": "Invoice",
+    "command": "setDeposit",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.stageClientMerge",
+    "entity": "Invoice",
+    "command": "stageClientMerge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Invoice.writeOff",
+    "entity": "Invoice",
+    "command": "writeOff",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Lead.capture",
+    "entity": "Lead",
+    "command": "capture",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (10 client, 0 server)"
+  },
+  {
+    "capability_id": "Lead.confirmConversion",
+    "entity": "Lead",
+    "command": "confirmConversion",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Lead.confirmProposalSent",
+    "entity": "Lead",
+    "command": "confirmProposalSent",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Lead.reviseDetails",
+    "entity": "Lead",
+    "command": "reviseDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "Lead.stageConversion",
+    "entity": "Lead",
+    "command": "stageConversion",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "Lead.stageProposal",
+    "entity": "Lead",
+    "command": "stageProposal",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Lead.updatePipeline",
+    "entity": "Lead",
+    "command": "updatePipeline",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "Menu.archive",
+    "entity": "Menu",
+    "command": "archive",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Menu.draft",
+    "entity": "Menu",
+    "command": "draft",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "Menu.markPublished",
+    "entity": "Menu",
+    "command": "markPublished",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Menu.restore",
+    "entity": "Menu",
+    "command": "restore",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Menu.reviseDetails",
+    "entity": "Menu",
+    "command": "reviseDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "Menu.unpublish",
+    "entity": "Menu",
+    "command": "unpublish",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Menu.updatePricing",
+    "entity": "Menu",
+    "command": "updatePricing",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "MenuDish.add",
+    "entity": "MenuDish",
+    "command": "add",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "MenuDish.remove",
+    "entity": "MenuDish",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "MenuDish.updateDetails",
+    "entity": "MenuDish",
+    "command": "updateDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "MenuDish.updateSellingPrice",
+    "entity": "MenuDish",
+    "command": "updateSellingPrice",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Organization.configureBranding",
+    "entity": "Organization",
+    "command": "configureBranding",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "Organization.deactivate",
+    "entity": "Organization",
+    "command": "deactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Organization.reactivate",
+    "entity": "Organization",
+    "command": "reactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Organization.register",
+    "entity": "Organization",
+    "command": "register",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "Organization.rename",
+    "entity": "Organization",
+    "command": "rename",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Organization.setDefaultCurrency",
+    "entity": "Organization",
+    "command": "setDefaultCurrency",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Organization.suspend",
+    "entity": "Organization",
+    "command": "suspend",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "OrganizationCapabilitySetting.register",
+    "entity": "OrganizationCapabilitySetting",
+    "command": "register",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "OrganizationCapabilitySetting.setEnabled",
+    "entity": "OrganizationCapabilitySetting",
+    "command": "setEnabled",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "PackList.cancel",
+    "entity": "PackList",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PackList.dispatch",
+    "entity": "PackList",
+    "command": "dispatch",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PackList.markLoaded",
+    "entity": "PackList",
+    "command": "markLoaded",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PackList.markPacked",
+    "entity": "PackList",
+    "command": "markPacked",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PackList.open",
+    "entity": "PackList",
+    "command": "open",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "PackList.startPacking",
+    "entity": "PackList",
+    "command": "startPacking",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PackListItem.addItem",
+    "entity": "PackListItem",
+    "command": "addItem",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "PackListItem.adjustQuantity",
+    "entity": "PackListItem",
+    "command": "adjustQuantity",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PackListItem.markMissing",
+    "entity": "PackListItem",
+    "command": "markMissing",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PackListItem.markPacked",
+    "entity": "PackListItem",
+    "command": "markPacked",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Payment.beginProcessing",
+    "entity": "Payment",
+    "command": "beginProcessing",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Payment.fail",
+    "entity": "Payment",
+    "command": "fail",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Payment.reassignClient",
+    "entity": "Payment",
+    "command": "reassignClient",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Payment.record",
+    "entity": "Payment",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "Payment.refund",
+    "entity": "Payment",
+    "command": "refund",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Payment.settle",
+    "entity": "Payment",
+    "command": "settle",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Payment.stageClientMerge",
+    "entity": "Payment",
+    "command": "stageClientMerge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "PaymentMethod.clearDefault",
+    "entity": "PaymentMethod",
+    "command": "clearDefault",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PaymentMethod.expire",
+    "entity": "PaymentMethod",
+    "command": "expire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PaymentMethod.invalidate",
+    "entity": "PaymentMethod",
+    "command": "invalidate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PaymentMethod.makeDefault",
+    "entity": "PaymentMethod",
+    "command": "makeDefault",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PaymentMethod.reactivate",
+    "entity": "PaymentMethod",
+    "command": "reactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PaymentMethod.reassignClient",
+    "entity": "PaymentMethod",
+    "command": "reassignClient",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PaymentMethod.register",
+    "entity": "PaymentMethod",
+    "command": "register",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "PaymentMethod.remove",
+    "entity": "PaymentMethod",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PaymentMethod.stageClientMerge",
+    "entity": "PaymentMethod",
+    "command": "stageClientMerge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "PayrollInput.finalize",
+    "entity": "PayrollInput",
+    "command": "finalize",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PayrollInput.markVoided",
+    "entity": "PayrollInput",
+    "command": "markVoided",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PayrollInput.prepare",
+    "entity": "PayrollInput",
+    "command": "prepare",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\finance\\PayrollPrepareForm.tsx",
+    "ownership_summary": "clientOnly (12 client, 0 server)"
+  },
+  {
+    "capability_id": "PerformanceReview.record",
+    "entity": "PerformanceReview",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "Person.assignRole",
+    "entity": "Person",
+    "command": "assignRole",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Person.correctIdentity",
+    "entity": "Person",
+    "command": "correctIdentity",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "Person.deactivate",
+    "entity": "Person",
+    "command": "deactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Person.hire",
+    "entity": "Person",
+    "command": "hire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "Person.reactivate",
+    "entity": "Person",
+    "command": "reactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Person.setSmsAlerts",
+    "entity": "Person",
+    "command": "setSmsAlerts",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Person.terminate",
+    "entity": "Person",
+    "command": "terminate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.assign",
+    "entity": "PrepTask",
+    "command": "assign",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.cancel",
+    "entity": "PrepTask",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.claim",
+    "entity": "PrepTask",
+    "command": "claim",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.complete",
+    "entity": "PrepTask",
+    "command": "complete",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.markBlocked",
+    "entity": "PrepTask",
+    "command": "markBlocked",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.open",
+    "entity": "PrepTask",
+    "command": "open",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (17 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.refreshGenerated",
+    "entity": "PrepTask",
+    "command": "refreshGenerated",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.release",
+    "entity": "PrepTask",
+    "command": "release",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.revise",
+    "entity": "PrepTask",
+    "command": "revise",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.start",
+    "entity": "PrepTask",
+    "command": "start",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTask.unblock",
+    "entity": "PrepTask",
+    "command": "unblock",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTaskComment.edit",
+    "entity": "PrepTaskComment",
+    "command": "edit",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTaskComment.post",
+    "entity": "PrepTaskComment",
+    "command": "post",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTaskDependency.declare",
+    "entity": "PrepTaskDependency",
+    "command": "declare",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "PrepTaskDependency.satisfy",
+    "entity": "PrepTaskDependency",
+    "command": "satisfy",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "ProductionBatch.cancel",
+    "entity": "ProductionBatch",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "ProductionBatch.complete",
+    "entity": "ProductionBatch",
+    "command": "complete",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "ProductionBatch.plan",
+    "entity": "ProductionBatch",
+    "command": "plan",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "ProductionBatch.start",
+    "entity": "ProductionBatch",
+    "command": "start",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Proposal.accept",
+    "entity": "Proposal",
+    "command": "accept",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Proposal.decline",
+    "entity": "Proposal",
+    "command": "decline",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Proposal.draft",
+    "entity": "Proposal",
+    "command": "draft",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (15 client, 0 server)"
+  },
+  {
+    "capability_id": "Proposal.expire",
+    "entity": "Proposal",
+    "command": "expire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Proposal.markViewed",
+    "entity": "Proposal",
+    "command": "markViewed",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Proposal.reassignClient",
+    "entity": "Proposal",
+    "command": "reassignClient",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Proposal.send",
+    "entity": "Proposal",
+    "command": "send",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Proposal.stageClientMerge",
+    "entity": "Proposal",
+    "command": "stageClientMerge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "ProposalDishSelection.adjustServings",
+    "entity": "ProposalDishSelection",
+    "command": "adjustServings",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "ProposalDishSelection.remove",
+    "entity": "ProposalDishSelection",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "ProposalDishSelection.select",
+    "entity": "ProposalDishSelection",
+    "command": "select",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "PurchaseNeed.assignToDraft",
+    "entity": "PurchaseNeed",
+    "command": "assignToDraft",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "PurchaseNeed.cancel",
+    "entity": "PurchaseNeed",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "PurchaseNeed.create",
+    "entity": "PurchaseNeed",
+    "command": "create",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "PurchaseNeed.markDraftOrdered",
+    "entity": "PurchaseNeed",
+    "command": "markDraftOrdered",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PurchaseNeed.markFulfilled",
+    "entity": "PurchaseNeed",
+    "command": "markFulfilled",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "PurchaseNeed.markOrdered",
+    "entity": "PurchaseNeed",
+    "command": "markOrdered",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "PurchaseNeed.reviseRequired",
+    "entity": "PurchaseNeed",
+    "command": "reviseRequired",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Qualification.expire",
+    "entity": "Qualification",
+    "command": "expire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Qualification.grant",
+    "entity": "Qualification",
+    "command": "grant",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "Qualification.revoke",
+    "entity": "Qualification",
+    "command": "revoke",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "QualityCheck.fail",
+    "entity": "QualityCheck",
+    "command": "fail",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "QualityCheck.open",
+    "entity": "QualityCheck",
+    "command": "open",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "QualityCheck.pass",
+    "entity": "QualityCheck",
+    "command": "pass",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "QualityCheck.reinspect",
+    "entity": "QualityCheck",
+    "command": "reinspect",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Recipe.draft",
+    "entity": "Recipe",
+    "command": "draft",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "Recipe.publishVersion",
+    "entity": "Recipe",
+    "command": "publishVersion",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Recipe.purge",
+    "entity": "Recipe",
+    "command": "purge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Recipe.retire",
+    "entity": "Recipe",
+    "command": "retire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Recipe.retract",
+    "entity": "Recipe",
+    "command": "retract",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Recipe.reviseDraft",
+    "entity": "Recipe",
+    "command": "reviseDraft",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "Recipe.setServesPerYield",
+    "entity": "Recipe",
+    "command": "setServesPerYield",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.approveReview",
+    "entity": "RecipeImport",
+    "command": "approveReview",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.beginFinalization",
+    "entity": "RecipeImport",
+    "command": "beginFinalization",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.beginReview",
+    "entity": "RecipeImport",
+    "command": "beginReview",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.cancel",
+    "entity": "RecipeImport",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.complete",
+    "entity": "RecipeImport",
+    "command": "complete",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.markFailed",
+    "entity": "RecipeImport",
+    "command": "markFailed",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.recordParse",
+    "entity": "RecipeImport",
+    "command": "recordParse",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.recordRecipe",
+    "entity": "RecipeImport",
+    "command": "recordRecipe",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.recordResolutionProgress",
+    "entity": "RecipeImport",
+    "command": "recordResolutionProgress",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.resumeReview",
+    "entity": "RecipeImport",
+    "command": "resumeReview",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImport.upload",
+    "entity": "RecipeImport",
+    "command": "upload",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImportLine.attachCreatedIngredient",
+    "entity": "RecipeImportLine",
+    "command": "attachCreatedIngredient",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImportLine.confirmExisting",
+    "entity": "RecipeImportLine",
+    "command": "confirmExisting",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImportLine.confirmNew",
+    "entity": "RecipeImportLine",
+    "command": "confirmNew",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImportLine.discard",
+    "entity": "RecipeImportLine",
+    "command": "discard",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImportLine.markNew",
+    "entity": "RecipeImportLine",
+    "command": "markNew",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImportLine.resetResolution",
+    "entity": "RecipeImportLine",
+    "command": "resetResolution",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImportLine.stage",
+    "entity": "RecipeImportLine",
+    "command": "stage",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImportLine.suggestExactMatch",
+    "entity": "RecipeImportLine",
+    "command": "suggestExactMatch",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeImportLine.suggestPossibleMatches",
+    "entity": "RecipeImportLine",
+    "command": "suggestPossibleMatches",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeIngredient.add",
+    "entity": "RecipeIngredient",
+    "command": "add",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeIngredient.adjustQuantity",
+    "entity": "RecipeIngredient",
+    "command": "adjustQuantity",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeIngredient.remove",
+    "entity": "RecipeIngredient",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeIngredient.setWasteFactor",
+    "entity": "RecipeIngredient",
+    "command": "setWasteFactor",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeSnapshot.capture",
+    "entity": "RecipeSnapshot",
+    "command": "capture",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeStep.add",
+    "entity": "RecipeStep",
+    "command": "add",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeStep.remove",
+    "entity": "RecipeStep",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "RecipeStep.revise",
+    "entity": "RecipeStep",
+    "command": "revise",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "RecurringAvailability.declare",
+    "entity": "RecurringAvailability",
+    "command": "declare",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "RecurringAvailability.withdraw",
+    "entity": "RecurringAvailability",
+    "command": "withdraw",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "SavedReportDefinition.archive",
+    "entity": "SavedReportDefinition",
+    "command": "archive",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "SavedReportDefinition.changeSharing",
+    "entity": "SavedReportDefinition",
+    "command": "changeSharing",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "SavedReportDefinition.createDefinition",
+    "entity": "SavedReportDefinition",
+    "command": "createDefinition",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\reports\\ReportCreateForm.tsx",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "SavedReportDefinition.rename",
+    "entity": "SavedReportDefinition",
+    "command": "rename",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "SavedReportDefinition.restore",
+    "entity": "SavedReportDefinition",
+    "command": "restore",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "SavedReportDefinition.updateDefinition",
+    "entity": "SavedReportDefinition",
+    "command": "updateDefinition",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "Shift.applyApprovedSwap",
+    "entity": "Shift",
+    "command": "applyApprovedSwap",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Shift.cancel",
+    "entity": "Shift",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Shift.complete",
+    "entity": "Shift",
+    "command": "complete",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Shift.markNoShow",
+    "entity": "Shift",
+    "command": "markNoShow",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Shift.schedule",
+    "entity": "Shift",
+    "command": "schedule",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "Shift.stageApprovedSwap",
+    "entity": "Shift",
+    "command": "stageApprovedSwap",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "Shift.start",
+    "entity": "Shift",
+    "command": "start",
+    "has_ui": true,
+    "ui_file_path": "src\\features\\workforce\\overtimeProjection.ts",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "ShiftSwapRequest.accept",
+    "entity": "ShiftSwapRequest",
+    "command": "accept",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "ShiftSwapRequest.approve",
+    "entity": "ShiftSwapRequest",
+    "command": "approve",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "ShiftSwapRequest.decline",
+    "entity": "ShiftSwapRequest",
+    "command": "decline",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "ShiftSwapRequest.propose",
+    "entity": "ShiftSwapRequest",
+    "command": "propose",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "ShiftSwapRequest.reject",
+    "entity": "ShiftSwapRequest",
+    "command": "reject",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "ShiftSwapRequest.withdraw",
+    "entity": "ShiftSwapRequest",
+    "command": "withdraw",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "ShiftType.define",
+    "entity": "ShiftType",
+    "command": "define",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "ShiftType.reactivate",
+    "entity": "ShiftType",
+    "command": "reactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "ShiftType.retire",
+    "entity": "ShiftType",
+    "command": "retire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "StaffMessage.markRead",
+    "entity": "StaffMessage",
+    "command": "markRead",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "StaffMessage.send",
+    "entity": "StaffMessage",
+    "command": "send",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "StockCountLine.confirmLedgerMatch",
+    "entity": "StockCountLine",
+    "command": "confirmLedgerMatch",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "StockCountLine.freeze",
+    "entity": "StockCountLine",
+    "command": "freeze",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "StockCountLine.reconcileVariance",
+    "entity": "StockCountLine",
+    "command": "reconcileVariance",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "StockCountLine.recordCount",
+    "entity": "StockCountLine",
+    "command": "recordCount",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "StockCountLine.reviseCount",
+    "entity": "StockCountLine",
+    "command": "reviseCount",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "StockCountSession.close",
+    "entity": "StockCountSession",
+    "command": "close",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "StockCountSession.start",
+    "entity": "StockCountSession",
+    "command": "start",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "StockTransfer.record",
+    "entity": "StockTransfer",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "StorageLocation.activate",
+    "entity": "StorageLocation",
+    "command": "activate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "StorageLocation.deactivate",
+    "entity": "StorageLocation",
+    "command": "deactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "StorageLocation.register",
+    "entity": "StorageLocation",
+    "command": "register",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "StorageLocation.reviseDetails",
+    "entity": "StorageLocation",
+    "command": "reviseDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "TaxRate.define",
+    "entity": "TaxRate",
+    "command": "define",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "TaxRate.revise",
+    "entity": "TaxRate",
+    "command": "revise",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "TaxRate.setActive",
+    "entity": "TaxRate",
+    "command": "setActive",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "TimeOffRequest.approve",
+    "entity": "TimeOffRequest",
+    "command": "approve",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "TimeOffRequest.decline",
+    "entity": "TimeOffRequest",
+    "command": "decline",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "TimeOffRequest.submit",
+    "entity": "TimeOffRequest",
+    "command": "submit",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "TimeRecord.clockIn",
+    "entity": "TimeRecord",
+    "command": "clockIn",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "TimeRecord.clockOut",
+    "entity": "TimeRecord",
+    "command": "clockOut",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "TimeRecord.correct",
+    "entity": "TimeRecord",
+    "command": "correct",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "TrainingCompletion.record",
+    "entity": "TrainingCompletion",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "TrainingModule.define",
+    "entity": "TrainingModule",
+    "command": "define",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "TrainingModule.reactivate",
+    "entity": "TrainingModule",
+    "command": "reactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "TrainingModule.retire",
+    "entity": "TrainingModule",
+    "command": "retire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Vehicle.register",
+    "entity": "Vehicle",
+    "command": "register",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "Vehicle.reviseDetails",
+    "entity": "Vehicle",
+    "command": "reviseDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "Vehicle.updateOperationalStatus",
+    "entity": "Vehicle",
+    "command": "updateOperationalStatus",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "VehicleFuelLog.record",
+    "entity": "VehicleFuelLog",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "VehicleMaintenanceSchedule.applyService",
+    "entity": "VehicleMaintenanceSchedule",
+    "command": "applyService",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (4 client, 0 server)"
+  },
+  {
+    "capability_id": "VehicleMaintenanceSchedule.schedule",
+    "entity": "VehicleMaintenanceSchedule",
+    "command": "schedule",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "VehicleServiceEntry.record",
+    "entity": "VehicleServiceEntry",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "Vendor.onboard",
+    "entity": "Vendor",
+    "command": "onboard",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (10 client, 0 server)"
+  },
+  {
+    "capability_id": "Vendor.reinstate",
+    "entity": "Vendor",
+    "command": "reinstate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Vendor.suspend",
+    "entity": "Vendor",
+    "command": "suspend",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Vendor.terminate",
+    "entity": "Vendor",
+    "command": "terminate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Vendor.updateDetails",
+    "entity": "Vendor",
+    "command": "updateDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (10 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContact.add",
+    "entity": "VendorContact",
+    "command": "add",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContact.remove",
+    "entity": "VendorContact",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContact.update",
+    "entity": "VendorContact",
+    "command": "update",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContract.activate",
+    "entity": "VendorContract",
+    "command": "activate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContract.draft",
+    "entity": "VendorContract",
+    "command": "draft",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContract.markExpired",
+    "entity": "VendorContract",
+    "command": "markExpired",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContract.terminate",
+    "entity": "VendorContract",
+    "command": "terminate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContract.updateTerms",
+    "entity": "VendorContract",
+    "command": "updateTerms",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContractPriceTier.add",
+    "entity": "VendorContractPriceTier",
+    "command": "add",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContractPriceTier.remove",
+    "entity": "VendorContractPriceTier",
+    "command": "remove",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorContractPriceTier.update",
+    "entity": "VendorContractPriceTier",
+    "command": "update",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.approve",
+    "entity": "VendorOrder",
+    "command": "approve",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.cancel",
+    "entity": "VendorOrder",
+    "command": "cancel",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.confirm",
+    "entity": "VendorOrder",
+    "command": "confirm",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.ensureWeeklyDraft",
+    "entity": "VendorOrder",
+    "command": "ensureWeeklyDraft",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.markPartiallyReceived",
+    "entity": "VendorOrder",
+    "command": "markPartiallyReceived",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.markReceived",
+    "entity": "VendorOrder",
+    "command": "markReceived",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.open",
+    "entity": "VendorOrder",
+    "command": "open",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.requestChanges",
+    "entity": "VendorOrder",
+    "command": "requestChanges",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.submit",
+    "entity": "VendorOrder",
+    "command": "submit",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.submitForApproval",
+    "entity": "VendorOrder",
+    "command": "submitForApproval",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrder.updateTotals",
+    "entity": "VendorOrder",
+    "command": "updateTotals",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrderLine.addLine",
+    "entity": "VendorOrderLine",
+    "command": "addLine",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (7 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrderLine.cancelLine",
+    "entity": "VendorOrderLine",
+    "command": "cancelLine",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrderLine.ensureWeeklyLine",
+    "entity": "VendorOrderLine",
+    "command": "ensureWeeklyLine",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrderLine.recordReceipt",
+    "entity": "VendorOrderLine",
+    "command": "recordReceipt",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrderLine.reviseQuantity",
+    "entity": "VendorOrderLine",
+    "command": "reviseQuantity",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (2 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrderLineDemand.link",
+    "entity": "VendorOrderLineDemand",
+    "command": "link",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (5 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrderLineDemand.retire",
+    "entity": "VendorOrderLineDemand",
+    "command": "retire",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "VendorOrderLineDemand.revise",
+    "entity": "VendorOrderLineDemand",
+    "command": "revise",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Venue.activate",
+    "entity": "Venue",
+    "command": "activate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "Venue.changeCapacity",
+    "entity": "Venue",
+    "command": "changeCapacity",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Venue.deactivate",
+    "entity": "Venue",
+    "command": "deactivate",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "Venue.register",
+    "entity": "Venue",
+    "command": "register",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (14 client, 0 server)"
+  },
+  {
+    "capability_id": "Venue.updateDetails",
+    "entity": "Venue",
+    "command": "updateDetails",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (13 client, 0 server)"
+  },
+  {
+    "capability_id": "WasteRecord.record",
+    "entity": "WasteRecord",
+    "command": "record",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (9 client, 0 server)"
+  },
+  {
+    "capability_id": "WasteRecord.voidRecord",
+    "entity": "WasteRecord",
+    "command": "voidRecord",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "WeeklyPurchasingConfig.configure",
+    "entity": "WeeklyPurchasingConfig",
+    "command": "configure",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "WeeklyPurchasingConfig.routeNeed",
+    "entity": "WeeklyPurchasingConfig",
+    "command": "routeNeed",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (8 client, 0 server)"
+  },
+  {
+    "capability_id": "WeeklyPurchasingConfig.setOrderApprovalThreshold",
+    "entity": "WeeklyPurchasingConfig",
+    "command": "setOrderApprovalThreshold",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (1 client, 0 server)"
+  },
+  {
+    "capability_id": "WeeklyScheduleNotice.acknowledge",
+    "entity": "WeeklyScheduleNotice",
+    "command": "acknowledge",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (0 client, 0 server)"
+  },
+  {
+    "capability_id": "WeeklyScheduleNotice.publishSchedule",
+    "entity": "WeeklyScheduleNotice",
+    "command": "publishSchedule",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (6 client, 0 server)"
+  },
+  {
+    "capability_id": "WeeklyScheduleNotice.republishSchedule",
+    "entity": "WeeklyScheduleNotice",
+    "command": "republishSchedule",
+    "has_ui": false,
+    "ui_file_path": "N/A",
+    "ownership_summary": "clientOnly (3 client, 0 server)"
+  }
+]

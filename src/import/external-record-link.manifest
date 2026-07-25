@@ -1,0 +1,397 @@
+// Capsule external record link — durable mapping from external system records to Capsule entities.
+// Provides stable external ID mapping for TPP integration and import framework.
+// Source + record type + stable external ID → Capsule entity ID
+
+use "./import-run.manifest"
+
+// External system identifiers - extensible for future integrations
+enum ExternalSourceSystem {
+  tpp_legacy
+  csv_export
+  api_sync
+  quickbooks_online
+  google_calendar
+  stripe
+  other
+}
+
+// Capsule entity types that can be linked to external records
+enum CapsuleEntityType {
+  event_record
+  contact
+  lead
+  menu
+  venue
+  payment
+  invoice
+  contract
+  proposal
+  client
+  vendor
+  person
+  task
+  batch
+  order
+  delivery
+  stock
+  location
+}
+
+// Link verification status
+enum LinkVerificationStatus {
+  unverified
+  verified
+  deprecated
+}
+
+// Conflict resolution status for duplicate mappings
+enum ConflictStatus {
+  resolved
+  pending_conflict
+  superseded
+}
+
+entity ExternalRecordLink mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, sourceSystem, recordType, externalId]
+  timestamps
+  versionProperty version: number
+
+  // Core mapping fields
+  property required sourceSystem: ExternalSourceSystem = "tpp_legacy"
+  property required recordType: string = ""
+  property required externalId: string = ""
+  property required capsuleEntity: CapsuleEntityType = "contact"
+  property required capsuleId: string = ""
+
+  // Verification tracking
+  property required verified: boolean = false
+  property lastVerifiedAt: datetime?
+  property verifiedByUserId: string?
+
+  // Source tracking
+  property sourceImportRunId: string?
+  property effectiveStartDate: datetime?
+  property effectiveEndDate: datetime?
+
+  // Additional metadata
+  property rawSourceData: string?
+  property metadata: string?
+
+  // Conflict resolution
+  property required conflictStatus: ConflictStatus = "pending_conflict"
+  property resolvedByUserId: string?
+  property resolutionNote: string?
+
+  // References
+  ref sourceImportRun: ImportRun fields [tenantId, sourceImportRunId] references [tenantId, id]
+
+  // Constraints
+  constraint linkSourceSystemPresent: self.sourceSystem != null "Source system is required"
+  constraint linkExternalIdPresent: length(trim(self.externalId)) > 0 "External ID is required"
+  constraint linkDatesOrdered: self.effectiveStartDate == null or self.effectiveEndDate == null or self.effectiveStartDate <= self.effectiveEndDate "Effective start date must be before or equal to end date"
+  constraint linkVerifiedRequiresUser: self.verified == false or self.verifiedByUserId != null "Verified status requires a verifying user"
+  constraint linkResolvedRequiresUser: self.conflictStatus == "resolved" or self.resolvedByUserId == null "Resolved status requires a resolving user"
+
+  // Policies
+  default policy externalRecordLinkRead read: roleAllows(user.role, "importAccess") "Staff may read external record links"
+  default policy externalRecordLinkWrite write: roleAllows(user.role, "importAccess") "Staff may write external record links through commands"
+  default policy externalRecordLinkExecute execute: roleAllows(user.role, "importAccess") "Staff may execute external record link commands"
+
+  // linkExternalRecord - Create a new external-to-Capsule mapping
+  command link(
+    sourceSystem: ExternalSourceSystem,
+    recordType: string,
+    externalId: string,
+    capsuleEntity: CapsuleEntityType,
+    capsuleId: string,
+    optional verified: boolean,
+    optional verifiedByUserId: string,
+    optional sourceImportRunId: string,
+    optional effectiveStartDate: datetime,
+    optional effectiveEndDate: datetime,
+    optional rawSourceData: string,
+    optional metadata: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt == null
+    constraint linkSourceSystemPresent: sourceSystem != null "Source system is required"
+    constraint linkExternalIdPresent: length(trim(externalId)) > 0 "External ID is required"
+    constraint linkCapsuleIdPresent: length(trim(capsuleId)) > 0 "Capsule ID is required"
+    constraint linkVerifiedRequiresUser: verified == false or (verifiedByUserId != null and length(trim(verifiedByUserId)) > 0) "Verified status requires a verifying user"
+    constraint linkDatesOrdered: effectiveStartDate == null or effectiveEndDate == null or effectiveStartDate <= effectiveEndDate "Effective start date must be before or equal to end date"
+    mutate sourceSystem = sourceSystem
+    mutate recordType = recordType != null ? recordType : ""
+    mutate externalId = externalId
+    mutate capsuleEntity = capsuleEntity
+    mutate capsuleId = capsuleId
+    mutate verified = verified != null ? verified : false
+    mutate verifiedByUserId = verifiedByUserId
+    mutate lastVerifiedAt = verified != null and verified ? now() : null
+    mutate sourceImportRunId = sourceImportRunId
+    mutate effectiveStartDate = effectiveStartDate
+    mutate effectiveEndDate = effectiveEndDate
+    mutate rawSourceData = rawSourceData
+    mutate metadata = metadata
+    mutate conflictStatus = "pending_conflict"
+    emit ExternalRecordLinked {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      sourceSystem: sourceSystem
+      recordType: recordType != null ? recordType : ""
+      externalId: externalId
+      capsuleEntity: capsuleEntity
+      capsuleId: capsuleId
+      verified: verified != null ? verified : false
+      sourceImportRunId: sourceImportRunId
+    }
+  }
+
+  // verifyLink - Mark a link as verified (e.g., after user confirmation)
+  command verifyLink(
+    verifiedByUserId: string,
+    optional verified: boolean,
+    optional metadata: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    constraint verifyUserPresent: length(trim(verifiedByUserId)) > 0 "Verifying user is required"
+    mutate verified = verified != null ? verified : true
+    mutate verifiedByUserId = verifiedByUserId
+    mutate lastVerifiedAt = now()
+    mutate metadata = metadata != null ? metadata : self.metadata
+    mutate conflictStatus = verified != null and verified ? "resolved" : self.conflictStatus
+    mutate resolvedByUserId = verified != null and verified ? verifiedByUserId : self.resolvedByUserId
+    emit ExternalRecordVerified {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      verified: verified != null ? verified : true
+      verifiedByUserId: verifiedByUserId
+      capsuleEntity: self.capsuleEntity
+      capsuleId: self.capsuleId
+    }
+  }
+
+  // unlinkExternalRecord - Remove a link (soft delete via discard)
+  command unlinkExternalRecord(
+    reason: string,
+    optional unlinkedByUserId: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    constraint unlinkReasonPresent: length(trim(reason)) > 0 "Unlink reason is required"
+    mutate deletedAt = now()
+    mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : now()
+    emit ExternalRecordUnlinked {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      reason: reason
+      unlinkedByUserId: unlinkedByUserId != null ? unlinkedByUserId : ""
+      capsuleEntity: self.capsuleEntity
+      capsuleId: self.capsuleId
+      externalId: self.externalId
+      sourceSystem: self.sourceSystem
+    }
+  }
+
+  // updateCapsuleId - Update the Capsule entity ID for an existing link
+  command updateCapsuleId(capsuleId: string) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    constraint updateCapsuleIdPresent: length(trim(capsuleId)) > 0 "Capsule ID is required"
+    compute previousCapsuleId = self.capsuleId
+    mutate capsuleId = capsuleId
+    mutate lastVerifiedAt = now()
+    mutate verified = false  // Reset verification on ID change
+    emit ExternalRecordCapsuleIdUpdated {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      previousCapsuleId: previousCapsuleId
+      capsuleId: capsuleId
+      capsuleEntity: self.capsuleEntity
+    }
+  }
+
+  // resolveConflict - Mark a conflict as resolved
+  command resolveConflict(
+    conflictStatus: ConflictStatus,
+    resolvedByUserId: string,
+    optional resolutionNote: string
+  ) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    constraint resolveUserPresent: length(trim(resolvedByUserId)) > 0 "Resolving user is required"
+    mutate conflictStatus = conflictStatus
+    mutate resolvedByUserId = resolvedByUserId
+    mutate resolutionNote = resolutionNote
+    mutate lastVerifiedAt = now()
+    emit ExternalRecordConflictResolved {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      conflictStatus: conflictStatus
+      resolvedByUserId: resolvedByUserId
+    }
+  }
+
+  // retire - Mark a link as superseded (no longer active)
+  command retire(optional effectiveEndDate: datetime) {
+    guard self.deletedAt == null
+    guard self.createdAt != null
+    mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : now()
+    mutate conflictStatus = "superseded"
+    mutate verified = false
+    mutate lastVerifiedAt = now()
+    emit ExternalRecordRetired {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      effectiveEndDate: effectiveEndDate != null ? effectiveEndDate : now()
+    }
+  }
+
+  // discard - Soft delete a link
+  command discard(reason: string) {
+    guard self.deletedAt == null
+    constraint discardReasonPresent: length(trim(reason)) > 0 "Discard reason is required"
+    mutate deletedAt = now()
+    mutate effectiveEndDate = effectiveEndDate != null ? effectiveEndDate : now()
+    emit ExternalRecordDiscarded {
+      externalRecordLinkId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  store ExternalRecordLink in durable
+}
+
+// Queries
+query findByExternal(
+  tenantId: string,
+  sourceSystem: ExternalSourceSystem,
+  recordType: string,
+  externalId: string
+): ExternalRecordLink {
+  assert tenantId != null
+  assert sourceSystem != null
+  assert recordType != null
+  assert externalId != null
+  filter self.tenantId == tenantId
+  filter self.sourceSystem == sourceSystem
+  filter self.recordType == recordType
+  filter self.externalId == externalId
+  filter self.deletedAt == null
+  sort self.createdAt desc
+  limit 1
+}
+
+query findByCapsule(
+  tenantId: string,
+  capsuleEntity: CapsuleEntityType,
+  capsuleId: string
+): ExternalRecordLink {
+  assert tenantId != null
+  assert capsuleEntity != null
+  assert capsuleId != null
+  filter self.tenantId == tenantId
+  filter self.capsuleEntity == capsuleEntity
+  filter self.capsuleId == capsuleId
+  filter self.deletedAt == null
+  sort self.createdAt desc
+  limit 1
+}
+
+query findAllBySourceSystem(
+  tenantId: string,
+  sourceSystem: ExternalSourceSystem
+): ExternalRecordLink[] {
+  assert tenantId != null
+  assert sourceSystem != null
+  filter self.tenantId == tenantId
+  filter self.sourceSystem == sourceSystem
+  filter self.deletedAt == null
+  sort self.createdAt desc
+}
+
+query findAllByImportRun(
+  tenantId: string,
+  sourceImportRunId: string
+): ExternalRecordLink[] {
+  assert tenantId != null
+  assert sourceImportRunId != null
+  filter self.tenantId == tenantId
+  filter self.sourceImportRunId == sourceImportRunId
+  filter self.deletedAt == null
+  sort self.createdAt desc
+}
+
+query findUnverified(
+  tenantId: string,
+  optional sourceSystem: ExternalSourceSystem
+): ExternalRecordLink[] {
+  assert tenantId != null
+  filter self.tenantId == tenantId
+  filter self.verified == false
+  filter sourceSystem == null or self.sourceSystem == sourceSystem
+  filter self.deletedAt == null
+  sort self.createdAt desc
+}
+
+// Events
+event ExternalRecordLinked: "external_record_link.linked" {
+  externalRecordLinkId: string
+  tenantId: string
+  sourceSystem: ExternalSourceSystem
+  recordType: string
+  externalId: string
+  capsuleEntity: CapsuleEntityType
+  capsuleId: string
+  verified: boolean
+  sourceImportRunId: string?
+}
+
+event ExternalRecordVerified: "external_record_link.verified" {
+  externalRecordLinkId: string
+  tenantId: string
+  verified: boolean
+  verifiedByUserId: string
+  capsuleEntity: CapsuleEntityType
+  capsuleId: string
+}
+
+event ExternalRecordUnlinked: "external_record_link.unlinked" {
+  externalRecordLinkId: string
+  tenantId: string
+  reason: string
+  unlinkedByUserId: string
+  capsuleEntity: CapsuleEntityType
+  capsuleId: string
+  externalId: string
+  sourceSystem: ExternalSourceSystem
+}
+
+event ExternalRecordCapsuleIdUpdated: "external_record_link.capsule_id_updated" {
+  externalRecordLinkId: string
+  tenantId: string
+  previousCapsuleId: string
+  capsuleId: string
+  capsuleEntity: CapsuleEntityType
+}
+
+event ExternalRecordConflictResolved: "external_record_link.conflict_resolved" {
+  externalRecordLinkId: string
+  tenantId: string
+  conflictStatus: ConflictStatus
+  resolvedByUserId: string
+}
+
+event ExternalRecordRetired: "external_record_link.retired" {
+  externalRecordLinkId: string
+  tenantId: string
+  effectiveEndDate: datetime
+}
+
+event ExternalRecordDiscarded: "external_record_link.discarded" {
+  externalRecordLinkId: string
+  tenantId: string
+  reason: string
+}

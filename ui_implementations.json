@@ -1,0 +1,89 @@
+{
+  "Dish.setPrimaryImage": {
+    "capability_id": "Dish.setPrimaryImage",
+    "entity": "Dish",
+    "command": "setPrimaryImage",
+    "files": ["src\\features\\attachments\\DishPrimaryImageUploader.tsx"]
+  },
+  "EventDish.confirmFromProposal": {
+    "capability_id": "EventDish.confirmFromProposal",
+    "entity": "EventDish",
+    "command": "confirmFromProposal",
+    "files": ["src\\features\\clients\\ProposalsPage.tsx"]
+  },
+  "EventGuest.assignTable": {
+    "capability_id": "EventGuest.assignTable",
+    "entity": "EventGuest",
+    "command": "assignTable",
+    "files": ["src\\features\\events\\EventGuestPolicy.ts"]
+  },
+  "EventGuest.checkIn": {
+    "capability_id": "EventGuest.checkIn",
+    "entity": "EventGuest",
+    "command": "checkIn",
+    "files": ["src\\features\\events\\EventGuestPolicy.ts"]
+  },
+  "EventGuest.withdraw": {
+    "capability_id": "EventGuest.withdraw",
+    "entity": "EventGuest",
+    "command": "withdraw",
+    "files": ["src\\features\\events\\EventGuestPolicy.ts"]
+  },
+  "EventDish.addToEvent": {
+    "capability_id": "EventDish.addToEvent",
+    "entity": "EventDish",
+    "command": "addToEvent",
+    "files": ["src\\features\\events\\EventMenuPanel.tsx"]
+  },
+  "Event.planEngagement": {
+    "capability_id": "Event.planEngagement",
+    "entity": "Event",
+    "command": "planEngagement",
+    "files": ["src\\features\\events\\EventPlanEngagementFormMapper.ts"]
+  },
+  "IngredientDemand.markReleased": {
+    "capability_id": "IngredientDemand.markReleased",
+    "entity": "IngredientDemand",
+    "command": "markReleased",
+    "files": ["src\\features\\events\\EventStockIssueCoordinator.ts"]
+  },
+  "InventoryReservation.consume": {
+    "capability_id": "InventoryReservation.consume",
+    "entity": "InventoryReservation",
+    "command": "consume",
+    "files": ["src\\features\\events\\EventStockIssueCoordinator.ts"]
+  },
+  "PayrollInput.prepare": {
+    "capability_id": "PayrollInput.prepare",
+    "entity": "PayrollInput",
+    "command": "prepare",
+    "files": ["src\\features\\finance\\PayrollPrepareForm.tsx"]
+  },
+  "Event.approve": {
+    "capability_id": "Event.approve",
+    "entity": "Event",
+    "command": "approve",
+    "files": [
+      "src\\features\\inventory\\SupplyLifecyclePolicy.ts",
+      "src\\features\\kitchen\\EventPrepTaskSynchronizer.ts"
+    ]
+  },
+  "IngredientDemand.confirm": {
+    "capability_id": "IngredientDemand.confirm",
+    "entity": "IngredientDemand",
+    "command": "confirm",
+    "files": ["src\\features\\inventory\\SupplyLifecyclePolicy.ts"]
+  },
+  "SavedReportDefinition.createDefinition": {
+    "capability_id": "SavedReportDefinition.createDefinition",
+    "entity": "SavedReportDefinition",
+    "command": "createDefinition",
+    "files": ["src\\features\\reports\\ReportCreateForm.tsx"]
+  },
+  "Shift.start": {
+    "capability_id": "Shift.start",
+    "entity": "Shift",
+    "command": "start",
+    "files": ["src\\features\\workforce\\overtimeProjection.ts"]
+  }
+}

@@ -13,6 +13,9 @@ import {
   useEventChangeVenue,
   useEventCloseOut,
   useEventComplete,
+  useEventConfirmSalesLock,
+  useEventFinalizeEvent,
+  useEventLockForSales,
   useEventReschedule,
   useEventReturnToPlanning,
   useEventSubmitForApproval,
@@ -74,6 +77,9 @@ export function EventDetailPage() {
   const { branding } = useTenantBranding();
   const submitForApproval = useEventSubmitForApproval();
   const approve = useEventApprove();
+  const lockForSales = useEventLockForSales();
+  const confirmSalesLock = useEventConfirmSalesLock();
+  const finalizeEvent = useEventFinalizeEvent();
   const beginExecution = useEventBeginExecution();
   const complete = useEventComplete();
   const closeOut = useEventCloseOut();
@@ -161,6 +167,9 @@ export function EventDetailPage() {
     const args = { docId: event._id, version };
     if (key === "submitForApproval") void run(() => submitForApproval(args));
     if (key === "approve") void run(() => approve(args));
+    if (key === "lockForSales") void run(() => lockForSales(args));
+    if (key === "confirmSalesLock") void run(() => confirmSalesLock(args));
+    if (key === "finalizeEvent") void run(() => finalizeEvent(args));
     if (key === "beginExecution") void run(() => beginExecution(args));
     if (key === "complete") void run(() => complete(args));
     if (key === "closeOut") void run(() => closeOut(args));
