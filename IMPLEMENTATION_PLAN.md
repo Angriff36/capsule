@@ -34,6 +34,17 @@
 
 **Honest scope notes:** (1) Blank string fields can't be CLEARED by blanking in the edit form (blank → `"" || undefined` → `undefined` → `patch` drops → preserves) — identical pre-existing behavior for every Venue string field, not introduced here. (2) `restrictions` is a single textarea, not a chip-list — the spec names no structure for it. (3) No focused test added — AGENTS.md forbids adding tests unless the owner asks; covered by the passing `bun run check` gate and verified-by-consistency.
 
+**⚠ Push status: BLOCKED by the pre-push review gate — escalated to the human (NOT pushed).** The PreToolUse `review-gate-hook` ran a broad independent codex review over the full `origin/main..HEAD` diff (~242k lines — dominated by the 8 new `.builder/baselines/*` regen snapshots) and returned FAIL on 5 findings — ALL in the GENERATED Manifest framework (`convex/mutations.ts`, do-not-edit), NONE in this increment's venue-fields change (the focused 3-file codex review APPROVED at round 3, above):
+1. CRITICAL — idempotency lookup runs before authentication, keyed only by caller-controlled key → cross-command/cross-tenant cached-result disclosure.
+2. CRITICAL — idempotency cache persists decrypted command results (encrypted PII: contact details, availability notes) in plaintext.
+3. HIGH — `Contract_sign` trusts caller-supplied `signedBy` text → any sales user can impersonate a client signer.
+4. HIGH — `Dish_mergeInto` retires/soft-deletes the source without verifying `targetDishId` exists / is active / same-tenant → destructive cross-tenant merge.
+5. HIGH — `CutoverDecision` execute/approval/rollback/read-only write `context.timestamp`, which `MutationCtx` does not expose (pre-existing; noted at plan line ~220 from 2026-07-25).
+
+**Verified PRE-EXISTING (not introduced by this increment):** `context.timestamp` (4×), `signedBy` (6×), `mergeInto` (6×), and the idempotency framework (3215×) are ALL present on `origin/main:convex/mutations.ts`; `git diff origin/main..HEAD -- convex/mutations.ts` touches `Contract_sign`/`mergeInto`/`CutoverDecision` **0 times**. These are systemic / generator-level and cannot be fixed by hand-editing generated files — same class as issue #111. Any manifest-regen produces a new baseline snapshot, so this gate will block ANY manifest-changing increment until the framework issues are addressed.
+
+**Local state:** GREEN (`bun run check` exit 0), 3 commits ahead of origin/main (`dd24d6b` + `d30e1f5` + `97c838c`) + tag `v0.0.10`, **NOT pushed**. Per the merge gate ("never push over a rejection"; `REVIEW_GATE=0` is human-only) → escalated. **Human options:** (a) `REVIEW_GATE=0 git push --follow-tags` conscious override (single-org dev deployment; the focused venue-fields review passed); (b) fix the systemic framework issues first — generator/manifest-level, separate effort, recommend a GitHub issue per `docs/architecture/escalate-blockers-to-github.md`; (c) accept local-only. NOTE: per AGENTS.md, pushing `main` auto-deploys the frontend (Vercel) but the Convex backend schema (`tangible-skunk-448`) needs a separate human-authorized `npx convex deploy -y` to actually persist the new Venue fields server-side.
+
 ---
 
 **2026-07-26 — Priority 18 (Pack List Templates) DONE — spec §11.2 (templates AND generation):**
