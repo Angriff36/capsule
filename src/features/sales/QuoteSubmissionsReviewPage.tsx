@@ -55,15 +55,21 @@ export function QuoteSubmissionsReviewPage() {
       const result = await process({
         submissionId: id as Doc<"quoteSubmissions">["_id"],
       });
-      setLastConverted({
-        clientName,
-        eventId: result.eventId,
-        leadId: result.leadId,
-      });
       if (result.errors.length > 0) {
+        // Conversion did not complete all steps — the submission is now failed
+        // (terminal). Do NOT show the green success banner; surface the per-step
+        // errors for manual reconciliation.
         setPartialErrors(
-          `Converted with partial failures: ${result.errors.join("; ")}`,
+          `Conversion incomplete — some steps failed: ${result.errors.join(
+            "; ",
+          )}. The submission is marked failed. Any records that were created exist in their respective lists.`,
         );
+      } else {
+        setLastConverted({
+          clientName,
+          eventId: result.eventId,
+          leadId: result.leadId,
+        });
       }
     } catch (err) {
       setFailure(classifyCommandFailure(err));
@@ -230,6 +236,18 @@ export function QuoteSubmissionsReviewPage() {
                   )}
                 </dl>
               )}
+
+              {sub.status === "failed" &&
+                (sub.errorMessage || sub.processingErrors) && (
+                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-900">
+                    {sub.errorMessage && (
+                      <div className="font-medium">{sub.errorMessage}</div>
+                    )}
+                    {sub.processingErrors && (
+                      <div className="mt-0.5">{sub.processingErrors}</div>
+                    )}
+                  </div>
+                )}
 
               {sub.status === "completed" && sub.eventId && (
                 <p className="mt-3 text-sm">

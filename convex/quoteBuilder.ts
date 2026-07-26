@@ -110,7 +110,7 @@ export const ingressQuoteSubmission = internalMutation({
   ): Promise<{
     submissionId: Id<"quoteSubmissions">;
     isDuplicate: boolean;
-    status: "pending";
+    status: Doc<"quoteSubmissions">["status"];
   }> => {
     // Resolve the public tenant: the active organization this deployment serves.
     // Single-org deployment today; a multi-tenant host would resolve from
@@ -148,7 +148,7 @@ export const ingressQuoteSubmission = internalMutation({
       return {
         submissionId: existing._id,
         isDuplicate: true,
-        status: "pending",
+        status: existing.status,
       };
     }
 
@@ -218,8 +218,12 @@ export const submitQuote = action({
     if (!dateValidation.valid) {
       throw new ConvexError(dateValidation.error ?? "Invalid event date");
     }
-    if (args.guestCount <= 0) {
-      throw new ConvexError("Guest count must be positive");
+    if (
+      !Number.isFinite(args.guestCount) ||
+      args.guestCount < 1 ||
+      args.guestCount > 100000
+    ) {
+      throw new ConvexError("Guest count must be between 1 and 100,000");
     }
     if (!args.clientName?.trim()) {
       throw new ConvexError("Client name is required");
@@ -262,7 +266,7 @@ export const submitQuote = action({
 
     return {
       submissionId: result.submissionId,
-      status: result.status,
+      status: result.status ?? "pending",
       isDuplicate: result.isDuplicate,
       message: result.isDuplicate
         ? "You've already submitted a quote request for this event. We'll be in touch soon!"
@@ -296,7 +300,7 @@ export const processQuoteSubmission = action({
     const submission = await ctx.runQuery(api.queries.getQuoteSubmission, {
       id: submissionId,
     });
-    if (!submission || submission.deletedAt !== null) {
+    if (!submission || submission.deletedAt != null) {
       throw new ConvexError("Quote submission not found");
     }
     // Only pending submissions can be converted: the manifest transitions are
@@ -333,7 +337,7 @@ export const processQuoteSubmission = action({
           api.mutations.Client_createViaRegister,
           { clientType: "company", companyName: clientName, email, phone },
         );
-        clientId = created._id;
+        clientId = created.docId;
       }
     } catch (error) {
       errors.push(
@@ -356,7 +360,7 @@ export const processQuoteSubmission = action({
             phone,
           },
         );
-        const createdLeadId = leadResult._id;
+        const createdLeadId = leadResult.docId;
         leadId = createdLeadId;
         await ctx.runMutation(api.mutations.Lead_stageConversion, {
           docId: createdLeadId,
@@ -402,7 +406,7 @@ export const processQuoteSubmission = action({
               submission.dietaryRestrictions ?? undefined,
           },
         );
-        eventId = eventResult._id;
+        eventId = eventResult.docId;
       }
     } catch (error) {
       errors.push(
@@ -433,7 +437,7 @@ export const processQuoteSubmission = action({
               "Draft proposal created from quote request. Menu selection and pricing to follow.",
           },
         );
-        proposalId = proposalResult._id;
+        proposalId = proposalResult.docId;
         // ponytail: no Proposal command links an event after creation
         // (createViaDraft has no eventId arg), so the draft stays unlinked;
         // both IDs are still recorded on the QuoteSubmission below.
@@ -496,7 +500,7 @@ export const getQuoteSubmissionStatus = action({
       id: submissionId,
     });
 
-    if (!submission || submission.deletedAt !== null) {
+    if (!submission || submission.deletedAt != null) {
       throw new ConvexError("Quote submission not found");
     }
 
