@@ -48,13 +48,23 @@
  * for matching context. No Payment entity is created — by design (the spec's
  * reference model), not omission.
  *
- * ponytail: ceiling — venues + contacts + events + leads + payments ship here.
- * Menus still throws an honest "not yet supported" (menus have no parser + no
- * TPP source feed; Dish/Menu entities exist but nothing maps a TPP row to them).
- * Revert supersedes links but leaves imported Venue entities in place (an event
- * may already reference one; deactivation is an operator action) — documented
- * honesty, not silent deletion. Source rows are caller-supplied (TPP has no bulk
- * export, spec §6.3), so this is the manual/JSON-paste migration path.
+ * Menus materialize as Dish entities, one per TPP dish-catalog row (the
+ * work/dishes.csv export has no menu grouping, no external id, and EMPTY price
+ * columns). Dish has no price field, so price_per_person / cost_per_person are
+ * preserved on the link's rawSourceData (the §6.2 "prices" captured verbatim
+ * from the source) rather than inventing a Menu+MenuDish pricing graph for
+ * empty data. A future TPP export with real prices is the follow-up slice for a
+ * queryable MenuDish.sellingPrice. `Dish_createViaIntroduce` is kitchenAccess-
+ * guarded (not salesAccess), so a role with importAccess but not kitchenAccess
+ * sees every dish land as pending_conflict; the dish name is slugified into the
+ * link externalId (no id column in the feed).
+ *
+ * ponytail: ceiling — venues + contacts + events + leads + payments + menus
+ * ship here (all six §6.2 datasets). Revert supersedes links but leaves imported
+ * entities in place (an event may already reference one; deactivation is an
+ * operator action) — documented honesty, not silent deletion. Source rows are
+ * caller-supplied (TPP has no bulk export, spec §6.3), so this is the manual/
+ * JSON-paste migration path.
  */
 import { ConvexError, v } from "convex/values";
 import { action, internalMutation, internalQuery } from "./_generated/server";
@@ -64,14 +74,17 @@ import {
   parseTppContacts,
   parseTppEvents,
   parseTppLeads,
+  parseTppMenus,
   parseTppPayments,
   parseTppVenues,
   type ParsedCapsuleEvent,
   type ParsedCapsuleLead,
+  type ParsedCapsuleMenu,
   type ParsedCapsulePayment,
   type TppContactRecord,
   type TppEventRecord,
   type TppLeadRecord,
+  type TppMenuRecord,
   type TppPaymentRecord,
   type TppVenueRecord,
 } from "./tppParser";
@@ -819,13 +832,123 @@ export const commitImportRun = action({
       };
     }
 
-    if (importRun.datasetType !== "venues") {
-      // ponytail: ceiling — venues + contacts + events + leads + payments
-      // supported. Menus needs a parser + a TPP source feed.
-      throw new ConvexError(
-        `Dataset '${importRun.datasetType}' import is not yet supported (venues/contacts/events/leads/payments only). Menus needs a parser + a TPP source feed.`,
-      );
+    if (importRun.datasetType === "menus") {
+      // ponytail: each TPP dish-catalog row → a Dish entity (the menu catalog
+      // item). The TPP dishes export (work/dishes.csv) has no menu grouping, no
+      // external id, and EMPTY price columns, so a Dish per row is the faithful
+      // one-entity mapping (mirrors venues/contacts/events/leads). Dish has no
+      // price field, so price_per_person / cost_per_person are preserved on the
+      // link's rawSourceData (captured verbatim from the source — they are empty
+      // in the real feed) rather than inventing a Menu+MenuDish pricing graph.
+      // Menu/MenuDish assembly (to make prices queryable) is a documented
+      // follow-up if a TPP export with real prices arrives. The dish name is
+      // slugified into the link externalId (no id column in the feed).
+      // Dish_createViaIntroduce is kitchenAccess-guarded (NOT salesAccess like
+      // the other branches), so a role with importAccess but not kitchenAccess
+      // sees every dish land as pending_conflict (managers/admins/owners hold
+      // both); portionSize is parsed from free text and defaults to 1.
+      if (args.rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const parsed = parseTppMenus(args.rawRows as TppMenuRecord[]);
+      if (parsed.records.length === 0) {
+        throw new ConvexError(
+          `No valid menu records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
+        );
+      }
+      const sourceSystem = importRun.sourceSystem;
+      let committed = 0;
+      let skipped = 0;
+      let pending = 0;
+
+      for (const menu of parsed.records as ParsedCapsuleMenu[]) {
+        const existing = await ctx.runQuery(internal.importCommit.findLink, {
+          tenantId,
+          sourceSystem,
+          recordType: "menu",
+          externalId: menu.externalId,
+        });
+        if (existing && existing.capsuleId) {
+          // Already materialized in a prior run — idempotent skip.
+          skipped += 1;
+          continue;
+        }
+
+        const idempotencyKey = `import:${args.importRunId}:menu:${menu.externalId}`;
+        try {
+          const created = await ctx.runMutation(
+            api.mutations.Dish_createViaIntroduce,
+            {
+              name: menu.name,
+              portionSize: menu.portionSize,
+              portionUnit: menu.portionUnit,
+              description: menu.description,
+              category: menu.category,
+              serviceStyle: menu.serviceStyle,
+              dietaryTags: menu.dietaryTags,
+              allergenSummary: menu.allergenSummary,
+              idempotencyKey,
+            },
+          );
+          const dishId: string = (created as { docId: string }).docId;
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "menu",
+            externalId: menu.externalId,
+            capsuleEntity: "menu",
+            capsuleId: dishId,
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(menu),
+            conflictStatus: "resolved",
+          });
+          committed += 1;
+        } catch (cause) {
+          // Per-record failure (e.g. kitchenAccess denied) → review queue.
+          const note =
+            cause instanceof Error
+              ? cause.message
+              : "Dish materialization failed";
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "menu",
+            externalId: menu.externalId,
+            capsuleEntity: "menu",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(menu),
+            conflictStatus: "pending_conflict",
+            resolutionNote: note,
+          });
+          pending += 1;
+        }
+      }
+
+      if (committed === 0 && pending > 0) {
+        throw new ConvexError(
+          `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+        );
+      }
+
+      await ctx.runMutation(api.mutations.ImportRun_commit, {
+        docId: args.importRunId,
+        version: importRun.version,
+      });
+
+      return {
+        committed,
+        skipped,
+        pending,
+        parseErrors: parsed.errors.length,
+      };
     }
+
+    // ImportDatasetType is a closed union (contacts/events/leads/payments/menus/
+    // venues); the five branches above each return, so TS narrows
+    // importRun.datasetType to "venues" here — this fall-through is exhaustive.
+    // A future member added without a branch would fall through to venue parsing
+    // and fail loudly ("No valid venue records parsed") rather than misroute.
     if (args.rawRows.length === 0) {
       throw new ConvexError("No source rows provided — nothing to commit.");
     }

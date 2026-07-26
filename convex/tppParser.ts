@@ -131,6 +131,29 @@ export interface TppPaymentRecord {
   CreatedDate?: string;
 }
 
+export interface TppMenuRecord {
+  // The TPP dishes export (work/dishes.csv) carries no external id and no menu
+  // grouping — the dish name is the only stable identity (slugified into
+  // externalId). MenuItemID is kept for parity with sibling records + a future
+  // real export. price_per_person / cost_per_person have no Dish field to land
+  // on (Dish has no price) and are EMPTY in the source feed; they are preserved
+  // on the link's rawSourceData rather than inventing a Menu+MenuDish graph.
+  MenuItemID?: string;
+  Name: string;
+  RecipeName?: string;
+  Description?: string;
+  Category?: string;
+  ServiceStyle?: string;
+  // Free text like "75 servings" / "55 or 150 servings depending on event";
+  // parsePortionSize extracts a leading int (default 1).
+  PortionSizeDescription?: string;
+  DietaryTags?: string;
+  Allergens?: string;
+  PricePerPerson?: number;
+  CostPerPerson?: number;
+  CreatedDate?: string;
+}
+
 /**
  * Parsed Capsule entity format
  */
@@ -219,6 +242,26 @@ export interface ParsedCapsuleLead {
   referralSource?: string;
   eventDate?: number;
   closeDate?: number;
+}
+
+export interface ParsedCapsuleMenu {
+  externalId: string; // slugified Name (or MenuItemID when present)
+  name: string;
+  description?: string;
+  category?: string;
+  serviceStyle?: string;
+  portionSize: number; // leading int from PortionSizeDescription, default 1
+  portionUnit: string; // "portion"
+  dietaryTags: string[];
+  allergenSummary: string[]; // normalized to the AllergenCode enum
+  // Raw source text preserved on the link (§6.1 "Legacy source fields are
+  // visible for reconciliation") — the normalized allergenSummary / portionSize
+  // alone would lose the original free text.
+  rawAllergens?: string;
+  rawPortionDescription?: string;
+  // Preserved for fidelity (Dish has no price field); EMPTY in the real feed.
+  pricePerPerson?: number;
+  costPerPerson?: number;
 }
 
 /**
@@ -347,6 +390,49 @@ export function mapTppVenueType(type?: string): string | undefined {
 }
 
 /**
+ * Extract a leading integer from free-text portion strings like "75 servings"
+ * or "55 or 150 servings depending on event". Defaults to 1 (Dish.portionSize
+ * must be > 0).
+ */
+export function parsePortionSize(value?: string): number {
+  if (!value) return 1;
+  const match = String(value).match(/\d+/);
+  return match ? Math.max(1, parseInt(match[0], 10)) : 1;
+}
+
+/**
+ * Normalize semicolon-separated TPP allergen display names
+ * (Eggs, Shellfish, Dairy, Wheat/Gluten, Tree Nuts, ...) to the Capsule
+ * AllergenCode enum (eggs, crustacean_shellfish, milk, wheat, tree_nuts, ...).
+ * Unknown values are dropped (the enum is closed; do not invent codes).
+ */
+export function mapTppAllergens(value?: string): string[] {
+  if (!value) return [];
+  const map: Record<string, string> = {
+    eggs: "eggs",
+    milk: "milk",
+    dairy: "milk",
+    fish: "fish",
+    shellfish: "crustacean_shellfish",
+    "tree nuts": "tree_nuts",
+    peanuts: "peanuts",
+    wheat: "wheat",
+    "wheat/gluten": "wheat",
+    gluten: "wheat",
+    soybeans: "soybeans",
+    soy: "soybeans",
+    sesame: "sesame",
+  };
+  const out: string[] = [];
+  for (const raw of value.split(/[;,]/)) {
+    const key = raw.trim().toLowerCase();
+    const code = map[key];
+    if (code && !out.includes(code)) out.push(code);
+  }
+  return out;
+}
+
+/**
  * Parse TPP Event record to Capsule format
  */
 export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
@@ -468,6 +554,74 @@ export function parseTppLead(record: TppLeadRecord): ParsedCapsuleLead {
     referralSource: record.ReferralSource,
     eventDate: parseTppDateTime(record.EventDate),
     closeDate: parseTppDateTime(record.CloseDate),
+  };
+}
+
+/** Slugify a dish name into a stable external id (no id column in the TPP feed). */
+function slugifyMenuName(name: string): string {
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  return slug || name;
+}
+
+/**
+ * Parse TPP menu (dish catalog) record to Capsule Dish format.
+ *
+ * Accepts BOTH the PascalCase TppMenuRecord shape (parity with the other
+ * datasets' interfaces) AND the literal snake_case columns of the real TPP
+ * dishes.csv export (name/description/category/service_style/
+ * portion_size_description/dietary_tags/allergens/price_per_person/
+ * cost_per_person), so an operator can paste either form — the first present,
+ * non-null key wins. Without this, a raw dishes.csv row (snake_case) would
+ * surface `undefined` for every field and `name.trim()` would throw, so the
+ * menus import would materialize nothing from the real feed.
+ */
+export function parseTppMenu(record: TppMenuRecord): ParsedCapsuleMenu {
+  const r = record as unknown as Record<string, unknown>;
+  const get = (...keys: string[]): unknown => {
+    for (const k of keys) {
+      const v = r[k];
+      if (v !== undefined && v !== null) return v;
+    }
+    return undefined;
+  };
+  const rawName = get("Name", "name");
+  const name = (typeof rawName === "string" ? rawName : "").trim();
+  const portionText = get(
+    "PortionSizeDescription",
+    "portion_size_description",
+  ) as string | undefined;
+  const allergenText = get("Allergens", "allergens") as string | undefined;
+  const dietaryText = get("DietaryTags", "dietary_tags") as string | undefined;
+  return {
+    externalId:
+      (get("MenuItemID", "menu_item_id") as string | undefined)?.trim() ||
+      slugifyMenuName(name),
+    name,
+    description: get("Description", "description") as string | undefined,
+    category: get("Category", "category") as string | undefined,
+    serviceStyle: get("ServiceStyle", "service_style") as string | undefined,
+    portionSize: parsePortionSize(portionText),
+    portionUnit: "portion",
+    dietaryTags: dietaryText
+      ? dietaryText
+          .split(/[;,]/)
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [],
+    allergenSummary: mapTppAllergens(allergenText),
+    // Preserve the raw source text on the link via JSON.stringify(menu)
+    // (§6.1 reconciliation visibility).
+    rawAllergens: allergenText,
+    rawPortionDescription: portionText,
+    pricePerPerson: parseTppMoney(
+      get("PricePerPerson", "price_per_person") as string | number | undefined,
+    ),
+    costPerPerson: parseTppMoney(
+      get("CostPerPerson", "cost_per_person") as string | number | undefined,
+    ),
   };
 }
 
@@ -798,8 +952,64 @@ export function parseTppLeads(
 }
 
 /**
- * Generate record counts summary
+ * Batch parse TPP menus (dish catalog rows)
  */
+export function parseTppMenus(
+  records: TppMenuRecord[],
+): ParserResult<ParsedCapsuleMenu> {
+  const result: ParsedCapsuleMenu[] = [];
+  const errors: Array<{ recordIndex: number; field: string; message: string }> =
+    [];
+  const warnings: Array<{
+    recordIndex: number;
+    field: string;
+    message: string;
+  }> = [];
+
+  records.forEach((record, index) => {
+    try {
+      const parsed = parseTppMenu(record);
+
+      // Validate required fields — the dish name is the only identity in the
+      // TPP feed (no id column), so it doubles as the external id.
+      if (!parsed.name || !parsed.name.trim()) {
+        errors.push({
+          recordIndex: index,
+          field: "Name",
+          message: "Name is required",
+        });
+        return;
+      }
+      if (!parsed.externalId) {
+        errors.push({
+          recordIndex: index,
+          field: "Name",
+          message: "Name is required (used as the external id)",
+        });
+        return;
+      }
+
+      result.push(parsed);
+    } catch (error) {
+      errors.push({
+        recordIndex: index,
+        field: "unknown",
+        message:
+          error instanceof Error ? error.message : "Unknown parsing error",
+      });
+    }
+  });
+
+  return {
+    success: errors.length === 0,
+    records: result,
+    errors,
+    warnings,
+    totalCount: records.length,
+    successCount: result.length,
+    failureCount: errors.length,
+  };
+}
 export function generateRecordCounts(
   results: Record<string, ParserResult<unknown>>,
 ): string {

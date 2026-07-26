@@ -79,7 +79,8 @@ export function ImportRunDetailPage() {
   const markFailed = useImportRunMarkFailed();
   // Commit/revert go through the authored importCommit seam, which actually
   // materializes entities + links (the generated ImportRun_commit only flips
-  // status). Venues + contacts + events + leads supported; see convex/importCommit.ts.
+  // status). Venues + contacts + events + leads + payments + menus supported;
+  // see convex/importCommit.ts.
   const commitImportRun = useAction(api.importCommit.commitImportRun);
   const revertImportRun = useAction(api.importCommit.revertImportRun);
 
@@ -88,8 +89,9 @@ export function ImportRunDetailPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [showRecordCountsForm, setShowRecordCountsForm] = useState(false);
   const [recordCountsInput, setRecordCountsInput] = useState("{}");
-  // Source-row commit form state — shared by the venues/contacts/events/leads
-  // datasets (each pastes a JSON array of TPP rows into the authored commitImportRun).
+  // Source-row commit form state — shared by the venues/contacts/events/leads/
+  // payments/menus datasets (each pastes a JSON array of TPP rows into the
+  // authored commitImportRun).
   const [showSourceForm, setShowSourceForm] = useState(false);
   const [sourceRowsInput, setSourceRowsInput] = useState("[]");
 
@@ -124,7 +126,8 @@ export function ImportRunDetailPage() {
     importRun.datasetType === "contacts" ||
     importRun.datasetType === "events" ||
     importRun.datasetType === "leads" ||
-    importRun.datasetType === "payments";
+    importRun.datasetType === "payments" ||
+    importRun.datasetType === "menus";
   const commitNoun =
     importRun.datasetType === "contacts"
       ? "contact"
@@ -134,7 +137,9 @@ export function ImportRunDetailPage() {
           ? "lead"
           : importRun.datasetType === "payments"
             ? "payment"
-            : "venue";
+            : importRun.datasetType === "menus"
+              ? "menu"
+              : "venue";
   const commitNounLabel =
     commitNoun.charAt(0).toUpperCase() + commitNoun.slice(1);
 
@@ -215,7 +220,7 @@ export function ImportRunDetailPage() {
   const handleCommit = () => {
     if (!supportedCommitDatasets) {
       setError(
-        "Commit supports the 'venues', 'contacts', 'events', 'leads', and 'payments' datasets. Menus needs a parser + a TPP source feed (separate slice).",
+        "Commit supports the 'venues', 'contacts', 'events', 'leads', 'payments', and 'menus' datasets.",
       );
       return;
     }
@@ -507,7 +512,9 @@ export function ImportRunDetailPage() {
                       ? '[{"LeadID":"L1","OpportunityName":"Smith Wedding","ClientID":"C1","Stage":"Qualified","Probability":40,"EstimatedValue":12000,"Source":"Wedding Wire","CloseDate":"2025-09-01"}]'
                       : commitNoun === "payment"
                         ? '[{"PaymentID":"P1","InvoiceID":"INV1","EventID":"E1","PaymentDate":"2025-06-10","PaymentAmount":5000,"PaymentMethod":"Credit Card","Reference":"CHK 1234","Notes":"Deposit"}]'
-                        : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
+                        : commitNoun === "menu"
+                          ? '[{"name":"Lobster Deviled Eggs","description":"Lobster deviled egg filling piped into egg whites and garnished with chives.","category":"Appetizer","service_style":"Passed","portion_size_description":"75 servings","allergens":"Eggs; Shellfish","price_per_person":3.5}]'
+                          : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
               }
             />
             <p className="text-xs text-ink-2 mt-2">
@@ -520,7 +527,9 @@ export function ImportRunDetailPage() {
                     ? "Lead (pre-client inquiry; client linked later on conversion)"
                     : commitNoun === "payment"
                       ? "reconciliation-reference link staged in the queue (no Payment entity; matched to a Capsule payment later via markMatched — spec §6.4)"
-                      : "Venue"}
+                      : commitNoun === "menu"
+                        ? "Dish (menu catalog item; requires kitchenAccess; price preserved on the link — Dish has no price field)"
+                        : "Venue"}
               , and linked to this run. Re-running is safe (already-linked rows
               are skipped).
             </p>
@@ -737,8 +746,9 @@ export function ImportRunDetailPage() {
               contacts → Client account, events → Event with client/venue
               resolved from prior imports, leads → Lead pre-client inquiry,
               payments → reconciliation-reference links staged in the queue for
-              matching to a Capsule payment) and link them to this run
-              (venues/contacts/events/leads/payments datasets only)
+              matching to a Capsule payment, menus → Dish catalog items with
+              price preserved on the link) and link them to this run
+              (venues/contacts/events/leads/payments/menus datasets only)
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires
