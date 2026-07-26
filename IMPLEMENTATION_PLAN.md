@@ -1,13 +1,36 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-26 (§4.2 client-portal proposal pricing DONE — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
+**Updated:** 2026-07-26 (§4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+---
+
+**2026-07-26 — §4.6 Revocable proposal share links DONE (closes the §4.6 PARTIAL):**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0, 65 test files). New entity + authored public seam + operator UI + client share-view page; one manifest regen (no #111 exposure beyond the systemic `*ByTenantId` every entity ships with; no new guard/policy beyond salesAccess).**
+
+**Finding (verified first-hand against spec + code this turn):** spec §4.6 (L238) — *"Published proposals and presentation decks receive revocable share links... Record version, expiry, revocation, first/last view, and viewer identity when known. Sharing always points to an immutable published revision, not a mutable draft"* — and Done-when (L240) — *"A salesperson can share, copy, revoke, and replace a link; the client sees the intended revision; later edits do not alter what was previously accepted"* — were unmet. The only client-facing share surface was the **event-scoped, stateless HMAC portal token** (`convex/lib/clientPortalToken.ts` → `createShareToken({eventId})`): no proposal-specific links, no revocation (nothing persisted to revoke — rotation would invalidate every tenant token), no expiry, no view tracking. There was no `ShareLink`/`ShareToken` entity (verified absent in `convex/schema.ts` + all manifests). All four documented §4.6 gaps confirmed against code before building.
+
+**Fix (smallest spec-faithful diff — new entity + public seam + 2 UI surfaces):**
+- `src/sales/share-link.manifest` (NEW) — `ShareLink` entity (TenantScoped, SoftDeletable; `versionProperty version`). Pins an immutable published revision: `proposalId` + `proposalRevisionId` (the §5.5 capture-on-send snapshot the client will see — later edits produce a new revision and never mutate the shared one). `status` enum `active|revoked` (expiry is a timestamp enforced at read time — no `expire` command, ponytail). `expiresAt`, `revokedAt`/`revokedByPersonId`, `createdByPersonId`. View tracking fields: `viewCount`, `firstViewedAt`, `lastViewedAt`, `lastViewerIdentity` (written by the public seam, not these commands). FK `belongsTo proposal` + `belongsTo proposalRevision` (`references` enforce existence + tenant scoping); **deliberately NO create-time guard on those refs** (the known-hard supplied-relation-param pattern that sank Priority 32 — a `guard self.proposal` reads the pre-mutate doc and is null at creation). Commands `create` (operator, pins the latest revision; salesAccess) + `revoke` (operator; salesAccess).
+- **The token IS the entity `_id`** (no separate token field). Rationale: a Convex `_id` is already unguessable high-entropy — the exact model `SignatureRequest` exposes as `callbackToken` in `/accept/:callbackToken`. A first cut used `mutate token = self.id`, which a verified generator inspection showed compiles to `token: args.id` = `undefined` at insert (literal `_create` runs before the id is allocated) — a silent GREEN-but-broken bug of the exact class the `context.timestamp`/create-result lessons warn about. Dropping the redundant field sidesteps the generator semantics entirely and is simpler (one fewer column, one fewer guard).
+- `convex/shareLinks.ts` (NEW, authored root-level seam — mirrors `clientPortal.ts`, so it is NOT scanned by the `convex/lib/` event-manifest guard and is not an ownership-ledger file): `getSharedProposal(token)` **query** + `recordShareView(token, viewerIdentity?)` **mutation**. Both authenticate by token in-handler (no Clerk auth — the same posture as the anonymous `clientPortal.getEvent` query). They `ctx.db.normalizeId("shareLinks", token)` → `ctx.db.get` → enforce `status === "active"` + not-expired + not-deleted BEFORE doing anything, so a revoked/expired/unknown token resolves to nothing. `recordShareView` is a raw `ctx.db.patch` (no generated guard, no Clerk auth) that bumps view stats — the documented "authored public-write seam" resolution to the public-ingress auth gotcha (no public generated-command invocation, so no empty-auth `salesAccess` throw). `getSharedProposal` loads the pinned revision, parses its snapshot, and returns a client-safe view (pricing breakdown lines + totals + terms; internal cost/margin are never in the snapshot).
+- `src/features/clients/ProposalsPage.tsx` — for sent/viewed/accepted proposals, a **Share link** button (creates a link pinned to the proposal's latest revision — found client-side from the existing `proposalRevisions` list, the `requestSignature` pattern — and copies `${origin}/share/<_id>` to the clipboard; re-clicking an existing active link copies it = "replace" is revoke-then-create). When an active link exists, **Copy link** + **Revoke link** show instead. Revoke prompts for confirm then calls the guarded `revoke`. If the proposal has no captured revision, the operator is told to send first (a share link requires a published revision).
+- `src/features/clients/SharedProposalPage.tsx` (NEW) + `src/app/App.tsx` — public route `/share/:token` (added alongside `/portal/events/:token` + `/accept/:callbackToken`). Renders the pinned revision (header, event details, priced line-item breakdown, subtotal/tax/discount/total, terms/notes, revision number + capture date, link expiry). On first successful load it records one view (IP via ipify when reachable + a UA hint — "viewer identity when known"; best-effort, never blocks the view). Revoked/expired/invalid → a clean "link isn't available" state.
+
+**Why it matters:** a spec-named entity ("Share Link", §2.1 domain spine) did not exist; the only share surface was an unrevocable event token. Proposals can now be shared by link, revoked, and replaced; the client always sees the exact published revision (later edits can't alter what was shared); first/last view + viewer identity are recorded. Completes the §4.6 acceptance ("share, copy, revoke, replace; client sees the intended revision; later edits do not alter what was previously accepted").
+
+**Verification:** `bun run check` GREEN (exit 0) — toolchain, ownership ledger (regen consistent), all 9 manifest-slice contracts, typecheck 0, format clean, secrets, test:coverage (65 files), build ok (ProposalsPage chunk 30.81 kB), baseline-decay ok. Runtime write-path verified by inspection (generator `as any` casts hide runtime bugs): operator `useShareLinkCreate({proposalId, proposalRevisionId})` → `__runShareLinkCreate` (salesAccess ×3 policies + guards + `expiresAt > now()` constraint, allocates row, returns `{_id}`) → `useShareLinkRevoke({docId, version})` → `__runShareLinkRevoke` (tenant check + salesAccess + `status==="active"` guard, patches status/revokedAt). Public: `getSharedProposal`/`recordShareView` resolve `_id`-token → enforce active/not-expired → (read) project the pinned revision snapshot / (write) raw patch view stats. The repo's recurring GREEN-but-broken failure modes do NOT apply (no `self.id`/`context.timestamp` in a create — dropped the token field; `_create` returns `_id`, read directly; FK refs carry existence; no relation-key reuse). No tests added (authored manifest + seam + UI; AGENTS.md: do not add tests unless the owner asks).
+
+**Cross-model review:** not run this increment (autonomous-loop cadence; the change adds a salesAccess-gated operator surface + a token-authenticated public read/patch that mirrors the shipped `clientPortal.ts`/`SignatureRequest` patterns, no new guard/policy/approval beyond salesAccess, no money mutation). Flag if a review pass is wanted before merge; the merge gate's independent cross-model review still applies at PR time.
+
+**Honest scope notes (documented, NOT this increment):** (1) **Deck sharing** is out of scope — there is no `Deck` entity anywhere in the schema/manifests (verified), so "presentation decks receive revocable share links" is a genuine separate slice that needs the Deck concept first, not a half-built omission here. (2) **Authenticated vs public-token mode** (spec: "Links may be public-token or authenticated, based on document sensitivity") — all links are public-token today; authenticated mode is a separate sensitivity setting, deferred. (3) `listShareLinkByTenantId` ships the systemic #111 cross-tenant read shape (byte-identical to every `*ByTenantId` query); the operator UI finds a proposal's link via the `by_proposalId` index + client filter, not the tenant scan. (4) View tracking is approximate (client-side, once-per-load, best-effort IP) — fit-for-purpose for "is this link being seen," not analytics. (5) `proposalRevisionId` is a `uuid?`-style id param with an FK `references` but no manifest-level cross-check that the revision belongs to the supplied proposal; the UI supplies both from the same proposal (latest revision), and the pinned revision's own snapshot is what the client sees regardless, so a mismatch is low-harm (single-org, salesAccess-gated). (6) The new authored mutations need a **human-authorized `npx convex deploy -y`** to take effect server-side (AGENTS.md: Convex deploys are human-only).
 
 ---
 
@@ -1936,27 +1959,26 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 ---
 
-### 🟡 4.6 Social Sharing / Share Links — PARTIAL
+### ✅ 4.6 Social Sharing / Share Links — DONE (revocable proposal share links)
 
-**Done:**
-- clientPortal.ts:22 — createShareToken() action
-- ClientPortalPage.tsx:91-102 — token-based portal access
-- Tokens reference specific eventId
+**Spec requirement (L238):** *"Published proposals and presentation decks receive revocable share links. Links may be public-token or authenticated... Record version, expiry, revocation, first/last view, and viewer identity when known. Sharing always points to an immutable published revision, not a mutable draft."* Done-when (L240): *"A salesperson can share, copy, revoke, and replace a link; the client sees the intended revision; later edits do not alter what was previously accepted."*
 
-**Gaps:**
-- NO proposal-specific share links
-- NO revocation mechanism (once created, tokens cannot be revoked)
-- NO deck sharing
-- NO share tracking (views, identity)
+**Status:** ✅ Shipped + `bun run check` GREEN (exit 0). New `ShareLink` entity (`src/sales/share-link.manifest`) pinned to an immutable `ProposalRevision`; authored public seam (`convex/shareLinks.ts`: `getSharedProposal` query + `recordShareView` mutation, token-as-auth in-handler); operator Share/Copy/Revoke UI (`ProposalsPage.tsx`); public client share-view page + route (`SharedProposalPage.tsx`, `/share/:token`). The token is the entity `_id` (unguessable; mirrors `SignatureRequest.callbackToken`); revocation + expiry are read-time checks the seam runs against the persisted row. See the top changelog entry for full detail + honest scope notes.
 
-**Next steps:**
-1. Extend share tokens to proposals/decks
-2. Add revocation mechanism
-3. Implement ShareTracking entity
+**Done now (this increment):**
+- Proposal-specific revocable share links (create / copy / revoke / replace) — operator surface.
+- Expiry (optional, enforced at read) + revocation audit (`revokedAt`/`revokedByPersonId`).
+- View tracking: `firstViewedAt` / `lastViewedAt` / `viewCount` / `lastViewerIdentity` (recorded by the public seam on client load).
+- Client sees the **pinned immutable revision** — later proposal edits produce a new revision and never mutate the shared link's view.
 
-**Estimated effort:** Small-Medium
+**Still open (genuine separate slices, NOT half-built omissions):**
+- **Deck sharing** — no `Deck` entity exists anywhere yet (verified); needs the Deck concept first.
+- **Authenticated vs public-token link mode** — all links are public-token today; authenticated mode is a separate sensitivity setting.
+- The systemic #111 cross-tenant read applies to `listShareLinkByTenantId` (same as every `*ByTenantId` query); not in-repo-fixable.
 
-**Dependencies:** Proposal revisions
+**Dependencies:** Proposal revisions (✅ capture-on-send wired 2026-07-26).
+
+**Estimated effort:** ✅ DONE for proposals (remaining: decks + authenticated mode).
 
 ---
 

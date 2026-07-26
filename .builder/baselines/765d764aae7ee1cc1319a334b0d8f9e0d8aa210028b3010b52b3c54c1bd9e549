@@ -30838,6 +30838,7 @@ async function __runShareLinkCreate(ctx: MutationCtx, args: any) {
       updatedAt: args.updatedAt,
       proposalId: args.proposalId,
       proposalRevisionId: args.proposalRevisionId,
+      token: args.id,
       status: "active",
       expiresAt: args.expiresAt,
       createdByPersonId: user.id,
@@ -30846,8 +30847,9 @@ async function __runShareLinkCreate(ctx: MutationCtx, args: any) {
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may read share links");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may write share links through commands");
     if (!(checkRole(user, "salesAccess"))) throw new Error("Sales staff may execute share link commands");
-    if (!((args.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((user.id != null))) throw new Error("Guard 1 failed");
+    if (!((args.token == null))) throw new Error("Guard 0 failed");
+    if (!((args.deletedAt == null))) throw new Error("Guard 1 failed");
+    if (!((user.id != null))) throw new Error("Guard 2 failed");
     if (!(((args.expiresAt == null) || (args.expiresAt > Date.now())))) throw new Error("Share link expiry must be in the future");
     const _id = await ctx.db.insert("shareLinks", doc as any);
     const payload: Record<string, any> = { _id, id: _id, ...doc, result: { _id, id: _id, ...doc }, shareLinkId: _id, tenantId: doc.tenantId, proposalId: doc.proposalId, proposalRevisionId: doc.proposalRevisionId, createdByPersonId: ((user.id != null) ? user.id : ""), expiresAt: doc.expiresAt, _subject: { entity: "ShareLink", command: "create", id: _id } };

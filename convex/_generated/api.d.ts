@@ -45,6 +45,7 @@ import type * as quoteBuilder from "../quoteBuilder.js";
 import type * as recurringEvents from "../recurringEvents.js";
 import type * as sagas from "../sagas.js";
 import type * as search from "../search.js";
+import type * as shareLinks from "../shareLinks.js";
 import type * as smsAlerts from "../smsAlerts.js";
 import type * as tppParser from "../tppParser.js";
 import type * as vehicleAssignment from "../vehicleAssignment.js";
@@ -95,6 +96,7 @@ declare const fullApi: ApiFromModules<{
   recurringEvents: typeof recurringEvents;
   sagas: typeof sagas;
   search: typeof search;
+  shareLinks: typeof shareLinks;
   smsAlerts: typeof smsAlerts;
   tppParser: typeof tppParser;
   vehicleAssignment: typeof vehicleAssignment;

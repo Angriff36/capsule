@@ -1,0 +1,155 @@
+// Capsule sales — ShareLink (spec §4.6 social sharing / share links).
+//
+// Spec §4.6 (L238): "Published proposals and presentation decks receive
+// revocable share links. Links may be public-token or authenticated, based on
+// document sensitivity. Record version, expiry, revocation, first/last view,
+// and viewer identity when known. Sharing always points to an immutable
+// published revision, not a mutable draft."
+//
+// Done-when (L240): "A salesperson can share, copy, revoke, and replace a link;
+// the client sees the intended revision; later edits do not alter what was
+// previously accepted."
+//
+// A ShareLink is ONE revocable public link to a specific proposal, pinned to the
+// immutable ProposalRevision captured at send time (so the client always sees
+// the exact terms that were shared — later edits produce a new revision, never
+// mutating the shared one). The link token IS the entity id (the proven
+// SignatureRequest callbackToken pattern), so the persisted record itself is the
+// token — revocation and expiry are enforced by reading the row, no separate
+// HMAC or denylist required.
+//
+// View tracking (firstViewedAt / lastViewedAt / viewCount / lastViewerIdentity)
+// is written by the authored public seam (convex/shareLinks.ts recordShareView),
+// which authenticates by token in-handler (a raw ctx.db.patch, no Clerk auth —
+// the same posture as the clientPortal.ts anonymous query). Decks are a separate
+// concept with no Deck entity today and are intentionally out of scope here.
+
+use "./proposal.manifest"
+use "./proposal-revision.manifest"
+
+enum ShareLinkStatus {
+  active
+  revoked
+}
+
+// One revocable public link to a proposal's pinned revision.
+entity ShareLink mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // The shared proposal and the IMMUTABLE revision the client will see.
+  // (spec §4.6: "Sharing always points to an immutable published revision.")
+  property required proposalId: uuid
+  property required proposalRevisionId: uuid
+
+  // The public token IS the entity _id (an unguessable Convex id — the same
+  // model SignatureRequest exposes as callbackToken in /accept/:callbackToken).
+  // No separate token field: the persisted row itself is the bearer, so
+  // revocation/expiry are read-time checks the authored seam runs against this
+  // row. (A literal `_create` command cannot set `token = self.id` — at insert
+  // self.id/args.id is still undefined — so we rely on _id directly.)
+  property required status: ShareLinkStatus = "active"
+
+  // Expiry is optional; enforced at read time by the public seam.
+  property expiresAt: datetime?
+
+  // Revocation audit.
+  property revokedAt: datetime?
+  property revokedByPersonId: uuid?
+  property createdByPersonId: uuid?
+
+  // View tracking (spec §4.6: "Record ... first/last view, and viewer identity
+  // when known"). Written by the authored public seam, not by these commands.
+  property required viewCount: int = 0
+  property firstViewedAt: datetime?
+  property lastViewedAt: datetime?
+  property lastViewerIdentity: string?
+
+  // FK references enforce the proposal + revision exist in the same tenant.
+  // Deliberately NO create-time guard on these refs (the known-hard
+  // supplied-relation-param pattern that sank Priority 32: a `guard self.proposal`
+  // reads the pre-mutate doc and is null at creation); the FK `references`
+  // constraints carry existence + tenant scoping.
+  belongsTo proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
+  belongsTo proposalRevision: ProposalRevision fields [tenantId, proposalRevisionId] references [tenantId, id]
+
+  default policy shareLinkRead read: roleAllows(user.role, "salesAccess") "Sales staff may read share links"
+  default policy shareLinkWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write share links through commands"
+  default policy shareLinkExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute share link commands"
+
+  // Issue a new revocable link pinned to a published revision. The caller (UI)
+  // supplies the proposal's latest captured revision id. The new row's _id (the
+  // public token) is returned to the caller and baked into the share URL.
+  command create(
+    proposalId: uuid,
+    proposalRevisionId: uuid,
+    optional expiresAt: datetime
+  ) {
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint createExpiresFuture: expiresAt == null or expiresAt > now() "Share link expiry must be in the future"
+    mutate proposalId = proposalId
+    mutate proposalRevisionId = proposalRevisionId
+    mutate status = "active"
+    mutate expiresAt = expiresAt
+    mutate createdByPersonId = user.id
+    emit ShareLinkCreated {
+      shareLinkId: self.id
+      tenantId: self.tenantId
+      proposalId: proposalId
+      proposalRevisionId: proposalRevisionId
+      createdByPersonId: user.id != null ? user.id : ""
+      expiresAt: expiresAt
+    }
+  }
+
+  // Revoke a link so the public seam stops resolving it. The row is retained
+  // for audit (revokedAt / revokedByPersonId); only its status changes.
+  command revoke() {
+    guard self.deletedAt == null
+    guard self.status == "active" "Can only revoke active share links"
+    guard roleAllows(user.role, "salesAccess") "Only sales staff can revoke share links"
+    mutate status = "revoked"
+    mutate revokedAt = now()
+    mutate revokedByPersonId = user.id
+    emit ShareLinkRevoked {
+      shareLinkId: self.id
+      tenantId: self.tenantId
+      proposalId: self.proposalId
+      revokedByPersonId: user.id != null ? user.id : ""
+      revokedAt: now()
+    }
+  }
+
+  store ShareLink in durable
+}
+
+// The active link for a proposal (if any) — used by the operator UI to show
+// Copy/Revoke instead of Create. At most one active link per proposal is the UI
+// invariant; this returns the newest active one.
+query findActiveByProposal(proposalId: uuid): ShareLink {
+  assert proposalId != null
+  filter self.proposalId == proposalId
+  filter self.status == "active"
+  filter self.deletedAt == null
+  sort self.createdAt desc
+  limit 1
+}
+
+event ShareLinkCreated: "share_link.created" {
+  shareLinkId: string
+  tenantId: string
+  proposalId: string
+  proposalRevisionId: string
+  createdByPersonId: string
+  expiresAt: datetime
+}
+
+event ShareLinkRevoked: "share_link.revoked" {
+  shareLinkId: string
+  tenantId: string
+  proposalId: string
+  revokedByPersonId: string
+  revokedAt: datetime
+}

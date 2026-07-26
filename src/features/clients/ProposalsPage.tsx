@@ -21,6 +21,9 @@ import {
   useProposalExpire,
   useProposalMarkViewed,
   useCreateSignatureRequest,
+  useListShareLink,
+  useShareLinkCreate,
+  useShareLinkRevoke,
 } from "../../lib/manifest-convex-react";
 import { api, type Id } from "../../lib/api";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -134,6 +137,11 @@ export function ProposalsPage() {
   const decline = useProposalDecline();
   const expire = useProposalExpire();
   const createSignatureRequest = useCreateSignatureRequest();
+  // Revocable proposal share links (spec §4.6). A link is pinned to the
+  // proposal's latest captured revision; its Convex _id is the public token.
+  const shareLinks = useListShareLink();
+  const createShareLink = useShareLinkCreate();
+  const revokeShareLink = useShareLinkRevoke();
   const [showDraft, setShowDraft] = useState(false);
   const [showTerminal, setShowTerminal] = useState(false);
   const [menuOpenFor, setMenuOpenFor] = useState<string | null>(null);
@@ -149,6 +157,30 @@ export function ProposalsPage() {
       row.registeredAt != null &&
       String(row.status) === "active",
   );
+  // Newest captured revision for a proposal (the immutable revision a share link
+  // pins to) and the proposal's active share link, if any (spec §4.6).
+  const latestRevisionFor = (proposalId: string) =>
+    (proposalRevisions ?? [])
+      .filter((r) => r.proposalId === proposalId && r.deletedAt == null)
+      .sort((a, b) => b.revisionNumber - a.revisionNumber)[0];
+  const activeShareLinkFor = (proposalId: string) =>
+    (shareLinks ?? [])
+      .filter(
+        (l) =>
+          l.proposalId === proposalId &&
+          l.deletedAt == null &&
+          String(l.status) === "active",
+      )
+      .sort((a, b) => Number(b.createdAt ?? 0) - Number(a.createdAt ?? 0))[0];
+  const copyShareUrl = async (id: string) => {
+    const url = `${window.location.origin}/share/${id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setNotice("Share link copied to clipboard.");
+    } catch {
+      setNotice(`Share link: ${url}`);
+    }
+  };
   const [searchParams, setSearchParams] = useSearchParams();
   const fromEventId = searchParams.get("event");
   const fromEvent =
@@ -460,6 +492,55 @@ export function ProposalsPage() {
         void run(`${row._id}:decline`, async () => {
           await decline({ docId: row._id, version: row.version });
           setNotice("Proposal declined.");
+        });
+        return;
+      }
+      if (key === "shareLink") {
+        // Spec §4.6: share/copy/replace. Reusing the active link copies it;
+        // otherwise create one pinned to the latest published revision.
+        const existing = activeShareLinkFor(row._id);
+        if (existing) {
+          void copyShareUrl(existing._id);
+          return;
+        }
+        const revision = latestRevisionFor(row._id);
+        if (!revision) {
+          setFailure(
+            new Error(
+              "Send the proposal first — a share link needs a published revision.",
+            ),
+          );
+          return;
+        }
+        void run(`${row._id}:share-link`, async () => {
+          const result = (await createShareLink({
+            proposalId: row._id,
+            proposalRevisionId: revision._id,
+            idempotencyKey: `share-link-${row._id}-${Date.now()}`,
+          })) as { _id?: string; id?: string } | undefined;
+          const id = result?._id ?? result?.id;
+          if (!id) throw new Error("Failed to create share link");
+          await copyShareUrl(id);
+        });
+        return;
+      }
+      if (key === "revokeShareLink") {
+        const existing = activeShareLinkFor(row._id);
+        if (!existing) return;
+        const ok = await prompt.askConfirm({
+          title: "Revoke share link",
+          description:
+            "The client will no longer be able to open this link. You can create a new one anytime.",
+          confirmLabel: "Revoke link",
+          tone: "danger",
+        });
+        if (!ok) return;
+        void run(`${row._id}:revoke-share`, async () => {
+          await revokeShareLink({
+            docId: existing._id,
+            version: existing.version,
+          });
+          setNotice("Share link revoked.");
         });
         return;
       }
@@ -1077,6 +1158,32 @@ export function ProposalsPage() {
                         >
                           Request Signature
                         </button>
+                      )}
+                      {(String(row.status) === "sent" ||
+                        String(row.status) === "viewed" ||
+                        String(row.status) === "accepted") && (
+                        <>
+                          <button
+                            className="btn btn-ghost"
+                            type="button"
+                            disabled={busy != null}
+                            onClick={() => invoke(row, "shareLink")}
+                          >
+                            {activeShareLinkFor(row._id)
+                              ? "Copy link"
+                              : "Share link"}
+                          </button>
+                          {activeShareLinkFor(row._id) && (
+                            <button
+                              className="btn btn-ghost"
+                              type="button"
+                              disabled={busy != null}
+                              onClick={() => invoke(row, "revokeShareLink")}
+                            >
+                              Revoke link
+                            </button>
+                          )}
+                        </>
                       )}
                       {policy
                         .proposalActions(String(row.status))

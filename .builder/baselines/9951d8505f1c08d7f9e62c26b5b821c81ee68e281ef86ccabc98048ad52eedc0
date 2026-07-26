@@ -2024,6 +2024,7 @@ export default defineSchema({
     deletedAt: v.optional(v.union(v.number(), v.null())),
     proposalId: v.id("proposals"),
     proposalRevisionId: v.id("proposalRevisions"),
+    token: v.optional(v.union(v.string(), v.null())),
     status: v.union(v.literal("active"), v.literal("revoked")),
     expiresAt: v.optional(v.union(v.number(), v.null())),
     revokedAt: v.optional(v.union(v.number(), v.null())),

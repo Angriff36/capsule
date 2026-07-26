@@ -2203,6 +2203,7 @@ export const ShareLinkSchema = z.object({
   deletedAt: z.coerce.date().nullable().optional(),
   proposalId: z.string().uuid(),
   proposalRevisionId: z.string().uuid(),
+  token: z.string().nullable().optional(),
   status: z.enum(["active", "revoked"]).default("active"),
   expiresAt: z.coerce.date().nullable().optional(),
   revokedAt: z.coerce.date().nullable().optional(),
