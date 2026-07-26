@@ -36,6 +36,15 @@ const VENUE_TYPE_LABELS: Record<VenueType, string> = {
   other: "Other",
 };
 
+// ponytail: an unchecked logistics checkbox must NOT assert "no" for a venue whose
+// value was never recorded (e.g. a venue created before the field existed). Preserve
+// the unknown — undefined is dropped by ctx.db.patch so the stored value is unchanged;
+// only record an explicit false when a value was already defined.
+const logisticsBoolean = (
+  checked: boolean,
+  stored: boolean | undefined | null,
+): boolean | undefined => (checked ? true : stored == null ? undefined : false);
+
 export function VenueDetailPage() {
   const { id } = useParams<{ id: string }>();
   const venue = useGetVenue(id ?? "skip");
@@ -98,16 +107,34 @@ export function VenueDetailPage() {
         onPremise: data.get("onPremise") === "on",
         kitchenAccess:
           String(data.get("kitchenAccess") ?? "").trim() || undefined,
-        parkingAvailable: data.get("parkingAvailable") === "on",
-        hasFreightElevator: data.get("hasFreightElevator") === "on",
-        storageAvailable: data.get("storageAvailable") === "on",
+        parkingAvailable: logisticsBoolean(
+          data.get("parkingAvailable") === "on",
+          venue.parkingAvailable,
+        ),
+        hasFreightElevator: logisticsBoolean(
+          data.get("hasFreightElevator") === "on",
+          venue.hasFreightElevator,
+        ),
+        storageAvailable: logisticsBoolean(
+          data.get("storageAvailable") === "on",
+          venue.storageAvailable,
+        ),
         logisticsNotes:
           String(data.get("logisticsNotes") ?? "").trim() || undefined,
         loadInInstructions:
           String(data.get("loadInInstructions") ?? "").trim() || undefined,
-        powerAvailable: data.get("powerAvailable") === "on",
-        waterAccess: data.get("waterAccess") === "on",
-        hasStairs: data.get("hasStairs") === "on",
+        powerAvailable: logisticsBoolean(
+          data.get("powerAvailable") === "on",
+          venue.powerAvailable,
+        ),
+        waterAccess: logisticsBoolean(
+          data.get("waterAccess") === "on",
+          venue.waterAccess,
+        ),
+        hasStairs: logisticsBoolean(
+          data.get("hasStairs") === "on",
+          venue.hasStairs,
+        ),
         wasteRules: String(data.get("wasteRules") ?? "").trim() || undefined,
         permitsInsuranceNotes:
           String(data.get("permitsInsuranceNotes") ?? "").trim() || undefined,
