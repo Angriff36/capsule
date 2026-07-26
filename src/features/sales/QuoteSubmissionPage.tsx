@@ -99,12 +99,21 @@ export function QuoteSubmissionPage() {
     const data = new FormData(event.currentTarget);
 
     try {
+      // Convert the date/time inputs to epoch-ms in the browser (local TZ) so
+      // the UTC server stores the correct calendar day/time — mirrors the
+      // Date.parse convention in EventPlanEngagementFormMapper. Sending raw
+      // strings would let the server parse the date-only value as UTC midnight
+      // and the date+time value as local, landing the event on the wrong day.
+      const dateStr = String(data.get("eventDate") ?? "");
+      const endTimeStr = String(data.get("eventEndTime") ?? "").trim();
       const result = await submitQuote({
         clientName: optional(String(data.get("clientName") ?? "")) ?? "",
         email: optional(String(data.get("email") ?? "")) ?? "",
         phone: optional(String(data.get("phone") ?? "")),
-        eventDate: String(data.get("eventDate") ?? ""),
-        eventEndTime: optional(String(data.get("eventEndTime") ?? "")),
+        eventDate: Date.parse(`${dateStr}T00:00`),
+        eventEndTime: endTimeStr
+          ? Date.parse(`${dateStr}T${endTimeStr}`)
+          : undefined,
         guestCount: Number(data.get("guestCount") ?? 0),
         consent: data.get("consent") === "on",
         serviceStyleId: formId<Id<"serviceStyles">>(data.get("serviceStyleId")),

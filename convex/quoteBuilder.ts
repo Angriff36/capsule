@@ -40,18 +40,19 @@ function generateDedupKey(
  * Validates that the event date is not in the past.
  * Basic business rule check; richer availability validation can follow.
  */
-function validateEventDate(eventDate: string): {
+// eventDate arrives as epoch-ms (converted in the browser so the visitor's
+// timezone defines the calendar day, not the UTC server runtime).
+function validateEventDate(eventDateMs: number): {
   valid: boolean;
   error?: string;
 } {
-  const date = new Date(eventDate);
-  if (Number.isNaN(date.getTime())) {
+  if (!Number.isFinite(eventDateMs)) {
     return { valid: false, error: "Invalid event date" };
   }
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  if (date < today) {
+  if (eventDateMs < today.getTime()) {
     return { valid: false, error: "Event date cannot be in the past" };
   }
   return { valid: true };
@@ -239,8 +240,8 @@ export const submitQuote = action({
     clientName: v.string(),
     email: v.string(),
     phone: v.optional(v.string()),
-    eventDate: v.string(), // ISO date string
-    eventEndTime: v.optional(v.string()),
+    eventDate: v.number(), // epoch-ms (browser-local; converted client-side)
+    eventEndTime: v.optional(v.number()), // epoch-ms, browser-local
     guestCount: v.number(),
     consent: v.boolean(),
     serviceStyleId: v.optional(v.id("serviceStyles")),
@@ -284,16 +285,12 @@ export const submitQuote = action({
       throw new ConvexError("Data processing consent is required");
     }
 
-    // Normalize the event end time: the form sends a time-only string ("18:00")
-    // or nothing. Combine with the event date into an epoch-ms value.
-    const eventEndMs = args.eventEndTime
-      ? new Date(
-          /^\d{2}:\d{2}/.test(args.eventEndTime)
-            ? `${args.eventDate}T${args.eventEndTime}`
-            : args.eventEndTime,
-        ).getTime()
-      : 0;
-    if (args.eventEndTime && !Number.isFinite(eventEndMs)) {
+    // eventEndTime (if provided) arrives as epoch-ms from the browser; just
+    // guard against a malformed value.
+    if (
+      args.eventEndTime !== undefined &&
+      !Number.isFinite(args.eventEndTime)
+    ) {
       throw new ConvexError("Invalid end time");
     }
 
@@ -303,8 +300,8 @@ export const submitQuote = action({
         clientName: bounded(args.clientName),
         email: bounded(args.email),
         phone: bounded(args.phone),
-        eventDate: new Date(args.eventDate).getTime(),
-        eventEndTime: eventEndMs,
+        eventDate: args.eventDate,
+        eventEndTime: args.eventEndTime ?? 0,
         guestCount: args.guestCount,
         serviceStyleId: args.serviceStyleId,
         occasionId: args.occasionId,
