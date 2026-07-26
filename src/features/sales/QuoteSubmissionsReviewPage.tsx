@@ -50,6 +50,7 @@ export function QuoteSubmissionsReviewPage() {
   const convert = async (id: string, clientName: string) => {
     setFailure(null);
     setPartialErrors(null);
+    setLastConverted(null);
     setBusyId(id);
     try {
       const result = await process({
