@@ -298,6 +298,11 @@ const LeadPipelinePage = lazy(() =>
     default: module.LeadPipelinePage,
   })),
 );
+const QuoteSubmissionsReviewPage = lazy(() =>
+  import("../features/sales/QuoteSubmissionsReviewPage").then((module) => ({
+    default: module.QuoteSubmissionsReviewPage,
+  })),
+);
 const ContractDocumentPage = lazy(() =>
   import("../features/clients/ContractDocumentPage").then((module) => ({
     default: module.ContractDocumentPage,
@@ -984,6 +989,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <ClientRetentionPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/quote-requests"
+              element={
+                <SupplyRoute>
+                  <QuoteSubmissionsReviewPage />
                 </SupplyRoute>
               }
             />

@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
-import { api } from "./_generated/api";
-import { action } from "./_generated/server";
+import { api, internal } from "./_generated/api";
+import { action, internalMutation } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
 
 // Public status payload for getQuoteSubmissionStatus — derived from the Doc so
@@ -23,10 +23,9 @@ type QuoteSubmissionStatusResult = {
  */
 function generateDedupKey(
   email: string,
-  eventDate: string,
+  eventDate: number,
   tenantId: string,
 ): string {
-  // Simple hash function for deduplication
   const normalized = `${email.toLowerCase().trim()}|${eventDate}|${tenantId}`;
   let hash = 0;
   for (let i = 0; i < normalized.length; i++) {
@@ -34,12 +33,12 @@ function generateDedupKey(
     hash = (hash << 5) - hash + char;
     hash = hash & hash; // Convert to 32-bit integer
   }
-  return `quote_${Math.abs(hash)}_${Date.now()}`;
+  return `quote_${Math.abs(hash)}`;
 }
 
 /**
  * Validates that the event date is not in the past.
- * This is a basic business rule check; more complex availability validation can be added later.
+ * Basic business rule check; richer availability validation can follow.
  */
 function validateEventDate(eventDate: string): {
   valid: boolean;
@@ -47,35 +46,134 @@ function validateEventDate(eventDate: string): {
 } {
   const date = new Date(eventDate);
   const today = new Date();
-  today.setHours(0, 0, 0, 0); // Reset to start of day for fair comparison
+  today.setHours(0, 0, 0, 0);
 
   if (date < today) {
-    return {
-      valid: false,
-      error: "Event date cannot be in the past",
-    };
+    return { valid: false, error: "Event date cannot be in the past" };
   }
-
   return { valid: true };
 }
 
 /**
- * Public quote submission mutation - creates Contact/Lead/Event/Proposal from web form.
- * This is an action (not a mutation) so it can write to multiple entities in one transaction.
+ * Public-ingress seam.
  *
- * Flow:
- * 1. Validate input (date not in past, guest count > 0, required fields)
- * 2. Generate dedup key
- * 3. Check for existing submission with same dedup key
- * 4. Create QuoteSubmission record
- * 5. Create Client (Company/Person)
- * 6. Create Lead
- * 7. Create Event (graceful failure - save Lead even if Event fails)
- * 8. Create Proposal draft (graceful failure - save Event even if Proposal fails)
- * 9. Update QuoteSubmission with created entity IDs and status
- * 10. Return submissionId and status
+ * The public /quote form runs ANONYMOUSLY (it lives outside AuthGate), so the
+ * submitQuote action cannot use the auth-gated generated creates: a mutation
+ * called from an action inherits the caller's (empty) auth context, and the
+ * generated `QuoteSubmission_create` enforces the `salesAccess` write policy on
+ * every command — so it throws for an anonymous caller before insert.
  *
- * Errors at any step are captured in QuoteSubmission for follow-up.
+ * This internal mutation runs with SYSTEM privileges (no auth context), so it
+ * can read the active organization directly, dedupe, and insert the
+ * QuoteSubmission capture record with an explicit tenantId. It is reachable
+ * ONLY from submitQuote (internal mutations are never exposed to clients),
+ * which has already validated the input — so this seam is not an open write
+ * surface.
+ *
+ * Downstream sales records (Lead/Event/Proposal) are intentionally NOT created
+ * here: they are auth-gated for good reason. An authenticated operator converts
+ * a captured submission via `processQuoteSubmission`, which creates them with
+ * the operator's own sales/admin auth.
+ */
+export const ingressQuoteSubmission = internalMutation({
+  args: {
+    clientName: v.string(),
+    email: v.string(),
+    phone: v.string(),
+    eventDate: v.number(),
+    eventEndTime: v.number(),
+    guestCount: v.number(),
+    serviceStyleId: v.optional(v.id("serviceStyles")),
+    occasionId: v.optional(v.id("occasions")),
+    venueName: v.string(),
+    venueAddress: v.string(),
+    menuPreferences: v.string(),
+    dietaryRestrictions: v.string(),
+    notes: v.string(),
+  },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
+    submissionId: Id<"quoteSubmissions">;
+    isDuplicate: boolean;
+    status: "pending";
+  }> => {
+    // Resolve the public tenant: the active organization this deployment serves.
+    // Single-org deployment today; a multi-tenant host would resolve from
+    // subdomain/route instead.
+    const org = await ctx.db
+      .query("organizations")
+      .filter((q) => q.eq(q.field("status"), "active"))
+      .first();
+    if (!org) {
+      throw new ConvexError(
+        "Unable to process quote. Please contact us directly.",
+      );
+    }
+    const tenantId = org.tenantId;
+
+    const email = args.email.trim().toLowerCase();
+    const clientName = args.clientName.trim();
+    const dedupKey = generateDedupKey(email, args.eventDate, tenantId);
+
+    // Dedup: a prior active submission for the same key is returned as-is so a
+    // repeat submit is a no-op (submit-once). Failed submissions can be retried.
+    const candidates = await ctx.db
+      .query("quoteSubmissions")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .filter((q) => q.eq(q.field("dedupKey"), dedupKey))
+      .collect();
+    const existing = candidates.find(
+      (sub) =>
+        sub.deletedAt == null &&
+        (sub.status === "pending" ||
+          sub.status === "processing" ||
+          sub.status === "completed"),
+    );
+    if (existing) {
+      return {
+        submissionId: existing._id,
+        isDuplicate: true,
+        status: "pending",
+      };
+    }
+
+    const now = Date.now();
+    const submissionId = await ctx.db.insert("quoteSubmissions", {
+      tenantId,
+      dedupKey,
+      status: "pending",
+      submittedAt: now,
+      clientName,
+      email,
+      phone: args.phone.trim() || null,
+      eventDate: args.eventDate,
+      eventEndTime: args.eventEndTime || null,
+      guestCount: args.guestCount,
+      serviceStyleId: args.serviceStyleId ?? null,
+      occasionId: args.occasionId ?? null,
+      venueName: args.venueName.trim() || null,
+      venueAddress: args.venueAddress.trim() || null,
+      menuPreferences: args.menuPreferences.trim() || null,
+      dietaryRestrictions: args.dietaryRestrictions.trim() || null,
+      notes: args.notes.trim() || null,
+      consentGrantedAt: now,
+      version: 1,
+    });
+
+    return { submissionId, isDuplicate: false, status: "pending" };
+  },
+});
+
+/**
+ * Public quote submission. Validates input, then captures the QuoteSubmission
+ * via the system-privileged ingress seam. Anonymous-safe — creates ONLY the
+ * capture record; an authenticated operator converts it into Lead/Event/
+ * Proposal via processQuoteSubmission.
+ *
+ * Why capture-only on the public path: the generated sales creates enforce
+ * salesAccess, which an anonymous web visitor cannot satisfy (and should not).
  */
 export const submitQuote = action({
   args: {
@@ -98,140 +196,130 @@ export const submitQuote = action({
     args,
   ): Promise<{
     submissionId: Id<"quoteSubmissions">;
-    status: string | undefined;
+    status: string;
     isDuplicate: boolean;
     message: string;
-    clientId?: Id<"clients"> | null;
-    leadId?: Id<"leads"> | null;
-    eventId?: Id<"events"> | null;
-    proposalId?: Id<"proposals"> | null;
   }> => {
-    // Step 1: Validate input
+    // Validate input.
     const dateValidation = validateEventDate(args.eventDate);
     if (!dateValidation.valid) {
       throw new ConvexError(dateValidation.error ?? "Invalid event date");
     }
-
     if (args.guestCount <= 0) {
       throw new ConvexError("Guest count must be positive");
     }
-
     if (!args.clientName?.trim()) {
       throw new ConvexError("Client name is required");
     }
-
     if (!args.email?.trim()) {
       throw new ConvexError("Email address is required");
     }
 
-    // Step 2: Get or create tenant context
-    // For MVP, we use a default tenant. In production, this would come from subdomain/route param.
-    const organizations = await ctx.runQuery(api.queries.listOrganization);
-    const organization =
-      organizations.find((org) => org.status === "active") ?? organizations[0];
+    // Normalize the event end time: the form sends a time-only string ("18:00")
+    // or nothing. Combine with the event date into an epoch-ms value.
+    const eventEndMs = args.eventEndTime
+      ? new Date(
+          /^\d{2}:\d{2}/.test(args.eventEndTime)
+            ? `${args.eventDate}T${args.eventEndTime}`
+            : args.eventEndTime,
+        ).getTime()
+      : 0;
 
-    if (!organization) {
-      throw new ConvexError(
-        "Unable to process quote. Please contact us directly.",
-      );
-    }
-
-    const tenantId = organization.tenantId;
-
-    // Step 3: Generate dedup key
-    const dedupKey = generateDedupKey(args.email, args.eventDate, tenantId);
-
-    // Step 4: Check for existing submission (prevent exact duplicates)
-    const existingSubmissions = await ctx.runQuery(
-      api.queries.listQuoteSubmission,
-    );
-    const existing = existingSubmissions.find(
-      (sub) => sub.dedupKey === dedupKey && sub.deletedAt === null,
-    );
-
-    if (
-      existing &&
-      (existing.status === "pending" ||
-        existing.status === "processing" ||
-        existing.status === "completed")
-    ) {
-      // Return existing submission instead of creating duplicate
-      return {
-        submissionId: existing._id,
-        status: existing.status,
-        isDuplicate: true,
-        message:
-          "You've already submitted a quote request for this event. We'll be in touch soon!",
-      };
-    }
-
-    // Step 5: Create QuoteSubmission record
-    const submissionResult = await ctx.runMutation(
-      api.mutations.QuoteSubmission_create,
+    const result = await ctx.runMutation(
+      internal.quoteBuilder.ingressQuoteSubmission,
       {
-        dedupKey,
-        clientName: args.clientName.trim(),
-        email: args.email.trim().toLowerCase(),
-        phone: args.phone?.trim() ?? "",
+        clientName: args.clientName,
+        email: args.email,
+        phone: args.phone ?? "",
         eventDate: new Date(args.eventDate).getTime(),
-        eventEndTime: args.eventEndTime
-          ? new Date(args.eventEndTime).getTime()
-          : 0,
+        eventEndTime: eventEndMs,
         guestCount: args.guestCount,
-        serviceStyleId: args.serviceStyleId ?? "",
-        occasionId: args.occasionId ?? "",
-        venueName: args.venueName?.trim() ?? "",
-        venueAddress: args.venueAddress?.trim() ?? "",
-        menuPreferences: args.menuPreferences?.trim() ?? "",
-        dietaryRestrictions: args.dietaryRestrictions?.trim() ?? "",
-        notes: args.notes?.trim() ?? "",
+        serviceStyleId: args.serviceStyleId,
+        occasionId: args.occasionId,
+        venueName: args.venueName ?? "",
+        venueAddress: args.venueAddress ?? "",
+        menuPreferences: args.menuPreferences ?? "",
+        dietaryRestrictions: args.dietaryRestrictions ?? "",
+        notes: args.notes ?? "",
       },
     );
-    const submissionId = submissionResult._id;
 
-    // Mark submission as processing
+    return {
+      submissionId: result.submissionId,
+      status: result.status,
+      isDuplicate: result.isDuplicate,
+      message: result.isDuplicate
+        ? "You've already submitted a quote request for this event. We'll be in touch soon!"
+        : "Thank you! Your quote request has been submitted. We'll be in touch within 24-48 hours.",
+    };
+  },
+});
+
+/**
+ * Authenticated operator path: converts a captured QuoteSubmission into the
+ * real sales records (Client, Lead, Event, draft Proposal). Runs with the
+ * caller's auth, so the generated sales creates pass their salesAccess guards.
+ * Each step fails gracefully — a partial conversion still leaves the earlier
+ * records and updates the submission with whatever was created.
+ */
+export const processQuoteSubmission = action({
+  args: {
+    submissionId: v.id("quoteSubmissions"),
+  },
+  handler: async (
+    ctx,
+    { submissionId },
+  ): Promise<{
+    submissionId: Id<"quoteSubmissions">;
+    clientId: Id<"clients"> | null;
+    leadId: Id<"leads"> | null;
+    eventId: Id<"events"> | null;
+    proposalId: Id<"proposals"> | null;
+    errors: string[];
+  }> => {
+    const submission = await ctx.runQuery(api.queries.getQuoteSubmission, {
+      id: submissionId,
+    });
+    if (!submission || submission.deletedAt !== null) {
+      throw new ConvexError("Quote submission not found");
+    }
+    if (submission.status === "completed") {
+      throw new ConvexError("Quote submission has already been converted");
+    }
+
+    const errors: string[] = [];
+    const clientName = submission.clientName ?? "Quote Lead";
+    const email = submission.email ?? "";
+    const phone = submission.phone ?? undefined;
+
+    // Move into processing (salesAccess write — caller is authorized).
     await ctx.runMutation(api.mutations.QuoteSubmission_startProcessing, {
       docId: submissionId,
     });
 
-    // Step 6: Create Client (Company for MVP - can be Person in future)
+    // Client — match by email, else create.
     let clientId: Id<"clients"> | null = null;
     try {
-      // Check if client with same email already exists
       const existingClients = await ctx.runQuery(api.queries.listClient);
       const existingClient = existingClients.find(
-        (c) =>
-          c.email?.toLowerCase() === args.email.toLowerCase() &&
-          c.deletedAt === null,
+        (c) => c.email?.toLowerCase() === email.toLowerCase() && !c.deletedAt,
       );
-
       if (existingClient) {
         clientId = existingClient._id;
       } else {
-        // Create new client (company type for MVP)
-        const newClient = await ctx.runMutation(
+        const created = await ctx.runMutation(
           api.mutations.Client_createViaRegister,
-          {
-            clientType: "company",
-            companyName: args.clientName.trim(),
-            email: args.email.trim().toLowerCase(),
-            phone: args.phone?.trim() ?? undefined,
-          },
+          { clientType: "company", companyName: clientName, email, phone },
         );
-        clientId = newClient._id;
+        clientId = created._id;
       }
     } catch (error) {
-      // If client creation fails, mark submission as failed and return
-      await ctx.runMutation(api.mutations.QuoteSubmission_fail, {
-        docId: submissionId,
-        errorMessage: "Failed to create client record",
-        processingErrors:
-          error instanceof Error ? error.message : String(error),
-      });
-      throw error;
+      errors.push(
+        `client: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
-    // Step 7: Create Lead
+    // Lead.
     let leadId: Id<"leads"> | null = null;
     try {
       if (clientId) {
@@ -239,107 +327,87 @@ export const submitQuote = action({
           api.mutations.Lead_createViaCapture,
           {
             leadType: "company",
-            source: "quote-builder", // Track that this came from the public quote form
-            estimatedValue: 0, // Will be calculated when proposal is created
-            companyName: args.clientName.trim(),
-            email: args.email.trim().toLowerCase(),
-            phone: args.phone?.trim() ?? undefined,
+            source: "quote-builder",
+            estimatedValue: 0,
+            companyName: clientName,
+            email,
+            phone,
           },
         );
-        leadId = leadResult._id;
-
-        // Link lead to client
-        if (leadId && clientId) {
-          await ctx.runMutation(api.mutations.Lead_stageConversion, {
-            docId: leadId,
-            clientId,
-            clientContactId: undefined,
-          });
-          await ctx.runMutation(api.mutations.Lead_confirmConversion, {
-            docId: leadId,
-          });
-        }
+        const createdLeadId = leadResult._id;
+        leadId = createdLeadId;
+        await ctx.runMutation(api.mutations.Lead_stageConversion, {
+          docId: createdLeadId,
+          clientId,
+          clientContactId: undefined,
+        });
+        await ctx.runMutation(api.mutations.Lead_confirmConversion, {
+          docId: createdLeadId,
+        });
       }
     } catch (error) {
-      // If lead creation fails, we still have the client - continue with event creation
-      console.error("Failed to create lead:", error);
+      errors.push(
+        `lead: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
-    // Step 8: Create Event (graceful failure - save submission even if this fails)
+    // Event.
     let eventId: Id<"events"> | null = null;
     try {
       if (clientId) {
-        // Parse dates for Event
-        const eventStart = new Date(args.eventDate);
-        const eventEnd = args.eventEndTime
-          ? new Date(
-              /^\d{2}:\d{2}/.test(args.eventEndTime)
-                ? `${args.eventDate}T${args.eventEndTime}`
-                : args.eventEndTime,
-            )
-          : new Date(eventStart.getTime() + 4 * 60 * 60 * 1000); // Default 4-hour event
-
+        const eventStart = submission.eventDate ?? Date.now();
+        const eventEnd = submission.eventEndTime
+          ? submission.eventEndTime
+          : eventStart + 4 * 60 * 60 * 1000; // default 4-hour event
         const eventResult = await ctx.runMutation(
           api.mutations.Event_createViaPlanEngagement,
           {
             clientId,
-            title: `Quote Request: ${args.clientName.trim()}`,
+            title: `Quote Request: ${clientName}`,
             eventType: "Catering Inquiry",
-            startsAt: eventStart.getTime(),
-            endsAt: eventEnd.getTime(),
-            expectedHeadcount: args.guestCount,
-            primaryContactName: args.clientName.trim(),
+            startsAt: eventStart,
+            endsAt: eventEnd,
+            expectedHeadcount: submission.guestCount ?? 0,
+            primaryContactName: clientName,
             budgetAmount: 0,
             quotedPrice: 0,
-            serviceStyleId: args.serviceStyleId ?? undefined,
-            occasionId: args.occasionId ?? undefined,
-            venueName: args.venueName?.trim() ?? undefined,
-            venueAddress: args.venueAddress?.trim() ?? undefined,
-            serviceRequirements: args.menuPreferences?.trim() ?? undefined,
+            serviceStyleId: submission.serviceStyleId ?? undefined,
+            occasionId: submission.occasionId ?? undefined,
+            venueName: submission.venueName ?? undefined,
+            venueAddress: submission.venueAddress ?? undefined,
+            serviceRequirements: submission.menuPreferences ?? undefined,
             operationalRequirements:
-              args.dietaryRestrictions?.trim() ?? undefined,
+              submission.dietaryRestrictions ?? undefined,
           },
         );
         eventId = eventResult._id;
       }
     } catch (error) {
-      // If event creation fails, we still have the lead - continue with proposal
-      console.error("Failed to create event:", error);
+      errors.push(
+        `event: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
-    // Step 9: Create Proposal draft (graceful failure)
+    // Draft proposal.
     let proposalId: Id<"proposals"> | null = null;
     try {
       if (clientId) {
-        // Get occasion name if provided
-        let eventName = "Event";
-        if (args.occasionId) {
-          try {
-            const occasions = await ctx.runQuery(api.queries.listOccasion);
-            const occasion = occasions.find((o) => o._id === args.occasionId);
-            eventName = occasion?.name || "Event";
-          } catch {
-            // Use default name
-          }
-        }
-
-        // Create a basic draft proposal
         const proposalResult = await ctx.runMutation(
           api.mutations.Proposal_createViaDraft,
           {
             clientId,
-            title: `Proposal for ${args.clientName.trim()}`,
-            eventDate: new Date(args.eventDate).getTime(),
-            eventType: eventName,
-            venueName: args.venueName?.trim() ?? undefined,
-            venueAddress: args.venueAddress?.trim() ?? undefined,
-            guestCount: args.guestCount,
-            subtotal: 0, // Will be calculated when menu is selected
+            title: `Proposal for ${clientName}`,
+            eventDate: submission.eventDate ?? Date.now(),
+            eventType: "Catering Inquiry",
+            venueName: submission.venueName ?? undefined,
+            venueAddress: submission.venueAddress ?? undefined,
+            guestCount: submission.guestCount ?? 0,
+            subtotal: 0,
             taxAmount: 0,
             discountAmount: 0,
             total: 0,
             notes:
-              args.notes?.trim() ??
+              submission.notes ??
               "Draft proposal created from quote request. Menu selection and pricing to follow.",
           },
         );
@@ -349,11 +417,12 @@ export const submitQuote = action({
         // both IDs are still recorded on the QuoteSubmission below.
       }
     } catch (error) {
-      // If proposal creation fails, we still have the event - mark as completed
-      console.error("Failed to create proposal:", error);
+      errors.push(
+        `proposal: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
-    // Step 10: Update QuoteSubmission with created entity IDs
+    // Record whatever was created on the submission and mark complete.
     await ctx.runMutation(api.mutations.QuoteSubmission_complete, {
       docId: submissionId,
       clientId: clientId ?? "",
@@ -362,23 +431,13 @@ export const submitQuote = action({
       proposalId: proposalId ?? "",
     });
 
-    return {
-      submissionId,
-      status: "completed",
-      isDuplicate: false,
-      message:
-        "Thank you! Your quote request has been submitted. We'll be in touch within 24-48 hours.",
-      clientId,
-      leadId,
-      eventId,
-      proposalId,
-    };
+    return { submissionId, clientId, leadId, eventId, proposalId, errors };
   },
 });
 
 /**
  * Public query to check quote submission status by ID.
- * This allows users to check the status of their submission without authentication.
+ * Allows users to check the status of their submission without authentication.
  */
 export const getQuoteSubmissionStatus = action({
   args: {

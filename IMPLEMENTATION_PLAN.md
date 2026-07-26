@@ -11,6 +11,28 @@
 
 ---
 
+**2026-07-25 — Finding 4 (public quote form dead) FIXED; Finding 6 documented as generator-blocked:**
+
+**Status: ✅ Finding 4 fixed + gate GREEN (726 tests). Finding 6 NOT fixable in-scope — documented below.**
+
+**Finding 4 (HIGH — public quote form was dead): FIXED.** The `/quote` form runs anonymously (outside AuthGate), and the old `submitQuote` action (a) called the staff-gated `listOrganization` for tenant resolution (returned `[]` for anon → abort) and (b) tried to create Client/Lead/Event/Proposal via the generated sales creates, which enforce `salesAccess` and throw for an anonymous caller. Even `QuoteSubmission_create` threw — the codegen applies the manifest's `write: salesAccess` policy to the create path too, and it sources `tenantId` from `__auth.tenantId` (empty for anon).
+
+**Fix (capture-only public submit + authenticated operator convert), the architecturally-clean split:**
+- **`convex/quoteBuilder.ts` `ingressQuoteSubmission` (internalMutation, system-privileged seam):** resolves the tenant by reading the active `organizations` row directly (no guard), dedupes by `dedupKey`, and inserts the `QuoteSubmission` capture record with an explicit `tenantId`. Internal mutations are reachable ONLY from other Convex functions (never from clients), and `submitQuote` validates input before calling it — so this is a controlled public entry point, not an open write surface. This is the seam the memory note `capsule-public-ingress-auth-gotcha` said was required.
+- **`submitQuote` (action) rewritten to capture-only:** validates input, normalizes the time-only `eventEndTime` into epoch-ms, then calls the seam. Returns `{ submissionId, status: "pending", isDuplicate, message }`. No anonymous sales-record creation.
+- **`processQuoteSubmission(submissionId)` (new authenticated action):** the operator-conversion path. Runs with the caller's sales/admin auth, so the generated `Client_createViaRegister` / `Lead_createViaCapture` / `Event_createViaPlanEngagement` / `Proposal_createViaDraft` creates pass their guards. Each step fails gracefully (partial conversion still records what was created); marks the submission `completed`.
+- **UI:** new `src/features/sales/QuoteSubmissionsReviewPage.tsx` at `/clients/quote-requests` (wired in `App.tsx`, added to `CLIENTS_SECTIONS`/`CLIENTS_ROUTES` + `ClientsWorkspaceNav`). Sales sees captured submissions and converts each into Lead+Event+draft Proposal in one click.
+
+**Product decision (documented):** the public submit CAPTURES only; a sales operator CONVERTS. This satisfies spec §4.3's "Done when" (mobile client submits once; sales sees the new lead/event with all selections; staff converts the draft without re-entry) without the spam/abuse vector of anonymous lead/event creation. Downstream sales records are created at conversion (seconds/minutes after submit) via the operator's own identity — never anonymously. This keeps every sales create on the auth-gated generated path (no hand-rolled multi-entity inserts, no guard weakening).
+
+**Why it matters:** the public quote form — the primary anonymous lead-capture surface — threw immediately and did nothing. It now works end-to-end: capture (anon-safe) → review queue → convert (authed) → Lead/Event/Proposal appear in existing pipeline/lists.
+
+**Verification:** `bun run check` GREEN — typecheck 0, format clean, **726 tests passing** (65 files; updated `tests/clients-routes.test.ts` to include the new `/clients/quote-requests` section — assertion, not gate weakening), build ok, baseline-decay ok.
+
+**Finding 6 (MEDIUM — `bun run seed` fails): NOT fixable in-scope — documented.** `scripts/seed-convex.ts` is **generated** ("do not edit by hand"; owned per AGENTS.md) and is the **direct entry point** (`"seed": "bun scripts/seed-convex.ts"` — no editable runner wrapper). It calls admin/sales-guarded creates (`CutoverDecision_create`, `QuoteSubmission_create`, `RevenueAttribution_create`, `PurchaseNeed_create`) via an unauthenticated `new ConvexHttpClient(url)`, so the guards throw. A clean fix needs a generator/manifest-IR change (the seed generator should skip guarded creates, OR an authenticated seed runner should be introduced) — not a hand-edit to the generated file. **Escalation:** recommend opening `Angriff36/capsule` issue "generated seed calls guarded creates anonymously → `bun run seed` fails" (per the escalate-blockers-to-GitHub rule). Not blocking any product flow (dev-only smoke seed).
+
+---
+
 **2026-07-25 — Venue-vendor relationship creation FIXED (Findings 1, 2, 3):**
 
 **Status: ✅ Findings 1, 2, 3 fixed + shipped; repo gate GREEN (726 tests). Findings 4 and 6 remain open.**
