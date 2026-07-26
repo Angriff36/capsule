@@ -579,6 +579,9 @@ export function ProposalsPage() {
           // Create signature request
           const result = await createSignatureRequest({
             proposalRevisionId: proposalRevisionId ?? "skip", // Skip if no revision yet
+            // proposalId drives the SignatureCompleted → Proposal.accept
+            // cascade, so the signed proposal actually flips to "accepted".
+            proposalId: row._id,
             recipientEmail,
             recipientName,
             recipientPersonId: "skip",

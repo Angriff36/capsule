@@ -38,6 +38,12 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
   // The proposal revision being accepted (immutable reference)
   property required proposalRevisionId: uuid
 
+  // The Proposal this request accepts. Denormalized from the revision at
+  // request time so the SignatureCompleted → Proposal.accept reaction can
+  // resolve its target by id without ref-navigating the revision at emit
+  // (emit ref-nav is unsupported; the UI supplies this from the proposal row).
+  property proposalId: uuid?
+
   // Recipient information
   property required recipientEmail: string
   property required recipientName: string
@@ -90,7 +96,8 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
     optional recipientPersonId: uuid,
     optional recipientContactId: uuid,
     optional provider: SignatureProvider,
-    optional expiresAt: datetime
+    optional expiresAt: datetime,
+    optional proposalId: uuid
   ) {
     guard self.deletedAt == null
     guard self.requestedAt == null "Request already initiated"
@@ -100,6 +107,7 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
     guard self.proposalRevision != null "Proposal revision not found"
 
     mutate proposalRevisionId = proposalRevisionId
+    mutate proposalId = proposalId
     mutate recipientEmail = recipientEmail
     mutate recipientName = recipientName
     mutate recipientPersonId = recipientPersonId
@@ -147,6 +155,7 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
       signatureRequestId: self.id
       tenantId: self.tenantId
       proposalRevisionId: self.proposalRevisionId
+      proposalId: self.proposalId
       recipientEmail: self.recipientEmail
       recipientName: self.recipientName
       signedAt: now()
@@ -250,6 +259,7 @@ event SignatureCompleted: "signature_request.completed" {
   signatureRequestId: string
   tenantId: string
   proposalRevisionId: string
+  proposalId: string?
   recipientEmail: string
   recipientName: string
   signedAt: datetime
@@ -272,3 +282,17 @@ event SignatureRevoked: "signature_request.revoked" {
   revokeReason: string
   revokedAt: datetime
 }
+
+// Acceptance cascade (spec §5.5: the bottom CTA "must be functional, not
+// decorative"). When a client completes a signature, drive the bound Proposal
+// through accept so its status flips sent/viewed → accepted and the downstream
+// ProposalAccepted cascade (ProposalDishSelection → EventDish.confirmFromProposal)
+// fires — without this the digitally-signed proposal stays "sent" forever.
+// Runs as a server-side reaction with system authority: the public acceptance
+// page holds no sales role, so Proposal.accept (salesExecute policy) cannot be
+// a client-callable command — the reaction is the designed bridge, exactly like
+// the Client.markMerged / Equipment.updateCondition cascades. A null proposalId
+// (revisionless/legacy request) makes the resolve target falsy and skips
+// cleanly. If Proposal.accept throws (already accepted / expired) the whole
+// complete rolls back — correct: a signature that cannot accept is invalid.
+on SignatureCompleted run Proposal.accept resolve payload.proposalId
