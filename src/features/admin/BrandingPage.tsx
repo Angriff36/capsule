@@ -244,13 +244,16 @@ export function BrandingPage() {
                 disabled={!canEdit || busy}
                 defaultValue={branding.displayName}
                 placeholder="Juniper & Co. Catering"
-                onInput={(event) =>
+                onInput={(event) => {
+                  // Read the value here, not inside the updater: React nulls
+                  // currentTarget once the handler returns, and StrictMode
+                  // re-invokes updaters during render.
+                  const value = event.currentTarget.value;
                   setPreviewBrand((current) => ({
                     ...current,
-                    displayName:
-                      event.currentTarget.value || branding.displayName,
-                  }))
-                }
+                    displayName: value || branding.displayName,
+                  }));
+                }}
               />
             </label>
             <label>
@@ -262,12 +265,13 @@ export function BrandingPage() {
                 disabled={!canEdit || busy}
                 defaultValue={branding.address}
                 placeholder={"418 Market Street\nPortland, OR 97205"}
-                onInput={(event) =>
+                onInput={(event) => {
+                  const value = event.currentTarget.value;
                   setPreviewBrand((current) => ({
                     ...current,
-                    address: event.currentTarget.value,
-                  }))
-                }
+                    address: value,
+                  }));
+                }}
               />
             </label>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -301,10 +305,11 @@ export function BrandingPage() {
                     disabled={!canEdit || busy}
                     className="font-mono uppercase"
                     onInput={(event) => {
-                      if (isValidBrandColor(event.currentTarget.value)) {
+                      const value = event.currentTarget.value;
+                      if (isValidBrandColor(value)) {
                         setPreviewBrand((current) => ({
                           ...current,
-                          primaryColor: event.currentTarget.value,
+                          primaryColor: value,
                         }));
                       }
                     }}
@@ -341,10 +346,11 @@ export function BrandingPage() {
                     disabled={!canEdit || busy}
                     className="font-mono uppercase"
                     onInput={(event) => {
-                      if (isValidBrandColor(event.currentTarget.value)) {
+                      const value = event.currentTarget.value;
+                      if (isValidBrandColor(value)) {
                         setPreviewBrand((current) => ({
                           ...current,
-                          accentColor: event.currentTarget.value,
+                          accentColor: value,
                         }));
                       }
                     }}

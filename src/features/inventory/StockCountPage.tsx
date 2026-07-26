@@ -437,13 +437,14 @@ export function StockCountPage() {
                     name="locationId"
                     value={location._id}
                     checked={checked}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      const isChecked = event.currentTarget.checked;
                       setSelectedLocationIds((current) =>
-                        event.currentTarget.checked
+                        isChecked
                           ? [...current, location._id]
                           : current.filter((id) => id !== location._id),
-                      )
-                    }
+                      );
+                    }}
                   />
                   <span>
                     <strong>{location.name}</strong>
