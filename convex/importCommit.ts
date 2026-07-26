@@ -36,10 +36,21 @@
  * (`capture` hardcodes stage "new"); the raw TPP ClientID + stage are preserved
  * on the link's rawSourceData for parallel-run reconciliation (§6.1).
  *
- * ponytail: ceiling — venues + contacts + events + leads ship here. Menus/
- * payments still throw an honest "not yet supported" (menus have no parser;
- * payments reference external invoice/event ids needing cross-dataset
- * resolution).
+ * Payments materialize as reconciliation-reference LINKS, NOT Payment entities
+ * (spec §6.4). `Payment.record` requires a Capsule invoice + client that NO
+ * import produces (there is no invoice dataset), and §6.4 treats imported
+ * payments as references matched (`Payment.markMatched`) against EXISTING
+ * Capsule payments — "retain source, external transaction ID, amount, date,
+ * type, event/client reference, and reconciliation state." So each TPP payment
+ * becomes a `pending_conflict` ExternalRecordLink (recordType "payment",
+ * capsuleEntity "payment", capsuleId "") awaiting a reconciliation match in the
+ * queue; the external EventID is cross-resolved against the prior events import
+ * for matching context. No Payment entity is created — by design (the spec's
+ * reference model), not omission.
+ *
+ * ponytail: ceiling — venues + contacts + events + leads + payments ship here.
+ * Menus still throws an honest "not yet supported" (menus have no parser + no
+ * TPP source feed; Dish/Menu entities exist but nothing maps a TPP row to them).
  * Revert supersedes links but leaves imported Venue entities in place (an event
  * may already reference one; deactivation is an operator action) — documented
  * honesty, not silent deletion. Source rows are caller-supplied (TPP has no bulk
@@ -53,12 +64,15 @@ import {
   parseTppContacts,
   parseTppEvents,
   parseTppLeads,
+  parseTppPayments,
   parseTppVenues,
   type ParsedCapsuleEvent,
   type ParsedCapsuleLead,
+  type ParsedCapsulePayment,
   type TppContactRecord,
   type TppEventRecord,
   type TppLeadRecord,
+  type TppPaymentRecord,
   type TppVenueRecord,
 } from "./tppParser";
 import type { Doc, Id } from "./_generated/dataModel";
@@ -696,10 +710,120 @@ export const commitImportRun = action({
       };
     }
 
+    if (importRun.datasetType === "payments") {
+      // ponytail: payments materialize as reconciliation-reference LINKS, NOT
+      // Payment entities (spec §6.4). Payment.record requires a Capsule invoice
+      // + client that NO import produces (there is no invoice dataset), and §6.4
+      // treats imported payments as references matched (Payment.markMatched)
+      // against EXISTING Capsule payments. So each TPP payment becomes a
+      // pending_conflict ExternalRecordLink (recordType "payment",
+      // capsuleEntity "payment", capsuleId "") awaiting a reconciliation match
+      // in the queue. conflictStatus "pending_conflict" is the CORRECT
+      // "awaiting match" state here — not a creation failure — so a staged link
+      // counts as `committed` (the link IS the artifact this dataset produces).
+      if (args.rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const parsed = parseTppPayments(args.rawRows as TppPaymentRecord[]);
+      if (parsed.records.length === 0) {
+        throw new ConvexError(
+          `No valid payment records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
+        );
+      }
+      const sourceSystem = importRun.sourceSystem;
+      let committed = 0;
+      let skipped = 0;
+      let pending = 0;
+
+      for (const payment of parsed.records as ParsedCapsulePayment[]) {
+        // Idempotent skip: an existing ACTIVE link means this payment reference
+        // is already staged (or already matched). The link IS the artifact, so
+        // ANY active link — matched or not — is a no-op skip (re-runs don't
+        // re-stage). findLink excludes superseded links, so a reverted run
+        // re-stages cleanly.
+        const existing = await ctx.runQuery(internal.importCommit.findLink, {
+          tenantId,
+          sourceSystem,
+          recordType: "payment",
+          externalId: payment.externalId,
+        });
+        if (existing) {
+          skipped += 1;
+          continue;
+        }
+
+        // Cross-dataset context (optional, aids later matching): resolve the
+        // TPP EventID → Capsule event from the prior events import. The natural
+        // Capsule match target is an invoice/payment, which is why §6.4 keys
+        // these records on event/client reference + reconciliation state. The
+        // external InvoiceID is preserved raw (no invoice import → not
+        // resolvable to a Capsule invoice).
+        let resolvedEventNote: string | null = null;
+        if (payment.eventId) {
+          const eventLink = await ctx.runQuery(internal.importCommit.findLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "event",
+            externalId: payment.eventId,
+          });
+          if (eventLink?.capsuleId) {
+            resolvedEventNote = `Capsule event ${eventLink.capsuleId}`;
+          } else if (eventLink) {
+            resolvedEventNote = `external event ${payment.eventId} (imported but unresolved)`;
+          }
+        }
+        const note = [
+          "Imported TPP payment — reconciliation reference (match via markMatched on a Capsule payment)",
+          payment.invoiceId
+            ? `external invoice ${payment.invoiceId} (no invoice import)`
+            : null,
+          resolvedEventNote ??
+            (payment.eventId ? `external event ${payment.eventId}` : null),
+          payment.recordedAt
+            ? `recorded ${new Date(payment.recordedAt).toISOString()}`
+            : null,
+        ]
+          .filter(Boolean)
+          .join(" — ");
+
+        await ctx.runMutation(internal.importCommit.upsertLink, {
+          tenantId,
+          sourceSystem,
+          recordType: "payment",
+          externalId: payment.externalId,
+          capsuleEntity: "payment",
+          capsuleId: "",
+          sourceImportRunId: args.importRunId,
+          rawSourceData: JSON.stringify(payment),
+          conflictStatus: "pending_conflict",
+          resolutionNote: note,
+        });
+        committed += 1;
+      }
+
+      if (committed === 0 && skipped === 0) {
+        // parsed.records.length > 0 is enforced above, so this is defensive.
+        throw new ConvexError("No payment references staged.");
+      }
+
+      await ctx.runMutation(api.mutations.ImportRun_commit, {
+        docId: args.importRunId,
+        version: importRun.version,
+      });
+
+      return {
+        committed,
+        skipped,
+        pending,
+        parseErrors: parsed.errors.length,
+      };
+    }
+
     if (importRun.datasetType !== "venues") {
-      // ponytail: ceiling — venues + contacts + events + leads supported.
+      // ponytail: ceiling — venues + contacts + events + leads + payments
+      // supported. Menus needs a parser + a TPP source feed.
       throw new ConvexError(
-        `Dataset '${importRun.datasetType}' import is not yet supported (venues/contacts/events/leads only). Menus/payments need parsers + cross-dataset ID resolution.`,
+        `Dataset '${importRun.datasetType}' import is not yet supported (venues/contacts/events/leads/payments only). Menus needs a parser + a TPP source feed.`,
       );
     }
     if (args.rawRows.length === 0) {

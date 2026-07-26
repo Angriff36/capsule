@@ -117,12 +117,14 @@ export function ImportRunDetailPage() {
     );
   }
 
-  // Datasets whose commit path materializes real entities (see importCommit.ts).
+  // Datasets whose commit path materializes entities/references (see
+  // importCommit.ts).
   const supportedCommitDatasets =
     importRun.datasetType === "venues" ||
     importRun.datasetType === "contacts" ||
     importRun.datasetType === "events" ||
-    importRun.datasetType === "leads";
+    importRun.datasetType === "leads" ||
+    importRun.datasetType === "payments";
   const commitNoun =
     importRun.datasetType === "contacts"
       ? "contact"
@@ -130,7 +132,9 @@ export function ImportRunDetailPage() {
         ? "event"
         : importRun.datasetType === "leads"
           ? "lead"
-          : "venue";
+          : importRun.datasetType === "payments"
+            ? "payment"
+            : "venue";
   const commitNounLabel =
     commitNoun.charAt(0).toUpperCase() + commitNoun.slice(1);
 
@@ -211,7 +215,7 @@ export function ImportRunDetailPage() {
   const handleCommit = () => {
     if (!supportedCommitDatasets) {
       setError(
-        "Commit supports the 'venues', 'contacts', 'events', and 'leads' datasets. Other datasets (menus/payments) need parsers + cross-dataset ID resolution (separate slice).",
+        "Commit supports the 'venues', 'contacts', 'events', 'leads', and 'payments' datasets. Menus needs a parser + a TPP source feed (separate slice).",
       );
       return;
     }
@@ -501,7 +505,9 @@ export function ImportRunDetailPage() {
                     ? '[{"EventID":"E1","EventName":"Smith Wedding","EventType":"Wedding","EventDate":"2025-06-14","StartTime":"17:00","EndTime":"23:00","ExpectedCount":150,"ClientID":"C1","VenueID":"V1","EventStatus":"Sales Lock","TotalRevenue":28500}]'
                     : commitNoun === "lead"
                       ? '[{"LeadID":"L1","OpportunityName":"Smith Wedding","ClientID":"C1","Stage":"Qualified","Probability":40,"EstimatedValue":12000,"Source":"Wedding Wire","CloseDate":"2025-09-01"}]'
-                      : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
+                      : commitNoun === "payment"
+                        ? '[{"PaymentID":"P1","InvoiceID":"INV1","EventID":"E1","PaymentDate":"2025-06-10","PaymentAmount":5000,"PaymentMethod":"Credit Card","Reference":"CHK 1234","Notes":"Deposit"}]'
+                        : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
               }
             />
             <p className="text-xs text-ink-2 mt-2">
@@ -512,7 +518,9 @@ export function ImportRunDetailPage() {
                   ? "Event (client/venue resolved from prior imports)"
                   : commitNoun === "lead"
                     ? "Lead (pre-client inquiry; client linked later on conversion)"
-                    : "Venue"}
+                    : commitNoun === "payment"
+                      ? "reconciliation-reference link staged in the queue (no Payment entity; matched to a Capsule payment later via markMatched — spec §6.4)"
+                      : "Venue"}
               , and linked to this run. Re-running is safe (already-linked rows
               are skipped).
             </p>
@@ -727,8 +735,10 @@ export function ImportRunDetailPage() {
               • <strong>Approve &amp; Commit</strong>: Finalize record counts,
               then paste source rows to materialize entities (venues → Venue,
               contacts → Client account, events → Event with client/venue
-              resolved from prior imports, leads → Lead pre-client inquiry) and
-              link them to this run (venues/contacts/events/leads datasets only)
+              resolved from prior imports, leads → Lead pre-client inquiry,
+              payments → reconciliation-reference links staged in the queue for
+              matching to a Capsule payment) and link them to this run
+              (venues/contacts/events/leads/payments datasets only)
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires
