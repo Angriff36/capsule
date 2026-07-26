@@ -19,6 +19,8 @@ import { api } from "../_generated/api";
 import { v } from "convex/values";
 import type { Id } from "../_generated/dataModel";
 import { computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
+import { getAuthContext, requireTenant } from "./authContext";
+import { assertValidCatalogLink } from "./proposalPricing";
 
 export const draftProposalWithLines = mutation({
   args: {
@@ -52,6 +54,10 @@ export const draftProposalWithLines = mutation({
     ),
   },
   handler: async (ctx, args): Promise<void> => {
+    // The created proposal's tenant is the caller's tenant (TenantScoped
+    // creation sources tenantId from auth). Validate every catalog link against
+    // it up front (codex review finding 3) — same-tenant published priced dish.
+    const tenantId = requireTenant(await getAuthContext(ctx));
     const pricing = computeProposalPricing({
       lines: args.lines.map((l) => ({
         pricingBasis: l.pricingBasis as PricingBasis,
@@ -86,6 +92,7 @@ export const draftProposalWithLines = mutation({
     // transaction → all-or-nothing with the proposal create above.
     for (let i = 0; i < args.lines.length; i++) {
       const line = args.lines[i];
+      await assertValidCatalogLink(ctx, line.menuDishId, tenantId);
       await ctx.runMutation(api.mutations.ProposalLineItem_createViaAddLine, {
         proposalId,
         description: line.description,

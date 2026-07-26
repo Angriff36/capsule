@@ -46,6 +46,34 @@ async function activeLines(
   ).filter((row: any) => row.deletedAt == null);
 }
 
+// Validate a catalog link (spec §5.4 L276, codex review finding 3): a menuDishId
+// must resolve to a SAME-TENANT dish in a PUBLISHED menu with a non-null
+// sellingPrice. Enforced at line write (add/revise/draft) so an invalid link
+// can never be created through the UI seams; the publish audit
+// (proposalRevision.ts) rejects any invalid link again as a backstop. Throws on
+// invalid; no-op for free-form lines (no menuDishId).
+export async function assertValidCatalogLink(
+  ctx: { db: any },
+  menuDishId: Id<"menuDishes"> | undefined | null,
+  tenantId: string,
+): Promise<void> {
+  if (!menuDishId) return;
+  const menuDish = await ctx.db.get(menuDishId);
+  if (
+    !menuDish ||
+    menuDish.tenantId !== tenantId ||
+    menuDish.sellingPrice == null
+  ) {
+    throw new Error(
+      "Catalog dish link is invalid (missing, foreign-tenant, or unpriced).",
+    );
+  }
+  const menu = await ctx.db.get(menuDish.menuId);
+  if (!menu || String(menu.status) !== "published") {
+    throw new Error("Catalog dish is not in a published menu.");
+  }
+}
+
 // Authoritative amount for ONE line against the proposal's active line set, so
 // the emitted ProposalLineItem{Added,Revised} event carries the real amount.
 // `target` is appended to the prospective set (and, for `revise`, the existing
@@ -152,6 +180,7 @@ export const addProposalLineAndRecompute = mutation({
   handler: async (ctx, args) => {
     const proposal = await ctx.db.get(args.proposalId);
     if (!proposal) throw new Error("Proposal not found");
+    await assertValidCatalogLink(ctx, args.menuDishId, proposal.tenantId);
     const amount = await authoritativeAmountForTarget(
       ctx,
       args.proposalId,
@@ -204,6 +233,7 @@ export const reviseProposalLineAndRecompute = mutation({
     if (!line) throw new Error("Proposal line not found");
     const proposal = await ctx.db.get(line.proposalId);
     if (!proposal) throw new Error("Proposal not found");
+    await assertValidCatalogLink(ctx, args.menuDishId, proposal.tenantId);
     const amount = await authoritativeAmountForTarget(
       ctx,
       line.proposalId,

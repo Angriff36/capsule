@@ -4,6 +4,7 @@ import { internalMutation, mutation } from "../_generated/server";
 import { api, internal } from "../_generated/api";
 import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
+import { getAuthContext } from "./authContext";
 
 // 2dp rounding for comparing stored money(12,2) values (float-stable).
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
@@ -297,6 +298,15 @@ export const sendProposalWithRevisionCapture = mutation({
     const proposal = await ctx.db.get(args.docId);
     if (!proposal) throw new Error("Proposal not found");
     const tenantId = proposal.tenantId;
+    // Verify the caller's tenant BEFORE reading any lines (codex review finding
+    // 2): otherwise the audit's throw-vs-proceed would oracle a foreign
+    // proposal's price-divergence state. A tenant mismatch is indistinguishable
+    // from a missing proposal (same "not found" error Proposal_send's salesAccess
+    // guard raises), so no information leaks.
+    const auth = await getAuthContext(ctx);
+    if (!auth.tenantId || auth.tenantId !== tenantId) {
+      throw new Error("Proposal not found");
+    }
     const overrideLines = (
       await ctx.db
         .query("proposalLineItems")
@@ -308,14 +318,22 @@ export const sendProposalWithRevisionCapture = mutation({
       // above guarantees non-null at runtime. Cast to the typed id so ctx.db.get
       // resolves to Doc<"menuDishes"> (sellingPrice/tenantId read cleanly).
       const menuDish = await ctx.db.get(line.menuDishId as Id<"menuDishes">);
-      // Foreign-tenant / missing / unpriced link → nothing comparable; skip
-      // (never audit or disclose a foreign catalog dish's price).
+      const menu = menuDish ? await ctx.db.get(menuDish.menuId) : null;
+      // Reject (do NOT skip) an invalid catalog link — missing, foreign-tenant,
+      // unpriced, or not in a published menu (codex review finding 3). A catalog-
+      // linked line must resolve to a same-tenant published priced dish, else
+      // publication is blocked until the link is fixed (an invalid link must not
+      // bypass the override audit by being silently ignored).
       if (
         !menuDish ||
         menuDish.tenantId !== tenantId ||
-        menuDish.sellingPrice == null
+        menuDish.sellingPrice == null ||
+        !menu ||
+        String(menu.status) !== "published"
       ) {
-        continue;
+        throw new Error(
+          "One or more catalog-linked lines point to an invalid menu dish (missing, foreign-tenant, unpriced, or not in a published menu). Fix the link before sending.",
+        );
       }
       const unit = round2(Number(line.unitPrice));
       const catalog = round2(Number(menuDish.sellingPrice));
@@ -323,9 +341,9 @@ export const sendProposalWithRevisionCapture = mutation({
         unit !== catalog &&
         (!line.overrideReason || line.overrideReason.trim().length === 0)
       ) {
-        // Non-disclosing (names no line or price): the proposal may not belong
-        // to the caller. The inline UI already flags each divergent line, so the
-        // operator knows where to add the reason.
+        // Non-disclosing (names no line or price). The caller's tenant was
+        // verified above, so this is an own-tenant proposal; the inline UI still
+        // flags each divergent line so the operator knows where to add a reason.
         throw new Error(
           "One or more catalog-linked lines have an unapproved price override. Add an override reason to each before sending (spec §5.4).",
         );
