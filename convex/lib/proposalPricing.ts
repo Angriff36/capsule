@@ -29,6 +29,7 @@ import { api, internal } from "../_generated/api";
 import { v } from "convex/values";
 import type { Doc, Id } from "../_generated/dataModel";
 import { computeProposalPricing, type PricingBasis } from "../../src/lib/pricing";
+import { getAuthContext } from "./authContext";
 
 // Active, non-deleted priced lines for a proposal. JS loose-equality filter
 // (governed-creation omits deletedAt at insert → fresh active rows have it
@@ -46,31 +47,51 @@ async function activeLines(
   ).filter((row: any) => row.deletedAt == null);
 }
 
-// Validate a catalog link (spec §5.4 L276, codex review finding 3): a menuDishId
-// must resolve to a SAME-TENANT dish in a PUBLISHED menu with a non-null
-// sellingPrice. Enforced at line write (add/revise/draft) so an invalid link
-// can never be created through the UI seams; the publish audit
-// (proposalRevision.ts) rejects any invalid link again as a backstop. Throws on
-// invalid; no-op for free-form lines (no menuDishId).
+// Resolve a catalog link's validated sellingPrice, or null if invalid (spec
+// §5.4 L276; codex review findings 3/C). A valid link resolves to a SAME-TENANT,
+// non-removed MenuDish (deletedAt null, addedAt set) that is priced, in a non-
+// deleted PUBLISHED menu, whose Dish is active — the same conditions
+// useCatalogDishes filters on, so UI and server agree. Non-throwing: the publish
+// snapshot records null; enforcement callers throw on null.
+export async function resolveCatalogPrice(
+  ctx: { db: any },
+  menuDishId: Id<"menuDishes"> | undefined | null,
+  tenantId: string,
+): Promise<number | null> {
+  if (!menuDishId) return null;
+  const menuDish = await ctx.db.get(menuDishId);
+  if (
+    !menuDish ||
+    menuDish.deletedAt != null ||
+    menuDish.addedAt == null ||
+    menuDish.tenantId !== tenantId ||
+    menuDish.sellingPrice == null
+  ) {
+    return null;
+  }
+  const menu = await ctx.db.get(menuDish.menuId);
+  if (!menu || menu.deletedAt != null || String(menu.status) !== "published") {
+    return null;
+  }
+  const dish = await ctx.db.get(menuDish.dishId);
+  if (!dish || String(dish.status) !== "active") return null;
+  return Number(menuDish.sellingPrice);
+}
+
+// Enforce a valid catalog link at write (throws on invalid). Thin throwing
+// wrapper over resolveCatalogPrice; no-op for free-form lines (no menuDishId).
 export async function assertValidCatalogLink(
   ctx: { db: any },
   menuDishId: Id<"menuDishes"> | undefined | null,
   tenantId: string,
 ): Promise<void> {
-  if (!menuDishId) return;
-  const menuDish = await ctx.db.get(menuDishId);
   if (
-    !menuDish ||
-    menuDish.tenantId !== tenantId ||
-    menuDish.sellingPrice == null
+    menuDishId != null &&
+    (await resolveCatalogPrice(ctx, menuDishId, tenantId)) == null
   ) {
     throw new Error(
-      "Catalog dish link is invalid (missing, foreign-tenant, or unpriced).",
+      "Catalog dish link is invalid (missing, removed, foreign-tenant, unpriced, or not in an active published menu).",
     );
-  }
-  const menu = await ctx.db.get(menuDish.menuId);
-  if (!menu || String(menu.status) !== "published") {
-    throw new Error("Catalog dish is not in a published menu.");
   }
 }
 
@@ -178,8 +199,13 @@ export const addProposalLineAndRecompute = mutation({
     overrideReason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
     const proposal = await ctx.db.get(args.proposalId);
-    if (!proposal) throw new Error("Proposal not found");
+    // Tenant-check before any catalog read so a foreign proposal id yields only
+    // "not found" (no existence / catalog-validation oracle). codex review A.
+    if (!proposal || !auth.tenantId || proposal.tenantId !== auth.tenantId) {
+      throw new Error("Proposal not found");
+    }
     await assertValidCatalogLink(ctx, args.menuDishId, proposal.tenantId);
     const amount = await authoritativeAmountForTarget(
       ctx,
@@ -229,8 +255,11 @@ export const reviseProposalLineAndRecompute = mutation({
     overrideReason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
     const line = await ctx.db.get(args.docId);
-    if (!line) throw new Error("Proposal line not found");
+    if (!line || !auth.tenantId || line.tenantId !== auth.tenantId) {
+      throw new Error("Proposal line not found");
+    }
     const proposal = await ctx.db.get(line.proposalId);
     if (!proposal) throw new Error("Proposal not found");
     await assertValidCatalogLink(ctx, args.menuDishId, proposal.tenantId);
@@ -275,8 +304,11 @@ export const removeProposalLineAndRecompute = mutation({
     version: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const auth = await getAuthContext(ctx);
     const line = await ctx.db.get(args.docId);
-    if (!line) throw new Error("Proposal line not found");
+    if (!line || !auth.tenantId || line.tenantId !== auth.tenantId) {
+      throw new Error("Proposal line not found");
+    }
     await ctx.runMutation(api.mutations.ProposalLineItem_removeLine, {
       docId: args.docId,
       version: args.version,

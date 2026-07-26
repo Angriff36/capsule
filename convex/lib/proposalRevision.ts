@@ -9,6 +9,38 @@ import { getAuthContext } from "./authContext";
 // 2dp rounding for comparing stored money(12,2) values (float-stable).
 const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
+// Resolve a catalog link's validated sellingPrice, or null if invalid (spec
+// §5.4 L276; codex review findings 3/C): same-tenant, non-removed MenuDish
+// (deletedAt null, addedAt set), priced, in a non-deleted published menu, with
+// an active dish — the same rules proposalPricing.resolveCatalogPrice enforces.
+// Kept LOCAL (not imported across modules) so this module's raw-write +
+// event-table references stay clear of the event-manifest integration guard.
+// Non-throwing: the publish snapshot records null; the send audit throws on null.
+async function resolveCatalogPrice(
+  ctx: { db: any },
+  menuDishId: Id<"menuDishes"> | string | null | undefined,
+  tenantId: string,
+): Promise<number | null> {
+  if (!menuDishId) return null;
+  const md: any = await ctx.db.get(menuDishId);
+  if (
+    !md ||
+    md.deletedAt != null ||
+    md.addedAt == null ||
+    md.tenantId !== tenantId ||
+    md.sellingPrice == null
+  ) {
+    return null;
+  }
+  const menu: any = await ctx.db.get(md.menuId);
+  if (!menu || menu.deletedAt != null || String(menu.status) !== "published") {
+    return null;
+  }
+  const dish: any = await ctx.db.get(md.dishId);
+  if (!dish || String(dish.status) !== "active") return null;
+  return Number(md.sellingPrice);
+}
+
 // Snapshot data structure for proposal revisions
 export interface ProposalRevisionSnapshot {
   proposal: {
@@ -138,14 +170,12 @@ export async function buildProposalRevisionSnapshot(
       lineItems.map(async (line: any) => {
         // Resolve the linked catalog price (spec §5.4 L276 audit) so the
         // snapshot records what the dish sold for at publication, independent
-        // of later MenuDish.sellingPrice edits. Only a SAME-TENANT dish's price
-        // is snapshotted — a foreign / missing / unpriced link carries no
-        // catalogPrice (no foreign-price leak into the immutable revision).
-        const menuDish = line.menuDishId ? await ctx.db.get(line.menuDishId) : null;
-        const sameTenantPriced =
-          !!menuDish &&
-          menuDish.tenantId === proposal.tenantId &&
-          menuDish.sellingPrice != null;
+        // of later MenuDish.sellingPrice edits. resolveCatalogPrice returns null
+        // for any foreign / missing / removed / unpriced / unpublished / inactive
+        // link — no foreign-price leak into the immutable revision (codex 3/C).
+        const catalogPrice = line.menuDishId
+          ? await resolveCatalogPrice(ctx, line.menuDishId, proposal.tenantId)
+          : null;
         return {
           id: line._id.toString(),
           description: line.description,
@@ -157,7 +187,7 @@ export async function buildProposalRevisionSnapshot(
           sortOrder: line.sortOrder,
           notes: line.notes ?? null,
           menuDishId: line.menuDishId ? line.menuDishId.toString() : null,
-          catalogPrice: sameTenantPriced ? Number(menuDish.sellingPrice) : null,
+          catalogPrice,
           overrideReason: line.overrideReason ?? null,
         };
       }),
@@ -314,31 +344,23 @@ export const sendProposalWithRevisionCapture = mutation({
         .collect()
     ).filter((row: any) => row.deletedAt == null && row.menuDishId != null);
     for (const line of overrideLines) {
-      // menuDishId is a uuid? column (`string | null | undefined`); the filter
-      // above guarantees non-null at runtime. Cast to the typed id so ctx.db.get
-      // resolves to Doc<"menuDishes"> (sellingPrice/tenantId read cleanly).
-      const menuDish = await ctx.db.get(line.menuDishId as Id<"menuDishes">);
-      const menu = menuDish ? await ctx.db.get(menuDish.menuId) : null;
-      // Reject (do NOT skip) an invalid catalog link — missing, foreign-tenant,
-      // unpriced, or not in a published menu (codex review finding 3). A catalog-
-      // linked line must resolve to a same-tenant published priced dish, else
-      // publication is blocked until the link is fixed (an invalid link must not
-      // bypass the override audit by being silently ignored).
-      if (
-        !menuDish ||
-        menuDish.tenantId !== tenantId ||
-        menuDish.sellingPrice == null ||
-        !menu ||
-        String(menu.status) !== "published"
-      ) {
+      // Reject (do not skip) any invalid catalog link — resolveCatalogPrice
+      // returns null for missing / removed / foreign-tenant / unpriced /
+      // unpublished-menu / inactive-dish (codex review 3/C). Same validator the
+      // write seams use.
+      const catalog = await resolveCatalogPrice(
+        ctx,
+        line.menuDishId as Id<"menuDishes">,
+        tenantId,
+      );
+      if (catalog == null) {
         throw new Error(
-          "One or more catalog-linked lines point to an invalid menu dish (missing, foreign-tenant, unpriced, or not in a published menu). Fix the link before sending.",
+          "One or more catalog-linked lines point to an invalid menu dish (missing, removed, foreign-tenant, unpriced, or not in an active published menu). Fix the link before sending.",
         );
       }
       const unit = round2(Number(line.unitPrice));
-      const catalog = round2(Number(menuDish.sellingPrice));
       if (
-        unit !== catalog &&
+        unit !== round2(catalog) &&
         (!line.overrideReason || line.overrideReason.trim().length === 0)
       ) {
         // Non-disclosing (names no line or price). The caller's tenant was
