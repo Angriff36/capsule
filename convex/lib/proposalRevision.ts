@@ -137,8 +137,14 @@ export async function buildProposalRevisionSnapshot(
       lineItems.map(async (line: any) => {
         // Resolve the linked catalog price (spec §5.4 L276 audit) so the
         // snapshot records what the dish sold for at publication, independent
-        // of later MenuDish.sellingPrice edits.
+        // of later MenuDish.sellingPrice edits. Only a SAME-TENANT dish's price
+        // is snapshotted — a foreign / missing / unpriced link carries no
+        // catalogPrice (no foreign-price leak into the immutable revision).
         const menuDish = line.menuDishId ? await ctx.db.get(line.menuDishId) : null;
+        const sameTenantPriced =
+          !!menuDish &&
+          menuDish.tenantId === proposal.tenantId &&
+          menuDish.sellingPrice != null;
         return {
           id: line._id.toString(),
           description: line.description,
@@ -150,10 +156,7 @@ export async function buildProposalRevisionSnapshot(
           sortOrder: line.sortOrder,
           notes: line.notes ?? null,
           menuDishId: line.menuDishId ? line.menuDishId.toString() : null,
-          catalogPrice:
-            menuDish && menuDish.sellingPrice != null
-              ? Number(menuDish.sellingPrice)
-              : null,
+          catalogPrice: sameTenantPriced ? Number(menuDish.sellingPrice) : null,
           overrideReason: line.overrideReason ?? null,
         };
       }),
@@ -285,6 +288,15 @@ export const sendProposalWithRevisionCapture = mutation({
     // fires only when an operator BOTH linked a catalog dish AND changed its
     // price. Runs before Proposal_send so a blocked proposal is not partially
     // sent; an uncaught throw rolls back the whole transaction.
+    //
+    // Fetch the proposal first: fail fast + non-disclosing on an unknown id,
+    // and establish the tenant so only SAME-TENANT catalog dishes are audited.
+    // The caller is not yet authorized (Proposal_send's salesAccess guard runs
+    // next), so read no foreign line/price detail and throw no disclosing
+    // message — a foreign proposal id must not leak its lines or prices.
+    const proposal = await ctx.db.get(args.docId);
+    if (!proposal) throw new Error("Proposal not found");
+    const tenantId = proposal.tenantId;
     const overrideLines = (
       await ctx.db
         .query("proposalLineItems")
@@ -294,19 +306,28 @@ export const sendProposalWithRevisionCapture = mutation({
     for (const line of overrideLines) {
       // menuDishId is a uuid? column (`string | null | undefined`); the filter
       // above guarantees non-null at runtime. Cast to the typed id so ctx.db.get
-      // resolves to Doc<"menuDishes"> (sellingPrice reads cleanly).
+      // resolves to Doc<"menuDishes"> (sellingPrice/tenantId read cleanly).
       const menuDish = await ctx.db.get(line.menuDishId as Id<"menuDishes">);
-      // Dish gone or catalog price unset → nothing to compare against; skip
-      // rather than block a send over a stale/empty link.
-      if (!menuDish || menuDish.sellingPrice == null) continue;
+      // Foreign-tenant / missing / unpriced link → nothing comparable; skip
+      // (never audit or disclose a foreign catalog dish's price).
+      if (
+        !menuDish ||
+        menuDish.tenantId !== tenantId ||
+        menuDish.sellingPrice == null
+      ) {
+        continue;
+      }
       const unit = round2(Number(line.unitPrice));
       const catalog = round2(Number(menuDish.sellingPrice));
       if (
         unit !== catalog &&
         (!line.overrideReason || line.overrideReason.trim().length === 0)
       ) {
+        // Non-disclosing (names no line or price): the proposal may not belong
+        // to the caller. The inline UI already flags each divergent line, so the
+        // operator knows where to add the reason.
         throw new Error(
-          `"${line.description}" is priced at ${unit.toFixed(2)} but its linked menu dish lists ${catalog.toFixed(2)}. Add an override reason (spec §5.4) before sending.`,
+          "One or more catalog-linked lines have an unapproved price override. Add an override reason to each before sending (spec §5.4).",
         );
       }
     }
