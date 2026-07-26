@@ -79,7 +79,7 @@ export function ImportRunDetailPage() {
   const markFailed = useImportRunMarkFailed();
   // Commit/revert go through the authored importCommit seam, which actually
   // materializes entities + links (the generated ImportRun_commit only flips
-  // status). Venues only this increment; see convex/importCommit.ts.
+  // status). Venues + contacts supported; see convex/importCommit.ts.
   const commitImportRun = useAction(api.importCommit.commitImportRun);
   const revertImportRun = useAction(api.importCommit.revertImportRun);
 
@@ -88,8 +88,10 @@ export function ImportRunDetailPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [showRecordCountsForm, setShowRecordCountsForm] = useState(false);
   const [recordCountsInput, setRecordCountsInput] = useState("{}");
-  const [showVenueForm, setShowVenueForm] = useState(false);
-  const [venueRowsInput, setVenueRowsInput] = useState("[]");
+  // Source-row commit form state — shared by the venues + contacts datasets
+  // (both paste a JSON array of TPP rows into the authored commitImportRun).
+  const [showSourceForm, setShowSourceForm] = useState(false);
+  const [sourceRowsInput, setSourceRowsInput] = useState("[]");
 
   if (id === "skip" || importRun === undefined) {
     return (
@@ -114,6 +116,13 @@ export function ImportRunDetailPage() {
       </div>
     );
   }
+
+  // Datasets whose commit path materializes real entities (see importCommit.ts).
+  const supportedCommitDatasets =
+    importRun.datasetType === "venues" || importRun.datasetType === "contacts";
+  const commitNoun = importRun.datasetType === "contacts" ? "contact" : "venue";
+  const commitNounLabel =
+    commitNoun.charAt(0).toUpperCase() + commitNoun.slice(1);
 
   const clearNotice = () => setNotice(null);
 
@@ -190,26 +199,26 @@ export function ImportRunDetailPage() {
   };
 
   const handleCommit = () => {
-    if (importRun.datasetType !== "venues") {
+    if (!supportedCommitDatasets) {
       setError(
-        "Commit currently supports the 'venues' dataset only. Other datasets need cross-dataset ID resolution (separate slice).",
+        "Commit supports the 'venues' and 'contacts' datasets. Other datasets need cross-dataset ID resolution (separate slice).",
       );
       return;
     }
-    setShowVenueForm(true);
+    setShowSourceForm(true);
   };
 
-  const handleCommitVenues = async () => {
+  const handleCommitSource = async () => {
     let rows: unknown[];
     try {
-      const parsed = JSON.parse(venueRowsInput);
+      const parsed = JSON.parse(sourceRowsInput);
       rows = Array.isArray(parsed) ? parsed : [];
     } catch {
-      setError("Invalid JSON for venue source rows");
+      setError(`Invalid JSON for ${commitNoun} source rows`);
       return;
     }
     if (rows.length === 0) {
-      setError("Paste at least one venue source row (JSON array)");
+      setError(`Paste at least one ${commitNoun} source row (JSON array)`);
       return;
     }
     setError(null);
@@ -220,10 +229,10 @@ export function ImportRunDetailPage() {
         importRunId: importRun._id,
         rawRows: rows,
       });
-      setShowVenueForm(false);
-      setVenueRowsInput("[]");
+      setShowSourceForm(false);
+      setSourceRowsInput("[]");
       setNotice(
-        `Imported ${result.committed} venue(s)` +
+        `Imported ${result.committed} ${commitNoun}(s)` +
           (result.skipped ? `, ${result.skipped} already linked` : "") +
           (result.pending ? `, ${result.pending} pending review` : "") +
           (result.parseErrors ? `, ${result.parseErrors} parse error(s)` : "") +
@@ -454,50 +463,55 @@ export function ImportRunDetailPage() {
         </div>
       ) : null}
 
-      {/* Venue Source Rows (commit) */}
-      {showVenueForm ? (
+      {/* Source Rows (commit) — venues or contacts */}
+      {showSourceForm ? (
         <div className="card mt-4">
           <div className="border-b border-line px-3">
             <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
-              Commit Venue Source Rows
+              Commit {commitNounLabel} Source Rows
             </h2>
           </div>
           <div className="p-4">
             <label
-              htmlFor="venueRows"
+              htmlFor="sourceRows"
               className="block text-sm font-medium text-ink-1 mb-2"
             >
-              Venue source rows (JSON array)
+              {commitNounLabel} source rows (JSON array)
             </label>
             <textarea
-              id="venueRows"
-              value={venueRowsInput}
-              onChange={(e) => setVenueRowsInput(e.target.value)}
+              id="sourceRows"
+              value={sourceRowsInput}
+              onChange={(e) => setSourceRowsInput(e.target.value)}
               className="w-full px-3 py-2 border border-line rounded-md text-sm font-mono"
               rows={8}
               placeholder={
-                '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
+                commitNoun === "contact"
+                  ? '[{"ContactID":"C1","FirstName":"Maria","LastName":"Gomez","Email":"maria@acme.com","Phone":"512-555-0100","Title":"Event Planner","CompanyID":"ACME1","IsPrimary":true}]'
+                  : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
               }
             />
             <p className="text-xs text-ink-2 mt-2">
-              Paste TPP venue rows. Each is parsed, created as a Venue, and
+              Paste TPP {commitNoun} rows. Each is parsed, created as a{" "}
+              {commitNoun === "contact" ? "Client account" : "Venue"}, and
               linked to this run. Re-running is safe (already-linked rows are
               skipped).
             </p>
             <div className="mt-4 flex gap-3">
               <button
                 type="button"
-                onClick={handleCommitVenues}
+                onClick={handleCommitSource}
                 disabled={busy === "commit"}
                 className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium disabled:opacity-50"
               >
-                {busy === "commit" ? "Committing..." : "Commit Venues"}
+                {busy === "commit"
+                  ? "Committing..."
+                  : `Commit ${commitNounLabel}s`}
               </button>
               <button
                 type="button"
                 onClick={() => {
-                  setShowVenueForm(false);
-                  setVenueRowsInput("[]");
+                  setShowSourceForm(false);
+                  setSourceRowsInput("[]");
                 }}
                 className="px-4 py-2 text-slate-600 rounded-md text-sm font-medium hover:bg-slate-100"
               >
@@ -691,8 +705,9 @@ export function ImportRunDetailPage() {
             </li>
             <li>
               • <strong>Approve &amp; Commit</strong>: Finalize record counts,
-              then paste venue source rows to materialize Venue entities and
-              link them to this run (venues dataset only)
+              then paste source rows to materialize entities (venues → Venue,
+              contacts → Client account) and link them to this run (venues +
+              contacts datasets only)
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires

@@ -9,16 +9,20 @@
  * false-success), and §5.3's "imported TPP Event uses the same create-proposal
  * command" had no imported events to act on.
  *
- * This seam makes commit/revert REAL for the self-contained **venues** dataset:
- * caller-supplied TPP venue rows are parsed, materialized into Venue entities via
- * the generated `Venue_createViaRegister` (handles encryption + eventManageAccess
- * guard), and linked idempotently through ExternalRecordLink. Re-run is safe
- * (Venue idempotencyKey + link dedup). Revert supersedes the run's links.
+ * This seam makes commit/revert REAL for the self-contained **venues** and
+ * **contacts** datasets: caller-supplied TPP rows are parsed, materialized into
+ * entities via the generated `Venue_createViaRegister` (handles encryption +
+ * eventManageAccess guard) or `Client_createViaRegister` (person-type client
+ * account; salesAccess guard), and linked idempotently through
+ * ExternalRecordLink. Re-run is safe (per-record idempotencyKey + link dedup).
+ * Revert supersedes the run's links (dataset-agnostic).
  *
- * ponytail: ceiling — only venues ship here. Events/leads/payments reference
- * external client/venue IDs that need cross-dataset resolution (import contacts
- * before events, resolve externalId→Capsule id), which is a separate slice; this
- * action throws an honest "not yet supported" for them rather than faking it.
+ * ponytail: ceiling — venues + contacts ship here. A TPP contact becomes a
+ * person-type Client (NOT a ClientContact, which needs a parent clientId = the
+ * cross-dataset CompanyID resolution). Events/leads/payments reference external
+ * client/venue IDs that need cross-dataset resolution (resolve
+ * externalId→Capsule id), which is a separate slice; this action throws an
+ * honest "not yet supported" for them rather than faking it.
  * Revert supersedes links but leaves imported Venue entities in place (an event
  * may already reference one; deactivation is an operator action) — documented
  * honesty, not silent deletion. Source rows are caller-supplied (TPP has no bulk
@@ -28,7 +32,12 @@ import { ConvexError, v } from "convex/values";
 import { action, internalMutation, internalQuery } from "./_generated/server";
 import { api, internal } from "./_generated/api";
 import { getAuthContext } from "./lib/authContext";
-import { parseTppVenues, type TppVenueRecord } from "./tppParser";
+import {
+  parseTppContacts,
+  parseTppVenues,
+  type TppContactRecord,
+  type TppVenueRecord,
+} from "./tppParser";
 import type { Doc, Id } from "./_generated/dataModel";
 
 /** Import access matches `importCoordinator.canImport` (managers + system). */
@@ -246,10 +255,119 @@ export const commitImportRun = action({
         `Import run must be in 'committing' status to commit, current: ${importRun.status}`,
       );
     }
+
+    // ponytail: a TPP contact (a person we cater for) → a person-type Client
+    // account. We deliberately do NOT create a ClientContact here: that entity
+    // requires a parent clientId (the TPP CompanyID → Capsule Client resolution
+    // the venue module header defers as cross-dataset). A person-Client is the
+    // top-level home for an individual client and mirrors the venue path
+    // exactly — generated `Client_createViaRegister` (salesAccess-guarded,
+    // PII-encrypting, `idempotencyKey`-deduped, returns `{docId}`), then an
+    // idempotent ExternalRecordLink (recordType "contact" → capsuleEntity
+    // "client"). The company/title are folded into notes (the full raw row is
+    // also preserved on the link), so nothing is lost.
+    if (importRun.datasetType === "contacts") {
+      if (args.rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const parsed = parseTppContacts(args.rawRows as TppContactRecord[]);
+      if (parsed.records.length === 0) {
+        throw new ConvexError(
+          `No valid contact records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
+        );
+      }
+      const sourceSystem = importRun.sourceSystem;
+      let committed = 0;
+      let skipped = 0;
+      let pending = 0;
+      for (const contact of parsed.records) {
+        const existing = await ctx.runQuery(internal.importCommit.findLink, {
+          tenantId,
+          sourceSystem,
+          recordType: "contact",
+          externalId: contact.externalId,
+        });
+        if (existing && existing.capsuleId) {
+          // Already materialized in a prior run — idempotent skip.
+          skipped += 1;
+          continue;
+        }
+
+        const idempotencyKey = `import:${args.importRunId}:contact:${contact.externalId}`;
+        const notes =
+          [contact.title, contact.notes].filter(Boolean).join(" — ") ||
+          undefined;
+        try {
+          const created = await ctx.runMutation(
+            api.mutations.Client_createViaRegister,
+            {
+              clientType: "person",
+              givenName: contact.givenName,
+              familyName: contact.familyName,
+              email: contact.email,
+              phone: contact.phone ?? contact.mobile,
+              notes,
+              idempotencyKey,
+            },
+          );
+          const clientId: string = (created as { docId: string }).docId;
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "contact",
+            externalId: contact.externalId,
+            capsuleEntity: "client",
+            capsuleId: clientId,
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(contact),
+            conflictStatus: "resolved",
+          });
+          committed += 1;
+        } catch (cause) {
+          // Per-record failure (e.g. salesAccess denied) → review queue.
+          const note =
+            cause instanceof Error
+              ? cause.message
+              : "Client materialization failed";
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "contact",
+            externalId: contact.externalId,
+            capsuleEntity: "client",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(contact),
+            conflictStatus: "pending_conflict",
+            resolutionNote: note,
+          });
+          pending += 1;
+        }
+      }
+
+      if (committed === 0 && pending > 0) {
+        throw new ConvexError(
+          `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+        );
+      }
+
+      await ctx.runMutation(api.mutations.ImportRun_commit, {
+        docId: args.importRunId,
+        version: importRun.version,
+      });
+
+      return {
+        committed,
+        skipped,
+        pending,
+        parseErrors: parsed.errors.length,
+      };
+    }
+
     if (importRun.datasetType !== "venues") {
-      // ponytail: ceiling — venues only this increment (see module header).
+      // ponytail: ceiling — venues + contacts supported; see module header.
       throw new ConvexError(
-        `Dataset '${importRun.datasetType}' import is not yet supported (venues only). Events/leads/payments need cross-dataset ID resolution.`,
+        `Dataset '${importRun.datasetType}' import is not yet supported (venues/contacts only). Events/leads/payments need cross-dataset ID resolution.`,
       );
     }
     if (args.rawRows.length === 0) {

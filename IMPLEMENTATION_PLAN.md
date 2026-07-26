@@ -1,13 +1,34 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-26 (§4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
+**Updated:** 2026-07-26 (§6.2 contacts import WIRED — venues + contacts now materialize; §4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+---
+
+**2026-07-26 — §6.2 Contacts import WIRED (next slice of the #1 Critical-priority Import Datasets; venues + contacts now materialize):**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0). Additive branch to the existing `convex/importCommit.ts` authored seam + a dataset-aware UI generalization; no manifest/regen (no new entity/guard/query — no #111 exposure), no schema change, no new Convex module.**
+
+**Finding (verified first-hand against spec + code this turn):** the venues-commit increment (entry below) documented its next slice as "import contacts/venues before events ... cross-dataset ID resolution." Only **venues** materialized; the `contacts` dataset still threw "not yet supported" inside `commitImportRun` (`importCommit.ts`), so the spec §6.2 "Contacts: name, email, phone, company, address" dataset wrote nothing. Verified before building: (1) the spec's "Contacts" dataset is a flat row (name/email/phone/company/address) mapping to the `Contact` entity (§2.1 spine); the spec is **silent on import ordering** (no "contacts before events" mandate — that was the prior author's reasoning). (2) The repo's `ClientContact` (`src/sales/contact.manifest`) is a person **under** a parent Client — its `add` command requires `clientId` (FK guard `self.client != null`), so importing a `ClientContact` needs the company-Client first = exactly the cross-dataset trap to avoid. (3) The existing `parseTppContacts` parser (`convex/tppParser.ts:516`) already validated ContactID/FirstName/LastName; only the materialization was missing.
+
+**Fix (smallest spec-faithful diff — one new branch mirroring the proven venue loop + a dataset-aware UI):**
+- `convex/importCommit.ts` — added a `contacts` branch to `commitImportRun` (the proven venue path is left byte-identical). Each parsed TPP contact → a **person-type `Client`** via the generated `Client_createViaRegister` (top-level account; `salesAccess`-guarded; encrypts email/phone; `idempotencyKey`-deduped; returns `{docId}` — verified at `convex/mutations.ts:1703`), then an idempotent `ExternalRecordLink` (recordType `contact` → capsuleEntity `client`; `resolved` on success, `pending_conflict` on per-record failure). The reject guard now allows `venues` + `contacts`; events/leads/menus/payments still throw an honest "not yet supported." Revert is already dataset-agnostic (supersedes all links the run created via `by_sourceImportRunId`), so `contacts` reverts for free.
+- **Key decision (documented in-code with a `ponytail:` comment): a TPP contact → a person-`Client`, NOT a `ClientContact`.** A `ClientContact` requires a parent `clientId` (the TPP `CompanyID` → Capsule Client resolution the venues entry deferred as cross-dataset). A person-`Client` is the top-level home for an individual client and mirrors the venue path exactly (same idempotency shape, same guard tier, same `{docId}` return, same `findLink`/`upsertLink`/`ImportRun_commit` tail). The company/title are folded into the Client `notes`, and the full raw row is preserved on the link's `rawSourceData`, so nothing is lost. This is the genuinely lazy/smallest spec-faithful mapping; a normalized company→Client + ClientContact import remains the documented next slice.
+- `src/features/admin/import/ImportRunDetailPage.tsx` — generalized the venues-only commit form to be dataset-aware: `handleCommit` now allows `venues` + `contacts`; the source-rows JSON form (heading/label/placeholder/help-text/notice/button) is parameterized by `commitNoun` (contact/venue); the form state was renamed to be generic (`showSourceForm`/`sourceRowsInput`). A contacts row gets a contact JSON example placeholder; the result counts (`committed/skipped/pending/parseErrors`) surface unchanged.
+
+**Why it matters:** the #1 Critical-priority Import Datasets (Priority 2) moves from "venues only" to "venues + contacts" — the second dataset that actually materializes real entities end-to-end. Imported contacts become real Client accounts (the entity events' client context and proposals reference), advancing §6.2 and the broader TPP migration. Re-running is safe (per-record `idempotencyKey` + `findLink`/`upsertLink` dedup keyed on `(tenant, sourceSystem, recordType="contact", externalId)`).
+
+**Verification:** `bun run check` GREEN (exit 0) — toolchain, ownership ledger, typecheck 0 (the `useGetImportRun` return type includes `null`, so the dataset-derived consts sit AFTER the `null` not-found guard, not between the `undefined`-loading and `null`-not-found guards), format clean, secrets, test:coverage, build ok (`ImportRunDetailPage` chunk 15.00 kB), baseline-decay ok. Runtime write-path verified by inspection (the generator's `as any` casts hide runtime bugs — the recurring GREEN-but-broken trap): UI `commitImportRun({importRunId, rawRows})` (datasetType contacts) → `loadCommitContext` (auth via internal query) → per contact: `findLink` (recordType "contact", idempotency) → `Client_createViaRegister` (generated, salesAccess-guarded, encrypts email/phone, `idempotencyKey` cached) → `upsertLink` (recordType "contact", capsuleEntity "client", conflictStatus resolved/pending) → `ImportRun_commit` (generated, committing→completed). The repo's recurring GREEN-but-broken failure modes do NOT apply (no `self.id`/`context.timestamp` in a create — Client id comes from the generated command's `{docId}` return; `clientType: "person"` passed to a `v.any()` validator satisfying the `registerIdentity` constraint; no FK relation key reused; no datetime param). No tests added (authored seam + UI; AGENTS.md: do not add tests unless the owner asks).
+
+**Cross-model review:** not run this increment (autonomous-loop cadence; the change is an additive authored-seam branch mirroring the shipped venues pattern + a mechanical UI generalization, with no new guard/policy/approval beyond the existing `importAccess`/`salesAccess` roles and no money mutation). The merge gate's independent cross-model review still applies at PR time.
+
+**Honest scope notes (documented, NOT this increment):** (1) **Person-Clients, not company-Client + ClientContact** — a TPP contact becomes a standalone person-Client; the company linkage (`CompanyID` → a company-Client + the contact as a `ClientContact` under it) is the cross-dataset resolution deferred to a future slice. (2) Each imported contact is its own Client account; a TPP company with multiple contacts yields multiple person-Clients (the company name is not reconstructed from the opaque `CompanyID` — only preserved in the link's `rawSourceData`). (3) **Events/leads/menus/payments still not wired** — events/leads reference external client/venue IDs; payments reference invoice/event IDs; menus have no parser yet. The next slice is either companies→Client (to resolve events' `ClientID`) or events with on-the-fly client/venue resolution. (4) The new authored action needs a **human-authorized `npx convex deploy -y`** to take effect server-side (AGENTS.md: Convex deploys are human-only; a frontend `main` push does not deploy Convex).
 
 ---
 
@@ -2044,11 +2065,11 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 **Objective:** Repeatable, measurable import with daily comparison dashboard before full cutover.
 
-### 🟡 6.1 Import Framework — PARTIAL (entities + venues commit/revert REAL 2026-07-26; other datasets not wired)
+### 🟡 6.1 Import Framework — PARTIAL (entities + venues + contacts commit/revert REAL 2026-07-26; events/leads/menus/payments not wired)
 
 **Spec requirement:** Durable Import Run (source, dataset, times, counts, checksum, actor, status, errors), External Record Link (source + record type + external ID → Capsule ID), idempotent imports, manual Capsule changes follow field ownership rules, conflicts → review queue
 
-**2026-07-26 update (see Changes This Update):** the commit/revert write path is now REAL for the **venues** dataset via the authored `convex/importCommit.ts` seam (`commitImportRun`/`revertImportRun` actions + UI wiring). The generated `ImportRun_commit`/`ImportRun_revert` (status-only) are now wrapped by seam actions that actually materialize Venue entities + idempotent ExternalRecordLinks and (revert) supersede them. This corrects the prior FALSE "Slice 2 100% complete" — the framework previously wrote zero business data. Events/contacts/leads/menus/payments materialization is still NOT wired (cross-dataset externalId→Capsule-id resolution is the next slice).
+**2026-07-26 update (see Changes This Update):** the commit/revert write path is now REAL for the **venues** and **contacts** datasets via the authored `convex/importCommit.ts` seam (`commitImportRun`/`revertImportRun` actions + UI wiring). The generated `ImportRun_commit`/`ImportRun_revert` (status-only) are wrapped by seam actions that actually materialize Venue/Client entities + idempotent ExternalRecordLinks and (revert) supersede them. A TPP contact → a person-type `Client` (NOT a `ClientContact`, which needs a parent client = cross-dataset). This corrects the prior FALSE "Slice 2 100% complete" — the framework previously wrote zero business data. Events/leads/menus/payments materialization is still NOT wired (cross-dataset externalId→Capsule-id resolution is the next slice).
 
 **Implemented:**
 - ✅ ExternalRecordLink entity FULLY IMPLEMENTED at `src/import/external-record-link.manifest` (398 lines)
@@ -2079,11 +2100,11 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 ---
 
-### ❌ 6.2 Required Datasets — NOT BUILT
+### 🟡 6.2 Required Datasets — PARTIAL (venues + contacts materialize 2026-07-26; events/leads/menus/payments not wired)
 
 **Datasets:**
 - 2,103 Events (27-field mapping documented)
-- Contacts (name, email, phone, company, address)
+- Contacts (name, email, phone, company, address) — ✅ WIRED 2026-07-26: `parseTppContacts` → person-type `Client` via `importCommit.ts`; the second dataset (after venues) that materializes real entities
 - Pipeline/deals, stages, close history
 - Menu catalog, categories, prices
 - Equipment Pack Lists (browser-extracted, see §6.3)
@@ -3040,8 +3061,8 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 | Priority | Item | Effort | Impact | Dependencies | Why First | Status |
 |----------|------|--------|--------|--------------|-----------|--------|
-| ~~1~~ | **Import Framework** | Large | Critical | None | Foundation for entire TPP migration - blocks Slice 2 | 🟡 PARTIAL (2026-07-26 correction): entities + reconcile UI + dashboard + cutover + **venues commit/revert REAL** (`convex/importCommit.ts`) — but commit/revert were silent-false-success stubs until now, and events/contacts/leads/menus/payments still do NOT materialize (cross-dataset ID resolution). Prior "✅ DONE" overstated. |
-| 2 | **Import Datasets** | Medium | Critical | None | Events/Contacts/Leads/Menu/Venues/Payments import - 2,103 TPP events | 🟡 PARTIAL (2026-07-26): parsers exist for events/contacts/venues/payments (`convex/tppParser.ts`); only **VENUES** materialize end-to-end via `importCommit.ts`. Events/contacts/leads/menus/payments not wired. Prior "✅ DONE 6 datasets" was FALSE. |
+| ~~1~~ | **Import Framework** | Large | Critical | None | Foundation for entire TPP migration - blocks Slice 2 | 🟡 PARTIAL (2026-07-26): entities + reconcile UI + dashboard + cutover + **venues + contacts commit/revert REAL** (`convex/importCommit.ts`); events/leads/menus/payments still NOT wired (cross-dataset ID resolution). Prior "✅ DONE" overstated. |
+| 2 | **Import Datasets** | Medium | Critical | None | Events/Contacts/Leads/Menu/Venues/Payments import - 2,103 TPP events | 🟡 PARTIAL (2026-07-26): parsers exist for events/contacts/venues/payments (`convex/tppParser.ts`); **VENUES + CONTACTS** materialize end-to-end via `importCommit.ts` (contacts → person-type `Client`). Events/leads/menus/payments not wired. Prior "✅ DONE 6 datasets" was FALSE. |
 | ~~3~~ | **Service Style Entity** | Medium | High | None | Foundational enum for operations - blocks 11 downstream features | ✅ DONE |
 | ~~3~~ | **Sales Lock Pipeline** | Medium | High | None (ServiceStyle ✅) | Quote → Sales Lock → Confirmed pipeline is core sales workflow | ✅ DONE |
 | 4 | **External Record Link** | Medium | High | Import Framework | Stable external ID mapping - prerequisite for all TPP integration | ✅ DONE |
