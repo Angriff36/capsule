@@ -327,6 +327,13 @@ entity Venue mixin TenantScoped, SoftDeletable {
   property hasFreightElevator: boolean?
   property storageAvailable: boolean?
   property logisticsNotes: string?
+  property loadInInstructions: string?
+  property powerAvailable: boolean?
+  property waterAccess: boolean?
+  property hasStairs: boolean?
+  property wasteRules: string?
+  property permitsInsuranceNotes: string?
+  property restrictions: string?
   property required status: VenueStatus = "active"
   property registeredAt: datetime?
   property deactivatedAt: datetime?
@@ -356,6 +363,13 @@ entity Venue mixin TenantScoped, SoftDeletable {
     optional hasFreightElevator: boolean,
     optional storageAvailable: boolean,
     optional logisticsNotes: string,
+    optional loadInInstructions: string,
+    optional powerAvailable: boolean,
+    optional waterAccess: boolean,
+    optional hasStairs: boolean,
+    optional wasteRules: string,
+    optional permitsInsuranceNotes: string,
+    optional restrictions: string,
     optional addressLine1: string,
     optional addressLine2: string,
     optional city: string,
@@ -382,6 +396,13 @@ entity Venue mixin TenantScoped, SoftDeletable {
     mutate hasFreightElevator = hasFreightElevator
     mutate storageAvailable = storageAvailable
     mutate logisticsNotes = logisticsNotes
+    mutate loadInInstructions = loadInInstructions
+    mutate powerAvailable = powerAvailable
+    mutate waterAccess = waterAccess
+    mutate hasStairs = hasStairs
+    mutate wasteRules = wasteRules
+    mutate permitsInsuranceNotes = permitsInsuranceNotes
+    mutate restrictions = restrictions
     mutate addressLine1 = addressLine1
     mutate addressLine2 = addressLine2
     mutate city = city
@@ -413,6 +434,13 @@ entity Venue mixin TenantScoped, SoftDeletable {
     optional hasFreightElevator: boolean,
     optional storageAvailable: boolean,
     optional logisticsNotes: string,
+    optional loadInInstructions: string,
+    optional powerAvailable: boolean,
+    optional waterAccess: boolean,
+    optional hasStairs: boolean,
+    optional wasteRules: string,
+    optional permitsInsuranceNotes: string,
+    optional restrictions: string,
     optional addressLine1: string,
     optional addressLine2: string,
     optional city: string,
@@ -436,6 +464,13 @@ entity Venue mixin TenantScoped, SoftDeletable {
     mutate hasFreightElevator = hasFreightElevator
     mutate storageAvailable = storageAvailable
     mutate logisticsNotes = logisticsNotes
+    mutate loadInInstructions = loadInInstructions
+    mutate powerAvailable = powerAvailable
+    mutate waterAccess = waterAccess
+    mutate hasStairs = hasStairs
+    mutate wasteRules = wasteRules
+    mutate permitsInsuranceNotes = permitsInsuranceNotes
+    mutate restrictions = restrictions
     mutate addressLine1 = addressLine1
     mutate addressLine2 = addressLine2
     mutate city = city

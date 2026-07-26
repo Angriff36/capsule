@@ -74,6 +74,16 @@ export function VenuesPage() {
         storageAvailable: data.get("storageAvailable") === "on",
         logisticsNotes:
           String(data.get("logisticsNotes") ?? "").trim() || undefined,
+        loadInInstructions:
+          String(data.get("loadInInstructions") ?? "").trim() || undefined,
+        powerAvailable: data.get("powerAvailable") === "on",
+        waterAccess: data.get("waterAccess") === "on",
+        hasStairs: data.get("hasStairs") === "on",
+        wasteRules: String(data.get("wasteRules") ?? "").trim() || undefined,
+        permitsInsuranceNotes:
+          String(data.get("permitsInsuranceNotes") ?? "").trim() || undefined,
+        restrictions:
+          String(data.get("restrictions") ?? "").trim() || undefined,
         addressLine1: String(data.get("addressLine1") ?? "").trim(),
         city: String(data.get("city") ?? "").trim(),
         region: String(data.get("region") ?? "").trim(),
@@ -191,7 +201,18 @@ export function VenuesPage() {
                     placeholder="e.g., Full kitchen, warming station only, no kitchen"
                   />
                 </div>
-                <div className="flex gap-4">
+                <div>
+                  <label className="block text-xs text-gray-600">
+                    Load-in Instructions
+                  </label>
+                  <input
+                    type="text"
+                    name="loadInInstructions"
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                    placeholder="e.g., Dock door 3, load-in 6:00–8:00am, freight entrance off Maple"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-4">
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -220,6 +241,36 @@ export function VenuesPage() {
                     />
                     <span className="ml-2 text-xs text-gray-600">
                       Storage Available
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="powerAvailable"
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span className="ml-2 text-xs text-gray-600">
+                      Power Available
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="waterAccess"
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span className="ml-2 text-xs text-gray-600">
+                      Water Access
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="hasStairs"
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span className="ml-2 text-xs text-gray-600">
+                      Stairs (load-in)
                     </span>
                   </div>
                 </div>
@@ -340,13 +391,46 @@ export function VenuesPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Logistics Notes (load-in, waste, permits, etc.)
+              Logistics Notes (other)
             </label>
             <textarea
               name="logisticsNotes"
               rows={2}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-              placeholder="Loading dock access, stairs to second floor, dumpster location..."
+              placeholder="Any other logistics context not captured above..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Waste Rules
+            </label>
+            <textarea
+              name="wasteRules"
+              rows={2}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              placeholder="e.g., Dumpster behind dock, no grease disposal on-site, recycling required"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Permits / Insurance
+            </label>
+            <textarea
+              name="permitsInsuranceNotes"
+              rows={2}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              placeholder="e.g., COI required naming venue, sound permit needed, open-flame permit"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Restrictions
+            </label>
+            <textarea
+              name="restrictions"
+              rows={2}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              placeholder="e.g., No open flame, sound curfew 10pm, no tape on walls"
             />
           </div>
           <div className="flex justify-end">

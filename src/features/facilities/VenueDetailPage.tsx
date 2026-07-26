@@ -103,6 +103,16 @@ export function VenueDetailPage() {
         storageAvailable: data.get("storageAvailable") === "on",
         logisticsNotes:
           String(data.get("logisticsNotes") ?? "").trim() || undefined,
+        loadInInstructions:
+          String(data.get("loadInInstructions") ?? "").trim() || undefined,
+        powerAvailable: data.get("powerAvailable") === "on",
+        waterAccess: data.get("waterAccess") === "on",
+        hasStairs: data.get("hasStairs") === "on",
+        wasteRules: String(data.get("wasteRules") ?? "").trim() || undefined,
+        permitsInsuranceNotes:
+          String(data.get("permitsInsuranceNotes") ?? "").trim() || undefined,
+        restrictions:
+          String(data.get("restrictions") ?? "").trim() || undefined,
         addressLine1:
           String(data.get("addressLine1") ?? "").trim() || undefined,
         addressLine2:
@@ -296,7 +306,19 @@ export function VenueDetailPage() {
                     placeholder="e.g., Full kitchen, warming station only, no kitchen"
                   />
                 </div>
-                <div className="flex gap-4">
+                <div>
+                  <label className="block text-xs text-gray-600">
+                    Load-in Instructions
+                  </label>
+                  <input
+                    type="text"
+                    name="loadInInstructions"
+                    defaultValue={venue.loadInInstructions ?? ""}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                    placeholder="e.g., Dock door 3, load-in 6:00–8:00am, freight entrance off Maple"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-4">
                   <div className="flex items-center">
                     <input
                       type="checkbox"
@@ -328,6 +350,39 @@ export function VenueDetailPage() {
                     />
                     <span className="ml-2 text-xs text-gray-600">
                       Storage Available
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="powerAvailable"
+                      defaultChecked={venue.powerAvailable ?? false}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span className="ml-2 text-xs text-gray-600">
+                      Power Available
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="waterAccess"
+                      defaultChecked={venue.waterAccess ?? false}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span className="ml-2 text-xs text-gray-600">
+                      Water Access
+                    </span>
+                  </div>
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      name="hasStairs"
+                      defaultChecked={venue.hasStairs ?? false}
+                      className="h-4 w-4 rounded border-gray-300"
+                    />
+                    <span className="ml-2 text-xs text-gray-600">
+                      Stairs (load-in)
                     </span>
                   </div>
                 </div>
@@ -457,12 +512,45 @@ export function VenueDetailPage() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700">
-              Logistics Notes (load-in, waste, permits, etc.)
+              Logistics Notes (other)
             </label>
             <textarea
               name="logisticsNotes"
               rows={2}
               defaultValue={venue.logisticsNotes ?? ""}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Waste Rules
+            </label>
+            <textarea
+              name="wasteRules"
+              rows={2}
+              defaultValue={venue.wasteRules ?? ""}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Permits / Insurance
+            </label>
+            <textarea
+              name="permitsInsuranceNotes"
+              rows={2}
+              defaultValue={venue.permitsInsuranceNotes ?? ""}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Restrictions
+            </label>
+            <textarea
+              name="restrictions"
+              rows={2}
+              defaultValue={venue.restrictions ?? ""}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
             />
           </div>
@@ -555,9 +643,16 @@ export function VenueDetailPage() {
           </div>
           {/* Logistics features */}
           {(venue.kitchenAccess ||
+            venue.loadInInstructions ||
             venue.parkingAvailable !== undefined ||
             venue.hasFreightElevator !== undefined ||
             venue.storageAvailable !== undefined ||
+            venue.powerAvailable !== undefined ||
+            venue.waterAccess !== undefined ||
+            venue.hasStairs !== undefined ||
+            venue.wasteRules ||
+            venue.permitsInsuranceNotes ||
+            venue.restrictions ||
             venue.logisticsNotes) && (
             <div className="mt-4 rounded-md bg-gray-50 p-3">
               <dt className="text-sm font-medium text-gray-700 mb-2">
@@ -568,6 +663,12 @@ export function VenueDetailPage() {
                   <div>
                     <span className="font-medium">Kitchen Access:</span>{" "}
                     {venue.kitchenAccess}
+                  </div>
+                )}
+                {venue.loadInInstructions && (
+                  <div>
+                    <span className="font-medium">Load-in:</span>{" "}
+                    {venue.loadInInstructions}
                   </div>
                 )}
                 <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -586,7 +687,42 @@ export function VenueDetailPage() {
                       {venue.storageAvailable ? "✓" : "✗"} Storage Available
                     </span>
                   )}
+                  {venue.powerAvailable !== undefined && (
+                    <span>
+                      {venue.powerAvailable ? "✓" : "✗"} Power Available
+                    </span>
+                  )}
+                  {venue.waterAccess !== undefined && (
+                    <span>{venue.waterAccess ? "✓" : "✗"} Water Access</span>
+                  )}
+                  {venue.hasStairs !== undefined && (
+                    <span>{venue.hasStairs ? "✓" : "✗"} Stairs</span>
+                  )}
                 </div>
+                {venue.wasteRules && (
+                  <div>
+                    <span className="font-medium">Waste Rules:</span>{" "}
+                    <span className="whitespace-pre-wrap text-gray-700">
+                      {venue.wasteRules}
+                    </span>
+                  </div>
+                )}
+                {venue.permitsInsuranceNotes && (
+                  <div>
+                    <span className="font-medium">Permits / Insurance:</span>{" "}
+                    <span className="whitespace-pre-wrap text-gray-700">
+                      {venue.permitsInsuranceNotes}
+                    </span>
+                  </div>
+                )}
+                {venue.restrictions && (
+                  <div>
+                    <span className="font-medium">Restrictions:</span>{" "}
+                    <span className="whitespace-pre-wrap text-gray-700">
+                      {venue.restrictions}
+                    </span>
+                  </div>
+                )}
                 {venue.logisticsNotes && (
                   <div className="whitespace-pre-wrap text-gray-700">
                     {venue.logisticsNotes}
