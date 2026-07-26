@@ -11,6 +11,29 @@
 
 ---
 
+**2026-07-26 — CutoverDecision `context.timestamp` runtime bug FIXED (push-block Finding 5 of 5):**
+
+**Status: ✅ Fixed + `bun run check` GREEN (exit 0). The ONLY one of the 5 systemic pre-push-gate findings that is cleanly fixable in this repo.**
+
+**Finding (verified first-hand against manifest + generated code this turn):** `src/admin/cutover-decision.manifest` wrote `mutate decidedAt|tppReadOnlyAt = context.timestamp` in **4 entity commands** (`recordApprovals`, `execute`, `setTppReadOnly`, `rollback`). The generator emits `const context = (ctx as any)` and reads `context.timestamp` (`convex/mutations.ts:3884` etc.) — but Convex `MutationCtx` has **no `.timestamp` property**, so it is `undefined` at runtime. It typechecks ONLY because of the `as any` cast, which is exactly why the repo stayed GREEN while the feature was silently broken: all 4 commands wrote `undefined` into the required `int` timestamp fields (`decidedAt`, `tppReadOnlyAt`). The §6.6 cutover go/no-go tooling (Priority 30, marked "DONE") therefore **never recorded its decision/rollback/tpp-readonly timestamps**. (The 2026-07-25 plan entry flagged this as pre-existing but only fixed the `create` command — `now()` at line 40 — leaving the 4 entity commands broken.)
+
+**Fix (smallest spec-faithful diff; 4-line manifest change + regen, no hand-edit of generated code):** replaced all 4 `context.timestamp` → `now()` in `cutover-decision.manifest`, matching the already-working `create` command (L40) and the `Contract.send` pattern. `now()` compiles to `Date.now()` in entity-command scope (verified: `convex/mutations.ts:3191` `sentAt: Date.now()`; no `context` alias needed). Added a 4-line comment above `recordApprovals` documenting why entity commands must use `now()` and never `context.timestamp` (prevents silent regression). `bun run manifest:regen` applied cleanly.
+
+**Verified in generated output:** `grep -c context.timestamp convex/mutations.ts` = **0** (was 4). All 4 commands now emit `Date.now()` — Execute `mutations.ts:3894`, RecordApprovals `:3934`, Rollback `:3975`, SetTppReadOnly `:4013` (+ create `:3844`).
+
+**Why it matters:** a shipped spec feature (§6.6 cutover gate) was broken at runtime — `execute`/`recordApprovals`/`setTppReadOnly`/`rollback` silently dropped their timestamps. Now they record real epoch-ms. **Lesson (binding for future agents):** never use `context.timestamp` in a manifest command — the generator's `as any` cast hides that `MutationCtx` has no `.timestamp`; use `now()` (→ `Date.now()`) in both create and entity-command scopes.
+
+**Disposition of the OTHER 4 push-block findings (verified first-hand this turn — NOT fixed; documented why each is out of scope):**
+- **Finding 3 (Contract `sign(signedBy)` "impersonation"):** NOT a real bug. The manifest comment (`contract.manifest:16-18`) states signer identity is **intentionally an external name string (not a Person)**. `user.id` is the *sales staff*, not the client signer — deriving `signedBy` from auth would be semantically *wrong*. `signedBy` is the operator attesting who signed an external contract (a normal sales/CRM action); the generated command still server-stamps which staff ran it for the real audit trail. Forcing a callback-token flow here is the over-engineering the merge-gate prompt prohibits ("catering app, not a bank"). Leave as-is.
+- **Finding 4 (Dish `mergeInto(targetDishId)` target not verified):** real gap, but NOT cleanly fixable at the manifest level. Validating a *supplied* relation param is the known-hard pattern that sank Priority 32 — a `guard self.mergedIntoDish != null` checks the *pre-mutate* value (always null, since `mergedIntoDishId` is being set by this command) → always fails → breaks the command (same class as the venue-vendor `createdAt` guard). Proper fix needs generator/IR support for supplied-relation-param validation (sibling Manifest repo) or an authored Convex seam — not a hand-edit. Single-org deployment = no other tenant to merge into, so real-world impact is a recoverable dangling pointer (`reinstate`). Documented, not half-fixed.
+- **Findings 1 & 2 (idempotency-before-auth; plaintext PII idempotency cache):** generator-level, emitted for ALL `idempotencyKey` commands in `convex/mutations.ts`. Not fixable in this repo — needs the Manifest generator (sibling repo). Unchanged.
+
+**⚠ Push status: STILL BLOCKED** (not the increment's fault). This fixes 1 of 5 findings — the only in-repo-fixable one. The pre-push `review-gate-hook` will still FAIL any manifest-regen push on Findings 1 & 2 (idempotency framework, generator-level). Not pushed. Human options unchanged: (a) `REVIEW_GATE=0 git push --follow-tags` conscious override (single-org dev deployment; this increment's focused review will pass); (b) fix Findings 1 & 2 in the sibling Manifest generator first (recommend a GitHub issue per `docs/architecture/escalate-blockers-to-github.md`); (c) accept local-only.
+
+**Local state:** GREEN (`bun run check` exit 0), now **5 commits ahead of origin/main** + tag `v0.0.11`, NOT pushed. Backend schema unchanged this increment (entity-command bodies only; no new table/field) — but the 4 fixed commands still need a human-authorized `npx convex deploy -y` to land server-side.
+
+---
+
 **2026-07-26 — Venue structured logistics fields DONE — spec §8.1 (power/water, load-in, stairs, waste, permits, restrictions):**
 
 **Status: ✅ Shipped + `bun run check` GREEN (exit 0). Single-entity additive change; no new entity, no new `*ByTenantId` query (no #111 exposure — `convex/queries.ts` untouched this regen).**

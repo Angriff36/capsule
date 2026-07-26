@@ -43,31 +43,36 @@ entity CutoverDecision mixin TenantScoped {
     mutate rollbackPlan = rollbackPlan
     mutate businessApproved = businessApproved != null ? businessApproved : false
   }
+  // Entity commands stamp time with now() (→ Date.now()). Do NOT use
+  // now(): the generator emits `const context = (ctx as any)` and
+  // reads now(), which is undefined on Convex MutationCtx at
+  // runtime (it typechecks only because of the `as any`) — writing undefined
+  // into the required `int` timestamp fields silently breaks the command.
   command recordApprovals(businessApproved: boolean, rollbackPlan: string) {
     guard roleAllows(user.role, "adminAccess")
     mutate businessApproved = businessApproved
     mutate rollbackPlan = rollbackPlan
-    mutate decidedAt = context.timestamp
+    mutate decidedAt = now()
     mutate decidedBy = user.id
   }
   command execute(decision: CutoverDecisionType, reason: string) {
     guard roleAllows(user.role, "adminAccess")
     mutate status = decision
     mutate reason = reason
-    mutate decidedAt = context.timestamp
+    mutate decidedAt = now()
     mutate decidedBy = user.id
   }
   command setTppReadOnly(reason: string) {
     guard status == "go"
     guard roleAllows(user.role, "adminAccess")
-    mutate tppReadOnlyAt = context.timestamp
+    mutate tppReadOnlyAt = now()
   }
   command rollback(reason: string) {
     guard status == "go"
     guard roleAllows(user.role, "adminAccess")
     mutate status = "rolled_back"
     mutate reason = reason
-    mutate decidedAt = context.timestamp
+    mutate decidedAt = now()
     mutate decidedBy = user.id
   }
   store CutoverDecision in durable
