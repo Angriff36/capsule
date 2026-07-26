@@ -340,6 +340,11 @@ const VenueVendorRelationshipsPage = lazy(() =>
     }),
   ),
 );
+const VenueLayoutTemplatesPage = lazy(() =>
+  import("../features/facilities/VenueLayoutTemplatesPage").then((module) => ({
+    default: module.VenueLayoutTemplatesPage,
+  })),
+);
 const PermissionsPage = lazy(() =>
   import("../features/admin/PermissionsPage").then((module) => ({
     default: module.PermissionsPage,
@@ -1042,6 +1047,14 @@ export function App() {
               }
             />
             <Route
+              path="/facilities/venues/templates"
+              element={
+                <SupplyRoute>
+                  <VenueLayoutTemplatesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
               path="/facilities/venues/:id"
               element={
                 <SupplyRoute>
@@ -1062,6 +1075,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <VenueVendorRelationshipsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/facilities/venues/:venueId/templates"
+              element={
+                <SupplyRoute>
+                  <VenueLayoutTemplatesPage />
                 </SupplyRoute>
               }
             />

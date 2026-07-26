@@ -4,13 +4,42 @@ import {
   useCreateEventLayoutSection,
   useEventLayoutSectionRemove,
   useEventLayoutSectionUpdate,
+  useGetEvent,
   useListEventLayoutSection,
+  useListVenueLayoutTemplate,
 } from "../../lib/manifest-convex-react";
 import { BATTLE_BOARD_LAYOUT_TYPES } from "./battleBoardLayoutTypes";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { EventFormCluster } from "./EventFormCluster";
 import { EventTabPanel } from "./EventTabPanel";
 import { FailureBanner } from "./FailureBanner";
+
+// Mirrors a VenueLayoutTemplate's stored sections JSON (see §8.2): each entry
+// is the editable shape of an EventLayoutSection, copied verbatim into the
+// event's setup snapshot.
+type LayoutSection = {
+  type: string;
+  instructions: string | null;
+  sortOrder: number;
+};
+
+const parseSections = (raw: string | null | undefined): LayoutSection[] => {
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(
+        (s): s is LayoutSection =>
+          typeof s === "object" &&
+          s !== null &&
+          typeof (s as LayoutSection).type === "string",
+      )
+      .sort((a, b) => a.sortOrder - b.sortOrder);
+  } catch {
+    return [];
+  }
+};
 
 type Props = {
   readonly eventId: Id<"events">;
@@ -22,8 +51,11 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
   const addSection = useCreateEventLayoutSection();
   const updateSection = useEventLayoutSectionUpdate();
   const removeSection = useEventLayoutSectionRemove();
+  const event = useGetEvent(eventId);
+  const templates = useListVenueLayoutTemplate();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const [copyTemplateId, setCopyTemplateId] = useState<string>("");
 
   const eventSections = useMemo(
     () =>
@@ -38,6 +70,20 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
     [sections, eventId],
   );
 
+  // Active templates for this event's venue (spec §8.2). When the event has no
+  // venue yet, offer all active templates so setup can still be seeded.
+  const copyable = useMemo(() => {
+    const venue = event?.venueId ?? null;
+    return (templates ?? [])
+      .filter(
+        (t) =>
+          t.deletedAt == null &&
+          t.status === "active" &&
+          (venue == null || t.venueId === venue),
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [templates, event]);
+
   const run = async (key: string, work: () => Promise<unknown>) => {
     setFailure(null);
     setBusy(key);
@@ -48,6 +94,29 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
     } finally {
       setBusy(null);
     }
+  };
+
+  const copyFromTemplate = () => {
+    const template = copyable.find((t) => t._id === copyTemplateId);
+    if (!template) return;
+    const templateSections = parseSections(template.sections);
+    if (templateSections.length === 0) {
+      alert("That template has no sections to copy.");
+      return;
+    }
+    const base = eventSections.length;
+    void run("copy", async () => {
+      for (let i = 0; i < templateSections.length; i++) {
+        const section = templateSections[i];
+        await addSection({
+          eventId,
+          type: section.type,
+          instructions: section.instructions ?? "",
+          sortOrder: base + i,
+        });
+      }
+      setCopyTemplateId("");
+    });
   };
 
   return (
@@ -77,6 +146,37 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
       testId="event-battle-board-layouts"
     >
       {failure ? <FailureBanner failure={failure} /> : null}
+
+      {copyable.length > 0 ? (
+        <div className="mb-3 flex flex-wrap items-end gap-2">
+          <label className="field-label min-w-[12rem] flex-1">
+            <span>Copy from venue template</span>
+            <select
+              className="input"
+              value={copyTemplateId}
+              disabled={busy != null}
+              onChange={(changeEvent) =>
+                setCopyTemplateId(changeEvent.target.value)
+              }
+            >
+              <option value="">Select a template…</option>
+              {copyable.map((template) => (
+                <option key={template._id} value={template._id}>
+                  {template.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button
+            type="button"
+            className="btn btn-ghost min-h-10"
+            disabled={busy != null || copyTemplateId === ""}
+            onClick={copyFromTemplate}
+          >
+            Copy sections
+          </button>
+        </div>
+      ) : null}
 
       {eventSections.length === 0 ? (
         <p className="text-[13px] text-ink-3">

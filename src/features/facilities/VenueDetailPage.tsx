@@ -8,6 +8,7 @@ import {
   useVenueActivate,
 } from "../../lib/manifest-convex-react";
 import {
+  venueLayoutTemplatesListPath,
   venueListPath,
   venueVendorRelationshipsListPath,
 } from "./facilitiesRoutes";
@@ -214,6 +215,12 @@ export function VenueDetailPage() {
                 className="btn btn-secondary"
               >
                 Vendor Relationships
+              </Link>
+              <Link
+                to={venueLayoutTemplatesListPath(venue._id)}
+                className="btn btn-secondary"
+              >
+                Layout Templates
               </Link>
             </div>
           )}

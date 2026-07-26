@@ -11,7 +11,29 @@
 
 ---
 
-**2026-07-26 — Priority 32 (Email / Message Threading) foundation SHIPPED:**
+**2026-07-26 — Priority 21 (Venue Layout Templates) DONE — re-implemented correctly after the 2026-07-25 revert:**
+
+**Status: ✅ Shipped + `bun run check` GREEN (65 files / 736 tests). Cross-model review pending before push.**
+
+**What shipped (spec §8.2 — "A Venue can own reusable layout/logistics templates. An Event selects or copies one into an Event-specific snapshot that can be edited without rewriting the venue template"):**
+- `src/operations/venue-layout-template.manifest` — `VenueLayoutTemplate` entity (venue-owned; `venueId`, `searchable name`, `description`, `sections` JSON string, `status` active/archived, `definedAt`/archivedAt, `version`). Creation command `define` → `VenueLayoutTemplate_createViaDefine` (in the governed-creation snapshot); instance commands `revise`, `archive`, `reactivate`. `belongsTo venue: Venue` (resolves without a module `use`, same as `venue-note.manifest`). `eventAccess` read/write/execute (matches venue-note; broad enough that event staff can pick a template — no over-gating per `domain-gating-restraint.md`).
+- `sections` stored as a JSON `string` of `[{ type, instructions, sortOrder }]` mirroring `EventLayoutSection`'s editable fields (same posture as `ProposalRevision.snapshot`). Copied verbatim into an event — no transform.
+- `src/features/facilities/VenueLayoutTemplatesPage.tsx` at `/facilities/venues/templates` (+ venue-scoped `/facilities/venues/:venueId/templates`), wired in `src/app/App.tsx` (lazy import + 2 routes). Full CRUD: create/edit (inline sections editor using `BATTLE_BOARD_LAYOUT_TYPES`), archive/reactivate. The route path helpers (`venueLayoutTemplatesListPath`/`DetailPath`) already existed in `facilitiesRoutes.ts` from the reverted attempt — now backed by a real page.
+- `EventBattleBoardLayoutsPanel.tsx` — "Copy from venue template": fetches the event's venue via `useGetEvent`, lists active templates for that venue, and on copy loops `useCreateEventLayoutSection` over the template's parsed sections (appended after existing sections). Pure client-side copy via the existing create hook — no new backend seam.
+- `VenueDetailPage.tsx` — added a "Layout Templates" link next to "Vendor Relationships" (discoverability; the dead `FACILITIES_SECTIONS` "layout-templates" nav entry is never rendered anywhere, so the venue-detail link is the real entry point).
+- Added `VenueLayoutTemplate_createViaDefine` to `tests/governed-creation-mappings.test.ts` (sorted between `VenueCommissionTerm` and `VenueNote`).
+
+**Why the first attempt failed and this one works (binding lessons, now applied):** the 2026-07-25 revert was caused by (a) `guard self.createdAt == null` in a creation command — the `timestamps` mixin populates `createdAt` before guards run, so it always threw; (b) client-supplied audit fields; (c) entity-command linkage validating existing-doc fields instead of supplied params. This re-implementation follows the `event-template.manifest` pattern instead: a `definedAt` field set INSIDE the `define` command, guarded by `guard self.definedAt == null` (correctly means "not yet defined"), server-stamped timestamps, and the template is the editable source of truth while the event snapshot stays independently editable. Same root-cause class as the venue-vendor-relationship fix (Findings 1–3), which is why this pattern is now reliable.
+
+**Stale-info corrected in this file:** the plan previously contradicted itself on Priority 21 — listed "✅ DONE" at one point (line ~2859) AND "❌ REVERTED" elsewhere (line ~2842). Both were written during the flawed attempt. It is now genuinely DONE; the priority table below is updated.
+
+**Verification:** `bun run check` GREEN — toolchain, ownership, all 9 manifest-slice contracts, typecheck 0, format clean, secrets, **test:coverage 736 passing (65 files)**, build ok, baseline-decay ok. (Convex backend not pushed — dev-only; deploy is human-authorized.)
+
+**Honest scope note:** the copy is append-only (does not replace existing sections); an operator copying the same template twice gets duplicates they must remove manually. That matches spec §8.2's "copies one into … editable" semantics and avoids a destructive replace — a "replace existing" toggle is a follow-up if operators ask.
+
+---
+
+
 
 **Status: ✅ Message threading data model + idempotent ingest + staff inbox UI shipped. `bun run check` GREEN (65 test files). Cross-model review pending before push. Per-provider OAuth/sync is the separate Integration Connection layer (provider-neutral spec) — not in this increment.**
 
@@ -2691,7 +2713,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 | 18 | **Pack List Templates** | Large | High | ServiceStyle, Equipment location | Operational efficiency - blocks automated pack list generation |
 | 19 | **Parallel Run Dashboard** | Large | High | Import Framework, Import Datasets | Migration validation - required for safe cutover | ✅ DONE - 680-line dashboard with comparison metrics, drill-down |
 | 20 | **TPP Bridge** | Large | High | Import Framework, Proposal Revisions | Legacy proposal migration - blocks historical proposal access |
-| 21 | **Venue Layout Templates** | Medium | Medium | Venue Profile | Operational efficiency - reusable layouts reduce setup time |
+| 21 | **Venue Layout Templates** | Medium | Medium | Venue Profile | Operational efficiency - reusable layouts reduce setup time | ✅ DONE 2026-07-26 — VenueLayoutTemplate entity + VenueLayoutTemplatesPage + copy-from-template in EventBattleBoardLayoutsPanel; see top entry |
 | ~~22~~ | **Venue Notes Entity** | Medium | Medium | Venue Profile | Knowledge base - institutional memory about venues | ✅ DONE - Full VenueNote entity (venue-note.manifest), VenueNotesPanel UI, all 721 tests passing |
 | ~~23~~ | **Vendor Ecosystem** | Medium | Medium | Venue Profile | Vendor coordination - approved vendor lists, venue policies | ✅ DONE - Full VenueVendorRelationship entity (275 lines), VenueVendorRelationshipsPage UI (595 lines), routing at /facilities/vendor-relationships, venue detail link added, 729 tests passing |
 | ~~24~~ | **Role Scorecards** | Medium | Medium | Performance tracking | HR management - defines measurable expectations | ✅ DONE - Full manifest entity (role-scorecard.manifest), RoleScorecardsPage UI with CRUD, wired in App.tsx route /staff/scorecards, navigation in workforceRoutes.ts |
@@ -2839,7 +2861,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 - ✅ **Hiring Pipeline (Candidate + Interview manifests, CandidatesPage + InterviewsPage UI, full routing wired)**
 - ✅ **Self-Service Quote Builder (QuoteSubmission manifest, QuoteSubmissionPage, quoteBuilder.ts, routing at /quote)**
 - ✅ **Payment Reconciliation (Payment entity has reconciliation fields, commands for match/verify/dispute workflow, generated hooks available)**
-- ❌ Priority 21: Venue Layout Templates — REVERTED (flawed manifest caught by pre-push review; no venue-layout-template.manifest exists in src/ as of 2026-07-25)
+- ✅ Priority 21: Venue Layout Templates — DONE 2026-07-26 (re-implemented correctly after the 2026-07-25 revert; see top entry). `src/operations/venue-layout-template.manifest` now exists and ships.
 - ✅ Equipment location fields (improves logistics accuracy)
 - ✅ Performance Event Linkage (unblocks per-event HR feedback granularity)
 - ✅ Role Scorecards (full manifest, UI, routing, unblocks One-on-Ones)
