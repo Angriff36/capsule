@@ -2,6 +2,14 @@ import React from "react";
 import { clsx } from "@/lib/utils";
 import { formatMoney, formatCount, formatDate } from "@/lib/format";
 
+/** Convert a date-ish value to epoch millis, mirroring the date column display. */
+function dateToMillis(value: unknown): number {
+  if (value instanceof Date) return value.getTime();
+  if (typeof value === "string") return new Date(value).getTime();
+  if (typeof value === "number") return value;
+  return NaN;
+}
+
 /**
  * TableDisplay Component
  *
@@ -62,15 +70,10 @@ export function TableDisplay({
         return `${Number(value).toFixed(1)}%`;
       case "number":
         return formatCount(Number(value));
-      case "date":
-        // Try to parse as ISO string or timestamp number
-        const dateVal =
-          value instanceof Date
-            ? value.getTime()
-            : typeof value === "string"
-              ? new Date(value).getTime()
-              : Number(value);
+      case "date": {
+        const dateVal = dateToMillis(value);
         return formatDate(isNaN(dateVal) ? null : dateVal);
+      }
       default:
         return String(value);
     }
@@ -90,19 +93,35 @@ export function TableDisplay({
   const sortedData = React.useMemo(() => {
     if (!sortColumn || !sortable) return data;
 
+    const column = columns.find((c) => c.key === sortColumn);
+    const numericType =
+      column?.type === "number" ||
+      column?.type === "currency" ||
+      column?.type === "percent";
+    const dateType = column?.type === "date";
+
     return [...data].sort((a, b) => {
       const aVal = a[sortColumn];
       const bVal = b[sortColumn];
 
       if (aVal === bVal) return 0;
+      // Empty/null/undefined values sort last regardless of direction.
+      if (aVal == null || aVal === "") return 1;
+      if (bVal == null || bVal === "") return -1;
 
-      // Handle unknown types with comparison
-      const aStr = String(aVal ?? "");
-      const bStr = String(bVal ?? "");
-      const comparison = aStr < bStr ? -1 : aStr > bStr ? 1 : 0;
+      let comparison: number;
+      if (numericType || dateType) {
+        const aKey = dateType ? dateToMillis(aVal) : Number(aVal);
+        const bKey = dateType ? dateToMillis(bVal) : Number(bVal);
+        comparison = aKey < bKey ? -1 : aKey > bKey ? 1 : 0;
+      } else {
+        const aStr = String(aVal);
+        const bStr = String(bVal);
+        comparison = aStr < bStr ? -1 : aStr > bStr ? 1 : 0;
+      }
       return sortDirection === "asc" ? comparison : -comparison;
     });
-  }, [data, sortColumn, sortDirection, sortable]);
+  }, [data, sortColumn, sortDirection, sortable, columns]);
 
   const alignClass = {
     left: "text-left",

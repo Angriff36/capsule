@@ -9,6 +9,24 @@
 
 ## Changes This Update
 
+**2026-07-25 — Finding 7 FIXED + shipped; Finding 4 reverted (cross-model review caught an incomplete fix):**
+
+**Status: ✅ Finding 7 fixed + shipped. Finding 4 reverted after cross-model review (codex gpt-5.6-sol) proved the fix incomplete — NOT shipped. Repo gate GREEN (726 tests). Findings 1, 2, 3, 4, 6 remain open.**
+
+**Shipped this iteration (approved by cross-model review):**
+- **Finding 7 (MEDIUM — dashboard tables sorted numbers wrong): FIXED + shipped.** `src/ui/charts/TableDisplay.tsx` stringified every cell for sorting, so currency/number/percent columns sorted lexicographically (`100` before `20`) and dates were unordered. Sort now branches on column type (numeric/date vs string) and sorts empty/null last. Extracted a shared `dateToMillis` helper. Reviewer (codex gpt-5.6-sol): "The table sorting change appears sound, and the increment adds no new tedious guard or approval."
+
+**Reverted — incomplete fix caught by cross-model review:**
+- **Finding 4 (HIGH — public quote form was dead): NOT FIXED — reverted.** First attempt added an authored public `getActiveTenant` query (tenant resolution) and pointed `submitQuote` at it. Cross-model review (codex gpt-5.6-sol, VERDICT: REJECT) proved this insufficient — verified against generated code: `submitQuote` is a Convex **action**, and `ctx.runMutation` propagates the action's (empty) auth context, so downstream generated creates still run anonymous. `__runQuoteSubmissionCreate` (convex/mutations.ts:25856-25891) sets `tenantId: __auth.tenantId` (empty for anon) and enforces all three policy guards — `if (!(checkRole(user, "salesAccess"))) throw "Only sales staff may update quote submissions"` (mutations.ts:25890) — so `QuoteSubmission_create` THROWS before insert for an unauthenticated caller; `Client_createViaRegister`/`Lead_createViaCapture`/`Event_createViaPlanEngagement`/`Proposal_createViaDraft` are similarly auth-gated. Resolving the tenant into a local var only moved the abort from step 2 to step 5. **Real fix needed:** an authored public-ingress seam (internal mutation inserting with explicit tenantId, no auth guard); and the spec wants Lead+Proposal auto-created, which can't happen anonymously without a system identity — needs a product decision (capture-only vs system-elevated writes). Deferred to a focused turn.
+
+**Still open (findings 1, 2, 3, 6):**
+- **Findings 1, 2, 3 (HIGH — venue-vendor relationship creation is broken):** `establish` is not a Manifest creation entry (only a command literally named `create` is recognized as one — same root cause as the reverted Priority 21/32), so no VenueVendorRelationship doc can be created at all; plus the contradictory `guard self.createdAt == null`, the `primaryContact` ref reusing `vendorId` (schema types `vendorId` as `v.id("vendorContacts")`), and `effectiveFrom`/`effectiveUntil`/`insuranceExpiry` typed `string` but stored `datetime`. Fix = a single `create` creation command + correct supplied-relation-param validation + datetime params, then `bun run manifest:regen`. Read `C:/Projects/Manifest/mintlify/llms-full.txt` first.
+- **Finding 6 (MEDIUM — `bun run seed` fails):** governed `CutoverDecision_create` (admin-gated) is invoked by the unauthenticated seed client. Needs a seed-skip for governed creates or an authenticated seed path.
+
+**Verification:** `bun run check` GREEN — typecheck 0, format clean, 726 tests passing, build ok, baseline-decay ok. Cross-model review (codex gpt-5.6-sol): finding 7 APPROVED, finding 4 REJECTED → reverted before push. Shipped commit on `main` ahead of origin by the finding-7 increment only.
+
+---
+
 **2026-07-25 — Whole-app typecheck cascade FIXED (1110→0); flawed WIP features reverted after independent review:**
 
 **Status: ✅ Repo gate genuinely GREEN for the first time (was typecheck-red on `main`). Priority 32 (comms) + Priority 21 (venue-layout-template) reverted — see findings below.**
@@ -35,10 +53,10 @@
 1. **HIGH `venue-vendor-relationship.manifest` `establish`** — same contradictory `guard self.createdAt == null` as venue-layout-template → creation always fails. (Pre-existing Priority 23; fix = remove the guard.) *Not fixed this iteration.*
 2. **HIGH `schema.ts venueVendorRelationships.vendorId`** — typed `v.id("vendorContacts")` but the UI supplies `vendors` IDs. Caused by the manifest's `primaryContact` ref reusing `vendorId` in its key (line 92). (Pre-existing Priority 23; fix = decouple the primaryContact ref from vendorId.) *Not fixed.*
 3. **HIGH `venue-vendor-relationship.manifest`** — `effectiveFrom`/`effectiveUntil`/`insuranceExpiry` command params are `string` but stored as `datetime` → schema-validation failures. (Pre-existing; fix = `string`→`datetime` params + UI sends timestamps.) *Not fixed.*
-4. **HIGH `convex/quoteBuilder.ts` public auth** — `/quote` is outside AuthGate (public), but `submitQuote` calls `listOrganization` whose read policy is `roleAllows(user.role,"staffAccess")` → unauthenticated callers get `[]` → the public form always aborts. This is a pre-existing Priority 14 **design gap** needing a public-ingress seam (a public tenant-resolution query/mutation). *Not fixed — needs design work.*
+4. **HIGH `convex/quoteBuilder.ts` public auth** — `/quote` is outside AuthGate (public), but `submitQuote` calls `listOrganization` whose read policy is `roleAllows(user.role,"staffAccess")` → unauthenticated callers get `[]` → the public form always aborts. This is a pre-existing Priority 14 **design gap** needing a public-ingress seam (a public tenant-resolution query/mutation). *Not fixed — a tenant-resolution query alone is insufficient; generated creates still throw `salesAccess` for anonymous callers (convex/mutations.ts:25890). Needs an authored public-write seam + a product decision (see top entry).*
 5. **HIGH `convex/quoteBuilder.ts`** — `eventType` was passed `""` and `eventEndTime` is a time-only string (`"18:00"`) → invalid timestamp. **Fixed this iteration:** `eventType: "Catering Inquiry"` and eventEndTime combines `eventDate`+`T`+time when time-only.
 6. **MEDIUM `scripts/seed-convex.ts`** — the governed `CutoverDecision_create` (admin-gated) is invoked by the unauthenticated seed client → `bun run seed` fails. Entangled: the `create` command is required to suppress the spurious `_createViaExecute` codegen (typecheck), but its admin guard breaks seed. *Not fixed — needs a seed-skip for governed creates or an authenticated seed path.*
-7. **MEDIUM `src/ui/charts/TableDisplay.tsx`** — sort stringifies every value → numeric columns sort lexicographically (`100` before `20`). (WIP dashboard code.) *Not fixed.*
+7. **MEDIUM `src/ui/charts/TableDisplay.tsx`** — sort stringifies every value → numeric columns sort lexicographically (`100` before `20`). (WIP dashboard code.) *✅ FIXED — type-aware sort branches on column type.*
 
 **Why not pushed:** Per the merge-gate rule (CLAUDE.md §17 — "never merge over a rejection; escalate to the human"), the autonomous loop must not override the gate (`REVIEW_GATE=0` is a human-only escape hatch). Findings 4 and 6 are design/codegen entanglements beyond a clean quick-fix and need either Manifest expertise (read `C:/Projects/Manifest/mintlify/llms-full.txt`) or a human decision.
 
