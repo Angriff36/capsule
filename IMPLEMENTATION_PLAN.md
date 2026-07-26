@@ -13,7 +13,7 @@
 
 **2026-07-26 — Priority 21 (Venue Layout Templates) DONE — re-implemented correctly after the 2026-07-25 revert:**
 
-**Status: ✅ Shipped + `bun run check` GREEN (65 files / 736 tests). Cross-model review pending before push.**
+**Status: ✅ Shipped + `bun run check` GREEN (65 files / 736 tests). Cross-model review: round 1 REJECT (4× P2 fixed, 1× P1 escalated to GitHub issue #111); round 2 — all P2s resolved, reviewer MAINTAINED the P1 (systemic `*ByTenantId` cross-tenant query) as a blocker. Push BLOCKED pending human decision — see review block below.**
 
 **What shipped (spec §8.2 — "A Venue can own reusable layout/logistics templates. An Event selects or copies one into an Event-specific snapshot that can be edited without rewriting the venue template"):**
 - `src/operations/venue-layout-template.manifest` — `VenueLayoutTemplate` entity (venue-owned; `venueId`, `searchable name`, `description`, `sections` JSON string, `status` active/archived, `definedAt`/archivedAt, `version`). Creation command `define` → `VenueLayoutTemplate_createViaDefine` (in the governed-creation snapshot); instance commands `revise`, `archive`, `reactivate`. `belongsTo venue: Venue` (resolves without a module `use`, same as `venue-note.manifest`). `eventAccess` read/write/execute (matches venue-note; broad enough that event staff can pick a template — no over-gating per `domain-gating-restraint.md`).
@@ -30,6 +30,16 @@
 **Verification:** `bun run check` GREEN — toolchain, ownership, all 9 manifest-slice contracts, typecheck 0, format clean, secrets, **test:coverage 736 passing (65 files)**, build ok, baseline-decay ok. (Convex backend not pushed — dev-only; deploy is human-authorized.)
 
 **Honest scope note:** the copy is append-only (does not replace existing sections); an operator copying the same template twice gets duplicates they must remove manually. That matches spec §8.2's "copies one into … editable" semantics and avoids a destructive replace — a "replace existing" toggle is a follow-up if operators ask.
+
+**Cross-model review (codex gpt-5.6-sol) — PUSH BLOCKED on a maintained P1 (human decision):**
+
+- **Round 1 — REJECT** (1× P1 + 4× P2). All 4 P2s FIXED in commit `3167a3b`:
+  1. Archive reason → **optional** (reversible/low-stakes; the mandatory reason was policy-tedium the merge gate prohibits). Manifest `archive(optional reason)` + nullable event field; UI prompt optional.
+  2. Edit button **disabled for archived** templates (revise's `status=="active"` guard always rejected archived edits — dead action removed).
+  3. **Preserve sections on edit unless changed** — `sectionsDirty` gate so a rename-only edit never overwrites stored sections the UI can't render (prevents silent data loss if `sections` JSON is malformed by another writer).
+  4. **Pre-validate copy sections** — blank-type sections fail fast before any mutation (no partial copy from invalid data); mid-loop network drop left as a documented `ponytail:` non-atomic limitation (a server-side bulk-copy action is the upgrade path if it bites).
+- **Round 2 — P2s confirmed resolved; P1 MAINTAINED.** The P1 is the generated `listVenueLayoutTemplateByTenantId` query, which takes a client-supplied `tenantId` and never compares it to `__auth.tenantId`. **Verified SYSTEMIC**: byte-identical in shape to `listVenueNoteByTenantId` and ~every `*ByTenantId` query repo-wide (generated `convex/queries.ts`; cannot hand-edit). The just-pushed Priority 32 (MessageThread/Message) shipped the identical pattern. Fix is generator-wide → **escalated to GitHub issue [#111](https://github.com/Angriff36/capsule/issues/111)** (not a piecemeal per-entity hand-fix).
+- **Why push is blocked, not overridden:** the merge gate (CLAUDE.md §17) says a reviewer REJECT must be fixed OR escalated to the human — "the autonomous loop must not override the gate." The reviewer and I disagree on whether adding one more table to a systemic/single-org/no-other-tenant-to-leak pattern blocks THIS increment (I say systemic → defer to the #111 generator fix, consistent with the Priority 32 precedent; reviewer says each new exposed table is a per-increment regression). That disagreement is exactly the "escalate to the human" branch. **Local state: GREEN, 2 commits ahead of origin/main (`adb737f` + `3167a3b`), not pushed.** Human options: (a) approve push (single-org-no-impact + systemic tracking + Priority 32 precedent), (b) wait for the #111 generator fix, or (c) `REVIEW_GATE=0 git push` to override.
 
 ---
 
