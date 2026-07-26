@@ -79,7 +79,7 @@ export function ImportRunDetailPage() {
   const markFailed = useImportRunMarkFailed();
   // Commit/revert go through the authored importCommit seam, which actually
   // materializes entities + links (the generated ImportRun_commit only flips
-  // status). Venues + contacts supported; see convex/importCommit.ts.
+  // status). Venues + contacts + events supported; see convex/importCommit.ts.
   const commitImportRun = useAction(api.importCommit.commitImportRun);
   const revertImportRun = useAction(api.importCommit.revertImportRun);
 
@@ -119,8 +119,15 @@ export function ImportRunDetailPage() {
 
   // Datasets whose commit path materializes real entities (see importCommit.ts).
   const supportedCommitDatasets =
-    importRun.datasetType === "venues" || importRun.datasetType === "contacts";
-  const commitNoun = importRun.datasetType === "contacts" ? "contact" : "venue";
+    importRun.datasetType === "venues" ||
+    importRun.datasetType === "contacts" ||
+    importRun.datasetType === "events";
+  const commitNoun =
+    importRun.datasetType === "contacts"
+      ? "contact"
+      : importRun.datasetType === "events"
+        ? "event"
+        : "venue";
   const commitNounLabel =
     commitNoun.charAt(0).toUpperCase() + commitNoun.slice(1);
 
@@ -201,7 +208,7 @@ export function ImportRunDetailPage() {
   const handleCommit = () => {
     if (!supportedCommitDatasets) {
       setError(
-        "Commit supports the 'venues' and 'contacts' datasets. Other datasets need cross-dataset ID resolution (separate slice).",
+        "Commit supports the 'venues', 'contacts', and 'events' datasets. Other datasets need cross-dataset ID resolution (separate slice).",
       );
       return;
     }
@@ -260,7 +267,7 @@ export function ImportRunDetailPage() {
   const handleRevert = () => {
     if (
       !confirm(
-        "Revert this import? All ExternalRecordLinks created by this run are superseded (imported venues are left in place for operator deactivation).",
+        "Revert this import? All ExternalRecordLinks created by this run are superseded (imported records are left in place for operator deactivation).",
       )
     ) {
       return;
@@ -487,14 +494,20 @@ export function ImportRunDetailPage() {
               placeholder={
                 commitNoun === "contact"
                   ? '[{"ContactID":"C1","FirstName":"Maria","LastName":"Gomez","Email":"maria@acme.com","Phone":"512-555-0100","Title":"Event Planner","CompanyID":"ACME1","IsPrimary":true}]'
-                  : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
+                  : commitNoun === "event"
+                    ? '[{"EventID":"E1","EventName":"Smith Wedding","EventType":"Wedding","EventDate":"2025-06-14","StartTime":"17:00","EndTime":"23:00","ExpectedCount":150,"ClientID":"C1","VenueID":"V1","EventStatus":"Sales Lock","TotalRevenue":28500}]'
+                    : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
               }
             />
             <p className="text-xs text-ink-2 mt-2">
               Paste TPP {commitNoun} rows. Each is parsed, created as a{" "}
-              {commitNoun === "contact" ? "Client account" : "Venue"}, and
-              linked to this run. Re-running is safe (already-linked rows are
-              skipped).
+              {commitNoun === "contact"
+                ? "Client account"
+                : commitNoun === "event"
+                  ? "Event (client/venue resolved from prior imports)"
+                  : "Venue"}
+              , and linked to this run. Re-running is safe (already-linked rows
+              are skipped).
             </p>
             <div className="mt-4 flex gap-3">
               <button
@@ -706,8 +719,9 @@ export function ImportRunDetailPage() {
             <li>
               • <strong>Approve &amp; Commit</strong>: Finalize record counts,
               then paste source rows to materialize entities (venues → Venue,
-              contacts → Client account) and link them to this run (venues +
-              contacts datasets only)
+              contacts → Client account, events → Event with client/venue
+              resolved from prior imports) and link them to this run
+              (venues/contacts/events datasets only)
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires

@@ -9,20 +9,27 @@
  * false-success), and §5.3's "imported TPP Event uses the same create-proposal
  * command" had no imported events to act on.
  *
- * This seam makes commit/revert REAL for the self-contained **venues** and
- * **contacts** datasets: caller-supplied TPP rows are parsed, materialized into
+ * This seam makes commit/revert REAL for the **venues**, **contacts**, and
+ * **events** datasets: caller-supplied TPP rows are parsed, materialized into
  * entities via the generated `Venue_createViaRegister` (handles encryption +
- * eventManageAccess guard) or `Client_createViaRegister` (person-type client
- * account; salesAccess guard), and linked idempotently through
+ * eventManageAccess guard), `Client_createViaRegister` (person-type client
+ * account; salesAccess guard), or `Event_createViaPlanEngagement` (the create
+ * verb; eventManageAccess/salesAccess guard), and linked idempotently through
  * ExternalRecordLink. Re-run is safe (per-record idempotencyKey + link dedup).
  * Revert supersedes the run's links (dataset-agnostic).
  *
- * ponytail: ceiling — venues + contacts ship here. A TPP contact becomes a
- * person-type Client (NOT a ClientContact, which needs a parent clientId = the
- * cross-dataset CompanyID resolution). Events/leads/payments reference external
- * client/venue IDs that need cross-dataset resolution (resolve
- * externalId→Capsule id), which is a separate slice; this action throws an
- * honest "not yet supported" for them rather than faking it.
+ * Events resolve cross-dataset: a TPP Event's external `ClientID`/`VenueID` are
+ * looked up against prior contacts/venues imports (recordType "contact"/"venue"
+ * → Capsule id) before the Event is created; an event whose client was not
+ * imported becomes a `pending_conflict` link (reconcile queue) rather than
+ * fabricating a client. The TPP-mapped stage is NOT applied (the create command
+ * hardcodes `stage: "planning"` and exposes no stage arg); the raw TPP
+ * EventStatus is preserved on the link's rawSourceData for parallel-run
+ * reconciliation (§6.1).
+ *
+ * ponytail: ceiling — venues + contacts + events ship here. Leads/menus/
+ * payments still throw an honest "not yet supported" (menus have no parser;
+ * leads/payments reference further cross-dataset ids).
  * Revert supersedes links but leaves imported Venue entities in place (an event
  * may already reference one; deactivation is an operator action) — documented
  * honesty, not silent deletion. Source rows are caller-supplied (TPP has no bulk
@@ -34,8 +41,11 @@ import { api, internal } from "./_generated/api";
 import { getAuthContext } from "./lib/authContext";
 import {
   parseTppContacts,
+  parseTppEvents,
   parseTppVenues,
+  type ParsedCapsuleEvent,
   type TppContactRecord,
+  type TppEventRecord,
   type TppVenueRecord,
 } from "./tppParser";
 import type { Doc, Id } from "./_generated/dataModel";
@@ -364,10 +374,208 @@ export const commitImportRun = action({
       };
     }
 
+    if (importRun.datasetType === "events") {
+      if (args.rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const parsed = parseTppEvents(args.rawRows as TppEventRecord[]);
+      if (parsed.records.length === 0) {
+        throw new ConvexError(
+          `No valid event records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
+        );
+      }
+      const sourceSystem = importRun.sourceSystem;
+      let committed = 0;
+      let skipped = 0;
+      let pending = 0;
+
+      for (const event of parsed.records as ParsedCapsuleEvent[]) {
+        const existing = await ctx.runQuery(internal.importCommit.findLink, {
+          tenantId,
+          sourceSystem,
+          recordType: "event",
+          externalId: event.externalId,
+        });
+        if (existing && existing.capsuleId) {
+          // Already materialized in a prior run — idempotent skip.
+          skipped += 1;
+          continue;
+        }
+
+        // Cross-dataset resolution: a TPP Event's ClientID is an EXTERNAL id.
+        // Resolve it to a Capsule client via the prior contacts import
+        // (recordType "contact" → capsuleEntity "client"). The Event create
+        // requires clientId, so an event whose client was not imported (e.g. a
+        // TPP company id never imported as a contact) becomes a
+        // pending_conflict link rather than fabricating a client — the
+        // documented next slice (company→Client).
+        const clientLink = await ctx.runQuery(internal.importCommit.findLink, {
+          tenantId,
+          sourceSystem,
+          recordType: "contact",
+          externalId: event.clientId,
+        });
+        if (!clientLink || !clientLink.capsuleId) {
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "event",
+            externalId: event.externalId,
+            capsuleEntity: "event_record",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(event),
+            conflictStatus: "pending_conflict",
+            resolutionNote: `Client not imported (external ${event.clientId}); import contacts first.`,
+          });
+          pending += 1;
+          continue;
+        }
+        const clientId: string = clientLink.capsuleId;
+
+        // Venue is optional on Event; resolve if the TPP VenueID was imported.
+        let venueId: string | undefined;
+        if (event.venueId) {
+          const venueLink = await ctx.runQuery(internal.importCommit.findLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "venue",
+            externalId: event.venueId,
+          });
+          venueId = venueLink?.capsuleId || undefined;
+        }
+
+        // The create command (Event_createViaPlanEngagement) requires several
+        // non-empty fields the TPP row does not carry directly. Synthesize the
+        // spec-faithful minimum so complete TPP events import cleanly;
+        // incomplete rows fall to pending_conflict via the catch below.
+        // ponytail: eventType is required + non-empty; surface the TPP EventType
+        // slug (parseTppEvent folds EventType into occasionId) as free text,
+        // else an honest placeholder. primaryContactName derives from the
+        // imported contact's name (stored on its link), else a placeholder.
+        // Headcount is guarded >= 1; dates require endsAt > startsAt (default a
+        // 1h window when EndTime is absent).
+        const eventType = event.occasionId || "Imported Event";
+        let primaryContactName = "Imported Contact";
+        try {
+          const contact = JSON.parse(clientLink.rawSourceData || "{}") as {
+            givenName?: string;
+            familyName?: string;
+          };
+          const name = [contact.givenName, contact.familyName]
+            .filter(Boolean)
+            .join(" ");
+          if (name) primaryContactName = name;
+        } catch {
+          // keep placeholder
+        }
+        const expectedHeadcount = Math.max(1, event.expectedHeadcount ?? 1);
+        if (!event.startsAt) {
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "event",
+            externalId: event.externalId,
+            capsuleEntity: "event_record",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(event),
+            conflictStatus: "pending_conflict",
+            resolutionNote: "Event is missing a start date (EventDate).",
+          });
+          pending += 1;
+          continue;
+        }
+        const startsAt = event.startsAt;
+        const endsAt =
+          !event.endsAt || event.endsAt <= startsAt
+            ? startsAt + 3_600_000
+            : event.endsAt;
+        const budgetAmount = Math.max(0, event.budgetAmount ?? 0);
+        const quotedPrice = Math.max(0, event.quotedRevenue ?? 0);
+
+        const idempotencyKey = `import:${args.importRunId}:event:${event.externalId}`;
+        try {
+          const created = await ctx.runMutation(
+            api.mutations.Event_createViaPlanEngagement,
+            {
+              clientId,
+              title: event.title,
+              eventType,
+              startsAt,
+              endsAt,
+              expectedHeadcount,
+              primaryContactName,
+              budgetAmount,
+              quotedPrice,
+              venueId,
+              venueName: event.venueName,
+              venueAddress: event.venueAddress,
+              accessibilityNeeds: event.accessibilityNeeds,
+              operationalRequirements:
+                event.operationalRequirements ?? event.notes,
+              idempotencyKey,
+            },
+          );
+          const eventId: string = (created as { docId: string }).docId;
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "event",
+            externalId: event.externalId,
+            capsuleEntity: "event_record",
+            capsuleId: eventId,
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(event),
+            conflictStatus: "resolved",
+          });
+          committed += 1;
+        } catch (cause) {
+          // Per-record failure (e.g. missing required field, salesAccess
+          // denied) → review queue.
+          const note =
+            cause instanceof Error
+              ? cause.message
+              : "Event materialization failed";
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "event",
+            externalId: event.externalId,
+            capsuleEntity: "event_record",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(event),
+            conflictStatus: "pending_conflict",
+            resolutionNote: note,
+          });
+          pending += 1;
+        }
+      }
+
+      if (committed === 0 && pending > 0) {
+        throw new ConvexError(
+          `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+        );
+      }
+
+      await ctx.runMutation(api.mutations.ImportRun_commit, {
+        docId: args.importRunId,
+        version: importRun.version,
+      });
+
+      return {
+        committed,
+        skipped,
+        pending,
+        parseErrors: parsed.errors.length,
+      };
+    }
+
     if (importRun.datasetType !== "venues") {
-      // ponytail: ceiling — venues + contacts supported; see module header.
+      // ponytail: ceiling — venues + contacts + events supported; see header.
       throw new ConvexError(
-        `Dataset '${importRun.datasetType}' import is not yet supported (venues/contacts only). Events/leads/payments need cross-dataset ID resolution.`,
+        `Dataset '${importRun.datasetType}' import is not yet supported (venues/contacts/events only). Leads/menus/payments need cross-dataset ID resolution.`,
       );
     }
     if (args.rawRows.length === 0) {
