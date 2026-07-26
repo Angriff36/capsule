@@ -1,14 +1,20 @@
 import { useState, type FormEvent } from "react";
-import {
-  useListOccasion,
-  useListServiceStyle,
-} from "../../lib/manifest-convex-react";
+import { useAction, useQuery } from "convex/react";
+import { api, type Id } from "../../lib/api";
 import { ArrowLeftIcon, CheckIcon } from "../../ui/icons";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
 
 function optional(value: string): string | undefined {
   const trimmed = value.trim();
   return trimmed || undefined;
+}
+
+// Coerce a form field into a branded Id (or undefined when empty).
+function formId<T extends string>(
+  value: FormDataEntryValue | null,
+): T | undefined {
+  const s = value == null ? "" : String(value);
+  return s ? (s as T) : undefined;
 }
 
 function quoteFieldRules(data: FormData): Record<string, string> {
@@ -73,19 +79,17 @@ export function QuoteSubmissionPage() {
     message: string;
   } | null>(null);
 
-  const serviceStyles = useListServiceStyle();
-  const occasions = useListOccasion();
+  // Public catalog read + submit via authored Convex functions: the generated
+  // list hooks and a raw fetch both fail for an anonymous visitor (role-gated
+  // queries return [], and /api/actions/<path> is not a real Convex route).
+  const options = useQuery(api.quoteBuilder.getQuoteFormOptions);
+  const submitQuote = useAction(api.quoteBuilder.submitQuote);
 
   const { errors, touched, formProps, handleSubmit } =
     useFieldValidation(quoteFieldRules);
 
-  const activeServiceStyles = (serviceStyles ?? [])
-    .filter((style) => style.status === "active")
-    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
-
-  const activeOccasions = (occasions ?? [])
-    .filter((occasion) => occasion.status === "active")
-    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  const activeServiceStyles = options?.serviceStyles ?? [];
+  const activeOccasions = options?.occasions ?? [];
 
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -95,54 +99,31 @@ export function QuoteSubmissionPage() {
     const data = new FormData(event.currentTarget);
 
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_CONVEX_URL}/api/actions/quoteBuilder/submitQuote`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            clientName: optional(String(data.get("clientName") ?? "")),
-            email: optional(String(data.get("email") ?? "")),
-            phone: optional(String(data.get("phone") ?? "")),
-            eventDate: String(data.get("eventDate") ?? ""),
-            eventEndTime: String(data.get("eventEndTime") ?? ""),
-            guestCount: Number(data.get("guestCount") ?? 0),
-            serviceStyleId: data.get("serviceStyleId") || undefined,
-            occasionId: data.get("occasionId") || undefined,
-            venueName: optional(String(data.get("venueName") ?? "")),
-            venueAddress: optional(String(data.get("venueAddress") ?? "")),
-            menuPreferences: optional(
-              String(data.get("menuPreferences") ?? ""),
-            ),
-            dietaryRestrictions: optional(
-              String(data.get("dietaryRestrictions") ?? ""),
-            ),
-            notes: optional(String(data.get("notes") ?? "")),
-          }),
-        },
-      );
+      const result = await submitQuote({
+        clientName: optional(String(data.get("clientName") ?? "")) ?? "",
+        email: optional(String(data.get("email") ?? "")) ?? "",
+        phone: optional(String(data.get("phone") ?? "")),
+        eventDate: String(data.get("eventDate") ?? ""),
+        eventEndTime: optional(String(data.get("eventEndTime") ?? "")),
+        guestCount: Number(data.get("guestCount") ?? 0),
+        consent: data.get("consent") === "on",
+        serviceStyleId: formId<Id<"serviceStyles">>(data.get("serviceStyleId")),
+        occasionId: formId<Id<"occasions">>(data.get("occasionId")),
+        venueName: optional(String(data.get("venueName") ?? "")),
+        venueAddress: optional(String(data.get("venueAddress") ?? "")),
+        menuPreferences: optional(String(data.get("menuPreferences") ?? "")),
+        dietaryRestrictions: optional(
+          String(data.get("dietaryRestrictions") ?? ""),
+        ),
+        notes: optional(String(data.get("notes") ?? "")),
+      });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to submit quote request");
-      }
-
-      const result = await response.json();
-
-      if (result.isDuplicate) {
-        setSuccess({
-          submissionId: result.submissionId,
-          message:
-            result.message ||
-            "You've already submitted a quote request for this event.",
-        });
-      } else {
-        setSuccess({
-          submissionId: result.submissionId,
-          message:
-            "Thank you! Your quote request has been submitted. We'll be in touch within 24-48 hours.",
-        });
-      }
+      setSuccess({
+        submissionId: result.submissionId,
+        message:
+          result.message ||
+          "Thank you! Your quote request has been submitted. We'll be in touch within 24-48 hours.",
+      });
     } catch (err) {
       console.error("[quote-submission]", err);
       setError(

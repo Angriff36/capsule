@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 import { api, internal } from "./_generated/api";
-import { action, internalMutation } from "./_generated/server";
+import { action, internalMutation, query } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
 
 // Public status payload for getQuoteSubmissionStatus — derived from the Doc so
@@ -180,6 +180,52 @@ export const ingressQuoteSubmission = internalMutation({
 });
 
 /**
+ * Anonymous-safe catalog read for the public /quote form. The generated
+ * listServiceStyle / listOccasion queries require event/sales roles and derive
+ * tenant scope from auth, so they return [] for an anonymous visitor. This
+ * authored query resolves the active organization's tenant directly (no auth)
+ * and returns just the public, active options the form needs.
+ */
+export const getQuoteFormOptions = query({
+  args: {},
+  handler: async (
+    ctx,
+  ): Promise<{
+    serviceStyles: { _id: Id<"serviceStyles">; name: string }[];
+    occasions: { _id: Id<"occasions">; name: string }[];
+  }> => {
+    const org = await ctx.db
+      .query("organizations")
+      .filter((q) => q.eq(q.field("status"), "active"))
+      .first();
+    if (!org) return { serviceStyles: [], occasions: [] };
+    const tenantId = org.tenantId;
+    const [serviceStyles, occasions] = await Promise.all([
+      ctx.db
+        .query("serviceStyles")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .filter((q) => q.eq(q.field("status"), "active"))
+        .collect(),
+      ctx.db
+        .query("occasions")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+        .filter((q) => q.eq(q.field("status"), "active"))
+        .collect(),
+    ]);
+    const bySort = (a: { sortOrder?: number }, b: { sortOrder?: number }) =>
+      (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
+    return {
+      serviceStyles: serviceStyles
+        .map((s) => ({ _id: s._id, name: s.name, sortOrder: s.sortOrder }))
+        .sort(bySort),
+      occasions: occasions
+        .map((o) => ({ _id: o._id, name: o.name, sortOrder: o.sortOrder }))
+        .sort(bySort),
+    };
+  },
+});
+
+/**
  * Public quote submission. Validates input, then captures the QuoteSubmission
  * via the system-privileged ingress seam. Anonymous-safe — creates ONLY the
  * capture record; an authenticated operator converts it into Lead/Event/
@@ -196,6 +242,7 @@ export const submitQuote = action({
     eventDate: v.string(), // ISO date string
     eventEndTime: v.optional(v.string()),
     guestCount: v.number(),
+    consent: v.boolean(),
     serviceStyleId: v.optional(v.id("serviceStyles")),
     occasionId: v.optional(v.id("occasions")),
     venueName: v.optional(v.string()),
@@ -230,6 +277,11 @@ export const submitQuote = action({
     }
     if (!args.email?.trim()) {
       throw new ConvexError("Email address is required");
+    }
+    // Consent is validated server-side, not just by the client checkbox — a
+    // direct API caller cannot stamp a submission as consented without it.
+    if (!args.consent) {
+      throw new ConvexError("Data processing consent is required");
     }
 
     // Normalize the event end time: the form sends a time-only string ("18:00")
