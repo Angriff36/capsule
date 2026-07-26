@@ -15,6 +15,7 @@ import {
 import { StatusChip } from "../../ui/primitives";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { VenueNotesPanel } from "./VenueNotesPanel";
+import { VenueRoomsPanel } from "./VenueRoomsPanel";
 
 const VENUE_TYPES = [
   "client_site",
@@ -782,6 +783,9 @@ export function VenueDetailPage() {
           )}
         </dl>
       </div>
+
+      {/* Venue Rooms & Spaces */}
+      <VenueRoomsPanel venueId={venue._id} />
 
       {/* Venue Notes */}
       <VenueNotesPanel venueId={venue._id} />

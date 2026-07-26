@@ -1,0 +1,106 @@
+// VenueRoom — a bookable room/space within a venue (spec §8.1 "room/space details").
+// Lets a venue model its ballrooms, dining rooms, prep kitchens, breakout and
+// outdoor spaces separately from the venue-level capacity.
+
+enum VenueRoomType {
+  ballroom
+  dining
+  kitchen
+  breakout
+  outdoor
+  other
+}
+
+entity VenueRoom mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required venueId: uuid
+  property required name: string = ""
+  property required roomType: VenueRoomType = "other"
+  property required capacity: int = 0
+  property squareFootage: int?
+  property description: string?
+  // Explicit nullable flag (not the auto timestamps mixin) so the create guard works.
+  property addedAt: datetime?
+
+  belongsTo venue: Venue fields [tenantId, venueId] references [tenantId, id]
+
+  constraint venueRoomName: self.addedAt == null or length(trim(self.name)) > 0 "Room name is required"
+  constraint venueRoomCapacity: self.capacity >= 0 "Room capacity cannot be negative"
+
+  default policy venueRoomRead read: roleAllows(user.role, "eventAccess") "Event staff may read venue rooms"
+  default policy venueRoomWrite write: roleAllows(user.role, "eventAccess") "Event staff may write venue rooms through commands"
+  default policy venueRoomExecute execute: roleAllows(user.role, "eventAccess") "Event staff may execute venue room commands"
+
+  command add(
+    venueId: uuid,
+    name: string,
+    roomType: VenueRoomType,
+    capacity: number,
+    optional squareFootage: number,
+    optional description: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint addVenueRoomName: length(trim(name)) > 0 "Room name is required"
+    constraint addVenueRoomCapacity: capacity >= 0 "Room capacity cannot be negative"
+    mutate venueId = venueId
+    mutate name = name
+    mutate roomType = roomType
+    mutate capacity = capacity
+    mutate squareFootage = squareFootage
+    mutate description = description
+    mutate addedAt = now()
+    emit VenueRoomAdded {
+      roomId: self.id
+      tenantId: self.tenantId
+      venueId: venueId
+      name: name
+      roomType: roomType
+      capacity: capacity
+    }
+  }
+
+  command revise(
+    name: string,
+    roomType: VenueRoomType,
+    capacity: number,
+    optional squareFootage: number,
+    optional description: string
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint reviseVenueRoomName: length(trim(name)) > 0 "Room name is required"
+    constraint reviseVenueRoomCapacity: capacity >= 0 "Room capacity cannot be negative"
+    mutate name = name
+    mutate roomType = roomType
+    mutate capacity = capacity
+    mutate squareFootage = squareFootage
+    mutate description = description
+    emit VenueRoomRevised {
+      roomId: self.id
+      tenantId: self.tenantId
+      venueId: self.venueId
+      name: name
+      roomType: roomType
+      capacity: capacity
+    }
+  }
+
+  command remove() {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate deletedAt = now()
+    emit VenueRoomRemoved {
+      roomId: self.id
+      tenantId: self.tenantId
+      venueId: self.venueId
+    }
+  }
+
+  store VenueRoom in durable
+}

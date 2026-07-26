@@ -115,6 +115,7 @@ describe("governed creation mappings", () => {
       "VenueCommissionTerm_createViaDefine",
       "VenueLayoutTemplate_createViaDefine",
       "VenueNote_createViaPost",
+      "VenueRoom_createViaAdd",
       "VenueVendorRelationship_createViaEstablish",
       "Venue_createViaRegister",
       "WasteRecord_createViaRecord",

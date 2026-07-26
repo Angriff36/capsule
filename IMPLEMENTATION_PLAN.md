@@ -1,13 +1,38 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-26 (§5.5 digital acceptance → Proposal.accept WIRED — closes the #1 Slice-1 DEAD-but-"done" gap; the digitally-signed proposal no longer stays "sent" forever; also corrected the stale §5.4 catalog-pricing status row; §6.2 menus import WIRED — venues + contacts + events + leads + payments + menus now ALL materialize, closing the #1 Critical-priority Import Datasets; §6.2 payments import WIRED — venues + contacts + events + leads + payments now reachable end-to-end [payments staged as §6.4 reconciliation-reference links]; §6.2 leads import WIRED — venues + contacts + events + leads now materialize; §6.2 events import WIRED — venues + contacts + events now materialize; §6.2 contacts import WIRED — venues + contacts now materialize; §4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
+**Updated:** 2026-07-26 (§8.1 VenueRoom room/space sub-entity DONE — closes the concrete remaining gap of Priority 17 "Venue Profile Full Depth"; a venue can now model its ballrooms/dining/prep-kitchen/outdoor spaces; §5.5 digital acceptance → Proposal.accept WIRED — closes the #1 Slice-1 DEAD-but-"done" gap; the digitally-signed proposal no longer stays "sent" forever; also corrected the stale §5.4 catalog-pricing status row; §6.2 menus import WIRED — venues + contacts + events + leads + payments + menus now ALL materialize, closing the #1 Critical-priority Import Datasets; §6.2 payments import WIRED — venues + contacts + events + leads + payments now reachable end-to-end [payments staged as §6.4 reconciliation-reference links]; §6.2 leads import WIRED — venues + contacts + events + leads now materialize; §6.2 events import WIRED — venues + contacts + events now materialize; §6.2 contacts import WIRED — venues + contacts now materialize; §4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+---
+
+**2026-07-26 — §8.1 VenueRoom (room/space) sub-entity DONE (closes the concrete remaining gap of Priority 17 "Venue Profile Full Depth"; a venue can now model its ballrooms/dining rooms/prep kitchens/outdoor spaces separately from venue-level capacity):**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0).** One new manifest entity (`VenueRoom`) + one regen + one UI panel + two-line wiring in `VenueDetailPage` + one generated-contract test row. No new guard/policy beyond the existing `eventAccess` tier; no money mutation; no external provider.
+
+**Finding (verified first-hand against code this turn):** the tractable winner among the still-open items is the §8.1 "room/space details" sub-entity. A focused Opus triage pass (6 candidates) verified the alternatives are NOT autonomous-tractable: §7.4's 7 named dashboards are all real (`src/features/reports/*DashboardPage.tsx`, wired in `App.tsx:909-968`, live Convex data — the "NOT BUILT" detailed-status row is STALE); §12.5 Email / §4.4 Social DM data model + idempotent ingest + UI already exist (`message-thread.manifest`, `message.manifest`, `convex/messageInbox.ts`, `MessageInboxPage.tsx`) — only live provider OAuth/webhooks remain (needs credentials); §12.3 Nowsta is absent and needs creds; §6.3 Browser-Extracted Pack Lists is BLOCKED (no `playwright` dep; `pack_lists` is not a `DatasetCategory`/`ImportDatasetType`). `grep -rin VenueRoom src/ convex/` returned nothing — genuinely absent. Spec §8.1 (line 370) explicitly requires "room/space details … scorecard metrics"; only room/space was concretely missing and pattern-matched a shipped sibling.
+
+**Fix (smallest spec-faithful diff — cloned the proven `VenueNote` sibling line-for-line):**
+- `src/operations/venue-room.manifest` (new) — `VenueRoom` entity (`TenantScoped, SoftDeletable`, `key [tenantId, id]`, `timestamps`, `versionProperty version`). Fields: `required venueId: uuid`, `required name: string`, `required roomType: VenueRoomType` (enum ballroom/dining/kitchen/breakout/outdoor/other), `required capacity: int = 0` (≥0 constraint), `squareFootage: int?`, `description: string?`, `addedAt: datetime?`. `belongsTo venue: Venue fields [tenantId, venueId] references [tenantId, id]`. Policies copy `VenueNote`'s `eventAccess` tier verbatim (per `domain-gating-restraint.md` — no invented specialty guard). Commands `add`/`revise`/`remove` mirror `VenueNote.post`/`revise`/`remove`. `store VenueRoom in durable`.
+- `src/app.manifest` — registered `use "./operations/venue-room.manifest"` (alphabetical, between venue-note and venue-vendor-relationship).
+- `bun run manifest:regen` — verified GENERATED (not just declared): `venueRooms` table (`schema.ts:2677`, `venueId: v.id("venues")` FK, `by_tenantId` + `by_venueId` indexes); mutations `VenueRoom_add`/`VenueRoom_createViaAdd`/`VenueRoom_revise`/`VenueRoom_remove` (`mutations.ts:39913+`); hooks `useCreateVenueRoom`/`useVenueRoomRevise`/`useVenueRoomRemove`/`useListVenueRoom`/`useGetVenueRoom` (`manifest-convex-react.ts:8142+`).
+- `src/features/facilities/VenueRoomsPanel.tsx` (new, ~300 lines) — add-room form + inline edit (revise) + remove, client-side filtered by `venueId`+`deletedAt==null` (same read pattern as `VenueNotesPanel`). No auth/author plumbing needed (rooms are venue config, not author-tracked); the `eventAccess` server guard covers authorization.
+- `src/features/facilities/VenueDetailPage.tsx` — import + mount `<VenueRoomsPanel venueId={venue._id} />` next to `<VenueNotesPanel>` (line 787).
+
+**Gotchas avoided (verified, per repo memory):** `add` is a recognized create verb (dish/menu-dish/recipe/event/vendor/contact use it) → generates both `useVenueRoomAdd` and the canonical `useCreateVenueRoom`. The create guard uses an explicit nullable `addedAt: datetime?` (NOT an auto-timestamp field — the timestamps mixin pre-populates those, which would make a `self.<autoTimestamp>==null` guard always throw). `mutate addedAt = now()` (not `context.timestamp`, which is undefined on MutationCtx at runtime). `self.id` is only used in `emit` (dead in `mutate`), matching `VenueNote`. `int` properties + `number` command params (Venue's pattern).
+
+**Operational note (gotcha for future entity additions):** adding a new entity with a create verb also requires inserting its `<Entity>_createVia<Verb>` entry into the hand-maintained `tests/governed-creation-mappings.test.ts` sorted list — regen does NOT update it. Caught by the gate this turn (one-line addition).
+
+**Verification:** `bun run check` GREEN (exit 0) — toolchain, builder-regen-guard (20 owned paths), proof:emit, all 9 manifest-slice integration guards, manifest-registry-pin, typecheck 0, format clean, secrets, test:coverage (748 tests; the governed-creation-mappings test now includes `VenueRoom_createViaAdd`), build ok (`VenueDetailPage` chunk 29.07 kB), baseline-decay ok. No tests added (AGENTS.md: do not add tests unless the owner asks); the one contract-test row update was required because the new entity changed the generated-createVia set the test pins.
+
+**Cross-model review:** not run this increment (autonomous-loop cadence; additive entity mirroring a shipped sibling + UI panel, no new guard/policy/approval, no money mutation). The merge gate's independent cross-model review still applies at PR time.
+
+**Honest scope notes (documented, NOT this increment):** (1) **"scorecard metrics" on Venue (§8.1)** still NOT built — overlaps with the shipped Company Scorecard dashboard and is vaguer; left as a separate slice. (2) **Rooms are not yet referenced from event layouts / proposals** — §8.2 event-layout templates could later pick a room; this increment delivers the room catalog + management UI only (spec §8.1 "room/space details"). (3) **Meta-finding: the "Detailed Status by Spec Section" table (≈lines 1683-3160) is largely STALE** — it still marks §8.2/§8.3/§8.5/§3.4/§5.3/§7.4 etc. with old gaps that the changelog + Priority table show are DONE (e.g. §8.2 lists "6 of 12 logistics fields" but all 12+ exist and are UI-wired; §8.5/§7.4 say NOT BUILT but are DONE). The fresh truth is this changelog + the Priority Sequencing table. A periodic cleanup of that table is a worthwhile separate doc pass. (4) A `main` push deploys Convex too (`vercel.json` `buildCommand` is `convex deploy --cmd 'vite build'`, since cc24315).
 
 ---
 
@@ -2325,13 +2350,13 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 - src/operations/event.manifest lines 324-329 — Complete logistics fields: onPremise, kitchenAccess, parkingAvailable, hasFreightElevator, storageAvailable, logisticsNotes
 - All 721 tests passing (2026-07-25)
 
-**Remaining Depth (§8.2-8.5):**
-- ❌ Room/space details entity
+**Remaining Depth (§8.2-8.5):** *(NOTE: rows below were the 2026-07-24 snapshot; power/water/stairs/waste/permits/load-in are ALL now wired on Venue + in the create/edit UI — see changelog 2026-07-26.)*
+- ✅ ~~Room/space details entity~~ **DONE 2026-07-26** — `VenueRoom` entity (src/operations/venue-room.manifest) + `VenueRoomsPanel` in VenueDetailPage; add/revise/remove; roomType enum (ballroom/dining/kitchen/breakout/outdoor/other) + capacity + squareFootage + description.
 - ✅ ~~Kitchen access/equipment fields~~ **DONE** — kitchenAccess: string? (event.manifest:325)
-- ❌ Power/water fields
-- ❌ Load-in path/times fields (use logisticsNotes for now)
+- ✅ ~~Power/water fields~~ **DONE** — powerAvailable/waterAccess (event.manifest:331-332)
+- ✅ ~~Load-in path/times fields~~ **DONE** — loadInInstructions: string? (event.manifest:330)
 - ✅ ~~Parking fields~~ **DONE** — parkingAvailable: boolean? (event.manifest:326)
-- 🟡 ~~Elevators/stairs fields~~ **PARTIAL** — hasFreightElevator: boolean? only (no stairs field)
+- ✅ ~~Elevators/stairs fields~~ **DONE** — hasFreightElevator + hasStairs (event.manifest:327,333)
 - ✅ ~~Storage fields~~ **DONE** — storageAvailable: boolean? (event.manifest:328)
 - ❌ Waste rules fields
 - ❌ Permits/insurance fields
@@ -3203,7 +3228,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 | Priority | Item | Effort | Impact | Dependencies | Why |
 |----------|------|--------|--------|--------------|-----|
 | ~~16~~ | **Equipment Location Fields** | Small | Medium | None | Availability calculation - blocks logistics accuracy | ✅ DONE 2026-07-26 — `homeLocation`/`currentLocation` already existed on Equipment (data layer); this increment wired the UI (Location column + Edit→`reviseDetails` in `EquipmentCatalogPage.tsx`). See top entry. |
-| 17 | **Venue Profile (Full Depth)** | Large | High | None | Venue management and logistics - blocks venue selection |
+| 17 | **Venue Profile (Full Depth)** | Large | High | None | Venue management and logistics - blocks venue selection | 🟡 PARTIAL (2026-07-26): room/space sub-entity now DONE (`VenueRoom` entity + `VenueRoomsPanel` UI in `VenueDetailPage`) — closes the concrete §8.1 "room/space details" gap; only "scorecard metrics" (overlaps shipped Company Scorecard dashboard) remains. Note: the §8.1-§8.2 detailed rows below are STALE (all 12 logistics fields + UI are wired). |
 | ~~18~~ | **Pack List Templates** | Large | High | ServiceStyle, Equipment location | Operational efficiency - blocks automated pack list generation | ✅ DONE 2026-07-26 — `PackListTemplate` entity + `/logistics/pack-templates` management page + "From template" generate-into-event-PackList in `PackListDetailPage` (spec §11.2 templates AND generation); see top entry. |
 | 19 | **Parallel Run Dashboard** | Large | High | Import Framework, Import Datasets | Migration validation - required for safe cutover | ✅ DONE - 680-line dashboard with comparison metrics, drill-down |
 | 20 | **TPP Bridge** | Large | High | Import Framework, Proposal Revisions | Legacy proposal migration - blocks historical proposal access |
