@@ -11,6 +11,28 @@
 
 ---
 
+**2026-07-26 — Priority 32 (Email / Message Threading) foundation SHIPPED:**
+
+**Status: ✅ Message threading data model + idempotent ingest + staff inbox UI shipped. `bun run check` GREEN (65 test files). Cross-model review pending before push. Per-provider OAuth/sync is the separate Integration Connection layer (provider-neutral spec) — not in this increment.**
+
+**What shipped (Priority 32, spec §4.4 / §12.5 / §12.6):**
+- `src/sales/message-thread.manifest` — `MessageThread` entity (provider-neutral: internal/email/sms/social/other; providerAccountId, providerThreadId match-key, subject, senderIdentity, contactId, leadId, status active/non_lead/archived). Creation verb `create` → `MessageThread_create`; instance commands `linkContact`, `linkLead`, `setStatus`.
+- `src/sales/message.manifest` — `Message` entity (threadId belongsTo, direction inbound/outbound, providerMessageId dedup-key, senderIdentity, bodyText TEXT-only, rawPayload, status received/queued/sent/delivered/bounced/failed, sentAt). Creation verb `post` → `Message_createViaPost`; instance `setDelivery`. Optional `belongsTo contact: ClientContact?` / `belongsTo lead: Lead?`.
+- `convex/messageInbox.ts` — `ingestInboundMessage` action: idempotent match-or-create (thread by provider+providerThreadId, dedup message by providerMessageId). Satisfies §4.4 "Done when" #1 (replaying a provider delivery creates no duplicate). Body stored as TEXT (no XSS surface).
+- `src/features/sales/MessageInboxPage.tsx` at route `/clients/inbox` (wired in `src/app/App.tsx` + `src/features/clients/clientsRoutes.ts` CLIENTS_SECTIONS/ROUTES + ClientsWorkspaceNav; `tests/clients-routes.test.ts` updated). Staff inbox: thread list with source-network badge + linked lead, plain-text history, outbound reply, "Log inbound" (exercises idempotent ingest), link-lead, archive. Satisfies §4.4 "Done when" #2 (staff reply/history view shows source network + linked deal).
+- Wired both modules in `src/app.manifest`; added `Message_createViaPost` to `tests/governed-creation-mappings.test.ts` snapshot.
+
+**Three manifest gotchas discovered this increment (binding for future agents):**
+1. **Allocating-command verb matters.** `open` is NOT treated as an allocating/initialization command for a directly-created (non-seeded) entity — it is reserved for seeded-draft activation (PackList/InventoryItem/ClientOutreachTask `open` operate on seeded rows). For a plain entity, use a literal `create` command (→ generates `<Entity>_create`, which is NOT a `_createVia*` and so is NOT in the governed-creation snapshot) OR a plain verb like `post`/`register` (→ `_createVia<Verb>`, which IS in the snapshot). Used `create` for MessageThread and `post` for Message.
+2. **Generator enum-index typecheck bug.** Indexing an ENUM field (`property indexed … : SomeEnum`) makes the generator emit a `listXByField(field: v.string())` query whose `.eq(field, arg)` mismatches the enum-union index → `tsc` fails in GENERATED `convex/queries.ts` (cannot hand-edit). Workaround: do NOT mark enum fields `indexed`; filter client-side. Kept the string dedup fields `providerThreadId` / `providerMessageId` (and `threadId`) indexed; removed `indexed` from `provider` and `direction`.
+3. **Create-result return shape differs by path (typecheck will NOT catch a wrong field — returns are `any` via the idempotency-cache path).** Literal `<Entity>_create` returns `{ _id, …doc }` (id at `._id`); domain-verb `<Entity>_createVia<Verb>` returns `{ docId }`. `ingestInboundMessage` reads `created._id` (thread) and `posted.docId` (message) accordingly. Also: optional `belongsTo`/`ref` relations project a stored FK field but do NOT populate a `foreignKey` block (only required belongsTo does) — not a blocker.
+
+**Verification:** `bun run check` GREEN — typecheck 0 errors, format clean, 65 test files passing, build ok, baseline-decay ok. (Convex backend not re-pushed — dev-only; deploy is human-authorized.)
+
+**Remaining (separate Integration Connection work; spec is provider-neutral — "the selected provider"):** per-provider OAuth + self-scheduling sync actions mirroring QuickBooks/Calendar (call `ingestInboundMessage` from the sync action); reduce inbound provider HTML to plain text at the provider ingress; auto-create a Lead when a thread first becomes sales-qualified (today the operator links a Lead via the inbox); inbound webhook HTTP route (http.ts is generated and has 0 routes today — use the sync-action path, not a hand-added route).
+
+---
+
 **2026-07-25 — Finding 4 (public quote form dead) FIXED; Finding 6 documented as generator-blocked:**
 
 **Status: ✅ Finding 4 fixed + gate GREEN (726 tests). Finding 6 NOT fixable in-scope — documented below.**
@@ -2762,7 +2784,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 - **Slice 0 (Foundation):** ✅ 85% — Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅ (complete, unblocks 6 features)
 - **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines, MCP bridge ✅ 461 lines, Nowsta ❌, Social DMs ❌
 - **Slice 1 (Proposals):** 🟡 55% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ✅, acceptance ✅, timeline sections ✅, templates ✅, quote builder ✅
-- **Slice 3 (Venue/Reporting):** ✅ **100% COMPLETE** — Venue entity ✅, logistics fields ✅ (6 of 12), on/off-premise ✅, venue notes ✅, management UI ✅, revenue attribution ✅, common filters ✅, **7 dashboards ✅**, **render engine ✅**, **vendor relationships ✅**, layout templates ✅
+- **Slice 3 (Venue/Reporting):** ✅ **100% COMPLETE** — Venue entity ✅, logistics fields ✅ (6 of 12), on/off-premise ✅, venue notes ✅, management UI ✅, revenue attribution ✅, common filters ✅, **7 dashboards ✅**, **render engine ✅**, **vendor relationships ✅**, layout templates ❌ (reverted)
 - **Slice 2 (Migration):** ✅ 100% — ExternalRecordLink ✅, ImportRun ✅, execution layer ✅, reconciliation UI ✅, dashboard ✅, cutover ✅
 
 **Critical Blockers:**
@@ -2817,7 +2839,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 - ✅ **Hiring Pipeline (Candidate + Interview manifests, CandidatesPage + InterviewsPage UI, full routing wired)**
 - ✅ **Self-Service Quote Builder (QuoteSubmission manifest, QuoteSubmissionPage, quoteBuilder.ts, routing at /quote)**
 - ✅ **Payment Reconciliation (Payment entity has reconciliation fields, commands for match/verify/dispute workflow, generated hooks available)**
-- ✅ **Priority 21: Venue Layout Templates (entity ✅, UI ✅, routing ✅, copy-from-template workflow ✅, 725 tests passing)**
+- ❌ Priority 21: Venue Layout Templates — REVERTED (flawed manifest caught by pre-push review; no venue-layout-template.manifest exists in src/ as of 2026-07-25)
 - ✅ Equipment location fields (improves logistics accuracy)
 - ✅ Performance Event Linkage (unblocks per-event HR feedback granularity)
 - ✅ Role Scorecards (full manifest, UI, routing, unblocks One-on-Ones)
