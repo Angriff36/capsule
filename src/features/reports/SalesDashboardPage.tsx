@@ -11,10 +11,8 @@ import {
 } from "@/ui/charts/DashboardGrid";
 import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
-import { LineChart } from "@/ui/charts/LineChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
-import { PageHeader, StatusChip } from "@/ui/primitives";
-import { formatMoney, formatCount } from "@/lib/format";
+import { PageHeader } from "@/ui/primitives";
 
 /**
  * Sales Dashboard (Priority 36)
@@ -64,8 +62,8 @@ export function SalesDashboardPage() {
     return Object.entries(stageCounts)
       .map(([stage, count]) => ({
         stage: formatStage(stage),
-        count,
-        value: count,
+        count: count as number,
+        value: count as number,
       }))
       .sort(
         (a, b) =>
@@ -211,7 +209,11 @@ export function SalesDashboardPage() {
       content: (
         <StatCard
           title="Total Leads"
-          main={{ value: conversionMetrics.totalLeads, format: "number" }}
+          main={{
+            label: "Total",
+            value: conversionMetrics.totalLeads,
+            format: "number",
+          }}
           rows={[
             {
               label: "Qualified",
@@ -236,6 +238,7 @@ export function SalesDashboardPage() {
         <StatCard
           title="Booked Revenue"
           main={{
+            label: "Booked",
             value: revenueMetrics.totalRevenue,
             format: "currency" as const,
           }}
@@ -263,13 +266,14 @@ export function SalesDashboardPage() {
         <StatCard
           title="Conversion Rate"
           main={{
+            label: "Rate",
             value: conversionMetrics.conversionRate,
             format: "percent" as const,
           }}
           rows={[
             {
               label: "Converted",
-              value: conversionMetrics.convertedCount,
+              value: conversionMetrics.convertedCount || 0,
               format: "number" as const,
             },
             {
@@ -290,6 +294,7 @@ export function SalesDashboardPage() {
         <StatCard
           title="Avg Event Value"
           main={{
+            label: "Average",
             value: revenueMetrics.averageEventValue,
             format: "currency" as const,
           }}

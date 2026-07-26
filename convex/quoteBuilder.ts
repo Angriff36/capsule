@@ -1,7 +1,21 @@
 import { ConvexError, v } from "convex/values";
 import { api } from "./_generated/api";
 import { action } from "./_generated/server";
-import { Id } from "./_generated/dataModel";
+import { Doc, Id } from "./_generated/dataModel";
+
+// Public status payload for getQuoteSubmissionStatus — derived from the Doc so
+// field types stay in sync with the schema (single source of truth).
+type QuoteSubmissionStatusResult = {
+  id: Doc<"quoteSubmissions">["_id"];
+  status: Doc<"quoteSubmissions">["status"];
+  submittedAt: Doc<"quoteSubmissions">["submittedAt"];
+  completedAt: Doc<"quoteSubmissions">["completedAt"];
+  clientId: Doc<"quoteSubmissions">["clientId"];
+  leadId: Doc<"quoteSubmissions">["leadId"];
+  eventId: Doc<"quoteSubmissions">["eventId"];
+  proposalId: Doc<"quoteSubmissions">["proposalId"];
+  errorMessage: Doc<"quoteSubmissions">["errorMessage"];
+};
 
 /**
  * Generates a stable deduplication key from email + event date + tenantId.
@@ -79,7 +93,19 @@ export const submitQuote = action({
     dietaryRestrictions: v.optional(v.string()),
     notes: v.optional(v.string()),
   },
-  handler: async (ctx, args) => {
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
+    submissionId: Id<"quoteSubmissions">;
+    status: string | undefined;
+    isDuplicate: boolean;
+    message: string;
+    clientId?: Id<"clients"> | null;
+    leadId?: Id<"leads"> | null;
+    eventId?: Id<"events"> | null;
+    proposalId?: Id<"proposals"> | null;
+  }> => {
     // Step 1: Validate input
     const dateValidation = validateEventDate(args.eventDate);
     if (!dateValidation.valid) {
@@ -100,13 +126,7 @@ export const submitQuote = action({
 
     // Step 2: Get or create tenant context
     // For MVP, we use a default tenant. In production, this would come from subdomain/route param.
-    // @ts-expect-error - Generated API types don't match actual query signature
-    const organizations = await ctx.runQuery(
-      api.queries.listOrganization as any,
-      {
-        limit: 1,
-      },
-    );
+    const organizations = await ctx.runQuery(api.queries.listOrganization);
     const organization =
       organizations.find((org) => org.status === "active") ?? organizations[0];
 
@@ -122,12 +142,8 @@ export const submitQuote = action({
     const dedupKey = generateDedupKey(args.email, args.eventDate, tenantId);
 
     // Step 4: Check for existing submission (prevent exact duplicates)
-    // @ts-expect-error - Generated API types don't match actual query signature
     const existingSubmissions = await ctx.runQuery(
-      api.queries.listQuoteSubmission as any,
-      {
-        limit: 100,
-      },
+      api.queries.listQuoteSubmission,
     );
     const existing = existingSubmissions.find(
       (sub) => sub.dedupKey === dedupKey && sub.deletedAt === null,
@@ -156,17 +172,19 @@ export const submitQuote = action({
         dedupKey,
         clientName: args.clientName.trim(),
         email: args.email.trim().toLowerCase(),
-        phone: args.phone?.trim() ?? undefined,
-        eventDate: args.eventDate,
-        eventEndTime: args.eventEndTime ?? undefined,
+        phone: args.phone?.trim() ?? "",
+        eventDate: new Date(args.eventDate).getTime(),
+        eventEndTime: args.eventEndTime
+          ? new Date(args.eventEndTime).getTime()
+          : 0,
         guestCount: args.guestCount,
-        serviceStyleId: args.serviceStyleId ?? undefined,
-        occasionId: args.occasionId ?? undefined,
-        venueName: args.venueName?.trim() ?? undefined,
-        venueAddress: args.venueAddress?.trim() ?? undefined,
-        menuPreferences: args.menuPreferences?.trim() ?? undefined,
-        dietaryRestrictions: args.dietaryRestrictions?.trim() ?? undefined,
-        notes: args.notes?.trim() ?? undefined,
+        serviceStyleId: args.serviceStyleId ?? "",
+        occasionId: args.occasionId ?? "",
+        venueName: args.venueName?.trim() ?? "",
+        venueAddress: args.venueAddress?.trim() ?? "",
+        menuPreferences: args.menuPreferences?.trim() ?? "",
+        dietaryRestrictions: args.dietaryRestrictions?.trim() ?? "",
+        notes: args.notes?.trim() ?? "",
       },
     );
     const submissionId = submissionResult._id;
@@ -180,9 +198,7 @@ export const submitQuote = action({
     let clientId: Id<"clients"> | null = null;
     try {
       // Check if client with same email already exists
-      const existingClients = await ctx.runQuery(api.queries.listClient, {
-        limit: 100,
-      });
+      const existingClients = await ctx.runQuery(api.queries.listClient);
       const existingClient = existingClients.find(
         (c) =>
           c.email?.toLowerCase() === args.email.toLowerCase() &&
@@ -193,12 +209,15 @@ export const submitQuote = action({
         clientId = existingClient._id;
       } else {
         // Create new client (company type for MVP)
-        const newClient = await ctx.runMutation(api.mutations.Client_register, {
-          clientType: "company",
-          companyName: args.clientName.trim(),
-          email: args.email.trim().toLowerCase(),
-          phone: args.phone?.trim() ?? undefined,
-        });
+        const newClient = await ctx.runMutation(
+          api.mutations.Client_createViaRegister,
+          {
+            clientType: "company",
+            companyName: args.clientName.trim(),
+            email: args.email.trim().toLowerCase(),
+            phone: args.phone?.trim() ?? undefined,
+          },
+        );
         clientId = newClient._id;
       }
     } catch (error) {
@@ -216,14 +235,17 @@ export const submitQuote = action({
     let leadId: Id<"leads"> | null = null;
     try {
       if (clientId) {
-        const leadResult = await ctx.runMutation(api.mutations.Lead_capture, {
-          leadType: "company",
-          source: "quote-builder", // Track that this came from the public quote form
-          estimatedValue: 0, // Will be calculated when proposal is created
-          companyName: args.clientName.trim(),
-          email: args.email.trim().toLowerCase(),
-          phone: args.phone?.trim() ?? undefined,
-        });
+        const leadResult = await ctx.runMutation(
+          api.mutations.Lead_createViaCapture,
+          {
+            leadType: "company",
+            source: "quote-builder", // Track that this came from the public quote form
+            estimatedValue: 0, // Will be calculated when proposal is created
+            companyName: args.clientName.trim(),
+            email: args.email.trim().toLowerCase(),
+            phone: args.phone?.trim() ?? undefined,
+          },
+        );
         leadId = leadResult._id;
 
         // Link lead to client
@@ -250,17 +272,25 @@ export const submitQuote = action({
         // Parse dates for Event
         const eventStart = new Date(args.eventDate);
         const eventEnd = args.eventEndTime
-          ? new Date(args.eventEndTime)
+          ? new Date(
+              /^\d{2}:\d{2}/.test(args.eventEndTime)
+                ? `${args.eventDate}T${args.eventEndTime}`
+                : args.eventEndTime,
+            )
           : new Date(eventStart.getTime() + 4 * 60 * 60 * 1000); // Default 4-hour event
 
         const eventResult = await ctx.runMutation(
-          api.mutations.Event_planEngagement,
+          api.mutations.Event_createViaPlanEngagement,
           {
             clientId,
             title: `Quote Request: ${args.clientName.trim()}`,
-            startsAt: eventStart.toISOString(),
-            endsAt: eventEnd.toISOString(),
+            eventType: "Catering Inquiry",
+            startsAt: eventStart.getTime(),
+            endsAt: eventEnd.getTime(),
             expectedHeadcount: args.guestCount,
+            primaryContactName: args.clientName.trim(),
+            budgetAmount: 0,
+            quotedPrice: 0,
             serviceStyleId: args.serviceStyleId ?? undefined,
             occasionId: args.occasionId ?? undefined,
             venueName: args.venueName?.trim() ?? undefined,
@@ -268,7 +298,6 @@ export const submitQuote = action({
             serviceRequirements: args.menuPreferences?.trim() ?? undefined,
             operationalRequirements:
               args.dietaryRestrictions?.trim() ?? undefined,
-            notes: args.notes?.trim() ?? undefined,
           },
         );
         eventId = eventResult._id;
@@ -286,9 +315,7 @@ export const submitQuote = action({
         let eventName = "Event";
         if (args.occasionId) {
           try {
-            const occasions = await ctx.runQuery(api.queries.listOccasion, {
-              limit: 100,
-            });
+            const occasions = await ctx.runQuery(api.queries.listOccasion);
             const occasion = occasions.find((o) => o._id === args.occasionId);
             eventName = occasion?.name || "Event";
           } catch {
@@ -302,7 +329,7 @@ export const submitQuote = action({
           {
             clientId,
             title: `Proposal for ${args.clientName.trim()}`,
-            eventDate: args.eventDate,
+            eventDate: new Date(args.eventDate).getTime(),
             eventType: eventName,
             venueName: args.venueName?.trim() ?? undefined,
             venueAddress: args.venueAddress?.trim() ?? undefined,
@@ -317,14 +344,9 @@ export const submitQuote = action({
           },
         );
         proposalId = proposalResult._id;
-
-        // Link proposal to event if event was created
-        if (eventId && proposalId) {
-          await ctx.runMutation(api.mutations.Proposal_reviseDetails, {
-            docId: proposalId,
-            eventId,
-          });
-        }
+        // ponytail: no Proposal command links an event after creation
+        // (createViaDraft has no eventId arg), so the draft stays unlinked;
+        // both IDs are still recorded on the QuoteSubmission below.
       }
     } catch (error) {
       // If proposal creation fails, we still have the event - mark as completed
@@ -334,10 +356,10 @@ export const submitQuote = action({
     // Step 10: Update QuoteSubmission with created entity IDs
     await ctx.runMutation(api.mutations.QuoteSubmission_complete, {
       docId: submissionId,
-      clientId: clientId ?? undefined,
-      leadId: leadId ?? undefined,
-      eventId: eventId ?? undefined,
-      proposalId: proposalId ?? undefined,
+      clientId: clientId ?? "",
+      leadId: leadId ?? "",
+      eventId: eventId ?? "",
+      proposalId: proposalId ?? "",
     });
 
     return {
@@ -362,7 +384,10 @@ export const getQuoteSubmissionStatus = action({
   args: {
     submissionId: v.id("quoteSubmissions"),
   },
-  handler: async (ctx, { submissionId }) => {
+  handler: async (
+    ctx,
+    { submissionId },
+  ): Promise<QuoteSubmissionStatusResult> => {
     const submission = await ctx.runQuery(api.queries.getQuoteSubmission, {
       id: submissionId,
     });

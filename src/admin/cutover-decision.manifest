@@ -24,6 +24,25 @@ entity CutoverDecision mixin TenantScoped {
   default policy cutoverDecisionRead read: user.id != null "Authenticated staff may read cutover decisions"
   default policy cutoverDecisionWrite write: user.id != null "Authenticated staff may write cutover decisions"
   default policy cutoverDecisionExecute execute: user.id != null "Authenticated staff may execute cutover decision commands"
+  // Creation command. CutoverDecision is tenant-scoped and historically created
+  // via a raw insert (convex/cutover.ts findOrCreateCutoverDecision); declaring a
+  // literal `create` makes it a governed capability and, per creation-entry rules,
+  // suppresses the spurious `_createViaExecute` codegen (execute allocates required
+  // fields and would otherwise be mis-selected as the initializer).
+  command create(
+    reason: string,
+    rollbackPlan: string,
+    optional businessApproved: boolean
+  ) {
+    guard roleAllows(user.role, "adminAccess")
+    constraint createReason: length(trim(reason)) > 0 "Reason is required to open a cutover decision"
+    mutate status = "not_started"
+    mutate decidedAt = now()
+    mutate decidedBy = user.id
+    mutate reason = reason
+    mutate rollbackPlan = rollbackPlan
+    mutate businessApproved = businessApproved != null ? businessApproved : false
+  }
   command recordApprovals(businessApproved: boolean, rollbackPlan: string) {
     guard roleAllows(user.role, "adminAccess")
     mutate businessApproved = businessApproved

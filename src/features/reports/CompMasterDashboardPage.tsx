@@ -74,13 +74,13 @@ export function CompMasterDashboardPage() {
         }
 
         const data = salesMap.get(attr.salespersonId)!;
-        data.attributedRevenue += attr.amount || 0;
-        data.commission += (attr.amount || 0) * COMMISSION_RATE;
+        data.attributedRevenue += attr.allocatedAmount || 0;
+        data.commission += (attr.allocatedAmount || 0) * COMMISSION_RATE;
 
-        if (attr.approved) {
-          data.paid += (attr.amount || 0) * COMMISSION_RATE;
+        if (attr.status === "approved") {
+          data.paid += (attr.allocatedAmount || 0) * COMMISSION_RATE;
         } else {
-          data.pending += (attr.amount || 0) * COMMISSION_RATE;
+          data.pending += (attr.allocatedAmount || 0) * COMMISSION_RATE;
         }
         data.eventCount += 1;
       });
@@ -181,7 +181,7 @@ export function CompMasterDashboardPage() {
 
     const currentMonthCommission = currentMonthAttributions.reduce(
       (sum, attr) => {
-        return sum + (attr.amount || 0) * 0.03;
+        return sum + (attr.allocatedAmount || 0) * 0.03;
       },
       0,
     );
@@ -328,9 +328,8 @@ export function CompMasterDashboardPage() {
             {
               label: "Basis",
               value: "Booked Revenue",
-              format: "string" as const,
             },
-            { label: "Rate Type", value: "Flat %", format: "string" as const },
+            { label: "Rate Type", value: "Flat %" },
           ]}
           tone="info"
         />

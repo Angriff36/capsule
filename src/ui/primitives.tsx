@@ -14,12 +14,27 @@ const STAGE_CHIP: Record<EventStage, string> = {
   closed_out: "border-line-2 bg-inset text-ink-3",
 };
 
-export function StatusChip({ status }: { status: string }) {
+export function StatusChip({
+  status,
+  label,
+  color,
+  children,
+}: {
+  status: string;
+  label?: string;
+  color?: string;
+  children?: ReactNode;
+}) {
   const known = (STAGE_LABEL as Record<string, string>)[status];
   const cls =
+    color ??
     (STAGE_CHIP as Record<string, string>)[status] ??
     "border-line-2 bg-inset text-ink-2";
-  return <span className={`chip ${cls}`}>{known ?? status}</span>;
+  return (
+    <span className={`chip ${cls}`}>
+      {children ?? label ?? known ?? status}
+    </span>
+  );
 }
 
 export function PageHeader({
@@ -117,11 +132,31 @@ export function Skeleton({ className = "" }: { className?: string }) {
   );
 }
 
-export function TableSkeleton({ rows = 6 }: { rows?: number }) {
+export function TableSkeleton({
+  rows = 6,
+  columns = 1,
+}: {
+  rows?: number;
+  columns?: number;
+}) {
   return (
     <div className="space-y-2 p-3" role="status" aria-label="Loading">
       {Array.from({ length: rows }, (_, i) => (
-        <Skeleton key={i} className="h-6" />
+        <div key={i} className="flex gap-2">
+          {Array.from({ length: columns }, (_, j) => (
+            <Skeleton key={j} className="h-6 flex-1" />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function FormSkeleton({ rows = 4 }: { rows?: number }) {
+  return (
+    <div className="space-y-3 p-3" role="status" aria-label="Loading">
+      {Array.from({ length: rows }, (_, i) => (
+        <Skeleton key={i} className="h-9" />
       ))}
     </div>
   );

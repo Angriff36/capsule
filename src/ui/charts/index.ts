@@ -21,4 +21,7 @@ export { TableDisplay } from "./TableDisplay";
 export type { TableDisplayProps, TableColumn } from "./TableDisplay";
 
 export { DashboardGrid } from "./DashboardGrid";
-export type { DashboardGridProps, DashboardGridSize } from "./DashboardGrid";
+export type {
+  DashboardGridProps as DashboardGridProps,
+  DashboardGridSize,
+} from "./DashboardGrid";

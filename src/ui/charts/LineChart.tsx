@@ -34,7 +34,7 @@ export interface LineChartProps {
   xAxisKey: string;
   series: LineChartSeries[];
   height?: number;
-  width?: number | string;
+  width?: number | `${number}%`;
   showGrid?: boolean;
   showLegend?: boolean;
   formatYAxis?: (value: number) => string;
@@ -46,7 +46,7 @@ export function LineChart({
   xAxisKey,
   series,
   height = 300,
-  width = "100%",
+  width = "100%" as const,
   showGrid = true,
   showLegend = true,
   formatYAxis = formatCount,

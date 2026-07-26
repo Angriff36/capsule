@@ -313,6 +313,23 @@ const EquipmentCatalogPage = lazy(() =>
     default: module.EquipmentCatalogPage,
   })),
 );
+const VenuesPage = lazy(() =>
+  import("../features/facilities/VenuesPage").then((module) => ({
+    default: module.VenuesPage,
+  })),
+);
+const VenueDetailPage = lazy(() =>
+  import("../features/facilities/VenueDetailPage").then((module) => ({
+    default: module.VenueDetailPage,
+  })),
+);
+const VenueVendorRelationshipsPage = lazy(() =>
+  import("../features/facilities/VenueVendorRelationshipsPage").then(
+    (module) => ({
+      default: module.VenueVendorRelationshipsPage,
+    }),
+  ),
+);
 const PermissionsPage = lazy(() =>
   import("../features/admin/PermissionsPage").then((module) => ({
     default: module.PermissionsPage,
@@ -980,9 +997,45 @@ export function App() {
             />
             <Route
               path="/facilities"
+              element={<Navigate to="/facilities/venues" replace />}
+            />
+            <Route
+              path="/facilities/equipment"
               element={
                 <SupplyRoute>
                   <EquipmentCatalogPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/facilities/venues"
+              element={
+                <SupplyRoute>
+                  <VenuesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/facilities/venues/:id"
+              element={
+                <SupplyRoute>
+                  <VenueDetailPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/facilities/vendor-relationships"
+              element={
+                <SupplyRoute>
+                  <VenueVendorRelationshipsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/facilities/venues/:venueId/vendor-relationships"
+              element={
+                <SupplyRoute>
+                  <VenueVendorRelationshipsPage />
                 </SupplyRoute>
               }
             />

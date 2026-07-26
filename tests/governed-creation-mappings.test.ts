@@ -111,6 +111,7 @@ describe("governed creation mappings", () => {
       "Vendor_createViaOnboard",
       "VenueCommissionTerm_createViaDefine",
       "VenueNote_createViaPost",
+      "VenueVendorRelationship_createViaEstablish",
       "Venue_createViaRegister",
       "WasteRecord_createViaRecord",
       "WeeklyPurchasingConfig_createViaConfigure",

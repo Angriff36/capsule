@@ -51,6 +51,10 @@ export function formatCount(n: number | null | undefined): string {
   return n == null ? "—" : numFmt.format(n);
 }
 
+export function formatPercent(n: number | null | undefined): string {
+  return n == null ? "—" : `${n.toFixed(1)}%`;
+}
+
 export function toDatetimeLocalValue(ms: number): string {
   const d = new Date(ms);
   const pad = (n: number) => String(n).padStart(2, "0");

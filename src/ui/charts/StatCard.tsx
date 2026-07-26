@@ -15,7 +15,7 @@ import { clsx } from "@/lib/utils";
  */
 
 export interface StatCardData {
-  label: string;
+  label?: string;
   value: string | number;
   format?: "number" | "currency" | "percent" | "date";
   trend?: {

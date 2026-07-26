@@ -30,6 +30,7 @@ import type * as lib_equipmentReservationAvailability from "../lib/equipmentRese
 import type * as lib_googleCalendar from "../lib/googleCalendar.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
 import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
+import type * as lib_proposalRevision from "../lib/proposalRevision.js";
 import type * as lib_qboSync from "../lib/qboSync.js";
 import type * as lib_twilio from "../lib/twilio.js";
 import type * as lib_vehicleDeliveryAvailability from "../lib/vehicleDeliveryAvailability.js";
@@ -37,6 +38,7 @@ import type * as mutations from "../mutations.js";
 import type * as personalDataExport from "../personalDataExport.js";
 import type * as qboSync from "../qboSync.js";
 import type * as queries from "../queries.js";
+import type * as quoteBuilder from "../quoteBuilder.js";
 import type * as recurringEvents from "../recurringEvents.js";
 import type * as sagas from "../sagas.js";
 import type * as search from "../search.js";
@@ -75,6 +77,7 @@ declare const fullApi: ApiFromModules<{
   "lib/googleCalendar": typeof lib_googleCalendar;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
   "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;
+  "lib/proposalRevision": typeof lib_proposalRevision;
   "lib/qboSync": typeof lib_qboSync;
   "lib/twilio": typeof lib_twilio;
   "lib/vehicleDeliveryAvailability": typeof lib_vehicleDeliveryAvailability;
@@ -82,6 +85,7 @@ declare const fullApi: ApiFromModules<{
   personalDataExport: typeof personalDataExport;
   qboSync: typeof qboSync;
   queries: typeof queries;
+  quoteBuilder: typeof quoteBuilder;
   recurringEvents: typeof recurringEvents;
   sagas: typeof sagas;
   search: typeof search;

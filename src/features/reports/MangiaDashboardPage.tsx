@@ -14,7 +14,7 @@ import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
 import { PageHeader } from "@/ui/primitives";
-import { formatMoney, formatCount } from "@/lib/format";
+import { formatCount } from "@/lib/format";
 
 /**
  * Mangia Dashboard Round 4 (Priority 41)
@@ -290,7 +290,11 @@ export function MangiaDashboardPage() {
       content: (
         <StatCard
           title="Guests Today"
-          main={{ value: todaySnapshot.totalGuests, format: "number" as const }}
+          main={{
+            label: "Today",
+            value: todaySnapshot.totalGuests,
+            format: "number" as const,
+          }}
           rows={[
             {
               label: "Executing",
@@ -314,7 +318,11 @@ export function MangiaDashboardPage() {
       content: (
         <StatCard
           title="Prep Progress"
-          main={{ value: prepStatus.pctComplete, format: "percent" as const }}
+          main={{
+            label: "Complete",
+            value: prepStatus.pctComplete,
+            format: "percent" as const,
+          }}
           rows={[
             {
               label: "Complete",
@@ -338,7 +346,11 @@ export function MangiaDashboardPage() {
       content: (
         <StatCard
           title="Pack Lists"
-          main={{ value: packStatus.pctReady, format: "percent" as const }}
+          main={{
+            label: "Ready",
+            value: packStatus.pctReady,
+            format: "percent" as const,
+          }}
           rows={[
             {
               label: "Total",
@@ -362,7 +374,11 @@ export function MangiaDashboardPage() {
       content: (
         <StatCard
           title="Staff On-Site"
-          main={{ value: staffStatus.totalStaff, format: "number" as const }}
+          main={{
+            label: "On-Site",
+            value: staffStatus.totalStaff,
+            format: "number" as const,
+          }}
           rows={[
             {
               label: "Events Active",
@@ -383,6 +399,7 @@ export function MangiaDashboardPage() {
         <StatCard
           title="Week-to-Date Revenue"
           main={{
+            label: "WTD Revenue",
             value: weekToDateMetrics.totalRevenue,
             format: "currency" as const,
           }}

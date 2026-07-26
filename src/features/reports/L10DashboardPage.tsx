@@ -170,8 +170,9 @@ export function L10DashboardPage() {
     );
 
     const monthCloseouts = (closeouts || []).filter((c) => {
-      if (!c.eventDate) return false;
-      const date = new Date(c.eventDate);
+      const ts = c.finalizedAt ?? c.capturedAt ?? c.createdAt;
+      if (!ts) return false;
+      const date = new Date(ts);
       return (
         date.getMonth() === currentMonth && date.getFullYear() === currentYear
       );
@@ -316,7 +317,6 @@ export function L10DashboardPage() {
               label: "Target: ≤30%",
               value:
                 scorecardMetrics.foodCostPct <= 30 ? "On Target" : "Off Target",
-              format: "string" as const,
             },
           ]}
           tone={scorecardMetrics.foodCostPct <= 30 ? "ok" : "warn"}

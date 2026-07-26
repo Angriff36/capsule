@@ -71,8 +71,9 @@ export function CompanyScorecardDashboardPage() {
   const currentMonthFoodCost = useMemo(() => {
     if (!closeouts) return 0;
     const monthCloseouts = closeouts.filter((c) => {
-      if (!c.eventDate) return false;
-      const date = new Date(c.eventDate);
+      const eventDate = c.finalizedAt ?? c.capturedAt ?? c.createdAt;
+      if (!eventDate) return false;
+      const date = new Date(eventDate);
       return (
         date.getMonth() === currentMonth && date.getFullYear() === currentYear
       );
@@ -91,8 +92,9 @@ export function CompanyScorecardDashboardPage() {
   const currentMonthCloseouts = useMemo(() => {
     if (!closeouts) return [];
     return closeouts.filter((c) => {
-      if (!c.eventDate) return false;
-      const date = new Date(c.eventDate);
+      const eventDate = c.finalizedAt ?? c.capturedAt ?? c.createdAt;
+      if (!eventDate) return false;
+      const date = new Date(eventDate);
       return (
         date.getMonth() === currentMonth && date.getFullYear() === currentYear
       );
@@ -271,8 +273,10 @@ export function CompanyScorecardDashboardPage() {
     });
 
     closeouts.forEach((closeout) => {
-      if (!closeout.eventDate) return;
-      const date = new Date(closeout.eventDate);
+      const eventDate =
+        closeout.finalizedAt ?? closeout.capturedAt ?? closeout.createdAt;
+      if (!eventDate) return;
+      const date = new Date(eventDate);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 
       if (!monthMap.has(monthKey)) return;

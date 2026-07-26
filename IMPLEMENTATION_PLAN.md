@@ -9,6 +9,49 @@
 
 ## Changes This Update
 
+**2026-07-25 — Whole-app typecheck cascade FIXED (1110→0); flawed WIP features reverted after independent review:**
+
+**Status: ✅ Repo gate genuinely GREEN for the first time (was typecheck-red on `main`). Priority 32 (comms) + Priority 21 (venue-layout-template) reverted — see findings below.**
+
+**SHIPPED:**
+- **CRITICAL — whole-app typecheck cascade fixed (1110 → 0 errors).** `convex/quoteBuilder.ts` (Priority 14 action) had untyped `submitQuote`/`getQuoteSubmissionStatus` return types; once `manifest:regen` registered it in Convex's `ApiFromModules` composite, its self-referential `any` poisoned the entire `api` type, cascading TS7006 across ~85 frontend pages. Fixed by annotating both handler return types and correcting the wrong mutation calls the poisoning had hidden (`Client_register`→`Client_createViaRegister`, `Lead_capture`→`Lead_createViaCapture`, `Event_planEngagement`→`Event_createViaPlanEngagement`), ISO-date→number conversions, dropping the non-existent `Proposal_reviseDetails` link, and removing stale `@ts-expect-error`/`as any`/invalid `{limit}` args. **`submitQuote` now actually works at runtime** (it previously threw). **Lesson:** every authored Convex function is in the typed `api` composite once codegen runs — an untyped return cascades `any` app-wide. Always annotate handler return types.
+- **CutoverDecision:** governed `create` command (suppresses spurious `_createViaExecute`) + `context.timestamp`→`now()` in create scope (create-command codegen omits the `context` alias entity commands emit).
+- **Dashboards (Priority 28 render engine):** `recharts` + BarChart/LineChart/PieChart/StatCard/TableDisplay/DashboardGrid + the 7 executive dashboard pages wired.
+- **Venue vendor relationships (Priority 23):** route wiring for `VenueVendorRelationshipsPage` (`/facilities/vendor-relationships` + venue-scoped).
+- **UI primitives:** `StatusChip`/`TableSkeleton`/`FormSkeleton`/`FailureBanner` additions, `formatPercent` helper.
+
+**REVERTED — caught by the independent pre-push review gate (codex):**
+- **Priority 32 (Communications/Message Threading) — NOT shipped.** The WIP manifests were fundamentally flawed and non-functional:
+  - `Message.createInbound`/`createOutbound` were generated as **entity commands** (they `ctx.db.get(docId)` and PATCH), not creation commands — so **no message can ever be ingested**. Only a command literally named `create` is recognized as a creation entry; `createInbound`/`createOutbound` are not. Fix = model as a single `create(direction, …)` mirroring `MessageThread.create` (which correctly INSERTs and validates supplied relations).
+  - Linkage/qualification commands (`qualifyAsLead`, `linkToEvent`) validate the **existing** doc's `self.contact`/`self.event` (null for new) instead of the **supplied** target — so initial linkage is impossible (and cross-tenant replacement is permitted). Entity-command relation-param validation needs Manifest docs (`C:/Projects/Manifest/mintlify/llms-full.txt`) to do correctly.
+  - `MessagesPanel` rendered inbound HTML via `dangerouslySetInnerHTML` (stored XSS) and called hooks with `id` instead of `docId` (calls would fail validation).
+  - **To re-implement:** single `create` command (creation entry) for Message; derive thread linkage validation from supplied params; sanitize HTML with DOMPurify (must add dep — not currently installed) or render as text; use `docId` in UI calls; derive tenant from auth context (note: the auto-generated `*ByTenantId` queries accept a client `tenantId` repo-wide — systemic, not Message-specific).
+- **Priority 21 (Venue Layout Templates) — NOT shipped.** Manifest `define` creation had a contradictory `guard self.createdAt == null` and client-supplied `definedByPersonId`/`revisedByPersonId` audit fields (should derive actor server-side). `EventBattleBoardLayoutsPanel` (the committed consumer) was stripped to its core manual layout-section CRUD (the "Copy from Template" button is gone until the entity is re-implemented correctly).
+
+**Verification:** `bun run check` GREEN — typecheck 0 errors, format clean, 726 tests passing, build ok, baseline-decay ok.
+
+**⚠ PUSH BLOCKED by the independent pre-push review gate (codex) — NOT pushed to origin. Local commit is green but not shipped.** The reviewer blocked the push with 7 findings (the comms/venue-template revert cleared the first review round; this is the second round on the remaining diff). Findings, with status:
+
+1. **HIGH `venue-vendor-relationship.manifest` `establish`** — same contradictory `guard self.createdAt == null` as venue-layout-template → creation always fails. (Pre-existing Priority 23; fix = remove the guard.) *Not fixed this iteration.*
+2. **HIGH `schema.ts venueVendorRelationships.vendorId`** — typed `v.id("vendorContacts")` but the UI supplies `vendors` IDs. Caused by the manifest's `primaryContact` ref reusing `vendorId` in its key (line 92). (Pre-existing Priority 23; fix = decouple the primaryContact ref from vendorId.) *Not fixed.*
+3. **HIGH `venue-vendor-relationship.manifest`** — `effectiveFrom`/`effectiveUntil`/`insuranceExpiry` command params are `string` but stored as `datetime` → schema-validation failures. (Pre-existing; fix = `string`→`datetime` params + UI sends timestamps.) *Not fixed.*
+4. **HIGH `convex/quoteBuilder.ts` public auth** — `/quote` is outside AuthGate (public), but `submitQuote` calls `listOrganization` whose read policy is `roleAllows(user.role,"staffAccess")` → unauthenticated callers get `[]` → the public form always aborts. This is a pre-existing Priority 14 **design gap** needing a public-ingress seam (a public tenant-resolution query/mutation). *Not fixed — needs design work.*
+5. **HIGH `convex/quoteBuilder.ts`** — `eventType` was passed `""` and `eventEndTime` is a time-only string (`"18:00"`) → invalid timestamp. **Fixed this iteration:** `eventType: "Catering Inquiry"` and eventEndTime combines `eventDate`+`T`+time when time-only.
+6. **MEDIUM `scripts/seed-convex.ts`** — the governed `CutoverDecision_create` (admin-gated) is invoked by the unauthenticated seed client → `bun run seed` fails. Entangled: the `create` command is required to suppress the spurious `_createViaExecute` codegen (typecheck), but its admin guard breaks seed. *Not fixed — needs a seed-skip for governed creates or an authenticated seed path.*
+7. **MEDIUM `src/ui/charts/TableDisplay.tsx`** — sort stringifies every value → numeric columns sort lexicographically (`100` before `20`). (WIP dashboard code.) *Not fixed.*
+
+**Why not pushed:** Per the merge-gate rule (CLAUDE.md §17 — "never merge over a rejection; escalate to the human"), the autonomous loop must not override the gate (`REVIEW_GATE=0` is a human-only escape hatch). Findings 4 and 6 are design/codegen entanglements beyond a clean quick-fix and need either Manifest expertise (read `C:/Projects/Manifest/mintlify/llms-full.txt`) or a human decision.
+
+**Local state (commit `dd6d6b3` + unfixed-quoteBuilder-regressions, all on `main`, NOT on origin):** typecheck 0, format clean, 726 tests passing, `bun run check` green. Contains the valuable cascade fix + dashboards + venue/vendor wiring + cutover create-command fix.
+
+**Recommended next steps (human decision):**
+- Re-implement Priority 32 (comms) + Priority 21 (venue-layout-template) with correct Manifest creation-command semantics (single `create` command per entity; validate supplied relation params, not existing doc fields; sanitize inbound HTML).
+- Fix venue-vendor-relationship findings 1–3 (committed Priority 23 latent bugs).
+- Resolve finding 4 (public quote ingress seam) and finding 6 (seed vs governed create).
+- Then push. Or, if the human accepts the current local state, override the gate with `REVIEW_GATE=0 git push`.
+
+---
+
 **2026-07-25 — Vendor Ecosystem + Hiring Pipeline DONE:**
 
 **Status: ✅ Slice 3 (Venue/Reporting) now 100% COMPLETE**

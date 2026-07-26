@@ -142,8 +142,8 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-[auto-bridge snapshot @ 10 changes]
-Files: src/features/facilities/VenueNotesPanel.tsx (create), src/operations/venue-note.manifest (edit), src/app.manifest (edit), src/operations/venue-note.manifest (create)
+[Emergency bridge — running bridge was not updated]
+No changes or facts in this session.
 
 # === END COGNILAYER ===
 

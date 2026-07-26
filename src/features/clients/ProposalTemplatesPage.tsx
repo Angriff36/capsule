@@ -194,7 +194,9 @@ export function ProposalTemplatesPage() {
 
   // Initialize selected sections when editing
   if (editingTemplate && editingTemplate.visibleSections) {
-    const editingSet = new Set(editingTemplate.visibleSections);
+    const editingSet = new Set<string>(
+      (editingTemplate.visibleSections as string[]) ?? [],
+    );
     if (
       Array.from(selectedSections).sort().join(",") !==
       Array.from(editingSet).sort().join(",")

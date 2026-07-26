@@ -17,7 +17,7 @@ export interface DashboardGridItem {
   subtitle?: string;
 }
 
-interface DashboardGridProps {
+export interface DashboardGridProps {
   items: DashboardGridItem[];
   className?: string;
 }

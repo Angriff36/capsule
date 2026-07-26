@@ -264,6 +264,7 @@ export function TimsKPIsDashboardPage() {
         <StatCard
           title="Total Revenue"
           main={{
+            label: "Revenue",
             value: revenueMetrics?.totalRevenue || 0,
             format: "currency" as const,
           }}
@@ -291,6 +292,7 @@ export function TimsKPIsDashboardPage() {
         <StatCard
           title="Food Cost %"
           main={{
+            label: "Actual",
             value: foodCostMetrics?.actualFoodCostPct || 0,
             format: "percent" as const,
           }}
@@ -322,6 +324,7 @@ export function TimsKPIsDashboardPage() {
         <StatCard
           title="Profit Rate"
           main={{
+            label: "Rate",
             value: foodCostMetrics?.profitRate || 0,
             format: "percent" as const,
           }}
@@ -351,6 +354,7 @@ export function TimsKPIsDashboardPage() {
         <StatCard
           title="Lead Conversion"
           main={{
+            label: "Rate",
             value: pipelineMetrics?.conversionRate || 0,
             format: "percent" as const,
           }}

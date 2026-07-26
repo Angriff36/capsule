@@ -36,7 +36,7 @@ const DEFAULT_COLORS = [
 export interface PieChartProps {
   data: Array<{ name: string; value: number }>;
   height?: number;
-  width?: number | string;
+  width?: number | `${number}%`;
   colors?: string[];
   innerRadius?: number;
   outerRadius?: number;
@@ -48,7 +48,7 @@ export interface PieChartProps {
 export function PieChart({
   data,
   height = 300,
-  width = "100%",
+  width = "100%" as const,
   colors = DEFAULT_COLORS,
   innerRadius = 0,
   outerRadius = 80,

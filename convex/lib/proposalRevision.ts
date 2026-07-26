@@ -1,9 +1,9 @@
 // Proposal Revision Capture - Authored seam for proposal revision snapshotting
 
-import { internalMutation } from "./_generated/api";
-import { internal } from "./_generated/api";
-import type { Doc, Id } from "./_generated/api";
-import type { v } from "convex/values";
+import { internalMutation } from "../_generated/server";
+import { internal } from "../_generated/api";
+import type { Doc, Id } from "../_generated/dataModel";
+import { v } from "convex/values";
 
 // Snapshot data structure for proposal revisions
 export interface ProposalRevisionSnapshot {
@@ -69,7 +69,7 @@ export async function buildProposalRevisionSnapshot(
 
   // Resolve dish names and menu names for each selection
   const dishSelectionsData = await Promise.all(
-    dishSelections.map(async (selection) => {
+    dishSelections.map(async (selection: any) => {
       const dish = await ctx.db.get(selection.dishId);
       const menu = await ctx.db.get(selection.menuId);
       return {
@@ -160,8 +160,9 @@ export const captureProposalRevision = internalMutation({
     // Build the snapshot
     const snapshot = await buildProposalRevisionSnapshot(ctx, proposal);
 
-    // Get capturedBy name from auth context
-    const capturedByName = ctx.auth?.user?.name ?? "Unknown";
+    // Get capturedBy identity from auth context
+    const identity = await ctx.auth.getUserIdentity();
+    const capturedByName = identity?.name ?? "Unknown";
 
     // Create the revision record
     const revisionId = await ctx.db.insert("proposalRevisions", {
@@ -170,7 +171,7 @@ export const captureProposalRevision = internalMutation({
       revisionNumber: nextRevisionNumber,
       changeSummary: changeSummary || "Proposal sent to client",
       capturedByName: capturedByName,
-      capturedByAuthSubjectId: ctx.auth?.user?.subjectId ?? null,
+      capturedByAuthSubjectId: identity?.subject ?? null,
       capturedAt: Date.now(),
       snapshot: snapshot,
       createdAt: Date.now(),

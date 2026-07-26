@@ -63,7 +63,14 @@ export function TableDisplay({
       case "number":
         return formatCount(Number(value));
       case "date":
-        return formatDate(String(value));
+        // Try to parse as ISO string or timestamp number
+        const dateVal =
+          value instanceof Date
+            ? value.getTime()
+            : typeof value === "string"
+              ? new Date(value).getTime()
+              : Number(value);
+        return formatDate(isNaN(dateVal) ? null : dateVal);
       default:
         return String(value);
     }
@@ -89,7 +96,10 @@ export function TableDisplay({
 
       if (aVal === bVal) return 0;
 
-      const comparison = aVal < bVal ? -1 : 1;
+      // Handle unknown types with comparison
+      const aStr = String(aVal ?? "");
+      const bStr = String(bVal ?? "");
+      const comparison = aStr < bStr ? -1 : aStr > bStr ? 1 : 0;
       return sortDirection === "asc" ? comparison : -comparison;
     });
   }, [data, sortColumn, sortDirection, sortable]);

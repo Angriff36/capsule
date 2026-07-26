@@ -34,7 +34,7 @@ export interface BarChartProps {
   xAxisKey: string;
   series: BarChartSeries[];
   height?: number;
-  width?: number | string;
+  width?: number | `${number}%`;
   orientation?: "vertical" | "horizontal";
   stacked?: boolean;
   showGrid?: boolean;
@@ -48,7 +48,7 @@ export function BarChart({
   xAxisKey,
   series,
   height = 300,
-  width = "100%",
+  width = "100%" as const,
   orientation = "vertical",
   stacked = false,
   showGrid = true,

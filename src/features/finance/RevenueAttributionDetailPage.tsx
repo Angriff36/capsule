@@ -17,7 +17,7 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 const usd = (value: number) =>
   value.toLocaleString(undefined, { style: "currency", currency: "USD" });
 
-const formatDate = (date: string | null | undefined) => {
+const formatDate = (date: string | number | null | undefined) => {
   if (!date) return "—";
   return new Date(date).toLocaleDateString();
 };
@@ -55,7 +55,7 @@ export function RevenueAttributionDetailPage() {
   const referralSources = useListReferralSource();
   const clients = useListClient();
   const event = useGetEvent(
-    (attribution?.eventId ?? isNew) ? "skip" : attribution.eventId,
+    (attribution?.eventId ?? isNew) ? "skip" : (attribution?.eventId ?? "skip"),
   );
 
   const create = useRevenueAttributionCreate();
