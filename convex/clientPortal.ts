@@ -65,7 +65,6 @@ export const getEvent = query({
       invoices,
       timelineActivities,
       eventAssignments,
-      proposalLineItems,
     ] = await Promise.all([
       ctx.db
         .query("eventDishes")
@@ -95,14 +94,6 @@ export const getEvent = query({
       ctx.db
         .query("eventAssignments")
         .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
-        .collect(),
-      // Spec §4.2: the client-facing proposal shows the SAME priced line-item
-      // breakdown as internal proposals (one catalog/pricing source). Tenant-
-      // scoped like the org/client loads above; only lines for this event's
-      // accepted proposals are attached below, so nothing foreign is exposed.
-      ctx.db
-        .query("proposalLineItems")
-        .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
         .collect(),
     ]);
 
@@ -201,7 +192,7 @@ export const getEvent = query({
         signedBy: contract.signedBy ?? null,
         notes: contract.notes ?? null,
       }));
-    const visibleProposals = proposals
+    const acceptedProposals = proposals
       .filter(
         (proposal) =>
           proposal.tenantId === event.tenantId &&
@@ -213,42 +204,60 @@ export const getEvent = query({
         (left, right) =>
           Number(right.acceptedAt ?? right.createdAt ?? 0) -
           Number(left.acceptedAt ?? left.createdAt ?? 0),
-      )
-      .map((proposal) => ({
-        _id: String(proposal._id),
-        proposalNumber: proposal.proposalNumber ?? null,
-        title: proposal.title,
-        eventDate: proposal.eventDate ?? null,
-        eventType: proposal.eventType ?? null,
-        guestCount: proposal.guestCount,
-        venueName: proposal.venueName ?? null,
-        venueAddress: proposal.venueAddress ?? null,
-        subtotal: proposal.subtotal,
-        taxAmount: proposal.taxAmount,
-        discountAmount: proposal.discountAmount,
-        total: proposal.total,
-        expiresAt: proposal.expiresAt ?? null,
-        notes: proposal.notes ?? null,
-        terms: proposal.terms ?? null,
-        // Spec §4.2 / §5.4: priced breakdown for the client-facing PDF. Only
-        // the client-safe inputs are projected — amount is derived in the PDF
-        // via the central calc (src/lib/pricing.ts), and internal cost/margin
-        // + the override-audit fields (menuDishId/overrideReason) stay private.
-        pricingLines: proposalLineItems
-          .filter(
-            (line) =>
-              line.proposalId === proposal._id && line.deletedAt == null,
+      );
+    // Spec §4.2 / §5.4: priced breakdown for the client-facing PDF. Lines are
+    // fetched per accepted proposal via by_proposalId (bounded — never a
+    // tenant-wide scan that could blow past Convex read limits), and the stored
+    // amount is carried so the client sees the frozen accepted terms (accepted
+    // proposals are immutable: line commands guard status == "draft"). Only
+    // client-safe fields are projected; internal cost/margin and the
+    // override-audit fields (menuDishId/overrideReason) stay private.
+    const pricingLinesByProposal = new Map(
+      await Promise.all(
+        acceptedProposals.map(async (proposal) => {
+          const lines = (
+            await ctx.db
+              .query("proposalLineItems")
+              .withIndex("by_proposalId", (q) =>
+                q.eq("proposalId", proposal._id),
+              )
+              .collect()
           )
-          .sort((left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0))
-          .map((line) => ({
-            description: line.description,
-            pricingBasis: line.pricingBasis,
-            unitPrice: line.unitPrice,
-            quantity: line.quantity,
-            unit: line.unit ?? null,
-          })),
-        acceptedAt: proposal.acceptedAt ?? null,
-      }));
+            .filter((line) => line.deletedAt == null)
+            .sort(
+              (left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0),
+            )
+            .map((line) => ({
+              description: line.description,
+              pricingBasis: line.pricingBasis,
+              unitPrice: line.unitPrice,
+              quantity: line.quantity,
+              unit: line.unit ?? null,
+              amount: line.amount,
+            }));
+          return [String(proposal._id), lines] as const;
+        }),
+      ),
+    );
+    const visibleProposals = acceptedProposals.map((proposal) => ({
+      _id: String(proposal._id),
+      proposalNumber: proposal.proposalNumber ?? null,
+      title: proposal.title,
+      eventDate: proposal.eventDate ?? null,
+      eventType: proposal.eventType ?? null,
+      guestCount: proposal.guestCount,
+      venueName: proposal.venueName ?? null,
+      venueAddress: proposal.venueAddress ?? null,
+      subtotal: proposal.subtotal,
+      taxAmount: proposal.taxAmount,
+      discountAmount: proposal.discountAmount,
+      total: proposal.total,
+      expiresAt: proposal.expiresAt ?? null,
+      notes: proposal.notes ?? null,
+      terms: proposal.terms ?? null,
+      pricingLines: pricingLinesByProposal.get(String(proposal._id)) ?? [],
+      acceptedAt: proposal.acceptedAt ?? null,
+    }));
     const visibleInvoices = invoices
       .filter(
         (invoice) =>

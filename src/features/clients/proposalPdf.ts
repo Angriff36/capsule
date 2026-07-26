@@ -69,6 +69,11 @@ export interface PricingLinePdf {
   unitPrice: number;
   quantity?: number | null;
   unit?: string | null;
+  // Stored authoritative amount (§5.4 recompute). When present the PDF renders
+  // it directly so an accepted proposal's breakdown stays frozen/reproducible
+  // (spec §5.5) rather than being re-derived by the current calc; absent → the
+  // central calc derives it (unchanged operator/draft behavior).
+  amount?: number | null;
 }
 
 export interface ProposalPdfInput {
@@ -493,7 +498,12 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
     });
     sectionLabel("Pricing breakdown");
     pricingLines.forEach((line, index) => {
-      const amount = priced.lines[index]?.amount ?? 0;
+      // Prefer the stored authoritative amount when carried (accepted-proposal
+      // client view) so the breakdown stays frozen; otherwise derive it.
+      const amount =
+        line.amount != null
+          ? Number(line.amount)
+          : (priced.lines[index]?.amount ?? 0);
       const basisLabel =
         PRICING_BASIS_LABELS[line.pricingBasis] ?? line.pricingBasis;
       const unit = Number(line.unitPrice) || 0;
