@@ -103,9 +103,12 @@ entity MessageThread mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Qualify the thread into the pipeline by linking a Lead. Idempotent: the
-  // ingest action checks thread.leadId before creating a Lead, so a replayed
-  // delivery creates no duplicate lead (§4.4 "Done when").
+  // Link this thread to an EXISTING Lead (operator-driven; idempotent set of
+  // leadId — version-free, so concurrent links of the same lead are harmless).
+  // To CREATE a lead from a thread in one step, use the qualifyThreadAsLead
+  // action (convex/messageInbox.ts): it captures a Lead from the thread context
+  // and links it, idempotent by thread so a repeat click creates no duplicate
+  // lead (§4.4 "Done when").
   command linkLead(leadId: uuid) {
     guard self.deletedAt == null
     guard user.id != null

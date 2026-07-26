@@ -11,6 +11,28 @@
 
 ---
 
+**2026-07-26 — Priority 32 (Message Threading) auto-Lead-qualification DONE — closed the last spec-affirmative gap in §4.4:**
+
+**Status: ✅ Shipped + `bun run check` GREEN. §4.4 line 224 ("create an Inquiry/Lead when the thread first becomes sales-qualified") + Done-when line 228 ("no duplicate ... lead on replay") are now met.**
+
+**Finding (verified first-hand against spec + generated code this turn):** the Priority 32 foundation (MessageThread/Message entities + idempotent `ingestInboundMessage` + MessageInboxPage) met the no-duplicate-MESSAGE half of §4.4 Done-when #1 and the source-network/linked-deal display half, but NOT the Lead-creation half: the inbox only had a "Link lead" DROPDOWN of *existing* leads, so qualifying a thread meant leaving the inbox → creating a Lead elsewhere → returning → picking it — pure tedium. The `message-thread.manifest` `linkLead` comment even claimed "the ingest action checks thread.leadId before creating a Lead" — that was FALSE (stale/over-promising; ingest creates no lead). (HTML→plaintext, also listed under Priority 32 "Remaining," is NOT a spec requirement — it appears nowhere in the spec; the current "caller reduces HTML" posture is correct and intentionally left as-is.)
+
+**Verification pass that ruled out the repo's flagship failure mode BEFORE building:** confirmed the Priority 32 ingest is not silently broken — read the generated `MessageThread_create` (returns `{_id, ...doc}`, mutations.ts:18373) and `Message_createViaPost` (returns `{docId}`, 18293) and that `ingestInboundMessage` reads `created._id` / `posted.docId` correctly on BOTH fresh and idempotency-cached paths. Both correct. (The repo's recurring "GREEN-but-broken" bug is reading the wrong field off an `any`-typed create result; not present here.) `Lead_createViaCapture` likewise returns `{docId}` (17077).
+
+**Fix (smallest spec-faithful diff; no manifest regen, no external creds needed):**
+- `convex/messageInbox.ts` — new authored action `qualifyThreadAsLead(threadId)` (same file/pattern as the proven `ingestInboundMessage`; action→runMutation propagates the authenticated staff caller's auth, so the salesAccess-gated `Lead_createViaCapture` runs as the operator). Reads the thread via `getMessageThread({id})`; if `leadId` already set, returns it (idempotent). Else captures a person Lead seeded from `senderIdentity`/`subject` with `source` from the provider channel, then `MessageThread_linkLead` (version-free → idempotent set). Idempotent by construction: `Lead_createViaCapture` gets `idempotencyKey: "qualify:<threadId>"` so a double-click or two concurrent qualifies resolve to ONE lead; linkLead re-setting the same id is harmless.
+- **Operator-driven, NOT automatic** — a sales staff click IS the "becomes sales-qualified" signal. Deliberately did NOT auto-create a lead from every inbound message (would seed the pipeline with support mail/spam). The operator choosing to qualify is the most defensible reading of the spec's undefined "becomes sales-qualified" trigger, and avoids inventing an aggressive automation (per `domain-gating-restraint.md`). The underlying `Lead.capture` enforces salesAccess, so qualification is a sales action even though threads are staff-readable — the generated guard is authoritative; no widening or narrowing.
+- `src/features/sales/MessageInboxPage.tsx` — "Qualify as Lead" primary button next to the existing link-lead dropdown, shown only when the thread has no lead yet. Replaces the leave-inbox→create→return→pick flow with one click. Non-sales staff get the generated salesAccess error at runtime.
+- `src/sales/message-thread.manifest` — corrected the stale `linkLead` comment (it falsely claimed ingest creates leads) to point at `qualifyThreadAsLead` and state idempotency honestly. Comment-only → generated output byte-identical → no regen needed (ownership ledger stayed green).
+
+**Why it matters:** Priority 32 (the highest-value open priority) had its one missing spec-affirmative requirement unmet, and the path to meet it was needlessly tedious. One click now qualifies a thread into the pipeline, idempotently.
+
+**Verification:** `bun run check` GREEN — toolchain, ownership, all 9 manifest-slice contracts, typecheck 0, format clean, secrets, test:coverage, build ok (✓ built), baseline-decay ok. No tests added (authored action + UI; AGENTS.md: do not add tests unless the owner asks). Diffstat: 3 files (`convex/messageInbox.ts` +76, `MessageInboxPage.tsx` button+handler, `message-thread.manifest` comment).
+
+**Honest scope note:** the created Lead is a minimal person lead (name from sender/subject, source from channel, $0 estimated value) — the operator refines details on the lead record afterward. The link-lead dropdown still lets an operator choose an EXISTING lead or switch leads later; the two compose. Per-provider OAuth/sync (the rest of Slice 5: Email/Nowsta/Social) still needs external provider credentials — separate work, untouched here.
+
+---
+
 **2026-07-26 — Priority 16 (Equipment Location Fields) DONE:**
 
 **Status: ✅ Shipped + `bun run check` GREEN (exit 0). Single-file UI change; no manifest/regen/schema/test/route changes — so no new generated `*ByTenantId` query and no #111 review exposure.**
@@ -81,7 +103,7 @@
 
 **Verification:** `bun run check` GREEN — typecheck 0 errors, format clean, 65 test files passing, build ok, baseline-decay ok. (Convex backend not re-pushed — dev-only; deploy is human-authorized.)
 
-**Remaining (separate Integration Connection work; spec is provider-neutral — "the selected provider"):** per-provider OAuth + self-scheduling sync actions mirroring QuickBooks/Calendar (call `ingestInboundMessage` from the sync action); reduce inbound provider HTML to plain text at the provider ingress; auto-create a Lead when a thread first becomes sales-qualified (today the operator links a Lead via the inbox); inbound webhook HTTP route (http.ts is generated and has 0 routes today — use the sync-action path, not a hand-added route).
+**Remaining (separate Integration Connection work; spec is provider-neutral — "the selected provider"):** per-provider OAuth + self-scheduling sync actions mirroring QuickBooks/Calendar (call `ingestInboundMessage` from the sync action); reduce inbound provider HTML to plain text at the provider ingress (NOT a spec requirement — appears nowhere in the spec; current "caller reduces HTML" posture is correct); ~~auto-create a Lead when a thread first becomes sales-qualified~~ ✅ DONE 2026-07-26 via the new `qualifyThreadAsLead` action + inbox "Qualify as Lead" button (see top entry); inbound webhook HTTP route (http.ts is generated and has 0 routes today — use the sync-action path, not a hand-added route).
 
 ---
 

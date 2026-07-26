@@ -139,3 +139,79 @@ export const ingestInboundMessage = action({
     };
   },
 });
+
+// Default Lead.source when a thread is qualified, derived from the channel the
+// inquiry came in on (spec §4.4 "Done when": the reply/history view shows the
+// source network).
+const LEAD_SOURCE_BY_PROVIDER: Record<string, string> = {
+  internal: "Internal Inbox",
+  email: "Email",
+  sms: "SMS",
+  social: "Social",
+  other: "Inbox",
+};
+
+// Qualify a message thread into the sales pipeline by creating a Lead from the
+// thread's context and linking it. Spec §4.4: "create an Inquiry/Lead when the
+// thread first becomes sales-qualified"; Done-when: "Replaying the same
+// provider delivery creates no duplicate ... lead."
+//
+// Operator-driven, NOT automatic: a sales staff member clicking this IS the
+// "becomes sales-qualified" signal. We deliberately do not auto-create a lead
+// from every inbound message — that would seed the pipeline with support mail
+// and spam. The underlying Lead create enforces salesAccess, so qualification
+// is a sales action even though threads themselves are staff-readable.
+//
+// Idempotent by construction:
+//  - thread already has a leadId → return it (no create, no relink);
+//  - the Lead create carries idempotencyKey `qualify:<threadId>`, so a double
+//    click or two concurrent qualifies resolve to ONE lead;
+//  - linkLead is called without a version (idempotent set of leadId), so the
+//    second of two concurrent qualifies harmlessly re-sets the same id.
+export const qualifyThreadAsLead = action({
+  args: {
+    threadId: v.id("messageThreads"),
+  },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{ leadId: Id<"leads">; created: boolean }> => {
+    const thread = await ctx.runQuery(api.queries.getMessageThread, {
+      id: args.threadId,
+    });
+    if (!thread) {
+      throw new ConvexError("Message thread not found");
+    }
+    if (thread.leadId) {
+      return { leadId: thread.leadId as Id<"leads">, created: false };
+    }
+
+    // Seed lead identity from what the inbox already shows — the sender for a
+    // person inquiry, falling back to the subject, then a generic label. The
+    // operator refines the details on the lead record afterwards.
+    const sender = (thread.senderIdentity ?? "").trim();
+    const subject = (thread.subject ?? "").trim();
+    const givenName = sender || subject || "Inquiry";
+    const source =
+      LEAD_SOURCE_BY_PROVIDER[thread.provider as string] ?? "Inbox";
+
+    const created = await ctx.runMutation(api.mutations.Lead_createViaCapture, {
+      leadType: "person",
+      source,
+      estimatedValue: 0,
+      givenName,
+      notes: subject
+        ? `From ${source} thread "${subject}"`
+        : `From ${source} thread`,
+      idempotencyKey: `qualify:${args.threadId}`,
+    });
+    const leadId = created.docId as Id<"leads">;
+
+    await ctx.runMutation(api.mutations.MessageThread_linkLead, {
+      docId: args.threadId,
+      leadId,
+    });
+
+    return { leadId, created: true };
+  },
+});
