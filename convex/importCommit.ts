@@ -9,13 +9,15 @@
  * false-success), and §5.3's "imported TPP Event uses the same create-proposal
  * command" had no imported events to act on.
  *
- * This seam makes commit/revert REAL for the **venues**, **contacts**, and
- * **events** datasets: caller-supplied TPP rows are parsed, materialized into
- * entities via the generated `Venue_createViaRegister` (handles encryption +
- * eventManageAccess guard), `Client_createViaRegister` (person-type client
- * account; salesAccess guard), or `Event_createViaPlanEngagement` (the create
- * verb; eventManageAccess/salesAccess guard), and linked idempotently through
- * ExternalRecordLink. Re-run is safe (per-record idempotencyKey + link dedup).
+ * This seam makes commit/revert REAL for the **venues**, **contacts**,
+ * **events**, and **leads** datasets: caller-supplied TPP rows are parsed,
+ * materialized into entities via the generated `Venue_createViaRegister`
+ * (handles encryption + eventManageAccess guard), `Client_createViaRegister`
+ * (person-type client account; salesAccess guard),
+ * `Event_createViaPlanEngagement` (the create verb; eventManageAccess/
+ * salesAccess guard), or `Lead_createViaCapture` (the create verb; salesAccess
+ * guard), and linked idempotently through ExternalRecordLink. Re-run is safe
+ * (per-record idempotencyKey + link dedup).
  * Revert supersedes the run's links (dataset-agnostic).
  *
  * Events resolve cross-dataset: a TPP Event's external `ClientID`/`VenueID` are
@@ -27,9 +29,17 @@
  * EventStatus is preserved on the link's rawSourceData for parallel-run
  * reconciliation (§6.1).
  *
- * ponytail: ceiling — venues + contacts + events ship here. Leads/menus/
+ * Leads need NO cross-dataset resolution: a Lead is the PRE-client inquiry
+ * (`clientId` is optional, set only on conversion), so a TPP opportunity/
+ * pipeline row becomes a company-type Lead (`OpportunityName` → companyName)
+ * without resolving its external `ClientID`. The TPP stage is NOT applied
+ * (`capture` hardcodes stage "new"); the raw TPP ClientID + stage are preserved
+ * on the link's rawSourceData for parallel-run reconciliation (§6.1).
+ *
+ * ponytail: ceiling — venues + contacts + events + leads ship here. Menus/
  * payments still throw an honest "not yet supported" (menus have no parser;
- * leads/payments reference further cross-dataset ids).
+ * payments reference external invoice/event ids needing cross-dataset
+ * resolution).
  * Revert supersedes links but leaves imported Venue entities in place (an event
  * may already reference one; deactivation is an operator action) — documented
  * honesty, not silent deletion. Source rows are caller-supplied (TPP has no bulk
@@ -42,10 +52,13 @@ import { getAuthContext } from "./lib/authContext";
 import {
   parseTppContacts,
   parseTppEvents,
+  parseTppLeads,
   parseTppVenues,
   type ParsedCapsuleEvent,
+  type ParsedCapsuleLead,
   type TppContactRecord,
   type TppEventRecord,
+  type TppLeadRecord,
   type TppVenueRecord,
 } from "./tppParser";
 import type { Doc, Id } from "./_generated/dataModel";
@@ -572,10 +585,121 @@ export const commitImportRun = action({
       };
     }
 
+    if (importRun.datasetType === "leads") {
+      if (args.rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const parsed = parseTppLeads(args.rawRows as TppLeadRecord[]);
+      if (parsed.records.length === 0) {
+        throw new ConvexError(
+          `No valid lead records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
+        );
+      }
+      const sourceSystem = importRun.sourceSystem;
+      let committed = 0;
+      let skipped = 0;
+      let pending = 0;
+
+      for (const lead of parsed.records as ParsedCapsuleLead[]) {
+        const existing = await ctx.runQuery(internal.importCommit.findLink, {
+          tenantId,
+          sourceSystem,
+          recordType: "lead",
+          externalId: lead.externalId,
+        });
+        if (existing && existing.capsuleId) {
+          // Already materialized in a prior run — idempotent skip.
+          skipped += 1;
+          continue;
+        }
+
+        // ponytail: a TPP opportunity/pipeline row → a company-type Lead. The
+        // Lead is the PRE-client inquiry (clientId is optional, set only on
+        // conversion), so — unlike events — NO cross-dataset client resolution
+        // is needed. The external TPP ClientID + the mapped stage are preserved
+        // on the link's rawSourceData (the stage is NOT applied: `capture`
+        // hardcodes stage "new" with no stage arg). Linking the lead to a
+        // Capsule Client is the conversion workflow (stageConversion →
+        // confirmConversion), a separate operator action.
+        const idempotencyKey = `import:${args.importRunId}:lead:${lead.externalId}`;
+        const notes =
+          [
+            lead.stage !== "new" ? `TPP stage: ${lead.stage}` : null,
+            lead.clientId ? `TPP client ${lead.clientId}` : null,
+          ]
+            .filter(Boolean)
+            .join(" — ") || undefined;
+        try {
+          const created = await ctx.runMutation(
+            api.mutations.Lead_createViaCapture,
+            {
+              leadType: "company",
+              source: lead.source,
+              estimatedValue: lead.estimatedValue,
+              companyName: lead.opportunityName,
+              probability: lead.probability,
+              notes,
+              idempotencyKey,
+            },
+          );
+          const leadId: string = (created as { docId: string }).docId;
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "lead",
+            externalId: lead.externalId,
+            capsuleEntity: "lead",
+            capsuleId: leadId,
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(lead),
+            conflictStatus: "resolved",
+          });
+          committed += 1;
+        } catch (cause) {
+          // Per-record failure (e.g. salesAccess denied) → review queue.
+          const note =
+            cause instanceof Error
+              ? cause.message
+              : "Lead materialization failed";
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "lead",
+            externalId: lead.externalId,
+            capsuleEntity: "lead",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(lead),
+            conflictStatus: "pending_conflict",
+            resolutionNote: note,
+          });
+          pending += 1;
+        }
+      }
+
+      if (committed === 0 && pending > 0) {
+        throw new ConvexError(
+          `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+        );
+      }
+
+      await ctx.runMutation(api.mutations.ImportRun_commit, {
+        docId: args.importRunId,
+        version: importRun.version,
+      });
+
+      return {
+        committed,
+        skipped,
+        pending,
+        parseErrors: parsed.errors.length,
+      };
+    }
+
     if (importRun.datasetType !== "venues") {
-      // ponytail: ceiling — venues + contacts + events supported; see header.
+      // ponytail: ceiling — venues + contacts + events + leads supported.
       throw new ConvexError(
-        `Dataset '${importRun.datasetType}' import is not yet supported (venues/contacts/events only). Leads/menus/payments need cross-dataset ID resolution.`,
+        `Dataset '${importRun.datasetType}' import is not yet supported (venues/contacts/events/leads only). Menus/payments need parsers + cross-dataset ID resolution.`,
       );
     }
     if (args.rawRows.length === 0) {

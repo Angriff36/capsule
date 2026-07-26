@@ -204,6 +204,23 @@ export interface ParsedCapsulePayment {
   notes?: string;
 }
 
+export interface ParsedCapsuleLead {
+  externalId: string;
+  opportunityName: string;
+  source: string;
+  estimatedValue: number;
+  // capture hardcodes stage "new" (no stage arg); the mapped TPP stage is
+  // preserved on the link's rawSourceData for parallel-run reconciliation.
+  stage: string;
+  probability?: number;
+  // external TPP ClientID — preserved on the link, NOT resolved at create
+  // (a Lead is the pre-client inquiry; conversion is a separate operator step).
+  clientId?: string;
+  referralSource?: string;
+  eventDate?: number;
+  closeDate?: number;
+}
+
 /**
  * Parser result with metadata
  */
@@ -433,6 +450,24 @@ export function parseTppPayment(
     amount: parseTppMoney(record.PaymentAmount) || 0,
     method: mapTppPaymentMethod(record.PaymentMethod),
     notes: [record.Reference, record.Notes].filter(Boolean).join(" | "),
+  };
+}
+
+/**
+ * Parse TPP Lead record to Capsule format
+ */
+export function parseTppLead(record: TppLeadRecord): ParsedCapsuleLead {
+  return {
+    externalId: record.LeadID,
+    opportunityName: record.OpportunityName,
+    source: record.Source || "TPP Import",
+    estimatedValue: parseTppMoney(record.EstimatedValue) ?? 0,
+    stage: mapTppLeadStage(record.Stage),
+    probability: record.Probability,
+    clientId: record.ClientID,
+    referralSource: record.ReferralSource,
+    eventDate: parseTppDateTime(record.EventDate),
+    closeDate: parseTppDateTime(record.CloseDate),
   };
 }
 
@@ -677,6 +712,65 @@ export function parseTppPayments(
           recordIndex: index,
           field: "PaymentMethod",
           message: "PaymentMethod is required",
+        });
+        return;
+      }
+
+      result.push(parsed);
+    } catch (error) {
+      errors.push({
+        recordIndex: index,
+        field: "unknown",
+        message:
+          error instanceof Error ? error.message : "Unknown parsing error",
+      });
+    }
+  });
+
+  return {
+    success: errors.length === 0,
+    records: result,
+    errors,
+    warnings,
+    totalCount: records.length,
+    successCount: result.length,
+    failureCount: errors.length,
+  };
+}
+
+/**
+ * Batch parse TPP leads
+ */
+export function parseTppLeads(
+  records: TppLeadRecord[],
+): ParserResult<ParsedCapsuleLead> {
+  const result: ParsedCapsuleLead[] = [];
+  const errors: Array<{ recordIndex: number; field: string; message: string }> =
+    [];
+  const warnings: Array<{
+    recordIndex: number;
+    field: string;
+    message: string;
+  }> = [];
+
+  records.forEach((record, index) => {
+    try {
+      const parsed = parseTppLead(record);
+
+      // Validate required fields
+      if (!parsed.externalId) {
+        errors.push({
+          recordIndex: index,
+          field: "LeadID",
+          message: "LeadID is required",
+        });
+        return;
+      }
+      if (!parsed.opportunityName || !parsed.opportunityName.trim()) {
+        errors.push({
+          recordIndex: index,
+          field: "OpportunityName",
+          message: "OpportunityName is required",
         });
         return;
       }

@@ -79,7 +79,7 @@ export function ImportRunDetailPage() {
   const markFailed = useImportRunMarkFailed();
   // Commit/revert go through the authored importCommit seam, which actually
   // materializes entities + links (the generated ImportRun_commit only flips
-  // status). Venues + contacts + events supported; see convex/importCommit.ts.
+  // status). Venues + contacts + events + leads supported; see convex/importCommit.ts.
   const commitImportRun = useAction(api.importCommit.commitImportRun);
   const revertImportRun = useAction(api.importCommit.revertImportRun);
 
@@ -88,8 +88,8 @@ export function ImportRunDetailPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const [showRecordCountsForm, setShowRecordCountsForm] = useState(false);
   const [recordCountsInput, setRecordCountsInput] = useState("{}");
-  // Source-row commit form state — shared by the venues + contacts datasets
-  // (both paste a JSON array of TPP rows into the authored commitImportRun).
+  // Source-row commit form state — shared by the venues/contacts/events/leads
+  // datasets (each pastes a JSON array of TPP rows into the authored commitImportRun).
   const [showSourceForm, setShowSourceForm] = useState(false);
   const [sourceRowsInput, setSourceRowsInput] = useState("[]");
 
@@ -121,13 +121,16 @@ export function ImportRunDetailPage() {
   const supportedCommitDatasets =
     importRun.datasetType === "venues" ||
     importRun.datasetType === "contacts" ||
-    importRun.datasetType === "events";
+    importRun.datasetType === "events" ||
+    importRun.datasetType === "leads";
   const commitNoun =
     importRun.datasetType === "contacts"
       ? "contact"
       : importRun.datasetType === "events"
         ? "event"
-        : "venue";
+        : importRun.datasetType === "leads"
+          ? "lead"
+          : "venue";
   const commitNounLabel =
     commitNoun.charAt(0).toUpperCase() + commitNoun.slice(1);
 
@@ -208,7 +211,7 @@ export function ImportRunDetailPage() {
   const handleCommit = () => {
     if (!supportedCommitDatasets) {
       setError(
-        "Commit supports the 'venues', 'contacts', and 'events' datasets. Other datasets need cross-dataset ID resolution (separate slice).",
+        "Commit supports the 'venues', 'contacts', 'events', and 'leads' datasets. Other datasets (menus/payments) need parsers + cross-dataset ID resolution (separate slice).",
       );
       return;
     }
@@ -496,7 +499,9 @@ export function ImportRunDetailPage() {
                   ? '[{"ContactID":"C1","FirstName":"Maria","LastName":"Gomez","Email":"maria@acme.com","Phone":"512-555-0100","Title":"Event Planner","CompanyID":"ACME1","IsPrimary":true}]'
                   : commitNoun === "event"
                     ? '[{"EventID":"E1","EventName":"Smith Wedding","EventType":"Wedding","EventDate":"2025-06-14","StartTime":"17:00","EndTime":"23:00","ExpectedCount":150,"ClientID":"C1","VenueID":"V1","EventStatus":"Sales Lock","TotalRevenue":28500}]'
-                    : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
+                    : commitNoun === "lead"
+                      ? '[{"LeadID":"L1","OpportunityName":"Smith Wedding","ClientID":"C1","Stage":"Qualified","Probability":40,"EstimatedValue":12000,"Source":"Wedding Wire","CloseDate":"2025-09-01"}]'
+                      : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
               }
             />
             <p className="text-xs text-ink-2 mt-2">
@@ -505,7 +510,9 @@ export function ImportRunDetailPage() {
                 ? "Client account"
                 : commitNoun === "event"
                   ? "Event (client/venue resolved from prior imports)"
-                  : "Venue"}
+                  : commitNoun === "lead"
+                    ? "Lead (pre-client inquiry; client linked later on conversion)"
+                    : "Venue"}
               , and linked to this run. Re-running is safe (already-linked rows
               are skipped).
             </p>
@@ -720,8 +727,8 @@ export function ImportRunDetailPage() {
               • <strong>Approve &amp; Commit</strong>: Finalize record counts,
               then paste source rows to materialize entities (venues → Venue,
               contacts → Client account, events → Event with client/venue
-              resolved from prior imports) and link them to this run
-              (venues/contacts/events datasets only)
+              resolved from prior imports, leads → Lead pre-client inquiry) and
+              link them to this run (venues/contacts/events/leads datasets only)
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires
