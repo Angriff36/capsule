@@ -17,7 +17,8 @@ enum ProposalStatus {
 }
 
 // Sales offer for a Client. Line items omitted in this trio (send requires a
-// non-empty title instead). Optional eventId links after acceptance when known.
+// non-empty title instead). eventId may link at draft time ("create proposal
+// from event", spec §5.3) or after acceptance when known.
 entity Proposal mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
@@ -92,7 +93,8 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     optional venueAddress: string,
     optional expiresAt: datetime,
     optional notes: string,
-    optional terms: string
+    optional terms: string,
+    optional eventId: uuid
   ) {
     guard self.draftedAt == null
     guard self.status == "draft"
@@ -118,6 +120,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
     mutate expiresAt = expiresAt
     mutate notes = notes
     mutate terms = terms
+    mutate eventId = eventId
     mutate draftedAt = now()
     emit ProposalDrafted {
       proposalId: self.id

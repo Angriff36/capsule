@@ -1,5 +1,5 @@
-import { Fragment, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { Fragment, useEffect, useState, type FormEvent } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   useCreateProposal,
   useListClient,
@@ -70,6 +70,15 @@ const defaultValidityDate = () => {
   return `${year}-${month}-${day}`;
 };
 
+const dateInputFromEpoch = (ms: number | null | undefined) => {
+  if (ms == null || !Number.isFinite(ms)) return undefined;
+  const date = new Date(ms);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 export function ProposalsPage() {
   const { branding } = useTenantBranding();
   const proposals = useListProposal();
@@ -100,6 +109,32 @@ export function ProposalsPage() {
       row.registeredAt != null &&
       String(row.status) === "active",
   );
+  const [searchParams, setSearchParams] = useSearchParams();
+  const fromEventId = searchParams.get("event");
+  const fromEvent =
+    fromEventId && events
+      ? (events ?? []).find(
+          (row) => row._id === fromEventId && row.deletedAt == null,
+        )
+      : undefined;
+  const hasClientSource = Boolean(fromEvent) || activeClients.length > 0;
+  const prefill = fromEvent
+    ? {
+        title: fromEvent.title ?? "",
+        guestCount: Number(fromEvent.expectedHeadcount ?? 0),
+        eventType: fromEvent.eventType ?? "",
+        eventDate: dateInputFromEpoch(fromEvent.startsAt),
+        venueName: fromEvent.venueName ?? "",
+        venueAddress: fromEvent.venueAddress ?? "",
+      }
+    : null;
+
+  useEffect(() => {
+    // "Create proposal" on an event navigates here with ?event=<id>; open the
+    // draft form prefilled from that event (spec §5.3 create-proposal-from-event).
+    if (fromEvent) setShowDraft(true);
+  }, [fromEvent?._id]);
+
   const activeRows = (proposals ?? []).filter((row) => row.deletedAt == null);
   // Keep accepted proposals visible — operators create the Event from them.
   const visibleRows = showTerminal
@@ -160,11 +195,21 @@ export function ProposalsPage() {
         expiresAt: dateValue(data.get("expiresAt"), true),
         notes: String(data.get("notes") || "").trim() || undefined,
         terms: String(data.get("terms") || "").trim() || undefined,
+        eventId: String(data.get("eventId") || "").trim() || undefined,
       });
       form.reset();
       draftForm.clear();
       setShowDraft(false);
-      setNotice("Proposal drafted. Send it when ready for the client.");
+      if (fromEventId) {
+        const nextParams = new URLSearchParams(searchParams);
+        nextParams.delete("event");
+        setSearchParams(nextParams, { replace: true });
+      }
+      setNotice(
+        fromEventId
+          ? "Proposal drafted and linked to the event. Send it when ready for the client."
+          : "Proposal drafted. Send it when ready for the client.",
+      );
     });
   };
 
@@ -355,7 +400,14 @@ export function ProposalsPage() {
           <div className="supply-form-heading">
             <div>
               <p className="eyebrow">Draft</p>
-              <h2>New proposal</h2>
+              <h2>{fromEvent ? "Proposal from event" : "New proposal"}</h2>
+              {fromEvent ? (
+                <p className="text-[13px] text-ink-2">
+                  Linked to "{fromEvent.title}". Client is locked to that
+                  event's client; the proposal belongs to this event (spec
+                  §5.3).
+                </p>
+              ) : null}
             </div>
           </div>
           <DraftRestoreBanner
@@ -363,7 +415,7 @@ export function ProposalsPage() {
             onRestore={draftForm.restore}
             onDiscard={draftForm.discard}
           />
-          {activeClients.length === 0 ? (
+          {!hasClientSource ? (
             <p className="text-[13px] text-ink-2">
               No active clients.{" "}
               <Link className="text-link" to={CLIENTS_ROUTES.root}>
@@ -373,22 +425,46 @@ export function ProposalsPage() {
             </p>
           ) : (
             <>
-              <label>
-                Client
-                <select name="clientId" required defaultValue="">
-                  <option value="" disabled>
-                    Select client
-                  </option>
-                  {activeClients.map((row) => (
-                    <option key={row._id} value={row._id}>
-                      {clientDisplayName(row._id, clients)}
+              {fromEvent ? (
+                <label>
+                  Client
+                  <input
+                    type="hidden"
+                    name="clientId"
+                    value={fromEvent.clientId}
+                  />
+                  <input type="hidden" name="eventId" value={fromEvent._id} />
+                  <input
+                    value={`${clientDisplayName(
+                      fromEvent.clientId,
+                      clients,
+                    )} — from event "${fromEvent.title}"`}
+                    disabled
+                    readOnly
+                  />
+                </label>
+              ) : (
+                <label>
+                  Client
+                  <select name="clientId" required defaultValue="">
+                    <option value="" disabled>
+                      Select client
                     </option>
-                  ))}
-                </select>
-              </label>
+                    {activeClients.map((row) => (
+                      <option key={row._id} value={row._id}>
+                        {clientDisplayName(row._id, clients)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
               <label>
                 Title
-                <input name="title" required />
+                <input
+                  name="title"
+                  required
+                  defaultValue={prefill?.title ?? ""}
+                />
               </label>
               <label>
                 Guest count
@@ -396,24 +472,37 @@ export function ProposalsPage() {
                   name="guestCount"
                   type="number"
                   min={0}
-                  defaultValue={0}
+                  defaultValue={prefill?.guestCount ?? 0}
                 />
               </label>
               <label>
                 Event type
-                <input name="eventType" />
+                <input
+                  name="eventType"
+                  defaultValue={prefill?.eventType ?? ""}
+                />
               </label>
               <label>
                 Event date
-                <input name="eventDate" type="date" />
+                <input
+                  name="eventDate"
+                  type="date"
+                  defaultValue={prefill?.eventDate}
+                />
               </label>
               <label>
                 Venue name
-                <input name="venueName" />
+                <input
+                  name="venueName"
+                  defaultValue={prefill?.venueName ?? ""}
+                />
               </label>
               <label>
                 Venue address
-                <input name="venueAddress" />
+                <input
+                  name="venueAddress"
+                  defaultValue={prefill?.venueAddress ?? ""}
+                />
               </label>
               <label>
                 Subtotal

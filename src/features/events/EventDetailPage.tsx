@@ -284,6 +284,13 @@ export function EventDetailPage() {
             Download BEO
           </button>,
           <Link
+            key="create-proposal"
+            className="btn btn-ghost"
+            to={`/clients/proposals?event=${event._id}`}
+          >
+            Create proposal
+          </Link>,
+          <Link
             key="save-as-template"
             className="btn btn-ghost"
             to={`/events/templates?fromEvent=${event._id}`}
