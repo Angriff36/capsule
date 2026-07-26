@@ -45,6 +45,9 @@ function validateEventDate(eventDate: string): {
   error?: string;
 } {
   const date = new Date(eventDate);
+  if (Number.isNaN(date.getTime())) {
+    return { valid: false, error: "Invalid event date" };
+  }
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -52,6 +55,16 @@ function validateEventDate(eventDate: string): {
     return { valid: false, error: "Event date cannot be in the past" };
   }
   return { valid: true };
+}
+
+// Bounded field lengths for the public form. The /quote action is anonymous and
+// reachable by anyone, so cap payload size to prevent trivial storage/CPU abuse
+// (a true per-caller rate limit needs a counter table and is a documented
+// follow-up). Trim+cap is the proportionate guard for a catering lead form.
+const MAX_SHORT = 200;
+const MAX_LONG = 4000;
+function bounded(value: string | undefined, max = MAX_SHORT): string {
+  return (value ?? "").trim().slice(0, max);
 }
 
 /**
@@ -224,23 +237,26 @@ export const submitQuote = action({
             : args.eventEndTime,
         ).getTime()
       : 0;
+    if (args.eventEndTime && !Number.isFinite(eventEndMs)) {
+      throw new ConvexError("Invalid end time");
+    }
 
     const result = await ctx.runMutation(
       internal.quoteBuilder.ingressQuoteSubmission,
       {
-        clientName: args.clientName,
-        email: args.email,
-        phone: args.phone ?? "",
+        clientName: bounded(args.clientName),
+        email: bounded(args.email),
+        phone: bounded(args.phone),
         eventDate: new Date(args.eventDate).getTime(),
         eventEndTime: eventEndMs,
         guestCount: args.guestCount,
         serviceStyleId: args.serviceStyleId,
         occasionId: args.occasionId,
-        venueName: args.venueName ?? "",
-        venueAddress: args.venueAddress ?? "",
-        menuPreferences: args.menuPreferences ?? "",
-        dietaryRestrictions: args.dietaryRestrictions ?? "",
-        notes: args.notes ?? "",
+        venueName: bounded(args.venueName),
+        venueAddress: bounded(args.venueAddress),
+        menuPreferences: bounded(args.menuPreferences, MAX_LONG),
+        dietaryRestrictions: bounded(args.dietaryRestrictions, MAX_LONG),
+        notes: bounded(args.notes, MAX_LONG),
       },
     );
 
@@ -283,8 +299,14 @@ export const processQuoteSubmission = action({
     if (!submission || submission.deletedAt !== null) {
       throw new ConvexError("Quote submission not found");
     }
-    if (submission.status === "completed") {
-      throw new ConvexError("Quote submission has already been converted");
+    // Only pending submissions can be converted: the manifest transitions are
+    // pending → processing → completed|failed, and failed is terminal (there is
+    // no failed → processing reopen command). A failed conversion is surfaced
+    // to the operator for manual handling rather than offered a broken retry.
+    if (submission.status !== "pending") {
+      throw new ConvexError(
+        `Only pending submissions can be converted (this one is ${submission.status}).`,
+      );
     }
 
     const errors: string[] = [];
@@ -422,14 +444,37 @@ export const processQuoteSubmission = action({
       );
     }
 
-    // Record whatever was created on the submission and mark complete.
-    await ctx.runMutation(api.mutations.QuoteSubmission_complete, {
-      docId: submissionId,
-      clientId: clientId ?? "",
-      leadId: leadId ?? "",
-      eventId: eventId ?? "",
-      proposalId: proposalId ?? "",
-    });
+    // Only mark complete when every entity was created: complete's id fields
+    // are schema-typed ids, so passing ""/null for a missing one throws AFTER
+    // startProcessing committed — which would strand the submission in
+    // "processing". A partial conversion is marked failed (terminal) with the
+    // per-step errors so the operator can reconcile manually.
+    if (errors.length === 0 && clientId && leadId && eventId && proposalId) {
+      // Best-effort: link the draft proposal back onto the lead so the pipeline
+      // shows it (and avoids a duplicate-proposal prompt). Non-fatal.
+      try {
+        await ctx.runMutation(api.mutations.Lead_stageProposal, {
+          docId: leadId,
+          proposalId,
+        });
+      } catch {
+        // swallow — the proposal still exists and is recorded on the submission
+      }
+      await ctx.runMutation(api.mutations.QuoteSubmission_complete, {
+        docId: submissionId,
+        clientId,
+        leadId,
+        eventId,
+        proposalId,
+      });
+    } else {
+      await ctx.runMutation(api.mutations.QuoteSubmission_fail, {
+        docId: submissionId,
+        errorMessage:
+          "Conversion could not complete all steps; see processing errors.",
+        processingErrors: errors.join("; ") || "Unknown conversion failure",
+      });
+    }
 
     return { submissionId, clientId, leadId, eventId, proposalId, errors };
   },

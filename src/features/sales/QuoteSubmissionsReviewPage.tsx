@@ -13,12 +13,12 @@ import type { Doc } from "../../lib/api";
 type QuoteSubmission = Doc<"quoteSubmissions">;
 type Failure = ReturnType<typeof classifyCommandFailure>;
 
-// A submission is actionable until an operator has converted it. Failed
-// submissions can be retried (a prior conversion step threw but the capture is
-// intact); completed submissions are shown as converted.
+// A submission is convertible while pending. The manifest transitions are
+// pending → processing → completed|failed, and failed is terminal (no reopen),
+// so failed submissions are shown for awareness but cannot be retried from here.
 function isActionable(sub: QuoteSubmission): boolean {
   if (sub.deletedAt != null) return false;
-  return sub.status === "pending" || sub.status === "failed";
+  return sub.status === "pending";
 }
 
 const STATUS_TONE: Record<string, string> = {
@@ -254,9 +254,7 @@ export function QuoteSubmissionsReviewPage() {
                   >
                     {busyId === sub._id
                       ? "Converting…"
-                      : sub.status === "failed"
-                        ? "Retry conversion"
-                        : "Convert to lead, event & proposal"}
+                      : "Convert to lead, event & proposal"}
                   </button>
                 </div>
               )}
