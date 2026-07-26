@@ -9,8 +9,6 @@ import {
 import { useMutation } from "convex/react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
-  useCreateProposal,
-  useCreateProposalLineItem,
   useListClient,
   useListEvent,
   useListEventTimelineActivity,
@@ -115,7 +113,9 @@ export function ProposalsPage() {
   // the pricing panel. Same query ProposalPricingPanel subscribes to (cached).
   const proposalLineItems = useListProposalLineItem();
   const proposalRevisions = useListProposalRevision();
-  const createProposal = useCreateProposal();
+  const draftProposalWithLines = useMutation(
+    api.lib.proposalDraft.draftProposalWithLines,
+  );
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
   // a thin authored action wraps the generated Proposal_send + best-effort
   // capture, so a sent proposal always has a reproducible revision record.
@@ -162,7 +162,6 @@ export function ProposalsPage() {
       }
     : null;
 
-  const createProposalLineItem = useCreateProposalLineItem();
   const [pricingOpenFor, setPricingOpenFor] = useState<string | null>(null);
   const lineSeqRef = useRef(0);
   const newDraftLine = (): DraftLine => ({
@@ -277,14 +276,19 @@ export function ProposalsPage() {
       return;
     }
     void run("draft-proposal", async () => {
-      const result = await createProposal({
-        clientId,
+      const eventIdRaw = String(data.get("eventId") || "").trim();
+      // Create the proposal AND all its priced lines in one atomic server
+      // transaction (convex/lib/proposalPricing.ts draftProposalWithLines): the
+      // central calc derives authoritative totals + every line amount there, so
+      // an interruption can never leave stored totals for lines not persisted.
+      await draftProposalWithLines({
+        clientId: clientId as Id<"clients">,
         title,
+        guestCount: draftGuestCount,
         subtotal: pricing.subtotal,
         taxAmount: pricing.taxAmount,
         discountAmount: pricing.discountAmount,
         total: pricing.total,
-        guestCount: draftGuestCount,
         eventDate: dateValue(data.get("eventDate")),
         eventType: String(data.get("eventType") || "").trim() || undefined,
         venueName: String(data.get("venueName") || "").trim() || undefined,
@@ -293,26 +297,15 @@ export function ProposalsPage() {
         expiresAt: dateValue(data.get("expiresAt"), true),
         notes: String(data.get("notes") || "").trim() || undefined,
         terms: String(data.get("terms") || "").trim() || undefined,
-        eventId: String(data.get("eventId") || "").trim() || undefined,
+        eventId: eventIdRaw ? (eventIdRaw as Id<"events">) : undefined,
+        lines: validLines.map((line, i) => ({
+          description: line.description.trim(),
+          pricingBasis: pricing.lines[i].pricingBasis,
+          unitPrice: pricing.lines[i].unitPrice,
+          quantity: pricing.lines[i].quantity ?? undefined,
+          unit: line.unit.trim() || undefined,
+        })),
       });
-      // Persist the priced lines against the new proposal. ponytail: sequential
-      // client-side creates (non-atomic — a mid-loop drop can leave a partial
-      // set; a server-side bulk action is the upgrade path if it bites).
-      const proposalId = result?.docId;
-      if (proposalId && pricing.lines.length > 0) {
-        for (let i = 0; i < pricing.lines.length; i++) {
-          await createProposalLineItem({
-            proposalId,
-            description: validLines[i].description.trim(),
-            pricingBasis: pricing.lines[i].pricingBasis,
-            unitPrice: pricing.lines[i].unitPrice,
-            amount: pricing.lines[i].amount,
-            quantity: pricing.lines[i].quantity ?? undefined,
-            unit: validLines[i].unit.trim() || undefined,
-            sortOrder: i,
-          });
-        }
-      }
       form.reset();
       draftForm.clear();
       setDraftLines([]);

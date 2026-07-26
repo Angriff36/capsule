@@ -74,12 +74,17 @@ export async function buildProposalRevisionSnapshot(
     throw new Error("Client not found for proposal revision snapshot");
   }
 
-  // Get dish selections for this proposal
-  const dishSelections = await ctx.db
-    .query("proposalDishSelections")
-    .withIndex("by_proposalId", (q: any) => q.eq(proposal._id))
-    .filter((q: any) => q.eq("deletedAt", null))
-    .collect();
+  // Get dish selections for this proposal. JS loose-equality filter (not the
+  // Convex DSL .eq): governed-creation omits deletedAt at insert, so fresh
+  // active rows have it ABSENT (undefined), and `.eq("deletedAt", null)` would
+  // drop every fresh selection → an empty dish snapshot. Same fix as the
+  // lineItems query below and the existingRevisions lookup in captureProposalRevision.
+  const dishSelections = (
+    await ctx.db
+      .query("proposalDishSelections")
+      .withIndex("by_proposalId", (q: any) => q.eq(proposal._id))
+      .collect()
+  ).filter((row: any) => row.deletedAt == null);
 
   // Resolve dish names and menu names for each selection
   const dishSelectionsData = await Promise.all(

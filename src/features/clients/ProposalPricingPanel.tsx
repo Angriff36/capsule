@@ -4,7 +4,6 @@ import { useListProposalLineItem } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { api, type Id } from "../../lib/api";
 import {
-  computeLineAmount,
   computeProposalPricing,
   PRICING_BASES,
   PRICING_BASIS_LABELS,
@@ -116,13 +115,10 @@ export function ProposalPricingPanel({
     const pricingBasis = editor.pricingBasis;
     const unitPrice = Number(editor.unitPrice) || 0;
     const quantity = Number(editor.quantity) || 0;
-    // Provisional amount (the caller can't resolve a percentage line alone); the
-    // recompute seam restamps every line authoritatively after the write.
-    const amount = computeLineAmount(
-      { pricingBasis, unitPrice, quantity },
-      guestCount,
-    );
+    // The server computes the authoritative amount (a percentage line can't be
+    // resolved in isolation) and restamps every line via the recompute seam.
     const unit = editor.unit.trim() || undefined;
+    const quantityArg = pricingBasis === "per_unit" ? quantity : undefined;
 
     if (editor.id === "new") {
       const nextSortOrder =
@@ -133,8 +129,7 @@ export function ProposalPricingPanel({
           description,
           pricingBasis,
           unitPrice,
-          amount,
-          quantity: pricingBasis === "per_unit" ? quantity : undefined,
+          quantity: quantityArg,
           unit,
           sortOrder: nextSortOrder,
         }),
@@ -148,8 +143,7 @@ export function ProposalPricingPanel({
           description,
           pricingBasis,
           unitPrice,
-          amount,
-          quantity: pricingBasis === "per_unit" ? quantity : undefined,
+          quantity: quantityArg,
           unit,
           sortOrder: target ? Number(target.sortOrder) : undefined,
         }),
