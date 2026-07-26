@@ -5,13 +5,13 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  FileText,
-  Settings,
+  CheckCircleIcon as CheckCircle,
+  XCircleIcon as XCircle,
+  AlertTriangleIcon as AlertTriangle,
+  FileTextIcon as FileText,
+  GearIcon as Settings,
   ArrowLeftIcon,
-} from "lucide-react";
+} from "../../../ui/icons";
 import { useQuery, useMutation } from "convex/react";
 import { api } from "@/lib/api";
 import { classifyCommandFailure } from "../../events/CommandFailure";

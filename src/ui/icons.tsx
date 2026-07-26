@@ -127,3 +127,27 @@ export const WifiOffIcon = icon(
 export const DownloadIcon = icon(
   <path d="M12 9v6M9 12l3 3 3-3M3 15v3a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />,
 );
+export const CheckCircleIcon = icon(
+  <>
+    <circle cx="8" cy="8" r="6" />
+    <path d="m5.2 8.3 2 2L11 6.2" />
+  </>,
+);
+export const XCircleIcon = icon(
+  <>
+    <circle cx="8" cy="8" r="6" />
+    <path d="m5.8 5.8 4.4 4.4M10.2 5.8l-4.4 4.4" />
+  </>,
+);
+export const AlertTriangleIcon = icon(
+  <>
+    <path d="M8 2.2 14.5 13.3H1.5z" />
+    <path d="M8 6.5v3M8 11.8h.01" />
+  </>,
+);
+export const FileTextIcon = icon(
+  <>
+    <path d="M4 1.8h5.5L12.5 5v9.2h-8.5z" />
+    <path d="M9.5 1.8V5h3M6 8h4M6 10.5h4" />
+  </>,
+);
