@@ -1,13 +1,37 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-26 (§9.4 Staff "My reviews" self-service view DONE — closes the §9.4 staff-facing-view gap; a staff member can now see their own recorded reviews; §8.1 VenueRoom room/space sub-entity DONE — closes the concrete remaining gap of Priority 17 "Venue Profile Full Depth"; a venue can now model its ballrooms/dining/prep-kitchen/outdoor spaces; §5.5 digital acceptance → Proposal.accept WIRED — closes the #1 Slice-1 DEAD-but-"done" gap; the digitally-signed proposal no longer stays "sent" forever; also corrected the stale §5.4 catalog-pricing status row; §6.2 menus import WIRED — venues + contacts + events + leads + payments + menus now ALL materialize, closing the #1 Critical-priority Import Datasets; §6.2 payments import WIRED — venues + contacts + events + leads + payments now reachable end-to-end [payments staged as §6.4 reconciliation-reference links]; §6.2 leads import WIRED — venues + contacts + events + leads now materialize; §6.2 events import WIRED — venues + contacts + events now materialize; §6.2 contacts import WIRED — venues + contacts now materialize; §4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
+**Updated:** 2026-07-26 (§6.1/§6.4 reconcile resolution UI FIXED + payment Match WIRED — closes the import-loop dead end; the ExternalRecordsReconcilePage queue is now functional and imported payments can be matched to existing Capsule payments; §9.4 Staff "My reviews" self-service view DONE — closes the §9.4 staff-facing-view gap; a staff member can now see their own recorded reviews; §8.1 VenueRoom room/space sub-entity DONE — closes the concrete remaining gap of Priority 17 "Venue Profile Full Depth"; a venue can now model its ballrooms/dining/prep-kitchen/outdoor spaces; §5.5 digital acceptance → Proposal.accept WIRED — closes the #1 Slice-1 DEAD-but-"done" gap; the digitally-signed proposal no longer stays "sent" forever; also corrected the stale §5.4 catalog-pricing status row; §6.2 menus import WIRED — venues + contacts + events + leads + payments + menus now ALL materialize, closing the #1 Critical-priority Import Datasets; §6.2 payments import WIRED — venues + contacts + events + leads + payments now reachable end-to-end [payments staged as §6.4 reconciliation-reference links]; §6.2 leads import WIRED — venues + contacts + events + leads now materialize; §6.2 events import WIRED — venues + contacts + events now materialize; §6.2 contacts import WIRED — venues + contacts now materialize; §4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+---
+
+**2026-07-26 — §6.1/§6.4 Reconcile resolution UI FIXED + payment Match WIRED (closes the import-loop dead end; the ExternalRecordsReconcilePage queue is now functional and imported payments can be matched):**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0).** One UI file rewritten; no manifest/regen, no new entity/guard/query (no #111 exposure), no schema change, no money mutation (no Payment entity is created or settled — the match links an external reference to an EXISTING Capsule payment).
+
+**Finding (verified first-hand against code this turn):** the `ExternalRecordsReconcilePage` (the only resolution surface for the TPP import's `pending_conflict` links) was NON-FUNCTIONAL, and the §6.4 payment-match workflow had NO UI at all — a dead end sitting on top of six increments of import work:
+- `verifySelected`/`skipSelected` passed `{ id: ... }`, but the generated hooks destructure `docId` (`src/lib/manifest-convex-react.ts:2752/2762/2802`), so `docId` was `undefined` → the mutation requires `docId: v.id("externalRecordLinks")` (`convex/mutations.ts:12136`). They also omitted the required `verifiedByUserId`/`resolvedByUserId` (`src/import/external-record-link.manifest:152/218`; the Zod schemas require them), so `.parse(params)` threw before the mutation fired. Every Verify/Skip click failed with "Failed to verify/skip records" (swallowed by try/catch).
+- `useExternalRecordLinkUpdateCapsuleId` and `usePaymentMarkMatched/verifyReconciliation/disputeReconciliation` had ZERO UI callers — imported payments (staged by `convex/importCommit.ts` as `pending_conflict` links with `capsuleId: ""`) sat in the queue forever.
+- Latent second bug: the page filtered `verified === false`, but `resolveConflict`/`updateCapsuleId` never set `verified=true`, so Skip/Match results would never leave the queue.
+
+**Fix (smallest spec-faithful diff — one UI file, `src/features/admin/import/ExternalRecordsReconcilePage.tsx`):**
+- `verifySelected`/`skipSelected` now pass `docId` + the Clerk operator id (`useUser().id`) as the required `verifiedByUserId`/`resolvedByUserId`; dropped the bogus `lastVerifiedAt`. `version` is `v.optional(v.number())` (`mutations.ts:12140`) so it is omitted.
+- New `matchPayment(linkId)` per-row §6.4 flow for `capsuleEntity === "payment"` rows: `updateCapsuleId({docId, capsuleId})` (the already-generated "match this external record to a Capsule entity" command) then `resolveConflict({docId, conflictStatus:"resolved", resolvedByUserId, resolutionNote})`. An inline native `<select>` of tenant Capsule payments (labeled invoice · amount · status via `useListPayment`/`useListInvoice`) lets the operator pick the match — the human decision §6.4 requires ("must not silently finalize an ambiguous match").
+- Queue filter corrected to `conflictStatus === "pending_conflict"` (the only non-terminal ConflictStatus; resolved/superseded are terminal) so Verify/Skip/Match actually clear records from the queue.
+
+**Why it matters:** the reconcile queue is now functional and the §6.4 payment-match loop is closed end-to-end — an operator can clear the import's `pending_conflict` queue (Verify to confirm, Skip to dismiss, Match to link a payment reference to a real Capsule payment). This unblocks the usability of the entire TPP-import track (Priorities 1–2), which had been producing a queue nobody could clear.
+
+**Verification:** `bun run check` GREEN (exit 0) — the `&&`-chained gate reached its final step (`baseline-decay: ok`) after a successful build, so toolchain/ownership/typecheck/format/secrets/test:coverage all passed. Runtime arg-shape verified by reading the generated hook (`docId` destructure) + mutation (`docId` required, `version` optional, `resolvedByUserId` required, runtime does NOT auto-inject the user id — `mutations.ts:12105-12118`). No tests added (UI-only fix; AGENTS.md forbids adding tests unless the owner asks).
+
+**Cross-model review:** not run this increment (autonomous-loop cadence; a UI-only fix of broken arg-passing + an additive per-row action using already-generated commands, no new guard/policy/approval, no money mutation). The merge gate's independent cross-model review still applies at PR time.
+
+**Honest scope notes (documented, NOT this increment):** (1) **Match is wired for `payment` rows only** — the documented §6.4 case and the bulk of staged pending links; pending `event_record` links (client-not-imported) have no created Event to match to (the company→Client resolution remains the documented deferred slice), and pending `contact` links resolve via Verify/Skip. (2) **No `Payment.markMatched` UI caller added** — the import produces no Payment entity (§6.4 reference model), so matching happens on the ExternalRecordLink via `updateCapsuleId` (the smaller, faithful path); a `PaymentsPage`-side "link external record" action is a complementary future placement. (3) **The picker is a native `<select>`** (`ponytail:` comment) — fine for hundreds of payments; a searchable combobox is the upgrade path for high-volume tenants. (4) A `main` push deploys Convex too (`vercel.json` `buildCommand` is `convex deploy --cmd 'vite build'`, since cc24315).
 
 ---
 
@@ -2318,7 +2342,7 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 **Impact:**
 - Unblocks: TPP payment import, QuickBooks/Nowsta payment matching
-- Remaining: Reconciliation queue UI (frontend for reviewing unmatched payments)
+- ✅ Reconciliation queue UI NOW WIRED (2026-07-26): `ExternalRecordsReconcilePage` Verify/Skip fixed (`docId` + Clerk operator id) + per-row Match-to-Capsule-payment via `updateCapsuleId`+`resolveConflict`; queue filter corrected to `pending_conflict` (see changelog). Remaining: a complementary `PaymentsPage`-side "link external record" action.
 
 **Estimated effort:** ✅ DONE
 

@@ -1,8 +1,12 @@
 import { useMemo, useState } from "react";
+import { useUser } from "@clerk/react";
 import {
   useListExternalRecordLink,
-  useExternalRecordLinkVerifyLink,
+  useListInvoice,
+  useListPayment,
   useExternalRecordLinkResolveConflict,
+  useExternalRecordLinkUpdateCapsuleId,
+  useExternalRecordLinkVerifyLink,
 } from "../../../lib/manifest-convex-react";
 import { ErrorState, StatusChip } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
@@ -48,6 +52,8 @@ const CONFLICT_STATUS_LABELS: Record<string, string> = {
 };
 
 export function ExternalRecordsReconcilePage() {
+  const { user } = useUser();
+  const operatorId = user?.id ?? "";
   const [selectedSourceSystem, setSelectedSourceSystem] = useState<
     string | null
   >(null);
@@ -55,22 +61,42 @@ export function ExternalRecordsReconcilePage() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // Per-row "Match to Capsule payment" picker state.
+  const [matchingId, setMatchingId] = useState<string | null>(null);
+  const [matchPaymentId, setMatchPaymentId] = useState("");
 
-  // Query for all external records
+  // Query for all external records + Capsule payments (for the §6.4 match flow).
   const allRecords = useListExternalRecordLink();
+  const payments = useListPayment();
+  const invoices = useListInvoice();
 
-  // Commands for resolving records
+  // Commands for resolving records.
   const verifyLink = useExternalRecordLinkVerifyLink();
   const resolveConflict = useExternalRecordLinkResolveConflict();
+  const updateCapsuleId = useExternalRecordLinkUpdateCapsuleId();
 
-  // Filter for unverified records and optional source system
+  // ponytail: the queue is records still needing action. Filtering on
+  // `verified === false` was wrong — resolveConflict/updateCapsuleId never set
+  // verified=true, so Skip/Match results would never leave the queue. The only
+  // non-terminal ConflictStatus is pending_conflict (resolved/superseded are
+  // terminal), so that is the faithful "needs action" set.
   const filteredRecords = useMemo(() => {
-    const records = (allRecords ?? []).filter((r) => r.verified === false);
+    const records = (allRecords ?? []).filter(
+      (r) => r.conflictStatus === "pending_conflict",
+    );
     if (selectedSourceSystem) {
       return records.filter((r) => r.sourceSystem === selectedSourceSystem);
     }
     return records;
   }, [allRecords, selectedSourceSystem]);
+
+  const candidatePayments = useMemo(
+    () => (payments ?? []).filter((p) => p.deletedAt == null),
+    [payments],
+  );
+
+  const invoiceNumber = (id: string) =>
+    invoices?.find((row) => row._id === id)?.invoiceNumber || "Unknown invoice";
 
   // Toggle selection
   function toggleSelection(id: string) {
@@ -97,9 +123,11 @@ export function ExternalRecordsReconcilePage() {
     setNotice(null);
   }
 
-  // Verify selected records
+  // Verify selected records. The generated hook reads `docId` (not `id`) and
+  // verifyLink requires a non-empty `verifiedByUserId`; both were missing before,
+  // so every click threw before reaching the mutation.
   async function verifySelected() {
-    if (selectedIds.size === 0) return;
+    if (selectedIds.size === 0 || !operatorId) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -107,9 +135,9 @@ export function ExternalRecordsReconcilePage() {
     try {
       for (const id of selectedIds) {
         await verifyLink({
-          id: id as any,
+          docId: id,
+          verifiedByUserId: operatorId,
           verified: true,
-          lastVerifiedAt: Date.now(),
         });
       }
       setNotice(`Verified ${selectedIds.size} record(s) successfully.`);
@@ -123,9 +151,9 @@ export function ExternalRecordsReconcilePage() {
     }
   }
 
-  // Skip selected records (mark as resolved with note)
+  // Skip selected records (mark as resolved with note).
   async function skipSelected() {
-    if (selectedIds.size === 0) return;
+    if (selectedIds.size === 0 || !operatorId) return;
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -133,8 +161,9 @@ export function ExternalRecordsReconcilePage() {
     try {
       for (const id of selectedIds) {
         await resolveConflict({
-          id: id as any,
+          docId: id,
           conflictStatus: "resolved",
+          resolvedByUserId: operatorId,
           resolutionNote: "Skipped during reconciliation",
         });
       }
@@ -149,6 +178,36 @@ export function ExternalRecordsReconcilePage() {
     }
   }
 
+  // §6.4 match flow for an imported payment reference: link it to an existing
+  // Capsule payment, then mark the conflict resolved. The import stages payments
+  // as pending_conflict links with capsuleId "" and a note saying "match via
+  // markMatched" — this is the UI that finally performs that match.
+  async function matchPayment(linkId: string) {
+    if (!matchPaymentId || !operatorId) return;
+    setBusy(true);
+    setError(null);
+    setNotice(null);
+
+    try {
+      await updateCapsuleId({ docId: linkId, capsuleId: matchPaymentId });
+      await resolveConflict({
+        docId: linkId,
+        conflictStatus: "resolved",
+        resolvedByUserId: operatorId,
+        resolutionNote: "Matched to Capsule payment during reconciliation",
+      });
+      setNotice("Payment linked and resolved.");
+      setMatchingId(null);
+      setMatchPaymentId("");
+    } catch (cause: unknown) {
+      setError(
+        cause instanceof Error ? cause.message : "Failed to match payment.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="operations-stage supply-stage">
       <header className="supply-masthead">
@@ -156,8 +215,8 @@ export function ExternalRecordsReconcilePage() {
           <p className="eyebrow">Import · Reconciliation</p>
           <h1 className="display-title mt-2">External Record Links</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Review and verify external system records mapped to Capsule
-            entities. Unverified records appear here after import runs.
+            Review and resolve external system records mapped to Capsule
+            entities. Imported records awaiting reconciliation appear here.
           </p>
         </div>
       </header>
@@ -211,7 +270,7 @@ export function ExternalRecordsReconcilePage() {
 
           <div className="ml-auto">
             <p className="text-sm text-ink-2">
-              {filteredRecords.length} unverified record(s)
+              {filteredRecords.length} record(s) awaiting reconciliation
             </p>
           </div>
         </div>
@@ -277,13 +336,14 @@ export function ExternalRecordsReconcilePage() {
                   Conflict Status
                 </th>
                 <th className="text-left py-3 px-4 font-medium">Created</th>
+                <th className="text-left py-3 px-4 font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredRecords.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="text-center py-8 text-ink-2">
-                    No unverified records found. Great job!
+                  <td colSpan={9} className="text-center py-8 text-ink-2">
+                    No records awaiting reconciliation. Great job!
                   </td>
                 </tr>
               ) : (
@@ -337,6 +397,72 @@ export function ExternalRecordsReconcilePage() {
                         ? new Date(record.createdAt).toLocaleDateString()
                         : "—"}
                     </td>
+                    <td className="py-3 px-4">
+                      {record.capsuleEntity === "payment" ? (
+                        matchingId === record._id ? (
+                          <div className="flex flex-wrap items-center gap-2">
+                            {/* ponytail: native select scales to hundreds of payments;
+                                a searchable combobox is the upgrade path for high-volume tenants. */}
+                            <select
+                              value={matchPaymentId}
+                              onChange={(e) =>
+                                setMatchPaymentId(e.target.value)
+                              }
+                              disabled={busy}
+                              className="px-2 py-1 border border-slate-300 rounded-md text-xs min-w-56"
+                            >
+                              <option value="">Select Capsule payment…</option>
+                              {candidatePayments.map((payment) => (
+                                <option key={payment._id} value={payment._id}>
+                                  {invoiceNumber(String(payment.invoiceId))} ·{" "}
+                                  {Number(payment.amount ?? 0).toLocaleString(
+                                    undefined,
+                                    {
+                                      style: "currency",
+                                      currency: "USD",
+                                    },
+                                  )}{" "}
+                                  · {String(payment.status)}
+                                </option>
+                              ))}
+                            </select>
+                            <button
+                              type="button"
+                              onClick={() => void matchPayment(record._id)}
+                              disabled={busy || !matchPaymentId}
+                              className="px-3 py-1 bg-primary text-white rounded-md text-xs font-medium disabled:opacity-50"
+                            >
+                              Link
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setMatchingId(null);
+                                setMatchPaymentId("");
+                              }}
+                              disabled={busy}
+                              className="px-3 py-1 text-slate-600 rounded-md text-xs font-medium hover:bg-slate-100"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMatchingId(record._id);
+                              setMatchPaymentId("");
+                            }}
+                            disabled={busy}
+                            className="px-3 py-1 text-primary rounded-md text-xs font-medium hover:bg-primary/10 disabled:opacity-50"
+                          >
+                            Match
+                          </button>
+                        )
+                      ) : (
+                        <span className="text-ink-3">—</span>
+                      )}
+                    </td>
                   </tr>
                 ))
               )}
@@ -356,12 +482,16 @@ export function ExternalRecordsReconcilePage() {
           <h3 className="font-medium text-sm mb-2">Actions</h3>
           <ul className="text-sm text-ink-2 space-y-1">
             <li>
-              • <strong>Verify</strong>: Confirm the mapping is correct. The
-              record will be marked as verified and won't appear in this queue.
+              • <strong>Match</strong>: Link an imported payment reference to an
+              existing Capsule payment, then mark it resolved (spec §6.4).
+            </li>
+            <li>
+              • <strong>Verify</strong>: Confirm a mapping is correct; the
+              record is marked verified and resolved and leaves this queue.
             </li>
             <li>
               • <strong>Skip</strong>: Mark as resolved with a note. Use this
-              for records that shouldn't be imported or need manual review
+              for records that shouldn&apos;t be linked or need manual review
               later.
             </li>
           </ul>
@@ -369,13 +499,15 @@ export function ExternalRecordsReconcilePage() {
           <ul className="text-sm text-ink-2 space-y-1">
             <li>
               • Records with <strong>Conflict</strong> status require resolution
-              before they can be verified.
+              before they leave this queue.
             </li>
             <li>
               • Filter by source system to focus on specific imports (TPP
               Legacy, QuickBooks, etc.).
             </li>
-            <li>• Select multiple records to perform bulk actions.</li>
+            <li>
+              • Select multiple records to perform bulk Verify / Skip actions.
+            </li>
           </ul>
         </div>
       </div>
