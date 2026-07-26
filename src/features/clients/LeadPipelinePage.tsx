@@ -1,5 +1,5 @@
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
-import { useAction } from "convex/react";
+import { useMutation } from "convex/react";
 import { Link } from "react-router-dom";
 import {
   useCreateClient,
@@ -101,7 +101,7 @@ export function LeadPipelinePage() {
   const createProposal = useCreateProposal();
   // Capture a revision snapshot on send (spec §5.5 / Priority 10) via the
   // authored action that wraps Proposal_send + best-effort capture.
-  const sendProposal = useAction(
+  const sendProposal = useMutation(
     api.lib.proposalRevision.sendProposalWithRevisionCapture,
   );
   const stageProposal = useLeadStageProposal();

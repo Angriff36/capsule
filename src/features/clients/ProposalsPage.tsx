@@ -6,7 +6,7 @@ import {
   useState,
   type FormEvent,
 } from "react";
-import { useAction } from "convex/react";
+import { useMutation } from "convex/react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   useCreateProposal,
@@ -119,7 +119,7 @@ export function ProposalsPage() {
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
   // a thin authored action wraps the generated Proposal_send + best-effort
   // capture, so a sent proposal always has a reproducible revision record.
-  const send = useAction(
+  const send = useMutation(
     api.lib.proposalRevision.sendProposalWithRevisionCapture,
   );
   const markViewed = useProposalMarkViewed();

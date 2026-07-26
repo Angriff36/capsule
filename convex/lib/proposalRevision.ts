@@ -1,6 +1,6 @@
 // Proposal Revision Capture - Authored seam for proposal revision snapshotting
 
-import { action, internalMutation } from "../_generated/server";
+import { internalMutation, mutation } from "../_generated/server";
 import { api, internal } from "../_generated/api";
 import type { Doc } from "../_generated/dataModel";
 import { v } from "convex/values";
@@ -181,12 +181,17 @@ export const captureProposalRevision = internalMutation({
       throw new Error("Proposal not found");
     }
 
-    // Get existing revisions to determine next revision number
-    const existingRevisions = await ctx.db
-      .query("proposalRevisions")
-      .withIndex("by_proposalId", (q: any) => q.eq(proposalId))
-      .filter((q: any) => q.eq("deletedAt", null))
-      .collect();
+    // Get existing revisions to determine next revision number. JS loose-equality
+    // filter (not the Convex DSL .eq): revisions are inserted WITHOUT deletedAt
+    // (optional, omitted at insert), so the DSL `.eq("deletedAt", null)` would
+    // miss every fresh active revision → nextRevisionNumber would always restart
+    // at 1 → collision. Same fix as the lineItems query in the snapshot builder.
+    const existingRevisions = (
+      await ctx.db
+        .query("proposalRevisions")
+        .withIndex("by_proposalId", (q: any) => q.eq(proposalId))
+        .collect()
+    ).filter((row: any) => row.deletedAt == null);
 
     let nextRevisionNumber = 1;
     if (existingRevisions.length > 0) {
@@ -223,16 +228,19 @@ export const captureProposalRevision = internalMutation({
   },
 });
 
-// Send a proposal and capture its revision snapshot in one server-side call
-// (spec §5.5 / Priority 10). The generated `Proposal_send` is salesAccess-gated
-// and runs as the authenticated operator — `ctx.runMutation` from an action
-// propagates the caller's auth context, so the send guard passes exactly as it
-// does through `useProposalSend`. The revision snapshot is BEST-EFFORT audit:
-// it must never fail or roll back the send, so capture errors are swallowed
-// (the proposal is already sent; a missed snapshot is recoverable, a failed
-// send is not). Captures AFTER send so the snapshot records the sent status /
-// sentAt. `changeSummary` defaults to a sent-label so callers need not pass it.
-export const sendProposalWithRevisionCapture = action({
+// Send a proposal and capture its revision snapshot in ONE Convex transaction
+// (spec §5.5 / Priority 10). A MUTATION (not an action) so the generated
+// `Proposal_send` and `captureProposalRevision` run as subtransactions of a
+// single transaction (Convex guideline: nested runMutation from a mutation =
+// subtransactions; an uncaught throw rolls back the whole txn). Send runs first;
+// if capture then throws, the send rolls back too — so a proposal is NEVER left
+// "sent without its immutable revision." Capture rarely fails for a sendable
+// proposal (the send guard already verified client.status == "active", and the
+// revision insert is schema-valid), so a capture failure surfaces as a loud
+// send error rather than a silently-missing audit snapshot. `ctx.runMutation`
+// propagates the operator's auth, so Proposal_send's salesAccess guard passes.
+// `changeSummary` defaults to a sent-label so callers need not pass it.
+export const sendProposalWithRevisionCapture = mutation({
   args: {
     docId: v.id("proposals"),
     version: v.optional(v.number()),
@@ -243,23 +251,16 @@ export const sendProposalWithRevisionCapture = action({
       docId: args.docId,
       version: args.version,
     });
-    try {
-      await ctx.runMutation(
-        internal.lib.proposalRevision.captureProposalRevision,
-        {
-          proposalId: args.docId,
-          changeSummary:
-            args.changeSummary && args.changeSummary.trim().length > 0
-              ? args.changeSummary.trim()
-              : "Proposal sent to client",
-        },
-      );
-    } catch (err) {
-      console.warn(
-        "captureProposalRevision failed (proposal already sent):",
-        err,
-      );
-    }
+    await ctx.runMutation(
+      internal.lib.proposalRevision.captureProposalRevision,
+      {
+        proposalId: args.docId,
+        changeSummary:
+          args.changeSummary && args.changeSummary.trim().length > 0
+            ? args.changeSummary.trim()
+            : "Proposal sent to client",
+      },
+    );
     return sent;
   },
 });
