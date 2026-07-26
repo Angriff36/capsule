@@ -36,14 +36,25 @@ const VENUE_TYPE_LABELS: Record<VenueType, string> = {
   other: "Other",
 };
 
-// ponytail: an unchecked logistics checkbox must NOT assert "no" for a venue whose
-// value was never recorded (e.g. a venue created before the field existed). Preserve
-// the unknown — undefined is dropped by ctx.db.patch so the stored value is unchanged;
-// only record an explicit false when a value was already defined.
-const logisticsBoolean = (
-  checked: boolean,
-  stored: boolean | undefined | null,
-): boolean | undefined => (checked ? true : stored == null ? undefined : false);
+const LOGISTICS_BOOLEANS = [
+  { name: "parkingAvailable", label: "Parking Available" },
+  { name: "hasFreightElevator", label: "Freight Elevator" },
+  { name: "storageAvailable", label: "Storage Available" },
+  { name: "powerAvailable", label: "Power Available" },
+  { name: "waterAccess", label: "Water Access" },
+  { name: "hasStairs", label: "Stairs (load-in)" },
+] as const;
+
+// Tri-state logistics booleans: "" = Unknown (unset), "true" = Yes, "false" = No.
+// A binary checkbox cannot express "unknown" vs "confirmed no", which mismarks
+// venues created before a field existed. A select gives the operator all three.
+const triStateBoolean = (
+  value: FormDataEntryValue | null,
+): boolean | undefined =>
+  value === "true" ? true : value === "false" ? false : undefined;
+
+const booleanSelectValue = (stored: boolean | undefined | null): string =>
+  stored == null ? "" : stored ? "true" : "false";
 
 export function VenueDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -107,34 +118,16 @@ export function VenueDetailPage() {
         onPremise: data.get("onPremise") === "on",
         kitchenAccess:
           String(data.get("kitchenAccess") ?? "").trim() || undefined,
-        parkingAvailable: logisticsBoolean(
-          data.get("parkingAvailable") === "on",
-          venue.parkingAvailable,
-        ),
-        hasFreightElevator: logisticsBoolean(
-          data.get("hasFreightElevator") === "on",
-          venue.hasFreightElevator,
-        ),
-        storageAvailable: logisticsBoolean(
-          data.get("storageAvailable") === "on",
-          venue.storageAvailable,
-        ),
+        parkingAvailable: triStateBoolean(data.get("parkingAvailable")),
+        hasFreightElevator: triStateBoolean(data.get("hasFreightElevator")),
+        storageAvailable: triStateBoolean(data.get("storageAvailable")),
         logisticsNotes:
           String(data.get("logisticsNotes") ?? "").trim() || undefined,
         loadInInstructions:
           String(data.get("loadInInstructions") ?? "").trim() || undefined,
-        powerAvailable: logisticsBoolean(
-          data.get("powerAvailable") === "on",
-          venue.powerAvailable,
-        ),
-        waterAccess: logisticsBoolean(
-          data.get("waterAccess") === "on",
-          venue.waterAccess,
-        ),
-        hasStairs: logisticsBoolean(
-          data.get("hasStairs") === "on",
-          venue.hasStairs,
-        ),
+        powerAvailable: triStateBoolean(data.get("powerAvailable")),
+        waterAccess: triStateBoolean(data.get("waterAccess")),
+        hasStairs: triStateBoolean(data.get("hasStairs")),
         wasteRules: String(data.get("wasteRules") ?? "").trim() || undefined,
         permitsInsuranceNotes:
           String(data.get("permitsInsuranceNotes") ?? "").trim() || undefined,
@@ -345,73 +338,23 @@ export function VenueDetailPage() {
                     placeholder="e.g., Dock door 3, load-in 6:00–8:00am, freight entrance off Maple"
                   />
                 </div>
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="parkingAvailable"
-                      defaultChecked={venue.parkingAvailable ?? false}
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="ml-2 text-xs text-gray-600">
-                      Parking Available
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="hasFreightElevator"
-                      defaultChecked={venue.hasFreightElevator ?? false}
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="ml-2 text-xs text-gray-600">
-                      Freight Elevator
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="storageAvailable"
-                      defaultChecked={venue.storageAvailable ?? false}
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="ml-2 text-xs text-gray-600">
-                      Storage Available
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="powerAvailable"
-                      defaultChecked={venue.powerAvailable ?? false}
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="ml-2 text-xs text-gray-600">
-                      Power Available
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="waterAccess"
-                      defaultChecked={venue.waterAccess ?? false}
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="ml-2 text-xs text-gray-600">
-                      Water Access
-                    </span>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      name="hasStairs"
-                      defaultChecked={venue.hasStairs ?? false}
-                      className="h-4 w-4 rounded border-gray-300"
-                    />
-                    <span className="ml-2 text-xs text-gray-600">
-                      Stairs (load-in)
-                    </span>
-                  </div>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {LOGISTICS_BOOLEANS.map((field) => (
+                    <div key={field.name}>
+                      <label className="block text-xs text-gray-600">
+                        {field.label}
+                      </label>
+                      <select
+                        name={field.name}
+                        defaultValue={booleanSelectValue(venue[field.name])}
+                        className="mt-1 block w-full rounded-md border-gray-300 text-sm"
+                      >
+                        <option value="">Unknown</option>
+                        <option value="true">Yes</option>
+                        <option value="false">No</option>
+                      </select>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
