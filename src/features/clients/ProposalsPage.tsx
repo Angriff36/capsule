@@ -214,11 +214,37 @@ export function ProposalsPage() {
   };
 
   const invoke = (
-    row: { _id: string; version: number; status: unknown; clientId?: unknown },
+    row: {
+      _id: string;
+      version: number;
+      status: unknown;
+      clientId?: unknown;
+      eventId?: unknown;
+    },
     key: string,
   ) => {
     void (async () => {
       if (key === "accept") {
+        // Already linked to an event (e.g., created from an event per §5.3):
+        // accept preserves the link and runs the menu cascade against it
+        // server-side, so do not re-prompt to "link an event" or claim it is
+        // unlinked (the prior copy misled on this happy path).
+        if (row.eventId) {
+          const ok = await prompt.askConfirm({
+            title: "Accept proposal",
+            description:
+              "Acceptance records the commercial win. Menu selections will copy to the linked event's dishes.",
+            confirmLabel: "Accept proposal",
+          });
+          if (!ok) return;
+          void run(`${row._id}:accept`, async () => {
+            await accept({ docId: row._id, version: row.version });
+            setNotice(
+              "Proposal accepted. Menu selections were copied to the linked event's dishes.",
+            );
+          });
+          return;
+        }
         const linkableEvents = (events ?? []).filter(
           (event) =>
             event.deletedAt == null &&
@@ -393,6 +419,7 @@ export function ProposalsPage() {
 
       {showDraft ? (
         <form
+          key={fromEvent?._id ?? "new-proposal"}
           className="supply-form"
           onSubmit={submitDraft}
           ref={draftForm.formRef}
