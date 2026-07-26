@@ -120,6 +120,11 @@ const PerformanceReviewsPage = lazy(() =>
     default: module.PerformanceReviewsPage,
   })),
 );
+const MyReviewsPage = lazy(() =>
+  import("../features/workforce/MyReviewsPage").then((module) => ({
+    default: module.MyReviewsPage,
+  })),
+);
 const PackListsPage = lazy(() =>
   import("../features/logistics/PackListsPage").then((module) => ({
     default: module.PackListsPage,
@@ -710,6 +715,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <PerformanceReviewsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff/my-reviews"
+              element={
+                <SupplyRoute>
+                  <MyReviewsPage />
                 </SupplyRoute>
               }
             />

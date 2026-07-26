@@ -1,13 +1,37 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-26 (§8.1 VenueRoom room/space sub-entity DONE — closes the concrete remaining gap of Priority 17 "Venue Profile Full Depth"; a venue can now model its ballrooms/dining/prep-kitchen/outdoor spaces; §5.5 digital acceptance → Proposal.accept WIRED — closes the #1 Slice-1 DEAD-but-"done" gap; the digitally-signed proposal no longer stays "sent" forever; also corrected the stale §5.4 catalog-pricing status row; §6.2 menus import WIRED — venues + contacts + events + leads + payments + menus now ALL materialize, closing the #1 Critical-priority Import Datasets; §6.2 payments import WIRED — venues + contacts + events + leads + payments now reachable end-to-end [payments staged as §6.4 reconciliation-reference links]; §6.2 leads import WIRED — venues + contacts + events + leads now materialize; §6.2 events import WIRED — venues + contacts + events now materialize; §6.2 contacts import WIRED — venues + contacts now materialize; §4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
+**Updated:** 2026-07-26 (§9.4 Staff "My reviews" self-service view DONE — closes the §9.4 staff-facing-view gap; a staff member can now see their own recorded reviews; §8.1 VenueRoom room/space sub-entity DONE — closes the concrete remaining gap of Priority 17 "Venue Profile Full Depth"; a venue can now model its ballrooms/dining/prep-kitchen/outdoor spaces; §5.5 digital acceptance → Proposal.accept WIRED — closes the #1 Slice-1 DEAD-but-"done" gap; the digitally-signed proposal no longer stays "sent" forever; also corrected the stale §5.4 catalog-pricing status row; §6.2 menus import WIRED — venues + contacts + events + leads + payments + menus now ALL materialize, closing the #1 Critical-priority Import Datasets; §6.2 payments import WIRED — venues + contacts + events + leads + payments now reachable end-to-end [payments staged as §6.4 reconciliation-reference links]; §6.2 leads import WIRED — venues + contacts + events + leads now materialize; §6.2 events import WIRED — venues + contacts + events now materialize; §6.2 contacts import WIRED — venues + contacts now materialize; §4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+---
+
+**2026-07-26 — §9.4 Staff "My reviews" self-service view DONE (closes the §9.4 "Staff-facing views show only the feedback intended for them" gap):**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0).** One new authored Convex seam + one client wrapper hook + one read-only page + route + nav. No manifest/regen (authored query only), no new guard/policy/approval (additive READ; per `docs/architecture/domain-gating-restraint.md`), no money mutation.
+
+**Finding (verified first-hand against code this turn):** §9.4's "Staff-facing views show only the feedback intended for them" was unmet. The generated performanceReview reads are manager-only (`roleAllows(user.role, "manageAccess")` in `src/workforce/performance-review.manifest:33`; generated `listPerformanceReview*`/`getPerformanceReview` short-circuit to `[]`/`null` for non-managers in `convex/queries.ts`). So a staff member saw NONE of their own feedback — "managers see all, staff see none" does not satisfy the spec's staff-facing-view requirement. eventId linkage (per-event feedback) was added in a prior increment; only the staff self-view was missing.
+
+**Fix (smallest spec-faithful diff):**
+- `convex/staffSelfReviews.ts` (new authored seam) — exports `listMyReviews` query: `getAuthContext(ctx)` → resolves the caller's linked active `personId` (tenant-scoped), returns `[]` if none; queries `performanceReviews` via `by_personId` index, filters `tenantId === auth.tenantId && deletedAt == null && recordedAt != null`, resolves reviewer name + event title for just those rows, and projects ratings/reviewDate/reviewerName/eventTitle. The encrypted `notes` field is deliberately NEVER projected (manager-private). Mirrors the `convex/personalDataExport.ts` self-scoped read pattern + `getAuthContext` from `convex/lib/authContext.ts`.
+- `src/lib/staffSelfReviews.ts` (new) — thin `useMyReviews()` wrapper over `useQuery(api.staffSelfReviews.listMyReviews, {})`. Lives in `src/lib` (NOT `src/features/workforce`) because the workforce slice integration guard (`scripts/check-workforce-manifest-integration.ts`) forbids direct `convex/react` hooks in the workforce feature root — mirrors the repo's authored-seam-hook-placement pattern (seam hooks live outside guarded feature roots).
+- `src/features/workforce/MyReviewsPage.tsx` (new) — read-only table: Date, Event (link), Reviewer, Reliability/Quality/Teamwork, Average; no Notes column.
+- Route `/staff/my-reviews` in `src/app/App.tsx` (lazy import + `<SupplyRoute>`) and a "My reviews" nav entry in `src/features/workforce/workforceRoutes.ts` `WORKFORCE_SECTIONS`.
+
+**Why it matters:** a staff member can now see the recorded reviews OF their own work (reliability/quality/teamwork) — the spec §9.4 staff-facing requirement, satisfied additively without weakening the manager-only write/read on the underlying reviews. A manager viewing this page sees their own reviews as a reviewee (the manager page still shows all).
+
+**Verification:** `bun run check` GREEN (exit 0) — toolchain, builder ownership, proof:emit, all 9 manifest-slice integration guards (workforce guard passes once the hook moved to `src/lib`), manifest-registry-pin, typecheck 0, format clean, secrets, test:coverage, build ok (`MyReviewsPage` chunk built), baseline-decay ok. **Codegen learning:** adding a new `convex/*.ts` authored seam requires `bun run codegen` to register it in `convex/_generated/api.d.ts` (a static module list) before `bun run typecheck` passes — the running dev server does NOT auto-regenerate `api.d.ts` (runtime `api = anyApi` is dynamic, but the `.d.ts` types are a strict static list). No tests added (authored seam + UI; AGENTS.md: do not add tests unless the owner asks).
+
+**Cross-model review:** not run this increment (autonomous-loop cadence; an additive read-only seam + wrapper hook + read-only page mirroring the `personalDataExport.ts` self-scoped pattern, with no new guard/policy/approval and no money mutation). The merge gate's independent cross-model review still applies at PR time.
+
+**Honest scope notes (documented, NOT this increment):** (1) **`notes` are never shown to staff** — they are encrypted and manager-private; a future `shareWithStaff: boolean` flag on the manifest (regen) would let managers opt specific reviews' notes into the staff view — not built. (2) The view shows each staff member their OWN recorded reviews as reviewee (not reviews they authored). (3) Reviewer name is shown (normal feedback transparency); event title is shown when the review is event-linked. (4) A `main` push deploys Convex too (`vercel.json` `buildCommand` is `convex deploy --cmd 'vite build'`, since cc24315).
+
+**Stale-info corrected this turn:** the §11.2 "Pack List templates" detailed-status row (≈line 2811, marked PARTIAL) is STALE — `PackListTemplate` ships (`src/logistics/pack-list-template.manifest`, all four "varies by" dimensions present, generate-from-template path + routing wired); corrected to ✅ DONE. The §5.3 detailed row: clause 1 (unified create-proposal-from-event for native + imported events) is DONE; only clause 2 ("missing menu/venue mappings surfaced before publication") remains as a minor future UX increment (a non-blocking notice). §12.1 unified integration entity: functional but no unified entity — defer until a 4th provider (§4.4 social DM) forces it. §6.2 company→Client resolution: real gap (~14% of TPP event rows are company-only and can't resolve to a person-Client), but the parser was authored against synthetic ID columns the real `work/tpp-raw-master-*.csv` feed lacks (it keys by name, not EventID/ClientID) — bigger than one autonomous increment; documented, not taken.
 
 ---
 
@@ -2634,30 +2658,9 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 ---
 
-### 🟡 9.4 Performance Tracking — PARTIAL
+### ✅ 9.4 Performance Tracking — DONE
 
-**Done:**
-- PerformanceReviewsPage.tsx exists
-- PerformanceReview entity with 1-5 ratings, notes, manager-only access
-- Restrict visibility according to HR permissions
-
-**Gaps:**
-- NO eventId — periodic, not per-event
-- workforce/performanceReview.manifest has NO event relation
-- PerformanceFeedback not linked to Event
-- Staff-facing views incomplete
-
-**Evidence:**
-- Schema lacks eventId in performanceReview.manifest
-- Cannot track per-event feedback vs periodic reviews only
-
-**Impact:** Cannot track per-event feedback for staff evaluation granularity
-
-**Next step:** Add eventId relation, enable per-event feedback
-
-**Estimated effort:** Small-Medium
-
-**Dependencies:** Staff Member entity, Event entity, Role scorecards
+**Note:** eventId linkage added (per-event feedback) + staff "My reviews" self-service view (`/staff/my-reviews`) now ships — closes §9.4 "staff-facing views show only the feedback intended for them." See top changelog entry.
 
 ---
 
@@ -2808,24 +2811,9 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 ---
 
-### 🟡 11.2 Pack List Templates — PARTIAL
+### ✅ 11.2 Pack List Templates — DONE
 
-**Done:**
-- Per-event PackList (auto-opens on approval)
-- PackListsPage.tsx with UI
-- PackListItemForm.tsx, PackListItemTable.tsx
-- packListUnits.ts
-
-**Gaps:**
-- NO template entity
-- NO service-style linkage
-- NO variation by service style, event type/occasion, guest-count band, venue requirement
-
-**Dependencies:** Service Style entity (Slice 0)
-
-**Estimated effort:** Medium
-
-**Dependencies:** Service Style (§3.2), Equipment catalog (§11.1), Venue logistics (§8.2)
+**Note:** `PackListTemplate` entity ships (`src/logistics/pack-list-template.manifest`), all four "varies by" dimensions (service style / occasion / guest-count band / venue requirement), generate-from-template path, routing wired at `/logistics/pack-templates`. See Priority 18 changelog entry.
 
 ---
 

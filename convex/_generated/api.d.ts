@@ -48,6 +48,7 @@ import type * as sagas from "../sagas.js";
 import type * as search from "../search.js";
 import type * as shareLinks from "../shareLinks.js";
 import type * as smsAlerts from "../smsAlerts.js";
+import type * as staffSelfReviews from "../staffSelfReviews.js";
 import type * as tppParser from "../tppParser.js";
 import type * as vehicleAssignment from "../vehicleAssignment.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
@@ -100,6 +101,7 @@ declare const fullApi: ApiFromModules<{
   search: typeof search;
   shareLinks: typeof shareLinks;
   smsAlerts: typeof smsAlerts;
+  staffSelfReviews: typeof staffSelfReviews;
   tppParser: typeof tppParser;
   vehicleAssignment: typeof vehicleAssignment;
   webhookIntegrations: typeof webhookIntegrations;
