@@ -1,8 +1,8 @@
 // Proposal Revision Capture - Authored seam for proposal revision snapshotting
 
-import { internalMutation } from "../_generated/server";
-import { internal } from "../_generated/api";
-import type { Doc, Id } from "../_generated/dataModel";
+import { action, internalMutation } from "../_generated/server";
+import { api, internal } from "../_generated/api";
+import type { Doc } from "../_generated/dataModel";
 import { v } from "convex/values";
 
 // Snapshot data structure for proposal revisions
@@ -220,5 +220,46 @@ export const captureProposalRevision = internalMutation({
     });
 
     return { revisionId, revisionNumber: nextRevisionNumber };
+  },
+});
+
+// Send a proposal and capture its revision snapshot in one server-side call
+// (spec §5.5 / Priority 10). The generated `Proposal_send` is salesAccess-gated
+// and runs as the authenticated operator — `ctx.runMutation` from an action
+// propagates the caller's auth context, so the send guard passes exactly as it
+// does through `useProposalSend`. The revision snapshot is BEST-EFFORT audit:
+// it must never fail or roll back the send, so capture errors are swallowed
+// (the proposal is already sent; a missed snapshot is recoverable, a failed
+// send is not). Captures AFTER send so the snapshot records the sent status /
+// sentAt. `changeSummary` defaults to a sent-label so callers need not pass it.
+export const sendProposalWithRevisionCapture = action({
+  args: {
+    docId: v.id("proposals"),
+    version: v.optional(v.number()),
+    changeSummary: v.optional(v.string()),
+  },
+  handler: async (ctx, args): Promise<Doc<"proposals">> => {
+    const sent = await ctx.runMutation(api.mutations.Proposal_send, {
+      docId: args.docId,
+      version: args.version,
+    });
+    try {
+      await ctx.runMutation(
+        internal.lib.proposalRevision.captureProposalRevision,
+        {
+          proposalId: args.docId,
+          changeSummary:
+            args.changeSummary && args.changeSummary.trim().length > 0
+              ? args.changeSummary.trim()
+              : "Proposal sent to client",
+        },
+      );
+    } catch (err) {
+      console.warn(
+        "captureProposalRevision failed (proposal already sent):",
+        err,
+      );
+    }
+    return sent;
   },
 });

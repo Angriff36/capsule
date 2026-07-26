@@ -11,6 +11,28 @@
 
 ---
 
+**2026-07-26 — Proposal Revisions capture-on-send WIRED (closes Priority 10 / P1#2 "DONE-but-broken" gap):**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0). Authored Convex action + 2 UI wirings; no manifest/regen, no new entity/guard/query (no #111 exposure), no schema change. The action + capture reuse existing tables, so no Convex deploy is needed for the wiring to function once deployed generally.**
+
+**Finding (verified first-hand this turn):** Proposal Revisions (Priority 10) was marked "✅ DONE" throughout this plan but was **inert at runtime** — `captureProposalRevision` (`convex/lib/proposalRevision.ts`: a complete, correct `internalMutation` + snapshot builder) was **never invoked**. `Proposal.send` is generated and does not call it, and capture is an `internalMutation` (not client-callable), so no proposal ever produced a revision record. The entire revision-history feature was a no-op (snapshot builder, revisionNumber auto-increment, line-item/dish-selection freezing — all dead code). This was the P1#2 finding the 2026-07-26 §5.4 codex review escalated as "PRE-EXISTING Priority 10 gap, NOT fixed this increment." Exactly the placeholder/stub waste the loop rules target.
+
+**Fix (smallest spec-faithful diff; one authored action + 2 hook swaps):**
+- `convex/lib/proposalRevision.ts` — new `sendProposalWithRevisionCapture` **action**: calls the generated `Proposal_send` (salesAccess-gated; `ctx.runMutation` from an action propagates the operator's auth — proven in `convex/messageInbox.ts` `qualifyThreadAsLead`), THEN best-effort `captureProposalRevision` (internal) in a try/catch. **Send is primary** (throws on guard/auth failure → surfaced to the caller, identical to `useProposalSend`); **capture is best-effort audit** (swallowed + `console.warn` — a missed snapshot is recoverable, a failed send is not). Captures AFTER send so the snapshot records `status=sent`/`sentAt`. The snapshot already freezes the §5.4 priced line items + dish selections + totals, so capture-on-send also completes the §5.4 "acceptance" consumer of the central calc.
+- `src/features/clients/ProposalsPage.tsx` + `src/features/clients/LeadPipelinePage.tsx` — the two `useProposalSend()` call sites switched to `useAction(api.lib.proposalRevision.sendProposalWithRevisionCapture)`. Args `{docId, version}` preserved; `docId` cast `as Id<"proposals">` (`useAction` enforces strict branded ids, unlike the generated mutation hook's loose `.parse()`).
+
+**Why it matters:** a "DONE" feature did nothing. Sending a proposal now actually captures the immutable revision snapshot the spec (§5.5) and the rest of this plan assume exists — so acceptance, supersession, and audit history work, and the priced terms stay reproducible after later menu/catalog edits.
+
+**Two lessons (binding for future agents):**
+1. **An authored Convex action's UNTYPED return cascades `any` app-wide** via the `api` composite — `_generated/api.d.ts` references every `convex/**` module via `typeof`, so an untyped action return makes `api.*` resolve to `any` → TS7006/7022 cascade into every consumer, including files you never touched (`messageInbox.ts`, `quoteBuilder.ts` lit up this turn). Same root cause as the 2026-07-25 quoteBuilder cascade. **Always annotate an authored action/mutation handler return type** — here `Promise<Doc<"proposals">>` broke the cycle and the cascade victims vanished.
+2. **`useAction` enforces strict `Id<"…">` arg types** (from the `v.id("…")` validator); the generated `use<Entity><Command>` mutation hooks accept loose args (they `.parse()` a `Record<string, unknown>` schema). Switching a call site from a generated hook to an authored action can newly require `as Id<"…">` casts on id args.
+
+**Verification:** `bun run check` GREEN — toolchain, ownership ledger, all 9 manifest-slice contracts, typecheck 0 (`Doc<"proposals">` annotation + `Id` casts), format clean (prettier-normalized), secrets, test:coverage, build ok (ProposalsPage chunk 22.18 kB; LeadPipelinePage 14.39 kB), baseline-decay ok. **No codegen re-run needed:** `_generated/api.d.ts` references the module via `typeof lib_proposalRevision`, so the new `action` export auto-registers in the `api` composite. Runtime write-path verified by inspection (generator `as any` casts hide runtime bugs): action → `ctx.runMutation(api.mutations.Proposal_send, {docId, version})` (the proven auth-propagating path) → then `internal.lib.proposalRevision.captureProposalRevision`. No tests added (authored seam + UI; AGENTS.md). Cross-model review run before push — see commit/PR.
+
+**Honest scope note:** capture is best-effort by design; if the snapshot insert ever fails, the proposal is still sent and the revision is simply missing (no data loss, recoverable on next send/revision). A transactional send+capture would need a single authored mutation calling both via `ctx.runMutation` (Convex nested-mutation transaction semantics) — deferred unless capture reliability becomes a real concern.
+
+---
+
 **2026-07-26 — §5.4 PDF/render: proposal PDF now shows the priced line-item breakdown DONE:**
 
 **Status: ✅ Shipped + `bun run check` GREEN (exit 0). Pure-frontend render change (2 source files); no manifest/regen, no new entity/guard/query (no #111 exposure), no authored Convex seam, no schema migration.**
@@ -53,7 +75,7 @@
 **Cross-model review (codex gpt-5.6-sol, author=Claude/Opus) — REJECT (4× P1 + 2× P2); resolution:**
 - **P2 #6 (silent drop of descriptionless rows): FIXED** — `submitDraft` now errors "Every pricing line needs a description" when a populated row lacks one, so live preview and submit agree (was: silently dropped → a lower saved total than previewed).
 - **P1 #3 (snapshot filter missed fresh rows): FIXED** — `deletedAt` is absent at governed-creation insert; switched the lineItems filter to JS loose-equality, matching the repo's working `*ByTenantId` query pattern.
-- **P1 #2 (snapshot never fires — capture not wired): PRE-EXISTING Priority 10 gap, NOT fixed this increment** — `captureProposalRevision` (proposalRevision.ts) is defined but never invoked; `Proposal.send` doesn't call it. The snapshot BUILDER + filter are now correct and will fire once capture-on-send is wired (blocked on `checkRole` being generated-only). **Escalated to the human; the commit was NOT auto-pushed over the rejection.**
+- **P1 #2 (snapshot never fires — capture not wired): RESOLVED 2026-07-26 — see top changelog entry.** `sendProposalWithRevisionCapture` action now wraps `Proposal_send` + best-effort `captureProposalRevision`, wired into both send sites. (The "blocked on `checkRole` being generated-only" concern was a red herring: capture is an authored `internalMutation` needing no generated guard; the action's `ctx.runMutation` propagates the operator's auth so `Proposal_send`'s salesAccess guard passes — the proven `messageInbox.ts` pattern.)
 - **P1 #1 (listProposalLineItemByTenantId cross-tenant): SYSTEMIC #111** — byte-identical to every `*ByTenantId` query repo-wide; Priority 21/32 shipped the identical pattern; tracked as generator-level GitHub issue #111. Not uniquely introduced by this increment.
 - **P1 #4 (recompute parent totals on line mutation): documented next-slice** (scope note #3) — the shipped draft-flow totals are consistent (computed from the same in-memory lines); post-draft line edits via API/assistant would desync until the server-side recompute seam lands.
 - **P2 #5 (restore pricing lines with the draft): documented follow-up** — the controlled `draftLines` state isn't serialized by `useFormDraft`, so pricing lines are lost on reload/restore (named form fields still restore). Persist line state alongside the draft in a next slice.
@@ -1868,26 +1890,13 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 ---
 
-### ❌ 5.6 Proposal Revisions Snapshot — NOT BUILT
+### ✅ 5.6 Proposal Revisions Snapshot — DONE (entity 2026-07-25; capture-on-send WIRED 2026-07-26)
 
 **Spec requirement:** Immutable revision snapshots (version number, timestamp, actor), event/client/venue/menu/pricing details, historical revisions reproducible for accepted proposals, superseded/expired tracking
 
-**Current gap:**
-- Only version field on proposals
-- NO snapshot entity
-- NO history tracking
-- Later edits mutate draft, no immutable record
+**Status:** `ProposalRevision` entity + snapshot builder (`convex/lib/proposalRevision.ts`) shipped previously; capture-on-send wiring shipped 2026-07-26 (see top changelog entry). Sending a proposal now captures the immutable snapshot (totals + priced §5.4 line items + dish selections + client/tenant), so accepted terms stay reproducible after later edits.
 
-**Evidence:**
-- Schema lacks proposalRevisions entity
-
-**Next steps:**
-1. Design ProposalRevision entity
-2. Implement snapshot on publish
-3. Track revision history
-4. Ensure reproducibility
-
-**Estimated effort:** Medium
+**Prior gap (resolved):** the snapshot builder existed but `Proposal.send` never invoked it — the feature was inert until the `sendProposalWithRevisionCapture` action wired capture into both send sites (ProposalsPage + LeadPipelinePage).
 
 ---
 

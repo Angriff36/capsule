@@ -1,4 +1,5 @@
 import { useMemo, useState, type CSSProperties, type FormEvent } from "react";
+import { useAction } from "convex/react";
 import { Link } from "react-router-dom";
 import {
   useCreateClient,
@@ -12,8 +13,8 @@ import {
   useLeadUpdatePipeline,
   useListLead,
   useListReferralSource,
-  useProposalSend,
 } from "../../lib/manifest-convex-react";
+import { api, type Id } from "../../lib/api";
 import { TableSkeleton } from "../../ui/primitives";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -98,7 +99,11 @@ export function LeadPipelinePage() {
   const stageConversion = useLeadStageConversion();
   const confirmConversion = useLeadConfirmConversion();
   const createProposal = useCreateProposal();
-  const sendProposal = useProposalSend();
+  // Capture a revision snapshot on send (spec §5.5 / Priority 10) via the
+  // authored action that wraps Proposal_send + best-effort capture.
+  const sendProposal = useAction(
+    api.lib.proposalRevision.sendProposalWithRevisionCapture,
+  );
   const stageProposal = useLeadStageProposal();
   const confirmProposalSent = useLeadConfirmProposalSent();
 
@@ -290,7 +295,7 @@ export function LeadPipelinePage() {
         eventDate: dateValue(data.get("eventDate")),
         notes: lead.notes || undefined,
       });
-      const proposalId = String(created.docId);
+      const proposalId = created.docId as Id<"proposals">;
       await sendProposal({ docId: proposalId, version: 1 });
       const staged = await stageProposal({
         docId: lead._id,

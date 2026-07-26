@@ -6,6 +6,7 @@ import {
   useState,
   type FormEvent,
 } from "react";
+import { useAction } from "convex/react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   useCreateProposal,
@@ -21,9 +22,9 @@ import {
   useProposalDecline,
   useProposalExpire,
   useProposalMarkViewed,
-  useProposalSend,
   useCreateSignatureRequest,
 } from "../../lib/manifest-convex-react";
+import { api, type Id } from "../../lib/api";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
@@ -115,7 +116,12 @@ export function ProposalsPage() {
   const proposalLineItems = useListProposalLineItem();
   const proposalRevisions = useListProposalRevision();
   const createProposal = useCreateProposal();
-  const send = useProposalSend();
+  // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
+  // a thin authored action wraps the generated Proposal_send + best-effort
+  // capture, so a sent proposal always has a reproducible revision record.
+  const send = useAction(
+    api.lib.proposalRevision.sendProposalWithRevisionCapture,
+  );
   const markViewed = useProposalMarkViewed();
   const accept = useProposalAccept();
   const decline = useProposalDecline();
@@ -483,7 +489,11 @@ export function ProposalsPage() {
       }
       void run(`${row._id}:${key}`, async () => {
         const args = { docId: row._id, version: row.version };
-        if (key === "send") await send(args);
+        if (key === "send")
+          await send({
+            docId: row._id as Id<"proposals">,
+            version: row.version,
+          });
         if (key === "markViewed") await markViewed(args);
         if (key === "expire") await expire(args);
         setNotice(`Proposal updated (${key}).`);
