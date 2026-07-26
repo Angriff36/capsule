@@ -6,6 +6,7 @@ import {
   useListDish,
   useListEvent,
   useListPackListItem,
+  useListPackListTemplate,
   usePackListCancel,
   usePackListDispatch,
   usePackListItemAdjustQuantity,
@@ -29,8 +30,22 @@ import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { PackListItemForm } from "./PackListItemForm";
 import { PackListItemTable } from "./PackListItemTable";
+import { PACK_LIST_UNITS } from "./packListUnits";
 
 const policy = new LogisticsLifecyclePolicy();
+
+// Generated list hooks return `any`; this summary type keeps template handling checked.
+type TemplateSummary = {
+  _id: string;
+  name: string;
+  items: string;
+  status: string;
+  serviceStyleId?: string | null;
+  occasionId?: string | null;
+  guestCountMin?: number | null;
+  guestCountMax?: number | null;
+  deletedAt?: number | null;
+};
 
 export function PackListDetailPage() {
   const { id } = useParams();
@@ -39,6 +54,7 @@ export function PackListDetailPage() {
   const events = useListEvent();
   const dishes = useListDish();
   const createItem = useCreatePackListItem();
+  const templates = useListPackListTemplate();
   const adjustQuantity = usePackListItemAdjustQuantity();
   const markItemPacked = usePackListItemMarkPacked();
   const markItemMissing = usePackListItemMarkMissing();
@@ -48,6 +64,7 @@ export function PackListDetailPage() {
   const dispatch = usePackListDispatch();
   const cancel = usePackListCancel();
   const [showAdd, setShowAdd] = useState(false);
+  const [showTemplates, setShowTemplates] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -144,6 +161,99 @@ export function PackListDetailPage() {
       setNotice("Item added to the load sheet.");
     });
   };
+
+  const event = events?.find((e) => e._id === packList.eventId);
+
+  const parseTemplateItems = (
+    raw: string | null | undefined,
+  ): { description: string; requiredQuantity: number; unit: string }[] => {
+    if (!raw) return [];
+    try {
+      const parsed = JSON.parse(raw) as unknown;
+      if (!Array.isArray(parsed)) return [];
+      return parsed
+        .filter(
+          (
+            it,
+          ): it is {
+            description: string;
+            requiredQuantity: number;
+            unit: string;
+          } =>
+            typeof it === "object" &&
+            it !== null &&
+            typeof (it as { description: unknown }).description === "string" &&
+            typeof (it as { requiredQuantity: unknown }).requiredQuantity ===
+              "number",
+        )
+        .map((it) => ({
+          description: it.description,
+          requiredQuantity: it.requiredQuantity,
+          unit: PACK_LIST_UNITS.includes(
+            it.unit as (typeof PACK_LIST_UNITS)[number],
+          )
+            ? it.unit
+            : "each",
+        }));
+    } catch {
+      return [];
+    }
+  };
+
+  // A template "matches" the event when every dimension it scopes is satisfied
+  // (null dimension = unconstrained). Used only to badge suggestions; the
+  // operator may still pick any active template.
+  const matchesEvent = (template: TemplateSummary): boolean => {
+    if (!event) return false;
+    const styleOk =
+      template.serviceStyleId == null ||
+      template.serviceStyleId === event.serviceStyleId;
+    const occasionOk =
+      template.occasionId == null || template.occasionId === event.occasionId;
+    const head = event.expectedHeadcount ?? 0;
+    const minOk =
+      template.guestCountMin == null || head >= template.guestCountMin;
+    const maxOk =
+      template.guestCountMax == null || head <= template.guestCountMax;
+    return styleOk && occasionOk && minOk && maxOk;
+  };
+
+  const generateFromTemplate = (template: TemplateSummary) => {
+    void run(`generate:${template._id}`, async () => {
+      const lines = parseTemplateItems(template.items).filter(
+        (it) => it.description.trim() !== "" && it.requiredQuantity > 0,
+      );
+      if (lines.length === 0) {
+        throw new Error("This template has no valid items to generate.");
+      }
+      // ponytail: sequential client-side copy (non-atomic). A mid-loop network
+      // drop can leave a partial load sheet; a server-side bulk-generate action
+      // is the upgrade path if it bites. Mirrors VenueLayoutTemplate's copy.
+      for (const it of lines) {
+        await createItem({
+          packListId: packList._id,
+          description: it.description,
+          requiredQuantity: it.requiredQuantity,
+          unit: it.unit,
+        });
+      }
+      setShowTemplates(false);
+      setNotice(
+        `${lines.length} ${lines.length === 1 ? "item" : "items"} generated from "${template.name}".`,
+      );
+    });
+  };
+
+  const activeTemplates = (templates ?? [])
+    .filter(
+      (t: TemplateSummary) =>
+        t.deletedAt == null && String(t.status) === "active",
+    )
+    .sort(
+      (a: TemplateSummary, b: TemplateSummary) =>
+        Number(matchesEvent(b)) - Number(matchesEvent(a)) ||
+        a.name.localeCompare(b.name),
+    );
 
   const invokeList = (key: string) => {
     void (async () => {
@@ -311,13 +421,28 @@ export function PackListDetailPage() {
             </button>
           ))}
           {canAddItems ? (
-            <button
-              className="btn btn-primary"
-              type="button"
-              onClick={() => setShowAdd((value) => !value)}
-            >
-              {showAdd ? "Close form" : "Add item"}
-            </button>
+            <>
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={() => {
+                  setShowAdd((value) => !value);
+                  setShowTemplates(false);
+                }}
+              >
+                {showAdd ? "Close form" : "Add item"}
+              </button>
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => {
+                  setShowTemplates((value) => !value);
+                  setShowAdd(false);
+                }}
+              >
+                {showTemplates ? "Close templates" : "From template"}
+              </button>
+            </>
           ) : null}
         </div>
       </header>
@@ -336,6 +461,66 @@ export function PackListDetailPage() {
           busy={busy === "add-item"}
           onSubmit={submitItem}
         />
+      ) : null}
+
+      {showTemplates && canAddItems ? (
+        <section className="mt-3 rounded-lg border border-line-2 bg-surface-1 p-3">
+          <div className="flex items-center justify-between">
+            <p className="eyebrow">Generate from a template</p>
+            <Link
+              className="text-link text-[13px]"
+              to="/logistics/pack-templates"
+            >
+              Manage templates
+            </Link>
+          </div>
+          {activeTemplates.length === 0 ? (
+            <p className="mt-2 text-[13px] text-ink-3">
+              No active pack list templates yet.{" "}
+              <Link className="link" to="/logistics/pack-templates">
+                Create one
+              </Link>
+              .
+            </p>
+          ) : (
+            <ul className="mt-2 grid gap-2">
+              {activeTemplates.map((template) => {
+                const count = parseTemplateItems(template.items).length;
+                const suggested = matchesEvent(template);
+                return (
+                  <li
+                    key={template._id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line-2 p-2"
+                  >
+                    <div>
+                      <span className="font-medium text-ink-1">
+                        {template.name}
+                      </span>
+                      {suggested ? (
+                        <span className="ml-2 rounded-full border border-ok/30 bg-ok-soft px-2 py-0.5 text-[11px] text-ok">
+                          Suggested for this event
+                        </span>
+                      ) : null}
+                      <span className="ml-2 text-[12px] text-ink-3">
+                        {count} {count === 1 ? "item" : "items"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-sm"
+                      disabled={busy != null}
+                      onClick={() => generateFromTemplate(template)}
+                    >
+                      {busy === `generate:${template._id}`
+                        ? "Generating…"
+                        : "Generate"}
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
       ) : null}
 
       <section className="working-ledger">

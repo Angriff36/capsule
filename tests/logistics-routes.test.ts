@@ -12,6 +12,7 @@ describe("Logistics routes and lifecycle bindings", () => {
   it("exposes pack list and delivery sections", () => {
     expect(LOGISTICS_SECTIONS.map((section) => section.path)).toEqual([
       "/logistics/packs",
+      "/logistics/pack-templates",
       "/logistics/deliveries",
       "/logistics/schedule",
       "/logistics/route",
@@ -27,9 +28,11 @@ describe("Logistics routes and lifecycle bindings", () => {
     );
     expect(app).toContain('path="/logistics/packs"');
     expect(app).toContain('path="/logistics/packs/:id"');
+    expect(app).toContain('path="/logistics/pack-templates"');
     expect(app).toContain('path="/logistics/deliveries"');
     expect(app).toContain("PackListsPage");
     expect(app).toContain("PackListDetailPage");
+    expect(app).toContain("PackListTemplatesPage");
     expect(app).toContain("DeliveriesPage");
   });
 

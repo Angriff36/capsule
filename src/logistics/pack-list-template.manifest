@@ -1,0 +1,184 @@
+// PackListTemplate — reusable equipment pack-list templates (spec §11.2).
+//
+// Spec §11.2: "Equipment PackList Templates can vary by service style, event
+// type/occasion, guest-count band, and venue requirement. Generating for an
+// Event creates an editable snapshot of PackListItems with required quantity,
+// packed/loaded/returned quantity, source/template, notes, and shortage state.
+// Venue logistics and Event selections may add requirements. Template changes
+// affect future generations, not already finalized event snapshots."
+//
+// `items` is a JSON array of { description, requiredQuantity, unit, dishId? }
+// mirroring PackListItem's editable fields (description/requiredQuantity/unit
+// and optional dishId), so generating a template into an event's PackList
+// creates PackListItem rows verbatim via the existing addItem command
+// (client-side copy). The template is the reusable source; the generated
+// PackListItems are an independent, editable snapshot — so later template
+// edits never touch already-generated event pack lists (spec's last sentence).
+//
+// The "varies by" dimensions are plain optional fields (not relations): a
+// template may apply broadly or be scoped. Matching at generation time is
+// client-side against the event's serviceStyleId/occasionId/expectedHeadcount.
+
+enum PackListTemplateStatus {
+  active
+  archived
+}
+
+entity PackListTemplate mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property description: string?
+  // JSON array of template lines: [{ "description": string, "requiredQuantity": number, "unit": UnitOfMeasure, "dishId": string|null }].
+  // Stored as a string (same posture as ProposalRevision.snapshot /
+  // VenueLayoutTemplate.sections) and parsed client-side; mirrors PackListItem
+  // so a copy needs no transformation.
+  property required items: string = "[]"
+  property required status: PackListTemplateStatus = "active"
+  property definedAt: datetime?
+  property archivedAt: datetime?
+  property archiveReason: string?
+
+  // "Varies by" dimensions (spec §11.2). All optional — null means unconstrained.
+  property serviceStyleId: uuid?
+  property occasionId: uuid?
+  // Guest-count band [min,max]; null min = no floor, null max = no ceiling.
+  property guestCountMin: int?
+  property guestCountMax: int?
+  property venueRequirement: string?
+
+  computed isActive: boolean = self.status == "active"
+
+  constraint templateComplete: self.definedAt == null or length(trim(self.name)) > 0 "Defined templates require a name"
+  constraint guestCountBandValid: self.guestCountMin == null or self.guestCountMax == null or self.guestCountMax >= self.guestCountMin "Guest-count band max must be >= min"
+
+  transition status from "active" to ["archived"]
+  transition status from "archived" to ["active"]
+
+  default policy packListTemplateRead read: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may read pack list templates"
+  default policy packListTemplateWrite write: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may write pack list templates through commands"
+  default policy packListTemplateExecute execute: roleAllows(user.role, "logisticsAccess") or roleAllows(user.role, "manageAccess") "Logistics staff and managers may execute pack list template commands"
+
+  command define(
+    name: string,
+    optional description: string,
+    optional items: string,
+    optional serviceStyleId: uuid,
+    optional occasionId: uuid,
+    optional guestCountMin: int,
+    optional guestCountMax: int,
+    optional venueRequirement: string
+  ) {
+    // No `guard self.createdAt == null`: the `timestamps` mixin auto-populates
+    // createdAt before guards run, so that guard always threw in the create
+    // path (the bug that sank earlier venue-template attempts — see
+    // IMPLEMENTATION_PLAN.md). `definedAt` is set inside this command, so
+    // guarding on it correctly means "not yet defined".
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    constraint defineTemplateName: length(trim(name)) > 0 "Template name is required"
+    constraint defineGuestCountBand: guestCountMin == null or guestCountMax == null or guestCountMax >= guestCountMin "Guest-count band max must be >= min"
+    mutate name = name
+    mutate description = description
+    mutate items = items != null ? items : "[]"
+    mutate serviceStyleId = serviceStyleId
+    mutate occasionId = occasionId
+    mutate guestCountMin = guestCountMin
+    mutate guestCountMax = guestCountMax
+    mutate venueRequirement = venueRequirement
+    mutate definedAt = now()
+    emit PackListTemplateDefined {
+      templateId: self.id
+      tenantId: self.tenantId
+      name: name
+    }
+  }
+
+  command revise(
+    name: string,
+    optional description: string,
+    optional items: string,
+    optional serviceStyleId: uuid,
+    optional occasionId: uuid,
+    optional guestCountMin: int,
+    optional guestCountMax: int,
+    optional venueRequirement: string
+  ) {
+    guard self.definedAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    constraint reviseTemplateName: length(trim(name)) > 0 "Template name is required"
+    constraint reviseGuestCountBand: guestCountMin == null or guestCountMax == null or guestCountMax >= guestCountMin "Guest-count band max must be >= min"
+    mutate name = name
+    mutate description = description
+    // Preserve stored items on a rename-only edit (the UI may not render
+    // malformed JSON); only overwrite when items are explicitly supplied.
+    mutate items = items != null ? items : self.items
+    mutate serviceStyleId = serviceStyleId
+    mutate occasionId = occasionId
+    mutate guestCountMin = guestCountMin
+    mutate guestCountMax = guestCountMax
+    mutate venueRequirement = venueRequirement
+    emit PackListTemplateRevised {
+      templateId: self.id
+      tenantId: self.tenantId
+      name: name
+    }
+  }
+
+  command archive(optional reason: string) {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    // Reason is optional: archiving is reversible and low-stakes, so forcing a
+    // reason is exactly the policy tedium the merge gate prohibits. It is
+    // captured only when staff choose to record one.
+    mutate status = "archived"
+    mutate archivedAt = now()
+    mutate archiveReason = reason
+    emit PackListTemplateArchived {
+      templateId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "archived"
+    guard self.deletedAt == null
+    mutate status = "active"
+    mutate archivedAt = null
+    mutate archiveReason = null
+    emit PackListTemplateReactivated {
+      templateId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store PackListTemplate in durable
+}
+
+event PackListTemplateDefined: "pack_list_template.defined" {
+  templateId: string
+  tenantId: string
+  name: string
+}
+
+event PackListTemplateRevised: "pack_list_template.revised" {
+  templateId: string
+  tenantId: string
+  name: string
+}
+
+event PackListTemplateArchived: "pack_list_template.archived" {
+  templateId: string
+  tenantId: string
+  reason: string?
+}
+
+event PackListTemplateReactivated: "pack_list_template.reactivated" {
+  templateId: string
+  tenantId: string
+}

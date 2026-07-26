@@ -59,6 +59,7 @@ describe("governed creation mappings", () => {
       "OrganizationCapabilitySetting_createViaRegister",
       "Organization_createViaRegister",
       "PackListItem_createViaAddItem",
+      "PackListTemplate_createViaDefine",
       "PackList_createViaOpen",
       "PaymentMethod_createViaRegister",
       "Payment_createViaRecord",
