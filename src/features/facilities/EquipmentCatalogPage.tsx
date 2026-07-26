@@ -4,6 +4,7 @@ import {
   useEquipmentReactivate,
   useEquipmentRecount,
   useEquipmentRetire,
+  useEquipmentReviseDetails,
   useEquipmentUpdateCondition,
   useListEquipment,
 } from "../../lib/manifest-convex-react";
@@ -37,7 +38,9 @@ export function EquipmentCatalogPage() {
   const recount = useEquipmentRecount();
   const retire = useEquipmentRetire();
   const reactivate = useEquipmentReactivate();
+  const reviseDetails = useEquipmentReviseDetails();
   const [showForm, setShowForm] = useState(false);
+  const [editing, setEditing] = useState<EquipmentDetailRow | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
 
@@ -75,6 +78,28 @@ export function EquipmentCatalogPage() {
       });
       element.reset();
       setShowForm(false);
+    });
+  };
+
+  const submitEdit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const element = event.currentTarget;
+    const data = new FormData(element);
+    const item = editing;
+    if (!item) return;
+    void run("revise", async () => {
+      await reviseDetails({
+        docId: item._id,
+        version: item.version,
+        name: String(data.get("name") ?? "").trim(),
+        category: String(data.get("category") ?? "").trim(),
+        ownership: String(data.get("ownership")) as "owned" | "rented",
+        purchaseValue: Number(data.get("purchaseValue")),
+        homeLocation: String(data.get("homeLocation") ?? "").trim(),
+        currentLocation: String(data.get("currentLocation") ?? "").trim(),
+      });
+      element.reset();
+      setEditing(null);
     });
   };
 
@@ -118,7 +143,13 @@ export function EquipmentCatalogPage() {
           </p>
         </div>
         <div className="supply-masthead-actions">
-          <button className="btn btn-primary" onClick={() => setShowForm(true)}>
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              setEditing(null);
+              setShowForm(true);
+            }}
+          >
             Register equipment
           </button>
         </div>
@@ -129,6 +160,14 @@ export function EquipmentCatalogPage() {
           busy={busy != null}
           onSubmit={submit}
           onClose={() => setShowForm(false)}
+        />
+      ) : null}
+      {editing ? (
+        <EquipmentForm
+          busy={busy != null}
+          onSubmit={submitEdit}
+          onClose={() => setEditing(null)}
+          editItem={editing}
         />
       ) : null}
 
@@ -160,6 +199,7 @@ export function EquipmentCatalogPage() {
                 <tr>
                   <th>Equipment</th>
                   <th>Category</th>
+                  <th>Location</th>
                   <th>Ownership</th>
                   <th>Qty</th>
                   <th>Purchase value</th>
@@ -177,6 +217,21 @@ export function EquipmentCatalogPage() {
                     </td>
                     <td>{item.category}</td>
                     <td>
+                      {item.homeLocation ? (
+                        <div>
+                          <div>{item.homeLocation}</div>
+                          {item.currentLocation &&
+                          item.currentLocation !== item.homeLocation ? (
+                            <small>now: {item.currentLocation}</small>
+                          ) : null}
+                        </div>
+                      ) : item.currentLocation ? (
+                        <small>{item.currentLocation}</small>
+                      ) : (
+                        "—"
+                      )}
+                    </td>
+                    <td>
                       <StatusChip status={String(item.ownership)} />
                     </td>
                     <td className="supply-number">{item.quantity}</td>
@@ -193,6 +248,16 @@ export function EquipmentCatalogPage() {
                       <div className="supply-row-actions">
                         {item.status === "active" ? (
                           <>
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              disabled={busy != null}
+                              onClick={() => {
+                                setShowForm(false);
+                                setEditing(item);
+                              }}
+                            >
+                              Edit
+                            </button>
                             <button
                               className="btn btn-ghost btn-sm"
                               disabled={busy != null}
@@ -247,40 +312,62 @@ type EquipmentRow = {
   deletedAt?: number | null;
 };
 
+type EquipmentDetailRow = {
+  _id: string;
+  version: number;
+  name: string;
+  category: string;
+  ownership: "owned" | "rented";
+  purchaseValue: number;
+  homeLocation?: string | null;
+  currentLocation?: string | null;
+};
+
 function EquipmentForm({
   busy,
   onSubmit,
   onClose,
+  editItem,
 }: {
   busy: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onClose: () => void;
+  editItem?: EquipmentDetailRow | null;
 }) {
+  const editing = editItem != null;
   return (
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
         <div>
           <p className="eyebrow">Governed facilities command</p>
-          <h2>Register equipment</h2>
+          <h2>{editing ? "Edit equipment details" : "Register equipment"}</h2>
         </div>
         <div className="supply-row-actions">
           <button type="button" className="btn btn-ghost" onClick={onClose}>
             Cancel
           </button>
           <button className="btn btn-primary" disabled={busy}>
-            {busy ? "Working…" : "Register"}
+            {busy ? "Working…" : editing ? "Save" : "Register"}
           </button>
         </div>
       </div>
       <div className="supply-form-grid">
         <label className="field-label">
           Name
-          <input name="name" className="input" required autoFocus />
+          <input
+            name="name"
+            className="input"
+            required
+            autoFocus
+            defaultValue={editItem?.name}
+          />
         </label>
-        <label className="field-label">
-          Asset tag
-          <input name="assetTag" className="input" required />
-        </label>
+        {editing ? null : (
+          <label className="field-label">
+            Asset tag
+            <input name="assetTag" className="input" required />
+          </label>
+        )}
         <label className="field-label">
           Category
           <input
@@ -288,6 +375,7 @@ function EquipmentForm({
             className="input"
             required
             list="equipment-categories"
+            defaultValue={editItem?.category}
           />
           <datalist id="equipment-categories">
             {CATEGORY_SUGGESTIONS.map((category) => (
@@ -297,23 +385,29 @@ function EquipmentForm({
         </label>
         <label className="field-label">
           Ownership
-          <select name="ownership" className="input">
+          <select
+            name="ownership"
+            className="input"
+            defaultValue={editItem?.ownership ?? "owned"}
+          >
             <option value="owned">Owned</option>
             <option value="rented">Rented</option>
           </select>
         </label>
-        <label className="field-label">
-          Quantity
-          <input
-            name="quantity"
-            className="input"
-            type="number"
-            min={1}
-            step={1}
-            defaultValue={1}
-            required
-          />
-        </label>
+        {editing ? null : (
+          <label className="field-label">
+            Quantity
+            <input
+              name="quantity"
+              className="input"
+              type="number"
+              min={1}
+              step={1}
+              defaultValue={1}
+              required
+            />
+          </label>
+        )}
         <label className="field-label">
           Purchase value (per unit)
           <input
@@ -322,20 +416,44 @@ function EquipmentForm({
             type="number"
             min={0}
             step="any"
-            defaultValue={0}
+            defaultValue={editItem?.purchaseValue ?? 0}
             required
           />
         </label>
-        <label className="field-label">
-          Condition
-          <select name="condition" className="input" defaultValue="good">
-            {CONDITIONS.map((condition) => (
-              <option key={condition} value={condition}>
-                {condition.replace("_", " ")}
-              </option>
-            ))}
-          </select>
-        </label>
+        {editing ? null : (
+          <label className="field-label">
+            Condition
+            <select name="condition" className="input" defaultValue="good">
+              {CONDITIONS.map((condition) => (
+                <option key={condition} value={condition}>
+                  {condition.replace("_", " ")}
+                </option>
+              ))}
+            </select>
+          </label>
+        )}
+        {editing ? (
+          <>
+            <label className="field-label">
+              Home location
+              <input
+                name="homeLocation"
+                className="input"
+                defaultValue={editItem?.homeLocation ?? ""}
+                placeholder="Where it lives"
+              />
+            </label>
+            <label className="field-label">
+              Current location
+              <input
+                name="currentLocation"
+                className="input"
+                defaultValue={editItem?.currentLocation ?? ""}
+                placeholder="Where it is now"
+              />
+            </label>
+          </>
+        ) : null}
       </div>
     </form>
   );

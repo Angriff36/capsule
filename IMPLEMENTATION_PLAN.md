@@ -11,6 +11,26 @@
 
 ---
 
+**2026-07-26 — Priority 16 (Equipment Location Fields) DONE:**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0). Single-file UI change; no manifest/regen/schema/test/route changes — so no new generated `*ByTenantId` query and no #111 review exposure.**
+
+**Finding (verified first-hand against the spec and code this turn):** the spec §11.1 requirement — "active state, home/current location, ownership/rental..." with app-impact "Operations knows what exists, where it is, whether it works, and whether it is available" — was ALREADY satisfied at the DATA layer. `homeLocation: string?` and `currentLocation: string?` exist on `Equipment` (`src/facilities/equipment.manifest` L49-50; generated `convex/schema.ts` `equipments` table), and the `reviseDetails` command already accepts and mutates both (manifest L106-132, params confirmed against the generated `EquipmentReviseDetailsParamsSchema`). BUT location was a DEAD field in the running app: `src/features/facilities/EquipmentCatalogPage.tsx` never imported `useEquipmentReviseDetails`, showed no location column, and had no edit affordance — so ops could neither SEE nor SET "where it is." (NOTE: the spec's own §0 implementation-status table at `specs/capsule-complete-feature-spec.md` line 48 — "11.1 Equipment inventory 🟡 ... no location field" — is STALE; the fields predate this increment. Not corrected in the spec this increment; left as a documented follow-up.)
+
+**Fix (UI-only; ponytail — smallest correct diff, no manifest change):** `src/features/facilities/EquipmentCatalogPage.tsx`:
+- Added a **Location column** to the catalog table that surfaces `homeLocation`, and shows "now: <currentLocation>" beneath it when current differs from home — the spec's "where it is" is now visible at a glance.
+- Added an **Edit** row action (active items only) that opens the existing `EquipmentForm` in a new edit mode (prefilled from the row) exposing **Home location** and **Current location** inputs plus the rest of the `reviseDetails` field set (name/category/ownership/purchase value). Wired to the already-generated `useEquipmentReviseDetails` — the ONLY command that sets location (the `register` create command does not accept it).
+- `EquipmentForm` is now dual-mode (create vs edit); the create flow is unchanged.
+- Blanking a location field sends `""`, which the manifest's `mutate <field> = <field> != null ? <field> : self.<field>` correctly treats as a clear (not a preserve-existing).
+
+**Why it matters:** "Operations knows where it is" (spec §11.1) was false in the running app — the data existed but was unreachable through the UI. Now each asset's home/current location is visible and editable.
+
+**Verification:** `bun run check` GREEN (exit 0) — toolchain, typecheck 0 errors, format clean, secrets, test:coverage, build ok (✓ built), baseline-decay ok. No tests added (authored-UI page; AGENTS.md: do not add tests unless the owner asks). Diffstat: 1 file (+162/−34).
+
+**Honest scope note:** location remains free-text strings (no Site/Area/Zone entity) — matches the manifest's intentional existing choice ("open string until a closed catalog is evidenced", equipment.manifest L31-33) and the spec, which names no location entity. `register` still does not accept location (set it via Edit after registering); the spec does not require location at creation.
+
+---
+
 **2026-07-26 — Priority 21 (Venue Layout Templates) DONE — re-implemented correctly after the 2026-07-25 revert:**
 
 **Status: ✅ Shipped + `bun run check` GREEN (65 files / 736 tests). Cross-model review: round 1 REJECT (4× P2 fixed, 1× P1 escalated to GitHub issue #111); round 2 — all P2s resolved, reviewer MAINTAINED the P1 (systemic `*ByTenantId` cross-tenant query) as a blocker. Push BLOCKED pending human decision — see review block below.**
@@ -2718,7 +2738,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 | Priority | Item | Effort | Impact | Dependencies | Why |
 |----------|------|--------|--------|--------------|-----|
-| 16 | **Equipment Location Fields** | Small | Medium | None | Availability calculation - blocks logistics accuracy |
+| ~~16~~ | **Equipment Location Fields** | Small | Medium | None | Availability calculation - blocks logistics accuracy | ✅ DONE 2026-07-26 — `homeLocation`/`currentLocation` already existed on Equipment (data layer); this increment wired the UI (Location column + Edit→`reviseDetails` in `EquipmentCatalogPage.tsx`). See top entry. |
 | 17 | **Venue Profile (Full Depth)** | Large | High | None | Venue management and logistics - blocks venue selection |
 | 18 | **Pack List Templates** | Large | High | ServiceStyle, Equipment location | Operational efficiency - blocks automated pack list generation |
 | 19 | **Parallel Run Dashboard** | Large | High | Import Framework, Import Datasets | Migration validation - required for safe cutover | ✅ DONE - 680-line dashboard with comparison metrics, drill-down |
