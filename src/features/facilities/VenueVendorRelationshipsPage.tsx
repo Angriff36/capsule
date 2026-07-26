@@ -3,7 +3,6 @@ import { Link, useParams } from "react-router-dom";
 import {
   useCreateVenueVendorRelationship,
   useVenueVendorRelationshipReviseStatus,
-  useVenueVendorRelationshipReviseDetails,
   useVenueVendorRelationshipRetire,
   useListVenueVendorRelationship,
   useListVenue,
@@ -57,6 +56,15 @@ const STATUSES = [
 type CategoryValue = (typeof CATEGORIES)[number]["value"];
 type StatusValue = (typeof STATUSES)[number]["value"];
 
+// <input type="date"> yields "YYYY-MM-DD"; the manifest stores these as
+// datetime (epoch-ms), so convert before sending.
+const toDateEpoch = (raw: FormDataEntryValue | null): number | undefined => {
+  const value = String(raw ?? "").trim();
+  if (!value) return undefined;
+  const ms = new Date(value).getTime();
+  return Number.isNaN(ms) ? undefined : ms;
+};
+
 /** Venue vendor relationships page — manage venue-specific vendor policies. */
 export function VenueVendorRelationshipsPage() {
   const { venueId } = useParams<{ venueId: string }>();
@@ -66,7 +74,6 @@ export function VenueVendorRelationshipsPage() {
 
   const createRelationship = useCreateVenueVendorRelationship();
   const reviseStatus = useVenueVendorRelationshipReviseStatus();
-  const reviseDetails = useVenueVendorRelationshipReviseDetails();
   const retireRelationship = useVenueVendorRelationshipRetire();
 
   const [showForm, setShowForm] = useState(false);
@@ -132,16 +139,13 @@ export function VenueVendorRelationshipsPage() {
         vendorId: targetVendorId,
         category: (data.get("category") ?? "other") as CategoryValue,
         status: (data.get("status") ?? "approved") as StatusValue,
-        effectiveFrom:
-          String(data.get("effectiveFrom") || "").trim() || undefined,
-        effectiveUntil:
-          String(data.get("effectiveUntil") || "").trim() || undefined,
+        effectiveFrom: toDateEpoch(data.get("effectiveFrom")),
+        effectiveUntil: toDateEpoch(data.get("effectiveUntil")),
         primaryContactId:
           String(data.get("primaryContactId") || "").trim() || undefined,
         insuranceCertificate:
           String(data.get("insuranceCertificate") || "").trim() || undefined,
-        insuranceExpiry:
-          String(data.get("insuranceExpiry") || "").trim() || undefined,
+        insuranceExpiry: toDateEpoch(data.get("insuranceExpiry")),
         complianceNotes:
           String(data.get("complianceNotes") || "").trim() || undefined,
         discountPercent:

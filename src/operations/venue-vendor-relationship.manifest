@@ -89,7 +89,11 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
 
   ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
   ref vendor: Vendor fields [tenantId, vendorId] references [tenantId, id]
-  ref primaryContact: VendorContact fields [tenantId, vendorId, primaryContactId] references [tenantId, vendorId, id]
+  // primaryContact keyed by [tenantId, primaryContactId] only — reusing vendorId
+  // here made the projection type the local vendorId as v.id("vendorContacts")
+  // instead of v.id("vendors"). VendorContact ids are globally unique, so the
+  // tenant + contact id is a sufficient (and correct) reference.
+  ref primaryContact: VendorContact fields [tenantId, primaryContactId] references [tenantId, id]
   ref establishedBy: Person fields [tenantId, establishedByPersonId] references [tenantId, id]
   ref revisedBy: Person fields [tenantId, revisedByPersonId] references [tenantId, id]
 
@@ -122,11 +126,11 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     vendorId: string,
     category: VenueVendorCategory,
     optional status: VenueVendorStatus,
-    optional effectiveFrom: string,
-    optional effectiveUntil: string,
+    optional effectiveFrom: datetime,
+    optional effectiveUntil: datetime,
     optional primaryContactId: string,
     optional insuranceCertificate: string,
-    optional insuranceExpiry: string,
+    optional insuranceExpiry: datetime,
     optional complianceNotes: string,
     optional discountPercent: float,
     optional paymentTerms: string,
@@ -134,7 +138,10 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
     optional notes: string,
     optional establishedByPersonId: string
   ) {
-    guard self.createdAt == null
+    // No `guard self.createdAt == null`: createdAt is auto-populated by the
+    // `timestamps` mixin, so that guard always threw in the creation path and
+    // made every establish fail. deletedAt is null on create, so its guard
+    // still passes.
     guard self.deletedAt == null
     constraint establishVenue: venueId != null and length(trim(venueId)) > 0 "Venue is required"
     constraint establishVendor: vendorId != null and length(trim(vendorId)) > 0 "Vendor is required"
@@ -180,11 +187,11 @@ entity VenueVendorRelationship mixin TenantScoped, SoftDeletable {
 
   command reviseDetails(
     optional category: VenueVendorCategory,
-    optional effectiveFrom: string,
-    optional effectiveUntil: string,
+    optional effectiveFrom: datetime,
+    optional effectiveUntil: datetime,
     optional primaryContactId: string,
     optional insuranceCertificate: string,
-    optional insuranceExpiry: string,
+    optional insuranceExpiry: datetime,
     optional complianceNotes: string,
     optional discountPercent: float,
     optional paymentTerms: string,

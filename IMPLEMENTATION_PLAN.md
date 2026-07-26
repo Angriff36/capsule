@@ -9,6 +9,24 @@
 
 ## Changes This Update
 
+---
+
+**2026-07-25 — Venue-vendor relationship creation FIXED (Findings 1, 2, 3):**
+
+**Status: ✅ Findings 1, 2, 3 fixed + shipped; repo gate GREEN (726 tests). Findings 4 and 6 remain open.**
+
+The prior note that "`establish` is not a Manifest creation entry" was inaccurate: `VenueVendorRelationship_createViaEstablish` IS generated and registered in `tests/governed-creation-mappings.test.ts`. The real failure (verified against generated code in `convex/mutations.ts`) was three latent bugs, all now fixed in `src/operations/venue-vendor-relationship.manifest` + `bun run manifest:regen`:
+
+- **Finding 1 (creation always threw):** `establish` had `guard self.createdAt == null`, but the `timestamps` mixin auto-populates `createdAt`, so the generated `VenueVendorRelationship_createViaEstablish` ran `if (!((_​_draft.createdAt == null))) throw "Guard 0 failed"` — which ALWAYS fired, so no relationship could ever be created. Removed that guard (kept `guard self.deletedAt == null`, which passes on create since deletedAt is null). Verified the regenerated `_createViaEstablish` no longer throws and reaches `ctx.db.insert`. Note: Manifest *runtime* docs say only a command named `create` is a creation entry, but the Capsule Builder projection treats any command as one (`_createVia<Cmd>`); the governed-creation ledger is the source of truth — so `establish` was already a valid creation entry and did NOT need renaming.
+- **Finding 2 (vendorId mistyped):** `ref primaryContact: VendorContact fields [tenantId, vendorId, primaryContactId] references [tenantId, vendorId, id]` caused the projection to type the local `vendorId` as `v.id("vendorContacts")` (convex/schema.ts) instead of `v.id("vendors")`, so inserting a vendor id failed Convex schema validation. Decoupled the ref to `fields [tenantId, primaryContactId] references [tenantId, id]` (VendorContact ids are globally unique). `schema.ts` now correctly has `vendorId: v.id("vendors")` and `primaryContactId: ...v.id("vendorContacts")`.
+- **Finding 3 (string vs datetime params):** `effectiveFrom`/`effectiveUntil`/`insuranceExpiry` params were typed `string` but stored as `datetime` (epoch-ms) → `E_TYPE_DATETIME`/schema-validation failure on insert. Changed to `datetime` in both `establish` and `reviseDetails` commands. UI (`src/features/facilities/VenueVendorRelationshipsPage.tsx`) now converts `<input type="date">` values to epoch-ms via a small `toDateEpoch` helper. Also removed an orphaned, never-called `useVenueVendorRelationshipReviseDetails` binding from that page.
+
+**Why it matters:** Venue-vendor relationships (Priority 23, previously logged "DONE") were completely non-functional at runtime — you could not create a single relationship. Now `useCreateVenueVendorRelationship` (→ `_createViaEstablish`) actually inserts a row. Lessons: (1) the `timestamps` mixin populates `createdAt` before creation-command guards run, so `guard self.createdAt == null` is always-false in the create path — never guard on an auto-managed timestamp field in a creation command; (2) reusing the same local field name (`vendorId`) in two different `ref`s confuses the projection's type inference — keep relation keys disambiguated.
+
+**Verification:** `bun run check` GREEN — typecheck 0 errors, format clean, 726 tests passing (65 files), build ok, baseline-decay ok. Spot-checked `convex/schema.ts` (`vendorId: v.id("vendors")`) and `convex/mutations.ts` (`_createViaEstablish` no longer has the createdAt throw; date args are `v.optional(v.number())`).
+
+---
+
 **2026-07-25 — Finding 7 FIXED + shipped; Finding 4 reverted (cross-model review caught an incomplete fix):**
 
 **Status: ✅ Finding 7 fixed + shipped. Finding 4 reverted after cross-model review (codex gpt-5.6-sol) proved the fix incomplete — NOT shipped. Repo gate GREEN (726 tests). Findings 1, 2, 3, 4, 6 remain open.**
