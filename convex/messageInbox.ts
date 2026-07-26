@@ -55,15 +55,24 @@ export const ingestInboundMessage = action({
       throw new ConvexError("Message text is required");
     }
 
-    // 1. Resolve the thread (match by provider + provider thread id). If a
-    // concurrent ingest already opened it, the idempotencyKey on the create
-    // returns that row instead of inserting a second one.
+    // Provider thread ids are unique within a provider ACCOUNT, not globally —
+    // so the account discriminator must ride along with every match/key to keep
+    // two connected accounts with the same provider+thread id from collapsing
+    // into one thread (and to keep message dedup account-scoped).
+    const account = args.providerAccountId?.trim() || "";
+
+    // 1. Resolve the thread (match by provider + account + provider thread id).
+    // If a concurrent ingest already opened it, the idempotencyKey on the
+    // create returns that row instead of inserting a second one.
     const candidates = await ctx.runQuery(
       api.queries.listMessageThreadByProviderThreadId,
       { providerThreadId },
     );
     const existingThread = candidates.find(
-      (t) => t.provider === provider && t.deletedAt == null,
+      (t) =>
+        t.provider === provider &&
+        (t.providerAccountId ?? "") === account &&
+        t.deletedAt == null,
     );
     let threadId: Id<"messageThreads">;
     let threadCreated: boolean;
@@ -80,7 +89,7 @@ export const ingestInboundMessage = action({
           subject: args.subject,
           senderIdentity: args.senderIdentity,
           contactId: args.contactId,
-          idempotencyKey: `mt:${provider}:${providerThreadId}`,
+          idempotencyKey: `mt:${provider}:${account}:${providerThreadId}`,
         },
       );
       // Literal `create` allocating mutations return { _id, ...doc }.

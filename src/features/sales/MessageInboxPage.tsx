@@ -187,6 +187,7 @@ export function MessageInboxPage() {
     try {
       const result = await ingest({
         provider: selected.provider,
+        providerAccountId: selected.providerAccountId ?? undefined,
         providerThreadId: selected.providerThreadId,
         providerMessageId,
         senderIdentity: liSender.trim() || selected.senderIdentity || undefined,
