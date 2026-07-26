@@ -107,11 +107,16 @@ export async function buildProposalRevisionSnapshot(
   const tenantName = "Tenant"; // TODO: Resolve from tenant entity
 
   // Get priced line items (spec §5.4) — effective prices snapshotted here.
-  const lineItems = await ctx.db
-    .query("proposalLineItems")
-    .withIndex("by_proposalId", (q: any) => q.eq(proposal._id))
-    .filter((q: any) => q.eq("deletedAt", null))
-    .collect();
+  // JS loose-equality filter (not the Convex DSL .eq) because governed-creation
+  // omits deletedAt at insert, so fresh active rows have it ABSENT (undefined),
+  // and the DSL `.eq("deletedAt", null)` would miss them. Matches the working
+  // pattern in convex/queries.ts listProposalLineItemByTenantId.
+  const lineItems = (
+    await ctx.db
+      .query("proposalLineItems")
+      .withIndex("by_proposalId", (q: any) => q.eq(proposal._id))
+      .collect()
+  ).filter((row: any) => row.deletedAt == null);
   const lineItemsData = lineItems
     .map((line: any) => ({
       id: line._id.toString(),

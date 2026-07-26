@@ -235,10 +235,23 @@ export function ProposalsPage() {
       return;
     }
     // Central calc (spec §5.4) derives the four stored totals from the priced
-    // lines; only lines with a description are committed.
-    const validLines = draftLines.filter(
-      (line) => line.description.trim().length > 0,
+    // lines. A row with a price/quantity but no description would otherwise be
+    // silently dropped here while the live preview counted it — validate instead
+    // so preview and submit agree.
+    const populatedLines = draftLines.filter(
+      (line) =>
+        line.description.trim().length > 0 ||
+        line.unitPrice.trim().length > 0 ||
+        line.quantity.trim().length > 0,
     );
+    const lineMissingDescription = populatedLines.find(
+      (line) => line.description.trim().length === 0,
+    );
+    if (lineMissingDescription) {
+      setFailure(new Error("Every pricing line needs a description."));
+      return;
+    }
+    const validLines = populatedLines;
     const pricing = computeProposalPricing({
       lines: validLines.map((line) => ({
         pricingBasis: line.pricingBasis,
