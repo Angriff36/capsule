@@ -207,10 +207,12 @@ export const getEvent = query({
       );
     // Spec §4.2 / §5.4: priced breakdown for the client-facing PDF. Lines are
     // fetched per accepted proposal via by_proposalId (bounded — never a
-    // tenant-wide scan that could blow past Convex read limits), and the stored
-    // amount is carried so the client sees the frozen accepted terms (accepted
-    // proposals are immutable: line commands guard status == "draft"). Only
-    // client-safe fields are projected; internal cost/margin and the
+    // tenant-wide scan that could blow past Convex read limits). Only the raw
+    // client-safe inputs are projected; the amount is RECOMPUTED by the PDF
+    // through the central calc (never trusted from storage — the command-API
+    // path can write caller-supplied amounts that skip the recompute seam).
+    // Accepted proposals are immutable (line commands guard status == "draft"),
+    // so recomputing reproduces the accepted terms. Cost/margin and the
     // override-audit fields (menuDishId/overrideReason) stay private.
     const pricingLinesByProposal = new Map(
       await Promise.all(
@@ -233,7 +235,6 @@ export const getEvent = query({
               unitPrice: line.unitPrice,
               quantity: line.quantity,
               unit: line.unit ?? null,
-              amount: line.amount,
             }));
           return [String(proposal._id), lines] as const;
         }),

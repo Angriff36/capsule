@@ -62,18 +62,15 @@ export interface Enhancement {
 
 // A priced proposal line for PDF render (spec §5.4). Carries the raw inputs;
 // the amount is derived in the builder via computeProposalPricing so the basis
-// math (per-person / per-unit / flat / percentage / package) stays in one place.
+// math (per-person / per-unit / flat / percentage / package) stays in one place
+// and is never trusted from a stored value (the command-API write path can
+// store caller-supplied amounts that skip the authoritative recompute seam).
 export interface PricingLinePdf {
   description: string;
   pricingBasis: PricingBasis;
   unitPrice: number;
   quantity?: number | null;
   unit?: string | null;
-  // Stored authoritative amount (§5.4 recompute). When present the PDF renders
-  // it directly so an accepted proposal's breakdown stays frozen/reproducible
-  // (spec §5.5) rather than being re-derived by the current calc; absent → the
-  // central calc derives it (unchanged operator/draft behavior).
-  amount?: number | null;
 }
 
 export interface ProposalPdfInput {
@@ -498,12 +495,13 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
     });
     sectionLabel("Pricing breakdown");
     pricingLines.forEach((line, index) => {
-      // Prefer the stored authoritative amount when carried (accepted-proposal
-      // client view) so the breakdown stays frozen; otherwise derive it.
-      const amount =
-        line.amount != null
-          ? Number(line.amount)
-          : (priced.lines[index]?.amount ?? 0);
+      // Recompute each line through the central calc (never trust a stored
+      // amount — the command-API path can write caller-supplied amounts that
+      // skip the authoritative recompute seam). For accepted proposals the
+      // line inputs are immutable (line commands guard status == "draft"), so
+      // this reproduces the accepted terms and stays byte-identical to the
+      // operator PDF (single source of truth).
+      const amount = priced.lines[index]?.amount ?? 0;
       const basisLabel =
         PRICING_BASIS_LABELS[line.pricingBasis] ?? line.pricingBasis;
       const unit = Number(line.unitPrice) || 0;
