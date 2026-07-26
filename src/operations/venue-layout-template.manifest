@@ -91,11 +91,13 @@ entity VenueLayoutTemplate mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command archive(reason: string) {
+  command archive(optional reason: string) {
     guard self.status == "active"
     guard self.definedAt != null
     guard self.deletedAt == null
-    constraint archiveTemplateReason: length(trim(reason)) > 0 "Archive reason is required"
+    // Reason is optional: archiving is reversible and low-stakes, so forcing a
+    // reason is exactly the policy tedium the merge gate prohibits. It is
+    // captured only when staff choose to record one.
     mutate status = "archived"
     mutate archivedAt = now()
     mutate archiveReason = reason
@@ -138,7 +140,7 @@ event VenueLayoutTemplateRevised: "venue_layout_template.revised" {
 event VenueLayoutTemplateArchived: "venue_layout_template.archived" {
   templateId: string
   tenantId: string
-  reason: string
+  reason: string?
 }
 
 event VenueLayoutTemplateReactivated: "venue_layout_template.reactivated" {

@@ -104,7 +104,19 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
       alert("That template has no sections to copy.");
       return;
     }
+    // Validate every section BEFORE any mutation so a bad template (e.g. a
+    // blank type from a hand-edit) fails fast instead of leaving a partial copy.
+    const invalidIndex = templateSections.findIndex((s) => !s.type.trim());
+    if (invalidIndex >= 0) {
+      alert(
+        `Section ${invalidIndex + 1} has a blank type. Fix the template before copying.`,
+      );
+      return;
+    }
     const base = eventSections.length;
+    // ponytail: each section is a separate mutation, so a mid-loop network
+    // drop can leave a partial (but valid) copy — upgrade to a server-side
+    // bulk-copy action if that ever bites operators in practice.
     void run("copy", async () => {
       for (let i = 0; i < templateSections.length; i++) {
         const section = templateSections[i];

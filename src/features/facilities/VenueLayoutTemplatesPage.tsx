@@ -81,6 +81,10 @@ export function VenueLayoutTemplatesPage() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [sections, setSections] = useState<LayoutSection[]>([]);
+  // Tracks whether the user touched the sections editor this session, so an
+  // edit that only changes name/description never overwrites stored sections
+  // (prevents clobbering data the UI can't parse — see parseSections).
+  const [sectionsDirty, setSectionsDirty] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
 
@@ -107,6 +111,7 @@ export function VenueLayoutTemplatesPage() {
     setName("");
     setDescription("");
     setSections([]);
+    setSectionsDirty(false);
     setFormVenueId("");
   };
 
@@ -117,6 +122,7 @@ export function VenueLayoutTemplatesPage() {
     setName("");
     setDescription("");
     setSections([]);
+    setSectionsDirty(false);
   };
 
   const openEdit = (template: VenueLayoutTemplateRow) => {
@@ -127,6 +133,7 @@ export function VenueLayoutTemplatesPage() {
     setName(template.name);
     setDescription(template.description ?? "");
     setSections(parseSections(template.sections));
+    setSectionsDirty(false);
   };
 
   const run = async (key: string, work: () => Promise<void>) => {
@@ -162,7 +169,10 @@ export function VenueLayoutTemplatesPage() {
           version: edit.version,
           name: trimmed,
           description: description.trim() || undefined,
-          sections: sectionsJson,
+          // Only send sections when the user actually edited them, so an
+          // edit-to-fix-the-name never overwrites stored sections the UI
+          // couldn't render (e.g. malformed JSON from another writer).
+          sections: sectionsDirty ? sectionsJson : undefined,
         });
       } else {
         await createTemplate({
@@ -176,23 +186,29 @@ export function VenueLayoutTemplatesPage() {
     });
   };
 
-  const addSection = () =>
+  const addSection = () => {
+    setSectionsDirty(true);
     setSections((prev) => [
       ...prev,
       { type: "Buffet", instructions: "", sortOrder: prev.length },
     ]);
+  };
 
-  const updateSection = (index: number, patch: Partial<LayoutSection>) =>
+  const updateSection = (index: number, patch: Partial<LayoutSection>) => {
+    setSectionsDirty(true);
     setSections((prev) =>
       prev.map((s, i) => (i === index ? { ...s, ...patch } : s)),
     );
+  };
 
-  const removeSection = (index: number) =>
+  const removeSection = (index: number) => {
+    setSectionsDirty(true);
     setSections((prev) =>
       prev
         .filter((_, i) => i !== index)
         .map((s, i) => ({ ...s, sortOrder: i })),
     );
+  };
 
   const formOpen = edit.mode !== "closed";
   const loading = templates === undefined || venues === undefined;
@@ -438,7 +454,9 @@ export function VenueLayoutTemplatesPage() {
                         <button
                           type="button"
                           className="btn btn-ghost min-h-10"
-                          disabled={busy != null}
+                          disabled={
+                            busy != null || template.status !== "active"
+                          }
                           onClick={() => openEdit(template)}
                         >
                           Edit
@@ -449,20 +467,18 @@ export function VenueLayoutTemplatesPage() {
                             className="btn btn-ghost min-h-10"
                             disabled={busy != null}
                             onClick={() => {
+                              // Reason is optional (archiving is reversible);
+                              // cancel the prompt to archive without one.
                               const reason = window.prompt(
-                                "Archive reason (required)",
+                                "Archive reason (optional)",
                               );
                               if (reason == null) return;
                               const trimmed = reason.trim();
-                              if (!trimmed) {
-                                alert("Archive reason is required");
-                                return;
-                              }
                               void run(`archive:${template._id}`, () =>
                                 archiveTemplate({
                                   docId: template._id,
                                   version: template.version,
-                                  reason: trimmed,
+                                  reason: trimmed || undefined,
                                 }),
                               );
                             }}
