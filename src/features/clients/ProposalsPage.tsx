@@ -15,6 +15,7 @@ import {
   useListEventTimelineActivity,
   useListVenue,
   useListProposal,
+  useListProposalLineItem,
   useListProposalRevision,
   useProposalAccept,
   useProposalDecline,
@@ -109,6 +110,9 @@ export function ProposalsPage() {
   const events = useListEvent();
   const timelineActivities = useListEventTimelineActivity();
   const venues = useListVenue();
+  // Tenant-wide priced lines; filtered per proposal for the PDF breakdown and
+  // the pricing panel. Same query ProposalPricingPanel subscribes to (cached).
+  const proposalLineItems = useListProposalLineItem();
   const proposalRevisions = useListProposalRevision();
   const createProposal = useCreateProposal();
   const send = useProposalSend();
@@ -930,6 +934,23 @@ export function ProposalsPage() {
                             venueLogistics: event
                               ? transformVenueLogistics(venue || null, event)
                               : undefined,
+                            pricingLines: (proposalLineItems ?? [])
+                              .filter(
+                                (line) =>
+                                  line.proposalId === row._id &&
+                                  line.deletedAt == null,
+                              )
+                              .sort(
+                                (a, b) =>
+                                  Number(a.sortOrder) - Number(b.sortOrder),
+                              )
+                              .map((line) => ({
+                                description: line.description,
+                                pricingBasis: line.pricingBasis as PricingBasis,
+                                unitPrice: Number(line.unitPrice) || 0,
+                                quantity: line.quantity,
+                                unit: line.unit,
+                              })),
                           };
 
                           void downloadProposalPdf({

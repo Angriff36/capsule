@@ -5,6 +5,11 @@ import {
   loadTenantBrandingForPdf,
   type TenantBranding,
 } from "../admin/tenantBranding";
+import {
+  computeProposalPricing,
+  PRICING_BASIS_LABELS,
+  type PricingBasis,
+} from "../../lib/pricing";
 
 export interface ProposalPdfRecord {
   _id: string;
@@ -26,6 +31,11 @@ export interface ProposalPdfRecord {
   timelineItems?: TimelineItem[];
   venueLogistics?: VenueLogistics;
   enhancements?: Enhancement[];
+  // Priced line items (spec §5.4). Rendered through the central calc
+  // (src/lib/pricing.ts) so the PDF uses the SAME path as preview, acceptance,
+  // and reporting — not a second arithmetic path. Optional: proposals without
+  // priced lines render the flat Estimate only (unchanged behavior).
+  pricingLines?: PricingLinePdf[];
   // Acceptance URL for CTA
   acceptanceUrl?: string;
 }
@@ -48,6 +58,17 @@ export interface Enhancement {
   name: string;
   description?: string;
   price?: number;
+}
+
+// A priced proposal line for PDF render (spec §5.4). Carries the raw inputs;
+// the amount is derived in the builder via computeProposalPricing so the basis
+// math (per-person / per-unit / flat / percentage / package) stays in one place.
+export interface PricingLinePdf {
+  description: string;
+  pricingBasis: PricingBasis;
+  unitPrice: number;
+  quantity?: number | null;
+  unit?: string | null;
 }
 
 export interface ProposalPdfInput {
@@ -452,6 +473,64 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
       }
     }
     y += 8;
+  }
+
+  // Pricing breakdown — priced line items through the central calc (spec §5.4
+  // "PDF/render"). Each line's amount is derived from the SAME engine the draft
+  // form and the read panel use, so percentage fees resolve against the base
+  // subtotal identically everywhere.
+  const pricingLines = proposal.pricingLines ?? [];
+  if (pricingLines.length > 0) {
+    const priced = computeProposalPricing({
+      lines: pricingLines.map((line) => ({
+        pricingBasis: line.pricingBasis,
+        unitPrice: Number(line.unitPrice) || 0,
+        quantity: line.quantity != null ? Number(line.quantity) : undefined,
+      })),
+      guestCount,
+      discountAmount: Number(proposal.discountAmount ?? 0),
+      taxAmount: Number(proposal.taxAmount ?? 0),
+    });
+    sectionLabel("Pricing breakdown");
+    pricingLines.forEach((line, index) => {
+      const amount = priced.lines[index]?.amount ?? 0;
+      const basisLabel =
+        PRICING_BASIS_LABELS[line.pricingBasis] ?? line.pricingBasis;
+      const unit = Number(line.unitPrice) || 0;
+      const descLines = doc.splitTextToSize(
+        line.description || basisLabel,
+        CONTENT_WIDTH - 132,
+      ) as string[];
+      ensureSpace(descLines.length * 14 + 14);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(10);
+      doc.setTextColor(...INK);
+      doc.text(descLines, MARGIN, y);
+      doc.setFont("helvetica", "bold");
+      doc.text(usd(amount), RIGHT, y, { align: "right" });
+      y += descLines.length * 14;
+      // ponytail: muted basis/unit detail so the client sees how a line priced
+      // without exposing internal cost (spec §4.2 keeps cost/margin private).
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8);
+      doc.setTextColor(...MUTED);
+      let detail = `${basisLabel}`;
+      if (line.pricingBasis === "per_person") {
+        detail = `Per person · ${usd(unit)} × ${guestCount} guests`;
+      } else if (line.pricingBasis === "per_unit") {
+        const unitLabel = line.unit?.trim();
+        detail = `Per unit · ${usd(unit)} × ${Number(line.quantity ?? 0)}${
+          unitLabel ? ` ${unitLabel}` : ""
+        }`;
+      } else if (line.pricingBasis === "percentage") {
+        detail = `${unit}% of subtotal`;
+      } else {
+        detail = `${basisLabel} · ${usd(unit)}`;
+      }
+      doc.text(detail, MARGIN, y);
+      y += 14;
+    });
+    y += 6;
   }
 
   // Estimate summary.
