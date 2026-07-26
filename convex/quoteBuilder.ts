@@ -36,26 +36,14 @@ function generateDedupKey(
   return `quote_${Math.abs(hash)}`;
 }
 
-/**
- * Validates that the event date is not in the past.
- * Basic business rule check; richer availability validation can follow.
- */
-// eventDate arrives as epoch-ms (converted in the browser so the visitor's
-// timezone defines the calendar day, not the UTC server runtime).
-function validateEventDate(eventDateMs: number): {
-  valid: boolean;
-  error?: string;
-} {
-  if (!Number.isFinite(eventDateMs)) {
-    return { valid: false, error: "Invalid event date" };
-  }
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  if (eventDateMs < today.getTime()) {
-    return { valid: false, error: "Event date cannot be in the past" };
-  }
-  return { valid: true };
+// eventDate/eventEndTime arrive as epoch-ms (converted in the browser so the
+// visitor's timezone defines the calendar day, not the UTC server runtime).
+// Reject NaN/Infinity AND finite-but-out-of-range epochs (e.g. 1e308): those
+// make new Date(ms) invalid and would crash formatDate in the review queue.
+// The "not in the past" UX rule is enforced client-side (visitor TZ); the
+// server only guards against unparseable timestamps.
+function isValidTimestamp(ms: number): boolean {
+  return Number.isFinite(ms) && Number.isFinite(new Date(ms).getTime());
 }
 
 // Bounded field lengths for the public form. The /quote action is anonymous and
@@ -262,9 +250,8 @@ export const submitQuote = action({
     message: string;
   }> => {
     // Validate input.
-    const dateValidation = validateEventDate(args.eventDate);
-    if (!dateValidation.valid) {
-      throw new ConvexError(dateValidation.error ?? "Invalid event date");
+    if (!isValidTimestamp(args.eventDate)) {
+      throw new ConvexError("Invalid event date");
     }
     if (
       !Number.isFinite(args.guestCount) ||
@@ -285,11 +272,9 @@ export const submitQuote = action({
       throw new ConvexError("Data processing consent is required");
     }
 
-    // eventEndTime (if provided) arrives as epoch-ms from the browser; just
-    // guard against a malformed value.
     if (
       args.eventEndTime !== undefined &&
-      !Number.isFinite(args.eventEndTime)
+      !isValidTimestamp(args.eventEndTime)
     ) {
       throw new ConvexError("Invalid end time");
     }
