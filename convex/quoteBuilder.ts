@@ -31,14 +31,9 @@ function generateDedupKey(
   eventDate: number,
   tenantId: string,
 ): string {
-  const normalized = `${email.toLowerCase().trim()}|${eventDate}|${tenantId}`;
-  let hash = 0;
-  for (let i = 0; i < normalized.length; i++) {
-    const char = normalized.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32-bit integer
-  }
-  return `quote_${Math.abs(hash)}`;
+  // Full normalized tuple as the key (no hashing): exact-match dedup with no
+  // collision risk, so two distinct requests never share a key.
+  return `quote|${email.toLowerCase().trim()}|${eventDate}|${tenantId}`;
 }
 
 // eventDate/eventEndTime arrive as epoch-ms (converted in the browser so the
@@ -141,6 +136,22 @@ export const ingressQuoteSubmission = internalMutation({
     const email = args.email.trim().toLowerCase();
     const clientName = args.clientName.trim();
     const dedupKey = generateDedupKey(email, args.eventDate, tenantId);
+
+    // Validate optional catalog selections belong to this tenant and are active,
+    // so a direct API caller can't store cross-tenant/inactive ids that would
+    // later be copied into the converted Event.
+    if (args.serviceStyleId) {
+      const ss = await ctx.db.get(args.serviceStyleId);
+      if (!ss || ss.tenantId !== tenantId || ss.status !== "active") {
+        throw new ConvexError("Invalid service style selection");
+      }
+    }
+    if (args.occasionId) {
+      const oc = await ctx.db.get(args.occasionId);
+      if (!oc || oc.tenantId !== tenantId || oc.status !== "active") {
+        throw new ConvexError("Invalid occasion selection");
+      }
+    }
 
     // Dedup: a prior active submission for the same key is returned as-is so a
     // repeat submit is a no-op (submit-once). Failed submissions can be retried.
@@ -385,7 +396,10 @@ export const processQuoteSubmission = action({
     try {
       const existingClients = await ctx.runQuery(api.queries.listClient);
       const existingClient = existingClients.find(
-        (c) => c.email?.toLowerCase() === email.toLowerCase() && !c.deletedAt,
+        (c) =>
+          c.email?.toLowerCase() === email.toLowerCase() &&
+          !c.deletedAt &&
+          c.status === "active",
       );
       if (existingClient) {
         clientId = existingClient._id;
@@ -439,9 +453,14 @@ export const processQuoteSubmission = action({
     try {
       if (clientId) {
         const eventStart = submission.eventDate ?? Date.now();
-        const eventEnd = submission.eventEndTime
-          ? submission.eventEndTime
-          : eventStart + 4 * 60 * 60 * 1000; // default 4-hour event
+        // Default to a 4-hour event when no end time is supplied OR the supplied
+        // end is invalid / non-positive-duration (e.g. an "00:00" end equals the
+        // midnight start) — otherwise Event creation fails terminally.
+        const rawEnd = submission.eventEndTime ?? 0;
+        const eventEnd =
+          Number.isFinite(rawEnd) && rawEnd > eventStart
+            ? rawEnd
+            : eventStart + 4 * 60 * 60 * 1000;
         const eventResult = await ctx.runMutation(
           api.mutations.Event_createViaPlanEngagement,
           {
