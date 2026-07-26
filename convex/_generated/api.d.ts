@@ -18,6 +18,7 @@ import type * as equipmentCheckout from "../equipmentCheckout.js";
 import type * as fileStorage from "../fileStorage.js";
 import type * as googleCalendar from "../googleCalendar.js";
 import type * as http from "../http.js";
+import type * as importCommit from "../importCommit.js";
 import type * as importCoordinator from "../importCoordinator.js";
 import type * as importPipeline from "../importPipeline.js";
 import type * as inventoryAudit from "../inventoryAudit.js";
@@ -69,6 +70,7 @@ declare const fullApi: ApiFromModules<{
   fileStorage: typeof fileStorage;
   googleCalendar: typeof googleCalendar;
   http: typeof http;
+  importCommit: typeof importCommit;
   importCoordinator: typeof importCoordinator;
   importPipeline: typeof importPipeline;
   inventoryAudit: typeof inventoryAudit;

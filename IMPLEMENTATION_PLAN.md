@@ -11,6 +11,26 @@
 
 ---
 
+**2026-07-26 — §6.1/§6.2/§5.3 Import commit/revert made REAL for venues (corrects a FALSE "Slice 2 100% COMPLETE"):**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0). New authored seam `convex/importCommit.ts` (2 actions + 4 internal helpers) + UI wiring in `ImportRunDetailPage.tsx`; no manifest/regen (new `convex/` root module auto-registers in the `api` composite), no generated-file edits, no new entity/guard/query.**
+
+**Finding (verified first-hand via 3 parallel investigation subagents, then confirmed against the source):** the plan's "Slice 2 ✅ Complete | 100% | None — full TPP migration framework ready for data loading" (Summary table L1466) was **FALSE for data persistence**. The UI's "Complete Commit" button called the **generated** `ImportRun_commit` (`convex/mutations.ts:12725`, do-not-edit) which only flips the run's status + emits an audit event — it writes ZERO business data (no `events`/`contacts`/`venues`/`payments`, no `externalRecordLinks`). The orphaned `convex/importCoordinator.ts` `commitImport` (`:696`, TODO at `:727`) / `revertImport` (`:817`, TODO at `:835`) were never called by the UI and returned `{success:true}` doing nothing (silent false-success). `tppParser.ts` parses rows in-memory that are then discarded (no staging), so even a non-stub commit had nothing to write from. Net: an operator could click an import to "Completed" with zero records imported, and §5.3's "imported TPP Event uses the same create-proposal command" had no imported events to act on.
+
+**Fix (smallest spec-faithful diff — authored seam collapses the staging gap):**
+- `convex/importCommit.ts` (NEW) — `commitImportRun({importRunId, rawRows})` action: parses caller-supplied TPP venue rows via the existing `parseTppVenues`, materializes each into a Venue through the **generated** `Venue_createViaRegister` (handles address-field encryption + the `eventManageAccess` guard + `idempotencyKey` dedup), and writes an idempotent `ExternalRecordLink` (resolved). Per-record failures become `pending_conflict` links (visible in the reconcile queue) instead of failing the whole run. Then flips the run to `completed` via the generated `ImportRun_commit` (transition guard + `ImportRunCommitted` event + OCC). `revertImportRun({importRunId})` supersedes every link the run created (via `by_sourceImportRunId`) then flips to `reverted` via `ImportRun_revert`. Internal helpers (`loadCommitContext`/`findLink`/`linksForRun`/`upsertLink`/`supersedeLink`) do the raw reads/writes. The staging gap is closed by flowing rows through the commit action itself (no separate staging table, no manifest change).
+- `src/features/admin/import/ImportRunDetailPage.tsx` — commit/revert now call the authored actions (`useAction(api.importCommit.*)`) instead of the generated hooks. When `status==committing && datasetType==venues`, "Complete Commit" opens a venue-rows JSON textarea; the result counts (committed/skipped/pending/parseErrors) are surfaced. Non-venues datasets get an honest "supported for venues only" error before opening the form. Help text corrected (revert supersedes links, does not delete venues).
+
+**Why it matters:** the single biggest false-claim in the plan (a foundation "100% complete" that wrote nothing) is corrected, and two silent-false-success stubs are replaced by real, reachable, idempotent code. Imported venues now become real Venue entities proposals can reference (a real piece of §5.3). Re-running a commit is safe (Venue idempotencyKey + link dedup).
+
+**Verification:** `bun run check` GREEN (exit 0) — toolchain, ownership ledger, typecheck 0, format clean (prettier-normalized), secrets, test:coverage, build ok (`ImportRunDetailPage` chunk 14.60 kB), baseline-decay ok. Runtime write-path verified by inspection (the generator's `as any` casts hide runtime bugs — the recurring GREEN-but-broken trap): UI `commitImportRun` → `loadCommitContext` (auth via internal query, full fidelity) → per venue: `findLink` (idempotency) → `Venue_createViaRegister` (generated, eventManageAccess-guarded, encrypts address fields, `idempotencyKey` cached) → `upsertLink` (raw insert/patch, `conflictStatus` resolved/pending) → `ImportRun_commit` (generated, committing→completed). The repo's recurring GREEN-but-broken failure modes do NOT apply (no `self.id`/`context.timestamp` in a create — Venue id comes from the generated command's return; no FK relation keys; no datetime param; `_id`-as-token not used). No tests added (authored seam + UI; AGENTS.md: do not add tests unless the owner asks).
+
+**Honest scope notes (documented, NOT this increment):** (1) **Venues only** — events/leads/payments reference external client/venue IDs needing cross-dataset resolution (import contacts/venues before events; resolve externalId→Capsule id); the action throws an honest "not yet supported" for them rather than faking it. That is the next slice. (2) **Revert supersedes links, does not delete Venue entities** — an event may already reference an imported venue; deactivation is an operator action (Venue has `deactivate`), not a silent import-rollback delete. (3) **Source rows are caller-supplied** (operator pastes TPP venue JSON) because TPP has no bulk export (spec §6.3); this is the manual/JSON-paste migration path, not an automated bulk loader. (4) Venue creation requires `eventManageAccess`; a role with `importAccess` but not `eventManageAccess` will see every venue go to `pending_conflict` (managers/admins/owners hold both). (5) The orphaned `convex/importCoordinator.ts` still exists with its TODO `commitImport`/`revertImport` (now superseded by `importCommit.ts`); left in place rather than deleted to avoid touching its registered actions, but `importCommit.ts` is the live path. (6) The new authored actions need a **human-authorized `npx convex deploy -y`** to take effect server-side (AGENTS.md: Convex deploys are human-only). (7) The "Summary Status by Slice" table (L1462-1469) and the detailed §6.x/§5.x bodies below are stale relative to the Changes-This-Update log + Priority Sequencing tables; this entry corrects only the Slice-2/§6.1/§5.3 claims this finding bears on.
+
+**Cross-model review:** not run this increment (autonomous-loop cadence; the change is an additive authored seam mirroring the shipped `clientPortal.ts`/`shareLinks.ts` patterns + a mechanical UI swap, with no new guard/policy/approval beyond the existing `importAccess`/`eventManageAccess` roles and no money mutation). The merge gate's independent cross-model review still applies at PR time.
+
+---
+
 **2026-07-26 — §4.6 Revocable proposal share links DONE (closes the §4.6 PARTIAL):**
 
 **Status: ✅ Shipped + `bun run check` GREEN (exit 0, 65 test files). New entity + authored public seam + operator UI + client share-view page; one manifest regen (no #111 exposure beyond the systemic `*ByTenantId` every entity ships with; no new guard/policy beyond salesAccess).**
@@ -1463,7 +1483,7 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 |-------|--------|----------|--------------|-----------------|---------------|
 | **Slice 0** | ✅ Strong | 0 | 85% | Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅ | Event creation fields partial (occasion/service-style now wired) |
 | **Slice 1** | 🟡 Partial | 3 | 45% | Proposal lifecycle ✅, menu selection ✅ | Quote builder ❌, revisions ❌, templates ❌, acceptance ❌ |
-| **Slice 2** | ✅ Complete | 0 | 100% | ExternalRecordLink ✅, ImportRun ✅, Execution layer ✅, Reconciliation UI ✅, Dashboard ✅, Cutover ✅ | None - full TPP migration framework ready for data loading and execution |
+| **Slice 2** | 🟡 Partial | 1 | ~35% | ExternalRecordLink ✅, ImportRun ✅, Reconciliation UI ✅, Dashboard ✅, Cutover ✅, **venues commit/revert ✅ real (2026-07-26)** | commit/revert were silent-false-success stubs — now REAL for venues; events/contacts/leads/menus/payments materialization NOT wired (cross-dataset ID resolution); no TPP bulk export to validate against. (Prior "100% Complete" was FALSE — see Changes This Update.) |
 | **Slice 3** | 🟡 Partial | 1 | 45% | Venue entity basic ✅, Venue management UI ✅ (basic), saved report config ✅, revenue attribution UI ✅ | Venue depth ❌, 7 dashboards ❌, render engine ❌ |
 | **Slice 4** | ✅ Strong | 1 | 90% | Kitchen ✅, inventory ✅, staffing ✅, equipment ✅, performance event linkage ✅ | HR features ❌ (scorecards, hiring, 1-on-1s) |
 | **Slice 5** | 🟡 Partial | 2 | 60% | QuickBooks ✅, Calendar ✅, SMS ✅, Webhooks ✅ | Nowsta ❌, Social DMs ❌, Email threading ❌ |
@@ -1887,18 +1907,19 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 ---
 
-### 🟡 5.3 TPP Bridge — PARTIAL
+### 🟡 5.3 TPP Bridge — PARTIAL (create-from-event real; venue import now lands real Venues)
 
 **Done:**
 - lead.manifest:159-164 — Lead.stageProposal command
 - lead.manifest:166-182 — Lead.confirmProposalSent (updates stage to proposalSent)
 - Proposal can create from lead
+- `Proposal.draft` accepts `eventId` (commit da0ac1d) — the one "create proposal from event" command used for both native and imported events (spec §5.3 "no separate proposal engine")
+- 2026-07-26: imported Venues now materialize as real Venue entities via `convex/importCommit.ts` (so an imported event's venue reference can resolve)
 
 **Gaps:**
-- NO import framework (Slice 2)
-- NO direct event→proposal command (imported TPP Event uses same create proposal command)
-- Legacy field reconciliation not surfaced
-- Missing menu or venue mappings not surfaced before publication
+- Imported TPP Events still cannot become rows in `events` — `commitImportRun` supports venues only; events reference external client/venue IDs needing cross-dataset resolution (next slice)
+- Legacy field reconciliation not surfaced in the proposal/event UI
+- Missing menu or venue mappings not surfaced before publication (non-blocking warning, not a guard — per domain-gating-restraint)
 
 **Dependencies:** Migration framework (Slice 2)
 
@@ -2023,9 +2044,11 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 **Objective:** Repeatable, measurable import with daily comparison dashboard before full cutover.
 
-### 🟡 6.1 Import Framework — PARTIAL (Entities Exist, Wiring Needed)
+### 🟡 6.1 Import Framework — PARTIAL (entities + venues commit/revert REAL 2026-07-26; other datasets not wired)
 
 **Spec requirement:** Durable Import Run (source, dataset, times, counts, checksum, actor, status, errors), External Record Link (source + record type + external ID → Capsule ID), idempotent imports, manual Capsule changes follow field ownership rules, conflicts → review queue
+
+**2026-07-26 update (see Changes This Update):** the commit/revert write path is now REAL for the **venues** dataset via the authored `convex/importCommit.ts` seam (`commitImportRun`/`revertImportRun` actions + UI wiring). The generated `ImportRun_commit`/`ImportRun_revert` (status-only) are now wrapped by seam actions that actually materialize Venue entities + idempotent ExternalRecordLinks and (revert) supersede them. This corrects the prior FALSE "Slice 2 100% complete" — the framework previously wrote zero business data. Events/contacts/leads/menus/payments materialization is still NOT wired (cross-dataset externalId→Capsule-id resolution is the next slice).
 
 **Implemented:**
 - ✅ ExternalRecordLink entity FULLY IMPLEMENTED at `src/import/external-record-link.manifest` (398 lines)
@@ -3017,8 +3040,8 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 | Priority | Item | Effort | Impact | Dependencies | Why First | Status |
 |----------|------|--------|--------|--------------|-----------|--------|
-| ~~1~~ | **Import Framework** | Large | Critical | None | Foundation for entire TPP migration - blocks Slice 2 | ✅ DONE - All components complete: ExternalRecordLink, ImportRun, execution layer, reconciliation UI, import runs pages, dashboard, cutover |
-| 2 | **Import Datasets** | Medium | Critical | None | Events/Contacts/Leads/Menu/Venues/Payments import - 2,103 TPP events | ✅ DONE - 6 datasets with 91 fields mapped |
+| ~~1~~ | **Import Framework** | Large | Critical | None | Foundation for entire TPP migration - blocks Slice 2 | 🟡 PARTIAL (2026-07-26 correction): entities + reconcile UI + dashboard + cutover + **venues commit/revert REAL** (`convex/importCommit.ts`) — but commit/revert were silent-false-success stubs until now, and events/contacts/leads/menus/payments still do NOT materialize (cross-dataset ID resolution). Prior "✅ DONE" overstated. |
+| 2 | **Import Datasets** | Medium | Critical | None | Events/Contacts/Leads/Menu/Venues/Payments import - 2,103 TPP events | 🟡 PARTIAL (2026-07-26): parsers exist for events/contacts/venues/payments (`convex/tppParser.ts`); only **VENUES** materialize end-to-end via `importCommit.ts`. Events/contacts/leads/menus/payments not wired. Prior "✅ DONE 6 datasets" was FALSE. |
 | ~~3~~ | **Service Style Entity** | Medium | High | None | Foundational enum for operations - blocks 11 downstream features | ✅ DONE |
 | ~~3~~ | **Sales Lock Pipeline** | Medium | High | None (ServiceStyle ✅) | Quote → Sales Lock → Confirmed pipeline is core sales workflow | ✅ DONE |
 | 4 | **External Record Link** | Medium | High | Import Framework | Stable external ID mapping - prerequisite for all TPP integration | ✅ DONE |

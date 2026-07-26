@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { useAction } from "convex/react";
 import {
   useGetImportRun,
   useImportRunRecordParse,
   useImportRunValidate,
   useImportRunBeginReview,
   useImportRunApproveReview,
-  useImportRunCommit,
   useImportRunMarkFailed,
-  useImportRunRevert,
 } from "../../../lib/manifest-convex-react";
+import { api } from "../../../lib/api";
 import { importRunsListPath } from "./importRoutes";
 import { StatusChip } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
@@ -76,15 +76,20 @@ export function ImportRunDetailPage() {
   const validate = useImportRunValidate();
   const beginReview = useImportRunBeginReview();
   const approveReview = useImportRunApproveReview();
-  const commit = useImportRunCommit();
   const markFailed = useImportRunMarkFailed();
-  const revert = useImportRunRevert();
+  // Commit/revert go through the authored importCommit seam, which actually
+  // materializes entities + links (the generated ImportRun_commit only flips
+  // status). Venues only this increment; see convex/importCommit.ts.
+  const commitImportRun = useAction(api.importCommit.commitImportRun);
+  const revertImportRun = useAction(api.importCommit.revertImportRun);
 
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [showRecordCountsForm, setShowRecordCountsForm] = useState(false);
   const [recordCountsInput, setRecordCountsInput] = useState("{}");
+  const [showVenueForm, setShowVenueForm] = useState(false);
+  const [venueRowsInput, setVenueRowsInput] = useState("[]");
 
   if (id === "skip" || importRun === undefined) {
     return (
@@ -185,12 +190,50 @@ export function ImportRunDetailPage() {
   };
 
   const handleCommit = () => {
-    void run("commit", async () => {
-      await commit({
-        docId: importRun._id,
-        version: importRun.version,
+    if (importRun.datasetType !== "venues") {
+      setError(
+        "Commit currently supports the 'venues' dataset only. Other datasets need cross-dataset ID resolution (separate slice).",
+      );
+      return;
+    }
+    setShowVenueForm(true);
+  };
+
+  const handleCommitVenues = async () => {
+    let rows: unknown[];
+    try {
+      const parsed = JSON.parse(venueRowsInput);
+      rows = Array.isArray(parsed) ? parsed : [];
+    } catch {
+      setError("Invalid JSON for venue source rows");
+      return;
+    }
+    if (rows.length === 0) {
+      setError("Paste at least one venue source row (JSON array)");
+      return;
+    }
+    setError(null);
+    setNotice(null);
+    setBusy("commit");
+    try {
+      const result = await commitImportRun({
+        importRunId: importRun._id,
+        rawRows: rows,
       });
-    });
+      setShowVenueForm(false);
+      setVenueRowsInput("[]");
+      setNotice(
+        `Imported ${result.committed} venue(s)` +
+          (result.skipped ? `, ${result.skipped} already linked` : "") +
+          (result.pending ? `, ${result.pending} pending review` : "") +
+          (result.parseErrors ? `, ${result.parseErrors} parse error(s)` : "") +
+          ".",
+      );
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : "Commit failed");
+    } finally {
+      setBusy(null);
+    }
   };
 
   const handleMarkFailed = async () => {
@@ -208,17 +251,24 @@ export function ImportRunDetailPage() {
   const handleRevert = () => {
     if (
       !confirm(
-        "Are you sure you want to revert this import? This will rollback all imported data.",
+        "Revert this import? All ExternalRecordLinks created by this run are superseded (imported venues are left in place for operator deactivation).",
       )
     ) {
       return;
     }
-    void run("revert", async () => {
-      await revert({
-        docId: importRun._id,
-        version: importRun.version,
-      });
-    });
+    setError(null);
+    setNotice(null);
+    setBusy("revert");
+    void (async () => {
+      try {
+        const result = await revertImportRun({ importRunId: importRun._id });
+        setNotice(`Reverted — ${result.rolledBack} link(s) superseded.`);
+      } catch (cause) {
+        setError(cause instanceof Error ? cause.message : "Revert failed");
+      } finally {
+        setBusy(null);
+      }
+    })();
   };
 
   // Parse record counts for display
@@ -394,6 +444,60 @@ export function ImportRunDetailPage() {
                 onClick={() => {
                   setShowRecordCountsForm(false);
                   setRecordCountsInput("{}");
+                }}
+                className="px-4 py-2 text-slate-600 rounded-md text-sm font-medium hover:bg-slate-100"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Venue Source Rows (commit) */}
+      {showVenueForm ? (
+        <div className="card mt-4">
+          <div className="border-b border-line px-3">
+            <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+              Commit Venue Source Rows
+            </h2>
+          </div>
+          <div className="p-4">
+            <label
+              htmlFor="venueRows"
+              className="block text-sm font-medium text-ink-1 mb-2"
+            >
+              Venue source rows (JSON array)
+            </label>
+            <textarea
+              id="venueRows"
+              value={venueRowsInput}
+              onChange={(e) => setVenueRowsInput(e.target.value)}
+              className="w-full px-3 py-2 border border-line rounded-md text-sm font-mono"
+              rows={8}
+              placeholder={
+                '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
+              }
+            />
+            <p className="text-xs text-ink-2 mt-2">
+              Paste TPP venue rows. Each is parsed, created as a Venue, and
+              linked to this run. Re-running is safe (already-linked rows are
+              skipped).
+            </p>
+            <div className="mt-4 flex gap-3">
+              <button
+                type="button"
+                onClick={handleCommitVenues}
+                disabled={busy === "commit"}
+                className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium disabled:opacity-50"
+              >
+                {busy === "commit" ? "Committing..." : "Commit Venues"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowVenueForm(false);
+                  setVenueRowsInput("[]");
                 }}
                 className="px-4 py-2 text-slate-600 rounded-md text-sm font-medium hover:bg-slate-100"
               >
@@ -586,16 +690,17 @@ export function ImportRunDetailPage() {
               verification
             </li>
             <li>
-              • <strong>Approve & Commit</strong>: Finalize record counts and
-              commit data to database
+              • <strong>Approve &amp; Commit</strong>: Finalize record counts,
+              then paste venue source rows to materialize Venue entities and
+              link them to this run (venues dataset only)
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires
               failure details)
             </li>
             <li>
-              • <strong>Revert</strong>: Rollback a completed import (removes
-              all imported data)
+              • <strong>Revert</strong>: Supersede the links created by a
+              completed import (venues are left for operator deactivation)
             </li>
           </ul>
         </div>
