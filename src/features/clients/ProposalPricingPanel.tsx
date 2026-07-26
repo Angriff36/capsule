@@ -9,6 +9,7 @@ import {
   PRICING_BASIS_LABELS,
   type PricingBasis,
 } from "../../lib/pricing";
+import { useCatalogDishes } from "./useCatalogDishes";
 
 interface ProposalPricingPanelProps {
   proposalId: string;
@@ -32,6 +33,8 @@ interface LineEditor {
   unitPrice: string;
   quantity: string;
   unit: string;
+  menuDishId: string;
+  overrideReason: string;
 }
 
 const emptyEditor = (id: string | "new"): LineEditor => ({
@@ -41,6 +44,8 @@ const emptyEditor = (id: string | "new"): LineEditor => ({
   unitPrice: "",
   quantity: "1",
   unit: "",
+  menuDishId: "",
+  overrideReason: "",
 });
 
 /**
@@ -64,6 +69,8 @@ export function ProposalPricingPanel({
   onFailure,
 }: ProposalPricingPanelProps) {
   const lineItems = useListProposalLineItem();
+  // Published-catalog dishes a line can be priced from (spec §5.4 L276).
+  const catalog = useCatalogDishes();
   const addLine = useMutation(
     api.lib.proposalPricing.addProposalLineAndRecompute,
   );
@@ -119,6 +126,9 @@ export function ProposalPricingPanel({
     // resolved in isolation) and restamps every line via the recompute seam.
     const unit = editor.unit.trim() || undefined;
     const quantityArg = pricingBasis === "per_unit" ? quantity : undefined;
+    const menuDishId = (editor.menuDishId || undefined) as
+      Id<"menuDishes"> | undefined;
+    const overrideReason = editor.overrideReason.trim() || undefined;
 
     if (editor.id === "new") {
       const nextSortOrder =
@@ -132,6 +142,8 @@ export function ProposalPricingPanel({
           quantity: quantityArg,
           unit,
           sortOrder: nextSortOrder,
+          menuDishId,
+          overrideReason,
         }),
       );
     } else {
@@ -146,10 +158,45 @@ export function ProposalPricingPanel({
           quantity: quantityArg,
           unit,
           sortOrder: target ? Number(target.sortOrder) : undefined,
+          menuDishId,
+          overrideReason,
         }),
       );
     }
   };
+
+  // Link (or unlink) the editor line to a catalog dish (spec §5.4 L276).
+  const pickDishForEditor = (menuDishId: string) => {
+    if (!editor) return;
+    if (!menuDishId) {
+      setEditor({ ...editor, menuDishId: "", overrideReason: "" });
+      return;
+    }
+    const dish = catalog.lines.find((c) => c.menuDishId === menuDishId);
+    if (!dish) {
+      setEditor({ ...editor, menuDishId });
+      return;
+    }
+    setEditor({
+      ...editor,
+      menuDishId,
+      description: dish.name,
+      unitPrice:
+        dish.sellingPrice == null
+          ? editor.unitPrice
+          : String(dish.sellingPrice),
+      overrideReason: "",
+    });
+  };
+  const editorIsOverride = (() => {
+    if (!editor || !editor.menuDishId) return false;
+    const dish = catalog.lines.find((c) => c.menuDishId === editor.menuDishId);
+    if (!dish || dish.sellingPrice == null) return false;
+    return (
+      Math.round((Number(editor.unitPrice) + Number.EPSILON) * 100) / 100 !==
+      dish.sellingPrice
+    );
+  })();
 
   return (
     <div className="rounded-sm border border-line bg-inset p-4">
@@ -207,6 +254,8 @@ export function ProposalPricingPanel({
                           unitPrice: String(row.unitPrice),
                           quantity: String(row.quantity),
                           unit: row.unit ?? "",
+                          menuDishId: row.menuDishId ?? "",
+                          overrideReason: row.overrideReason ?? "",
                         })
                       }
                     >
@@ -268,6 +317,38 @@ export function ProposalPricingPanel({
               ))}
             </select>
           </label>
+          <label className="min-w-[12rem]">
+            <span className="field-label">Catalog dish</span>
+            <select
+              className="input"
+              value={editor.menuDishId}
+              disabled={catalog.loading}
+              onChange={(e) => pickDishForEditor(e.target.value)}
+            >
+              <option value="">— custom line —</option>
+              {catalog.lines.map((dish) => (
+                <option key={dish.menuDishId} value={dish.menuDishId}>
+                  {dish.name}
+                  {dish.sellingPrice == null
+                    ? ""
+                    : ` · ${dish.sellingPrice.toFixed(2)}`}
+                </option>
+              ))}
+            </select>
+          </label>
+          {editorIsOverride ? (
+            <label className="flex-1 min-w-[16rem]">
+              <span className="field-label">Override reason (spec §5.4)</span>
+              <input
+                className="input"
+                value={editor.overrideReason}
+                onChange={(e) =>
+                  setEditor({ ...editor, overrideReason: e.target.value })
+                }
+                placeholder="Why this price differs from the catalog"
+              />
+            </label>
+          ) : null}
           <label>
             <span className="field-label">Price / %</span>
             <input

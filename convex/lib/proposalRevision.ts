@@ -2,8 +2,11 @@
 
 import { internalMutation, mutation } from "../_generated/server";
 import { api, internal } from "../_generated/api";
-import type { Doc } from "../_generated/dataModel";
+import type { Doc, Id } from "../_generated/dataModel";
 import { v } from "convex/values";
+
+// 2dp rounding for comparing stored money(12,2) values (float-stable).
+const round2 = (n: number) => Math.round((n + Number.EPSILON) * 100) / 100;
 
 // Snapshot data structure for proposal revisions
 export interface ProposalRevisionSnapshot {
@@ -47,6 +50,10 @@ export interface ProposalRevisionSnapshot {
   // Priced lines (spec §5.4) captured at publication so an accepted revision
   // stays reproducible after later catalog/menu edits. `amount` is the central
   // calc output stored on each line; the snapshot copies it verbatim.
+  // Catalog-sourced lines (spec §5.4 L276) also snapshot the linked MenuDish's
+  // `sellingPrice` as `catalogPrice` plus the `overrideReason`, so a price
+  // override stays auditable in the immutable revision even after the catalog
+  // price later changes.
   lineItems: Array<{
     id: string;
     description: string;
@@ -57,6 +64,9 @@ export interface ProposalRevisionSnapshot {
     amount: number;
     sortOrder: number;
     notes: string | null;
+    menuDishId: string | null;
+    catalogPrice: number | null;
+    overrideReason: string | null;
   }>;
   tenant: {
     name: string;
@@ -122,19 +132,33 @@ export async function buildProposalRevisionSnapshot(
       .withIndex("by_proposalId", (q: any) => q.eq(proposal._id))
       .collect()
   ).filter((row: any) => row.deletedAt == null);
-  const lineItemsData = lineItems
-    .map((line: any) => ({
-      id: line._id.toString(),
-      description: line.description,
-      pricingBasis: line.pricingBasis,
-      unitPrice: line.unitPrice,
-      quantity: line.quantity,
-      unit: line.unit ?? null,
-      amount: line.amount,
-      sortOrder: line.sortOrder,
-      notes: line.notes ?? null,
-    }))
-    .sort((a: any, b: any) => a.sortOrder - b.sortOrder);
+  const lineItemsData = (
+    await Promise.all(
+      lineItems.map(async (line: any) => {
+        // Resolve the linked catalog price (spec §5.4 L276 audit) so the
+        // snapshot records what the dish sold for at publication, independent
+        // of later MenuDish.sellingPrice edits.
+        const menuDish = line.menuDishId ? await ctx.db.get(line.menuDishId) : null;
+        return {
+          id: line._id.toString(),
+          description: line.description,
+          pricingBasis: line.pricingBasis,
+          unitPrice: line.unitPrice,
+          quantity: line.quantity,
+          unit: line.unit ?? null,
+          amount: line.amount,
+          sortOrder: line.sortOrder,
+          notes: line.notes ?? null,
+          menuDishId: line.menuDishId ? line.menuDishId.toString() : null,
+          catalogPrice:
+            menuDish && menuDish.sellingPrice != null
+              ? Number(menuDish.sellingPrice)
+              : null,
+          overrideReason: line.overrideReason ?? null,
+        };
+      }),
+    )
+  ).sort((a: any, b: any) => a.sortOrder - b.sortOrder);
 
   const snapshot: ProposalRevisionSnapshot = {
     proposal: {
@@ -252,6 +276,40 @@ export const sendProposalWithRevisionCapture = mutation({
     changeSummary: v.optional(v.string()),
   },
   handler: async (ctx, args): Promise<Doc<"proposals">> => {
+    // spec §5.4 L276: a proposal may not be published while a catalog-linked
+    // line carries an UNAPPROVED price override — a unitPrice that diverges from
+    // the linked MenuDish.sellingPrice with no recorded reason. Free-form lines
+    // (no menuDishId) and exact-price catalog lines are never overrides and
+    // always pass. Narrow by design: this is a real spec requirement (sales
+    // price overrides must be justified and auditable), not policy tedium — it
+    // fires only when an operator BOTH linked a catalog dish AND changed its
+    // price. Runs before Proposal_send so a blocked proposal is not partially
+    // sent; an uncaught throw rolls back the whole transaction.
+    const overrideLines = (
+      await ctx.db
+        .query("proposalLineItems")
+        .withIndex("by_proposalId", (q: any) => q.eq(args.docId))
+        .collect()
+    ).filter((row: any) => row.deletedAt == null && row.menuDishId != null);
+    for (const line of overrideLines) {
+      // menuDishId is a uuid? column (`string | null | undefined`); the filter
+      // above guarantees non-null at runtime. Cast to the typed id so ctx.db.get
+      // resolves to Doc<"menuDishes"> (sellingPrice reads cleanly).
+      const menuDish = await ctx.db.get(line.menuDishId as Id<"menuDishes">);
+      // Dish gone or catalog price unset → nothing to compare against; skip
+      // rather than block a send over a stale/empty link.
+      if (!menuDish || menuDish.sellingPrice == null) continue;
+      const unit = round2(Number(line.unitPrice));
+      const catalog = round2(Number(menuDish.sellingPrice));
+      if (
+        unit !== catalog &&
+        (!line.overrideReason || line.overrideReason.trim().length === 0)
+      ) {
+        throw new Error(
+          `"${line.description}" is priced at ${unit.toFixed(2)} but its linked menu dish lists ${catalog.toFixed(2)}. Add an override reason (spec §5.4) before sending.`,
+        );
+      }
+    }
     const sent = await ctx.runMutation(api.mutations.Proposal_send, {
       docId: args.docId,
       version: args.version,

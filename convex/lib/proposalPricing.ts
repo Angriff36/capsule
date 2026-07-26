@@ -146,6 +146,8 @@ export const addProposalLineAndRecompute = mutation({
     unit: v.optional(v.string()),
     sortOrder: v.optional(v.number()),
     notes: v.optional(v.string()),
+    menuDishId: v.optional(v.id("menuDishes")),
+    overrideReason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const proposal = await ctx.db.get(args.proposalId);
@@ -171,6 +173,8 @@ export const addProposalLineAndRecompute = mutation({
       unit: args.unit,
       sortOrder: args.sortOrder,
       notes: args.notes,
+      menuDishId: args.menuDishId,
+      overrideReason: args.overrideReason,
     });
     await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
       proposalId: args.proposalId,
@@ -192,6 +196,8 @@ export const reviseProposalLineAndRecompute = mutation({
     unit: v.optional(v.string()),
     sortOrder: v.optional(v.number()),
     notes: v.optional(v.string()),
+    menuDishId: v.optional(v.id("menuDishes")),
+    overrideReason: v.optional(v.string()),
   },
   handler: async (ctx, args) => {
     const line = await ctx.db.get(args.docId);
@@ -221,6 +227,8 @@ export const reviseProposalLineAndRecompute = mutation({
       unit: args.unit,
       sortOrder: args.sortOrder,
       notes: args.notes,
+      menuDishId: args.menuDishId,
+      overrideReason: args.overrideReason,
     });
     await ctx.runMutation(internal.lib.proposalPricing.recomputeProposalTotals, {
       proposalId: line.proposalId,

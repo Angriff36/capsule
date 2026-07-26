@@ -46,6 +46,8 @@ export const draftProposalWithLines = mutation({
         unitPrice: v.number(),
         quantity: v.optional(v.number()),
         unit: v.optional(v.string()),
+        menuDishId: v.optional(v.id("menuDishes")),
+        overrideReason: v.optional(v.string()),
       }),
     ),
   },
@@ -93,6 +95,8 @@ export const draftProposalWithLines = mutation({
         quantity: line.quantity,
         unit: line.unit,
         sortOrder: i,
+        menuDishId: line.menuDishId,
+        overrideReason: line.overrideReason,
       });
     }
     // No return: an untyped `any` return here would cascade through the `api`

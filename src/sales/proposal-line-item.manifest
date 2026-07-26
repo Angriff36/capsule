@@ -18,9 +18,10 @@
 // the same way ProposalDishSelection is captured.
 //
 // Internal food cost / vendor cost / margin are deliberately NOT stored here
-// (spec §4.2: "stay private"). Catalog-sourced pricing (linking a line to a
-// Menu/MenuDish sell price) and the mandatory override-reason audit are the
-// next slice; this entity carries operator-entered sell prices only.
+// (spec §4.2: "stay private"). Catalog-sourced pricing: a line MAY link to a
+// published MenuDish (`menuDishId`); its sell price is then auditable against
+// MenuDish.sellingPrice, and a divergent price requires an `overrideReason`
+// (spec §5.4 L276). Free-form lines carry operator-entered sell prices only.
 
 use "./proposal.manifest"
 
@@ -52,6 +53,16 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
   property required amount: money(12, 2) = 0
   property required sortOrder: int = 0
   property notes: string?
+  // Catalog link (spec §5.4 L276): when a line is priced FROM a published
+  // MenuDish, this pins that catalog entry so the sell price can be audited
+  // against MenuDish.sellingPrice. Free-form lines (flat fees, enhancements,
+  // packages) leave this null — they are custom lines, not price overrides.
+  property menuDishId: uuid?
+  // Reason captured when this line's unitPrice diverges from the linked
+  // MenuDish.sellingPrice (spec §5.4: "Authorized overrides require a reason
+  // and remain auditable"). The send seam (convex/lib/proposalRevision.ts)
+  // blocks publication of a divergent catalog-linked line lacking a reason.
+  property overrideReason: string?
   property addedAt: datetime?
   property removedAt: datetime?
 
@@ -76,7 +87,9 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     optional quantity: decimal(12, 4),
     optional unit: string,
     optional sortOrder: int,
-    optional notes: string
+    optional notes: string,
+    optional menuDishId: uuid,
+    optional overrideReason: string
   ) {
     guard self.addedAt == null
     guard self.deletedAt == null
@@ -94,6 +107,8 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     mutate amount = amount
     mutate sortOrder = sortOrder != null ? sortOrder : 0
     mutate notes = notes
+    mutate menuDishId = menuDishId
+    mutate overrideReason = overrideReason
     mutate addedAt = now()
     emit ProposalLineItemAdded {
       lineItemId: self.id
@@ -114,7 +129,9 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     optional quantity: decimal(12, 4),
     optional unit: string,
     optional sortOrder: int,
-    optional notes: string
+    optional notes: string,
+    optional menuDishId: uuid,
+    optional overrideReason: string
   ) {
     guard self.addedAt != null
     guard self.deletedAt == null
@@ -130,6 +147,8 @@ entity ProposalLineItem mixin TenantScoped, SoftDeletable {
     mutate amount = amount
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
     mutate notes = notes
+    mutate menuDishId = menuDishId
+    mutate overrideReason = overrideReason
     emit ProposalLineItemRevised {
       lineItemId: self.id
       tenantId: self.tenantId

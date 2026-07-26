@@ -41,6 +41,7 @@ import {
 } from "./proposalPdf";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
+import { useCatalogDishes } from "./useCatalogDishes";
 import {
   computeProposalPricing,
   PRICING_BASES,
@@ -66,6 +67,8 @@ const policy = new CrmLifecyclePolicy();
 
 // In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
 // as strings for clean editing; parsed for the central calc on submit/preview.
+// `menuDishId` links the line to a catalog MenuDish (spec §5.4 L276); when the
+// price diverges from that dish's sellingPrice, `overrideReason` is required.
 type DraftLine = {
   key: string;
   description: string;
@@ -73,6 +76,8 @@ type DraftLine = {
   unitPrice: string;
   quantity: string;
   unit: string;
+  menuDishId: string;
+  overrideReason: string;
 };
 
 const dateValue = (value: FormDataEntryValue | null, endOfDay = false) => {
@@ -113,6 +118,8 @@ export function ProposalsPage() {
   // the pricing panel. Same query ProposalPricingPanel subscribes to (cached).
   const proposalLineItems = useListProposalLineItem();
   const proposalRevisions = useListProposalRevision();
+  // Published-catalog dishes a pricing line can be priced from (spec §5.4 L276).
+  const catalog = useCatalogDishes();
   const draftProposalWithLines = useMutation(
     api.lib.proposalDraft.draftProposalWithLines,
   );
@@ -171,6 +178,8 @@ export function ProposalsPage() {
     unitPrice: "",
     quantity: "1",
     unit: "",
+    menuDishId: "",
+    overrideReason: "",
   });
   const [draftLines, setDraftLines] = useState<DraftLine[]>([]);
   const [draftGuestCount, setDraftGuestCount] = useState<number>(0);
@@ -202,6 +211,36 @@ export function ProposalsPage() {
   const removeLine = (key: string) =>
     setDraftLines((lines) => lines.filter((l) => l.key !== key));
   const addLine = () => setDraftLines((lines) => [...lines, newDraftLine()]);
+
+  // Link (or unlink) a draft line to a catalog dish (spec §5.4 L276). Picking a
+  // dish autofills its name + sellingPrice; tweaking unitPrice away from that
+  // price is an override that requires a reason before the proposal can be sent.
+  const pickDish = (key: string, menuDishId: string) =>
+    setDraftLines((lines) =>
+      lines.map((l) => {
+        if (l.key !== key) return l;
+        if (!menuDishId) return { ...l, menuDishId: "", overrideReason: "" };
+        const dish = catalog.lines.find((c) => c.menuDishId === menuDishId);
+        if (!dish) return { ...l, menuDishId };
+        return {
+          ...l,
+          menuDishId,
+          description: dish.name,
+          unitPrice:
+            dish.sellingPrice == null ? l.unitPrice : String(dish.sellingPrice),
+          overrideReason: "",
+        };
+      }),
+    );
+  const isOverride = (line: DraftLine) => {
+    if (!line.menuDishId) return false;
+    const dish = catalog.lines.find((c) => c.menuDishId === line.menuDishId);
+    if (!dish || dish.sellingPrice == null) return false;
+    return (
+      Math.round((Number(line.unitPrice) + Number.EPSILON) * 100) / 100 !==
+      dish.sellingPrice
+    );
+  };
 
   useEffect(() => {
     // "Create proposal" on an event navigates here with ?event=<id>; open the
@@ -304,6 +343,10 @@ export function ProposalsPage() {
           unitPrice: pricing.lines[i].unitPrice,
           quantity: pricing.lines[i].quantity ?? undefined,
           unit: line.unit.trim() || undefined,
+          menuDishId: line.menuDishId
+            ? (line.menuDishId as Id<"menuDishes">)
+            : undefined,
+          overrideReason: line.overrideReason.trim() || undefined,
         })),
       });
       form.reset();
@@ -666,6 +709,7 @@ export function ProposalsPage() {
                       <tr>
                         <th>Description</th>
                         <th>Basis</th>
+                        <th>Catalog dish</th>
                         <th>Price / %</th>
                         <th>Qty</th>
                         <th>Unit</th>
@@ -675,95 +719,148 @@ export function ProposalsPage() {
                     </thead>
                     <tbody>
                       {draftLines.map((line, index) => (
-                        <tr key={line.key}>
-                          <td>
-                            <input
-                              className="input"
-                              value={line.description}
-                              onChange={(e) =>
-                                updateLine(
-                                  line.key,
-                                  "description",
-                                  e.target.value,
-                                )
-                              }
-                              placeholder="Line description"
-                            />
-                          </td>
-                          <td>
-                            <select
-                              className="input"
-                              value={line.pricingBasis}
-                              onChange={(e) =>
-                                updateLine(
-                                  line.key,
-                                  "pricingBasis",
-                                  e.target.value,
-                                )
-                              }
-                            >
-                              {PRICING_BASES.map((basis) => (
-                                <option key={basis} value={basis}>
-                                  {PRICING_BASIS_LABELS[basis]}
-                                </option>
-                              ))}
-                            </select>
-                          </td>
-                          <td>
-                            <input
-                              className="input w-24"
-                              type="number"
-                              step="0.01"
-                              min={0}
-                              value={line.unitPrice}
-                              onChange={(e) =>
-                                updateLine(
-                                  line.key,
-                                  "unitPrice",
-                                  e.target.value,
-                                )
-                              }
-                            />
-                          </td>
-                          <td>
-                            <input
-                              className="input w-20"
-                              type="number"
-                              step="0.01"
-                              min={0}
-                              value={line.quantity}
-                              onChange={(e) =>
-                                updateLine(line.key, "quantity", e.target.value)
-                              }
-                              disabled={line.pricingBasis !== "per_unit"}
-                            />
-                          </td>
-                          <td>
-                            <input
-                              className="input w-20"
-                              value={line.unit}
-                              onChange={(e) =>
-                                updateLine(line.key, "unit", e.target.value)
-                              }
-                              placeholder="tray, hr"
-                              disabled={line.pricingBasis !== "per_unit"}
-                            />
-                          </td>
-                          <td className="tabular-nums">
-                            {(draftPricing.lines[index]?.amount ?? 0).toFixed(
-                              2,
-                            )}
-                          </td>
-                          <td>
-                            <button
-                              className="btn btn-ghost btn-sm"
-                              type="button"
-                              onClick={() => removeLine(line.key)}
-                            >
-                              Remove
-                            </button>
-                          </td>
-                        </tr>
+                        <Fragment key={line.key}>
+                          <tr>
+                            <td>
+                              <input
+                                className="input"
+                                value={line.description}
+                                onChange={(e) =>
+                                  updateLine(
+                                    line.key,
+                                    "description",
+                                    e.target.value,
+                                  )
+                                }
+                                placeholder="Line description"
+                              />
+                            </td>
+                            <td>
+                              <select
+                                className="input"
+                                value={line.pricingBasis}
+                                onChange={(e) =>
+                                  updateLine(
+                                    line.key,
+                                    "pricingBasis",
+                                    e.target.value,
+                                  )
+                                }
+                              >
+                                {PRICING_BASES.map((basis) => (
+                                  <option key={basis} value={basis}>
+                                    {PRICING_BASIS_LABELS[basis]}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+                            <td>
+                              <select
+                                className="input"
+                                value={line.menuDishId}
+                                onChange={(e) =>
+                                  pickDish(line.key, e.target.value)
+                                }
+                                disabled={catalog.loading}
+                                aria-label="Link line to a catalog dish"
+                              >
+                                <option value="">— custom line —</option>
+                                {catalog.lines.map((dish) => (
+                                  <option
+                                    key={dish.menuDishId}
+                                    value={dish.menuDishId}
+                                  >
+                                    {dish.name}
+                                    {dish.sellingPrice == null
+                                      ? ""
+                                      : ` · ${dish.sellingPrice.toFixed(2)}`}
+                                  </option>
+                                ))}
+                              </select>
+                            </td>
+                            <td>
+                              <input
+                                className="input w-24"
+                                type="number"
+                                step="0.01"
+                                min={0}
+                                value={line.unitPrice}
+                                onChange={(e) =>
+                                  updateLine(
+                                    line.key,
+                                    "unitPrice",
+                                    e.target.value,
+                                  )
+                                }
+                              />
+                            </td>
+                            <td>
+                              <input
+                                className="input w-20"
+                                type="number"
+                                step="0.01"
+                                min={0}
+                                value={line.quantity}
+                                onChange={(e) =>
+                                  updateLine(
+                                    line.key,
+                                    "quantity",
+                                    e.target.value,
+                                  )
+                                }
+                                disabled={line.pricingBasis !== "per_unit"}
+                              />
+                            </td>
+                            <td>
+                              <input
+                                className="input w-20"
+                                value={line.unit}
+                                onChange={(e) =>
+                                  updateLine(line.key, "unit", e.target.value)
+                                }
+                                placeholder="tray, hr"
+                                disabled={line.pricingBasis !== "per_unit"}
+                              />
+                            </td>
+                            <td className="tabular-nums">
+                              {(draftPricing.lines[index]?.amount ?? 0).toFixed(
+                                2,
+                              )}
+                            </td>
+                            <td>
+                              <button
+                                className="btn btn-ghost btn-sm"
+                                type="button"
+                                onClick={() => removeLine(line.key)}
+                              >
+                                Remove
+                              </button>
+                            </td>
+                          </tr>
+                          {isOverride(line) ? (
+                            <tr>
+                              <td colSpan={8}>
+                                <label className="flex items-center gap-2">
+                                  <span className="field-label">
+                                    Override reason (spec §5.4)
+                                  </span>
+                                  <input
+                                    className="input flex-1"
+                                    value={line.overrideReason}
+                                    onChange={(e) =>
+                                      updateLine(
+                                        line.key,
+                                        "overrideReason",
+                                        e.target.value,
+                                      )
+                                    }
+                                    placeholder="Why this price differs from the catalog"
+                                  />
+                                </label>
+                              </td>
+                            </tr>
+                          ) : null}
+                        </Fragment>
                       ))}
                     </tbody>
                   </table>

@@ -142,18 +142,8 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-[proactive bridge @ 93% context — saved before compacting]
-Files (10):
-  src/operations/venue-layout-template.manifest (create)
-  src/app.manifest (edit)
-  tests/governed-creation-mappings.test.ts (edit)
-  src/features/facilities/VenueLayoutTemplatesPage.tsx (create)
-  src/features/facilities/VenueLayoutTemplatesPage.tsx (edit)
-  src/app/App.tsx (edit)
-  src/features/events/EventBattleBoardLayoutsPanel.tsx (edit)
-  src/features/facilities/VenueDetailPage.tsx (edit)
-  IMPLEMENTATION_PLAN.md (edit)
-  src/operations/venue-layout-template.manifest (edit)
+[Emergency bridge — running bridge was not updated]
+No changes or facts in this session.
 
 # === END COGNILAYER ===
 
