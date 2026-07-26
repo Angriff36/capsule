@@ -1,6 +1,11 @@
 import { ConvexError, v } from "convex/values";
 import { api, internal } from "./_generated/api";
-import { action, internalMutation, query } from "./_generated/server";
+import {
+  action,
+  internalMutation,
+  internalQuery,
+  query,
+} from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
 
 // Public status payload for getQuoteSubmissionStatus — derived from the Doc so
@@ -114,6 +119,24 @@ export const ingressQuoteSubmission = internalMutation({
       );
     }
     const tenantId = org.tenantId;
+
+    // Per-tenant rate cap on the anonymous public write. Dedup only blocks
+    // exact (email+date) repeats, so a caller varying those fields could flood
+    // the review queue and inflate cost; cap submissions per tenant per hour
+    // (table-less: a bounded take over the tenant index). A true per-caller
+    // (per-IP) limit needs a counter table and remains a follow-up.
+    const HOUR_MS = 60 * 60 * 1000;
+    const MAX_PER_HOUR = 30;
+    const recent = await ctx.db
+      .query("quoteSubmissions")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .filter((q) => q.gte(q.field("submittedAt"), Date.now() - HOUR_MS))
+      .take(MAX_PER_HOUR + 1);
+    if (recent.length >= MAX_PER_HOUR) {
+      throw new ConvexError(
+        "We've received a lot of quote requests recently. Please try again shortly.",
+      );
+    }
 
     const email = args.email.trim().toLowerCase();
     const clientName = args.clientName.trim();
@@ -506,6 +529,19 @@ export const processQuoteSubmission = action({
         proposalId,
       });
     } else {
+      // Persist whatever IDs WERE created onto the submission before marking it
+      // failed, so the terminal failed row keeps durable links to the partial
+      // records (and reconciliation doesn't lose them or create duplicates).
+      await ctx.runMutation(
+        internal.quoteBuilder.checkpointQuoteSubmissionIds,
+        {
+          docId: submissionId,
+          clientId: clientId ?? undefined,
+          leadId: leadId ?? undefined,
+          eventId: eventId ?? undefined,
+          proposalId: proposalId ?? undefined,
+        },
+      );
       await ctx.runMutation(api.mutations.QuoteSubmission_fail, {
         docId: submissionId,
         errorMessage:
@@ -515,6 +551,45 @@ export const processQuoteSubmission = action({
     }
 
     return { submissionId, clientId, leadId, eventId, proposalId, errors };
+  },
+});
+
+/**
+ * Persists whichever sales-record IDs a partial conversion created onto the
+ * QuoteSubmission (used before marking a conversion failed, so the terminal
+ * row retains its links for reconciliation). Internal — only processQuoteSubmission calls it.
+ */
+export const checkpointQuoteSubmissionIds = internalMutation({
+  args: {
+    docId: v.id("quoteSubmissions"),
+    clientId: v.optional(v.id("clients")),
+    leadId: v.optional(v.id("leads")),
+    eventId: v.optional(v.id("events")),
+    proposalId: v.optional(v.id("proposals")),
+  },
+  handler: async (ctx, args) => {
+    const patch: Record<string, string> = {};
+    if (args.clientId) patch.clientId = args.clientId;
+    if (args.leadId) patch.leadId = args.leadId;
+    if (args.eventId) patch.eventId = args.eventId;
+    if (args.proposalId) patch.proposalId = args.proposalId;
+    if (Object.keys(patch).length > 0) {
+      await ctx.db.patch(args.docId, patch);
+    }
+  },
+});
+
+/**
+ * Anonymous-safe status read. The generated getQuoteSubmission query is
+ * tenant-scoped (it returns null when the caller has no matching tenantId), so
+ * an anonymous submitter cannot look up their own submission. This internal
+ * query reads by id directly (the submission id is the unguessable tracking
+ * number) and the public action below returns only non-PII status fields.
+ */
+export const getQuoteSubmissionPublicStatus = internalQuery({
+  args: { id: v.id("quoteSubmissions") },
+  handler: async (ctx, { id }): Promise<Doc<"quoteSubmissions"> | null> => {
+    return await ctx.db.get(id);
   },
 });
 
@@ -530,9 +605,12 @@ export const getQuoteSubmissionStatus = action({
     ctx,
     { submissionId },
   ): Promise<QuoteSubmissionStatusResult> => {
-    const submission = await ctx.runQuery(api.queries.getQuoteSubmission, {
-      id: submissionId,
-    });
+    const submission = await ctx.runQuery(
+      internal.quoteBuilder.getQuoteSubmissionPublicStatus,
+      {
+        id: submissionId,
+      },
+    );
 
     if (!submission || submission.deletedAt != null) {
       throw new ConvexError("Quote submission not found");
