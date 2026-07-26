@@ -136,7 +136,7 @@ event MessageThreadCreated: "message_thread.created" {
   threadId: string
   tenantId: string
   provider: string
-  providerThreadId: string
+  providerThreadId: string?
   contactId: string?
 }
 

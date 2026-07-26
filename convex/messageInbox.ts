@@ -4,15 +4,21 @@ import { action } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 
 // Idempotent inbound message ingestion (spec §4.4 "Done when": replaying the
-// same provider delivery creates no duplicate message). Provider-neutral: a
-// provider sync action (authenticated, like the QBO/Calendar syncs) or an
-// operator "log inbound" action calls this. It match-or-creates a MessageThread
-// by provider thread id, dedups the message by provider message id, and stores
-// the message as inbound plain text. Replays return the existing ids.
+// same provider delivery creates no duplicate message — including under
+// concurrent retry). Provider-neutral: a provider sync action (authenticated,
+// like the QBO/Calendar syncs) or an operator "log inbound" action calls this.
 //
-// The body is stored as TEXT only — callers must reduce any inbound provider
-// HTML to plain text before calling, so there is no stored-XSS surface and the
-// UI never renders message bodies as HTML.
+// Concurrency design: an action runs its query/mutation calls as separate
+// transactions, so a plain check-then-insert races. Each allocating create is
+// therefore passed a persistent `idempotencyKey`; the generated create checks
+// and claims that key INSIDE its own transaction, so two concurrent calls with
+// the same key resolve to one insert (the loser's OCC-retried read hits the
+// cached result). Message dedup is additionally scoped to the resolved thread
+// (account-scoped), not the provider message id globally.
+//
+// The body is stored as TEXT only — callers must reduce inbound provider HTML
+// to plain text before calling, so there is no stored-XSS surface and the UI
+// never renders message bodies as HTML.
 
 export const ingestInboundMessage = action({
   args: {
@@ -49,23 +55,9 @@ export const ingestInboundMessage = action({
       throw new ConvexError("Message text is required");
     }
 
-    // 1. Dedup by provider message id — a replay is an idempotent no-op.
-    const dups = await ctx.runQuery(
-      api.queries.listMessageByProviderMessageId,
-      { providerMessageId },
-    );
-    const existingMessage = dups.find((m) => m.deletedAt == null);
-    if (existingMessage) {
-      return {
-        threadId: existingMessage.threadId,
-        messageId: existingMessage._id,
-        isDuplicate: true,
-        threadCreated: false,
-      };
-    }
-
-    // 2. Match-or-create the thread by provider thread id (and provider, since a
-    // thread id is unique within a provider account, not globally).
+    // 1. Resolve the thread (match by provider + provider thread id). If a
+    // concurrent ingest already opened it, the idempotencyKey on the create
+    // returns that row instead of inserting a second one.
     const candidates = await ctx.runQuery(
       api.queries.listMessageThreadByProviderThreadId,
       { providerThreadId },
@@ -88,6 +80,7 @@ export const ingestInboundMessage = action({
           subject: args.subject,
           senderIdentity: args.senderIdentity,
           contactId: args.contactId,
+          idempotencyKey: `mt:${provider}:${providerThreadId}`,
         },
       );
       // Literal `create` allocating mutations return { _id, ...doc }.
@@ -95,7 +88,28 @@ export const ingestInboundMessage = action({
       threadCreated = true;
     }
 
-    // 3. Post the inbound message. _createVia* allocating mutations return { docId }.
+    // 2. Dedup the message WITHIN this thread (account-scoped). A replay hits
+    // the existing row; a concurrent replay is also caught by the create's
+    // idempotencyKey below.
+    const dups = await ctx.runQuery(
+      api.queries.listMessageByProviderMessageId,
+      { providerMessageId },
+    );
+    const existingMessage = dups.find(
+      (m) => m.threadId === threadId && m.deletedAt == null,
+    );
+    if (existingMessage) {
+      return {
+        threadId,
+        messageId: existingMessage._id,
+        isDuplicate: true,
+        threadCreated,
+      };
+    }
+
+    // 3. Post the inbound message. The idempotencyKey (thread + provider
+    // message id) makes a concurrent replay a no-op at the create level.
+    // _createVia* allocating mutations return { docId }.
     const posted = await ctx.runMutation(api.mutations.Message_createViaPost, {
       threadId,
       direction: "inbound",
@@ -105,6 +119,7 @@ export const ingestInboundMessage = action({
       senderIdentity: args.senderIdentity,
       sentAt: args.sentAt,
       rawPayload: args.rawPayload,
+      idempotencyKey: `msg:${threadId}:${providerMessageId}`,
     });
 
     return {

@@ -110,7 +110,7 @@ event MessagePosted: "message.posted" {
   tenantId: string
   threadId: string
   direction: string
-  providerMessageId: string
+  providerMessageId: string?
 }
 
 event MessageDeliveryUpdated: "message.delivery_updated" {

@@ -120,19 +120,12 @@ export function MessageInboxPage() {
   const submitNewThread = async () => {
     setFailure(null);
     setNotice(null);
-    const senderIdentity = ntSender.trim();
-    if (!senderIdentity) {
-      setFailure(
-        classifyCommandFailure(new Error("Sender identity is required")),
-      );
-      return;
-    }
     try {
       const result = await createThread({
         provider: ntProvider as Thread["provider"],
         providerThreadId: ntThreadRef.trim() || undefined,
         subject: ntSubject.trim() || undefined,
-        senderIdentity,
+        senderIdentity: ntSender.trim() || undefined,
       });
       setShowNew(false);
       setNtSender("");
@@ -151,10 +144,14 @@ export function MessageInboxPage() {
     setFailure(null);
     setSending(true);
     try {
+      // Internal threads record the reply as sent (no external delivery). For
+      // any real provider the message is queued — this increment has no
+      // provider/outbox wired, so we never claim "sent" for an unsent message;
+      // a future provider worker moves queued -> sent on acknowledgement.
       await createMessage({
         threadId: selected._id,
         direction: "outbound",
-        status: "sent",
+        status: selected.provider === "internal" ? "sent" : "queued",
         bodyText: body,
       });
       setReply("");
@@ -381,6 +378,9 @@ export function MessageInboxPage() {
                     </p>
                     <p className="text-[11px] text-ink-3">
                       {PROVIDER_LABEL[selected.provider] ?? selected.provider}
+                      {selected.providerAccountId
+                        ? ` · ${selected.providerAccountId}`
+                        : ""}
                       {selected.providerThreadId
                         ? ` · ${selected.providerThreadId}`
                         : ""}
