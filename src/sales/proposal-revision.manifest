@@ -134,6 +134,19 @@ event ProposalRevisionCaptured: "proposal_revision.captured" {
 //     specialInstructions: string | null
 //     selectedAt: number | null
 //   }>
+//   // Priced lines (spec §5.4) captured at publication so an accepted revision
+//   // stays reproducible after later catalog/menu edits.
+//   lineItems: Array<{
+//     id: string
+//     description: string
+//     pricingBasis: PricingBasis
+//     unitPrice: number
+//     quantity: number
+//     unit: string | null
+//     amount: number
+//     sortOrder: number
+//     notes: string | null
+//   }>
 //   tenant: {
 //     name: string
 //   }

@@ -71,6 +71,7 @@ describe("governed creation mappings", () => {
       "PrepTask_createViaOpen",
       "ProductionBatch_createViaPlan",
       "ProposalDishSelection_createViaSelect",
+      "ProposalLineItem_createViaAddLine",
       "ProposalRevision_createViaCapture",
       "ProposalTemplate_createViaDefine",
       "Proposal_createViaDraft",

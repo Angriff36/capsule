@@ -1,0 +1,184 @@
+// Capsule sales — ProposalLineItem (spec §5.4 pricing bases).
+//
+// Spec §5.4: "Line items support the pricing bases Capsule already needs—per
+// person, quantity/unit, flat fee, percentage, or package—without mixing
+// internal cost into client-facing totals. Effective prices are snapshotted
+// into a proposal revision. Discounts, service charges, taxability, and
+// deposits use one central calculation path..."
+//
+// A ProposalLineItem is ONE priced line on a proposal. Its `amount` is derived
+// from `pricingBasis` + `unitPrice` + `quantity` (+ the proposal's guestCount)
+// by the central calc in src/lib/pricing.ts; the manifest stores the inputs and
+// the computed amount, so the UI/central-calc is the single derivation path and
+// every read surface (PDF, acceptance, portal) shows the stored amount.
+//
+// Lines belong to the Proposal and are editable only while it is `draft`
+// (spec §5.1: "Draft revisions are editable"). At publication the live lines
+// are snapshotted into the ProposalRevision (convex/lib/proposalRevision.ts),
+// the same way ProposalDishSelection is captured.
+//
+// Internal food cost / vendor cost / margin are deliberately NOT stored here
+// (spec §4.2: "stay private"). Catalog-sourced pricing (linking a line to a
+// Menu/MenuDish sell price) and the mandatory override-reason audit are the
+// next slice; this entity carries operator-entered sell prices only.
+
+use "./proposal.manifest"
+
+enum PricingBasis {
+  per_person
+  per_unit
+  flat
+  percentage
+  package
+}
+
+// One priced line on a proposal. `amount` is the central-calc output for this
+// line (caller-supplied, like Proposal.total); the entity enforces it is
+// non-negative, not that it matches a recomputation (manifest cannot call TS).
+entity ProposalLineItem mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required proposalId: uuid
+  property required description: string = ""
+  property required pricingBasis: PricingBasis = "flat"
+  // Sell price the client sees. For `percentage` this is a percent 0-100.
+  property required unitPrice: money(12, 2) = 0
+  // Quantity for `per_unit` lines (guests for per_person come from the proposal).
+  property required quantity: decimal(12, 4) = 1
+  property unit: string?
+  // Central-calc-computed line amount — stored so read surfaces need not recompute.
+  property required amount: money(12, 2) = 0
+  property required sortOrder: int = 0
+  property notes: string?
+  property addedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
+
+  constraint lineComplete: self.addedAt == null or (length(trim(self.description)) > 0 and self.unitPrice >= 0 and self.quantity >= 0 and self.amount >= 0) "Priced lines require a description and non-negative money and quantity"
+
+  default policy proposalLineItemRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposal line items"
+  default policy proposalLineItemWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposal line items through commands"
+  default policy proposalLineItemExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal line item commands"
+
+  // Add a priced line. `amount` is supplied by the caller (computed by the
+  // central calc in src/lib/pricing.ts); the entity stores it verbatim. Only
+  // editable while the proposal is still a draft — once sent, pricing is locked
+  // (a new revision supersedes rather than mutating a shared one).
+  command addLine(
+    proposalId: uuid,
+    description: string,
+    pricingBasis: PricingBasis,
+    unitPrice: money(12, 2),
+    amount: money(12, 2),
+    optional quantity: decimal(12, 4),
+    optional unit: string,
+    optional sortOrder: int,
+    optional notes: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard self.proposal != null and self.proposal.status == "draft"
+    constraint addLineProposalMatch: proposalId == self.proposalId "Add line proposalId must match the seeded proposal reference"
+    constraint addLineDescription: length(trim(description)) > 0 "Line description is required"
+    constraint addLineNonnegative: unitPrice >= 0 and amount >= 0 "Line money cannot be negative"
+    constraint addLineQuantityNonnegative: quantity == null or quantity >= 0 "Line quantity cannot be negative"
+    mutate proposalId = proposalId
+    mutate description = description
+    mutate pricingBasis = pricingBasis
+    mutate unitPrice = unitPrice
+    mutate quantity = quantity != null ? quantity : 1
+    mutate unit = unit
+    mutate amount = amount
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate notes = notes
+    mutate addedAt = now()
+    emit ProposalLineItemAdded {
+      lineItemId: self.id
+      tenantId: self.tenantId
+      proposalId: proposalId
+      description: description
+      pricingBasis: pricingBasis
+      unitPrice: unitPrice
+      amount: amount
+    }
+  }
+
+  command reviseLine(
+    description: string,
+    pricingBasis: PricingBasis,
+    unitPrice: money(12, 2),
+    amount: money(12, 2),
+    optional quantity: decimal(12, 4),
+    optional unit: string,
+    optional sortOrder: int,
+    optional notes: string
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.proposal != null and self.proposal.status == "draft"
+    constraint reviseLineDescription: length(trim(description)) > 0 "Line description is required"
+    constraint reviseLineNonnegative: unitPrice >= 0 and amount >= 0 "Line money cannot be negative"
+    constraint reviseLineQuantityNonnegative: quantity == null or quantity >= 0 "Line quantity cannot be negative"
+    mutate description = description
+    mutate pricingBasis = pricingBasis
+    mutate unitPrice = unitPrice
+    mutate quantity = quantity != null ? quantity : self.quantity
+    mutate unit = unit != null ? unit : self.unit
+    mutate amount = amount
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    mutate notes = notes
+    emit ProposalLineItemRevised {
+      lineItemId: self.id
+      tenantId: self.tenantId
+      proposalId: self.proposalId
+      description: description
+      pricingBasis: pricingBasis
+      unitPrice: unitPrice
+      amount: amount
+    }
+  }
+
+  command removeLine() {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    guard self.proposal != null and self.proposal.status == "draft"
+    mutate deletedAt = now()
+    mutate removedAt = now()
+    emit ProposalLineItemRemoved {
+      lineItemId: self.id
+      tenantId: self.tenantId
+      proposalId: self.proposalId
+    }
+  }
+
+  store ProposalLineItem in durable
+}
+
+event ProposalLineItemAdded: "proposal_line_item.added" {
+  lineItemId: string
+  tenantId: string
+  proposalId: string
+  description: string
+  pricingBasis: PricingBasis
+  unitPrice: money(12, 2)
+  amount: money(12, 2)
+}
+
+event ProposalLineItemRevised: "proposal_line_item.revised" {
+  lineItemId: string
+  tenantId: string
+  proposalId: string
+  description: string
+  pricingBasis: PricingBasis
+  unitPrice: money(12, 2)
+  amount: money(12, 2)
+}
+
+event ProposalLineItemRemoved: "proposal_line_item.removed" {
+  lineItemId: string
+  tenantId: string
+  proposalId: string
+}

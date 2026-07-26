@@ -11,6 +11,28 @@
 
 ---
 
+**2026-07-26 — §5.4 Pricing Behavior: Proposal Line Item + central calc (data-model + calc slice) DONE:**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0). The §5.4 "pricing bases + one central calculation path" core is now met. New entity + pure calc module + revision-snapshot capture + authoring/preview UI; the `Proposal.draft` command signature is UNCHANGED, no new guard/policy, no new `*ByTenantId` query hand-edited.**
+
+**Finding (verified first-hand against spec + code this turn):** spec §5.4 (L274) — *"Line items support the pricing bases Capsule already needs—per person, quantity/unit, flat fee, percentage, or package… Discounts, service charges, taxability, and deposits use one central calculation path shared by preview, publication, acceptance, PDF/render, and reporting"* — was unmet. The Proposal had only flat `subtotal/taxAmount/discountAmount/total` (`proposal.manifest` L38-41), with the `total = subtotal + tax - discount` invariant duplicated in 3 places (manifest L67 & L107, `convex/mutations.ts:24390`, `ProposalsPage.tsx`). There was NO line-item pricing model and NO shared money-arithmetic path (only per-file Intl formatters). Spec line 97 names "Proposal Line Item" as a distinct entity. `ProposalDishSelection` is menu *composition* only (no price fields) — a different concern, correctly left separate.
+
+**Fix (smallest spec-faithful diff; new entity + pure calc + snapshot + UI):**
+- `src/lib/pricing.ts` (NEW) — the ONE central calculation path. Pure functions: `computeLineAmount` (per_person = unitPrice×guestCount; per_unit = unitPrice×quantity; flat/package = unitPrice; percentage resolved in pass 2) and `computeProposalPricing` (lines → {subtotal, discountAmount, taxAmount, total}; two-pass so percentage lines resolve against the base subtotal). No deps; float math rounded to 2dp (`money(12,2)`); internal cost/margin deliberately excluded (spec §4.2 private).
+- `src/sales/proposal-line-item.manifest` (NEW) — `ProposalLineItem` entity (TenantScoped, SoftDeletable; belongsTo Proposal; `description`, `pricingBasis` enum [per_person/per_unit/flat/percentage/package], `unitPrice` money, `quantity` decimal, `unit`, `amount` money [central-calc output, stored], `sortOrder`, `notes`). Commands `addLine` (→ `_createViaAddLine`), `reviseLine`, `removeLine`; all guard `self.proposal.status == "draft"` (pricing locked once sent — spec §5.1). Mirrors the proven ProposalDishSelection / PackListItem child pattern; NO `guard self.createdAt == null` (the timestamps-mixin lesson). Constraints enforce non-negative money/quantity + description. No override-reason field yet (catalog-sourced pricing + mandatory override audit is the documented next slice).
+- `src/app.manifest` — wired `use "./sales/proposal-line-item.manifest"`; `bun run manifest:regen` applied cleanly. Generated: `proposalLineItems` table (`convex/schema.ts:1615`, `by_proposalId` index), `ProposalLineItem_createViaAddLine` (`convex/mutations.ts:25099`), React hooks.
+- `convex/lib/proposalRevision.ts` — captures `lineItems` into the revision snapshot (spec: "Effective prices are snapshotted into a proposal revision"), mirroring the existing `dishSelections` capture; snapshot interface + commented type updated.
+- `src/features/clients/ProposalsPage.tsx` — draft form: replaced the manual Subtotal/Tax/Discount inputs with an in-memory **pricing-line editor** (per-person/per-unit/flat/percentage/package) whose live subtotal + total are computed by the central calc; on submit the totals pass to the UNCHANGED `Proposal.draft`, then each line is persisted via `addLine` (sequential client-side creates — `ponytail:` non-atomic, documented). Added a per-row read-only **"Pricing" panel** (`ProposalPricingPanel.tsx`, NEW) that recomputes totals through the same central calc — proves the one path is shared by authoring AND preview. Removed the now-dead local `money()` helper.
+- `tests/governed-creation-mappings.test.ts` — added `ProposalLineItem_createViaAddLine` (sorted between `ProposalDishSelection_createViaSelect` and `ProposalRevision_createViaCapture`; mechanical assertion update, not a new test).
+
+**Why it matters:** the proposal's primary purpose — producing a *priced* client-facing artifact — had no line-item pricing model; every total was a hand-typed flat number with the invariant copy-pasted in three places. Now pricing is built from priced lines through one engine, snapshotted immutably into revisions, and visible in both the authoring preview and a read-only breakdown.
+
+**Verification:** `bun run check` GREEN (exit 0) — toolchain, ownership ledger, all 9 manifest-slice contracts, typecheck 0, format clean (prettier-normalized), secrets, test:coverage, build ok (ProposalsPage chunk 22.50 kB), baseline-decay ok. Runtime write-path verified by inspection: `Proposal_createViaDraft` returns `{ docId }` (confirmed `mutations.ts:24415`, NOT `._id`) → loop `createProposalLineItem` → `_createViaAddLine`. The repo's recurring GREEN-but-broken failure modes do NOT apply (correct `.docId` off the create-result; no creation-command guard on an auto-managed timestamp; no relation-key reuse; uuid/money/decimal/enum params match property types). No tests added (authored manifest + seam + UI; AGENTS.md: do not add tests unless the owner asks).
+
+**Honest scope notes (documented next slices, NOT this increment):** (1) **Catalog-sourced pricing + override audit** — lines are operator-entered sell prices today; they do not yet link to `Menu.basePrice`/`pricePerPerson`/`MenuDish.sellingPrice`, and the spec's "authorized overrides require a reason" audit is not yet enforced (every line is an operator quote). Next slice: optional `menuId`/`menuDishId` ref + mandatory `overrideReason` when the price diverges from the catalog. (2) **Editing persisted draft lines** — `reviseLine`/`removeLine` commands exist but are not yet wired to a UI panel (only `addLine` is, via the draft form). (3) **Publish-time aggregate validation** — the spec's "publishes blocks on invalid totals / unapproved manual overrides" is enforced per-line + via the existing `proposalTotalsConsistent` invariant, but a server-side check that the stored subtotal equals the SUM of line amounts needs an authored seam (a manifest guard cannot fan-in child docs). (4) **PDF line-item rendering** — proposalPdf.ts still renders the 4 stored totals (which the central calc produced); rendering each priced line in the PDF is a follow-up. (5) Line creation is `ponytail:` sequential + non-atomic.
+
+---
+
 **2026-07-26 — "Create proposal from event" DONE — spec §5.3 (Priority 20 TPP bridge, native + imported events):**
 
 **Status: ✅ Shipped + `bun run check` GREEN (exit 0). Additive manifest change (one optional param on an existing creation command) + UI wiring; no new entity, no new guard, no new `*ByTenantId` query (no #111 exposure). NOTE: the pre-push hook is now a regen-only gate (the old broad codex review-gate hook is GONE — verified this turn), so a clean-regen push lands normally again.**
@@ -1715,7 +1737,7 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 ---
 
-### ❌ 5.4 Pricing Behavior — PARTIAL
+### ✅ 5.4 Pricing Behavior — DONE (data-model + central-calc slice)
 
 **Done:**
 - proposalPdf.ts:192-194 — per-person pricing calculation

@@ -44,6 +44,20 @@ export interface ProposalRevisionSnapshot {
     specialInstructions: string | null;
     selectedAt: number | null;
   }>;
+  // Priced lines (spec §5.4) captured at publication so an accepted revision
+  // stays reproducible after later catalog/menu edits. `amount` is the central
+  // calc output stored on each line; the snapshot copies it verbatim.
+  lineItems: Array<{
+    id: string;
+    description: string;
+    pricingBasis: string;
+    unitPrice: number;
+    quantity: number;
+    unit: string | null;
+    amount: number;
+    sortOrder: number;
+    notes: string | null;
+  }>;
   tenant: {
     name: string;
   };
@@ -92,6 +106,26 @@ export async function buildProposalRevisionSnapshot(
   // For now, use a placeholder - this would come from tenant entity in production
   const tenantName = "Tenant"; // TODO: Resolve from tenant entity
 
+  // Get priced line items (spec §5.4) — effective prices snapshotted here.
+  const lineItems = await ctx.db
+    .query("proposalLineItems")
+    .withIndex("by_proposalId", (q: any) => q.eq(proposal._id))
+    .filter((q: any) => q.eq("deletedAt", null))
+    .collect();
+  const lineItemsData = lineItems
+    .map((line: any) => ({
+      id: line._id.toString(),
+      description: line.description,
+      pricingBasis: line.pricingBasis,
+      unitPrice: line.unitPrice,
+      quantity: line.quantity,
+      unit: line.unit ?? null,
+      amount: line.amount,
+      sortOrder: line.sortOrder,
+      notes: line.notes ?? null,
+    }))
+    .sort((a: any, b: any) => a.sortOrder - b.sortOrder);
+
   const snapshot: ProposalRevisionSnapshot = {
     proposal: {
       id: proposal._id.toString(),
@@ -118,6 +152,7 @@ export async function buildProposalRevisionSnapshot(
       name: client.clientType === "company" ? (client.companyName ?? "Unknown Company") : `${client.givenName ?? ""} ${client.familyName ?? ""}`.trim() || "Unknown Client",
     },
     dishSelections: dishSelectionsData,
+    lineItems: lineItemsData,
     tenant: {
       name: tenantName,
     },

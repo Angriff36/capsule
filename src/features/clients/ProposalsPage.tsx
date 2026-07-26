@@ -1,7 +1,15 @@
-import { Fragment, useEffect, useState, type FormEvent } from "react";
+import {
+  Fragment,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   useCreateProposal,
+  useCreateProposalLineItem,
   useListClient,
   useListEvent,
   useListEventTimelineActivity,
@@ -32,6 +40,13 @@ import {
   type ProposalPdfRecord,
 } from "./proposalPdf";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
+import { ProposalPricingPanel } from "./ProposalPricingPanel";
+import {
+  computeProposalPricing,
+  PRICING_BASES,
+  PRICING_BASIS_LABELS,
+  type PricingBasis,
+} from "../../lib/pricing";
 
 // Event stages the acceptance cascade can feed dishes into (matches the
 // EventDish.confirmFromProposal stage guard).
@@ -47,9 +62,17 @@ const MENU_EDITABLE_STATUSES = ["draft", "sent", "viewed"];
 
 const policy = new CrmLifecyclePolicy();
 
-const money = (value: FormDataEntryValue | null) => {
-  const amount = Number(String(value ?? "").trim());
-  return Number.isFinite(amount) ? amount : Number.NaN;
+// Proposal money math lives in the shared pricing engine (src/lib/pricing.ts).
+
+// In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
+// as strings for clean editing; parsed for the central calc on submit/preview.
+type DraftLine = {
+  key: string;
+  description: string;
+  pricingBasis: PricingBasis;
+  unitPrice: string;
+  quantity: string;
+  unit: string;
 };
 
 const dateValue = (value: FormDataEntryValue | null, endOfDay = false) => {
@@ -129,10 +152,55 @@ export function ProposalsPage() {
       }
     : null;
 
+  const createProposalLineItem = useCreateProposalLineItem();
+  const [pricingOpenFor, setPricingOpenFor] = useState<string | null>(null);
+  const lineSeqRef = useRef(0);
+  const newDraftLine = (): DraftLine => ({
+    key: `line-${lineSeqRef.current++}`,
+    description: "",
+    pricingBasis: "flat",
+    unitPrice: "",
+    quantity: "1",
+    unit: "",
+  });
+  const [draftLines, setDraftLines] = useState<DraftLine[]>([]);
+  const [draftGuestCount, setDraftGuestCount] = useState<number>(0);
+  const [draftTax, setDraftTax] = useState<number>(0);
+  const [draftDiscount, setDraftDiscount] = useState<number>(0);
+
+  // Live pricing preview via the ONE central calc (spec §5.4): lines → totals.
+  const draftPricing = useMemo(
+    () =>
+      computeProposalPricing({
+        lines: draftLines.map((l) => ({
+          pricingBasis: l.pricingBasis,
+          unitPrice: Number(l.unitPrice) || 0,
+          quantity: Number(l.quantity) || 0,
+        })),
+        guestCount: draftGuestCount,
+        discountAmount: draftDiscount,
+        taxAmount: draftTax,
+      }),
+    [draftLines, draftGuestCount, draftTax, draftDiscount],
+  );
+
+  const updateLine = (key: string, field: keyof DraftLine, value: string) =>
+    setDraftLines((lines) =>
+      lines.map((l) =>
+        l.key === key ? ({ ...l, [field]: value } as DraftLine) : l,
+      ),
+    );
+  const removeLine = (key: string) =>
+    setDraftLines((lines) => lines.filter((l) => l.key !== key));
+  const addLine = () => setDraftLines((lines) => [...lines, newDraftLine()]);
+
   useEffect(() => {
     // "Create proposal" on an event navigates here with ?event=<id>; open the
     // draft form prefilled from that event (spec §5.3 create-proposal-from-event).
-    if (fromEvent) setShowDraft(true);
+    if (fromEvent) {
+      setShowDraft(true);
+      setDraftGuestCount(Number(fromEvent.expectedHeadcount ?? 0));
+    }
   }, [fromEvent?._id]);
 
   const activeRows = (proposals ?? []).filter((row) => row.deletedAt == null);
@@ -162,31 +230,38 @@ export function ProposalsPage() {
     const data = new FormData(form);
     const clientId = String(data.get("clientId") || "").trim();
     const title = String(data.get("title") || "").trim();
-    const subtotal = money(data.get("subtotal"));
-    const taxAmount = money(data.get("taxAmount"));
-    const discountAmount = money(data.get("discountAmount"));
     if (!clientId || !title) {
       setFailure(new Error("Client and title are required."));
       return;
     }
-    if ([subtotal, taxAmount, discountAmount].some((n) => Number.isNaN(n))) {
-      setFailure(new Error("Money fields must be valid numbers."));
-      return;
-    }
-    const total = subtotal + taxAmount - discountAmount;
-    if (total < 0) {
+    // Central calc (spec §5.4) derives the four stored totals from the priced
+    // lines; only lines with a description are committed.
+    const validLines = draftLines.filter(
+      (line) => line.description.trim().length > 0,
+    );
+    const pricing = computeProposalPricing({
+      lines: validLines.map((line) => ({
+        pricingBasis: line.pricingBasis,
+        unitPrice: Number(line.unitPrice) || 0,
+        quantity: Number(line.quantity) || 0,
+      })),
+      guestCount: draftGuestCount,
+      discountAmount: draftDiscount,
+      taxAmount: draftTax,
+    });
+    if (pricing.total < 0) {
       setFailure(new Error("Total cannot be negative."));
       return;
     }
     void run("draft-proposal", async () => {
-      await createProposal({
+      const result = await createProposal({
         clientId,
         title,
-        subtotal,
-        taxAmount,
-        discountAmount,
-        total,
-        guestCount: Number(data.get("guestCount") || 0) || 0,
+        subtotal: pricing.subtotal,
+        taxAmount: pricing.taxAmount,
+        discountAmount: pricing.discountAmount,
+        total: pricing.total,
+        guestCount: draftGuestCount,
         eventDate: dateValue(data.get("eventDate")),
         eventType: String(data.get("eventType") || "").trim() || undefined,
         venueName: String(data.get("venueName") || "").trim() || undefined,
@@ -197,8 +272,29 @@ export function ProposalsPage() {
         terms: String(data.get("terms") || "").trim() || undefined,
         eventId: String(data.get("eventId") || "").trim() || undefined,
       });
+      // Persist the priced lines against the new proposal. ponytail: sequential
+      // client-side creates (non-atomic — a mid-loop drop can leave a partial
+      // set; a server-side bulk action is the upgrade path if it bites).
+      const proposalId = result?.docId;
+      if (proposalId && pricing.lines.length > 0) {
+        for (let i = 0; i < pricing.lines.length; i++) {
+          await createProposalLineItem({
+            proposalId,
+            description: validLines[i].description.trim(),
+            pricingBasis: pricing.lines[i].pricingBasis,
+            unitPrice: pricing.lines[i].unitPrice,
+            amount: pricing.lines[i].amount,
+            quantity: pricing.lines[i].quantity ?? undefined,
+            unit: validLines[i].unit.trim() || undefined,
+            sortOrder: i,
+          });
+        }
+      }
       form.reset();
       draftForm.clear();
+      setDraftLines([]);
+      setDraftTax(0);
+      setDraftDiscount(0);
       setShowDraft(false);
       if (fromEventId) {
         const nextParams = new URLSearchParams(searchParams);
@@ -499,7 +595,10 @@ export function ProposalsPage() {
                   name="guestCount"
                   type="number"
                   min={0}
-                  defaultValue={prefill?.guestCount ?? 0}
+                  value={draftGuestCount}
+                  onChange={(e) =>
+                    setDraftGuestCount(Number(e.target.value) || 0)
+                  }
                 />
               </label>
               <label>
@@ -531,16 +630,138 @@ export function ProposalsPage() {
                   defaultValue={prefill?.venueAddress ?? ""}
                 />
               </label>
-              <label>
-                Subtotal
-                <input
-                  name="subtotal"
-                  type="number"
-                  step="0.01"
-                  min={0}
-                  required
-                />
-              </label>
+              <div className="mt-1">
+                <p className="eyebrow">Pricing lines (spec §5.4)</p>
+                <p className="text-[12px] text-ink-2">
+                  Per person / per unit / flat / percentage / package. Subtotal
+                  and total are computed by the shared pricing engine.
+                </p>
+                {draftLines.length === 0 ? (
+                  <p className="mt-2 text-[13px] text-ink-2">
+                    No pricing lines yet — add one to price the proposal.
+                  </p>
+                ) : (
+                  <table className="data-table mt-2">
+                    <thead>
+                      <tr>
+                        <th>Description</th>
+                        <th>Basis</th>
+                        <th>Price / %</th>
+                        <th>Qty</th>
+                        <th>Unit</th>
+                        <th>Amount</th>
+                        <th aria-label="Remove line" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {draftLines.map((line, index) => (
+                        <tr key={line.key}>
+                          <td>
+                            <input
+                              className="input"
+                              value={line.description}
+                              onChange={(e) =>
+                                updateLine(
+                                  line.key,
+                                  "description",
+                                  e.target.value,
+                                )
+                              }
+                              placeholder="Line description"
+                            />
+                          </td>
+                          <td>
+                            <select
+                              className="input"
+                              value={line.pricingBasis}
+                              onChange={(e) =>
+                                updateLine(
+                                  line.key,
+                                  "pricingBasis",
+                                  e.target.value,
+                                )
+                              }
+                            >
+                              {PRICING_BASES.map((basis) => (
+                                <option key={basis} value={basis}>
+                                  {PRICING_BASIS_LABELS[basis]}
+                                </option>
+                              ))}
+                            </select>
+                          </td>
+                          <td>
+                            <input
+                              className="input w-24"
+                              type="number"
+                              step="0.01"
+                              min={0}
+                              value={line.unitPrice}
+                              onChange={(e) =>
+                                updateLine(
+                                  line.key,
+                                  "unitPrice",
+                                  e.target.value,
+                                )
+                              }
+                            />
+                          </td>
+                          <td>
+                            <input
+                              className="input w-20"
+                              type="number"
+                              step="0.01"
+                              min={0}
+                              value={line.quantity}
+                              onChange={(e) =>
+                                updateLine(line.key, "quantity", e.target.value)
+                              }
+                              disabled={line.pricingBasis !== "per_unit"}
+                            />
+                          </td>
+                          <td>
+                            <input
+                              className="input w-20"
+                              value={line.unit}
+                              onChange={(e) =>
+                                updateLine(line.key, "unit", e.target.value)
+                              }
+                              placeholder="tray, hr"
+                              disabled={line.pricingBasis !== "per_unit"}
+                            />
+                          </td>
+                          <td className="tabular-nums">
+                            {(draftPricing.lines[index]?.amount ?? 0).toFixed(
+                              2,
+                            )}
+                          </td>
+                          <td>
+                            <button
+                              className="btn btn-ghost btn-sm"
+                              type="button"
+                              onClick={() => removeLine(line.key)}
+                            >
+                              Remove
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+                <button
+                  className="btn btn-ghost btn-sm mt-2"
+                  type="button"
+                  onClick={addLine}
+                >
+                  Add line
+                </button>
+                <p className="mt-2 text-[13px] text-ink-2">
+                  Subtotal (from lines):{" "}
+                  <span className="tabular-nums">
+                    {draftPricing.subtotal.toFixed(2)}
+                  </span>
+                </p>
+              </div>
               <label>
                 Tax
                 <input
@@ -548,8 +769,8 @@ export function ProposalsPage() {
                   type="number"
                   step="0.01"
                   min={0}
-                  defaultValue={0}
-                  required
+                  value={draftTax}
+                  onChange={(e) => setDraftTax(Number(e.target.value) || 0)}
                 />
               </label>
               <label>
@@ -559,10 +780,18 @@ export function ProposalsPage() {
                   type="number"
                   step="0.01"
                   min={0}
-                  defaultValue={0}
-                  required
+                  value={draftDiscount}
+                  onChange={(e) =>
+                    setDraftDiscount(Number(e.target.value) || 0)
+                  }
                 />
               </label>
+              <p className="text-[13px] font-semibold text-ink">
+                Total:{" "}
+                <span className="tabular-nums">
+                  {draftPricing.total.toFixed(2)}
+                </span>
+              </p>
               <label>
                 Proposed menu
                 <textarea
@@ -645,6 +874,19 @@ export function ProposalsPage() {
                         }
                       >
                         {menuOpenFor === row._id ? "Hide menu" : "Menu"}
+                      </button>
+                      <button
+                        className="btn btn-ghost"
+                        type="button"
+                        onClick={() =>
+                          setPricingOpenFor((current) =>
+                            current === row._id ? null : row._id,
+                          )
+                        }
+                      >
+                        {pricingOpenFor === row._id
+                          ? "Hide pricing"
+                          : "Pricing"}
                       </button>
                       <button
                         className="btn btn-ghost"
@@ -737,6 +979,18 @@ export function ProposalsPage() {
                             String(row.status),
                           )}
                           onFailure={setFailure}
+                        />
+                      </td>
+                    </tr>
+                  ) : null}
+                  {pricingOpenFor === row._id ? (
+                    <tr>
+                      <td colSpan={5}>
+                        <ProposalPricingPanel
+                          proposalId={row._id}
+                          guestCount={Number(row.guestCount ?? 0)}
+                          taxAmount={Number(row.taxAmount ?? 0)}
+                          discountAmount={Number(row.discountAmount ?? 0)}
                         />
                       </td>
                     </tr>
