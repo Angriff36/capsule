@@ -1,0 +1,120 @@
+// Capsule sales — Message. A single inbound or outbound message within a
+// MessageThread, from any provider. Provider-neutral: stores the provider's
+// message id (the dedup key for idempotent ingestion) and an opaque raw-payload
+// reference for re-import/debugging.
+//
+// The body is stored and rendered as TEXT only — inbound provider HTML is
+// reduced to plain text at ingest time, so there is no stored-XSS surface and
+// the UI never renders message bodies as HTML.
+
+use "./message-thread.manifest"
+
+enum MessageDirection {
+  inbound
+  outbound
+}
+
+enum MessageDeliveryStatus {
+  received
+  queued
+  sent
+  delivered
+  bounced
+  failed
+}
+
+entity Message mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property indexed required threadId: uuid
+  // Not indexed: the generator emits a v.string()-typed listMessageByDirection
+  // query that mismatches the enum index and fails typecheck. Filter client-side.
+  property required direction: MessageDirection = "inbound"
+  // Provider's message id — the dedup key. The ingest action looks this up
+  // before creating, so a replayed provider delivery creates no duplicate
+  // (§4.4 "Done when"). Null for internal/outbound messages without one yet.
+  property indexed providerMessageId: string
+  property senderIdentity: string
+  property required bodyText: string = ""
+  // Opaque serialized provider payload (JSON), kept for debugging/re-import.
+  // Never rendered; bodyText is the only render surface.
+  property rawPayload: string
+  property required status: MessageDeliveryStatus = "received"
+  property sentAt: datetime?
+  // Stamped from trusted auth context for outbound; for inbound this is the
+  // operator/sync account that ingested it.
+  property authorAuthSubjectId: string?
+
+  belongsTo thread: MessageThread fields [tenantId, threadId] references [tenantId, id]
+
+  constraint messageBodyPresent: length(trim(self.bodyText)) > 0 "Message text is required"
+
+  default policy messageRead read: roleAllows(user.role, "staffAccess") "Staff may read messages"
+  default policy messageWrite write: roleAllows(user.role, "staffAccess") "Staff may write messages through commands"
+  default policy messageExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute message commands"
+
+  // Post one message into a thread (inbound or outbound). threadId is a supplied
+  // target validated by the belongsTo relation; the author identity is stamped
+  // from trusted context. status is required so inbound ("received") and
+  // outbound ("queued"/"sent") start in the right delivery state.
+  command post(
+    threadId: uuid,
+    direction: MessageDirection,
+    status: MessageDeliveryStatus,
+    bodyText: string,
+    optional providerMessageId: string,
+    optional senderIdentity: string,
+    optional sentAt: datetime,
+    optional rawPayload: string
+  ) {
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint postBodyPresent: length(trim(bodyText)) > 0 "Message text is required"
+    mutate threadId = threadId
+    mutate direction = direction
+    mutate status = status
+    mutate bodyText = bodyText
+    mutate providerMessageId = providerMessageId
+    mutate senderIdentity = senderIdentity
+    mutate sentAt = sentAt
+    mutate rawPayload = rawPayload
+    mutate authorAuthSubjectId = user.id
+    emit MessagePosted {
+      messageId: self.id
+      tenantId: self.tenantId
+      threadId: threadId
+      direction: direction
+      providerMessageId: providerMessageId
+    }
+  }
+
+  // Update delivery state on a provider ack/bounce (outbound messages).
+  command setDelivery(status: MessageDeliveryStatus) {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = status
+    emit MessageDeliveryUpdated {
+      messageId: self.id
+      tenantId: self.tenantId
+      status: status
+    }
+  }
+
+  store Message in durable
+}
+
+event MessagePosted: "message.posted" {
+  messageId: string
+  tenantId: string
+  threadId: string
+  direction: string
+  providerMessageId: string
+}
+
+event MessageDeliveryUpdated: "message.delivery_updated" {
+  messageId: string
+  tenantId: string
+  status: string
+}

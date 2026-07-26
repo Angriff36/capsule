@@ -18343,65 +18343,6 @@ export const Message_setDelivery = mutation({
   },
 });
 
-async function __runMessageThreadCreate(ctx: MutationCtx, args: any) {
-    const __auth = (await getAuthContext(ctx)) as any;
-    const user = __auth;
-    const doc: Record<string, any> = {
-      tenantId: __auth.tenantId,
-      deletedAt: args.deletedAt,
-      leadId: args.leadId,
-      status: args.status ?? "active",
-      createdAt: args.createdAt,
-      updatedAt: args.updatedAt,
-      provider: args.provider,
-      providerAccountId: args.providerAccountId,
-      providerThreadId: args.providerThreadId,
-      subject: args.subject,
-      senderIdentity: args.senderIdentity,
-      contactId: args.contactId,
-      openedByAuthSubjectId: user.id,
-      version: 1
-    };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read message threads");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write message threads through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute message thread commands");
-    if (!((args.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!((user.id != null))) throw new Error("Guard 1 failed");
-    const _id = await ctx.db.insert("messageThreads", doc as any);
-    const payload: Record<string, any> = { _id, id: _id, ...doc, result: { _id, id: _id, ...doc }, threadId: _id, tenantId: doc.tenantId, provider: doc.provider, providerThreadId: doc.providerThreadId, contactId: doc.contactId, _subject: { entity: "MessageThread", command: "create", id: _id } };
-    await ctx.db.insert("manifestEvents", { type: "MessageThreadCreated", entity: "MessageThread", entityId: _id, payload: { threadId: _id, tenantId: doc.tenantId, provider: doc.provider, providerThreadId: doc.providerThreadId, contactId: doc.contactId }, createdAt: Date.now() });
-    return { _id, ...doc };
-
-}
-
-export const MessageThread_create = mutation({
-  args: {
-    deletedAt: v.optional(v.union(v.number(), v.null())),
-    leadId: v.optional(v.union(v.id("leads"), v.null())),
-    status: v.optional(v.union(v.literal("active"), v.literal("non_lead"), v.literal("archived"))),
-    createdAt: v.optional(v.number()),
-    updatedAt: v.optional(v.number()),
-    provider: v.any(),
-    providerAccountId: v.optional(v.string()),
-    providerThreadId: v.optional(v.string()),
-    subject: v.optional(v.string()),
-    senderIdentity: v.optional(v.string()),
-    contactId: v.optional(v.string()),
-    idempotencyKey: v.optional(v.string())
-  },
-  handler: async (ctx, args) => {
-    if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
-      if (__cached !== undefined) return __cached;
-    }
-    const __result = await __runMessageThreadCreate(ctx, args);
-    if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "MessageThread_create", __result);
-    }
-    return __result;
-  },
-});
-
 async function __runMessageThreadLinkContact(ctx: MutationCtx, { docId, contactId, version }: any, __creation = false) {
     const __auth = (await getAuthContext(ctx)) as any;
     const user = __auth;
@@ -18487,6 +18428,62 @@ export const MessageThread_linkLead = mutation({
     const __result = await __runMessageThreadLinkLead(ctx, args);
     if (args.idempotencyKey !== undefined) {
       await __setCommandIdempotency(ctx, args.idempotencyKey, "MessageThread_linkLead", __result);
+    }
+    return __result;
+  },
+});
+
+async function __runMessageThreadOpen(ctx: MutationCtx, { docId, provider, providerAccountId, providerThreadId, subject, senderIdentity, contactId, version }: any, __creation = false) {
+    const __auth = (await getAuthContext(ctx)) as any;
+    const user = __auth;
+    const doc = await ctx.db.get(docId) as Record<string, any> | null;
+    if (!doc) throw new Error("MessageThread not found");
+    if ((doc as any).tenantId !== __auth.tenantId) throw new Error("MessageThread not found");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read message threads");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write message threads through commands");
+    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute message thread commands");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!((user.id != null))) throw new Error("Guard 1 failed");
+    if (version !== undefined && (doc as any).version !== version) {
+      throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
+    }
+    const updates = {
+      provider: provider,
+      providerAccountId: providerAccountId,
+      providerThreadId: providerThreadId,
+      subject: subject,
+      senderIdentity: senderIdentity,
+      contactId: contactId,
+      openedByAuthSubjectId: user.id,
+      version: ((doc as any).version ?? 0) + 1
+    };
+    await ctx.db.patch(docId, updates as any);
+    const __after: Record<string, any> = { ...doc, ...updates };
+    const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, threadId: docId, tenantId: __after.tenantId, provider: provider, providerThreadId: providerThreadId, contactId: contactId, _subject: { entity: "MessageThread", command: "open", id: docId } };
+    await ctx.db.insert("manifestEvents", { type: "MessageThreadOpened", entity: "MessageThread", entityId: docId, payload: { threadId: docId, tenantId: __after.tenantId, provider: provider, providerThreadId: providerThreadId, contactId: contactId }, createdAt: Date.now() });
+    return { ...doc, ...updates };
+}
+
+export const MessageThread_open = mutation({
+  args: {
+    docId: v.id("messageThreads"),
+    provider: v.any(),
+    providerAccountId: v.optional(v.string()),
+    providerThreadId: v.optional(v.string()),
+    subject: v.optional(v.string()),
+    senderIdentity: v.optional(v.string()),
+    contactId: v.optional(v.string()),
+    version: v.optional(v.number()),
+    idempotencyKey: v.optional(v.string())
+  },
+  handler: async (ctx, args) => {
+    if (args.idempotencyKey !== undefined) {
+      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
+      if (__cached !== undefined) return __cached;
+    }
+    const __result = await __runMessageThreadOpen(ctx, args);
+    if (args.idempotencyKey !== undefined) {
+      await __setCommandIdempotency(ctx, args.idempotencyKey, "MessageThread_open", __result);
     }
     return __result;
   },

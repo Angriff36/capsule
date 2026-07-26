@@ -54,6 +54,7 @@ describe("governed creation mappings", () => {
       "Lead_createViaCapture",
       "MenuDish_createViaAdd",
       "Menu_createViaDraft",
+      "Message_createViaPost",
       "Occasion_createViaRegister",
       "OrganizationCapabilitySetting_createViaRegister",
       "Organization_createViaRegister",

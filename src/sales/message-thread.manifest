@@ -1,0 +1,159 @@
+// Capsule sales — MessageThread. A provider-neutral conversation that groups
+// inbound and outbound messages (email, SMS, social DM, or internal) and links
+// them to a Contact and, when sales-qualified, a Lead. Distinct from
+// staff-to-staff StaffMessage (workforce) and the immutable ClientCommunication
+// log: this is the threaded inbox model the spec preserves for integrations
+// (§12.5 Email, §12.6 SMS "same thread and delivery model as Email", §4.4
+// Social DM).
+//
+// Provider-neutral by design: the provider's account/thread ids are stored for
+// match-or-create dedup, but the provider OAuth+sync is a separate Integration
+// Connection per provider (as with QuickBooks/Calendar). Inbound delivery is
+// ingested idempotently by the authored ingestInboundMessage action, which
+// dedups by provider message id so a replayed delivery creates no duplicate
+// (§4.4 "Done when").
+
+use "./contact.manifest"
+use "./lead.manifest"
+
+enum MessageProvider {
+  internal
+  email
+  sms
+  social
+  other
+}
+
+enum MessageThreadStatus {
+  active
+  non_lead
+  archived
+}
+
+entity MessageThread mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Not indexed: the generator emits a v.string()-typed listMessageThreadByProvider
+  // query that mismatches the enum index and fails typecheck. Filter client-side.
+  property required provider: MessageProvider = "internal"
+  // Provider account this thread belongs to (inbox address, social handle, …).
+  property indexed providerAccountId: string
+  // Provider's conversation/thread id — the match-or-create key on ingestion.
+  // Null for threads opened internally before the provider assigns an id.
+  property indexed providerThreadId: string
+  property subject: string
+  // Snapshot of the external party the thread is with, so the inbox shows who
+  // it is before a Contact is matched/linked.
+  property senderIdentity: string
+
+  property contactId: uuid?
+  property leadId: uuid?
+
+  property required status: MessageThreadStatus = "active"
+  // Stamped from trusted auth context on open, never accepted from the browser.
+  property openedByAuthSubjectId: string?
+
+  belongsTo contact: ClientContact? fields [tenantId, contactId] references [tenantId, id]
+  belongsTo lead: Lead? fields [tenantId, leadId] references [tenantId, id]
+
+  default policy messageThreadRead read: roleAllows(user.role, "staffAccess") "Staff may read message threads"
+  default policy messageThreadWrite write: roleAllows(user.role, "staffAccess") "Staff may write message threads through commands"
+  default policy messageThreadExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute message thread commands"
+
+  // Create a new conversation thread. Provider ids are supplied targets used by
+  // the ingest action for match-or-create; the creator identity is stamped from
+  // trusted auth context.
+  command create(
+    provider: MessageProvider,
+    optional providerAccountId: string,
+    optional providerThreadId: string,
+    optional subject: string,
+    optional senderIdentity: string,
+    optional contactId: uuid
+  ) {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate provider = provider
+    mutate providerAccountId = providerAccountId
+    mutate providerThreadId = providerThreadId
+    mutate subject = subject
+    mutate senderIdentity = senderIdentity
+    mutate contactId = contactId
+    mutate openedByAuthSubjectId = user.id
+    emit MessageThreadCreated {
+      threadId: self.id
+      tenantId: self.tenantId
+      provider: provider
+      providerThreadId: providerThreadId
+      contactId: contactId
+    }
+  }
+
+  // Match this thread to an existing Contact (operator-driven; idempotent).
+  command linkContact(contactId: uuid) {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate contactId = contactId
+    emit MessageThreadContactLinked {
+      threadId: self.id
+      tenantId: self.tenantId
+      contactId: contactId
+    }
+  }
+
+  // Qualify the thread into the pipeline by linking a Lead. Idempotent: the
+  // ingest action checks thread.leadId before creating a Lead, so a replayed
+  // delivery creates no duplicate lead (§4.4 "Done when").
+  command linkLead(leadId: uuid) {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate leadId = leadId
+    emit MessageThreadLeadLinked {
+      threadId: self.id
+      tenantId: self.tenantId
+      leadId: leadId
+    }
+  }
+
+  // Archive a thread or mark it non-lead (keeps history; never deletes source).
+  command setStatus(status: MessageThreadStatus) {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = status
+    emit MessageThreadStatusSet {
+      threadId: self.id
+      tenantId: self.tenantId
+      status: status
+    }
+  }
+
+  store MessageThread in durable
+}
+
+event MessageThreadCreated: "message_thread.created" {
+  threadId: string
+  tenantId: string
+  provider: string
+  providerThreadId: string
+  contactId: string?
+}
+
+event MessageThreadContactLinked: "message_thread.contact_linked" {
+  threadId: string
+  tenantId: string
+  contactId: string
+}
+
+event MessageThreadLeadLinked: "message_thread.lead_linked" {
+  threadId: string
+  tenantId: string
+  leadId: string
+}
+
+event MessageThreadStatusSet: "message_thread.status_set" {
+  threadId: string
+  tenantId: string
+  status: string
+}

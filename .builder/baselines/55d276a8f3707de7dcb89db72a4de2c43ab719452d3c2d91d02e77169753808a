@@ -61,9 +61,7 @@ export async function seedConvex(deploymentUrl: string): Promise<void> {
   // skip Menu: no create command in IR (2 rows unused)
   // skip MenuDish: no create command in IR (2 rows unused)
   // skip Message: no create command in IR (2 rows unused)
-  // MessageThread → api.mutations.MessageThread_create
-  await client.mutation(api.mutations.MessageThread_create, { "provider": "demo-provider-1", "providerAccountId": "providerAccountId-message-thread-1", "providerThreadId": "providerThreadId-message-thread-1", "subject": "demo-subject-1", "senderIdentity": "demo-senderIdentity-1", "contactId": "client-contact-1" } as any);
-  await client.mutation(api.mutations.MessageThread_create, { "provider": "demo-provider-2", "providerAccountId": "providerAccountId-message-thread-2", "providerThreadId": "providerThreadId-message-thread-2", "subject": "demo-subject-2", "senderIdentity": "demo-senderIdentity-2", "contactId": "client-contact-2" } as any);
+  // skip MessageThread: no create command in IR (2 rows unused)
   // skip Occasion: no create command in IR (2 rows unused)
   // skip Organization: no create command in IR (2 rows unused)
   // skip OrganizationCapabilitySetting: no create command in IR (2 rows unused)
@@ -395,7 +393,7 @@ export const MANIFEST_CONVEX_SEED_BINDING = {
     },
     {
       "entity": "MessageThread",
-      "createMutation": "MessageThread_create",
+      "createMutation": null,
       "rowCount": 2
     },
     {

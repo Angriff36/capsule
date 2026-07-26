@@ -19,6 +19,7 @@ export const CLIENTS_SECTIONS = [
     label: "Quote Requests",
     path: "/clients/quote-requests",
   },
+  { key: "inbox", label: "Inbox", path: "/clients/inbox" },
 ] as const;
 
 export type ClientsSection = (typeof CLIENTS_SECTIONS)[number]["key"];
@@ -32,5 +33,6 @@ export const CLIENTS_ROUTES = {
   contracts: "/clients/contracts",
   retention: "/clients/retention",
   quoteRequests: "/clients/quote-requests",
+  inbox: "/clients/inbox",
   contractDocument: (id: string) => `/clients/contracts/${id}/document`,
 } as const;

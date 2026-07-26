@@ -1182,6 +1182,7 @@ export default defineSchema({
   })
     .index("by_tenantId", ["tenantId"])
     .index("by_threadId", ["threadId"])
+    .index("by_direction", ["direction"])
     .index("by_providerMessageId", ["providerMessageId"]),
   messageThreads: defineTable({
     tenantId: v.string(),
@@ -1200,6 +1201,7 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
+    .index("by_provider", ["provider"])
     .index("by_providerAccountId", ["providerAccountId"])
     .index("by_providerThreadId", ["providerThreadId"])
     .index("by_contactId", ["contactId"])

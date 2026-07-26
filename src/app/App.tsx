@@ -303,6 +303,11 @@ const QuoteSubmissionsReviewPage = lazy(() =>
     default: module.QuoteSubmissionsReviewPage,
   })),
 );
+const MessageInboxPage = lazy(() =>
+  import("../features/sales/MessageInboxPage").then((module) => ({
+    default: module.MessageInboxPage,
+  })),
+);
 const ContractDocumentPage = lazy(() =>
   import("../features/clients/ContractDocumentPage").then((module) => ({
     default: module.ContractDocumentPage,
@@ -997,6 +1002,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <QuoteSubmissionsReviewPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/clients/inbox"
+              element={
+                <SupplyRoute>
+                  <MessageInboxPage />
                 </SupplyRoute>
               }
             />

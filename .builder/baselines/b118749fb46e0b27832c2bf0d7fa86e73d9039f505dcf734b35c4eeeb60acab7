@@ -973,10 +973,6 @@ const COMMAND_DISPATCH = {
     ref: api.mutations.Message_setDelivery,
     params: ["docId","status","version","idempotencyKey"] as const,
   },
-  "MessageThread.create": {
-    ref: api.mutations.MessageThread_create,
-    params: ["provider","providerAccountId","providerThreadId","subject","senderIdentity","contactId","idempotencyKey"] as const,
-  },
   "MessageThread.linkContact": {
     ref: api.mutations.MessageThread_linkContact,
     params: ["docId","contactId","version","idempotencyKey"] as const,
@@ -984,6 +980,10 @@ const COMMAND_DISPATCH = {
   "MessageThread.linkLead": {
     ref: api.mutations.MessageThread_linkLead,
     params: ["docId","leadId","version","idempotencyKey"] as const,
+  },
+  "MessageThread.open": {
+    ref: api.mutations.MessageThread_open,
+    params: ["docId","provider","providerAccountId","providerThreadId","subject","senderIdentity","contactId","version","idempotencyKey"] as const,
   },
   "MessageThread.setStatus": {
     ref: api.mutations.MessageThread_setStatus,

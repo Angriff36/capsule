@@ -4974,18 +4974,6 @@ export const MessageSetDeliveryParamsSchema = z.object({
 
 export type MessageSetDeliveryParams = z.infer<typeof MessageSetDeliveryParamsSchema>;
 
-// Command: create on MessageThread
-export const MessageThreadCreateParamsSchema = z.object({
-  provider: z.enum(["internal", "email", "sms", "social", "other"]),
-  providerAccountId: z.string().optional(),
-  providerThreadId: z.string().optional(),
-  subject: z.string().optional(),
-  senderIdentity: z.string().optional(),
-  contactId: z.string().uuid().optional(),
-});
-
-export type MessageThreadCreateParams = z.infer<typeof MessageThreadCreateParamsSchema>;
-
 // Command: linkContact on MessageThread
 export const MessageThreadLinkContactParamsSchema = z.object({
   contactId: z.string().uuid(),
@@ -4999,6 +4987,18 @@ export const MessageThreadLinkLeadParamsSchema = z.object({
 });
 
 export type MessageThreadLinkLeadParams = z.infer<typeof MessageThreadLinkLeadParamsSchema>;
+
+// Command: open on MessageThread
+export const MessageThreadOpenParamsSchema = z.object({
+  provider: z.enum(["internal", "email", "sms", "social", "other"]),
+  providerAccountId: z.string().optional(),
+  providerThreadId: z.string().optional(),
+  subject: z.string().optional(),
+  senderIdentity: z.string().optional(),
+  contactId: z.string().uuid().optional(),
+});
+
+export type MessageThreadOpenParams = z.infer<typeof MessageThreadOpenParamsSchema>;
 
 // Command: setStatus on MessageThread
 export const MessageThreadSetStatusParamsSchema = z.object({

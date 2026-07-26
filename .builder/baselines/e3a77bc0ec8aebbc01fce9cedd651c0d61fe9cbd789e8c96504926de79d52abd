@@ -731,14 +731,14 @@ describe("Manifest Convex contract", () => {
   it("exports mutation Message_setDelivery", () => {
     expect(typeof (mutations as any).Message_setDelivery).toBe("function");
   });
-  it("exports mutation MessageThread_create", () => {
-    expect(typeof (mutations as any).MessageThread_create).toBe("function");
-  });
   it("exports mutation MessageThread_linkContact", () => {
     expect(typeof (mutations as any).MessageThread_linkContact).toBe("function");
   });
   it("exports mutation MessageThread_linkLead", () => {
     expect(typeof (mutations as any).MessageThread_linkLead).toBe("function");
+  });
+  it("exports mutation MessageThread_open", () => {
+    expect(typeof (mutations as any).MessageThread_open).toBe("function");
   });
   it("exports mutation MessageThread_setStatus", () => {
     expect(typeof (mutations as any).MessageThread_setStatus).toBe("function");
