@@ -1035,6 +1035,8 @@ export function ProposalsPage() {
                           guestCount={Number(row.guestCount ?? 0)}
                           taxAmount={Number(row.taxAmount ?? 0)}
                           discountAmount={Number(row.discountAmount ?? 0)}
+                          editable={String(row.status) === "draft"}
+                          onFailure={setFailure}
                         />
                       </td>
                     </tr>
