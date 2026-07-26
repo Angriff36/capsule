@@ -53,6 +53,8 @@ bun run agent:mcp        # Capsule MCP stdio host for Cursor (idle in a TTY is e
 # but are not package.json scripts in this checkout — use the MCP host + mint-jwt path above.
 ```
 
+**New `convex/*.ts` authored seam?** Run `bun run codegen` before `bun run typecheck` — `convex/_generated/api.d.ts` is a strict static module list (runtime `api = anyApi` is dynamic, but the types are not); the dev server does NOT auto-regenerate it, so a fresh authored query/mutation won't typecheck until codegen registers it.
+
 Essential commands: [docs/commands.md](docs/commands.md). Full reference: [docs/operations/commands.md](docs/operations/commands.md).  
 Manifest CLI safe vs unsafe in Capsule: [docs/generation/manifest-cli-safety.md](docs/generation/manifest-cli-safety.md).
 Agent enter prompt: [docs/generation/AGENT_PROMPT_ENTER_RECIPE.md](docs/generation/AGENT_PROMPT_ENTER_RECIPE.md).
@@ -189,25 +191,26 @@ Convex agent skills for common tasks can be installed by running
 
 ## Deploying (agents: read before touching anything deploy-shaped)
 
-**Deploys are HUMAN-AUTHORIZED only.** No loop or agent runs
+**Manual deploys are HUMAN-AUTHORIZED only.** No loop or agent runs
 `npx convex deploy`, `vercel deploy`, or edits Vercel/Clerk settings without
-the human explicitly asking in the current conversation. Merging a PR to
-`main` DOES auto-deploy the frontend (GitHub→Vercel integration, production
-branch `main`) — that is expected and fine; it ships whatever CI already
-verified.
+the human explicitly asking in the current conversation.
 
-When the human asks for a deploy, the correct order is:
+**Pushing `main` deploys BOTH frontend and Convex backend** (since
+`cc24315`, 2026-07-24): `vercel.json`'s `buildCommand` is
+`convex deploy --cmd 'vite build'`, so every Vercel production build pushes
+Convex functions/schema to prod (`tangible-skunk-448`) together with the UI.
+An authorized `git push` to `main` therefore ships everything CI verified —
+no separate `npx convex deploy -y` step is needed for changes that ride a
+`main` push. (Before `cc24315`, Vercel shipped only the UI and new Convex
+queries would Server Error until a manual deploy — that skew is why the
+buildCommand now deploys both; do not remove it.)
+
+When the human asks for a MANUAL deploy (no `main` push involved):
 
 1. Backend first, if `convex/` or manifests changed:
    `bun run manifest:regen` (manifest changes only) → `npx convex deploy -y`
    → prod deployment `tangible-skunk-448`.
-2. Frontend: merge to `main` (auto-deploys) or
-   `vercel deploy --prod --yes --archive=tgz`.
-
-**Pushing `main` alone is not enough** when Manifest/Convex surfaces changed.
-Vercel ships the UI immediately; until `npx convex deploy -y` lands, new
-queries (e.g. `listAnnouncement` in `AppShell`) Server Error and can white-
-screen the whole app via the top-level error boundary.
+2. Frontend: `vercel deploy --prod --yes --archive=tgz`.
 
 Invariants agents must not break (each broke a real deploy once):
 
