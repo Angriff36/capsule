@@ -1,13 +1,33 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-26 (§5.4 catalog-sourced pricing + override audit DONE — largest open §5.4 item closed)
+**Updated:** 2026-07-26 (§4.2 client-portal proposal pricing DONE — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+---
+
+**2026-07-26 — §4.2 Online menu pricing in the client portal DONE (closes §4.2 PARTIAL + the documented §5.4 "client-portal PDF line items" follow-up):**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0). Pure additive change to ONE authored Convex projection (`convex/clientPortal.ts`); zero client-code changes, no manifest/regen, no new entity/guard/query (no #111 exposure), no schema change.**
+
+**Finding (verified first-hand against spec + code this turn):** spec §4.2 L202 — *"Clients can see accurate sell prices without exposing internal cost or margin"* — and L206 — *"The public menu and self-service quote use the same catalog/pricing source as internal proposals. There is no second hard-coded web catalog"* — were unmet on the client-facing surface. The anonymous client-portal projection (`clientPortal.ts`) showed each accepted proposal's flat totals only (subtotal/tax/discount/total); a client self-downloading the proposal PDF from the portal saw a single Estimate number, NOT the priced line-item breakdown the §5.4 central calc produces. This was the §5.4 PDF-render entry's documented scope note #1 ("the anonymous `getEvent` projection does not currently include `ProposalLineItem` rows, so a client self-downloading from the portal still sees the flat Estimate … a separate security-reviewed slice").
+
+**First-hand correction of the plan's own §4.2 note:** the prior plan text guessed the fix was "Expose `MenuDish.sellingPrice` in client portal queries/components" / "clientPortal.ts:131-138 omits it." That is WRONG. The portal's `dishId` resolves to **`Dish`** (`event-dish.manifest:39` `belongsTo dish: Dish`), and `Dish` has **no price field** — the catalog sell price lives on `MenuDish` (a separate menu-composition entity). So there is no per-dish price to surface on the portal's menu list; the spec-faithful client-facing price is the **`ProposalLineItem` breakdown** (the §5.4 single source of truth), surfaced on the accepted-proposal artifact. Implementing the literal old plan text would have been impossible and would have fabricated a `Dish.sellingPrice` that does not exist.
+
+**Fix (smallest spec-faithful diff; 3 edits in one file):** `convex/clientPortal.ts` `getEvent` now also loads `proposalLineItems` (tenant-scoped via the existing `by_tenantId` index — the same shape as the org/client loads already in this query) and attaches a `pricingLines` array to each **accepted** proposal for this event's client. The projection carries ONLY the client-safe inputs (`description`, `pricingBasis`, `unitPrice`, `quantity`, `unit`) — the `amount` is derived in the PDF via the central calc (`src/lib/pricing.ts`), and internal cost/margin + the override-audit fields (`menuDishId`/`overrideReason`/`catalogPrice`) stay private, matching exactly what the operator PDF exposes. It flows through with **zero** `ClientPortalPage.tsx` changes: the portal download handler already spreads `...proposal` into `downloadProposalPdf`, the portal proposal type is already `ProposalPdfRecord` (which already declares `pricingLines?: PricingLinePdf[]`), and `generateProposalPdf` already renders `proposal.pricingLines ?? []` through the central calc — so the client's downloaded accepted-proposal PDF now itemizes every priced line identically to the operator PDF.
+
+**Why it matters:** the proposal's client-facing artifact (the whole point of §4.2 / §5.4) showed one flat number to the client; now it itemizes the priced breakdown through the SAME engine as preview, acceptance, the operator PDF, and reporting — one catalog/pricing source, no second hard-coded web catalog. Completes the §5.4 "PDF/render" + "acceptance" consumer chain on the client surface.
+
+**Security (verified, not overgated):** the projection is the anonymous token-authorized client view, so this was the flagged "security-reviewed slice." The new lines inherit the query's existing authorization unchanged — token → event → `event.tenantId` (verified at handler entry) → `by_tenantId` index scopes the load; lines are attached ONLY inside `visibleProposals`, which already filters `proposal.tenantId === event.tenantId && clientId === event.clientId && status === "accepted" && deletedAt == null`. A line for any other proposal/client/tenant is loaded into the tenant set but never attached or returned (the `line.proposalId === proposal._id` filter is inside the accepted-proposal map). No new guard/policy/approval — clients see prices they were already told in aggregate; this REDUCES opacity, not adds friction.
+
+**Verification:** `bun run check` GREEN (exit 0) — toolchain, ownership ledger, typecheck 0 (`PricingBasis` schema literal union == `src/lib/pricing.ts` type, so `line.pricingBasis` needs no cast; `line.proposalId === proposal._id` is a direct branded-`Id` compare), format clean, secrets, test:coverage, build ok, baseline-decay ok. Runtime path verified by inspection: `getEvent` → `proposalLineItems` (by_tenantId) → `visibleProposals[].pricingLines` → `ClientPortalPage` `...proposal` spread → `downloadProposalPdf` → `generateProposalPdf` `pricingLines ?? []` → `computeProposalPricing`. No tests added (authored seam projection; AGENTS.md: do not add tests unless the owner asks). The repo's recurring GREEN-but-broken failure modes do NOT apply (pure read+project of an existing entity through an existing render path; no creation command, no guard, no relation key, no datetime param).
+
+**Honest scope notes (documented, NOT this increment):** (1) The portal's LIVE menu list (the event's `Dish` selections) still shows composition only — correct, because `Dish` carries no price; pricing lives on the proposal, which is now broken down in its PDF. (2) The proposal breakdown reaches the client via the downloadable PDF, not a new live in-portal breakdown view — the portal is download-centric for proposals, so the PDF is the natural surface; a live breakdown view is a separate UI slice if wanted. (3) Effective-date / seasonal catalog pricing (§4.2 L208 "Done when") remains open — `MenuDish.sellingPrice` is still a single current value with no price history / effective-date entity (the catalog-pricing entry's documented next slice).
 
 ---
 
@@ -120,7 +140,7 @@
 
 **Verification:** `bun run check` GREEN (exit 0) — toolchain, ownership ledger, all 9 manifest-slice contracts, typecheck 0, format clean (prettier-normalized), secrets, test:coverage, build ok (ProposalsPage chunk 22.09 kB), baseline-decay ok. Runtime correctness verified-by-consistency (not a separate browser pass): the field reads (`line.proposalId`/`deletedAt`/`sortOrder`/`description`/`pricingBasis`/`unitPrice`/`quantity`/`unit`) are byte-identical to the shipped `ProposalPricingPanel` (same hook, same doc type, same `as PricingBasis` cast); the calc call is byte-identical to the draft-form preview; the jsPDF row rendering mirrors the existing Estimate/enhancements patterns. The repo's recurring GREEN-but-broken failure modes DO NOT APPLY (pure read+render of an existing entity; no creation command, no guard, no relation key, no datetime param, no `any`-create-result field read). No tests added (authored UI render; AGENTS.md: do not add tests unless the owner asks). No cross-model review run this increment (autonomous-loop cadence; minimal pure-render diff with no new guard/policy/approval — the shape the merge-gate prompt exempts); flag if a review pass is wanted.
 
-**Honest scope notes (documented follow-ups, NOT this increment):** (1) Client-portal PDF line items — the anonymous `getEvent` projection (`convex/clientPortal.ts`) does not currently include `ProposalLineItem` rows, so a client self-downloading from the portal still sees the flat Estimate; threading priced lines into that token-authorized projection is a separate security-reviewed slice. (2) Catalog-sourced pricing + override audit (§5.4 L276) remains the largest open §5.4 item — lines are still operator-entered sell prices, not linked to `MenuDish.sellingPrice`, and overrides are not audited. (3) Editable persisted draft lines (`reviseLine`/`removeLine` commands exist + generated hooks but are imported by zero source files) remain unwired — NOT a clean UI slice because editing a line desyncs the parent Proposal totals (no governed command restamps them; needs the authored recompute seam documented as P1 #4). (4) `captureProposalRevision` on `Proposal.send` still never fires (Priority 10 gap; blocked on `checkRole` being generated-only).
+**Honest scope notes (documented follow-ups, NOT this increment):** (1) ~~Client-portal PDF line items~~ ✅ **DONE 2026-07-26** — `convex/clientPortal.ts` `getEvent` now projects priced `ProposalLineItem` rows onto each accepted proposal; the portal proposal PDF renders the breakdown through the central calc (see the top changelog entry). (2) Catalog-sourced pricing + override audit (§5.4 L276) remains the largest open §5.4 item — lines are still operator-entered sell prices, not linked to `MenuDish.sellingPrice`, and overrides are not audited. (3) Editable persisted draft lines (`reviseLine`/`removeLine` commands exist + generated hooks but are imported by zero source files) remain unwired — NOT a clean UI slice because editing a line desyncs the parent Proposal totals (no governed command restamps them; needs the authored recompute seam documented as P1 #4). (4) `captureProposalRevision` on `Proposal.send` still never fires (Priority 10 gap; blocked on `checkRole` being generated-only).
 
 ---
 
@@ -1674,21 +1694,19 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 **Objective:** Deliver the first visible TPP replacement value. Live menu pricing, proposal revisions, builder, TPP bridge, share links, acceptance.
 
-### 🟡 4.2 Online Menu Pricing — PARTIAL
+### ✅ 4.2 Online Menu Pricing — DONE (client portal)
 
 **Done:**
-- MenuDish.sellingPrice exists in menu.manifest
-- Pricing engine internal
+- MenuDish.sellingPrice exists in menu.manifest (catalog sell price source)
+- Central pricing engine (`src/lib/pricing.ts`) shared by preview, publication, acceptance, PDF/render, reporting
 - ProposalMenuSelectionPanel.tsx reads from published menus
+- **Client-facing proposal breakdown wired 2026-07-26** — `convex/clientPortal.ts` `getEvent` now projects the priced `ProposalLineItem` rows onto each accepted proposal; the portal proposal PDF renders the breakdown through the same central calc as the operator PDF. Clients see accurate sell prices; internal cost/margin + override-audit fields stay private. (See the top changelog entry.)
 
-**Gap:**
-- Client portal omits pricing display
-- ClientPortalPage.tsx:238-264 menu rendering omits pricing
-- Spec explicitly notes: "client portal omits it"
+**Note (first-hand correction):** the prior "Gap" here claimed the fix was to expose `MenuDish.sellingPrice` on the portal menu list — that is impossible: the portal's `dishId` resolves to `Dish` (`event-dish.manifest:39`), which has **no price field**. The spec-faithful client-facing price is the `ProposalLineItem` breakdown (§5.4 single source), now surfaced on the accepted-proposal PDF. The live menu list stays composition-only (correct — `Dish` carries no price).
 
-**Next step:** Expose sellingPrice in client portal queries/components (or intentionally omit per product decision)
+**Remaining sub-slice (NOT this increment):** effective-date / seasonal catalog pricing (§4.2 L208 "Done when") — `MenuDish.sellingPrice` is still a single current value with no price-history / effective-date entity.
 
-**Estimated effort:** Small (UI only, if decision is to show)
+**Estimated effort:** ✅ DONE
 
 ---
 

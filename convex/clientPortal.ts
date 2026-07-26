@@ -65,6 +65,7 @@ export const getEvent = query({
       invoices,
       timelineActivities,
       eventAssignments,
+      proposalLineItems,
     ] = await Promise.all([
       ctx.db
         .query("eventDishes")
@@ -94,6 +95,14 @@ export const getEvent = query({
       ctx.db
         .query("eventAssignments")
         .withIndex("by_eventId", (q) => q.eq("eventId", eventId))
+        .collect(),
+      // Spec §4.2: the client-facing proposal shows the SAME priced line-item
+      // breakdown as internal proposals (one catalog/pricing source). Tenant-
+      // scoped like the org/client loads above; only lines for this event's
+      // accepted proposals are attached below, so nothing foreign is exposed.
+      ctx.db
+        .query("proposalLineItems")
+        .withIndex("by_tenantId", (q) => q.eq("tenantId", event.tenantId))
         .collect(),
     ]);
 
@@ -221,6 +230,23 @@ export const getEvent = query({
         expiresAt: proposal.expiresAt ?? null,
         notes: proposal.notes ?? null,
         terms: proposal.terms ?? null,
+        // Spec §4.2 / §5.4: priced breakdown for the client-facing PDF. Only
+        // the client-safe inputs are projected — amount is derived in the PDF
+        // via the central calc (src/lib/pricing.ts), and internal cost/margin
+        // + the override-audit fields (menuDishId/overrideReason) stay private.
+        pricingLines: proposalLineItems
+          .filter(
+            (line) =>
+              line.proposalId === proposal._id && line.deletedAt == null,
+          )
+          .sort((left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0))
+          .map((line) => ({
+            description: line.description,
+            pricingBasis: line.pricingBasis,
+            unitPrice: line.unitPrice,
+            quantity: line.quantity,
+            unit: line.unit ?? null,
+          })),
         acceptedAt: proposal.acceptedAt ?? null,
       }));
     const visibleInvoices = invoices
