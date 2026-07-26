@@ -15,6 +15,21 @@ const convexUrl = import.meta.env.VITE_CONVEX_URL as string | undefined;
 const clerkPublishableKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY as
   string | undefined;
 
+// A deploy rewrites every content-hashed chunk, so a tab opened before it
+// asks for a lazy route chunk that no longer exists. Vercel's SPA rewrite
+// answers with index.html (200, text/html), the module fails to parse, and
+// the route dies in the error boundary. Reload once to pick up the new
+// index; the timestamp guard stops a reload loop when the chunk is genuinely
+// broken rather than merely stale.
+const CHUNK_RELOAD_AT = "capsule:chunk-reload-at";
+window.addEventListener("vite:preloadError", (event) => {
+  const lastReload = Number(sessionStorage.getItem(CHUNK_RELOAD_AT) ?? 0);
+  if (Date.now() - lastReload < 10_000) return; // just tried — let it surface
+  sessionStorage.setItem(CHUNK_RELOAD_AT, String(Date.now()));
+  event.preventDefault(); // suppress the rethrow so we reload instead of crashing
+  window.location.reload();
+});
+
 const root = document.getElementById("root");
 if (!root) throw new Error("#root not found");
 
