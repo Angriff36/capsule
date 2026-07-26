@@ -1,0 +1,36 @@
+# Paths the cross-model push review gate excludes as generated/machine-owned.
+# One git pathspec per line; read by ~/.claude/tools/review-gate.sh.
+# Source of truth: .builder/ownership.json (Builder-owned files) + generated trees.
+# NOTE: convex/lib/** author seams (authContext, encryption, proposal*, etc.)
+# are AUTHORED and deliberately NOT listed — they stay under review.
+
+# Builder regen snapshots + ownership ledger
+.builder/**
+
+# Generated Convex runtime output (Builder-owned per ownership.json)
+convex/_generated/**
+convex/computed.ts
+convex/crons.ts
+convex/http.ts
+convex/mutations.ts
+convex/queries.ts
+convex/sagas.ts
+convex/schema.ts
+
+# Generated wiring / schema / proof artifacts
+src/generated/**
+src/lib/manifest-convex-react.ts
+schemas/manifest-schemas.ts
+wiring/contract.json
+manifest-context-summary.json
+generated/**
+tests/manifest-convex.contract.test.ts
+scripts/seed-convex.ts
+
+# Builder-owned config + docs
+package.json
+tsconfig.builder.json
+PRESET.md
+
+# Lockfile (no authored logic)
+bun.lock
