@@ -12398,9 +12398,9 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
       const __fanMatch2_rows = __fanMatch2_raw.filter((d) => (d as any).eventDishId === payload.eventDishId && (d as any).componentId === null && (d as any).ingredientId === __row.ingredientId && (d as any).unit === __row.unit && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
       const __fanMatch2_id = __fanMatch2_rows.length > 0 ? (__fanMatch2_rows[0] as any)._id : null;
       if (__fanMatch2_id) {
-        await __runEventIngredientContributionRecord(ctx, { docId: __fanMatch2_id, eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.dishId, componentId: null, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __fanMatch2_id, eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.dishId, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart } as any);
       } else {
-        const __elseArgs: Record<string, any> = { eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.dishId, componentId: null, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart };
+        const __elseArgs: Record<string, any> = { eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.dishId, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart };
         const __elseDoc: Record<string, any> = {
           tenantId: __auth.tenantId,
           quantity: 0,
@@ -12572,9 +12572,9 @@ export const EventDish_createViaAddToEvent = mutation({
       const __fanMatch2_rows = __fanMatch2_raw.filter((d) => (d as any).eventDishId === payload.eventDishId && (d as any).componentId === null && (d as any).ingredientId === __row.ingredientId && (d as any).unit === __row.unit && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
       const __fanMatch2_id = __fanMatch2_rows.length > 0 ? (__fanMatch2_rows[0] as any)._id : null;
       if (__fanMatch2_id) {
-        await __runEventIngredientContributionRecord(ctx, { docId: __fanMatch2_id, eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.dishId, componentId: null, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __fanMatch2_id, eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.dishId, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart } as any);
       } else {
-        const __elseArgs: Record<string, any> = { eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.dishId, componentId: null, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart };
+        const __elseArgs: Record<string, any> = { eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.dishId, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart };
         const __elseDoc: Record<string, any> = {
           tenantId: __auth.tenantId,
           quantity: 0,
@@ -12813,9 +12813,9 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
       const __fanMatch1_rows = __fanMatch1_raw.filter((d) => (d as any).eventDishId === payload.eventDishId && (d as any).componentId === null && (d as any).ingredientId === __row.ingredientId && (d as any).unit === __row.unit && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
       const __fanMatch1_id = __fanMatch1_rows.length > 0 ? (__fanMatch1_rows[0] as any)._id : null;
       if (__fanMatch1_id) {
-        await __runEventIngredientContributionRecord(ctx, { docId: __fanMatch1_id, eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.seedDishId, componentId: null, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart } as any);
+        await __runEventIngredientContributionRecord(ctx, { docId: __fanMatch1_id, eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.seedDishId, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart } as any);
       } else {
-        const __elseArgs: Record<string, any> = { eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.seedDishId, componentId: null, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart };
+        const __elseArgs: Record<string, any> = { eventId: payload.eventId, eventDishId: payload.eventDishId, dishId: payload.seedDishId, ingredientId: __row.ingredientId, quantity: (__row.quantity * payload.quantityServings), unit: __row.unit, servings: payload.quantityServings, purchasingWeekStart: payload.purchasingWeekStart };
         const __elseDoc: Record<string, any> = {
           tenantId: __auth.tenantId,
           quantity: 0,

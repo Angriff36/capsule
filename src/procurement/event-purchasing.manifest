@@ -130,7 +130,7 @@ entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
 
 entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
-  unique [tenantId, eventDishId, ingredientId, unit]
+  unique [tenantId, eventDishId, componentId, ingredientId, unit]
   timestamps
   versionProperty version: number
 
@@ -305,12 +305,13 @@ on EventDishConfirmedFromProposal fanOut DishComponent where dishId = payload.se
 // than through a component's yield.
 on EventDishAdded fanOut DishIngredient where dishId = payload.dishId
   run EventIngredientContribution.record
-  match eventDishId = payload.eventDishId, ingredientId = self.ingredientId, unit = self.unit
+  match eventDishId = payload.eventDishId, componentId = null, ingredientId = self.ingredientId, unit = self.unit
   else create
   params {
     eventId: payload.eventId
     eventDishId: payload.eventDishId
     dishId: payload.dishId
+    componentId: null
     ingredientId: self.ingredientId
     quantity: self.quantity * payload.quantityServings
     unit: self.unit
@@ -320,7 +321,7 @@ on EventDishAdded fanOut DishIngredient where dishId = payload.dishId
 
 on EventDishComponentSeeded fanOut ComponentIngredient where componentId = payload.componentId
   run EventIngredientContribution.record
-  match eventDishId = payload.eventDishId, ingredientId = self.ingredientId, unit = self.unit
+  match eventDishId = payload.eventDishId, componentId = payload.componentId, ingredientId = self.ingredientId, unit = self.unit
   else create
   params {
     eventId: payload.eventId
@@ -422,4 +423,23 @@ on VendorOrderLineWeeklyEnsured run PurchaseNeed.assignToDraft
   params {
     vendorOrderId: payload.vendorOrderId
     vendorOrderLineId: payload.vendorOrderLineId
+  }
+
+// Proposal-fed dish lines need their direct ingredients as well, same as the
+// component path above. seedDishId is null when the line already existed, and a
+// null fanOut key matches no DishIngredient rows, so no double-count.
+on EventDishConfirmedFromProposal fanOut DishIngredient where dishId = payload.seedDishId
+  run EventIngredientContribution.record
+  match eventDishId = payload.eventDishId, componentId = null, ingredientId = self.ingredientId, unit = self.unit
+  else create
+  params {
+    eventId: payload.eventId
+    eventDishId: payload.eventDishId
+    dishId: payload.seedDishId
+    componentId: null
+    ingredientId: self.ingredientId
+    quantity: self.quantity * payload.quantityServings
+    unit: self.unit
+    servings: payload.quantityServings
+    purchasingWeekStart: payload.purchasingWeekStart
   }
