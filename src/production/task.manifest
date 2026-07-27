@@ -404,6 +404,37 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Cascade twin of cancel, for EventDishRemoved / EventCancelled. Those fan
+  // out over an event's ENTIRE prep list, so a command that throws on settled
+  // work makes the whole removal fail: one cook finishing one step used to make
+  // a dish impossible to pull from service, which is exactly when you need to
+  // pull it. Finished work stays finished here — the task is left alone rather
+  // than rejected. eventManageAccess is granted because the fan-out runs as the
+  // acting user, and an event manager killing their own event is not a kitchen
+  // lead. `cancel` stays narrow: it is the button a human presses.
+  command standDown(reason: string) {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenLeadAccess") or roleAllows(user.role, "eventManageAccess")
+    constraint standDownPrepReason: length(trim(reason)) > 0 "Stand-down reason is required"
+    compute previousStatus = self.status
+    compute alreadySettled = self.status == "completed" or self.status == "cancelled"
+    mutate status = alreadySettled ? self.status : "cancelled"
+    mutate cancelledAt = alreadySettled ? self.cancelledAt : now()
+    mutate cancellationReason = alreadySettled ? self.cancellationReason : reason
+    emit PrepTaskCancelled {
+      prepTaskId: self.id
+      tenantId: self.tenantId
+      eventDishId: self.eventDishId
+      eventId: self.eventId
+      name: self.name
+      quantity: self.quantity
+      unit: self.unit
+      previousStatus: previousStatus
+      status: self.status
+      reason: reason
+    }
+  }
+
   store PrepTask in durable
 }
 
@@ -629,14 +660,15 @@ event PrepTaskCancelled: "prep_task.cancelled" {
 on PrepTaskCompleted fanOut PrepTaskDependency where predecessorTaskId = payload.prepTaskId
   run satisfy
 
-// EventCancelled → cancel open prep work for that event.
+// EventCancelled → stand down prep work for that event. standDown, not cancel:
+// these fan out over every task including completed ones. See PrepTask.standDown.
 on EventCancelled fanOut PrepTask where eventId = payload.eventId
-  run cancel
+  run standDown
   params { reason: payload.reason }
 
-// EventDishRemoved → cancel prep lines for that event dish.
+// EventDishRemoved → stand down prep lines for that event dish.
 on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
-  run cancel
+  run standDown
   params { reason: payload.reason }
 
 // ---------------------------------------------------------------------------
