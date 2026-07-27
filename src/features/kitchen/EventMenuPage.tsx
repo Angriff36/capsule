@@ -120,7 +120,7 @@ export function EventMenuPage() {
       const quantityServings = Number(data.get("quantityServings"));
       const specialInstructions =
         String(data.get("specialInstructions") ?? "").trim() || undefined;
-      const created = (await createEventDish({
+      await createEventDish({
         eventId,
         dishId: String(data.get("dishId")),
         quantityServings,
@@ -128,14 +128,10 @@ export function EventMenuPage() {
         serviceStyle:
           String(data.get("serviceStyle") ?? "").trim() || undefined,
         specialInstructions,
-      })) as { docId: string };
-      const shortages = await menuSync().syncPrepForDish({
-        id: created.docId,
-        eventId,
-        dishId: String(data.get("dishId")),
-        quantityServings,
-        specialInstructions,
       });
+      // Prep tasks come from the EventDishAdded reaction; syncing them here
+      // would duplicate, because these catalogs predate the server's rows.
+      const shortages = await menuSync().syncRecipeDemands(eventId);
       setStockShortages(shortages);
       form.reset();
     });
@@ -160,23 +156,16 @@ export function EventMenuPage() {
     void run("applyTemplate", async () => {
       const allShortages: EventStockShortage[] = [];
       for (const line of lines) {
-        const created = (await createEventDish({
+        await createEventDish({
           eventId,
           dishId: line.dishId,
           quantityServings: servings,
           course: line.course ?? undefined,
           serviceStyle: line.serviceStyle ?? undefined,
           specialInstructions: line.specialInstructions ?? undefined,
-        })) as { docId: string };
-        const shortages = await menuSync().syncPrepForDish({
-          id: created.docId,
-          eventId,
-          dishId: line.dishId,
-          quantityServings: servings,
-          specialInstructions: line.specialInstructions ?? undefined,
         });
-        allShortages.push(...shortages);
       }
+      allShortages.push(...(await menuSync().syncRecipeDemands(eventId)));
       setStockShortages(allShortages);
       setTemplateMenuId("");
     });

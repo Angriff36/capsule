@@ -663,10 +663,11 @@ on EventDishAdded fanOut DishTask where activeDishId = payload.dishId
     eventDishId: payload.eventDishId
     eventId: payload.eventId
     name: self.name
-    // Templates may leave quantity blank; fall back to the event's servings so
-    // open's "quantity must be positive" constraint cannot fail the whole add.
-    quantity: self.defaultQuantity != null and self.defaultQuantity > 0 ? self.defaultQuantity : (payload.quantityServings > 0 ? payload.quantityServings : 1)
-    unit: self.defaultUnit != null ? self.defaultUnit : "each"
+    // defaultQuantity is PER GUEST (EventPrepTaskSynchronizer.quantityFor uses
+    // the same rule); blank means one per guest. Both must agree or the client
+    // reconcile would resize every generated task on the next sync.
+    quantity: self.defaultQuantity != null and self.defaultQuantity > 0 ? self.defaultQuantity * payload.quantityServings : (payload.quantityServings > 0 ? payload.quantityServings : 1)
+    unit: self.defaultUnit != null ? self.defaultUnit : "portion"
     dishTaskId: self.id
     dishId: payload.dishId
     category: self.category

@@ -29,7 +29,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
   const removeDish = useEventDishRemove();
-  const { ready: prepSyncReady, syncPrepForDish } = useEventMenuSync();
+  const { ready: prepSyncReady, syncStockForEvent } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
@@ -97,19 +97,16 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           onSelect={(dishId) =>
             void run("add", async () => {
               const servings = Math.max(1, expectedHeadcount || 1);
-              const created = (await createEventDish({
+              await createEventDish({
                 eventId,
                 dishId,
                 quantityServings: servings,
                 headcountOverride: 0,
-              })) as { docId: string };
+              });
+              // Prep tasks are generated server-side by the EventDishAdded
+              // reaction; only stock needs reconciling from the client.
               if (prepSyncReady) {
-                await syncPrepForDish({
-                  id: created.docId,
-                  eventId,
-                  dishId,
-                  quantityServings: servings,
-                });
+                await syncStockForEvent(eventId);
               }
               setShowPicker(false);
             })

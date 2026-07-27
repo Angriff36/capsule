@@ -108,6 +108,11 @@ export function useEventMenuSync() {
 
   return {
     ready,
+    // Reconcile prep tasks against the dish's templates. Only needed AFTER an
+    // event dish already exists — adding one generates its prep tasks
+    // server-side (EventDishAdded fanOut in production/task.manifest). Calling
+    // this straight after a create duplicates them, because the reactive
+    // catalogs have not seen the server's rows yet.
     syncPrepForDish: async (
       target: EventDishSyncTarget,
     ): Promise<EventStockShortage[]> => {
@@ -115,6 +120,16 @@ export function useEventMenuSync() {
         throw new Error("Prep sync catalogs are still loading");
       }
       return controller.syncPrepForDish(target);
+    },
+    // Stock shortages only — no prep-task materialization. This is what a
+    // just-created event dish needs.
+    syncStockForEvent: async (
+      eventId: string,
+    ): Promise<EventStockShortage[]> => {
+      if (!controller) {
+        throw new Error("Prep sync catalogs are still loading");
+      }
+      return controller.syncRecipeDemands(eventId);
     },
   };
 }

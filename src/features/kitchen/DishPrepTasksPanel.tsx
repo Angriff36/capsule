@@ -223,7 +223,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
           />
         </label>
         <label className="block text-[12px]">
-          <span className="meta-term">Default quantity (0 = per guest)</span>
+          <span className="meta-term">Per guest (0 = one each)</span>
           <input
             name="defaultQuantity"
             type="number"
