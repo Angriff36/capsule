@@ -54,6 +54,7 @@ import { EventPhotosTab } from "./EventPhotosTab";
 import { EventStaffingTab } from "./EventStaffingTab";
 import { EventTabErrorBoundary } from "./EventTabErrorBoundary";
 import { EventWeatherPanel } from "./EventWeatherPanel";
+import { EventSourceProvenancePanel } from "./EventSourceProvenancePanel";
 import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
 import { FailureBanner } from "./FailureBanner";
@@ -419,6 +420,9 @@ export function EventDetailPage() {
           />
           <div className="mt-4">
             <EventWeatherPanel venue={venue} />
+          </div>
+          <div className="mt-4">
+            <EventSourceProvenancePanel capsuleId={event._id} />
           </div>
         </EventTabErrorBoundary>
       ) : null}
