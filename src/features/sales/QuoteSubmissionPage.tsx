@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useAction, useQuery } from "convex/react";
+import { publicErrorMessage } from "../../lib/publicErrorMessage";
 import { api, type Id } from "../../lib/api";
 import { ArrowLeftIcon, CheckIcon } from "../../ui/icons";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
@@ -135,8 +136,13 @@ export function QuoteSubmissionPage() {
       });
     } catch (err) {
       console.error("[quote-submission]", err);
+      // Public page: never render the raw server error (it embeds the module
+      // path, line number and request id). See src/lib/publicErrorMessage.ts.
       setError(
-        err instanceof Error ? err.message : "Failed to submit quote request",
+        publicErrorMessage(
+          err,
+          "We could not submit your request just now. Please try again, or contact us directly.",
+        ),
       );
     } finally {
       setBusy(false);

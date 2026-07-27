@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../../lib/api";
+import { publicErrorMessage } from "../../lib/publicErrorMessage";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
 
 /**
@@ -154,11 +155,10 @@ export function ProposalAcceptancePage() {
         <div className="w-full max-w-2xl p-8">
           <ErrorState
             title="Unable to load acceptance page"
-            detail={
-              error instanceof Error
-                ? error.message
-                : "Please contact us if this problem persists"
-            }
+            detail={publicErrorMessage(
+              error,
+              "Please contact us if this problem persists",
+            )}
           />
         </div>
       </div>
