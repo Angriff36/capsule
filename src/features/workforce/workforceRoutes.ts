@@ -13,6 +13,7 @@ export const WORKFORCE_SECTIONS = [
   { key: "training", label: "Training", path: "/staff/training" },
   { key: "reviews", label: "Reviews", path: "/staff/reviews" },
   { key: "my-reviews", label: "My reviews", path: "/staff/my-reviews" },
+  { key: "scorecards", label: "Scorecards", path: "/staff/scorecards" },
 ] as const;
 
 export type WorkforceSection = (typeof WORKFORCE_SECTIONS)[number]["key"];

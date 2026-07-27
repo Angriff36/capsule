@@ -125,6 +125,11 @@ const MyReviewsPage = lazy(() =>
     default: module.MyReviewsPage,
   })),
 );
+const RoleScorecardsPage = lazy(() =>
+  import("../features/workforce/RoleScorecardsPage").then((module) => ({
+    default: module.RoleScorecardsPage,
+  })),
+);
 const PackListsPage = lazy(() =>
   import("../features/logistics/PackListsPage").then((module) => ({
     default: module.PackListsPage,
@@ -723,6 +728,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <MyReviewsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff/scorecards"
+              element={
+                <SupplyRoute>
+                  <RoleScorecardsPage />
                 </SupplyRoute>
               }
             />

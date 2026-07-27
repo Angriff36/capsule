@@ -1,0 +1,152 @@
+// Capsule workforce — Role Scorecard. Defines the current measurable
+// expectations for a staff role, with version/effective dates and active
+// state (spec §9.2). Performance reviews and one-on-ones can reference a
+// scorecard row (by id; `version` is the optimistic-concurrency token that
+// increments on each command) so a historical assessment stays interpretable
+// after a later revision supersedes it.
+//
+// History is the row set, not a mutation log: revising bumps `version` and
+// keeps the prior row intact; `effectiveTo` is stamped on archive so the
+// active scorecard for a role is unambiguous. `expectations` is a JSON array
+// of {metric, target} stored as a string (like the proposal-revision
+// snapshot) so the shape can grow without a schema migration; the UI
+// parses/renders it and it is never indexed.
+
+use "../identity/person.manifest"
+
+enum RoleScorecardStatus {
+  active
+  archived
+}
+
+entity RoleScorecard mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Which staff role this scorecard measures. CapsuleRole mirrors Person.role
+  // (closed vocab). Not indexed: the generator emits a v.string()-typed
+  // listRoleScorecardByRole query that mismatches the enum and fails
+  // typecheck — filter client-side (see message.manifest for the same note).
+  property required role: CapsuleRole = "staff"
+  property required title: string = ""
+  // JSON array of {metric, target} — the measurable expectations.
+  property required expectations: string = "[]"
+  property effectiveFrom: datetime?
+  property effectiveTo: datetime?
+  property required status: RoleScorecardStatus = "active"
+  property definedAt: datetime?
+  property archivedAt: datetime?
+  property archiveReason: string?
+
+  constraint scorecardComplete: self.definedAt == null or length(trim(self.title)) > 0 "Defined scorecards require a title"
+
+  transition status from "active" to ["archived"]
+  transition status from "archived" to ["active"]
+
+  default policy roleScorecardRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may read role scorecards"
+  default policy roleScorecardWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write role scorecards through commands"
+  default policy roleScorecardExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute role scorecard commands"
+
+  command define(
+    role: CapsuleRole,
+    title: string,
+    optional expectations: string,
+    optional effectiveFrom: datetime
+  ) {
+    guard self.definedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint defineTitle: length(trim(title)) > 0 "Scorecard title is required"
+    mutate role = role
+    mutate title = title
+    mutate expectations = expectations != null ? expectations : "[]"
+    mutate effectiveFrom = effectiveFrom
+    mutate definedAt = now()
+    emit RoleScorecardDefined {
+      scorecardId: self.id
+      tenantId: self.tenantId
+      role: role
+      title: title
+    }
+  }
+
+  command revise(
+    title: string,
+    optional role: CapsuleRole,
+    optional expectations: string,
+    optional effectiveFrom: datetime
+  ) {
+    guard self.definedAt != null
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint reviseTitle: length(trim(title)) > 0 "Scorecard title is required"
+    mutate role = role != null ? role : self.role
+    mutate title = title
+    mutate expectations = expectations != null ? expectations : self.expectations
+    mutate effectiveFrom = effectiveFrom != null ? effectiveFrom : self.effectiveFrom
+    emit RoleScorecardRevised {
+      scorecardId: self.id
+      tenantId: self.tenantId
+      title: title
+    }
+  }
+
+  command archive(reason: string) {
+    guard self.status == "active"
+    guard self.definedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint archiveScorecardReason: length(trim(reason)) > 0 "Archive reason is required"
+    mutate status = "archived"
+    mutate archivedAt = now()
+    mutate archiveReason = reason
+    mutate effectiveTo = now()
+    emit RoleScorecardArchived {
+      scorecardId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command reactivate() {
+    guard self.status == "archived"
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = "active"
+    mutate archivedAt = null
+    mutate archiveReason = null
+    mutate effectiveTo = null
+    emit RoleScorecardReactivated {
+      scorecardId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store RoleScorecard in durable
+}
+
+event RoleScorecardDefined: "role_scorecard.defined" {
+  scorecardId: string
+  tenantId: string
+  role: string
+  title: string
+}
+
+event RoleScorecardRevised: "role_scorecard.revised" {
+  scorecardId: string
+  tenantId: string
+  title: string
+}
+
+event RoleScorecardArchived: "role_scorecard.archived" {
+  scorecardId: string
+  tenantId: string
+  reason: string
+}
+
+event RoleScorecardReactivated: "role_scorecard.reactivated" {
+  scorecardId: string
+  tenantId: string
+}

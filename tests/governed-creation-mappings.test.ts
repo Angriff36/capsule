@@ -85,6 +85,7 @@ describe("governed creation mappings", () => {
       "Recipe_createViaDraft",
       "RecurringAvailability_createViaDeclare",
       "ReferralSource_createViaRegister",
+      "RoleScorecard_createViaDefine",
       "SavedReportDefinition_createViaCreateDefinition",
       "ServiceStyle_createViaRegister",
       "ShiftSwapRequest_createViaPropose",
