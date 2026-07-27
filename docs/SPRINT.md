@@ -288,8 +288,9 @@ events/proposals/contracts/invoices/payments.
 
 | Step | State |
 |---|---|
-| Dishes auto-create prep tasks | ⚠️ `DishTask` templates exist, but instantiation lives in **client-side** `EventPrepTaskSynchronizer.ts` / `EventPrepCoordinator.ts` — no `on … run PrepTask.*` reaction. Tasks appear only when someone opens the page. |
-| Prep task **claim** | ❌ **was broken** — `claim` wrote `user.id` (the IdP subject) into `assignedToId`, declared `belongsTo assignedTo: Person`. The FK never resolved. Fixed 2026-07-27 to `user.personId`; same bug fixed in `PrepTask` quality `pass`/`fail` and `AllergenCheck.record`. Depends on the staff profile being linked (see `Person.linkAccount`). |
+| Dishes auto-create prep tasks | ✅ **BUILT + VERIFIED IN PRODUCTION 2026-07-27.** `EventDishAdded` now fans out over the dish's active `DishTask` templates and opens one `PrepTask` each, server-side. Proven live: 3 templates on Tito Test Dish produced exactly 3 prep tasks on Test Event (55 guests) — `55 portion`, `55 portion`, `342.65 ounce` (6.23 × 55) — visible on `/kitchen/prep` on first load, with no "Sync prep" click. See §7 for the duplicate-generation defect this exposed and fixed. |
+| Prep task **claim** | ⚠️ Fixed but **still unproven end to end.** `claim` used to write `user.id` (the IdP subject) into `assignedToId`, declared `belongsTo assignedTo: Person`, so the FK never resolved. Fixed 2026-07-27 to `user.personId` (same bug fixed in `PrepTask` quality `pass`/`fail` and `AllergenCheck.record`). Verifying it needs a sign-in that is linked to a `Person`; the production admin account is not linked, so `claim` fails by design. See §7. |
+| Prep task **assign** + **complete** | ✅ **VERIFIED IN PRODUCTION 2026-07-27.** Armed Josh Mitchell in Quick Assign → Assign moved the step `pending → in_progress` showing "Josh Mitchell" (the Person FK resolves — the 2026-07-27 fix holds) → Complete moved it to `completed`. Event rollup went to 1/3 · 33% and Crew Load to "0 doing · 0 claimed · 1 done". |
 | Containers → pack list | ✅ **BUILT + VERIFIED IN PRODUCTION 2026-07-27.** New `DishContainer` entity + two chained reactions (`PackListOpened → EventDish → DishContainer → PackListItem.addItem`). Proven live: a 55-serving dish with a 25-serving pan and +1 always-send produced a pack line of **4 each, LISTED**, automatically. |
 | Equipment per dish | 🟡 `DishContainer.equipmentNotes` carries it as free text (chafers, burners) so an operator is never blocked; a structured Dish → Equipment link is still not built. |
 | Cook-on-site / kitchen / bring-hot split | ✅ Real `DishServiceMethod` enum on DishContainer: `cooked_on_site` / `cooked_at_kitchen` / `brought_hot` / `cold_service`. (`DishTask.category` remains a free string; the container carries the authoritative method.) |
@@ -303,3 +304,59 @@ events/proposals/contracts/invoices/payments.
 The continuous walkthrough — one event from lead through closeout, verifying
 each cascade actually fired — has **not** been done. The pieces above are
 evidence about the code, not about a live event.
+
+---
+
+## 7. Prep-list walkthrough (2026-07-27, production, signed in as `Angriff36`)
+
+Run on **Test Event** (Jul 30 2026, 55 guests) with **Tito Test Dish**.
+
+### What was built to make it runnable
+
+1. `EventDishAdded → DishTask → PrepTask.open` reaction (`src/production/task.manifest`),
+   matched on `(eventDishId, dishTaskId)` so a replay updates rather than duplicates.
+2. `DishTask.activeDishId` — a nullable mirror of `dishId`, cleared on retire.
+   `fanOut` takes a single predicate, so the "only active templates" filter has
+   to live in the key. `backfillActiveKey` + a compat fanOut ahead of generation
+   repairs templates that predate the field.
+3. `DishTask.station` — real prep sheets (`work/prep_list.csv`) group by station
+   ("Apps - Passed - Finish at Event"). `PrepTask` already had the field; the
+   template had no way to set it.
+4. A create/remove form on the dish page's prep-template panel, which was
+   previously **read-only** — so the cascade had nothing to fan out.
+
+### Defect found by running it: every prep task was created twice
+
+First live run produced **6** tasks from 3 templates, in two different units
+(`55 each` + `55 portion`; `6.23 ounce` + `342.65 ounce`).
+
+Cause: the new server reaction *and* the surviving client-side
+`EventPrepTaskSynchronizer` both materialized the templates. The client call
+fires immediately after `createEventDish`, so its reactive catalogs have not
+seen the server's rows yet and its dedupe-by-`dishTaskId` misses every time.
+
+Fixed by making the server the only creator at add time — the three
+post-create call sites now reconcile stock only. "Sync prep" and the
+post-adjust path still run the full synchronizer, where the catalogs are
+current, so they update rather than duplicate. The server's quantity rule was
+also aligned to `EventPrepTaskSynchronizer.quantityFor` (`defaultQuantity` is
+**per guest**, unit falls back to `portion`) — disagreeing would have made
+every reconcile resize every generated task.
+
+Re-run after the fix: exactly 3 tasks, correct units, correct quantities.
+
+### Blocked: `claim` cannot be proven without a linked sign-in
+
+`PrepTask.claim` guards on `user.personId`. The production admin account
+(`Angriff36` / `user_3GR87p1FnpiFY9TUrupNU9WqWyt`) is **not** linked to any
+`Person` — the two linked profiles (`bill colacurcio`, `me admin`) point at a
+different Clerk user (`user_3Gt6c5YLSR9nLD4j90Tb7Cx4KOR`). Clicking Claim
+therefore fails, correctly.
+
+Proving it needs an owner decision, because the fix is a permission grant on
+production: hire/link `Angriff36` to a `Person` under Administration → Team
+roles. **Not done — awaiting authorization.**
+
+The bare "Action failed unexpectedly" this produced was replaced with copy
+naming the cause and pointing at both remedies (link the account, or use
+Assign). Assign is unaffected and already works.

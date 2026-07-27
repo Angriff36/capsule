@@ -14,6 +14,7 @@ import {
   usePrepTaskRelease,
   usePrepTaskStart,
 } from "../../lib/manifest-convex-react";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -41,6 +42,7 @@ export function KitchenDashboardPage() {
   const tasks = useListPrepTask();
   const people = useListPerson();
   const venues = useListVenue();
+  const authStatus = useAuthStatus();
 
   const assign = usePrepTaskAssign();
   const claim = usePrepTaskClaim();
@@ -245,13 +247,24 @@ export function KitchenDashboardPage() {
                   "Released",
                 )
               }
-              onClaim={(task) =>
+              onClaim={(task) => {
+                // PrepTask.claim writes user.personId into a Person FK, so it
+                // fails outright for a sign-in with no staff profile. Say that
+                // instead of surfacing a bare "Action failed unexpectedly".
+                if (!authStatus?.personId) {
+                  setFailure(
+                    new Error(
+                      "Your sign-in isn't linked to a staff profile yet, so it can't hold prep work. Ask an admin to link it under Administration → Team roles — or use Assign to put a cook on this step.",
+                    ),
+                  );
+                  return;
+                }
                 void run(
                   `claim:${task._id}`,
                   () => actions.claimOne(task),
                   "Claimed",
-                )
-              }
+                );
+              }}
               onStart={(task) =>
                 void run(
                   `start:${task._id}`,
