@@ -24,6 +24,7 @@ import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { DishContainersPanel } from "./DishContainersPanel";
 import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
+import { DishRecipesPanel } from "./DishRecipesPanel";
 import { DishPrimaryImageUploader } from "../attachments/DishPrimaryImageUploader";
 import { KitchenBookNav } from "./KitchenBookNav";
 import { dishPath, kitchenCatalogPath, recipePath } from "./kitchenRoutes";
@@ -274,6 +275,8 @@ export function DishDetailPage() {
           </p>
         ) : null}
       </section>
+
+      <DishRecipesPanel dishId={dish._id} />
 
       <DishPrepTasksPanel dishId={dish._id} />
 
