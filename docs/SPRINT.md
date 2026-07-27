@@ -19,51 +19,31 @@ Test data lives on **Test Event** (Jul 30 2026, 55 guests).
 
 **Done and proven live** — §7 has the evidence:
 containers → pack list; dish → prep list (server-side); prep assign / claim /
-complete; prep templates editable with the real sheet's categories and units.
+complete; prep templates editable with the real sheet's categories and units;
+pulling a dish off an event mid-prep; and **the purchasing chain, which now
+produces real ingredient demand from a recipe** — its first input ever.
 
 **Do these next, in order:**
 
-0. **Unblock [#114](https://github.com/Angriff36/capsule/issues/114) first.**
-   Everything below that touches Tito Test Dish is stuck behind it: **a dish
-   can never be removed from an event once any of its prep tasks is
-   completed.** `EventDishRemoved` fans out `PrepTask.cancel` over every
-   non-deleted prep task with no status filter, and `cancel` throws on
-   `completed`. `EventDish.remove` explicitly allows removal during
-   `executing` — the stage where prep *is* completed — so the command is dead
-   exactly when the kitchen needs it. Proven in production 2026-07-27
-   (Request ID `ba979f26d2b1d74e`). The issue carries the suggested fix (a
-   nullable mirror key, same shape as `DishTask.activeDishId`).
-1. **Delete the fabricated data.** ⚠️ **Half done 2026-07-27.** The three
-   invented prep templates on Tito Test Dish (lobster deviled egg filling,
-   piping bag, micro chives) are **retired** — the panel now reads "0 tasks".
-   The three prep tasks they already generated on Test Event are **still
-   there** (2 completed, 1 pending), and they cannot be cleared until #114
-   lands: the only route is removing the event dish, which is what #114
-   blocks.
-2. **Load the real dishes.** `work/prep-lists-from-photos.csv` (local only,
-   `work/` is gitignored) holds all 16 dishes from the three photographed
-   sheets, transcribed by hand. **Two are now in** — FRESH GRILLED CORN ON THE
-   COB and GRAND MARNIER FRUIT SALAD (entered by hand 2026-07-27, all 8 tasks,
-   generation verified exact at 55 guests; see §7). Fourteen to go. Entering
-   one dish by hand costs roughly 30 form interactions, so the rest should be
-   scripted — read the UI notes in §7 first, they describe what a human hits.
-3. **Prove the purchasing chain.** It has never had input. A recipe is now
-   attachable to a dish (`7e4d0aa`), and Macaroni Salad is attached to Tito
-   Test Dish, but demand still reads **0 LINES deployment-wide** — the cascade
-   fires on `EventDishAdded` (`event-purchasing.manifest:267`), and the recipe
-   was attached after the dish was already on the event. Re-firing it means
-   removing and re-adding the dish, which is blocked by #114.
+Steps 1–3 of the previous handoff are **done**. What is left:
 
-   A clean alternative that sidesteps #114 entirely: attach a recipe to
-   **GRAND MARNIER FRUIT SALAD** (or any dish with no completed prep), remove
-   and re-add *that*, and read `/inventory/demand`,
-   `/inventory/purchasing`, and the event Margin tab.
-
-   Note the demand page's own copy is wrong: it says demand "generates
-   automatically when you approve an event with dishes". The manifest fires it
-   on dish-add, not approval.
-4. **Enter ingredient costs.** All 8 Macaroni Salad ingredients are $0.00, so
-   food cost and margins will read zero even once demand flows. Data entry.
+1. **Enter ingredient costs.** All 8 Macaroni Salad ingredients are $0.00, so
+   food cost and margins read zero even though demand now flows. Pure data
+   entry, and it is what stands between the app and a real margin number.
+2. **Load the remaining 14 dishes.** `work/prep-lists-from-photos.csv` (local
+   only, `work/` is gitignored) holds all 16 from the three photographed
+   sheets. **Two are in** — FRESH GRILLED CORN ON THE COB and GRAND MARNIER
+   FRUIT SALAD, both entered by hand and verified exact at 55 guests (§7). The
+   friction that made hand entry slow is fixed (`e07947f`), so scripting the
+   rest is now a choice rather than a necessity.
+3. **Approve Test Event and watch purchasing.** Demand lines read
+   "Opens on Event approve", so `PurchaseNeed` → `VendorOrder.ensureWeeklyDraft`
+   → `VendorOrderLine` is still unproven. Approving Test Event is the next
+   real test of the chain.
+4. **Delete the leftover fabricated tasks.** Two `completed` prep tasks from
+   the invented Tito templates survive on Test Event by design — standing a
+   dish down leaves finished work alone. They no longer appear anywhere in the
+   UI. Harmless, but they are fabricated.
 
 **Untouched:** lead → proposal → contract, timeline + staff assignment,
 notifications, vehicle assign/check-out, venue/client/event sync, post-event
@@ -365,7 +345,8 @@ events/proposals/contracts/invoices/payments.
 | Equipment per dish | 🟡 `DishContainer.equipmentNotes` carries it as free text (chafers, burners) so an operator is never blocked; a structured Dish → Equipment link is still not built. |
 | Cook-on-site / kitchen / bring-hot split | ✅ Real `DishServiceMethod` enum on DishContainer: `cooked_on_site` / `cooked_at_kitchen` / `brought_hot` / `cold_service`. (`DishTask.category` remains a free string; the container carries the authoritative method.) |
 | Post-event reports fire automatically | ❌ Only `EventClosedOut → EventCloseout.capture`. No automatic report generation or sending. |
-| Remove a dish from an event | 🔴 **BROKEN — [#114](https://github.com/Angriff36/capsule/issues/114), found 2026-07-27.** Throws once any of that dish's prep tasks is `completed`. The unfiltered `EventDishRemoved → PrepTask.cancel` fan-out hits the cancel guard. `on EventCancelled fanOut PrepTask run cancel` has the same shape, so cancelling an event with completed prep is likely broken too — not yet reproduced. |
+| Remove a dish from an event | ✅ **BROKE, FIXED, VERIFIED IN PRODUCTION 2026-07-27** ([#114](https://github.com/Angriff36/capsule/issues/114)). It threw once any of that dish's prep tasks was `completed` — the `EventDishRemoved → PrepTask.cancel` fan-out has no status filter and `cancel` guards on status, so one finished step made the dish unremovable, in a command that explicitly permits removal during `executing`. Fixed by `PrepTask.standDown`, a cascade twin that leaves settled work alone; both fan-outs (`EventDishRemoved`, `EventCancelled`) now use it. |
+| Purchasing chain end to end | ✅ **VERIFIED IN PRODUCTION 2026-07-27.** First input it has ever had. Re-adding Tito Test Dish (Macaroni Salad attached) to Test Event produced **8 demand lines** at `/inventory/demand`, scaled off the recipe's 3-quart yield to 55 servings — 18.33 lb elbow macaroni, 55 cup mayonnaise, 73.33 each scallions, and so on. `EventDishAdded → DishRecipe → EventDishRecipeSeeded → RecipeIngredient → EventIngredientContribution → IngredientDemand` all fired server-side, no manual step. The tail (`PurchaseNeed → VendorOrder`) reads "Opens on Event approve" and is still unproven. |
 | Event notifications | ⚠️ Unverified. |
 | Vehicle assign / check-out | ⚠️ `vehicle.manifest` has register / reviseDetails / updateOperationalStatus and a `vehicleAssignment` seam; no explicit check-out command found. |
 | Invoices sent | ⚠️ Issue/send commands exist; delivery needs `RESEND_API_KEY` (G6). |
@@ -441,6 +422,27 @@ roles. **Not done — awaiting authorization.**
 The bare "Action failed unexpectedly" this produced was replaced with copy
 naming the cause and pointing at both remedies (link the account, or use
 Assign). Assign is unaffected and already works.
+
+### Resolved: the purchasing chain produced demand (2026-07-27)
+
+Removing Tito Test Dish from Test Event and re-adding it — possible only after
+the #114 fix — fired the whole cascade. `/inventory/demand` went from
+**0 LINES** deployment-wide to **8 lines**, one per Macaroni Salad ingredient,
+scaled from the recipe's 3-quart yield to 55 servings (18.33 lb elbow macaroni,
+55 cup mayonnaise, 9.17 cup cider vinegar, 73.33 each scallions, …). Nothing
+was clicked to make it happen.
+
+Two things the run corrected:
+
+- The demand page tells users demand "generates automatically when you approve
+  an event with dishes". It does not — `event-purchasing.manifest:267` fires it
+  on `EventDishAdded`. Approval is what opens `PurchaseNeed`s, which is a
+  later hop and still unproven.
+- All 8 lines read `CALCULATED` / "Opens on Event approve", so
+  `PurchaseNeed → WeeklyPurchasingConfig.routeNeed → VendorOrder` remains
+  untested. Approving Test Event is the next step.
+
+Original blocker, kept for context:
 
 ### Blocked: the purchasing chain has never had any input
 
@@ -532,30 +534,24 @@ basis:
 
 The `melon` unit works end to end. Categories render as "Finish at Event".
 
-#### What a human hits doing this by hand
+#### Friction found doing it by hand — all fixed (`e07947f`)
 
-None of these are bugs; all of them are friction, and they compound across
-sixteen dishes.
-
-1. **"New dishe" / "Add dishe"** — the dish index button and the create-form
-   heading are mis-pluralised.
-2. **The prep-template form resets everything on submit**, including Category
-   and Unit. All eight Grand Marnier tasks share "Finish at Event" and six of
-   the eight share a unit, but both had to be re-picked every time. Keeping the
-   last-used category and unit would roughly halve the interactions.
-3. **Creating a dish does not open it.** The form closes and leaves you on the
-   index, but adding prep templates — the actual next step every single time —
-   is on the detail page.
-4. **The dish portion-unit list and the prep-template unit list disagree.** The
-   dish form offers each / gram / kilogram / ounce / pound / ml / l / tsp /
-   tbsp / cup / pint / quart / gallon / portion. The prep-template form also
-   has serving, batch, melon and bottle. The sheets cost every dish as
-   "P: N Serving", so the dish's own portion unit cannot say what the sheet
-   says.
-5. **Fractional counts of countable things.** 0.55 melon is arithmetically
-   right and operationally meaningless — nobody balls half a watermelon. The
-   same will hit `batch` and `bottle`. Countable units probably want a ceiling
-   at display time. This is a product decision, not a defect.
+1. **"New dishe" / "Add dishe".** `section.slice(0, -1)` works for three of the
+   four kitchen sections and not for dishes. Singulars are spelled out now.
+2. **The prep-template form reset Category, Station and Unit on every add.** A
+   dish's tasks come off one sheet and share all three. They hold their last
+   value now; name, quantity and notes still clear.
+3. **Creating a dish left you on the index**, when adding prep templates on the
+   detail page is always the next step. It navigates there now, as recipes did.
+4. **The dish portion-unit list was missing serving, batch, melon and bottle**,
+   though its own comment claimed it mirrored the `UnitOfMeasure` enum. Widened.
+   The four opaque units get their own conversion dimension so nothing pretends
+   a melon converts to an each.
+5. **0.55 melon.** Arithmetically right, operationally meaningless. Units you
+   can only handle whole now round up on the sheet — BALL WATERMELON reads
+   **1 melon** at 55 guests. Weights, volumes and `batch` stay exact, because
+   the sheets really do ask for 0.75 batch. Display only: prep quantity
+   instructs a cook and is not a costing input.
 
 ### Route correction (2026-07-27)
 
