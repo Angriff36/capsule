@@ -237,7 +237,10 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             name="defaultQuantity"
             type="number"
             min={0}
-            step="0.01"
+            // Real per-guest rates are finer than cents: the 5673 sheet works
+            // out to 0.0313 lb butter and 0.0156 pints Grand Marnier per guest,
+            // and step="0.01" made the browser reject both.
+            step="any"
             defaultValue={0}
             className="input mt-1"
           />
