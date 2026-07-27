@@ -95,14 +95,16 @@ entity Candidate mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Move a candidate to any other stage. Terminals (hired/rejected) have their
-  // own metadata-recording commands, but `advance` is not restricted from
-  // reaching them — an operator is never blocked from moving a candidate.
+  // Move a candidate between NON-TERMINAL stages (application/screening/
+  // interview/decision) from any current stage — including reopening a
+  // mistakenly-hired/rejected candidate (no terminal lock). Terminals are
+  // reachable only via the dedicated `hire`/`reject` commands so the stage
+  // selector can't bypass their metadata (hired-person link / reason).
   command advance(toStage: CandidateStage) {
     guard self.appliedAt != null
-    guard self.stage != "hired"
     guard self.deletedAt == null
     guard user.id != null
+    constraint advanceNotTerminal: toStage != "hired" and toStage != "rejected" "Use Hire or Reject to reach a terminal stage"
     mutate stage = toStage
     mutate stageChangedAt = now()
     emit CandidateStageChanged {
@@ -112,19 +114,19 @@ entity Candidate mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command reject(reason: string) {
+  // Reject a candidate. A reason is OPTIONAL (spec §9.3 does not require one);
+  // forcing it would be a guard with no proportionate real-world reason.
+  command reject(optional reason: string) {
     guard self.appliedAt != null
     guard self.stage != "rejected"
     guard self.deletedAt == null
     guard user.id != null
-    constraint rejectReason: length(trim(reason)) > 0 "Rejection reason is required"
     mutate stage = "rejected"
     mutate rejectionReason = reason
     mutate stageChangedAt = now()
     emit CandidateRejected {
       candidateId: self.id
       tenantId: self.tenantId
-      reason: reason
     }
   }
 
@@ -235,7 +237,6 @@ event CandidateStageChanged: "candidate.stage_changed" {
 event CandidateRejected: "candidate.rejected" {
   candidateId: string
   tenantId: string
-  reason: string
 }
 
 event CandidateHired: "candidate.hired" {

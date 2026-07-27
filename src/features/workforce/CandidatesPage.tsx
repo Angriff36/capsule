@@ -31,13 +31,14 @@ const ROLE_OPTIONS: { value: string; label: string }[] = [
   { value: "manager", label: "Manager" },
 ];
 
-const STAGES = [
+// advance can target only NON-TERMINAL stages (hired/rejected are reached via
+// the dedicated Hire/Reject buttons). Reopening a mistakenly-hired/rejected
+// candidate is allowed — Move works from any stage.
+const STAGES_MOVE = [
   "application",
   "screening",
   "interview",
   "decision",
-  "hired",
-  "rejected",
 ] as const;
 
 const STAGE_LABEL: Record<string, string> = {
@@ -377,10 +378,15 @@ export function CandidatesPage() {
                     <select
                       name="toStage"
                       className="input"
-                      defaultValue={candidate.stage}
-                      disabled={candidate.stage === "hired"}
+                      defaultValue={
+                        (STAGES_MOVE as readonly string[]).includes(
+                          candidate.stage,
+                        )
+                          ? candidate.stage
+                          : "screening"
+                      }
                     >
-                      {STAGES.map((stage) => (
+                      {STAGES_MOVE.map((stage) => (
                         <option key={stage} value={stage}>
                           {STAGE_LABEL[stage]}
                         </option>
@@ -392,7 +398,6 @@ export function CandidatesPage() {
                     <button
                       type="button"
                       className="btn btn-secondary"
-                      disabled={candidate.stage === "hired"}
                       onClick={(e) => {
                         const select = e.currentTarget
                           .closest(".supply-form-grid")
@@ -412,11 +417,11 @@ export function CandidatesPage() {
                     </button>
                   </label>
                   <label className="field-label">
-                    Rejection reason
+                    Rejection note (optional)
                     <input
                       name="rejectReason"
                       className="input"
-                      placeholder="Required to reject"
+                      placeholder="Optional"
                       disabled={terminal}
                     />
                   </label>
