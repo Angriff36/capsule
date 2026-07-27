@@ -15,6 +15,7 @@ import {
   useListVenue,
   useListProposal,
   useListProposalLineItem,
+  useListProposalDishSelection,
   useListProposalRevision,
   useProposalAccept,
   useProposalDecline,
@@ -43,6 +44,7 @@ import {
   type ProposalPdfRecord,
 } from "./proposalPdf";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
+import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
 import { useCatalogDishes } from "./useCatalogDishes";
 import {
@@ -120,6 +122,7 @@ export function ProposalsPage() {
   // Tenant-wide priced lines; filtered per proposal for the PDF breakdown and
   // the pricing panel. Same query ProposalPricingPanel subscribes to (cached).
   const proposalLineItems = useListProposalLineItem();
+  const proposalDishSelections = useListProposalDishSelection();
   const proposalRevisions = useListProposalRevision();
   // Published-catalog dishes a pricing line can be priced from (spec §5.4 L276).
   const catalog = useCatalogDishes();
@@ -1211,6 +1214,27 @@ export function ProposalsPage() {
                           Create Event
                         </Link>
                       ) : null}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan={5} className="pt-0">
+                      <ProposalReadinessNotice
+                        eventId={row.eventId ? String(row.eventId) : null}
+                        status={String(row.status)}
+                        hasVenue={Boolean(
+                          events?.find((e) => e._id === row.eventId)?.venueId,
+                        )}
+                        hasMenuSelections={(proposalDishSelections ?? []).some(
+                          (selection) =>
+                            selection.proposalId === row._id &&
+                            selection.deletedAt == null,
+                        )}
+                        hasPricedLines={(proposalLineItems ?? []).some(
+                          (line) =>
+                            line.proposalId === row._id &&
+                            line.deletedAt == null,
+                        )}
+                      />
                     </td>
                   </tr>
                   {menuOpenFor === row._id ? (
