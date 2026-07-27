@@ -15,6 +15,7 @@ export const WORKFORCE_SECTIONS = [
   { key: "my-reviews", label: "My reviews", path: "/staff/my-reviews" },
   { key: "scorecards", label: "Scorecards", path: "/staff/scorecards" },
   { key: "one-on-ones", label: "One-on-ones", path: "/staff/one-on-ones" },
+  { key: "hiring", label: "Hiring", path: "/staff/hiring" },
 ] as const;
 
 export type WorkforceSection = (typeof WORKFORCE_SECTIONS)[number]["key"];

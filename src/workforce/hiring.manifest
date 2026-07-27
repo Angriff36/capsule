@@ -1,0 +1,257 @@
+// Capsule workforce — Hiring pipeline (spec §9.3).
+//
+// Maps the KM interview tool into Capsule's candidate/interview model.
+// Candidate tracks a person through the hiring stages (application →
+// screening → interview → decision/offer → hired/rejected). Interview is a
+// SEPARATE child entity (one candidate, many interviews) so recording an
+// interview outcome never rewrites the candidate row — the same parent/child
+// split as OneOnOne/OneOnOneAction (§9.5) and Proposal/ProposalLineItem.
+//
+// Source fidelity (§9.3 "preserve source IDs and raw response references"):
+// each entity carries `sourceSystem` + `external*Id` + `rawSourceData` (the
+// raw KM response as a JSON string). Re-import is idempotent —
+// `hiringPipeline.ingestKmCandidates` upserts by (sourceSystem, externalId),
+// so re-importing the same KM export updates source-linked records without
+// duplication (the §9.3 "re-import updates without duplication" requirement).
+//
+// No `transition` state-machine is declared on `stage`/`outcome` (per
+// docs/architecture/domain-gating-restraint.md): the enum vocab + the command
+// guards are enough structure, and no operator is policy-denied moving a
+// candidate forward or correcting a stage. This is a catering app, not a bank.
+
+use "../identity/person.manifest"
+
+enum CandidateStage {
+  application
+  screening
+  interview
+  decision
+  hired
+  rejected
+}
+
+enum InterviewOutcome {
+  pending
+  passed
+  failed
+}
+
+entity Candidate mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required fullName: string = ""
+  property email: string?
+  property phone: string?
+  property required roleAppliedFor: CapsuleRole = "staff"
+  property required stage: CandidateStage = "application"
+  property sourceSystem: string?
+  property externalCandidateId: string?
+  property rawSourceData: string?
+  property appliedAt: datetime?
+  property stageChangedAt: datetime?
+  property rejectionReason: string?
+  property hiredPersonId: uuid?
+
+  belongsTo hiredPerson: Person fields [tenantId, hiredPersonId] references [tenantId, id]
+
+  constraint candidateComplete: self.appliedAt == null or length(trim(self.fullName)) > 0 "An applied candidate requires a name"
+
+  default policy candidateRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may read candidates"
+  default policy candidateWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write candidates through commands"
+  default policy candidateExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute candidate commands"
+
+  // Create verb → Candidate_createViaApply. Source fields are all optional so a
+  // manually-entered candidate (no KM provenance) and an ingested one share the
+  // same path; the ingest seam passes sourceSystem/externalCandidateId/raw.
+  command apply(
+    fullName: string,
+    optional email: string,
+    optional phone: string,
+    optional roleAppliedFor: CapsuleRole,
+    optional sourceSystem: string,
+    optional externalCandidateId: string,
+    optional rawSourceData: string
+  ) {
+    guard self.appliedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint applyName: length(trim(fullName)) > 0 "Candidate name is required"
+    mutate fullName = fullName
+    mutate email = email
+    mutate phone = phone
+    mutate roleAppliedFor = roleAppliedFor != null ? roleAppliedFor : "staff"
+    mutate sourceSystem = sourceSystem
+    mutate externalCandidateId = externalCandidateId
+    mutate rawSourceData = rawSourceData
+    mutate appliedAt = now()
+    mutate stageChangedAt = now()
+    emit CandidateApplied {
+      candidateId: self.id
+      tenantId: self.tenantId
+      fullName: fullName
+      roleAppliedFor: roleAppliedFor != null ? roleAppliedFor : "staff"
+    }
+  }
+
+  // Move a candidate to any other stage. Terminals (hired/rejected) have their
+  // own metadata-recording commands, but `advance` is not restricted from
+  // reaching them — an operator is never blocked from moving a candidate.
+  command advance(toStage: CandidateStage) {
+    guard self.appliedAt != null
+    guard self.stage != "hired"
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate stage = toStage
+    mutate stageChangedAt = now()
+    emit CandidateStageChanged {
+      candidateId: self.id
+      tenantId: self.tenantId
+      toStage: toStage
+    }
+  }
+
+  command reject(reason: string) {
+    guard self.appliedAt != null
+    guard self.stage != "rejected"
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint rejectReason: length(trim(reason)) > 0 "Rejection reason is required"
+    mutate stage = "rejected"
+    mutate rejectionReason = reason
+    mutate stageChangedAt = now()
+    emit CandidateRejected {
+      candidateId: self.id
+      tenantId: self.tenantId
+      reason: reason
+    }
+  }
+
+  command hire(optional hiredPersonId: uuid) {
+    guard self.appliedAt != null
+    guard self.stage != "hired"
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate stage = "hired"
+    mutate hiredPersonId = hiredPersonId
+    mutate stageChangedAt = now()
+    emit CandidateHired {
+      candidateId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store Candidate in durable
+}
+
+entity Interview mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required candidateId: uuid
+  property required outcome: InterviewOutcome = "pending"
+  property bookedAt: datetime?
+  property scheduledFor: datetime?
+  property conductedAt: datetime?
+  property interviewerPersonId: uuid?
+  property notes: string?
+  property sourceSystem: string?
+  property externalInterviewId: string?
+  property rawSourceData: string?
+
+  belongsTo candidate: Candidate fields [tenantId, candidateId] references [tenantId, id]
+  belongsTo interviewer: Person fields [tenantId, interviewerPersonId] references [tenantId, id]
+
+  // A conducted interview must have been booked first (direct fields only).
+  constraint interviewComplete: self.conductedAt == null or self.bookedAt != null "A conducted interview must have been booked"
+
+  default policy interviewRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may read interviews"
+  default policy interviewWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write interviews through commands"
+  default policy interviewExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute interview commands"
+
+  // Create verb → Interview_createViaSchedule. Mirrors OneOnOneAction.capture:
+  // candidateId seeds the belongsTo so `self.candidate` resolves at creation,
+  // and the guard confirms the parent exists. bookedAt is the create-flag.
+  command schedule(
+    candidateId: uuid,
+    optional scheduledFor: datetime,
+    optional interviewerPersonId: uuid,
+    optional sourceSystem: string,
+    optional externalInterviewId: string,
+    optional rawSourceData: string
+  ) {
+    guard self.bookedAt == null
+    guard self.deletedAt == null
+    guard self.candidate != null
+    guard user.id != null
+    mutate candidateId = candidateId
+    mutate scheduledFor = scheduledFor
+    mutate interviewerPersonId = interviewerPersonId
+    mutate sourceSystem = sourceSystem
+    mutate externalInterviewId = externalInterviewId
+    mutate rawSourceData = rawSourceData
+    mutate bookedAt = now()
+    emit InterviewScheduled {
+      interviewId: self.id
+      tenantId: self.tenantId
+      candidateId: candidateId
+    }
+  }
+
+  command recordOutcome(outcome: InterviewOutcome, optional notes: string) {
+    guard self.outcome == "pending"
+    guard self.bookedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate outcome = outcome
+    mutate notes = notes
+    mutate conductedAt = now()
+    emit InterviewOutcomeRecorded {
+      interviewId: self.id
+      tenantId: self.tenantId
+      candidateId: self.candidateId
+      outcome: outcome
+    }
+  }
+
+  store Interview in durable
+}
+
+event CandidateApplied: "candidate.applied" {
+  candidateId: string
+  tenantId: string
+  fullName: string
+  roleAppliedFor: string
+}
+
+event CandidateStageChanged: "candidate.stage_changed" {
+  candidateId: string
+  tenantId: string
+  toStage: string
+}
+
+event CandidateRejected: "candidate.rejected" {
+  candidateId: string
+  tenantId: string
+  reason: string
+}
+
+event CandidateHired: "candidate.hired" {
+  candidateId: string
+  tenantId: string
+}
+
+event InterviewScheduled: "interview.scheduled" {
+  interviewId: string
+  tenantId: string
+  candidateId: string
+}
+
+event InterviewOutcomeRecorded: "interview.outcome_recorded" {
+  interviewId: string
+  tenantId: string
+  candidateId: string
+  outcome: string
+}

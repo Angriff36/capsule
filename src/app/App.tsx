@@ -135,6 +135,11 @@ const OneOnOnesPage = lazy(() =>
     default: module.OneOnOnesPage,
   })),
 );
+const CandidatesPage = lazy(() =>
+  import("../features/workforce/CandidatesPage").then((module) => ({
+    default: module.CandidatesPage,
+  })),
+);
 const PackListsPage = lazy(() =>
   import("../features/logistics/PackListsPage").then((module) => ({
     default: module.PackListsPage,
@@ -749,6 +754,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <OneOnOnesPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff/hiring"
+              element={
+                <SupplyRoute>
+                  <CandidatesPage />
                 </SupplyRoute>
               }
             />
