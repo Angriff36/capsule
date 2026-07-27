@@ -376,6 +376,9 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   property required taskType: string = "manual"
   property defaultQuantity: decimal(12, 4)?
   property defaultUnit: UnitOfMeasure?
+  // Where the work happens ("Apps - Passed - Finish at Event", "Finish at
+  // Kitchen"). Real prep sheets group by this; PrepTask carries the same field.
+  property station: string?
   property sortOrder: int = 0
   property recipeId: uuid?
   property ingredientId: uuid?
@@ -407,6 +410,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     optional taskType: string,
     optional defaultQuantity: decimal(12, 4),
     optional defaultUnit: UnitOfMeasure,
+    optional station: string,
     optional sortOrder: number,
     optional recipeId: uuid,
     optional ingredientId: uuid,
@@ -426,6 +430,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     mutate taskType = taskType != null ? taskType : "manual"
     mutate defaultQuantity = defaultQuantity
     mutate defaultUnit = defaultUnit
+    mutate station = station
     mutate sortOrder = sortOrder != null ? sortOrder : 0
     mutate recipeId = recipeId
     mutate ingredientId = ingredientId
@@ -452,6 +457,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     optional taskType: string,
     optional defaultQuantity: decimal(12, 4),
     optional defaultUnit: UnitOfMeasure,
+    optional station: string,
     optional sortOrder: number,
     optional recipeId: uuid,
     optional ingredientId: uuid,
@@ -468,6 +474,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     mutate taskType = taskType != null ? taskType : self.taskType
     mutate defaultQuantity = defaultQuantity
     mutate defaultUnit = defaultUnit
+    mutate station = station
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
     mutate recipeId = recipeId
     mutate ingredientId = ingredientId

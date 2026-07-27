@@ -137,7 +137,7 @@ export function SyncErrorsPanel() {
                 </details>
               ) : null}
               <div className="mt-2 flex gap-2">
-                {RETRYABLE_KINDS.has(e.kind) ? (
+                {RETRYABLE_KINDS.has(e.kind) && e.rawPayload ? (
                   <button
                     type="button"
                     className="btn btn-primary"

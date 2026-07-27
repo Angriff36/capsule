@@ -58,6 +58,7 @@ export function MessageInboxPage() {
   const leads = useListLead();
   const contacts = useListClientContact();
   const ingest = useAction(api.messageInbox.ingestInboundMessage);
+  const ingestEnvelope = useAction(api.messageInbox.ingestProviderEnvelope);
   const createThread = useMessageThreadCreate();
   const createMessage = useCreateMessage();
   const linkLead = useMessageThreadLinkLead();
@@ -83,6 +84,13 @@ export function MessageInboxPage() {
   const [liMsgId, setLiMsgId] = useState("");
   const [liBody, setLiBody] = useState("");
   const [liSender, setLiSender] = useState("");
+
+  // Paste-provider-envelope inline form (§4.4 parse boundary — a malformed
+  // envelope lands in the sync-error queue instead of being silently lost).
+  const [showEnv, setShowEnv] = useState(false);
+  const [envProvider, setEnvProvider] = useState<string>("email");
+  const [envJson, setEnvJson] = useState("");
+  const [envBusy, setEnvBusy] = useState(false);
 
   const visibleThreads = useMemo(
     () => (threads ?? []).filter((t) => t.deletedAt == null),
@@ -213,7 +221,7 @@ export function MessageInboxPage() {
   };
 
   const linkLeadToSelected = async (leadId: string) => {
-    if (!selected || !leadId) return;
+    if (!selected) return;
     setFailure(null);
     try {
       await linkLead({
