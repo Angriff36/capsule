@@ -7268,17 +7268,6 @@ export function useSyncErrorRecord() {
   };
 }
 
-/** Governed creation hook for SyncError.record. */
-export function useCreateSyncError() {
-  const mutate = useMutation(api.mutations.SyncError_createViaRecord);
-  return (args: any) => {
-    const { idempotencyKey, ...params } = args ?? {};
-    const parsed = SyncErrorRecordParamsSchema.parse(params) as Record<string, unknown>;
-    const body = __convexArgsFromZod(parsed);
-    return mutate((idempotencyKey !== undefined ? { ...body, idempotencyKey } : body) as any);
-  };
-}
-
 /** Reactive list for TaxRate. */
 export function useListTaxRate() {
   return useQuery(api.queries.listTaxRate);
@@ -8674,4 +8663,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 926 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 925 as const;

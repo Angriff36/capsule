@@ -2557,7 +2557,6 @@ export const SyncErrorSchema = z.object({
   kind: z.enum(["parse_failed", "missing_field", "unknown"]).default("unknown"),
   errorMessage: z.string().default(""),
   rawPayload: z.string().optional(),
-  recordedAt: z.coerce.date().nullable().optional(),
   createdAt: z.coerce.date().optional(),
   updatedAt: z.coerce.date().optional(),
 });

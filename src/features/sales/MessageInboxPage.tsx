@@ -16,6 +16,7 @@ import { FailureBanner } from "../events/FailureBanner";
 import { formatTime } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "../clients/ClientsWorkspaceNav";
+import { SyncErrorsPanel } from "./SyncErrorsPanel";
 import type { Doc } from "../../lib/api";
 
 type Thread = Doc<"messageThreads">;
@@ -568,6 +569,7 @@ export function MessageInboxPage() {
           </div>
         </section>
       )}
+      <SyncErrorsPanel />
     </div>
   );
 }

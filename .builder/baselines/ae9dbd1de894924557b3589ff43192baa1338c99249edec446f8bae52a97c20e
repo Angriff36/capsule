@@ -2363,7 +2363,6 @@ export default defineSchema({
     kind: v.union(v.literal("parse_failed"), v.literal("missing_field"), v.literal("unknown")),
     errorMessage: v.string(),
     rawPayload: v.optional(v.string()),
-    recordedAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.optional(v.number()),
     updatedAt: v.optional(v.number()),
     version: v.number(),

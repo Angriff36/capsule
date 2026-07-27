@@ -46,12 +46,44 @@ export const ingestInboundMessage = action({
     const providerThreadId = args.providerThreadId.trim();
     const providerMessageId = args.providerMessageId.trim();
     const bodyText = args.bodyText.trim();
+
+    // §4.4: "Failed parsing appears in a retryable sync-error queue." Record a
+    // SyncError for a validation failure before re-throwing — the throw still
+    // gives the operator immediate feedback, and the queue captures the failure
+    // with the verbatim input (rawPayload) so it can be retried or dismissed
+    // from the inbox. Idempotent per (recordType, externalId-or-input) so a
+    // repeated failure, or a retry that fails the same way, does not flood the
+    // queue. Recording is best-effort and never masks the validation error.
+    const recordSyncError = async (
+      kind: "missing_field" | "parse_failed" | "unknown",
+      errorMessage: string,
+    ): Promise<void> => {
+      try {
+        await ctx.runMutation(api.mutations.SyncError_createViaRecord, {
+          sourceSystem: provider || "unknown",
+          recordType: "message",
+          kind,
+          errorMessage,
+          externalId: providerMessageId || undefined,
+          rawPayload: JSON.stringify(args),
+          idempotencyKey: `syncerr:message:${providerMessageId || `${provider}:${providerThreadId}`}`,
+        });
+      } catch {
+        // Swallow — the validation error thrown below is the user-facing signal.
+      }
+    };
+
     if (!provider || !providerThreadId || !providerMessageId) {
+      await recordSyncError(
+        "missing_field",
+        "provider, providerThreadId, and providerMessageId are required",
+      );
       throw new ConvexError(
         "provider, providerThreadId, and providerMessageId are required",
       );
     }
     if (!bodyText) {
+      await recordSyncError("missing_field", "Message text is required");
       throw new ConvexError("Message text is required");
     }
 

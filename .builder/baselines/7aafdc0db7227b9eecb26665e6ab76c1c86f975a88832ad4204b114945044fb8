@@ -1874,8 +1874,8 @@ const COMMAND_DISPATCH = {
     params: ["docId","version","idempotencyKey"] as const,
   },
   "SyncError.record": {
-    ref: api.mutations.SyncError_createViaRecord,
-    params: ["sourceSystem","recordType","kind","errorMessage","externalId","rawPayload","idempotencyKey"] as const,
+    ref: api.mutations.SyncError_record,
+    params: ["docId","sourceSystem","recordType","kind","errorMessage","externalId","rawPayload","version","idempotencyKey"] as const,
   },
   "TaxRate.define": {
     ref: api.mutations.TaxRate_createViaDefine,

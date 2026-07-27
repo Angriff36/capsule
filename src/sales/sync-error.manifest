@@ -1,0 +1,115 @@
+// Capsule sales — SyncError. A retryable queue for provider/ingest parse and
+// sync failures. Spec §4.4: "Failed parsing appears in a retryable sync-error
+// queue"; the integrations "done when" (spec §12) requires error visibility.
+//
+// Provider-neutral and cross-cutting: the message ingest path
+// (convex/messageInbox.ts ingestInboundMessage) records here when an inbound
+// delivery fails validation; other provider syncs may record here the same
+// way. Staff review, retry (re-run the ingest from the stored payload), or
+// dismiss — the source payload is preserved so a retry does not need re-keying.
+//
+// `status` is intentionally NOT indexed: an enum index emits a mistyped
+// listXBy query that fails typecheck (see message.manifest). The queue is
+// filtered client-side, matching the rest of the inbox surface.
+
+use "./message-thread.manifest"
+
+enum SyncErrorKind {
+  parse_failed
+  missing_field
+  unknown
+}
+
+enum SyncErrorStatus {
+  pending
+  resolved
+}
+
+entity SyncError mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  // Which integration/source produced the failure (email/sms/social/qbo/…).
+  property required sourceSystem: string = "unknown"
+  // What kind of record was being ingested (message, event, payment, …).
+  property required recordType: string = "unknown"
+  // External id of the failed record, when one was extractable.
+  property externalId: string
+  property required status: SyncErrorStatus = "pending"
+  property required kind: SyncErrorKind = "unknown"
+  property required errorMessage: string = ""
+  // Opaque serialized failed input (JSON), kept for retry/debug.
+  property rawPayload: string
+  // Creation stamp. The generator only emits the allocating
+  // `SyncError_createViaRecord` selector (and accepts the command on a fresh
+  // draft) when `record` carries a `guard self.recordedAt == null` creation
+  // guard on a command-mutated field — the ClientCommunication.record idiom.
+  // Without it, `record` compiles to mutate-only (requires a pre-existing
+  // docId) and there is no way to insert a SyncError row.
+  property recordedAt: datetime?
+
+  default policy syncErrorRead read: roleAllows(user.role, "staffAccess") "Staff may read sync errors"
+  default policy syncErrorWrite write: roleAllows(user.role, "staffAccess") "Staff may write sync errors through commands"
+  default policy syncErrorExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute sync error commands"
+
+  // Record a sync/parse failure. The actor identity is stamped from trusted
+  // auth context. status starts pending; a retry that succeeds or a dismiss
+  // flips it to resolved via `markResolved`. Callers pass a deterministic
+  // idempotencyKey so a repeated failure (or a retry that fails the same way)
+  // does not flood the queue.
+  command record(
+    sourceSystem: string,
+    recordType: string,
+    kind: SyncErrorKind,
+    errorMessage: string,
+    optional externalId: string,
+    optional rawPayload: string
+  ) {
+    guard self.recordedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate sourceSystem = sourceSystem
+    mutate recordType = recordType
+    mutate kind = kind
+    mutate errorMessage = errorMessage
+    mutate externalId = externalId
+    mutate rawPayload = rawPayload
+    mutate recordedAt = now()
+    emit SyncErrorRecorded {
+      syncErrorId: self.id
+      tenantId: self.tenantId
+      sourceSystem: sourceSystem
+      recordType: recordType
+      kind: kind
+    }
+  }
+
+  // Mark resolved (retry succeeded, or staff dismissed). Idempotent set.
+  // (Named `markResolved`, not `resolve` — `resolve` is a reserved word in the
+  // generated JS and the manifest compiler rejects it as an identifier.)
+  command markResolved() {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = "resolved"
+    emit SyncErrorResolved {
+      syncErrorId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  store SyncError in durable
+}
+
+event SyncErrorRecorded: "sync_error.recorded" {
+  syncErrorId: string
+  tenantId: string
+  sourceSystem: string
+  recordType: string
+  kind: string
+}
+
+event SyncErrorResolved: "sync_error.resolved" {
+  syncErrorId: string
+  tenantId: string
+}

@@ -35001,9 +35001,8 @@ async function __runSyncErrorRecord(ctx: MutationCtx, { docId, sourceSystem, rec
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read sync errors");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write sync errors through commands");
     if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute sync error commands");
-    if (!((doc.recordedAt == null))) throw new Error("Guard 0 failed");
-    if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((user.id != null))) throw new Error("Guard 2 failed");
+    if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!((user.id != null))) throw new Error("Guard 1 failed");
     if (version !== undefined && (doc as any).version !== version) {
       throw new Error("ConcurrencyConflict: VERSION_MISMATCH" + ` expected ${version} actual ${(doc as any).version}`);
     }
@@ -35014,7 +35013,6 @@ async function __runSyncErrorRecord(ctx: MutationCtx, { docId, sourceSystem, rec
       errorMessage: errorMessage,
       externalId: externalId,
       rawPayload: rawPayload,
-      recordedAt: Date.now(),
       version: ((doc as any).version ?? 0) + 1
     };
     await ctx.db.patch(docId, updates as any);
@@ -35044,64 +35042,6 @@ export const SyncError_record = mutation({
     const __result = await __runSyncErrorRecord(ctx, args);
     if (args.idempotencyKey !== undefined) {
       await __setCommandIdempotency(ctx, args.idempotencyKey, "SyncError_record", __result);
-    }
-    return __result;
-  },
-});
-
-export const SyncError_createViaRecord = mutation({
-  args: {
-    sourceSystem: v.string(),
-    recordType: v.string(),
-    kind: v.any(),
-    errorMessage: v.string(),
-    externalId: v.optional(v.string()),
-    rawPayload: v.optional(v.string()),
-    idempotencyKey: v.optional(v.string())
-  },
-  handler: async (ctx, args: any) => {
-    if (args.idempotencyKey !== undefined) {
-      const __cached = await __getCommandIdempotency(ctx, args.idempotencyKey);
-      if (__cached !== undefined) return __cached;
-    }
-    const __auth = (await getAuthContext(ctx)) as any;
-    const user = __auth;
-    const { sourceSystem, recordType, kind, errorMessage, externalId, rawPayload } = args;
-    const __draft: Record<string, any> = {
-      tenantId: __auth.tenantId,
-      status: "pending",
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-      errorMessage: args.errorMessage,
-      externalId: args.externalId,
-      kind: args.kind,
-      rawPayload: args.rawPayload,
-      recordType: args.recordType,
-      sourceSystem: args.sourceSystem
-    };
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may read sync errors");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may write sync errors through commands");
-    if (!(checkRole(user, "staffAccess"))) throw new Error("Staff may execute sync error commands");
-    if (!((__draft.recordedAt == null))) throw new Error("Guard 0 failed");
-    if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
-    if (!((user.id != null))) throw new Error("Guard 2 failed");
-    const doc: Record<string, any> = {
-      ...__draft,
-      sourceSystem: sourceSystem,
-      recordType: recordType,
-      kind: kind,
-      errorMessage: errorMessage,
-      externalId: externalId,
-      rawPayload: rawPayload,
-      recordedAt: Date.now(),
-      version: 1,
-    };
-    const docId = await ctx.db.insert("syncErrors", doc as any);
-    const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, syncErrorId: docId, tenantId: doc.tenantId, sourceSystem: doc.sourceSystem, recordType: doc.recordType, kind: doc.kind, _subject: { entity: "SyncError", command: "record", id: docId } };
-    await ctx.db.insert("manifestEvents", { type: "SyncErrorRecorded", entity: "SyncError", entityId: docId, payload: { syncErrorId: docId, tenantId: doc.tenantId, sourceSystem: doc.sourceSystem, recordType: doc.recordType, kind: doc.kind }, createdAt: Date.now() });
-    const __result = { docId };
-    if (args.idempotencyKey !== undefined) {
-      await __setCommandIdempotency(ctx, args.idempotencyKey, "SyncError_createViaRecord", __result);
     }
     return __result;
   },

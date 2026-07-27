@@ -101,6 +101,7 @@ describe("governed creation mappings", () => {
       "StockCountSession_createViaStart",
       "StockTransfer_createViaRecord",
       "StorageLocation_createViaRegister",
+      "SyncError_createViaRecord",
       "TaxRate_createViaDefine",
       "TimeOffRequest_createViaSubmit",
       "TimeRecord_createViaClockIn",
