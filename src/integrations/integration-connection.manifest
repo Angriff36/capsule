@@ -60,10 +60,18 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
   // Explicit nullable flag (not the timestamps mixin) so the create guard works.
   property connectedAt: datetime?
 
-  transition status from "disconnected" to ["pending", "connected", "error"]
-  transition status from "pending" to ["connected", "error", "disconnected"]
-  transition status from "connected" to ["error", "revoked", "pending"]
-  transition status from "error" to ["pending", "connected", "revoked", "disconnected"]
+  // Every command that writes `status` needs its transition declared, including
+  // self-transitions — Manifest rejects an undeclared same-value write. The
+  // commands write: markConnected/recordSyncSuccess → connected (callable while
+  // already connected, i.e. a plain refresh), recordFailure → error (repeat
+  // failures land error → error), disconnect → revoked (reachable from any
+  // live state, including mid-onboarding), reauthorize → pending.
+  // An incomplete matrix here is not a safety feature: a refused refresh gets
+  // recorded as a provider failure and blocks payment links.
+  transition status from "disconnected" to ["pending", "connected", "error", "revoked"]
+  transition status from "pending" to ["connected", "error", "disconnected", "revoked"]
+  transition status from "connected" to ["connected", "error", "revoked", "pending"]
+  transition status from "error" to ["pending", "connected", "error", "revoked", "disconnected"]
   transition status from "revoked" to ["pending", "disconnected"]
 
   computed isUsable: boolean = self.status == "connected" and self.deletedAt == null
