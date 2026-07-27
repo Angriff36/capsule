@@ -12410,7 +12410,7 @@ async function __runEventDishAddToEvent(ctx: MutationCtx, { docId, eventId, dish
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeId","ingredientId","quantity","unit","servings","purchasingWeekStart","recordedAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","ingredientId","quantity","unit","servings","purchasingWeekStart","recordedAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
@@ -12584,7 +12584,7 @@ export const EventDish_createViaAddToEvent = mutation({
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeId","ingredientId","quantity","unit","servings","purchasingWeekStart","recordedAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","ingredientId","quantity","unit","servings","purchasingWeekStart","recordedAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
@@ -12825,7 +12825,7 @@ async function __runEventDishConfirmFromProposal(ctx: MutationCtx, { docId, even
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeId","ingredientId","quantity","unit","servings","purchasingWeekStart","recordedAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","ingredientId","quantity","unit","servings","purchasingWeekStart","recordedAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
@@ -13146,7 +13146,7 @@ async function __runEventDishComponentSeedSeed(ctx: MutationCtx, { docId, eventI
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeId","ingredientId","quantity","unit","servings","purchasingWeekStart","recordedAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","ingredientId","quantity","unit","servings","purchasingWeekStart","recordedAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);
@@ -13253,7 +13253,7 @@ export const EventDishComponentSeed_createViaSeed = mutation({
           updatedAt: Date.now(),
           version: 0,
         };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","recipeId","ingredientId","quantity","unit","servings","purchasingWeekStart","recordedAt","createdAt","updatedAt"] as string[]) {
+        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","ingredientId","quantity","unit","servings","purchasingWeekStart","recordedAt","createdAt","updatedAt"] as string[]) {
           if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
         }
         const __elseId = await ctx.db.insert("eventIngredientContributions", __elseDoc as any);

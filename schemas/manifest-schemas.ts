@@ -965,7 +965,6 @@ export const EventIngredientContributionSchema = z.object({
   eventDishId: z.string().uuid(),
   dishId: z.string().uuid(),
   componentId: z.string().uuid().nullable().optional(),
-  recipeId: z.string().uuid().nullable().optional(),
   ingredientId: z.string().uuid(),
   quantity: z.number().default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),

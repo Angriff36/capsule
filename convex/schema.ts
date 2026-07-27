@@ -868,7 +868,6 @@ export default defineSchema({
     eventDishId: v.id("eventDishes"),
     dishId: v.string(),
     componentId: v.optional(v.union(v.string(), v.null())),
-    recipeId: v.optional(v.union(v.string(), v.null())),
     ingredientId: v.id("ingredients"),
     quantity: v.number(),
     unit: v.union(v.literal("each"), v.literal("gram"), v.literal("kilogram"), v.literal("ounce"), v.literal("pound"), v.literal("milliliter"), v.literal("liter"), v.literal("teaspoon"), v.literal("tablespoon"), v.literal("cup"), v.literal("pint"), v.literal("quart"), v.literal("gallon"), v.literal("portion"), v.literal("serving"), v.literal("batch"), v.literal("melon"), v.literal("bottle")),
