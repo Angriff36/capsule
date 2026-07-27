@@ -9,6 +9,44 @@
 
 ## Changes This Update
 
+---
+
+**2026-07-26 — SHIP SPRINT increment: §12.1 IntegrationConnection + Stripe Connect (#112 CLOSED), §8.1 venue scorecard, §5.3 proposal readiness/provenance, public-error leak fixed, `SPRINT.md` written. Two NEW blockers escalated.**
+
+Shipped this increment (each `bun run check` green, exit 0):
+
+- **§12.1 Common integration contract → `src/integrations/integration-connection.manifest`** (819e4b7). One row per (tenant, provider): status, provider account id, scopes, last-successful-sync, last-error, charges/payouts capability. Deliberately NOT a credential vault — Connect direct charges need only the account id plus the platform key. QBO/Google Calendar keep their existing `manifestEvents` token path untouched (no migration, no regression risk). Command `authorize` (NOT `connect` — reserved word).
+- **Stripe Connect → `convex/stripeConnect.ts` + `StripeConnectSection`** — closes **#112**. Standard connected accounts + direct charges: every Stripe call in `convex/invoicePayments.ts` now carries a `Stripe-Account` header from the tenant's connection, and `requireConnectedAccountId` REFUSES to create a payment link when the tenant has no charges-enabled account rather than silently charging the platform. The caterer owns disputes/payouts/fees; Capsule never takes custody. `canManage` is returned by the server so the UI matches the entity's `adminAccess` policy instead of the looser calendar-style manager check.
+- **§8.1 venue scorecard metrics → `VenueScorecardPanel`** (c488496) — closes the last concrete gap of Priority 17. Derived read-side from linked events (booked/completed/upcoming, cancellation rate, booked + average value, headcounts, most recent), so it cannot drift from the event spine.
+- **§5.3 proposal readiness + provenance → `ProposalReadinessNotice`** — closes both remaining §5.3 gaps (legacy-field reconciliation surfaced on the proposal; missing venue/menu/pricing surfaced before publication). Warnings only, drafts only — per `domain-gating-restraint.md` a caterer must stay able to send a proposal the system thinks is incomplete.
+- **Public error leak FIXED → `src/lib/publicErrorMessage.ts`** (1f654e9). Found by the QA walkthrough: the public `/quote` form rendered the entire Convex action failure to the prospect — internal module path, line/column, request id. Now prefers the sanitized `ConvexError.data`. Verified in-browser.
+- **`SPRINT.md`** — 3-day ship plan, the full `quote → closed_out` lifecycle as a runnable QA script, and the ship-with limitations.
+
+**QA run — what was actually verified (and what was NOT):**
+- `bunx vitest run tests/proofs`: **22 files / 50 tests passing** — real `convex-test` runtime proofs against generated mutations (event→approve→packlist, approve→production batch, closeout, food-cost rollup, weekly purchasing, packlist→delivery, invoice→payment, shift, payroll), each with a role-denial case proving no partial writes.
+- Browser: public `/quote` renders and submits; error copy fixed and re-verified live.
+- **NOT browser-verified: every authenticated route.** Two hard blockers below.
+
+**NEW BLOCKER 1 — [#113](https://github.com/Angriff36/capsule/issues/113): `bun run seed` is a no-op.** The generated `scripts/seed-convex.ts` only *exports* `seedConvex(deploymentUrl)` (line 8) with no top-level call/`import.meta.main`/argv handling, so `bun scripts/seed-convex.ts` defines the function and exits 0 with no output. And even when invoked it emits 124 `// skip <Entity>: no create command in IR` lines against only 12 real mutation calls — `Client`, `Event`, `Venue`, `Dish`, `Person` are all skipped, i.e. the whole event spine. The seed binding appears to look for a literal `create` command rather than the promoted create verb (`Event_createViaPlanEngagement` etc. plainly exist). **Consequence: the local deployment is completely empty** (`organizations`, `events`, `clients`, `venues`, `serviceStyles`, `occasions` all zero rows), which is the root cause of the empty Service Style/Occasion dropdowns AND the "Unable to process quote" failure on `/quote` (`convex/quoteBuilder.ts:107-115` throws when no active organization exists). Generator-level; not hand-fixable here.
+
+**NEW BLOCKER 2 — browser QA needs a minted Clerk sign-in token.** Authenticated-route verification requires `POST https://api.clerk.com/v1/sign_in_tokens` for a real user; that is a live credential and was correctly refused. Needs the owner's explicit go-ahead, or a seeded dev bypass.
+
+**STILL BLOCKED — #52 (cross-repo).** The Stripe webhook verifier fix lives in `C:/Projects/Manifest/src/manifest/projections/convex/orchestration.ts` (`_verifyHmac`/`_hexToBuffer`/`_stripSigPrefix` treat the whole header as a hex digest; Stripe signs `t=<unix>,v1=<hex>` over `<t>.<body>` with a replay window). A patch was drafted — auto-detecting the timestamped scheme from the header shape, needing no new DSL surface — but editing that shared foundational repo was refused pending owner authorization. Until it lands, payment confirmation is PULLED by a finance user ("Sync payments"), not pushed by Stripe. `refreshStripeConnection` is the same poll-based substitute for `account.updated`.
+
+---
+
+**2026-07-26 — OWNER DECISION + escalation: Stripe payments must settle to the TENANT, not the platform (issue #112). Do not build further on the single-account assumption.**
+
+Verified this turn against code, not docs: `convex/invoicePayments.ts:266-276` creates every Checkout Session with one platform `process.env.STRIPE_SECRET_KEY` (`:69`); there is no Stripe Connect (zero matches for `Stripe-Account` / `stripe_account` / `transfer_data` / `application_fee` / `acct_`). `payment_intent_data[metadata][tenantId]` (`:264`) labels the payment but does not route funds. `Invoice` is `TenantScoped` with `clientId` (`src/sales/invoice-core.manifest:21-26`) — it is the caterer billing their event client, NOT SaaS billing.
+
+**Owner decision (2026-07-26): a tenant's payments go to that tenant.** Correct today ONLY for a single-tenant deployment holding that tenant's own key; wrong the moment a second caterer exists. Fix direction is Stripe Connect with per-tenant connected accounts (`Stripe-Account` header), which needs somewhere to store the connected-account id + onboarding status — i.e. **§12.1 `IntegrationConnection` is now a prerequisite, not a nice-to-have refactor.**
+
+**Not blocking today:** `STRIPE_SECRET_KEY` is unset on the dev Convex deployment (`bunx convex env list` shows only `CLERK_JWT_ISSUER_DOMAIN` + `CONVEX_FIELD_ENCRYPTION_KEY`); prod not checked. No payment path is live, so this is deferred deliberately — but it is escalated (#112) rather than silently ignored, per `docs/architecture/escalate-blockers-to-github.md`.
+
+**Paired blocker #52** (open, correctly diagnosed, **cannot be fixed in this repo**): inbound Stripe webhooks can't be verified beside generated `convex/http.ts` — the Manifest projection's verifier treats the whole header as a hex digest and cannot parse Stripe's `t=...,v1=...` format. The fix lives in `C:/Projects/Manifest/src/manifest/projections/convex/orchestration.ts` (Stripe-compatible signature parsing + replay tolerance) or an ownership-safe authored HTTP-route seam. Until then payment confirmation is PULLED by an authenticated finance user, not pushed by Stripe. **Both #52 and #112 must land before Stripe payments are production-usable:** without #52 payments do not auto-reconcile; without #112 they reach the wrong account.
+
+**2026-07-26 — Typecheck fix (MessageInboxPage null-safety):** Fixed TS18047 errors in `src/features/sales/MessageInboxPage.tsx` where `selected._id` and `selected.version` were accessed without null check in `linkLeadToSelected`. Added early return + `setFailure(null)` guard matching the `archiveSelected` pattern. `bun run typecheck` now passes.
+
 **2026-07-26 — §4.4 retryable sync-error queue DONE (closes the spec-named "Failed parsing appears in a retryable sync-error queue" clause of §4.4 Social DM inquiry capture + the integrations "error visibility" done-when; corrects the stale "Sync Error ❌ NOT BUILT" detailed-status row):**
 
 **Status: ✅ Shipped + `bun run check` GREEN (exit 0, 65 test files).** One new authored manifest entity (`SyncError`) + regen + an ingest-failure recording hook + a staff panel mounted on the inbox + one test-mapping line. No money mutation, no new guard/policy beyond the existing `staffAccess`, no schema migration (additive table).
