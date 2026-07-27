@@ -40,11 +40,19 @@ export class KitchenCommandDeckModel {
   }
 
   tasksForEvent(eventId: string): PrepTaskLike[] {
+    // Pulling a dish mid-service stands its prep down, but work already
+    // completed keeps its record rather than being cancelled. Those tasks are
+    // no longer on any dish card, so counting them here made the header
+    // ("2/14") disagree with the dishes listed under it (0/4 + 0/8).
+    const liveSelections = new Set(
+      this.selections(eventId).map((row) => row._id),
+    );
     return this.tasks.filter(
       (t) =>
         t.deletedAt == null &&
         t.eventId === eventId &&
-        t.status !== "cancelled",
+        t.status !== "cancelled" &&
+        liveSelections.has(t.eventDishId),
     );
   }
 
