@@ -7,6 +7,8 @@ export type EventPlanEngagementFormInput = {
   title: string;
   occasionId: string;
   serviceStyleId: string;
+  salespersonId: string;
+  referralSourceId: string;
   startsAtRaw: string;
   endsAtRaw: string;
   expectedHeadcountRaw: FormDataEntryValue | null;
@@ -53,6 +55,8 @@ export class EventPlanEngagementFormMapper {
     };
     this.assignOptionalOccasionField(args, input.occasionId);
     this.assignOptionalServiceStyleField(args, input.serviceStyleId);
+    this.assignOptionalSalespersonField(args, input.salespersonId);
+    this.assignOptionalReferralSourceField(args, input.referralSourceId);
     this.assignOptionalVenueFields(args, input.venue);
     this.assignOptionalContactFields(args, input);
     return args;
@@ -117,6 +121,27 @@ export class EventPlanEngagementFormMapper {
     const trimmed = serviceStyleId.trim();
     if (trimmed) {
       args.serviceStyleId = trimmed;
+    }
+  }
+
+  // Salesperson maps to Event.assignedToId (the event owner/sales lead).
+  private assignOptionalSalespersonField(
+    args: Record<string, unknown>,
+    salespersonId: string,
+  ): void {
+    const trimmed = salespersonId.trim();
+    if (trimmed) {
+      args.assignedToId = trimmed;
+    }
+  }
+
+  private assignOptionalReferralSourceField(
+    args: Record<string, unknown>,
+    referralSourceId: string,
+  ): void {
+    const trimmed = referralSourceId.trim();
+    if (trimmed) {
+      args.referralSourceId = trimmed;
     }
   }
 

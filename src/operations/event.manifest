@@ -549,6 +549,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   property mergeTargetClientId: uuid?
   property serviceStyleId: uuid?
   property occasionId: uuid?
+  property referralSourceId: uuid?
   property venueId: uuid?
   property assignedToId: uuid?
   property required searchable title: string = ""
@@ -605,6 +606,7 @@ entity Event mixin TenantScoped, SoftDeletable {
   ref occasion: Occasion fields [tenantId, occasionId] references [tenantId, id]
   ref venue: Venue fields [tenantId, venueId] references [tenantId, id]
   ref assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
+  ref referralSource: ReferralSource fields [tenantId, referralSourceId] references [tenantId, id]
   ref recurrenceTemplateEvent: Event fields [tenantId, recurrenceTemplateEventId] references [tenantId, id]
   hasMany guests: EventGuest
   // EventDish inverse for live estimatedFoodCost rollup (2026-07-23). Culinary
@@ -689,7 +691,8 @@ entity Event mixin TenantScoped, SoftDeletable {
     optional accessibilityNeeds: list<string>,
     optional serviceRequirements: string,
     optional operationalRequirements: string,
-    optional assignedToId: uuid
+    optional assignedToId: uuid,
+    optional referralSourceId: uuid
   ) {
     guard self.stage == "planning"
     guard self.plannedAt == null
@@ -723,6 +726,7 @@ entity Event mixin TenantScoped, SoftDeletable {
     mutate budgetAmount = budgetAmount
     mutate quotedPrice = quotedPrice
     mutate assignedToId = assignedToId
+    mutate referralSourceId = referralSourceId
     mutate plannedAt = now()
     emit EventPlanned {
       eventId: self.id

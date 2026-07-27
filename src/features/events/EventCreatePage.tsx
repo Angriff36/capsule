@@ -9,6 +9,8 @@ import {
   useListClient,
   useListMenu,
   useListOccasion,
+  useListPerson,
+  useListReferralSource,
   useListServiceStyle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
@@ -31,6 +33,9 @@ const VENUE_TYPES = [
   ["private_home", "Private home"],
   ["other", "Other"],
 ] as const;
+
+// People who can be named as an event's salesperson/owner (Event.assignedToId).
+const SALES_PERSON_ROLES = new Set(["sales_staff", "sales_manager", "owner"]);
 
 function optional(value: string): string | undefined {
   const trimmed = value.trim();
@@ -75,6 +80,8 @@ export function EventCreatePage() {
   const venues = useListVenue();
   const occasions = useListOccasion();
   const serviceStyles = useListServiceStyle();
+  const people = useListPerson();
+  const referralSources = useListReferralSource();
   const createClient = useCreateClient();
   const createVenue = useCreateVenue();
   const createEvent = useCreateEvent();
@@ -86,6 +93,8 @@ export function EventCreatePage() {
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [occasionId, setOccasionId] = useState("");
   const [serviceStyleId, setServiceStyleId] = useState("");
+  const [salespersonId, setSalespersonId] = useState("");
+  const [referralSourceId, setReferralSourceId] = useState("");
   const { errors, touched, formProps, handleSubmit } =
     useFieldValidation(eventFieldRules);
   const draftForm = useFormDraft("event-create");
@@ -107,6 +116,21 @@ export function EventCreatePage() {
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   const activeServiceStyles = (serviceStyles ?? [])
     .filter((serviceStyle) => serviceStyle.status === "active")
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  const salespeople = (people ?? [])
+    .filter(
+      (person) =>
+        person.deletedAt == null &&
+        person.status === "active" &&
+        SALES_PERSON_ROLES.has(person.role),
+    )
+    .sort((a, b) =>
+      `${a.givenName} ${a.familyName}`.localeCompare(
+        `${b.givenName} ${b.familyName}`,
+      ),
+    );
+  const activeReferralSources = (referralSources ?? [])
+    .filter((source) => source.status === "active")
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   const selectedVenue = activeVenues.find((venue) => venue._id === venueId);
 
@@ -185,6 +209,8 @@ export function EventCreatePage() {
         title: String(data.get("title") ?? ""),
         occasionId,
         serviceStyleId,
+        salespersonId,
+        referralSourceId,
         startsAtRaw: String(data.get("startsAt") ?? ""),
         endsAtRaw: String(data.get("endsAt") ?? ""),
         expectedHeadcountRaw: data.get("expectedHeadcount"),
@@ -270,6 +296,40 @@ export function EventCreatePage() {
                   {activeServiceStyles.map((serviceStyle) => (
                     <option key={serviceStyle._id} value={serviceStyle._id}>
                       {serviceStyle.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Salesperson
+                <select
+                  value={salespersonId}
+                  onChange={(event) => setSalespersonId(event.target.value)}
+                  className="input"
+                  form="event-create-form"
+                >
+                  <option value="">Select a salesperson</option>
+                  {salespeople.map((person) => (
+                    <option key={person._id} value={person._id}>
+                      {[person.givenName, person.familyName]
+                        .filter(Boolean)
+                        .join(" ")}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Referral source
+                <select
+                  value={referralSourceId}
+                  onChange={(event) => setReferralSourceId(event.target.value)}
+                  className="input"
+                  form="event-create-form"
+                >
+                  <option value="">Select a referral source</option>
+                  {activeReferralSources.map((source) => (
+                    <option key={source._id} value={source._id}>
+                      {source.name}
                     </option>
                   ))}
                 </select>
