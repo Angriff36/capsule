@@ -20,6 +20,21 @@ const STRIPE_PROVIDER = "stripe";
 // manager; owner and system extend admin). A plain `*_manager` is NOT included.
 const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
 
+/**
+ * Binding a payout account is admin-only. The generated commands enforce the
+ * entity's `adminAccess` execute policy, but `startStripeOnboarding` calls
+ * Stripe BEFORE any mutation — and skips the create entirely when a connection
+ * already exists — so without this an ordinary tenant member could mint an
+ * onboarding link for the workspace's payout account.
+ */
+function requireAdmin(role: string): void {
+  if (!ADMIN_ROLES.has(role)) {
+    throw new ConvexError(
+      "Only an admin or owner can change this workspace's payout account.",
+    );
+  }
+}
+
 function asRecord(value: unknown): Record<string, unknown> {
   return value !== null && typeof value === "object"
     ? (value as Record<string, unknown>)
@@ -173,6 +188,7 @@ export const startStripeOnboarding = action({
     if (!auth.tenantId) {
       throw new ConvexError("Workspace unavailable. Check your access.");
     }
+    requireAdmin(auth.role);
 
     const existing = await ctx.runQuery(
       internal.stripeConnect.loadStripeConnection,
@@ -210,6 +226,13 @@ export const startStripeOnboarding = action({
         },
       );
       connectionId = String(created.docId);
+    } else if (existing && existing.status !== "pending") {
+      // Reconnecting a revoked/errored/connected row. `authorize` only creates,
+      // so without this the row stays revoked and the later markConnected would
+      // attempt revoked → connected, which no transition allows.
+      await ctx.runMutation(api.mutations.IntegrationConnection_reauthorize, {
+        docId: existing._id as Id<"integrationConnections">,
+      });
     }
 
     const returnUrl = new URL(environment.appOrigin);

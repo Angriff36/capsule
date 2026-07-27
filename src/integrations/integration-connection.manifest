@@ -104,6 +104,24 @@ entity IntegrationConnection mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Re-open onboarding on an existing row. Without this, a connection that was
+  // revoked (or errored) could never be reconnected: `authorize` only creates,
+  // and `markConnected` would attempt revoked → connected, which no transition
+  // allows. Every non-terminal status may return to `pending`.
+  command reauthorize() {
+    guard self.connectedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = "pending"
+    mutate lastErrorMessage = null
+    mutate lastErrorAt = null
+    emit IntegrationConnectionReauthorized {
+      connectionId: self.id
+      tenantId: self.tenantId
+      provider: self.provider
+    }
+  }
+
   // Provider confirmed the account. For Stripe this carries the account's real
   // charges/payouts capability so the UI never sends customers to a connected
   // account that cannot take money yet.
