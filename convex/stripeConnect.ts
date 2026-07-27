@@ -274,6 +274,7 @@ export const refreshStripeConnection = action({
     if (!auth.tenantId) {
       throw new ConvexError("Workspace unavailable. Check your access.");
     }
+    requireAdmin(auth.role);
     const existing = await ctx.runQuery(
       internal.stripeConnect.loadStripeConnection,
       { tenantId: auth.tenantId },
@@ -336,6 +337,7 @@ export const disconnectStripe = action({
       internal.stripeConnect.loadStripeConnection,
       { tenantId: auth.tenantId },
     );
+    requireAdmin(auth.role);
     if (!existing) return { disconnected: false };
     // Capsule forgets the account; the caterer's Stripe account itself keeps
     // existing and is theirs. We never delete a live merchant account.

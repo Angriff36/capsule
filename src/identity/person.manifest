@@ -170,10 +170,16 @@ entity Person mixin TenantScoped, SoftDeletable {
   // The link is by IdP subject id, not email: getAuthContext resolves the
   // staff profile with `authSubjectId == identity.subject`, so the stored
   // email plays no part in sign-in and cannot stand in for this.
+  // Escalation guard: binding a sign-in to a profile GRANTS that profile's role
+  // to that account (getAuthContext returns the linked person's role). So
+  // linking an admin/owner profile is admin-only, mirroring assignRole. Linking
+  // ordinary staff stays a normal workforce-manager task — an HR manager must
+  // not need the owner to onboard a line cook.
   command linkAccount(authSubjectId: string) {
     guard self.status == "active"
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "adminAccess") or not roleAllows(self.role, "adminAccess")
     constraint linkAccountSubject: length(trim(authSubjectId)) > 0 "Choose an account to link"
     mutate authSubjectId = authSubjectId
     emit PersonAccountLinked {
@@ -189,6 +195,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   command unlinkAccount() {
     guard self.deletedAt == null
     guard roleAllows(user.role, "workforceManageAccess")
+    guard roleAllows(user.role, "adminAccess") or not roleAllows(self.role, "adminAccess")
     mutate authSubjectId = null
     emit PersonAccountUnlinked {
       personId: self.id
