@@ -9,6 +9,7 @@ import {
   useListClient,
   useListMenu,
   useListOccasion,
+  useListServiceStyle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { ArrowLeftIcon } from "../../ui/icons";
@@ -73,6 +74,7 @@ export function EventCreatePage() {
   const clients = useListClient();
   const venues = useListVenue();
   const occasions = useListOccasion();
+  const serviceStyles = useListServiceStyle();
   const createClient = useCreateClient();
   const createVenue = useCreateVenue();
   const createEvent = useCreateEvent();
@@ -83,6 +85,7 @@ export function EventCreatePage() {
   const [busy, setBusy] = useState<"client" | "venue" | "event" | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
   const [occasionId, setOccasionId] = useState("");
+  const [serviceStyleId, setServiceStyleId] = useState("");
   const { errors, touched, formProps, handleSubmit } =
     useFieldValidation(eventFieldRules);
   const draftForm = useFormDraft("event-create");
@@ -101,6 +104,9 @@ export function EventCreatePage() {
   );
   const activeOccasions = (occasions ?? [])
     .filter((occasion) => occasion.status === "active")
+    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  const activeServiceStyles = (serviceStyles ?? [])
+    .filter((serviceStyle) => serviceStyle.status === "active")
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   const selectedVenue = activeVenues.find((venue) => venue._id === venueId);
 
@@ -178,6 +184,7 @@ export function EventCreatePage() {
         venue,
         title: String(data.get("title") ?? ""),
         occasionId,
+        serviceStyleId,
         startsAtRaw: String(data.get("startsAt") ?? ""),
         endsAtRaw: String(data.get("endsAt") ?? ""),
         expectedHeadcountRaw: data.get("expectedHeadcount"),
@@ -247,6 +254,22 @@ export function EventCreatePage() {
                   {activeOccasions.map((occasion) => (
                     <option key={occasion._id} value={occasion._id}>
                       {occasion.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Service style
+                <select
+                  value={serviceStyleId}
+                  onChange={(event) => setServiceStyleId(event.target.value)}
+                  className="input"
+                  form="event-create-form"
+                >
+                  <option value="">Select a service style</option>
+                  {activeServiceStyles.map((serviceStyle) => (
+                    <option key={serviceStyle._id} value={serviceStyle._id}>
+                      {serviceStyle.name}
                     </option>
                   ))}
                 </select>

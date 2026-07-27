@@ -6,6 +6,7 @@ export type EventPlanEngagementFormInput = {
   venue: Doc<"venues"> | undefined;
   title: string;
   occasionId: string;
+  serviceStyleId: string;
   startsAtRaw: string;
   endsAtRaw: string;
   expectedHeadcountRaw: FormDataEntryValue | null;
@@ -51,6 +52,7 @@ export class EventPlanEngagementFormMapper {
       quotedPrice: schedule.quotedPrice,
     };
     this.assignOptionalOccasionField(args, input.occasionId);
+    this.assignOptionalServiceStyleField(args, input.serviceStyleId);
     this.assignOptionalVenueFields(args, input.venue);
     this.assignOptionalContactFields(args, input);
     return args;
@@ -105,6 +107,16 @@ export class EventPlanEngagementFormMapper {
     const trimmed = occasionId.trim();
     if (trimmed) {
       args.occasionId = trimmed;
+    }
+  }
+
+  private assignOptionalServiceStyleField(
+    args: Record<string, unknown>,
+    serviceStyleId: string,
+  ): void {
+    const trimmed = serviceStyleId.trim();
+    if (trimmed) {
+      args.serviceStyleId = trimmed;
     }
   }
 
