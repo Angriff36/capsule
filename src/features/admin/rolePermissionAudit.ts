@@ -16,7 +16,7 @@ const ROLE_DEFINITIONS = {
   driver: { parent: "logistics_staff", allow: [] },
   workforce_staff: { parent: "staff", allow: ["workforceAccess"] },
   finance_staff: { parent: "staff", allow: ["financeAccess"] },
-  manager: { parent: "staff", allow: ["manageAccess"] },
+  manager: { parent: "staff", allow: ["manageAccess", "importAccess"] },
   kitchen_manager: {
     parent: "manager",
     allow: ["kitchenAccess", "kitchenLeadAccess", "kitchenManageAccess"],

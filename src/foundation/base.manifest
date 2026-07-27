@@ -56,6 +56,13 @@ role finance_staff extends staff {
 
 role manager extends staff {
   allow manageAccess
+  // Import framework (ExternalRecordLink / ImportRun / ImportDataset) reads +
+  // writes gate on importAccess. Granting at the manager tier propagates to
+  // every *_manager, admin, owner, system — the operators who run TPP imports.
+  // Without this, every generated import read returns [] for all users
+  // (checkRole("importAccess") was unsatisfiable) and the reconcile queue +
+  // source provenance are invisible. See docs §6.1/§6.4.
+  allow importAccess
 }
 
 role kitchen_manager extends manager {
