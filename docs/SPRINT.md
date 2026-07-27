@@ -298,7 +298,7 @@ events/proposals/contracts/invoices/payments.
 | Step | State |
 |---|---|
 | Dishes auto-create prep tasks | ✅ **BUILT + VERIFIED IN PRODUCTION 2026-07-27.** `EventDishAdded` now fans out over the dish's active `DishTask` templates and opens one `PrepTask` each, server-side. Proven live: 3 templates on Tito Test Dish produced exactly 3 prep tasks on Test Event (55 guests) — `55 portion`, `55 portion`, `342.65 ounce` (6.23 × 55) — visible on `/kitchen/prep` on first load, with no "Sync prep" click. See §7 for the duplicate-generation defect this exposed and fixed. |
-| Prep task **claim** | ⚠️ Fixed but **still unproven end to end.** `claim` used to write `user.id` (the IdP subject) into `assignedToId`, declared `belongsTo assignedTo: Person`, so the FK never resolved. Fixed 2026-07-27 to `user.personId` (same bug fixed in `PrepTask` quality `pass`/`fail` and `AllergenCheck.record`). Verifying it needs a sign-in that is linked to a `Person`; the production admin account is not linked, so `claim` fails by design. See §7. |
+| Prep task **claim** | ✅ **VERIFIED IN PRODUCTION 2026-07-27.** `claim` used to write `user.id` (the IdP subject) into `assignedToId`, declared `belongsTo assignedTo: Person`, so the FK never resolved. Fixed 2026-07-27 to `user.personId` (same bug fixed in `PrepTask` quality `pass`/`fail` and `AllergenCheck.record`). Proven after linking the `Angriff36` sign-in to a hired `Person`: Claim → **CLAIMED · Ryan Ostwind**, then Start → Complete, event rollup 2/3 · 67%, crew load "0 doing · 0 claimed · 1 done". The FK resolves to a real name, which is exactly what the old bug broke. |
 | Prep task **assign** + **complete** | ✅ **VERIFIED IN PRODUCTION 2026-07-27.** Armed Josh Mitchell in Quick Assign → Assign moved the step `pending → in_progress` showing "Josh Mitchell" (the Person FK resolves — the 2026-07-27 fix holds) → Complete moved it to `completed`. Event rollup went to 1/3 · 33% and Crew Load to "0 doing · 0 claimed · 1 done". |
 | Containers → pack list | ✅ **BUILT + VERIFIED IN PRODUCTION 2026-07-27.** New `DishContainer` entity + two chained reactions (`PackListOpened → EventDish → DishContainer → PackListItem.addItem`). Proven live: a 55-serving dish with a 25-serving pan and +1 always-send produced a pack line of **4 each, LISTED**, automatically. |
 | Equipment per dish | 🟡 `DishContainer.equipmentNotes` carries it as free text (chafers, burners) so an operator is never blocked; a structured Dish → Equipment link is still not built. |
@@ -354,7 +354,17 @@ every reconcile resize every generated task.
 
 Re-run after the fix: exactly 3 tasks, correct units, correct quantities.
 
-### Blocked: `claim` cannot be proven without a linked sign-in
+### Resolved: `claim` proven after linking the sign-in
+
+Owner authorized the permission change. Hired "Ryan Ostwind" with the `admin`
+role and linked it to the `Angriff36` sign-in under Administration → Team
+roles; the banner moved from "temporary sign-in fallback" to "from team record
+in app settings", and `Angriff36` gained a `personId`. Claim → Start →
+Complete then ran clean, with the task showing **Ryan Ostwind** throughout.
+
+Original blocker, kept for context:
+
+### Why `claim` could not be proven without a linked sign-in
 
 `PrepTask.claim` guards on `user.personId`. The production admin account
 (`Angriff36` / `user_3GR87p1FnpiFY9TUrupNU9WqWyt`) is **not** linked to any
