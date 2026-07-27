@@ -290,9 +290,9 @@ events/proposals/contracts/invoices/payments.
 |---|---|
 | Dishes auto-create prep tasks | ⚠️ `DishTask` templates exist, but instantiation lives in **client-side** `EventPrepTaskSynchronizer.ts` / `EventPrepCoordinator.ts` — no `on … run PrepTask.*` reaction. Tasks appear only when someone opens the page. |
 | Prep task **claim** | ❌ **was broken** — `claim` wrote `user.id` (the IdP subject) into `assignedToId`, declared `belongsTo assignedTo: Person`. The FK never resolved. Fixed 2026-07-27 to `user.personId`; same bug fixed in `PrepTask` quality `pass`/`fail` and `AllergenCheck.record`. Depends on the staff profile being linked (see `Person.linkAccount`). |
-| Containers → pack list | ❌ **No container entity anywhere.** `pack-list.manifest` only carries a comment that "Description covers equipment/containers". Zero reactions create a `PackListItem`, so a pack list opens **empty** — nothing flows from dishes. |
-| Equipment per dish | ❌ No Dish → Equipment link exists. |
-| Cook-on-site / kitchen / bring-hot split | ⚠️ `DishTask.category` is a **free string** defaulting `"finish_at_event"` — not an enum, not enforced, no closed vocabulary. |
+| Containers → pack list | ✅ **BUILT + VERIFIED IN PRODUCTION 2026-07-27.** New `DishContainer` entity + two chained reactions (`PackListOpened → EventDish → DishContainer → PackListItem.addItem`). Proven live: a 55-serving dish with a 25-serving pan and +1 always-send produced a pack line of **4 each, LISTED**, automatically. |
+| Equipment per dish | 🟡 `DishContainer.equipmentNotes` carries it as free text (chafers, burners) so an operator is never blocked; a structured Dish → Equipment link is still not built. |
+| Cook-on-site / kitchen / bring-hot split | ✅ Real `DishServiceMethod` enum on DishContainer: `cooked_on_site` / `cooked_at_kitchen` / `brought_hot` / `cold_service`. (`DishTask.category` remains a free string; the container carries the authoritative method.) |
 | Post-event reports fire automatically | ❌ Only `EventClosedOut → EventCloseout.capture`. No automatic report generation or sending. |
 | Event notifications | ⚠️ Unverified. |
 | Vehicle assign / check-out | ⚠️ `vehicle.manifest` has register / reviseDetails / updateOperationalStatus and a `vehicleAssignment` seam; no explicit check-out command found. |
