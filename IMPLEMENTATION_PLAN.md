@@ -27,7 +27,7 @@
 
 **Verification:** `bun run check` GREEN — fully `&&`-chained to `baseline-decay: ok`: toolchain, builder ownership, proof:emit, all 9 manifest-slice integration guards, manifest-registry-pin, typecheck 0, format clean, secrets, test:coverage, build ok (`OneOnOnesPage` chunk built), baseline-decay ok. Runtime write-path verified by inspection (not just typecheck): `hold`/`capture` use the proven `_createVia*` governed-creation hooks; `close` uses `{ docId }` (the fix applied here); the `capture` `guard self.oneOnOne != null` clones `ProposalLineItem.addLine`'s `guard self.proposal != null` verbatim (sibling-in-one-file entity ref + belongsTo seed param). No tests added (authored manifest + additive UI cloning shipped siblings; AGENTS.md: do not add tests unless the owner asks).
 
-**Cross-model review:** not run this increment (autonomous-loop cadence; new manifest entities + additive UI + route, `workforceManageAccess` already exists, no money mutation). The merge gate's independent cross-model review still applies at PR time.
+**Cross-model review:** the pre-push review gate (codex) reviewed the outgoing diff and **BLOCKED on first push** — caught a real correctness bug in `OneOnOnesPage`: the "carried forward" panel filtered prior actions by `ownerPersonId === staffDraft`, which omits open follow-ups owned by the manager/another participant. Spec §9.5 wants open actions from the staff member's **prior meetings** (any owner). Fixed to match by prior-meeting id (`priorMeetingIds.has(row.oneOnOneId)`). Second push APPROVED; shipped as `e5403dc` / `v0.0.34`.
 
 ---
 
