@@ -72,7 +72,11 @@ entity EventAllergenCheck mixin TenantScoped, SoftDeletable {
     mutate result = result
     mutate flaggedAllergens = nextFlags
     mutate notes = notes != null ? notes : self.notes
-    mutate checkedById = user.id
+    // user.id is the IdP subject; this field is a Person reference
+    // (belongsTo ... references [tenantId, id]). Writing user.id here stored a
+    // Clerk id in a Person FK, so the relation never resolved. personId comes
+    // from the linked staff profile — see Person.linkAccount.
+    mutate checkedById = user.personId
     mutate status = "recorded"
     mutate checkedAt = now()
     emit EventAllergenCheckRecorded {
@@ -83,7 +87,7 @@ entity EventAllergenCheck mixin TenantScoped, SoftDeletable {
       dishId: dishId != null ? dishId : self.dishId
       result: result
       flaggedAllergens: nextFlags
-      checkedById: user.id
+      checkedById: user.personId
       status: "recorded"
     }
   }

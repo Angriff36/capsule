@@ -74,7 +74,11 @@ entity QualityCheck mixin TenantScoped, SoftDeletable {
     guard user.id != null
     compute previousStatus = self.status
     mutate result = "pass"
-    mutate checkedById = user.id
+    // user.id is the IdP subject; this field is a Person reference
+    // (belongsTo ... references [tenantId, id]). Writing user.id here stored a
+    // Clerk id in a Person FK, so the relation never resolved. personId comes
+    // from the linked staff profile — see Person.linkAccount.
+    mutate checkedById = user.personId
     mutate notes = notes != null ? notes : self.notes
     mutate status = "passed"
     mutate completedAt = now()
@@ -83,7 +87,7 @@ entity QualityCheck mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       prepTaskId: self.prepTaskId
       productionBatchId: self.productionBatchId
-      checkedById: user.id
+      checkedById: user.personId
       result: "pass"
       previousStatus: previousStatus
       status: "passed"
@@ -98,7 +102,11 @@ entity QualityCheck mixin TenantScoped, SoftDeletable {
     guard user.id != null
     compute previousStatus = self.status
     mutate result = "fail"
-    mutate checkedById = user.id
+    // user.id is the IdP subject; this field is a Person reference
+    // (belongsTo ... references [tenantId, id]). Writing user.id here stored a
+    // Clerk id in a Person FK, so the relation never resolved. personId comes
+    // from the linked staff profile — see Person.linkAccount.
+    mutate checkedById = user.personId
     mutate notes = notes != null ? notes : self.notes
     mutate status = "failed"
     mutate completedAt = now()
@@ -107,7 +115,7 @@ entity QualityCheck mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       prepTaskId: self.prepTaskId
       productionBatchId: self.productionBatchId
-      checkedById: user.id
+      checkedById: user.personId
       result: "fail"
       previousStatus: previousStatus
       status: "failed"

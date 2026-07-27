@@ -225,9 +225,13 @@ blocks the walkthrough. Resist adding features.
   rollup, weekly purchasing, pack-list→delivery, invoice→payment, shift, and
   payroll lifecycles, each with a role-denial case proving no partial writes.
 
-### Browser walkthrough (2026-07-27, signed in as admin)
+### Browser route smoke test (2026-07-27, signed in as admin)
 
-- **53 authenticated routes swept, zero crashes** — no error boundary, no
+**This is a smoke test, not a workflow test.** It proves pages render and
+individual commands fire. It does NOT prove one event moves through the
+operational chain. See §6 for what that audit found.
+
+- **53 authenticated routes loaded, zero crashes** — no error boundary, no
   unhandled Convex error, across events, clients, kitchen, inventory,
   logistics, facilities, staff, finance, all 7 report dashboards, and admin.
 - **Staff account linking — proven end to end.** Linked an unlinked staff
@@ -254,3 +258,48 @@ blocks the walkthrough. Resist adding features.
   stages are covered by runtime proofs; the continuous walkthrough is Day 2.
 - **The escalation guard on `linkAccount`** was verified by reading the
   generated code, not by signing in as a workforce manager.
+
+---
+
+## 6. Operational workflow audit (2026-07-27)
+
+Checked against the manifests, not the docs. "Automatic" below means a
+server-side Manifest reaction fires it; anything else needs a human or a page
+visit.
+
+### Real, and genuinely automatic
+
+The purchasing chain is the strongest thing in the app — an unbroken reaction
+path from adding a dish to a drafted vendor order:
+
+`EventDishAdded → DishRecipe → EventDishRecipeSeeded → RecipeIngredient →
+EventIngredientContribution → IngredientDemand.syncFromContributions →
+PurchaseNeed → WeeklyPurchasingConfig.routeNeed → VendorOrder.ensureWeeklyDraft
+→ VendorOrderLine.ensureWeeklyLine`
+
+Also automatic: `EventApproved → PackList.open`, `EventApproved →
+EventDishRecipeSeed`, `EventHeadcountChanged → EventDish` (re-drives demand and
+cost), `PackListPacked → Delivery.schedule`, `VendorOrderLineReceived →
+InventoryLot.record + IngredientPriceObservation.record`, `EventClosedOut →
+EventCloseout.capture`, and the full `ClientMergeCompleted` fan-out across
+events/proposals/contracts/invoices/payments.
+
+### Gaps found
+
+| Step | State |
+|---|---|
+| Dishes auto-create prep tasks | ⚠️ `DishTask` templates exist, but instantiation lives in **client-side** `EventPrepTaskSynchronizer.ts` / `EventPrepCoordinator.ts` — no `on … run PrepTask.*` reaction. Tasks appear only when someone opens the page. |
+| Prep task **claim** | ❌ **was broken** — `claim` wrote `user.id` (the IdP subject) into `assignedToId`, declared `belongsTo assignedTo: Person`. The FK never resolved. Fixed 2026-07-27 to `user.personId`; same bug fixed in `PrepTask` quality `pass`/`fail` and `AllergenCheck.record`. Depends on the staff profile being linked (see `Person.linkAccount`). |
+| Containers → pack list | ❌ **No container entity anywhere.** `pack-list.manifest` only carries a comment that "Description covers equipment/containers". Zero reactions create a `PackListItem`, so a pack list opens **empty** — nothing flows from dishes. |
+| Equipment per dish | ❌ No Dish → Equipment link exists. |
+| Cook-on-site / kitchen / bring-hot split | ⚠️ `DishTask.category` is a **free string** defaulting `"finish_at_event"` — not an enum, not enforced, no closed vocabulary. |
+| Post-event reports fire automatically | ❌ Only `EventClosedOut → EventCloseout.capture`. No automatic report generation or sending. |
+| Event notifications | ⚠️ Unverified. |
+| Vehicle assign / check-out | ⚠️ `vehicle.manifest` has register / reviseDetails / updateOperationalStatus and a `vehicleAssignment` seam; no explicit check-out command found. |
+| Invoices sent | ⚠️ Issue/send commands exist; delivery needs `RESEND_API_KEY` (G6). |
+
+### Not yet run
+
+The continuous walkthrough — one event from lead through closeout, verifying
+each cascade actually fired — has **not** been done. The pieces above are
+evidence about the code, not about a live event.
