@@ -5,9 +5,12 @@
 // increments on each command) so a historical assessment stays interpretable
 // after a later revision supersedes it.
 //
-// History is the row set, not a mutation log: revising bumps `version` and
-// keeps the prior row intact; `effectiveTo` is stamped on archive so the
-// active scorecard for a role is unambiguous. `expectations` is a JSON array
+// Each defined row is an IMMUTABLE version. There is no in-place `revise` —
+// mutating a row would silently change the content that historical reviews
+// and one-on-ones reference, breaking spec §9.2 ("reference the applicable
+// scorecard version so historical assessments remain interpretable"). To
+// change expectations: define a new row and archive the prior (`effectiveTo`
+// stamps the close); prior rows stay intact and interpretable. `expectations`
 // of {metric, target} stored as a string (like the proposal-revision
 // snapshot) so the shape can grow without a schema migration; the UI
 // parses/renders it and it is never indexed.
@@ -71,28 +74,6 @@ entity RoleScorecard mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command revise(
-    title: string,
-    optional role: CapsuleRole,
-    optional expectations: string,
-    optional effectiveFrom: datetime
-  ) {
-    guard self.definedAt != null
-    guard self.status == "active"
-    guard self.deletedAt == null
-    guard user.id != null
-    constraint reviseTitle: length(trim(title)) > 0 "Scorecard title is required"
-    mutate role = role != null ? role : self.role
-    mutate title = title
-    mutate expectations = expectations != null ? expectations : self.expectations
-    mutate effectiveFrom = effectiveFrom != null ? effectiveFrom : self.effectiveFrom
-    emit RoleScorecardRevised {
-      scorecardId: self.id
-      tenantId: self.tenantId
-      title: title
-    }
-  }
-
   command archive(reason: string) {
     guard self.status == "active"
     guard self.definedAt != null
@@ -131,12 +112,6 @@ event RoleScorecardDefined: "role_scorecard.defined" {
   scorecardId: string
   tenantId: string
   role: string
-  title: string
-}
-
-event RoleScorecardRevised: "role_scorecard.revised" {
-  scorecardId: string
-  tenantId: string
   title: string
 }
 

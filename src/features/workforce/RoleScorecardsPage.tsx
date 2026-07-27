@@ -4,7 +4,6 @@ import {
   useRoleScorecardArchive,
   useRoleScorecardDefine,
   useRoleScorecardReactivate,
-  useRoleScorecardRevise,
 } from "../../lib/manifest-convex-react";
 import { PersonRoleDirectory } from "../admin/PersonRoleDirectory";
 import { TableSkeleton } from "../../ui/primitives";
@@ -52,7 +51,6 @@ function formatEpoch(value: number | null | undefined) {
 export function RoleScorecardsPage() {
   const scorecards = useListRoleScorecard();
   const define = useRoleScorecardDefine();
-  const revise = useRoleScorecardRevise();
   const archive = useRoleScorecardArchive();
   const reactivate = useRoleScorecardReactivate();
 
@@ -122,7 +120,11 @@ export function RoleScorecardsPage() {
           effectiveFrom: localDateEpoch(data.get("effectiveFrom")),
         };
         if (editingId) {
-          await revise({ id: editingId, ...payload });
+          // Supersede: define a new immutable version, then close the prior
+          // (archive stamps effectiveTo). The old row stays intact so reviews
+          // and one-on-ones referencing it remain historically interpretable.
+          await define(payload);
+          await archive({ id: editingId, reason: "Superseded by new version" });
         } else {
           await define(payload);
         }
@@ -171,8 +173,9 @@ export function RoleScorecardsPage() {
           </h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Define the current scorecard for each staff role — the metrics and
-            targets reviews and one-on-ones measure against. Revising keeps
-            prior versions so historical assessments stay interpretable.
+            targets reviews and one-on-ones measure against. Each revision is a
+            new version; prior versions stay intact so historical assessments
+            stay interpretable.
           </p>
         </div>
         <div aria-label="Scorecard actions">
@@ -194,14 +197,16 @@ export function RoleScorecardsPage() {
             <div>
               <p className="eyebrow">Role scorecard</p>
               <h2>
-                {editingId ? "Revise scorecard" : "Define a new scorecard"}
+                {editingId
+                  ? "Define new version (supersedes prior)"
+                  : "Define a new scorecard"}
               </h2>
             </div>
             <button className="btn btn-primary" disabled={busy}>
               {busy
                 ? "Saving…"
                 : editingId
-                  ? "Save changes"
+                  ? "Create new version"
                   : "Create scorecard"}
             </button>
           </div>
