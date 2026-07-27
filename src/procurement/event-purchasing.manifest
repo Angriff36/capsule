@@ -141,6 +141,12 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   // a component. A dish is the recipe; only hand-made sub-preparations have a
   // component behind them.
   property componentId: uuid?
+  // TEMPORARY — phase 1 of the recipeId → componentId rename. Convex validates
+  // existing rows on push, so the field cannot be dropped while production rows
+  // still carry it, and those rows cannot be rewritten while the live schema
+  // still requires it. Keeping it optional lets the new schema land; the rows
+  // are migrated straight after, then this line goes. Nothing writes it.
+  property recipeId: uuid?
   property required ingredientId: uuid
   property required quantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
