@@ -52,6 +52,7 @@ import type * as shareLinks from "../shareLinks.js";
 import type * as smsAlerts from "../smsAlerts.js";
 import type * as sourceProvenance from "../sourceProvenance.js";
 import type * as staffSelfReviews from "../staffSelfReviews.js";
+import type * as stripeConnect from "../stripeConnect.js";
 import type * as tppParser from "../tppParser.js";
 import type * as vehicleAssignment from "../vehicleAssignment.js";
 import type * as webhookIntegrations from "../webhookIntegrations.js";
@@ -108,6 +109,7 @@ declare const fullApi: ApiFromModules<{
   smsAlerts: typeof smsAlerts;
   sourceProvenance: typeof sourceProvenance;
   staffSelfReviews: typeof staffSelfReviews;
+  stripeConnect: typeof stripeConnect;
   tppParser: typeof tppParser;
   vehicleAssignment: typeof vehicleAssignment;
   webhookIntegrations: typeof webhookIntegrations;

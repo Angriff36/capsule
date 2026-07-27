@@ -1,0 +1,184 @@
+// IntegrationConnection — spec §12.1 "Common integration contract".
+//
+// One row per (tenant, provider): status, the provider-side account id, granted
+// scopes, and last-successful-sync / last-error visibility. This is the record
+// spec §12.1 asks for ("Integration Connection with tenant, provider, status,
+// encrypted credentials/reference, scopes, and last successful sync") and the
+// prerequisite for per-tenant Stripe Connect (issue #112) — a tenant's payments
+// must settle to that tenant, which needs somewhere to hold its `acct_...` id.
+//
+// Deliberately NOT a credential vault. Stripe Connect direct charges need only
+// the connected-account id plus the platform key, so no secret is stored here.
+// QuickBooks and Google Calendar keep replaying their encrypted tokens out of
+// the shared `manifestEvents` ledger exactly as they do today; `credentialRef`
+// is a pointer for those providers to adopt later, not a migration.
+
+enum IntegrationProvider {
+  stripe
+  quickbooks
+  google_calendar
+  email
+  sms
+  nowsta
+  instagram
+  facebook
+  tiktok
+}
+
+enum IntegrationConnectionStatus {
+  disconnected
+  pending
+  connected
+  error
+  revoked
+}
+
+entity IntegrationConnection mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  unique [tenantId, provider]
+  timestamps
+  versionProperty version: number
+
+  property required provider: IntegrationProvider = "stripe"
+  property required status: IntegrationConnectionStatus = "disconnected"
+  // Provider-side account identity: Stripe `acct_...`, QuickBooks realmId,
+  // Google calendar id. Not a secret — safe to read.
+  property externalAccountId: string?
+  property displayName: string?
+  // Space-separated granted scopes, verbatim from the provider.
+  property scopes: string?
+  // Pointer to where a secret lives (e.g. a manifestEvents ledger event type).
+  // Never the secret itself.
+  property credentialRef: string?
+  property lastSuccessfulSyncAt: datetime?
+  property lastErrorMessage: string?
+  property lastErrorAt: datetime?
+  // Stripe Connect onboarding: the provider tells us whether the account can
+  // actually accept charges yet. Both false while onboarding is incomplete.
+  property required chargesEnabled: boolean = false
+  property required payoutsEnabled: boolean = false
+  // Explicit nullable flag (not the timestamps mixin) so the create guard works.
+  property connectedAt: datetime?
+
+  transition status from "disconnected" to ["pending", "connected", "error"]
+  transition status from "pending" to ["connected", "error", "disconnected"]
+  transition status from "connected" to ["error", "revoked", "pending"]
+  transition status from "error" to ["pending", "connected", "revoked", "disconnected"]
+  transition status from "revoked" to ["pending", "disconnected"]
+
+  computed isUsable: boolean = self.status == "connected" and self.deletedAt == null
+  // Stripe: a connected account that cannot accept charges must not be sent
+  // customers. Non-payment providers ignore chargesEnabled.
+  computed canAcceptCharges: boolean = self.status == "connected" and self.chargesEnabled and self.deletedAt == null
+
+  // Read at the manager tier so an operator can see integration health; write
+  // and execute at admin because connecting a payment account binds real money.
+  default policy integrationConnectionRead read: roleAllows(user.role, "manageAccess") "Managers may read integration connections"
+  default policy integrationConnectionWrite write: roleAllows(user.role, "adminAccess") "Admins may write integration connections through commands"
+  default policy integrationConnectionExecute execute: roleAllows(user.role, "adminAccess") "Admins may execute integration connection commands"
+
+  // Begin an onboarding/authorization attempt. Creates the row.
+  // Named `authorize`, not `connect` — `connect` is a Manifest reserved word.
+  command authorize(
+    provider: IntegrationProvider,
+    optional externalAccountId: string,
+    optional displayName: string,
+    optional scopes: string,
+    optional credentialRef: string
+  ) {
+    guard self.connectedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate provider = provider
+    mutate externalAccountId = externalAccountId
+    mutate displayName = displayName
+    mutate scopes = scopes
+    mutate credentialRef = credentialRef
+    mutate status = "pending"
+    mutate connectedAt = now()
+    emit IntegrationConnectionStarted {
+      connectionId: self.id
+      tenantId: self.tenantId
+      provider: provider
+      externalAccountId: externalAccountId
+    }
+  }
+
+  // Provider confirmed the account. For Stripe this carries the account's real
+  // charges/payouts capability so the UI never sends customers to a connected
+  // account that cannot take money yet.
+  command markConnected(
+    optional externalAccountId: string,
+    optional displayName: string,
+    optional scopes: string,
+    chargesEnabled: boolean,
+    payoutsEnabled: boolean
+  ) {
+    guard self.connectedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate externalAccountId = externalAccountId
+    mutate displayName = displayName
+    mutate scopes = scopes
+    mutate chargesEnabled = chargesEnabled
+    mutate payoutsEnabled = payoutsEnabled
+    mutate status = "connected"
+    mutate lastErrorMessage = null
+    mutate lastErrorAt = null
+    emit IntegrationConnectionEstablished {
+      connectionId: self.id
+      tenantId: self.tenantId
+      provider: self.provider
+      externalAccountId: externalAccountId
+      chargesEnabled: chargesEnabled
+    }
+  }
+
+  // §12.1 "visible pending/failed integration state" — a provider outage marks
+  // the connection, it never rolls back unrelated user work.
+  command recordFailure(reason: string) {
+    guard self.connectedAt != null
+    guard self.deletedAt == null
+    constraint integrationFailureReason: length(trim(reason)) > 0 "Failure reason is required"
+    mutate status = "error"
+    mutate lastErrorMessage = reason
+    mutate lastErrorAt = now()
+    emit IntegrationConnectionFailed {
+      connectionId: self.id
+      tenantId: self.tenantId
+      provider: self.provider
+      reason: reason
+    }
+  }
+
+  // §12.1 "last successful sync".
+  command recordSyncSuccess() {
+    guard self.connectedAt != null
+    guard self.deletedAt == null
+    mutate status = "connected"
+    mutate lastSuccessfulSyncAt = now()
+    mutate lastErrorMessage = null
+    mutate lastErrorAt = null
+    emit IntegrationConnectionSynced {
+      connectionId: self.id
+      tenantId: self.tenantId
+      provider: self.provider
+    }
+  }
+
+  command disconnect(optional reason: string) {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = "revoked"
+    mutate chargesEnabled = false
+    mutate payoutsEnabled = false
+    mutate lastErrorMessage = reason
+    emit IntegrationConnectionRevoked {
+      connectionId: self.id
+      tenantId: self.tenantId
+      provider: self.provider
+    }
+  }
+
+  store IntegrationConnection in durable
+}

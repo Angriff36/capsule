@@ -48,6 +48,7 @@ describe("governed creation mappings", () => {
       "IngredientDemand_createViaCalculate",
       "IngredientPriceObservation_createViaRecord",
       "Ingredient_createViaIntroduce",
+      "IntegrationConnection_createViaAuthorize",
       "Interview_createViaSchedule",
       "InventoryItem_createViaOpen",
       "InventoryLot_createViaRecord",

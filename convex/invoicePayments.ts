@@ -16,6 +16,12 @@ import { getAuthContext } from "./lib/authContext";
 // generated/owned), so confirmation is pulled from Stripe by an authenticated
 // finance user and recorded through the governed Payment.record → Payment.settle
 // commands; the PaymentSettled reaction applies the amount to the invoice.
+//
+// Funds settle to the TENANT, not the platform (issue #112): every Stripe call
+// carries a `Stripe-Account` header naming the tenant's Standard connected
+// account, resolved from its IntegrationConnection row (spec §12.1). A tenant
+// without a charges-enabled connection cannot create a payment link at all —
+// see `requireConnectedAccountId`. Onboarding lives in `convex/stripeConnect.ts`.
 
 const OPEN_INVOICE_STATUSES = new Set(["sent", "viewed", "overdue", "partial"]);
 const MAX_SESSIONS_CHECKED = 24;
@@ -187,16 +193,58 @@ export const recordLedgerEvent = internalMutation({
   },
 });
 
+/**
+ * The tenant's Stripe Connect account id (issue #112). Direct charges are made
+ * with the platform key plus a `Stripe-Account` header so the money settles to
+ * the caterer, not to Capsule. Throws rather than silently charging into the
+ * platform account.
+ */
+async function requireConnectedAccountId(
+  ctx: ActionCtx,
+  tenantId: string,
+): Promise<string> {
+  const connection = await ctx.runQuery(
+    internal.stripeConnect.loadStripeConnection,
+    { tenantId },
+  );
+  const accountId =
+    typeof connection?.externalAccountId === "string"
+      ? connection.externalAccountId.trim()
+      : "";
+  if (!connection || !accountId) {
+    throw new ConvexError(
+      "Connect this workspace's Stripe account before taking payments (Admin → Integrations).",
+    );
+  }
+  if (connection.status !== "connected" || !connection.chargesEnabled) {
+    throw new ConvexError(
+      "This workspace's Stripe account cannot accept charges yet. Finish Stripe onboarding in Admin → Integrations.",
+    );
+  }
+  return accountId;
+}
+
+function connectedAccountHeaders(
+  stripeSecretKey: string,
+  connectedAccountId: string,
+): Record<string, string> {
+  return {
+    Authorization: `Bearer ${stripeSecretKey}`,
+    "Stripe-Account": connectedAccountId,
+  };
+}
+
 async function fetchStripeSession(
   sessionId: string,
   stripeSecretKey: string,
+  connectedAccountId: string,
 ): Promise<Record<string, unknown> | null> {
   const query = new URLSearchParams({
     "expand[]": "payment_intent.payment_method",
   });
   const response = await fetch(
     `https://api.stripe.com/v1/checkout/sessions/${encodeURIComponent(sessionId)}?${query}`,
-    { headers: { Authorization: `Bearer ${stripeSecretKey}` } },
+    { headers: connectedAccountHeaders(stripeSecretKey, connectedAccountId) },
   );
   if (response.status === 404) return null;
   const body = asRecord(await response.json().catch(() => null));
@@ -239,6 +287,10 @@ export const createPaymentLink = action({
     const auth = await getAuthContext(ctx);
     const invoice = await requireInvoice(ctx, args.invoiceId);
     assertPayableInvoice(invoice);
+    const connectedAccountId = await requireConnectedAccountId(
+      ctx,
+      invoice.tenantId,
+    );
 
     const invoiceNumber = String(invoice.invoiceNumber || invoice._id);
     const amountDue = Number(invoice.amountDue);
@@ -268,7 +320,10 @@ export const createPaymentLink = action({
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${environment.stripeSecretKey}`,
+          ...connectedAccountHeaders(
+            environment.stripeSecretKey,
+            connectedAccountId,
+          ),
           "Content-Type": "application/x-www-form-urlencoded",
         },
         body,
@@ -308,6 +363,10 @@ export const syncStripePayments = action({
   handler: async (ctx, args): Promise<StripeSyncResult> => {
     const environment = requireStripeEnvironment();
     const invoice = await requireInvoice(ctx, args.invoiceId);
+    const connectedAccountId = await requireConnectedAccountId(
+      ctx,
+      invoice.tenantId,
+    );
     const view: LedgerView = await ctx.runQuery(
       internal.invoicePayments.loadLedgerView,
       { invoiceId: args.invoiceId, tenantId: invoice.tenantId },
@@ -329,6 +388,7 @@ export const syncStripePayments = action({
         const stripeSession = await fetchStripeSession(
           session.sessionId,
           environment.stripeSecretKey,
+          connectedAccountId,
         );
         if (!stripeSession || stripeSession.payment_status !== "paid") {
           continue;
