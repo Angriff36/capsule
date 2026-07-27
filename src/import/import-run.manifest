@@ -13,6 +13,7 @@ enum ImportDatasetType {
   menus
   venues
   payments
+  pack_list
 }
 
 enum ImportRunStatus {

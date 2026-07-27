@@ -42,6 +42,7 @@ const RECORD_TYPE_LABELS: Record<string, string> = {
   delivery: "Delivery",
   stock: "Stock",
   location: "Location",
+  pack_list: "Pack List",
 };
 
 // Conflict status labels

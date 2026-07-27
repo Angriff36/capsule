@@ -249,6 +249,69 @@ export interface ParsedCapsuleLead {
   closeDate?: number;
 }
 
+// --- §6.3 Browser-extracted Pack Lists -------------------------------------
+// TPP has no bulk export for per-event equipment pack lists, so each source row
+// is ONE event's browser-extracted pack list: source event id + page/version +
+// extraction time + nested items (item text, quantity, unit, grouping). Both
+// PascalCase and snake_case keys are accepted (parity with parseTppMenu) so an
+// operator can paste the browser-extracted JSON in either form.
+export interface TppPackListItemRecord {
+  Item?: string;
+  Description?: string;
+  Name?: string;
+  Quantity?: number | string;
+  Qty?: number | string;
+  Unit?: string;
+  Group?: string;
+  Category?: string;
+  // snake_case variants
+  item?: string;
+  description?: string;
+  name?: string;
+  quantity?: number | string;
+  qty?: number | string;
+  unit?: string;
+  group?: string;
+  category?: string;
+}
+
+export interface TppPackListRecord {
+  SourceEventID?: string;
+  EventID?: string;
+  SourcePage?: string;
+  ExtractedAt?: string;
+  Name?: string;
+  Items?: TppPackListItemRecord[];
+  ExtractionErrors?: string[];
+  // snake_case / camelCase variants
+  source_event_id?: string;
+  event_id?: string;
+  eventId?: string;
+  source_page?: string;
+  extracted_at?: string;
+  name?: string;
+  items?: TppPackListItemRecord[];
+  extraction_errors?: string[];
+}
+
+export interface ParsedCapsulePackListItem {
+  description: string;
+  requiredQuantity: number;
+  unit: string; // UnitOfMeasure literal (default "each")
+  group?: string;
+  rawUnit?: string; // original unit text preserved on the link (§6.1)
+}
+
+export interface ParsedCapsulePackList {
+  externalId: string; // = sourceEventId (the per-event stable link key)
+  sourceEventId: string;
+  sourcePage?: string;
+  extractedAt?: string;
+  name: string;
+  items: ParsedCapsulePackListItem[];
+  extractionErrors: string[];
+}
+
 export interface ParsedCapsuleMenu {
   externalId: string; // slugified Name (or MenuItemID when present)
   name: string;
@@ -629,6 +692,161 @@ export function parseTppMenu(record: TppMenuRecord): ParsedCapsuleMenu {
     costPerPerson: parseTppMoney(
       get("CostPerPerson", "cost_per_person") as string | number | undefined,
     ),
+  };
+}
+
+/**
+ * Map TPP pack-list unit text to a UnitOfMeasure literal. Unrecognized text
+ * defaults to "each" (the raw unit is preserved on the link via rawUnit), so an
+ * unmapped unit never blocks the item — it lands as a free-text line (§6.3).
+ */
+const PACK_LIST_UNIT_ALIASES: Record<string, string> = {
+  ea: "each",
+  each: "each",
+  count: "each",
+  ct: "each",
+  g: "gram",
+  gram: "gram",
+  grams: "gram",
+  kg: "kilogram",
+  kilo: "kilogram",
+  kilogram: "kilogram",
+  oz: "ounce",
+  ounce: "ounce",
+  ounces: "ounce",
+  lb: "pound",
+  pound: "pound",
+  pounds: "pound",
+  ml: "milliliter",
+  milliliter: "milliliter",
+  l: "liter",
+  liter: "liter",
+  tsp: "teaspoon",
+  teaspoon: "teaspoon",
+  tbsp: "tablespoon",
+  tablespoon: "tablespoon",
+  cup: "cup",
+  cups: "cup",
+  pt: "pint",
+  pint: "pint",
+  qt: "quart",
+  quart: "quart",
+  gal: "gallon",
+  gallon: "gallon",
+  portion: "portion",
+  portions: "portion",
+  serving: "portion",
+  servings: "portion",
+};
+
+function mapPackListUnit(raw: string | undefined): string {
+  if (!raw) return "each";
+  const key = raw.trim().toLowerCase().replace(/\.$/, "");
+  return PACK_LIST_UNIT_ALIASES[key] ?? "each";
+}
+
+/** Parse a pack-list item quantity (number or numeric-leading string); default 1. */
+function parsePackListQuantity(value: unknown): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string") {
+    const match = value.match(/-?\d+(\.\d+)?/);
+    if (match) return parseFloat(match[0]);
+  }
+  return 1;
+}
+
+/**
+ * Parse a TPP browser-extracted pack list (one event's equipment pack list).
+ *
+ * Accepts PascalCase (SourceEventID / Items[] / [Item,Quantity,Unit,Group]) and
+ * snake_case variants, so an operator can paste the browser-extracted JSON
+ * directly. Each item maps to a PackListItem; items with no Equipment/Dish
+ * mapping are kept as description-only free-text lines (dishId null) per §6.3.
+ * The raw unit text is preserved on the link via rawUnit for §6.1 visibility.
+ */
+export function parseTppPackList(
+  record: TppPackListRecord,
+): ParsedCapsulePackList {
+  const r = record as unknown as Record<string, unknown>;
+  const get = (...keys: string[]): unknown => {
+    for (const k of keys) {
+      const v = r[k];
+      if (v !== undefined && v !== null) return v;
+    }
+    return undefined;
+  };
+  const sourceEventId = (
+    (get(
+      "SourceEventID",
+      "EventID",
+      "source_event_id",
+      "event_id",
+      "eventId",
+    ) as string | undefined) ?? ""
+  ).trim();
+  const rawItems = get("Items", "items") as unknown as
+    TppPackListItemRecord[] | undefined;
+  const extractionErrors: string[] = [];
+  const items: ParsedCapsulePackListItem[] = [];
+  if (Array.isArray(rawItems)) {
+    rawItems.forEach((raw, i) => {
+      const ir = raw as unknown as Record<string, unknown>;
+      const iget = (...keys: string[]): unknown => {
+        for (const k of keys) {
+          const v = ir[k];
+          if (v !== undefined && v !== null) return v;
+        }
+        return undefined;
+      };
+      const description = (
+        (iget("Item", "Description", "Name", "item", "description", "name") as
+          string | undefined) ?? ""
+      ).trim();
+      if (!description) {
+        extractionErrors.push(`Item at index ${i}: missing item text`);
+        return;
+      }
+      const rawUnit =
+        ((iget("Unit", "unit") as string | undefined) ?? "").trim() ||
+        undefined;
+      items.push({
+        description,
+        requiredQuantity: parsePackListQuantity(
+          iget("Quantity", "Qty", "quantity", "qty"),
+        ),
+        unit: mapPackListUnit(rawUnit),
+        group:
+          (
+            (iget("Group", "Category", "group", "category") as
+              string | undefined) ?? ""
+          ).trim() || undefined,
+        rawUnit,
+      });
+    });
+  }
+  const name = (
+    (get("Name", "name", "PackListName") as string | undefined) ?? ""
+  ).trim();
+  const extractionErrorsField = get(
+    "ExtractionErrors",
+    "extraction_errors",
+  ) as unknown as string[] | undefined;
+  if (Array.isArray(extractionErrorsField)) {
+    extractionErrors.push(...extractionErrorsField.map(String));
+  }
+  return {
+    externalId: sourceEventId,
+    sourceEventId,
+    sourcePage: get("SourcePage", "source_page", "Page") as string | undefined,
+    extractedAt: get("ExtractedAt", "extracted_at", "ExtractionTime") as
+      string | undefined,
+    name:
+      name ||
+      (sourceEventId
+        ? `Imported pack list (${sourceEventId})`
+        : "Imported pack list"),
+    items,
+    extractionErrors,
   };
 }
 
@@ -1017,6 +1235,59 @@ export function parseTppMenus(
     failureCount: errors.length,
   };
 }
+/**
+ * Batch parse TPP browser-extracted pack lists (one event's pack list per row).
+ */
+export function parseTppPackLists(
+  records: TppPackListRecord[],
+): ParserResult<ParsedCapsulePackList> {
+  const result: ParsedCapsulePackList[] = [];
+  const errors: Array<{ recordIndex: number; field: string; message: string }> =
+    [];
+  const warnings: Array<{
+    recordIndex: number;
+    field: string;
+    message: string;
+  }> = [];
+
+  records.forEach((record, index) => {
+    try {
+      const parsed = parseTppPackList(record);
+
+      // The source event id is the only identity (it is the per-event stable
+      // link key + the PackList target resolver), so it doubles as external id.
+      if (!parsed.sourceEventId) {
+        errors.push({
+          recordIndex: index,
+          field: "SourceEventID",
+          message:
+            "SourceEventID is required (the pack list's per-event stable id)",
+        });
+        return;
+      }
+
+      result.push(parsed);
+    } catch (error) {
+      errors.push({
+        recordIndex: index,
+        field: "unknown",
+        message:
+          error instanceof Error ? error.message : "Unknown parsing error",
+      });
+    }
+  });
+
+  return {
+    success: errors.length === 0,
+    records: result,
+    errors,
+    warnings,
+    totalCount: records.length,
+    successCount: result.length,
+    failureCount: errors.length,
+  };
+}
+
 export function generateRecordCounts(
   results: Record<string, ParserResult<unknown>>,
 ): string {

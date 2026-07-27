@@ -59,8 +59,21 @@
  * sees every dish land as pending_conflict; the dish name is slugified into the
  * link externalId (no id column in the feed).
  *
- * ponytail: ceiling — venues + contacts + events + leads + payments + menus
- * ship here (all six §6.2 datasets). Revert supersedes links but leaves imported
+ * Pack lists materialize as Equipment PackList + PackListItem (spec §6.3). TPP
+ * has no bulk export for per-event pack lists, so each caller-supplied row is
+ * ONE event's browser-extracted pack list (source event id + page/version +
+ * extraction time + nested items[text, qty, unit, group]). The source event is
+ * cross-resolved against the prior events import (recordType "event") before
+ * `PackList_createViaOpen` (logisticsAccess guard); each item becomes a
+ * `PackListItem_createViaAddItem` (description-only when no Equipment/Dish
+ * mapping — the §6.3 "unrecognized items may remain as imported free-text
+ * lines" path). Idempotent per-event (externalId = sourceEventId); item-level
+ * failures are recorded as extraction errors on the link without failing the
+ * whole list.
+ *
+ * ponytail: ceiling — venues + contacts + events + leads + payments + menus +
+ * pack lists ship here (all six §6.2 datasets + §6.3 pack lists). Revert
+ * supersedes links but leaves imported
  * entities in place (an event may already reference one; deactivation is an
  * operator action) — documented honesty, not silent deletion. Source rows are
  * caller-supplied (TPP has no bulk export, spec §6.3), so this is the manual/
@@ -75,16 +88,19 @@ import {
   parseTppEvents,
   parseTppLeads,
   parseTppMenus,
+  parseTppPackLists,
   parseTppPayments,
   parseTppVenues,
   type ParsedCapsuleEvent,
   type ParsedCapsuleLead,
   type ParsedCapsuleMenu,
+  type ParsedCapsulePackList,
   type ParsedCapsulePayment,
   type TppContactRecord,
   type TppEventRecord,
   type TppLeadRecord,
   type TppMenuRecord,
+  type TppPackListRecord,
   type TppPaymentRecord,
   type TppVenueRecord,
 } from "./tppParser";
@@ -944,8 +960,178 @@ export const commitImportRun = action({
       };
     }
 
+    if (importRun.datasetType === "pack_list") {
+      // ponytail: §6.3 browser-extracted Pack Lists. TPP has no bulk export for
+      // per-event equipment pack lists, so each source row is one event's
+      // browser-extracted pack list (source event id + page/version + extraction
+      // time + nested items[text, qty, unit, group]). The source event is
+      // resolved to a Capsule Event via the prior events import (recordType
+      // "event"); one PackList is opened for it and each item is added as a
+      // PackListItem. Items with no Equipment/Dish mapping land as
+      // description-only free-text lines (dishId null) per §6.3. Unmapped unit
+      // text defaults to "each" (raw unit preserved on the link). Idempotent
+      // per-event (externalId = sourceEventId): a re-run skips an already-linked
+      // event. PackList_createViaOpen is logisticsAccess-guarded, so a role with
+      // importAccess but not logisticsAccess sees the row land as pending_conflict.
+      if (args.rawRows.length === 0) {
+        throw new ConvexError("No source rows provided — nothing to commit.");
+      }
+      const parsed = parseTppPackLists(args.rawRows as TppPackListRecord[]);
+      if (parsed.records.length === 0) {
+        throw new ConvexError(
+          `No valid pack-list records parsed (${parsed.errors.length} parse error(s)). Nothing to commit.`,
+        );
+      }
+      const sourceSystem = importRun.sourceSystem;
+      let committed = 0;
+      let skipped = 0;
+      let pending = 0;
+
+      for (const packList of parsed.records as ParsedCapsulePackList[]) {
+        const existing = await ctx.runQuery(internal.importCommit.findLink, {
+          tenantId,
+          sourceSystem,
+          recordType: "pack_list",
+          externalId: packList.externalId,
+        });
+        if (existing && existing.capsuleId) {
+          // Already materialized in a prior run — idempotent skip.
+          skipped += 1;
+          continue;
+        }
+
+        // Cross-dataset resolution: the source event id is EXTERNAL — resolve it
+        // to a Capsule Event via the prior events import (recordType "event").
+        // PackList belongsTo Event, so an event that was not imported has no
+        // target; stage as pending_conflict rather than fabricating an event —
+        // mirrors how events resolve their external client/venue.
+        const eventLink = await ctx.runQuery(internal.importCommit.findLink, {
+          tenantId,
+          sourceSystem,
+          recordType: "event",
+          externalId: packList.sourceEventId,
+        });
+        if (!eventLink || !eventLink.capsuleId) {
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "pack_list",
+            externalId: packList.externalId,
+            capsuleEntity: "pack_list",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(packList),
+            conflictStatus: "pending_conflict",
+            resolutionNote: `Source event not imported (external ${packList.sourceEventId}); import events first.`,
+          });
+          pending += 1;
+          continue;
+        }
+        const eventId: string = eventLink.capsuleId;
+
+        const idempotencyKey = `import:${args.importRunId}:pack_list:${packList.externalId}`;
+        try {
+          const created = await ctx.runMutation(
+            api.mutations.PackList_createViaOpen,
+            {
+              eventId,
+              name: packList.name,
+              idempotencyKey,
+            },
+          );
+          const packListId: string = (created as { docId: string }).docId;
+
+          // Add each item. Per-item failures (e.g. a bad unit slipping through)
+          // are recorded as extraction errors but do NOT fail the whole pack
+          // list — partial import is faithful to §6.3 ("records … extraction
+          // errors") and the PackList already exists.
+          const itemImportErrors: string[] = [];
+          let itemsAdded = 0;
+          for (const [itemIndex, item] of packList.items.entries()) {
+            try {
+              await ctx.runMutation(
+                api.mutations.PackListItem_createViaAddItem,
+                {
+                  packListId,
+                  description: item.description,
+                  requiredQuantity: item.requiredQuantity,
+                  unit: item.unit,
+                  // Deterministic per-item key: a retried/overlapping commit
+                  // re-opens the SAME PackList (idempotencyKey above) — without
+                  // a per-item key it would append duplicate items, breaking the
+                  // §6.3 idempotent-import requirement. Run-scoped to match the
+                  // PackList/Dish create-key convention; cross-run dedup is the
+                  // pack-list link check's job (findLink above).
+                  idempotencyKey: `import:${args.importRunId}:pack_list:${packList.externalId}:item:${itemIndex}`,
+                },
+              );
+              itemsAdded += 1;
+            } catch (itemCause) {
+              itemImportErrors.push(
+                `${item.description}: ${itemCause instanceof Error ? itemCause.message : "add item failed"}`,
+              );
+            }
+          }
+
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "pack_list",
+            externalId: packList.externalId,
+            capsuleEntity: "pack_list",
+            capsuleId: packListId,
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify({
+              ...packList,
+              itemsAdded,
+              itemImportErrors,
+            }),
+            conflictStatus: "resolved",
+          });
+          committed += 1;
+        } catch (cause) {
+          // Per-record failure (e.g. logisticsAccess denied) → review queue.
+          const note =
+            cause instanceof Error
+              ? cause.message
+              : "Pack list materialization failed";
+          await ctx.runMutation(internal.importCommit.upsertLink, {
+            tenantId,
+            sourceSystem,
+            recordType: "pack_list",
+            externalId: packList.externalId,
+            capsuleEntity: "pack_list",
+            capsuleId: "",
+            sourceImportRunId: args.importRunId,
+            rawSourceData: JSON.stringify(packList),
+            conflictStatus: "pending_conflict",
+            resolutionNote: note,
+          });
+          pending += 1;
+        }
+      }
+
+      if (committed === 0 && pending > 0) {
+        throw new ConvexError(
+          `No records materialized (${pending} pending conflict). Resolve in the reconcile queue before re-committing.`,
+        );
+      }
+
+      await ctx.runMutation(api.mutations.ImportRun_commit, {
+        docId: args.importRunId,
+        version: importRun.version,
+      });
+
+      return {
+        committed,
+        skipped,
+        pending,
+        parseErrors: parsed.errors.length,
+      };
+    }
+
     // ImportDatasetType is a closed union (contacts/events/leads/payments/menus/
-    // venues); the five branches above each return, so TS narrows
+    // pack_list/venues); the six branches above each return, so TS narrows
     // importRun.datasetType to "venues" here — this fall-through is exhaustive.
     // A future member added without a branch would fall through to venue parsing
     // and fail loudly ("No valid venue records parsed") rather than misroute.

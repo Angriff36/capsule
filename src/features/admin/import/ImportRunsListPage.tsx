@@ -24,6 +24,7 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   menus: "Menus",
   venues: "Venues",
   payments: "Payments",
+  pack_list: "Pack Lists",
 };
 
 // Status labels

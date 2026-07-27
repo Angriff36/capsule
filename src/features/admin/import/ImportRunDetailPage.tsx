@@ -29,6 +29,7 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   menus: "Menus",
   venues: "Venues",
   payments: "Payments",
+  pack_list: "Pack Lists",
 };
 
 // Status labels
@@ -127,7 +128,8 @@ export function ImportRunDetailPage() {
     importRun.datasetType === "events" ||
     importRun.datasetType === "leads" ||
     importRun.datasetType === "payments" ||
-    importRun.datasetType === "menus";
+    importRun.datasetType === "menus" ||
+    importRun.datasetType === "pack_list";
   const commitNoun =
     importRun.datasetType === "contacts"
       ? "contact"
@@ -139,7 +141,9 @@ export function ImportRunDetailPage() {
             ? "payment"
             : importRun.datasetType === "menus"
               ? "menu"
-              : "venue";
+              : importRun.datasetType === "pack_list"
+                ? "pack list"
+                : "venue";
   const commitNounLabel =
     commitNoun.charAt(0).toUpperCase() + commitNoun.slice(1);
 
@@ -220,7 +224,7 @@ export function ImportRunDetailPage() {
   const handleCommit = () => {
     if (!supportedCommitDatasets) {
       setError(
-        "Commit supports the 'venues', 'contacts', 'events', 'leads', 'payments', and 'menus' datasets.",
+        "Commit supports the 'venues', 'contacts', 'events', 'leads', 'payments', 'menus', and 'pack lists' datasets.",
       );
       return;
     }
@@ -514,7 +518,9 @@ export function ImportRunDetailPage() {
                         ? '[{"PaymentID":"P1","InvoiceID":"INV1","EventID":"E1","PaymentDate":"2025-06-10","PaymentAmount":5000,"PaymentMethod":"Credit Card","Reference":"CHK 1234","Notes":"Deposit"}]'
                         : commitNoun === "menu"
                           ? '[{"name":"Lobster Deviled Eggs","description":"Lobster deviled egg filling piped into egg whites and garnished with chives.","category":"Appetizer","service_style":"Passed","portion_size_description":"75 servings","allergens":"Eggs; Shellfish","price_per_person":3.5}]'
-                          : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
+                          : commitNoun === "pack list"
+                            ? '[{"SourceEventID":"E1","SourcePage":"pack-list.html","ExtractedAt":"2026-07-26T12:00:00Z","Name":"Smith Wedding pack list","Items":[{"Item":"Chafing dish","Quantity":4,"Unit":"ea","Group":"Front of house"},{"Item":"Sternos","Quantity":8,"Unit":"each"}]}]'
+                            : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
               }
             />
             <p className="text-xs text-ink-2 mt-2">
@@ -529,7 +535,9 @@ export function ImportRunDetailPage() {
                       ? "reconciliation-reference link staged in the queue (no Payment entity; matched to a Capsule payment later via markMatched — spec §6.4)"
                       : commitNoun === "menu"
                         ? "Dish (menu catalog item; requires kitchenAccess; price preserved on the link — Dish has no price field)"
-                        : "Venue"}
+                        : commitNoun === "pack list"
+                          ? "PackList + PackListItems (source event resolved from a prior events import; unrecognized items land as free-text lines — spec §6.3)"
+                          : "Venue"}
               , and linked to this run. Re-running is safe (already-linked rows
               are skipped).
             </p>
@@ -747,8 +755,11 @@ export function ImportRunDetailPage() {
               resolved from prior imports, leads → Lead pre-client inquiry,
               payments → reconciliation-reference links staged in the queue for
               matching to a Capsule payment, menus → Dish catalog items with
-              price preserved on the link) and link them to this run
-              (venues/contacts/events/leads/payments/menus datasets only)
+              price preserved on the link, pack lists → PackList + PackListItems
+              with the source event resolved from a prior events import) and
+              link them to this run
+              (venues/contacts/events/leads/payments/menus/pack lists datasets
+              only)
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires
