@@ -75,7 +75,7 @@ describe("CapsuleEventPrepCoordinator", () => {
     expect(result.demands).toHaveLength(1);
   });
 
-  it("exposes generated-prep capabilities (recipe demand is Manifest-owned)", () => {
+  it("exposes generated-prep capabilities (component demand is Manifest-owned)", () => {
     const catalog = new CapsuleCommandCatalog();
 
     expect(catalog.get("EventDish.addToEvent").mutationName).toBe(

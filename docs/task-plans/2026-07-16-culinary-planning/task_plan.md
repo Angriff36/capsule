@@ -4,7 +4,7 @@
 
 ## Goal
 
-Replace the `/kitchen` placeholder with a verified Manifest-backed culinary planning workflow for ingredients, recipes, dishes, menus, and event-dish selection without entering Production, Inventory, or generated-file work.
+Replace the `/kitchen` placeholder with a verified Manifest-backed culinary planning workflow for ingredients, components, dishes, menus, and event-dish selection without entering Production, Inventory, or generated-file work.
 
 ## Current Phase
 
@@ -56,7 +56,7 @@ Phase 1
 | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Treat this as Slice 2 Culinary planning, not Production/PrepTask                              | The current implementation sequence and Culinary owner page supersede the older Capsule-V2 handoff memory. |
 | Preserve the existing industrial/editorial shell and express Kitchen as a dense culinary book | This matches `DESIGN.md`, the existing app primitives, and the Culinary owner page.                        |
-| Use peer catalog routes plus a Recipe working document                                        | This is the smallest route family that covers the catalog owner and one detailed operational document.     |
+| Use peer catalog routes plus a Component working document                                        | This is the smallest route family that covers the catalog owner and one detailed operational document.     |
 | Treat EventDish as the cross-system handoff; do not invent Menu-Dish composition              | EventDish is the only source-modeled composition relation.                                                 |
 
 ## Errors Encountered

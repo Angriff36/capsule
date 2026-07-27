@@ -8,7 +8,7 @@ type Commands = {
   reinstateIngredient: (args: Record<string, unknown>) => Promise<unknown>;
   purgeDish: (args: Record<string, unknown>) => Promise<unknown>;
   reinstateDish: (args: Record<string, unknown>) => Promise<unknown>;
-  purgeRecipe?: (args: Record<string, unknown>) => Promise<unknown>;
+  purgeComponent?: (args: Record<string, unknown>) => Promise<unknown>;
   publishMenu: (args: Record<string, unknown>) => Promise<unknown>;
   unpublishMenu: (args: Record<string, unknown>) => Promise<unknown>;
   archiveMenu: (args: Record<string, unknown>) => Promise<unknown>;
@@ -47,7 +47,7 @@ export function KitchenCatalogLifecycleButtons({
         ? policy.dishActions(String(item.status), deletedAt, {
             includeRestore: showHidden,
           })
-        : section === "recipes"
+        : section === "components"
           ? deletedAt == null
             ? [{ key: "purge", label: "Delete" }]
             : []
@@ -64,8 +64,8 @@ export function KitchenCatalogLifecycleButtons({
       if (key === "purge") {
         if (section === "ingredients") {
           await commands.purgeIngredient(args);
-        } else if (section === "recipes") {
-          await commands.purgeRecipe?.(args);
+        } else if (section === "components") {
+          await commands.purgeComponent?.(args);
         } else {
           await commands.purgeDish(args);
         }

@@ -69,7 +69,7 @@
   color: var(--color-canvas);
 }
 
-.culinary-studio .recipe-book-masthead,
+.culinary-studio .component-book-masthead,
 .culinary-studio .culinary-header-compact {
   position: relative;
   padding-bottom: 1.25rem;
@@ -84,7 +84,7 @@
 }
 
 .culinary-studio .culinary-header-compact .eyebrow,
-.culinary-studio .recipe-book-masthead .eyebrow {
+.culinary-studio .component-book-masthead .eyebrow {
   color: var(--color-accent-deep);
   font-family: var(--font-mono);
   letter-spacing: 0.12em;
@@ -99,22 +99,22 @@
   font-weight: 600;
 }
 
-.culinary-studio .recipe-book-masthead-actions {
+.culinary-studio .component-book-masthead-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
   align-items: center;
 }
 
-.culinary-studio .recipe-catalog {
+.culinary-studio .component-catalog {
   padding-top: 1.25rem;
 }
 
-.culinary-studio .recipe-index-heading h2 {
+.culinary-studio .component-index-heading h2 {
   letter-spacing: -0.03em;
 }
 
-.culinary-studio .recipe-toolbar {
+.culinary-studio .component-toolbar {
   padding: 0.85rem 1rem;
   margin: 0.85rem 0 1.1rem;
   border: 1px solid var(--color-line);
@@ -124,7 +124,7 @@
   flex-wrap: wrap;
 }
 
-.culinary-studio .recipe-search {
+.culinary-studio .component-search {
   background: var(--color-panel);
   height: 2.5rem;
 }

@@ -5,7 +5,7 @@ import {
   useListPrepTask,
   useListPrepTaskDependency,
   useListProductionBatch,
-  useListRecipe,
+  useListComponent,
   usePrepTaskClaim,
   usePrepTaskComplete,
   usePrepTaskStart,
@@ -75,7 +75,7 @@ export function KitchenDisplayPage() {
   const dependencies = useListPrepTaskDependency();
   const batches = useListProductionBatch();
   const events = useListEvent();
-  const recipes = useListRecipe();
+  const components = useListComponent();
   const claim = usePrepTaskClaim();
   const start = usePrepTaskStart();
   const complete = usePrepTaskComplete();
@@ -92,12 +92,12 @@ export function KitchenDisplayPage() {
     dependencies === undefined ||
     batches === undefined ||
     events === undefined ||
-    recipes === undefined;
+    components === undefined;
 
   const eventName = (id: string | null) =>
     (id && events?.find((event) => event._id === id)?.title) || "House";
-  const recipeName = (id: string) =>
-    recipes?.find((recipe) => recipe._id === id)?.name ?? "Recipe";
+  const componentName = (id: string) =>
+    components?.find((component) => component._id === id)?.name ?? "Component";
 
   const items: BoardItem[] = [
     ...(tasks ?? [])
@@ -137,7 +137,7 @@ export function KitchenDisplayPage() {
         kind: "batch",
         id: batch._id,
         version: batch.version,
-        title: recipeName(batch.recipeId),
+        title: componentName(batch.componentId),
         detail: `Batch · ${batch.plannedYield} ${batch.yieldUnit}`,
         station: null,
         eventId: batch.eventId ?? null,

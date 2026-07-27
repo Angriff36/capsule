@@ -1,8 +1,8 @@
-export type KitchenSection = "recipes" | "ingredients" | "dishes" | "menus";
+export type KitchenSection = "components" | "ingredients" | "dishes" | "menus";
 
 /** "dishes".slice(0, -1) is "dishe" — spell the singulars out instead. */
 export const KITCHEN_SECTION_SINGULAR: Record<KitchenSection, string> = {
-  recipes: "recipe",
+  components: "component",
   ingredients: "ingredient",
   dishes: "dish",
   menus: "menu",
@@ -13,15 +13,15 @@ export const KITCHEN_SECTIONS: readonly {
   label: string;
   path: string;
 }[] = [
-  { key: "recipes", label: "Recipes", path: "/kitchen/recipes" },
+  { key: "components", label: "Components", path: "/kitchen/components" },
   { key: "ingredients", label: "Ingredients", path: "/kitchen/ingredients" },
   { key: "dishes", label: "Dishes", path: "/kitchen/dishes" },
   { key: "menus", label: "Menus", path: "/kitchen/menus" },
   { key: "prep", label: "Command deck", path: "/kitchen/prep" },
 ] as const;
 
-export function recipePath(id: string) {
-  return `/kitchen/recipes/${id}`;
+export function componentPath(id: string) {
+  return `/kitchen/components/${id}`;
 }
 
 export function ingredientPath(id: string) {
@@ -36,7 +36,7 @@ export function menuPath(id: string) {
   return `/kitchen/menus/${id}`;
 }
 
-export const RECIPE_IMPORT_PATH = "/kitchen/recipes/import";
+export const COMPONENT_IMPORT_PATH = "/kitchen/components/import";
 
 /** Deep-link allergen matrix (not a Kitchen nav tab). */
 export const ALLERGEN_MATRIX_PATH = "/kitchen/allergen-matrix";

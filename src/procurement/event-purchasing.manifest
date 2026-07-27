@@ -1,11 +1,11 @@
 // Manifest-owned event → weekly purchasing workflow.
-// Replaces host EventRecipeDemandReconciler + PrepPurchaseDraftCoordinator.
+// Replaces host EventComponentDemandReconciler + PrepPurchaseDraftCoordinator.
 // Requires @angriff36/manifest ≥ 3.6.41 (sum + match else create + fanOut soft-delete skip).
 
 use "./purchase-need.manifest"
 use "../culinary/event-dish.manifest"
 use "../culinary/dish.manifest"
-use "../culinary/recipe.manifest"
+use "../culinary/component.manifest"
 use "../inventory/demand.manifest"
 
 // Tenant purchasing defaults — seed/E2E must create one row per tenant before approve.
@@ -72,16 +72,16 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
   store WeeklyPurchasingConfig in durable
 }
 
-entity EventDishRecipeSeed mixin TenantScoped, SoftDeletable {
+entity EventDishComponentSeed mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
-  unique [tenantId, eventDishId, recipeId]
+  unique [tenantId, eventDishId, componentId]
   timestamps
   versionProperty version: number
 
   property required eventId: uuid
   property indexed required eventDishId: uuid
   property required dishId: uuid
-  property indexed required recipeId: uuid
+  property indexed required componentId: uuid
   property required servings: decimal(12, 4) = 0
   property required yieldQuantity: decimal(10, 2) = 1
   property required batchMultiplier: decimal(10, 4) = 1
@@ -94,7 +94,7 @@ entity EventDishRecipeSeed mixin TenantScoped, SoftDeletable {
     eventId: uuid,
     eventDishId: uuid,
     dishId: uuid,
-    recipeId: uuid,
+    componentId: uuid,
     servings: decimal(12, 4),
     yieldQuantity: decimal(10, 2),
     batchMultiplier: decimal(10, 4),
@@ -105,19 +105,19 @@ entity EventDishRecipeSeed mixin TenantScoped, SoftDeletable {
     mutate eventId = eventId
     mutate eventDishId = eventDishId
     mutate dishId = dishId
-    mutate recipeId = recipeId
+    mutate componentId = componentId
     mutate servings = servings
     mutate yieldQuantity = yieldQuantity
     mutate batchMultiplier = batchMultiplier
     mutate purchasingWeekStart = purchasingWeekStart
     mutate seededAt = now()
-    emit EventDishRecipeSeeded {
+    emit EventDishComponentSeeded {
       seedId: self.id
       tenantId: self.tenantId
       eventId: eventId
       eventDishId: eventDishId
       dishId: dishId
-      recipeId: recipeId
+      componentId: componentId
       servings: servings
       yieldQuantity: yieldQuantity
       batchMultiplier: batchMultiplier
@@ -125,7 +125,7 @@ entity EventDishRecipeSeed mixin TenantScoped, SoftDeletable {
     }
   }
 
-  store EventDishRecipeSeed in durable
+  store EventDishComponentSeed in durable
 }
 
 entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
@@ -137,7 +137,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   property required eventId: uuid
   property required eventDishId: uuid
   property required dishId: uuid
-  property required recipeId: uuid
+  property required componentId: uuid
   property required ingredientId: uuid
   property required quantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -157,7 +157,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     eventId: uuid,
     eventDishId: uuid,
     dishId: uuid,
-    recipeId: uuid,
+    componentId: uuid,
     ingredientId: uuid,
     quantity: decimal(12, 4),
     unit: UnitOfMeasure,
@@ -170,7 +170,7 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     mutate eventId = eventId
     mutate eventDishId = eventDishId
     mutate dishId = dishId
-    mutate recipeId = recipeId
+    mutate componentId = componentId
     mutate ingredientId = ingredientId
     mutate quantity = quantity
     mutate unit = unit
@@ -228,13 +228,13 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   store EventIngredientContribution in durable
 }
 
-event EventDishRecipeSeeded: "event_dish_recipe.seeded" {
+event EventDishComponentSeeded: "event_dish_component.seeded" {
   seedId: string
   tenantId: string
   eventId: string
   eventDishId: string
   dishId: string
-  recipeId: string
+  componentId: string
   servings: number
   yieldQuantity: number
   batchMultiplier: number
@@ -264,15 +264,15 @@ event PurchaseNeedReadyForWeeklyDraft: "purchase_need.ready_for_weekly_draft" {
   vendorId: string
 }
 
-on EventDishAdded fanOut DishRecipe where dishId = payload.dishId
-  run EventDishRecipeSeed.seed
-  match eventDishId = payload.eventDishId, recipeId = self.recipeId
+on EventDishAdded fanOut DishComponent where dishId = payload.dishId
+  run EventDishComponentSeed.seed
+  match eventDishId = payload.eventDishId, componentId = self.componentId
   else create
   params {
     eventId: payload.eventId
     eventDishId: payload.eventDishId
     dishId: payload.dishId
-    recipeId: self.recipeId
+    componentId: self.componentId
     servings: payload.quantityServings
     yieldQuantity: self.yieldQuantity
     batchMultiplier: self.batchMultiplier
@@ -281,23 +281,26 @@ on EventDishAdded fanOut DishRecipe where dishId = payload.dishId
 
 // Proposal-fed dish lines (EventDish.confirmFromProposal) seed BOM the same
 // way as manual adds. seedDishId is null when the line already existed —
-// null fanOut key matches no DishRecipe rows, so no double-seed.
-on EventDishConfirmedFromProposal fanOut DishRecipe where dishId = payload.seedDishId
-  run EventDishRecipeSeed.seed
-  match eventDishId = payload.eventDishId, recipeId = self.recipeId
+// null fanOut key matches no DishComponent rows, so no double-seed.
+on EventDishConfirmedFromProposal fanOut DishComponent where dishId = payload.seedDishId
+  run EventDishComponentSeed.seed
+  match eventDishId = payload.eventDishId, componentId = self.componentId
   else create
   params {
     eventId: payload.eventId
     eventDishId: payload.eventDishId
     dishId: payload.dishId
-    recipeId: self.recipeId
+    componentId: self.componentId
     servings: payload.quantityServings
     yieldQuantity: self.yieldQuantity
     batchMultiplier: self.batchMultiplier
     purchasingWeekStart: payload.purchasingWeekStart
   }
 
-on EventDishRecipeSeeded fanOut RecipeIngredient where recipeId = payload.recipeId
+// The dish's OWN ingredient lines contribute directly — no Component needed.
+// Their quantity is per serving, so it scales straight off headcount rather
+// than through a component's yield.
+on EventDishAdded fanOut DishIngredient where dishId = payload.dishId
   run EventIngredientContribution.record
   match eventDishId = payload.eventDishId, ingredientId = self.ingredientId, unit = self.unit
   else create
@@ -305,7 +308,22 @@ on EventDishRecipeSeeded fanOut RecipeIngredient where recipeId = payload.recipe
     eventId: payload.eventId
     eventDishId: payload.eventDishId
     dishId: payload.dishId
-    recipeId: payload.recipeId
+    ingredientId: self.ingredientId
+    quantity: self.quantity * payload.quantityServings
+    unit: self.unit
+    servings: payload.quantityServings
+    purchasingWeekStart: payload.purchasingWeekStart
+  }
+
+on EventDishComponentSeeded fanOut ComponentIngredient where componentId = payload.componentId
+  run EventIngredientContribution.record
+  match eventDishId = payload.eventDishId, ingredientId = self.ingredientId, unit = self.unit
+  else create
+  params {
+    eventId: payload.eventId
+    eventDishId: payload.eventDishId
+    dishId: payload.dishId
+    componentId: payload.componentId
     ingredientId: self.ingredientId
     quantity: (self.quantity * payload.batchMultiplier * payload.servings) / payload.yieldQuantity
     unit: self.unit

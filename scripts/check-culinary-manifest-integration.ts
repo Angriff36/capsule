@@ -12,10 +12,10 @@ export interface CulinaryManifestViolation {
 
 const TABLES = [
   "ingredients",
-  "recipes",
-  "recipeIngredients",
-  "recipeImports",
-  "recipeImportLines",
+  "components",
+  "componentIngredients",
+  "componentImports",
+  "componentImportLines",
   "dishes",
   "menus",
   "eventDishes",
@@ -91,7 +91,7 @@ function inspectFeature(
   if (
     relativePath.endsWith("/CulinaryLifecyclePolicy.ts") &&
     (!source.includes('../../generated/manifest-wiring-bindings"') ||
-      !source.includes("RecipePublishVersionLifecycle") ||
+      !source.includes("ComponentPublishVersionLifecycle") ||
       !source.includes("MenuMarkPublishedLifecycle"))
   ) {
     violations.push(

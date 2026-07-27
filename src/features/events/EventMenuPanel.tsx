@@ -5,19 +5,19 @@ import {
   useEventDishRemove,
   useEventDishSetHeadcountOverride,
   useListDish,
-  useListDishRecipe,
+  useListDishComponent,
   useListEventDish,
   useListIngredient,
-  useListRecipe,
-  useListRecipeIngredient,
+  useListComponent,
+  useListComponentIngredient,
 } from "../../lib/manifest-convex-react";
 import {
-  calculateRecipeNutrition,
+  calculateComponentNutrition,
   sumPerGuestNutrition,
   toNutritionIngredient,
-  type RecipeNutritionLineInput,
-} from "../kitchen/RecipeNutrition";
-import { RecipeNutritionPanel } from "../kitchen/RecipeNutritionPanel";
+  type ComponentNutritionLineInput,
+} from "../kitchen/ComponentNutrition";
+import { ComponentNutritionPanel } from "../kitchen/ComponentNutritionPanel";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
@@ -33,9 +33,9 @@ type Props = {
 export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
   const dishes = useListDish();
   const eventDishes = useListEventDish();
-  const dishRecipes = useListDishRecipe();
-  const recipes = useListRecipe();
-  const recipeIngredients = useListRecipeIngredient();
+  const dishComponents = useListDishComponent();
+  const components = useListComponent();
+  const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
@@ -49,8 +49,8 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
     (item) => item.deletedAt == null && item.eventId === eventId,
   );
 
-  // Per-guest nutrition across the event's dishes → recipes. Operational
-  // estimate; it does not re-scale for dish-level recipe yields.
+  // Per-guest nutrition across the event's dishes → components. Operational
+  // estimate; it does not re-scale for dish-level component yields.
   const eventNutrition = useMemo(() => {
     const dishIds = new Set(
       (eventDishes ?? [])
@@ -60,34 +60,34 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
     const nutritionIngredients = (ingredients ?? [])
       .filter((ingredient) => ingredient.deletedAt == null)
       .map(toNutritionIngredient);
-    const linesByRecipe = new Map<string, RecipeNutritionLineInput[]>();
-    for (const line of recipeIngredients ?? []) {
+    const linesByComponent = new Map<string, ComponentNutritionLineInput[]>();
+    for (const line of componentIngredients ?? []) {
       if (line.deletedAt != null) continue;
-      const list = linesByRecipe.get(line.recipeId) ?? [];
+      const list = linesByComponent.get(line.componentId) ?? [];
       list.push({
         id: line._id,
         ingredientId: line.ingredientId,
         quantity: Number(line.quantity),
         unit: line.unit,
       });
-      linesByRecipe.set(line.recipeId, list);
+      linesByComponent.set(line.componentId, list);
     }
-    const recipeById = new Map(
-      (recipes ?? []).map((recipe) => [recipe._id, recipe]),
+    const componentById = new Map(
+      (components ?? []).map((component) => [component._id, component]),
     );
-    const summaries = (dishRecipes ?? [])
+    const summaries = (dishComponents ?? [])
       .filter(
         (attachment) =>
           attachment.deletedAt == null &&
           dishIds.has(String(attachment.dishId)),
       )
       .map((attachment) => {
-        const recipe = recipeById.get(attachment.recipeId);
-        return calculateRecipeNutrition({
-          lines: linesByRecipe.get(attachment.recipeId) ?? [],
+        const component = componentById.get(attachment.componentId);
+        return calculateComponentNutrition({
+          lines: linesByComponent.get(attachment.componentId) ?? [],
           ingredients: nutritionIngredients,
           servesPerYield: Number(
-            (recipe as { servesPerYield?: number } | undefined)
+            (component as { servesPerYield?: number } | undefined)
               ?.servesPerYield ?? 1,
           ),
         });
@@ -96,20 +96,20 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
   }, [
     eventDishes,
     eventId,
-    dishRecipes,
-    recipes,
-    recipeIngredients,
+    dishComponents,
+    components,
+    componentIngredients,
     ingredients,
   ]);
   const nutritionLoading =
-    dishRecipes === undefined ||
-    recipes === undefined ||
-    recipeIngredients === undefined ||
+    dishComponents === undefined ||
+    components === undefined ||
+    componentIngredients === undefined ||
     ingredients === undefined;
   const eventNutritionNote =
-    eventNutrition.recipeCount === 0
-      ? "Add dishes with recipes to estimate per-guest nutrition."
-      : `Estimated across ${eventNutrition.recipeCount} recipe${eventNutrition.recipeCount === 1 ? "" : "s"} on this event${eventNutrition.isComplete ? "" : ` (${eventNutrition.measuredRecipeCount} with recorded nutrition)`}.`;
+    eventNutrition.componentCount === 0
+      ? "Add dishes with components to estimate per-guest nutrition."
+      : `Estimated across ${eventNutrition.componentCount} component${eventNutrition.componentCount === 1 ? "" : "s"} on this event${eventNutrition.isComplete ? "" : ` (${eventNutrition.measuredComponentCount} with recorded nutrition)`}.`;
   const dishName = (dishId: string) =>
     dishes?.find((dish) => dish._id === dishId)?.name ?? "Unknown dish";
   const foodCostTotal = selections.reduce((total, item) => {
@@ -365,10 +365,12 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
         </ul>
       )}
 
-      <RecipeNutritionPanel
+      <ComponentNutritionPanel
         heading="Per-guest nutrition"
         portionLabel="per guest"
-        totals={eventNutrition.recipeCount > 0 ? eventNutrition.perGuest : null}
+        totals={
+          eventNutrition.componentCount > 0 ? eventNutrition.perGuest : null
+        }
         coverageNote={eventNutritionNote}
         loading={nutritionLoading}
       />

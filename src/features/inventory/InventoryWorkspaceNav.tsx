@@ -14,7 +14,7 @@ const sections = [
 export function InventoryWorkspaceNav() {
   return (
     <nav
-      className="recipe-status-tabs supply-tabs"
+      className="component-status-tabs supply-tabs"
       aria-label="Inventory workspace"
     >
       {sections.map((section) => (

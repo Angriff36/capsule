@@ -23,7 +23,7 @@
 
 ## Combined CSS/icon inspection exited 1
 
-- The CSS portion succeeded and confirmed the committed Recipe Book/document classes.
+- The CSS portion succeeded and confirmed the committed Component Book/document classes.
 - The icon search targeted an incorrect filename/pattern and returned no matches, causing the combined command to exit 1.
 - Kitchen will use text/typographic affordances and existing known icons only where already imported elsewhere; no icon dependency is required.
 

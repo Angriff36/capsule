@@ -21,8 +21,8 @@ Turn event demand into executable kitchen work, prove readiness through completi
 Use an **execution board** with a companion **production sheet**:
 
 - group prep by event, due window, station text, assignee, and real status;
-- make quantity, unit, recipe/dish/demand provenance, claim, blocker, and completion visible in each row;
-- give ProductionBatch a yield-focused document linked to recipe and event;
+- make quantity, unit, component/dish/demand provenance, claim, blocker, and completion visible in each row;
+- give ProductionBatch a yield-focused document linked to component and event;
 - place quality gates next to their subject, not in a detached QA dashboard;
 - attach incident and allergen records to the relevant Event/work object.
 
@@ -58,7 +58,7 @@ Slice 4 operator surfaces ship at `/kitchen/prep` (Prep execution board) and `/k
 | Limitations      | Convex projection does not hydrate `belongsTo` for guards — PrepTask.open uses seeded FK guards. Stations remain free text. Quality auto-block semantics beyond the declared fail→markBlocked reaction remain open.                                          |
 | Proof            | Structural: `tests/event-reaction-projection.test.ts`. Runtime: `tests/proofs/quality-check-fail-block.runtime.test.ts` (`QualityCheckFailed → PrepTask.markBlocked`). Guard: `generated/proof/guard.production.json` + `bun run check:production-manifest`. |
 
-The yield dashboard is read-only and uses the generated ProductionBatch and Recipe list queries. It includes only non-deleted completed batches with a recorded actual yield, groups compatible yields by recipe and unit, sums planned and actual output before calculating variance percentage, and ranks the largest aggregate shortfall first across selectable 30-, 90-, or 365-day windows. No new production policy or approval is introduced for reporting.
+The yield dashboard is read-only and uses the generated ProductionBatch and Component list queries. It includes only non-deleted completed batches with a recorded actual yield, groups compatible yields by component and unit, sums planned and actual output before calculating variance percentage, and ranks the largest aggregate shortfall first across selectable 30-, 90-, or 365-day windows. No new production policy or approval is introduced for reporting.
 
 Manifest output dispatches `QualityCheck_fail` through the governed PrepTask `markBlocked` runner. That path is runtime-proven for an allowed lead role; kitchen_staff fail attempts fail closed without partial allocation.
 

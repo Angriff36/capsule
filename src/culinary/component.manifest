@@ -1,0 +1,590 @@
+// Capsule culinary components — Component, ComponentStep (method), ComponentIngredient (BOM).
+// A Component is a make-formula, not a finished Dish. Dishes compose Components via DishComponent.
+
+use "./ingredient.manifest"
+
+enum ComponentStatus {
+  draft
+  published
+  retired
+}
+
+entity Component mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required searchable name: string = ""
+  property category: string?
+  property cuisine: string?
+  property description: string?
+  property instructions: string?
+  property required versionNumber: int = 1
+  property required yieldQuantity: decimal(10, 2) = 1
+  property required yieldUnit: UnitOfMeasure = "portion"
+  // Guests served by one yieldQuantity batch (e.g. 1 gallon lemonade → 5 people).
+  // Optional so pre-field Component rows validate under Convex schema push.
+  property servesPerYield: int? = 1
+  property batchMultiplier: decimal(10, 4)? = 1
+  property required status: ComponentStatus = "draft"
+  property draftedAt: datetime?
+  property publishedAt: datetime?
+  property retiredAt: datetime?
+  property retirementReason: string?
+
+  hasMany steps: ComponentStep
+  hasMany ingredientLines: ComponentIngredient
+
+  computed isPublished: boolean = self.status == "published"
+  computed isEditable: boolean = self.status == "draft"
+  // Live batch cost from non-deleted ingredient lines (Ingredient.costPerUnit).
+  // Inlined line cost (not line.liveIngredientCost) so Convex projection can emit one expression.
+  computed liveBatchCost: money(12, 2) = sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * (line.wasteFactor != null ? line.wasteFactor : 1) * line.ingredient.costPerUnit : 0)
+  computed liveCostPerGuest: money(12, 2) = self.servesPerYield > 0 ? sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * (line.wasteFactor != null ? line.wasteFactor : 1) * line.ingredient.costPerUnit : 0) / self.servesPerYield : 0
+
+  constraint componentIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Drafted components require a name"
+  constraint componentYieldPositive: self.yieldQuantity > 0 "Component yield quantity must be positive"
+  constraint componentServesPerYieldPositive: self.servesPerYield > 0 "Serves per yield must be a positive integer"
+  constraint componentBatchPositive: self.batchMultiplier > 0 "Component batch multiplier must be positive"
+
+  transition status from "draft" to ["published", "retired"]
+  transition status from "published" to ["draft", "retired"]
+  transition status from "retired" to []
+
+  default policy componentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read components"
+  default policy componentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write components through commands"
+  default policy componentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component commands"
+
+  command draft(
+    name: string,
+    yieldQuantity: decimal(10, 2),
+    yieldUnit: UnitOfMeasure,
+    optional servesPerYield: int,
+    optional batchMultiplier: decimal(10, 4),
+    optional category: string,
+    optional cuisine: string,
+    optional description: string,
+    optional instructions: string
+  ) {
+    guard self.draftedAt == null
+    guard self.deletedAt == null
+    constraint draftComponentName: length(trim(name)) > 0 "Component name is required"
+    constraint draftYieldPositive: yieldQuantity > 0 "Component yield quantity must be positive"
+    constraint draftServesPerYieldPositive: servesPerYield == null or servesPerYield > 0 "Serves per yield must be a positive integer"
+    constraint draftBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Component batch multiplier must be positive"
+    mutate name = name
+    mutate yieldQuantity = yieldQuantity
+    mutate yieldUnit = yieldUnit
+    mutate servesPerYield = servesPerYield != null ? servesPerYield : 1
+    mutate batchMultiplier = batchMultiplier != null ? batchMultiplier : 1
+    mutate category = category
+    mutate cuisine = cuisine
+    mutate description = description
+    mutate instructions = instructions
+    mutate versionNumber = 1
+    mutate draftedAt = now()
+    emit ComponentDrafted {
+      componentId: self.id
+      tenantId: self.tenantId
+      name: name
+      yieldQuantity: yieldQuantity
+      yieldUnit: yieldUnit
+      servesPerYield: servesPerYield != null ? servesPerYield : 1
+      batchMultiplier: batchMultiplier != null ? batchMultiplier : 1
+      versionNumber: 1
+    }
+  }
+
+  command reviseDraft(
+    name: string,
+    yieldQuantity: decimal(10, 2),
+    yieldUnit: UnitOfMeasure,
+    batchMultiplier: decimal(10, 4),
+    optional servesPerYield: int,
+    optional category: string,
+    optional cuisine: string,
+    optional description: string,
+    optional instructions: string
+  ) {
+    guard self.status == "draft"
+    guard self.deletedAt == null
+    constraint reviseComponentName: length(trim(name)) > 0 "Component name is required"
+    constraint reviseYieldPositive: yieldQuantity > 0 "Component yield quantity must be positive"
+    constraint reviseServesPerYieldPositive: servesPerYield == null or servesPerYield > 0 "Serves per yield must be a positive integer"
+    constraint reviseBatchPositive: batchMultiplier > 0 "Component batch multiplier must be positive"
+    mutate name = name
+    mutate yieldQuantity = yieldQuantity
+    mutate yieldUnit = yieldUnit
+    mutate servesPerYield = servesPerYield != null ? servesPerYield : self.servesPerYield
+    mutate batchMultiplier = batchMultiplier
+    mutate category = category
+    mutate cuisine = cuisine
+    mutate description = description
+    mutate instructions = instructions
+    emit ComponentDraftRevised {
+      componentId: self.id
+      tenantId: self.tenantId
+      name: name
+      yieldQuantity: yieldQuantity
+      yieldUnit: yieldUnit
+      servesPerYield: servesPerYield != null ? servesPerYield : self.servesPerYield
+      batchMultiplier: batchMultiplier
+      versionNumber: self.versionNumber
+    }
+  }
+
+  // How many guests one yieldQuantity batch serves.
+  command setServesPerYield(servesPerYield: int) {
+    guard self.deletedAt == null
+    constraint setServesPerYieldPositive: servesPerYield > 0 "Serves per yield must be a positive integer"
+    mutate servesPerYield = servesPerYield
+    emit ComponentServesPerYieldSet {
+      componentId: self.id
+      tenantId: self.tenantId
+      servesPerYield: servesPerYield
+    }
+  }
+
+  command publishVersion() {
+    guard self.status == "draft"
+    guard self.draftedAt != null
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "published"
+    mutate publishedAt = now()
+    emit ComponentVersionPublished {
+      componentId: self.id
+      tenantId: self.tenantId
+      versionNumber: self.versionNumber
+      yieldQuantity: self.yieldQuantity
+      yieldUnit: self.yieldUnit
+      batchMultiplier: self.batchMultiplier
+    }
+  }
+
+  command retract() {
+    guard self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    compute nextVersion = self.versionNumber + 1
+    mutate status = "draft"
+    mutate publishedAt = null
+    mutate versionNumber = nextVersion
+    emit ComponentVersionRetracted {
+      componentId: self.id
+      tenantId: self.tenantId
+      versionNumber: nextVersion
+    }
+  }
+
+  // Retire = remove from the kitchen book (soft-delete). Reason optional.
+  command retire(optional reason: string) {
+    guard self.status == "draft" or self.status == "published"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "retired"
+    mutate retiredAt = now()
+    mutate retirementReason = reason != null ? reason : "Deleted"
+    mutate deletedAt = now()
+    emit ComponentRetired {
+      componentId: self.id
+      tenantId: self.tenantId
+      reason: reason != null ? reason : "Deleted"
+    }
+  }
+
+  // One-click hide from any non-deleted status — no restore dance.
+  command purge() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "kitchenManageAccess")
+    mutate status = "retired"
+    mutate retiredAt = self.retiredAt != null ? self.retiredAt : now()
+    mutate retirementReason = "Deleted"
+    mutate deletedAt = now()
+    emit ComponentPurged {
+      componentId: self.id
+      tenantId: self.tenantId
+      reason: "Deleted"
+    }
+  }
+
+  store Component in durable
+}
+
+entity ComponentIngredient mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required componentId: uuid
+  property required ingredientId: uuid
+  property required quantity: decimal(10, 4) = 0
+  property required unit: UnitOfMeasure = "each"
+  property required sortOrder: int = 0
+  // Waste / trim multiplier (1.0 = no waste). Applied before live cost.
+  // Optional so pre-field ComponentIngredient rows validate under Convex schema push.
+  property wasteFactor: decimal(10, 4)? = 1
+  property prepNotes: string?
+  property addedAt: datetime?
+
+  belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+
+  computed adjustedQuantity: decimal(10, 4) = self.quantity * (self.wasteFactor != null ? self.wasteFactor : 1)
+  // Capsule prices components from Ingredient.costPerUnit (catalog). Same-unit
+  // only — do not silently multiply incompatible UnitOfMeasure values.
+  // Cross-unit conversion remains in ComponentCostCalculator until Manifest owns factors.
+  computed unitsMatchIngredientPrice: boolean = self.unit == self.ingredient.unit
+  computed liveIngredientCost: money(12, 2) = self.unit == self.ingredient.unit ? self.quantity * (self.wasteFactor != null ? self.wasteFactor : 1) * self.ingredient.costPerUnit : 0
+
+  constraint lineQuantityPositive: self.addedAt == null or self.quantity > 0 "Component ingredient quantity must be positive"
+  constraint lineWasteFactorPositive: self.addedAt == null or self.wasteFactor == null or self.wasteFactor > 0 "Waste factor must be greater than 0"
+
+  default policy componentIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component ingredient lines"
+  default policy componentIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component ingredient lines through commands"
+  default policy componentIngredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component ingredient line commands"
+
+  command add(
+    componentId: uuid,
+    ingredientId: uuid,
+    quantity: decimal(10, 4),
+    unit: UnitOfMeasure,
+    optional sortOrder: number,
+    optional wasteFactor: decimal(10, 4),
+    optional prepNotes: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    constraint addLineQuantity: quantity > 0 "Component ingredient quantity must be positive"
+    constraint addLineWasteFactor: wasteFactor == null or wasteFactor > 0 "Waste factor must be greater than 0"
+    mutate componentId = componentId
+    mutate ingredientId = ingredientId
+    mutate quantity = quantity
+    mutate unit = unit
+    mutate wasteFactor = wasteFactor != null ? wasteFactor : 1
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate prepNotes = prepNotes
+    mutate addedAt = now()
+    emit ComponentIngredientAdded {
+      componentIngredientId: self.id
+      tenantId: self.tenantId
+      componentId: componentId
+      ingredientId: ingredientId
+      quantity: quantity
+      unit: unit
+      wasteFactor: wasteFactor != null ? wasteFactor : 1
+    }
+  }
+
+  command setWasteFactor(wasteFactor: decimal(10, 4)) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint setWasteFactorPositive: wasteFactor > 0 "Waste factor must be greater than 0"
+    mutate wasteFactor = wasteFactor
+    emit ComponentIngredientWasteFactorSet {
+      componentIngredientId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      ingredientId: self.ingredientId
+      wasteFactor: wasteFactor
+    }
+  }
+
+  command adjustQuantity(quantity: decimal(10, 4), unit: UnitOfMeasure) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint adjustLineQuantity: quantity > 0 "Component ingredient quantity must be positive"
+    compute previousQuantity = self.quantity
+    compute previousUnit = self.unit
+    mutate quantity = quantity
+    mutate unit = unit
+    emit ComponentIngredientQuantityAdjusted {
+      componentIngredientId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      ingredientId: self.ingredientId
+      previousQuantity: previousQuantity
+      previousUnit: previousUnit
+      quantity: quantity
+      unit: unit
+    }
+  }
+
+  command remove(reason: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint removeLineReason: length(trim(reason)) > 0 "Removal reason is required"
+    mutate deletedAt = now()
+    emit ComponentIngredientRemoved {
+      componentIngredientId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      ingredientId: self.ingredientId
+      quantity: self.quantity
+      unit: self.unit
+      reason: reason
+    }
+  }
+
+  store ComponentIngredient in durable
+}
+
+// Ordered method step on a Component (e.g. "Combine oil with anchovies").
+entity ComponentStep mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required componentId: uuid
+  property required searchable instruction: string = ""
+  property required sortOrder: int = 0
+  property durationMinutes: int?
+  property addedAt: datetime?
+
+  belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
+
+  constraint stepInstructionComplete: self.addedAt == null or length(trim(self.instruction)) > 0 "Component steps require an instruction"
+
+  default policy componentStepRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component steps"
+  default policy componentStepWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component steps through commands"
+  default policy componentStepExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component step commands"
+
+  command add(
+    componentId: uuid,
+    instruction: string,
+    optional sortOrder: number,
+    optional durationMinutes: number
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    constraint addStepInstruction: length(trim(instruction)) > 0 "Component step instruction is required"
+    constraint addStepDuration: durationMinutes == null or durationMinutes >= 0 "Component step duration cannot be negative"
+    mutate componentId = componentId
+    mutate instruction = instruction
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate durationMinutes = durationMinutes
+    mutate addedAt = now()
+    emit ComponentStepAdded {
+      componentStepId: self.id
+      tenantId: self.tenantId
+      componentId: componentId
+      instruction: instruction
+      sortOrder: sortOrder != null ? sortOrder : 0
+    }
+  }
+
+  command revise(
+    instruction: string,
+    optional sortOrder: number,
+    optional durationMinutes: number
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint reviseStepInstruction: length(trim(instruction)) > 0 "Component step instruction is required"
+    constraint reviseStepDuration: durationMinutes == null or durationMinutes >= 0 "Component step duration cannot be negative"
+    mutate instruction = instruction
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    mutate durationMinutes = durationMinutes
+    emit ComponentStepRevised {
+      componentStepId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      instruction: instruction
+      sortOrder: sortOrder != null ? sortOrder : self.sortOrder
+    }
+  }
+
+  command remove(reason: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint removeStepReason: length(trim(reason)) > 0 "Removal reason is required"
+    mutate deletedAt = now()
+    emit ComponentStepRemoved {
+      componentStepId: self.id
+      tenantId: self.tenantId
+      componentId: self.componentId
+      reason: reason
+    }
+  }
+
+  store ComponentStep in durable
+}
+
+// Component version history — an immutable snapshot of the full component (scalar
+// fields + ingredient lines) captured each time the component is modified. Gives
+// an ordered changelog with author + timestamp; the UI diffs two snapshots and
+// restores a prior one through the existing Component / ComponentIngredient commands.
+entity ComponentSnapshot mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required componentId: uuid
+  property required versionNumber: int = 1
+  property required capturedByName: string = ""
+  // Stamped from trusted auth context on capture; never accepted from browser.
+  property capturedByAuthSubjectId: string?
+  property required changeSummary: string = ""
+  // JSON blob of the full component at capture time: name, category, cuisine,
+  // description, instructions, yields, batchMultiplier, servesPerYield, lines.
+  property required snapshot: string = "{}"
+  property capturedAt: datetime?
+
+  belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
+
+  default policy componentSnapshotRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component version history"
+  default policy componentSnapshotWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component snapshots through commands"
+  default policy componentSnapshotExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component snapshot commands"
+
+  command capture(
+    componentId: uuid,
+    versionNumber: int,
+    capturedByName: string,
+    changeSummary: string,
+    snapshot: string
+  ) {
+    guard self.capturedAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    constraint captureSnapshotPayload: length(trim(snapshot)) > 0 "Snapshot payload is required"
+    mutate componentId = componentId
+    mutate versionNumber = versionNumber
+    mutate capturedByName = capturedByName
+    mutate capturedByAuthSubjectId = user.id
+    mutate changeSummary = changeSummary
+    mutate snapshot = snapshot
+    mutate capturedAt = now()
+    emit ComponentSnapshotCaptured {
+      snapshotId: self.id
+      tenantId: self.tenantId
+      componentId: componentId
+      versionNumber: versionNumber
+    }
+  }
+
+  store ComponentSnapshot in durable
+}
+
+event ComponentDrafted: "component.drafted" {
+  componentId: string
+  tenantId: string
+  name: string
+  yieldQuantity: decimal(10, 2)
+  yieldUnit: UnitOfMeasure
+  servesPerYield: int
+  batchMultiplier: decimal(10, 4)
+  versionNumber: number
+}
+
+event ComponentDraftRevised: "component.draft_revised" {
+  componentId: string
+  tenantId: string
+  name: string
+  yieldQuantity: decimal(10, 2)
+  yieldUnit: UnitOfMeasure
+  servesPerYield: int
+  batchMultiplier: decimal(10, 4)
+  versionNumber: number
+}
+
+event ComponentServesPerYieldSet: "component.serves_per_yield_set" {
+  componentId: string
+  tenantId: string
+  servesPerYield: int
+}
+
+event ComponentVersionPublished: "component.version_published" {
+  componentId: string
+  tenantId: string
+  versionNumber: number
+  yieldQuantity: decimal(10, 2)
+  yieldUnit: UnitOfMeasure
+  batchMultiplier: decimal(10, 4)
+}
+
+event ComponentVersionRetracted: "component.version_retracted" {
+  componentId: string
+  tenantId: string
+  versionNumber: number
+}
+
+event ComponentRetired: "component.retired" {
+  componentId: string
+  tenantId: string
+  reason: string
+}
+
+event ComponentPurged: "component.purged" {
+  componentId: string
+  tenantId: string
+  reason: string
+}
+
+event ComponentIngredientAdded: "component_ingredient.added" {
+  componentIngredientId: string
+  tenantId: string
+  componentId: string
+  ingredientId: string
+  quantity: decimal(10, 4)
+  unit: UnitOfMeasure
+  wasteFactor: decimal(10, 4)
+}
+
+event ComponentIngredientWasteFactorSet: "component_ingredient.waste_factor_set" {
+  componentIngredientId: string
+  tenantId: string
+  componentId: string
+  ingredientId: string
+  wasteFactor: decimal(10, 4)
+}
+
+event ComponentIngredientQuantityAdjusted: "component_ingredient.quantity_adjusted" {
+  componentIngredientId: string
+  tenantId: string
+  componentId: string
+  ingredientId: string
+  previousQuantity: decimal(10, 4)
+  previousUnit: UnitOfMeasure
+  quantity: decimal(10, 4)
+  unit: UnitOfMeasure
+}
+
+event ComponentIngredientRemoved: "component_ingredient.removed" {
+  componentIngredientId: string
+  tenantId: string
+  componentId: string
+  ingredientId: string
+  quantity: decimal(10, 4)
+  unit: UnitOfMeasure
+  reason: string
+}
+
+event ComponentStepAdded: "component_step.added" {
+  componentStepId: string
+  tenantId: string
+  componentId: string
+  instruction: string
+  sortOrder: number
+}
+
+event ComponentStepRevised: "component_step.revised" {
+  componentStepId: string
+  tenantId: string
+  componentId: string
+  instruction: string
+  sortOrder: number
+}
+
+event ComponentStepRemoved: "component_step.removed" {
+  componentStepId: string
+  tenantId: string
+  componentId: string
+  reason: string
+}
+
+event ComponentSnapshotCaptured: "component_snapshot.captured" {
+  snapshotId: string
+  tenantId: string
+  componentId: string
+  versionNumber: number
+}

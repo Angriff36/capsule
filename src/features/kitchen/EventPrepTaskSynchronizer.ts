@@ -24,7 +24,7 @@ type TaskInput = {
   unit: EventPrepUnit;
   ingredientId?: string;
   ingredientDemandId?: string;
-  recipeId?: string;
+  componentId?: string;
   dishTaskId: string;
   dishId: string;
   category?: string;
@@ -153,7 +153,7 @@ export class EventPrepTaskSynchronizer {
         unit: item.unit,
         ingredientId,
         ingredientDemandId: demandId,
-        recipeId: item.template.recipeId ?? undefined,
+        componentId: item.template.componentId ?? undefined,
         dishTaskId: item.template.id,
         dishId: input.eventDish.dishId,
         category: item.template.category ?? undefined,

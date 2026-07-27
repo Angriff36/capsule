@@ -23,11 +23,11 @@ These screenshots are the visual north star for Capsule's product language. They
 ## Reference set
 
 - `landing-page.png`: overall brand palette, editorial type, botanical framing, and hand-drawn accent language.
-- `dashboard-and-recipe-detail.png`: light application shell and the relationship between generous overview pages and dense detail pages.
-- `recipe-import-split-view.png`: high-density two-pane task workspace.
-- `recipe-detail.png`: hierarchy, tags, rules, and culinary document composition.
-- `mobile-recipe-book.png`: responsive hierarchy and restrained mobile navigation.
-- `recipe-dashboard.png`: overview-to-detail relationship for the Recipe Book slice.
-- `recipe-single.png`: desktop culinary detail hierarchy.
-- `recipe-pages.png`: cookbook behavior across desktop and mobile.
-- `recipe-cookbook-import.png`: source-to-recipe import workbench.
+- `dashboard-and-component-detail.png`: light application shell and the relationship between generous overview pages and dense detail pages.
+- `component-import-split-view.png`: high-density two-pane task workspace.
+- `component-detail.png`: hierarchy, tags, rules, and culinary document composition.
+- `mobile-component-book.png`: responsive hierarchy and restrained mobile navigation.
+- `component-dashboard.png`: overview-to-detail relationship for the Component Book slice.
+- `component-single.png`: desktop culinary detail hierarchy.
+- `component-pages.png`: cookbook behavior across desktop and mobile.
+- `component-cookbook-import.png`: source-to-component import workbench.

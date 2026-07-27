@@ -129,8 +129,8 @@
 }
 
 .culinary-studio .document-empty,
-.culinary-studio .recipe-empty-state,
-.culinary-studio .recipe-filter-empty {
+.culinary-studio .component-empty-state,
+.culinary-studio .component-filter-empty {
   border: 1px dashed var(--color-line-2);
   border-radius: 14px;
   background: color-mix(in srgb, var(--color-sage) 28%, transparent);

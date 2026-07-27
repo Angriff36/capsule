@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { StatusChip } from "../../../ui/primitives";
 import { AllergenIconRow } from "../AllergenIconRow";
 import { DishPrimaryImage } from "../../attachments/DishPrimaryImage";
-import { eventDetailMenuPath, recipePath } from "../kitchenRoutes";
+import { eventDetailMenuPath, componentPath } from "../kitchenRoutes";
 import { prepQuantityLabel } from "../prepQuantityLabel";
 import type { KitchenCommandDeckModel } from "./KitchenCommandDeckModel";
 import type {
@@ -19,7 +19,7 @@ type Props = Readonly<{
   armedPersonId: string | null;
   busy: string | null;
   prepSyncReady: boolean;
-  recipeName: (recipeId: string | null | undefined) => string | null;
+  componentName: (componentId: string | null | undefined) => string | null;
   onAssignTask: (task: PrepTaskLike) => void;
   onAssignDish: (tasks: PrepTaskLike[]) => void;
   onRelease: (task: PrepTaskLike) => void;
@@ -37,7 +37,7 @@ export function KitchenCommandDeckTaskPanel({
   armedPersonId,
   busy,
   prepSyncReady,
-  recipeName,
+  componentName,
   onAssignTask,
   onAssignDish,
   onRelease,
@@ -133,11 +133,12 @@ export function KitchenCommandDeckTaskPanel({
                 </div>
                 <p className="kcd-dish-meta">
                   {selection.quantityServings} servings
-                  {dish.primaryRecipeId && recipeName(dish.primaryRecipeId) ? (
+                  {dish.primaryComponentId &&
+                  componentName(dish.primaryComponentId) ? (
                     <>
                       {" · "}
-                      <Link to={recipePath(dish.primaryRecipeId)}>
-                        {recipeName(dish.primaryRecipeId)}
+                      <Link to={componentPath(dish.primaryComponentId)}>
+                        {componentName(dish.primaryComponentId)}
                       </Link>
                     </>
                   ) : null}
@@ -181,7 +182,7 @@ export function KitchenCommandDeckTaskPanel({
                     model={model}
                     busy={busy}
                     armedPersonId={armedPersonId}
-                    recipeName={recipeName}
+                    componentName={componentName}
                     onAssignTask={onAssignTask}
                     onRelease={onRelease}
                     onClaim={onClaim}
@@ -203,7 +204,7 @@ function TaskRow({
   model,
   busy,
   armedPersonId,
-  recipeName,
+  componentName,
   onAssignTask,
   onRelease,
   onClaim,
@@ -214,7 +215,7 @@ function TaskRow({
   model: KitchenCommandDeckModel;
   busy: string | null;
   armedPersonId: string | null;
-  recipeName: (recipeId: string | null | undefined) => string | null;
+  componentName: (componentId: string | null | undefined) => string | null;
   onAssignTask: (task: PrepTaskLike) => void;
   onRelease: (task: PrepTaskLike) => void;
   onClaim: (task: PrepTaskLike) => void;
@@ -222,7 +223,7 @@ function TaskRow({
   onComplete: (task: PrepTaskLike) => void;
 }>) {
   const assignee = model.findPerson(task.assignedToId);
-  const linkedRecipe = recipeName(task.recipeId);
+  const linkedComponent = componentName(task.componentId);
   const canAssign = task.status === "pending" || task.status === "claimed";
   const rowClass = taskRowClass(task.status);
 
@@ -243,10 +244,12 @@ function TaskRow({
           {task.category ? ` · ${humanCategory(task.category)}` : ""}
           {task.station ? ` · ${task.station}` : ""}
           {assignee ? ` · ${model.personLabel(assignee)}` : " · unassigned"}
-          {linkedRecipe && task.recipeId ? (
+          {linkedComponent && task.componentId ? (
             <>
               {" · "}
-              <Link to={recipePath(task.recipeId)}>{linkedRecipe}</Link>
+              <Link to={componentPath(task.componentId)}>
+                {linkedComponent}
+              </Link>
             </>
           ) : null}
         </p>

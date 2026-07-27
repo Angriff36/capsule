@@ -1,5 +1,5 @@
 /**
- * Mint CAPSULE_AGENT_JWT into .env.local for agent:enter-recipe / agent:mcp.
+ * Mint CAPSULE_AGENT_JWT into .env.local for agent:enter-component / agent:mcp.
  *
  *   bun run agent:mint-jwt
  *

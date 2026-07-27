@@ -29,9 +29,9 @@ describe("CapsuleCommandCatalog", () => {
     }
   });
 
-  it("describes Recipe.draft client params", () => {
-    const draft = new CapsuleCommandCatalog().get("Recipe.draft");
-    expect(draft.mutationName).toBe("Recipe_createViaDraft");
+  it("describes Component.draft client params", () => {
+    const draft = new CapsuleCommandCatalog().get("Component.draft");
+    expect(draft.mutationName).toBe("Component_createViaDraft");
     expect(draft.clientParameterNames).toContain("name");
     expect(draft.clientParameterNames).toContain("yieldQuantity");
   });

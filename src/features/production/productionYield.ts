@@ -4,7 +4,7 @@ type DateValue = Date | number | string | null | undefined;
 
 export type ProductionYieldBatch = {
   _id?: string;
-  recipeId: string;
+  componentId: string;
   status?: string | null;
   plannedYield?: number | null;
   actualYield?: number | null;
@@ -13,15 +13,15 @@ export type ProductionYieldBatch = {
   deletedAt?: DateValue;
 };
 
-export type ProductionYieldRecipe = {
+export type ProductionYieldComponent = {
   _id: string;
   name?: string | null;
 };
 
 export type ProductionYieldRow = {
   key: string;
-  recipeId: string;
-  recipeName: string;
+  componentId: string;
+  componentName: string;
   yieldUnit: string;
   batchCount: number;
   plannedYield: number;
@@ -34,7 +34,7 @@ export type ProductionYieldReport = {
   rows: ProductionYieldRow[];
   rangeStart: Date;
   rangeEnd: Date;
-  recipeCount: number;
+  componentCount: number;
   batchCount: number;
   totalPlannedYield: number;
   totalActualYield: number;
@@ -59,19 +59,19 @@ function finiteNumber(value: number | null | undefined): number | null {
 
 export function buildProductionYieldReport({
   batches,
-  recipes,
+  components,
   windowDays,
   now = new Date(),
 }: {
   batches: readonly ProductionYieldBatch[];
-  recipes: readonly ProductionYieldRecipe[];
+  components: readonly ProductionYieldComponent[];
   windowDays: ProductionYieldWindow;
   now?: Date;
 }): ProductionYieldReport {
   const rangeEnd = new Date(now);
   const rangeStart = new Date(rangeEnd.getTime() - windowDays * DAY_MS);
-  const recipesById = new Map(
-    recipes.map((recipe) => [String(recipe._id), recipe]),
+  const componentsById = new Map(
+    components.map((component) => [String(component._id), component]),
   );
   const grouped = new Map<string, ProductionYieldRow>();
 
@@ -94,14 +94,14 @@ export function buildProductionYieldReport({
       continue;
     }
 
-    const recipeId = String(batch.recipeId);
+    const componentId = String(batch.componentId);
     const yieldUnit = batch.yieldUnit?.trim() || "unit";
-    const key = `${recipeId}:${yieldUnit}`;
-    const recipe = recipesById.get(recipeId);
+    const key = `${componentId}:${yieldUnit}`;
+    const component = componentsById.get(componentId);
     const current = grouped.get(key) ?? {
       key,
-      recipeId,
-      recipeName: recipe?.name?.trim() || "Unknown recipe",
+      componentId,
+      componentName: component?.name?.trim() || "Unknown component",
       yieldUnit,
       batchCount: 0,
       plannedYield: 0,
@@ -126,7 +126,7 @@ export function buildProductionYieldReport({
   rows.sort(
     (left, right) =>
       left.variancePercentage - right.variancePercentage ||
-      left.recipeName.localeCompare(right.recipeName),
+      left.componentName.localeCompare(right.componentName),
   );
 
   const batchCount = rows.reduce((sum, row) => sum + row.batchCount, 0);
@@ -143,7 +143,7 @@ export function buildProductionYieldReport({
     rows,
     rangeStart,
     rangeEnd,
-    recipeCount: new Set(rows.map((row) => row.recipeId)).size,
+    componentCount: new Set(rows.map((row) => row.componentId)).size,
     batchCount,
     totalPlannedYield,
     totalActualYield,

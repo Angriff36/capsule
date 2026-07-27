@@ -818,16 +818,16 @@ git commit -m "feat(finance): adopt shared folio components"
 
 - Modify: `src/features/kitchen/KitchenBookNav.tsx`
 - Modify: `src/features/kitchen/KitchenCatalogPage.tsx`
-- Modify: `src/features/kitchen/RecipeDetailPage.tsx`
+- Modify: `src/features/kitchen/ComponentDetailPage.tsx`
 - Modify: `src/features/kitchen/IngredientDetailPage.tsx`
 - Modify: `src/features/kitchen/DishDetailPage.tsx`
 - Modify: `src/features/kitchen/MenuDetailPage.tsx`
 - Modify: `src/features/kitchen/EventMenuPage.tsx`
 - Modify: `src/features/kitchen/AllergenMatrixPage.tsx`
-- Modify: `src/features/kitchen/import/RecipeImportPage.tsx`
-- Modify: `src/features/kitchen/RecipeCostPanel.tsx`
-- Modify: `src/features/kitchen/RecipeNutritionPanel.tsx`
-- Modify: `src/features/kitchen/RecipeVersionHistoryPanel.tsx`
+- Modify: `src/features/kitchen/import/ComponentImportPage.tsx`
+- Modify: `src/features/kitchen/ComponentCostPanel.tsx`
+- Modify: `src/features/kitchen/ComponentNutritionPanel.tsx`
+- Modify: `src/features/kitchen/ComponentVersionHistoryPanel.tsx`
 - Modify: `src/features/kitchen/IngredientPriceTrendPanel.tsx`
 - Modify: `src/features/kitchen/VendorPriceComparisonPanel.tsx`
 - Modify: `src/features/kitchen/DishPrepTasksPanel.tsx`
@@ -842,9 +842,9 @@ git commit -m "feat(finance): adopt shared folio components"
 
 **Interfaces:**
 
-- Uses shared controls and document components while preserving the Recipe
+- Uses shared controls and document components while preserving the Component
   Book catalog/detail composition and genuine two-pane workbenches.
-- Preserves all recipe, ingredient, dish, menu, allergen, import, cost,
+- Preserves all component, ingredient, dish, menu, allergen, import, cost,
   nutrition, and version behavior.
 
 - [ ] **Step 1: Normalize book navigation and native controls**
@@ -859,7 +859,7 @@ procedures, costing, nutrition, versions, prices, prep tasks, and menu uses.
 
 - [ ] **Step 3: Preserve specialized workbenches**
 
-Keep the recipe-import and command-deck layouts specialized. Replace only
+Keep the component-import and command-deck layouts specialized. Replace only
 their duplicated controls, feedback, and generic document sections.
 
 - [ ] **Step 4: Verify and commit**
@@ -972,7 +972,7 @@ For every route archetype, inspect at 1440px, 1024px, and 390px:
 - Dark mode if exposed by the current shell.
 - Reduced-motion mode.
 
-At minimum include Home, Events list, Event Staffing, Recipe Book, Recipe
+At minimum include Home, Events list, Event Staffing, Component Book, Component
 detail, Demand, Stock, Prep, Roster, Pack Lists, Clients, Invoices, Tax,
 Profit Margins, Reports, Facilities, and Admin.
 

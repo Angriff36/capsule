@@ -8,7 +8,7 @@
  * sheets do ask for "0.75 batch".
  *
  * Storage is untouched: prep quantity is an instruction to a cook, not a
- * costing input (cost comes from RecipeIngredient via EventIngredientContribution).
+ * costing input (cost comes from ComponentIngredient via EventIngredientContribution).
  */
 const WHOLE_UNITS = new Set(["each", "melon", "bottle"]);
 

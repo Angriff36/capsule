@@ -59,14 +59,14 @@ describe("proof registry gate", () => {
       );
     }
     for (const id of [
-      "Recipe.draft",
+      "Component.draft",
       "Ingredient.introduce",
-      "RecipeIngredient.add",
+      "ComponentIngredient.add",
     ]) {
       const importProof = registry.proofs.find((p) => p.id === id);
       expect(importProof?.status).toBe("runtime_proven");
       expect(importProof?.runtimeTest).toBe(
-        "tests/proofs/recipe-import-finalize.runtime.test.ts",
+        "tests/proofs/component-import-finalize.runtime.test.ts",
       );
     }
   });

@@ -3,7 +3,7 @@ import {
   useCreateInventoryReservation,
   useCreatePrepTask,
   useInventoryReservationRelease,
-  useListDishRecipe,
+  useListDishComponent,
   useListDishTask,
   useListEventDish,
   useListIngredient,
@@ -12,8 +12,8 @@ import {
   useListInventoryLot,
   useListInventoryReservation,
   useListPrepTask,
-  useListRecipe,
-  useListRecipeIngredient,
+  useListComponent,
+  useListComponentIngredient,
   usePrepTaskRefreshGenerated,
 } from "../../lib/manifest-convex-react";
 import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
@@ -32,9 +32,9 @@ export type EventDishSyncTarget = {
  */
 export function useEventMenuSync() {
   const dishTasks = useListDishTask();
-  const dishRecipes = useListDishRecipe();
-  const recipes = useListRecipe();
-  const recipeIngredients = useListRecipeIngredient();
+  const dishComponents = useListDishComponent();
+  const components = useListComponent();
+  const componentIngredients = useListComponentIngredient();
   const prepTasks = useListPrepTask();
   const eventDishes = useListEventDish();
   const ingredients = useListIngredient();
@@ -53,9 +53,9 @@ export function useEventMenuSync() {
     eventDishes !== undefined &&
     ingredients !== undefined &&
     demands !== undefined &&
-    dishRecipes !== undefined &&
-    recipes !== undefined &&
-    recipeIngredients !== undefined &&
+    dishComponents !== undefined &&
+    components !== undefined &&
+    componentIngredients !== undefined &&
     inventoryItems !== undefined &&
     inventoryLots !== undefined &&
     inventoryReservations !== undefined;
@@ -78,9 +78,9 @@ export function useEventMenuSync() {
         prepTasks: prepTasks as never,
         ingredients: ingredients as never,
         demands: demands as never,
-        dishRecipes: dishRecipes as never,
-        recipes: recipes as never,
-        recipeIngredients: recipeIngredients as never,
+        dishComponents: dishComponents as never,
+        components: components as never,
+        componentIngredients: componentIngredients as never,
         eventDishes: eventDishes as never,
         inventoryItems: inventoryItems as never,
         inventoryLots: inventoryLots as never,
@@ -91,7 +91,7 @@ export function useEventMenuSync() {
     createPrepTask,
     createReservation,
     demands,
-    dishRecipes,
+    dishComponents,
     dishTasks,
     eventDishes,
     ingredients,
@@ -100,8 +100,8 @@ export function useEventMenuSync() {
     inventoryReservations,
     prepTasks,
     ready,
-    recipeIngredients,
-    recipes,
+    componentIngredients,
+    components,
     refreshGeneratedTask,
     releaseReservation,
   ]);
@@ -129,7 +129,7 @@ export function useEventMenuSync() {
       if (!controller) {
         throw new Error("Prep sync catalogs are still loading");
       }
-      return controller.syncRecipeDemands(eventId);
+      return controller.syncComponentDemands(eventId);
     },
   };
 }

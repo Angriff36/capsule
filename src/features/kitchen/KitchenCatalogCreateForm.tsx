@@ -73,7 +73,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
             </label>
           </>
         ) : null}
-        {section === "recipes" ? (
+        {section === "components" ? (
           <>
             <label className="field-label">
               Yield

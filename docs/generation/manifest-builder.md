@@ -80,13 +80,13 @@ blocked `git push` until re-committed as `d1c77d6`.
 
 ### Local Convex: “Could not find public function” after a schema reshape
 
-Symptom: client calls a generated query (e.g. `queries:listDishRecipe`) that exists in
+Symptom: client calls a generated query (e.g. `queries:listDishComponent`) that exists in
 `convex/queries.ts`, but `bun run dev:convex` logs `Schema validation failed` and never
 finishes the push. Root cause is almost always **stale local documents** that still have
 removed fields (or lack newly required ones) — not a missing export.
 
-Example (2026-07-19): Dish dropped direct `recipeId` for `DishRecipe` joins; local `dishes`
-rows still carried `recipeId`, so every push failed and new queries never registered.
+Example (2026-07-19): Dish dropped direct `componentId` for `DishComponent` joins; local `dishes`
+rows still carried `componentId`, so every push failed and new queries never registered.
 
 Fix local data (do not hand-edit generated schema long-term):
 
@@ -211,7 +211,7 @@ for (const [p,{sha256:expected}] of Object.entries(o.files)) {
 
 ## Authored Culinary integration
 
-- Use generated hooks from `src/lib/manifest-convex-react.ts` first, including the governed `useCreate*` hooks for Ingredient, Recipe, RecipeIngredient, Dish, Menu, and EventDish.
+- Use generated hooks from `src/lib/manifest-convex-react.ts` first, including the governed `useCreate*` hooks for Ingredient, Component, ComponentIngredient, Dish, Menu, and EventDish.
 - Culinary creation needs no authored allocation seam. Generated `createVia*` mutations construct one final document atomically (draft → checks → mutate → single persist); nothing is written on failure.
 - Keep validation, tenant enforcement, lifecycle, events, and reactions in generated runtime behavior. Consume lifecycle availability from `src/generated/manifest-wiring-bindings.ts`; do not recreate transition tables in authored Kitchen code.
 - Generated runtime behavior still requires focused reaction tests. Typed wiring and generated creation cleanup do not prove downstream demand or production reactions execute correctly.

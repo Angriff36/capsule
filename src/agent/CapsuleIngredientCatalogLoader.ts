@@ -1,6 +1,6 @@
 import { ConvexHttpClient } from "convex/browser";
 import { api } from "../lib/api";
-import type { CatalogIngredient } from "../features/kitchen/import/RecipeImportTypes";
+import type { CatalogIngredient } from "../features/kitchen/import/ComponentImportTypes";
 import { CapsuleAgentAuthManager } from "./CapsuleAgentAuthManager";
 
 interface IngredientRow {

@@ -86,9 +86,9 @@ async function seedDish(proof: Proof, tenantId: string) {
     "kitchen_manager",
     `kitchen-${tenantId}`,
   );
-  const recipe = (await proof.executeCommand(
+  const component = (await proof.executeCommand(
     kitchen,
-    api.mutations.Recipe_createViaDraft,
+    api.mutations.Component_createViaDraft,
     {
       name: "Relation proof lentil entree",
       yieldQuantity: 20,

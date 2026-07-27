@@ -6,9 +6,9 @@ const read = (relativePath: string) => readFileSync(relativePath, "utf8");
 describe("Culinary planning slice contract", () => {
   it("wires the Kitchen route family to authored culinary screens", () => {
     const app = read("src/app/App.tsx");
-    expect(app).toContain('path="/kitchen/recipes"');
-    expect(app).toContain('path="/kitchen/recipes/import"');
-    expect(app).toContain('path="/kitchen/recipes/:id"');
+    expect(app).toContain('path="/kitchen/components"');
+    expect(app).toContain('path="/kitchen/components/import"');
+    expect(app).toContain('path="/kitchen/components/:id"');
     expect(app).toContain('path="/kitchen/ingredients"');
     expect(app).toContain('path="/kitchen/ingredients/:id"');
     expect(app).toContain('path="/kitchen/dishes"');
@@ -21,40 +21,40 @@ describe("Culinary planning slice contract", () => {
 
   it("uses generated reads and command hooks in authored feature code", () => {
     const catalog = read("src/features/kitchen/KitchenCatalogPage.tsx");
-    const recipe = read("src/features/kitchen/RecipeDetailPage.tsx");
+    const component = read("src/features/kitchen/ComponentDetailPage.tsx");
     const ingredient = read("src/features/kitchen/IngredientDetailPage.tsx");
     const dish = read("src/features/kitchen/DishDetailPage.tsx");
     const menu = read("src/features/kitchen/MenuDetailPage.tsx");
     const eventMenu = read("src/features/kitchen/EventMenuPage.tsx");
-    const recipeImport = read(
-      "src/features/kitchen/import/RecipeImportPage.tsx",
+    const componentImport = read(
+      "src/features/kitchen/import/ComponentImportPage.tsx",
     );
 
     for (const hook of [
       "useListIngredient",
-      "useListRecipe",
+      "useListComponent",
       "useListDish",
       "useListMenu",
     ]) {
       expect(catalog).toContain(hook);
     }
     for (const hook of [
-      "useGetRecipe",
-      "useRecipeReviseDraft",
-      "useRecipeIngredientAdjustQuantity",
-      "useRecipeIngredientRemove",
+      "useGetComponent",
+      "useComponentReviseDraft",
+      "useComponentIngredientAdjustQuantity",
+      "useComponentIngredientRemove",
     ]) {
-      expect(recipe).toContain(hook);
+      expect(component).toContain(hook);
     }
     expect(ingredient).toContain("useGetIngredient");
     expect(dish).toContain("useGetDish");
     expect(menu).toContain("useGetMenu");
     for (const hook of [
       "useCreateIngredient",
-      "useCreateRecipe",
-      "useCreateRecipeIngredient",
+      "useCreateComponent",
+      "useCreateComponentIngredient",
     ]) {
-      expect(recipeImport).toContain(hook);
+      expect(componentImport).toContain(hook);
     }
     for (const hook of [
       "useListEvent",
@@ -69,38 +69,38 @@ describe("Culinary planning slice contract", () => {
     ]) {
       expect(eventMenu).toContain(hook);
     }
-    // Recipe → IngredientDemand is Manifest-owned; menu UI does not create demand.
+    // Component → IngredientDemand is Manifest-owned; menu UI does not create demand.
     expect(eventMenu).not.toContain("useCreateIngredientDemand");
     expect(eventMenu).toContain("EventMenuSyncController");
   });
 
   it("uses governed generated creation hooks without an authored allocation seam", () => {
     const catalog = read("src/features/kitchen/KitchenCatalogPage.tsx");
-    const recipe = read("src/features/kitchen/RecipeDetailPage.tsx");
+    const component = read("src/features/kitchen/ComponentDetailPage.tsx");
     const eventMenu = read("src/features/kitchen/EventMenuPage.tsx");
 
     for (const hook of [
       "useCreateIngredient",
-      "useCreateRecipe",
+      "useCreateComponent",
       "useCreateDish",
       "useCreateMenu",
     ]) {
       expect(catalog).toContain(hook);
     }
-    expect(recipe).toContain("useCreateRecipeIngredient");
+    expect(component).toContain("useCreateComponentIngredient");
     expect(eventMenu).toContain("useCreateEventDish");
-    for (const source of [catalog, recipe, eventMenu]) {
+    for (const source of [catalog, component, eventMenu]) {
       expect(source).not.toContain('from "./culinaryPlanningApi"');
       expect(source).toContain('from "../../lib/manifest-convex-react"');
     }
   });
 
-  it("uses generated lifecycle metadata for menu/recipe publish offers", () => {
+  it("uses generated lifecycle metadata for menu/component publish offers", () => {
     const policy = read("src/features/kitchen/CulinaryLifecyclePolicy.ts");
     expect(policy).toContain('from "../../generated/manifest-wiring-bindings"');
     for (const metadata of [
-      "RecipePublishVersionLifecycle",
-      "RecipeRetractLifecycle",
+      "ComponentPublishVersionLifecycle",
+      "ComponentRetractLifecycle",
       "MenuMarkPublishedLifecycle",
       "MenuUnpublishLifecycle",
       "MenuArchiveLifecycle",

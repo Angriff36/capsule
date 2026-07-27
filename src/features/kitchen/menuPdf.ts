@@ -305,7 +305,7 @@ export function buildMenuPdf(input: MenuPdfInput): jsPDF {
     doc.setFontSize(7.5);
     doc.setTextColor(120, 125, 122);
     const note = doc.splitTextToSize(
-      "Allergen indicators derive from recipe ingredient classifications and dish-level declarations. Unflagged dishes are not certified allergen-free — confirm with the kitchen.",
+      "Allergen indicators derive from component ingredient classifications and dish-level declarations. Unflagged dishes are not certified allergen-free — confirm with the kitchen.",
       PAGE_WIDTH - MARGIN * 2,
     ) as string[];
     doc.text(note, PAGE_WIDTH / 2, Math.min(priceY + 16, FOOTER_Y - 18), {

@@ -31,7 +31,7 @@ enum WasteRecordStatus {
 }
 
 // Materialized required quantity of one Ingredient for one Event.
-// Prep-list derivation (recipe line × batch × servings / yield) lands via
+// Prep-list derivation (component line × batch × servings / yield) lands via
 // later reactions; this entity stores the governed result and its inputs.
 // Shortage vs on-hand/reservations is deferred (D056 / Q10; was OD015) —
 // no hasMany edges from this entity to InventoryItem / InventoryReservation
@@ -51,7 +51,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
   property required unit: UnitOfMeasure = "each"
   property servings: decimal(12, 4)?
   property dishId: uuid?
-  property sourceRecipeLineQuantity: decimal(12, 4)?
+  property sourceComponentLineQuantity: decimal(12, 4)?
   property sourceBatchMultiplier: decimal(12, 4)?
   property sourceYieldQuantity: decimal(12, 4)?
   property required status: IngredientDemandStatus = "pending"
@@ -127,7 +127,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     unit: UnitOfMeasure,
     optional servings: decimal(12, 4),
     optional dishId: uuid,
-    optional sourceRecipeLineQuantity: decimal(12, 4),
+    optional sourceComponentLineQuantity: decimal(12, 4),
     optional sourceBatchMultiplier: decimal(12, 4),
     optional sourceYieldQuantity: decimal(12, 4)
   ) {
@@ -140,7 +140,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     constraint calculateIngredientMatch: ingredientId == self.ingredientId "Calculate ingredientId must match the seeded ingredient reference"
     constraint calculateQuantityPositive: requiredQuantity > 0 "Required quantity must be positive"
     constraint calculateServingsNonnegative: servings == null or servings >= 0 "Servings cannot be negative"
-    constraint calculateRecipeLineNonnegative: sourceRecipeLineQuantity == null or sourceRecipeLineQuantity >= 0 "Source recipe line quantity cannot be negative"
+    constraint calculateComponentLineNonnegative: sourceComponentLineQuantity == null or sourceComponentLineQuantity >= 0 "Source component line quantity cannot be negative"
     constraint calculateBatchNonnegative: sourceBatchMultiplier == null or sourceBatchMultiplier >= 0 "Source batch multiplier cannot be negative"
     constraint calculateYieldPositive: sourceYieldQuantity == null or sourceYieldQuantity > 0 "Source yield quantity must be positive when provided"
     mutate eventId = eventId
@@ -150,7 +150,7 @@ entity IngredientDemand mixin TenantScoped, SoftDeletable {
     mutate unit = unit
     mutate servings = servings != null ? servings : self.servings
     mutate dishId = dishId != null ? dishId : self.dishId
-    mutate sourceRecipeLineQuantity = sourceRecipeLineQuantity != null ? sourceRecipeLineQuantity : self.sourceRecipeLineQuantity
+    mutate sourceComponentLineQuantity = sourceComponentLineQuantity != null ? sourceComponentLineQuantity : self.sourceComponentLineQuantity
     mutate sourceBatchMultiplier = sourceBatchMultiplier != null ? sourceBatchMultiplier : self.sourceBatchMultiplier
     mutate sourceYieldQuantity = sourceYieldQuantity != null ? sourceYieldQuantity : self.sourceYieldQuantity
     mutate status = "calculated"

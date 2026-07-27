@@ -1,24 +1,24 @@
-import { RecipeImportCoordinator } from "../features/kitchen/import/RecipeImportCoordinator";
-import { RecipeImportFinalizer } from "../features/kitchen/import/RecipeImportFinalizer";
+import { ComponentImportCoordinator } from "../features/kitchen/import/ComponentImportCoordinator";
+import { ComponentImportFinalizer } from "../features/kitchen/import/ComponentImportFinalizer";
 import {
   countUnresolvedLines,
   type CatalogIngredient,
-  type RecipeImportReviewState,
-} from "../features/kitchen/import/RecipeImportTypes";
+  type ComponentImportReviewState,
+} from "../features/kitchen/import/ComponentImportTypes";
 import type { CapsuleCommandExecutor } from "./CapsuleCommandExecutor";
 import { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
 import {
-  CapsuleRecipeStatusLoader,
-  type CapsuleRecipeStatusReader,
-} from "./CapsuleRecipeStatusLoader";
+  CapsuleComponentStatusLoader,
+  type CapsuleComponentStatusReader,
+} from "./CapsuleComponentStatusLoader";
 
 export interface CapsuleDocumentEnterOptions {
   sourceText: string;
   catalog?: readonly CatalogIngredient[];
   /**
-   * Opt-in only. Recipe sheets (work/recipes photos, pesto, brine, sauce) are
-   * Recipes — not Dishes. Dishes are production-sheet menu items with DishTask
-   * lines underneath (work/list*.jpg). Never invent a Dish from a recipe title.
+   * Opt-in only. Component sheets (work/components photos, pesto, brine, sauce) are
+   * Components — not Dishes. Dishes are production-sheet menu items with DishTask
+   * lines underneath (work/list*.jpg). Never invent a Dish from a component title.
    */
   introduceDish?: boolean;
   dishPortionSize?: number;
@@ -31,14 +31,14 @@ export interface CapsuleDocumentEnterOptions {
 }
 
 export interface CapsuleDocumentPreviewResult {
-  review: RecipeImportReviewState;
+  review: ComponentImportReviewState;
   unresolvedLineCount: number;
   safeToEnterWithoutApproval: boolean;
   warnings: string[];
 }
 
 export interface CapsuleDocumentEnterResult {
-  recipeId: string;
+  componentId: string;
   createdIngredientIds: string[];
   lineIds: string[];
   dishId?: string;
@@ -58,16 +58,16 @@ function asDocId(result: unknown): string {
 }
 
 /**
- * Document → Capsule Recipe enter path using RecipeImport* + governed createVia.
+ * Document → Capsule Component enter path using ComponentImport* + governed createVia.
  * Preview first; never auto-create unmatched ingredient lines unless approved.
- * Does not treat a recipe sheet as a Dish (see work/ production photos).
+ * Does not treat a component sheet as a Dish (see work/ production photos).
  */
 export class CapsuleDocumentEnterCoordinator {
-  private readonly importCoordinator = new RecipeImportCoordinator();
+  private readonly importCoordinator = new ComponentImportCoordinator();
 
   constructor(
     private readonly executor: CapsuleCommandExecutor,
-    private readonly recipeStatusLoader: CapsuleRecipeStatusReader = new CapsuleRecipeStatusLoader(),
+    private readonly componentStatusLoader: CapsuleComponentStatusReader = new CapsuleComponentStatusLoader(),
   ) {}
 
   previewFromText(options: {
@@ -137,12 +137,12 @@ export class CapsuleDocumentEnterCoordinator {
 
     let ingredientIndex = 0;
     let lineIndex = 0;
-    // Document-hash idempotency can return a retired Recipe after wipe (#17).
-    // Bump generation until Recipe.draft yields a writable (draft/published) row.
-    let recipeAliveGeneration = 0;
-    const finalizer = new RecipeImportFinalizer({
+    // Document-hash idempotency can return a retired Component after wipe (#17).
+    // Bump generation until Component.draft yields a writable (draft/published) row.
+    let componentAliveGeneration = 0;
+    const finalizer = new ComponentImportFinalizer({
       createIngredient: async (input) => {
-        const suffix = `ingredient:${ingredientIndex}:${input.name}:alive${recipeAliveGeneration}`;
+        const suffix = `ingredient:${ingredientIndex}:${input.name}:alive${componentAliveGeneration}`;
         ingredientIndex += 1;
         const result = await this.executor.execute({
           capabilityId: "Ingredient.introduce",
@@ -151,44 +151,44 @@ export class CapsuleDocumentEnterCoordinator {
         });
         return { docId: asDocId(result) };
       },
-      createRecipe: async (input) => {
+      createComponent: async (input) => {
         const maxGenerations = 5;
         for (let generation = 0; generation < maxGenerations; generation += 1) {
-          recipeAliveGeneration = generation;
+          componentAliveGeneration = generation;
           const result = await this.executor.execute({
-            capabilityId: "Recipe.draft",
+            capabilityId: "Component.draft",
             args: { ...input },
             idempotencyKey: keys.forCapability(
-              "Recipe.draft",
-              generation === 0 ? "recipe" : `recipe:alive${generation}`,
+              "Component.draft",
+              generation === 0 ? "component" : `component:alive${generation}`,
             ),
           });
           const docId = asDocId(result);
-          const status = await this.recipeStatusLoader.loadStatus(docId);
+          const status = await this.componentStatusLoader.loadStatus(docId);
           if (status === "draft" || status === "published") {
             return { docId };
           }
         }
         throw new Error(
-          `Refuse to enter: Recipe.draft idempotency only returned retired/missing ` +
-            `recipes for document scope ${keys.scope}. Open/fix GitHub #17 path — ` +
-            `do not silently attach lines to a retired recipe.`,
+          `Refuse to enter: Component.draft idempotency only returned retired/missing ` +
+            `components for document scope ${keys.scope}. Open/fix GitHub #17 path — ` +
+            `do not silently attach lines to a retired component.`,
         );
       },
-      createRecipeIngredient: async (input) => {
-        const suffix = `line:${lineIndex}:alive${recipeAliveGeneration}`;
+      createComponentIngredient: async (input) => {
+        const suffix = `line:${lineIndex}:alive${componentAliveGeneration}`;
         lineIndex += 1;
         const result = await this.executor.execute({
-          capabilityId: "RecipeIngredient.add",
+          capabilityId: "ComponentIngredient.add",
           args: { ...input },
-          idempotencyKey: keys.forCapability("RecipeIngredient.add", suffix),
+          idempotencyKey: keys.forCapability("ComponentIngredient.add", suffix),
         });
         return { docId: asDocId(result) };
       },
     });
 
     const saved = await finalizer.finalize(ready);
-    // Opt-in only — never invent a Dish from a recipe sheet title.
+    // Opt-in only — never invent a Dish from a component sheet title.
     const introduceDish = options.introduceDish === true;
     let dishId: string | undefined;
 
@@ -206,20 +206,20 @@ export class CapsuleDocumentEnterCoordinator {
       });
       dishId = asDocId(dishResult);
       await this.executor.execute({
-        capabilityId: "DishRecipe.attach",
+        capabilityId: "DishComponent.attach",
         args: {
           dishId,
-          recipeId: saved.recipeId,
+          componentId: saved.componentId,
           yieldQuantity: ready.yieldQuantity,
           batchMultiplier: ready.batchMultiplier ?? 1,
           sortOrder: 0,
         },
-        idempotencyKey: keys.forCapability("DishRecipe.attach", "link"),
+        idempotencyKey: keys.forCapability("DishComponent.attach", "link"),
       });
     }
 
     return {
-      recipeId: saved.recipeId,
+      componentId: saved.componentId,
       createdIngredientIds: saved.createdIngredientIds,
       lineIds: saved.lineIds,
       dishId,

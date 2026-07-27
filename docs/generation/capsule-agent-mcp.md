@@ -26,9 +26,9 @@ descriptions are also prefixed with `⚠️ NO UI`.
 | `execute_capsule_command`      | Run any catalog capability (`args` + optional `idempotencyKey`)                                                                                                                                                                                                                            |
 | `get_capsule_llm_tools`        | Dump Anthropic/OpenAI tool defs (wiring + agent-sdk snake names)                                                                                                                                                                                                                           |
 | `execute_capsule_llm_tool`     | Generic execute by snake name (prefer first-class tools below)                                                                                                                                                                                                                             |
-| `recipe_draft`, …              | First-class MCP tools for every wiring capability (snake names, Zod schemas)                                                                                                                                                                                                               |
-| `preview_recipe_document`      | Parse only — inspect lines/yield before writing                                                                                                                                                                                                                                            |
-| `enter_recipe_document`        | Write createVia path for a **Recipe** sheet; requires `approveUnresolvedAsNew` for new ingredients. Default does **not** create a Dish (`introduceDish` opt-in only). Dish shape = production sheet + DishTasks — see `work/list*.jpg` and `docs/event-prep-and-weekly-order-workflow.md`. |
+| `component_draft`, …              | First-class MCP tools for every wiring capability (snake names, Zod schemas)                                                                                                                                                                                                               |
+| `preview_component_document`      | Parse only — inspect lines/yield before writing                                                                                                                                                                                                                                            |
+| `enter_component_document`        | Write createVia path for a **Component** sheet; requires `approveUnresolvedAsNew` for new ingredients. Default does **not** create a Dish (`introduceDish` opt-in only). Dish shape = production sheet + DishTasks — see `work/list*.jpg` and `docs/event-prep-and-weekly-order-workflow.md`. |
 | `add_event_dish_and_sync_prep` | Add EventDish + PrepTask template sync (`skipDemand`; Manifest owns demand)                                                                                                                                                                                                                |
 | `capsule_query`                | Allowlisted Convex reads (demand/prep/needs/orders) for cascade verify                                                                                                                                                                                                                     |
 
@@ -64,7 +64,7 @@ below (or call the driver from a one-off `bun` script).
      omits `cwd` (that was the live discovery failure mode).
 5. Start the stdio host: `bun run agent:mcp` (idle in a TTY is expected).
 6. In Cursor: Settings → MCP → enable/refresh **`capsule`**. Chat tools should
-   include `recipe_draft`, `ingredient_introduce`,
+   include `component_draft`, `ingredient_introduce`,
    `savedreportdefinition_createDefinition`, etc. (full wiring catalog — if a
    capability exists locally but Cursor returns UNKNOWN_TOOL / “not in catalog”,
    the long-lived MCP host is stale; refresh it). Do **not** expect
@@ -104,8 +104,8 @@ Secrets stay in `.env.local` (`CONVEX_URL`, `CAPSULE_AGENT_JWT`).
 ## Agent prompt (copy-paste)
 
 Use the locked prompt in
-[AGENT_PROMPT_ENTER_RECIPE.md](./AGENT_PROMPT_ENTER_RECIPE.md)
-(`bun run agent:enter-recipe` — works without MCP).
+[AGENT_PROMPT_ENTER_COMPONENT.md](./AGENT_PROMPT_ENTER_COMPONENT.md)
+(`bun run agent:enter-component` — works without MCP).
 
 ## Proof
 
@@ -126,8 +126,8 @@ without a live JWT. Live MCP tool calls require `CAPSULE_AGENT_JWT`.
 `add_event_dish_and_sync_prep` does not submit purchasing. It creates the
 EventDish through `EventDish.addToEvent`, then materializes PrepTasks from
 active DishTask templates (`skipDemand: true` — host sync does **not** write
-IngredientDemand). Manifest reactions on EventDish expand DishRecipe →
-RecipeIngredient into calculated `IngredientDemand`. On `Event.approve`,
+IngredientDemand). Manifest reactions on EventDish expand DishComponent →
+ComponentIngredient into calculated `IngredientDemand`. On `Event.approve`,
 eligible demand routes into PurchaseNeed → a shared weekly VendorOrder DRAFT.
 Verify with `capsule_query` (allowlisted reads). See
 [event-prep-and-weekly-order-workflow.md](../event-prep-and-weekly-order-workflow.md).

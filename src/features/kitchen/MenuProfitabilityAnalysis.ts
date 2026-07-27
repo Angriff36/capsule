@@ -4,9 +4,9 @@ import {
   type IngredientPriceObservationInput,
 } from "./IngredientPriceHistory";
 import {
-  calculateRecipeCost,
-  type RecipeCostIngredientInput,
-} from "./RecipeCostCalculator";
+  calculateComponentCost,
+  type ComponentCostIngredientInput,
+} from "./ComponentCostCalculator";
 import type { UnitOfMeasure } from "./import/UnitOfMeasureMapper";
 
 export const DEFAULT_GROSS_MARGIN_TARGET = 70;
@@ -27,17 +27,17 @@ export interface DishProfitabilityInput extends Deletable {
   name: string;
 }
 
-export interface DishRecipeProfitabilityInput extends Deletable {
+export interface DishComponentProfitabilityInput extends Deletable {
   id: string;
   dishId: string;
-  recipeId: string;
+  componentId: string;
   yieldQuantity: number | string;
   batchMultiplier: number | string;
 }
 
-export interface RecipeIngredientProfitabilityInput extends Deletable {
+export interface ComponentIngredientProfitabilityInput extends Deletable {
   id: string;
-  recipeId: string;
+  componentId: string;
   ingredientId: string;
   quantity: number | string;
   unit: UnitOfMeasure;
@@ -61,11 +61,11 @@ export interface MenuProfitabilityRow {
   course?: string;
   sortOrder: number;
   sellingPrice: number | null;
-  recipeCost: number;
+  componentCost: number;
   grossMarginAmount: number | null;
   grossMarginPercent: number | null;
   foodCostPercent: number | null;
-  recipeCount: number;
+  componentCount: number;
   incompleteCostLineCount: number;
   costComplete: boolean;
   status: MenuProfitabilityStatus;
@@ -85,8 +85,8 @@ export interface MenuProfitabilityAnalysis {
 export interface BuildMenuProfitabilityInput {
   menuDishes: MenuDishProfitabilityInput[];
   dishes: DishProfitabilityInput[];
-  dishRecipes: DishRecipeProfitabilityInput[];
-  recipeIngredients: RecipeIngredientProfitabilityInput[];
+  dishComponents: DishComponentProfitabilityInput[];
+  componentIngredients: ComponentIngredientProfitabilityInput[];
   ingredients: IngredientProfitabilityInput[];
   priceObservations: IngredientPriceObservationInput[];
   grossMarginTarget?: number;
@@ -119,8 +119,8 @@ function clampTarget(value: number | undefined): number {
 export function buildMenuProfitability({
   menuDishes,
   dishes,
-  dishRecipes,
-  recipeIngredients,
+  dishComponents,
+  componentIngredients,
   ingredients,
   priceObservations,
   grossMarginTarget,
@@ -130,7 +130,7 @@ export function buildMenuProfitability({
     dishes.filter(isActive).map((dish) => [dish.id, dish]),
   );
   const latestPrices = latestPriceByIngredient(priceObservations);
-  const costingIngredients: RecipeCostIngredientInput[] = ingredients
+  const costingIngredients: ComponentCostIngredientInput[] = ingredients
     .filter(isActive)
     .map((ingredient) => {
       const price = resolveIngredientPrice(
@@ -144,66 +144,72 @@ export function buildMenuProfitability({
         costPerUnit: price.costPerUnit,
       };
     });
-  const attachmentsByDish = new Map<string, DishRecipeProfitabilityInput[]>();
-  for (const attachment of dishRecipes.filter(isActive)) {
+  const attachmentsByDish = new Map<
+    string,
+    DishComponentProfitabilityInput[]
+  >();
+  for (const attachment of dishComponents.filter(isActive)) {
     const existing = attachmentsByDish.get(attachment.dishId) ?? [];
     existing.push(attachment);
     attachmentsByDish.set(attachment.dishId, existing);
   }
-  const linesByRecipe = new Map<string, RecipeIngredientProfitabilityInput[]>();
-  for (const line of recipeIngredients.filter(isActive)) {
-    const existing = linesByRecipe.get(line.recipeId) ?? [];
+  const linesByComponent = new Map<
+    string,
+    ComponentIngredientProfitabilityInput[]
+  >();
+  for (const line of componentIngredients.filter(isActive)) {
+    const existing = linesByComponent.get(line.componentId) ?? [];
     existing.push(line);
-    linesByRecipe.set(line.recipeId, existing);
+    linesByComponent.set(line.componentId, existing);
   }
 
   const rows = menuDishes.filter(isActive).map<MenuProfitabilityRow>((line) => {
     const dish = dishesById.get(line.dishId);
     const attachments = attachmentsByDish.get(line.dishId) ?? [];
-    let recipeCost = 0;
+    let componentCost = 0;
     let incompleteCostLineCount = attachments.length ? 0 : 1;
     let costComplete = attachments.length > 0;
 
     for (const attachment of attachments) {
-      const recipeLines = linesByRecipe.get(attachment.recipeId) ?? [];
+      const componentLines = linesByComponent.get(attachment.componentId) ?? [];
       const yieldQuantity = positiveNumber(attachment.yieldQuantity);
       const batchMultiplier = positiveNumber(attachment.batchMultiplier);
-      const summary = calculateRecipeCost({
-        lines: recipeLines.map((recipeLine) => ({
-          id: recipeLine.id,
-          ingredientId: recipeLine.ingredientId,
-          quantity: Number(recipeLine.quantity),
-          unit: recipeLine.unit,
+      const summary = calculateComponentCost({
+        lines: componentLines.map((componentLine) => ({
+          id: componentLine.id,
+          ingredientId: componentLine.ingredientId,
+          quantity: Number(componentLine.quantity),
+          unit: componentLine.unit,
         })),
         ingredients: costingIngredients,
         batchMultiplier: batchMultiplier ?? 0,
         yieldQuantity: yieldQuantity ?? 0,
       });
-      const recipeIsComplete =
-        recipeLines.length > 0 &&
+      const componentIsComplete =
+        componentLines.length > 0 &&
         batchMultiplier != null &&
         yieldQuantity != null &&
         summary.isComplete &&
         summary.costPerYieldUnit != null;
 
-      if (!recipeIsComplete) {
+      if (!componentIsComplete) {
         costComplete = false;
         incompleteCostLineCount += Math.max(1, summary.incompleteLineCount);
       }
       if (summary.costPerYieldUnit != null) {
-        recipeCost += summary.costPerYieldUnit;
+        componentCost += summary.costPerYieldUnit;
       }
     }
 
     const price = sellingPrice(line.sellingPrice);
     const grossMarginAmount =
-      price != null && costComplete ? price - recipeCost : null;
+      price != null && costComplete ? price - componentCost : null;
     const grossMarginPercent =
       price != null && grossMarginAmount != null
         ? (grossMarginAmount / price) * 100
         : null;
     const foodCostPercent =
-      price != null && costComplete ? (recipeCost / price) * 100 : null;
+      price != null && costComplete ? (componentCost / price) * 100 : null;
     const status: MenuProfitabilityStatus =
       price == null
         ? "missing_price"
@@ -221,11 +227,11 @@ export function buildMenuProfitability({
       course: line.course?.trim() || undefined,
       sortOrder: line.sortOrder,
       sellingPrice: price,
-      recipeCost,
+      componentCost,
       grossMarginAmount,
       grossMarginPercent,
       foodCostPercent,
-      recipeCount: attachments.length,
+      componentCount: attachments.length,
       incompleteCostLineCount,
       costComplete,
       status,
@@ -263,11 +269,11 @@ export function buildMenuProfitability({
     (total, row) => total + row.sellingPrice!,
     0,
   );
-  const totalRecipeCost = rankedRows.reduce(
-    (total, row) => total + row.recipeCost,
+  const totalComponentCost = rankedRows.reduce(
+    (total, row) => total + row.componentCost,
     0,
   );
-  const portfolioMarginAmount = totalSellingPrice - totalRecipeCost;
+  const portfolioMarginAmount = totalSellingPrice - totalComponentCost;
 
   return {
     rows,

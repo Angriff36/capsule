@@ -3,7 +3,7 @@ import type {
   IngredientMatchStatus,
   ParsedIngredientLine,
   ReviewIngredientLine,
-} from "./RecipeImportTypes";
+} from "./ComponentImportTypes";
 
 const PLURAL_SUFFIXES = ["ies", "es", "s"];
 

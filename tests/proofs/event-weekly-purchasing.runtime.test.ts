@@ -137,9 +137,9 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
       },
     );
 
-    const recipeA = (await proof.executeCommand(
+    const componentA = (await proof.executeCommand(
       kitchen,
-      api.mutations.Recipe_createViaDraft,
+      api.mutations.Component_createViaDraft,
       {
         name: "Bread base",
         yieldQuantity: 1,
@@ -147,9 +147,9 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
         batchMultiplier: 1,
       },
     )) as { docId: string };
-    const recipeB = (await proof.executeCommand(
+    const componentB = (await proof.executeCommand(
       kitchen,
-      api.mutations.Recipe_createViaDraft,
+      api.mutations.Component_createViaDraft,
       {
         name: "Seasoned base",
         yieldQuantity: 1,
@@ -160,9 +160,9 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
 
     await proof.executeCommand(
       kitchen,
-      api.mutations.RecipeIngredient_createViaAdd,
+      api.mutations.ComponentIngredient_createViaAdd,
       {
-        recipeId: recipeA.docId,
+        componentId: componentA.docId,
         ingredientId: flour.docId,
         quantity: S.flourPerServing,
         unit: "kilogram",
@@ -170,9 +170,9 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
     );
     await proof.executeCommand(
       kitchen,
-      api.mutations.RecipeIngredient_createViaAdd,
+      api.mutations.ComponentIngredient_createViaAdd,
       {
-        recipeId: recipeA.docId,
+        componentId: componentA.docId,
         ingredientId: salt.docId,
         quantity: S.saltPerServing,
         unit: "kilogram",
@@ -180,9 +180,9 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
     );
     await proof.executeCommand(
       kitchen,
-      api.mutations.RecipeIngredient_createViaAdd,
+      api.mutations.ComponentIngredient_createViaAdd,
       {
-        recipeId: recipeB.docId,
+        componentId: componentB.docId,
         ingredientId: flour.docId,
         quantity: S.flourPerServing,
         unit: "kilogram",
@@ -190,24 +190,32 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
     );
     await proof.executeCommand(
       kitchen,
-      api.mutations.RecipeIngredient_createViaAdd,
+      api.mutations.ComponentIngredient_createViaAdd,
       {
-        recipeId: recipeB.docId,
+        componentId: componentB.docId,
         ingredientId: pepper.docId,
         quantity: S.pepperPerServing,
         unit: "kilogram",
       },
     );
 
-    // Event.approve → ProductionBatch.plan requires published recipes.
-    await proof.executeCommand(kitchen, api.mutations.Recipe_publishVersion, {
-      docId: recipeA.docId,
-      version: 1,
-    });
-    await proof.executeCommand(kitchen, api.mutations.Recipe_publishVersion, {
-      docId: recipeB.docId,
-      version: 1,
-    });
+    // Event.approve → ProductionBatch.plan requires published components.
+    await proof.executeCommand(
+      kitchen,
+      api.mutations.Component_publishVersion,
+      {
+        docId: componentA.docId,
+        version: 1,
+      },
+    );
+    await proof.executeCommand(
+      kitchen,
+      api.mutations.Component_publishVersion,
+      {
+        docId: componentB.docId,
+        version: 1,
+      },
+    );
 
     const dishA = (await proof.executeCommand(
       kitchen,
@@ -232,20 +240,20 @@ describe("runtime proof: event dishes → shared weekly VendorOrder draft", () =
 
     await proof.executeCommand(
       kitchen,
-      api.mutations.DishRecipe_createViaAttach,
+      api.mutations.DishComponent_createViaAttach,
       {
         dishId: dishA.docId,
-        recipeId: recipeA.docId,
+        componentId: componentA.docId,
         yieldQuantity: 1,
         batchMultiplier: 1,
       },
     );
     await proof.executeCommand(
       kitchen,
-      api.mutations.DishRecipe_createViaAttach,
+      api.mutations.DishComponent_createViaAttach,
       {
         dishId: dishB.docId,
-        recipeId: recipeB.docId,
+        componentId: componentB.docId,
         yieldQuantity: 1,
         batchMultiplier: 1,
       },

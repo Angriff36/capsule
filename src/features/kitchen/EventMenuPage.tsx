@@ -8,7 +8,7 @@ import {
   useEventDishRemove,
   useInventoryReservationRelease,
   useListDish,
-  useListDishRecipe,
+  useListDishComponent,
   useListDishTask,
   useListEvent,
   useListEventDish,
@@ -20,8 +20,8 @@ import {
   useListMenu,
   useListMenuDish,
   useListPrepTask,
-  useListRecipe,
-  useListRecipeIngredient,
+  useListComponent,
+  useListComponentIngredient,
   usePrepTaskRefreshGenerated,
 } from "../../lib/manifest-convex-react";
 import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
@@ -37,9 +37,9 @@ export function EventMenuPage() {
   const dishes = useListDish();
   const eventDishes = useListEventDish();
   const dishTasks = useListDishTask();
-  const dishRecipes = useListDishRecipe();
-  const recipes = useListRecipe();
-  const recipeIngredients = useListRecipeIngredient();
+  const dishComponents = useListDishComponent();
+  const components = useListComponent();
+  const componentIngredients = useListComponentIngredient();
   const prepTasks = useListPrepTask();
   const ingredients = useListIngredient();
   const demands = useListIngredientDemand();
@@ -103,9 +103,9 @@ export function EventMenuPage() {
         prepTasks: prepTasks as never,
         ingredients: ingredients as never,
         demands: demands as never,
-        dishRecipes: dishRecipes as never,
-        recipes: recipes as never,
-        recipeIngredients: recipeIngredients as never,
+        dishComponents: dishComponents as never,
+        components: components as never,
+        componentIngredients: componentIngredients as never,
         eventDishes: eventDishes as never,
         inventoryItems: inventoryItems as never,
         inventoryLots: inventoryLots as never,
@@ -131,7 +131,7 @@ export function EventMenuPage() {
       });
       // Prep tasks come from the EventDishAdded reaction; syncing them here
       // would duplicate, because these catalogs predate the server's rows.
-      const shortages = await menuSync().syncRecipeDemands(eventId);
+      const shortages = await menuSync().syncComponentDemands(eventId);
       setStockShortages(shortages);
       form.reset();
     });
@@ -165,15 +165,15 @@ export function EventMenuPage() {
           specialInstructions: line.specialInstructions ?? undefined,
         });
       }
-      allShortages.push(...(await menuSync().syncRecipeDemands(eventId)));
+      allShortages.push(...(await menuSync().syncComponentDemands(eventId)));
       setStockShortages(allShortages);
       setTemplateMenuId("");
     });
   };
 
   return (
-    <div className="recipe-book-stage">
-      <header className="recipe-book-masthead">
+    <div className="component-book-stage">
+      <header className="component-book-masthead">
         <div>
           <p className="eyebrow">Culinary book · Cross-system handoff</p>
           <h1 className="display-title mt-2">Event menu</h1>
@@ -486,7 +486,7 @@ export function EventMenuPage() {
                               version: selection.version,
                             });
                             const shortages =
-                              await menuSync().syncRecipeDemands(eventId, {
+                              await menuSync().syncComponentDemands(eventId, {
                                 id: selection._id,
                                 eventId: selection.eventId,
                                 dishId: selection.dishId,

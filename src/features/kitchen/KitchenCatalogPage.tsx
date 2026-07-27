@@ -4,7 +4,7 @@ import {
   useCreateDish,
   useCreateIngredient,
   useCreateMenu,
-  useCreateRecipe,
+  useCreateComponent,
   useDishPurge,
   useDishReinstate,
   useIngredientPurge,
@@ -12,8 +12,8 @@ import {
   useListDish,
   useListIngredient,
   useListMenu,
-  useListRecipe,
-  useRecipePurge,
+  useListComponent,
+  useComponentPurge,
   useMenuArchive,
   useMenuMarkPublished,
   useMenuRestore,
@@ -28,9 +28,9 @@ import { KitchenCatalogCards } from "./KitchenCatalogCards";
 import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
 import {
   KITCHEN_SECTION_SINGULAR,
-  RECIPE_IMPORT_PATH,
+  COMPONENT_IMPORT_PATH,
   dishPath,
-  recipePath,
+  componentPath,
   type KitchenSection,
 } from "./kitchenRoutes";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
@@ -53,18 +53,18 @@ function csv(value: FormDataEntryValue | null) {
 export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const navigate = useNavigate();
   const ingredients = useListIngredient();
-  const recipes = useListRecipe();
+  const components = useListComponent();
   const dishes = useListDish();
   const menus = useListMenu();
   const createIngredient = useCreateIngredient();
-  const createRecipe = useCreateRecipe();
+  const createComponent = useCreateComponent();
   const createDish = useCreateDish();
   const createMenu = useCreateMenu();
   const purgeIngredient = useIngredientPurge();
   const reinstateIngredient = useIngredientReinstate();
   const purgeDish = useDishPurge();
   const reinstateDish = useDishReinstate();
-  const purgeRecipe = useRecipePurge();
+  const purgeComponent = useComponentPurge();
   const publishMenu = useMenuMarkPublished();
   const unpublishMenu = useMenuUnpublish();
   const archiveMenu = useMenuArchive();
@@ -75,7 +75,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
 
-  const data = { recipes, ingredients, dishes, menus }[section];
+  const data = { components, ingredients, dishes, menus }[section];
   const rows = useMemo(() => {
     const query = search.trim().toLowerCase();
     const base = showHidden
@@ -142,8 +142,8 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
               )[]
             | undefined,
         });
-      } else if (section === "recipes") {
-        const created = await createRecipe({
+      } else if (section === "components") {
+        const created = await createComponent({
           name: String(data.get("name") ?? "").trim(),
           yieldQuantity: Number(data.get("yieldQuantity")),
           yieldUnit: String(data.get("yieldUnit")) as (typeof UNITS)[number],
@@ -153,7 +153,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           description: optional(data.get("description")),
           instructions: optional(data.get("instructions")),
         });
-        navigate(recipePath(created.docId));
+        navigate(componentPath(created.docId));
         return;
       } else if (section === "dishes") {
         const name = String(data.get("name") ?? "").trim();
@@ -181,8 +181,8 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           serviceStyle: optional(data.get("serviceStyle")),
           dietaryTags: csv(data.get("dietaryTags")),
         });
-        // Prep templates, containers and recipes all live on the detail page,
-        // and adding them is always the next step. Land there like recipes do.
+        // Prep templates, containers and components all live on the detail page,
+        // and adding them is always the next step. Land there like components do.
         navigate(dishPath(created.docId));
         return;
       } else {
@@ -208,15 +208,15 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
     reinstateIngredient,
     purgeDish,
     reinstateDish,
-    purgeRecipe,
+    purgeComponent,
     publishMenu,
     unpublishMenu,
     archiveMenu,
     restoreMenu,
   };
   return (
-    <div className="recipe-book-stage culinary-studio">
-      <header className="recipe-book-masthead">
+    <div className="component-book-stage culinary-studio">
+      <header className="component-book-masthead">
         <div>
           <p className="eyebrow">Culinary book · {title}</p>
           <h1 className="display-title mt-2">The house book</h1>
@@ -225,10 +225,10 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
             needs work.
           </p>
         </div>
-        <div className="recipe-book-masthead-actions">
-          {section === "recipes" ? (
-            <Link to={RECIPE_IMPORT_PATH} className="btn btn-ghost">
-              Import recipe
+        <div className="component-book-masthead-actions">
+          {section === "components" ? (
+            <Link to={COMPONENT_IMPORT_PATH} className="btn btn-ghost">
+              Import component
             </Link>
           ) : null}
           <button
@@ -256,8 +256,8 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         />
       ) : null}
 
-      <section className="recipe-catalog">
-        <div className="recipe-index-heading">
+      <section className="component-catalog">
+        <div className="component-index-heading">
           <div>
             <p className="eyebrow">Live index</p>
             <h2 className="font-display mt-1 text-3xl">{title}</h2>
@@ -266,8 +266,8 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
             {rows.length} records
           </span>
         </div>
-        <div className="recipe-toolbar">
-          <label className="recipe-search">
+        <div className="component-toolbar">
+          <label className="component-search">
             <span aria-hidden="true">⌕</span>
             <input
               value={search}
@@ -277,7 +277,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           </label>
           {section === "dishes" ||
           section === "ingredients" ||
-          section === "recipes" ? (
+          section === "components" ? (
             <label className="flex items-center gap-2 text-sm text-ink-2">
               <input
                 type="checkbox"
@@ -295,12 +295,12 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           </div>
         ) : rows.length === 0 ? (
           search ? (
-            <div className="recipe-filter-empty">
+            <div className="component-filter-empty">
               <p>No records match this search.</p>
             </div>
           ) : (
-            <div className="recipe-empty-state">
-              <div className="recipe-book-mark" aria-hidden="true">
+            <div className="component-empty-state">
+              <div className="component-book-mark" aria-hidden="true">
                 <span />
               </div>
               <div>

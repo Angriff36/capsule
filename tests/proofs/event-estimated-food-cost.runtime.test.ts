@@ -1,6 +1,6 @@
 /**
  * Runtime proof: getEvent.estimatedFoodCost equals sum(listEventDish.estimatedCost)
- * for same-unit priced recipe lines, and both update when Ingredient.costPerUnit changes.
+ * for same-unit priced component lines, and both update when Ingredient.costPerUnit changes.
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -65,9 +65,9 @@ describe("runtime proof: Event.estimatedFoodCost ↔ EventDish.estimatedCost", (
       },
     )) as { docId: string };
 
-    const recipe = (await proof.executeCommand(
+    const component = (await proof.executeCommand(
       kitchen,
-      api.mutations.Recipe_createViaDraft,
+      api.mutations.Component_createViaDraft,
       {
         name: "Food-cost dough",
         yieldQuantity: 1,
@@ -77,16 +77,20 @@ describe("runtime proof: Event.estimatedFoodCost ↔ EventDish.estimatedCost", (
       },
     )) as { docId: string };
 
-    await proof.executeCommand(kitchen, api.mutations.Recipe_publishVersion, {
-      docId: recipe.docId,
-      version: 1,
-    });
+    await proof.executeCommand(
+      kitchen,
+      api.mutations.Component_publishVersion,
+      {
+        docId: component.docId,
+        version: 1,
+      },
+    );
 
     await proof.executeCommand(
       kitchen,
-      api.mutations.RecipeIngredient_createViaAdd,
+      api.mutations.ComponentIngredient_createViaAdd,
       {
-        recipeId: recipe.docId,
+        componentId: component.docId,
         ingredientId: flour.docId,
         quantity: S.qtyPerBatch,
         unit: "kilogram",
@@ -106,10 +110,10 @@ describe("runtime proof: Event.estimatedFoodCost ↔ EventDish.estimatedCost", (
 
     await proof.executeCommand(
       kitchen,
-      api.mutations.DishRecipe_createViaAttach,
+      api.mutations.DishComponent_createViaAttach,
       {
         dishId: dish.docId,
-        recipeId: recipe.docId,
+        componentId: component.docId,
         yieldQuantity: 1,
         batchMultiplier: 1,
       },

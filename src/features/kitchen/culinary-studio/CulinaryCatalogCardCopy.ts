@@ -17,12 +17,12 @@ export class CulinaryCatalogCardCopy {
     item: CatalogCopySource,
   ): string {
     if (item.category) return item.category;
-    if (section === "recipes" && item.cuisine) return item.cuisine;
+    if (section === "components" && item.cuisine) return item.cuisine;
     return "No description recorded";
   }
 
   static glyph(section: KitchenSection, index: number): string {
-    if (section === "recipes") return "R";
+    if (section === "components") return "R";
     if (section === "ingredients") return "I";
     if (section === "menus") return "M";
     return String(index + 1).padStart(2, "0");

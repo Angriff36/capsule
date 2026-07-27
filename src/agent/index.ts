@@ -21,11 +21,11 @@ export type {
   CapsuleDocumentPreviewResult,
 } from "./CapsuleDocumentEnterCoordinator";
 export { CapsuleIdempotencyKeyFactory } from "./CapsuleIdempotencyKeyFactory";
-export { CapsuleRecipeStatusLoader } from "./CapsuleRecipeStatusLoader";
+export { CapsuleComponentStatusLoader } from "./CapsuleComponentStatusLoader";
 export type {
-  CapsuleRecipeLifecycleStatus,
-  CapsuleRecipeStatusReader,
-} from "./CapsuleRecipeStatusLoader";
+  CapsuleComponentLifecycleStatus,
+  CapsuleComponentStatusReader,
+} from "./CapsuleComponentStatusLoader";
 export {
   AGENT_AC_CAPABILITY_IDS,
   mutationNameForCapability,

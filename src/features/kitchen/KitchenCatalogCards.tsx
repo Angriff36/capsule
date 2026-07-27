@@ -10,7 +10,7 @@ import { KitchenCatalogLifecycleButtons } from "./KitchenCatalogLifecycleButtons
 import {
   dishPath,
   menuPath,
-  recipePath,
+  componentPath,
   type KitchenSection,
 } from "./kitchenRoutes";
 
@@ -35,7 +35,7 @@ type LifecycleCommands = {
   reinstateIngredient: (args: Record<string, unknown>) => Promise<unknown>;
   purgeDish: (args: Record<string, unknown>) => Promise<unknown>;
   reinstateDish: (args: Record<string, unknown>) => Promise<unknown>;
-  purgeRecipe: (args: Record<string, unknown>) => Promise<unknown>;
+  purgeComponent: (args: Record<string, unknown>) => Promise<unknown>;
   publishMenu: (args: Record<string, unknown>) => Promise<unknown>;
   unpublishMenu: (args: Record<string, unknown>) => Promise<unknown>;
   archiveMenu: (args: Record<string, unknown>) => Promise<unknown>;
@@ -187,7 +187,7 @@ function CardMetaChips({
       {section === "menus" && item.isTemplate ? (
         <span className="is-flag">Template</span>
       ) : null}
-      {section === "recipes" && item.cuisine ? (
+      {section === "components" && item.cuisine ? (
         <span>{item.cuisine}</span>
       ) : null}
     </div>
@@ -219,7 +219,7 @@ function wrapCardLink(
 }
 
 function catalogPath(section: KitchenSection, id: string): string {
-  if (section === "recipes") return recipePath(id);
+  if (section === "components") return componentPath(id);
   if (section === "dishes") return dishPath(id);
   return menuPath(id);
 }

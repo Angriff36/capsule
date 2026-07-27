@@ -83,7 +83,7 @@ export function IngredientSubstitutionEditor({
         <span>{selectedIds.length} mapped</span>
       </div>
       <p className="max-w-160 text-[13px] text-ink-2">
-        When this ingredient cannot cover recipe demand, the event menu ranks
+        When this ingredient cannot cover component demand, the event menu ranks
         these alternatives by allergen compatibility and unit-cost impact.
       </p>
 

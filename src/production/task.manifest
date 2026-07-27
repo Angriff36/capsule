@@ -1,5 +1,5 @@
 // Capsule production — PrepTask under EventDish (claim/start/complete + block).
-// Hierarchy: Event → EventDish → PrepTask → optional Recipe (make-formula).
+// Hierarchy: Event → EventDish → PrepTask → optional Component (make-formula).
 // Station is an open string property (Station entity deferred). Compile chain
 // continues via batch.manifest → prep.manifest (entry).
 
@@ -16,7 +16,7 @@ enum PrepTaskStatus {
 }
 
 // Prep work line for one EventDish (e.g. "chop romaine", "portion caesar dressing").
-// Optional recipeId links a MAKE line to its Recipe (dressing, brine, sauce…).
+// Optional componentId links a MAKE line to its Component (dressing, brine, sauce…).
 // eventId is denormalized from EventDish for Event readiness / EventCancelled fan-out.
 entity PrepTask mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
@@ -30,7 +30,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   property ingredientId: uuid?
   property ingredientDemandId: uuid?
   property dishId: uuid?
-  property recipeId: uuid?
+  property componentId: uuid?
   property required category: string = "finish_at_event"
   property required taskType: string = "manual"
   property specialInstructions: string?
@@ -57,7 +57,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
   belongsTo ingredientDemand: IngredientDemand fields [tenantId, ingredientDemandId] references [tenantId, id]
-  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+  belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
   belongsTo assignedTo: Person fields [tenantId, assignedToId] references [tenantId, id]
   // Keep this hasMany paired with PrepTaskDependency.dependentTask, which is
   // intentionally the edge entity's first PrepTask relation for Convex inverse hydration.
@@ -86,7 +86,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     unit: UnitOfMeasure,
     optional ingredientId: uuid,
     optional ingredientDemandId: uuid,
-    optional recipeId: uuid,
+    optional componentId: uuid,
     optional dishTaskId: uuid,
     optional dishId: uuid,
     optional category: string,
@@ -114,7 +114,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate name = name
     mutate ingredientId = ingredientId != null ? ingredientId : self.ingredientId
     mutate ingredientDemandId = ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
-    mutate recipeId = recipeId != null ? recipeId : self.recipeId
+    mutate componentId = componentId != null ? componentId : self.componentId
     mutate dishTaskId = dishTaskId != null ? dishTaskId : self.dishTaskId
     mutate dishId = dishId != null ? dishId : self.dishId
     mutate category = category != null ? category : self.category
@@ -134,7 +134,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
       name: name
       ingredientId: ingredientId != null ? ingredientId : self.ingredientId
       ingredientDemandId: ingredientDemandId != null ? ingredientDemandId : self.ingredientDemandId
-      recipeId: recipeId != null ? recipeId : self.recipeId
+      componentId: componentId != null ? componentId : self.componentId
       dishTaskId: dishTaskId != null ? dishTaskId : self.dishTaskId
       dishId: dishId != null ? dishId : self.dishId
       category: category != null ? category : self.category
@@ -157,7 +157,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     optional taskType: string,
     optional specialInstructions: string,
     optional ingredientId: uuid,
-    optional recipeId: uuid
+    optional componentId: uuid
   ) {
     guard self.status == "pending"
     guard self.deletedAt == null
@@ -170,7 +170,7 @@ entity PrepTask mixin TenantScoped, SoftDeletable {
     mutate taskType = taskType != null ? taskType : self.taskType
     mutate specialInstructions = specialInstructions != null ? specialInstructions : self.specialInstructions
     mutate ingredientId = ingredientId != null ? ingredientId : self.ingredientId
-    mutate recipeId = recipeId != null ? recipeId : self.recipeId
+    mutate componentId = componentId != null ? componentId : self.componentId
     mutate isGenerated = false
     emit PrepTaskRevised {
       prepTaskId: self.id
@@ -515,7 +515,7 @@ event PrepTaskOpened: "prep_task.opened" {
   ingredientId: string?
   ingredientDemandId: string?
   dishId: string?
-  recipeId: string?
+  componentId: string?
   dishTaskId: string?
   category: string
   taskType: string
@@ -704,7 +704,7 @@ on EventDishAdded fanOut DishTask where activeDishId = payload.dishId
     dishId: payload.dishId
     category: self.category
     taskType: self.taskType
-    recipeId: self.recipeId
+    componentId: self.componentId
     ingredientId: self.ingredientId
     specialInstructions: self.instructions
   }

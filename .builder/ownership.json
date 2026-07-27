@@ -2,13 +2,13 @@
   "version": 1,
   "files": {
     "convex/computed.ts": {
-      "sha256": "18f203eb0f7cabe8133e404eaecff589adc0d7cd40a9be8f4092a63fc6171a81"
+      "sha256": "e135ee3175a6452211f81bdd9174560a8c110599e1c470b0cb40f15f860be4be"
     },
     "convex/crons.ts": {
       "sha256": "3b83373150a367f16a8d4b1d26b9cf03d7b33e0d03d4a7c6efd3a769e1d6b030"
     },
     "convex/http.ts": {
-      "sha256": "bb3cbb9999c10b9b3d6e60cbe9bd649d2288319a75a5252b84e62f832659e83d"
+      "sha256": "8d44af2ce90a3c4dec415eb0acf777b7ae2d4b2f748bb16f23d5e4d0718ec76d"
     },
     "convex/lib/authContext.ts": {
       "sha256": "4669aa49562a10836af801b874bbef5a2f4ab41d106ec44bce8e758ab364d715",
@@ -18,19 +18,19 @@
       "sha256": "f086ac7d574a84a59893e7e8e38a9301fdb63346d5c476388cbfb10aa7e49170"
     },
     "convex/mutations.ts": {
-      "sha256": "0c498a6ac912e634d2d373ad512fe4f873a076d05ff51e6f2fa0b0d8e380e822"
+      "sha256": "26603cd88df5b9fb66c15433d6dd1578363bdafa83be019b90df43db4c1208e2"
     },
     "convex/queries.ts": {
-      "sha256": "292d6bef405e04b8769e6870b13d31ad58e6f66d24f2d29e37fb4f745ed53b4f"
+      "sha256": "62cbeaf85aea174b6964e9280510e90a9b10f2b6c20eae1e14d8bc71f8a9b5b8"
     },
     "convex/sagas.ts": {
       "sha256": "7dc60e9944bd650c3f762c7856c5179969567ab7a8183d67700cad4070a0ad3b"
     },
     "convex/schema.ts": {
-      "sha256": "4b1871c34fbf77dd99c6b691ec63f652d6a186303c8332d98c20c2f5ac2122dd"
+      "sha256": "e387dd3af13ec462a7c19d9df0180b65804f67d872267bbc8eb3aa9ab10b94c4"
     },
     "manifest-context-summary.json": {
-      "sha256": "12ce9f662651714c518c9a6f00ebb0b3300182725a4dc6223b34b53f2a3780f6"
+      "sha256": "b121ddd4ee7084c0ad8ebee8b02bd72d09af7b2cd9468188cf9d998da6fed56f"
     },
     "package.json": {
       "sha256": "d8faaf4bff09ffbbf9034cda4e9bd04de66e16fe9d7d5c6b4707275073216665"
@@ -39,28 +39,28 @@
       "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "9a2f310f366b723da5b3663aa9c74fe60658b73c0a7b617737654c201d3e28dc"
+      "sha256": "3555dc8f00fd9e5c0dcc7af4453afde3a9f9d002ebc4dc661f48ad1ff7c0fec7"
     },
     "scripts/seed-convex.ts": {
-      "sha256": "3b551aebde61fae620e4064bf65a8a063baa6d6d8bda571aa9840cbc05bf7913"
+      "sha256": "1a4bc13a2e3cba5cbe4da41b9051d6bf13b813ac8d0ce13b0af29600636c2d64"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "fa32e3ffba36099c89b170c201a99845e3896b1df7e729e91ac229b92d58f380"
+      "sha256": "c51bf4e3a670702f001935cd738e461ef9470cb6e3d09f7a1b4ddd10d1fc4933"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "e9b748767b7a4ed2004c3425d9562d21fb238ad610a6b5bfdfaba7e747adc806"
+      "sha256": "23bc4f6e32eecf31d860afb19f48b3051fddc10e2d15616db5de8c0e7afaa17d"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "290ce82519c6f13699d7142f1b0abb9a15d0f87fe40b4ceb4766957c493b2e91"
+      "sha256": "3ff41ee37bd6f94a1f0d11be0999e4d98516348309014d00ad9424fdcadc0a93"
     },
     "tests/manifest-convex.contract.test.ts": {
-      "sha256": "ac04095e55069f93cd8a5c2e9dc0924c8e6c58ede71bb355287ec121eafc2885"
+      "sha256": "9fc094fa39a5eecc93b21b9a9beeae54dafa64d723f6911eaea9f8994004a789"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "a37d067e2c2d5a263e240762a2d2fe7429a9d01a84c185aefd705b7d1cb7ad0f"
+      "sha256": "97658b9a573f66dd24f00d10dc8a460156ea94331e92a59863f621041a7b50c1"
     }
   },
   "package": {
@@ -89,14 +89,14 @@
       "src/admin/capability-setting.manifest",
       "src/admin/cutover-decision.manifest",
       "src/app.manifest",
+      "src/culinary/component-import.manifest",
+      "src/culinary/component.manifest",
       "src/culinary/dish-container.manifest",
       "src/culinary/dish.manifest",
       "src/culinary/event-dish.manifest",
       "src/culinary/ingredient.manifest",
       "src/culinary/menu-dish.manifest",
       "src/culinary/menu.manifest",
-      "src/culinary/recipe-import.manifest",
-      "src/culinary/recipe.manifest",
       "src/documents/attachment.manifest",
       "src/facilities/equipment.manifest",
       "src/finance/closeout.manifest",

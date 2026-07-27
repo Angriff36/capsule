@@ -6,7 +6,7 @@ Generated 2026-07-23 from `.aboardai/features/<id>/feature.json`. Method: each r
 
 - **117 / 117** requested features are present in the repo as tracked features. **None are missing.**
 - **All 117 are `status: verified`.** 112 carry a written implementation summary; **5 are verified but have no summary text recorded** (implemented, summary field simply left blank — see below).
-- 15 additional `backlog` features exist in the repo that were **not** in the request. Status was misleading — judged by code **and** each feature's agent log: `menu-pdf-export` is now fully implemented and flipped to `verified` (allergen indicators + two layouts finished 2026-07-24); `event-scoped-chat` is now done and `verified` (shipped as the `EventTimelineComment` entity + "Staff comments" thread on the event timeline); `audit-log-global` was investigated then blocked (#43); `recipe-version-history` has only pre-existing recipe-lifecycle primitives; the other 11 never produced code (10 never ran at all). See the table at the end.
+- 15 additional `backlog` features exist in the repo that were **not** in the request. Status was misleading — judged by code **and** each feature's agent log: `menu-pdf-export` is now fully implemented and flipped to `verified` (allergen indicators + two layouts finished 2026-07-24); `event-scoped-chat` is now done and `verified` (shipped as the `EventTimelineComment` entity + "Staff comments" thread on the event timeline); `audit-log-global` was investigated then blocked (#43); `component-version-history` has only pre-existing component-lifecycle primitives; the other 11 never produced code (10 never ran at all). See the table at the end.
 
 ### The 5 verified features with no written summary
 
@@ -78,9 +78,9 @@ Evidence used: the repo code **plus** each feature's own agent artifacts (`event
 | **Menu PDF / Print Sheet Export** (`menu-pdf-export`) | **verified** (flipped 2026-07-24) | ✅ **Complete.** Core branded PDF export existed (`src/features/kitchen/menuPdf.ts`); the two missing spec pieces were then built: **allergen indicators** (per-dish `Contains:` line + footnote, derived via `deriveAllergenRows`) and **two layout styles** (`card` single-column / `buffet` two-column). Wired into `MenuDetailPage.tsx` with a layout selector. Typecheck + Prettier + PDF render smoke test all pass; status flipped to `verified`. |
 | **Event-Scoped Team Chat Thread** (`event-scoped-chat`) | **verified** (2026-07-24) | ✅ **Done** — a later agent completed it as the **`EventTimelineComment`** entity (`event.manifest:1205`): `post`/`remove` commands, `EventTimelineCommentPosted/Removed` events, `eventAccess` policy, Convex table `eventTimelineComments`, generated mutations/queries/hooks, and a "Staff comments" post form + event-scoped threaded list in `EventTimelineTab.tsx`. Verified against the repo; `bun run typecheck` exit 0. Two minor caveats: author identity is browser-supplied (not auth-stamped like StaffMessage/PrepTaskComment), and `remove()` is open to any `eventAccess` user — both acceptable per the catering-app domain-gating principle. |
 | **Global Org-Level Audit Log** (`audit-log-global`) | backlog, has summary | ✗ **Investigated, then blocked** — 14 bash tool calls; summary states no product code was written, only plan docs under `codex-plans/`. Blocked on Manifest mutation-wrapper support, escalated as **issue #43**. |
-| **Recipe Version History** (`recipe-version-history`) | backlog, no summary | ◑ **Partial primitives only (pre-existing)** — agent log is status-only (no work run). `recipe.manifest` does have `versionNumber` + `publishVersion()`/`retract()` and `RecipeVersion*` events, but **no stored version-history/snapshot entity** — that is core recipe lifecycle, not this feature. |
+| **Component Version History** (`component-version-history`) | backlog, no summary | ◑ **Partial primitives only (pre-existing)** — agent log is status-only (no work run). `component.manifest` does have `versionNumber` + `publishVersion()`/`retract()` and `ComponentVersion*` events, but **no stored version-history/snapshot entity** — that is core component lifecycle, not this feature. |
 | `quickbooks-online-sync` | implemented (2026-07-24) | ◑ **Built, not yet live-verified.** OAuth2 + sync engine authored mirroring the Google Calendar integration: `convex/lib/qboSync.ts` (Intuit OAuth + Accounting REST helpers), `convex/qboSync.ts` (connect/disconnect/syncNow actions, per-tenant encrypted refresh token in the `manifestEvents` ledger, reconcile action that maps clients→QBO customers then pushes eligible invoices + completed payments), and a QuickBooks section in `IntegrationsPage.tsx`. `bun run typecheck` + Prettier + ownership guard pass. **Gap:** cannot be run end-to-end without Intuit sandbox credentials — set `QBO_CLIENT_ID`/`QBO_CLIENT_SECRET`/`QBO_REDIRECT_URI`/`QBO_ENVIRONMENT` in the Convex env and connect a sandbox company to verify. |
-| `demand-anomaly-detection`, `recipe-nutritional-info`, `recipe-recommendation-engine`, `referral-source-tracking`, `seasonal-demand-forecasting`, `smart-reorder-suggestions`, `sms-alert-integration`, `staff-performance-reviews`, `vehicle-maintenance-log`, `weather-forecast-integration` | backlog, no summary | ✗ **Never ran** — no `events.jsonl` / `agent-output.md` at all, and no manifest/seam/page in the repo. |
+| `demand-anomaly-detection`, `component-nutritional-info`, `component-recommendation-engine`, `referral-source-tracking`, `seasonal-demand-forecasting`, `smart-reorder-suggestions`, `sms-alert-integration`, `staff-performance-reviews`, `vehicle-maintenance-log`, `weather-forecast-integration` | backlog, no summary | ✗ **Never ran** — no `events.jsonl` / `agent-output.md` at all, and no manifest/seam/page in the repo. |
 
 ---
 
@@ -605,7 +605,7 @@ All bulk actions reuse each page's existing Convex mutation hooks and lifecycle 
 - **New Manifest entity `ProposalDishSelection`** (`src/sales/proposal-dish-selection.manifest`): one row per (proposal, dish) picked from the operator's **published** menu catalog while the proposal is in review (draft/sent/viewed). Commands: `select` (creation, guards: proposal in review, menu published, dish active, servings > 0), `adjustServings`, `remove` (soft delete). Policies: `salesAccess`.
 - **Acceptance cascade** (Manifest reaction, same file): `on ProposalAccepted fanOut ProposalDishSelection where proposalId = payload.dishSelectionProposalId run EventDish.confirmFromProposal match eventId+dishId else create`. `Proposal.accept` now emits `dishSelectionProposalId` (non-null only when an Event is linked at accept) — accepting without an event skips the cascade cleanly and keeps the selections; removed selections are skipped by the soft-delete filter.
 - **New `EventDish.confirmFromProposal` command** (`src/culinary/event-dish.manifest`): idempotent, first-write-wins on a pre-existing live (event, dish) line — kitchen edits are never clobbered, and re-confirmation does not double-seed BOM. Emits new `EventDishConfirmedFromProposal` event with a conditional `seedDishId` key.
-- **BOM hop** (`src/procurement/event-purchasing.manifest`): new reaction seeds `EventDishRecipeSeed` from `EventDishConfirmedFromProposal` exactly like manual `addToEvent`, keyed on `seedDishId` (null for pre-existing lines → no double-seed, which would otherwise throw on `seed`'s creation guard).
+- **BOM hop** (`src/procurement/event-purchasing.manifest`): new reaction seeds `EventDishComponentSeed` from `EventDishConfirmedFromProposal` exactly like manual `addToEvent`, keyed on `seedDishId` (null for pre-existing lines → no double-seed, which would otherwise throw on `seed`'s creation guard).
 - **Catalog read policies broadened** (`menu`, `menu-dish`, `dish` manifests): read now allows `kitchenAccess` **or** `salesAccess` so sales can browse the catalog they're selling. Write/execute unchanged.
 - **Regenerated** all owned projections via `bun run manifest:regen` + `bun run codegen` (Convex schema/mutations/queries, Zod schemas, wiring, client hooks, diagrams, seed script, ownership ledger).
 - **UI — `ProposalMenuSelectionPanel`** (new component): per-proposal expandable panel on the Proposals page showing current selections (servings editable inline, remove) and the published catalog grouped by menu (add buttons, already-selected dishes disabled; course/serviceStyle copied from the menu line; servings default to the proposal guest count).
@@ -633,7 +633,7 @@ All bulk actions reuse each page's existing Convex mutation hooks and lifecycle 
 - Changes are **uncommitted** per the repo's "commit only when asked" rule; the independent cross-model review gate applies before any merge.
 
 ### Verification Status
-- **Runtime (backend, real generated Convex functions)**: wrote a temporary convex-test proof (`tests/proofs/tmp-client-menu-selection-verification.runtime.test.ts`, deleted after passing, per task instructions) using the repo's proof-kit harness. Proved end-to-end: publish a menu with two dishes (one with a recipe) → draft+send proposal → select both dishes → adjust servings to 50 → remove one selection → plan an event → accept with the event linked ⇒ exactly **one** live `EventDish` row (right dish, 50 servings, course carried over, `addedAt` set), removed selection skipped, and the BOM `EventDishRecipeSeed` created for the recipe. Second test: accept **without** an event ⇒ no `EventDish` rows, selection stays live, accept succeeds. Both passed.
+- **Runtime (backend, real generated Convex functions)**: wrote a temporary convex-test proof (`tests/proofs/tmp-client-menu-selection-verification.runtime.test.ts`, deleted after passing, per task instructions) using the repo's proof-kit harness. Proved end-to-end: publish a menu with two dishes (one with a component) → draft+send proposal → select both dishes → adjust servings to 50 → remove one selection → plan an event → accept with the event linked ⇒ exactly **one** live `EventDish` row (right dish, 50 servings, course carried over, `addedAt` set), removed selection skipped, and the BOM `EventDishComponentSeed` created for the component. Second test: accept **without** an event ⇒ no `EventDish` rows, selection stays live, accept succeeds. Both passed.
 - **Full suite + build**: 595/595 tests pass (includes the regenerated 399-case Convex contract test and the updated createVia mapping test); production build succeeds; typecheck clean.
 - **Playwright/browser**: attempted (Clerk sign-in-token flow against the running vite server on :7811) but **blocked by environment** — the app's `VITE_CONVEX_URL` points at the local Convex backend (`127.0.0.1:3210`) which is not currently running, so the app hangs at the auth gate with `ERR_CONNECTION_REFUSED` websocket errors before any page renders. Repo rules prohibit starting dev servers, so the UI-in-browser pass could not be completed; UI correctness is covered by typecheck/build and the exercised generated hooks, and the full flow is proven at the Convex layer as above.
 
@@ -955,7 +955,7 @@ Generated by `bun run manifest:regen --apply`:
 - **Feature id:** `allergen-matrix-view`  
 - **Status:** `verified` · **Priority:** 1 · **Complexity:** moderate
 
-**Description:** Render a grid of all dishes in a menu or event against the 14 major allergens, with cells auto-populated from recipe ingredient allergen flags. Exportable as a PDF for client disclosure and health inspector review.
+**Description:** Render a grid of all dishes in a menu or event against the 14 major allergens, with cells auto-populated from component ingredient allergen flags. Exportable as a PDF for client disclosure and health inspector review.
 
 **Summary:**
 
@@ -963,7 +963,7 @@ Generated by `bun run manifest:regen --apply`:
 
 ### Changes Implemented
 - New **Allergen matrix page** at `/kitchen/allergens` rendering a grid of every dish on a selected menu or event against the repo's major-allergen vocabulary. A grouped Menus/Events dropdown picks the scope, carried in the URL (`?menu=<id>` / `?event=<id>`) so views are linkable.
-- **Cells auto-populate from recipe ingredient allergen flags** via Dish → DishRecipe → Recipe → RecipeIngredient → Ingredient.allergens, unioned with dish-level declared `allergenSummary`. Flagged cells show a tooltip listing contributing ingredients (or "Declared on dish"); soft-deleted dishes/lines/ingredients are excluded. Derivation lives in an exported pure function `deriveAllergenRows`.
+- **Cells auto-populate from component ingredient allergen flags** via Dish → DishComponent → Component → ComponentIngredient → Ingredient.allergens, unioned with dish-level declared `allergenSummary`. Flagged cells show a tooltip listing contributing ingredients (or "Declared on dish"); soft-deleted dishes/lines/ingredients are excluded. Derivation lives in an exported pure function `deriveAllergenRows`.
 - **PDF export** via an "Export PDF" button using browser print-to-PDF: `@media print` rules isolate the matrix sheet (landscape `@page`, all chrome hidden) with a disclosure header (scope name, prepared date, dish count) and an inspector-appropriate footnote clarifying unflagged means "not recorded," not certified allergen-free.
 - "Allergens" entry added to the kitchen book nav; "Allergen matrix" button on `MenuDetailPage` deep-links pre-scoped to that menu.
 - **No manifest or schema changes** — read-only view composed from existing generated Convex list hooks.
@@ -1001,7 +1001,7 @@ Generated by `bun run manifest:regen --apply`:
 
 ### Changes Implemented
 - Added a dark color scheme by overriding the existing Tailwind v4 `@theme` color tokens (`--color-canvas`, `--color-panel`, `--color-ink`, `--color-brand`, all status/soft colors, etc.) under a `.dark` class in `src/styles/app.css`. Since the entire app styles through these tokens, every page inherits the dark palette automatically. Also added `@custom-variant dark` so future `dark:` utilities work with the class strategy, and `color-scheme: dark` for native form controls/scrollbars.
-- Added targeted `.dark` overrides for the handful of hardcoded light-paper colors in `app.css` (app-canvas gradient, recipe empty-state gradient, attention ledger, schedule notice cards, revenue prior-bar fill) and flipped white-on-brand text (capsule mark, active nav, primary buttons, etc.) to dark ink since brand becomes a light teal in dark mode.
+- Added targeted `.dark` overrides for the handful of hardcoded light-paper colors in `app.css` (app-canvas gradient, component empty-state gradient, attention ledger, schedule notice cards, revenue prior-bar fill) and flipped white-on-brand text (capsule mark, active nav, primary buttons, etc.) to dark ink since brand becomes a light teal in dark mode.
 - Added a pre-paint inline script in `index.html`: stored user choice (`localStorage["capsule-theme"]`) wins; with no stored choice it follows the OS `prefers-color-scheme` — no flash of wrong theme.
 - Added a per-user toggle button (moon/sun) at the bottom of the sidebar rail (`ThemeToggle` in `Sidebar.tsx`), which flips the `.dark` class and persists the choice to localStorage. New `SunIcon`/`MoonIcon` follow the existing hand-drawn 16px icon style in `src/ui/icons.tsx`.
 
@@ -1785,7 +1785,7 @@ Generated by `bun run manifest:regen --apply`:
 - **Feature id:** `ingredient-price-history`  
 - **Status:** `verified` · **Priority:** 1 · **Complexity:** moderate
 
-**Description:** Record the unit price on every vendor order line receipt and maintain a time-series of price observations per ingredient per vendor. Feeds the recipe cost calculator with the most recent confirmed price and powers price-trend views.
+**Description:** Record the unit price on every vendor order line receipt and maintain a time-series of price observations per ingredient per vendor. Feeds the component cost calculator with the most recent confirmed price and powers price-trend views.
 
 **Summary:**
 
@@ -1811,7 +1811,7 @@ Generated by `bun run manifest:regen --apply`:
 - **Feature id:** `ingredient-substitution-suggestions`  
 - **Status:** `verified` · **Priority:** 2 · **Complexity:** moderate
 
-**Description:** When a recipe ingredient is out of stock or below demand, suggest mapped substitute ingredients (configured per ingredient) ranked by cost delta and allergen compatibility, allowing the kitchen to adapt without recreating the recipe.
+**Description:** When a component ingredient is out of stock or below demand, suggest mapped substitute ingredients (configured per ingredient) ranked by cost delta and allergen compatibility, allowing the kitchen to adapt without recreating the component.
 
 **Summary:**
 
@@ -1822,7 +1822,7 @@ Generated by `bun run manifest:regen --apply`:
 - Added a kitchen editor for configuring active, same-unit substitutes.
 - Ranked available substitutes by allergen compatibility, then unit-cost delta.
 - Displayed available quantity, shortage coverage, allergen warnings, and cost impact in the event-menu shortage banner.
-- Preserved canonical recipes instead of automatically rewriting them for one event shortage.
+- Preserved canonical components instead of automatically rewriting them for one event shortage.
 - Regenerated all Manifest-owned bindings through `bun run manifest:regen`.
 
 ### Files Modified
@@ -1857,7 +1857,7 @@ Generated by `bun run manifest:regen --apply`:
 
 **Description:** Validate form fields as users type or on blur (required fields, numeric ranges, date ordering like event end after start), showing errors next to the offending field rather than only on submit. Scroll to and focus the first invalid field on failed submission.
 
-**Rationale:** Multi-field forms (events, recipes, invoices) that fail silently or dump a generic error on submit force users to hunt for the problem. Inline validation catches mistakes at the moment they happen.
+**Rationale:** Multi-field forms (events, components, invoices) that fail silently or dump a generic error on submit force users to hunt for the problem. Inline validation catches mistakes at the moment they happen.
 
 **Summary:**
 
@@ -1878,7 +1878,7 @@ Generated by `bun run manifest:regen --apply`:
 
 ### Notes for Developer
 - The existing server-side `FailureBanner` (command denials/guard failures) is untouched and still shows for backend errors — inline validation only handles client-side field constraints.
-- **Applying to other forms is mechanical**: import `useFieldValidation`/`FieldError`, spread `formProps` on the `<form>`, wrap the submit handler with `handleSubmit`, and drop a `<FieldError name="…">` under each field. The recipe (`kitchen/RecipeDetailPage.tsx`), invoice (`finance/InvoiceIssueForm.tsx`), and the inline client/venue subforms on this same page use the identical uncontrolled `.field-label`/`.input` pattern and can adopt it as-is. I scoped this pass to the event form (the case that explicitly needs date ordering) to keep the diff surgical — extend to the others when you want the same UX there.
+- **Applying to other forms is mechanical**: import `useFieldValidation`/`FieldError`, spread `formProps` on the `<form>`, wrap the submit handler with `handleSubmit`, and drop a `<FieldError name="…">` under each field. The component (`kitchen/ComponentDetailPage.tsx`), invoice (`finance/InvoiceIssueForm.tsx`), and the inline client/venue subforms on this same page use the identical uncontrolled `.field-label`/`.input` pattern and can adopt it as-is. I scoped this pass to the event form (the case that explicitly needs date ordering) to keep the diff surgical — extend to the others when you want the same UX there.
 - No new dependencies; leans on the built-in Constraint Validation API. Error styling reuses the existing `text-danger` token.
 - Gates run: `bun run typecheck` (clean) and `prettier` (applied). Full `bun run check` (coverage/build/manifest gates) was not run — disproportionate for a two-file UI change; run it in CI before merge.
 
@@ -1949,24 +1949,24 @@ Generated by `bun run manifest:regen --apply`:
 
 ---
 
-## Interactive Recipe Scaling Calculator
+## Interactive Component Scaling Calculator
 
-- **Feature id:** `recipe-scaling-ui`  
+- **Feature id:** `component-scaling-ui`  
 - **Status:** `verified` · **Priority:** 2 · **Complexity:** simple
 
-**Description:** Provide a scaling widget on the recipe detail page where the operator enters a desired yield or headcount and sees all ingredient quantities re-calculated in real time, without modifying the canonical recipe record.
+**Description:** Provide a scaling widget on the component detail page where the operator enters a desired yield or headcount and sees all ingredient quantities re-calculated in real time, without modifying the canonical component record.
 
 **Summary:**
 
-## Summary: Recipe scaling widget on recipe detail page
+## Summary: Component scaling widget on component detail page
 
 ### Changes Implemented
-- Added a "Scale to yield" widget to the Composition section of the recipe detail page. The operator enters a desired yield (in the recipe's yield unit); all ingredient line quantities re-calculate in real time via a client-side scale factor (`target / recipe.yieldQuantity`).
-- Scaled lines show the base quantity alongside (e.g. "6 pound (base 3)"), plus a "× 2.00 of the canonical recipe (preview only — recipe is unchanged)" note and a Reset button.
-- Purely local React state — no mutation is ever called, so the canonical recipe record is never modified.
+- Added a "Scale to yield" widget to the Composition section of the component detail page. The operator enters a desired yield (in the component's yield unit); all ingredient line quantities re-calculate in real time via a client-side scale factor (`target / component.yieldQuantity`).
+- Scaled lines show the base quantity alongside (e.g. "6 pound (base 3)"), plus a "× 2.00 of the canonical component (preview only — component is unchanged)" note and a Reset button.
+- Purely local React state — no mutation is ever called, so the canonical component record is never modified.
 
 ### Files Modified
-- `src/features/kitchen/RecipeDetailPage.tsx`
+- `src/features/kitchen/ComponentDetailPage.tsx`
 
 ### Notes for Developer
 - Non-integer scaled values render with 2 decimals; integers render clean.
@@ -1974,7 +1974,7 @@ Generated by `bun run manifest:regen --apply`:
 - `bun run typecheck` and prettier check pass.
 
 ### Verification Status
-- Verified live with Playwright (MCP browser): started the vite dev server on port 7811, authenticated via a Clerk sign-in token, navigated to a real recipe detail page, entered 2× the base yield, and confirmed the first ingredient line changed from "3 pound" to "6 pound (base 3)" with the ×2.00 preview note; Reset restored "3 pound". Dev server was stopped afterward. No permanent test files were added (verification was interactive Playwright rather than a spec file, per repo rule against adding tests).
+- Verified live with Playwright (MCP browser): started the vite dev server on port 7811, authenticated via a Clerk sign-in token, navigated to a real component detail page, entered 2× the base yield, and confirmed the first ingredient line changed from "3 pound" to "6 pound (base 3)" with the ×2.00 preview note; Reset restored "3 pound". Dev server was stopped afterward. No permanent test files were added (verification was interactive Playwright rather than a spec file, per repo rule against adding tests).
 
 ---
 
@@ -2099,13 +2099,13 @@ The command palette core already existed (⌘K/Ctrl+K toggle, arrow/enter/escape
 
 - **Searchable shortcut reference overlay** — a new modal (`?` or via the palette) that lists every keyboard shortcut grouped by category (Global, Command palette), with live search/filter, `.kbd` key caps, platform-aware modifier (⌘ on macOS / Ctrl elsewhere), a no-match state, and Esc + backdrop-click dismiss.
 - **`?` global shortcut** — opens the reference overlay anywhere outside text fields and while the palette is closed.
-- **Expanded create/action commands in the palette** — added "Import recipe" (real `/kitchen/recipes/import` route) and a "Keyboard shortcuts" action that opens the overlay.
+- **Expanded create/action commands in the palette** — added "Import component" (real `/kitchen/components/import` route) and a "Keyboard shortcuts" action that opens the overlay.
 - **Single source of truth** — a typed shortcut catalog (`SHORTCUT_GROUPS`) drives the overlay, so future shortcuts are added in one place.
 
 ### Files Modified
 - `src/app/shell/keyboardShortcuts.ts` (new) — shortcut catalog + `isMac` / `modLabel()` / `displayKeys()` helpers.
 - `src/app/shell/ShortcutReferenceOverlay.tsx` (new) — searchable overlay component.
-- `src/app/shell/CommandPalette.tsx` — `onOpenShortcuts` prop; added "Import recipe" and "Keyboard shortcuts" commands; `KeyboardIcon` import; updated `useMemo` deps.
+- `src/app/shell/CommandPalette.tsx` — `onOpenShortcuts` prop; added "Import component" and "Keyboard shortcuts" commands; `KeyboardIcon` import; updated `useMemo` deps.
 - `src/app/shell/AppShell.tsx` — `shortcutsOpen` state, `?` keydown handler (skips editable targets / open palette), renders the overlay, passes `onOpenShortcuts` to the palette.
 - `src/ui/icons.tsx` — added `KeyboardIcon`.
 
@@ -2220,29 +2220,29 @@ The command palette core already existed (⌘K/Ctrl+K toggle, arrow/enter/escape
 
 ---
 
-## Live Recipe Cost Calculator
+## Live Component Cost Calculator
 
-- **Feature id:** `recipe-cost-calculator`  
+- **Feature id:** `component-cost-calculator`  
 - **Status:** `verified` · **Priority:** 1 · **Complexity:** moderate
 
-**Description:** Compute the ingredient cost of a Recipe in real time by joining RecipeLine quantities against current vendor pricing per unit. Surfaces cost per portion and total batch cost alongside the recipe editor so chefs see financial impact instantly.
+**Description:** Compute the ingredient cost of a Component in real time by joining ComponentLine quantities against current vendor pricing per unit. Surfaces cost per portion and total batch cost alongside the component editor so chefs see financial impact instantly.
 
 **Summary:**
 
-## Summary: Live Recipe Cost Calculator
+## Summary: Live Component Cost Calculator
 
 ### Changes Implemented
-- Added unit-aware recipe costing with mass and volume conversions.
+- Added unit-aware component costing with mass and volume conversions.
 - Added live batch cost, cost per portion/yield unit, and pricing coverage.
 - Added honest warnings for missing prices, ingredients, or incompatible units.
-- Wired calculations to reactive recipe lines and current ingredient pricing.
+- Wired calculations to reactive component lines and current ingredient pricing.
 
 ### Files Modified
-- `src/features/kitchen/RecipeCostCalculator.ts`
-- `src/features/kitchen/RecipeCostPanel.tsx`
-- `src/features/kitchen/RecipeDetailPage.tsx`
+- `src/features/kitchen/ComponentCostCalculator.ts`
+- `src/features/kitchen/ComponentCostPanel.tsx`
+- `src/features/kitchen/ComponentDetailPage.tsx`
 - `src/styles/app.css`
-- `codex-plans/recipe-cost-calculator/*`
+- `codex-plans/component-cost-calculator/*`
 
 ### Notes for Developer
 - The live model stores current pricing in `Ingredient.costPerUnit`; Vendor has no price/quote entity.
@@ -2299,15 +2299,15 @@ The command palette core already existed (⌘K/Ctrl+K toggle, arrow/enter/escape
 - **Feature id:** `menu-profitability-analysis`  
 - **Status:** `verified` · **Priority:** 2 · **Complexity:** moderate
 
-**Description:** Combine recipe cost with the selling price on a menu-dish link to compute gross margin per dish. Rank dishes by margin within a menu and flag low-margin items so operators can reprice or substitute ingredients.
+**Description:** Combine component cost with the selling price on a menu-dish link to compute gross margin per dish. Rank dishes by margin within a menu and flag low-margin items so operators can reprice or substitute ingredients.
 
 **Summary:**
 
-## Summary: Combine recipe cost with the selling price on a menu-dish link
+## Summary: Combine component cost with the selling price on a menu-dish link
 
 ### Changes Implemented
 - Added optional MenuDish selling prices and a governed repricing command.
-- Calculated per-dish recipe cost, gross margin, food-cost percentage, and menu-wide margin.
+- Calculated per-dish component cost, gross margin, food-cost percentage, and menu-wide margin.
 - Ranked dishes by margin and flagged dishes below the 70% target.
 - Added an operator-facing margin board with repricing and missing-data guidance.
 - Refreshed generated Convex schema, mutations, and React wiring.
@@ -2330,8 +2330,8 @@ The command palette core already existed (⌘K/Ctrl+K toggle, arrow/enter/escape
 - Full `bun run check` remains blocked by unrelated Event integration failures tracked in [#58](https://github.com/Angriff36/capsule/issues/58). Invalid `loop-ledger.json` formatting is tracked in [#68](https://github.com/Angriff36/capsule/issues/68).
 
 ### Notes for Developer
-- Margin ranking requires complete recipe costs and a positive selling price.
-- Recipe costs use the latest receipt price when available, falling back to catalog cost.
+- Margin ranking requires complete component costs and a positive selling price.
+- Component costs use the latest receipt price when available, falling back to catalog cost.
 - No unrelated concurrent files were rewritten.
 
 ---
@@ -2466,7 +2466,7 @@ The command palette core already existed (⌘K/Ctrl+K toggle, arrow/enter/escape
 ### Changes Implemented
 - Added a tenant-scoped, ranked cross-entity natural-language search backed by the Convex full-text search indexes the Manifest projection already declares.
 - The search bar (Ctrl+K command palette) now accepts free-form queries like *"events next week for Acme Corp"* or *"invoices unpaid over 30 days"* and returns ranked results across entities, with static nav/event items still filtered live as you type.
-- Server-side intent parsing extracts entity kind (event, invoice, client, vendor, dish, menu, recipe, ingredient, lead, proposal, contract, venue, person), status (unpaid, overdue, paid, draft, sent, cancelled, approved, upcoming), date windows (next/this week, today), and age thresholds (over N days).
+- Server-side intent parsing extracts entity kind (event, invoice, client, vendor, dish, menu, component, ingredient, lead, proposal, contract, venue, person), status (unpaid, overdue, paid, draft, sent, cancelled, approved, upcoming), date windows (next/this week, today), and age thresholds (over N days).
 - Wall-clock is passed in as `now` (queries never read `Date.now()`), and tenant scoping is derived from the authenticated identity only — no client-supplied tenantId is trusted.
 - Handles the invoice case (no full-text index on `invoices`) via a structured tenant-index query honoring status + age intent; handles pure date-intent event queries ("events next week") via a tenant-index + `startsAt` filter fallback when there is no text term for the search index.
 
@@ -2938,7 +2938,7 @@ The command palette core already existed (⌘K/Ctrl+K toggle, arrow/enter/escape
 - **Feature id:** `production-batch-yield-dashboard`  
 - **Status:** `verified` · **Priority:** 2 · **Complexity:** moderate
 
-**Description:** Aggregate yield variance across all completed ProductionBatches per recipe per period — expected yield vs actual yield — and rank recipes by worst-performing variance. Surfaces systematic portioning or cooking issues for targeted training.
+**Description:** Aggregate yield variance across all completed ProductionBatches per component per period — expected yield vs actual yield — and rank components by worst-performing variance. Surfaces systematic portioning or cooking issues for targeted training.
 
 **Summary:**
 
@@ -2946,7 +2946,7 @@ The command palette core already existed (⌘K/Ctrl+K toggle, arrow/enter/escape
 
 ### Changes Implemented
 - Added a read-only `/kitchen/yield` dashboard with 30-, 90-, and 365-day windows.
-- Aggregated expected versus actual yield by recipe and unit, ranked by worst variance.
+- Aggregated expected versus actual yield by component and unit, ranked by worst variance.
 - Excluded deleted, incomplete, out-of-window, and missing-actual-yield batches.
 - Added responsive dashboard styling, navigation, routing, and system documentation.
 - Fixed null actual yields being incorrectly treated as zero.
@@ -3072,7 +3072,7 @@ The command palette core already existed (⌘K/Ctrl+K toggle, arrow/enter/escape
 ### Changes Implemented
 - **Recents tracking (last 20 records):** Added a per-browser localStorage store (`src/lib/recents.ts`) with `pushRecent`, `useRecents()`, and a `useTrackRecent(type, label)` hook. Front-dedupes by path, caps at 20, and broadcasts changes so the dropdown updates live (mirrors the existing NotificationTray localStorage pattern).
 - **Quick-access dropdown:** Added `RecentsMenu` (`src/app/shell/RecentsMenu.tsx`), a `<details>` dropdown (matching NotificationTray) wired into the Topbar next to notifications. Shows each record's type, relative time, and label, linking straight back to it.
-- **Detail pages now track opens:** Added one-line `useTrackRecent(...)` calls to Event, Client, Dish, Recipe, Menu, Ingredient, and Invoice detail pages using each record's real title.
+- **Detail pages now track opens:** Added one-line `useTrackRecent(...)` calls to Event, Client, Dish, Component, Menu, Ingredient, and Invoice detail pages using each record's real title.
 - **Hover-preview cards:** Added a reusable `HoverPreview` wrapper (`src/ui/HoverPreview.tsx`, ~180ms hover/focus delay, dismisses on leave/blur). Wired two previews as named in the request:
   - Client name on the Event detail header → `ClientPreviewCard` (type, status, email, phone, location).
   - Ingredient name on the Demand ledger lines → `IngredientPreviewCard` (category, status, cost/unit, allergens). Both references also became links to their detail pages.
@@ -3080,7 +3080,7 @@ The command palette core already existed (⌘K/Ctrl+K toggle, arrow/enter/escape
 
 ### Files Modified
 - New: `src/lib/recents.ts`, `src/ui/HoverPreview.tsx`, `src/app/shell/RecentsMenu.tsx`, `src/features/clients/ClientPreviewCard.tsx`, `src/features/kitchen/IngredientPreviewCard.tsx`
-- Edited: `src/ui/icons.tsx`, `src/app/shell/Topbar.tsx`, `src/features/events/EventDetailPage.tsx`, `src/features/clients/ClientDetailPage.tsx`, `src/features/kitchen/DishDetailPage.tsx`, `src/features/kitchen/MenuDetailPage.tsx`, `src/features/kitchen/IngredientDetailPage.tsx`, `src/features/kitchen/RecipeDetailPage.tsx`, `src/features/finance/InvoiceDetailPage.tsx`, `src/features/inventory/DemandLedgerPage.tsx`
+- Edited: `src/ui/icons.tsx`, `src/app/shell/Topbar.tsx`, `src/features/events/EventDetailPage.tsx`, `src/features/clients/ClientDetailPage.tsx`, `src/features/kitchen/DishDetailPage.tsx`, `src/features/kitchen/MenuDetailPage.tsx`, `src/features/kitchen/IngredientDetailPage.tsx`, `src/features/kitchen/ComponentDetailPage.tsx`, `src/features/finance/InvoiceDetailPage.tsx`, `src/features/inventory/DemandLedgerPage.tsx`
 
 ### Notes for Developer
 - Recents are per-browser (localStorage), not per-account/cross-device — same tradeoff as existing notification read-state (marked with a `ponytail:` comment). Move to a Convex entity only if cross-device sync is ever needed.
@@ -3882,9 +3882,9 @@ A reusable, per-user **saved views** capability for list pages: save the current
 - **Feature id:** `feature-1784713282637-jnq5jx669`  
 - **Status:** `verified` · **Priority:** ? · **Complexity:** ?
 
-**Description:** Detect dirty form state and warn before navigation discards edits on long forms like recipes, proposals, and events. Autosave a local draft so users can restore work after an accidental tab close or session timeout.
+**Description:** Detect dirty form state and warn before navigation discards edits on long forms like components, proposals, and events. Autosave a local draft so users can restore work after an accidental tab close or session timeout.
 
-**Rationale:** Losing a half-entered 30-line recipe or event configuration is one of the most rage-inducing experiences in data-heavy SaaS. Cheap to build, huge trust payoff.
+**Rationale:** Losing a half-entered 30-line component or event configuration is one of the most rage-inducing experiences in data-heavy SaaS. Cheap to build, huge trust payoff.
 
 **Summary:**
 
@@ -3901,13 +3901,13 @@ A reusable, per-user **saved views** capability for list pages: save the current
 - Wired into the three "long forms" named in the feature:
   - **Events** (`EventCreatePage.tsx`): main event-create form — ref + banner above the grid; draft cleared before navigating on success.
   - **Proposals** (`ProposalsPage.tsx`): draft-proposal form — ref + banner inside the form; cleared on successful create.
-  - **Recipes** (`RecipeDetailPage.tsx`): revise-draft editor — hook keyed per-recipe (`recipe-revise:<id>`), called before the component's early returns to respect hook rules; `RecipeEditForm` gained a `formRef` prop; banner shown when the editor is open; cleared on successful revision.
+  - **Components** (`ComponentDetailPage.tsx`): revise-draft editor — hook keyed per-component (`component-revise:<id>`), called before the component's early returns to respect hook rules; `ComponentEditForm` gained a `formRef` prop; banner shown when the editor is open; cleared on successful revision.
 
 ### Files Modified
 - `src/ui/formDraft.tsx` (new)
 - `src/features/events/EventCreatePage.tsx`
 - `src/features/clients/ProposalsPage.tsx`
-- `src/features/kitchen/RecipeDetailPage.tsx`
+- `src/features/kitchen/ComponentDetailPage.tsx`
 
 ### Notes for Developer
 - Only **named, uncontrolled** fields are persisted. The Event page's Client/Venue `<select>`s are React-controlled with no `name`, so they aren't captured/restored (by design — easy to re-pick; the rage case is typed text like titles, contact info, notes, and method).

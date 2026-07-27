@@ -27,7 +27,7 @@ beforeAll(() => {
 });
 
 describe("culinary governed creation", () => {
-  it("creates Ingredient, Recipe, and Dish with command-owned timestamps", async () => {
+  it("creates Ingredient, Component, and Dish with command-owned timestamps", async () => {
     const { proof, actor } = kitchenActor();
 
     const ingredient = (await proof.executeCommand(
@@ -41,9 +41,9 @@ describe("culinary governed creation", () => {
         category: "pantry",
       },
     )) as { docId: string };
-    const recipe = (await proof.executeCommand(
+    const component = (await proof.executeCommand(
       actor,
-      api.mutations.Recipe_createViaDraft,
+      api.mutations.Component_createViaDraft,
       {
         name: "Seasoning base",
         yieldQuantity: 12,
@@ -63,7 +63,7 @@ describe("culinary governed creation", () => {
 
     const created = await actor.run(async (ctx) => ({
       ingredient: await ctx.db.get(ingredient.docId as never),
-      recipe: await ctx.db.get(recipe.docId as never),
+      component: await ctx.db.get(component.docId as never),
       dish: await ctx.db.get(dish.docId as never),
     }));
 
@@ -72,7 +72,7 @@ describe("culinary governed creation", () => {
       tenantId: "tenant-culinary-create",
       version: 1,
     });
-    expect(created.recipe).toMatchObject({
+    expect(created.component).toMatchObject({
       name: "Seasoning base",
       tenantId: "tenant-culinary-create",
       version: 1,
@@ -83,7 +83,7 @@ describe("culinary governed creation", () => {
       version: 1,
     });
     expect(created.ingredient?.introducedAt).toEqual(expect.any(Number));
-    expect(created.recipe?.draftedAt).toEqual(expect.any(Number));
+    expect(created.component?.draftedAt).toEqual(expect.any(Number));
     expect(created.dish?.introducedAt).toEqual(expect.any(Number));
   });
 

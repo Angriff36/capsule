@@ -17,16 +17,16 @@
 
 ## Research Findings
 
-- The current repo sequence defines Slice 2 as Culinary planning: maintain ingredients, recipes, and dishes; publish menus; select event dishes.
+- The current repo sequence defines Slice 2 as Culinary planning: maintain ingredients, components, and dishes; publish menus; select event dishes.
 - The older Capsule-V2 memory named Kitchen production/tasks as the next slice, but that is stale for this checkout and would skip the current repo's Culinary slice.
 - `/kitchen` currently renders only `KitchenRoutePlaceholder`; all six Culinary entities have generated list/detail/index queries and command hooks.
-- The Culinary owner page calls for a culinary-book workspace, not a dashboard, and explicitly forbids inventing procedures, prep time, nutrition, media, or imported recipe behavior.
+- The Culinary owner page calls for a culinary-book workspace, not a dashboard, and explicitly forbids inventing procedures, prep time, nutrition, media, or imported component behavior.
 - Production and quality are separately owned and remain out of scope.
-- `DESIGN.md` defines the route family at `/kitchen/recipes`, sibling Recipes/Dishes/Ingredients views, Menus as a separate composition surface, large serif object documents, and explicit responsive reduction rules.
-- `src/styles/app.css` already contains committed Recipe Book and culinary-document classes, including catalog, empty, detail, facts, tags, and responsive treatments; implementation should reuse them.
+- `DESIGN.md` defines the route family at `/kitchen/components`, sibling Components/Dishes/Ingredients views, Menus as a separate composition surface, large serif object documents, and explicit responsive reduction rules.
+- `src/styles/app.css` already contains committed Component Book and culinary-document classes, including catalog, empty, detail, facts, tags, and responsive treatments; implementation should reuse them.
 - Ingredient commands: introduce, update details, classify allergens, update costing, discontinue, reinstate.
-- Recipe commands: draft, revise draft, publish version, retract, retire; RecipeIngredient supports add, adjust quantity, remove.
-- Dish commands: introduce, revise details, change recipe, update portioning, classify allergens, retire, reinstate.
+- Component commands: draft, revise draft, publish version, retract, retire; ComponentIngredient supports add, adjust quantity, remove.
+- Dish commands: introduce, revise details, change component, update portioning, classify allergens, retire, reinstate.
 - Menu commands: draft, revise details, update pricing, publish, unpublish, archive, restore.
 - EventDish is the modeled event composition record: `addToEvent`, adjust servings, change course/service style, update instructions, remove. MenuDish exists for catalog menus; EventDish is the event composition handoff.
 - ~~EventDish writes are guarded to Event stages planning, pending approval, or approved.~~
@@ -60,39 +60,39 @@
 
 # 2026-07-16 — Generated culinary surface
 
-- Generated React hooks already cover list/get plus commands for Ingredient, Recipe, RecipeIngredient, Dish, Menu, and EventDish.
-- Generated bindings export typed client inputs and lifecycle arrays such as `RecipePublishVersionLifecycle`, `RecipeRetireLifecycle`, `MenuMarkPublishedLifecycle`, and `MenuUnpublishLifecycle`; authored UI should consume these rather than restating transition rules.
+- Generated React hooks already cover list/get plus commands for Ingredient, Component, ComponentIngredient, Dish, Menu, and EventDish.
+- Generated bindings export typed client inputs and lifecycle arrays such as `ComponentPublishVersionLifecycle`, `ComponentRetireLifecycle`, `MenuMarkPublishedLifecycle`, and `MenuUnpublishLifecycle`; authored UI should consume these rather than restating transition rules.
 - Manifest creation commands are instance commands, so the authored slice likely needs the same narrow allocation/action seam used by Event: allocate the minimum document shape, invoke the generated command, and delete the allocation if the command rejects.
 - `EventDish` must be allocated with its parent `eventId` before `addToEvent` (or use `EventDish_createViaAddToEvent`) so parent-stage policy can run against the real event.
 - Generated command bodies insert domain events and accept preallocated `docId` values; allocation is not performed by those generated mutations.
 - ~~Source truth does not define Menu-to-Dish membership.~~
   > **Correction (2026-07-19):** `MenuDish` models catalog menu membership; EventDish remains the event composition handoff.
-- Recipe publication does not currently require ingredient lines in Manifest source. The UI must not add that local policy.
+- Component publication does not currently require ingredient lines in Manifest source. The UI must not add that local policy.
 
 ## Allocation requirements
 
-- Generated create-like mutations (`Ingredient_introduce`, `Recipe_draft`, `RecipeIngredient_add`, `Dish_introduce`, `Menu_draft`, `EventDish_addToEvent`) all require a valid preallocated `docId` and fail if the row does not exist.
+- Generated create-like mutations (`Ingredient_introduce`, `Component_draft`, `ComponentIngredient_add`, `Dish_introduce`, `Menu_draft`, `EventDish_addToEvent`) all require a valid preallocated `docId` and fail if the row does not exist.
 - The authored allocation seam must seed schema-valid neutral values only:
   - Ingredient: name, unit, cost, active status.
-  - Recipe: name, yield, batch multiplier, draft status, version number.
-  - RecipeIngredient: recipe and ingredient references, quantity/unit/sort order.
-  - Dish: recipe reference, portion values, active status.
+  - Component: name, yield, batch multiplier, draft status, version number.
+  - ComponentIngredient: component and ingredient references, quantity/unit/sort order.
+  - Dish: component reference, portion values, active status.
   - Menu: pricing/guest-range defaults and draft status.
   - EventDish: event and dish references plus servings; the event reference is required for generated parent-stage policy.
 - Generated mutations own validation, role checks, transitions, event emission, versioning, and timestamps. The seam must not duplicate any of those behaviors.
 
 ## Visual reference decisions
 
-- The local Galley references reinforce a book-first information architecture: Recipe/Ingredient/Menu are peer catalogs, while a recipe opens as a full-width working document.
+- The local Galley references reinforce a book-first information architecture: Component/Ingredient/Menu are peer catalogs, while a component opens as a full-width working document.
 - The useful pattern is hierarchy and density, not the reference's decorative food imagery. Capsule's committed CSS already translates it into the warm-white, sage, serif/mono system.
-- Only source-backed recipe facts should appear. The reference's prep time, HACCP, media, nutrition, and derived allergen affordances are intentionally excluded because Manifest does not model them in this slice.
+- Only source-backed component facts should appear. The reference's prep time, HACCP, media, nutrition, and derived allergen affordances are intentionally excluded because Manifest does not model them in this slice.
 
 ## Existing authored seam pattern
 
 - `convex/lib/eventPlanning.ts` is the canonical implementation model: tenant-aware internal allocators, one cleanup mutation, and public actions that call exact generated mutations.
 - `src/features/events/eventPlanningApi.ts` wraps those actions with generated client input types and returns typed Convex IDs.
 - Kitchen should follow this pattern in its own authored seam, leaving the Event seam untouched.
-- The current app has only a `/kitchen` placeholder. The smallest coherent route family is `/kitchen/:section` for peer catalogs plus `/kitchen/recipes/:id` for the working document; `/kitchen` should resolve to recipes.
+- The current app has only a `/kitchen` placeholder. The smallest coherent route family is `/kitchen/:section` for peer catalogs plus `/kitchen/components/:id` for the working document; `/kitchen` should resolve to components.
 
 ## Test and repository-gate pattern
 

@@ -47,7 +47,7 @@ export class CapsuleMcpToolRegistrar {
       {
         capabilityId: z
           .string()
-          .describe("e.g. Ingredient.introduce, Recipe.draft"),
+          .describe("e.g. Ingredient.introduce, Component.draft"),
       },
       async ({ capabilityId }) => {
         const descriptor = this.catalog.get(capabilityId);
@@ -110,10 +110,10 @@ export class CapsuleMcpToolRegistrar {
     );
 
     server.tool(
-      "preview_recipe_document",
-      "Parse a recipe document without writing. Inspect lines/yield/instructions before enter_recipe_document.",
+      "preview_component_document",
+      "Parse a component document without writing. Inspect lines/yield/instructions before enter_component_document.",
       {
-        sourceText: z.string().describe("Full recipe document text"),
+        sourceText: z.string().describe("Full component document text"),
       },
       async ({ sourceText }) => {
         const catalog = await new CapsuleIngredientCatalogLoader().load();
@@ -146,10 +146,10 @@ export class CapsuleMcpToolRegistrar {
     );
 
     server.tool(
-      "enter_recipe_document",
-      "Enter a previewed recipe through governed createVia commands. Loads live catalog. Refuses unresolved lines unless approveUnresolvedAsNew is true (creates active ingredients — no pending state).",
+      "enter_component_document",
+      "Enter a previewed component through governed createVia commands. Loads live catalog. Refuses unresolved lines unless approveUnresolvedAsNew is true (creates active ingredients — no pending state).",
       {
-        sourceText: z.string().describe("Full recipe document text"),
+        sourceText: z.string().describe("Full component document text"),
         approveUnresolvedAsNew: z
           .boolean()
           .optional()
@@ -160,7 +160,7 @@ export class CapsuleMcpToolRegistrar {
           .boolean()
           .optional()
           .describe(
-            "Default false. Recipe sheets are Recipes (work/recipes). Dishes are production-sheet menu items with DishTask lines (work/list*.jpg). Opt-in only — do not invent a Dish from a recipe title.",
+            "Default false. Component sheets are Components (work/components). Dishes are production-sheet menu items with DishTask lines (work/list*.jpg). Opt-in only — do not invent a Dish from a component title.",
           ),
         dishPortionSize: z.number().optional(),
         dishPortionUnit: z.string().optional(),

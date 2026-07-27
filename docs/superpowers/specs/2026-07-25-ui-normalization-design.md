@@ -148,7 +148,7 @@ Routes compose document components through a small set of recognizable
 archetypes:
 
 - `EditorialOverview`: home, reports, analytical overview pages.
-- `ObjectDossier`: event, client, recipe, menu, invoice, and other detail
+- `ObjectDossier`: event, client, component, menu, invoice, and other detail
   pages.
 - `LedgerWorkspace`: inventory, purchasing, staffing, time, logistics, and
   finance registers.

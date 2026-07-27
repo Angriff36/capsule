@@ -14,11 +14,11 @@ import { HomePage } from "../features/home/HomePage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
 import { DishDetailPage } from "../features/kitchen/DishDetailPage";
 import { IngredientDetailPage } from "../features/kitchen/IngredientDetailPage";
-import { RecipeImportPage } from "../features/kitchen/import/RecipeImportPage";
+import { ComponentImportPage } from "../features/kitchen/import/ComponentImportPage";
 import { KitchenCatalogPage } from "../features/kitchen/KitchenCatalogPage";
 import { KitchenDashboardPage } from "../features/kitchen/KitchenDashboardPage";
 import { MenuDetailPage } from "../features/kitchen/MenuDetailPage";
-import { RecipeDetailPage } from "../features/kitchen/RecipeDetailPage";
+import { ComponentDetailPage } from "../features/kitchen/ComponentDetailPage";
 import { ErrorState, TableSkeleton } from "../ui/primitives";
 import { AuthGate } from "./AuthGate";
 import { NAV_AREAS } from "./nav";
@@ -543,17 +543,20 @@ export function App() {
             />
             <Route
               path="/kitchen"
-              element={<Navigate to="/kitchen/recipes" replace />}
+              element={<Navigate to="/kitchen/components" replace />}
             />
             <Route
-              path="/kitchen/recipes"
-              element={<KitchenCatalogPage section="recipes" />}
+              path="/kitchen/components"
+              element={<KitchenCatalogPage section="components" />}
             />
             <Route
-              path="/kitchen/recipes/import"
-              element={<RecipeImportPage />}
+              path="/kitchen/components/import"
+              element={<ComponentImportPage />}
             />
-            <Route path="/kitchen/recipes/:id" element={<RecipeDetailPage />} />
+            <Route
+              path="/kitchen/components/:id"
+              element={<ComponentDetailPage />}
+            />
             <Route
               path="/kitchen/ingredients/:id"
               element={<IngredientDetailPage />}

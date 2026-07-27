@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useIngredientSetNutrition } from "../../lib/manifest-convex-react";
-import { NUTRIENTS, type IngredientNutritionFields } from "./RecipeNutrition";
+import {
+  NUTRIENTS,
+  type IngredientNutritionFields,
+} from "./ComponentNutrition";
 
 export type IngredientNutritionTarget = IngredientNutritionFields & {
   _id: string;
@@ -84,9 +87,9 @@ export function IngredientNutritionEditor({
         {!canEdit && <span>Reinstate to edit</span>}
       </div>
       <p className="max-w-160 text-[13px] text-ink-2">
-        Values for one {ingredient.unit} of this ingredient. Recipes and menus
-        aggregate these into per-portion panels. Leave a field blank when the
-        value is unknown.
+        Values for one {ingredient.unit} of this ingredient. Components and
+        menus aggregate these into per-portion panels. Leave a field blank when
+        the value is unknown.
       </p>
       <form
         className="mt-4 grid gap-3 sm:grid-cols-3"

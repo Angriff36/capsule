@@ -4,9 +4,9 @@ import {
   useCreateDishTask,
   useDishTaskRetire,
   useListDishTask,
-  useListRecipe,
+  useListComponent,
 } from "../../lib/manifest-convex-react";
-import { recipePath } from "./kitchenRoutes";
+import { componentPath } from "./kitchenRoutes";
 
 type Props = {
   dishId: string;
@@ -46,10 +46,10 @@ const UNITS = [
   "bottle",
 ] as const;
 
-/** Dish-level prep task templates with recipe hyperlinks when linked. */
+/** Dish-level prep task templates with component hyperlinks when linked. */
 export function DishPrepTasksPanel({ dishId }: Props) {
   const tasks = useListDishTask();
-  const recipes = useListRecipe();
+  const components = useListComponent();
   const addTask = useCreateDishTask();
   const retireTask = useDishTaskRetire();
 
@@ -154,8 +154,8 @@ export function DishPrepTasksPanel({ dishId }: Props) {
       ) : (
         <ul className="divide-y divide-line">
           {rows.map((task) => {
-            const recipe = task.recipeId
-              ? recipes?.find((entry) => entry._id === task.recipeId)
+            const component = task.componentId
+              ? components?.find((entry) => entry._id === task.componentId)
               : null;
             return (
               <li
@@ -176,19 +176,19 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
-                  {recipe ? (
+                  {component ? (
                     <Link
-                      to={recipePath(recipe._id)}
+                      to={componentPath(component._id)}
                       className="text-[13px] text-accent underline-offset-2 hover:underline"
                     >
-                      Recipe: {recipe.name}
+                      Component: {component.name}
                     </Link>
-                  ) : task.recipeId ? (
+                  ) : task.componentId ? (
                     <span className="text-[12px] text-ink-3">
-                      Recipe linked
+                      Component linked
                     </span>
                   ) : (
-                    <span className="text-[12px] text-ink-3">No recipe</span>
+                    <span className="text-[12px] text-ink-3">No component</span>
                   )}
                   <button
                     type="button"

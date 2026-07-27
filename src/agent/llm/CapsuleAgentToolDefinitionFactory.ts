@@ -109,7 +109,7 @@ export class CapsuleAgentToolDefinitionFactory {
           properties: {
             capabilityId: {
               type: "string",
-              description: "e.g. Recipe.draft, Ingredient.introduce",
+              description: "e.g. Component.draft, Ingredient.introduce",
             },
           },
           required: ["capabilityId"],

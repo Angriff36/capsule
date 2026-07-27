@@ -1,6 +1,6 @@
 /* Per-entry distinctness: kind tint, status chips, layered type. */
 
-.culinary-card--recipes {
+.culinary-card--components {
   --card-kind: var(--color-brand);
   --card-kind-soft: color-mix(
     in srgb,

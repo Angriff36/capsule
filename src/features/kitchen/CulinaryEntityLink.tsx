@@ -4,10 +4,10 @@ import {
   dishPath,
   ingredientPath,
   menuPath,
-  recipePath,
+  componentPath,
 } from "./kitchenRoutes";
 
-type EntityKind = "recipe" | "ingredient" | "dish" | "menu";
+type EntityKind = "component" | "ingredient" | "dish" | "menu";
 
 export function CulinaryEntityLink({
   kind,
@@ -21,8 +21,8 @@ export function CulinaryEntityLink({
   className?: string;
 }) {
   const path =
-    kind === "recipe"
-      ? recipePath(id)
+    kind === "component"
+      ? componentPath(id)
       : kind === "ingredient"
         ? ingredientPath(id)
         : kind === "dish"

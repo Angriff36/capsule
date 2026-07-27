@@ -6,7 +6,7 @@ import {
   useListEventDish,
   useListPerson,
   useListPrepTask,
-  useListRecipe,
+  useListComponent,
   useListVenue,
   usePrepTaskAssign,
   usePrepTaskClaim,
@@ -38,7 +38,7 @@ export function KitchenDashboardPage() {
   const events = useListEvent();
   const eventDishes = useListEventDish();
   const dishes = useListDish();
-  const recipes = useListRecipe();
+  const components = useListComponent();
   const tasks = useListPrepTask();
   const people = useListPerson();
   const venues = useListVenue();
@@ -235,8 +235,10 @@ export function KitchenDashboardPage() {
               armedPersonId={armedPersonId}
               busy={busy}
               prepSyncReady={prepSyncReady}
-              recipeName={(id) =>
-                id ? (recipes?.find((r) => r._id === id)?.name ?? null) : null
+              componentName={(id) =>
+                id
+                  ? (components?.find((r) => r._id === id)?.name ?? null)
+                  : null
               }
               onAssignTask={onAssignTask}
               onAssignDish={onAssignDish}

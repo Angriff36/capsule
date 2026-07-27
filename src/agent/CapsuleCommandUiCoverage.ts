@@ -22,20 +22,20 @@ export const CAPABILITY_UI_SURFACES: Readonly<
     hooks: ["useCreateIngredient"],
     surfaces: ["src/features/kitchen/KitchenCatalogPage.tsx"],
   },
-  "Recipe.draft": {
-    hooks: ["useCreateRecipe"],
+  "Component.draft": {
+    hooks: ["useCreateComponent"],
     surfaces: ["src/features/kitchen/KitchenCatalogPage.tsx"],
   },
-  "RecipeIngredient.add": {
-    hooks: ["useCreateRecipeIngredient"],
-    surfaces: ["src/features/kitchen/RecipeDetailPage.tsx"],
+  "ComponentIngredient.add": {
+    hooks: ["useCreateComponentIngredient"],
+    surfaces: ["src/features/kitchen/ComponentDetailPage.tsx"],
   },
-  "RecipeImport.upload": null,
+  "ComponentImport.upload": null,
   "Dish.introduce": {
     hooks: ["useCreateDish"],
     surfaces: ["src/features/kitchen/KitchenCatalogPage.tsx"],
   },
-  "DishRecipe.attach": null,
+  "DishComponent.attach": null,
   "DishTask.add": {
     hooks: ["useCreateDishTask"],
     surfaces: ["src/features/kitchen/DishDetailPage.tsx"],

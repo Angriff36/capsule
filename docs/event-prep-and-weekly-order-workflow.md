@@ -3,7 +3,7 @@ source_of_truth: true
 created: 2026-07-19
 updated: 2026-07-21
 # Correction 2026-07-21: Capsule pins Manifest 3.6.41; event→weekly purchasing is Manifest-owned — see § Implementation boundary.
-# Correction 2026-07-21: Visual SoT for Dish vs Recipe vs DishTask is work/list*.jpg and work/recipes/*.jpg — see § What the kitchen actually needs.
+# Correction 2026-07-21: Visual SoT for Dish vs Component vs DishTask is work/list*.jpg and work/components/*.jpg — see § What the kitchen actually needs.
 # Correction 2026-07-21: Event.approve also opens PackList + plans ProductionBatch; Delivery on PackListPacked — see § Demand and the weekly order form.
 ---
 
@@ -16,10 +16,10 @@ updated: 2026-07-21
 - `work/list3.jpg`, `work/list4.jpg`, `work/list5.jpg` — production sheets.
   The bold ALL-CAPS menu lines are **Dishes**. Under each dish are prep /
   portion lines with quantities (those are **DishTask** templates). Lines like
-  “MAKE HUCKLEBERRY BBQ SAUCE” or “MAKE HONEY CINNAMON BUTTER (RECIPE)” point
-  at a separate **Recipe**, they are not the dish itself.
-- `work/recipes/*.jpg` — component formula sheets (pesto, brine, sauce,
-  concentrate). Those are **Recipes** with ingredients + method.
+  “MAKE HUCKLEBERRY BBQ SAUCE” or “MAKE HONEY CINNAMON BUTTER (COMPONENT)” point
+  at a separate **Component**, they are not the dish itself.
+- `work/components/*.jpg` — component formula sheets (pesto, brine, sauce,
+  concentrate). Those are **Components** with ingredients + method.
 
 A Dish is a reusable finished offering. It has reusable DishTask templates such as:
 
@@ -28,7 +28,7 @@ A Dish is a reusable finished offering. It has reusable DishTask templates such 
 - Portion Caesar dressing
 - Make a component when that component is not already available
 
-A Recipe is a reusable formula. It has RecipeIngredients and ordered RecipeSteps for making a component. A Recipe is not rewritten when an Event needs a different amount. Never name a Recipe the same as its Dish and pretend that is “full ingredients.”
+A Component is a reusable formula. It has ComponentIngredients and ordered ComponentSteps for making a component. A Component is not rewritten when an Event needs a different amount. Never name a Component the same as its Dish and pretend that is “full ingredients.”
 
 A Menu only groups Dishes. It does not own prep work.
 
@@ -38,7 +38,7 @@ When a Dish is added to an Event:
 
 1. Capsule creates an EventDish for the selected Dish.
 2. Active DishTask templates are copied into editable PrepTask rows (host prep sync).
-3. Manifest expands DishRecipe → RecipeIngredient into `EventIngredientContribution` rows and aggregates `IngredientDemand` (`calculated`, `purchaseEligibleEventId = eventId`).
+3. Manifest expands DishComponent → ComponentIngredient into `EventIngredientContribution` rows and aggregates `IngredientDemand` (`calculated`, `purchaseEligibleEventId = eventId`).
 4. The Event quantity (servings / headcount) drives those quantities.
 5. Event-specific instructions, dietary requirements, and one-off tasks are added to the Event work list.
 
@@ -62,7 +62,7 @@ When the Event is **approved**:
 3. `WeeklyPurchasingConfig.routeNeed` uses each ingredient's first preferred vendor, falling back to the tenant default, and ensures the matching weekly `VendorOrder` DRAFT
 4. Lines consolidate identical ingredients; on-hand stock reduces the ordered quantity once across the week
 5. Needs stay `open` until the buyer submits the draft — approval never auto-submits
-6. Manifest also `PackList.open` (match `eventId` + `activeEventId`, else create) and fanOut `ProductionBatch.plan` per `EventDishRecipeSeed` (MCP-proved 2026-07-21 on local Convex after #8/#10/#11/#14)
+6. Manifest also `PackList.open` (match `eventId` + `activeEventId`, else create) and fanOut `ProductionBatch.plan` per `EventDishComponentSeed` (MCP-proved 2026-07-21 on local Convex after #8/#10/#11/#14)
 7. Manifest `Invoice.issue` (match `eventId`, else create) from `quotedPrice` / `clientId` on the expanded `EventApproved` payload — remains draft until finance sends
 8. `Delivery.schedule` is **not** on approve — it runs on `PackListPacked` after pack
 9. After the event is completed and **closed out**, Manifest seeds `EventCloseout.capture`
@@ -77,7 +77,7 @@ Headcount or dish changes revise contributions and reconcile the same draft (ide
 When receiving an order line, the buyer enters the actual unit price with the
 receipt quantity. `VendorOrderLine.recordReceipt` retains that price on the line
 and creates one immutable `IngredientPriceObservation` for the ingredient,
-vendor, order, and partial receipt. Ingredient price trends and Recipe costing
+vendor, order, and partial receipt. Ingredient price trends and Component costing
 use the newest confirmed observation; Ingredients without a receipt observation
 continue using their catalog cost. Physical stock receipt remains a separate
 generated Inventory command.
@@ -96,7 +96,7 @@ EventDish + headcount
 
 ## Implementation boundary
 
-> **Correction (2026-07-21):** Manifest owns recalculation, BOM expansion, shortage consolidation, weekly draft ensure/reconcile (`src/procurement/event-purchasing.manifest` + related demand/order/purchase-need commands). Pin `@angriff36/manifest` **`3.6.41`** (exact — requires `sum(Entity where … of field)`, single-target and fanOut `match … else create`, Convex else-create allocate, and fanOut soft-delete source exclusion so headcount cascades skip retired EventDish rows). Host `PrepPurchaseDraftCoordinator` and `EventRecipeDemandReconciler` / `EventMenuRecipeDemandSync` are removed. UI “Generate prep-list draft” / “Create need” / demand-confirm theater controls are removed. PrepTask template sync may still use `EventPrepCoordinator` (with `skipDemand`); recipe→demand→weekly draft is Manifest-owned.
+> **Correction (2026-07-21):** Manifest owns recalculation, BOM expansion, shortage consolidation, weekly draft ensure/reconcile (`src/procurement/event-purchasing.manifest` + related demand/order/purchase-need commands). Pin `@angriff36/manifest` **`3.6.41`** (exact — requires `sum(Entity where … of field)`, single-target and fanOut `match … else create`, Convex else-create allocate, and fanOut soft-delete source exclusion so headcount cascades skip retired EventDish rows). Host `PrepPurchaseDraftCoordinator` and `EventComponentDemandReconciler` / `EventMenuComponentDemandSync` are removed. UI “Generate prep-list draft” / “Create need” / demand-confirm theater controls are removed. PrepTask template sync may still use `EventPrepCoordinator` (with `skipDemand`); component→demand→weekly draft is Manifest-owned.
 >
 > Proof: `tests/proofs/event-weekly-purchasing.runtime.test.ts`.
 

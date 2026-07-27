@@ -85,7 +85,7 @@ const ALIASES: Record<string, UnitOfMeasure> = {
   gallons: "gallon",
   portion: "portion",
   portions: "portion",
-  // serving stays mapped to portion: this alias table is for the recipe/
+  // serving stays mapped to portion: this alias table is for the component/
   // ingredient importer, where "yields 6 servings" has to land on a unit that
   // costing can convert. `serving` itself is in the vocabulary for prep
   // templates, which are instructions and never costed.

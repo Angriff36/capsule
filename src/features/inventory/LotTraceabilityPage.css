@@ -271,7 +271,7 @@
 
   .app-sidebar,
   .app-topbar,
-  .recipe-status-tabs,
+  .component-status-tabs,
   .lot-trace-actions {
     display: none !important;
   }

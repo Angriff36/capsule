@@ -41,7 +41,7 @@ function invocationKey(base: string | undefined, suffix: string) {
 }
 
 /**
- * Agent: add EventDish (Manifest owns recipe→demand→weekly draft), then sync PrepTasks.
+ * Agent: add EventDish (Manifest owns component→demand→weekly draft), then sync PrepTasks.
  */
 export class CapsuleEventPrepCoordinator {
   constructor(

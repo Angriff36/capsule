@@ -55,7 +55,7 @@ export class CapsuleLiveEventPrepStateLoader implements CapsuleEventPrepStateLoa
             category: row.category as string | null | undefined,
             taskType: row.taskType as string | null | undefined,
             sortOrder: row.sortOrder as number | null | undefined,
-            recipeId: row.recipeId as string | null | undefined,
+            componentId: row.componentId as string | null | undefined,
             ingredientId: row.ingredientId as string | null | undefined,
             instructions: row.instructions as string | null | undefined,
             status: String(row.status),
@@ -77,7 +77,7 @@ export class CapsuleLiveEventPrepStateLoader implements CapsuleEventPrepStateLoa
             ingredientId: row.ingredientId as string | null | undefined,
             ingredientDemandId: row.ingredientDemandId as
               string | null | undefined,
-            recipeId: row.recipeId as string | null | undefined,
+            componentId: row.componentId as string | null | undefined,
             specialInstructions: row.specialInstructions as
               string | null | undefined,
             isGenerated: Boolean(row.isGenerated),

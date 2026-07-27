@@ -15,7 +15,7 @@ describe("ImportSourceReadinessChecker", () => {
     ).toEqual({
       ready: false,
       kind: "none",
-      message: "Paste recipe text before parsing.",
+      message: "Paste component text before parsing.",
     });
   });
 
@@ -35,8 +35,8 @@ describe("ImportSourceReadinessChecker", () => {
       checker.evaluate({
         mode: "files",
         source: "",
-        sheetCsv: "recipe_name\nBasil",
-        linesCsv: "recipe_name\nBasil",
+        sheetCsv: "component_name\nBasil",
+        linesCsv: "component_name\nBasil",
       }),
     ).toEqual({ ready: true, kind: "csv_bundle" });
   });
@@ -73,9 +73,9 @@ describe("ImportSourceReadinessChecker", () => {
       checker.fileStatusLabel({
         mode: "files",
         source: "",
-        sheetCsv: "recipe_name\nBasil\nMacaroni",
+        sheetCsv: "component_name\nBasil\nMacaroni",
         linesCsv: "",
       }),
-    ).toContain("add recipe_lines.csv");
+    ).toContain("add component_lines.csv");
   });
 });

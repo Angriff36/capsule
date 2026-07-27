@@ -226,14 +226,14 @@
   font-weight: 700;
 }
 
-.production-yield-recipe strong,
-.production-yield-recipe small,
+.production-yield-component strong,
+.production-yield-component small,
 .production-yield-table td:nth-child(5) strong,
 .production-yield-table td:nth-child(5) small {
   display: block;
 }
 
-.production-yield-recipe small {
+.production-yield-component small {
   max-width: 310px;
   margin-top: 4px;
   color: var(--ink-3);

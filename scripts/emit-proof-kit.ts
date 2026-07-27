@@ -35,8 +35,8 @@ const CLOSEOUT_ENTITIES = ["EventCloseout"] as const;
 const PAYROLL_ENTITIES = ["PayrollInput"] as const;
 const CULINARY_ENTITIES = [
   "Ingredient",
-  "Recipe",
-  "RecipeIngredient",
+  "Component",
+  "ComponentIngredient",
   "Dish",
   "Menu",
 ] as const;
@@ -64,8 +64,8 @@ const CLOSEOUT_RUNTIME_TEST =
   "tests/proofs/event-closeout-lifecycle.runtime.test.ts";
 const PAYROLL_RUNTIME_TEST =
   "tests/proofs/payroll-input-lifecycle.runtime.test.ts";
-const RECIPE_IMPORT_RUNTIME_TEST =
-  "tests/proofs/recipe-import-finalize.runtime.test.ts";
+const COMPONENT_IMPORT_RUNTIME_TEST =
+  "tests/proofs/component-import-finalize.runtime.test.ts";
 const STRUCTURAL_TEST = "tests/event-reaction-projection.test.ts";
 const SHIFT_RUNTIME_PROOF_IDS = [
   "Shift.schedule",
@@ -94,10 +94,10 @@ const PAYROLL_RUNTIME_PROOF_IDS = [
   "PayrollInput.prepare",
   "PayrollInput.finalize",
 ] as const;
-const RECIPE_IMPORT_PROOF_IDS = [
-  "Recipe.draft",
+const COMPONENT_IMPORT_PROOF_IDS = [
+  "Component.draft",
   "Ingredient.introduce",
-  "RecipeIngredient.add",
+  "ComponentIngredient.add",
 ] as const;
 
 function compileIr(): void {
@@ -207,7 +207,7 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
     ...COMMERCIAL_RUNTIME_PROOF_IDS,
     ...CLOSEOUT_RUNTIME_PROOF_IDS,
     ...PAYROLL_RUNTIME_PROOF_IDS,
-    ...RECIPE_IMPORT_PROOF_IDS,
+    ...COMPONENT_IMPORT_PROOF_IDS,
   ]);
   const structuralProofIds = new Set([
     demandReactionId,
@@ -261,9 +261,9 @@ export function emitCapsuleProofKit(options?: { skipCompile?: boolean }): void {
         proofId,
         runtimeTest: PAYROLL_RUNTIME_TEST,
       })),
-      ...RECIPE_IMPORT_PROOF_IDS.map((proofId) => ({
+      ...COMPONENT_IMPORT_PROOF_IDS.map((proofId) => ({
         proofId,
-        runtimeTest: RECIPE_IMPORT_RUNTIME_TEST,
+        runtimeTest: COMPONENT_IMPORT_RUNTIME_TEST,
       })),
     ],
   });

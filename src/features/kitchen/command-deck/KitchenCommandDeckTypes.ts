@@ -17,7 +17,7 @@ export type PrepTaskLike = {
   specialInstructions?: string | null;
   notes?: string | null;
   dueAt?: number | null;
-  recipeId?: string | null;
+  componentId?: string | null;
   deletedAt?: number | null;
 };
 
@@ -42,7 +42,7 @@ export type EventDishLike = {
 export type DishLike = {
   _id: string;
   name: string;
-  primaryRecipeId?: string | null;
+  primaryComponentId?: string | null;
   primaryImageStorageId?: string | null;
   allergenSummary?: string[] | null;
   deletedAt?: number | null;

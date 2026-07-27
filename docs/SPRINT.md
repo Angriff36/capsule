@@ -21,7 +21,7 @@ Test data lives on **Test Event** (Jul 30 2026, 55 guests).
 containers → pack list; dish → prep list (server-side); prep assign / claim /
 complete; prep templates editable with the real sheet's categories and units;
 pulling a dish off an event mid-prep; and **the purchasing chain, which now
-produces real ingredient demand from a recipe** — its first input ever.
+produces real ingredient demand from a component** — its first input ever.
 
 **Do these next, in order:**
 
@@ -147,10 +147,10 @@ quote → planning → pending_approval → approved → sales_lock
 
 | Track | Route | Must be true after |
 |---|---|---|
-| Menu & recipes | `/events/:id?tab=menu`, `/kitchen/dishes`, `/kitchen/recipes` | Event dishes resolve to recipes; estimated food cost rolls up and equals the sum of `EventDish.estimatedCost` |
+| Menu & components | `/events/:id?tab=menu`, `/kitchen/dishes`, `/kitchen/components` | Event dishes resolve to components; estimated food cost rolls up and equals the sum of `EventDish.estimatedCost` |
 | Allergens | `/events/:id/allergen-briefing`, `/kitchen/allergen-matrix` | Every guest restriction is represented; a failed quality check blocks the prep task |
 | Prep | `/kitchen/prep` | Prep tasks exist per dish with due times before service |
-| Purchasing | `/inventory/demand`, `/inventory/purchasing` | Ingredient demand fans out from recipes; shortages consolidate into one weekly vendor order that stays `DRAFT` |
+| Purchasing | `/inventory/demand`, `/inventory/purchasing` | Ingredient demand fans out from components; shortages consolidate into one weekly vendor order that stays `DRAFT` |
 | Stock | `/inventory/stock` | Reservations placed; reconcile leaves no orphan reservation |
 | Staffing | `/staff/roster`, `/staff/time` | Shifts scheduled and assigned; approved time-off is not double-booked |
 | Equipment & pack | `/logistics/packs`, `/logistics/pack-templates` | Pack list generated from a template, then packed |
@@ -312,9 +312,9 @@ visit.
 
 > **Correction (2026-07-27):** the purchasing chain below is real in the
 > manifest but was **unreachable from the UI until 2026-07-27**. Its first hop
-> fans out over `DishRecipe`, and no screen in `src/features` ever called
-> `DishRecipe.attach` — six places read `useListDishRecipe`, nothing wrote it.
-> Every dish in production therefore had zero recipe lines, and
+> fans out over `DishComponent`, and no screen in `src/features` ever called
+> `DishComponent.attach` — six places read `useListDishComponent`, nothing wrote it.
+> Every dish in production therefore had zero component lines, and
 > `/inventory/demand` read "0 LINES" for an event that had a dish. An
 > attach/detach panel now exists on the dish page (commit `7e4d0aa`). The
 > chain firing end to end is **still unverified in the UI** — see §7.
@@ -322,13 +322,13 @@ visit.
 The purchasing chain is the strongest thing in the app *on paper* — an
 unbroken reaction path from adding a dish to a drafted vendor order:
 
-`EventDishAdded → DishRecipe → EventDishRecipeSeeded → RecipeIngredient →
+`EventDishAdded → DishComponent → EventDishComponentSeeded → ComponentIngredient →
 EventIngredientContribution → IngredientDemand.syncFromContributions →
 PurchaseNeed → WeeklyPurchasingConfig.routeNeed → VendorOrder.ensureWeeklyDraft
 → VendorOrderLine.ensureWeeklyLine`
 
 Also automatic: `EventApproved → PackList.open`, `EventApproved →
-EventDishRecipeSeed`, `EventHeadcountChanged → EventDish` (re-drives demand and
+EventDishComponentSeed`, `EventHeadcountChanged → EventDish` (re-drives demand and
 cost), `PackListPacked → Delivery.schedule`, `VendorOrderLineReceived →
 InventoryLot.record + IngredientPriceObservation.record`, `EventClosedOut →
 EventCloseout.capture`, and the full `ClientMergeCompleted` fan-out across
@@ -346,7 +346,7 @@ events/proposals/contracts/invoices/payments.
 | Cook-on-site / kitchen / bring-hot split | ✅ Real `DishServiceMethod` enum on DishContainer: `cooked_on_site` / `cooked_at_kitchen` / `brought_hot` / `cold_service`. (`DishTask.category` remains a free string; the container carries the authoritative method.) |
 | Post-event reports fire automatically | ❌ Only `EventClosedOut → EventCloseout.capture`. No automatic report generation or sending. |
 | Remove a dish from an event | ✅ **BROKE, FIXED, VERIFIED IN PRODUCTION 2026-07-27** ([#114](https://github.com/Angriff36/capsule/issues/114)). It threw once any of that dish's prep tasks was `completed` — the `EventDishRemoved → PrepTask.cancel` fan-out has no status filter and `cancel` guards on status, so one finished step made the dish unremovable, in a command that explicitly permits removal during `executing`. Fixed by `PrepTask.standDown`, a cascade twin that leaves settled work alone; both fan-outs (`EventDishRemoved`, `EventCancelled`) now use it. |
-| Purchasing chain end to end | ✅ **VERIFIED IN PRODUCTION 2026-07-27.** First input it has ever had. Re-adding Tito Test Dish (Macaroni Salad attached) to Test Event produced **8 demand lines** at `/inventory/demand`, scaled off the recipe's 3-quart yield to 55 servings — 18.33 lb elbow macaroni, 55 cup mayonnaise, 73.33 each scallions, and so on. `EventDishAdded → DishRecipe → EventDishRecipeSeeded → RecipeIngredient → EventIngredientContribution → IngredientDemand` all fired server-side, no manual step. The tail (`PurchaseNeed → VendorOrder`) reads "Opens on Event approve" and is still unproven. |
+| Purchasing chain end to end | ✅ **VERIFIED IN PRODUCTION 2026-07-27.** First input it has ever had. Re-adding Tito Test Dish (Macaroni Salad attached) to Test Event produced **8 demand lines** at `/inventory/demand`, scaled off the component's 3-quart yield to 55 servings — 18.33 lb elbow macaroni, 55 cup mayonnaise, 73.33 each scallions, and so on. `EventDishAdded → DishComponent → EventDishComponentSeeded → ComponentIngredient → EventIngredientContribution → IngredientDemand` all fired server-side, no manual step. The tail (`PurchaseNeed → VendorOrder`) reads "Opens on Event approve" and is still unproven. |
 | Event notifications | ⚠️ Unverified. |
 | Vehicle assign / check-out | ⚠️ `vehicle.manifest` has register / reviseDetails / updateOperationalStatus and a `vehicleAssignment` seam; no explicit check-out command found. |
 | Invoices sent | ⚠️ Issue/send commands exist; delivery needs `RESEND_API_KEY` (G6). |
@@ -428,7 +428,7 @@ Assign). Assign is unaffected and already works.
 Removing Tito Test Dish from Test Event and re-adding it — possible only after
 the #114 fix — fired the whole cascade. `/inventory/demand` went from
 **0 LINES** deployment-wide to **8 lines**, one per Macaroni Salad ingredient,
-scaled from the recipe's 3-quart yield to 55 servings (18.33 lb elbow macaroni,
+scaled from the component's 3-quart yield to 55 servings (18.33 lb elbow macaroni,
 55 cup mayonnaise, 9.17 cup cider vinegar, 73.33 each scallions, …). Nothing
 was clicked to make it happen.
 
@@ -447,9 +447,9 @@ Original blocker, kept for context:
 ### Blocked: the purchasing chain has never had any input
 
 `/inventory/demand` read **0 LINES** for Test Event even with a dish on it.
-Root cause is not the reaction chain — it is that `DishRecipe.attach` had no
-caller in `src/features`, so no dish anywhere had a recipe line. Fixed by
-adding a "Recipes in this dish" panel (`7e4d0aa`), and Macaroni Salad (8
+Root cause is not the reaction chain — it is that `DishComponent.attach` had no
+caller in `src/features`, so no dish anywhere had a component line. Fixed by
+adding a "Components in this dish" panel (`7e4d0aa`), and Macaroni Salad (8
 priced-at-zero ingredient lines) was attached to Tito Test Dish in production.
 
 **Still unverified:** demand did not appear afterwards, because the cascade
@@ -542,7 +542,7 @@ The `melon` unit works end to end. Categories render as "Finish at Event".
    dish's tasks come off one sheet and share all three. They hold their last
    value now; name, quantity and notes still clear.
 3. **Creating a dish left you on the index**, when adding prep templates on the
-   detail page is always the next step. It navigates there now, as recipes did.
+   detail page is always the next step. It navigates there now, as components did.
 4. **The dish portion-unit list was missing serving, batch, melon and bottle**,
    though its own comment claimed it mirrored the `UnitOfMeasure` enum. Widened.
    The four opaque units get their own conversion dimension so nothing pretends

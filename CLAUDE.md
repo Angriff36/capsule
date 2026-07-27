@@ -142,8 +142,8 @@ Active: [new session]
 Last: [first session]
 
 ## Last Session Bridge
-[auto-bridge snapshot @ 10 changes]
-Files: IMPLEMENTATION_PLAN.md (edit), AGENTS.md (edit), src/features/workforce/MyReviewsPage.tsx (edit), src/lib/staffSelfReviews.ts (create), src/features/workforce/workforceRoutes.ts (edit), src/app/App.tsx (edit), src/features/workforce/MyReviewsPage.tsx (create), convex/staffSelfReviews.ts (create)
+[Emergency bridge — running bridge was not updated]
+No changes or facts in this session.
 
 # === END COGNILAYER ===
 

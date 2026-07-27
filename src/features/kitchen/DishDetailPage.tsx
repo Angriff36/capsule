@@ -6,13 +6,12 @@ import {
   useDishMergeInto,
   useDishPurge,
   useDishReinstate,
-  useDishSetPrimaryRecipe,
   useGetDish,
-  useGetRecipe,
+  useGetComponent,
   useListDish,
   useListEvent,
   useListEventDish,
-  useListRecipe,
+  useListComponent,
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
@@ -24,10 +23,11 @@ import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { DishContainersPanel } from "./DishContainersPanel";
 import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
-import { DishRecipesPanel } from "./DishRecipesPanel";
+import { DishComponentsPanel } from "./DishComponentsPanel";
+import { DishIngredientsPanel } from "./DishIngredientsPanel";
 import { DishPrimaryImageUploader } from "../attachments/DishPrimaryImageUploader";
 import { KitchenBookNav } from "./KitchenBookNav";
-import { dishPath, kitchenCatalogPath, recipePath } from "./kitchenRoutes";
+import { dishPath, kitchenCatalogPath, componentPath } from "./kitchenRoutes";
 
 const policy = new CulinaryLifecyclePolicy();
 
@@ -36,13 +36,11 @@ export function DishDetailPage() {
   const dish = useGetDish(id ?? "skip");
   useTrackRecent("Dish", dish?.name);
   const allDishes = useListDish();
-  const recipes = useListRecipe();
-  const primaryRecipe = useGetRecipe(dish?.primaryRecipeId ?? "skip");
+  const components = useListComponent();
   const events = useListEvent();
   const eventDishes = useListEventDish();
   const purge = useDishPurge();
   const reinstate = useDishReinstate();
-  const setPrimaryRecipe = useDishSetPrimaryRecipe();
   const createDish = useCreateDish();
   const linkAsEdition = useDishLinkAsEdition();
   const mergeInto = useDishMergeInto();
@@ -80,12 +78,6 @@ export function DishDetailPage() {
   const nameMatches = culinaryCanonicalMatcher
     .findNameMatches(allDishes ?? [], dish.name, 6)
     .filter((row) => row._id !== dish._id);
-
-  const yieldRecipe =
-    primaryRecipe && primaryRecipe !== null
-      ? primaryRecipe
-      : (recipes?.find((recipe) => recipe._id === dish.primaryRecipeId) ??
-        null);
 
   const actions = policy.dishActions(String(dish.status), dish.deletedAt, {
     includeRestore: true,
@@ -198,85 +190,9 @@ export function DishDetailPage() {
         </p>
       )}
 
-      <section className="culinary-section">
-        <div className="culinary-section-heading">
-          <h2>Production / yield</h2>
-        </div>
-        {yieldRecipe &&
-        !("deletedAt" in yieldRecipe && yieldRecipe.deletedAt) ? (
-          <dl className="culinary-facts culinary-facts-compact">
-            <div>
-              <dt>Primary recipe</dt>
-              <dd>
-                <Link
-                  to={recipePath(yieldRecipe._id)}
-                  className="text-accent underline-offset-2 hover:underline"
-                >
-                  {yieldRecipe.name}
-                </Link>
-              </dd>
-            </div>
-            <div>
-              <dt>Yield</dt>
-              <dd>
-                {yieldRecipe.yieldQuantity} {String(yieldRecipe.yieldUnit)}
-              </dd>
-            </div>
-            <div>
-              <dt>Serves per yield</dt>
-              <dd>{yieldRecipe.servesPerYield}</dd>
-            </div>
-            <div>
-              <dt>Batch multiplier</dt>
-              <dd>{yieldRecipe.batchMultiplier}</dd>
-            </div>
-          </dl>
-        ) : (
-          <div className="document-empty space-y-2">
-            <p>
-              Yield comes from the linked primary recipe. Ingredients and
-              composition live on the recipe — not on this dish.
-            </p>
-            <label className="field-label max-w-md">
-              Link primary recipe
-              <select
-                className="field-input"
-                disabled={busy != null}
-                defaultValue=""
-                onChange={(event) => {
-                  const primaryRecipeId = event.target.value || undefined;
-                  void run("setPrimaryRecipe", async () => {
-                    await setPrimaryRecipe({
-                      docId: dish._id,
-                      version: dish.version,
-                      primaryRecipeId,
-                    });
-                  });
-                }}
-              >
-                <option value="">Select a recipe…</option>
-                {(recipes ?? [])
-                  .filter((recipe) => recipe.deletedAt == null)
-                  .map((recipe) => (
-                    <option key={recipe._id} value={recipe._id}>
-                      {recipe.name}
-                    </option>
-                  ))}
-              </select>
-            </label>
-          </div>
-        )}
-        {yieldRecipe ? (
-          <p className="mt-2 text-[12px] text-ink-3">
-            Open the recipe to edit ingredients, instructions, and cost.{" "}
-            <CulinaryEntityLink kind="recipe" id={yieldRecipe._id}>
-              Go to recipe
-            </CulinaryEntityLink>
-          </p>
-        ) : null}
-      </section>
+      <DishIngredientsPanel dishId={dish._id} />
 
-      <DishRecipesPanel dishId={dish._id} />
+      <DishComponentsPanel dishId={dish._id} />
 
       <DishPrepTasksPanel dishId={dish._id} />
 
@@ -312,12 +228,6 @@ export function DishDetailPage() {
                     culinaryCanonicalMatcher.resolveCanonicalId(dish),
                   editionNumber: (dish.editionNumber ?? 1) + 1,
                 });
-                if (dish.primaryRecipeId) {
-                  await setPrimaryRecipe({
-                    docId: createdId,
-                    primaryRecipeId: dish.primaryRecipeId,
-                  });
-                }
                 window.location.assign(dishPath(createdId));
               })
             }

@@ -64,7 +64,7 @@ export class CapsuleMcpLlmToolRegistrar {
 
     server.tool(
       "execute_capsule_llm_tool",
-      "Execute a Capsule LLM tool by snake name (e.g. recipe_draft). Prefer the first-class snake-named MCP tool when present.",
+      "Execute a Capsule LLM tool by snake name (e.g. component_draft). Prefer the first-class snake-named MCP tool when present.",
       {
         name: z.string().describe("Tool name from get_capsule_llm_tools"),
         arguments: z

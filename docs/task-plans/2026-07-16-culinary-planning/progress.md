@@ -12,7 +12,7 @@
   - Confirmed the current repo and preserved the existing dirty worktree.
   - Read the frontend-design and planning-with-files skills.
   - Resolved the Kitchen scope to current Slice 2 Culinary planning rather than the stale Production/PrepTask handoff.
-  - Read the Recipe Book design archetype and confirmed reusable committed CSS already exists.
+  - Read the Component Book design archetype and confirmed reusable committed CSS already exists.
   - Traced all Culinary commands and established EventDish—not Menu↔Dish—as the canonical composition handoff.
 - Files created/modified:
   - `codex-plans/task_plan.md`
@@ -46,7 +46,7 @@
 
 - Confirmed the live slice boundary from `docs/product/implementation-plan.md` and `docs/systems/culinary.md`.
 - Traced all six culinary entities and their generated React hooks, typed command inputs, and lifecycle metadata.
-- Confirmed the existing authored visual foundation in `src/styles/app.css` is the Recipe Book/editorial kitchen system and should be reused.
+- Confirmed the existing authored visual foundation in `src/styles/app.css` is the Component Book/editorial kitchen system and should be reused.
 - Next: lock the smallest route/creation-seam design, then add focused failing tests before implementation.
 - Confirmed every create-like culinary command requires a preallocated row and recorded the minimum schema-valid allocation shapes.
 - Visually reviewed the checked-in Galley dashboard/detail references and reduced them to source-backed catalog/document patterns.
@@ -58,14 +58,14 @@
 - Red state captured: all three focused test files fail only because the new policy, guard, route components, and creation seam do not exist yet or the placeholder route remains.
 - Corrected the Menu lifecycle assertions to match the generated metadata's overlapping restore/unpublish availability instead of imposing a local simplification.
 - Implemented the authored Culinary allocation/action seam, typed React creation adapter, generated-metadata lifecycle policy, and focused bypass guard. No generated files were changed.
-- Replaced the placeholder with peer culinary catalogs, a source-backed Recipe working document, and the EventDish selection handoff.
-- Added loading, empty, command-failure, conflict, busy, and lifecycle states while reusing the committed Recipe Book visual system.
+- Replaced the placeholder with peer culinary catalogs, a source-backed Component working document, and the EventDish selection handoff.
+- Added loading, empty, command-failure, conflict, busy, and lifecycle states while reusing the committed Component Book visual system.
 - Registered the Culinary guard in the required repository gate.
 - Focused Culinary proof is green: 3 files, 11 tests passed after implementation.
 - Next: typecheck, correct any authored integration errors, update the system note, then perform browser and repository verification.
 - Typecheck reached only pre-existing errors in untouched generated/Event files; no Culinary TypeScript errors were reported.
 - Updated the Culinary owner page and Manifest integration note with the shipped route family, allocation seam, generated-first rule, current Menu/EventDish limit, and reaction-test caveat.
-- Tightened responsive behavior for authored catalog rows, forms, recipe lines, and event-menu composition.
+- Tightened responsive behavior for authored catalog rows, forms, component lines, and event-menu composition.
 - Browser verification guidance loaded; next step is to start the local app and inspect the real route at desktop and mobile widths.
 - Resolved the Bun shim to its real executable; retrying the hidden local server with the executable path.
 - Vite is live at `http://127.0.0.1:7811`; beginning in-app browser inspection.

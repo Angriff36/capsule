@@ -21,16 +21,16 @@ Proven example (2026-07-21 kitchen wipe) — issues filed only after this rule:
 
 - Schema drift blocking cancel/remove/retire → [#15](https://github.com/Angriff36/capsule/issues/15)
 - Stale Capsule MCP capability catalog → [#16](https://github.com/Angriff36/capsule/issues/16)
-- enter-recipe idempotency returns retired recipe ids → [#17](https://github.com/Angriff36/capsule/issues/17)
+- enter-component idempotency returns retired component ids → [#17](https://github.com/Angriff36/capsule/issues/17)
 - `Ingredient.discontinue` ≠ wipe / no catalog reset → [#18](https://github.com/Angriff36/capsule/issues/18)
-- No `Recipe.reinstate` → [#19](https://github.com/Angriff36/capsule/issues/19)
+- No `Component.reinstate` → [#19](https://github.com/Angriff36/capsule/issues/19)
 
 Agents had reminted JWT / switched CLI / reinstated ingredients and originally
 filed **zero** GitHub issues — that is the failure this rule forbids.
 
-**Partial fix note (2026-07-21):** enter-recipe now refuses retired Recipe ids
+**Partial fix note (2026-07-21):** enter-component now refuses retired Component ids
 from document-hash idempotency (`CapsuleDocumentEnterCoordinator` +
-`CapsuleRecipeStatusLoader`). Dish.introduce can still return a retired dish
+`CapsuleComponentStatusLoader`). Dish.introduce can still return a retired dish
 via the same idempotency class — use a new key or extend the same check; see
 [#17](https://github.com/Angriff36/capsule/issues/17).
 
@@ -52,7 +52,7 @@ via the same idempotency class — use a new key or extend the same check; see
    - Suggested fix owner: Manifest regen / Capsule agent / Convex data repair /
      Cursor MCP refresh — state your best guess, do not invent deferrals
 5. **Labels:** use `bug` for broken paths; `enhancement` only for missing
-   product commands (e.g. no `Recipe.reinstate`). Add others only if they
+   product commands (e.g. no `Component.reinstate`). Add others only if they
    already exist.
 6. **Tell the human the issue URL(s)** in the work report / chat reply. Pasting
    “blocked” without a link is a rule violation.
@@ -61,7 +61,7 @@ via the same idempotency class — use a new key or extend the same check; see
 
 ## Anti-patterns
 
-- “Events couldn’t cancel; continuing with recipes” with no issue
+- “Events couldn’t cancel; continuing with components” with no issue
 - “MCP catalog stale — used CLI instead” with no issue
 - Writing a private `.artifacts/` dump and treating that as tracked
 - Closing the loop with work-report “Shortcuts” that list blockers but never

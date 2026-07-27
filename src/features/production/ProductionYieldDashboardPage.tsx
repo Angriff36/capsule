@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   useListProductionBatch,
-  useListRecipe,
+  useListComponent,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
@@ -9,7 +9,7 @@ import { ProductionWorkspaceNav } from "./ProductionWorkspaceNav";
 import {
   buildProductionYieldReport,
   type ProductionYieldBatch,
-  type ProductionYieldRecipe,
+  type ProductionYieldComponent,
   type ProductionYieldRow,
   type ProductionYieldWindow,
 } from "./productionYield";
@@ -88,19 +88,19 @@ function YieldVarianceMeter({ value }: { value: number }) {
 
 export function ProductionYieldDashboard({
   batches,
-  recipes,
+  components,
   loading = false,
   now,
 }: {
   batches: readonly ProductionYieldBatch[];
-  recipes: readonly ProductionYieldRecipe[];
+  components: readonly ProductionYieldComponent[];
   loading?: boolean;
   now: Date;
 }) {
   const [windowDays, setWindowDays] = useState<ProductionYieldWindow>(30);
   const report = useMemo(
-    () => buildProductionYieldReport({ batches, recipes, windowDays, now }),
-    [batches, recipes, windowDays, now],
+    () => buildProductionYieldReport({ batches, components, windowDays, now }),
+    [batches, components, windowDays, now],
   );
   const unitLabel = report.summaryUnit ?? "See rows";
 
@@ -111,7 +111,7 @@ export function ProductionYieldDashboard({
           <p className="eyebrow">Production · Yield intelligence</p>
           <h1 className="display-title mt-2">Production yield variance</h1>
           <p className="mt-3 max-w-180 text-ink-2">
-            Compare the kitchen&apos;s planned output with what each recipe
+            Compare the kitchen&apos;s planned output with what each component
             actually produced, then start coaching where the shortfall repeats.
           </p>
         </div>
@@ -164,7 +164,7 @@ export function ProductionYieldDashboard({
             <p>No completed production yields in this window.</p>
             <span>
               Complete a production batch and record its actual yield to begin
-              comparing recipe performance.
+              comparing component performance.
             </span>
           </div>
         </section>
@@ -198,7 +198,7 @@ export function ProductionYieldDashboard({
               <small>
                 {report.summaryUnit
                   ? `${signed(report.totalVarianceYield)} ${report.summaryUnit}`
-                  : "Calculated per recipe and unit below"}
+                  : "Calculated per component and unit below"}
               </small>
             </div>
             <div>
@@ -207,8 +207,8 @@ export function ProductionYieldDashboard({
                 {report.batchCount}
               </strong>
               <small>
-                {report.recipeCount}{" "}
-                {report.recipeCount === 1 ? "recipe" : "recipes"}
+                {report.componentCount}{" "}
+                {report.componentCount === 1 ? "component" : "components"}
               </small>
             </div>
           </section>
@@ -217,7 +217,7 @@ export function ProductionYieldDashboard({
             <div className="production-yield-panel-heading">
               <div>
                 <p className="eyebrow">Training queue</p>
-                <h2>Recipes furthest below plan</h2>
+                <h2>Components furthest below plan</h2>
               </div>
               <div className="production-yield-key" aria-hidden="true">
                 <span>
@@ -232,11 +232,11 @@ export function ProductionYieldDashboard({
             <div className="supply-table-wrap">
               <table className="supply-table production-yield-table">
                 <caption className="sr-only">
-                  Recipe yield variance ranked from largest shortfall
+                  Component yield variance ranked from largest shortfall
                 </caption>
                 <thead>
                   <tr>
-                    <th scope="col">Rank / recipe</th>
+                    <th scope="col">Rank / component</th>
                     <th scope="col">Batches</th>
                     <th scope="col">Expected</th>
                     <th scope="col">Actual</th>
@@ -248,15 +248,15 @@ export function ProductionYieldDashboard({
                   {report.rows.map((row, index) => (
                     <tr
                       key={row.key}
-                      data-testid="yield-recipe-row"
+                      data-testid="yield-component-row"
                       className={varianceClass(row.variancePercentage)}
                     >
                       <td>
                         <span className="production-yield-rank">
                           {String(index + 1).padStart(2, "0")}
                         </span>
-                        <span className="production-yield-recipe">
-                          <strong>{row.recipeName}</strong>
+                        <span className="production-yield-component">
+                          <strong>{row.componentName}</strong>
                           <small>{varianceSignal(row)}</small>
                         </span>
                       </td>
@@ -292,7 +292,7 @@ export function ProductionYieldDashboard({
       <aside className="production-yield-method-note">
         <span className="eyebrow">Method</span>
         <p>
-          Expected yield is the batch&apos;s planned yield, not the recipe
+          Expected yield is the batch&apos;s planned yield, not the component
           catalog yield. Cancelled, active, deleted, or incomplete batches are
           excluded. Different yield units remain separate so portions are never
           added to weight or volume.
@@ -304,13 +304,13 @@ export function ProductionYieldDashboard({
 
 export function ProductionYieldDashboardPage() {
   const batches = useListProductionBatch();
-  const recipes = useListRecipe();
-  const loading = batches === undefined || recipes === undefined;
+  const components = useListComponent();
+  const loading = batches === undefined || components === undefined;
 
   return (
     <ProductionYieldDashboard
       batches={(batches ?? []) as ProductionYieldBatch[]}
-      recipes={(recipes ?? []) as ProductionYieldRecipe[]}
+      components={(components ?? []) as ProductionYieldComponent[]}
       loading={loading}
       now={new Date()}
     />

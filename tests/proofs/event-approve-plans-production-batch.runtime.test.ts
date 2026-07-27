@@ -1,5 +1,5 @@
 /**
- * Runtime proof: Event.approve fans out EventDishRecipeSeed → ProductionBatch.plan
+ * Runtime proof: Event.approve fans out EventDishComponentSeed → ProductionBatch.plan
  * (match else create).
  */
 import { convexTest } from "convex-test";
@@ -32,7 +32,7 @@ beforeAll(() => {
 });
 
 describe("runtime proof: Event.approve → ProductionBatch.plan", () => {
-  it("plans one production batch per seeded dish recipe on approve", async () => {
+  it("plans one production batch per seeded dish component on approve", async () => {
     const proof = harness();
     const sales = proof.asRole({
       subject: "sales-batch-cascade",
@@ -50,9 +50,9 @@ describe("runtime proof: Event.approve → ProductionBatch.plan", () => {
       tenantId: S.tenantId,
     });
 
-    const recipe = (await proof.executeCommand(
+    const component = (await proof.executeCommand(
       kitchen,
-      api.mutations.Recipe_createViaDraft,
+      api.mutations.Component_createViaDraft,
       {
         name: "Batch cascade rolls",
         yieldQuantity: 1,
@@ -61,10 +61,14 @@ describe("runtime proof: Event.approve → ProductionBatch.plan", () => {
       },
     )) as { docId: string };
 
-    await proof.executeCommand(kitchen, api.mutations.Recipe_publishVersion, {
-      docId: recipe.docId,
-      version: 1,
-    });
+    await proof.executeCommand(
+      kitchen,
+      api.mutations.Component_publishVersion,
+      {
+        docId: component.docId,
+        version: 1,
+      },
+    );
 
     const dish = (await proof.executeCommand(
       kitchen,
@@ -79,10 +83,10 @@ describe("runtime proof: Event.approve → ProductionBatch.plan", () => {
 
     await proof.executeCommand(
       kitchen,
-      api.mutations.DishRecipe_createViaAttach,
+      api.mutations.DishComponent_createViaAttach,
       {
         dishId: dish.docId,
-        recipeId: recipe.docId,
+        componentId: component.docId,
         yieldQuantity: 1,
         batchMultiplier: 1,
       },
@@ -153,13 +157,13 @@ describe("runtime proof: Event.approve → ProductionBatch.plan", () => {
     );
     expect(forEvent).toHaveLength(1);
     const batch = forEvent[0]! as {
-      recipeId?: string;
+      componentId?: string;
       plannedYield?: number;
       yieldUnit?: string;
       plannedAt?: number | null;
       status?: string;
     };
-    expect(batch.recipeId).toBe(recipe.docId);
+    expect(batch.componentId).toBe(component.docId);
     expect(Number(batch.plannedYield)).toBe(S.headcount);
     expect(batch.yieldUnit).toBe("portion");
     expect(batch.plannedAt).toEqual(expect.any(Number));
@@ -168,7 +172,7 @@ describe("runtime proof: Event.approve → ProductionBatch.plan", () => {
     // Idempotent plan via match: re-open does not allocate a second batch.
     await proof.executeCommand(kitchen, api.mutations.ProductionBatch_plan, {
       docId: (forEvent[0] as { _id: string })._id,
-      recipeId: recipe.docId,
+      componentId: component.docId,
       plannedYield: 999,
       yieldUnit: "portion",
       eventId: event.docId,

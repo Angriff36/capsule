@@ -1,9 +1,9 @@
 // Capsule culinary Dish — finished served product.
-// A Dish is NOT a Recipe. It may compose many Recipes via DishRecipe.
+// A Dish is NOT a Component. It may compose many Components via DishComponent.
 // Menu: menu.manifest. MenuDish: menu-dish.manifest. EventDish: event-dish.manifest.
 
-use "./recipe.manifest"
-use "./recipe-import.manifest"
+use "./component.manifest"
+use "./component-import.manifest"
 
 enum DishStatus {
   active
@@ -34,8 +34,6 @@ entity Dish mixin TenantScoped, SoftDeletable {
   // Convex storage id for the customer-facing hero image (upload via Attachment).
   property primaryImageStorageId: string?
   property primaryImageFileName: string?
-  // Optional primary Recipe for compact summary / hyperlink (not composition editor).
-  property primaryRecipeId: uuid?
   // Canonical lineage: null means this row is a canonical root; otherwise a version of that root.
   property canonicalDishId: uuid?
   // Optional so existing dish rows validate before backfill; UI treats null as 1.
@@ -43,9 +41,9 @@ entity Dish mixin TenantScoped, SoftDeletable {
   // Soft merge pointer — keep row for reference integrity; pickers prefer the target.
   property mergedIntoDishId: uuid?
 
-  hasMany recipeLines: DishRecipe
+  hasMany ingredientLines: DishIngredient
+  hasMany componentLines: DishComponent
   hasMany prepTasks: DishTask
-  belongsTo primaryRecipe: Recipe fields [tenantId, primaryRecipeId] references [tenantId, id]
   belongsTo canonicalDish: Dish fields [tenantId, canonicalDishId] references [tenantId, id]
   belongsTo mergedIntoDish: Dish fields [tenantId, mergedIntoDishId] references [tenantId, id]
 
@@ -224,17 +222,6 @@ entity Dish mixin TenantScoped, SoftDeletable {
     }
   }
 
-  command setPrimaryRecipe(optional primaryRecipeId: uuid) {
-    guard self.status == "active"
-    guard self.deletedAt == null
-    mutate primaryRecipeId = primaryRecipeId
-    emit DishPrimaryRecipeSet {
-      dishId: self.id
-      tenantId: self.tenantId
-      primaryRecipeId: primaryRecipeId
-    }
-  }
-
   // Attach an already-introduced dish as an edition of a canonical root.
   // Birth stays on introduce so createViaIntroduce remains the catalog create path.
   command linkAsEdition(sourceDishId: uuid, optional editionNumber: int) {
@@ -277,17 +264,121 @@ entity Dish mixin TenantScoped, SoftDeletable {
   store Dish in durable
 }
 
-// Dish ↔ Recipe composition line. One Dish may include many Recipes
-// (e.g. Caesar salad → dressing recipe + crouton recipe).
-entity DishRecipe mixin TenantScoped, SoftDeletable {
+// A dish's own ingredient line. The dish IS the recipe: a sirloin steak is a
+// dish and its steak, salt and oil belong here, not on some separate record you
+// have to create first. Only the parts you actually make by hand — the
+// peppercorn sauce, the honey cinnamon butter — become Components with
+// ingredient lines of their own.
+//
+// Quantity is PER SERVING, the same rule as DishTask.defaultQuantity, because
+// that is how the printed sheets are costed ("P: 100 Serving").
+entity DishIngredient mixin TenantScoped, SoftDeletable {
   key [tenantId, id]
   timestamps
   versionProperty version: number
 
   property required dishId: uuid
-  property required recipeId: uuid
+  property required ingredientId: uuid
+  property required quantity: decimal(10, 4) = 0
+  property required unit: UnitOfMeasure = "each"
   property required sortOrder: int = 0
-  // Snapshot of Recipe yield/batch at attach so EventDish→BOM reactions can
+  // Waste / trim multiplier (1.0 = no waste). Applied before live cost.
+  property wasteFactor: decimal(10, 4)? = 1
+  property prepNotes: string?
+  property addedAt: datetime?
+
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+  belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
+
+  computed adjustedQuantity: decimal(10, 4) = self.quantity * (self.wasteFactor != null ? self.wasteFactor : 1)
+  computed unitsMatchIngredientPrice: boolean = self.unit == self.ingredient.unit
+  computed liveIngredientCost: money(12, 2) = self.unit == self.ingredient.unit ? self.quantity * (self.wasteFactor != null ? self.wasteFactor : 1) * self.ingredient.costPerUnit : 0
+
+  constraint dishLineQuantityPositive: self.addedAt == null or self.quantity > 0 "Dish ingredient quantity must be positive"
+  constraint dishLineWasteFactorPositive: self.addedAt == null or self.wasteFactor == null or self.wasteFactor > 0 "Waste factor must be greater than 0"
+
+  default policy dishIngredientRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish ingredient lines"
+  default policy dishIngredientWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish ingredient lines through commands"
+  default policy dishIngredientExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish ingredient line commands"
+
+  command add(
+    dishId: uuid,
+    ingredientId: uuid,
+    quantity: decimal(10, 4),
+    unit: UnitOfMeasure,
+    optional sortOrder: number,
+    optional wasteFactor: decimal(10, 4),
+    optional prepNotes: string
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    constraint addDishLineQuantity: quantity > 0 "Dish ingredient quantity must be positive"
+    constraint addDishLineWasteFactor: wasteFactor == null or wasteFactor > 0 "Waste factor must be greater than 0"
+    mutate dishId = dishId
+    mutate ingredientId = ingredientId
+    mutate quantity = quantity
+    mutate unit = unit
+    mutate wasteFactor = wasteFactor != null ? wasteFactor : 1
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate prepNotes = prepNotes
+    mutate addedAt = now()
+    emit DishIngredientAdded {
+      dishIngredientId: self.id
+      tenantId: self.tenantId
+      dishId: dishId
+      ingredientId: ingredientId
+      quantity: quantity
+      unit: unit
+      wasteFactor: wasteFactor != null ? wasteFactor : 1
+    }
+  }
+
+  command adjustQuantity(quantity: decimal(10, 4), unit: UnitOfMeasure) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint adjustDishLineQuantity: quantity > 0 "Dish ingredient quantity must be positive"
+    compute previousQuantity = self.quantity
+    mutate quantity = quantity
+    mutate unit = unit
+    emit DishIngredientQuantityAdjusted {
+      dishIngredientId: self.id
+      tenantId: self.tenantId
+      dishId: self.dishId
+      ingredientId: self.ingredientId
+      previousQuantity: previousQuantity
+      quantity: quantity
+      unit: unit
+    }
+  }
+
+  command remove(reason: string) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint removeDishLineReason: length(trim(reason)) > 0 "Removal reason is required"
+    mutate deletedAt = now()
+    emit DishIngredientRemoved {
+      dishIngredientId: self.id
+      tenantId: self.tenantId
+      dishId: self.dishId
+      ingredientId: self.ingredientId
+      reason: reason
+    }
+  }
+
+  store DishIngredient in durable
+}
+
+// Dish ↔ Component composition line. One Dish may include many Components
+// (e.g. Caesar salad → dressing component + crouton component).
+entity DishComponent mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required dishId: uuid
+  property required componentId: uuid
+  property required sortOrder: int = 0
+  // Snapshot of Component yield/batch at attach so EventDish→BOM reactions can
   // compute quantities without nested relation hydration on fanOut rows.
   property required yieldQuantity: decimal(10, 2) = 1
   property required batchMultiplier: decimal(10, 4) = 1
@@ -296,15 +387,15 @@ entity DishRecipe mixin TenantScoped, SoftDeletable {
   property removedAt: datetime?
 
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
-  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+  belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
 
-  default policy dishRecipeRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish recipe composition"
-  default policy dishRecipeWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish recipe composition through commands"
-  default policy dishRecipeExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish recipe composition commands"
+  default policy dishComponentRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish component composition"
+  default policy dishComponentWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish component composition through commands"
+  default policy dishComponentExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish component composition commands"
 
   command attach(
     dishId: uuid,
-    recipeId: uuid,
+    componentId: uuid,
     yieldQuantity: decimal(10, 2),
     optional batchMultiplier: decimal(10, 4),
     optional sortOrder: number,
@@ -314,20 +405,20 @@ entity DishRecipe mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.dish != null and self.dish.status == "active"
     constraint attachDishMatch: dishId == self.dishId "Attach dishId must match the seeded dish reference"
-    constraint attachYieldPositive: yieldQuantity > 0 "Attached recipe yield must be positive"
-    constraint attachBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Attached recipe batch multiplier must be positive"
+    constraint attachYieldPositive: yieldQuantity > 0 "Attached component yield must be positive"
+    constraint attachBatchPositive: batchMultiplier == null or batchMultiplier > 0 "Attached component batch multiplier must be positive"
     mutate dishId = dishId
-    mutate recipeId = recipeId
+    mutate componentId = componentId
     mutate yieldQuantity = yieldQuantity
     mutate batchMultiplier = batchMultiplier != null ? batchMultiplier : 1
     mutate sortOrder = sortOrder != null ? sortOrder : 0
     mutate role = role
     mutate attachedAt = now()
-    emit DishRecipeAttached {
-      dishRecipeId: self.id
+    emit DishComponentAttached {
+      dishComponentId: self.id
       tenantId: self.tenantId
       dishId: dishId
-      recipeId: recipeId
+      componentId: componentId
       yieldQuantity: yieldQuantity
       batchMultiplier: batchMultiplier != null ? batchMultiplier : 1
       sortOrder: sortOrder != null ? sortOrder : 0
@@ -341,16 +432,16 @@ entity DishRecipe mixin TenantScoped, SoftDeletable {
     constraint detachReason: length(trim(reason)) > 0 "Detach reason is required"
     mutate deletedAt = now()
     mutate removedAt = now()
-    emit DishRecipeDetached {
-      dishRecipeId: self.id
+    emit DishComponentDetached {
+      dishComponentId: self.id
       tenantId: self.tenantId
       dishId: self.dishId
-      recipeId: self.recipeId
+      componentId: self.componentId
       reason: reason
     }
   }
 
-  store DishRecipe in durable
+  store DishComponent in durable
 }
 
 enum DishTaskStatus {
@@ -380,7 +471,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   // Kitchen"). Real prep sheets group by this; PrepTask carries the same field.
   property station: string?
   property sortOrder: int = 0
-  property recipeId: uuid?
+  property componentId: uuid?
   property ingredientId: uuid?
   property instructions: string?
   property required status: DishTaskStatus = "active"
@@ -389,7 +480,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   property retirementReason: string?
 
   belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
-  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+  belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
   belongsTo ingredient: Ingredient fields [tenantId, ingredientId] references [tenantId, id]
 
   constraint dishTaskNameComplete: self.status == "retired" or length(trim(self.name)) > 0 "Dish task name is required"
@@ -412,7 +503,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     optional defaultUnit: UnitOfMeasure,
     optional station: string,
     optional sortOrder: number,
-    optional recipeId: uuid,
+    optional componentId: uuid,
     optional ingredientId: uuid,
     optional instructions: string
   ) {
@@ -432,7 +523,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     mutate defaultUnit = defaultUnit
     mutate station = station
     mutate sortOrder = sortOrder != null ? sortOrder : 0
-    mutate recipeId = recipeId
+    mutate componentId = componentId
     mutate ingredientId = ingredientId
     mutate instructions = instructions
     mutate activeAt = now()
@@ -443,7 +534,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
       name: name
       category: category != null ? category : "finish_at_event"
       taskType: taskType != null ? taskType : "manual"
-      recipeId: recipeId
+      componentId: componentId
       ingredientId: ingredientId
       defaultQuantity: defaultQuantity
       defaultUnit: defaultUnit
@@ -459,7 +550,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     optional defaultUnit: UnitOfMeasure,
     optional station: string,
     optional sortOrder: number,
-    optional recipeId: uuid,
+    optional componentId: uuid,
     optional ingredientId: uuid,
     optional instructions: string
   ) {
@@ -476,7 +567,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     mutate defaultUnit = defaultUnit
     mutate station = station
     mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
-    mutate recipeId = recipeId
+    mutate componentId = componentId
     mutate ingredientId = ingredientId
     mutate instructions = instructions
     emit DishTaskRevised {
@@ -573,12 +664,6 @@ event DishPrimaryImageCleared: "dish.primary_image_cleared" {
   tenantId: string
 }
 
-event DishPrimaryRecipeSet: "dish.primary_recipe_set" {
-  dishId: string
-  tenantId: string
-  primaryRecipeId: string?
-}
-
 event DishEditionCreated: "dish.edition_created" {
   dishId: string
   tenantId: string
@@ -594,21 +679,49 @@ event DishMerged: "dish.merged" {
   reason: string
 }
 
-event DishRecipeAttached: "dish_recipe.attached" {
-  dishRecipeId: string
+event DishIngredientAdded: "dish_ingredient.added" {
+  dishIngredientId: string
   tenantId: string
   dishId: string
-  recipeId: string
+  ingredientId: string
+  quantity: number
+  unit: string
+  wasteFactor: number
+}
+
+event DishIngredientQuantityAdjusted: "dish_ingredient.quantity_adjusted" {
+  dishIngredientId: string
+  tenantId: string
+  dishId: string
+  ingredientId: string
+  previousQuantity: number
+  quantity: number
+  unit: string
+}
+
+event DishIngredientRemoved: "dish_ingredient.removed" {
+  dishIngredientId: string
+  tenantId: string
+  dishId: string
+  ingredientId: string
+  reason: string
+}
+
+event DishComponentAttached: "dish_component.attached" {
+  dishComponentId: string
+  tenantId: string
+  dishId: string
+  componentId: string
   yieldQuantity: number
   batchMultiplier: number
   sortOrder: number
   role: string?
 }
 
-event DishRecipeDetached: "dish_recipe.detached" {
-  dishRecipeId: string
+event DishComponentDetached: "dish_component.detached" {
+  dishComponentId: string
   tenantId: string
   dishId: string
-  recipeId: string
+  componentId: string
   reason: string
 }

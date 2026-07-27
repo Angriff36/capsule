@@ -37,7 +37,7 @@ export class ImportSourceReadinessChecker {
         return {
           ready: false,
           kind: "none",
-          message: "Paste recipe text before parsing.",
+          message: "Paste component text before parsing.",
         };
       }
       return { ready: true, kind: "paste_text" };
@@ -54,14 +54,14 @@ export class ImportSourceReadinessChecker {
         ready: false,
         kind: "none",
         message:
-          "Load both recipe sheet and recipe lines CSV files, or choose a .txt recipe file.",
+          "Load both component sheet and component lines CSV files, or choose a .txt component file.",
       };
     }
     return {
       ready: false,
       kind: "none",
       message:
-        "Choose a .txt recipe file or load the paired CSV bundle before parsing.",
+        "Choose a .txt component file or load the paired CSV bundle before parsing.",
     };
   }
 
@@ -79,10 +79,10 @@ export class ImportSourceReadinessChecker {
       return `CSV bundle ready · sheet ${this.countRows(snapshot.sheetCsv)} rows · lines ${this.countRows(snapshot.linesCsv)} rows`;
     }
     if (hasSheet) {
-      return `Recipe sheet loaded · ${this.countRows(snapshot.sheetCsv)} rows · add recipe_lines.csv to continue`;
+      return `Component sheet loaded · ${this.countRows(snapshot.sheetCsv)} rows · add component_lines.csv to continue`;
     }
     if (hasLines) {
-      return `Recipe lines loaded · ${this.countRows(snapshot.linesCsv)} rows · add recipe_sheet.csv to continue`;
+      return `Component lines loaded · ${this.countRows(snapshot.linesCsv)} rows · add component_sheet.csv to continue`;
     }
     return null;
   }

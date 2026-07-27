@@ -4,8 +4,8 @@ import type { KitchenSection } from "../kitchenRoutes";
 export class CulinaryCatalogCardTone {
   static kindLabel(section: KitchenSection): string {
     switch (section) {
-      case "recipes":
-        return "Recipe";
+      case "components":
+        return "Component";
       case "ingredients":
         return "Ingredient";
       case "dishes":

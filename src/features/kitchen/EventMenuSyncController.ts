@@ -11,7 +11,7 @@ type DishTaskRow = {
   category?: string | null;
   taskType?: string | null;
   sortOrder?: number | null;
-  recipeId?: string | null;
+  componentId?: string | null;
   ingredientId?: string | null;
   instructions?: string | null;
   status: string;
@@ -28,7 +28,7 @@ type PrepTaskRow = {
   unit: string;
   ingredientId?: string | null;
   ingredientDemandId?: string | null;
-  recipeId?: string | null;
+  componentId?: string | null;
   specialInstructions?: string | null;
   isGenerated: boolean;
   status: string;
@@ -96,20 +96,20 @@ type Catalogs = {
   prepTasks: readonly PrepTaskRow[];
   ingredients: readonly IngredientRow[];
   demands: readonly DemandRow[];
-  dishRecipes: readonly {
+  dishComponents: readonly {
     dishId: string;
-    recipeId: string;
+    componentId: string;
     deletedAt?: number | null;
     attachedAt?: number | null;
   }[];
-  recipes: readonly {
+  components: readonly {
     _id: string;
     yieldQuantity: number;
     batchMultiplier: number;
     deletedAt?: number | null;
   }[];
-  recipeIngredients: readonly {
-    recipeId: string;
+  componentIngredients: readonly {
+    componentId: string;
     ingredientId: string;
     quantity: number;
     unit: string;
@@ -160,9 +160,9 @@ export class EventMenuSyncController {
     prepTasks: readonly PrepTaskRow[] | undefined;
     ingredients: readonly IngredientRow[] | undefined;
     demands: readonly DemandRow[] | undefined;
-    dishRecipes: Catalogs["dishRecipes"] | undefined;
-    recipes: Catalogs["recipes"] | undefined;
-    recipeIngredients: Catalogs["recipeIngredients"] | undefined;
+    dishComponents: Catalogs["dishComponents"] | undefined;
+    components: Catalogs["components"] | undefined;
+    componentIngredients: Catalogs["componentIngredients"] | undefined;
     eventDishes: Catalogs["eventDishes"] | undefined;
     inventoryItems: readonly InventoryItemRow[] | undefined;
     inventoryLots: readonly InventoryLotRow[] | undefined;
@@ -173,9 +173,9 @@ export class EventMenuSyncController {
       input.prepTasks === undefined ||
       input.ingredients === undefined ||
       input.demands === undefined ||
-      input.dishRecipes === undefined ||
-      input.recipes === undefined ||
-      input.recipeIngredients === undefined ||
+      input.dishComponents === undefined ||
+      input.components === undefined ||
+      input.componentIngredients === undefined ||
       input.eventDishes === undefined ||
       input.inventoryItems === undefined ||
       input.inventoryLots === undefined ||
@@ -188,9 +188,9 @@ export class EventMenuSyncController {
       prepTasks: input.prepTasks,
       ingredients: input.ingredients,
       demands: input.demands,
-      dishRecipes: input.dishRecipes,
-      recipes: input.recipes,
-      recipeIngredients: input.recipeIngredients,
+      dishComponents: input.dishComponents,
+      components: input.components,
+      componentIngredients: input.componentIngredients,
       eventDishes: input.eventDishes,
       inventoryItems: input.inventoryItems,
       inventoryLots: input.inventoryLots,
@@ -198,7 +198,7 @@ export class EventMenuSyncController {
     };
   }
 
-  async syncRecipeDemands(
+  async syncComponentDemands(
     eventId: string,
     _override?: EventDishOverride,
   ): Promise<EventStockShortage[]> {
@@ -275,7 +275,7 @@ export class EventMenuSyncController {
         category: task.category ?? undefined,
         taskType: task.taskType ?? undefined,
         sortOrder: task.sortOrder ?? undefined,
-        recipeId: task.recipeId,
+        componentId: task.componentId,
         ingredientId: task.ingredientId,
         instructions: task.instructions,
         status: task.status,
@@ -291,7 +291,7 @@ export class EventMenuSyncController {
         unit: task.unit as never,
         ingredientId: task.ingredientId,
         ingredientDemandId: task.ingredientDemandId,
-        recipeId: task.recipeId,
+        componentId: task.componentId,
         specialInstructions: task.specialInstructions,
         isGenerated: task.isGenerated,
         status: task.status,
@@ -309,7 +309,7 @@ export class EventMenuSyncController {
       })),
       skipDemand: true,
     });
-    return this.syncRecipeDemands(eventDish.eventId, eventDish);
+    return this.syncComponentDemands(eventDish.eventId, eventDish);
   }
 
   private prepCoordinator() {

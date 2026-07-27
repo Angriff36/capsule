@@ -3,12 +3,12 @@
 ## Outcome
 
 Ingredients can store kitchen-configured substitute mappings. When event-menu
-recipe demand cannot be fully reserved, the existing shortage banner ranks
+component demand cannot be fully reserved, the existing shortage banner ranks
 mapped, same-unit alternatives that have unreserved stock. Candidates that add
 no allergens rank before allergen-changing alternatives; signed catalog
 unit-cost delta then orders equally compatible choices.
 
-The canonical recipe is not silently rewritten for one event shortage. Kitchen
+The canonical component is not silently rewritten for one event shortage. Kitchen
 staff receive the alternative, coverage quantity, allergen impact, and cost
 impact needed to adapt service.
 

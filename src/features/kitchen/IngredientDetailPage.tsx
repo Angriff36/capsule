@@ -7,8 +7,8 @@ import {
   useIngredientSetPreferredVendors,
   useListIngredient,
   useListIngredientPriceObservation,
-  useListRecipe,
-  useListRecipeIngredient,
+  useListComponent,
+  useListComponentIngredient,
   useListVendor,
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
@@ -259,8 +259,8 @@ export function IngredientDetailPage() {
   const { id } = useParams();
   const ingredient = useGetIngredient(id ?? "skip");
   useTrackRecent("Ingredient", ingredient?.name);
-  const recipes = useListRecipe();
-  const lines = useListRecipeIngredient();
+  const components = useListComponent();
+  const lines = useListComponentIngredient();
   const ingredients = useListIngredient();
   const vendors = useListVendor();
   const priceObservations = useListIngredientPriceObservation();
@@ -288,15 +288,17 @@ export function IngredientDetailPage() {
     );
   }
 
-  const recipeUses = (lines ?? [])
+  const componentUses = (lines ?? [])
     .filter(
       (line) => line.deletedAt == null && line.ingredientId === ingredient._id,
     )
     .map((line) => ({
       line,
-      recipe: (recipes ?? []).find((recipe) => recipe._id === line.recipeId),
+      component: (components ?? []).find(
+        (component) => component._id === line.componentId,
+      ),
     }))
-    .filter((entry) => entry.recipe && entry.recipe.deletedAt == null);
+    .filter((entry) => entry.component && entry.component.deletedAt == null);
 
   const actions = policy.ingredientActions(
     String(ingredient.status),
@@ -456,18 +458,18 @@ export function IngredientDetailPage() {
 
       <section className="culinary-section">
         <div className="culinary-section-heading">
-          <h2>Recipe uses</h2>
-          <span>{recipeUses.length} recipes</span>
+          <h2>Component uses</h2>
+          <span>{componentUses.length} components</span>
         </div>
-        {recipeUses.length ? (
+        {componentUses.length ? (
           <ul className="ingredient-list">
-            {recipeUses.map(({ line, recipe }) => (
+            {componentUses.map(({ line, component }) => (
               <li key={line._id}>
                 <strong>
                   {line.quantity} {String(line.unit)}
                 </strong>
-                <CulinaryEntityLink kind="recipe" id={recipe!._id}>
-                  {recipe!.name}
+                <CulinaryEntityLink kind="component" id={component!._id}>
+                  {component!.name}
                 </CulinaryEntityLink>
                 <span>{line.prepNotes || "No preparation note"}</span>
               </li>
@@ -475,7 +477,7 @@ export function IngredientDetailPage() {
           </ul>
         ) : (
           <div className="document-empty">
-            <p>No recipes use this ingredient yet.</p>
+            <p>No components use this ingredient yet.</p>
           </div>
         )}
       </section>

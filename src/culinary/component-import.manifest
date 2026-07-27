@@ -1,0 +1,580 @@
+// Capsule culinary component import — durable import workflow and line resolution.
+
+use "./component.manifest"
+
+enum ComponentImportSourceKind {
+  pasted_text
+  text_file
+  csv_bundle
+}
+
+enum ComponentImportStatus {
+  uploaded
+  parsed
+  reviewing
+  ready
+  finalizing
+  completed
+  failed
+  cancelled
+}
+
+enum ComponentImportMatchStatus {
+  unresolved
+  exact
+  possible
+  new
+  confirmed_existing
+  confirmed_new
+}
+
+entity ComponentImport mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required sourceKind: ComponentImportSourceKind = "pasted_text"
+  property sourceFilename: string?
+  property required rawSourceText: string = ""
+  property required sourceByteCount: int = 0
+  property required sourceFingerprint: string = ""
+  property parsedName: string?
+  property parsedDescription: string?
+  property parsedCategory: string?
+  property parsedCuisine: string?
+  property parsedInstructions: string?
+  property parsedYieldQuantity: decimal(10, 2)?
+  property parsedYieldUnit: UnitOfMeasure?
+  property parsedBatchMultiplier: decimal(10, 4)?
+  property required parsedLineCount: int = 0
+  property required resolvedLineCount: int = 0
+  property required status: ComponentImportStatus = "uploaded"
+  property parsingFailureDetail: string?
+  property finalizationFailureDetail: string?
+  property resultingComponentId: uuid?
+  property uploadedAt: datetime?
+  property parsedAt: datetime?
+  property reviewStartedAt: datetime?
+  property readyAt: datetime?
+  property finalizationStartedAt: datetime?
+  property completedAt: datetime?
+  property failedAt: datetime?
+  property cancelledAt: datetime?
+
+  hasMany lines: ComponentImportLine
+  belongsTo resultingComponent: Component fields [tenantId, resultingComponentId] references [tenantId, id]
+
+  constraint importSourcePresent: self.uploadedAt == null or length(trim(self.rawSourceText)) > 0 "Import source content is required"
+  constraint importYieldPositive: self.parsedYieldQuantity == null or self.parsedYieldQuantity > 0 "Parsed yield quantity must be positive when present"
+  constraint importBatchPositive: self.parsedBatchMultiplier == null or self.parsedBatchMultiplier > 0 "Parsed batch multiplier must be positive when present"
+  constraint importLineCountsNonnegative: self.parsedLineCount >= 0 and self.resolvedLineCount >= 0 "Import line counts cannot be negative"
+  constraint importResolvedWithinParsed: self.resolvedLineCount <= self.parsedLineCount "Resolved line count cannot exceed parsed line count"
+  constraint importCompletionRequiresComponent: self.completedAt == null or self.resultingComponentId != null "Completed imports require a resulting component"
+
+  transition status from "uploaded" to ["parsed", "failed", "cancelled"]
+  transition status from "parsed" to ["reviewing", "failed", "cancelled"]
+  transition status from "reviewing" to ["ready", "failed", "cancelled"]
+  transition status from "ready" to ["finalizing", "reviewing", "failed", "cancelled"]
+  transition status from "finalizing" to ["completed", "failed", "reviewing", "cancelled"]
+  transition status from "completed" to []
+  transition status from "failed" to ["reviewing", "cancelled"]
+  transition status from "cancelled" to []
+
+  default policy componentImportRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component imports"
+  default policy componentImportWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component imports through commands"
+  default policy componentImportExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component import commands"
+
+  command upload(
+    sourceKind: ComponentImportSourceKind,
+    rawSourceText: string,
+    sourceByteCount: int,
+    sourceFingerprint: string,
+    optional sourceFilename: string
+  ) {
+    guard self.uploadedAt == null
+    guard self.deletedAt == null
+    constraint uploadSourcePresent: length(trim(rawSourceText)) > 0 "Import source content is required"
+    constraint uploadByteCountNonnegative: sourceByteCount >= 0 "Source byte count cannot be negative"
+    constraint uploadFingerprintPresent: length(trim(sourceFingerprint)) > 0 "Source fingerprint is required"
+    mutate sourceKind = sourceKind
+    mutate sourceFilename = sourceFilename
+    mutate rawSourceText = rawSourceText
+    mutate sourceByteCount = sourceByteCount
+    mutate sourceFingerprint = sourceFingerprint
+    mutate status = "uploaded"
+    mutate uploadedAt = now()
+    emit ComponentImportUploaded {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      sourceKind: sourceKind
+      sourceByteCount: sourceByteCount
+      sourceFingerprint: sourceFingerprint
+    }
+  }
+
+  command recordParse(
+    parsedName: string,
+    parsedLineCount: int,
+    optional parsedDescription: string,
+    optional parsedCategory: string,
+    optional parsedCuisine: string,
+    optional parsedInstructions: string,
+    optional parsedYieldQuantity: decimal(10, 2),
+    optional parsedYieldUnit: UnitOfMeasure,
+    optional parsedBatchMultiplier: decimal(10, 4)
+  ) {
+    guard self.status == "uploaded"
+    guard self.uploadedAt != null
+    guard self.deletedAt == null
+    constraint parseNamePresent: length(trim(parsedName)) > 0 "Parsed component name is required"
+    constraint parseLineCountNonnegative: parsedLineCount >= 0 "Parsed line count cannot be negative"
+    constraint parseYieldPositive: parsedYieldQuantity == null or parsedYieldQuantity > 0 "Parsed yield quantity must be positive when present"
+    constraint parseBatchPositive: parsedBatchMultiplier == null or parsedBatchMultiplier > 0 "Parsed batch multiplier must be positive when present"
+    mutate parsedName = parsedName
+    mutate parsedDescription = parsedDescription
+    mutate parsedCategory = parsedCategory
+    mutate parsedCuisine = parsedCuisine
+    mutate parsedInstructions = parsedInstructions
+    mutate parsedYieldQuantity = parsedYieldQuantity
+    mutate parsedYieldUnit = parsedYieldUnit
+    mutate parsedBatchMultiplier = parsedBatchMultiplier != null ? parsedBatchMultiplier : 1
+    mutate parsedLineCount = parsedLineCount
+    mutate resolvedLineCount = 0
+    mutate status = "parsed"
+    mutate parsedAt = now()
+    emit ComponentImportParsed {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      parsedName: parsedName
+      parsedLineCount: parsedLineCount
+    }
+  }
+
+  command beginReview() {
+    guard self.status == "parsed"
+    guard self.parsedAt != null
+    guard self.deletedAt == null
+    mutate status = "reviewing"
+    mutate reviewStartedAt = now()
+    emit ComponentImportReviewStarted {
+      componentImportId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command recordResolutionProgress(resolvedLineCount: int) {
+    guard self.status == "reviewing"
+    guard self.reviewStartedAt != null
+    guard self.deletedAt == null
+    constraint progressNonnegative: resolvedLineCount >= 0 "Resolved line count cannot be negative"
+    constraint progressWithinParsed: resolvedLineCount <= self.parsedLineCount "Resolved line count cannot exceed parsed line count"
+    mutate resolvedLineCount = resolvedLineCount
+    emit ComponentImportResolutionProgressRecorded {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      resolvedLineCount: resolvedLineCount
+      parsedLineCount: self.parsedLineCount
+    }
+  }
+
+  command approveReview() {
+    guard self.status == "reviewing"
+    guard self.reviewStartedAt != null
+    guard self.deletedAt == null
+    guard self.parsedLineCount > 0
+    guard self.resolvedLineCount == self.parsedLineCount
+    mutate status = "ready"
+    mutate readyAt = now()
+    emit ComponentImportReviewApproved {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      parsedLineCount: self.parsedLineCount
+    }
+  }
+
+  command beginFinalization() {
+    guard self.status == "ready"
+    guard self.readyAt != null
+    guard self.deletedAt == null
+    mutate status = "finalizing"
+    mutate finalizationStartedAt = now()
+    emit ComponentImportFinalizationStarted {
+      componentImportId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command recordComponent(resultingComponentId: uuid) {
+    guard self.status == "finalizing"
+    guard self.finalizationStartedAt != null
+    guard self.deletedAt == null
+    guard self.resultingComponent != null
+    mutate resultingComponentId = resultingComponentId
+    emit ComponentImportComponentRecorded {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      resultingComponentId: resultingComponentId
+    }
+  }
+
+  command markFailed(failureDetail: string, optional duringParsing: boolean) {
+    guard self.status != "completed"
+    guard self.status != "cancelled"
+    guard self.deletedAt == null
+    constraint failureDetailPresent: length(trim(failureDetail)) > 0 "Failure detail is required"
+    compute previousStatus = self.status
+    mutate status = "failed"
+    mutate failedAt = now()
+    mutate parsingFailureDetail = duringParsing == true ? failureDetail : self.parsingFailureDetail
+    mutate finalizationFailureDetail = duringParsing == true ? self.finalizationFailureDetail : failureDetail
+    emit ComponentImportFailed {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      previousStatus: previousStatus
+      failureDetail: failureDetail
+    }
+  }
+
+  command resumeReview() {
+    guard self.status == "failed" or self.status == "finalizing"
+    guard self.deletedAt == null
+    mutate status = "reviewing"
+    mutate failedAt = null
+    mutate finalizationStartedAt = null
+    mutate finalizationFailureDetail = null
+    emit ComponentImportReviewResumed {
+      componentImportId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
+  command complete() {
+    guard self.status == "finalizing"
+    guard self.finalizationStartedAt != null
+    guard self.resultingComponentId != null
+    guard self.deletedAt == null
+    mutate status = "completed"
+    mutate completedAt = now()
+    emit ComponentImportCompleted {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      resultingComponentId: self.resultingComponentId
+    }
+  }
+
+  command cancel(reason: string) {
+    guard self.status != "completed"
+    guard self.deletedAt == null
+    constraint cancelReasonPresent: length(trim(reason)) > 0 "Cancellation reason is required"
+    compute previousStatus = self.status
+    mutate status = "cancelled"
+    mutate cancelledAt = now()
+    emit ComponentImportCancelled {
+      componentImportId: self.id
+      tenantId: self.tenantId
+      previousStatus: previousStatus
+      reason: reason
+    }
+  }
+
+  store ComponentImport in durable
+}
+
+entity ComponentImportLine mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required importId: uuid
+  property required sourceOrder: int = 0
+  property required sourceLine: string = ""
+  property parsedQuantity: decimal(10, 4)?
+  property parsedUnit: UnitOfMeasure?
+  property parsedIngredientName: string?
+  property preparationNote: string?
+  property required matchStatus: ComponentImportMatchStatus = "unresolved"
+  property matchedIngredientId: uuid?
+  property possibleMatchIngredientIds: list<string> = []
+  property resolvedAt: datetime?
+
+  belongsTo import: ComponentImport fields [tenantId, importId] references [tenantId, id]
+  belongsTo matchedIngredient: Ingredient fields [tenantId, matchedIngredientId] references [tenantId, id]
+
+  constraint lineMatchedIngredientAllowed: self.matchStatus == "exact" or self.matchStatus == "confirmed_existing" or self.matchedIngredientId == null "Only exact or confirmed existing lines may carry a matched ingredient id"
+  constraint lineConfirmedNewWithoutMatch: self.matchStatus != "confirmed_new" or self.matchedIngredientId == null "Confirmed new lines remain unmatched until ingredient creation succeeds"
+
+  default policy componentImportLineRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read component import lines"
+  default policy componentImportLineWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write component import lines through commands"
+  default policy componentImportLineExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute component import line commands"
+
+  command stage(
+    importId: uuid,
+    sourceOrder: int,
+    sourceLine: string,
+    optional parsedQuantity: decimal(10, 4),
+    optional parsedUnit: UnitOfMeasure,
+    optional parsedIngredientName: string,
+    optional preparationNote: string
+  ) {
+    guard self.resolvedAt == null
+    guard self.deletedAt == null
+    guard self.import != null
+    constraint stageImportMatch: importId == self.importId "Stage importId must match the seeded import reference"
+    constraint stageSourceLinePresent: length(trim(sourceLine)) > 0 "Source line is required"
+    constraint stageOrderNonnegative: sourceOrder >= 0 "Source order cannot be negative"
+    mutate importId = importId
+    mutate sourceOrder = sourceOrder
+    mutate sourceLine = sourceLine
+    mutate parsedQuantity = parsedQuantity
+    mutate parsedUnit = parsedUnit
+    mutate parsedIngredientName = parsedIngredientName
+    mutate preparationNote = preparationNote
+    mutate matchStatus = "unresolved"
+    emit ComponentImportLineStaged {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: importId
+      sourceOrder: sourceOrder
+    }
+  }
+
+  command suggestExactMatch(matchedIngredientId: uuid) {
+    guard self.resolvedAt == null
+    guard self.deletedAt == null
+    guard self.matchedIngredient != null and self.matchedIngredient.status == "active"
+    mutate matchStatus = "exact"
+    mutate matchedIngredientId = matchedIngredientId
+    mutate possibleMatchIngredientIds = []
+    emit ComponentImportLineExactMatchSuggested {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+      matchedIngredientId: matchedIngredientId
+    }
+  }
+
+  command suggestPossibleMatches(possibleMatchIngredientIds: list<string>) {
+    guard self.resolvedAt == null
+    guard self.deletedAt == null
+    mutate matchStatus = "possible"
+    mutate matchedIngredientId = null
+    mutate possibleMatchIngredientIds = possibleMatchIngredientIds
+    emit ComponentImportLinePossibleMatchesSuggested {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+      candidateCount: length(possibleMatchIngredientIds)
+    }
+  }
+
+  command markNew() {
+    guard self.resolvedAt == null
+    guard self.deletedAt == null
+    mutate matchStatus = "new"
+    mutate matchedIngredientId = null
+    mutate possibleMatchIngredientIds = []
+    emit ComponentImportLineMarkedNew {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+    }
+  }
+
+  command confirmExisting(matchedIngredientId: uuid) {
+    guard self.resolvedAt == null
+    guard self.deletedAt == null
+    guard self.matchedIngredient != null and self.matchedIngredient.status == "active"
+    mutate matchStatus = "confirmed_existing"
+    mutate matchedIngredientId = matchedIngredientId
+    mutate resolvedAt = now()
+    emit ComponentImportLineExistingConfirmed {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+      matchedIngredientId: matchedIngredientId
+    }
+  }
+
+  command confirmNew() {
+    guard self.resolvedAt == null
+    guard self.deletedAt == null
+    mutate matchStatus = "confirmed_new"
+    mutate matchedIngredientId = null
+    mutate resolvedAt = now()
+    emit ComponentImportLineNewConfirmed {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+    }
+  }
+
+  command attachCreatedIngredient(matchedIngredientId: uuid) {
+    guard self.matchStatus == "confirmed_new"
+    guard self.resolvedAt != null
+    guard self.deletedAt == null
+    guard self.matchedIngredient != null and self.matchedIngredient.status == "active"
+    mutate matchedIngredientId = matchedIngredientId
+    emit ComponentImportLineCreatedIngredientAttached {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+      matchedIngredientId: matchedIngredientId
+    }
+  }
+
+  command resetResolution() {
+    guard self.deletedAt == null
+    mutate matchStatus = "unresolved"
+    mutate matchedIngredientId = null
+    mutate possibleMatchIngredientIds = []
+    mutate resolvedAt = null
+    emit ComponentImportLineResolutionReset {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+    }
+  }
+
+  command discard(reason: string) {
+    guard self.deletedAt == null
+    constraint discardReasonPresent: length(trim(reason)) > 0 "Discard reason is required"
+    mutate deletedAt = now()
+    emit ComponentImportLineDiscarded {
+      componentImportLineId: self.id
+      tenantId: self.tenantId
+      importId: self.importId
+      reason: reason
+    }
+  }
+
+  store ComponentImportLine in durable
+}
+
+event ComponentImportUploaded: "component_import.uploaded" {
+  componentImportId: string
+  tenantId: string
+  sourceKind: ComponentImportSourceKind
+  sourceByteCount: int
+  sourceFingerprint: string
+}
+
+event ComponentImportParsed: "component_import.parsed" {
+  componentImportId: string
+  tenantId: string
+  parsedName: string
+  parsedLineCount: int
+}
+
+event ComponentImportReviewStarted: "component_import.review_started" {
+  componentImportId: string
+  tenantId: string
+}
+
+event ComponentImportResolutionProgressRecorded: "component_import.resolution_progress_recorded" {
+  componentImportId: string
+  tenantId: string
+  resolvedLineCount: int
+  parsedLineCount: int
+}
+
+event ComponentImportReviewApproved: "component_import.review_approved" {
+  componentImportId: string
+  tenantId: string
+  parsedLineCount: int
+}
+
+event ComponentImportFinalizationStarted: "component_import.finalization_started" {
+  componentImportId: string
+  tenantId: string
+}
+
+event ComponentImportComponentRecorded: "component_import.component_recorded" {
+  componentImportId: string
+  tenantId: string
+  resultingComponentId: string
+}
+
+event ComponentImportFailed: "component_import.failed" {
+  componentImportId: string
+  tenantId: string
+  previousStatus: ComponentImportStatus
+  failureDetail: string
+}
+
+event ComponentImportReviewResumed: "component_import.review_resumed" {
+  componentImportId: string
+  tenantId: string
+}
+
+event ComponentImportCompleted: "component_import.completed" {
+  componentImportId: string
+  tenantId: string
+  resultingComponentId: string
+}
+
+event ComponentImportCancelled: "component_import.cancelled" {
+  componentImportId: string
+  tenantId: string
+  previousStatus: ComponentImportStatus
+  reason: string
+}
+
+event ComponentImportLineStaged: "component_import_line.staged" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+  sourceOrder: int
+}
+
+event ComponentImportLineExactMatchSuggested: "component_import_line.exact_match_suggested" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+  matchedIngredientId: string
+}
+
+event ComponentImportLinePossibleMatchesSuggested: "component_import_line.possible_matches_suggested" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+  candidateCount: int
+}
+
+event ComponentImportLineMarkedNew: "component_import_line.marked_new" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+}
+
+event ComponentImportLineExistingConfirmed: "component_import_line.existing_confirmed" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+  matchedIngredientId: string
+}
+
+event ComponentImportLineNewConfirmed: "component_import_line.new_confirmed" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+}
+
+event ComponentImportLineCreatedIngredientAttached: "component_import_line.created_ingredient_attached" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+  matchedIngredientId: string
+}
+
+event ComponentImportLineResolutionReset: "component_import_line.resolution_reset" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+}
+
+event ComponentImportLineDiscarded: "component_import_line.discarded" {
+  componentImportLineId: string
+  tenantId: string
+  importId: string
+  reason: string
+}

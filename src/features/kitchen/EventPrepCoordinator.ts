@@ -25,7 +25,7 @@ export type EventPrepDishTask = {
   category?: string | null;
   taskType?: string | null;
   sortOrder?: number | null;
-  recipeId?: string | null;
+  componentId?: string | null;
   ingredientId?: string | null;
   instructions?: string | null;
   status: string;
@@ -42,7 +42,7 @@ export type EventPrepTask = {
   unit: EventPrepUnit;
   ingredientId?: string | null;
   ingredientDemandId?: string | null;
-  recipeId?: string | null;
+  componentId?: string | null;
   specialInstructions?: string | null;
   isGenerated: boolean;
   status: string;
@@ -75,7 +75,7 @@ type DemandInput = {
   unit: EventPrepUnit;
   servings?: number;
   dishId?: string;
-  sourceRecipeLineQuantity?: number;
+  sourceComponentLineQuantity?: number;
   sourceBatchMultiplier?: number;
   sourceYieldQuantity?: number;
   idempotencyKey?: string;
@@ -89,7 +89,7 @@ type TaskInput = {
   unit: EventPrepUnit;
   ingredientId?: string;
   ingredientDemandId?: string;
-  recipeId?: string;
+  componentId?: string;
   dishTaskId: string;
   dishId: string;
   category?: string;
@@ -134,12 +134,12 @@ type SyncInput = {
   demands: readonly EventPrepDemand[];
   /**
    * When true, only materialize PrepTask rows.
-   * Recipe → IngredientDemand is Manifest-owned (event-purchasing.manifest).
+   * Component → IngredientDemand is Manifest-owned (event-purchasing.manifest).
    */
   skipDemand?: boolean;
 };
 
-/** Host prep-task materialization only — not purchasing / recipe demand. */
+/** Host prep-task materialization only — not purchasing / component demand. */
 export class EventPrepCoordinator {
   constructor(private readonly ports: Ports) {}
 

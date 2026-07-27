@@ -15,9 +15,9 @@ import type {
 } from "../../src/agent/CapsuleCommandExecutor";
 import { CapsuleDocumentEnterCoordinator } from "../../src/agent/CapsuleDocumentEnterCoordinator";
 import type {
-  CapsuleRecipeLifecycleStatus,
-  CapsuleRecipeStatusReader,
-} from "../../src/agent/CapsuleRecipeStatusLoader";
+  CapsuleComponentLifecycleStatus,
+  CapsuleComponentStatusReader,
+} from "../../src/agent/CapsuleComponentStatusLoader";
 import { modules } from "./convex-test-modules";
 
 const SOURCE = readFileSync(
@@ -68,12 +68,14 @@ class ProofCommandExecutor implements CapsuleCommandExecutor {
 }
 
 /** Harness-backed status reader — never hits live Convex HTTP/OIDC. */
-class ProofRecipeStatusReader implements CapsuleRecipeStatusReader {
+class ProofComponentStatusReader implements CapsuleComponentStatusReader {
   constructor(private readonly session: RoleSession) {}
 
-  async loadStatus(recipeId: string): Promise<CapsuleRecipeLifecycleStatus> {
+  async loadStatus(
+    componentId: string,
+  ): Promise<CapsuleComponentLifecycleStatus> {
     return this.session.run(async (ctx) => {
-      const row = await ctx.db.get(recipeId as never);
+      const row = await ctx.db.get(componentId as never);
       if (!row || (row as { deletedAt?: number | null }).deletedAt != null) {
         return "missing";
       }
@@ -96,7 +98,7 @@ function enterCoordinator(
 ): CapsuleDocumentEnterCoordinator {
   return new CapsuleDocumentEnterCoordinator(
     new ProofCommandExecutor(proof, session),
-    new ProofRecipeStatusReader(session),
+    new ProofComponentStatusReader(session),
   );
 }
 
@@ -108,7 +110,7 @@ beforeAll(() => {
 });
 
 describe("runtime proof: agent document enter", () => {
-  it("enters fixture recipe document as ingredients + recipe + dish", async () => {
+  it("enters fixture component document as ingredients + component + dish", async () => {
     const proof = harness();
     const kitchen = proof.asRole({
       subject: "agent-doc-enter",
@@ -128,23 +130,23 @@ describe("runtime proof: agent document enter", () => {
       approveUnresolvedAsNew: true,
       introduceDish: true,
     });
-    expect(first.recipeId).toBeTruthy();
+    expect(first.componentId).toBeTruthy();
     expect(first.dishId).toBeTruthy();
     expect(first.createdIngredientIds.length).toBeGreaterThan(0);
 
     const snapshot = await kitchen.run(async (ctx) => {
-      const recipe = await ctx.db.get(first.recipeId as never);
+      const component = await ctx.db.get(first.componentId as never);
       const dish = first.dishId
         ? await ctx.db.get(first.dishId as never)
         : null;
       const ingredients = await ctx.db.query("ingredients").collect();
-      const lines = await ctx.db.query("recipeIngredients").collect();
-      const dishRecipes = await ctx.db.query("dishRecipes").collect();
+      const lines = await ctx.db.query("componentIngredients").collect();
+      const dishComponents = await ctx.db.query("dishComponents").collect();
       const dishes = await ctx.db.query("dishes").collect();
-      return { recipe, dish, ingredients, lines, dishRecipes, dishes };
+      return { component, dish, ingredients, lines, dishComponents, dishes };
     });
 
-    expect(snapshot.recipe).toMatchObject({
+    expect(snapshot.component).toMatchObject({
       name: "House Herb Oil",
       yieldQuantity: 2,
       yieldUnit: "cup",
@@ -155,13 +157,14 @@ describe("runtime proof: agent document enter", () => {
       tenantId: "tenant-agent-enter",
     });
     expect(
-      snapshot.dishRecipes.some(
+      snapshot.dishComponents.some(
         (link) =>
-          link.dishId === first.dishId && link.recipeId === first.recipeId,
+          link.dishId === first.dishId &&
+          link.componentId === first.componentId,
       ),
     ).toBe(true);
     expect(
-      snapshot.lines.filter((line) => line.recipeId === first.recipeId),
+      snapshot.lines.filter((line) => line.componentId === first.componentId),
     ).toHaveLength(3);
     expect(snapshot.ingredients.some((i) => i.name === "Olive Oil")).toBe(true);
 
@@ -170,18 +173,19 @@ describe("runtime proof: agent document enter", () => {
       approveUnresolvedAsNew: true,
       introduceDish: true,
     });
-    expect(second.recipeId).toBe(first.recipeId);
+    expect(second.componentId).toBe(first.componentId);
     expect(second.dishId).toBe(first.dishId);
 
     const afterRetry = await kitchen.run(async (ctx) => {
-      const recipes = await ctx.db.query("recipes").collect();
+      const components = await ctx.db.query("components").collect();
       const dishes = await ctx.db.query("dishes").collect();
       return {
-        recipeCount: recipes.filter((r) => r.name === "House Herb Oil").length,
+        componentCount: components.filter((r) => r.name === "House Herb Oil")
+          .length,
         dishCount: dishes.filter((d) => d.name === "House Herb Oil").length,
       };
     });
-    expect(afterRetry.recipeCount).toBe(1);
+    expect(afterRetry.componentCount).toBe(1);
     expect(afterRetry.dishCount).toBe(1);
   });
 

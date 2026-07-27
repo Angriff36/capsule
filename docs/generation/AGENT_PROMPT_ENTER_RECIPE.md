@@ -1,7 +1,7 @@
-# Copy-paste prompt: enter a recipe into Capsule
+# Copy-paste prompt: enter a component into Capsule
 
 **Created:** 2026-07-17  
-**Updated:** 2026-07-21 — look at `work/` photos first; Dish ≠ Recipe
+**Updated:** 2026-07-21 — look at `work/` photos first; Dish ≠ Component
 
 Paste this into an IDE agent chat in the Capsule repo:
 
@@ -12,27 +12,27 @@ Paste this into an IDE agent chat in the Capsule repo:
 - `work/list3.jpg`, `work/list4.jpg`, `work/list5.jpg` — production sheets.
   Bold ALL-CAPS lines are **Dishes** (menu items). Indented lines under each
   dish are **DishTask** prep/portion lines with quantities. “MAKE X (DRIVE
-  RECIPE)” / “(RECIPE)” points at a separate Recipe sheet.
-- `work/recipes/*.jpg` (e.g. basil pesto, macaroni salad, lemonade concentrate)
-  — those are **Recipes** (component formulas with ingredients + method).
+  COMPONENT)” / “(COMPONENT)” points at a separate Component sheet.
+- `work/components/*.jpg` (e.g. basil pesto, macaroni salad, lemonade concentrate)
+  — those are **Components** (component formulas with ingredients + method).
 
-Do **not** create a Recipe titled the same as a Dish. Do **not** invent
+Do **not** create a Component titled the same as a Dish. Do **not** invent
 “batch formula” renames. A Dish’s ingredients/prep live on DishTask lines
-(`dishtask_add`). A Recipe is only for reusable make-formulas.
+(`dishtask_add`). A Component is only for reusable make-formulas.
 
-Enter **recipe sheets** with Capsule MCP / governed commands only (no UI, no
-direct DB writes). Prefer MCP (`preview_recipe_document` →
-`enter_recipe_document`, or first-class snake tools). **Preview first. Do not
-write until the preview lines look correct.** Entering a recipe does **not**
+Enter **component sheets** with Capsule MCP / governed commands only (no UI, no
+direct DB writes). Prefer MCP (`preview_component_document` →
+`enter_component_document`, or first-class snake tools). **Preview first. Do not
+write until the preview lines look correct.** Entering a component does **not**
 create a Dish (default).
 
 Working directory: `C:/Projects/capsule`
 
 1. Run `bun run agent:mint-jwt` if needed (active Capsule UI session + org).
-2. For each recipe file, preview only:
+2. For each component file, preview only:
 
 ```bash
-bun run agent:enter-recipe -- --preview path/to/recipe.txt
+bun run agent:enter-component -- --preview path/to/component.txt
 ```
 
 3. Check the JSON: `catalogSize` must be > 0 (live Ingredient list). Ingredient
@@ -43,7 +43,7 @@ bun run agent:enter-recipe -- --preview path/to/recipe.txt
 5. Only after preview is clean (and human OK for any remaining news), enter:
 
 ```bash
-bun run agent:enter-recipe -- path/to/recipe.txt --approve-new
+bun run agent:enter-component -- path/to/component.txt --approve-new
 ```
 
 6. Report preview summary (`exactMatchCount`, `unresolvedLineCount`,
@@ -52,7 +52,7 @@ bun run agent:enter-recipe -- path/to/recipe.txt --approve-new
 
 To add a **Dish with prep/ingredient lines** (production sheet shape): use
 `dish_introduce` then `dishtask_add` for each line (optional `ingredientId` /
-`recipeId`). See `docs/event-prep-and-weekly-order-workflow.md`.
+`componentId`). See `docs/event-prep-and-weekly-order-workflow.md`.
 
 ---
 

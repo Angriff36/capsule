@@ -2,13 +2,13 @@ import { useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   useListDish,
-  useListDishRecipe,
+  useListDishComponent,
   useListEvent,
   useListEventDish,
   useListIngredient,
   useListMenu,
   useListMenuDish,
-  useListRecipeIngredient,
+  useListComponentIngredient,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import {
@@ -28,26 +28,26 @@ type MatrixRecord = {
 };
 
 /**
- * Dish rows for the matrix: allergen flags unioned from recipe ingredient
- * classifications (dish → DishRecipe → RecipeIngredient → Ingredient.allergens)
+ * Dish rows for the matrix: allergen flags unioned from component ingredient
+ * classifications (dish → DishComponent → ComponentIngredient → Ingredient.allergens)
  * plus dish-level declared allergenSummary. Each flagged cell records its
  * contributing sources for disclosure tooltips.
  */
 export function deriveAllergenRows(input: {
   dishIds: string[];
   dishes: MatrixRecord[];
-  dishRecipes: MatrixRecord[];
-  recipeIngredients: MatrixRecord[];
+  dishComponents: MatrixRecord[];
+  componentIngredients: MatrixRecord[];
   ingredients: MatrixRecord[];
 }) {
   return [...new Set(input.dishIds)]
     .map((dishId) => {
       const dish = input.dishes.find((item) => item._id === dishId);
       if (!dish || dish.deletedAt != null) return null;
-      const recipeIds = new Set(
-        input.dishRecipes
+      const componentIds = new Set(
+        input.dishComponents
           .filter((line) => line.deletedAt == null && line.dishId === dishId)
-          .map((line) => line.recipeId),
+          .map((line) => line.componentId),
       );
       const sources = new Map<AllergenCode, string[]>();
       const flag = (code: AllergenCode, source: string) => {
@@ -55,8 +55,9 @@ export function deriveAllergenRows(input: {
         if (!list.includes(source)) list.push(source);
         sources.set(code, list);
       };
-      for (const line of input.recipeIngredients) {
-        if (line.deletedAt != null || !recipeIds.has(line.recipeId)) continue;
+      for (const line of input.componentIngredients) {
+        if (line.deletedAt != null || !componentIds.has(line.componentId))
+          continue;
         const ingredient = input.ingredients.find(
           (item) => item._id === line.ingredientId,
         );
@@ -81,8 +82,8 @@ export function AllergenMatrixPage() {
   const menuDishes = useListMenuDish();
   const eventDishes = useListEventDish();
   const dishes = useListDish();
-  const dishRecipes = useListDishRecipe();
-  const recipeIngredients = useListRecipeIngredient();
+  const dishComponents = useListDishComponent();
+  const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
 
   const menuId = params.get("menu") ?? "";
@@ -99,8 +100,8 @@ export function AllergenMatrixPage() {
     menuDishes === undefined ||
     eventDishes === undefined ||
     dishes === undefined ||
-    dishRecipes === undefined ||
-    recipeIngredients === undefined ||
+    dishComponents === undefined ||
+    componentIngredients === undefined ||
     ingredients === undefined;
 
   const liveMenus = (menus ?? []).filter((menu) => menu.deletedAt == null);
@@ -126,8 +127,8 @@ export function AllergenMatrixPage() {
     return deriveAllergenRows({
       dishIds,
       dishes: dishes ?? [],
-      dishRecipes: dishRecipes ?? [],
-      recipeIngredients: recipeIngredients ?? [],
+      dishComponents: dishComponents ?? [],
+      componentIngredients: componentIngredients ?? [],
       ingredients: ingredients ?? [],
     });
   }, [
@@ -138,8 +139,8 @@ export function AllergenMatrixPage() {
     menuDishes,
     eventDishes,
     dishes,
-    dishRecipes,
-    recipeIngredients,
+    dishComponents,
+    componentIngredients,
     ingredients,
   ]);
 
@@ -149,18 +150,18 @@ export function AllergenMatrixPage() {
   };
 
   return (
-    <div className="recipe-book-stage culinary-studio">
-      <header className="recipe-book-masthead">
+    <div className="component-book-stage culinary-studio">
+      <header className="component-book-masthead">
         <div>
           <p className="eyebrow">Culinary book · Allergens</p>
           <h1 className="display-title mt-2">Allergen matrix</h1>
           <p className="mt-3 max-w-150 text-ink-2">
             Every dish on a menu or event against the major food allergens,
-            auto-populated from recipe ingredient allergen flags. Print for
+            auto-populated from component ingredient allergen flags. Print for
             client disclosure or health inspection.
           </p>
         </div>
-        <div className="recipe-book-masthead-actions">
+        <div className="component-book-masthead-actions">
           <button
             className="btn btn-primary"
             disabled={!scopeValue || rows.length === 0}
@@ -205,11 +206,11 @@ export function AllergenMatrixPage() {
           <TableSkeleton rows={7} />
         </div>
       ) : !scopeValue ? (
-        <div className="recipe-filter-empty mt-4">
+        <div className="component-filter-empty mt-4">
           <p>Select a menu or event to build its allergen matrix.</p>
         </div>
       ) : rows.length === 0 ? (
-        <div className="recipe-filter-empty mt-4">
+        <div className="component-filter-empty mt-4">
           <p>No dishes on this {menuId ? "menu" : "event"} yet.</p>
         </div>
       ) : (
@@ -280,7 +281,7 @@ export function AllergenMatrixPage() {
             </table>
           </div>
           <p className="allergen-matrix-footnote">
-            Flags derive from recipe ingredient allergen classifications and
+            Flags derive from component ingredient allergen classifications and
             dish-level declarations. Unflagged cells mean no allergen is
             recorded, not a certified absence — verify with the kitchen before
             guaranteeing allergen-free service.

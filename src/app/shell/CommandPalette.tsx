@@ -35,7 +35,7 @@ const KIND_ICON: Record<string, React.ReactNode> = {
   vendor: <TruckIcon />,
   dish: <FlameIcon />,
   menu: <FlameIcon />,
-  recipe: <FlameIcon />,
+  component: <FlameIcon />,
   ingredient: <BoxIcon />,
   proposal: <ContactIcon />,
   contract: <ContactIcon />,
@@ -95,11 +95,11 @@ export function CommandPalette({
       ...(kitchenOn
         ? [
             {
-              key: "import-recipe",
-              label: "Import recipe",
+              key: "import-component",
+              label: "Import component",
               hint: "Create",
               icon: <PlusIcon />,
-              run: go("/kitchen/recipes/import"),
+              run: go("/kitchen/components/import"),
             } satisfies Command,
           ]
         : []),

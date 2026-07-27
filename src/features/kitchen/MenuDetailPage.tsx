@@ -5,12 +5,12 @@ import {
   useCreateMenuDish,
   useGetMenu,
   useListDish,
-  useListDishRecipe,
+  useListDishComponent,
   useListIngredient,
   useListIngredientPriceObservation,
   useListMenuDish,
-  useListRecipe,
-  useListRecipeIngredient,
+  useListComponent,
+  useListComponentIngredient,
   useMenuArchive,
   useMenuDishUpdateSellingPrice,
   useMenuMarkPublished,
@@ -26,12 +26,12 @@ import { MenuDishManager } from "./MenuDishManager";
 import { buildMenuProfitability } from "./MenuProfitabilityAnalysis";
 import { MenuProfitabilityPanel } from "./MenuProfitabilityPanel";
 import {
-  calculateRecipeNutrition,
+  calculateComponentNutrition,
   sumPerGuestNutrition,
   toNutritionIngredient,
-  type RecipeNutritionLineInput,
-} from "./RecipeNutrition";
-import { RecipeNutritionPanel } from "./RecipeNutritionPanel";
+  type ComponentNutritionLineInput,
+} from "./ComponentNutrition";
+import { ComponentNutritionPanel } from "./ComponentNutritionPanel";
 import {
   allergenMatrixPath,
   kitchenCatalogPath,
@@ -51,9 +51,9 @@ export function MenuDetailPage() {
   useTrackRecent("Menu", menu?.name);
   const dishes = useListDish();
   const menuDishes = useListMenuDish();
-  const dishRecipes = useListDishRecipe();
-  const recipes = useListRecipe();
-  const recipeIngredients = useListRecipeIngredient();
+  const dishComponents = useListDishComponent();
+  const components = useListComponent();
+  const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
   const { branding } = useTenantBranding();
@@ -79,8 +79,8 @@ export function MenuDetailPage() {
     const rows = deriveAllergenRows({
       dishIds: selectedMenuDishes.map((selection) => String(selection.dishId)),
       dishes: dishes ?? [],
-      dishRecipes: dishRecipes ?? [],
-      recipeIngredients: recipeIngredients ?? [],
+      dishComponents: dishComponents ?? [],
+      componentIngredients: componentIngredients ?? [],
       ingredients: ingredients ?? [],
     });
     const map = new Map<string, string[]>();
@@ -88,7 +88,13 @@ export function MenuDetailPage() {
       map.set(String(dish._id), [...sources.keys()]);
     }
     return map;
-  }, [selectedMenuDishes, dishes, dishRecipes, recipeIngredients, ingredients]);
+  }, [
+    selectedMenuDishes,
+    dishes,
+    dishComponents,
+    componentIngredients,
+    ingredients,
+  ]);
   const profitability = useMemo(
     () =>
       buildMenuProfitability({
@@ -106,17 +112,17 @@ export function MenuDetailPage() {
           name: dish.name,
           deletedAt: dish.deletedAt,
         })),
-        dishRecipes: (dishRecipes ?? []).map((attachment) => ({
+        dishComponents: (dishComponents ?? []).map((attachment) => ({
           id: attachment._id,
           dishId: attachment.dishId,
-          recipeId: attachment.recipeId,
+          componentId: attachment.componentId,
           yieldQuantity: attachment.yieldQuantity,
           batchMultiplier: attachment.batchMultiplier,
           deletedAt: attachment.deletedAt,
         })),
-        recipeIngredients: (recipeIngredients ?? []).map((line) => ({
+        componentIngredients: (componentIngredients ?? []).map((line) => ({
           id: line._id,
-          recipeId: line.recipeId,
+          componentId: line.componentId,
           ingredientId: line.ingredientId,
           quantity: line.quantity,
           unit: line.unit,
@@ -133,23 +139,23 @@ export function MenuDetailPage() {
       }),
     [
       dishes,
-      dishRecipes,
+      dishComponents,
       ingredients,
       priceObservations,
-      recipeIngredients,
+      componentIngredients,
       selectedMenuDishes,
     ],
   );
   const profitabilityLoading =
     dishes === undefined ||
     menuDishes === undefined ||
-    dishRecipes === undefined ||
-    recipeIngredients === undefined ||
+    dishComponents === undefined ||
+    componentIngredients === undefined ||
     ingredients === undefined ||
     priceObservations === undefined;
 
-  // Per-guest nutrition = one portion of each recipe composing each dish on the
-  // menu. Operational estimate; it does not re-scale for dish-level recipe yields.
+  // Per-guest nutrition = one portion of each component composing each dish on the
+  // menu. Operational estimate; it does not re-scale for dish-level component yields.
   const menuNutrition = useMemo(() => {
     const dishIds = new Set(
       selectedMenuDishes.map((selection) => String(selection.dishId)),
@@ -157,34 +163,34 @@ export function MenuDetailPage() {
     const nutritionIngredients = (ingredients ?? [])
       .filter((ingredient) => ingredient.deletedAt == null)
       .map(toNutritionIngredient);
-    const linesByRecipe = new Map<string, RecipeNutritionLineInput[]>();
-    for (const line of recipeIngredients ?? []) {
+    const linesByComponent = new Map<string, ComponentNutritionLineInput[]>();
+    for (const line of componentIngredients ?? []) {
       if (line.deletedAt != null) continue;
-      const list = linesByRecipe.get(line.recipeId) ?? [];
+      const list = linesByComponent.get(line.componentId) ?? [];
       list.push({
         id: line._id,
         ingredientId: line.ingredientId,
         quantity: Number(line.quantity),
         unit: line.unit,
       });
-      linesByRecipe.set(line.recipeId, list);
+      linesByComponent.set(line.componentId, list);
     }
-    const recipeById = new Map(
-      (recipes ?? []).map((recipe) => [recipe._id, recipe]),
+    const componentById = new Map(
+      (components ?? []).map((component) => [component._id, component]),
     );
-    const summaries = (dishRecipes ?? [])
+    const summaries = (dishComponents ?? [])
       .filter(
         (attachment) =>
           attachment.deletedAt == null &&
           dishIds.has(String(attachment.dishId)),
       )
       .map((attachment) => {
-        const recipe = recipeById.get(attachment.recipeId);
-        return calculateRecipeNutrition({
-          lines: linesByRecipe.get(attachment.recipeId) ?? [],
+        const component = componentById.get(attachment.componentId);
+        return calculateComponentNutrition({
+          lines: linesByComponent.get(attachment.componentId) ?? [],
           ingredients: nutritionIngredients,
           servesPerYield: Number(
-            (recipe as { servesPerYield?: number } | undefined)
+            (component as { servesPerYield?: number } | undefined)
               ?.servesPerYield ?? 1,
           ),
         });
@@ -192,20 +198,20 @@ export function MenuDetailPage() {
     return sumPerGuestNutrition(summaries);
   }, [
     selectedMenuDishes,
-    dishRecipes,
-    recipes,
-    recipeIngredients,
+    dishComponents,
+    components,
+    componentIngredients,
     ingredients,
   ]);
   const nutritionLoading =
-    dishRecipes === undefined ||
-    recipes === undefined ||
-    recipeIngredients === undefined ||
+    dishComponents === undefined ||
+    components === undefined ||
+    componentIngredients === undefined ||
     ingredients === undefined;
   const menuNutritionNote =
-    menuNutrition.recipeCount === 0
-      ? "Add dishes with recipes to estimate per-guest nutrition."
-      : `Estimated across ${menuNutrition.recipeCount} recipe${menuNutrition.recipeCount === 1 ? "" : "s"} on this menu${menuNutrition.isComplete ? "" : ` (${menuNutrition.measuredRecipeCount} with recorded nutrition)`}.`;
+    menuNutrition.componentCount === 0
+      ? "Add dishes with components to estimate per-guest nutrition."
+      : `Estimated across ${menuNutrition.componentCount} component${menuNutrition.componentCount === 1 ? "" : "s"} on this menu${menuNutrition.isComplete ? "" : ` (${menuNutrition.measuredComponentCount} with recorded nutrition)`}.`;
 
   if (!id) return <ErrorState title="Menu not found" />;
   if (menu === undefined) {
@@ -455,10 +461,12 @@ export function MenuDetailPage() {
         }}
       />
 
-      <RecipeNutritionPanel
+      <ComponentNutritionPanel
         heading="Per-guest nutrition"
         portionLabel="per guest"
-        totals={menuNutrition.recipeCount > 0 ? menuNutrition.perGuest : null}
+        totals={
+          menuNutrition.componentCount > 0 ? menuNutrition.perGuest : null
+        }
         coverageNote={menuNutritionNote}
         loading={nutritionLoading}
       />

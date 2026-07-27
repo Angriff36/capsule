@@ -11,7 +11,7 @@ describe("Culinary Manifest integration guard", () => {
 
   it("rejects direct generated Convex imports and handwritten hooks", () => {
     for (const source of [
-      'import { Recipe_draft } from "../../../convex/mutations";',
+      'import { Component_draft } from "../../../convex/mutations";',
       'import { useMutation } from "convex/react"; const save = useMutation(anything);',
     ]) {
       expect(
@@ -27,8 +27,8 @@ describe("Culinary Manifest integration guard", () => {
   it("rejects direct authored writes to Culinary-owned documents", () => {
     const tables = [
       "ingredients",
-      "recipes",
-      "recipeIngredients",
+      "components",
+      "componentIngredients",
       "dishes",
       "menus",
       "eventDishes",
@@ -49,7 +49,7 @@ describe("Culinary Manifest integration guard", () => {
   it("does not exempt a local Culinary allocation seam", () => {
     const violations = inspectCulinarySource(
       "convex/lib/culinaryPlanning.ts",
-      'async function allocate(ctx: any) { return ctx.db.insert("recipes", {}); }',
+      'async function allocate(ctx: any) { return ctx.db.insert("components", {}); }',
     );
     expect(violations).toEqual(
       expect.arrayContaining([

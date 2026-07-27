@@ -3,16 +3,16 @@ import { CapsuleCapabilityMutationResolver } from "./CapsuleCapabilityMutationRe
 const resolver = new CapsuleCapabilityMutationResolver();
 
 /**
- * North-star demo / AC proof set (recipe → event path). Not an MCP ceiling —
+ * North-star demo / AC proof set (component → event path). Not an MCP ceiling —
  * the catalog exposes every wiring capability that resolves to a Convex mutation.
  */
 export const AGENT_AC_CAPABILITY_IDS: readonly string[] = [
   "Ingredient.introduce",
-  "Recipe.draft",
-  "RecipeIngredient.add",
-  "RecipeImport.upload",
+  "Component.draft",
+  "ComponentIngredient.add",
+  "ComponentImport.upload",
   "Dish.introduce",
-  "DishRecipe.attach",
+  "DishComponent.attach",
   "DishTask.add",
   "Menu.draft",
   "PrepTask.open",

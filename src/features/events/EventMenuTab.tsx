@@ -6,17 +6,17 @@ import {
   useEventDishRemove,
   useListDish,
   useListEventDish,
-  useListRecipe,
+  useListComponent,
 } from "../../lib/manifest-convex-react";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
-import { dishPath, recipePath } from "../kitchen/kitchenRoutes";
+import { dishPath, componentPath } from "../kitchen/kitchenRoutes";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
-import { RecipeStockSuggestions } from "./RecipeStockSuggestions";
+import { ComponentStockSuggestions } from "./ComponentStockSuggestions";
 
 type Props = {
   eventId: string;
@@ -25,7 +25,7 @@ type Props = {
 
 export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const dishes = useListDish();
-  const recipes = useListRecipe();
+  const components = useListComponent();
   const eventDishes = useListEventDish();
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
@@ -80,7 +80,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       </div>
       {failure ? <FailureBanner failure={failure} /> : null}
       {host}
-      <RecipeStockSuggestions />
+      <ComponentStockSuggestions />
       {showPicker ? (
         <CulinaryRecordPicker
           kind="dish"
@@ -137,8 +137,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         <ul className="space-y-4">
           {selections.map((selection) => {
             const dish = dishes?.find((row) => row._id === selection.dishId);
-            const recipe = dish?.primaryRecipeId
-              ? recipes?.find((row) => row._id === dish.primaryRecipeId)
+            const component = dish?.primaryComponentId
+              ? components?.find((row) => row._id === dish.primaryComponentId)
               : null;
             const estimated =
               Number((selection as { estimatedCost?: number }).estimatedCost) ||
@@ -171,11 +171,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     {" · "}
                     {selection.quantityServings} servings
                     {estimated > 0 ? ` · est. $${estimated.toFixed(2)}` : ""}
-                    {recipe ? (
+                    {component ? (
                       <>
                         {" · "}
-                        <Link to={recipePath(recipe._id)} className="underline">
-                          Recipe: {recipe.name}
+                        <Link
+                          to={componentPath(component._id)}
+                          className="underline"
+                        >
+                          Component: {component.name}
                         </Link>
                       </>
                     ) : null}

@@ -1,4 +1,4 @@
-// Capsule production — ProductionBatch (recipe yield execution).
+// Capsule production — ProductionBatch (component yield execution).
 // Product-required; capsule-pro has NO ProductionBatch entity evidence.
 
 use "./task.manifest"
@@ -15,7 +15,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
   timestamps
   versionProperty version: number
 
-  property required recipeId: uuid
+  property required componentId: uuid
   property eventId: uuid?
   property required plannedYield: decimal(12, 4) = 0
   property actualYield: decimal(12, 4)?
@@ -28,7 +28,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
   property cancelledAt: datetime?
   property cancellationReason: string?
 
-  belongsTo recipe: Recipe fields [tenantId, recipeId] references [tenantId, id]
+  belongsTo component: Component fields [tenantId, componentId] references [tenantId, id]
   belongsTo event: Event fields [tenantId, eventId] references [tenantId, id]
 
   constraint batchPlannedPositive: self.plannedAt == null or self.plannedYield > 0 "Planned yield must be positive once planned"
@@ -46,7 +46,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
 
   // Idempotent plan: Event.approve fanOut may re-fire; do not fail or duplicate.
   command plan(
-    recipeId: uuid,
+    componentId: uuid,
     plannedYield: decimal(12, 4),
     yieldUnit: UnitOfMeasure,
     optional eventId: uuid,
@@ -54,12 +54,12 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
   ) {
     guard self.deletedAt == null
     guard self.status == "planned"
-    guard self.plannedAt == null or self.recipeId == recipeId
-    guard self.plannedAt != null or (self.recipe != null and self.recipe.status == "published")
-    constraint planRecipeMatch: recipeId == self.recipeId "Plan recipeId must match the seeded recipe reference"
+    guard self.plannedAt == null or self.componentId == componentId
+    guard self.plannedAt != null or (self.component != null and self.component.status == "published")
+    constraint planComponentMatch: componentId == self.componentId "Plan componentId must match the seeded component reference"
     constraint planEventMatch: eventId == null or self.eventId == null or eventId == self.eventId "Plan eventId must match the seeded event reference when provided"
     constraint planYieldPositive: plannedYield > 0 or self.plannedYield > 0 "Planned yield must be positive"
-    mutate recipeId = recipeId
+    mutate componentId = componentId
     mutate eventId = eventId != null ? eventId : self.eventId
     mutate plannedYield = self.plannedAt != null ? self.plannedYield : plannedYield
     mutate yieldUnit = self.plannedAt != null ? self.yieldUnit : yieldUnit
@@ -68,7 +68,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     emit ProductionBatchPlanned {
       productionBatchId: self.id
       tenantId: self.tenantId
-      recipeId: recipeId
+      componentId: componentId
       eventId: eventId != null ? eventId : self.eventId
       plannedYield: self.plannedAt != null ? self.plannedYield : plannedYield
       yieldUnit: self.plannedAt != null ? self.yieldUnit : yieldUnit
@@ -86,7 +86,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     emit ProductionBatchStarted {
       productionBatchId: self.id
       tenantId: self.tenantId
-      recipeId: self.recipeId
+      componentId: self.componentId
       eventId: self.eventId
       plannedYield: self.plannedYield
       yieldUnit: self.yieldUnit
@@ -107,7 +107,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     emit ProductionBatchCompleted {
       productionBatchId: self.id
       tenantId: self.tenantId
-      recipeId: self.recipeId
+      componentId: self.componentId
       eventId: self.eventId
       plannedYield: self.plannedYield
       actualYield: actualYield
@@ -129,7 +129,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
     emit ProductionBatchCancelled {
       productionBatchId: self.id
       tenantId: self.tenantId
-      recipeId: self.recipeId
+      componentId: self.componentId
       eventId: self.eventId
       plannedYield: self.plannedYield
       actualYield: self.actualYield
@@ -146,7 +146,7 @@ entity ProductionBatch mixin TenantScoped, SoftDeletable {
 event ProductionBatchPlanned: "production_batch.planned" {
   productionBatchId: string
   tenantId: string
-  recipeId: string
+  componentId: string
   eventId: string?
   plannedYield: decimal(12, 4)
   yieldUnit: UnitOfMeasure
@@ -156,7 +156,7 @@ event ProductionBatchPlanned: "production_batch.planned" {
 event ProductionBatchStarted: "production_batch.started" {
   productionBatchId: string
   tenantId: string
-  recipeId: string
+  componentId: string
   eventId: string?
   plannedYield: decimal(12, 4)
   yieldUnit: UnitOfMeasure
@@ -167,7 +167,7 @@ event ProductionBatchStarted: "production_batch.started" {
 event ProductionBatchCompleted: "production_batch.completed" {
   productionBatchId: string
   tenantId: string
-  recipeId: string
+  componentId: string
   eventId: string?
   plannedYield: decimal(12, 4)
   actualYield: decimal(12, 4)
@@ -179,7 +179,7 @@ event ProductionBatchCompleted: "production_batch.completed" {
 event ProductionBatchCancelled: "production_batch.cancelled" {
   productionBatchId: string
   tenantId: string
-  recipeId: string
+  componentId: string
   eventId: string?
   plannedYield: decimal(12, 4)
   actualYield: decimal(12, 4)?
@@ -189,13 +189,13 @@ event ProductionBatchCancelled: "production_batch.cancelled" {
   reason: string
 }
 
-// Vision cascade: approved event plans one ProductionBatch per seeded dish recipe.
-on EventApproved fanOut EventDishRecipeSeed where eventId = payload.eventId
+// Vision cascade: approved event plans one ProductionBatch per seeded dish component.
+on EventApproved fanOut EventDishComponentSeed where eventId = payload.eventId
   run ProductionBatch.plan
-  match eventId = payload.eventId, recipeId = self.recipeId
+  match eventId = payload.eventId, componentId = self.componentId
   else create
   params {
-    recipeId: self.recipeId
+    componentId: self.componentId
     plannedYield: self.servings
     yieldUnit: "portion"
     eventId: payload.eventId

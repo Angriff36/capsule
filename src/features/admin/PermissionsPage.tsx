@@ -13,7 +13,7 @@ import { RolePermissionAudit } from "./RolePermissionAuditPanel";
 import { TeamRolesPanel } from "./TeamRolesPanel";
 
 const CAPABILITIES = [
-  ["kitchen", "Kitchen", "Recipes, dishes, menus, and prep work."],
+  ["kitchen", "Kitchen", "Components, dishes, menus, and prep work."],
   ["inventory", "Inventory", "Stock, locations, demand, and waste."],
   ["procurement", "Procurement", "Vendors, purchase needs, and orders."],
   ["events", "Events", "Bookings, execution, staffing, and closeout."],

@@ -3,8 +3,8 @@ import {
   MenuMarkPublishedLifecycle,
   MenuRestoreLifecycle,
   MenuUnpublishLifecycle,
-  RecipePublishVersionLifecycle,
-  RecipeRetractLifecycle,
+  ComponentPublishVersionLifecycle,
+  ComponentRetractLifecycle,
 } from "../../generated/manifest-wiring-bindings";
 
 export interface CulinaryAction<Key extends string = string> {
@@ -32,16 +32,16 @@ function available<Key extends string>(
     .map(({ key, label }) => ({ key, label }));
 }
 
-const RECIPE_PUBLISH_ACTIONS = [
+const COMPONENT_PUBLISH_ACTIONS = [
   {
     key: "publishVersion",
     label: "Publish",
-    lifecycle: RecipePublishVersionLifecycle,
+    lifecycle: ComponentPublishVersionLifecycle,
   },
   {
     key: "retract",
     label: "Return to draft",
-    lifecycle: RecipeRetractLifecycle,
+    lifecycle: ComponentRetractLifecycle,
   },
 ] as const;
 
@@ -65,9 +65,9 @@ const MENU_ACTIONS = [
  * is still visible — no restore-first, no reason prompt.
  */
 export class CulinaryLifecyclePolicy {
-  recipeActions(status: string, deletedAt?: number | null) {
+  componentActions(status: string, deletedAt?: number | null) {
     const actions: CulinaryAction[] = [
-      ...available(status, RECIPE_PUBLISH_ACTIONS),
+      ...available(status, COMPONENT_PUBLISH_ACTIONS),
     ];
     if (deletedAt == null) {
       actions.push({ key: "purge", label: "Delete" });
