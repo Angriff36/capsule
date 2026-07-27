@@ -13,6 +13,7 @@ import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { dishPath, recipePath } from "../kitchen/kitchenRoutes";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
+import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 import { RecipeStockSuggestions } from "./RecipeStockSuggestions";
@@ -33,6 +34,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const [showPicker, setShowPicker] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const { prompt, host } = useActionPrompt(busy != null);
 
   const selections = useMemo(
     () =>
@@ -77,6 +79,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         </button>
       </div>
       {failure ? <FailureBanner failure={failure} /> : null}
+      {host}
       <RecipeStockSuggestions />
       {showPicker ? (
         <CulinaryRecordPicker
@@ -223,17 +226,24 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     className="btn btn-ghost"
                     disabled={busy != null}
                     onClick={() => {
-                      const reason = window
-                        .prompt("Reason for removing this dish")
-                        ?.trim();
-                      if (!reason) return;
-                      void run(`remove:${selection._id}`, () =>
-                        removeDish({
-                          docId: selection._id,
-                          version: selection.version,
-                          reason,
-                        }),
-                      );
+                      void (async () => {
+                        const reason = await prompt.askReason({
+                          ...ReasonCopy.removeLine,
+                          title: "Remove event dish",
+                          description:
+                            "Record why this dish is leaving the event menu.",
+                          confirmLabel: "Remove dish",
+                          tone: "danger",
+                        });
+                        if (!reason) return;
+                        void run(`remove:${selection._id}`, () =>
+                          removeDish({
+                            docId: selection._id,
+                            version: selection.version,
+                            reason,
+                          }),
+                        );
+                      })();
                     }}
                   >
                     Remove
