@@ -12,29 +12,38 @@ type Props = {
   dishId: string;
 };
 
-// Categories match the station language on real prep sheets (work/prep_list.csv):
-// "Finish at Event" vs "Finish at Kitchen" is the split the kitchen actually uses.
+// The exact Category values printed on the real prep sheets, transcribed from
+// the photographs into work/prep-lists-from-photos.csv. Kept as the sheet
+// spells them so a printed list reads the same as the one the kitchen knows.
 const CATEGORIES = [
-  { value: "finish_at_event", label: "Finish at event" },
-  { value: "finish_at_kitchen", label: "Finish at kitchen" },
-  { value: "prep_ahead", label: "Prep ahead" },
+  { value: "Finish at Event", label: "Finish at Event" },
+  { value: "Finish at Kitchen", label: "Finish at Kitchen" },
+  { value: "Drop Off", label: "Drop Off" },
+  { value: "Drop Off Items", label: "Drop Off Items" },
+  { value: "Bev - Non Alcohol", label: "Bev - Non Alcohol" },
+  { value: "Side Items", label: "Side Items" },
 ] as const;
 
+// Ordered so the units the sheets actually use most come first.
 const UNITS = [
   "each",
+  "serving",
   "portion",
   "pound",
   "ounce",
   "gram",
   "kilogram",
   "quart",
+  "pint",
+  "cup",
   "gallon",
   "liter",
   "milliliter",
-  "cup",
-  "pint",
   "tablespoon",
   "teaspoon",
+  "batch",
+  "melon",
+  "bottle",
 ] as const;
 
 /** Dish-level prep task templates with recipe hyperlinks when linked. */
@@ -74,7 +83,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
       await addTask({
         dishId,
         name,
-        category: String(data.get("category") ?? "finish_at_event"),
+        category: String(data.get("category") ?? "Finish at Event"),
         station: String(data.get("station") ?? "").trim() || undefined,
         defaultQuantity: quantity > 0 ? quantity : undefined,
         defaultUnit: quantity > 0 ? String(data.get("defaultUnit")) : undefined,
@@ -205,7 +214,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
           <select
             name="category"
             className="input mt-1"
-            defaultValue="finish_at_event"
+            defaultValue="Finish at Event"
           >
             {CATEGORIES.map((c) => (
               <option key={c.value} value={c.value}>

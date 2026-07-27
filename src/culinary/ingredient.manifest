@@ -17,6 +17,16 @@ enum UnitOfMeasure {
   quart
   gallon
   portion
+  // Units the real printed prep sheets use that the catalog units cannot
+  // express. Transcribed from work/list3.jpg / list4.jpg / list5.jpg into
+  // work/prep-lists-from-photos.csv: "BALL WATERMELON 1.00 melon",
+  // "MAKE HUCKLEBERRY COBBLER 0.75 batch", "PIPE PESTO CREAM 15.00 serving",
+  // "PORTION BOTTLED WATERS 4.00 bottles". Units are opaque labels here —
+  // nothing converts between them — so widening is additive.
+  serving
+  batch
+  melon
+  bottle
 }
 
 // US major food allergens (Big-8) plus sesame (FASTER Act). Evidence stored
