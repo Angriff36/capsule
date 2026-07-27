@@ -67,6 +67,33 @@ export interface ProposalRevisionSnapshot {
     id: string;
     name: string;
   };
+  // §8.2 / §5.2 (spec L263 "Venue logistics snapshot" required section, L376
+  // "snapshot the venue information needed to reproduce the client and
+  // operations plan"): the venue's logistics frozen into the immutable
+  // revision so an accepted/shared proposal stays reproducible after later
+  // venue edits (§5.5 L284). Null when the proposal isn't linked through an
+  // event to a venue (Proposal.eventId → Event.venueId → Venue); the free-text
+  // proposal.venueName/venueAddress remain the always-present fallback then.
+  venue: {
+    name: string;
+    venueType: string;
+    capacity: number;
+    onPremise: boolean | null;
+    kitchenAccess: string | null;
+    parkingAvailable: boolean | null;
+    hasFreightElevator: boolean | null;
+    storageAvailable: boolean | null;
+    logisticsNotes: string | null;
+    loadInInstructions: string | null;
+    powerAvailable: boolean | null;
+    waterAccess: boolean | null;
+    hasStairs: boolean | null;
+    wasteRules: string | null;
+    permitsInsuranceNotes: string | null;
+    restrictions: string | null;
+    accessNotes: string | null;
+    cateringNotes: string | null;
+  } | null;
   dishSelections: Array<{
     id: string;
     menuId: string;
@@ -103,6 +130,46 @@ export interface ProposalRevisionSnapshot {
   }>;
   tenant: {
     name: string;
+  };
+}
+
+// §8.2: resolve the venue logistics to freeze into the revision snapshot. Two
+// optional hops Proposal.eventId → Event.venueId → Venue. Returns null
+// (non-disclosing) when the proposal isn't event-linked or the event has no
+// venue — the free-text proposal.venueName/venueAddress remain the venue
+// identity in that case. Same-tenant guard is belt-and-braces; the FK
+// `references` already enforce tenant scoping.
+async function resolveVenueLogistics(
+  ctx: { db: any },
+  proposal: Doc<"proposals">,
+): Promise<ProposalRevisionSnapshot["venue"]> {
+  if (!proposal.eventId) return null;
+  const event: any = await ctx.db.get(proposal.eventId);
+  if (!event || event.tenantId !== proposal.tenantId) return null;
+  if (!event.venueId) return null;
+  const venue: any = await ctx.db.get(event.venueId);
+  if (!venue || venue.deletedAt != null || venue.tenantId !== proposal.tenantId) {
+    return null;
+  }
+  return {
+    name: venue.name,
+    venueType: venue.venueType,
+    capacity: venue.capacity,
+    onPremise: venue.onPremise ?? null,
+    kitchenAccess: venue.kitchenAccess ?? null,
+    parkingAvailable: venue.parkingAvailable ?? null,
+    hasFreightElevator: venue.hasFreightElevator ?? null,
+    storageAvailable: venue.storageAvailable ?? null,
+    logisticsNotes: venue.logisticsNotes ?? null,
+    loadInInstructions: venue.loadInInstructions ?? null,
+    powerAvailable: venue.powerAvailable ?? null,
+    waterAccess: venue.waterAccess ?? null,
+    hasStairs: venue.hasStairs ?? null,
+    wasteRules: venue.wasteRules ?? null,
+    permitsInsuranceNotes: venue.permitsInsuranceNotes ?? null,
+    restrictions: venue.restrictions ?? null,
+    accessNotes: venue.accessNotes ?? null,
+    cateringNotes: venue.cateringNotes ?? null,
   };
 }
 
@@ -219,6 +286,7 @@ export async function buildProposalRevisionSnapshot(
       id: client._id.toString(),
       name: client.clientType === "company" ? (client.companyName ?? "Unknown Company") : `${client.givenName ?? ""} ${client.familyName ?? ""}`.trim() || "Unknown Client",
     },
+    venue: await resolveVenueLogistics(ctx, proposal),
     dishSelections: dishSelectionsData,
     lineItems: lineItemsData,
     tenant: {

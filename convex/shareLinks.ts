@@ -37,6 +37,25 @@ type SharedProposal = {
     notes: string | null;
     terms: string | null;
   };
+  // §5.2 L263 "Venue logistics snapshot": the client-facing projection of the
+  // frozen venue logistics (§8.2). Null when the proposal wasn't linked to a
+  // venue at send time. Operator-authored free-text notes (access/catering/
+  // logistics) stay in the immutable snapshot for ops reproduction but are
+  // NOT surfaced to the client.
+  venueLogistics: {
+    onPremise: boolean | null;
+    capacity: number | null;
+    loadInInstructions: string | null;
+    powerAvailable: boolean | null;
+    waterAccess: boolean | null;
+    hasStairs: boolean | null;
+    hasFreightElevator: boolean | null;
+    parkingAvailable: boolean | null;
+    kitchenAccess: string | null;
+    wasteRules: string | null;
+    permitsInsuranceNotes: string | null;
+    restrictions: string | null;
+  } | null;
   clientName: string;
   lineItems: Array<{
     description: string;
@@ -90,6 +109,29 @@ export const getSharedProposal = query({
       typeof value === "number" && Number.isFinite(value) ? value : fallback;
     const str = (value: unknown): string | null =>
       typeof value === "string" && value.length > 0 ? value : null;
+    const bool = (value: unknown): boolean | null =>
+      typeof value === "boolean" ? value : null;
+    const venueSnap =
+      snapshot.venue && typeof snapshot.venue === "object"
+        ? (snapshot.venue as Record<string, unknown>)
+        : null;
+    const venueLogistics: SharedProposal["venueLogistics"] = venueSnap
+      ? {
+          onPremise: bool(venueSnap.onPremise),
+          capacity:
+            typeof venueSnap.capacity === "number" ? venueSnap.capacity : null,
+          loadInInstructions: str(venueSnap.loadInInstructions),
+          powerAvailable: bool(venueSnap.powerAvailable),
+          waterAccess: bool(venueSnap.waterAccess),
+          hasStairs: bool(venueSnap.hasStairs),
+          hasFreightElevator: bool(venueSnap.hasFreightElevator),
+          parkingAvailable: bool(venueSnap.parkingAvailable),
+          kitchenAccess: str(venueSnap.kitchenAccess),
+          wasteRules: str(venueSnap.wasteRules),
+          permitsInsuranceNotes: str(venueSnap.permitsInsuranceNotes),
+          restrictions: str(venueSnap.restrictions),
+        }
+      : null;
 
     return {
       ok: true,
@@ -111,6 +153,7 @@ export const getSharedProposal = query({
         notes: str(proposal.notes),
         terms: str(proposal.terms),
       },
+      venueLogistics,
       clientName:
         typeof client.name === "string" && client.name.length > 0
           ? client.name

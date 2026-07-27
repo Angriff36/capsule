@@ -85,6 +85,55 @@ export function SharedProposalPage() {
     ? new Date(proposal.eventDate).toLocaleDateString()
     : "TBD";
 
+  // §5.2 L263 "Venue logistics snapshot": render the frozen venue logistics
+  // (§8.2) when the shared revision captured a linked venue. Only non-null
+  // fields are shown, so an unlinked proposal renders no empty section.
+  const venueLogisticsRows: Array<[string, string]> = [];
+  const vl = data.venueLogistics;
+  if (vl) {
+    if (vl.onPremise !== null)
+      venueLogisticsRows.push([
+        "Service type",
+        vl.onPremise ? "On-premise" : "Off-premise",
+      ]);
+    if (vl.capacity !== null)
+      venueLogisticsRows.push(["Capacity", `${vl.capacity}`]);
+    if (vl.loadInInstructions)
+      venueLogisticsRows.push(["Load-in", vl.loadInInstructions]);
+    if (vl.powerAvailable !== null)
+      venueLogisticsRows.push([
+        "Power",
+        vl.powerAvailable ? "Available" : "Not available",
+      ]);
+    if (vl.waterAccess !== null)
+      venueLogisticsRows.push([
+        "Water",
+        vl.waterAccess ? "Available" : "Not available",
+      ]);
+    if (vl.hasStairs !== null)
+      venueLogisticsRows.push(["Stairs", vl.hasStairs ? "Yes" : "No"]);
+    if (vl.hasFreightElevator !== null)
+      venueLogisticsRows.push([
+        "Freight elevator",
+        vl.hasFreightElevator ? "Yes" : "No",
+      ]);
+    if (vl.parkingAvailable !== null)
+      venueLogisticsRows.push([
+        "Parking",
+        vl.parkingAvailable ? "Available" : "Not available",
+      ]);
+    if (vl.kitchenAccess)
+      venueLogisticsRows.push(["Kitchen access", vl.kitchenAccess]);
+    if (vl.wasteRules) venueLogisticsRows.push(["Waste rules", vl.wasteRules]);
+    if (vl.permitsInsuranceNotes)
+      venueLogisticsRows.push([
+        "Permits / insurance",
+        vl.permitsInsuranceNotes,
+      ]);
+    if (vl.restrictions)
+      venueLogisticsRows.push(["Restrictions", vl.restrictions]);
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-3xl mx-auto">
@@ -131,6 +180,24 @@ export function SharedProposalPage() {
                 )}
               </div>
             </div>
+
+            {venueLogisticsRows.length > 0 && (
+              <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+                  Venue Logistics
+                </h3>
+                <div className="space-y-2">
+                  {venueLogisticsRows.map(([label, value], index) => (
+                    <div key={index} className="flex justify-between gap-4">
+                      <span className="text-gray-600">{label}:</span>
+                      <span className="font-medium text-right whitespace-pre-wrap">
+                        {value}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {lineItems.length > 0 && (
               <div className="mb-6">
