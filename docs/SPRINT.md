@@ -23,10 +23,13 @@ complete; prep templates editable with the real sheet's categories and units.
 
 **Do these next, in order:**
 
-1. **Delete the fabricated data.** Tito Test Dish carries three prep
-   templates invented before the prep-sheet photos were read (lobster deviled
-   egg filling, piping bag, micro chives), plus the prep tasks they generated
-   on Test Event. Remove both.
+1. **Delete the fabricated data.** ⚠️ **Half done 2026-07-27.** The three
+   invented prep templates on Tito Test Dish (lobster deviled egg filling,
+   piping bag, micro chives) are **retired** — the panel now reads "0 tasks".
+   The three prep tasks they already generated on Test Event are **still
+   there** (2 completed, 1 pending). They clear when the event dish is
+   removed (`EventDishRemoved → fanOut PrepTask run cancel`) — but see the
+   caveat under step 3.
 2. **Load the real dishes.** `work/prep-lists-from-photos.csv` (local only,
    `work/` is gitignored) holds all 16 dishes from the three photographed
    sheets, transcribed by hand. One — FRESH GRILLED CORN ON THE COB — is
@@ -37,8 +40,17 @@ complete; prep templates editable with the real sheet's categories and units.
    Test Dish, but demand still reads 0 — the cascade fires on
    `EventDishAdded`, so the dish must be removed and re-added. Then check
    `/inventory/demand`, `/inventory/purchasing`, and the event Margin tab.
-   Note the Remove button uses `window.prompt`; stub it via the browser's JS
-   console before clicking, or the click silently no-ops under automation.
+
+   Two things to know before doing it:
+   - The remove control is on the event page's **Menu tab**
+     (`/events/:id?tab=menu`, `src/features/events/EventMenuTab.tsx`). It
+     used `window.prompt`, which is undrivable under automation; swapped to
+     the repo's own `useActionPrompt` reason modal on 2026-07-27. **That
+     change is unpushed — production still has the `window.prompt`.**
+   - `EventDishRemoved` fans out `PrepTask.cancel`, whose guard only accepts
+     `pending`/`claimed`/`in_progress`/`blocked`. Two of Test Event's three
+     fabricated tasks are `completed`, so the removal may throw on the
+     fan-out. If it does, that is a real defect, not a data problem.
 4. **Enter ingredient costs.** All 8 Macaroni Salad ingredients are $0.00, so
    food cost and margins will read zero even once demand flows. Data entry.
 
@@ -144,7 +156,7 @@ quote → planning → pending_approval → approved → sales_lock
 
 | Track | Route | Must be true after |
 |---|---|---|
-| Menu & recipes | `/kitchen/event-menu`, `/kitchen/dishes`, `/kitchen/recipes` | Event dishes resolve to recipes; estimated food cost rolls up and equals the sum of `EventDish.estimatedCost` |
+| Menu & recipes | `/events/:id?tab=menu`, `/kitchen/dishes`, `/kitchen/recipes` | Event dishes resolve to recipes; estimated food cost rolls up and equals the sum of `EventDish.estimatedCost` |
 | Allergens | `/events/:id/allergen-briefing`, `/kitchen/allergen-matrix` | Every guest restriction is represented; a failed quality check blocks the prep task |
 | Prep | `/kitchen/prep` | Prep tasks exist per dish with due times before service |
 | Purchasing | `/inventory/demand`, `/inventory/purchasing` | Ingredient demand fans out from recipes; shortages consolidate into one weekly vendor order that stays `DRAFT` |
@@ -484,10 +496,23 @@ STRAWBERRY AND SPINACH SALAD (6), MID SUMMER WEDDING SALAD (6), HARICOTS
 VERTS (4), CHICKEN CARNITAS (4). All transcribed in
 `work/prep-lists-from-photos.csv`, ready to enter.
 
-**Cleanup owed:** Tito Test Dish still carries three prep templates I invented
-before reading the photographs (lobster deviled egg filling, piping bag,
-micro chives). They should be removed; the prep tasks already generated from
-them on Test Event are fabricated data.
+**Cleanup owed:** ⚠️ Partly done 2026-07-27 — the three invented templates
+(lobster deviled egg filling, piping bag, micro chives) are retired on Tito
+Test Dish, so they will not generate again. The three prep tasks they already
+produced on Test Event are still present. See §0 step 1.
+
+### Route correction (2026-07-27)
+
+`/kitchen/event-menu` is **not a page** — `src/app/App.tsx:576` redirects it
+to `/events`. The event menu is a tab: `/events/:id?tab=menu`, rendered by
+`src/features/events/EventMenuTab.tsx`.
+
+`src/features/kitchen/EventMenuPage.tsx` still exists but no route renders it.
+It is the *better* of the two implementations (in-app reason modal, stock
+shortage banner) and it is dead. `src/agent/CapsuleCommandUiCoverage.ts` still
+lists it as a surface for `PrepTask.open`, `PrepTask.refreshGenerated`, and
+`EventDish.addToEvent` — each of those also lists a live surface, so no
+command is falsely marked covered, but the citation is stale.
 
 ### Remaining, untouched this session
 
