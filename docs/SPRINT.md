@@ -269,8 +269,17 @@ visit.
 
 ### Real, and genuinely automatic
 
-The purchasing chain is the strongest thing in the app — an unbroken reaction
-path from adding a dish to a drafted vendor order:
+> **Correction (2026-07-27):** the purchasing chain below is real in the
+> manifest but was **unreachable from the UI until 2026-07-27**. Its first hop
+> fans out over `DishRecipe`, and no screen in `src/features` ever called
+> `DishRecipe.attach` — six places read `useListDishRecipe`, nothing wrote it.
+> Every dish in production therefore had zero recipe lines, and
+> `/inventory/demand` read "0 LINES" for an event that had a dish. An
+> attach/detach panel now exists on the dish page (commit `7e4d0aa`). The
+> chain firing end to end is **still unverified in the UI** — see §7.
+
+The purchasing chain is the strongest thing in the app *on paper* — an
+unbroken reaction path from adding a dish to a drafted vendor order:
 
 `EventDishAdded → DishRecipe → EventDishRecipeSeeded → RecipeIngredient →
 EventIngredientContribution → IngredientDemand.syncFromContributions →
@@ -360,3 +369,29 @@ roles. **Not done — awaiting authorization.**
 The bare "Action failed unexpectedly" this produced was replaced with copy
 naming the cause and pointing at both remedies (link the account, or use
 Assign). Assign is unaffected and already works.
+
+### Blocked: the purchasing chain has never had any input
+
+`/inventory/demand` read **0 LINES** for Test Event even with a dish on it.
+Root cause is not the reaction chain — it is that `DishRecipe.attach` had no
+caller in `src/features`, so no dish anywhere had a recipe line. Fixed by
+adding a "Recipes in this dish" panel (`7e4d0aa`), and Macaroni Salad (8
+priced-at-zero ingredient lines) was attached to Tito Test Dish in production.
+
+**Still unverified:** demand did not appear afterwards, because the cascade
+fires on `EventDishAdded` and the dish was already on the event. Re-adding it
+to re-fire the reaction did not complete before this session ran out — the
+`window.prompt` in the Remove handler makes that path awkward to drive from
+automation. Next session: remove and re-add the dish, then check
+`/inventory/demand`, `/inventory/purchasing`, and the event Margin tab.
+
+Also note: all 8 Macaroni Salad ingredients have **no cost recorded**
+("8 LINES NEED PRICING ATTENTION", $0.00/quart). Even once demand flows,
+margins and food-cost reporting will read zero until ingredient costs are
+entered. That is data entry, not a code gap.
+
+### Remaining, untouched this session
+
+Timeline + staff assignment, event notifications, vehicle assign/check-out,
+venue/client/event sync, post-event report firing, invoice send. The
+lead → proposal → contract → event front half of §2 was also not walked.
