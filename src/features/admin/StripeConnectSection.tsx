@@ -2,6 +2,7 @@ import { useAction } from "convex/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api } from "../../lib/api";
+import { publicErrorMessage } from "../../lib/publicErrorMessage";
 import { ErrorState, Section, StatusChip } from "../../ui/primitives";
 
 // Stripe Connect (issue #112) — a tenant's invoice payments settle to that
@@ -73,7 +74,7 @@ export function StripeConnectSection() {
     } catch (cause) {
       // An unconfigured Stripe environment must not break the whole page.
       setView(DISCONNECTED);
-      setError(cause instanceof Error ? cause.message : null);
+      setError(publicErrorMessage(cause, "Stripe status is unavailable."));
     }
   }, [getConnection]);
 
@@ -98,9 +99,7 @@ export function StripeConnectSection() {
         setNotice("Stripe account status updated.");
       } catch (cause) {
         setError(
-          cause instanceof Error
-            ? cause.message
-            : "Stripe status could not be refreshed.",
+          publicErrorMessage(cause, "Stripe status could not be refreshed."),
         );
       } finally {
         setBusy(false);
@@ -118,9 +117,7 @@ export function StripeConnectSection() {
       window.location.assign(result.onboardingUrl);
     } catch (cause) {
       setError(
-        cause instanceof Error
-          ? cause.message
-          : "Stripe onboarding could not be started.",
+        publicErrorMessage(cause, "Stripe onboarding could not be started."),
       );
       setBusy(false);
     }
@@ -136,9 +133,7 @@ export function StripeConnectSection() {
       setNotice("Stripe account status updated.");
     } catch (cause) {
       setError(
-        cause instanceof Error
-          ? cause.message
-          : "Stripe status could not be refreshed.",
+        publicErrorMessage(cause, "Stripe status could not be refreshed."),
       );
     } finally {
       setBusy(false);
@@ -157,11 +152,7 @@ export function StripeConnectSection() {
         "Stripe disconnected from Capsule. Your Stripe account itself is untouched.",
       );
     } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "Stripe could not be disconnected.",
-      );
+      setError(publicErrorMessage(cause, "Stripe could not be disconnected."));
     } finally {
       setBusy(false);
     }

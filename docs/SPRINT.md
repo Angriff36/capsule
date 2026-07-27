@@ -214,17 +214,43 @@ blocks the walkthrough. Resist adding features.
 
 ---
 
-## 5. Evidence as of 2026-07-26
+## 5. Evidence
 
-- `bun run check` — green, exit 0 (typecheck, format, secrets, 768 tests, build, baseline).
-- `bunx vitest run tests/proofs` — **22 files, 50 tests passing**: real
+### Automated (2026-07-26)
+
+- `bun run check` — green, exit 0 (typecheck, format, secrets, tests, build, baseline).
+- `bunx vitest run tests/proofs` — **22 files / 50 tests passing**: real
   `convex-test` runtime proofs against generated mutations, including
   event→approve→packlist, approve→production batch, closeout, food-cost
   rollup, weekly purchasing, pack-list→delivery, invoice→payment, shift, and
   payroll lifecycles, each with a role-denial case proving no partial writes.
-- 109 routes registered in `src/app/App.tsx`.
-- Browser-verified this session: the public `/quote` form renders and submits
-  (fails correctly on an empty deployment), and its error copy no longer leaks
-  the server stack trace.
-- **Not** browser-verified: every authenticated route. Blocked by an empty
-  database (#113) and by browser auth needing a minted Clerk token.
+
+### Browser walkthrough (2026-07-27, signed in as admin)
+
+- **53 authenticated routes swept, zero crashes** — no error boundary, no
+  unhandled Convex error, across events, clients, kitchen, inventory,
+  logistics, facilities, staff, finance, all 7 report dashboards, and admin.
+- **Staff account linking — proven end to end.** Linked an unlinked staff
+  profile to a workspace account from the roster, confirmed the
+  `authSubjectId` persisted in Convex, then unlinked and confirmed the row
+  returned to its original state.
+- **Venue scorecard — real derived numbers.** 12 events booked, 7 upcoming,
+  1 cancelled (8%), $13,502 booked value, $1,227 average. Cross-checked:
+  13502 ÷ 11 non-cancelled = 1227, so cancelled events are correctly excluded.
+- **Proposal readiness notice — fires and does not block.** A freshly drafted
+  proposal showed all three warnings (no linked event, no menu selections, no
+  priced line items) and remained fully actionable.
+- **Stripe Connect section renders** with "Not connected" and a working
+  Connect button; with no `STRIPE_SECRET_KEY` set it reports the missing
+  configuration cleanly.
+- **Public `/quote`** renders and submits; on an empty-organization deployment
+  it fails with plain copy rather than a stack trace.
+
+### Not verified
+
+- **Any flow requiring a real Stripe key** — onboarding, payment link creation,
+  and settlement are unexercised until G4.
+- **The full quote → closed_out stage progression on one event.** Individual
+  stages are covered by runtime proofs; the continuous walkthrough is Day 2.
+- **The escalation guard on `linkAccount`** was verified by reading the
+  generated code, not by signing in as a workforce manager.
