@@ -1,0 +1,179 @@
+// Capsule workforce — One-on-One meetings + their follow-up actions (spec §9.5).
+//
+// A OneOnOne captures ONE recurring meeting between a lead (manager) and a
+// staff member: period (meeting date), agenda, goals, wins/strengths, areas of
+// opportunity, and decisions. Each held meeting is an IMMUTABLE historical
+// record — there is no in-place edit command; the next meeting is a new row.
+// This keeps prior notes interpretable forever (same immutable-version idea as
+// RoleScorecard, spec §9.2).
+//
+// Follow-up actions are a SEPARATE child entity (OneOnOneAction), NOT JSON on
+// the meeting record. Spec §9.5: actions "can be closed without rewriting the
+// prior record" — closing mutates only the action row; the meeting note is
+// never touched. And "open actions appear in the next meeting": the
+// new-meeting form surfaces a staff member's still-open actions from prior
+// meetings (a client-side read filter, like every derived view in this repo).
+//
+// `goals`/`decisions` are JSON arrays of strings (additive shape; no schema
+// migration to extend), like RoleScorecard.expectations. `agenda`/`wins`/
+// `opportunities` are prose (single string).
+
+use "../foundation/base.manifest"
+
+enum OneOnOneActionStatus {
+  open
+  closed
+}
+
+entity OneOnOne mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required leadPersonId: uuid
+  property required staffMemberId: uuid
+  property meetingDate: datetime?
+  property required agenda: string = ""
+  property required goals: string = "[]"
+  property required wins: string = ""
+  property required opportunities: string = ""
+  property required decisions: string = "[]"
+  property heldAt: datetime?
+
+  belongsTo lead: Person fields [tenantId, leadPersonId] references [tenantId, id]
+  belongsTo staffMember: Person fields [tenantId, staffMemberId] references [tenantId, id]
+
+  // A held meeting must record when it happened. Both participants are required
+  // uuids; the UI offers two separate people pickers.
+  constraint meetingComplete: self.heldAt == null or self.meetingDate != null "A held one-on-one requires a meeting date"
+
+  default policy oneOnOneRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may read one-on-ones"
+  default policy oneOnOneWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write one-on-ones through commands"
+  default policy oneOnOneExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute one-on-one commands"
+
+  command hold(
+    leadPersonId: uuid,
+    staffMemberId: uuid,
+    meetingDate: datetime,
+    optional agenda: string,
+    optional goals: string,
+    optional wins: string,
+    optional opportunities: string,
+    optional decisions: string
+  ) {
+    guard self.heldAt == null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate leadPersonId = leadPersonId
+    mutate staffMemberId = staffMemberId
+    mutate meetingDate = meetingDate
+    mutate agenda = agenda != null ? agenda : ""
+    mutate goals = goals != null ? goals : "[]"
+    mutate wins = wins != null ? wins : ""
+    mutate opportunities = opportunities != null ? opportunities : ""
+    mutate decisions = decisions != null ? decisions : "[]"
+    mutate heldAt = now()
+    emit OneOnOneHeld {
+      oneOnOneId: self.id
+      tenantId: self.tenantId
+      leadPersonId: leadPersonId
+      staffMemberId: staffMemberId
+      meetingDate: meetingDate
+    }
+  }
+
+  store OneOnOne in durable
+}
+
+entity OneOnOneAction mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required oneOnOneId: uuid
+  property required ownerPersonId: uuid
+  property required description: string = ""
+  property dueDate: datetime?
+  property required status: OneOnOneActionStatus = "open"
+  property capturedAt: datetime?
+  property closedAt: datetime?
+
+  belongsTo oneOnOne: OneOnOne fields [tenantId, oneOnOneId] references [tenantId, id]
+  belongsTo owner: Person fields [tenantId, ownerPersonId] references [tenantId, id]
+
+  constraint actionComplete: self.capturedAt == null or length(trim(self.description)) > 0 "A captured action requires a description"
+
+  transition status from "open" to ["closed"]
+
+  default policy oneOnOneActionRead read: roleAllows(user.role, "workforceManageAccess") "Workforce managers may read one-on-one actions"
+  default policy oneOnOneActionWrite write: roleAllows(user.role, "workforceManageAccess") "Workforce managers may write one-on-one actions through commands"
+  default policy oneOnOneActionExecute execute: roleAllows(user.role, "workforceManageAccess") "Workforce managers may execute one-on-one action commands"
+
+  // Capture a follow-up against an already-held meeting. Mirrors
+  // ProposalLineItem.addLine: oneOnOneId seeds the belongsTo so `self.oneOnOne`
+  // resolves at creation, and the guard confirms the parent was held.
+  command capture(
+    oneOnOneId: uuid,
+    ownerPersonId: uuid,
+    description: string,
+    optional dueDate: datetime
+  ) {
+    guard self.capturedAt == null
+    guard self.deletedAt == null
+    guard self.oneOnOne != null and self.oneOnOne.heldAt != null
+    guard user.id != null
+    constraint captureDescription: length(trim(description)) > 0 "Action description is required"
+    mutate oneOnOneId = oneOnOneId
+    mutate ownerPersonId = ownerPersonId
+    mutate description = description
+    mutate dueDate = dueDate
+    mutate capturedAt = now()
+    emit OneOnOneActionCaptured {
+      actionId: self.id
+      tenantId: self.tenantId
+      oneOnOneId: oneOnOneId
+      ownerPersonId: ownerPersonId
+      description: description
+    }
+  }
+
+  // Close an open action. Mutates ONLY this action row — the parent meeting
+  // record is never rewritten (spec §9.5).
+  command close() {
+    guard self.status == "open"
+    guard self.capturedAt != null
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = "closed"
+    mutate closedAt = now()
+    emit OneOnOneActionClosed {
+      actionId: self.id
+      tenantId: self.tenantId
+      oneOnOneId: self.oneOnOneId
+    }
+  }
+
+  store OneOnOneAction in durable
+}
+
+event OneOnOneHeld: "one_on_one.held" {
+  oneOnOneId: string
+  tenantId: string
+  leadPersonId: string
+  staffMemberId: string
+  meetingDate: datetime
+}
+
+event OneOnOneActionCaptured: "one_on_one_action.captured" {
+  actionId: string
+  tenantId: string
+  oneOnOneId: string
+  ownerPersonId: string
+  description: string
+}
+
+event OneOnOneActionClosed: "one_on_one_action.closed" {
+  actionId: string
+  tenantId: string
+  oneOnOneId: string
+}

@@ -130,6 +130,11 @@ const RoleScorecardsPage = lazy(() =>
     default: module.RoleScorecardsPage,
   })),
 );
+const OneOnOnesPage = lazy(() =>
+  import("../features/workforce/OneOnOnesPage").then((module) => ({
+    default: module.OneOnOnesPage,
+  })),
+);
 const PackListsPage = lazy(() =>
   import("../features/logistics/PackListsPage").then((module) => ({
     default: module.PackListsPage,
@@ -736,6 +741,14 @@ export function App() {
               element={
                 <SupplyRoute>
                   <RoleScorecardsPage />
+                </SupplyRoute>
+              }
+            />
+            <Route
+              path="/staff/one-on-ones"
+              element={
+                <SupplyRoute>
+                  <OneOnOnesPage />
                 </SupplyRoute>
               }
             />

@@ -56,6 +56,8 @@ describe("governed creation mappings", () => {
       "Menu_createViaDraft",
       "Message_createViaPost",
       "Occasion_createViaRegister",
+      "OneOnOneAction_createViaCapture",
+      "OneOnOne_createViaHold",
       "OrganizationCapabilitySetting_createViaRegister",
       "Organization_createViaRegister",
       "PackListItem_createViaAddItem",

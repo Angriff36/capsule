@@ -1,13 +1,35 @@
 # Capsule Pro — Implementation Plan
 
 **Generated:** 2026-07-24
-**Updated:** 2026-07-26 (§4.1/§3.4 Event create: Salesperson + Referral Source selectors WIRED — closes the §4.1 "labeled salesperson, referral source" gap; both event-create reference fields now captured at creation — salesperson via the already-shipped Event.assignedToId→Person (UI was missing), referral source via a new optional Event.referralSourceId→ReferralSource (was on Lead only); §6.1 raw TPP EventStatus/Lead Stage preservation FIXED — the literal source status/stage now rides into rawSourceData alongside the mapped Capsule stage (was lost; comments had overstated it); §8.2 venue-logistics snapshot in the proposal revision DONE — closes the §5.2 "Venue logistics snapshot" + §8.2 snapshot-at-publication gap; accepted/shared proposals now freeze venue logistics after later venue edits; §4.1 Event-create Service Style selector WIRED — closes the §4.1 "service-style enum" UI gap (backend already shipped); §6.1/§6.4 reconcile resolution UI FIXED + payment Match WIRED — closes the import-loop dead end; the ExternalRecordsReconcilePage queue is now functional and imported payments can be matched to existing Capsule payments; §9.4 Staff "My reviews" self-service view DONE — closes the §9.4 staff-facing-view gap; a staff member can now see their own recorded reviews; §8.1 VenueRoom room/space sub-entity DONE — closes the concrete remaining gap of Priority 17 "Venue Profile Full Depth"; a venue can now model its ballrooms/dining/prep-kitchen/outdoor spaces; §5.5 digital acceptance → Proposal.accept WIRED — closes the #1 Slice-1 DEAD-but-"done" gap; the digitally-signed proposal no longer stays "sent" forever; also corrected the stale §5.4 catalog-pricing status row; §6.2 menus import WIRED — venues + contacts + events + leads + payments + menus now ALL materialize, closing the #1 Critical-priority Import Datasets; §6.2 payments import WIRED — venues + contacts + events + leads + payments now reachable end-to-end [payments staged as §6.4 reconciliation-reference links]; §6.2 leads import WIRED — venues + contacts + events + leads now materialize; §6.2 events import WIRED — venues + contacts + events now materialize; §6.2 contacts import WIRED — venues + contacts now materialize; §4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
+**Updated:** 2026-07-26 (§9.5 Monthly One-on-Ones DONE — new `OneOnOne` (immutable held meeting) + `OneOnOneAction` (closable follow-up child) entities + `OneOnOnesPage` + `/staff/one-on-ones` route + nav; the action is a separate child entity so closing it never rewrites the prior meeting record, and the new-meeting form surfaces the staff member's open prior actions; §9.2 scorecard archive/reactivate/revise `docId` bug FIXED — generated command hooks target `docId` not `id`, so the shipped `{id}` calls silently no-op'd; §4.1/§3.4 Event create: Salesperson + Referral Source selectors WIRED — closes the §4.1 "labeled salesperson, referral source" gap; both event-create reference fields now captured at creation — salesperson via the already-shipped Event.assignedToId→Person (UI was missing), referral source via a new optional Event.referralSourceId→ReferralSource (was on Lead only); §6.1 raw TPP EventStatus/Lead Stage preservation FIXED — the literal source status/stage now rides into rawSourceData alongside the mapped Capsule stage (was lost; comments had overstated it); §8.2 venue-logistics snapshot in the proposal revision DONE — closes the §5.2 "Venue logistics snapshot" + §8.2 snapshot-at-publication gap; accepted/shared proposals now freeze venue logistics after later venue edits; §4.1 Event-create Service Style selector WIRED — closes the §4.1 "service-style enum" UI gap (backend already shipped); §6.1/§6.4 reconcile resolution UI FIXED + payment Match WIRED — closes the import-loop dead end; the ExternalRecordsReconcilePage queue is now functional and imported payments can be matched to existing Capsule payments; §9.4 Staff "My reviews" self-service view DONE — closes the §9.4 staff-facing-view gap; a staff member can now see their own recorded reviews; §8.1 VenueRoom room/space sub-entity DONE — closes the concrete remaining gap of Priority 17 "Venue Profile Full Depth"; a venue can now model its ballrooms/dining/prep-kitchen/outdoor spaces; §5.5 digital acceptance → Proposal.accept WIRED — closes the #1 Slice-1 DEAD-but-"done" gap; the digitally-signed proposal no longer stays "sent" forever; also corrected the stale §5.4 catalog-pricing status row; §6.2 menus import WIRED — venues + contacts + events + leads + payments + menus now ALL materialize, closing the #1 Critical-priority Import Datasets; §6.2 payments import WIRED — venues + contacts + events + leads + payments now reachable end-to-end [payments staged as §6.4 reconciliation-reference links]; §6.2 leads import WIRED — venues + contacts + events + leads now materialize; §6.2 events import WIRED — venues + contacts + events now materialize; §6.2 contacts import WIRED — venues + contacts now materialize; §4.6 revocable proposal share links DONE — closes the §4.6 PARTIAL; §4.2 client-portal proposal pricing DONE earlier — closes §4.2 PARTIAL + the §5.4 portal-PDF follow-up)
 **Source:** `specs/capsule-complete-feature-spec.md`
 **Purpose:** Track implementation gaps vs. the complete product specification, ordered by delivery priority.
 
 ---
 
 ## Changes This Update
+
+**2026-07-26 — §9.5 Monthly One-on-Ones — NEWLY IMPLEMENTED (the detailed ❌ row was truthful; now built) + §9.2 scorecard docId bug fixed:**
+
+**Status: ✅ Shipped + `bun run check` GREEN (exit 0).** One new authored manifest file (two entities) + regen + page + route + nav + two test-mapping lines. No money mutation, no new guard/policy beyond the existing `workforceManageAccess`.
+
+**Finding (verified first-hand against code this turn):** spec §9.5 ("A One-on-One captures period, participants, agenda, goals, wins/strengths, areas of opportunity, decisions, and follow-up actions with owners/dates. Open actions appear in the next meeting and can be closed without rewriting the prior record.") was entirely unbuilt — confirmed by exhaustive search: no `one-on-one.manifest`, no `oneOnOnes`/`oneOnOneActions` table, no page/route. The closest analog (§9.2 RoleScorecard, shipped the prior increment) supplied the exact manifest+page+route blueprint to clone.
+
+**Fix (smallest spec-faithful diff — clones the §9.2 RoleScorecard + ProposalLineItem parent/child patterns):**
+- `src/workforce/one-on-one.manifest` — `OneOnOne` (the held meeting; `hold` create command; immutable — no edit command so prior notes are never rewritten) + `OneOnOneAction` (closable follow-up child; `capture` create + `close`). Why two entities, not JSON-on-meeting: the spec's "closed WITHOUT rewriting the prior record" requires the action to be independently mutable — closing mutates only the action row, never the meeting. goals/decisions are JSON string arrays (additive shape, like RoleScorecard.expectations).
+- Registered in `src/app.manifest`; `bun run manifest:regen` produced `oneOnOnes` + `oneOnOneActions` tables (with `by_oneOnOneId` index) + hooks.
+- `src/features/workforce/OneOnOnesPage.tsx` — hold-meeting form + ledger + per-meeting action capture/close + a "carried forward" panel showing the selected staff member's open prior actions (the "open actions appear in the next meeting" requirement, read client-side).
+- Route `/staff/one-on-ones` in `App.tsx`; nav in `workforceRoutes.ts`; `governed-creation-mappings.test.ts` += `OneOnOne_createViaHold` + `OneOnOneAction_createViaCapture`.
+
+**Bug fixed in passing (§9.2):** the shipped `RoleScorecardsPage` called `archive({ id })` / `reactivate({ id })`, but generated command hooks target the doc via `docId` and `RoleScorecard_archive` requires `docId: v.id("roleScorecards")` — so Archive/Reactivate/Revise silently no-op'd (caught by the page's try/catch). Fixed to `{ docId: id }` (3 call sites). This is the documented `capsule-generated-hook-docid-gotcha` surfaced in shipped code; verified against the generated mutation signature.
+
+**Why it matters:** closes §9.5 ("open actions appear in the next meeting and can be closed without rewriting the prior record"). The immutable-meeting + closable-action split is the only model that satisfies both clauses; JSON-on-meeting would rewrite the record on close. Also un-hides the §9.2 archive/reactivate UI that was inert since it shipped.
+
+**Verification:** `bun run check` GREEN — fully `&&`-chained to `baseline-decay: ok`: toolchain, builder ownership, proof:emit, all 9 manifest-slice integration guards, manifest-registry-pin, typecheck 0, format clean, secrets, test:coverage, build ok (`OneOnOnesPage` chunk built), baseline-decay ok. Runtime write-path verified by inspection (not just typecheck): `hold`/`capture` use the proven `_createVia*` governed-creation hooks; `close` uses `{ docId }` (the fix applied here); the `capture` `guard self.oneOnOne != null` clones `ProposalLineItem.addLine`'s `guard self.proposal != null` verbatim (sibling-in-one-file entity ref + belongsTo seed param). No tests added (authored manifest + additive UI cloning shipped siblings; AGENTS.md: do not add tests unless the owner asks).
+
+**Cross-model review:** not run this increment (autonomous-loop cadence; new manifest entities + additive UI + route, `workforceManageAccess` already exists, no money mutation). The merge gate's independent cross-model review still applies at PR time.
+
+---
 
 **2026-07-26 — §9.2 Role Scorecards — NEWLY IMPLEMENTED (corrects a stale priority-table claim; the detailed ❌ row was the truthful one):**
 
@@ -1858,7 +1880,7 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 | **Slice 1** | 🟡 Partial | 3 | 45% | Proposal lifecycle ✅, menu selection ✅ | Quote builder ❌, revisions ❌, templates ❌, acceptance ❌ |
 | **Slice 2** | 🟡 Partial | 1 | ~85% | ExternalRecordLink ✅, ImportRun ✅, Reconciliation UI ✅, Dashboard ✅, Cutover ✅, **venues + contacts + events commit/revert ✅ real (2026-07-26)** | commit/revert were silent-false-success stubs — now REAL for venues/contacts/events (events resolve external client/venue ids from prior imports; events land at stage `planning` with raw TPP status preserved); all six §6.2 datasets now materialize 2026-07-26 (venues/contacts/events/leads/payments/menus); only §6.3 pack-list browser-extraction remained unwired — now WIRED 2026-07-26 (browser-extracted pack-list JSON → PackList + PackListItem via importCommit.ts pack_list branch; all seven §6.2/§6.3 datasets now materialize); no TPP bulk export to validate against. (Prior "100% Complete" was FALSE — see Changes This Update.) |
 | **Slice 3** | 🟡 Partial | 1 | 45% | Venue entity basic ✅, Venue management UI ✅ (basic), saved report config ✅, revenue attribution UI ✅ | Venue depth ❌, 7 dashboards ❌, render engine ❌ |
-| **Slice 4** | ✅ Strong | 1 | 90% | Kitchen ✅, inventory ✅, staffing ✅, equipment ✅, performance event linkage ✅ | HR features ❌ (scorecards, hiring, 1-on-1s) |
+| **Slice 4** | ✅ Strong | 1 | 92% | Kitchen ✅, inventory ✅, staffing ✅, equipment ✅, performance event linkage ✅, scorecards ✅, one-on-ones ✅ | HR features ❌ (hiring pipeline §9.3 only) |
 | **Slice 5** | 🟡 Partial | 2 | 60% | QuickBooks ✅, Calendar ✅, SMS ✅, Webhooks ✅ | Nowsta ❌, Social DMs ❌, Email threading ❌ |
 
 **Overall Assessment:** Slice 4 (Operations) is 90% production-ready after Performance Event Linkage complete. Slice 0 foundation now 69% complete with ServiceStyle, Occasion, and ReferralSource entities DONE. Sales Lock pipeline remains the critical blocker (Priority 3). Slice 2 has foundation entities (ExternalRecordLink ✅, ImportRun ✅) but needs dataset definitions and reconciliation UI; prerequisite for TPP migration. Slice 3 has Venue entity with basic management UI ✅ but lacks venue depth, all 7 executive dashboards, revenue attribution logic, and render engine. Slice 1: Quote builder NOT BUILT (client portal read-only); proposal system has full command surface but missing revisions snapshot, template system, digital acceptance, and timeline/logistics PDF sections.
@@ -2817,6 +2839,8 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 **Note:** NEWLY IMPLEMENTED 2026-07-26 — was previously (falsely) marked DONE in the Priority Sequencing table but had no manifest/page/route; the detailed ❌ row here was the correct one. See top changelog entry.
 
+**Bug fix 2026-07-26 (caught while building §9.5):** the shipped `RoleScorecardsPage` called `archive({ id })` / `reactivate({ id })`, but the generated command hooks target the doc via `docId` (see memory `capsule-generated-hook-docid-gotcha`) and the `RoleScorecard_archive` mutation requires `docId: v.id("roleScorecards")`. Passing `{id}` forwarded `docId: undefined` → Convex validation rejected it → the page's try/catch swallowed it → Archive/Reactivate/Revise silently no-op'd. Fixed to `{ docId: id }` (3 call sites in `RoleScorecardsPage.tsx`).
+
 ---
 
 ### ❌ 9.3 Hiring Pipeline — NOT BUILT
@@ -2839,17 +2863,23 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 ---
 
-### ❌ 9.5 Monthly One-on-Ones — NOT BUILT
+### ✅ 9.5 Monthly One-on-Ones — DONE
 
 **Spec requirement:** One-on-One entity (period, participants, agenda, goals, wins/strengths, opportunities, decisions, follow-ups with owners/dates), open actions appear in next meeting, closable without rewriting prior record
 
-**Current gap:**
-- NO 1-on-1/goals/strengths/decision entities
-- NO follow-up action tracking
+**Evidence:**
+- `src/workforce/one-on-one.manifest` — TWO entities in one file: `OneOnOne` (the held meeting: `leadPersonId`+`staffMemberId` Person refs, `meetingDate`, `agenda`, `goals`/`decisions` as JSON string arrays, `wins`, `opportunities`, `heldAt` sentinel; `hold` create command; immutable — no in-place edit command) + `OneOnOneAction` child (closable follow-up: `oneOnOneId` ref, `ownerPersonId`, `description`, `dueDate`, `status` open/closed; `capture` create + `close` commands). Both `workforceManageAccess`-gated, `versionProperty version`, TenantScoped+SoftDeletable.
+- Registered in `src/app.manifest`; regen produced `oneOnOnes` + `oneOnOneActions` schema tables (with `by_oneOnOneId` index) + generated hooks (`useListOneOnOne`/`useListOneOnOneAction`, `useCreateOneOnOne`/`useCreateOneOnOneAction`, `useOneOnOneHold`, `useOneOnOneActionCapture`/`Close`).
+- `src/features/workforce/OneOnOnesPage.tsx` — hold-meeting form (lead + staff pickers, date, agenda, dynamic goals/decisions lists, wins, opportunities), ledger of held meetings, per-meeting follow-up capture + Close, and a "carried forward" panel that surfaces the selected staff member's open prior-meeting actions in the new-meeting form.
+- Route `/staff/one-on-ones` wired in `src/app/App.tsx`; nav section added to `workforceRoutes.ts`.
+- `tests/governed-creation-mappings.test.ts` — includes `OneOnOne_createViaHold` + `OneOnOneAction_createViaCapture`.
+- `bun run check` GREEN (exit 0).
 
-**Estimated effort:** Medium
-
-**Dependencies:** Staff Member entity (✅ exists)
+**Acceptance criteria met:**
+- Captures period (`meetingDate`), participants (lead + staff Person refs), agenda, goals, wins/strengths, areas of opportunity, decisions.
+- Follow-up actions have owners (`ownerPersonId`) and dates (`dueDate`).
+- "Open actions appear in the next meeting" — the new-meeting form shows the selected staff member's open actions from prior meetings (client-side read filter, like every derived view in this repo).
+- "Closable without rewriting the prior record" — actions are a SEPARATE child entity; `close` mutates only the action row; the held meeting is immutable (no edit command), so closing never touches prior notes.
 
 ---
 
@@ -3510,15 +3540,14 @@ The codebase includes several production-grade enhancements not explicitly in th
 
 **Next Priority:**
 
-**RECOMMENDED: Priority 27 (§9.5 Monthly One-on-Ones)** — Medium effort, medium impact; now UNBLOCKED (Role Scorecards DONE this increment, 2026-07-26)
+**§9.5 Monthly One-on-Ones — ✅ DONE this increment (2026-07-26).** See the top changelog entry + the §9.5 detailed-status row.
 
-**Why this is the best next priority:**
-- **HR gap** — structured manager meetings (period, agenda, goals, wins/strengths, opportunities, decisions, follow-ups); genuinely NOT BUILT (no `one-on-one.manifest`, no page, no route — verified 2026-07-26)
-- **Dependency satisfied** — Role Scorecards (its dependency) just shipped this increment
-- **Medium effort** — single new manifest entity + page + route, mirroring the Role Scorecards increment
+**RECOMMENDED next: Priority 26 (§9.3 Hiring Pipeline)** — Medium-Large effort, medium impact; the last remaining slice-4 HR gap now that One-on-Ones shipped.
 
-**Alternative HR priority:**
-- Priority 26 (§9.3 Hiring Pipeline): Large effort; candidate + interview manifests + KM JSON mapping; also genuinely NOT BUILT (verified 2026-07-26)
+**Why this is the next priority:**
+- **HR gap** — candidate/application + interview entities, pipeline (application → screening → interview → decision → hired/rejected), KM interview-tool JSON mapping with source IDs preserved; genuinely NOT BUILT (no `candidate.manifest`/`interview.manifest`, no pages/routes — verified 2026-07-26)
+- **Caveat — verify the dependency first** — spec says it maps an "Existing KM export format"; confirm that JSON shape is accessible before building the parser (the TPP-import track hit the same "no bulk export" wall; a JSON-paste path may be needed, as was done for venues/contacts/events)
+- **Effort** — two new manifest entities (Candidate + Interview) + a KM-JSON parser + pipeline UI + routes; larger than the One-on-One increment
 
 **Other priorities considered (integrations):**
 - Priority 32 (Email Inbox/Threading): Medium-Large effort, high value for connected inbox
@@ -3526,7 +3555,7 @@ The codebase includes several production-grade enhancements not explicitly in th
 - Priority 34 (Social DMs): XLarge effort, medium value for inquiry capture
 
 **Status snapshot:**
-- **Slice 4 (Operations):** 🟡 ~90% — Kitchen/inventory/staffing/equipment + Performance linkage + Role Scorecards ✅; One-on-Ones ❌ + Hiring Pipeline ❌ NOT BUILT (verified 2026-07-26)
+- **Slice 4 (Operations):** ✅ ~92% — Kitchen/inventory/staffing/equipment + Performance linkage + Role Scorecards ✅ + One-on-Ones ✅ (2026-07-26); Hiring Pipeline ❌ is the only remaining HR gap (verified 2026-07-26)
 - **Slice 0 (Foundation):** ✅ 85% — Event detail ✅, PackList separation ✅, ServiceStyle ✅, Occasion ✅, ReferralSource ✅, Sales Lock ✅
 - **Slice 5 (Integrations):** 🟡 60% — QuickBooks ✅ 1,434 lines, Calendar ✅ 1,144 lines, SMS ✅ 512 lines, Webhooks ✅ 910 lines
 - **Slice 1 (Proposals):** 🟡 55% — Lifecycle ✅, menu selection ✅, PDF ✅, revisions ✅, templates ✅, quote builder ✅

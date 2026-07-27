@@ -124,7 +124,13 @@ export function RoleScorecardsPage() {
           // (archive stamps effectiveTo). The old row stays intact so reviews
           // and one-on-ones referencing it remain historically interpretable.
           await define(payload);
-          await archive({ id: editingId, reason: "Superseded by new version" });
+          // Generated command hooks target the doc via `docId` (not `id`) —
+          // passing {id} forwards docId: undefined and fails at Convex
+          // validation, so archive/reactivate silently no-op'd before this fix.
+          await archive({
+            docId: editingId,
+            reason: "Superseded by new version",
+          });
         } else {
           await define(payload);
         }
@@ -146,7 +152,7 @@ export function RoleScorecardsPage() {
     if (!reason?.trim()) return;
     setFailure(null);
     try {
-      await archive({ id, reason });
+      await archive({ docId: id, reason });
     } catch (error) {
       setFailure(error);
     }
@@ -155,7 +161,7 @@ export function RoleScorecardsPage() {
   const handleReactivate = async (id: string) => {
     setFailure(null);
     try {
-      await reactivate({ id });
+      await reactivate({ docId: id });
     } catch (error) {
       setFailure(error);
     }
