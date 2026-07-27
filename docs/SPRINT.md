@@ -10,6 +10,44 @@ both the product flow and its test.
 
 ---
 
+## 0. Start here (handoff, updated 2026-07-27)
+
+Working environment: production, <https://capsule-tau-eight.vercel.app>,
+signed in as `Angriff36`. Vercel builds run `convex deploy`, so a push to
+`main` deploys both; allow ~2 minutes before re-testing in the browser.
+Test data lives on **Test Event** (Jul 30 2026, 55 guests).
+
+**Done and proven live** — §7 has the evidence:
+containers → pack list; dish → prep list (server-side); prep assign / claim /
+complete; prep templates editable with the real sheet's categories and units.
+
+**Do these next, in order:**
+
+1. **Delete the fabricated data.** Tito Test Dish carries three prep
+   templates invented before the prep-sheet photos were read (lobster deviled
+   egg filling, piping bag, micro chives), plus the prep tasks they generated
+   on Test Event. Remove both.
+2. **Load the real dishes.** `work/prep-lists-from-photos.csv` (local only,
+   `work/` is gitignored) holds all 16 dishes from the three photographed
+   sheets, transcribed by hand. One — FRESH GRILLED CORN ON THE COB — is
+   already in. GRAND MARNIER FRUIT SALAD is the best next one: 8 tasks and it
+   exercises the new `melon` unit.
+3. **Prove the purchasing chain.** It has never had input. A recipe is now
+   attachable to a dish (`7e4d0aa`), and Macaroni Salad is attached to Tito
+   Test Dish, but demand still reads 0 — the cascade fires on
+   `EventDishAdded`, so the dish must be removed and re-added. Then check
+   `/inventory/demand`, `/inventory/purchasing`, and the event Margin tab.
+   Note the Remove button uses `window.prompt`; stub it via the browser's JS
+   console before clicking, or the click silently no-ops under automation.
+4. **Enter ingredient costs.** All 8 Macaroni Salad ingredients are $0.00, so
+   food cost and margins will read zero even once demand flows. Data entry.
+
+**Untouched:** lead → proposal → contract, timeline + staff assignment,
+notifications, vehicle assign/check-out, venue/client/event sync, post-event
+reports, invoice send.
+
+---
+
 ## 1. Ship gate — what must be true on 2026-07-29
 
 | # | Gate | State on 2026-07-26 | Owner |
