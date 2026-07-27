@@ -177,6 +177,9 @@ export interface ParsedCapsuleEvent {
   depositAmount?: number;
   budgetAmount?: number;
   stage: string;
+  // The literal TPP EventStatus, preserved verbatim (§6.1) so the parallel-run
+  // can reconcile the source status against the mapped Capsule `stage` above.
+  rawEventStatus: string;
   probability?: number;
   notes?: string;
   operationalRequirements?: string;
@@ -232,9 +235,11 @@ export interface ParsedCapsuleLead {
   opportunityName: string;
   source: string;
   estimatedValue: number;
-  // capture hardcodes stage "new" (no stage arg); the mapped TPP stage is
-  // preserved on the link's rawSourceData for parallel-run reconciliation.
+  // capture hardcodes stage "new" (no stage arg); the mapped TPP stage AND the
+  // literal TPP stage are preserved on the link's rawSourceData (rawStage) for
+  // parallel-run reconciliation.
   stage: string;
+  rawStage: string;
   probability?: number;
   // external TPP ClientID — preserved on the link, NOT resolved at create
   // (a Lead is the pre-client inquiry; conversion is a separate operator step).
@@ -468,6 +473,7 @@ export function parseTppEvent(record: TppEventRecord): ParsedCapsuleEvent {
     depositAmount: parseTppMoney(record.DepositAmount),
     budgetAmount: parseTppMoney(record.BudgetAmount),
     stage: mapTppEventStage(record.EventStatus),
+    rawEventStatus: record.EventStatus,
     probability: record.Probability,
     notes: record.EventNotes,
     operationalRequirements: record.SpecialRequirements,
@@ -549,6 +555,7 @@ export function parseTppLead(record: TppLeadRecord): ParsedCapsuleLead {
     source: record.Source || "TPP Import",
     estimatedValue: parseTppMoney(record.EstimatedValue) ?? 0,
     stage: mapTppLeadStage(record.Stage),
+    rawStage: record.Stage,
     probability: record.Probability,
     clientId: record.ClientID,
     referralSource: record.ReferralSource,
