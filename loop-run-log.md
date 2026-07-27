@@ -50,6 +50,21 @@ Append one entry per run. Prune entries older than 30 days.
 <!-- Loop appends below this line -->
 ```json
 {
+  "run_id": "2026-07-27T00:00:00Z",
+  "pattern": "product-loop",
+  "source": "product-loop",
+  "verdict": "NOOP",
+  "reason": "STATE.md contains loop-pause-all - exiting immediately per iteration contract rule 1",
+  "duration_s": 5,
+  "items_attempted": 0,
+  "actions_taken": 0,
+  "escalations": 0,
+  "tokens_estimate": 15000,
+  "outcome": "no-op"
+}
+```
+```json
+{
   "run_id": "2026-07-25T02:00:28Z",
   "pattern": "product-loop",
   "source": "product-loop",

@@ -133,15 +133,6 @@ export function KitchenCommandDeckTaskPanel({
                 </div>
                 <p className="kcd-dish-meta">
                   {selection.quantityServings} servings
-                  {dish.primaryComponentId &&
-                  componentName(dish.primaryComponentId) ? (
-                    <>
-                      {" · "}
-                      <Link to={componentPath(dish.primaryComponentId)}>
-                        {componentName(dish.primaryComponentId)}
-                      </Link>
-                    </>
-                  ) : null}
                   {" · "}
                   {dishTasks.length
                     ? `${dishDone}/${dishTasks.length} tasks`

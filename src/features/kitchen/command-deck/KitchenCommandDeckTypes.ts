@@ -42,7 +42,6 @@ export type EventDishLike = {
 export type DishLike = {
   _id: string;
   name: string;
-  primaryComponentId?: string | null;
   primaryImageStorageId?: string | null;
   allergenSummary?: string[] | null;
   deletedAt?: number | null;

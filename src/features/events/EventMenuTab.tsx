@@ -137,9 +137,6 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
         <ul className="space-y-4">
           {selections.map((selection) => {
             const dish = dishes?.find((row) => row._id === selection.dishId);
-            const component = dish?.primaryComponentId
-              ? components?.find((row) => row._id === dish.primaryComponentId)
-              : null;
             const estimated =
               Number((selection as { estimatedCost?: number }).estimatedCost) ||
               0;
@@ -171,17 +168,6 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     {" · "}
                     {selection.quantityServings} servings
                     {estimated > 0 ? ` · est. $${estimated.toFixed(2)}` : ""}
-                    {component ? (
-                      <>
-                        {" · "}
-                        <Link
-                          to={componentPath(component._id)}
-                          className="underline"
-                        >
-                          Component: {component.name}
-                        </Link>
-                      </>
-                    ) : null}
                   </p>
                 </div>
                 <form

@@ -137,7 +137,10 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
   property required eventId: uuid
   property required eventDishId: uuid
   property required dishId: uuid
-  property required componentId: uuid
+  // Null when the line comes from the dish's OWN ingredients rather than from
+  // a component. A dish is the recipe; only hand-made sub-preparations have a
+  // component behind them.
+  property componentId: uuid?
   property required ingredientId: uuid
   property required quantity: decimal(12, 4) = 0
   property required unit: UnitOfMeasure = "each"
@@ -157,11 +160,11 @@ entity EventIngredientContribution mixin TenantScoped, SoftDeletable {
     eventId: uuid,
     eventDishId: uuid,
     dishId: uuid,
-    componentId: uuid,
     ingredientId: uuid,
     quantity: decimal(12, 4),
     unit: UnitOfMeasure,
     servings: decimal(12, 4),
+    optional componentId: uuid,
     optional purchasingWeekStart: datetime
   ) {
     guard self.deletedAt == null
