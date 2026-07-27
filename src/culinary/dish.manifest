@@ -502,8 +502,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   // guards that can fail, so it can never roll back the EventDishAdded that
   // triggers it. Wired as a fanOut ahead of PrepTask generation.
   command backfillActiveKey() {
-    guard self.deletedAt == null
-    mutate activeDishId = (self.status == "active" and self.activeDishId == null) ? self.dishId : self.activeDishId
+    mutate activeDishId = (self.deletedAt == null and self.status == "active" and self.activeDishId == null) ? self.dishId : self.activeDishId
   }
 
   store DishTask in durable
