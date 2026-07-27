@@ -400,6 +400,57 @@ Also note: all 8 Macaroni Salad ingredients have **no cost recorded**
 margins and food-cost reporting will read zero until ingredient costs are
 entered. That is data entry, not a code gap.
 
+### Checked against the real prep sheets (2026-07-27)
+
+The three prep-sheet photographs — `work/list3.jpg` (invoice 5792),
+`work/list4.jpg` (5673), `work/list5.jpg` (5826) — were transcribed by hand
+into `work/prep-lists-from-photos.csv` (local only; `work/` is gitignored).
+`work/prep_list.csv` was **not** used: it covers different events and its
+quantities disagree with the photographed 5673 sheet.
+
+What the sheets confirmed:
+
+- **Per-guest quantities are the right model.** Where one dish appears on two
+  events the scaling is exact — honey cinnamon butter 1.75 quarts at 100
+  servings vs 1.05 cups at 15 (7 cups ÷ 100 = 0.07/guest); candy walnuts
+  3.13 lb at 100 vs 7.50 oz at 15 (0.5 oz/guest).
+
+What the sheets contradicted, now fixed:
+
+- **Category.** I had invented `finish_at_event` / `finish_at_kitchen` /
+  `prep_ahead`. The sheets print six: Finish at Event, Finish at Kitchen,
+  Drop Off, Drop Off Items, Bev - Non Alcohol, Side Items. Offered verbatim.
+- **Units.** `UnitOfMeasure` could not express "BALL WATERMELON 1.00 melon",
+  "MAKE HUCKLEBERRY COBBLER 0.75 batch", "PIPE PESTO CREAM 15.00 serving" or
+  "PORTION BOTTLED WATERS 4.00 bottles". Added serving, batch, melon, bottle.
+- **Quantity precision.** The per-guest input used `step="0.01"`, so the
+  browser refused 0.0313 lb butter/guest and 0.0156 pints Grand
+  Marnier/guest. Now `step="any"`.
+
+**End-to-end proof with real data.** `FRESH GRILLED CORN ON THE COB` was
+created in production with its four real tasks from invoice 5673, then added
+to Test Event (55 guests). The generated prep list matched the sheet exactly:
+
+| Task | Sheet @ 100 | Generated @ 55 | Expected |
+|---|---|---|---|
+| REMOVE CORN HUSKS | 100 each | 55 each | 55 |
+| PAN CORN ON THE COB | 100 each | 55 each | 55 |
+| PORTION BUTTER | 3.13 pound | 1.7215 pound | 1.7215 |
+| PORTION JOHNNY'S SEASONING | 8.33 ounces | 4.5815 ounce | 4.5815 |
+
+Categories render as "Finish at Event", the sheet's own wording.
+
+**Still to load:** the other 15 dishes across the three sheets — notably
+GRAND MARNIER FRUIT SALAD (8 tasks, exercises `melon`), CHICKEN ROULADE (5),
+STRAWBERRY AND SPINACH SALAD (6), MID SUMMER WEDDING SALAD (6), HARICOTS
+VERTS (4), CHICKEN CARNITAS (4). All transcribed in
+`work/prep-lists-from-photos.csv`, ready to enter.
+
+**Cleanup owed:** Tito Test Dish still carries three prep templates I invented
+before reading the photographs (lobster deviled egg filling, piping bag,
+micro chives). They should be removed; the prep tasks already generated from
+them on Test Event are fabricated data.
+
 ### Remaining, untouched this session
 
 Timeline + staff assignment, event notifications, vehicle assign/check-out,
