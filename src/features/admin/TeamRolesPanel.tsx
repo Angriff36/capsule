@@ -3,6 +3,8 @@ import { useOrganization, useUser } from "@clerk/react";
 import {
   useCreatePerson,
   usePersonAssignRole,
+  usePersonLinkAccount,
+  usePersonUnlinkAccount,
 } from "../../lib/manifest-convex-react";
 import { EmptyState, ErrorState, Section } from "../../ui/primitives";
 import { PersonRoleDirectory } from "./PersonRoleDirectory";
@@ -28,6 +30,8 @@ export function TeamRolesPanel({
 }>) {
   const createPerson = useCreatePerson();
   const assignRole = usePersonAssignRole();
+  const linkAccount = usePersonLinkAccount();
+  const unlinkAccount = usePersonUnlinkAccount();
   const { user } = useUser();
   const { memberships } = useOrganization({
     memberships: { infinite: true, pageSize: 50 },
@@ -59,6 +63,21 @@ export function TeamRolesPanel({
       })
       .filter((row): row is NonNullable<typeof row> => row != null);
   }, [memberships?.data]);
+
+  // Two staff rows sharing one sign-in would make getAuthContext's lookup
+  // ambiguous (it takes .first()), so an account already spoken for is not
+  // offered again.
+  const linkedSubjectIds = useMemo(
+    () =>
+      new Set(
+        activePeople
+          .map((row) => row.authSubjectId)
+          .filter(
+            (id): id is string => typeof id === "string" && id.length > 0,
+          ),
+      ),
+    [activePeople],
+  );
 
   async function onHire(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -97,6 +116,44 @@ export function TeamRolesPanel({
       );
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "Could not hire.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function onLinkAccount(person: TeamPerson, authSubjectId: string) {
+    if (!canEdit || !authSubjectId) return;
+    setBusy(person._id);
+    setError(null);
+    setNotice(null);
+    try {
+      await linkAccount({
+        docId: person._id,
+        authSubjectId,
+        version: person.version,
+      });
+      setNotice(
+        `Linked ${person.givenName} ${person.familyName}. They can now use their day sheet, comments, and self-service pages.`,
+      );
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "Could not link.");
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  async function onUnlinkAccount(person: TeamPerson) {
+    if (!canEdit) return;
+    setBusy(person._id);
+    setError(null);
+    setNotice(null);
+    try {
+      await unlinkAccount({ docId: person._id, version: person.version });
+      setNotice(
+        `Unlinked ${person.givenName} ${person.familyName}. Their Capsule role falls back to Clerk until relinked.`,
+      );
+    } catch (error_) {
+      setError(error_ instanceof Error ? error_.message : "Could not unlink.");
     } finally {
       setBusy(null);
     }
@@ -208,6 +265,10 @@ export function TeamRolesPanel({
         canEdit={canEdit}
         busy={busy}
         onAssignRole={onAssignRole}
+        clerkMembers={clerkMembers}
+        linkedSubjectIds={linkedSubjectIds}
+        onLinkAccount={onLinkAccount}
+        onUnlinkAccount={onUnlinkAccount}
       />
     </Section>
   );
@@ -219,12 +280,24 @@ function TeamRolesTable({
   canEdit,
   busy,
   onAssignRole,
+  clerkMembers,
+  linkedSubjectIds,
+  onLinkAccount,
+  onUnlinkAccount,
 }: Readonly<{
   people: readonly TeamPerson[] | undefined;
   activePeople: readonly TeamPerson[];
   canEdit: boolean;
   busy: string | null;
   onAssignRole: (person: TeamPerson, role: string) => Promise<void>;
+  clerkMembers: readonly {
+    userId: string;
+    name: string;
+    identifier?: string | null;
+  }[];
+  linkedSubjectIds: ReadonlySet<string>;
+  onLinkAccount: (person: TeamPerson, authSubjectId: string) => Promise<void>;
+  onUnlinkAccount: (person: TeamPerson) => Promise<void>;
 }>) {
   if (people === undefined) {
     return <p className="p-4 text-[13px] text-ink-3">Loading team…</p>;
@@ -259,15 +332,15 @@ function TeamRolesTable({
                 </span>
               </td>
               <td className="border-b border-line px-3 py-3 text-[11px]">
-                {person.authSubjectId ? (
-                  <code className="font-mono text-ink-2">
-                    {person.authSubjectId}
-                  </code>
-                ) : (
-                  <span className="text-warn">
-                    Not linked — still using Clerk role
-                  </span>
-                )}
+                <PersonLinkCell
+                  person={person}
+                  canEdit={canEdit}
+                  busy={busy === person._id}
+                  clerkMembers={clerkMembers}
+                  linkedSubjectIds={linkedSubjectIds}
+                  onLink={onLinkAccount}
+                  onUnlink={onUnlinkAccount}
+                />
               </td>
               <td className="border-b border-line px-3 py-3">
                 <PersonRoleCell
@@ -319,5 +392,91 @@ function PersonRoleCell({
         <option value={person.role}>{person.role}</option>
       )}
     </select>
+  );
+}
+
+function PersonLinkCell({
+  person,
+  canEdit,
+  busy,
+  clerkMembers,
+  linkedSubjectIds,
+  onLink,
+  onUnlink,
+}: Readonly<{
+  person: TeamPerson;
+  canEdit: boolean;
+  busy: boolean;
+  clerkMembers: readonly {
+    userId: string;
+    name: string;
+    identifier?: string | null;
+  }[];
+  linkedSubjectIds: ReadonlySet<string>;
+  onLink: (person: TeamPerson, authSubjectId: string) => Promise<void>;
+  onUnlink: (person: TeamPerson) => Promise<void>;
+}>) {
+  if (person.authSubjectId) {
+    const member = clerkMembers.find(
+      (row) => row.userId === person.authSubjectId,
+    );
+    return (
+      <div className="grid gap-1">
+        <span className="text-ink-2">{member?.name ?? "Linked account"}</span>
+        <code className="font-mono text-[10px] text-ink-3">
+          {person.authSubjectId}
+        </code>
+        {canEdit ? (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm justify-self-start"
+            disabled={busy}
+            onClick={() => void onUnlink(person)}
+          >
+            {busy ? "Working…" : "Unlink"}
+          </button>
+        ) : null}
+      </div>
+    );
+  }
+
+  if (!canEdit) {
+    return (
+      <span className="text-warn">Not linked — still using Clerk role</span>
+    );
+  }
+
+  // Only accounts not already claimed by another staff row.
+  const available = clerkMembers.filter(
+    (row) => !linkedSubjectIds.has(row.userId),
+  );
+
+  return (
+    <div className="grid gap-1">
+      <span className="text-warn">Not linked — still using Clerk role</span>
+      {available.length === 0 ? (
+        <span className="text-ink-3">
+          No unlinked workspace accounts available.
+        </span>
+      ) : (
+        <select
+          className="input"
+          defaultValue=""
+          disabled={busy}
+          onChange={(event) => {
+            const value = event.target.value;
+            if (value) void onLink(person, value);
+          }}
+        >
+          <option value="">{busy ? "Working…" : "Link an account…"}</option>
+          {available.map((member) => (
+            <option key={member.userId} value={member.userId}>
+              {member.name}
+              {member.identifier ? ` · ${member.identifier}` : ""}
+            </option>
+          ))}
+        </select>
+      )}
+    </div>
   );
 }

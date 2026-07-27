@@ -1,7 +1,70 @@
 import { ConvexError, v } from "convex/values";
 import { api } from "./_generated/api";
-import { action } from "./_generated/server";
+import { action, type ActionCtx } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
+
+// §4.4 retryable sync-error queue: record an ingest/parse failure as a SyncError.
+// Tenant-scoped find-or-upsert — REOPEN (bump attempts, refresh, return to
+// pending) an existing error with the SAME (sourceSystem, recordType, externalId),
+// else create. The generated command-idempotency cache is keyed by the key string
+// ALONE (commandIdempotencyKeys.by_key, no tenantId), so an idempotency key would
+// collide across tenants and suppress recurrences after dismissal — find-or-upsert
+// avoids that data loss. Only reopens when externalId (provider message id) is
+// present: two DISTINCT no-message-id failures must NOT collapse onto one row
+// (that would overwrite and lose the independent failure). The verbatim input is
+// stored as rawPayload ONLY when it fits under the cap — a truncated JSON blob
+// can't round-trip through Retry, so an oversized payload is omitted (Retry then
+// stays hidden for it). Best-effort: never masks the original error.
+const MAX_RAW_PAYLOAD = 8192;
+async function recordMessageSyncError(
+  ctx: ActionCtx,
+  opts: {
+    provider: string;
+    providerMessageId?: string;
+    kind: "missing_field" | "parse_failed" | "unknown";
+    errorMessage: string;
+    payloadObject: unknown;
+  },
+): Promise<void> {
+  try {
+    const sourceSystem = opts.provider || "unknown";
+    const externalId = opts.providerMessageId?.trim() || undefined;
+    const fullPayload = JSON.stringify(opts.payloadObject);
+    const rawPayload =
+      fullPayload.length <= MAX_RAW_PAYLOAD ? fullPayload : undefined;
+    if (externalId) {
+      const existing = (await ctx.runQuery(api.queries.listSyncError, {})).find(
+        (e) =>
+          e.sourceSystem === sourceSystem &&
+          e.recordType === "message" &&
+          e.externalId === externalId &&
+          e.deletedAt == null,
+      );
+      if (existing) {
+        await ctx.runMutation(api.mutations.SyncError_reopen, {
+          docId: existing._id,
+          attempts: (existing.attempts ?? 0) + 1,
+          kind: opts.kind,
+          errorMessage: opts.errorMessage,
+          rawPayload,
+          version: existing.version,
+        });
+        return;
+      }
+    }
+    await ctx.runMutation(api.mutations.SyncError_createViaRecord, {
+      sourceSystem,
+      recordType: "message",
+      kind: opts.kind,
+      errorMessage: opts.errorMessage,
+      externalId,
+      rawPayload,
+    });
+  } catch {
+    // Swallow — the caller's thrown error is the user-facing signal; queue
+    // recording must not mask it.
+  }
+}
 
 // Idempotent inbound message ingestion (spec §4.4 "Done when": replaying the
 // same provider delivery creates no duplicate message — including under
@@ -64,50 +127,21 @@ export const ingestInboundMessage = action({
     // Find-then-(reopen|create) in an action is not atomic, so two concurrent
     // identical failures could create two rows — acceptable for an error queue
     // (a rare duplicate is far less bad than silently dropping a failure).
-    const MAX_RAW_PAYLOAD = 8192;
+    // §4.4: a failure is recorded to the sync-error queue before re-throwing —
+    // the throw still gives the operator immediate feedback, and the queue
+    // captures the failure (verbatim input when it fits) so it can be retried or
+    // dismissed. See `recordMessageSyncError` for the tenant-scoped find-or-upsert.
     const recordSyncError = async (
       kind: "missing_field" | "parse_failed" | "unknown",
       errorMessage: string,
-    ): Promise<void> => {
-      try {
-        const sourceSystem = provider || "unknown";
-        const externalId = providerMessageId || undefined;
-        // Cap the stored payload so a huge provider blob can't blow the Convex
-        // write limit and lose the failure entirely.
-        const rawPayload = JSON.stringify(args).slice(0, MAX_RAW_PAYLOAD);
-        const existing = (
-          await ctx.runQuery(api.queries.listSyncError, {})
-        ).find(
-          (e) =>
-            e.sourceSystem === sourceSystem &&
-            e.recordType === "message" &&
-            (e.externalId ?? "") === (externalId ?? "") &&
-            e.deletedAt == null,
-        );
-        if (existing) {
-          await ctx.runMutation(api.mutations.SyncError_reopen, {
-            docId: existing._id,
-            attempts: (existing.attempts ?? 0) + 1,
-            kind,
-            errorMessage,
-            rawPayload,
-            version: existing.version,
-          });
-        } else {
-          await ctx.runMutation(api.mutations.SyncError_createViaRecord, {
-            sourceSystem,
-            recordType: "message",
-            kind,
-            errorMessage,
-            externalId,
-            rawPayload,
-          });
-        }
-      } catch {
-        // Swallow — the error thrown below is the user-facing signal; queue
-        // recording must not mask it.
-      }
-    };
+    ): Promise<void> =>
+      recordMessageSyncError(ctx, {
+        provider,
+        providerMessageId,
+        kind,
+        errorMessage,
+        payloadObject: args,
+      });
 
     if (!provider || !providerThreadId || !providerMessageId) {
       await recordSyncError(
@@ -221,6 +255,151 @@ export const ingestInboundMessage = action({
         err instanceof Error ? err.message : String(err),
       );
       throw err;
+    }
+  },
+});
+
+// Liberal field extraction from a raw provider envelope (try several common key
+// names + casing, like the TPP/KM parsers). Returns the first non-empty trimmed
+// string value, else undefined.
+function pickEnvelopeField(
+  parsed: Record<string, unknown>,
+  keys: string[],
+): string | undefined {
+  for (const k of keys) {
+    const val = parsed[k];
+    if (typeof val === "string" && val.trim()) return val.trim();
+  }
+  return undefined;
+}
+
+// Provider raw-envelope ingress — the §4.4 "failed parsing appears in a
+// retryable sync-error queue" parse boundary. Accepts a raw provider envelope
+// (a signed-webhook body, a polling-API response, or an operator-pasted export)
+// and normalizes it, calling the strongly-typed ingestInboundMessage ONLY after
+// JSON parse + required-field validation succeed. A malformed envelope (bad JSON
+// or missing thread/message id/body) lands in the sync-error queue instead of
+// being silently lost to pre-handler Zod rejection of the typed action. The
+// signed-webhook delivery + provider OAuth remain the deferred provider layer;
+// this is the consumer-side parse boundary (mirrors the KM/TPP JSON-paste shape).
+export const ingestProviderEnvelope = action({
+  args: {
+    provider: v.string(),
+    providerAccountId: v.optional(v.string()),
+    rawJson: v.string(),
+  },
+  handler: async (
+    ctx,
+    args,
+  ): Promise<{
+    recorded: "ingested" | "sync_error";
+    threadId?: Id<"messageThreads">;
+    messageId?: Id<"messages">;
+    reason?: string;
+  }> => {
+    const provider = args.provider.trim();
+    let parsed: Record<string, unknown>;
+    try {
+      const value: unknown = JSON.parse(args.rawJson);
+      if (!value || typeof value !== "object" || Array.isArray(value)) {
+        throw new Error("envelope must be a JSON object");
+      }
+      parsed = value as Record<string, unknown>;
+    } catch (e) {
+      await recordMessageSyncError(ctx, {
+        provider,
+        kind: "parse_failed",
+        errorMessage: `Invalid JSON envelope: ${
+          e instanceof Error ? e.message : String(e)
+        }`,
+        payloadObject: {
+          provider,
+          providerAccountId: args.providerAccountId,
+          rawJson: args.rawJson,
+        },
+      });
+      return {
+        recorded: "sync_error",
+        reason: "Invalid JSON envelope — recorded to the sync-error queue.",
+      };
+    }
+
+    const providerThreadId = pickEnvelopeField(parsed, [
+      "providerThreadId",
+      "threadId",
+      "thread_id",
+      "conversationId",
+      "conversation_id",
+    ]);
+    const providerMessageId = pickEnvelopeField(parsed, [
+      "providerMessageId",
+      "messageId",
+      "message_id",
+      "id",
+    ]);
+    const bodyText = pickEnvelopeField(parsed, [
+      "bodyText",
+      "body",
+      "text",
+      "message",
+      "content",
+      "plainText",
+    ]);
+    if (!providerThreadId || !providerMessageId || !bodyText) {
+      await recordMessageSyncError(ctx, {
+        provider,
+        providerMessageId,
+        kind: "missing_field",
+        errorMessage:
+          "Envelope missing required field: providerThreadId / providerMessageId / bodyText",
+        payloadObject: {
+          provider,
+          providerAccountId: args.providerAccountId,
+          envelope: parsed,
+        },
+      });
+      return {
+        recorded: "sync_error",
+        reason:
+          "Envelope missing required fields — recorded to the sync-error queue.",
+      };
+    }
+
+    try {
+      const result = await ctx.runAction(
+        api.messageInbox.ingestInboundMessage,
+        {
+          provider,
+          providerAccountId: args.providerAccountId,
+          providerThreadId,
+          providerMessageId,
+          senderIdentity: pickEnvelopeField(parsed, [
+            "senderIdentity",
+            "sender",
+            "from",
+          ]),
+          bodyText,
+          subject: pickEnvelopeField(parsed, [
+            "subject",
+            "subject_line",
+            "title",
+          ]),
+          rawPayload:
+            args.rawJson.length <= MAX_RAW_PAYLOAD ? args.rawJson : undefined,
+        },
+      );
+      return {
+        recorded: "ingested",
+        threadId: result.threadId,
+        messageId: result.messageId,
+      };
+    } catch (e) {
+      // ingestInboundMessage already recorded the failure (validation or
+      // mid-ingest) via its own hook; surface the reason without duplicating.
+      return {
+        recorded: "sync_error",
+        reason: e instanceof Error ? e.message : String(e),
+      };
     }
   },
 });

@@ -159,6 +159,43 @@ entity Person mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Link a sign-in account to this staff profile AFTER hire.
+  //
+  // `hire` takes an optional authSubjectId, but in practice you hire someone
+  // before they have an account — the hire form's own "Link later" option had
+  // no "later" to go to, because no command could set the field once the row
+  // existed. Everything keyed on personId (day sheet, comments, self-service
+  // reviews, shift claims, messages) stayed dead for that person forever.
+  //
+  // The link is by IdP subject id, not email: getAuthContext resolves the
+  // staff profile with `authSubjectId == identity.subject`, so the stored
+  // email plays no part in sign-in and cannot stand in for this.
+  command linkAccount(authSubjectId: string) {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    constraint linkAccountSubject: length(trim(authSubjectId)) > 0 "Choose an account to link"
+    mutate authSubjectId = authSubjectId
+    emit PersonAccountLinked {
+      personId: self.id
+      tenantId: self.tenantId
+      authSubjectId: authSubjectId
+    }
+  }
+
+  // Release the sign-in account — wrong person linked, or they left and the
+  // account is being reassigned. Deliberately separate from terminate() so a
+  // mis-link is correctable without ending someone's employment.
+  command unlinkAccount() {
+    guard self.deletedAt == null
+    guard roleAllows(user.role, "workforceManageAccess")
+    mutate authSubjectId = null
+    emit PersonAccountUnlinked {
+      personId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   // Admin-only: changing Capsule role is more sensitive than profile edits.
   command assignRole(role: CapsuleRole) {
     guard self.status == "active"
