@@ -14,6 +14,12 @@ export const UNIT_OF_MEASURE = [
   "quart",
   "gallon",
   "portion",
+  // Kept in step with the enum: the printed prep sheets use these and the
+  // catalog units cannot express them.
+  "serving",
+  "batch",
+  "melon",
+  "bottle",
 ] as const;
 
 export type UnitOfMeasure = (typeof UNIT_OF_MEASURE)[number];
@@ -79,8 +85,18 @@ const ALIASES: Record<string, UnitOfMeasure> = {
   gallons: "gallon",
   portion: "portion",
   portions: "portion",
+  // serving stays mapped to portion: this alias table is for the recipe/
+  // ingredient importer, where "yields 6 servings" has to land on a unit that
+  // costing can convert. `serving` itself is in the vocabulary for prep
+  // templates, which are instructions and never costed.
   serving: "portion",
   servings: "portion",
+  batch: "batch",
+  batches: "batch",
+  melon: "melon",
+  melons: "melon",
+  bottle: "bottle",
+  bottles: "bottle",
 };
 
 export class UnitOfMeasureMapper {

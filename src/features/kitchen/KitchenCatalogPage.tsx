@@ -27,7 +27,9 @@ import { KitchenBookNav } from "./KitchenBookNav";
 import { KitchenCatalogCards } from "./KitchenCatalogCards";
 import { KitchenCatalogCreateForm } from "./KitchenCatalogCreateForm";
 import {
+  KITCHEN_SECTION_SINGULAR,
   RECIPE_IMPORT_PATH,
+  dishPath,
   recipePath,
   type KitchenSection,
 } from "./kitchenRoutes";
@@ -167,7 +169,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         ) {
           return;
         }
-        await createDish({
+        const created = await createDish({
           name,
           portionSize: Number(data.get("portionSize")),
           portionUnit: String(
@@ -179,6 +181,10 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           serviceStyle: optional(data.get("serviceStyle")),
           dietaryTags: csv(data.get("dietaryTags")),
         });
+        // Prep templates, containers and recipes all live on the detail page,
+        // and adding them is always the next step. Land there like recipes do.
+        navigate(dishPath(created.docId));
+        return;
       } else {
         await createMenu({
           name: String(data.get("name") ?? "").trim(),
@@ -229,7 +235,9 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
             className="btn btn-primary"
             onClick={() => setShowCreate((value) => !value)}
           >
-            {showCreate ? "Close form" : `New ${section.slice(0, -1)}`}
+            {showCreate
+              ? "Close form"
+              : `New ${KITCHEN_SECTION_SINGULAR[section]}`}
           </button>
         </div>
       </header>
@@ -301,8 +309,8 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
                   Every kitchen needs a house book.
                 </h3>
                 <p className="mt-3 max-w-110 text-ink-2">
-                  Create the first {section.slice(0, -1)} through the generated
-                  Manifest command.
+                  Create the first {KITCHEN_SECTION_SINGULAR[section]} through
+                  the generated Manifest command.
                 </p>
               </div>
             </div>

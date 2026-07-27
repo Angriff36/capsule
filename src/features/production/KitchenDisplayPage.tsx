@@ -20,6 +20,7 @@ import {
   prepTaskDependencySummary,
   type PrepTaskDependencySummary,
 } from "./PrepTaskDependencies";
+import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
 import "./KitchenDisplayPage.css";
 
 const policy = new ProductionLifecyclePolicy();
@@ -118,7 +119,7 @@ export function KitchenDisplayPage() {
           id: task._id,
           version: task.version,
           title: task.name?.trim() || "Prep task",
-          detail: `${task.quantity} ${task.unit}`,
+          detail: `${prepQuantityLabel(task.quantity, String(task.unit))} ${task.unit}`,
           station: task.station?.trim() || null,
           eventId: task.eventId,
           status: optimistic.statusOf(task._id, String(task.status)),

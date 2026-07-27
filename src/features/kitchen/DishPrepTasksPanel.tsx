@@ -56,6 +56,12 @@ export function DishPrepTasksPanel({ dishId }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // A dish's tasks come off one sheet, so they share a category and station and
+  // mostly share a unit. form.reset() would send all three back to the default
+  // after every add and make the operator re-pick them once per task.
+  const [category, setCategory] = useState("Finish at Event");
+  const [station, setStation] = useState("");
+  const [unit, setUnit] = useState("each");
 
   const rows = (tasks ?? [])
     .filter(
@@ -83,10 +89,10 @@ export function DishPrepTasksPanel({ dishId }: Props) {
       await addTask({
         dishId,
         name,
-        category: String(data.get("category") ?? "Finish at Event"),
-        station: String(data.get("station") ?? "").trim() || undefined,
+        category,
+        station: station.trim() || undefined,
         defaultQuantity: quantity > 0 ? quantity : undefined,
-        defaultUnit: quantity > 0 ? String(data.get("defaultUnit")) : undefined,
+        defaultUnit: quantity > 0 ? unit : undefined,
         instructions:
           String(data.get("instructions") ?? "").trim() || undefined,
         sortOrder: rows.length,
@@ -214,7 +220,8 @@ export function DishPrepTasksPanel({ dishId }: Props) {
           <select
             name="category"
             className="input mt-1"
-            defaultValue="Finish at Event"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
           >
             {CATEGORIES.map((c) => (
               <option key={c.value} value={c.value}>
@@ -229,6 +236,8 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             name="station"
             className="input mt-1"
             placeholder="Apps - Passed - Finish at Event"
+            value={station}
+            onChange={(e) => setStation(e.target.value)}
           />
         </label>
         <label className="block text-[12px]">
@@ -247,7 +256,12 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         </label>
         <label className="block text-[12px]">
           <span className="meta-term">Unit</span>
-          <select name="defaultUnit" className="input mt-1" defaultValue="each">
+          <select
+            name="defaultUnit"
+            className="input mt-1"
+            value={unit}
+            onChange={(e) => setUnit(e.target.value)}
+          >
             {UNITS.map((u) => (
               <option key={u} value={u}>
                 {u}

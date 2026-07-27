@@ -1,5 +1,13 @@
 export type KitchenSection = "recipes" | "ingredients" | "dishes" | "menus";
 
+/** "dishes".slice(0, -1) is "dishe" — spell the singulars out instead. */
+export const KITCHEN_SECTION_SINGULAR: Record<KitchenSection, string> = {
+  recipes: "recipe",
+  ingredients: "ingredient",
+  dishes: "dish",
+  menus: "menu",
+};
+
 export const KITCHEN_SECTIONS: readonly {
   key: KitchenSection | "prep";
   label: string;

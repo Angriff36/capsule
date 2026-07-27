@@ -31,6 +31,7 @@ import {
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
 import { KitchenBookNav } from "../kitchen/KitchenBookNav";
+import { prepQuantityLabel } from "../kitchen/prepQuantityLabel";
 import {
   PrepActionReasonForm,
   type PrepReasonAction,
@@ -687,7 +688,8 @@ export function PrepBoardPage() {
                         {task.notes ? <small>{task.notes}</small> : null}
                       </td>
                       <td className="supply-number">
-                        {task.quantity} {task.unit}
+                        {prepQuantityLabel(task.quantity, String(task.unit))}{" "}
+                        {task.unit}
                       </td>
                       <td>
                         <StatusChip

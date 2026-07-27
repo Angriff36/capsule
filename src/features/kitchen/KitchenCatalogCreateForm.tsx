@@ -1,6 +1,6 @@
 import type { FormEvent } from "react";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
-import type { KitchenSection } from "./kitchenRoutes";
+import { KITCHEN_SECTION_SINGULAR, type KitchenSection } from "./kitchenRoutes";
 
 const UNITS = UNIT_OF_MEASURE;
 
@@ -31,7 +31,9 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
       <div className="culinary-create-heading">
         <div>
           <p className="eyebrow">New record</p>
-          <h2 className="font-display text-2xl">Add {section.slice(0, -1)}</h2>
+          <h2 className="font-display text-2xl">
+            Add {KITCHEN_SECTION_SINGULAR[section]}
+          </h2>
         </div>
         <button className="btn btn-primary" disabled={busy}>
           {busy ? "Creating…" : "Create"}

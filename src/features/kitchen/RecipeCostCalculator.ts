@@ -1,6 +1,9 @@
 import type { UnitOfMeasure } from "./import/UnitOfMeasureMapper";
 
-type UnitDimension = "mass" | "volume" | "count";
+// The prep-sheet units are opaque labels — nothing converts a melon into an
+// each — so each gets its own dimension and only ever matches itself.
+type UnitDimension =
+  "mass" | "volume" | "count" | "serving" | "batch" | "melon" | "bottle";
 
 const UNIT_FACTORS: Record<
   UnitOfMeasure,
@@ -20,6 +23,10 @@ const UNIT_FACTORS: Record<
   quart: { dimension: "volume", factor: 946.352946 },
   gallon: { dimension: "volume", factor: 3_785.411784 },
   portion: { dimension: "count", factor: 1 },
+  serving: { dimension: "serving", factor: 1 },
+  batch: { dimension: "batch", factor: 1 },
+  melon: { dimension: "melon", factor: 1 },
+  bottle: { dimension: "bottle", factor: 1 },
 };
 
 export type RecipeCostLineStatus =

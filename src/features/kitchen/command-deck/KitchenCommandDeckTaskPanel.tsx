@@ -3,6 +3,7 @@ import { StatusChip } from "../../../ui/primitives";
 import { AllergenIconRow } from "../AllergenIconRow";
 import { DishPrimaryImage } from "../../attachments/DishPrimaryImage";
 import { eventDetailMenuPath, recipePath } from "../kitchenRoutes";
+import { prepQuantityLabel } from "../prepQuantityLabel";
 import type { KitchenCommandDeckModel } from "./KitchenCommandDeckModel";
 import type {
   CommandDeckFilter,
@@ -237,7 +238,8 @@ function TaskRow({
           <span>{task.name}</span>
         </p>
         <p className="kcd-task-meta">
-          {task.quantity} {String(task.unit)}
+          {prepQuantityLabel(task.quantity, String(task.unit))}{" "}
+          {String(task.unit)}
           {task.category ? ` · ${humanCategory(task.category)}` : ""}
           {task.station ? ` · ${task.station}` : ""}
           {assignee ? ` · ${model.personLabel(assignee)}` : " · unassigned"}
