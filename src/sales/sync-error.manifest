@@ -41,6 +41,10 @@ entity SyncError mixin TenantScoped, SoftDeletable {
   property required errorMessage: string = ""
   // Opaque serialized failed input (JSON), kept for retry/debug.
   property rawPayload: string
+  // Times this failure has recurred (bumped on reopen). The find-or-upsert
+  // recorder reopens an existing row on recurrence instead of creating a
+  // duplicate (or suppressing it via a global create-idempotency key).
+  property attempts: int = 0
   // Creation stamp. The generator only emits the allocating
   // `SyncError_createViaRecord` selector (and accepts the command on a fresh
   // draft) when `record` carries a `guard self.recordedAt == null` creation
@@ -98,6 +102,30 @@ entity SyncError mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Reopen on a recurrence of the SAME failure (same sourceSystem/recordType/
+  // externalId within the tenant). The find-or-upsert recorder calls this
+  // instead of creating a duplicate row — bumps attempts, refreshes the latest
+  // message/payload, returns to pending. Avoids the global create-idempotency
+  // key (which would collide across tenants and suppress later redeliveries).
+  command reopen(
+    attempts: int,
+    kind: SyncErrorKind,
+    errorMessage: string,
+    optional rawPayload: string
+  ) {
+    guard self.deletedAt == null
+    guard user.id != null
+    mutate status = "pending"
+    mutate attempts = attempts
+    mutate kind = kind
+    mutate errorMessage = errorMessage
+    mutate rawPayload = rawPayload
+    emit SyncErrorReopened {
+      syncErrorId: self.id
+      tenantId: self.tenantId
+    }
+  }
+
   store SyncError in durable
 }
 
@@ -110,6 +138,11 @@ event SyncErrorRecorded: "sync_error.recorded" {
 }
 
 event SyncErrorResolved: "sync_error.resolved" {
+  syncErrorId: string
+  tenantId: string
+}
+
+event SyncErrorReopened: "sync_error.reopened" {
   syncErrorId: string
   tenantId: string
 }

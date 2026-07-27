@@ -48,28 +48,64 @@ export const ingestInboundMessage = action({
     const bodyText = args.bodyText.trim();
 
     // §4.4: "Failed parsing appears in a retryable sync-error queue." Record a
-    // SyncError for a validation failure before re-throwing — the throw still
-    // gives the operator immediate feedback, and the queue captures the failure
-    // with the verbatim input (rawPayload) so it can be retried or dismissed
-    // from the inbox. Idempotent per (recordType, externalId-or-input) so a
-    // repeated failure, or a retry that fails the same way, does not flood the
-    // queue. Recording is best-effort and never masks the validation error.
+    // SyncError for a failure before re-throwing — the throw still gives the
+    // operator immediate feedback, and the queue captures the failure with the
+    // verbatim input (rawPayload) so it can be retried or dismissed from the
+    // inbox. Recording is best-effort and never masks the original error.
+    //
+    // TENANT-SCOPED FIND-OR-UPSERT (not a global create-idempotency key): the
+    // generated command-idempotency cache is keyed by the key string ALONE
+    // (commandIdempotencyKeys.by_key, no tenantId), so a key like
+    // `syncerr:message:<providerMessageId>` would collide across tenants and
+    // suppress a recurrence after dismissal (the cached create result is
+    // immutable). Instead we look up an existing tenant error by
+    // (sourceSystem, recordType, externalId) and REOPEN it (bump attempts,
+    // refresh message/payload, return to pending), else create a new row.
+    // Find-then-(reopen|create) in an action is not atomic, so two concurrent
+    // identical failures could create two rows — acceptable for an error queue
+    // (a rare duplicate is far less bad than silently dropping a failure).
+    const MAX_RAW_PAYLOAD = 8192;
     const recordSyncError = async (
       kind: "missing_field" | "parse_failed" | "unknown",
       errorMessage: string,
     ): Promise<void> => {
       try {
-        await ctx.runMutation(api.mutations.SyncError_createViaRecord, {
-          sourceSystem: provider || "unknown",
-          recordType: "message",
-          kind,
-          errorMessage,
-          externalId: providerMessageId || undefined,
-          rawPayload: JSON.stringify(args),
-          idempotencyKey: `syncerr:message:${providerMessageId || `${provider}:${providerThreadId}`}`,
-        });
+        const sourceSystem = provider || "unknown";
+        const externalId = providerMessageId || undefined;
+        // Cap the stored payload so a huge provider blob can't blow the Convex
+        // write limit and lose the failure entirely.
+        const rawPayload = JSON.stringify(args).slice(0, MAX_RAW_PAYLOAD);
+        const existing = (
+          await ctx.runQuery(api.queries.listSyncError, {})
+        ).find(
+          (e) =>
+            e.sourceSystem === sourceSystem &&
+            e.recordType === "message" &&
+            (e.externalId ?? "") === (externalId ?? "") &&
+            e.deletedAt == null,
+        );
+        if (existing) {
+          await ctx.runMutation(api.mutations.SyncError_reopen, {
+            docId: existing._id,
+            attempts: (existing.attempts ?? 0) + 1,
+            kind,
+            errorMessage,
+            rawPayload,
+            version: existing.version,
+          });
+        } else {
+          await ctx.runMutation(api.mutations.SyncError_createViaRecord, {
+            sourceSystem,
+            recordType: "message",
+            kind,
+            errorMessage,
+            externalId,
+            rawPayload,
+          });
+        }
       } catch {
-        // Swallow — the validation error thrown below is the user-facing signal.
+        // Swallow — the error thrown below is the user-facing signal; queue
+        // recording must not mask it.
       }
     };
 
@@ -87,88 +123,105 @@ export const ingestInboundMessage = action({
       throw new ConvexError("Message text is required");
     }
 
-    // Provider thread ids are unique within a provider ACCOUNT, not globally —
-    // so the account discriminator must ride along with every match/key to keep
-    // two connected accounts with the same provider+thread id from collapsing
-    // into one thread (and to keep message dedup account-scoped).
-    const account = args.providerAccountId?.trim() || "";
+    // Ingest core (thread resolve → message post). Any unexpected failure here
+    // is recorded as a retryable parse_failed SyncError before propagating, so a
+    // mid-ingest error does not disappear silently. (Pre-handler Zod rejection
+    // of a malformed envelope is the caller/provider-layer's responsibility — a
+    // provider webhook parses the raw envelope and calls this typed action only
+    // after normalization; that provider layer is not built in this increment.)
+    try {
+      // Provider thread ids are unique within a provider ACCOUNT, not globally —
+      // so the account discriminator must ride along with every match/key to keep
+      // two connected accounts with the same provider+thread id from collapsing
+      // into one thread (and to keep message dedup account-scoped).
+      const account = args.providerAccountId?.trim() || "";
 
-    // 1. Resolve the thread (match by provider + account + provider thread id).
-    // If a concurrent ingest already opened it, the idempotencyKey on the
-    // create returns that row instead of inserting a second one.
-    const candidates = await ctx.runQuery(
-      api.queries.listMessageThreadByProviderThreadId,
-      { providerThreadId },
-    );
-    const existingThread = candidates.find(
-      (t) =>
-        t.provider === provider &&
-        (t.providerAccountId ?? "") === account &&
-        t.deletedAt == null,
-    );
-    let threadId: Id<"messageThreads">;
-    let threadCreated: boolean;
-    if (existingThread) {
-      threadId = existingThread._id;
-      threadCreated = false;
-    } else {
-      const created = await ctx.runMutation(
-        api.mutations.MessageThread_create,
+      // 1. Resolve the thread (match by provider + account + provider thread id).
+      // If a concurrent ingest already opened it, the idempotencyKey on the
+      // create returns that row instead of inserting a second one.
+      const candidates = await ctx.runQuery(
+        api.queries.listMessageThreadByProviderThreadId,
+        { providerThreadId },
+      );
+      const existingThread = candidates.find(
+        (t) =>
+          t.provider === provider &&
+          (t.providerAccountId ?? "") === account &&
+          t.deletedAt == null,
+      );
+      let threadId: Id<"messageThreads">;
+      let threadCreated: boolean;
+      if (existingThread) {
+        threadId = existingThread._id;
+        threadCreated = false;
+      } else {
+        const created = await ctx.runMutation(
+          api.mutations.MessageThread_create,
+          {
+            provider,
+            providerAccountId: args.providerAccountId,
+            providerThreadId,
+            subject: args.subject,
+            senderIdentity: args.senderIdentity,
+            contactId: args.contactId,
+            idempotencyKey: `mt:${provider}:${account}:${providerThreadId}`,
+          },
+        );
+        // Literal `create` allocating mutations return { _id, ...doc }.
+        threadId = created._id;
+        threadCreated = true;
+      }
+
+      // 2. Dedup the message WITHIN this thread (account-scoped). A replay hits
+      // the existing row; a concurrent replay is also caught by the create's
+      // idempotencyKey below.
+      const dups = await ctx.runQuery(
+        api.queries.listMessageByProviderMessageId,
+        { providerMessageId },
+      );
+      const existingMessage = dups.find(
+        (m) => m.threadId === threadId && m.deletedAt == null,
+      );
+      if (existingMessage) {
+        return {
+          threadId,
+          messageId: existingMessage._id,
+          isDuplicate: true,
+          threadCreated,
+        };
+      }
+
+      // 3. Post the inbound message. The idempotencyKey (thread + provider
+      // message id) makes a concurrent replay a no-op at the create level.
+      // _createVia* allocating mutations return { docId }.
+      const posted = await ctx.runMutation(
+        api.mutations.Message_createViaPost,
         {
-          provider,
-          providerAccountId: args.providerAccountId,
-          providerThreadId,
-          subject: args.subject,
+          threadId,
+          direction: "inbound",
+          status: "received",
+          bodyText,
+          providerMessageId,
           senderIdentity: args.senderIdentity,
-          contactId: args.contactId,
-          idempotencyKey: `mt:${provider}:${account}:${providerThreadId}`,
+          sentAt: args.sentAt,
+          rawPayload: args.rawPayload,
+          idempotencyKey: `msg:${threadId}:${providerMessageId}`,
         },
       );
-      // Literal `create` allocating mutations return { _id, ...doc }.
-      threadId = created._id;
-      threadCreated = true;
-    }
 
-    // 2. Dedup the message WITHIN this thread (account-scoped). A replay hits
-    // the existing row; a concurrent replay is also caught by the create's
-    // idempotencyKey below.
-    const dups = await ctx.runQuery(
-      api.queries.listMessageByProviderMessageId,
-      { providerMessageId },
-    );
-    const existingMessage = dups.find(
-      (m) => m.threadId === threadId && m.deletedAt == null,
-    );
-    if (existingMessage) {
       return {
         threadId,
-        messageId: existingMessage._id,
-        isDuplicate: true,
+        messageId: posted.docId,
+        isDuplicate: false,
         threadCreated,
       };
+    } catch (err) {
+      await recordSyncError(
+        "parse_failed",
+        err instanceof Error ? err.message : String(err),
+      );
+      throw err;
     }
-
-    // 3. Post the inbound message. The idempotencyKey (thread + provider
-    // message id) makes a concurrent replay a no-op at the create level.
-    // _createVia* allocating mutations return { docId }.
-    const posted = await ctx.runMutation(api.mutations.Message_createViaPost, {
-      threadId,
-      direction: "inbound",
-      status: "received",
-      bodyText,
-      providerMessageId,
-      senderIdentity: args.senderIdentity,
-      sentAt: args.sentAt,
-      rawPayload: args.rawPayload,
-      idempotencyKey: `msg:${threadId}:${providerMessageId}`,
-    });
-
-    return {
-      threadId,
-      messageId: posted.docId,
-      isDuplicate: false,
-      threadCreated,
-    };
   },
 });
 

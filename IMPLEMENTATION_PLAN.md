@@ -16,10 +16,10 @@
 **Finding (verified first-hand against code this turn via a read-only triage pass + direct reads):** the IMPLEMENTATION_PLAN's own status rows were stale and contradictory on Priority 32 / §4.4 / §12.5. The message-threading **data model is substantially built** — `messages` + `messageThreads` tables (`convex/schema.ts`), `Message`/`MessageThread` manifests (`src/sales/message.manifest`, `message-thread.manifest`) with `post`/`create`/`linkContact`/`linkLead`/`setStatus` commands, `convex/messageInbox.ts` with the idempotent `ingestInboundMessage` action + one-click `qualifyThreadAsLead`, and a wired staff inbox at `/clients/inbox` (`MessageInboxPage.tsx`). So the old "§12.5 NO MessageThread entities / NO threading" detailed-status rows were **wrong** (corrected below). But spec §4.4 explicitly requires: "**Failed parsing appears in a retryable sync-error queue**", and the integrations "done when" (spec §12) requires "error visibility". `ingestInboundMessage` simply **threw** `ConvexError` on a missing/empty required field — a provider webhook delivering a malformed payload would have the failure silently lost. There was NO `syncErrors` table, NO `SyncError` entity (grep-confirmed: zero matches across convex/src/schemas). The Detailed Status row "Sync Error | ❌ NOT BUILT | No retryable error queue" was the truthful one.
 
 **Fix (smallest spec-faithful diff — clones the `message.manifest` + `ClientCommunication.record` patterns):**
-- `src/sales/sync-error.manifest` (new) — `SyncError` entity: `sourceSystem`, `recordType`, `externalId?`, `status` pending/resolved, `kind` parse_failed/missing_field/unknown, `errorMessage`, `rawPayload?` (opaque serialized failed input, kept for retry), `recordedAt?` (creation stamp). Commands `record` (create) + `markResolved` (idempotent set to resolved). `staffAccess`-gated. `status` intentionally NOT indexed (enum index emits a mistyped `listXBy` query that fails typecheck — the documented `message.manifest` gotcha); the queue is filtered client-side, matching the rest of the inbox surface.
-- Registered in `src/app.manifest`; `bun run manifest:regen` produced the `syncErrors` table + `SyncError_createViaRecord` / `SyncError_record` / `SyncError_markResolved` mutations + 4 React hooks (`useListSyncError`, `useGetSyncError`, `useSyncErrorRecord`, `useSyncErrorMarkResolved`).
-- `convex/messageInbox.ts` — `ingestInboundMessage` now records a `SyncError` (via `SyncError_createViaRecord`, idempotency-keyed `syncerr:message:<externalId|provider:thread>`) BEFORE re-throwing on its two validation failures (missing provider/thread/message-id; empty body). The throw still gives the operator immediate feedback; the queue captures the verbatim input (`rawPayload = JSON.stringify(args)`) so the failure can be retried or dismissed. Recording is best-effort (swallowed) so it never masks the validation error.
-- `src/features/sales/SyncErrorsPanel.tsx` (new) — staff panel listing pending sync errors with per-row Retry + Dismiss, collapsible raw payload, hidden when there are no pending errors (no inbox noise). **Retry is client-side** (parses the stored `rawPayload` → re-calls `ingestInboundMessage` → calls `markResolved` on success) — no server retry action, no action→action call. Dismiss calls `markResolved`.
+- `src/sales/sync-error.manifest` (new) — `SyncError` entity: `sourceSystem`, `recordType`, `externalId?`, `status` pending/resolved, `kind` parse_failed/missing_field/unknown, `errorMessage`, `rawPayload?` (opaque serialized failed input, kept for retry), `recordedAt?` (creation stamp), `attempts` (int, recurrence counter). Commands `record` (create) + `markResolved` (set resolved) + `reopen` (return to pending, bump attempts, refresh message/payload — used by the find-or-upsert on recurrence). `staffAccess`-gated. `status` intentionally NOT indexed (enum index emits a mistyped `listXBy` query that fails typecheck — the documented `message.manifest` gotcha); the queue is filtered client-side, matching the rest of the inbox surface.
+- Registered in `src/app.manifest`; `bun run manifest:regen` + `bun run codegen` produced the `syncErrors` table + `SyncError_createViaRecord` / `SyncError_record` / `SyncError_markResolved` / `SyncError_reopen` mutations + React hooks.
+- `convex/messageInbox.ts` — `ingestInboundMessage` now records a `SyncError` for a failure before re-throwing. The recorder is a **tenant-scoped find-or-upsert** (NOT a global create-idempotency key): it looks up an existing tenant error by `(sourceSystem, recordType, externalId)` and calls `SyncError_reopen` (bump attempts, refresh message/payload, return to pending), else `SyncError_createViaRecord`. The generated command-idempotency cache is keyed by the key string ALONE (`commandIdempotencyKeys.by_key`, no tenantId), so an idempotency key would collide across tenants and suppress recurrences after dismissal — find-or-upsert avoids that data loss. The verbatim input is stored as `rawPayload` (capped at 8KB so a huge provider blob can't blow the Convex write limit and lose the failure). Recording wraps the validation failures (missing provider/thread/message-id; empty body) AND a try/catch around the ingest core (thread resolve → message post) so an unexpected mid-ingest failure is recorded as `parse_failed` before propagating. Recording is best-effort (swallowed) so it never masks the original error.
+- `src/features/sales/SyncErrorsPanel.tsx` (new) — staff panel listing pending sync errors with per-row Retry (shown only for transient kinds `parse_failed`/`unknown`; hidden for `missing_field`, which replays the same bad input and can't succeed) + Dismiss, collapsible raw payload, hidden when there are no pending errors (no inbox noise). Retry is client-side (parses the stored `rawPayload` → re-calls `ingestInboundMessage` → `markResolved` on success); Dismiss calls `markResolved`.
 - Mounted `<SyncErrorsPanel />` in `MessageInboxPage.tsx` (the §4.4 "appears" surface — no new route/nav).
 - `tests/governed-creation-mappings.test.ts` += `SyncError_createViaRecord`.
 
@@ -29,9 +29,15 @@
 
 **Generator learning (new, worth recording):** a manifest `record` command only emits the allocating `SyncError_createViaRecord` selector (and accepts the command on a fresh draft) when it carries a **creation-guard** — a `guard self.<stamp> == null` on a field the command itself mutates (e.g. `recordedAt`, set to `now()`). Without it, `record` compiles to mutate-only (requires a pre-existing `docId`) and, with no separate `create` command, there is NO way to insert a row. `ClientCommunication.record` (with `guard self.recordedAt == null`) and `TaxRate.define` (with `guard self.configuredAt == null`) confirm the idiom; `Message.post` is special-cased to allocate without a stamp. `resolve` is a reserved JS word and the manifest compiler rejects it as a command name — use `markResolved`.
 
-**Cross-model review:** to be run pre-push (merge gate; author is Claude → reviewer Codex `gpt-5.6-sol`). Result recorded here once run.
+**Cross-model review (merge gate — author is Claude; reviewer Codex `gpt-5.6-sol`):** reviewed the authored diff and returned **REJECT — 6 findings (2 High / 4 Medium)**. All addressed before push (4 fixed in code, 2 documented as deferred/ceiling):
+- **FIXED (High, idempotency key suppressed failures)** — the global `commandIdempotencyKeys.by_key` cache is not tenant-scoped, so the `syncerr:message:<id>` key collided across tenants and suppressed recurrences after dismissal (data loss). Replaced with a tenant-scoped find-or-upsert: `SyncError_reopen` (bump `attempts`, refresh, return to pending) on an existing `(sourceSystem, recordType, externalId)` match, else `SyncError_createViaRecord` with no idempotency key. A rare concurrent-identical-failure duplicate is accepted (better a dup than a dropped failure).
+- **FIXED (High, malformed deliveries bypassed the queue)** — pre-handler Zod rejection of a malformed envelope can't be caught inside the typed action (that is the caller/provider-layer's job). Added a try/catch around the ingest core so an unexpected mid-ingest failure is recorded as `parse_failed` before propagating (and the previously-dead `parse_failed` kind is now produced). The provider raw-envelope parser itself is the deferred provider layer (no provider creds).
+- **FIXED (Medium, retry was misleading)** — Retry replayed the verbatim stored payload, so for `missing_field` it deterministically failed again. Retry is now shown only for transient kinds (`parse_failed`/`unknown`); hidden for `missing_field`.
+- **FIXED (Medium, unbounded payload)** — `rawPayload` is now capped at 8KB on store so a huge provider blob can't exceed the Convex write limit and lose the failure.
+- **DOCUMENTED (Medium, unbounded read)** — the panel reads all tenant `syncErrors` and filters pending client-side (no `status` index — enum-index typecheck gotcha). This matches the existing inbox pattern (`MessageInboxPage` reads all threads/messages client-side) and is fine at single-tenant scale; a bounded paginated `by_status` query is the speculative upgrade path if volume grows.
+- **DOCUMENTED (Medium, staff-only vs webhook)** — recording requires `staffAccess` + a Clerk identity, which the operator "Log inbound" path supplies today. A signed provider webhook has no Clerk identity, so it would record through its own signature-verified seam (the public-ingress gotcha) — that is the deferred provider layer, not loosened here.
 
-**Honest scope notes (documented, NOT this increment):** (1) **Provider OAuth / inbound webhook layer is still not built** — the threaded-inbox data model, idempotent ingest action, one-click qualify, and now the sync-error queue are all complete, but no Integration Connection (OAuth) per email/SMS/social provider and no inbound delivery pipeline (webhook or poller) actually calls `ingestInboundMessage`. So `messages` is only populated by the operator "Log inbound" form today; a real connected inbox needs provider credentials not available in this loop. This is the same "Capsule-side consumer is what was missing" shape as the TPP/KM import tracks. (2) **Outbound delivery worker not added** — replies still save as `queued` for non-internal providers (internal threads mark `sent`); advancing queued→sent needs a provider sender. (3) **Sync-error queue is wired for the message path only** — QBO/Calendar/SMS already have their own reconciliation queues; recording their parse failures into `syncErrors` is additive and not wired here (scope creep). (4) **Retry replays the original failed payload** — for a permanent `missing_field` error, retry fails the same way (and re-records idempotently, no dup); dismiss is the operator action for permanent failures. (5) A `main` push deploys Convex too (`vercel.json` `buildCommand` is `convex deploy --cmd 'vite build'`, since cc24315) — the additive `syncErrors` table is backward-compatible.
+**Honest scope notes (documented, NOT this increment):** (1) **Provider OAuth / inbound webhook layer is still not built** — the threaded-inbox data model, idempotent ingest action, one-click qualify, and now the sync-error queue are all complete, but no Integration Connection (OAuth) per email/SMS/social provider and no inbound delivery pipeline (webhook or poller) actually calls `ingestInboundMessage`. So `messages` is only populated by the operator "Log inbound" form today; a real connected inbox needs provider credentials not available in this loop. This is the same "Capsule-side consumer is what was missing" shape as the TPP/KM import tracks. (2) **Outbound delivery worker not added** — replies still save as `queued` for non-internal providers (internal threads mark `sent`); advancing queued→sent needs a provider sender. (3) **Sync-error queue is wired for the message path only** — QBO/Calendar/SMS already have their own reconciliation queues; recording their parse failures into `syncErrors` is additive and not wired here (scope creep). (4) **Retry replays the original failed payload** — only offered for transient kinds (`parse_failed`/`unknown`); a `missing_field` error hides Retry (Dismiss is the operator action for permanent failures). A recurrence of the same failure reopens the existing row (bumps `attempts`) rather than creating a duplicate. (5) A `main` push deploys Convex too (`vercel.json` `buildCommand` is `convex deploy --cmd 'vite build'`, since cc24315) — the additive `syncErrors` table is backward-compatible.
 
 ---
 
@@ -2062,7 +2068,7 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 | Payment/Reconciliation Record | 🟡 PARTIAL | payments in schema.ts:1150-1179 with amount/method/status/invoiceId/eventId | No external transaction ID field; No source field for import tracking; No reconciliation state field; No QuickBooks/Nowsta link IDs |
 | Message Thread | 🟡 PARTIAL | `messageThreads` + `messages` tables in schema.ts; `MessageThread` manifest (`src/sales/message-thread.manifest`) with post/create/linkContact/linkLead/setStatus; Contact + Lead linkage; provider thread/message IDs; sender identity; provider timestamps; raw payload; `MessageInboxPage` at `/clients/inbox` with idempotent `ingestInboundMessage` + one-click `qualifyThreadAsLead` | Connected-inbox delivery layer NOT built — no provider OAuth Integration Connection, no inbound webhook/poller calling ingest; threads populated via operator "Log inbound" only; no outbound delivery worker (queued→sent for non-internal providers) |
 | Message | 🟡 PARTIAL | `messages` table + `Message` manifest (`src/sales/message.manifest`) with `post` create command; thread ID + provider message ID + sender identity + provider timestamp + text/media metadata + raw payload | Outbound delivery worker not added — replies save as `queued` for non-internal providers (internal threads mark `sent`); advancing queued→sent needs a provider sender (delivery layer tracked at §12.5 / Priority 32) |
-| Integration Connection | 🟡 PARTIAL | Integration credentials scattered: qboConnections, googleCalendarConnections | No unified integrationConnections table; No tenant/provider/status schema; No encrypted credentials/reference; No scopes tracking; No last successful sync |
+| Integration Connection | 🟡 PARTIAL | **Corrected 2026-07-26:** there are NO `qboConnections`/`googleCalendarConnections` tables (that claim was stale). Both providers persist encrypted tokens as rows in the generic append-only `manifestEvents` ledger (schema.ts:2890) — see `convex/qboSync.ts`, `convex/googleCalendar.ts` | No unified `integrationConnections` table; no tenant/provider/status schema; no scopes tracking; no last-successful-sync field; connection state must be replayed out of the event ledger per provider |
 
 ---
 
@@ -2373,8 +2379,8 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 - 2026-07-26: imported Venues now materialize as real Venue entities via `convex/importCommit.ts` (so an imported event's venue reference can resolve)
 
 **Gaps:**
-- Imported TPP Events still cannot become rows in `events` — `commitImportRun` supports venues only; events reference external client/venue IDs needing cross-dataset resolution (next slice)
-- Legacy field reconciliation not surfaced in the proposal/event UI
+- ~~Imported TPP Events still cannot become rows in `events`~~ **STALE — corrected 2026-07-26:** all seven datasets (venues, contacts, events, leads, payments, menus, pack lists) now materialize via `convex/importCommit.ts` with cross-dataset client/venue resolution.
+- Legacy field reconciliation not surfaced in the proposal/event UI (an EventDetailPage source-provenance panel shipped 2026-07-26; the **proposal** side is still unsurfaced)
 - Missing menu or venue mappings not surfaced before publication (non-blocking warning, not a guard — per domain-gating-restraint)
 
 **Dependencies:** Migration framework (Slice 2)
@@ -2830,9 +2836,9 @@ The prior note that "`establish` is not a Manifest creation entry" was inaccurat
 
 ---
 
-### ❌ 7.4 Named Dashboards — NOT BUILT (All 7 Confirmed Absent)
+### ✅ 7.4 Named Dashboards — DONE (all 7 verified present in `src/features/reports/` on 2026-07-26: `TimsKPIsDashboardPage`, `CompanyScorecardDashboardPage`, `L10DashboardPage`, `AvgEventValueGrowthDashboardPage`, `CompMasterDashboardPage`, `SalesDashboardPage`, `MangiaDashboardPage`. The "Evidence" block below is STALE and kept only for history.)
 
-**Dashboards (all 7 confirmed absent):**
+**Dashboards (all 7 present):**
 1. Tim's KPIs — Replicate TPP KPIs, record-level reconciliation
 2. Company Scorecard — Metrics, target, actual, trend, owner, status
 3. L10 — Scorecard, rocks/priorities, issues, action items, history
@@ -3249,16 +3255,13 @@ See the top changelog entry for the full fix + honest scope notes.
 
 **Spec requirement:** Inbound DMs follow inquiry-capture spec (§4.4, §6.1), outbound replies linked to source thread, provider message IDs, provider-specific limits/unsupported types as actionable errors
 
-**Current gap:**
-- NO social/DM integration
-- Lead.source is free-text only
-- NO ProviderAccount, MessageThread, Message entities
-- NO webhook ingestion
-- NO thread/message ID tracking
+**Current gap (updated 2026-07-26 — the data model landed; only the provider edge is missing):**
+- NO social/DM provider integration (no Instagram/TikTok/Facebook client, no webhook ingestion, no outbound delivery)
+- NO ProviderAccount / unified `integrationConnections` entity (§12.1)
+- ~~NO MessageThread, Message entities~~ **STALE:** `messages` (schema.ts:1210) + `messageThreads` (schema.ts:1229) exist, with idempotent ingest, thread/message ID tracking, `MessageInboxPage`, and the §4.4 `syncErrors` retry queue (schema.ts:2356)
 
 **Evidence:**
-- NO social media integration files
-- Lead.source free-text only
+- NO social media provider files; ingest exists but has no inbound source wired
 
 **Dependencies:** Social DM inquiry capture (§4.4, §6.1), Integration Connection (§12.1)
 
@@ -3279,16 +3282,16 @@ See the top changelog entry for the full fix + honest scope notes.
 - Self-scheduling reconcile actions with exponential backoff
 - WebhooksSection.tsx:1-345 with UI
 
-**Gaps:**
-- NO generic Integration Connection entity
-- Separate GoogleCalendarConnection and QuickBooksConnection with NO common contract
-- NO durable Sync Run/Job pattern
-- Each integration defines its own connection pattern
+**Gaps (spec §12.1 bullets, checked against code 2026-07-26):**
+- NO generic Integration Connection entity — no `integrationConnections` table; no tenant/provider/status/scopes/lastSuccessfulSync record
+- ~~Separate GoogleCalendarConnection and QuickBooksConnection~~ **STALE:** those tables do not exist. Each provider instead replays its own connection state out of the shared `manifestEvents` ledger, with its own event-type conventions — no common contract either way
+- NO durable Sync Run/Job entity with counts (the §4.4 `syncErrors` table, schema.ts:2356, covers the retryable-error half only)
+- NO transaction-backed outbox for outbound work
+
+**Present:** External Record Link ✅ (`externalRecordLinks`, schema.ts:813), encrypted credentials ✅ (`lib/encryption.ts`), HMAC-signed inbound/outbound webhooks + delivery ledger ✅ (`webhookIntegrations.ts`), exponential retry + self-scheduling reconcile ✅, visible error state ✅ (`syncErrors` + `SyncErrorsPanel`).
 
 **Evidence:**
-- manifestEvents used in all: qboSync.ts:236, googleCalendar.ts:233, smsAlerts.ts:235
-- Separate connection entities exist
-- NO unified IntegrationConnection contract
+- `manifestEvents` used as the connection store in `convex/qboSync.ts` and `convex/googleCalendar.ts`; `grep` for `qboConnection`/`googleCalendarConnection` returns zero hits repo-wide
 
 **Impact:** Each integration rolls own pattern; harder to add new providers
 
@@ -3518,17 +3521,17 @@ The codebase includes several production-grade enhancements not explicitly in th
 | 33 | **Nowsta Integration** | Large | Medium | Integration Contract | Payroll automation; eliminates CSV export |
 | 34 | **Social DMs** | XLarge | Medium | Import Framework, Integration Contract | Inquiry capture; provider-specific |
 
-### Nice-to-Have (Executive dashboards — Slice 3)
+### Nice-to-Have (Executive dashboards — Slice 3) — ✅ ALL DONE (pages verified in `src/features/reports/` 2026-07-26; these rows duplicated Priority 28 and were stale ❌)
 
-| Priority | Item | Effort | Impact | Dependencies | Why |
-|----------|------|--------|--------|--------------|-----|
-| 35 | **Tim's KPIs Dashboard** | Large | High | Render Engine, Revenue Attribution | Leadership visibility; TPP parity; record-level reconciliation |
-| 36 | **Sales Dashboard** | Medium | High | Render Engine, Revenue Attribution | Pipeline visibility; conversion tracking; 3% compensation basis |
-| 37 | **Company Scorecard** | Medium | High | Render Engine | Executive metrics; targets vs actual; trend tracking |
-| 38 | **Avg Event Value Growth** | Medium | Medium | Render Engine, ServiceStyle | Sales analytics; trend analysis; driver identification |
-| 39 | **Comp Master Dashboard** | Medium | Medium | Render Engine | Compensation tracking; deliverables status |
-| 40 | **L10 Dashboard** | Medium | Medium | Render Engine | Meeting management; rocks/issues tracking |
-| 41 | **Mangia Dashboard Round 4** | Large | Medium | Render Engine | Operational metrics; visual hierarchy |
+| Priority | Item | Effort | Impact | Dependencies | Why | Status |
+|----------|------|--------|--------|--------------|-----|--------|
+| ~~35~~ | **Tim's KPIs Dashboard** | Large | High | Render Engine, Revenue Attribution | Leadership visibility; TPP parity; record-level reconciliation | ✅ `TimsKPIsDashboardPage.tsx` |
+| ~~36~~ | **Sales Dashboard** | Medium | High | Render Engine, Revenue Attribution | Pipeline visibility; conversion tracking; 3% compensation basis | ✅ `SalesDashboardPage.tsx` |
+| ~~37~~ | **Company Scorecard** | Medium | High | Render Engine | Executive metrics; targets vs actual; trend tracking | ✅ `CompanyScorecardDashboardPage.tsx` |
+| ~~38~~ | **Avg Event Value Growth** | Medium | Medium | Render Engine, ServiceStyle | Sales analytics; trend analysis; driver identification | ✅ `AvgEventValueGrowthDashboardPage.tsx` |
+| ~~39~~ | **Comp Master Dashboard** | Medium | Medium | Render Engine | Compensation tracking; deliverables status | ✅ `CompMasterDashboardPage.tsx` |
+| ~~40~~ | **L10 Dashboard** | Medium | Medium | Render Engine | Meeting management; rocks/issues tracking | ✅ `L10DashboardPage.tsx` |
+| ~~41~~ | **Mangia Dashboard Round 4** | Large | Medium | Render Engine | Operational metrics; visual hierarchy | ✅ `MangiaDashboardPage.tsx` |
 
 ---
 

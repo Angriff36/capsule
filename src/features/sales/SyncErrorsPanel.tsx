@@ -19,6 +19,12 @@ const KIND_LABEL: Record<string, string> = {
   unknown: "Unknown",
 };
 
+// Retry replays the verbatim stored payload, so it can only help when the
+// failure was transient (parse_failed/unknown). A missing_field failure replays
+// the same bad input and deterministically fails again — hide Retry for those
+// rather than offer a button that can never succeed (anti-tedium).
+const RETRYABLE_KINDS = new Set(["parse_failed", "unknown"]);
+
 /**
  * Retryable sync-error queue (spec §4.4 "Failed parsing appears in a retryable
  * sync-error queue" + the integrations "error visibility" done-when). Surfaces
@@ -131,14 +137,16 @@ export function SyncErrorsPanel() {
                 </details>
               ) : null}
               <div className="mt-2 flex gap-2">
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={() => void retry(e)}
-                  disabled={isBusy}
-                >
-                  {isBusy ? "Working…" : "Retry"}
-                </button>
+                {RETRYABLE_KINDS.has(e.kind) ? (
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={() => void retry(e)}
+                    disabled={isBusy}
+                  >
+                    {isBusy ? "Working…" : "Retry"}
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   className="btn"
