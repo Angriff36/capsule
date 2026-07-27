@@ -22,6 +22,7 @@ import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
+import { DishContainersPanel } from "./DishContainersPanel";
 import { DishPrepTasksPanel } from "./DishPrepTasksPanel";
 import { DishPrimaryImageUploader } from "../attachments/DishPrimaryImageUploader";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -275,6 +276,8 @@ export function DishDetailPage() {
       </section>
 
       <DishPrepTasksPanel dishId={dish._id} />
+
+      <DishContainersPanel dishId={dish._id} />
 
       <section className="culinary-section">
         <div className="culinary-section-heading">

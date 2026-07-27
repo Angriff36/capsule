@@ -204,6 +204,21 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Bridge for the container -> pack list chain. fanOut walks one level, but the
+  // path is PackList -> EventDish -> DishContainer, so this re-emits the pack
+  // list id alongside this row's dish and servings for the second fanOut.
+  command requestContainerPack(packListId: uuid) {
+    guard self.deletedAt == null
+    emit EventDishContainerPackRequested {
+      eventDishId: self.id
+      tenantId: self.tenantId
+      eventId: self.eventId
+      dishId: self.dishId
+      packListId: packListId
+      quantityServings: self.quantityServings
+    }
+  }
+
   command remove(reason: string) {
     guard self.addedAt != null
     guard self.deletedAt == null
@@ -224,6 +239,15 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   }
 
   store EventDish in durable
+}
+
+event EventDishContainerPackRequested: "event_dish.container_pack_requested" {
+  eventDishId: string
+  tenantId: string
+  eventId: string
+  dishId: string
+  packListId: string
+  quantityServings: number
 }
 
 event EventDishAdded: "event_dish.added" {

@@ -23,6 +23,7 @@ describe("governed creation mappings", () => {
       "CorrectiveAction_createViaOpen",
       "CreditMemo_createViaIssue",
       "Delivery_createViaSchedule",
+      "DishContainer_createViaDefine",
       "DishRecipe_createViaAttach",
       "DishTask_createViaAdd",
       "Dish_createViaIntroduce",

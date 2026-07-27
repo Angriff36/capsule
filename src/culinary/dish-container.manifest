@@ -1,0 +1,217 @@
+// DishContainer — what a dish physically ships in, and how it is handled.
+//
+// Closes two gaps the pack-list track could not express:
+//   * a PackList opened by EventApproved was always EMPTY — nothing connected a
+//     dish to the pans, cambros and boxes it travels in, so the day-of pack
+//     sheet had to be typed by hand every event;
+//   * "cooked on site / cooked at the kitchen / brought hot" lived only in
+//     DishTask.category, an unconstrained string, so it could not be relied on
+//     to sort a pack list or a prep list.
+//
+// One row per container a dish needs. The pack-list reaction below fans these
+// out onto the event's PackList so the sheet builds itself.
+
+use "../foundation/base.manifest"
+
+// How the dish reaches the guest. Drives both packing and prep: a cooked_on_site
+// dish travels as raw components plus equipment, brought_hot travels in
+// insulated carriers, cooked_at_kitchen travels chilled for reheat.
+enum DishServiceMethod {
+  cooked_on_site
+  cooked_at_kitchen
+  brought_hot
+  cold_service
+}
+
+enum DishContainerStatus {
+  active
+  retired
+}
+
+entity DishContainer mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required dishId: uuid
+  property required searchable name: string = ""
+  property required serviceMethod: DishServiceMethod = "cooked_at_kitchen"
+  // How many guest servings one of these containers holds. The pack reaction
+  // divides the event's servings by this to get the count to pack.
+  property required servingsPerContainer: int = 1
+  // Extra containers always sent regardless of headcount (serving utensils,
+  // a spare pan). Added on top of the computed count.
+  property required baseQuantity: int = 0
+  property required unit: UnitOfMeasure = "each"
+  // Equipment needed to serve/cook this dish on site — chafers, induction
+  // burners, a carving station. Free text so an operator is never blocked
+  // waiting for an Equipment record to exist.
+  property equipmentNotes: string?
+  property handlingNotes: string?
+  property sortOrder: int = 0
+  property required status: DishContainerStatus = "active"
+  property addedAt: datetime?
+  property retiredAt: datetime?
+
+  belongsTo dish: Dish fields [tenantId, dishId] references [tenantId, id]
+
+  constraint dishContainerName: self.addedAt == null or length(trim(self.name)) > 0 "Container name is required"
+  constraint dishContainerServings: self.servingsPerContainer >= 1 "Servings per container must be at least 1"
+  constraint dishContainerBase: self.baseQuantity >= 0 "Base quantity cannot be negative"
+  constraint dishContainerSort: self.sortOrder >= 0 "Sort order cannot be negative"
+
+  transition status from "active" to ["retired"]
+  transition status from "retired" to ["active"]
+
+  default policy dishContainerRead read: roleAllows(user.role, "kitchenAccess") "Kitchen staff may read dish containers"
+  default policy dishContainerWrite write: roleAllows(user.role, "kitchenAccess") "Kitchen staff may write dish containers through commands"
+  default policy dishContainerExecute execute: roleAllows(user.role, "kitchenAccess") "Kitchen staff may execute dish container commands"
+
+  command define(
+    dishId: uuid,
+    name: string,
+    serviceMethod: DishServiceMethod,
+    servingsPerContainer: int,
+    optional baseQuantity: int,
+    optional unit: UnitOfMeasure,
+    optional equipmentNotes: string,
+    optional handlingNotes: string,
+    optional sortOrder: int
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    constraint defineContainerName: length(trim(name)) > 0 "Container name is required"
+    constraint defineContainerServings: servingsPerContainer >= 1 "Servings per container must be at least 1"
+    mutate dishId = dishId
+    mutate name = name
+    mutate serviceMethod = serviceMethod
+    mutate servingsPerContainer = servingsPerContainer
+    mutate baseQuantity = baseQuantity != null ? baseQuantity : 0
+    mutate unit = unit != null ? unit : "each"
+    mutate equipmentNotes = equipmentNotes
+    mutate handlingNotes = handlingNotes
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate addedAt = now()
+    emit DishContainerDefined {
+      dishContainerId: self.id
+      tenantId: self.tenantId
+      dishId: dishId
+      name: name
+      serviceMethod: serviceMethod
+    }
+  }
+
+  command revise(
+    name: string,
+    serviceMethod: DishServiceMethod,
+    servingsPerContainer: int,
+    optional baseQuantity: int,
+    optional unit: UnitOfMeasure,
+    optional equipmentNotes: string,
+    optional handlingNotes: string,
+    optional sortOrder: int
+  ) {
+    guard self.addedAt != null
+    guard self.deletedAt == null
+    constraint reviseContainerName: length(trim(name)) > 0 "Container name is required"
+    constraint reviseContainerServings: servingsPerContainer >= 1 "Servings per container must be at least 1"
+    mutate name = name
+    mutate serviceMethod = serviceMethod
+    mutate servingsPerContainer = servingsPerContainer
+    mutate baseQuantity = baseQuantity != null ? baseQuantity : 0
+    mutate unit = unit != null ? unit : "each"
+    mutate equipmentNotes = equipmentNotes
+    mutate handlingNotes = handlingNotes
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    emit DishContainerRevised {
+      dishContainerId: self.id
+      tenantId: self.tenantId
+      dishId: self.dishId
+      name: name
+      serviceMethod: serviceMethod
+    }
+  }
+
+  command retire(reason: string = "") {
+    guard self.status == "active"
+    guard self.deletedAt == null
+    mutate status = "retired"
+    mutate retiredAt = now()
+    emit DishContainerRetired {
+      dishContainerId: self.id
+      tenantId: self.tenantId
+      dishId: self.dishId
+    }
+  }
+
+  command reinstate() {
+    guard self.status == "retired"
+    guard self.deletedAt == null
+    mutate status = "active"
+    mutate retiredAt = null
+    emit DishContainerReinstated {
+      dishContainerId: self.id
+      tenantId: self.tenantId
+      dishId: self.dishId
+    }
+  }
+
+  store DishContainer in durable
+}
+
+event DishContainerDefined: "dish_container.defined" {
+  dishContainerId: string
+  tenantId: string
+  dishId: string
+  name: string
+  serviceMethod: string
+}
+
+event DishContainerRevised: "dish_container.revised" {
+  dishContainerId: string
+  tenantId: string
+  dishId: string
+  name: string
+  serviceMethod: string
+}
+
+event DishContainerRetired: "dish_container.retired" {
+  dishContainerId: string
+  tenantId: string
+  dishId: string
+}
+
+event DishContainerReinstated: "dish_container.reinstated" {
+  dishContainerId: string
+  tenantId: string
+  dishId: string
+}
+
+// ---------------------------------------------------------------------------
+// Pack-list cascade — the day-of pack sheet builds itself.
+//
+// EventApproved already opens a PackList (pack-list.manifest). Until now that
+// list opened EMPTY. These two reactions walk PackList -> EventDish ->
+// DishContainer and list one line per container the event actually needs.
+// fanOut resolves a single level, so the first hop re-emits the pack list id
+// alongside each dish (EventDish.requestContainerPack) for the second hop.
+// ---------------------------------------------------------------------------
+
+on PackListOpened fanOut EventDish where eventId = payload.eventId
+  run EventDish.requestContainerPack
+  params {
+    packListId: payload.packListId
+  }
+
+on EventDishContainerPackRequested fanOut DishContainer where dishId = payload.dishId
+  run PackListItem.addItem
+  match packListId = payload.packListId, dishContainerId = self.id
+  else create
+  params {
+    packListId: payload.packListId
+    dishContainerId: self.id
+    description: self.name
+    requiredQuantity: ceil(payload.quantityServings / self.servingsPerContainer) + self.baseQuantity
+    unit: self.unit
+    dishId: payload.dishId
+  }

@@ -2,6 +2,7 @@
 use "./admin/announcement.manifest"
 use "./admin/capability-setting.manifest"
 use "./admin/cutover-decision.manifest"
+use "./culinary/dish-container.manifest"
 use "./culinary/dish.manifest"
 use "./culinary/event-dish.manifest"
 use "./culinary/ingredient.manifest"

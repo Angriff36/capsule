@@ -205,6 +205,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
   property required packListId: uuid
   property required description: string = ""
   property dishId: uuid?
+  // Set when the line was generated from a DishContainer, so re-opening or
+  // re-running the pack cascade updates the same line instead of duplicating.
+  property dishContainerId: uuid?
   property productionBatchId: uuid?
   property required requiredQuantity: decimal(12, 4) = 0
   property required packedQuantity: decimal(12, 4) = 0
