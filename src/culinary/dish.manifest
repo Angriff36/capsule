@@ -366,6 +366,11 @@ entity DishTask mixin TenantScoped, SoftDeletable {
   versionProperty version: number
 
   property required dishId: uuid
+  // Conditional-cascade key: mirrors dishId while this step is active, null once
+  // retired. EventDishAdded fans out on THIS field so a retired step stops
+  // generating prep tasks — fanOut takes a single predicate, so the filter has
+  // to live in the key. Same trick as IngredientDemand.purchaseEligibleEventId.
+  property indexed activeDishId: uuid?
   property required searchable name: string = ""
   property required category: string = "finish_at_event"
   property required taskType: string = "manual"
@@ -415,6 +420,7 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     constraint addQuantityPositive: defaultQuantity == null or defaultQuantity > 0 "Dish task quantity must be positive"
     constraint addSortNonnegative: sortOrder == null or sortOrder >= 0 "Dish task sort order cannot be negative"
     mutate dishId = dishId
+    mutate activeDishId = dishId
     mutate name = name
     mutate category = category != null ? category : "finish_at_event"
     mutate taskType = taskType != null ? taskType : "manual"
@@ -483,12 +489,21 @@ entity DishTask mixin TenantScoped, SoftDeletable {
     mutate retiredAt = now()
     mutate retirementReason = reason
     mutate status = "retired"
+    mutate activeDishId = null
     emit DishTaskRetired {
       dishTaskId: self.id
       tenantId: self.tenantId
       dishId: self.dishId
       reason: reason
     }
+  }
+
+  // Compat for templates added before activeDishId existed. Soft mutate — no
+  // guards that can fail, so it can never roll back the EventDishAdded that
+  // triggers it. Wired as a fanOut ahead of PrepTask generation.
+  command backfillActiveKey() {
+    guard self.deletedAt == null
+    mutate activeDishId = (self.status == "active" and self.activeDishId == null) ? self.dishId : self.activeDishId
   }
 
   store DishTask in durable

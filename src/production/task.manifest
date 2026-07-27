@@ -638,3 +638,40 @@ on EventCancelled fanOut PrepTask where eventId = payload.eventId
 on EventDishRemoved fanOut PrepTask where eventDishId = payload.eventDishId
   run cancel
   params { reason: payload.reason }
+
+// ---------------------------------------------------------------------------
+// Adding a dish to an event builds its prep list.
+//
+// DishTask is the per-dish template ("brine the birds", "portion dressing").
+// Until now those were instantiated CLIENT-side, so the prep list only existed
+// once somebody opened the prep page. These two reactions make it server-side:
+// the tasks are there the moment the dish is on the event.
+// ---------------------------------------------------------------------------
+
+// Compat first — repair activeDishId on templates that predate the field, in
+// the same transaction, so legacy dishes still generate.
+on EventDishAdded fanOut DishTask where dishId = payload.dishId
+  run DishTask.backfillActiveKey
+
+// One PrepTask per active template. match on (eventDishId, dishTaskId) makes a
+// replayed EventDishAdded update the existing line instead of duplicating it.
+on EventDishAdded fanOut DishTask where activeDishId = payload.dishId
+  run PrepTask.open
+  match eventDishId = payload.eventDishId, dishTaskId = self.id
+  else create
+  params {
+    eventDishId: payload.eventDishId
+    eventId: payload.eventId
+    name: self.name
+    // Templates may leave quantity blank; fall back to the event's servings so
+    // open's "quantity must be positive" constraint cannot fail the whole add.
+    quantity: self.defaultQuantity != null and self.defaultQuantity > 0 ? self.defaultQuantity : (payload.quantityServings > 0 ? payload.quantityServings : 1)
+    unit: self.defaultUnit != null ? self.defaultUnit : "each"
+    dishTaskId: self.id
+    dishId: payload.dishId
+    category: self.category
+    taskType: self.taskType
+    recipeId: self.recipeId
+    ingredientId: self.ingredientId
+    specialInstructions: self.instructions
+  }
