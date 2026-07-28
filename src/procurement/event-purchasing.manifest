@@ -28,11 +28,11 @@ entity WeeklyPurchasingConfig mixin TenantScoped, SoftDeletable {
   default policy weeklyPurchasingConfigExecute execute: roleAllows(user.role, "procurementAccess") or roleAllows(user.role, "manageAccess") "Procurement and managers may execute weekly purchasing config"
 
   command configure(defaultVendorId: uuid) {
-    guard self.configuredAt == null
+    // Reconfigure is allowed so the default vendor stays correctable.
     guard self.deletedAt == null
     guard self.defaultVendor != null and self.defaultVendor.status == "active"
     mutate defaultVendorId = defaultVendorId
-    mutate configuredAt = now()
+    mutate configuredAt = self.configuredAt != null ? self.configuredAt : now()
   }
 
   // Manager control on buyer spend — setting it is manage-gated so buyers

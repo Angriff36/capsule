@@ -246,7 +246,13 @@ export function PurchasingPage() {
   // WeeklyPurchasingConfig.configure command had no UI caller at all.
   const editDefaultVendor = () => {
     void (async () => {
-      if (activeVendors.length === 0) {
+      const vendorOptions = activeVendors
+        .filter((vendor) => String(vendor.status) === "active")
+        .map((vendor) => ({
+          value: vendor._id,
+          label: String(vendor.name ?? vendor._id),
+        }));
+      if (vendorOptions.length === 0) {
         setFailure(
           new Error("Onboard a vendor first — the default routes to one."),
         );
@@ -262,12 +268,7 @@ export function PurchasingPage() {
             label: "Vendor",
             required: true,
             defaultValue: defaultVendorId ?? undefined,
-            options: activeVendors
-              .filter((vendor) => String(vendor.status) === "active")
-              .map((vendor) => ({
-                value: vendor._id,
-                label: String(vendor.name ?? vendor._id),
-              })),
+            options: vendorOptions,
           },
         ],
         confirmLabel: "Set default vendor",

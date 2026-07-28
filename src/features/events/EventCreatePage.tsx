@@ -275,6 +275,7 @@ export function EventCreatePage() {
                   name="eventType"
                   className="input"
                   placeholder="Wedding, corporate lunch, holiday dinner…"
+                  defaultValue={template?.eventType ?? undefined}
                   required
                 />
                 <FieldError

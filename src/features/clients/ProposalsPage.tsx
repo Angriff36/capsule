@@ -554,8 +554,15 @@ export function ProposalsPage() {
           return;
         }
 
+        if (proposalRevisions === undefined) {
+          setFailure(
+            new Error("Still loading revisions — try again in a second."),
+          );
+          return;
+        }
+
         // Find or use latest revision
-        const latestRevision = (proposalRevisions ?? [])
+        const latestRevision = proposalRevisions
           .filter((r) => r.proposalId === row._id && r.deletedAt == null)
           .sort((a, b) => b.revisionNumber - a.revisionNumber)[0];
 
@@ -566,7 +573,7 @@ export function ProposalsPage() {
         if (!proposalRevisionId) {
           setFailure(
             new Error(
-              "No revision snapshot exists for this proposal — re-send it, then request the signature.",
+              "This proposal has no revision snapshot (sent before snapshots existed). Create a share link or accept it manually; signature requests need a snapshot.",
             ),
           );
           return;
