@@ -1,11 +1,4 @@
-import {
-  Fragment,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type FormEvent,
-} from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useMutation } from "convex/react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
@@ -28,12 +21,11 @@ import {
 } from "../../lib/manifest-convex-react";
 import { api, type Id } from "../../lib/api";
 import { useActionPrompt } from "../../ui/action-prompt";
-import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatMoneyExact } from "../../lib/format";
 import { clientDisplayName } from "../events/clientName";
 import { eventCreatePath } from "../events/eventRoutes";
 import { useTenantBranding } from "../admin/tenantBranding";
-import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { CrmLifecyclePolicy } from "./CrmLifecyclePolicy";
@@ -43,16 +35,11 @@ import {
   transformVenueLogistics,
   type ProposalPdfRecord,
 } from "./proposalPdf";
+import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
-import { useCatalogDishes } from "./useCatalogDishes";
-import {
-  computeProposalPricing,
-  PRICING_BASES,
-  PRICING_BASIS_LABELS,
-  type PricingBasis,
-} from "../../lib/pricing";
+import { type PricingBasis } from "../../lib/pricing";
 
 // Event stages the acceptance cascade can feed dishes into (matches the
 // EventDish.confirmFromProposal stage guard).
@@ -69,48 +56,7 @@ const MENU_EDITABLE_STATUSES = ["draft", "sent", "viewed"];
 const policy = new CrmLifecyclePolicy();
 
 // Proposal money math lives in the shared pricing engine (src/lib/pricing.ts).
-
-// In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
-// as strings for clean editing; parsed for the central calc on submit/preview.
-// `menuDishId` links the line to a catalog MenuDish (spec §5.4 L276); when the
-// price diverges from that dish's sellingPrice, `overrideReason` is required.
-type DraftLine = {
-  key: string;
-  description: string;
-  pricingBasis: PricingBasis;
-  unitPrice: string;
-  quantity: string;
-  unit: string;
-  menuDishId: string;
-  overrideReason: string;
-};
-
-const dateValue = (value: FormDataEntryValue | null, endOfDay = false) => {
-  const raw = String(value ?? "").trim();
-  if (!raw) return undefined;
-  const timestamp = new Date(
-    `${raw}T${endOfDay ? "23:59:59.999" : "12:00:00.000"}`,
-  ).getTime();
-  return Number.isNaN(timestamp) ? undefined : timestamp;
-};
-
-const defaultValidityDate = () => {
-  const date = new Date();
-  date.setDate(date.getDate() + 14);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
-
-const dateInputFromEpoch = (ms: number | null | undefined) => {
-  if (ms == null || !Number.isFinite(ms)) return undefined;
-  const date = new Date(ms);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-};
+// The draft form (state, pricing preview, submit) lives in ProposalCreateForm.
 
 export function ProposalsPage() {
   const { branding } = useTenantBranding();
@@ -124,11 +70,6 @@ export function ProposalsPage() {
   const proposalLineItems = useListProposalLineItem();
   const proposalDishSelections = useListProposalDishSelection();
   const proposalRevisions = useListProposalRevision();
-  // Published-catalog dishes a pricing line can be priced from (spec §5.4 L276).
-  const catalog = useCatalogDishes();
-  const draftProposalWithLines = useMutation(
-    api.lib.proposalDraft.draftProposalWithLines,
-  );
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
   // a thin authored action wraps the generated Proposal_send + best-effort
   // capture, so a sent proposal always has a reproducible revision record.
@@ -152,7 +93,6 @@ export function ProposalsPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
-  const draftForm = useFormDraft("proposal");
 
   const activeClients = (clients ?? []).filter(
     (row) =>
@@ -184,7 +124,7 @@ export function ProposalsPage() {
       setNotice(`Share link: ${url}`);
     }
   };
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const fromEventId = searchParams.get("event");
   const fromEvent =
     fromEventId && events
@@ -192,97 +132,14 @@ export function ProposalsPage() {
           (row) => row._id === fromEventId && row.deletedAt == null,
         )
       : undefined;
-  const hasClientSource = Boolean(fromEvent) || activeClients.length > 0;
-  const prefill = fromEvent
-    ? {
-        title: fromEvent.title ?? "",
-        guestCount: Number(fromEvent.expectedHeadcount ?? 0),
-        eventType: fromEvent.eventType ?? "",
-        eventDate: dateInputFromEpoch(fromEvent.startsAt),
-        venueName: fromEvent.venueName ?? "",
-        venueAddress: fromEvent.venueAddress ?? "",
-      }
-    : null;
 
   const [pricingOpenFor, setPricingOpenFor] = useState<string | null>(null);
-  const lineSeqRef = useRef(0);
-  const newDraftLine = (): DraftLine => ({
-    key: `line-${lineSeqRef.current++}`,
-    description: "",
-    pricingBasis: "flat",
-    unitPrice: "",
-    quantity: "1",
-    unit: "",
-    menuDishId: "",
-    overrideReason: "",
-  });
-  const [draftLines, setDraftLines] = useState<DraftLine[]>([]);
-  const [draftGuestCount, setDraftGuestCount] = useState<number>(0);
-  const [draftTax, setDraftTax] = useState<number>(0);
-  const [draftDiscount, setDraftDiscount] = useState<number>(0);
-
-  // Live pricing preview via the ONE central calc (spec §5.4): lines → totals.
-  const draftPricing = useMemo(
-    () =>
-      computeProposalPricing({
-        lines: draftLines.map((l) => ({
-          pricingBasis: l.pricingBasis,
-          unitPrice: Number(l.unitPrice) || 0,
-          quantity: Number(l.quantity) || 0,
-        })),
-        guestCount: draftGuestCount,
-        discountAmount: draftDiscount,
-        taxAmount: draftTax,
-      }),
-    [draftLines, draftGuestCount, draftTax, draftDiscount],
-  );
-
-  const updateLine = (key: string, field: keyof DraftLine, value: string) =>
-    setDraftLines((lines) =>
-      lines.map((l) =>
-        l.key === key ? ({ ...l, [field]: value } as DraftLine) : l,
-      ),
-    );
-  const removeLine = (key: string) =>
-    setDraftLines((lines) => lines.filter((l) => l.key !== key));
-  const addLine = () => setDraftLines((lines) => [...lines, newDraftLine()]);
-
-  // Link (or unlink) a draft line to a catalog dish (spec §5.4 L276). Picking a
-  // dish autofills its name + sellingPrice; tweaking unitPrice away from that
-  // price is an override that requires a reason before the proposal can be sent.
-  const pickDish = (key: string, menuDishId: string) =>
-    setDraftLines((lines) =>
-      lines.map((l) => {
-        if (l.key !== key) return l;
-        if (!menuDishId) return { ...l, menuDishId: "", overrideReason: "" };
-        const dish = catalog.lines.find((c) => c.menuDishId === menuDishId);
-        if (!dish) return { ...l, menuDishId };
-        return {
-          ...l,
-          menuDishId,
-          description: dish.name,
-          unitPrice:
-            dish.sellingPrice == null ? l.unitPrice : String(dish.sellingPrice),
-          overrideReason: "",
-        };
-      }),
-    );
-  const isOverride = (line: DraftLine) => {
-    if (!line.menuDishId) return false;
-    const dish = catalog.lines.find((c) => c.menuDishId === line.menuDishId);
-    if (!dish || dish.sellingPrice == null) return false;
-    return (
-      Math.round((Number(line.unitPrice) + Number.EPSILON) * 100) / 100 !==
-      dish.sellingPrice
-    );
-  };
 
   useEffect(() => {
     // "Create proposal" on an event navigates here with ?event=<id>; open the
     // draft form prefilled from that event (spec §5.3 create-proposal-from-event).
     if (fromEvent) {
       setShowDraft(true);
-      setDraftGuestCount(Number(fromEvent.expectedHeadcount ?? 0));
     }
   }, [fromEvent?._id]);
 
@@ -305,102 +162,6 @@ export function ProposalsPage() {
     } finally {
       setBusy(null);
     }
-  };
-
-  const submitDraft = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const form = event.currentTarget;
-    const data = new FormData(form);
-    const clientId = String(data.get("clientId") || "").trim();
-    const title = String(data.get("title") || "").trim();
-    if (!clientId || !title) {
-      setFailure(new Error("Client and title are required."));
-      return;
-    }
-    // Central calc (spec §5.4) derives the four stored totals from the priced
-    // lines. A row with a price/quantity but no description would otherwise be
-    // silently dropped here while the live preview counted it — validate instead
-    // so preview and submit agree.
-    const populatedLines = draftLines.filter(
-      (line) =>
-        line.description.trim().length > 0 ||
-        line.unitPrice.trim().length > 0 ||
-        line.quantity.trim().length > 0,
-    );
-    const lineMissingDescription = populatedLines.find(
-      (line) => line.description.trim().length === 0,
-    );
-    if (lineMissingDescription) {
-      setFailure(new Error("Every pricing line needs a description."));
-      return;
-    }
-    const validLines = populatedLines;
-    const pricing = computeProposalPricing({
-      lines: validLines.map((line) => ({
-        pricingBasis: line.pricingBasis,
-        unitPrice: Number(line.unitPrice) || 0,
-        quantity: Number(line.quantity) || 0,
-      })),
-      guestCount: draftGuestCount,
-      discountAmount: draftDiscount,
-      taxAmount: draftTax,
-    });
-    if (pricing.total < 0) {
-      setFailure(new Error("Total cannot be negative."));
-      return;
-    }
-    void run("draft-proposal", async () => {
-      const eventIdRaw = String(data.get("eventId") || "").trim();
-      // Create the proposal AND all its priced lines in one atomic server
-      // transaction (convex/lib/proposalPricing.ts draftProposalWithLines): the
-      // central calc derives authoritative totals + every line amount there, so
-      // an interruption can never leave stored totals for lines not persisted.
-      await draftProposalWithLines({
-        clientId: clientId as Id<"clients">,
-        title,
-        guestCount: draftGuestCount,
-        subtotal: pricing.subtotal,
-        taxAmount: pricing.taxAmount,
-        discountAmount: pricing.discountAmount,
-        total: pricing.total,
-        eventDate: dateValue(data.get("eventDate")),
-        eventType: String(data.get("eventType") || "").trim() || undefined,
-        venueName: String(data.get("venueName") || "").trim() || undefined,
-        venueAddress:
-          String(data.get("venueAddress") || "").trim() || undefined,
-        expiresAt: dateValue(data.get("expiresAt"), true),
-        notes: String(data.get("notes") || "").trim() || undefined,
-        terms: String(data.get("terms") || "").trim() || undefined,
-        eventId: eventIdRaw ? (eventIdRaw as Id<"events">) : undefined,
-        lines: validLines.map((line, i) => ({
-          description: line.description.trim(),
-          pricingBasis: pricing.lines[i].pricingBasis,
-          unitPrice: pricing.lines[i].unitPrice,
-          quantity: pricing.lines[i].quantity ?? undefined,
-          unit: line.unit.trim() || undefined,
-          menuDishId: line.menuDishId
-            ? (line.menuDishId as Id<"menuDishes">)
-            : undefined,
-          overrideReason: line.overrideReason.trim() || undefined,
-        })),
-      });
-      form.reset();
-      draftForm.clear();
-      setDraftLines([]);
-      setDraftTax(0);
-      setDraftDiscount(0);
-      setShowDraft(false);
-      if (fromEventId) {
-        const nextParams = new URLSearchParams(searchParams);
-        nextParams.delete("event");
-        setSearchParams(nextParams, { replace: true });
-      }
-      setNotice(
-        fromEventId
-          ? "Proposal drafted and linked to the event. Send it when ready for the client."
-          : "Proposal drafted. Send it when ready for the client.",
-      );
-    });
   };
 
   const invoke = (
@@ -664,7 +425,7 @@ export function ProposalsPage() {
             type="button"
             onClick={() => setShowDraft((value) => !value)}
           >
-            {showDraft ? "Close form" : "Draft proposal"}
+            {showDraft ? "Close form" : "New proposal"}
           </button>
         </div>
       </header>
@@ -677,374 +438,17 @@ export function ProposalsPage() {
       ) : null}
       {host}
 
-      {showDraft ? (
-        <form
-          key={fromEvent?._id ?? "new-proposal"}
-          className="supply-form"
-          onSubmit={submitDraft}
-          ref={draftForm.formRef}
-        >
-          <div className="supply-form-heading">
-            <div>
-              <p className="eyebrow">Draft</p>
-              <h2>{fromEvent ? "Proposal from event" : "New proposal"}</h2>
-              {fromEvent ? (
-                <p className="text-[13px] text-ink-2">
-                  Linked to "{fromEvent.title}". Client is locked to that
-                  event's client; the proposal belongs to this event (spec
-                  §5.3).
-                </p>
-              ) : null}
-            </div>
-          </div>
-          <DraftRestoreBanner
-            draft={draftForm.draft}
-            onRestore={draftForm.restore}
-            onDiscard={draftForm.discard}
-          />
-          {!hasClientSource ? (
-            <p className="text-[13px] text-ink-2">
-              No active clients.{" "}
-              <Link className="text-link" to={CLIENTS_ROUTES.root}>
-                Register a client
-              </Link>{" "}
-              first.
-            </p>
-          ) : (
-            <>
-              {fromEvent ? (
-                <label>
-                  Client
-                  <input
-                    type="hidden"
-                    name="clientId"
-                    value={fromEvent.clientId}
-                  />
-                  <input type="hidden" name="eventId" value={fromEvent._id} />
-                  <input
-                    value={`${clientDisplayName(
-                      fromEvent.clientId,
-                      clients,
-                    )} — from event "${fromEvent.title}"`}
-                    disabled
-                    readOnly
-                  />
-                </label>
-              ) : (
-                <label>
-                  Client
-                  <select name="clientId" required defaultValue="">
-                    <option value="" disabled>
-                      Select client
-                    </option>
-                    {activeClients.map((row) => (
-                      <option key={row._id} value={row._id}>
-                        {clientDisplayName(row._id, clients)}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              )}
-              <label>
-                Title
-                <input
-                  name="title"
-                  required
-                  defaultValue={prefill?.title ?? ""}
-                />
-              </label>
-              <label>
-                Guest count
-                <input
-                  name="guestCount"
-                  type="number"
-                  min={0}
-                  value={draftGuestCount}
-                  onChange={(e) =>
-                    setDraftGuestCount(Number(e.target.value) || 0)
-                  }
-                />
-              </label>
-              <label>
-                Event type
-                <input
-                  name="eventType"
-                  defaultValue={prefill?.eventType ?? ""}
-                />
-              </label>
-              <label>
-                Event date
-                <input
-                  name="eventDate"
-                  type="date"
-                  defaultValue={prefill?.eventDate}
-                />
-              </label>
-              <label>
-                Venue name
-                <input
-                  name="venueName"
-                  defaultValue={prefill?.venueName ?? ""}
-                />
-              </label>
-              <label>
-                Venue address
-                <input
-                  name="venueAddress"
-                  defaultValue={prefill?.venueAddress ?? ""}
-                />
-              </label>
-              <div className="mt-1">
-                <p className="eyebrow">Pricing lines (spec §5.4)</p>
-                <p className="text-[12px] text-ink-2">
-                  Per person / per unit / flat / percentage / package. Subtotal
-                  and total are computed by the shared pricing engine.
-                </p>
-                {draftLines.length === 0 ? (
-                  <p className="mt-2 text-[13px] text-ink-2">
-                    No pricing lines yet — add one to price the proposal.
-                  </p>
-                ) : (
-                  <table className="data-table mt-2">
-                    <thead>
-                      <tr>
-                        <th>Description</th>
-                        <th>Basis</th>
-                        <th>Catalog dish</th>
-                        <th>Price / %</th>
-                        <th>Qty</th>
-                        <th>Unit</th>
-                        <th>Amount</th>
-                        <th aria-label="Remove line" />
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {draftLines.map((line, index) => (
-                        <Fragment key={line.key}>
-                          <tr>
-                            <td>
-                              <input
-                                className="input"
-                                value={line.description}
-                                onChange={(e) =>
-                                  updateLine(
-                                    line.key,
-                                    "description",
-                                    e.target.value,
-                                  )
-                                }
-                                placeholder="Line description"
-                              />
-                            </td>
-                            <td>
-                              <select
-                                className="input"
-                                value={line.pricingBasis}
-                                onChange={(e) =>
-                                  updateLine(
-                                    line.key,
-                                    "pricingBasis",
-                                    e.target.value,
-                                  )
-                                }
-                              >
-                                {PRICING_BASES.map((basis) => (
-                                  <option key={basis} value={basis}>
-                                    {PRICING_BASIS_LABELS[basis]}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-                            <td>
-                              <select
-                                className="input"
-                                value={line.menuDishId}
-                                onChange={(e) =>
-                                  pickDish(line.key, e.target.value)
-                                }
-                                disabled={catalog.loading}
-                                aria-label="Link line to a catalog dish"
-                              >
-                                <option value="">— custom line —</option>
-                                {catalog.lines.map((dish) => (
-                                  <option
-                                    key={dish.menuDishId}
-                                    value={dish.menuDishId}
-                                  >
-                                    {dish.name}
-                                    {dish.sellingPrice == null
-                                      ? ""
-                                      : ` · ${dish.sellingPrice.toFixed(2)}`}
-                                  </option>
-                                ))}
-                              </select>
-                            </td>
-                            <td>
-                              <input
-                                className="input w-24"
-                                type="number"
-                                step="0.01"
-                                min={0}
-                                value={line.unitPrice}
-                                onChange={(e) =>
-                                  updateLine(
-                                    line.key,
-                                    "unitPrice",
-                                    e.target.value,
-                                  )
-                                }
-                              />
-                            </td>
-                            <td>
-                              <input
-                                className="input w-20"
-                                type="number"
-                                step="0.01"
-                                min={0}
-                                value={line.quantity}
-                                onChange={(e) =>
-                                  updateLine(
-                                    line.key,
-                                    "quantity",
-                                    e.target.value,
-                                  )
-                                }
-                                disabled={line.pricingBasis !== "per_unit"}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                className="input w-20"
-                                value={line.unit}
-                                onChange={(e) =>
-                                  updateLine(line.key, "unit", e.target.value)
-                                }
-                                placeholder="tray, hr"
-                                disabled={line.pricingBasis !== "per_unit"}
-                              />
-                            </td>
-                            <td className="tabular-nums">
-                              {(draftPricing.lines[index]?.amount ?? 0).toFixed(
-                                2,
-                              )}
-                            </td>
-                            <td>
-                              <button
-                                className="btn btn-ghost btn-sm"
-                                type="button"
-                                onClick={() => removeLine(line.key)}
-                              >
-                                Remove
-                              </button>
-                            </td>
-                          </tr>
-                          {isOverride(line) ? (
-                            <tr>
-                              <td colSpan={8}>
-                                <label className="flex items-center gap-2">
-                                  <span className="field-label">
-                                    Override reason (spec §5.4)
-                                  </span>
-                                  <input
-                                    className="input flex-1"
-                                    value={line.overrideReason}
-                                    onChange={(e) =>
-                                      updateLine(
-                                        line.key,
-                                        "overrideReason",
-                                        e.target.value,
-                                      )
-                                    }
-                                    placeholder="Why this price differs from the catalog"
-                                  />
-                                </label>
-                              </td>
-                            </tr>
-                          ) : null}
-                        </Fragment>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-                <button
-                  className="btn btn-ghost btn-sm mt-2"
-                  type="button"
-                  onClick={addLine}
-                >
-                  Add line
-                </button>
-                <p className="mt-2 text-[13px] text-ink-2">
-                  Subtotal (from lines):{" "}
-                  <span className="tabular-nums">
-                    {draftPricing.subtotal.toFixed(2)}
-                  </span>
-                </p>
-              </div>
-              <label>
-                Tax
-                <input
-                  name="taxAmount"
-                  type="number"
-                  step="0.01"
-                  min={0}
-                  value={draftTax}
-                  onChange={(e) => setDraftTax(Number(e.target.value) || 0)}
-                />
-              </label>
-              <label>
-                Discount
-                <input
-                  name="discountAmount"
-                  type="number"
-                  step="0.01"
-                  min={0}
-                  value={draftDiscount}
-                  onChange={(e) =>
-                    setDraftDiscount(Number(e.target.value) || 0)
-                  }
-                />
-              </label>
-              <p className="text-[13px] font-semibold text-ink">
-                Total:{" "}
-                <span className="tabular-nums">
-                  {draftPricing.total.toFixed(2)}
-                </span>
-              </p>
-              <label>
-                Proposed menu
-                <textarea
-                  name="notes"
-                  rows={4}
-                  placeholder="List menu items, one per line"
-                />
-              </label>
-              <label>
-                Valid through
-                <input
-                  name="expiresAt"
-                  type="date"
-                  defaultValue={defaultValidityDate()}
-                />
-              </label>
-              <label>
-                Terms
-                <textarea
-                  name="terms"
-                  rows={3}
-                  placeholder="Deposit, service, cancellation, or other terms"
-                />
-              </label>
-              <button
-                className="btn btn-primary"
-                type="submit"
-                disabled={busy === "draft-proposal"}
-              >
-                Draft proposal
-              </button>
-            </>
-          )}
-        </form>
-      ) : null}
+      <ProposalCreateForm
+        open={showDraft}
+        fromEvent={fromEvent}
+        clients={clients}
+        activeClients={activeClients}
+        busy={busy}
+        run={run}
+        onFailure={setFailure}
+        onNotice={setNotice}
+        onClose={() => setShowDraft(false)}
+      />
 
       <section className="working-ledger">
         <div className="ledger-heading">
@@ -1057,232 +461,249 @@ export function ProposalsPage() {
         {loading ? (
           <TableSkeleton rows={5} />
         ) : visibleRows.length === 0 ? (
-          <div className="document-empty">
-            <p>No open proposals.</p>
-          </div>
+          <EmptyState
+            title="No open proposals."
+            hint="Draft an offer to start the sales conversation."
+            action={
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={() => setShowDraft(true)}
+              >
+                New proposal
+              </button>
+            }
+          />
         ) : (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Client</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {visibleRows.map((row) => (
-                <Fragment key={row._id}>
-                  <tr>
-                    <td>{row.title}</td>
-                    <td>{clientDisplayName(row.clientId, clients)}</td>
-                    <td>{Number(row.total ?? 0).toFixed(2)}</td>
-                    <td>
-                      <StatusChip status={String(row.status)} />
-                    </td>
-                    <td className="supply-row-actions">
-                      <button
-                        className="btn btn-ghost"
-                        type="button"
-                        onClick={() =>
-                          setMenuOpenFor((current) =>
-                            current === row._id ? null : row._id,
-                          )
-                        }
-                      >
-                        {menuOpenFor === row._id ? "Hide menu" : "Menu"}
-                      </button>
-                      <button
-                        className="btn btn-ghost"
-                        type="button"
-                        onClick={() =>
-                          setPricingOpenFor((current) =>
-                            current === row._id ? null : row._id,
-                          )
-                        }
-                      >
-                        {pricingOpenFor === row._id
-                          ? "Hide pricing"
-                          : "Pricing"}
-                      </button>
-                      <button
-                        className="btn btn-ghost"
-                        type="button"
-                        disabled={busy != null}
-                        onClick={() => {
-                          // Enrich proposal with timeline and venue logistics data
-                          const event = events?.find(
-                            (e) => e._id === row.eventId,
-                          );
-                          const eventTimelineItems =
-                            event && timelineActivities
-                              ? timelineActivities.filter(
-                                  (a) =>
-                                    a.eventId === event._id &&
-                                    a.deletedAt == null,
-                                )
-                              : [];
-                          const venue =
-                            event?.venueId && venues
-                              ? venues.find((v) => v._id === event.venueId)
-                              : null;
-
-                          const enrichedProposal: ProposalPdfRecord = {
-                            ...row,
-                            timelineItems:
-                              transformTimelineActivities(eventTimelineItems),
-                            venueLogistics: event
-                              ? transformVenueLogistics(venue || null, event)
-                              : undefined,
-                            pricingLines: (proposalLineItems ?? [])
-                              .filter(
-                                (line) =>
-                                  line.proposalId === row._id &&
-                                  line.deletedAt == null,
-                              )
-                              .sort(
-                                (a, b) =>
-                                  Number(a.sortOrder) - Number(b.sortOrder),
-                              )
-                              .map((line) => ({
-                                description: line.description,
-                                pricingBasis: line.pricingBasis as PricingBasis,
-                                unitPrice: Number(line.unitPrice) || 0,
-                                quantity: line.quantity,
-                                unit: line.unit,
-                              })),
-                          };
-
-                          void downloadProposalPdf({
-                            proposal: enrichedProposal,
-                            clientName: clientDisplayName(
-                              row.clientId,
-                              clients,
-                            ),
-                            branding,
-                          })
-                            .then(() => setNotice("Proposal PDF downloaded."))
-                            .catch((error) => setFailure(error));
-                        }}
-                      >
-                        Download PDF
-                      </button>
-                      {(String(row.status) === "sent" ||
-                        String(row.status) === "viewed") && (
+          <div className="supply-table-wrap">
+            <table className="supply-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Client</th>
+                  <th>Total</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleRows.map((row) => (
+                  <Fragment key={row._id}>
+                    <tr>
+                      <td>{row.title}</td>
+                      <td>{clientDisplayName(row.clientId, clients)}</td>
+                      <td className="supply-number">
+                        {formatMoneyExact(Number(row.total ?? 0))}
+                      </td>
+                      <td>
+                        <StatusChip status={String(row.status)} />
+                      </td>
+                      <td className="supply-row-actions">
+                        <button
+                          className="btn btn-ghost"
+                          type="button"
+                          onClick={() =>
+                            setMenuOpenFor((current) =>
+                              current === row._id ? null : row._id,
+                            )
+                          }
+                        >
+                          {menuOpenFor === row._id ? "Hide menu" : "Menu"}
+                        </button>
+                        <button
+                          className="btn btn-ghost"
+                          type="button"
+                          onClick={() =>
+                            setPricingOpenFor((current) =>
+                              current === row._id ? null : row._id,
+                            )
+                          }
+                        >
+                          {pricingOpenFor === row._id
+                            ? "Hide pricing"
+                            : "Pricing"}
+                        </button>
                         <button
                           className="btn btn-ghost"
                           type="button"
                           disabled={busy != null}
-                          onClick={() => invoke(row, "requestSignature")}
+                          onClick={() => {
+                            // Enrich proposal with timeline and venue logistics data
+                            const event = events?.find(
+                              (e) => e._id === row.eventId,
+                            );
+                            const eventTimelineItems =
+                              event && timelineActivities
+                                ? timelineActivities.filter(
+                                    (a) =>
+                                      a.eventId === event._id &&
+                                      a.deletedAt == null,
+                                  )
+                                : [];
+                            const venue =
+                              event?.venueId && venues
+                                ? venues.find((v) => v._id === event.venueId)
+                                : null;
+
+                            const enrichedProposal: ProposalPdfRecord = {
+                              ...row,
+                              timelineItems:
+                                transformTimelineActivities(eventTimelineItems),
+                              venueLogistics: event
+                                ? transformVenueLogistics(venue || null, event)
+                                : undefined,
+                              pricingLines: (proposalLineItems ?? [])
+                                .filter(
+                                  (line) =>
+                                    line.proposalId === row._id &&
+                                    line.deletedAt == null,
+                                )
+                                .sort(
+                                  (a, b) =>
+                                    Number(a.sortOrder) - Number(b.sortOrder),
+                                )
+                                .map((line) => ({
+                                  description: line.description,
+                                  pricingBasis:
+                                    line.pricingBasis as PricingBasis,
+                                  unitPrice: Number(line.unitPrice) || 0,
+                                  quantity: line.quantity,
+                                  unit: line.unit,
+                                })),
+                            };
+
+                            void downloadProposalPdf({
+                              proposal: enrichedProposal,
+                              clientName: clientDisplayName(
+                                row.clientId,
+                                clients,
+                              ),
+                              branding,
+                            })
+                              .then(() => setNotice("Proposal PDF downloaded."))
+                              .catch((error) => setFailure(error));
+                          }}
                         >
-                          Request Signature
+                          Download PDF
                         </button>
-                      )}
-                      {(String(row.status) === "sent" ||
-                        String(row.status) === "viewed" ||
-                        String(row.status) === "accepted") && (
-                        <>
+                        {(String(row.status) === "sent" ||
+                          String(row.status) === "viewed") && (
                           <button
                             className="btn btn-ghost"
                             type="button"
                             disabled={busy != null}
-                            onClick={() => invoke(row, "shareLink")}
+                            onClick={() => invoke(row, "requestSignature")}
                           >
-                            {activeShareLinkFor(row._id)
-                              ? "Copy link"
-                              : "Share link"}
+                            Request Signature
                           </button>
-                          {activeShareLinkFor(row._id) && (
+                        )}
+                        {(String(row.status) === "sent" ||
+                          String(row.status) === "viewed" ||
+                          String(row.status) === "accepted") && (
+                          <>
                             <button
                               className="btn btn-ghost"
                               type="button"
                               disabled={busy != null}
-                              onClick={() => invoke(row, "revokeShareLink")}
+                              onClick={() => invoke(row, "shareLink")}
                             >
-                              Revoke link
+                              {activeShareLinkFor(row._id)
+                                ? "Copy link"
+                                : "Share link"}
                             </button>
-                          )}
-                        </>
-                      )}
-                      {policy
-                        .proposalActions(String(row.status))
-                        .map((action) => (
-                          <button
-                            key={action.key}
+                            {activeShareLinkFor(row._id) && (
+                              <button
+                                className="btn btn-ghost"
+                                type="button"
+                                disabled={busy != null}
+                                onClick={() => invoke(row, "revokeShareLink")}
+                              >
+                                Revoke link
+                              </button>
+                            )}
+                          </>
+                        )}
+                        {policy
+                          .proposalActions(String(row.status))
+                          .map((action) => (
+                            <button
+                              key={action.key}
+                              className="btn btn-ghost"
+                              type="button"
+                              disabled={busy != null}
+                              onClick={() => invoke(row, action.key)}
+                            >
+                              {action.label}
+                            </button>
+                          ))}
+                        {String(row.status) === "accepted" ? (
+                          <Link
                             className="btn btn-ghost"
-                            type="button"
-                            disabled={busy != null}
-                            onClick={() => invoke(row, action.key)}
+                            to={eventCreatePath({
+                              clientId: String(row.clientId),
+                            })}
                           >
-                            {action.label}
-                          </button>
-                        ))}
-                      {String(row.status) === "accepted" ? (
-                        <Link
-                          className="btn btn-ghost"
-                          to={eventCreatePath({
-                            clientId: String(row.clientId),
-                          })}
-                        >
-                          Create Event
-                        </Link>
-                      ) : null}
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={5} className="pt-0">
-                      <ProposalReadinessNotice
-                        eventId={row.eventId ? String(row.eventId) : null}
-                        status={String(row.status)}
-                        hasVenue={Boolean(
-                          events?.find((e) => e._id === row.eventId)?.venueId,
-                        )}
-                        hasMenuSelections={(proposalDishSelections ?? []).some(
-                          (selection) =>
-                            selection.proposalId === row._id &&
-                            selection.deletedAt == null,
-                        )}
-                        hasPricedLines={(proposalLineItems ?? []).some(
-                          (line) =>
-                            line.proposalId === row._id &&
-                            line.deletedAt == null,
-                        )}
-                      />
-                    </td>
-                  </tr>
-                  {menuOpenFor === row._id ? (
+                            Create Event
+                          </Link>
+                        ) : null}
+                      </td>
+                    </tr>
                     <tr>
-                      <td colSpan={5}>
-                        <ProposalMenuSelectionPanel
-                          proposalId={row._id}
-                          guestCount={Number(row.guestCount ?? 0)}
-                          editable={MENU_EDITABLE_STATUSES.includes(
-                            String(row.status),
+                      <td colSpan={5} className="pt-0">
+                        <ProposalReadinessNotice
+                          eventId={row.eventId ? String(row.eventId) : null}
+                          status={String(row.status)}
+                          hasVenue={Boolean(
+                            events?.find((e) => e._id === row.eventId)?.venueId,
                           )}
-                          onFailure={setFailure}
+                          hasMenuSelections={(
+                            proposalDishSelections ?? []
+                          ).some(
+                            (selection) =>
+                              selection.proposalId === row._id &&
+                              selection.deletedAt == null,
+                          )}
+                          hasPricedLines={(proposalLineItems ?? []).some(
+                            (line) =>
+                              line.proposalId === row._id &&
+                              line.deletedAt == null,
+                          )}
                         />
                       </td>
                     </tr>
-                  ) : null}
-                  {pricingOpenFor === row._id ? (
-                    <tr>
-                      <td colSpan={5}>
-                        <ProposalPricingPanel
-                          proposalId={row._id}
-                          guestCount={Number(row.guestCount ?? 0)}
-                          taxAmount={Number(row.taxAmount ?? 0)}
-                          discountAmount={Number(row.discountAmount ?? 0)}
-                          editable={String(row.status) === "draft"}
-                          onFailure={setFailure}
-                        />
-                      </td>
-                    </tr>
-                  ) : null}
-                </Fragment>
-              ))}
-            </tbody>
-          </table>
+                    {menuOpenFor === row._id ? (
+                      <tr>
+                        <td colSpan={5}>
+                          <ProposalMenuSelectionPanel
+                            proposalId={row._id}
+                            guestCount={Number(row.guestCount ?? 0)}
+                            editable={MENU_EDITABLE_STATUSES.includes(
+                              String(row.status),
+                            )}
+                            onFailure={setFailure}
+                          />
+                        </td>
+                      </tr>
+                    ) : null}
+                    {pricingOpenFor === row._id ? (
+                      <tr>
+                        <td colSpan={5}>
+                          <ProposalPricingPanel
+                            proposalId={row._id}
+                            guestCount={Number(row.guestCount ?? 0)}
+                            taxAmount={Number(row.taxAmount ?? 0)}
+                            discountAmount={Number(row.discountAmount ?? 0)}
+                            editable={String(row.status) === "draft"}
+                            onFailure={setFailure}
+                          />
+                        </td>
+                      </tr>
+                    ) : null}
+                  </Fragment>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </section>
     </div>

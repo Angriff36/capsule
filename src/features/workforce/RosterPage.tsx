@@ -26,7 +26,7 @@ import {
 import type { Id } from "../../lib/api";
 import { findApprovedTimeOffConflict } from "../../lib/timeOff";
 import { useScheduleShift } from "../../lib/workforceScheduling";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { AvailabilityGridSection } from "./AvailabilityGridSection";
@@ -51,12 +51,6 @@ const OVERTIME_THRESHOLD_STORAGE_KEY =
 
 const hours = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 2,
-});
-
-const weekDate = new Intl.DateTimeFormat(undefined, {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
 });
 
 const formatHours = (value: number) =>
@@ -306,7 +300,7 @@ export function RosterPage() {
       if (overtimeProjection) {
         const shouldSchedule = await prompt.askConfirm({
           title: "Overtime warning",
-          description: `${personName(personId)} is projected for ${formatHours(overtimeProjection.projectedHours)} in the week of ${weekDate.format(overtimeProjection.weekStartsAt)} (${formatHours(overtimeProjection.existingHours)} committed + ${formatHours(overtimeProjection.proposedHours)} proposed). That is ${formatHours(overtimeProjection.overtimeHours)} over the ${hours.format(overtimeProjection.thresholdHours)}-hour threshold.`,
+          description: `${personName(personId)} is projected for ${formatHours(overtimeProjection.projectedHours)} in the week of ${formatDate(overtimeProjection.weekStartsAt)} (${formatHours(overtimeProjection.existingHours)} committed + ${formatHours(overtimeProjection.proposedHours)} proposed). That is ${formatHours(overtimeProjection.overtimeHours)} over the ${hours.format(overtimeProjection.thresholdHours)}-hour threshold.`,
           confirmLabel: "Schedule anyway",
           cancelLabel: "Review shift",
         });
@@ -414,249 +408,10 @@ export function RosterPage() {
             and out of their own work; managers control the rest.
           </p>
         </div>
-        <div className="supply-row-actions">
-          <button
-            className="btn btn-primary"
-            onClick={() =>
-              setShowForm((value) =>
-                value === "assignment" ? null : "assignment",
-              )
-            }
-          >
-            {showForm === "assignment" ? "Close form" : "Assign to event"}
-          </button>
-          <button
-            className="btn btn-primary"
-            onClick={() =>
-              setShowForm((value) => (value === "shift" ? null : "shift"))
-            }
-          >
-            {showForm === "shift" ? "Close form" : "Schedule shift"}
-          </button>
-        </div>
       </header>
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       {host}
-
-      {showForm === "assignment" ? (
-        <form className="supply-form" onSubmit={submitAssignment}>
-          <div className="supply-form-heading">
-            <div>
-              <p className="eyebrow">New governed assignment</p>
-              <h2>Assign a person to an event</h2>
-            </div>
-            <button
-              className="btn btn-primary"
-              disabled={
-                busy != null ||
-                (requiredTrainingModule != null &&
-                  selectedTrainingCompletion == null)
-              }
-            >
-              {busy === "create-assignment" ? "Assigning…" : "Assign"}
-            </button>
-          </div>
-          <div className="supply-form-grid">
-            <label className="field-label">
-              Event
-              <select name="eventId" className="input" required>
-                <option value="">Select event</option>
-                {(events ?? [])
-                  .filter((item) => item.deletedAt == null)
-                  .map((item) => (
-                    <option key={item._id} value={item._id}>
-                      {item.title}
-                    </option>
-                  ))}
-              </select>
-            </label>
-            <label className="field-label">
-              Person
-              <select name="personId" className="input" required>
-                <option value="">Select person</option>
-                {activePeople.map((item) => (
-                  <option key={item._id} value={item._id}>
-                    {item.givenName} {item.familyName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field-label">
-              Role
-              <input
-                name="role"
-                className="input"
-                placeholder="server"
-                required
-              />
-            </label>
-            <label className="field-label">
-              Starts
-              <input name="startsAt" className="input" type="datetime-local" />
-            </label>
-            <label className="field-label">
-              Ends
-              <input name="endsAt" className="input" type="datetime-local" />
-            </label>
-            <label className="field-label">
-              Notes
-              <input name="notes" className="input" />
-            </label>
-          </div>
-        </form>
-      ) : null}
-
-      {showForm === "shift" ? (
-        <form className="supply-form" onSubmit={submitShift}>
-          <div className="supply-form-heading">
-            <div>
-              <p className="eyebrow">New governed shift</p>
-              <h2>Schedule a shift</h2>
-            </div>
-            <button className="btn btn-primary" disabled={busy != null}>
-              {busy === "create-shift" ? "Scheduling…" : "Schedule"}
-            </button>
-          </div>
-          <div className="supply-form-grid">
-            <label className="field-label">
-              Person
-              <select
-                name="personId"
-                className="input"
-                value={shiftPersonId}
-                onChange={(event) => setShiftPersonId(event.target.value)}
-                required
-              >
-                <option value="">Select person</option>
-                {activePeople.map((item) => (
-                  <option key={item._id} value={item._id}>
-                    {item.givenName} {item.familyName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field-label">
-              Overtime threshold (hours)
-              <input
-                name="overtimeThresholdHours"
-                className="input"
-                type="number"
-                min="0.5"
-                max="168"
-                step="0.5"
-                value={overtimeThresholdHours}
-                data-testid="overtime-threshold-hours"
-                onChange={(event) => {
-                  const next = Number(event.target.value);
-                  if (Number.isFinite(next) && next > 0 && next <= 168) {
-                    setOvertimeThresholdHours(next);
-                  }
-                }}
-              />
-              <small>Saved for this browser</small>
-            </label>
-            <label className="field-label">
-              Starts
-              <input
-                name="startsAt"
-                className="input"
-                type="datetime-local"
-                required
-              />
-            </label>
-            <label className="field-label">
-              Ends
-              <input
-                name="endsAt"
-                className="input"
-                type="datetime-local"
-                required
-              />
-            </label>
-            <label className="field-label">
-              Event (optional)
-              <select name="eventId" className="input">
-                <option value="">No event</option>
-                {(events ?? [])
-                  .filter((item) => item.deletedAt == null)
-                  .map((item) => (
-                    <option key={item._id} value={item._id}>
-                      {item.title}
-                    </option>
-                  ))}
-              </select>
-            </label>
-            <label className="field-label">
-              Role
-              <input name="role" className="input" placeholder="captain" />
-            </label>
-            <label className="field-label">
-              Shift type
-              <select
-                name="shiftTypeId"
-                className="input"
-                value={shiftTypeId}
-                onChange={(event) => setShiftTypeId(event.target.value)}
-              >
-                <option value="">Standard shift · no training gate</option>
-                {activeShiftTypes.map((shiftType) => (
-                  <option key={shiftType._id} value={shiftType._id}>
-                    {shiftType.name}
-                    {shiftType.requiredTrainingModuleId
-                      ? ` · requires ${
-                          activeTrainingModules.find(
-                            (module) =>
-                              module._id === shiftType.requiredTrainingModuleId,
-                          )?.name ?? "training"
-                        }`
-                      : ""}
-                  </option>
-                ))}
-              </select>
-              {requiredTrainingModule ? (
-                <small
-                  className={
-                    selectedTrainingCompletion ? "text-ok" : "text-danger"
-                  }
-                  data-testid="training-gate-status"
-                >
-                  {selectedTrainingCompletion
-                    ? `${requiredTrainingModule.name} completed ${formatDate(
-                        selectedTrainingCompletion.completedAt ?? 0,
-                      )} · ${selectedTrainingCompletion.assessmentScore}%`
-                    : `Missing ${requiredTrainingModule.name}. Record it in Staff → Training first.`}
-                </small>
-              ) : null}
-            </label>
-            <label className="field-label">
-              Required certification (optional)
-              <select name="requiredQualificationId" className="input">
-                <option value="">
-                  {shiftPersonId
-                    ? "No certification prerequisite"
-                    : "Select a person first"}
-                </option>
-                {selectedPersonQualifications.map((qualification) => (
-                  <option key={qualification._id} value={qualification._id}>
-                    {qualification.name}
-                    {qualification.certificationType
-                      ? ` · ${qualification.certificationType}`
-                      : ""}
-                    {qualification.expiresAt
-                      ? ` · expires ${formatDate(qualification.expiresAt)}`
-                      : ""}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field-label">
-              Notes
-              <input name="notes" className="input" />
-            </label>
-          </div>
-        </form>
-      ) : null}
 
       <AvailabilityGridSection people={activePeople} />
 
@@ -668,15 +423,110 @@ export function RosterPage() {
             <p className="eyebrow">Coverage</p>
             <h2>Event assignments</h2>
           </div>
-          <span>{activeAssignments.length} assignments</span>
+          <div className="supply-row-actions">
+            <span className="font-mono text-[10px] text-ink-3 uppercase">
+              {activeAssignments.length} assignments
+            </span>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() =>
+                setShowForm((value) =>
+                  value === "assignment" ? null : "assignment",
+                )
+              }
+            >
+              {showForm === "assignment" ? "Close form" : "Add assignment"}
+            </button>
+          </div>
         </div>
+        {showForm === "assignment" ? (
+          <form className="supply-form" onSubmit={submitAssignment}>
+            <div className="supply-form-heading">
+              <div>
+                <p className="eyebrow">New governed assignment</p>
+                <h2>Assign a person to an event</h2>
+              </div>
+              <button
+                className="btn btn-primary"
+                disabled={
+                  busy != null ||
+                  (requiredTrainingModule != null &&
+                    selectedTrainingCompletion == null)
+                }
+              >
+                {busy === "create-assignment" ? "Assigning…" : "Assign"}
+              </button>
+            </div>
+            <div className="supply-form-grid">
+              <label className="field-label">
+                Event
+                <select name="eventId" className="input" required>
+                  <option value="">Select event</option>
+                  {(events ?? [])
+                    .filter((item) => item.deletedAt == null)
+                    .map((item) => (
+                      <option key={item._id} value={item._id}>
+                        {item.title}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Person
+                <select name="personId" className="input" required>
+                  <option value="">Select person</option>
+                  {activePeople.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.givenName} {item.familyName}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Role
+                <input
+                  name="role"
+                  className="input"
+                  placeholder="server"
+                  required
+                />
+              </label>
+              <label className="field-label">
+                Starts
+                <input
+                  name="startsAt"
+                  className="input"
+                  type="datetime-local"
+                />
+              </label>
+              <label className="field-label">
+                Ends
+                <input name="endsAt" className="input" type="datetime-local" />
+              </label>
+              <label className="field-label">
+                Notes
+                <input name="notes" className="input" />
+              </label>
+            </div>
+          </form>
+        ) : null}
         {loading ? (
           <TableSkeleton rows={5} />
         ) : activeAssignments.length === 0 ? (
-          <div className="document-empty">
-            <p>No one is assigned to an event.</p>
-            <span>Assign an active person to an event with a role.</span>
-          </div>
+          <EmptyState
+            title="No one is assigned to an event."
+            hint="Assign an active person to an event with a role."
+            action={
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setShowForm("assignment")}
+              >
+                Add assignment
+              </button>
+            }
+          />
         ) : (
           <div className="supply-table-wrap">
             <table className="supply-table">
@@ -732,15 +582,179 @@ export function RosterPage() {
             <p className="eyebrow">Schedule</p>
             <h2>Weekly shifts</h2>
           </div>
-          <span>{selectedWeekShifts.length} shifts</span>
+          <div className="supply-row-actions">
+            <span className="font-mono text-[10px] text-ink-3 uppercase">
+              {selectedWeekShifts.length} shifts
+            </span>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() =>
+                setShowForm((value) => (value === "shift" ? null : "shift"))
+              }
+            >
+              {showForm === "shift" ? "Close form" : "Add shift"}
+            </button>
+          </div>
         </div>
+        {showForm === "shift" ? (
+          <form className="supply-form" onSubmit={submitShift}>
+            <div className="supply-form-heading">
+              <div>
+                <p className="eyebrow">New governed shift</p>
+                <h2>Schedule a shift</h2>
+              </div>
+              <button className="btn btn-primary" disabled={busy != null}>
+                {busy === "create-shift" ? "Scheduling…" : "Schedule"}
+              </button>
+            </div>
+            <div className="supply-form-grid">
+              <label className="field-label">
+                Person
+                <select
+                  name="personId"
+                  className="input"
+                  value={shiftPersonId}
+                  onChange={(event) => setShiftPersonId(event.target.value)}
+                  required
+                >
+                  <option value="">Select person</option>
+                  {activePeople.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.givenName} {item.familyName}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Overtime threshold (hours)
+                <input
+                  name="overtimeThresholdHours"
+                  className="input"
+                  type="number"
+                  min="0.5"
+                  max="168"
+                  step="0.5"
+                  value={overtimeThresholdHours}
+                  data-testid="overtime-threshold-hours"
+                  onChange={(event) => {
+                    const next = Number(event.target.value);
+                    if (Number.isFinite(next) && next > 0 && next <= 168) {
+                      setOvertimeThresholdHours(next);
+                    }
+                  }}
+                />
+                <small>Saved for this browser</small>
+              </label>
+              <label className="field-label">
+                Starts
+                <input
+                  name="startsAt"
+                  className="input"
+                  type="datetime-local"
+                  required
+                />
+              </label>
+              <label className="field-label">
+                Ends
+                <input
+                  name="endsAt"
+                  className="input"
+                  type="datetime-local"
+                  required
+                />
+              </label>
+              <label className="field-label">
+                Event (optional)
+                <select name="eventId" className="input">
+                  <option value="">No event</option>
+                  {(events ?? [])
+                    .filter((item) => item.deletedAt == null)
+                    .map((item) => (
+                      <option key={item._id} value={item._id}>
+                        {item.title}
+                      </option>
+                    ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Role
+                <input name="role" className="input" placeholder="captain" />
+              </label>
+              <label className="field-label">
+                Shift type
+                <select
+                  name="shiftTypeId"
+                  className="input"
+                  value={shiftTypeId}
+                  onChange={(event) => setShiftTypeId(event.target.value)}
+                >
+                  <option value="">Standard shift · no training gate</option>
+                  {activeShiftTypes.map((shiftType) => (
+                    <option key={shiftType._id} value={shiftType._id}>
+                      {shiftType.name}
+                      {shiftType.requiredTrainingModuleId
+                        ? ` · requires ${
+                            activeTrainingModules.find(
+                              (module) =>
+                                module._id ===
+                                shiftType.requiredTrainingModuleId,
+                            )?.name ?? "training"
+                          }`
+                        : ""}
+                    </option>
+                  ))}
+                </select>
+                {requiredTrainingModule ? (
+                  <small
+                    className={
+                      selectedTrainingCompletion ? "text-ok" : "text-danger"
+                    }
+                    data-testid="training-gate-status"
+                  >
+                    {selectedTrainingCompletion
+                      ? `${requiredTrainingModule.name} completed ${formatDate(
+                          selectedTrainingCompletion.completedAt ?? 0,
+                        )} · ${selectedTrainingCompletion.assessmentScore}%`
+                      : `Missing ${requiredTrainingModule.name}. Record it in Staff → Training first.`}
+                  </small>
+                ) : null}
+              </label>
+              <label className="field-label">
+                Required certification (optional)
+                <select name="requiredQualificationId" className="input">
+                  <option value="">
+                    {shiftPersonId
+                      ? "No certification prerequisite"
+                      : "Select a person first"}
+                  </option>
+                  {selectedPersonQualifications.map((qualification) => (
+                    <option key={qualification._id} value={qualification._id}>
+                      {qualification.name}
+                      {qualification.certificationType
+                        ? ` · ${qualification.certificationType}`
+                        : ""}
+                      {qualification.expiresAt
+                        ? ` · expires ${formatDate(qualification.expiresAt)}`
+                        : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Notes
+                <input name="notes" className="input" />
+              </label>
+            </div>
+          </form>
+        ) : null}
         <div className="schedule-publish-panel">
           <div className="schedule-publish-heading">
             <div>
               <p className="eyebrow">Work week</p>
               <strong>
-                {weekDate.format(selectedWeekStartsAt)} –{" "}
-                {weekDate.format(selectedWeekEndsAt - 1)}
+                {formatDate(selectedWeekStartsAt)} –{" "}
+                {formatDate(selectedWeekEndsAt - 1)}
               </strong>
               <small>
                 {scheduledPersonIds.length} scheduled{" "}
@@ -841,10 +855,19 @@ export function RosterPage() {
         {loading ? (
           <TableSkeleton rows={5} />
         ) : selectedWeekShifts.length === 0 ? (
-          <div className="document-empty">
-            <p>No shifts are scheduled for this week.</p>
-            <span>Choose another week or schedule a shift above.</span>
-          </div>
+          <EmptyState
+            title="No shifts are scheduled for this week."
+            hint="Choose another week or add the first shift."
+            action={
+              <button
+                type="button"
+                className="btn btn-primary btn-sm"
+                onClick={() => setShowForm("shift")}
+              >
+                Add shift
+              </button>
+            }
+          />
         ) : (
           <div className="supply-table-wrap">
             <table className="supply-table">

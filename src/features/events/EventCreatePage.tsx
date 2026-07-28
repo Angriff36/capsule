@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc } from "../../lib/api";
 import {
@@ -14,7 +14,7 @@ import {
   useListServiceStyle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
-import { ArrowLeftIcon } from "../../ui/icons";
+import { ArrowLeftIcon, ChevronRightIcon } from "../../ui/icons";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
 import { PageHeader, Section, Skeleton } from "../../ui/primitives";
@@ -64,6 +64,70 @@ function venueAddress(venue: Doc<"venues"> | undefined): string | undefined {
       .filter(Boolean)
       .join(", ") || undefined
   );
+}
+
+// Collapsible form block (native <details>) styled like Section. Uncontrolled:
+// the `open` prop only sets the initial state, so user toggles and the
+// imperative reveal-on-invalid below never fight React.
+function FormSection({
+  title,
+  hint,
+  count,
+  defaultOpen = false,
+  children,
+}: {
+  title: string;
+  hint: string;
+  count: number;
+  defaultOpen?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <details className="card group" open={defaultOpen}>
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 select-none [&::-webkit-details-marker]:hidden">
+        <span className="min-w-0">
+          <span className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase">
+            {title}
+            <span className="ml-1.5 font-mono text-ink-3 normal-case">
+              {count}
+            </span>
+          </span>
+          <span className="mt-0.5 block text-[11px] text-ink-3">{hint}</span>
+        </span>
+        <ChevronRightIcon
+          width={12}
+          height={12}
+          className="shrink-0 text-ink-3 transition-transform group-open:rotate-90"
+        />
+      </summary>
+      <div className="border-t border-line">{children}</div>
+    </details>
+  );
+}
+
+// A field with a validation error must never stay hidden inside a collapsed
+// section: open every <details> that contains an invalid field before the
+// validation handler scrolls/focuses it. Synchronous DOM writes so the
+// subsequent scrollIntoView/focus in useFieldValidation land on visible fields.
+function revealInvalidSections(form: HTMLFormElement) {
+  const crossFieldNames = new Set(
+    Object.keys(eventFieldRules(new FormData(form))),
+  );
+  for (const el of Array.from(form.elements)) {
+    if (
+      !(
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLSelectElement ||
+        el instanceof HTMLTextAreaElement
+      ) ||
+      !el.name
+    ) {
+      continue;
+    }
+    const invalid =
+      (el.willValidate && !el.checkValidity()) || crossFieldNames.has(el.name);
+    if (invalid) el.closest("details")?.setAttribute("open", "");
+  }
 }
 
 export function EventCreatePage() {
@@ -258,11 +322,19 @@ export function EventCreatePage() {
           key={template?._id ?? "blank"}
           id="event-create-form"
           ref={draftForm.formRef}
-          onSubmit={handleSubmit(submitEvent)}
+          onSubmit={(event) => {
+            revealInvalidSections(event.currentTarget);
+            handleSubmit(submitEvent)(event);
+          }}
           className="space-y-3"
           {...formProps}
         >
-          <Section title="Engagement">
+          <FormSection
+            title="Basics"
+            hint="Title, type, schedule, headcount, and the day-of contact."
+            count={9}
+            defaultOpen
+          >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
               <label className="field-label sm:col-span-2">
                 Event title
@@ -296,56 +368,6 @@ export function EventCreatePage() {
                   {activeOccasions.map((occasion) => (
                     <option key={occasion._id} value={occasion._id}>
                       {occasion.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field-label">
-                Service style
-                <select
-                  value={serviceStyleId}
-                  onChange={(event) => setServiceStyleId(event.target.value)}
-                  className="input"
-                  form="event-create-form"
-                >
-                  <option value="">Select a service style</option>
-                  {activeServiceStyles.map((serviceStyle) => (
-                    <option key={serviceStyle._id} value={serviceStyle._id}>
-                      {serviceStyle.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field-label">
-                Salesperson
-                <select
-                  value={salespersonId}
-                  onChange={(event) => setSalespersonId(event.target.value)}
-                  className="input"
-                  form="event-create-form"
-                >
-                  <option value="">Select a salesperson</option>
-                  {salespeople.map((person) => (
-                    <option key={person._id} value={person._id}>
-                      {[person.givenName, person.familyName]
-                        .filter(Boolean)
-                        .join(" ")}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field-label">
-                Referral source
-                <select
-                  value={referralSourceId}
-                  onChange={(event) => setReferralSourceId(event.target.value)}
-                  className="input"
-                  form="event-create-form"
-                >
-                  <option value="">Select a referral source</option>
-                  {activeReferralSources.map((source) => (
-                    <option key={source._id} value={source._id}>
-                      {source.name}
                     </option>
                   ))}
                 </select>
@@ -387,46 +409,66 @@ export function EventCreatePage() {
                 />
                 <FieldError name="endsAt" errors={errors} touched={touched} />
               </label>
+              <div className="grid gap-3 sm:col-span-2 sm:grid-cols-3">
+                <p className="text-[11px] font-medium tracking-[0.08em] text-ink-3 uppercase sm:col-span-3">
+                  Primary contact
+                </p>
+                <label className="field-label">
+                  Name
+                  <input name="primaryContactName" className="input" required />
+                  <FieldError
+                    name="primaryContactName"
+                    errors={errors}
+                    touched={touched}
+                  />
+                </label>
+                <label className="field-label">
+                  Email
+                  <input
+                    name="primaryContactEmail"
+                    type="email"
+                    className="input"
+                  />
+                  <FieldError
+                    name="primaryContactEmail"
+                    errors={errors}
+                    touched={touched}
+                  />
+                </label>
+                <label className="field-label">
+                  Phone
+                  <input
+                    name="primaryContactPhone"
+                    type="tel"
+                    className="input"
+                  />
+                </label>
+              </div>
             </div>
-          </Section>
+          </FormSection>
 
-          <Section title="Primary contact">
-            <div className="grid gap-3 p-3 sm:grid-cols-3">
-              <label className="field-label">
-                Name
-                <input name="primaryContactName" className="input" required />
-                <FieldError
-                  name="primaryContactName"
-                  errors={errors}
-                  touched={touched}
-                />
-              </label>
-              <label className="field-label">
-                Email
-                <input
-                  name="primaryContactEmail"
-                  type="email"
-                  className="input"
-                />
-                <FieldError
-                  name="primaryContactEmail"
-                  errors={errors}
-                  touched={touched}
-                />
-              </label>
-              <label className="field-label">
-                Phone
-                <input
-                  name="primaryContactPhone"
-                  type="tel"
-                  className="input"
-                />
-              </label>
-            </div>
-          </Section>
-
-          <Section title="Planning brief">
+          <FormSection
+            title="Venue & logistics"
+            hint="Service style and on-site requirements — pick the venue in the side panel."
+            count={4}
+          >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
+              <label className="field-label">
+                Service style
+                <select
+                  value={serviceStyleId}
+                  onChange={(event) => setServiceStyleId(event.target.value)}
+                  className="input"
+                  form="event-create-form"
+                >
+                  <option value="">Select a service style</option>
+                  {activeServiceStyles.map((serviceStyle) => (
+                    <option key={serviceStyle._id} value={serviceStyle._id}>
+                      {serviceStyle.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
               <label className="field-label sm:col-span-2">
                 Accessibility needs
                 <input
@@ -450,9 +492,13 @@ export function EventCreatePage() {
                 />
               </label>
             </div>
-          </Section>
+          </FormSection>
 
-          <Section title="Commercial">
+          <FormSection
+            title="Money"
+            hint="Budget and quoted price for the engagement."
+            count={2}
+          >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
               <label className="field-label">
                 Budget amount
@@ -489,7 +535,50 @@ export function EventCreatePage() {
                 />
               </label>
             </div>
-          </Section>
+          </FormSection>
+
+          <FormSection
+            title="Details"
+            hint="Sales attribution — salesperson and referral source."
+            count={2}
+          >
+            <div className="grid gap-3 p-3 sm:grid-cols-2">
+              <label className="field-label">
+                Salesperson
+                <select
+                  value={salespersonId}
+                  onChange={(event) => setSalespersonId(event.target.value)}
+                  className="input"
+                  form="event-create-form"
+                >
+                  <option value="">Select a salesperson</option>
+                  {salespeople.map((person) => (
+                    <option key={person._id} value={person._id}>
+                      {[person.givenName, person.familyName]
+                        .filter(Boolean)
+                        .join(" ")}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field-label">
+                Referral source
+                <select
+                  value={referralSourceId}
+                  onChange={(event) => setReferralSourceId(event.target.value)}
+                  className="input"
+                  form="event-create-form"
+                >
+                  <option value="">Select a referral source</option>
+                  {activeReferralSources.map((source) => (
+                    <option key={source._id} value={source._id}>
+                      {source.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          </FormSection>
         </form>
 
         <aside className="space-y-3 lg:sticky lg:top-4 lg:self-start">

@@ -29,7 +29,13 @@ import {
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatTime } from "../../lib/format";
 import { CheckIcon, WifiOffIcon } from "../../ui/icons";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  EmptyState,
+  PageHeader,
+  Section,
+  StatusChip,
+  TableSkeleton,
+} from "../../ui/primitives";
 import {
   CLOSEOUT_EVIDENCE_CATEGORIES,
   RecordPhotoCapture,
@@ -60,6 +66,13 @@ const dayLabel = (ms?: number | null) =>
       });
 
 const timeLabel = (ms?: number | null) => formatTime(ms);
+
+/** Row action button: comfortable thumb target on phones, compact on desktop. */
+const ROW_BTN = "btn btn-ghost btn-sm py-2 max-sm:min-h-11";
+const ROW_BTN_PRIMARY = "btn btn-primary btn-sm py-2 max-sm:min-h-11";
+/** Full-width primary action inside a card. */
+const BLOCK_BTN =
+  "btn btn-primary mt-3 w-full py-3 text-[15px] max-sm:min-h-11";
 
 /**
  * Phone-first view for field staff: shifts, clock in/out, prep, packing,
@@ -220,16 +233,17 @@ export function MyDayPage() {
             {activePeople.map((person) => (
               <button
                 key={person._id}
-                className="btn btn-ghost w-full justify-start py-3 text-[15px]"
+                className="btn btn-ghost w-full justify-start py-3 text-[15px] max-sm:min-h-11"
                 onClick={() => choosePerson(person._id)}
               >
                 {person.givenName} {person.familyName}
               </button>
             ))}
             {activePeople.length === 0 ? (
-              <p className="text-[13px] text-ink-3">
-                No active staff profiles exist in this workspace yet.
-              </p>
+              <EmptyState
+                title="No active staff profiles yet"
+                hint="Ask a manager to add you to this workspace, then reload."
+              />
             ) : null}
           </div>
         </section>
@@ -263,6 +277,9 @@ export function MyDayPage() {
         notice.weekEndsAt >= startOfToday.getTime(),
     )
     .sort((a, b) => a.weekStartsAt - b.weekStartsAt);
+  const unacknowledgedNotices = myScheduleNotices.filter(
+    (notice) => !notice.acknowledgedAt,
+  ).length;
   const myTasks = (tasks ?? [])
     .filter(
       (task) =>
@@ -372,144 +389,53 @@ export function MyDayPage() {
         pending={pending}
         onRetry={retryPending}
       />
-      <OfflineStatusBar
-        online={online}
-        pending={pending}
-        onRetry={retryPending}
-      />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       {loading ? <TableSkeleton rows={8} /> : null}
 
-      <section className="card px-4 py-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="eyebrow">Time clock</p>
-            <p className="mt-1 text-[13px] text-ink-2">
-              {openRecord
-                ? `Clocked in at ${timeLabel(openRecord.clockInAt)}`
-                : "You are not clocked in."}
-            </p>
-          </div>
-        </div>
-        {openRecord ? (
-          <button
-            className="btn btn-primary mt-3 w-full py-3 text-[15px]"
-            disabled={busy != null}
-            onClick={() =>
-              perform("clock-out", "clock-out", "Clock out", {
-                docId: openRecord._id,
-                version: openRecord.version,
-              })
-            }
-          >
-            {busy === "clock-out" ? "Clocking out…" : "Clock out"}
-          </button>
-        ) : (
-          <button
-            className="btn btn-primary mt-3 w-full py-3 text-[15px]"
-            disabled={busy != null}
-            onClick={() =>
-              perform("clock-in", "clock-in", "Clock in", {
-                personId: me._id,
-              })
-            }
-          >
-            {busy === "clock-in" ? "Clocking in…" : "Clock in"}
-          </button>
-        )}
-      </section>
-
-      <section
-        className="card schedule-notice-card px-4 py-4"
-        data-testid="staff-schedule-notices"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="eyebrow">Published schedule</p>
-            <p className="mt-1 text-[13px] leading-relaxed text-ink-2">
-              Review each shift summary and let your manager know you received
-              it.
-            </p>
-          </div>
-          <span className="schedule-notice-count">
-            {
-              myScheduleNotices.filter((notice) => !notice.acknowledgedAt)
-                .length
-            }
-          </span>
-        </div>
-
-        {myScheduleNotices.length === 0 ? (
-          <p className="mt-3 text-[13px] text-ink-3">
-            No published schedules are waiting for you.
+      <Section title="Time clock">
+        <div className="px-4 py-4">
+          <p className="text-[13px] text-ink-2">
+            {openRecord
+              ? `Clocked in at ${timeLabel(openRecord.clockInAt)}`
+              : "You are not clocked in."}
           </p>
-        ) : (
-          <ul className="mt-3 flex flex-col gap-3">
-            {myScheduleNotices.map((notice) => {
-              const canAcknowledge =
-                notice.recipientAuthSubjectId != null &&
-                notice.recipientAuthSubjectId === user?.id;
-              return (
-                <li key={notice._id} className="schedule-notice-item">
-                  <div className="schedule-notice-item-heading">
-                    <div>
-                      <strong>Week of {dayLabel(notice.weekStartsAt)}</strong>
-                      <small>
-                        {notice.shiftCount}{" "}
-                        {notice.shiftCount === 1 ? "shift" : "shifts"}
-                      </small>
-                    </div>
-                    {notice.acknowledgedAt ? (
-                      <span className="schedule-notice-received">Received</span>
-                    ) : (
-                      <span className="schedule-notice-new">New</span>
-                    )}
-                  </div>
-                  <p className="schedule-notice-summary">
-                    {notice.shiftSummary}
-                  </p>
-                  {notice.acknowledgedAt ? (
-                    <p className="schedule-notice-confirmation">
-                      Acknowledged {dayLabel(notice.acknowledgedAt)} at{" "}
-                      {timeLabel(notice.acknowledgedAt)}
-                    </p>
-                  ) : canAcknowledge ? (
-                    <button
-                      className="btn btn-primary mt-3 w-full py-3 text-[15px]"
-                      data-testid="acknowledge-schedule-action"
-                      disabled={busy != null}
-                      onClick={() =>
-                        perform(
-                          `acknowledge:${notice._id}`,
-                          "schedule-acknowledge",
-                          "Acknowledge schedule",
-                          { docId: notice._id, version: notice.version },
-                        )
-                      }
-                    >
-                      {busy === `acknowledge:${notice._id}`
-                        ? "Acknowledging…"
-                        : "Acknowledge schedule"}
-                    </button>
-                  ) : (
-                    <p className="schedule-notice-link-help">
-                      Ask a manager to link this staff profile to your sign-in
-                      before acknowledging.
-                    </p>
-                  )}
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+          {openRecord ? (
+            <button
+              className={BLOCK_BTN}
+              disabled={busy != null}
+              onClick={() =>
+                perform("clock-out", "clock-out", "Clock out", {
+                  docId: openRecord._id,
+                  version: openRecord.version,
+                })
+              }
+            >
+              {busy === "clock-out" ? "Clocking out…" : "Clock out"}
+            </button>
+          ) : (
+            <button
+              className={BLOCK_BTN}
+              disabled={busy != null}
+              onClick={() =>
+                perform("clock-in", "clock-in", "Clock in", {
+                  personId: me._id,
+                })
+              }
+            >
+              {busy === "clock-in" ? "Clocking in…" : "Clock in"}
+            </button>
+          )}
+        </div>
+      </Section>
 
-      <section className="card px-4 py-4">
-        <p className="eyebrow">Upcoming shifts</p>
+      <Section title="Upcoming shifts" count={myShifts.length}>
         {myShifts.length === 0 ? (
-          <p className="mt-2 text-[13px] text-ink-3">No shifts scheduled.</p>
+          <EmptyState
+            title="No shifts scheduled"
+            hint="Shifts assigned to you will show up here as soon as they are published."
+          />
         ) : (
-          <ul className="mt-2 flex flex-col divide-y divide-line-2">
+          <ul className="flex flex-col divide-y divide-line-2 px-4">
             {myShifts.map((shift) => (
               <li key={shift._id} className="flex items-center gap-3 py-3">
                 <div className="min-w-0 flex-1">
@@ -525,7 +451,7 @@ export function MyDayPage() {
                 {String(shift.status) === "scheduled" &&
                 shift.scheduledAt != null ? (
                   <button
-                    className="btn btn-ghost btn-sm py-2"
+                    className={ROW_BTN}
                     disabled={busy != null}
                     onClick={() =>
                       perform(
@@ -544,7 +470,7 @@ export function MyDayPage() {
                 ) : null}
                 {String(shift.status) === "started" ? (
                   <button
-                    className="btn btn-ghost btn-sm py-2"
+                    className={ROW_BTN}
                     disabled={busy != null}
                     onClick={() =>
                       perform(
@@ -562,18 +488,95 @@ export function MyDayPage() {
             ))}
           </ul>
         )}
-      </section>
+      </Section>
+
+      <div data-testid="staff-schedule-notices">
+        <Section title="Published schedule" count={unacknowledgedNotices}>
+          {myScheduleNotices.length === 0 ? (
+            <EmptyState
+              title="No published schedules are waiting for you"
+              hint="When a manager publishes your week, it appears here to acknowledge."
+            />
+          ) : (
+            <div className="px-4 py-4">
+              <p className="text-[13px] leading-relaxed text-ink-2">
+                Review each shift summary and let your manager know you received
+                it.
+              </p>
+              <ul className="mt-3 flex flex-col gap-3">
+                {myScheduleNotices.map((notice) => {
+                  const canAcknowledge =
+                    notice.recipientAuthSubjectId != null &&
+                    notice.recipientAuthSubjectId === user?.id;
+                  return (
+                    <li key={notice._id} className="schedule-notice-item">
+                      <div className="schedule-notice-item-heading">
+                        <div>
+                          <strong>
+                            Week of {dayLabel(notice.weekStartsAt)}
+                          </strong>
+                          <small>
+                            {notice.shiftCount}{" "}
+                            {notice.shiftCount === 1 ? "shift" : "shifts"}
+                          </small>
+                        </div>
+                        {notice.acknowledgedAt ? (
+                          <StatusChip status="acknowledged" label="Received" />
+                        ) : (
+                          <StatusChip status="pending" label="New" />
+                        )}
+                      </div>
+                      <p className="schedule-notice-summary">
+                        {notice.shiftSummary}
+                      </p>
+                      {notice.acknowledgedAt ? (
+                        <p className="schedule-notice-confirmation">
+                          Acknowledged {dayLabel(notice.acknowledgedAt)} at{" "}
+                          {timeLabel(notice.acknowledgedAt)}
+                        </p>
+                      ) : canAcknowledge ? (
+                        <button
+                          className={BLOCK_BTN}
+                          data-testid="acknowledge-schedule-action"
+                          disabled={busy != null}
+                          onClick={() =>
+                            perform(
+                              `acknowledge:${notice._id}`,
+                              "schedule-acknowledge",
+                              "Acknowledge schedule",
+                              { docId: notice._id, version: notice.version },
+                            )
+                          }
+                        >
+                          {busy === `acknowledge:${notice._id}`
+                            ? "Acknowledging…"
+                            : "Acknowledge schedule"}
+                        </button>
+                      ) : (
+                        <p className="schedule-notice-link-help">
+                          Ask a manager to link this staff profile to your
+                          sign-in before acknowledging.
+                        </p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+        </Section>
+      </div>
 
       <ShiftSwapCard person={me} />
 
-      <section className="card px-4 py-4">
-        <p className="eyebrow">Today's prep</p>
+      <Section title="Today's prep" count={myTasks.length}>
         {myTasks.length === 0 ? (
-          <p className="mt-2 text-[13px] text-ink-3">
-            No prep tasks due today.
-          </p>
+          <EmptyState
+            title="No prep tasks due today"
+            hint="Tasks the kitchen assigns for today land here."
+          />
         ) : (
-          <ul className="mt-2 flex flex-col divide-y divide-line-2">
+          <ul className="flex flex-col divide-y divide-line-2 px-4">
             {myTasks.map((task) => {
               const status = String(task.status);
               const key = `task:${task._id}`;
@@ -596,7 +599,7 @@ export function MyDayPage() {
                   </div>
                   <StatusChip status={status} />
                   <button
-                    className="btn btn-ghost btn-sm py-2"
+                    className={ROW_BTN}
                     disabled={busy != null}
                     onClick={() =>
                       perform(key, next.runKey, next.label, {
@@ -609,7 +612,7 @@ export function MyDayPage() {
                   </button>
                   {status === "claimed" ? (
                     <button
-                      className="btn btn-ghost btn-sm py-2"
+                      className={ROW_BTN}
                       disabled={busy != null}
                       onClick={() =>
                         perform(
@@ -628,16 +631,16 @@ export function MyDayPage() {
             })}
           </ul>
         )}
-      </section>
+      </Section>
 
-      <section className="card px-4 py-4">
-        <p className="eyebrow">Pack list items</p>
+      <Section title="Pack list items" count={openPackItems.length}>
         {openPackItems.length === 0 ? (
-          <p className="mt-2 text-[13px] text-ink-3">
-            Nothing is waiting to be packed.
-          </p>
+          <EmptyState
+            title="Nothing is waiting to be packed"
+            hint="Items from active pack lists appear here when packing starts."
+          />
         ) : (
-          <ul className="mt-2 flex flex-col divide-y divide-line-2">
+          <ul className="flex flex-col divide-y divide-line-2 px-4">
             {openPackItems.map((item) => (
               <li key={item._id} className="flex items-center gap-3 py-3">
                 <div className="min-w-0 flex-1">
@@ -650,7 +653,7 @@ export function MyDayPage() {
                   </p>
                 </div>
                 <button
-                  className="btn btn-primary btn-sm py-2"
+                  className={ROW_BTN_PRIMARY}
                   disabled={busy != null}
                   onClick={() =>
                     perform(
@@ -668,7 +671,7 @@ export function MyDayPage() {
                   Packed
                 </button>
                 <button
-                  className="btn btn-ghost btn-sm py-2"
+                  className={ROW_BTN}
                   disabled={busy != null}
                   onClick={() =>
                     perform(
@@ -685,204 +688,223 @@ export function MyDayPage() {
             ))}
           </ul>
         )}
-      </section>
+      </Section>
 
       {myDeliveries.length > 0 ? (
-        <section className="card px-4 py-4" data-testid="my-deliveries">
-          <p className="eyebrow">Assigned deliveries</p>
-          <p className="mt-1 text-[12.5px] text-ink-3">
-            Capture proof at the drop-off so dispatch can see it immediately.
-          </p>
-          <ul className="mt-2 flex flex-col divide-y divide-line-2">
-            {myDeliveries.map((delivery) => {
-              const photoKey = `delivery:${delivery._id}`;
-              const photosOpen = openPhotoKey === photoKey;
-              return (
-                <li key={delivery._id} className="py-3">
-                  <div className="flex items-center gap-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-semibold">
-                        {delivery.destination}
-                      </p>
-                      <p className="text-[12.5px] text-ink-2">
-                        {dayLabel(delivery.windowStartsAt)} ·{" "}
-                        {timeLabel(delivery.windowStartsAt)}–
-                        {timeLabel(delivery.windowEndsAt)}
-                      </p>
-                    </div>
-                    <StatusChip status={String(delivery.status)} />
-                    <button
-                      type="button"
-                      className="btn btn-primary btn-sm min-h-10"
-                      aria-expanded={photosOpen}
-                      onClick={() =>
-                        setOpenPhotoKey(photosOpen ? null : photoKey)
-                      }
-                    >
-                      {photosOpen ? "Close" : "Add photo"}
-                    </button>
-                  </div>
-                  {photosOpen ? (
-                    <div className="mt-3">
-                      <RecordPhotoCapture
-                        parentType="delivery"
-                        parentId={delivery._id}
-                        title="Proof of delivery"
-                        description="Photograph the completed drop-off, signed paperwork, or placement at the venue."
-                      />
-                    </div>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
+        <div data-testid="my-deliveries">
+          <Section title="Assigned deliveries" count={myDeliveries.length}>
+            <div className="px-4 py-4">
+              <p className="text-[12.5px] text-ink-3">
+                Capture proof at the drop-off so dispatch can see it
+                immediately.
+              </p>
+              <ul className="mt-1 flex flex-col divide-y divide-line-2">
+                {myDeliveries.map((delivery) => {
+                  const photoKey = `delivery:${delivery._id}`;
+                  const photosOpen = openPhotoKey === photoKey;
+                  return (
+                    <li key={delivery._id} className="py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[14px] font-semibold">
+                            {delivery.destination}
+                          </p>
+                          <p className="text-[12.5px] text-ink-2">
+                            {dayLabel(delivery.windowStartsAt)} ·{" "}
+                            {timeLabel(delivery.windowStartsAt)}–
+                            {timeLabel(delivery.windowEndsAt)}
+                          </p>
+                        </div>
+                        <StatusChip status={String(delivery.status)} />
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm min-h-10 max-sm:min-h-11"
+                          aria-expanded={photosOpen}
+                          onClick={() =>
+                            setOpenPhotoKey(photosOpen ? null : photoKey)
+                          }
+                        >
+                          {photosOpen ? "Close" : "Add photo"}
+                        </button>
+                      </div>
+                      {photosOpen ? (
+                        <div className="mt-3">
+                          <RecordPhotoCapture
+                            parentType="delivery"
+                            parentId={delivery._id}
+                            title="Proof of delivery"
+                            description="Photograph the completed drop-off, signed paperwork, or placement at the venue."
+                          />
+                        </div>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </Section>
+        </div>
       ) : null}
 
       {fieldCloseouts.length > 0 ? (
-        <section className="card px-4 py-4" data-testid="my-closeouts">
-          <p className="eyebrow">Venue closeouts</p>
-          <p className="mt-1 text-[12.5px] text-ink-3">
-            Capture venue, leftover-food, and equipment-return evidence before
-            the team leaves.
-          </p>
-          <ul className="mt-2 flex flex-col divide-y divide-line-2">
-            {fieldCloseouts.map((closeout) => {
-              const photoKey = `closeout:${closeout._id}`;
-              const photosOpen = openPhotoKey === photoKey;
-              return (
-                <li key={closeout._id} className="py-3">
-                  <div className="flex items-center gap-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[14px] font-semibold">
-                        {eventTitle(String(closeout.eventId))}
-                      </p>
-                      <p className="text-[12.5px] text-ink-2">
-                        {closeout.capturedAt
-                          ? `Captured ${formatDate(closeout.capturedAt)} ${formatTime(closeout.capturedAt)}`
-                          : "Ready for venue photos"}
-                      </p>
-                    </div>
-                    <StatusChip status={String(closeout.status)} />
-                    <button
-                      type="button"
-                      className="btn btn-primary btn-sm min-h-10"
-                      aria-expanded={photosOpen}
-                      onClick={() =>
-                        setOpenPhotoKey(photosOpen ? null : photoKey)
-                      }
-                    >
-                      {photosOpen ? "Close" : "Add photo"}
-                    </button>
-                  </div>
-                  {photosOpen ? (
-                    <div className="mt-3">
-                      <RecordPhotoCapture
-                        parentType="closeout"
-                        parentId={closeout._id}
-                        title="Closeout evidence"
-                        description="Choose what the photo documents so the office can match it to a waste claim or credit adjustment."
-                        evidenceCategories={CLOSEOUT_EVIDENCE_CATEGORIES}
-                      />
-                    </div>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
+        <div data-testid="my-closeouts">
+          <Section title="Venue closeouts" count={fieldCloseouts.length}>
+            <div className="px-4 py-4">
+              <p className="text-[12.5px] text-ink-3">
+                Capture venue, leftover-food, and equipment-return evidence
+                before the team leaves.
+              </p>
+              <ul className="mt-1 flex flex-col divide-y divide-line-2">
+                {fieldCloseouts.map((closeout) => {
+                  const photoKey = `closeout:${closeout._id}`;
+                  const photosOpen = openPhotoKey === photoKey;
+                  return (
+                    <li key={closeout._id} className="py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[14px] font-semibold">
+                            {eventTitle(String(closeout.eventId))}
+                          </p>
+                          <p className="text-[12.5px] text-ink-2">
+                            {closeout.capturedAt
+                              ? `Captured ${formatDate(closeout.capturedAt)} ${formatTime(closeout.capturedAt)}`
+                              : "Ready for venue photos"}
+                          </p>
+                        </div>
+                        <StatusChip status={String(closeout.status)} />
+                        <button
+                          type="button"
+                          className="btn btn-primary btn-sm min-h-10 max-sm:min-h-11"
+                          aria-expanded={photosOpen}
+                          onClick={() =>
+                            setOpenPhotoKey(photosOpen ? null : photoKey)
+                          }
+                        >
+                          {photosOpen ? "Close" : "Add photo"}
+                        </button>
+                      </div>
+                      {photosOpen ? (
+                        <div className="mt-3">
+                          <RecordPhotoCapture
+                            parentType="closeout"
+                            parentId={closeout._id}
+                            title="Closeout evidence"
+                            description="Choose what the photo documents so the office can match it to a waste claim or credit adjustment."
+                            evidenceCategories={CLOSEOUT_EVIDENCE_CATEGORIES}
+                          />
+                        </div>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </Section>
+        </div>
       ) : null}
 
       <TimeOffRequestCard personId={me._id} busy={busy} run={run} />
 
       <WeeklyAvailabilityCard personId={me._id} busy={busy} run={run} />
 
-      <section className="card px-4 py-4">
-        <div className="flex items-center justify-between">
-          <p className="eyebrow">Specific dates</p>
+      <Section
+        title="Specific dates"
+        count={myWindows.length}
+        actions={
           <button
-            className="btn btn-ghost btn-sm py-2"
+            className="btn btn-ghost btn-sm py-2 max-sm:min-h-9"
             onClick={() => setShowDeclare((value) => !value)}
           >
             {showDeclare ? "Close" : "Declare"}
           </button>
-        </div>
-        <p className="mt-1 text-[12.5px] text-ink-3">
-          Add a one-time window when you can work outside your usual weekly
-          availability.
-        </p>
-        {showDeclare ? (
-          <form className="mt-3 flex flex-col gap-3" onSubmit={submitDeclare}>
-            <label className="field-label">
-              From
-              <input
-                name="startsAt"
-                className="input"
-                type="datetime-local"
-                required
-              />
-            </label>
-            <label className="field-label">
-              Until
-              <input
-                name="endsAt"
-                className="input"
-                type="datetime-local"
-                required
-              />
-            </label>
-            <label className="field-label">
-              Notes
-              <input name="notes" className="input" />
-            </label>
-            <button
-              className="btn btn-primary w-full py-3 text-[15px]"
-              disabled={busy != null}
-            >
-              {busy === "declare" ? "Adding…" : "Add availability"}
-            </button>
-          </form>
-        ) : null}
-        {myWindows.length === 0 ? (
-          <p className="mt-2 text-[13px] text-ink-3">
-            No date-specific windows declared.
+        }
+      >
+        <div className="px-4 py-4">
+          <p className="text-[12.5px] text-ink-3">
+            Add a one-time window when you can work outside your usual weekly
+            availability.
           </p>
-        ) : (
-          <ul className="mt-2 flex flex-col divide-y divide-line-2">
-            {myWindows.map((window) => (
-              <li key={window._id} className="flex items-center gap-3 py-3">
-                <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-semibold">
-                    {dayLabel(window.startsAt)}
-                    {window.kind === "unavailable" ? (
-                      <span className="ml-2 text-[12px] font-medium text-danger">
-                        Time off
-                      </span>
-                    ) : null}
-                  </p>
-                  <p className="text-[12.5px] text-ink-2">
-                    {timeLabel(window.startsAt)} – {timeLabel(window.endsAt)}
-                  </p>
-                </div>
-                <button
-                  className="btn btn-ghost btn-sm py-2"
-                  disabled={busy != null}
-                  onClick={() =>
-                    perform(
-                      `window:${window._id}`,
-                      "availability-withdraw",
-                      "Withdraw availability",
-                      { docId: window._id, version: window.version },
-                    )
-                  }
-                >
-                  Withdraw
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
+          {showDeclare ? (
+            <form className="mt-3 flex flex-col gap-3" onSubmit={submitDeclare}>
+              <label className="field-label">
+                From
+                <input
+                  name="startsAt"
+                  className="input"
+                  type="datetime-local"
+                  required
+                />
+              </label>
+              <label className="field-label">
+                Until
+                <input
+                  name="endsAt"
+                  className="input"
+                  type="datetime-local"
+                  required
+                />
+              </label>
+              <label className="field-label">
+                Notes
+                <input name="notes" className="input" />
+              </label>
+              <button className={BLOCK_BTN} disabled={busy != null}>
+                {busy === "declare" ? "Adding…" : "Add availability"}
+              </button>
+            </form>
+          ) : null}
+          {myWindows.length === 0 ? (
+            showDeclare ? null : (
+              <EmptyState
+                title="No date-specific windows declared"
+                hint="Declare a one-off window when you can pick up extra work."
+                action={
+                  <button
+                    className="btn btn-ghost btn-sm max-sm:min-h-11"
+                    onClick={() => setShowDeclare(true)}
+                  >
+                    Declare availability
+                  </button>
+                }
+              />
+            )
+          ) : (
+            <ul className="mt-1 flex flex-col divide-y divide-line-2">
+              {myWindows.map((window) => (
+                <li key={window._id} className="flex items-center gap-3 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[14px] font-semibold">
+                      {dayLabel(window.startsAt)}
+                      {window.kind === "unavailable" ? (
+                        <span className="ml-2 inline-flex align-middle">
+                          <StatusChip status="unavailable" label="Time off" />
+                        </span>
+                      ) : null}
+                    </p>
+                    <p className="text-[12.5px] text-ink-2">
+                      {timeLabel(window.startsAt)} – {timeLabel(window.endsAt)}
+                    </p>
+                  </div>
+                  <button
+                    className={ROW_BTN}
+                    disabled={busy != null}
+                    onClick={() =>
+                      perform(
+                        `window:${window._id}`,
+                        "availability-withdraw",
+                        "Withdraw availability",
+                        { docId: window._id, version: window.version },
+                      )
+                    }
+                  >
+                    Withdraw
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </Section>
     </MobileFrame>
   );
 }
@@ -902,27 +924,23 @@ function MobileFrame({
         <span className="grid h-6 w-6 place-items-center rounded-xs bg-accent font-mono text-[12px] font-bold text-white">
           C
         </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-[13px] leading-tight font-semibold">My Day</p>
-          {subtitle ? (
-            <p className="truncate text-[11.5px] leading-tight text-ink-3">
-              {subtitle}
-            </p>
-          ) : null}
-        </div>
+        <p className="min-w-0 flex-1 truncate text-[13px] leading-tight font-semibold">
+          {subtitle ?? "My Day"}
+        </p>
         {onSwitchPerson ? (
           <button
-            className="btn btn-ghost btn-sm py-2"
+            className="btn btn-ghost btn-sm py-2 max-sm:min-h-9"
             onClick={onSwitchPerson}
           >
             Switch
           </button>
         ) : null}
-        <Link className="btn btn-ghost btn-sm py-2" to="/">
+        <Link className="btn btn-ghost btn-sm py-2 max-sm:min-h-9" to="/">
           Full app
         </Link>
       </header>
       <main className="mx-auto flex max-w-md flex-col gap-4 px-4 py-5 pb-16">
+        <PageHeader title="My Day" lead={formatDate(Date.now())} />
         {children}
       </main>
     </div>

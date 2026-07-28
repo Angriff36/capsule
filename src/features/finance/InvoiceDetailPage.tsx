@@ -6,7 +6,7 @@ import {
   formatMoney,
   normalizeCurrencyCode,
 } from "../../lib/format";
-import { formatCurrencyLabel } from "../../lib/currency";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useCreateCreditMemo,
   useGetInvoice,
@@ -37,7 +37,12 @@ import {
 } from "../../lib/invoiceReminderSchedule";
 import { useTrackRecent } from "../../lib/recents";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
-import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  EmptyState,
+  ErrorState,
+  StatusChip,
+  TableSkeleton,
+} from "../../ui/primitives";
 import { CLIENTS_ROUTES } from "../clients/clientsRoutes";
 import { clientDisplayName } from "../events/clientName";
 import { useTenantBranding } from "../admin/tenantBranding";
@@ -247,6 +252,12 @@ export function InvoiceDetailPage() {
     amountDue - (depositPaidAt == null ? depositAmount : 0),
   );
   const dueDate = invoice.dueDate == null ? null : Number(invoice.dueDate);
+  const issuedAt =
+    invoice.issuedAt != null
+      ? Number(invoice.issuedAt)
+      : invoice.createdAt != null
+        ? Number(invoice.createdAt)
+        : null;
   const invoiceOpen = ["sent", "viewed", "overdue", "partial"].includes(
     String(invoice.status),
   );
@@ -528,7 +539,7 @@ export function InvoiceDetailPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
+      <header className="supply-masthead invoice-doc-masthead">
         <div>
           <p className="eyebrow">
             <Link className="text-link" to={FINANCE_ROUTES.invoices}>
@@ -540,6 +551,7 @@ export function InvoiceDetailPage() {
             {invoice.invoiceNumber || "Untitled invoice"}
           </h1>
           <p className="mt-3 max-w-160 text-ink-2">
+            Billed to{" "}
             <Link
               className="text-link"
               to={CLIENTS_ROUTES.detail(String(invoice.clientId))}
@@ -554,41 +566,58 @@ export function InvoiceDetailPage() {
                   {String(linkedEvent.title || "Linked event")}
                 </Link>
               </>
-            ) : null}{" "}
-            · {formatMoney(Number(invoice.amountDue ?? 0), invoiceCurrencyCode)}{" "}
-            due
-            {isForeignCurrency && functionalEquivalentDue != null ? (
-              <>
-                {" "}
-                · {formatMoney(
-                  functionalEquivalentDue,
-                  functionalCurrencyCode,
-                )}{" "}
-                {formatCurrencyLabel(functionalCurrencyCode).split(" ")[0]}{" "}
-                equivalent
-              </>
             ) : null}
           </p>
-        </div>
-        <div className="supply-row-actions">
-          <StatusChip status={String(invoice.status)} />
-          {invoice.status === "paid" ? (
-            <button
-              className="btn btn-ghost"
-              type="button"
-              disabled={busy != null || !canIssueCreditMemo}
-              onClick={() => setShowCreditMemo((visible) => !visible)}
-            >
-              Issue credit memo
+          <div className="supply-row-actions mt-4">
+            {invoice.status === "paid" ? (
+              <button
+                className="btn btn-ghost"
+                type="button"
+                disabled={busy != null || !canIssueCreditMemo}
+                onClick={() => setShowCreditMemo((visible) => !visible)}
+              >
+                Issue credit memo
+              </button>
+            ) : null}
+            <button className="btn btn-ghost" onClick={downloadPdf}>
+              Download PDF
             </button>
-          ) : null}
-          <button className="btn btn-ghost" onClick={downloadPdf}>
-            Download PDF
-          </button>
-          <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
-            Record payment
-          </Link>
+            <Link className="btn btn-primary" to={FINANCE_ROUTES.payments}>
+              Record payment
+            </Link>
+          </div>
         </div>
+        <aside className="invoice-doc-stamp" aria-label="Invoice summary">
+          <StatusChip status={String(invoice.status)} />
+          <dl>
+            <div>
+              <dt>Issued</dt>
+              <dd>{formatDate(issuedAt)}</dd>
+            </div>
+            <div>
+              <dt>Due</dt>
+              <dd>{formatDate(dueDate)}</dd>
+            </div>
+            <div>
+              <dt>Total</dt>
+              <dd>{usd(invoice.total)}</dd>
+            </div>
+            <div>
+              <dt>Paid</dt>
+              <dd>{usd(invoice.amountPaid)}</dd>
+            </div>
+            <div className="invoice-doc-stamp-due">
+              <dt>Amount due</dt>
+              <dd>{usd(invoice.amountDue)}</dd>
+            </div>
+          </dl>
+          {isForeignCurrency && functionalEquivalentDue != null ? (
+            <small>
+              ≈ {formatMoney(functionalEquivalentDue, functionalCurrencyCode)}{" "}
+              {functionalCurrencyCode} equivalent
+            </small>
+          ) : null}
+        </aside>
       </header>
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
@@ -662,10 +691,10 @@ export function InvoiceDetailPage() {
           <span>{lineItems.length}</span>
         </div>
         {lineItems.length === 0 ? (
-          <div className="document-empty">
-            <p>This invoice predates itemized tax.</p>
-            <span>Its aggregate subtotal and tax remain available below.</span>
-          </div>
+          <EmptyState
+            title="This invoice predates itemized tax."
+            hint="Its aggregate subtotal and tax remain available below."
+          />
         ) : (
           <div className="supply-table-wrap">
             <table className="supply-table invoice-detail-lines">
@@ -684,7 +713,7 @@ export function InvoiceDetailPage() {
                 {lineItems.map((line, index) => (
                   <tr key={`${line.description}-${index}`}>
                     <td>{line.description}</td>
-                    <td>{line.category}</td>
+                    <td>{formatStatusLabel(line.category)}</td>
                     <td>{line.quantity}</td>
                     <td>{usd(line.unitPrice)}</td>
                     <td>{usd(line.subtotal)}</td>
@@ -906,12 +935,22 @@ export function InvoiceDetailPage() {
           </form>
         ) : null}
         {relatedCreditMemos.length === 0 ? (
-          <div className="document-empty mt-4">
-            <p>No credit memos issued.</p>
-            <span>
-              Paid invoice totals and payment history remain unchanged.
-            </span>
-          </div>
+          <EmptyState
+            title="No credit memos issued."
+            hint="Paid invoice totals and payment history remain unchanged."
+            action={
+              canIssueCreditMemo && !showCreditMemo ? (
+                <button
+                  className="btn btn-ghost btn-sm"
+                  type="button"
+                  disabled={busy != null}
+                  onClick={() => setShowCreditMemo(true)}
+                >
+                  Issue credit memo
+                </button>
+              ) : undefined
+            }
+          />
         ) : (
           <div className="supply-table-wrap mt-4">
             <table className="supply-table">
@@ -1222,10 +1261,18 @@ export function InvoiceDetailPage() {
           <span>{relatedPayments.length}</span>
         </div>
         {relatedPayments.length === 0 ? (
-          <div className="document-empty">
-            <p>No payments recorded yet.</p>
-            <span>Record a payment after the invoice is sent.</span>
-          </div>
+          <EmptyState
+            title="No payments recorded yet."
+            hint="Record a payment after the invoice is sent."
+            action={
+              <Link
+                className="btn btn-ghost btn-sm"
+                to={FINANCE_ROUTES.payments}
+              >
+                Record payment
+              </Link>
+            }
+          />
         ) : (
           <div className="supply-table-wrap">
             <table className="supply-table">
@@ -1245,7 +1292,7 @@ export function InvoiceDetailPage() {
                         invoiceCurrencyCode,
                       )}
                     </td>
-                    <td>{String(payment.method)}</td>
+                    <td>{formatStatusLabel(String(payment.method))}</td>
                     <td>
                       <StatusChip status={String(payment.status)} />
                     </td>
