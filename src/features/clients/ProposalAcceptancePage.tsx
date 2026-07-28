@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
 import { api } from "../../lib/api";
 import { publicErrorMessage } from "../../lib/publicErrorMessage";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
@@ -20,8 +19,14 @@ import { ErrorState, TableSkeleton } from "../../ui/primitives";
  * 7. SignatureRequest.complete emits SignatureCompleted event
  * 8. Manifest reaction triggers Proposal.accept
  */
-export function ProposalAcceptancePage() {
-  const { callbackToken } = useParams<{ callbackToken: string }>();
+// callbackToken is a prop: App renders this page directly off useMatch (no
+// <Route> context), so useParams() here would always be empty and every link
+// would read "Invalid acceptance link". Same pattern as ClientPortalPage.
+export function ProposalAcceptancePage({
+  callbackToken,
+}: {
+  callbackToken: string;
+}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
   const [accepted, setAccepted] = useState(false);

@@ -484,7 +484,9 @@ export function App() {
   if (acceptanceMatch?.params.callbackToken) {
     return (
       <AppErrorBoundary>
-        <ProposalAcceptancePage />
+        <ProposalAcceptancePage
+          callbackToken={acceptanceMatch.params.callbackToken}
+        />
       </AppErrorBoundary>
     );
   }
@@ -492,7 +494,7 @@ export function App() {
   if (shareMatch?.params.token) {
     return (
       <AppErrorBoundary>
-        <SharedProposalPage />
+        <SharedProposalPage token={shareMatch.params.token} />
       </AppErrorBoundary>
     );
   }

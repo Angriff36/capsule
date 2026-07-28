@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../lib/api";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
@@ -23,8 +22,11 @@ const PRICING_BASIS_LABEL: Record<string, string> = {
 const money = (value: number | null | undefined): string =>
   (Number(value ?? 0) || 0).toFixed(2);
 
-export function SharedProposalPage() {
-  const { token } = useParams<{ token: string }>();
+// token comes in as a prop: App renders this page directly off useMatch (no
+// <Route> context), so useParams() here would always be empty and the query
+// would stay skipped forever — an endless skeleton. Same pattern as
+// ClientPortalPage.
+export function SharedProposalPage({ token }: { token: string }) {
   const data = useQuery(
     api.shareLinks.getSharedProposal,
     token ? { token } : "skip",
