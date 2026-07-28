@@ -3,13 +3,7 @@ import type {
   ComponentCostLineResult,
   ComponentCostSummary,
 } from "./ComponentCostCalculator";
-
-const money = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
+import { formatMoneyExact } from "../../lib/format";
 
 function issueText(line: ComponentCostLineResult) {
   if (line.status === "missing_ingredient") {
@@ -67,7 +61,7 @@ export function ComponentCostPanel({
         <div>
           <dt>{summary.isComplete ? "Batch total" : "Priced subtotal"}</dt>
           <dd data-testid="component-batch-cost">
-            {loading ? "—" : money.format(summary.batchCost)}
+            {loading ? "—" : formatMoneyExact(summary.batchCost)}
           </dd>
         </div>
         <div>
@@ -79,7 +73,7 @@ export function ComponentCostPanel({
           <dd data-testid="component-portion-cost">
             {loading || summary.costPerYieldUnit == null
               ? "—"
-              : money.format(summary.costPerYieldUnit)}
+              : formatMoneyExact(summary.costPerYieldUnit)}
           </dd>
         </div>
         <div>

@@ -5,6 +5,7 @@ import {
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { formatDate, formatMoney } from "../../lib/format";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { ReportFilterBar } from "./ReportFilterBar";
 import { useFinanceReportFilters } from "./useFinanceReportFilters";
@@ -20,23 +21,11 @@ import "./FoodCostPercentagePage.css";
 
 const TARGET_STORAGE_KEY = "capsule.finance.food-cost-target";
 
-const money = new Intl.NumberFormat(undefined, {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
-
 const compactMoney = new Intl.NumberFormat(undefined, {
   style: "currency",
   currency: "USD",
   notation: "compact",
   maximumFractionDigits: 1,
-});
-
-const reportDate = new Intl.DateTimeFormat(undefined, {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
 });
 
 function initialTarget(): number {
@@ -248,8 +237,8 @@ export function FoodCostPercentageDashboard({
         >
           <span>Service window</span>
           <strong>
-            {reportDate.format(report.rangeStart)} —{" "}
-            {reportDate.format(inclusiveRangeEnd)}
+            {formatDate(report.rangeStart.getTime())} —{" "}
+            {formatDate(inclusiveRangeEnd.getTime())}
           </strong>
           <small>finalized closeouts only</small>
         </div>
@@ -415,8 +404,8 @@ function FoodCostReportBody({
                       >
                         <td>{period.label}</td>
                         <td>{period.eventCount}</td>
-                        <td>{money.format(period.foodCost)}</td>
-                        <td>{money.format(period.revenue)}</td>
+                        <td>{formatMoney(period.foodCost)}</td>
+                        <td>{formatMoney(period.revenue)}</td>
                         <td>
                           <strong>{percentage(period.percentage)}</strong>
                         </td>
@@ -470,9 +459,9 @@ function FoodCostReportBody({
                       <strong>{event.title}</strong>
                       <small>{event.eventType}</small>
                     </td>
-                    <td>{reportDate.format(event.date)}</td>
-                    <td>{money.format(event.foodCost)}</td>
-                    <td>{money.format(event.revenue)}</td>
+                    <td>{formatDate(event.date.getTime())}</td>
+                    <td>{formatMoney(event.foodCost)}</td>
+                    <td>{formatMoney(event.revenue)}</td>
                     <td>
                       <strong>{percentage(event.percentage)}</strong>
                     </td>

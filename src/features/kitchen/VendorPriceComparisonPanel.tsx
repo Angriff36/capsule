@@ -3,24 +3,12 @@ import {
   observationTime,
   type IngredientPriceObservationInput,
 } from "./IngredientPriceHistory";
+import { formatDate, formatMoneyExact } from "../../lib/format";
 
 type VendorOption = {
   _id: string;
   name: string;
 };
-
-const money = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-
-const date = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-});
 
 export function VendorPriceComparisonPanel({
   observations,
@@ -87,14 +75,14 @@ export function VendorPriceComparisonPanel({
                 ) : null}
               </div>
               <p className="mt-1 text-[18px] font-semibold">
-                {money.format(price)}
+                {formatMoneyExact(price)}
                 <small className="ml-1 text-[12px] font-normal text-ink-2">
                   / {observation.unit}
                 </small>
               </p>
               <p className="text-[11px] text-ink-3">
                 {at
-                  ? `Received ${date.format(new Date(at))}`
+                  ? `Received ${formatDate(new Date(at).getTime())}`
                   : "Date unavailable"}
               </p>
             </li>

@@ -6,22 +6,11 @@ import {
   type EventCostSummaryInvoice,
 } from "./eventCostSummary";
 import "./EventCostSummaryReport.css";
-
-const money = new Intl.NumberFormat(undefined, {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
+import { formatDate, formatMoney } from "../../lib/format";
 
 const percent = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 1,
   signDisplay: "exceptZero",
-});
-
-const reportDate = new Intl.DateTimeFormat(undefined, {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
 });
 
 function validDate(value: Date | number | string | null | undefined) {
@@ -86,7 +75,7 @@ export function EventCostSummaryReport({
             <span>
               {[
                 event.eventType,
-                eventStart ? reportDate.format(eventStart) : null,
+                eventStart ? formatDate(eventStart.getTime()) : null,
               ]
                 .filter(Boolean)
                 .join(" · ") || "Completed event"}
@@ -94,7 +83,9 @@ export function EventCostSummaryReport({
           </div>
           <div className="event-cost-report-stamp">
             <span>{summary.status.replaceAll("_", " ")}</span>
-            <strong>{asOf ? reportDate.format(asOf) : "Not finalized"}</strong>
+            <strong>
+              {asOf ? formatDate(asOf.getTime()) : "Not finalized"}
+            </strong>
             <small>
               {summary.headcount.actual}/{summary.headcount.expected} guests
             </small>
@@ -108,7 +99,7 @@ export function EventCostSummaryReport({
           <div>
             <span>Invoiced revenue</span>
             <strong data-testid="invoiced-revenue">
-              {money.format(summary.invoicedRevenue)}
+              {formatMoney(summary.invoicedRevenue)}
             </strong>
             <small>
               {summary.invoiceCount} invoice
@@ -118,14 +109,14 @@ export function EventCostSummaryReport({
           <div>
             <span>Total event cost</span>
             <strong data-testid="total-event-cost">
-              {money.format(summary.totalCost)}
+              {formatMoney(summary.totalCost)}
             </strong>
             <small>reconciled closeout</small>
           </div>
           <div className={summary.margin < 0 ? "is-negative" : "is-positive"}>
             <span>Resulting margin</span>
             <strong data-testid="resulting-margin">
-              {money.format(summary.margin)}
+              {formatMoney(summary.margin)}
             </strong>
             <small>
               {summary.marginPercent == null
@@ -141,7 +132,7 @@ export function EventCostSummaryReport({
               <p>Cost ledger</p>
               <h3>Where the event spend landed</h3>
             </div>
-            <strong>{money.format(summary.totalCost)}</strong>
+            <strong>{formatMoney(summary.totalCost)}</strong>
           </div>
 
           <div className="event-cost-report-costs">
@@ -149,7 +140,7 @@ export function EventCostSummaryReport({
               <div className="event-cost-report-cost" key={bucket.key}>
                 <div>
                   <span>{bucket.label}</span>
-                  <strong>{money.format(bucket.amount)}</strong>
+                  <strong>{formatMoney(bucket.amount)}</strong>
                 </div>
                 <div className="event-cost-report-bar" aria-hidden="true">
                   <i
@@ -177,9 +168,9 @@ export function EventCostSummaryReport({
           <div>
             <p>Reconciliation</p>
             <span>
-              Closeout revenue {money.format(summary.reconciledRevenue)}
+              Closeout revenue {formatMoney(summary.reconciledRevenue)}
               {Math.abs(revenueDifference) >= 0.01
-                ? ` · ${money.format(Math.abs(revenueDifference))} ${revenueDifference > 0 ? "more" : "less"} invoiced`
+                ? ` · ${formatMoney(Math.abs(revenueDifference))} ${revenueDifference > 0 ? "more" : "less"} invoiced`
                 : " · matches invoiced revenue"}
             </span>
             {summary.invoiceNumbers.length > 0 ? (

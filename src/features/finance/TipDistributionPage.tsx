@@ -7,7 +7,7 @@ import {
   useListPerson,
   useListShift,
 } from "../../lib/manifest-convex-react";
-import { formatDate } from "../../lib/format";
+import { formatDate, formatMoneyExact } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
@@ -21,11 +21,6 @@ import {
   type TipPoolingMethod,
 } from "./tipDistribution";
 import "./TipDistributionPage.css";
-
-const money = new Intl.NumberFormat(undefined, {
-  style: "currency",
-  currency: "USD",
-});
 
 const roleLabel = (value: string) =>
   value.replaceAll("_", " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -245,7 +240,7 @@ export function TipDistributionPage() {
         </div>
         <div className="tip-total-card" aria-live="polite">
           <span>Pool on the table</span>
-          <strong>{money.format(calculation.totalCents / 100)}</strong>
+          <strong>{formatMoneyExact(calculation.totalCents / 100)}</strong>
           <small>{calculation.shares.length} staff included</small>
         </div>
       </header>
@@ -399,7 +394,9 @@ export function TipDistributionPage() {
               </div>
               <div>
                 <span>Total collected</span>
-                <strong>{money.format(calculation.totalCents / 100)}</strong>
+                <strong>
+                  {formatMoneyExact(calculation.totalCents / 100)}
+                </strong>
                 <small>{roleLabel(method)} pool</small>
               </div>
             </header>
@@ -486,7 +483,9 @@ export function TipDistributionPage() {
                         </td>
                         <td className="tip-share-cell">
                           <strong>
-                            {share ? money.format(share.shareCents / 100) : "—"}
+                            {share
+                              ? formatMoneyExact(share.shareCents / 100)
+                              : "—"}
                           </strong>
                           <small>
                             {share ? `${share.sharePercent.toFixed(2)}%` : ""}
@@ -503,7 +502,7 @@ export function TipDistributionPage() {
                   <tr>
                     <td className="tip-no-print" />
                     <td colSpan={4}>Distribution total</td>
-                    <td>{money.format(calculation.totalCents / 100)}</td>
+                    <td>{formatMoneyExact(calculation.totalCents / 100)}</td>
                     <td className="tip-signature" />
                   </tr>
                 </tfoot>

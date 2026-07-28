@@ -10,6 +10,7 @@ import {
   useListStorageLocation,
   useListVendor,
 } from "../../lib/manifest-convex-react";
+import { formatDate, formatTime } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import {
@@ -20,18 +21,6 @@ import "./LotTraceabilityPage.css";
 
 const quantity = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 4,
-});
-const date = new Intl.DateTimeFormat(undefined, {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-});
-const dateTime = new Intl.DateTimeFormat(undefined, {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  hour: "numeric",
-  minute: "2-digit",
 });
 
 export function LotTraceabilityPage() {
@@ -286,10 +275,14 @@ export function LotTraceabilityPage() {
                       </small>
                     </td>
                     <td>
-                      <strong>{dateTime.format(row.lastConsumedAt)}</strong>
+                      <strong>
+                        {formatDate(row.lastConsumedAt)}{" "}
+                        {formatTime(row.lastConsumedAt)}
+                      </strong>
                       {row.firstConsumedAt !== row.lastConsumedAt ? (
                         <small>
-                          First {dateTime.format(row.firstConsumedAt)}
+                          First {formatDate(row.firstConsumedAt)}{" "}
+                          {formatTime(row.firstConsumedAt)}
                         </small>
                       ) : null}
                     </td>
@@ -348,5 +341,5 @@ function endOfDay(value: string): number | undefined {
 }
 
 function formatOptionalDate(value: number | null | undefined): string {
-  return value == null ? "not recorded" : date.format(value);
+  return value == null ? "not recorded" : formatDate(value);
 }

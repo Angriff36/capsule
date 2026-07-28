@@ -7,13 +7,7 @@ import type {
   MenuProfitabilityStatus,
 } from "./MenuProfitabilityAnalysis";
 import "./MenuProfitabilityPanel.css";
-
-const money = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
+import { formatMoneyExact } from "../../lib/format";
 
 function percentage(value: number | null): string {
   return value == null ? "—" : `${value.toFixed(1)}%`;
@@ -128,7 +122,7 @@ export function MenuProfitabilityPanel({
               </dd>
               <small>
                 {analysis.rankedDishCount
-                  ? `${money.format(analysis.portfolioMarginAmount)} across priced dishes`
+                  ? `${formatMoneyExact(analysis.portfolioMarginAmount)} across priced dishes`
                   : "Waiting on complete price and cost data"}
               </small>
             </div>
@@ -183,13 +177,15 @@ export function MenuProfitabilityPanel({
                     <strong>
                       {row.sellingPrice == null
                         ? "—"
-                        : money.format(row.sellingPrice)}
+                        : formatMoneyExact(row.sellingPrice)}
                     </strong>
                   </div>
                   <div className="menu-profitability__metric">
                     <span>Component cost</span>
                     <strong>
-                      {row.costComplete ? money.format(row.componentCost) : "—"}
+                      {row.costComplete
+                        ? formatMoneyExact(row.componentCost)
+                        : "—"}
                     </strong>
                   </div>
                   <div className="menu-profitability__metric is-margin">
@@ -197,7 +193,7 @@ export function MenuProfitabilityPanel({
                     <strong>
                       {row.grossMarginAmount == null
                         ? "—"
-                        : money.format(row.grossMarginAmount)}
+                        : formatMoneyExact(row.grossMarginAmount)}
                     </strong>
                     <em>{percentage(row.grossMarginPercent)}</em>
                   </div>

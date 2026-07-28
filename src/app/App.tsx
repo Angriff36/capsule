@@ -68,6 +68,31 @@ const VendorContractsPage = lazy(() =>
     default: module.VendorContractsPage,
   })),
 );
+const InventoryOverviewPage = lazy(() =>
+  import("../features/inventory/InventoryOverviewPage").then((module) => ({
+    default: module.InventoryOverviewPage,
+  })),
+);
+const StaffOverviewPage = lazy(() =>
+  import("../features/workforce/StaffOverviewPage").then((module) => ({
+    default: module.StaffOverviewPage,
+  })),
+);
+const LogisticsOverviewPage = lazy(() =>
+  import("../features/logistics/LogisticsOverviewPage").then((module) => ({
+    default: module.LogisticsOverviewPage,
+  })),
+);
+const FinanceOverviewPage = lazy(() =>
+  import("../features/finance/FinanceOverviewPage").then((module) => ({
+    default: module.FinanceOverviewPage,
+  })),
+);
+const FacilitiesOverviewPage = lazy(() =>
+  import("../features/facilities/FacilitiesOverviewPage").then((module) => ({
+    default: module.FacilitiesOverviewPage,
+  })),
+);
 const KitchenDisplayPage = lazy(() =>
   import("../features/production/KitchenDisplayPage").then((module) => ({
     default: module.KitchenDisplayPage,
@@ -600,7 +625,11 @@ export function App() {
             />
             <Route
               path="/inventory"
-              element={<Navigate to="/inventory/demand" replace />}
+              element={
+                <SupplyRoute>
+                  <InventoryOverviewPage />
+                </SupplyRoute>
+              }
             />
             <Route
               path="/inventory/demand"
@@ -676,7 +705,11 @@ export function App() {
             />
             <Route
               path="/staff"
-              element={<Navigate to="/staff/roster" replace />}
+              element={
+                <SupplyRoute>
+                  <StaffOverviewPage />
+                </SupplyRoute>
+              }
             />
             <Route
               path="/staff/roster"
@@ -784,7 +817,11 @@ export function App() {
             />
             <Route
               path="/logistics"
-              element={<Navigate to="/logistics/packs" replace />}
+              element={
+                <SupplyRoute>
+                  <LogisticsOverviewPage />
+                </SupplyRoute>
+              }
             />
             <Route
               path="/logistics/packs"
@@ -852,7 +889,11 @@ export function App() {
             />
             <Route
               path="/finance"
-              element={<Navigate to="/finance/invoices" replace />}
+              element={
+                <SupplyRoute>
+                  <FinanceOverviewPage />
+                </SupplyRoute>
+              }
             />
             <Route
               path="/finance/invoices"
@@ -1112,7 +1153,11 @@ export function App() {
             />
             <Route
               path="/facilities"
-              element={<Navigate to="/facilities/venues" replace />}
+              element={
+                <SupplyRoute>
+                  <FacilitiesOverviewPage />
+                </SupplyRoute>
+              }
             />
             <Route
               path="/facilities/equipment"

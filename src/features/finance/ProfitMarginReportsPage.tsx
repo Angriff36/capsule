@@ -5,6 +5,7 @@ import {
   useListEventCloseout,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { formatDate, formatMoney } from "../../lib/format";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import {
   buildProfitMarginCsv,
@@ -19,23 +20,11 @@ import {
 } from "./profitMarginReport";
 import "./ProfitMarginReportsPage.css";
 
-const money = new Intl.NumberFormat(undefined, {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
-
 const compactMoney = new Intl.NumberFormat(undefined, {
   style: "currency",
   currency: "USD",
   notation: "compact",
   maximumFractionDigits: 1,
-});
-
-const day = new Intl.DateTimeFormat(undefined, {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
 });
 
 function percent(value: number | null): string {
@@ -65,12 +54,12 @@ function resultCount(
 function MetricsCells({ metrics }: { metrics: ProfitMetrics }) {
   return (
     <>
-      <td>{money.format(metrics.revenue)}</td>
-      <td>{money.format(metrics.totalCost)}</td>
-      <td>{money.format(metrics.grossProfit)}</td>
+      <td>{formatMoney(metrics.revenue)}</td>
+      <td>{formatMoney(metrics.totalCost)}</td>
+      <td>{formatMoney(metrics.grossProfit)}</td>
       <td>{percent(metrics.grossMarginPercent)}</td>
       <td className={metrics.netProfit < 0 ? "is-negative" : "is-positive"}>
-        {money.format(metrics.netProfit)}
+        {formatMoney(metrics.netProfit)}
       </td>
       <td className={metrics.netProfit < 0 ? "is-negative" : "is-positive"}>
         {percent(metrics.netMarginPercent)}
@@ -116,7 +105,7 @@ function ProfitResultsTable({
                   <td>
                     <strong>{row.title}</strong>
                     <small>
-                      {day.format(row.date)} · {row.eventType}
+                      {formatDate(row.date.getTime())} · {row.eventType}
                     </small>
                   </td>
                   <td>
@@ -291,7 +280,7 @@ export function ProfitMarginDashboard({
           <span>Closeout window</span>
           <strong>
             {validRange
-              ? `${day.format(report.rangeStart)} — ${day.format(report.rangeEnd)}`
+              ? `${formatDate(report.rangeStart.getTime())} — ${formatDate(report.rangeEnd.getTime())}`
               : "Choose a valid range"}
           </strong>
         </div>
@@ -326,7 +315,7 @@ export function ProfitMarginDashboard({
                 {percent(report.summary.grossMarginPercent)}
               </strong>
               <small>
-                {money.format(report.summary.grossProfit)} after food
+                {formatMoney(report.summary.grossProfit)} after food
               </small>
             </div>
             <div>
@@ -345,7 +334,7 @@ export function ProfitMarginDashboard({
               <strong data-testid="profit-net-margin">
                 {percent(report.summary.netMarginPercent)}
               </strong>
-              <small>{money.format(report.summary.netProfit)} net profit</small>
+              <small>{formatMoney(report.summary.netProfit)} net profit</small>
             </div>
           </section>
 
@@ -355,7 +344,7 @@ export function ProfitMarginDashboard({
                 <p className="eyebrow">Cost composition</p>
                 <h2>Every dollar below gross</h2>
               </div>
-              <strong>{money.format(report.summary.totalCost)}</strong>
+              <strong>{formatMoney(report.summary.totalCost)}</strong>
             </div>
             <div className="profit-cost-band" aria-label="Cost distribution">
               {costBuckets.map((bucket) => (
@@ -363,7 +352,7 @@ export function ProfitMarginDashboard({
                   key={bucket.key}
                   className={`is-${bucket.key}`}
                   style={{ width: `${(bucket.value / totalCost) * 100}%` }}
-                  title={`${bucket.label}: ${money.format(bucket.value)}`}
+                  title={`${bucket.label}: ${formatMoney(bucket.value)}`}
                 />
               ))}
             </div>
@@ -372,7 +361,7 @@ export function ProfitMarginDashboard({
                 <div key={bucket.key}>
                   <i className={`is-${bucket.key}`} aria-hidden="true" />
                   <span>{bucket.label}</span>
-                  <strong>{money.format(bucket.value)}</strong>
+                  <strong>{formatMoney(bucket.value)}</strong>
                   <small>
                     {report.summary.totalCost === 0
                       ? "0%"
@@ -411,7 +400,7 @@ export function ProfitMarginDashboard({
                     {percent(report.bestSegment?.netMarginPercent ?? null)}
                   </strong>
                   <small>
-                    {money.format(report.bestSegment?.netProfit ?? 0)} across{" "}
+                    {formatMoney(report.bestSegment?.netProfit ?? 0)} across{" "}
                     {report.bestSegment?.eventCount ?? 0} events
                   </small>
                 </article>
@@ -425,7 +414,7 @@ export function ProfitMarginDashboard({
                     {percent(report.weakestSegment?.netMarginPercent ?? null)}
                   </strong>
                   <small>
-                    {money.format(report.weakestSegment?.netProfit ?? 0)} across{" "}
+                    {formatMoney(report.weakestSegment?.netProfit ?? 0)} across{" "}
                     {report.weakestSegment?.eventCount ?? 0} events
                   </small>
                 </article>
@@ -437,7 +426,7 @@ export function ProfitMarginDashboard({
                         <strong>{segment.label}</strong>
                         <small>
                           {segment.eventCount} events ·{" "}
-                          {money.format(segment.revenue)} revenue
+                          {formatMoney(segment.revenue)} revenue
                         </small>
                       </div>
                       <b>{percent(segment.netMarginPercent)}</b>

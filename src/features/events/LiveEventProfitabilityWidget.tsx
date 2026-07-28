@@ -9,14 +9,9 @@ import {
   useListVendorOrderLine,
   useListVendorOrderLineDemand,
 } from "../../lib/manifest-convex-react";
+import { formatMoney } from "../../lib/format";
 import { buildLiveEventProfitability } from "./liveEventProfitability";
 import "./LiveEventProfitabilityWidget.css";
-
-const money = new Intl.NumberFormat(undefined, {
-  style: "currency",
-  currency: "USD",
-  maximumFractionDigits: 0,
-});
 
 const percent = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 1,
@@ -115,7 +110,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
             <div className="live-profitability__margin">
               <span>Current priced margin</span>
               <strong data-testid="live-profit-margin">
-                {money.format(result.margin)}
+                {formatMoney(result.margin)}
               </strong>
               <small data-testid="live-profit-margin-percent">
                 {result.marginPercent == null
@@ -130,7 +125,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
               <div>
                 <span>Confirmed revenue</span>
                 <strong data-testid="live-profit-revenue">
-                  {money.format(result.confirmedRevenue)}
+                  {formatMoney(result.confirmedRevenue)}
                 </strong>
                 <small>
                   {result.invoiceCount} issued invoice
@@ -140,7 +135,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
               <div>
                 <span>Committed cost</span>
                 <strong data-testid="live-profit-cost">
-                  {money.format(result.totalCommittedCost)}
+                  {formatMoney(result.totalCommittedCost)}
                 </strong>
                 <small>priced records to date</small>
               </div>
@@ -161,7 +156,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
               <div>
                 <p>Ingredient demand</p>
                 <strong data-testid="live-profit-ingredients">
-                  {money.format(result.ingredientCost)}
+                  {formatMoney(result.ingredientCost)}
                 </strong>
                 <small>
                   {result.ingredientLineCount} committed line
@@ -176,7 +171,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
               <div>
                 <p>Labor</p>
                 <strong data-testid="live-profit-labor">
-                  {money.format(result.laborCost)}
+                  {formatMoney(result.laborCost)}
                 </strong>
                 <small>
                   {hours.format(result.laborHours)} reviewed hours ·{" "}
@@ -190,7 +185,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
               <div>
                 <p>Rental equipment</p>
                 <strong data-testid="live-profit-equipment">
-                  {money.format(result.equipmentCost)}
+                  {formatMoney(result.equipmentCost)}
                 </strong>
                 <small>
                   {result.rentalReservationCount} priced rental
