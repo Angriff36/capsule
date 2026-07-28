@@ -6,14 +6,9 @@ import {
   useProposalTemplateRevise,
   useListProposalTemplate,
 } from "../../lib/manifest-convex-react";
-import { TableSkeleton } from "../../ui/primitives";
+import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
-
-const STATUS_LABELS: Record<string, string> = {
-  active: "Active",
-  archived: "Archived",
-} as const;
 
 const PROPOSAL_SECTIONS = [
   { id: "cover_brand", label: "Cover & Brand" },
@@ -385,9 +380,20 @@ export function ProposalTemplatesPage() {
           <tbody>
             {activeTemplates.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center text-ink-2">
-                  No proposal templates yet. Create your first template to get
-                  started.
+                <td colSpan={6}>
+                  <EmptyState
+                    title="No proposal templates yet"
+                    hint="Create your first template to get started."
+                    action={
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => setOpen(true)}
+                      >
+                        New template
+                      </button>
+                    }
+                  />
                 </td>
               </tr>
             ) : (
@@ -414,13 +420,7 @@ export function ProposalTemplatesPage() {
                     </div>
                   </td>
                   <td>
-                    <span
-                      className={`badge badge-${
-                        row.status === "active" ? "success" : "muted"
-                      }`}
-                    >
-                      {STATUS_LABELS[row.status] || row.status}
-                    </span>
+                    <StatusChip status={row.status} />
                   </td>
                   <td className="text-right">
                     {row.status === "active" ? (

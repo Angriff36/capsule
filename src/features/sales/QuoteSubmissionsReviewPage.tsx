@@ -6,7 +6,12 @@ import { useListQuoteSubmission } from "../../lib/manifest-convex-react";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
 import { formatDate } from "../../lib/format";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  EmptyState,
+  PageHeader,
+  StatusChip,
+  TableSkeleton,
+} from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "../clients/ClientsWorkspaceNav";
 import type { Doc } from "../../lib/api";
 
@@ -82,7 +87,7 @@ export function QuoteSubmissionsReviewPage() {
   if (submissions === undefined) {
     return (
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-ink mb-4">Quote Requests</h1>
+        <PageHeader title="Quote Requests" />
         <TableSkeleton />
       </div>
     );
@@ -96,26 +101,30 @@ export function QuoteSubmissionsReviewPage() {
   return (
     <div className="p-6 max-w-6xl mx-auto">
       <ClientsWorkspaceNav />
-      <div className="flex items-center justify-between mb-6 mt-4">
-        <div>
-          <h1 className="text-2xl font-bold text-ink">Quote Requests</h1>
-          <p className="text-sm text-ink-3 mt-1">
-            Self-service submissions from the public quote form.{" "}
-            {pendingCount > 0 ? (
-              <span className="text-warn font-medium">
-                {pendingCount} awaiting conversion
-              </span>
-            ) : (
-              <span>All caught up.</span>
-            )}
-          </p>
-        </div>
-        <Link
-          to="/clients/pipeline"
-          className="text-sm text-ink-2 hover:text-ink underline"
-        >
-          View lead pipeline →
-        </Link>
+      <div className="mb-6 mt-4">
+        <PageHeader
+          title="Quote Requests"
+          lead={
+            <>
+              Self-service submissions from the public quote form.{" "}
+              {pendingCount > 0 ? (
+                <span className="text-warn font-medium">
+                  {pendingCount} awaiting conversion
+                </span>
+              ) : (
+                <span>All caught up.</span>
+              )}
+            </>
+          }
+          actions={
+            <Link
+              to="/clients/pipeline"
+              className="text-sm text-ink-2 hover:text-ink underline"
+            >
+              View lead pipeline →
+            </Link>
+          }
+        />
       </div>
 
       {failure && (
@@ -152,13 +161,15 @@ export function QuoteSubmissionsReviewPage() {
       )}
 
       {visible.length === 0 ? (
-        <p className="text-ink-3 italic">
-          No quote requests yet. Submissions from the public{" "}
-          <Link to="/quote" className="underline">
-            /quote
-          </Link>{" "}
-          form appear here for conversion.
-        </p>
+        <EmptyState
+          title="No quote requests yet"
+          hint="Submissions from the public quote form appear here for conversion."
+          action={
+            <Link to="/quote" className="btn btn-ghost btn-sm">
+              Open the public /quote form
+            </Link>
+          }
+        />
       ) : (
         <div className="space-y-3">
           {visible.map((sub) => (

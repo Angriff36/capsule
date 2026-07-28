@@ -5,6 +5,7 @@ import {
   useListComponent,
   useListComponentIngredient,
 } from "../../lib/manifest-convex-react";
+import { Skeleton } from "../../ui/primitives";
 import { componentPath } from "../kitchen/kitchenRoutes";
 
 const TOP_N = 6;
@@ -117,7 +118,10 @@ export function ComponentStockSuggestions() {
       {open ? (
         <div className="border-t border-line p-3">
           {loading ? (
-            <p className="text-[13px] text-ink-2">Loading inventory…</p>
+            <div className="space-y-2">
+              <Skeleton className="h-5" />
+              <Skeleton className="h-5" />
+            </div>
           ) : suggestions.length === 0 ? (
             <p className="text-[13px] text-ink-2">
               No published components have ingredient coverage from current

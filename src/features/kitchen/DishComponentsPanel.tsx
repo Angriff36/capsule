@@ -7,6 +7,7 @@ import {
   useListComponent,
 } from "../../lib/manifest-convex-react";
 import { componentPath } from "./kitchenRoutes";
+import { TableSkeleton } from "../../ui/primitives";
 
 // DishComponent attach/detach — the first hop of the purchasing chain.
 //
@@ -121,7 +122,7 @@ export function DishComponentsPanel({ dishId }: Props) {
       ) : null}
 
       {dishComponents === undefined ? (
-        <p className="text-[13px] text-ink-2">Loading components…</p>
+        <TableSkeleton rows={3} />
       ) : rows.length === 0 ? (
         <div className="document-empty">
           <p>

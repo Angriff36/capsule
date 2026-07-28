@@ -9,6 +9,7 @@ import {
   bandLabel,
   timeToMinutes,
 } from "../workforce/availabilityGrid";
+import { EmptyState } from "../../ui/primitives";
 
 /**
  * Mobile self-service editor for a person's general weekly availability:
@@ -94,9 +95,21 @@ export function WeeklyAvailabilityCard({
         </form>
       ) : null}
       {rows === undefined ? null : mine.length === 0 ? (
-        <p className="mt-2 text-[13px] text-ink-3">
-          No weekly availability set.
-        </p>
+        <EmptyState
+          title="No weekly availability set"
+          hint="Add the days and hours you can generally work."
+          action={
+            showAdd ? null : (
+              <button
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setShowAdd(true)}
+              >
+                Add availability
+              </button>
+            )
+          }
+        />
       ) : (
         <ul className="mt-2 flex flex-col divide-y divide-line-2">
           {mine.map((row) => (

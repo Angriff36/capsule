@@ -16,7 +16,7 @@ export function IngredientPreviewCard({
       </span>
       <span className="block text-[11px] text-ink-3 capitalize">
         {ingredient.category ? `${ingredient.category} · ` : ""}
-        {ingredient.status}
+        {formatStatusLabel(ingredient.status)}
       </span>
       <span className="block text-[12px] text-ink-2">
         {formatMoney(ingredient.costPerUnit)} / {ingredient.unit}

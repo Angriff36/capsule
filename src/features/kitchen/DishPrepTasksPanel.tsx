@@ -7,6 +7,7 @@ import {
   useListComponent,
 } from "../../lib/manifest-convex-react";
 import { componentPath } from "./kitchenRoutes";
+import { TableSkeleton } from "../../ui/primitives";
 
 type Props = {
   dishId: string;
@@ -143,7 +144,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
       ) : null}
 
       {tasks === undefined ? (
-        <p className="text-[13px] text-ink-2">Loading prep tasks…</p>
+        <TableSkeleton rows={3} />
       ) : rows.length === 0 ? (
         <div className="document-empty">
           <p>

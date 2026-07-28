@@ -7,7 +7,12 @@ import {
   usePersonUnlinkAccount,
 } from "../../lib/manifest-convex-react";
 import { formatStatusLabel } from "../../lib/statusLabels";
-import { EmptyState, ErrorState, Section } from "../../ui/primitives";
+import {
+  EmptyState,
+  ErrorState,
+  Section,
+  TableSkeleton,
+} from "../../ui/primitives";
 import { PersonRoleDirectory } from "./PersonRoleDirectory";
 
 type TeamPerson = {
@@ -301,7 +306,7 @@ function TeamRolesTable({
   onUnlinkAccount: (person: TeamPerson) => Promise<void>;
 }>) {
   if (people === undefined) {
-    return <p className="p-4 text-[13px] text-ink-3">Loading team…</p>;
+    return <TableSkeleton rows={3} columns={3} />;
   }
   if (activePeople.length === 0) {
     return (

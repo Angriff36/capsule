@@ -26,7 +26,8 @@ import {
 } from "../../lib/manifest-convex-react";
 import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
-import { TableSkeleton } from "../../ui/primitives";
+import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { EventMenuStockShortageBanner } from "./EventMenuStockShortageBanner";
 import { EventMenuSyncController } from "./EventMenuSyncController";
@@ -236,7 +237,7 @@ export function EventMenuPage() {
                 .filter((event) => event.deletedAt == null)
                 .map((event) => (
                   <option key={event._id} value={event._id}>
-                    {event.title} · {event.stage}
+                    {event.title} · {formatStatusLabel(String(event.stage))}
                   </option>
                 ))}
             </select>
@@ -245,7 +246,9 @@ export function EventMenuPage() {
             <dl className="event-menu-brief">
               <div>
                 <dt>Stage</dt>
-                <dd>{selectedEvent.stage}</dd>
+                <dd>
+                  <StatusChip status={String(selectedEvent.stage)} />
+                </dd>
               </div>
               <div>
                 <dt>Headcount</dt>

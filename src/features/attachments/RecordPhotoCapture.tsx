@@ -7,6 +7,7 @@ import {
   useAttachmentSetSurveySelection,
   useCreateAttachment,
 } from "../../lib/manifest-convex-react";
+import { EmptyState, Skeleton } from "../../ui/primitives";
 
 export type PhotoParentType = "delivery" | "closeout" | "eventRecord";
 
@@ -433,9 +434,16 @@ export function RecordPhotoCaptureView({
       ) : null}
 
       {photos === undefined ? (
-        <p className="mt-3 text-[13px] text-ink-3">Loading photos…</p>
+        <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
+          <Skeleton className="aspect-[4/3]" />
+          <Skeleton className="aspect-[4/3]" />
+          <Skeleton className="aspect-[4/3]" />
+        </div>
       ) : photos.length === 0 ? (
-        <p className="mt-3 text-[13px] text-ink-3">No photos attached yet.</p>
+        <EmptyState
+          title="No photos attached yet"
+          hint="Take or choose a photo above to document this record."
+        />
       ) : (
         <ul className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-4">
           {photos.map((photo) => (

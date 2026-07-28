@@ -6,7 +6,7 @@ import {
   useListStaffMessage,
   useStaffMessageMarkRead,
 } from "../../lib/manifest-convex-react";
-import { TableSkeleton } from "../../ui/primitives";
+import { EmptyState, TableSkeleton } from "../../ui/primitives";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
@@ -193,9 +193,10 @@ export function MessagesPage() {
           <div className="border-line-2 max-md:border-b md:border-r">
             <p className="eyebrow px-4 pt-4">Teammates</p>
             {contacts.length === 0 ? (
-              <p className="px-4 py-3 text-[12px] text-ink-3">
-                No other staff members yet.
-              </p>
+              <EmptyState
+                title="No other staff members yet"
+                hint="Teammates appear here once they are added to the roster."
+              />
             ) : (
               <ul className="max-h-130 overflow-y-auto p-2">
                 {contacts.map(({ person, unread }) => (
@@ -237,9 +238,10 @@ export function MessagesPage() {
                 </div>
                 <div className="flex-1 space-y-2 overflow-y-auto px-4 py-3">
                   {thread.length === 0 ? (
-                    <p className="text-[12px] text-ink-3">
-                      No messages in the last 90 days. Say hello.
-                    </p>
+                    <EmptyState
+                      title="No messages in the last 90 days"
+                      hint="Say hello."
+                    />
                   ) : (
                     thread.map((m) => {
                       const mine = m.senderPersonId === me._id;

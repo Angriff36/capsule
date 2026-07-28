@@ -11,6 +11,7 @@ import {
   useListInventoryReservation,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
+import { StatusChip } from "../../ui/primitives";
 import { EventStockIssueCoordinator } from "./EventStockIssueCoordinator";
 import {
   EventStockReservationCoordinator,
@@ -304,7 +305,9 @@ export function EventInventoryPanel({
                     <td className="py-2 pr-3 font-mono">
                       {reserved} {String(demand.unit)}
                     </td>
-                    <td className="py-2">{String(demand.status)}</td>
+                    <td className="py-2">
+                      <StatusChip status={String(demand.status)} />
+                    </td>
                   </tr>
                 );
               })}
@@ -343,7 +346,9 @@ export function EventInventoryPanel({
                     <td className="py-2 pr-3 font-mono">
                       {Number(reservation.quantity)}
                     </td>
-                    <td className="py-2 pr-3">{String(reservation.status)}</td>
+                    <td className="py-2 pr-3">
+                      <StatusChip status={String(reservation.status)} />
+                    </td>
                     <td className="py-2">
                       {eligible && reservation.status === "active" ? (
                         <button

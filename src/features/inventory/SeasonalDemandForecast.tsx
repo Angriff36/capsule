@@ -4,6 +4,7 @@ import {
   useListIngredient,
   useListIngredientDemand,
 } from "../../lib/manifest-convex-react";
+import { TableSkeleton } from "../../ui/primitives";
 
 const TOP_N = 12;
 const QUARTER_LABELS = [
@@ -152,7 +153,7 @@ export function SeasonalDemandForecast() {
       </p>
       {open ? (
         loading ? (
-          <p className="mt-3 text-ink-2">Loading history…</p>
+          <TableSkeleton rows={4} columns={3} />
         ) : forecast.rows.length === 0 ? (
           <div className="document-empty">
             <p>No seasonal history yet</p>

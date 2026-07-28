@@ -5,6 +5,7 @@ import {
   useVehicleReviseDetails,
   useVehicleUpdateOperationalStatus,
 } from "../../lib/manifest-convex-react";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -33,9 +34,6 @@ type VehicleRow = {
   statusNote?: string | null;
   deletedAt?: number | null;
 };
-
-const humanize = (value: string) =>
-  value.replaceAll("_", " ").replace(/^./, (letter) => letter.toUpperCase());
 
 export function VehicleFleetPage() {
   const vehicles = useListVehicle();
@@ -120,7 +118,7 @@ export function VehicleFleetPage() {
         operationalStatus,
       });
       setNotice(
-        `${vehicle.registration} is now ${humanize(operationalStatus).toLowerCase()}.`,
+        `${vehicle.registration} is now ${formatStatusLabel(operationalStatus).toLowerCase()}.`,
       );
     });
   };
@@ -248,7 +246,7 @@ export function VehicleFleetPage() {
                         >
                           {OPERATIONAL_STATUSES.map((status) => (
                             <option key={status} value={status}>
-                              {humanize(status)}
+                              {formatStatusLabel(status)}
                             </option>
                           ))}
                         </select>
@@ -341,7 +339,7 @@ function VehicleForm({
           >
             {OWNERSHIP.map((ownership) => (
               <option key={ownership} value={ownership}>
-                {humanize(ownership)}
+                {formatStatusLabel(ownership)}
               </option>
             ))}
           </select>
@@ -369,7 +367,7 @@ function VehicleForm({
               >
                 {OPERATIONAL_STATUSES.map((status) => (
                   <option key={status} value={status}>
-                    {humanize(status)}
+                    {formatStatusLabel(status)}
                   </option>
                 ))}
               </select>

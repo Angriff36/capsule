@@ -34,17 +34,6 @@ const attributionTypeLabel = (type: string) => {
   return labels[type] ?? type;
 };
 
-const statusColor = (status: string) => {
-  const colors: Record<string, string> = {
-    draft: "draft",
-    pending_approval: "pending",
-    approved: "success",
-    rejected: "error",
-    applied: "active",
-  };
-  return colors[status] ?? "draft";
-};
-
 export function RevenueAttributionsPage() {
   const attributions = useListRevenueAttribution();
   const events = useListEvent();
@@ -230,7 +219,7 @@ export function RevenueAttributionsPage() {
                 return (
                   <tr key={attr._id}>
                     <td>
-                      <StatusChip status={statusColor(attr.status)} />
+                      <StatusChip status={String(attr.status)} />
                     </td>
                     <td>
                       <Link

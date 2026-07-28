@@ -1,7 +1,7 @@
 import { useAction, useQuery } from "convex/react";
 import { useState, type FormEvent } from "react";
 import { api } from "../../lib/api";
-import { ErrorState, Section } from "../../ui/primitives";
+import { EmptyState, ErrorState, Section, Skeleton } from "../../ui/primitives";
 
 function formatWhen(value: number | null | undefined): string {
   return value == null
@@ -227,11 +227,12 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
           <div className="rounded-sm border border-line bg-inset p-4">
             <p className="eyebrow">Registered endpoints</p>
             {endpoints === undefined ? (
-              <p className="mt-2 text-[12px] text-ink-3">Loading…</p>
+              <Skeleton className="mt-2 h-6" />
             ) : endpoints.length === 0 ? (
-              <p className="mt-2 text-[12px] text-ink-3">
-                No endpoints yet. Registered endpoints appear here.
-              </p>
+              <EmptyState
+                title="No endpoints yet"
+                hint="Registered endpoints appear here."
+              />
             ) : (
               <ul className="mt-3 space-y-3">
                 {endpoints.map((endpoint) => (
@@ -298,11 +299,12 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
           <div className="rounded-sm border border-line bg-inset p-4">
             <p className="eyebrow">Recent deliveries</p>
             {deliveries === undefined ? (
-              <p className="mt-2 text-[12px] text-ink-3">Loading…</p>
+              <Skeleton className="mt-2 h-6" />
             ) : deliveries.length === 0 ? (
-              <p className="mt-2 text-[12px] text-ink-3">
-                No deliveries yet. Deliveries appear here once an event fires.
-              </p>
+              <EmptyState
+                title="No deliveries yet"
+                hint="Deliveries appear here once an event fires."
+              />
             ) : (
               <ul className="mt-3 divide-y divide-line text-[12px]">
                 {deliveries.map((delivery) => (

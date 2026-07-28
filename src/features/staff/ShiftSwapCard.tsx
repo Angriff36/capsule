@@ -12,7 +12,7 @@ import {
   useShiftSwapRequestDecline,
   useShiftSwapRequestWithdraw,
 } from "../../lib/manifest-convex-react";
-import { StatusChip } from "../../ui/primitives";
+import { EmptyState, StatusChip } from "../../ui/primitives";
 import { WorkforceFailureBanner } from "../workforce/WorkforceFailureBanner";
 import { evaluateShiftSwapCandidate } from "../workforce/shiftSwapEligibility";
 
@@ -210,7 +210,10 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
           Your upcoming shifts
         </p>
         {myScheduledShifts.length === 0 ? (
-          <p className="text-[13px] text-ink-3">No future shifts to swap.</p>
+          <EmptyState
+            title="No future shifts to swap"
+            hint="Upcoming scheduled shifts appear here once they are assigned."
+          />
         ) : (
           myScheduledShifts.map((shift) => {
             const existing = outgoing.find(
@@ -249,7 +252,10 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
                     </p>
                   </div>
                   {existing ? (
-                    <StatusChip status={statusLabel(String(existing.status))} />
+                    <StatusChip
+                      status={String(existing.status)}
+                      label={statusLabel(String(existing.status))}
+                    />
                   ) : (
                     <button
                       className="btn btn-ghost btn-sm"

@@ -6,15 +6,10 @@ import {
   useRoleScorecardReactivate,
 } from "../../lib/manifest-convex-react";
 import { PersonRoleDirectory } from "../admin/PersonRoleDirectory";
-import { TableSkeleton } from "../../ui/primitives";
+import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
-
-const STATUS_LABELS: Record<string, string> = {
-  active: "Active",
-  archived: "Archived",
-} as const;
 
 // A measurable expectation row — serialized to a JSON string on the
 // `expectations` property (additive shape; no schema migration to extend).
@@ -369,13 +364,7 @@ export function RoleScorecardsPage() {
                           </td>
                           <td className="text-ink-2">v{row.version}</td>
                           <td>
-                            <span
-                              className={`badge badge-${
-                                row.status === "active" ? "success" : "muted"
-                              }`}
-                            >
-                              {STATUS_LABELS[row.status] ?? row.status}
-                            </span>
+                            <StatusChip status={String(row.status)} />
                           </td>
                           <td className="text-right">
                             {row.status === "active" ? (

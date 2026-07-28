@@ -7,7 +7,8 @@ import {
   useListPerson,
   useOneOnOneActionClose,
 } from "../../lib/manifest-convex-react";
-import { TableSkeleton } from "../../ui/primitives";
+import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { CHIP_TONE_CLASS } from "../../lib/statusLabels";
 import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -472,13 +473,14 @@ export function OneOnOnesPage() {
                             <td>{personName(row.ownerPersonId)}</td>
                             <td>{formatDate(row.dueDate)}</td>
                             <td>
-                              <span
-                                className={`badge badge-${
-                                  row.status === "open" ? "warning" : "muted"
-                                }`}
-                              >
-                                {row.status}
-                              </span>
+                              <StatusChip
+                                status={String(row.status)}
+                                color={
+                                  row.status === "open"
+                                    ? CHIP_TONE_CLASS.warn
+                                    : CHIP_TONE_CLASS.mute
+                                }
+                              />
                             </td>
                             <td className="text-right">
                               {row.status === "open" ? (

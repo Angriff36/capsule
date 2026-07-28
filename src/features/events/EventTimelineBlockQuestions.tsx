@@ -8,6 +8,7 @@ import {
   useListPerson,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { Skeleton } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 
@@ -84,11 +85,14 @@ export function EventTimelineBlockQuestions({ eventId, activityId }: Props) {
         <div className="mt-2 space-y-2">
           {failure ? <FailureBanner failure={failure} /> : null}
           {me == null ? (
-            <p className="text-[12px] text-ink-3">
-              {authStatus === undefined
-                ? "Loading…"
-                : "Your account isn't linked to a staff profile, so you can't post questions."}
-            </p>
+            authStatus === undefined ? (
+              <Skeleton className="h-4 w-48" />
+            ) : (
+              <p className="text-[12px] text-ink-3">
+                Your account isn&apos;t linked to a staff profile, so you
+                can&apos;t post questions.
+              </p>
+            )
           ) : (
             <form
               className="space-y-2"

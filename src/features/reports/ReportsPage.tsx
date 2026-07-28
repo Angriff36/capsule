@@ -9,6 +9,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   ReportCreateForm,
   ReportCreatePayloadBuilder,
@@ -255,12 +256,11 @@ export function ReportsPage() {
                       <td>
                         <strong>{String(row.name || "Untitled")}</strong>
                       </td>
-                      <td>{String(row.subjectArea)}</td>
-                      <td>{String(row.chartType)}</td>
+                      <td>{formatStatusLabel(String(row.subjectArea))}</td>
+                      <td>{formatStatusLabel(String(row.chartType))}</td>
                       <td>
-                        {String(row.sharingScope || "owner_only").replaceAll(
-                          "_",
-                          " ",
+                        {formatStatusLabel(
+                          String(row.sharingScope || "owner_only"),
                         )}
                       </td>
                       <td>

@@ -28,6 +28,7 @@ import {
 import { ComponentVersionHistoryPanel } from "./ComponentVersionHistoryPanel";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
@@ -346,7 +347,7 @@ export function ComponentDetailPage() {
           <div>
             <p className="eyebrow">
               Component · Edition {component.versionNumber} ·{" "}
-              {String(component.status)}
+              {formatStatusLabel(String(component.status))}
             </p>
             <h1 className="culinary-title-compact">{component.name}</h1>
           </div>
@@ -662,7 +663,8 @@ export function ComponentDetailPage() {
                   <span className="font-display text-xl">{dish.name}</span>
                 </CulinaryEntityLink>
                 <span className="font-mono text-[10px] text-ink-3">
-                  {dish.portionSize} {String(dish.portionUnit)} · {dish.status}
+                  {dish.portionSize} {String(dish.portionUnit)} ·{" "}
+                  {formatStatusLabel(String(dish.status))}
                 </span>
               </li>
             ))}

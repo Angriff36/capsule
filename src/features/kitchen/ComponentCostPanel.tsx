@@ -80,7 +80,7 @@ export function ComponentCostPanel({
           <dt>Pricing coverage</dt>
           <dd data-testid="component-pricing-coverage">
             {loading
-              ? "Loading"
+              ? "—"
               : `${summary.pricedLineCount} / ${summary.totalLineCount} lines`}
           </dd>
         </div>

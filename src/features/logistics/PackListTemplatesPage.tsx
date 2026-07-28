@@ -9,7 +9,12 @@ import {
   usePackListTemplateReactivate,
   usePackListTemplateRevise,
 } from "../../lib/manifest-convex-react";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import {
+  EmptyState,
+  PageHeader,
+  StatusChip,
+  TableSkeleton,
+} from "../../ui/primitives";
 import {
   classifyCommandFailure,
   type CommandFailure,
@@ -255,27 +260,29 @@ export function PackListTemplatesPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold text-ink">
-            Pack List Templates
-          </h1>
-          <p className="text-[13px] text-ink-3">
-            Reusable equipment pack lists an event can generate into its load
-            sheet.{" "}
-            <Link className="link" to="/logistics/packs">
-              Pack lists
-            </Link>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="btn btn-primary min-h-10"
-          disabled={busy != null}
-          onClick={formOpen ? resetForm : openCreate}
-        >
-          {formOpen ? "Close" : "+ New template"}
-        </button>
+      <div className="mb-4">
+        <PageHeader
+          title="Pack List Templates"
+          lead={
+            <>
+              Reusable equipment pack lists an event can generate into its load
+              sheet.{" "}
+              <Link className="link" to="/logistics/packs">
+                Pack lists
+              </Link>
+            </>
+          }
+          actions={
+            <button
+              type="button"
+              className="btn btn-primary min-h-10"
+              disabled={busy != null}
+              onClick={formOpen ? resetForm : openCreate}
+            >
+              {formOpen ? "Close" : "+ New template"}
+            </button>
+          }
+        />
       </div>
 
       {failure ? <FailureBanner failure={failure} /> : null}
@@ -484,9 +491,20 @@ export function PackListTemplatesPage() {
       {loading ? (
         <TableSkeleton />
       ) : rows.length === 0 ? (
-        <p className="text-[13px] text-ink-3">
-          No pack list templates yet. Create one to generate load sheets faster.
-        </p>
+        <EmptyState
+          title="No pack list templates yet"
+          hint="Create one to generate load sheets faster."
+          action={
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              disabled={busy != null}
+              onClick={openCreate}
+            >
+              + New template
+            </button>
+          }
+        />
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

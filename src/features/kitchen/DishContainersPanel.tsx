@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { TableSkeleton } from "../../ui/primitives";
 import {
   useCreateDishContainer,
   useDishContainerRetire,
@@ -115,7 +116,7 @@ export function DishContainersPanel({ dishId }: Props) {
       ) : null}
 
       {containers === undefined ? (
-        <p className="text-[13px] text-ink-2">Loading containers…</p>
+        <TableSkeleton rows={3} />
       ) : rows.length === 0 ? (
         <div className="document-empty">
           <p>

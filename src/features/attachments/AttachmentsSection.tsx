@@ -6,6 +6,7 @@ import {
   useAttachmentRemove,
   useCreateAttachment,
 } from "../../lib/manifest-convex-react";
+import { EmptyState, TableSkeleton } from "../../ui/primitives";
 
 export type AttachmentParentType =
   | "eventRecord"
@@ -102,9 +103,12 @@ export function AttachmentsSection({
         </p>
       ) : null}
       {attachments === undefined ? (
-        <p className="mt-3 text-[13px] text-ink-2">Loading attachments…</p>
+        <TableSkeleton rows={2} />
       ) : attachments.length === 0 ? (
-        <p className="mt-3 text-[13px] text-ink-2">No files attached yet.</p>
+        <EmptyState
+          title="No files attached yet"
+          hint="PDFs, images, and spreadsheets attached here stay with this record."
+        />
       ) : (
         <ul className="mt-3 divide-y">
           {attachments.map((row) => (

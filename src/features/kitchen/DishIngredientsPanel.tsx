@@ -6,6 +6,7 @@ import {
   useListIngredient,
 } from "../../lib/manifest-convex-react";
 import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
+import { TableSkeleton } from "../../ui/primitives";
 
 type Props = {
   dishId: string;
@@ -111,7 +112,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
       ) : null}
 
       {lines === undefined ? (
-        <p className="text-[13px] text-ink-2">Loading ingredients…</p>
+        <TableSkeleton rows={3} />
       ) : rows.length === 0 ? (
         <div className="document-empty">
           <p>

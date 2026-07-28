@@ -12,6 +12,7 @@ import {
   useListVendorOrderLine,
   useListVendorOrderLineDemand,
 } from "../../lib/manifest-convex-react";
+import { TableSkeleton } from "../../ui/primitives";
 import { buildLiveEventProfitability } from "./liveEventProfitability";
 import { LiveEventProfitabilityWidget } from "./LiveEventProfitabilityWidget";
 
@@ -98,7 +99,7 @@ export function EventMarginTab({ eventId }: Props) {
   const budgetVariance = budget > 0 ? budget - totalCost : null;
 
   if (event === undefined) {
-    return <p className="text-[13px] text-ink-2">Loading margin…</p>;
+    return <TableSkeleton rows={3} />;
   }
   if (event === null) {
     return <p className="text-[13px] text-ink-2">Event unavailable.</p>;

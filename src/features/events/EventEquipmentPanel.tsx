@@ -339,9 +339,7 @@ export function EventEquipmentPanel({
                       {reservation.quantity}
                     </span>
                   </div>
-                  <StatusChip
-                    status={String(reservation.status).replaceAll("_", " ")}
-                  />
+                  <StatusChip status={String(reservation.status)} />
                 </div>
 
                 <div className="equipment-checklist__window">

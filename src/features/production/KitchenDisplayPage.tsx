@@ -13,6 +13,8 @@ import {
   useProductionBatchStart,
 } from "../../lib/manifest-convex-react";
 import { useOptimisticStatus } from "../../ui/useOptimisticStatus";
+import { TableSkeleton } from "../../ui/primitives";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { ProductionFailureBanner } from "./ProductionFailureBanner";
 import { ProductionLifecyclePolicy } from "./ProductionLifecyclePolicy";
 import {
@@ -235,7 +237,7 @@ export function KitchenDisplayPage() {
       </header>
       {failure != null ? <ProductionFailureBanner error={failure} /> : null}
       {isLoading ? (
-        <p className="kds-empty">Loading the board…</p>
+        <TableSkeleton rows={6} />
       ) : items.length === 0 ? (
         <p className="kds-empty">All caught up — nothing in progress.</p>
       ) : (
@@ -257,7 +259,7 @@ export function KitchenDisplayPage() {
               >
                 <div className="kds-card-top">
                   <span className="kds-status">
-                    {item.status.replace("_", " ")}
+                    {formatStatusLabel(item.status)}
                   </span>
                   <span
                     className={overdue ? "kds-due kds-due-late" : "kds-due"}

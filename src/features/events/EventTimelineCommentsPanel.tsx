@@ -8,6 +8,7 @@ import {
   useListPerson,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { Skeleton } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { EventTabPanel } from "./EventTabPanel";
 import { FailureBanner } from "./FailureBanner";
@@ -74,11 +75,14 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
     >
       {failure ? <FailureBanner failure={failure} /> : null}
       {me == null ? (
-        <p className="text-[13px] text-ink-3">
-          {authStatus === undefined
-            ? "Loading…"
-            : "Your account isn't linked to a staff profile, so you can't post comments."}
-        </p>
+        authStatus === undefined ? (
+          <Skeleton className="h-4 w-48" />
+        ) : (
+          <p className="text-[13px] text-ink-3">
+            Your account isn&apos;t linked to a staff profile, so you can&apos;t
+            post comments.
+          </p>
+        )
       ) : (
         <form
           className="space-y-3 rounded-sm border border-line-2 bg-panel p-3"

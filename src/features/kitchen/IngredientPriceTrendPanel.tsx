@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { formatDate, formatMoneyExact } from "../../lib/format";
+import { TableSkeleton } from "../../ui/primitives";
 import {
   observationTime,
   priceChange,
@@ -103,7 +104,7 @@ export function IngredientPriceTrendPanel({
       </div>
 
       {loading ? (
-        <div className="ingredient-price-empty">Loading confirmed prices…</div>
+        <TableSkeleton rows={4} />
       ) : current ? (
         <>
           <div className="ingredient-price-snapshot">

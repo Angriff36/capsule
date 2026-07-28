@@ -7,6 +7,7 @@ import {
   type FormEvent,
 } from "react";
 import "./StockReceiptScanner.css";
+import { formatStatusLabel } from "../../lib/statusLabels";
 
 export interface StockReceiptInventoryItem {
   _id: string;
@@ -534,7 +535,7 @@ export function StockReceiptScanner({
               <strong>{eventName(selectedDemand.eventId)}</strong>
               <small>
                 {selectedDemand.requiredQuantity} {selectedDemand.unit}{" "}
-                requested · {selectedDemand.status}
+                requested · {formatStatusLabel(String(selectedDemand.status))}
               </small>
             </div>
           ) : null}

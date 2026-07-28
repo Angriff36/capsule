@@ -22,6 +22,7 @@ import {
   useAssignVehicle,
   useUnassignVehicle,
 } from "../facilities/vehicleAssignment";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { RecordPhotoCapture } from "../attachments/RecordPhotoCapture";
@@ -290,7 +291,8 @@ export function DeliveriesPage() {
                 <option value="">Select pack list</option>
                 {schedulablePacks.map((pack) => (
                   <option key={pack._id} value={pack._id}>
-                    {pack.name} · {eventName(pack.eventId)} ({pack.status})
+                    {pack.name} · {eventName(pack.eventId)} (
+                    {formatStatusLabel(String(pack.status))})
                   </option>
                 ))}
               </select>

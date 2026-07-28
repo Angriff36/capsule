@@ -10,7 +10,7 @@ import {
   useShiftSwapRequestApprove,
   useShiftSwapRequestReject,
 } from "../../lib/manifest-convex-react";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { evaluateShiftSwapCandidate } from "./shiftSwapEligibility";
@@ -72,20 +72,20 @@ export function ShiftSwapRequestsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header className="operations-hero">
-        <div>
-          <p className="eyebrow">Workforce · schedule integrity</p>
-          <h1>Shift swap approvals</h1>
-          <p>
-            Review swaps only after both staff members agree. Approval moves the
-            scheduled shift to its new owner in the same transaction.
-          </p>
-        </div>
-        <div className="hero-metric">
-          <span>Ready for review</span>
-          <strong>{pending.length}</strong>
-        </div>
-      </header>
+      <PageHeader
+        title="Shift swap approvals"
+        lead="Review swaps only after both staff members agree. Approval moves the scheduled shift to its new owner in the same transaction."
+        actions={
+          <div className="rounded-sm border border-brand/20 bg-brand-soft px-5 py-4 text-center">
+            <p className="text-[28px] leading-none font-semibold text-brand">
+              {pending.length}
+            </p>
+            <p className="mt-1 text-[11px] font-medium tracking-wide text-ink-2 uppercase">
+              Ready for review
+            </p>
+          </div>
+        }
+      />
 
       <WorkforceWorkspaceNav />
       {failure ? <WorkforceFailureBanner error={failure} /> : null}

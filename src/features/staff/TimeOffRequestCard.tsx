@@ -3,7 +3,7 @@ import {
   useCreateTimeOffRequest,
   useListTimeOffRequest,
 } from "../../lib/manifest-convex-react";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 
 const dateOnly = new Intl.DateTimeFormat(undefined, {
   month: "short",
@@ -120,7 +120,21 @@ export function TimeOffRequestCard({
         {requests === undefined ? (
           <TableSkeleton rows={2} />
         ) : myRequests.length === 0 ? (
-          <p className="text-[13px] text-ink-3">No time-off requests yet.</p>
+          <EmptyState
+            title="No time-off requests yet"
+            hint="Your requests and their review status appear here."
+            action={
+              showForm ? null : (
+                <button
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setShowForm(true)}
+                >
+                  New request
+                </button>
+              )
+            }
+          />
         ) : (
           <ul className="flex flex-col divide-y divide-line-2">
             {myRequests.slice(0, 6).map((request) => (

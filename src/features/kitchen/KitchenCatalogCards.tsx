@@ -7,6 +7,7 @@ import { CulinaryCatalogCardTone } from "./culinary-studio/CulinaryCatalogCardTo
 import "./culinary-studio/CulinaryCatalogCards.css";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { KitchenCatalogLifecycleButtons } from "./KitchenCatalogLifecycleButtons";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   dishPath,
   menuPath,
@@ -107,7 +108,7 @@ function CardBody({
         <span
           className={CulinaryCatalogCardTone.statusClass(String(item.status))}
         >
-          {String(item.status)}
+          {formatStatusLabel(String(item.status))}
         </span>
       </div>
 

@@ -7,6 +7,7 @@ import {
 } from "./eventCostSummary";
 import "./EventCostSummaryReport.css";
 import { formatDate, formatMoney } from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
 
 const percent = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 1,
@@ -82,7 +83,7 @@ export function EventCostSummaryReport({
             </span>
           </div>
           <div className="event-cost-report-stamp">
-            <span>{summary.status.replaceAll("_", " ")}</span>
+            <span>{formatStatusLabel(summary.status)}</span>
             <strong>
               {asOf ? formatDate(asOf.getTime()) : "Not finalized"}
             </strong>

@@ -11,7 +11,7 @@ import {
   useListPerson,
 } from "../../lib/manifest-convex-react";
 import { useIngestKmCandidates } from "../../lib/hiringPipeline";
-import { TableSkeleton } from "../../ui/primitives";
+import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -476,7 +476,7 @@ export function CandidatesPage() {
                             <td>{formatDate(row.scheduledFor)}</td>
                             <td>{personName(row.interviewerPersonId)}</td>
                             <td>
-                              <span className="badge">{row.outcome}</span>
+                              <StatusChip status={String(row.outcome)} />
                             </td>
                             <td>{row.notes || "—"}</td>
                             <td className="text-right">
