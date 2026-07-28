@@ -560,9 +560,17 @@ export function ProposalsPage() {
           .sort((a, b) => b.revisionNumber - a.revisionNumber)[0];
 
         const proposalRevisionId = latestRevision?._id;
-
-        // If no revision exists, we'll create the signature request without one
-        // (the SignatureRequest entity can work with a revision captured separately)
+        // Sending a proposal captures a revision, and this action only shows
+        // for sent/viewed proposals — a missing revision means the send-time
+        // capture failed and the request would dangle. Fail loud instead.
+        if (!proposalRevisionId) {
+          setFailure(
+            new Error(
+              "No revision snapshot exists for this proposal — re-send it, then request the signature.",
+            ),
+          );
+          return;
+        }
 
         const recipientName =
           client.clientType === "company"
@@ -580,17 +588,16 @@ export function ProposalsPage() {
 
         void run(`${row._id}:request-signature`, async () => {
           // Create signature request
+          // Optional recipient links are omitted, not sent as "skip" — the
+          // schema validates them (uuid) and the value would be stored as a FK.
           const result = await createSignatureRequest({
-            proposalRevisionId: proposalRevisionId ?? "skip", // Skip if no revision yet
+            proposalRevisionId,
             // proposalId drives the SignatureCompleted → Proposal.accept
             // cascade, so the signed proposal actually flips to "accepted".
             proposalId: row._id,
             recipientEmail,
             recipientName,
-            recipientPersonId: "skip",
-            recipientContactId: "skip",
             provider: "internal" as const,
-            expiresAt: undefined,
             idempotencyKey: `signature-request-${row._id}-${Date.now()}`,
           });
 
