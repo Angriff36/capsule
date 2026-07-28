@@ -12,6 +12,7 @@ import { formatMoney } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { EquipmentMaintenanceBoard } from "./EquipmentMaintenanceBoard";
+import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 
 const CONDITIONS = [
   "excellent",
@@ -154,6 +155,7 @@ export function EquipmentCatalogPage() {
           </button>
         </div>
       </header>
+      <FacilitiesWorkspaceNav />
       {failure ? <SupplyFailureBanner error={failure} /> : null}
       {showForm ? (
         <EquipmentForm

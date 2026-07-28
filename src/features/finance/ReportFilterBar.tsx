@@ -27,32 +27,30 @@ export function ReportFilterBar({
     useFinanceReportFilters(customDefaults);
 
   return (
-    <div className="mb-4 rounded-md bg-gray-50 p-4">
+    <div className="mb-4 rounded-md bg-inset p-4">
       <div className="flex flex-wrap items-center gap-4">
         {/* Date Range */}
         <div className="flex items-center gap-2">
-          <label className="text-sm font-medium text-gray-700">
-            Date Range:
-          </label>
+          <label className="text-sm font-medium text-ink-2">Date Range:</label>
           <input
             type="date"
             value={filters.rangeStart}
             onChange={(e) => setFilter("rangeStart", e.target.value)}
-            className="rounded border-gray-300 text-sm"
+            className="rounded border-line-2 text-sm"
           />
-          <span className="text-gray-500">to</span>
+          <span className="text-ink-3">to</span>
           <input
             type="date"
             value={filters.rangeEnd}
             onChange={(e) => setFilter("rangeEnd", e.target.value)}
-            className="rounded border-gray-300 text-sm"
+            className="rounded border-line-2 text-sm"
           />
         </div>
 
         {/* Granularity */}
         {showGranularity && (
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">By:</label>
+            <label className="text-sm font-medium text-ink-2">By:</label>
             <select
               value={filters.granularity}
               onChange={(e) =>
@@ -61,7 +59,7 @@ export function ReportFilterBar({
                   e.target.value as "week" | "month" | "quarter",
                 )
               }
-              className="rounded border-gray-300 text-sm"
+              className="rounded border-line-2 text-sm"
             >
               <option value="week">Week</option>
               <option value="month">Month</option>
@@ -73,9 +71,7 @@ export function ReportFilterBar({
         {/* Breakdown */}
         {showBreakdown && (
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">
-              Breakdown:
-            </label>
+            <label className="text-sm font-medium text-ink-2">Breakdown:</label>
             <select
               value={filters.breakdown}
               onChange={(e) =>
@@ -84,7 +80,7 @@ export function ReportFilterBar({
                   e.target.value as FinanceReportFilters["breakdown"],
                 )
               }
-              className="rounded border-gray-300 text-sm"
+              className="rounded border-line-2 text-sm"
             >
               <option value="event_type">Event Type</option>
               <option value="client">Client</option>
@@ -98,7 +94,7 @@ export function ReportFilterBar({
         {/* View */}
         {showView && (
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">View:</label>
+            <label className="text-sm font-medium text-ink-2">View:</label>
             <select
               value={filters.view}
               onChange={(e) =>
@@ -107,7 +103,7 @@ export function ReportFilterBar({
                   e.target.value as FinanceReportFilters["view"],
                 )
               }
-              className="rounded border-gray-300 text-sm"
+              className="rounded border-line-2 text-sm"
             >
               <option value="event">By Event</option>
               <option value="client">By Client</option>
@@ -119,7 +115,7 @@ export function ReportFilterBar({
         {/* Venue Premise */}
         {showVenuePremise && (
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">Venue:</label>
+            <label className="text-sm font-medium text-ink-2">Venue:</label>
             <select
               value={filters.venuePremise}
               onChange={(e) =>
@@ -128,7 +124,7 @@ export function ReportFilterBar({
                   e.target.value as "on" | "off" | "all",
                 )
               }
-              className="rounded border-gray-300 text-sm"
+              className="rounded border-line-2 text-sm"
             >
               <option value="all">All</option>
               <option value="on">On-Premise</option>
@@ -140,7 +136,7 @@ export function ReportFilterBar({
         {/* Status */}
         {showStatus && (
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">Status:</label>
+            <label className="text-sm font-medium text-ink-2">Status:</label>
             <select
               value={filters.status}
               onChange={(e) =>
@@ -149,7 +145,7 @@ export function ReportFilterBar({
                   e.target.value as FinanceReportFilters["status"],
                 )
               }
-              className="rounded border-gray-300 text-sm"
+              className="rounded border-line-2 text-sm"
             >
               <option value="all">All</option>
               <option value="planning">Planning</option>
@@ -165,16 +161,14 @@ export function ReportFilterBar({
         {/* Target */}
         {showTarget && (
           <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-gray-700">
-              Target %:
-            </label>
+            <label className="text-sm font-medium text-ink-2">Target %:</label>
             <input
               type="number"
               min="1"
               max="100"
               value={filters.target}
               onChange={(e) => setFilter("target", Number(e.target.value))}
-              className="w-20 rounded border-gray-300 text-sm"
+              className="w-20 rounded border-line-2 text-sm"
             />
           </div>
         )}
@@ -183,7 +177,7 @@ export function ReportFilterBar({
         {hasActiveFilters && (
           <button
             onClick={() => clearFilters()}
-            className="ml-auto text-sm text-blue-600 hover:text-blue-800"
+            className="ml-auto text-sm text-brand hover:underline"
           >
             Clear Filters
           </button>

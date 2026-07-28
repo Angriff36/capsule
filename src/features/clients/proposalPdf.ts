@@ -426,53 +426,6 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
     y += 8;
   }
 
-  // Enhancements section (if provided).
-  if (proposal.enhancements != null && proposal.enhancements.length > 0) {
-    sectionLabel("Enhancements & upgrades");
-    for (const enhancement of proposal.enhancements) {
-      // Calculate card height based on content.
-      let cardHeight = 24;
-      if (
-        enhancement.description != null &&
-        enhancement.description.trim() !== ""
-      ) {
-        const descLines = doc.splitTextToSize(
-          enhancement.description,
-          CONTENT_WIDTH - 24,
-        ) as string[];
-        cardHeight = Math.max(24, 18 + descLines.length * 12);
-      }
-      ensureSpace(cardHeight + 12);
-      doc.setFillColor(251, 250, 247);
-      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, cardHeight, 4, 4, "F");
-      doc.setFont("helvetica", "bold");
-      doc.setFontSize(10);
-      doc.setTextColor(...INK);
-      const nameWithPrice =
-        enhancement.price != null
-          ? `${enhancement.name} (+${usd(enhancement.price)})`
-          : enhancement.name;
-      doc.text(nameWithPrice, MARGIN + 12, y + 10);
-      if (
-        enhancement.description != null &&
-        enhancement.description.trim() !== ""
-      ) {
-        doc.setFont("helvetica", "normal");
-        doc.setFontSize(8);
-        doc.setTextColor(...MUTED);
-        const descLines = doc.splitTextToSize(
-          enhancement.description,
-          CONTENT_WIDTH - 24,
-        ) as string[];
-        doc.text(descLines, MARGIN + 12, y + 22);
-        y += cardHeight + 6;
-      } else {
-        y += cardHeight + 6;
-      }
-    }
-    y += 8;
-  }
-
   // Pricing breakdown — priced line items through the central calc (spec §5.4
   // "PDF/render"). Each line's amount is derived from the SAME engine the draft
   // form and the read panel use, so percentage fees resolve against the base
@@ -535,6 +488,52 @@ export function buildProposalPdf(input: ProposalPdfInput): jsPDF {
       y += 14;
     });
     y += 6;
+  }
+
+  // Optional enhancements (if provided) — listed after pricing lines.
+  if (proposal.enhancements != null && proposal.enhancements.length > 0) {
+    sectionLabel("Optional Enhancements");
+    for (const enhancement of proposal.enhancements) {
+      let cardHeight = 24;
+      if (
+        enhancement.description != null &&
+        enhancement.description.trim() !== ""
+      ) {
+        const descLines = doc.splitTextToSize(
+          enhancement.description,
+          CONTENT_WIDTH - 24,
+        ) as string[];
+        cardHeight = Math.max(24, 18 + descLines.length * 12);
+      }
+      ensureSpace(cardHeight + 12);
+      doc.setFillColor(251, 250, 247);
+      doc.roundedRect(MARGIN, y - 6, CONTENT_WIDTH, cardHeight, 4, 4, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.setTextColor(...INK);
+      const nameWithPrice =
+        enhancement.price != null
+          ? `${enhancement.name} (+${usd(enhancement.price)})`
+          : enhancement.name;
+      doc.text(nameWithPrice, MARGIN + 12, y + 10);
+      if (
+        enhancement.description != null &&
+        enhancement.description.trim() !== ""
+      ) {
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.setTextColor(...MUTED);
+        const descLines = doc.splitTextToSize(
+          enhancement.description,
+          CONTENT_WIDTH - 24,
+        ) as string[];
+        doc.text(descLines, MARGIN + 12, y + 22);
+        y += cardHeight + 6;
+      } else {
+        y += cardHeight + 6;
+      }
+    }
+    y += 8;
   }
 
   // Estimate summary.

@@ -181,20 +181,20 @@ export function VenueNotesPanel({ venueId }: Props) {
         {venueNotes.map((note) => (
           <li
             key={note._id}
-            className={`px-3 py-2.5 ${note.isPinned ? "bg-amber-50/50" : ""}`}
+            className={`px-3 py-2.5 ${note.isPinned ? "bg-warn-soft/50" : ""}`}
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   {note.isPinned ? (
-                    <span className="text-amber-600" title="Pinned">
+                    <span className="text-warn" title="Pinned">
                       📌
                     </span>
                   ) : null}
                   <span className="text-[12px] font-medium text-ink-2 uppercase">
                     {CATEGORY_LABELS[note.category] || note.category}
                   </span>
-                  <span className="text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-ink-3">
+                  <span className="text-[11px] px-1.5 py-0.5 rounded bg-inset text-ink-3">
                     {note.visibility === "public"
                       ? "Public"
                       : note.visibility === "management_only"
@@ -236,7 +236,7 @@ export function VenueNotesPanel({ venueId }: Props) {
                     </button>
                     <button
                       type="button"
-                      className="btn btn-ghost btn-sm text-rose-600"
+                      className="btn btn-ghost btn-sm text-danger"
                       disabled={busy != null}
                       onClick={() =>
                         void run(`rmv:${note._id}`, () =>

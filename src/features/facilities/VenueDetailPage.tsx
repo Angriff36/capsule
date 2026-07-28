@@ -75,7 +75,7 @@ export function VenueDetailPage() {
   if (id === "skip" || venue === undefined) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="text-center text-gray-500">Loading...</div>
+        <div className="text-center text-ink-3">Loading...</div>
       </div>
     );
   }
@@ -83,12 +83,9 @@ export function VenueDetailPage() {
   if (venue === null) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="text-center text-gray-500">
+        <div className="text-center text-ink-3">
           <p>Venue not found</p>
-          <Link
-            to={venueListPath()}
-            className="text-blue-600 hover:text-blue-800"
-          >
+          <Link to={venueListPath()} className="text-brand hover:underline">
             Back to Venues
           </Link>
         </div>
@@ -200,7 +197,7 @@ export function VenueDetailPage() {
         <div className="flex items-center gap-2">
           <Link
             to={venueListPath()}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm text-brand hover:underline"
           >
             ← Back to Venues
           </Link>
@@ -213,11 +210,11 @@ export function VenueDetailPage() {
       {failure != null && <SupplyFailureBanner error={failure} />}
 
       {/* Venue Header */}
-      <div className="rounded-md bg-white p-6 shadow-sm">
+      <div className="rounded-md bg-panel p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="text-2xl font-bold">{venue.name}</h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-ink-3">
               {VENUE_TYPE_LABELS[venue.venueType as VenueType] ||
                 venue.venueType}
               {venue.capacity && ` • Capacity: ${venue.capacity}`}
@@ -263,12 +260,12 @@ export function VenueDetailPage() {
       {showEditForm && (
         <form
           onSubmit={handleUpdateDetails}
-          className="space-y-4 rounded-md bg-gray-50 p-4"
+          className="space-y-4 rounded-md bg-inset p-4"
         >
           <h3 className="text-lg font-medium">Edit Venue Details</h3>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 Name *
               </label>
               <input
@@ -276,18 +273,18 @@ export function VenueDetailPage() {
                 name="name"
                 required
                 defaultValue={venue.name}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 Type *
               </label>
               <select
                 name="venueType"
                 required
                 defaultValue={venue.venueType}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               >
                 {VENUE_TYPES.map((type) => (
                   <option key={type} value={type}>
@@ -297,7 +294,7 @@ export function VenueDetailPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 On-Premise Venue
               </label>
               <div className="mt-2 flex items-center">
@@ -305,52 +302,52 @@ export function VenueDetailPage() {
                   type="checkbox"
                   name="onPremise"
                   defaultChecked={venue.onPremise ?? false}
-                  className="h-4 w-4 rounded border-gray-300"
+                  className="h-4 w-4 rounded border-line-2"
                 />
-                <span className="ml-2 text-sm text-gray-600">
+                <span className="ml-2 text-sm text-ink-2">
                   Check if this is an on-premise venue (catering at venue)
                 </span>
               </div>
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 Logistics Information
               </label>
               <div className="mt-2 space-y-2">
                 <div>
-                  <label className="block text-xs text-gray-600">
+                  <label className="block text-xs text-ink-2">
                     Kitchen Access
                   </label>
                   <input
                     type="text"
                     name="kitchenAccess"
                     defaultValue={venue.kitchenAccess ?? ""}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                    className="mt-1 block w-full rounded-md border-line-2 shadow-sm text-sm"
                     placeholder="e.g., Full kitchen, warming station only, no kitchen"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-600">
+                  <label className="block text-xs text-ink-2">
                     Load-in Instructions
                   </label>
                   <input
                     type="text"
                     name="loadInInstructions"
                     defaultValue={venue.loadInInstructions ?? ""}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm text-sm"
+                    className="mt-1 block w-full rounded-md border-line-2 shadow-sm text-sm"
                     placeholder="e.g., Dock door 3, load-in 6:00–8:00am, freight entrance off Maple"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {LOGISTICS_BOOLEANS.map((field) => (
                     <div key={field.name}>
-                      <label className="block text-xs text-gray-600">
+                      <label className="block text-xs text-ink-2">
                         {field.label}
                       </label>
                       <select
                         name={field.name}
                         defaultValue={booleanSelectValue(venue[field.name])}
-                        className="mt-1 block w-full rounded-md border-gray-300 text-sm"
+                        className="mt-1 block w-full rounded-md border-line-2 text-sm"
                       >
                         <option value="">Unknown</option>
                         <option value="true">Yes</option>
@@ -362,169 +359,169 @@ export function VenueDetailPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 Address Line 1
               </label>
               <input
                 type="text"
                 name="addressLine1"
                 defaultValue={venue.addressLine1 ?? ""}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 Address Line 2
               </label>
               <input
                 type="text"
                 name="addressLine2"
                 defaultValue={venue.addressLine2 ?? ""}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 City
               </label>
               <input
                 type="text"
                 name="city"
                 defaultValue={venue.city ?? ""}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 State/Region
               </label>
               <input
                 type="text"
                 name="region"
                 defaultValue={venue.region ?? ""}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 Postal Code
               </label>
               <input
                 type="text"
                 name="postalCode"
                 defaultValue={venue.postalCode ?? ""}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 Country
               </label>
               <input
                 type="text"
                 name="country"
                 defaultValue={venue.countryCode ?? ""}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 Contact Name
               </label>
               <input
                 type="text"
                 name="contactName"
                 defaultValue={venue.contactName ?? ""}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 Contact Email
               </label>
               <input
                 type="email"
                 name="contactEmail"
                 defaultValue={venue.contactEmail ?? ""}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 Contact Phone
               </label>
               <input
                 type="tel"
                 name="contactPhone"
                 defaultValue={venue.contactPhone ?? ""}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-ink-2">
               Access Notes
             </label>
             <textarea
               name="accessNotes"
               rows={2}
               defaultValue={venue.accessNotes ?? ""}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-ink-2">
               Catering Notes
             </label>
             <textarea
               name="cateringNotes"
               rows={2}
               defaultValue={venue.cateringNotes ?? ""}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-ink-2">
               Logistics Notes (other)
             </label>
             <textarea
               name="logisticsNotes"
               rows={2}
               defaultValue={venue.logisticsNotes ?? ""}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-ink-2">
               Waste Rules
             </label>
             <textarea
               name="wasteRules"
               rows={2}
               defaultValue={venue.wasteRules ?? ""}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-ink-2">
               Permits / Insurance
             </label>
             <textarea
               name="permitsInsuranceNotes"
               rows={2}
               defaultValue={venue.permitsInsuranceNotes ?? ""}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-ink-2">
               Restrictions
             </label>
             <textarea
               name="restrictions"
               rows={2}
               defaultValue={venue.restrictions ?? ""}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+              className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
             />
           </div>
           <div className="flex justify-end gap-2">
@@ -550,12 +547,12 @@ export function VenueDetailPage() {
       {venue.status === "active" && (
         <form
           onSubmit={handleChangeCapacity}
-          className="rounded-md bg-white p-6 shadow-sm"
+          className="rounded-md bg-panel p-6 shadow-sm"
         >
           <h3 className="text-lg font-medium">Change Capacity</h3>
           <div className="mt-4 flex items-end gap-4">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-ink-2">
                 New Capacity *
               </label>
               <input
@@ -565,7 +562,7 @@ export function VenueDetailPage() {
                 min="1"
                 defaultValue={venue.capacity ?? ""}
                 placeholder={String(venue.capacity ?? "Enter capacity")}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                className="mt-1 block w-full rounded-md border-line-2 shadow-sm"
               />
             </div>
             <button
@@ -580,27 +577,27 @@ export function VenueDetailPage() {
       )}
 
       {/* Venue Information Display */}
-      <div className="rounded-md bg-white p-6 shadow-sm">
+      <div className="rounded-md bg-panel p-6 shadow-sm">
         <h3 className="text-lg font-medium">Venue Information</h3>
         <dl className="mt-4 space-y-2">
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
-            <dt className="text-sm font-medium text-gray-500">Status</dt>
-            <dd className="col-span-2 text-sm text-gray-900">
+            <dt className="text-sm font-medium text-ink-3">Status</dt>
+            <dd className="col-span-2 text-sm text-ink">
               <StatusChip
                 status={venue.status === "active" ? "active" : "inactive"}
               />
             </dd>
           </div>
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
-            <dt className="text-sm font-medium text-gray-500">Type</dt>
-            <dd className="col-span-2 text-sm text-gray-900">
+            <dt className="text-sm font-medium text-ink-3">Type</dt>
+            <dd className="col-span-2 text-sm text-ink">
               {VENUE_TYPE_LABELS[venue.venueType as VenueType] ||
                 venue.venueType}
             </dd>
           </div>
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
-            <dt className="text-sm font-medium text-gray-500">Premise Type</dt>
-            <dd className="col-span-2 text-sm text-gray-900">
+            <dt className="text-sm font-medium text-ink-3">Premise Type</dt>
+            <dd className="col-span-2 text-sm text-ink">
               {venue.onPremise === true
                 ? "On-Premise"
                 : venue.onPremise === false
@@ -609,8 +606,8 @@ export function VenueDetailPage() {
             </dd>
           </div>
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
-            <dt className="text-sm font-medium text-gray-500">Capacity</dt>
-            <dd className="col-span-2 text-sm text-gray-900">
+            <dt className="text-sm font-medium text-ink-3">Capacity</dt>
+            <dd className="col-span-2 text-sm text-ink">
               {venue.capacity ?? "Not set"}
             </dd>
           </div>
@@ -627,11 +624,11 @@ export function VenueDetailPage() {
             venue.permitsInsuranceNotes ||
             venue.restrictions ||
             venue.logisticsNotes) && (
-            <div className="mt-4 rounded-md bg-gray-50 p-3">
-              <dt className="text-sm font-medium text-gray-700 mb-2">
+            <div className="mt-4 rounded-md bg-inset p-3">
+              <dt className="text-sm font-medium text-ink-2 mb-2">
                 Logistics Features
               </dt>
-              <div className="space-y-1 text-sm text-gray-900">
+              <div className="space-y-1 text-sm text-ink">
                 {venue.kitchenAccess && (
                   <div>
                     <span className="font-medium">Kitchen Access:</span>{" "}
@@ -675,7 +672,7 @@ export function VenueDetailPage() {
                 {venue.wasteRules && (
                   <div>
                     <span className="font-medium">Waste Rules:</span>{" "}
-                    <span className="whitespace-pre-wrap text-gray-700">
+                    <span className="whitespace-pre-wrap text-ink-2">
                       {venue.wasteRules}
                     </span>
                   </div>
@@ -683,7 +680,7 @@ export function VenueDetailPage() {
                 {venue.permitsInsuranceNotes && (
                   <div>
                     <span className="font-medium">Permits / Insurance:</span>{" "}
-                    <span className="whitespace-pre-wrap text-gray-700">
+                    <span className="whitespace-pre-wrap text-ink-2">
                       {venue.permitsInsuranceNotes}
                     </span>
                   </div>
@@ -691,13 +688,13 @@ export function VenueDetailPage() {
                 {venue.restrictions && (
                   <div>
                     <span className="font-medium">Restrictions:</span>{" "}
-                    <span className="whitespace-pre-wrap text-gray-700">
+                    <span className="whitespace-pre-wrap text-ink-2">
                       {venue.restrictions}
                     </span>
                   </div>
                 )}
                 {venue.logisticsNotes && (
-                  <div className="whitespace-pre-wrap text-gray-700">
+                  <div className="whitespace-pre-wrap text-ink-2">
                     {venue.logisticsNotes}
                   </div>
                 )}
@@ -705,8 +702,8 @@ export function VenueDetailPage() {
             </div>
           )}
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
-            <dt className="text-sm font-medium text-gray-500">Address</dt>
-            <dd className="col-span-2 text-sm text-gray-900">
+            <dt className="text-sm font-medium text-ink-3">Address</dt>
+            <dd className="col-span-2 text-sm text-ink">
               {[
                 venue.addressLine1,
                 venue.addressLine2,
@@ -720,14 +717,14 @@ export function VenueDetailPage() {
           </div>
           {(venue.contactName || venue.contactEmail || venue.contactPhone) && (
             <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
-              <dt className="text-sm font-medium text-gray-500">Contact</dt>
-              <dd className="col-span-2 text-sm text-gray-900">
+              <dt className="text-sm font-medium text-ink-3">Contact</dt>
+              <dd className="col-span-2 text-sm text-ink">
                 {venue.contactName && <div>{venue.contactName}</div>}
                 {venue.contactEmail && (
                   <div>
                     <a
                       href={`mailto:${venue.contactEmail}`}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-brand hover:underline"
                     >
                       {venue.contactEmail}
                     </a>
@@ -737,7 +734,7 @@ export function VenueDetailPage() {
                   <div>
                     <a
                       href={`tel:${venue.contactPhone}`}
-                      className="text-blue-600 hover:text-blue-800"
+                      className="text-brand hover:underline"
                     >
                       {venue.contactPhone}
                     </a>
@@ -748,27 +745,23 @@ export function VenueDetailPage() {
           )}
           {venue.accessNotes && (
             <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
-              <dt className="text-sm font-medium text-gray-500">
-                Access Notes
-              </dt>
-              <dd className="col-span-2 text-sm text-gray-900 whitespace-pre-wrap">
+              <dt className="text-sm font-medium text-ink-3">Access Notes</dt>
+              <dd className="col-span-2 text-sm text-ink whitespace-pre-wrap">
                 {venue.accessNotes}
               </dd>
             </div>
           )}
           {venue.cateringNotes && (
             <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
-              <dt className="text-sm font-medium text-gray-500">
-                Catering Notes
-              </dt>
-              <dd className="col-span-2 text-sm text-gray-900 whitespace-pre-wrap">
+              <dt className="text-sm font-medium text-ink-3">Catering Notes</dt>
+              <dd className="col-span-2 text-sm text-ink whitespace-pre-wrap">
                 {venue.cateringNotes}
               </dd>
             </div>
           )}
           <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
-            <dt className="text-sm font-medium text-gray-500">Registered</dt>
-            <dd className="col-span-2 text-sm text-gray-900">
+            <dt className="text-sm font-medium text-ink-3">Registered</dt>
+            <dd className="col-span-2 text-sm text-ink">
               {venue.registeredAt
                 ? formatDate(venue.registeredAt)
                 : "Not registered"}
@@ -776,8 +769,8 @@ export function VenueDetailPage() {
           </div>
           {venue.deactivatedAt && (
             <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
-              <dt className="text-sm font-medium text-gray-500">Deactivated</dt>
-              <dd className="col-span-2 text-sm text-gray-900">
+              <dt className="text-sm font-medium text-ink-3">Deactivated</dt>
+              <dd className="col-span-2 text-sm text-ink">
                 {formatDate(venue.deactivatedAt)}
                 {venue.deactivationReason && ` (${venue.deactivationReason})`}
               </dd>
@@ -796,9 +789,9 @@ export function VenueDetailPage() {
 
       {/* Danger Zone */}
       {venue.status === "active" && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-6">
-          <h3 className="text-lg font-medium text-red-900">Danger Zone</h3>
-          <p className="mt-2 text-sm text-red-700">
+        <div className="rounded-md border border-danger/40 bg-danger-soft p-6">
+          <h3 className="text-lg font-medium text-danger">Danger Zone</h3>
+          <p className="mt-2 text-sm text-danger">
             Deactivating a venue will mark it as inactive. It will no longer
             appear in dropdowns for new events, but will remain visible in
             historical event records.

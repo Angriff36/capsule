@@ -237,7 +237,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                 {endpoints.map((endpoint) => (
                   <li
                     key={endpoint.endpointId}
-                    className="rounded-sm border border-line bg-white p-3 text-[12px]"
+                    className="rounded-sm border border-line bg-panel p-3 text-[12px]"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">

@@ -132,7 +132,7 @@ export function TableDisplay({
   return (
     <div
       className={clsx(
-        "overflow-hidden rounded-lg border border-ink-200 bg-white",
+        "overflow-hidden rounded-lg border border-line bg-panel",
         className,
       )}
     >

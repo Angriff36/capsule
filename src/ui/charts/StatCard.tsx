@@ -99,7 +99,7 @@ export function StatCard({
   return (
     <div
       className={clsx(
-        "rounded-lg border bg-white",
+        "rounded-lg border border-line bg-panel",
         TONE_STYLES[tone],
         SIZE_STYLES[size],
         className,

@@ -85,15 +85,15 @@ export function SyncErrorsPanel() {
 
   return (
     <section
-      className="mt-4 rounded-sm border border-amber-300 bg-amber-50 p-4"
+      className="mt-4 rounded-sm border border-warn/40 bg-warn-soft p-4"
       data-testid="sync-errors-panel"
     >
       <div className="flex items-baseline justify-between">
-        <h2 className="text-[14px] font-semibold text-amber-900">
+        <h2 className="text-[14px] font-semibold text-warn">
           Sync errors{" "}
-          <span className="font-normal text-amber-700">({pending.length})</span>
+          <span className="font-normal text-warn">({pending.length})</span>
         </h2>
-        <p className="text-[11px] text-amber-700">
+        <p className="text-[11px] text-warn">
           Inbound deliveries that failed to parse — retry or dismiss.
         </p>
       </div>
@@ -104,10 +104,10 @@ export function SyncErrorsPanel() {
           return (
             <li
               key={e._id}
-              className="rounded-sm border border-amber-200 bg-panel px-3 py-2"
+              className="rounded-sm border border-warn/40 bg-panel px-3 py-2"
             >
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-medium text-amber-800">
+                <span className="rounded-full bg-warn-soft px-2 py-0.5 text-[10px] font-medium text-warn">
                   {e.sourceSystem}
                 </span>
                 <span className="text-[10px] text-ink-3">{e.recordType}</span>

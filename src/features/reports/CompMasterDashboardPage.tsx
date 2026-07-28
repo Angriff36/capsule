@@ -469,7 +469,7 @@ export function CompMasterDashboardPage() {
       </div>
 
       {/* Evidence Trail */}
-      <div className="mt-4 rounded-lg border border-ink-200 bg-white p-4">
+      <div className="mt-4 rounded-lg border border-line bg-panel p-4">
         <h4 className="text-sm font-semibold text-ink-900">Evidence Trail</h4>
         <div className="mt-2 text-sm text-ink-600">
           <p>

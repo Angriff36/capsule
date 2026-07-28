@@ -97,7 +97,7 @@ export function AttachmentsSection({
         </div>
       </div>
       {error ? (
-        <p className="mt-2 text-[13px] text-red-600" role="alert">
+        <p className="mt-2 text-[13px] text-danger" role="alert">
           {error}
         </p>
       ) : null}

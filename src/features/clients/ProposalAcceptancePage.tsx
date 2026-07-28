@@ -50,14 +50,14 @@ export function ProposalAcceptancePage({
 
   if (accepted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-canvas">
         <div className="w-full max-w-2xl p-8">
-          <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-            <div className="text-green-600 text-6xl mb-4">✓</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <div className="bg-panel rounded-lg shadow-lg p-8 text-center">
+            <div className="text-ok text-6xl mb-4">✓</div>
+            <h1 className="text-2xl font-bold text-ink mb-2">
               Proposal Accepted
             </h1>
-            <p className="text-gray-600">
+            <p className="text-ink-2">
               Thank you! Your acceptance has been recorded. We'll be in touch
               shortly to confirm the next steps.
             </p>
@@ -69,7 +69,7 @@ export function ProposalAcceptancePage({
 
   if (!callbackToken || pending === null) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-canvas">
         <div className="w-full max-w-2xl p-8">
           <ErrorState
             title="Unable to load acceptance page"
@@ -82,7 +82,7 @@ export function ProposalAcceptancePage({
 
   if (pending === undefined) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-canvas">
         <div className="w-full max-w-2xl p-8">
           <TableSkeleton rows={3} />
         </div>
@@ -96,15 +96,15 @@ export function ProposalAcceptancePage({
     : "TBD";
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-canvas py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-panel rounded-lg shadow-lg overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-6">
-            <h1 className="text-2xl font-bold text-white">
+          <div className="border-b border-line bg-brand-soft px-8 py-6">
+            <h1 className="text-2xl font-bold text-brand">
               Proposal Acceptance
             </h1>
-            <p className="text-blue-100 mt-1">
+            <p className="text-ink-2 mt-1">
               Revision {pending.revisionNumber}
               {pending.capturedAt ? ` • ${formatDate(pending.capturedAt)}` : ""}
             </p>
@@ -113,32 +113,30 @@ export function ProposalAcceptancePage({
           {/* Proposal Details */}
           <div className="p-8">
             <div className="mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-xl font-semibold text-ink mb-2">
                 {pending.proposal.title}
               </h2>
-              <p className="text-gray-600">
-                For: {pending.proposal.clientName}
-              </p>
+              <p className="text-ink-2">For: {pending.proposal.clientName}</p>
             </div>
 
-            <div className="bg-gray-50 rounded-lg p-6 mb-6">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+            <div className="bg-inset rounded-lg p-6 mb-6">
+              <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-4">
                 Event Details
               </h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Date:</span>
+                  <span className="text-ink-2">Date:</span>
                   <span className="font-medium">{formattedDate}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Guests:</span>
+                  <span className="text-ink-2">Guests:</span>
                   <span className="font-medium">
                     {pending.proposal.guestCount}
                   </span>
                 </div>
                 {pending.proposal.venueName && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Venue:</span>
+                    <span className="text-ink-2">Venue:</span>
                     <span className="font-medium">
                       {pending.proposal.venueName}
                     </span>
@@ -147,20 +145,48 @@ export function ProposalAcceptancePage({
               </div>
             </div>
 
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6">
+            {pending.enhancements.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-3">
+                  Optional Enhancements
+                </h3>
+                <ul className="space-y-2 text-sm text-ink-2">
+                  {pending.enhancements.map((item, index) => (
+                    <li
+                      key={index}
+                      className="flex justify-between gap-4 border-b border-line pb-2 last:border-0"
+                    >
+                      <span>
+                        {item.name}
+                        {item.description ? (
+                          <span className="block text-xs text-ink-3">
+                            {item.description}
+                          </span>
+                        ) : null}
+                      </span>
+                      <span className="font-medium text-ink whitespace-nowrap">
+                        {formatMoneyExact(item.price ?? 0)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="bg-info-soft border-l-4 border-info p-6 mb-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm text-gray-600 mb-1">Total Amount</p>
-                  <p className="text-3xl font-bold text-gray-900">
+                  <p className="text-sm text-ink-2 mb-1">Total Amount</p>
+                  <p className="text-3xl font-bold text-ink">
                     {formattedTotal}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-ink-3">
                     Revision {pending.revisionNumber}
                   </p>
                   {pending.changeSummary ? (
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-ink-3">
                       {pending.changeSummary}
                     </p>
                   ) : null}
@@ -170,10 +196,10 @@ export function ProposalAcceptancePage({
 
             {pending.proposal.terms && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-2">
                   Terms
                 </h3>
-                <p className="text-gray-700 text-sm whitespace-pre-wrap">
+                <p className="text-ink-2 text-sm whitespace-pre-wrap">
                   {pending.proposal.terms}
                 </p>
               </div>
@@ -192,8 +218,8 @@ export function ProposalAcceptancePage({
             ) : null}
 
             {/* Acceptance Notice */}
-            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-              <p className="text-sm text-yellow-800">
+            <div className="bg-warn-soft border-l-4 border-warn p-4 mb-6">
+              <p className="text-sm text-warn">
                 By clicking "Accept Proposal," you confirm that you have
                 reviewed and agree to the proposal terms and pricing shown
                 above.
@@ -205,25 +231,22 @@ export function ProposalAcceptancePage({
               <button
                 onClick={handleAccept}
                 disabled={busy}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                className="btn btn-primary flex-1 justify-center"
               >
                 {busy ? "Recording…" : "Accept Proposal"}
               </button>
-              <a
-                href="mailto:"
-                className="flex-1 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 px-6 rounded-lg transition-colors"
-              >
+              <a href="mailto:" className="btn btn-ghost flex-1 justify-center">
                 Contact Us
               </a>
             </div>
 
             {/* Footer Info */}
-            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-              <p className="text-xs text-gray-500">
+            <div className="mt-8 pt-6 border-t border-line text-center">
+              <p className="text-xs text-ink-3">
                 This acceptance is being recorded for {pending.recipientName} (
                 {pending.recipientEmail})
               </p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-ink-3 mt-1">
                 If this is not you, please contact us immediately.
               </p>
             </div>

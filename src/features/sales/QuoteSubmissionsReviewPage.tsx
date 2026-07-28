@@ -22,10 +22,10 @@ function isActionable(sub: QuoteSubmission): boolean {
 }
 
 const STATUS_TONE: Record<string, string> = {
-  pending: "bg-amber-100 text-amber-800",
-  processing: "bg-blue-100 text-blue-800",
-  completed: "bg-green-100 text-green-800",
-  failed: "bg-red-100 text-red-800",
+  pending: "bg-warn-soft text-warn",
+  processing: "bg-info-soft text-info",
+  completed: "bg-ok-soft text-ok",
+  failed: "bg-danger-soft text-danger",
 };
 
 /**
@@ -82,9 +82,7 @@ export function QuoteSubmissionsReviewPage() {
   if (submissions === undefined) {
     return (
       <div className="p-6">
-        <h1 className="text-2xl font-bold text-stone-900 mb-4">
-          Quote Requests
-        </h1>
+        <h1 className="text-2xl font-bold text-ink mb-4">Quote Requests</h1>
         <TableSkeleton />
       </div>
     );
@@ -100,11 +98,11 @@ export function QuoteSubmissionsReviewPage() {
       <ClientsWorkspaceNav />
       <div className="flex items-center justify-between mb-6 mt-4">
         <div>
-          <h1 className="text-2xl font-bold text-stone-900">Quote Requests</h1>
-          <p className="text-sm text-stone-500 mt-1">
+          <h1 className="text-2xl font-bold text-ink">Quote Requests</h1>
+          <p className="text-sm text-ink-3 mt-1">
             Self-service submissions from the public quote form.{" "}
             {pendingCount > 0 ? (
-              <span className="text-amber-700 font-medium">
+              <span className="text-warn font-medium">
                 {pendingCount} awaiting conversion
               </span>
             ) : (
@@ -114,7 +112,7 @@ export function QuoteSubmissionsReviewPage() {
         </div>
         <Link
           to="/clients/pipeline"
-          className="text-sm text-stone-600 hover:text-stone-900 underline"
+          className="text-sm text-ink-2 hover:text-ink underline"
         >
           View lead pipeline →
         </Link>
@@ -124,13 +122,13 @@ export function QuoteSubmissionsReviewPage() {
         <FailureBanner failure={failure} onDismiss={() => setFailure(null)} />
       )}
       {partialErrors && (
-        <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-900">
+        <div className="mb-4 p-3 bg-warn-soft border border-warn/40 rounded-lg text-sm text-warn">
           {partialErrors}
         </div>
       )}
 
       {lastConverted && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-900">
+        <div className="mb-4 p-4 bg-ok-soft border border-ok/40 rounded-lg text-sm text-ok">
           <p className="font-medium">
             Converted “{lastConverted.clientName}” into a lead, event, and draft
             proposal.
@@ -154,7 +152,7 @@ export function QuoteSubmissionsReviewPage() {
       )}
 
       {visible.length === 0 ? (
-        <p className="text-stone-500 italic">
+        <p className="text-ink-3 italic">
           No quote requests yet. Submissions from the public{" "}
           <Link to="/quote" className="underline">
             /quote
@@ -166,12 +164,12 @@ export function QuoteSubmissionsReviewPage() {
           {visible.map((sub) => (
             <div
               key={sub._id}
-              className="bg-white border border-stone-200 rounded-lg p-4"
+              className="bg-panel border border-line rounded-lg p-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <h2 className="font-semibold text-stone-900 truncate">
+                    <h2 className="font-semibold text-ink truncate">
                       {sub.clientName ?? "Unknown"}
                     </h2>
                     <StatusChip
@@ -179,18 +177,18 @@ export function QuoteSubmissionsReviewPage() {
                       color={STATUS_TONE[sub.status ?? "pending"]}
                     />
                   </div>
-                  <p className="text-sm text-stone-600 mt-1">
+                  <p className="text-sm text-ink-2 mt-1">
                     {sub.email}
                     {sub.phone ? ` · ${sub.phone}` : ""}
                   </p>
                 </div>
-                <div className="text-right text-sm text-stone-600 shrink-0">
+                <div className="text-right text-sm text-ink-2 shrink-0">
                   <div>
                     {sub.eventDate ? formatDate(sub.eventDate) : "No date"}
                   </div>
                   <div>{sub.guestCount ?? 0} guests</div>
                   {sub.submittedAt && (
-                    <div className="text-xs text-stone-400">
+                    <div className="text-xs text-ink-3">
                       submitted {formatDate(sub.submittedAt)}
                     </div>
                   )}
@@ -198,7 +196,7 @@ export function QuoteSubmissionsReviewPage() {
               </div>
 
               {(sub.venueName || sub.venueAddress) && (
-                <p className="text-sm text-stone-600 mt-2">
+                <p className="text-sm text-ink-2 mt-2">
                   {[sub.venueName, sub.venueAddress]
                     .filter(Boolean)
                     .join(" — ")}
@@ -211,28 +209,22 @@ export function QuoteSubmissionsReviewPage() {
                 <dl className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
                   {sub.menuPreferences && (
                     <div>
-                      <dt className="text-xs uppercase text-stone-400">
+                      <dt className="text-xs uppercase text-ink-3">
                         Menu prefs
                       </dt>
-                      <dd className="text-stone-700">{sub.menuPreferences}</dd>
+                      <dd className="text-ink-2">{sub.menuPreferences}</dd>
                     </div>
                   )}
                   {sub.dietaryRestrictions && (
                     <div>
-                      <dt className="text-xs uppercase text-stone-400">
-                        Dietary
-                      </dt>
-                      <dd className="text-stone-700">
-                        {sub.dietaryRestrictions}
-                      </dd>
+                      <dt className="text-xs uppercase text-ink-3">Dietary</dt>
+                      <dd className="text-ink-2">{sub.dietaryRestrictions}</dd>
                     </div>
                   )}
                   {sub.notes && (
                     <div>
-                      <dt className="text-xs uppercase text-stone-400">
-                        Notes
-                      </dt>
-                      <dd className="text-stone-700">{sub.notes}</dd>
+                      <dt className="text-xs uppercase text-ink-3">Notes</dt>
+                      <dd className="text-ink-2">{sub.notes}</dd>
                     </div>
                   )}
                 </dl>
@@ -240,7 +232,7 @@ export function QuoteSubmissionsReviewPage() {
 
               {sub.status === "failed" &&
                 (sub.errorMessage || sub.processingErrors) && (
-                  <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-xs text-red-900">
+                  <div className="mt-2 p-2 bg-danger-soft border border-danger/40 rounded text-xs text-danger">
                     {sub.errorMessage && (
                       <div className="font-medium">{sub.errorMessage}</div>
                     )}
@@ -254,7 +246,7 @@ export function QuoteSubmissionsReviewPage() {
                 <p className="mt-3 text-sm">
                   <Link
                     to={`/events/${sub.eventId}`}
-                    className="text-stone-600 underline"
+                    className="text-ink-2 underline"
                   >
                     Open converted event →
                   </Link>
@@ -269,7 +261,7 @@ export function QuoteSubmissionsReviewPage() {
                     onClick={() =>
                       convert(sub._id, sub.clientName ?? "the lead")
                     }
-                    className="px-4 py-2 bg-stone-900 text-white text-sm font-medium rounded-lg hover:bg-stone-800 disabled:bg-stone-400 disabled:cursor-not-allowed"
+                    className="btn btn-primary"
                   >
                     {busyId === sub._id
                       ? "Converting…"

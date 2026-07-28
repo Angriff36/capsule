@@ -8,6 +8,7 @@ import {
   useListVenue,
   useListProposal,
   useListProposalLineItem,
+  useListProposalEnhancement,
   useListProposalDishSelection,
   useListProposalRevision,
   useProposalAccept,
@@ -39,6 +40,7 @@ import { ProposalCreateForm } from "./ProposalCreateForm";
 import { ProposalMenuSelectionPanel } from "./ProposalMenuSelectionPanel";
 import { ProposalReadinessNotice } from "./ProposalReadinessNotice";
 import { ProposalPricingPanel } from "./ProposalPricingPanel";
+import { ProposalEnhancementsPanel } from "./ProposalEnhancementsPanel";
 import { type PricingBasis } from "../../lib/pricing";
 
 // Event stages the acceptance cascade can feed dishes into (matches the
@@ -68,6 +70,7 @@ export function ProposalsPage() {
   // Tenant-wide priced lines; filtered per proposal for the PDF breakdown and
   // the pricing panel. Same query ProposalPricingPanel subscribes to (cached).
   const proposalLineItems = useListProposalLineItem();
+  const proposalEnhancements = useListProposalEnhancement();
   const proposalDishSelections = useListProposalDishSelection();
   const proposalRevisions = useListProposalRevision();
   // Send captures a revision snapshot server-side (spec §5.5 / Priority 10) —
@@ -134,6 +137,9 @@ export function ProposalsPage() {
       : undefined;
 
   const [pricingOpenFor, setPricingOpenFor] = useState<string | null>(null);
+  const [enhancementsOpenFor, setEnhancementsOpenFor] = useState<string | null>(
+    null,
+  );
 
   useEffect(() => {
     // "Create proposal" on an event navigates here with ?event=<id>; open the
@@ -526,6 +532,19 @@ export function ProposalsPage() {
                         <button
                           className="btn btn-ghost"
                           type="button"
+                          onClick={() =>
+                            setEnhancementsOpenFor((current) =>
+                              current === row._id ? null : row._id,
+                            )
+                          }
+                        >
+                          {enhancementsOpenFor === row._id
+                            ? "Hide enhancements"
+                            : "Enhancements"}
+                        </button>
+                        <button
+                          className="btn btn-ghost"
+                          type="button"
                           disabled={busy != null}
                           onClick={() => {
                             // Enrich proposal with timeline and venue logistics data
@@ -569,6 +588,22 @@ export function ProposalsPage() {
                                   unitPrice: Number(line.unitPrice) || 0,
                                   quantity: line.quantity,
                                   unit: line.unit,
+                                })),
+                              enhancements: (proposalEnhancements ?? [])
+                                .filter(
+                                  (item) =>
+                                    item.proposalId === row._id &&
+                                    item.deletedAt == null &&
+                                    item.addedAt != null,
+                                )
+                                .sort(
+                                  (a, b) =>
+                                    Number(a.sortOrder) - Number(b.sortOrder),
+                                )
+                                .map((item) => ({
+                                  name: item.name,
+                                  description: item.description ?? undefined,
+                                  price: Number(item.price) || 0,
                                 })),
                             };
 
@@ -693,6 +728,17 @@ export function ProposalsPage() {
                             guestCount={Number(row.guestCount ?? 0)}
                             taxAmount={Number(row.taxAmount ?? 0)}
                             discountAmount={Number(row.discountAmount ?? 0)}
+                            editable={String(row.status) === "draft"}
+                            onFailure={setFailure}
+                          />
+                        </td>
+                      </tr>
+                    ) : null}
+                    {enhancementsOpenFor === row._id ? (
+                      <tr>
+                        <td colSpan={5}>
+                          <ProposalEnhancementsPanel
+                            proposalId={row._id}
                             editable={String(row.status) === "draft"}
                             onFailure={setFailure}
                           />

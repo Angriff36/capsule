@@ -310,7 +310,7 @@ export function VenueRoomsPanel({ venueId }: Props) {
                     <span className="text-[13px] font-medium text-ink">
                       {row.name}
                     </span>
-                    <span className="text-[11px] px-1.5 py-0.5 rounded bg-slate-100 text-ink-3">
+                    <span className="text-[11px] px-1.5 py-0.5 rounded bg-inset text-ink-3">
                       {ROOM_TYPES[row.roomType] || row.roomType}
                     </span>
                   </div>
@@ -337,7 +337,7 @@ export function VenueRoomsPanel({ venueId }: Props) {
                   </button>
                   <button
                     type="button"
-                    className="btn btn-ghost btn-sm text-rose-600"
+                    className="btn btn-ghost btn-sm text-danger"
                     disabled={busy != null}
                     onClick={() =>
                       void run(`rmv:${row._id}`, () =>

@@ -19,6 +19,7 @@ import {
   type CommandFailure,
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
+import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { BATTLE_BOARD_LAYOUT_TYPES } from "../events/battleBoardLayoutTypes";
 
 // Mirrors EventLayoutSection's editable fields; stored as a JSON string on the
@@ -216,6 +217,7 @@ export function VenueLayoutTemplatesPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
+      <FacilitiesWorkspaceNav />
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-ink">Layout Templates</h1>

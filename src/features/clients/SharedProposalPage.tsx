@@ -59,7 +59,7 @@ export function SharedProposalPage({ token }: { token: string }) {
 
   if (data === undefined) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-canvas">
         <div className="w-full max-w-2xl p-8">
           <TableSkeleton rows={3} />
         </div>
@@ -69,7 +69,7 @@ export function SharedProposalPage({ token }: { token: string }) {
 
   if (!data || !data.ok) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-canvas">
         <div className="w-full max-w-2xl p-8">
           <ErrorState
             title="This link isn't available"
@@ -80,7 +80,7 @@ export function SharedProposalPage({ token }: { token: string }) {
     );
   }
 
-  const { proposal, lineItems } = data;
+  const { proposal, lineItems, enhancements } = data;
   const formattedDate = proposal.eventDate
     ? formatDate(proposal.eventDate)
     : "TBD";
@@ -135,44 +135,44 @@ export function SharedProposalPage({ token }: { token: string }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4">
+    <div className="min-h-screen bg-canvas py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 px-8 py-6">
-            <h1 className="text-2xl font-bold text-white">{proposal.title}</h1>
-            <p className="text-blue-100 mt-1">
+        <div className="bg-panel rounded-lg shadow-lg overflow-hidden">
+          <div className="border-b border-line bg-brand-soft px-8 py-6">
+            <h1 className="text-2xl font-bold text-brand">{proposal.title}</h1>
+            <p className="text-ink-2 mt-1">
               Prepared for {data.clientName}
               {proposal.proposalNumber ? ` · ${proposal.proposalNumber}` : ""}
             </p>
-            <p className="text-blue-200 text-xs mt-1">
+            <p className="text-ink-3 text-xs mt-1">
               Revision {data.revisionNumber}
               {data.capturedAt ? ` · ${formatDate(data.capturedAt)}` : ""}
             </p>
           </div>
 
           <div className="p-8">
-            <div className="bg-gray-50 rounded-lg p-6 mb-6">
-              <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+            <div className="bg-inset rounded-lg p-6 mb-6">
+              <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-4">
                 Event Details
               </h3>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Date:</span>
+                  <span className="text-ink-2">Date:</span>
                   <span className="font-medium">{formattedDate}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Guests:</span>
+                  <span className="text-ink-2">Guests:</span>
                   <span className="font-medium">{proposal.guestCount}</span>
                 </div>
                 {proposal.venueName && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Venue:</span>
+                    <span className="text-ink-2">Venue:</span>
                     <span className="font-medium">{proposal.venueName}</span>
                   </div>
                 )}
                 {proposal.eventType && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Service:</span>
+                    <span className="text-ink-2">Service:</span>
                     <span className="font-medium">{proposal.eventType}</span>
                   </div>
                 )}
@@ -180,14 +180,14 @@ export function SharedProposalPage({ token }: { token: string }) {
             </div>
 
             {venueLogisticsRows.length > 0 && (
-              <div className="bg-gray-50 rounded-lg p-6 mb-6">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+              <div className="bg-inset rounded-lg p-6 mb-6">
+                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-4">
                   Venue Logistics
                 </h3>
                 <div className="space-y-2">
                   {venueLogisticsRows.map(([label, value], index) => (
                     <div key={index} className="flex justify-between gap-4">
-                      <span className="text-gray-600">{label}:</span>
+                      <span className="text-ink-2">{label}:</span>
                       <span className="font-medium text-right whitespace-pre-wrap">
                         {value}
                       </span>
@@ -199,24 +199,24 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {lineItems.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-3">
                   Pricing Breakdown
                 </h3>
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-line">
                   {lineItems.map((line, index) => (
                     <div
                       key={index}
                       className="py-2 flex justify-between gap-4"
                     >
                       <div>
-                        <p className="text-gray-900">{line.description}</p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-ink">{line.description}</p>
+                        <p className="text-xs text-ink-3">
                           {PRICING_BASIS_LABEL[line.pricingBasis] ??
                             line.pricingBasis}
                           {line.unit ? ` · ${line.unit}` : ""}
                         </p>
                       </div>
-                      <span className="font-medium text-gray-900 whitespace-nowrap">
+                      <span className="font-medium text-ink whitespace-nowrap">
                         {formatMoneyExact(line.amount ?? 0)}
                       </span>
                     </div>
@@ -225,16 +225,44 @@ export function SharedProposalPage({ token }: { token: string }) {
               </div>
             )}
 
-            <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6 space-y-2">
+            {enhancements.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-3">
+                  Optional Enhancements
+                </h3>
+                <div className="divide-y divide-line">
+                  {enhancements.map((item, index) => (
+                    <div
+                      key={index}
+                      className="py-2 flex justify-between gap-4"
+                    >
+                      <div>
+                        <p className="text-ink">{item.name}</p>
+                        {item.description ? (
+                          <p className="text-xs text-ink-3">
+                            {item.description}
+                          </p>
+                        ) : null}
+                      </div>
+                      <span className="font-medium text-ink whitespace-nowrap">
+                        {formatMoneyExact(item.price ?? 0)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="bg-info-soft border-l-4 border-info p-6 mb-6 space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Subtotal</span>
+                <span className="text-ink-2">Subtotal</span>
                 <span className="font-medium">
                   {formatMoneyExact(proposal.subtotal ?? 0)}
                 </span>
               </div>
               {proposal.taxAmount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax</span>
+                  <span className="text-ink-2">Tax</span>
                   <span className="font-medium">
                     {formatMoneyExact(proposal.taxAmount ?? 0)}
                   </span>
@@ -242,15 +270,15 @@ export function SharedProposalPage({ token }: { token: string }) {
               )}
               {proposal.discountAmount > 0 && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Discount</span>
+                  <span className="text-ink-2">Discount</span>
                   <span className="font-medium">
                     -{formatMoneyExact(proposal.discountAmount ?? 0)}
                   </span>
                 </div>
               )}
-              <div className="flex justify-between items-center pt-2 border-t border-blue-100">
-                <span className="text-gray-600">Total</span>
-                <span className="text-2xl font-bold text-gray-900">
+              <div className="flex justify-between items-center pt-2 border-t border-info/40">
+                <span className="text-ink-2">Total</span>
+                <span className="text-2xl font-bold text-ink">
                   {formatMoneyExact(proposal.total ?? 0)}
                 </span>
               </div>
@@ -258,10 +286,10 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {proposal.terms && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-2">
                   Terms
                 </h3>
-                <p className="text-gray-700 text-sm whitespace-pre-wrap">
+                <p className="text-ink-2 text-sm whitespace-pre-wrap">
                   {proposal.terms}
                 </p>
               </div>
@@ -269,17 +297,17 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {proposal.notes && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-2">
                   Notes
                 </h3>
-                <p className="text-gray-700 text-sm whitespace-pre-wrap">
+                <p className="text-ink-2 text-sm whitespace-pre-wrap">
                   {proposal.notes}
                 </p>
               </div>
             )}
 
-            <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-              <p className="text-xs text-gray-500">
+            <div className="mt-8 pt-6 border-t border-line text-center">
+              <p className="text-xs text-ink-3">
                 {linkExpiresAt != null
                   ? `This link expires ${formatDate(linkExpiresAt)}. `
                   : ""}

@@ -346,7 +346,7 @@ export function L10DashboardPage() {
       id: "rocks-summary",
       size: "medium",
       content: (
-        <div className="rounded-lg border border-ink-200 bg-white p-4">
+        <div className="rounded-lg border border-line bg-panel p-4">
           <h3 className="font-semibold text-ink-900">Rocks / Priorities</h3>
           <div className="mt-3 flex items-center justify-around text-center">
             <div>
@@ -382,7 +382,7 @@ export function L10DashboardPage() {
       id: "issues-summary",
       size: "medium",
       content: (
-        <div className="rounded-lg border border-ink-200 bg-white p-4">
+        <div className="rounded-lg border border-line bg-panel p-4">
           <h3 className="font-semibold text-ink-900">Issues</h3>
           <div className="mt-3 flex items-center justify-around text-center">
             <div>
@@ -418,7 +418,7 @@ export function L10DashboardPage() {
       id: "todos-summary",
       size: "medium",
       content: (
-        <div className="rounded-lg border border-ink-200 bg-white p-4">
+        <div className="rounded-lg border border-line bg-panel p-4">
           <h3 className="font-semibold text-ink-900">To-Dos</h3>
           <div className="mt-3 flex items-center justify-around text-center">
             <div>

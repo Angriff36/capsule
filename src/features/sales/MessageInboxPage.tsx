@@ -294,7 +294,7 @@ export function MessageInboxPage() {
       <ClientsWorkspaceNav />
       {failure ? <FailureBanner failure={failure} /> : null}
       {notice ? (
-        <p className="mb-3 rounded-sm bg-green-50 px-4 py-2 text-[13px] text-green-800">
+        <p className="mb-3 rounded-sm bg-ok-soft px-4 py-2 text-[13px] text-ok">
           {notice}
         </p>
       ) : null}

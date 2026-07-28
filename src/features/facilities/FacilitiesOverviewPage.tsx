@@ -15,6 +15,7 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { FACILITIES_SECTIONS } from "./facilitiesRoutes";
+import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SOON_MS = 7 * DAY_MS;
@@ -117,6 +118,7 @@ export function FacilitiesOverviewPage() {
         title="Facilities"
         lead="Venues, equipment, and the service work that keeps them event-ready."
       />
+      <FacilitiesWorkspaceNav />
 
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line lg:grid-cols-4">
         {kpis.map((kpi) => (
