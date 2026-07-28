@@ -2,6 +2,7 @@ import { useState } from "react";
 import {
   useCreateProposalEnhancement,
   useListProposalEnhancement,
+  useProposalEnhancementRevise,
   useProposalEnhancementWithdraw,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
@@ -39,8 +40,10 @@ export function ProposalEnhancementsPanel({
 }: ProposalEnhancementsPanelProps) {
   const enhancements = useListProposalEnhancement();
   const createEnhancement = useCreateProposalEnhancement();
+  const reviseEnhancement = useProposalEnhancementRevise();
   const withdrawEnhancement = useProposalEnhancementWithdraw();
   const [editorOpen, setEditorOpen] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editor, setEditor] = useState<EnhancementEditor>(emptyEditor);
   const [busy, setBusy] = useState(false);
 
@@ -60,6 +63,7 @@ export function ProposalEnhancementsPanel({
     try {
       await fn();
       setEditorOpen(false);
+      setEditingId(null);
       setEditor(emptyEditor());
     } catch (e) {
       onFailure?.(e instanceof Error ? e : new Error(String(e)));
@@ -80,6 +84,24 @@ export function ProposalEnhancementsPanel({
       return;
     }
     const description = editor.description.trim() || undefined;
+    if (editingId) {
+      const existing = rows.find((row) => row._id === editingId);
+      if (!existing) {
+        onFailure?.(new Error("This enhancement is no longer editable."));
+        return;
+      }
+      void runEdit(() =>
+        reviseEnhancement({
+          docId: editingId as Id<"proposalEnhancements">,
+          version: Number(existing.version),
+          name,
+          price,
+          description,
+          sortOrder: Number(existing.sortOrder),
+        }),
+      );
+      return;
+    }
     const nextSortOrder =
       rows.length === 0 ? 0 : Number(rows[rows.length - 1].sortOrder) + 1;
     void runEdit(() =>
@@ -125,6 +147,22 @@ export function ProposalEnhancementsPanel({
                 </td>
                 {editable ? (
                   <td>
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      type="button"
+                      disabled={busy}
+                      onClick={() => {
+                        setEditingId(row._id);
+                        setEditor({
+                          name: row.name,
+                          price: String(row.price ?? ""),
+                          description: row.description ?? "",
+                        });
+                        setEditorOpen(true);
+                      }}
+                    >
+                      Edit
+                    </button>
                     <button
                       className="btn btn-ghost btn-sm"
                       type="button"
@@ -188,7 +226,7 @@ export function ProposalEnhancementsPanel({
             disabled={busy}
             onClick={saveEditor}
           >
-            Add
+            {editingId ? "Save" : "Add"}
           </button>
           <button
             className="btn btn-ghost btn-sm"
@@ -196,6 +234,7 @@ export function ProposalEnhancementsPanel({
             disabled={busy}
             onClick={() => {
               setEditorOpen(false);
+              setEditingId(null);
               setEditor(emptyEditor());
             }}
           >

@@ -198,6 +198,13 @@ export function FinanceOverviewPage() {
   const draftCount = activeRows.filter(
     (row) => String(row.status) === "draft",
   ).length;
+  // paymentRead requires financeAccess while invoices are readable via
+  // manageAccess, and denied generated reads come back as [] — so an empty
+  // payments list alongside invoices that have settled is access-denial, not
+  // "no receipts". Show that honestly instead of $0 (sol review 2026-07-28).
+  const paymentsUnreadable =
+    (payments ?? []).length === 0 &&
+    activeRows.some((row) => row.paidAt != null);
 
   const attentionRows = [...openRows]
     .sort((a, b) => {
@@ -241,8 +248,17 @@ export function FinanceOverviewPage() {
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Paid this month</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : formatMoney(paidThisMonth, functionalCurrencyCode)}
+            {loading
+              ? "—"
+              : paymentsUnreadable
+                ? "—"
+                : formatMoney(paidThisMonth, functionalCurrencyCode)}
           </dd>
+          {!loading && paymentsUnreadable ? (
+            <p className="mt-1 text-[11px] text-ink-3">
+              Requires finance access to read payments.
+            </p>
+          ) : null}
         </div>
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Drafts waiting</dt>

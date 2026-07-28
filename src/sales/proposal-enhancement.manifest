@@ -63,6 +63,33 @@ entity ProposalEnhancement mixin TenantScoped, SoftDeletable {
     }
   }
 
+  // Correct a draft enhancement in place (sol review 2026-07-28: withdraw+
+  // re-offer for a typo is needless tedium). Same draft-only window as offer.
+  command revise(
+    name: string,
+    price: money(12, 2),
+    optional description: string,
+    optional sortOrder: int
+  ) {
+    guard self.addedAt != null
+    guard self.removedAt == null
+    guard self.deletedAt == null
+    guard self.proposal != null and self.proposal.status == "draft"
+    constraint reviseEnhancementName: length(trim(name)) > 0 "Enhancement name is required"
+    constraint reviseEnhancementPrice: price >= 0 "Enhancement price cannot be negative"
+    mutate name = name
+    mutate description = description
+    mutate price = price
+    mutate sortOrder = sortOrder != null ? sortOrder : self.sortOrder
+    emit ProposalEnhancementRevised {
+      enhancementId: self.id
+      tenantId: self.tenantId
+      proposalId: self.proposalId
+      name: name
+      price: price
+    }
+  }
+
   command withdraw() {
     guard self.addedAt != null
     guard self.removedAt == null
@@ -86,6 +113,14 @@ entity ProposalEnhancement mixin TenantScoped, SoftDeletable {
 // ---------------------------------------------------------------------------
 
 event ProposalEnhancementOffered: "proposal_enhancement.offered" {
+  enhancementId: string
+  tenantId: string
+  proposalId: string
+  name: string
+  price: money(12, 2)
+}
+
+event ProposalEnhancementRevised: "proposal_enhancement.revised" {
   enhancementId: string
   tenantId: string
   proposalId: string
