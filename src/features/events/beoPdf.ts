@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { formatTime } from "../../lib/format";
 import { addPdfLogo, documentAddressLines } from "../admin/pdfBranding";
 import {
   brandColorRgb,
@@ -121,10 +122,7 @@ const clockTime = (value: unknown) => {
   const date = new Date(Number(value));
   return Number.isNaN(date.getTime())
     ? "Time not set"
-    : date.toLocaleTimeString("en-US", {
-        hour: "numeric",
-        minute: "2-digit",
-      });
+    : formatTime(date.getTime());
 };
 
 const clockRange = (startsAt: unknown, endsAt: unknown) =>

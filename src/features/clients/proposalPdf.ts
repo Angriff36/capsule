@@ -1,4 +1,8 @@
 import { jsPDF } from "jspdf";
+import {
+  formatMoneyExact,
+  formatTime as formatTimeShared,
+} from "../../lib/format";
 import { addPdfLogo, documentAddressLines } from "../admin/pdfBranding";
 import {
   brandColorRgb,
@@ -90,11 +94,7 @@ const INK = [28, 32, 30] as const;
 const MUTED = [101, 108, 104] as const;
 const PAPER = [246, 244, 238] as const;
 
-const usd = (value: unknown) =>
-  Number(value ?? 0).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
+const usd = (value: unknown) => formatMoneyExact(Number(value ?? 0));
 
 const dateText = (value: unknown) => {
   if (value == null || value === "") return "Not specified";
@@ -123,11 +123,7 @@ const formatTime = (timestamp: number | null | undefined): string => {
     typeof timestamp === "number" ? timestamp : Number(timestamp),
   );
   if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  });
+  return formatTimeShared(date.getTime());
 };
 
 // Transform EventTimelineActivity records to TimelineItem shape for PDF

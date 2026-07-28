@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../lib/api";
+import { formatDate, formatMoneyExact } from "../../lib/format";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
 
 /**
@@ -18,9 +19,6 @@ const PRICING_BASIS_LABEL: Record<string, string> = {
   percentage: "Percentage",
   package: "Package",
 };
-
-const money = (value: number | null | undefined): string =>
-  (Number(value ?? 0) || 0).toFixed(2);
 
 // token comes in as a prop: App renders this page directly off useMatch (no
 // <Route> context), so useParams() here would always be empty and the query
@@ -84,7 +82,7 @@ export function SharedProposalPage({ token }: { token: string }) {
 
   const { proposal, lineItems } = data;
   const formattedDate = proposal.eventDate
-    ? new Date(proposal.eventDate).toLocaleDateString()
+    ? formatDate(proposal.eventDate)
     : "TBD";
 
   // §5.2 L263 "Venue logistics snapshot": render the frozen venue logistics
@@ -148,9 +146,7 @@ export function SharedProposalPage({ token }: { token: string }) {
             </p>
             <p className="text-blue-200 text-xs mt-1">
               Revision {data.revisionNumber}
-              {data.capturedAt
-                ? ` · ${new Date(data.capturedAt).toLocaleDateString()}`
-                : ""}
+              {data.capturedAt ? ` · ${formatDate(data.capturedAt)}` : ""}
             </p>
           </div>
 
@@ -221,7 +217,7 @@ export function SharedProposalPage({ token }: { token: string }) {
                         </p>
                       </div>
                       <span className="font-medium text-gray-900 whitespace-nowrap">
-                        ${money(line.amount)}
+                        {formatMoneyExact(line.amount ?? 0)}
                       </span>
                     </div>
                   ))}
@@ -232,13 +228,15 @@ export function SharedProposalPage({ token }: { token: string }) {
             <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-6 space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Subtotal</span>
-                <span className="font-medium">${money(proposal.subtotal)}</span>
+                <span className="font-medium">
+                  {formatMoneyExact(proposal.subtotal ?? 0)}
+                </span>
               </div>
               {proposal.taxAmount > 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Tax</span>
                   <span className="font-medium">
-                    ${money(proposal.taxAmount)}
+                    {formatMoneyExact(proposal.taxAmount ?? 0)}
                   </span>
                 </div>
               )}
@@ -246,14 +244,14 @@ export function SharedProposalPage({ token }: { token: string }) {
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Discount</span>
                   <span className="font-medium">
-                    -${money(proposal.discountAmount)}
+                    -{formatMoneyExact(proposal.discountAmount ?? 0)}
                   </span>
                 </div>
               )}
               <div className="flex justify-between items-center pt-2 border-t border-blue-100">
                 <span className="text-gray-600">Total</span>
                 <span className="text-2xl font-bold text-gray-900">
-                  ${money(proposal.total)}
+                  {formatMoneyExact(proposal.total ?? 0)}
                 </span>
               </div>
             </div>
@@ -283,7 +281,7 @@ export function SharedProposalPage({ token }: { token: string }) {
             <div className="mt-8 pt-6 border-t border-gray-200 text-center">
               <p className="text-xs text-gray-500">
                 {linkExpiresAt != null
-                  ? `This link expires ${new Date(linkExpiresAt).toLocaleDateString()}. `
+                  ? `This link expires ${formatDate(linkExpiresAt)}. `
                   : ""}
                 This proposal reflects the terms shared with you; any updates
                 will come as a new link.

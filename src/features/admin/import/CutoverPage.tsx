@@ -165,18 +165,18 @@ export function CutoverPage() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           {check.passed ? (
-            <CheckCircle className="w-5 h-5 text-green-600" />
+            <CheckCircle className="w-5 h-5 text-ok" />
           ) : (
-            <XCircle className="w-5 h-5 text-red-600" />
+            <XCircle className="w-5 h-5 text-danger" />
           )}
           <h3 className="font-medium">{title}</h3>
         </div>
         {action}
       </div>
-      <p className="text-sm text-gray-600">{check.message}</p>
-      {details && <p className="text-xs text-gray-500">{details}</p>}
+      <p className="text-sm text-ink-2">{check.message}</p>
+      {details && <p className="text-xs text-ink-3">{details}</p>}
       {check.count !== undefined && check.count > 0 && (
-        <p className="text-sm text-red-600 font-medium">
+        <p className="text-sm text-danger font-medium">
           {check.count} items require attention
         </p>
       )}
@@ -216,11 +216,11 @@ export function CutoverPage() {
 
       {/* Status banner */}
       {cutoverStatus.status === "go" && (
-        <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <CheckCircle className="w-5 h-5 text-green-600" />
+        <div className="flex items-center gap-3 p-4 bg-ok-soft border border-ok/40 rounded-lg">
+          <CheckCircle className="w-5 h-5 text-ok" />
           <div>
             <p className="font-medium">Cutover Approved</p>
-            <p className="text-sm text-green-700">
+            <p className="text-sm text-ok">
               TPP migration cutover was approved on{" "}
               {formatDate(cutoverStatus.decidedAt)}.
             </p>
@@ -229,11 +229,11 @@ export function CutoverPage() {
       )}
 
       {cutoverStatus.status === "no_go" && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <XCircle className="w-5 h-5 text-red-600" />
+        <div className="flex items-center gap-3 p-4 bg-danger-soft border border-danger/40 rounded-lg">
+          <XCircle className="w-5 h-5 text-danger" />
           <div>
             <p className="font-medium">Cutover Rejected</p>
-            <p className="text-sm text-red-700">
+            <p className="text-sm text-danger">
               TPP migration cutover was rejected on{" "}
               {formatDate(cutoverStatus.decidedAt)}.
             </p>
@@ -276,22 +276,22 @@ export function CutoverPage() {
         <div
           className={`border rounded-lg p-4 ${
             validation.canProceed
-              ? "border-green-200 bg-green-50"
-              : "border-red-200 bg-red-50"
+              ? "border-ok/40 bg-ok-soft"
+              : "border-danger/40 bg-danger-soft"
           }`}
         >
           <div className="flex items-center gap-2">
             {validation.canProceed ? (
-              <CheckCircle className="w-6 h-6 text-green-600" />
+              <CheckCircle className="w-6 h-6 text-ok" />
             ) : (
-              <XCircle className="w-6 h-6 text-red-600" />
+              <XCircle className="w-6 h-6 text-danger" />
             )}
             <h3 className="font-medium">
               {validation.canProceed ? "Ready for Cutover" : "Cutover Blocked"}
             </h3>
           </div>
           {!validation.canProceed && validation.blockers.length > 0 && (
-            <ul className="list-disc list-inside text-sm mt-2 text-red-700 space-y-1">
+            <ul className="list-disc list-inside text-sm mt-2 text-danger space-y-1">
               {validation.blockers.map((blocker: string, i: number) => (
                 <li key={i}>{blocker}</li>
               ))}
@@ -307,7 +307,7 @@ export function CutoverPage() {
             details={validation.checks.finalDeltaImport.details}
             action={
               validation.checks.finalDeltaImport.passed && latestImport ? (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-ink-3">
                   {new Date(
                     latestImport.completionTime || 0,
                   ).toLocaleDateString()}
@@ -315,7 +315,7 @@ export function CutoverPage() {
               ) : (
                 <Link
                   to="/admin/imports"
-                  className="text-sm text-blue-600 hover:text-blue-700"
+                  className="text-sm text-info hover:text-info"
                 >
                   View Imports
                 </Link>
@@ -331,7 +331,7 @@ export function CutoverPage() {
               (validation.checks.zeroCriticalMappings.count || 0) > 0 ? (
                 <Link
                   to="/admin/reconcile"
-                  className="text-sm text-blue-600 hover:text-blue-700"
+                  className="text-sm text-info hover:text-info"
                 >
                   Resolve Mappings
                 </Link>
@@ -374,7 +374,7 @@ export function CutoverPage() {
                     "Rollback: Revert latest import, re-enable TPP writes",
                   )
                 }
-                className="text-sm text-blue-600 hover:text-blue-700"
+                className="text-sm text-info hover:text-info"
               >
                 Use Template
               </button>
@@ -417,8 +417,8 @@ export function CutoverPage() {
                   localRollbackPlan &&
                   isAdmin &&
                   !isSubmitting
-                    ? "bg-green-600 hover:bg-green-700"
-                    : "bg-green-600 opacity-50 cursor-not-allowed"
+                    ? "bg-ok hover:bg-ok"
+                    : "bg-ok opacity-50 cursor-not-allowed"
                 }`}
                 disabled={
                   !validation.canProceed ||
@@ -466,7 +466,7 @@ export function CutoverPage() {
               </button>
             </>
           ) : cutoverStatus.status === "no_go" ? (
-            <div className="p-4 bg-gray-50 rounded-lg text-sm text-gray-700">
+            <div className="p-4 bg-inset rounded-lg text-sm text-ink-2">
               Cutover was rejected. Address blockers and retry when ready.
             </div>
           ) : cutoverStatus.status === "rolled_back" ? (
@@ -478,14 +478,14 @@ export function CutoverPage() {
         </div>
 
         {!isAdmin && (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-ink-3">
             Only organization administrators can execute cutover decisions.
           </p>
         )}
       </div>
 
       {/* Help text */}
-      <div className="text-sm text-gray-600 space-y-1">
+      <div className="text-sm text-ink-2 space-y-1">
         <p className="font-medium">Cutover Process (§6.6):</p>
         <ol className="list-decimal list-inside space-y-1">
           <li>Run final delta import from TPP</li>

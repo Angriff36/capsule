@@ -47,6 +47,18 @@ export function formatMoney(
   }
 }
 
+const exactMoneyFmt = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
+/** Money with cents, for invoices/orders where exact amounts matter. */
+export function formatMoneyExact(n: number | null | undefined): string {
+  return n == null ? "—" : exactMoneyFmt.format(n);
+}
+
 export function formatCount(n: number | null | undefined): string {
   return n == null ? "—" : numFmt.format(n);
 }

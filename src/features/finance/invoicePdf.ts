@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { formatDate, formatMoneyExact } from "../../lib/format";
 import { addPdfLogo, documentAddressLines } from "../admin/pdfBranding";
 import {
   brandColorRgb,
@@ -57,11 +58,7 @@ const PAGE_WIDTH = 612; // letter, pt
 const MARGIN = 54;
 const RIGHT = PAGE_WIDTH - MARGIN;
 
-const usd = (value: unknown) =>
-  Number(value ?? 0).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
+const usd = (value: unknown) => formatMoneyExact(Number(value ?? 0));
 
 const moneyFmt = (currencyCode?: string | null) => {
   const code = String(currencyCode ?? "")
@@ -76,7 +73,7 @@ const moneyFmt = (currencyCode?: string | null) => {
 };
 
 const dateText = (value: unknown) =>
-  value == null ? "—" : new Date(Number(value)).toLocaleDateString("en-US");
+  value == null ? "—" : formatDate(Number(value));
 
 function clientNameOf(client: InvoicePdfClient | undefined): string {
   if (!client) return "Client";
@@ -269,11 +266,7 @@ export function buildInvoicePdf(input: InvoicePdfInput): jsPDF {
   doc.setFontSize(8);
   doc.setTextColor(150, 150, 150);
   doc.text(
-    [
-      branding.displayName,
-      address[0],
-      `Generated ${new Date().toLocaleDateString("en-US")}`,
-    ]
+    [branding.displayName, address[0], `Generated ${formatDate(Date.now())}`]
       .filter(Boolean)
       .join(" · "),
     MARGIN,

@@ -12,14 +12,17 @@ import {
   useRevenueAttributionUpdate,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, FormSkeleton } from "../../ui/primitives";
+import {
+  formatDate as formatDateShared,
+  formatMoneyExact,
+} from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 
-const usd = (value: number) =>
-  value.toLocaleString(undefined, { style: "currency", currency: "USD" });
+const usd = formatMoneyExact;
 
 const formatDate = (date: string | number | null | undefined) => {
   if (!date) return "—";
-  return new Date(date).toLocaleDateString();
+  return formatDateShared(new Date(date).getTime());
 };
 
 const attributionTypeLabel = (type: string) => {

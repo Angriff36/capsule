@@ -10,6 +10,7 @@ import {
   usePaymentRefund,
   usePaymentSettle,
 } from "../../lib/manifest-convex-react";
+import { formatMoneyExact } from "../../lib/format";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
@@ -253,13 +254,7 @@ export function PaymentsPage() {
                   {payableInvoices.map((invoice) => (
                     <option key={invoice._id} value={invoice._id}>
                       {invoice.invoiceNumber} · due{" "}
-                      {Number(invoice.amountDue ?? 0).toLocaleString(
-                        undefined,
-                        {
-                          style: "currency",
-                          currency: "USD",
-                        },
-                      )}
+                      {formatMoneyExact(Number(invoice.amountDue ?? 0))}
                     </option>
                   ))}
                 </select>
@@ -376,12 +371,7 @@ export function PaymentsPage() {
                       </Link>
                       <small>{String(row.method)}</small>
                     </td>
-                    <td>
-                      {Number(row.amount ?? 0).toLocaleString(undefined, {
-                        style: "currency",
-                        currency: "USD",
-                      })}
-                    </td>
+                    <td>{formatMoneyExact(Number(row.amount ?? 0))}</td>
                     <td>
                       <StatusChip status={String(row.status)} />
                     </td>

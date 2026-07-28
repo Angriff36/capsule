@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
-import { formatMoney, normalizeCurrencyCode } from "../../lib/format";
+import {
+  formatDate,
+  formatMoney,
+  normalizeCurrencyCode,
+} from "../../lib/format";
 import { formatCurrencyLabel } from "../../lib/currency";
 import {
   useCreateCreditMemo,
@@ -972,9 +976,7 @@ export function InvoiceDetailPage() {
           <div>
             <dt>Deposit paid</dt>
             <dd>
-              {depositPaidAt != null
-                ? new Date(depositPaidAt).toLocaleDateString()
-                : "Not paid"}
+              {depositPaidAt != null ? formatDate(depositPaidAt) : "Not paid"}
             </dd>
           </div>
           <div>
@@ -1127,11 +1129,7 @@ export function InvoiceDetailPage() {
         <dl className="supply-kv mt-4">
           <div>
             <dt>Invoice due</dt>
-            <dd>
-              {dueDate == null
-                ? "No due date"
-                : new Date(dueDate).toLocaleDateString()}
-            </dd>
+            <dd>{dueDate == null ? "No due date" : formatDate(dueDate)}</dd>
           </div>
           <div>
             <dt>Automation</dt>
@@ -1151,9 +1149,9 @@ export function InvoiceDetailPage() {
               {reminderSchedule.offsetsDays
                 .map(
                   (offsetDays) =>
-                    `${reminderOffsetLabel(offsetDays)} (${new Date(
+                    `${reminderOffsetLabel(offsetDays)} (${formatDate(
                       reminderScheduledAt(dueDate, offsetDays),
-                    ).toLocaleDateString()})`,
+                    )})`,
                 )
                 .join(" · ")}
             </span>

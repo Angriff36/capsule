@@ -21,8 +21,6 @@ import { MenuDetailPage } from "../features/kitchen/MenuDetailPage";
 import { ComponentDetailPage } from "../features/kitchen/ComponentDetailPage";
 import { ErrorState, TableSkeleton } from "../ui/primitives";
 import { AuthGate } from "./AuthGate";
-import { NAV_AREAS } from "./nav";
-import { PlannedAreaPage } from "./PlannedAreaPage";
 import { AppShell } from "./shell/AppShell";
 
 const DemandLedgerPage = lazy(() =>
@@ -543,10 +541,7 @@ export function App() {
               path="/events/:id/allergen-briefing"
               element={<EventAllergenBriefingPage />}
             />
-            <Route
-              path="/kitchen"
-              element={<Navigate to="/kitchen/components" replace />}
-            />
+            <Route path="/kitchen" element={<KitchenDashboardPage />} />
             <Route
               path="/kitchen/components"
               element={<KitchenCatalogPage section="components" />}
@@ -1263,9 +1258,6 @@ export function App() {
                 </SupplyRoute>
               }
             />
-            {NAV_AREAS.filter((a) => a.planned).map((a) => (
-              <Route key={a.path} path={a.path} element={<PlannedAreaPage />} />
-            ))}
             <Route
               path="*"
               element={

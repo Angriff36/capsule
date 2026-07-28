@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { useRef, useState } from "react";
 import { api } from "../../lib/api";
+import { formatDate, formatTime } from "../../lib/format";
 import {
   useAttachmentRemove,
   useAttachmentSetSurveySelection,
@@ -468,7 +469,7 @@ export function RecordPhotoCaptureView({
                 <p className="mt-0.5 text-[11px] text-ink-3">
                   {formatSize(photo.fileSize)}
                   {photo.uploadedAt
-                    ? ` · ${new Date(photo.uploadedAt).toLocaleString()}`
+                    ? ` · ${formatDate(photo.uploadedAt)} ${formatTime(photo.uploadedAt)}`
                     : ""}
                 </p>
                 {onToggleSurvey ? (

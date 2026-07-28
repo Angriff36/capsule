@@ -10,6 +10,7 @@ import {
   useImportRunMarkFailed,
 } from "../../../lib/manifest-convex-react";
 import { api } from "../../../lib/api";
+import { formatDate, formatTime } from "../../../lib/format";
 import { importRunsListPath } from "./importRoutes";
 import { StatusChip } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
@@ -99,7 +100,7 @@ export function ImportRunDetailPage() {
   if (id === "skip" || importRun === undefined) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="text-center text-gray-500">Loading...</div>
+        <div className="text-center text-ink-3">Loading...</div>
       </div>
     );
   }
@@ -107,7 +108,7 @@ export function ImportRunDetailPage() {
   if (importRun === null) {
     return (
       <div className="flex h-64 items-center justify-center">
-        <div className="text-center text-gray-500">
+        <div className="text-center text-ink-3">
           <p>Import run not found</p>
           <Link
             to={importRunsListPath()}
@@ -320,12 +321,12 @@ export function ImportRunDetailPage() {
   const statusLabel = STATUS_LABELS[importRun.status] || importRun.status;
   const availableTransitions = STAGE_TRANSITIONS[importRun.status] || [];
 
-  // Format date for display - handles both number (ms) and string dates
-  const formatDate = (dateVal: string | number | null | undefined) => {
+  // Normalizes ms-or-string timestamps into the shared date+time format.
+  const formatDateTime = (dateVal: string | number | null | undefined) => {
     if (!dateVal) return "—";
-    const date =
-      typeof dateVal === "number" ? new Date(dateVal) : new Date(dateVal);
-    return date.toLocaleString();
+    const ms =
+      typeof dateVal === "number" ? dateVal : new Date(dateVal).getTime();
+    return `${formatDate(ms)} ${formatTime(ms)}`;
   };
 
   return (
@@ -347,8 +348,17 @@ export function ImportRunDetailPage() {
           </div>
           <p className="mt-1 text-ink-2">
             {SOURCE_SYSTEM_LABELS[importRun.sourceSystem]} ·{" "}
-            {DATASET_TYPE_LABELS[importRun.datasetType]} · ID:{" "}
-            <span className="font-mono text-xs">{importRun._id}</span>
+            {DATASET_TYPE_LABELS[importRun.datasetType]}
+            <button
+              type="button"
+              className="ml-3 font-mono text-[11px] text-ink-3 hover:text-ink"
+              title="Copy the internal run ID for support"
+              onClick={() =>
+                void navigator.clipboard.writeText(String(importRun._id))
+              }
+            >
+              Copy run ID
+            </button>
           </p>
         </div>
       </header>
@@ -420,7 +430,7 @@ export function ImportRunDetailPage() {
                 disabled={isBusy}
                 className={`px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50 ${
                   transition.next === "failed" || transition.next === "reverted"
-                    ? "bg-slate-200 text-slate-700 hover:bg-slate-300"
+                    ? "bg-inset text-ink-2 hover:bg-line-2"
                     : "bg-brand text-white hover:bg-brand"
                 }`}
               >
@@ -477,7 +487,7 @@ export function ImportRunDetailPage() {
                   setShowRecordCountsForm(false);
                   setRecordCountsInput("{}");
                 }}
-                className="px-4 py-2 text-slate-600 rounded-md text-sm font-medium hover:bg-slate-100"
+                className="px-4 py-2 text-ink-2 rounded-md text-sm font-medium hover:bg-inset"
               >
                 Cancel
               </button>
@@ -558,7 +568,7 @@ export function ImportRunDetailPage() {
                   setShowSourceForm(false);
                   setSourceRowsInput("[]");
                 }}
-                className="px-4 py-2 text-slate-600 rounded-md text-sm font-medium hover:bg-slate-100"
+                className="px-4 py-2 text-ink-2 rounded-md text-sm font-medium hover:bg-inset"
               >
                 Cancel
               </button>
@@ -603,13 +613,13 @@ export function ImportRunDetailPage() {
             <div>
               <dt className="font-medium text-ink">Started At</dt>
               <dd className="mt-1 text-ink-2">
-                {formatDate(importRun.startTime)}
+                {formatDateTime(importRun.startTime)}
               </dd>
             </div>
             <div>
               <dt className="font-medium text-ink">Completed At</dt>
               <dd className="mt-1 text-ink-2">
-                {formatDate(importRun.completionTime)}
+                {formatDateTime(importRun.completionTime)}
               </dd>
             </div>
             <div>
@@ -640,49 +650,49 @@ export function ImportRunDetailPage() {
             <div>
               <dt className="font-medium text-ink">Started</dt>
               <dd className="mt-1 text-ink-2">
-                {formatDate(importRun.startTime)}
+                {formatDateTime(importRun.startTime)}
               </dd>
             </div>
             <div>
               <dt className="font-medium text-ink">Parsed At</dt>
               <dd className="mt-1 text-ink-2">
-                {formatDate(importRun.parsedAt)}
+                {formatDateTime(importRun.parsedAt)}
               </dd>
             </div>
             <div>
               <dt className="font-medium text-ink">Validated At</dt>
               <dd className="mt-1 text-ink-2">
-                {formatDate(importRun.validatedAt)}
+                {formatDateTime(importRun.validatedAt)}
               </dd>
             </div>
             <div>
               <dt className="font-medium text-ink">Review Started At</dt>
               <dd className="mt-1 text-ink-2">
-                {formatDate(importRun.reviewStartedAt)}
+                {formatDateTime(importRun.reviewStartedAt)}
               </dd>
             </div>
             <div>
               <dt className="font-medium text-ink">Review Approved At</dt>
               <dd className="mt-1 text-ink-2">
-                {formatDate(importRun.reviewApprovedAt)}
+                {formatDateTime(importRun.reviewApprovedAt)}
               </dd>
             </div>
             <div>
               <dt className="font-medium text-ink">Commit Started At</dt>
               <dd className="mt-1 text-ink-2">
-                {formatDate(importRun.commitStartedAt)}
+                {formatDateTime(importRun.commitStartedAt)}
               </dd>
             </div>
             <div>
               <dt className="font-medium text-ink">Reverted At</dt>
               <dd className="mt-1 text-ink-2">
-                {formatDate(importRun.revertedAt)}
+                {formatDateTime(importRun.revertedAt)}
               </dd>
             </div>
             <div>
               <dt className="font-medium text-ink">End Time</dt>
               <dd className="mt-1 text-ink-2">
-                {formatDate(importRun.endTime)}
+                {formatDateTime(importRun.endTime)}
               </dd>
             </div>
           </dl>
@@ -719,7 +729,7 @@ export function ImportRunDetailPage() {
             </h2>
           </div>
           <div className="p-4">
-            <pre className="text-sm text-danger whitespace-pre-wrap">
+            <pre className="max-h-60 overflow-auto rounded-xs bg-inset p-3 font-mono text-[12px] whitespace-pre-wrap text-danger">
               {importRun.failureDetails}
             </pre>
           </div>

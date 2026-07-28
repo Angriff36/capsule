@@ -12,7 +12,7 @@ import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { PageHeader, StatusChip } from "@/ui/primitives";
-import { formatMoney, formatPercent } from "@/lib/format";
+import { formatDate, formatMoney, formatPercent } from "@/lib/format";
 
 /**
  * Comp Master Dashboard (Priority 39)
@@ -213,9 +213,7 @@ export function CompMasterDashboardPage() {
             : "Unassigned",
           revenue: event.quotedPrice || 0,
           commission: (event.quotedPrice || 0) * COMMISSION_RATE,
-          date: event.startsAt
-            ? new Date(event.startsAt).toLocaleDateString()
-            : "",
+          date: event.startsAt ? formatDate(event.startsAt) : "",
           stage: event.stage || "unknown",
         };
       })

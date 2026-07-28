@@ -11,6 +11,7 @@ import {
   useListComponentIngredient,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import {
   CULINARY_ALLERGENS,
   type CulinaryAllergenCode,
@@ -221,7 +222,7 @@ export function AllergenMatrixPage() {
               <h2 className="font-display mt-1 text-3xl">{scopeName}</h2>
             </div>
             <span className="font-mono text-[11px] text-ink-3">
-              Prepared {new Date().toLocaleDateString()} · {rows.length} dishes
+              Prepared {formatDate(Date.now())} · {rows.length} dishes
             </span>
           </header>
           <div className="supply-table-wrap">

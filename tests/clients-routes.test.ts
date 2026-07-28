@@ -23,9 +23,9 @@ describe("Clients CRM routes and lifecycle bindings", () => {
     ]);
   });
 
-  it("ships Clients in primary nav without a planned placeholder", () => {
+  it("ships Clients in primary nav", () => {
     const clients = NAV_AREAS.find((area) => area.path === "/clients");
-    expect(clients?.planned).toBeUndefined();
+    expect(clients).toBeDefined();
     expect(clients?.label).toMatch(/Clients/);
   });
 

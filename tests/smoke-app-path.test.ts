@@ -26,7 +26,7 @@ describe("smoke: signed-in workspace path", () => {
     const catalog = new NavigationCatalog(NAV_AREAS);
     const events = catalog.areaForPath("/events");
     expect(events?.label).toBe("Events");
-    expect(events?.planned).toBeUndefined();
+    expect(events).toBeDefined();
     expect(catalog.availableAreas().some((a) => a.path === "/events")).toBe(
       true,
     );

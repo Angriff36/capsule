@@ -227,6 +227,33 @@
   .text-link {
     @apply items-center gap-2 text-[11px] font-semibold tracking-[0.04em] text-brand uppercase transition-colors hover:text-accent-deep;
   }
+
+  /* Arrival motion — masthead leads, working surfaces follow. Mount-only,
+     so live Convex re-renders never re-trigger it. */
+  @media (prefers-reduced-motion: no-preference) {
+    .page-header,
+    .supply-masthead,
+    .journal-masthead {
+      animation: rise-in 340ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
+    }
+    .card,
+    .working-ledger,
+    .attention-ledger {
+      animation: rise-in 380ms cubic-bezier(0.22, 0.9, 0.3, 1) both;
+      animation-delay: 60ms;
+    }
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @layer utilities {
@@ -324,6 +351,12 @@
     visibility: visible;
     opacity: 1;
     transform: translateX(0);
+  }
+  .icon-nav-rule {
+    width: 18px;
+    height: 1px;
+    margin: 4px 0;
+    background: var(--color-line-2);
   }
   .module-drawer {
     position: relative;

@@ -27,6 +27,7 @@ import type { Id } from "../../lib/api";
 import { findApprovedTimeOffConflict } from "../../lib/timeOff";
 import { useScheduleShift } from "../../lib/workforceScheduling";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { AvailabilityGridSection } from "./AvailabilityGridSection";
 import {
@@ -278,11 +279,11 @@ export function RosterPage() {
     if (approvedTimeOff) {
       setFailure(
         new Error(
-          `${personName(personId)} has approved time off from ${new Date(
+          `${personName(personId)} has approved time off from ${formatDate(
             approvedTimeOff.startsAt ?? 0,
-          ).toLocaleDateString()} through ${new Date(
+          )} through ${formatDate(
             (approvedTimeOff.endsAt ?? 1) - 1,
-          ).toLocaleDateString()}. Choose another person or adjust the shift.`,
+          )}. Choose another person or adjust the shift.`,
         ),
       );
       return;
@@ -621,9 +622,9 @@ export function RosterPage() {
                   data-testid="training-gate-status"
                 >
                   {selectedTrainingCompletion
-                    ? `${requiredTrainingModule.name} completed ${new Date(
+                    ? `${requiredTrainingModule.name} completed ${formatDate(
                         selectedTrainingCompletion.completedAt ?? 0,
-                      ).toLocaleDateString()} · ${selectedTrainingCompletion.assessmentScore}%`
+                      )} · ${selectedTrainingCompletion.assessmentScore}%`
                     : `Missing ${requiredTrainingModule.name}. Record it in Staff → Training first.`}
                 </small>
               ) : null}
@@ -643,7 +644,7 @@ export function RosterPage() {
                       ? ` · ${qualification.certificationType}`
                       : ""}
                     {qualification.expiresAt
-                      ? ` · expires ${new Date(qualification.expiresAt).toLocaleDateString()}`
+                      ? ` · expires ${formatDate(qualification.expiresAt)}`
                       : ""}
                   </option>
                 ))}
@@ -884,10 +885,12 @@ export function RosterPage() {
                     <td>{eventName(row.eventId)}</td>
                     <td>
                       {row.startsAt
-                        ? new Date(row.startsAt).toLocaleString()
+                        ? `${formatDate(row.startsAt)} ${formatTime(row.startsAt)}`
                         : "—"}{" "}
                       →{" "}
-                      {row.endsAt ? new Date(row.endsAt).toLocaleString() : "—"}
+                      {row.endsAt
+                        ? `${formatDate(row.endsAt)} ${formatTime(row.endsAt)}`
+                        : "—"}
                     </td>
                     <td>
                       <StatusChip status={String(row.status)} />

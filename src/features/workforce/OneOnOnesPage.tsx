@@ -8,6 +8,7 @@ import {
   useOneOnOneActionClose,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
@@ -30,10 +31,6 @@ function localDateEpoch(value: FormDataEntryValue | null): number | undefined {
   const text = String(value ?? "");
   if (!text) return undefined;
   return new Date(`${text}T12:00:00`).getTime();
-}
-
-function formatEpoch(value: number | null | undefined): string {
-  return value ? new Date(value).toLocaleDateString() : "—";
 }
 
 export function OneOnOnesPage() {
@@ -362,7 +359,7 @@ export function OneOnOnesPage() {
                     <tr key={row._id}>
                       <td>{row.description}</td>
                       <td>{personName(row.ownerPersonId)}</td>
-                      <td>{formatEpoch(row.dueDate)}</td>
+                      <td>{formatDate(row.dueDate)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -416,9 +413,7 @@ export function OneOnOnesPage() {
               <div key={meeting._id} className="supply-form mt-4">
                 <div className="supply-form-heading">
                   <div>
-                    <p className="eyebrow">
-                      {formatEpoch(meeting.meetingDate)}
-                    </p>
+                    <p className="eyebrow">{formatDate(meeting.meetingDate)}</p>
                     <h2>
                       {personName(meeting.staffMemberId)} ↔{" "}
                       {personName(meeting.leadPersonId)}
@@ -475,7 +470,7 @@ export function OneOnOnesPage() {
                           <tr key={row._id}>
                             <td>{row.description}</td>
                             <td>{personName(row.ownerPersonId)}</td>
-                            <td>{formatEpoch(row.dueDate)}</td>
+                            <td>{formatDate(row.dueDate)}</td>
                             <td>
                               <span
                                 className={`badge badge-${
@@ -495,7 +490,7 @@ export function OneOnOnesPage() {
                                 </button>
                               ) : (
                                 <span className="text-ink-2">
-                                  {formatEpoch(row.closedAt)}
+                                  {formatDate(row.closedAt)}
                                 </span>
                               )}
                             </td>

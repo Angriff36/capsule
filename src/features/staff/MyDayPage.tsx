@@ -27,6 +27,7 @@ import {
   useTimeRecordClockOut,
   useWeeklyScheduleNoticeAcknowledge,
 } from "../../lib/manifest-convex-react";
+import { formatDate, formatTime } from "../../lib/format";
 import { CheckIcon, WifiOffIcon } from "../../ui/icons";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
@@ -58,13 +59,7 @@ const dayLabel = (ms?: number | null) =>
         day: "numeric",
       });
 
-const timeLabel = (ms?: number | null) =>
-  ms == null
-    ? "—"
-    : new Date(ms).toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-      });
+const timeLabel = (ms?: number | null) => formatTime(ms);
 
 /**
  * Phone-first view for field staff: shifts, clock in/out, prep, packing,
@@ -764,7 +759,7 @@ export function MyDayPage() {
                       </p>
                       <p className="text-[12.5px] text-ink-2">
                         {closeout.capturedAt
-                          ? `Captured ${new Date(closeout.capturedAt).toLocaleString()}`
+                          ? `Captured ${formatDate(closeout.capturedAt)} ${formatTime(closeout.capturedAt)}`
                           : "Ready for venue photos"}
                       </p>
                     </div>

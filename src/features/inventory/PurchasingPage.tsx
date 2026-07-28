@@ -30,6 +30,7 @@ import {
   useBulkSelection,
 } from "../../ui/bulk-select";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatDate, formatMoneyExact } from "../../lib/format";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { PurchasingCommandForm } from "./PurchasingCommandForm";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
@@ -360,7 +361,7 @@ export function PurchasingPage() {
             onClick={editApprovalThreshold}
           >
             {approvalThreshold != null
-              ? `Approval threshold: $${Number(approvalThreshold).toFixed(2)}`
+              ? `Approval threshold: ${formatMoneyExact(Number(approvalThreshold))}`
               : "Approval threshold: off"}
           </button>
           <button
@@ -451,15 +452,13 @@ export function PurchasingPage() {
                     <td>
                       <strong>
                         {order.sourceRangeStart
-                          ? new Date(
-                              order.sourceRangeStart,
-                            ).toLocaleDateString()
+                          ? formatDate(order.sourceRangeStart)
                           : "—"}
                       </strong>
                     </td>
                     <td>{vendorName(order.vendorId)}</td>
                     <td className="supply-number">
-                      ${Number(order.totalAmount).toFixed(2)}
+                      {formatMoneyExact(Number(order.totalAmount))}
                     </td>
                     <td>
                       <StatusChip status={String(order.status)} />
@@ -569,7 +568,7 @@ export function PurchasingPage() {
                         : "Weekly / general"}
                     </td>
                     <td className="supply-number">
-                      ${Number(order.totalAmount).toFixed(2)}
+                      {formatMoneyExact(Number(order.totalAmount))}
                     </td>
                     <td>
                       <StatusChip status={String(order.status)} />

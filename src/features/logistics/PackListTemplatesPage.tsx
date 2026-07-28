@@ -257,7 +257,7 @@ export function PackListTemplatesPage() {
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-ink-1">
+          <h1 className="text-xl font-semibold text-ink">
             Pack List Templates
           </h1>
           <p className="text-[13px] text-ink-3">
@@ -282,7 +282,7 @@ export function PackListTemplatesPage() {
 
       {formOpen ? (
         <form
-          className="mb-6 rounded-lg border border-line-2 bg-surface-1 p-4"
+          className="mb-6 rounded-lg border border-line-2 bg-panel p-4"
           onSubmit={submit}
         >
           <div className="grid gap-3 md:grid-cols-2">
@@ -510,7 +510,7 @@ export function PackListTemplatesPage() {
                 return (
                   <tr key={template._id} className="border-t border-line-2">
                     <td className="py-2 pr-3">
-                      <div className="font-medium text-ink-1">
+                      <div className="font-medium text-ink">
                         {template.name}
                       </div>
                       {template.description ? (

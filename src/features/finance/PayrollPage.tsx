@@ -11,6 +11,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
@@ -396,13 +397,8 @@ export function PayrollPage() {
                     <td>
                       <strong>{personName(String(row.personId))}</strong>
                       <small>
-                        {row.periodStart
-                          ? new Date(row.periodStart).toLocaleDateString()
-                          : "—"}{" "}
-                        →{" "}
-                        {row.periodEnd
-                          ? new Date(row.periodEnd).toLocaleDateString()
-                          : "—"}
+                        {row.periodStart ? formatDate(row.periodStart) : "—"} →{" "}
+                        {row.periodEnd ? formatDate(row.periodEnd) : "—"}
                       </small>
                     </td>
                     <td>

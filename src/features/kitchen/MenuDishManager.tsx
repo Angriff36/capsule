@@ -4,6 +4,7 @@ import {
   useMenuDishRemove,
   useMenuDishUpdateDetails,
 } from "../../lib/manifest-convex-react";
+import { formatMoneyExact } from "../../lib/format";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryRecordPicker, type PickerDish } from "./CulinaryRecordPicker";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
@@ -132,7 +133,7 @@ export function MenuDishManager({
                     Edition {dish?.editionNumber ?? 1}
                     {line.course ? ` · ${line.course}` : ""}
                     {line.sellingPrice != null
-                      ? ` · $${Number(line.sellingPrice).toFixed(2)}`
+                      ? ` · ${formatMoneyExact(Number(line.sellingPrice))}`
                       : ""}
                   </p>
                   {dish?.description ? (

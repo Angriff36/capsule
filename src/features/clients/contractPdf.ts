@@ -1,4 +1,5 @@
 import { jsPDF } from "jspdf";
+import { formatMoneyExact } from "../../lib/format";
 import { addPdfLogo, documentAddressLines } from "../admin/pdfBranding";
 import {
   brandColorRgb,
@@ -57,11 +58,7 @@ const RIGHT = PAGE_WIDTH - MARGIN;
 const CONTENT_WIDTH = RIGHT - MARGIN;
 const FOOTER_Y = PAGE_HEIGHT - 34;
 
-const money = (value: unknown) =>
-  Number(value ?? 0).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
+const money = (value: unknown) => formatMoneyExact(Number(value ?? 0));
 
 const dateText = (value: unknown) =>
   value == null

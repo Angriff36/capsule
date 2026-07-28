@@ -10,6 +10,7 @@ import {
   useTimeRecordCorrect,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatDate, formatTime } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -272,12 +273,12 @@ export function TimeSheetPage() {
                     </td>
                     <td>
                       {row.clockInAt
-                        ? new Date(row.clockInAt).toLocaleString()
+                        ? `${formatDate(row.clockInAt)} ${formatTime(row.clockInAt)}`
                         : "—"}
                     </td>
                     <td>
                       {row.clockOutAt
-                        ? new Date(row.clockOutAt).toLocaleString()
+                        ? `${formatDate(row.clockOutAt)} ${formatTime(row.clockOutAt)}`
                         : "—"}
                     </td>
                     <td className="supply-number">
@@ -347,10 +348,12 @@ export function TimeSheetPage() {
                     </td>
                     <td>
                       {row.startsAt
-                        ? new Date(row.startsAt).toLocaleString()
+                        ? `${formatDate(row.startsAt)} ${formatTime(row.startsAt)}`
                         : "—"}{" "}
                       →{" "}
-                      {row.endsAt ? new Date(row.endsAt).toLocaleString() : "—"}
+                      {row.endsAt
+                        ? `${formatDate(row.endsAt)} ${formatTime(row.endsAt)}`
+                        : "—"}
                       {row.kind === "unavailable" ? (
                         <small className="text-danger"> · time off</small>
                       ) : null}

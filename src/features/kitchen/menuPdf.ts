@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import type { Doc } from "../../lib/api";
+import { formatMoneyExact } from "../../lib/format";
 import { addPdfLogo, documentAddressLines } from "../admin/pdfBranding";
 import {
   brandColorRgb,
@@ -34,11 +35,7 @@ const DISHES_TOP = 62;
 
 type Rgb = readonly [number, number, number];
 
-const usd = (value: unknown) =>
-  Number(value ?? 0).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  });
+const usd = (value: unknown) => formatMoneyExact(Number(value ?? 0));
 
 const slug = (value: unknown) =>
   String(value ?? "menu")

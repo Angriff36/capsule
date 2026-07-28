@@ -7,6 +7,7 @@ import {
   useListEvent,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
@@ -142,8 +143,7 @@ export function PerformanceReviewsPage() {
                 <option value="">No specific event</option>
                 {events?.map((event) => (
                   <option key={event._id} value={event._id}>
-                    {event.title} —{" "}
-                    {new Date(event.startsAt ?? 0).toLocaleDateString()}
+                    {event.title} — {formatDate(event.startsAt ?? 0)}
                   </option>
                 ))}
               </select>
@@ -233,9 +233,7 @@ export function PerformanceReviewsPage() {
                         )}
                       </td>
                       <td>
-                        {row.reviewDate
-                          ? new Date(row.reviewDate).toLocaleDateString()
-                          : "—"}
+                        {row.reviewDate ? formatDate(row.reviewDate) : "—"}
                       </td>
                       <td>{row.reliabilityRating}</td>
                       <td>{row.qualityRating}</td>

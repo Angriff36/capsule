@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
+import { formatMoneyExact } from "../../lib/format";
 import {
   useCreateVendorOrderLine,
   useGetVendorOrder,
@@ -298,7 +299,7 @@ export function VendorOrderPage() {
         </div>
         <div className="order-state">
           <StatusChip status={String(order.status)} />
-          <strong>${Number(order.totalAmount).toFixed(2)}</strong>
+          <strong>{formatMoneyExact(Number(order.totalAmount))}</strong>
           <span>Projected number precision</span>
         </div>
       </header>
@@ -349,9 +350,9 @@ export function VendorOrderPage() {
         <aside className="supply-degraded" role="note">
           <strong>Awaiting manager approval before it is sent</strong>
           <span>
-            This order total (${Number(order.totalAmount).toFixed(2)}) is above
-            the spend approval threshold. A manager can approve it in one click
-            or request modifications.
+            This order total ({formatMoneyExact(Number(order.totalAmount))}) is
+            above the spend approval threshold. A manager can approve it in one
+            click or request modifications.
           </span>
         </aside>
       ) : null}
@@ -538,8 +539,8 @@ export function VendorOrderPage() {
                           : ` · ${line.remainingQuantity} remaining`}
                       </span>
                       <small>
-                        ${Number(line.lineTotal).toFixed(2)} line · $
-                        {Number(line.unitCost).toFixed(2)} / {line.unit}
+                        {formatMoneyExact(Number(line.lineTotal))} line ·{" "}
+                        {formatMoneyExact(Number(line.unitCost))} / {line.unit}
                         {line.hasReceivingDiscrepancy
                           ? ` · discrepancy ${line.discrepancyQuantity}`
                           : ""}

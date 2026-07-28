@@ -16,7 +16,7 @@ import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { PageHeader } from "@/ui/primitives";
-import { formatMoney, formatCount } from "@/lib/format";
+import { formatDate, formatMoney, formatCount } from "@/lib/format";
 
 /**
  * Tim's KPIs Dashboard (Priority 35)
@@ -242,9 +242,7 @@ export function TimsKPIsDashboardPage() {
       .map((event) => ({
         title: event.title,
         revenue: event.quotedPrice || 0,
-        date: event.startsAt
-          ? new Date(event.startsAt).toLocaleDateString()
-          : "",
+        date: event.startsAt ? formatDate(event.startsAt) : "",
         headcount: event.expectedHeadcount || 0,
         venueId: event.venueId || "N/A",
       }));

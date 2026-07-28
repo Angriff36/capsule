@@ -12,6 +12,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatDate, formatMoneyExact } from "../../lib/format";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 
@@ -296,7 +297,7 @@ export function VendorContractsPage() {
                       </span>
                       <small>
                         {contract.startsAt != null && endsAt != null
-                          ? `${new Date(Number(contract.startsAt)).toLocaleDateString()} → ${new Date(endsAt).toLocaleDateString()}`
+                          ? `${formatDate(Number(contract.startsAt))} → ${formatDate(endsAt)}`
                           : "Period not set"}
                         {" · "}Net {contract.paymentTermsDays} ·{" "}
                         {contract.deliveryLeadTimeDays} day lead
@@ -372,7 +373,8 @@ export function VendorContractsPage() {
                           <li key={tier._id}>
                             <strong>{tier.itemName}</strong>
                             <span>
-                              ${Number(tier.unitPrice).toFixed(2)} / {tier.unit}
+                              {formatMoneyExact(Number(tier.unitPrice))} /{" "}
+                              {tier.unit}
                               {Number(tier.minQuantity) > 0
                                 ? ` · min ${tier.minQuantity} ${tier.unit}`
                                 : ""}

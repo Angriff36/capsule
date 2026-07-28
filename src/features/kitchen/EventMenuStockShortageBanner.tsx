@@ -1,4 +1,5 @@
 import type { EventStockShortage } from "../events/EventStockReservationCoordinator";
+import { formatMoneyExact } from "../../lib/format";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import {
   rankIngredientSubstitutions,
@@ -17,7 +18,7 @@ type Props = {
 
 function costDeltaLabel(delta: number, unit: string) {
   if (Math.abs(delta) < 0.005) return `same cost / ${unit}`;
-  return `${delta > 0 ? "+" : "−"}$${Math.abs(delta).toFixed(2)} / ${unit}`;
+  return `${delta > 0 ? "+" : "−"}${formatMoneyExact(Math.abs(delta))} / ${unit}`;
 }
 
 /** Surfaces reservation shortfalls after menu-driven demand reconcile. */

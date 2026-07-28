@@ -4,6 +4,8 @@
  * exceptions). Client-side read model — command writes stay governed.
  */
 
+import { formatTime } from "../../lib/format";
+
 export interface RecurringRow {
   personId: string;
   dayOfWeek: number;
@@ -38,9 +40,8 @@ export const DAY_NAMES = [
 ] as const;
 
 export const minuteLabel = (minute: number) =>
-  new Date(2000, 0, 1, Math.floor(minute / 60), minute % 60).toLocaleTimeString(
-    [],
-    { hour: "numeric", minute: "2-digit" },
+  formatTime(
+    new Date(2000, 0, 1, Math.floor(minute / 60), minute % 60).getTime(),
   );
 
 export const bandLabel = (startMinute: number, endMinute: number) =>

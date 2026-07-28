@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatMoneyExact } from "../../lib/format";
 import { useIngredientConfigureSubstitutes } from "../../lib/manifest-convex-react";
 
 type IngredientOption = {
@@ -21,7 +22,7 @@ function allergenDelta(
 
 function costDeltaLabel(delta: number, unit: string) {
   if (Math.abs(delta) < 0.005) return `Same cost / ${unit}`;
-  return `${delta > 0 ? "+" : "−"}$${Math.abs(delta).toFixed(2)} / ${unit}`;
+  return `${delta > 0 ? "+" : "−"}${formatMoneyExact(Math.abs(delta))} / ${unit}`;
 }
 
 export function IngredientSubstitutionEditor({

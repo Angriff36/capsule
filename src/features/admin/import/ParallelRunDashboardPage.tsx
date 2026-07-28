@@ -427,53 +427,51 @@ export function ParallelRunDashboardPage() {
           {/* Summary Cards */}
           <section className="grid grid-cols-1 gap-4 md:grid-cols-4 mt-6">
             <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500">
-                Capsule Events
-              </h3>
+              <h3 className="text-sm font-medium text-ink-3">Capsule Events</h3>
               <p className="text-2xl font-bold">{filteredEvents.length}</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-ink-3">
                 {selectedDateRange.start.toLocaleDateString()} -{" "}
                 {selectedDateRange.end.toLocaleDateString()}
               </p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500">TPP Events</h3>
+              <h3 className="text-sm font-medium text-ink-3">TPP Events</h3>
               <p className="text-2xl font-bold">
                 {tppRecordCounts.total ?? "N/A"}
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-ink-3">
                 {latestTppImport
                   ? `Imported ${new Date(latestTppImport.startTime ?? 0).toLocaleDateString()}`
                   : "No recent import"}
               </p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500">Difference</h3>
+              <h3 className="text-sm font-medium text-ink-3">Difference</h3>
               <p
                 className={`text-2xl font-bold ${
                   filteredEvents.length - (tppRecordCounts.total ?? 0) === 0
-                    ? "text-green-600"
+                    ? "text-ok"
                     : "text-orange-600"
                 }`}
               >
                 {filteredEvents.length - (tppRecordCounts.total ?? 0)}
               </p>
-              <p className="text-xs text-gray-400">Events variance</p>
+              <p className="text-xs text-ink-3">Events variance</p>
             </div>
             <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-gray-500">
+              <h3 className="text-sm font-medium text-ink-3">
                 Unresolved Mappings
               </h3>
               <p
                 className={`text-2xl font-bold ${
                   unresolvedMappings.length === 0
-                    ? "text-green-600"
+                    ? "text-ok"
                     : "text-orange-600"
                 }`}
               >
                 {unresolvedMappings.length}
               </p>
-              <p className="text-xs text-gray-400">
+              <p className="text-xs text-ink-3">
                 {unresolvedMappings.length === 0
                   ? "All verified"
                   : "Need resolution"}
@@ -510,9 +508,7 @@ export function ParallelRunDashboardPage() {
                       <td>{metric.tppCount.toLocaleString()}</td>
                       <td
                         className={
-                          metric.diff === 0
-                            ? "text-green-600"
-                            : "text-orange-600"
+                          metric.diff === 0 ? "text-ok" : "text-orange-600"
                         }
                       >
                         {metric.diff > 0 ? "+" : ""}
@@ -521,7 +517,7 @@ export function ParallelRunDashboardPage() {
                       <td
                         className={
                           metric.diffPercent === 0
-                            ? "text-green-600"
+                            ? "text-ok"
                             : "text-orange-600"
                         }
                       >
@@ -540,7 +536,7 @@ export function ParallelRunDashboardPage() {
                       <td
                         className={
                           revenueMetric.diff === 0
-                            ? "text-green-600"
+                            ? "text-ok"
                             : "text-orange-600"
                         }
                       >
@@ -550,7 +546,7 @@ export function ParallelRunDashboardPage() {
                       <td
                         className={
                           revenueMetric.diffPercent === 0
-                            ? "text-green-600"
+                            ? "text-ok"
                             : "text-orange-600"
                         }
                       >
@@ -596,9 +592,7 @@ export function ParallelRunDashboardPage() {
                         <td>{item.tpp}</td>
                         <td
                           className={
-                            item.diff === 0
-                              ? "text-green-600"
-                              : "text-orange-600"
+                            item.diff === 0 ? "text-ok" : "text-orange-600"
                           }
                         >
                           {item.diff > 0 ? "+" : ""}
@@ -637,9 +631,7 @@ export function ParallelRunDashboardPage() {
                         <td>{item.tpp}</td>
                         <td
                           className={
-                            item.diff === 0
-                              ? "text-green-600"
-                              : "text-orange-600"
+                            item.diff === 0 ? "text-ok" : "text-orange-600"
                           }
                         >
                           {item.diff > 0 ? "+" : ""}
@@ -678,9 +670,7 @@ export function ParallelRunDashboardPage() {
                         <td>{item.tpp}</td>
                         <td
                           className={
-                            item.diff === 0
-                              ? "text-green-600"
-                              : "text-orange-600"
+                            item.diff === 0 ? "text-ok" : "text-orange-600"
                           }
                         >
                           {item.diff > 0 ? "+" : ""}
@@ -719,9 +709,7 @@ export function ParallelRunDashboardPage() {
                         <td>{item.tpp}</td>
                         <td
                           className={
-                            item.diff === 0
-                              ? "text-green-600"
-                              : "text-orange-600"
+                            item.diff === 0 ? "text-ok" : "text-orange-600"
                           }
                         >
                           {item.diff > 0 ? "+" : ""}
@@ -733,7 +721,7 @@ export function ParallelRunDashboardPage() {
                       <tr>
                         <td
                           colSpan={4}
-                          className="text-center text-sm text-gray-500"
+                          className="text-center text-sm text-ink-3"
                         >
                           +{venueBreakdown.length - 10} more venues
                         </td>
@@ -767,7 +755,7 @@ export function ParallelRunDashboardPage() {
                 <tbody>
                   {recentChanges.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="text-center text-gray-500">
+                      <td colSpan={5} className="text-center text-ink-3">
                         No recent changes
                       </td>
                     </tr>
@@ -833,7 +821,7 @@ export function ParallelRunDashboardPage() {
                 <tbody>
                   {unresolvedMappings.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center text-green-600">
+                      <td colSpan={6} className="text-center text-ok">
                         ✓ All mappings verified
                       </td>
                     </tr>
@@ -845,13 +833,14 @@ export function ParallelRunDashboardPage() {
                             link.sourceSystem}
                         </td>
                         <td>{link.recordType}</td>
-                        <td className="font-mono text-sm">
-                          {link.externalId.slice(0, 16)}...
+                        <td
+                          className="font-mono text-[11px] text-ink-3"
+                          title={link.externalId}
+                        >
+                          {link.externalId.slice(0, 16)}…
                         </td>
-                        <td className="font-mono text-sm">
-                          {link.capsuleId
-                            ? `${link.capsuleId.slice(0, 8)}...`
-                            : "Unmapped"}
+                        <td title={link.capsuleId || undefined}>
+                          {link.capsuleId ? "Linked" : "Unmapped"}
                         </td>
                         <td>
                           <StatusChip status={String(link.conflictStatus)} />
@@ -868,7 +857,7 @@ export function ParallelRunDashboardPage() {
                               View
                             </Link>
                           ) : (
-                            <span className="text-sm text-gray-400">
+                            <span className="text-sm text-ink-3">
                               No action
                             </span>
                           )}
@@ -880,7 +869,7 @@ export function ParallelRunDashboardPage() {
               </table>
             </div>
             {unresolvedMappings.length > 50 && (
-              <p className="mt-3 text-sm text-center text-gray-500">
+              <p className="mt-3 text-sm text-center text-ink-3">
                 Showing 50 of {unresolvedMappings.length} unresolved mappings
               </p>
             )}
@@ -912,7 +901,7 @@ export function ParallelRunDashboardPage() {
                 <tbody>
                   {completedImportRuns.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="text-center text-gray-500">
+                      <td colSpan={6} className="text-center text-ink-3">
                         No completed imports in date range
                       </td>
                     </tr>
@@ -963,11 +952,11 @@ export function ParallelRunDashboardPage() {
           </section>
 
           {/* Help Text */}
-          <section className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h3 className="font-semibold text-blue-900">
+          <section className="mt-6 p-4 bg-info-soft border border-info/40 rounded-lg">
+            <h3 className="font-semibold text-info">
               Understanding the Dashboard
             </h3>
-            <ul className="mt-2 space-y-1 text-sm text-blue-800">
+            <ul className="mt-2 space-y-1 text-sm text-info">
               <li>
                 • <strong>Match status</strong>: Capsule and TPP counts are
                 identical

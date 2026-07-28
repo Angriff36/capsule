@@ -1,3 +1,5 @@
+import { formatMoneyExact } from "../../lib/format";
+
 export type TipPoolingMethod = "equal" | "hours" | "role";
 
 export type TipParticipant = {
@@ -105,10 +107,7 @@ export function distributeTipPool(
 }
 
 export function formatTipPayrollNote(marker: TipPayrollMarker): string {
-  const amount = (marker.amountCents / 100).toLocaleString(undefined, {
-    style: "currency",
-    currency: "USD",
-  });
+  const amount = formatMoneyExact(marker.amountCents / 100);
   return [
     `Event gratuity · ${marker.eventTitle} · ${methodLabel[marker.method]} · ${amount}`,
     `${TIP_PAYROLL_MARKER} ${JSON.stringify(marker)}`,

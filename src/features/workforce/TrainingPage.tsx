@@ -9,6 +9,7 @@ import {
   useListTrainingModule,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import "./TrainingPage.css";
@@ -517,9 +518,7 @@ export function TrainingPage() {
                         </td>
                         <td>{moduleName(row.trainingModuleId)}</td>
                         <td>
-                          {row.completedAt
-                            ? new Date(row.completedAt).toLocaleDateString()
-                            : "—"}
+                          {row.completedAt ? formatDate(row.completedAt) : "—"}
                         </td>
                         <td>
                           <span className="training-score">

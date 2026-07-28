@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
+import { NAV_GROUPS } from "../nav";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
 import { MoonIcon, SunIcon } from "../../ui/icons";
 
@@ -37,7 +38,10 @@ export function Sidebar() {
   const available = navigationCatalog.availableAreas(
     authStatus?.disabledCapabilities,
   );
-  const planned = navigationCatalog.plannedAreas();
+  const groups = NAV_GROUPS.map((group) => ({
+    group,
+    areas: available.filter((area) => area.group === group),
+  })).filter(({ areas }) => areas.length > 0);
 
   return (
     <aside className="app-shell-sidebar max-md:hidden">
@@ -45,32 +49,41 @@ export function Sidebar() {
         <span aria-hidden="true">C</span>
       </NavLink>
       <nav className="icon-nav" aria-label="Primary">
-        {available.map((area) => (
-          <NavLink
-            key={area.path}
-            to={area.path}
-            end={area.path === "/"}
-            aria-label={area.label}
-            title={area.label}
-            className={({ isActive }) => (isActive ? "active" : undefined)}
-          >
-            <area.icon width={19} height={19} />
-            <span>{area.label}</span>
-          </NavLink>
+        {groups.map(({ group, areas }, index) => (
+          <Fragment key={group}>
+            {index > 0 && <span className="icon-nav-rule" aria-hidden="true" />}
+            {areas.map((area) => (
+              <NavLink
+                key={area.path}
+                to={area.path}
+                end={area.path === "/"}
+                aria-label={area.label}
+                title={area.label}
+                className={({ isActive }) => (isActive ? "active" : undefined)}
+              >
+                <area.icon width={19} height={19} />
+                <span>{area.label}</span>
+              </NavLink>
+            ))}
+          </Fragment>
         ))}
       </nav>
       <ThemeToggle />
       <details className="module-drawer">
-        <summary aria-label="Planned areas" title="Planned areas">
+        <summary aria-label="All workspaces" title="All workspaces">
           <span aria-hidden="true">•••</span>
         </summary>
         <div className="module-popover">
-          <p>Future workspaces</p>
-          {planned.map((area) => (
-            <NavLink key={area.path} to={area.path}>
-              <area.icon width={15} height={15} />
-              <span>{area.label}</span>
-            </NavLink>
+          {groups.map(({ group, areas }) => (
+            <Fragment key={group}>
+              <p>{group}</p>
+              {areas.map((area) => (
+                <NavLink key={area.path} to={area.path} end={area.path === "/"}>
+                  <area.icon width={15} height={15} />
+                  <span>{area.label}</span>
+                </NavLink>
+              ))}
+            </Fragment>
           ))}
         </div>
       </details>

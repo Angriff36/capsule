@@ -18,8 +18,6 @@ export interface NavArea {
   label: string;
   group: "Operate" | "People" | "Business" | "System";
   icon: ComponentType<SVGProps<SVGSVGElement>>;
-  /** Areas that ship in a later slice render a single "planned" page. */
-  planned?: string;
 }
 
 export const NAV_AREAS: NavArea[] = [

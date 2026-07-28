@@ -13,7 +13,12 @@ import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { PageHeader } from "@/ui/primitives";
-import { formatMoney, formatPercent, formatCount } from "@/lib/format";
+import {
+  formatDate,
+  formatMoney,
+  formatPercent,
+  formatCount,
+} from "@/lib/format";
 
 /**
  * L10 Dashboard (Priority 40)
@@ -463,7 +468,7 @@ export function L10DashboardPage() {
           data={MOCK_ROCKS.map((r) => ({
             title: r.title,
             owner: r.owner,
-            deadline: new Date(r.deadline).toLocaleDateString(),
+            deadline: formatDate(new Date(r.deadline).getTime()),
             status:
               r.status === "complete"
                 ? "✓ Complete"
@@ -519,7 +524,7 @@ export function L10DashboardPage() {
           data={MOCK_TODOS.map((t) => ({
             task: t.task,
             owner: t.owner,
-            due: new Date(t.due).toLocaleDateString(),
+            due: formatDate(new Date(t.due).getTime()),
             status:
               t.status === "done"
                 ? "✓ Done"

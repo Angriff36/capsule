@@ -12,7 +12,7 @@ import { NAV_AREAS } from "../src/app/nav";
 describe("Reports routes and lifecycle bindings", () => {
   it("exposes /reports as a shipping nav area", () => {
     const reports = NAV_AREAS.find((area) => area.path === "/reports");
-    expect(reports?.planned).toBeUndefined();
+    expect(reports).toBeDefined();
     expect(reports?.label).toBe("Reports");
   });
 

@@ -7,13 +7,13 @@ import {
   useTaxRateSetActive,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatMoneyExact } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { calculateTaxRemittance } from "./invoiceTax";
 import "./taxWorkspace.css";
 
-const usd = (value: number) =>
-  value.toLocaleString(undefined, { style: "currency", currency: "USD" });
+const usd = formatMoneyExact;
 
 const applicability = (rate: {
   appliesToFood?: unknown;

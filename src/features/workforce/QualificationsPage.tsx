@@ -7,6 +7,7 @@ import {
   useQualificationRevoke,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -248,15 +249,9 @@ export function QualificationsPage() {
                       <small>{row.certificationType || "Unclassified"}</small>
                     </td>
                     <td>{row.issuingBody || "—"}</td>
+                    <td>{row.issuedAt ? formatDate(row.issuedAt) : "—"}</td>
                     <td>
-                      {row.issuedAt
-                        ? new Date(row.issuedAt).toLocaleDateString()
-                        : "—"}
-                    </td>
-                    <td>
-                      {row.expiresAt
-                        ? new Date(row.expiresAt).toLocaleDateString()
-                        : "—"}
+                      {row.expiresAt ? formatDate(row.expiresAt) : "—"}
                       {(() => {
                         const expiry = expiryLabel(row.expiresAt, now);
                         return expiry ? (

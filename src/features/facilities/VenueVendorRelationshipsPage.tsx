@@ -13,6 +13,7 @@ import {
   venueVendorRelationshipsListPath,
 } from "./facilitiesRoutes";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import {
   classifyCommandFailure,
   type CommandFailure,
@@ -535,11 +536,11 @@ export function VenueVendorRelationshipsPage() {
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
                         {row.effectiveFrom
-                          ? new Date(row.effectiveFrom).toLocaleDateString()
+                          ? formatDate(row.effectiveFrom)
                           : "-"}
                         {" → "}
                         {row.effectiveUntil
-                          ? new Date(row.effectiveUntil).toLocaleDateString()
+                          ? formatDate(row.effectiveUntil)
                           : "Ongoing"}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">

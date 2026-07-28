@@ -8,6 +8,7 @@ import {
   useListEventDish,
   useListComponent,
 } from "../../lib/manifest-convex-react";
+import { formatMoneyExact } from "../../lib/format";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
@@ -167,7 +168,9 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     {selection.course || "Uncategorized"}
                     {" · "}
                     {selection.quantityServings} servings
-                    {estimated > 0 ? ` · est. $${estimated.toFixed(2)}` : ""}
+                    {estimated > 0
+                      ? ` · est. ${formatMoneyExact(estimated)}`
+                      : ""}
                   </p>
                 </div>
                 <form

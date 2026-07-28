@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useMyReviews } from "../../lib/staffSelfReviews";
 import { TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
 // Staff self-service view of their OWN recorded reviews (spec §9.4). Read-only
@@ -58,11 +59,7 @@ export function MyReviewsPage() {
               <tbody>
                 {reviews.map((row) => (
                   <tr key={row.id}>
-                    <td>
-                      {row.reviewDate
-                        ? new Date(row.reviewDate).toLocaleDateString()
-                        : "—"}
-                    </td>
+                    <td>{row.reviewDate ? formatDate(row.reviewDate) : "—"}</td>
                     <td>
                       {row.eventId && row.eventTitle ? (
                         <Link

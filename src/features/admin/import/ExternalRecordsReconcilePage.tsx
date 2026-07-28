@@ -258,7 +258,7 @@ export function ExternalRecordsReconcilePage() {
               id="source-system-filter"
               value={selectedSourceSystem ?? ""}
               onChange={(e) => setSelectedSourceSystem(e.target.value || null)}
-              className="min-w-48 px-3 py-2 border border-slate-300 rounded-md text-sm"
+              className="min-w-48 px-3 py-2 border border-line-2 rounded-md text-sm"
             >
               <option value="">All Systems</option>
               {Object.entries(SOURCE_SYSTEM_LABELS).map(([value, label]) => (
@@ -278,7 +278,7 @@ export function ExternalRecordsReconcilePage() {
 
         {/* Bulk actions */}
         {selectedIds.size > 0 ? (
-          <div className="flex items-center gap-3 p-4 bg-slate-50 border-b border-line">
+          <div className="flex items-center gap-3 p-4 bg-inset border-b border-line">
             <span className="text-sm font-medium">
               {selectedIds.size} record(s) selected
             </span>
@@ -294,14 +294,14 @@ export function ExternalRecordsReconcilePage() {
               type="button"
               onClick={skipSelected}
               disabled={busy}
-              className="px-4 py-2 bg-slate-200 text-slate-700 rounded-md text-sm font-medium disabled:opacity-50"
+              className="px-4 py-2 bg-inset text-ink-2 rounded-md text-sm font-medium disabled:opacity-50"
             >
               Skip Selected
             </button>
             <button
               type="button"
               onClick={() => setSelectedIds(new Set())}
-              className="px-4 py-2 text-slate-600 rounded-md text-sm font-medium hover:bg-slate-100"
+              className="px-4 py-2 text-ink-2 rounded-md text-sm font-medium hover:bg-inset"
             >
               Clear Selection
             </button>
@@ -351,7 +351,7 @@ export function ExternalRecordsReconcilePage() {
                 filteredRecords.map((record) => (
                   <tr
                     key={record._id}
-                    className="border-b border-line hover:bg-slate-50"
+                    className="border-b border-line hover:bg-inset"
                   >
                     <td className="py-3 px-4">
                       <input
@@ -410,7 +410,7 @@ export function ExternalRecordsReconcilePage() {
                                 setMatchPaymentId(e.target.value)
                               }
                               disabled={busy}
-                              className="px-2 py-1 border border-slate-300 rounded-md text-xs min-w-56"
+                              className="px-2 py-1 border border-line-2 rounded-md text-xs min-w-56"
                             >
                               <option value="">Select Capsule payment…</option>
                               {candidatePayments.map((payment) => (
@@ -442,7 +442,7 @@ export function ExternalRecordsReconcilePage() {
                                 setMatchPaymentId("");
                               }}
                               disabled={busy}
-                              className="px-3 py-1 text-slate-600 rounded-md text-xs font-medium hover:bg-slate-100"
+                              className="px-3 py-1 text-ink-2 rounded-md text-xs font-medium hover:bg-inset"
                             >
                               Cancel
                             </button>

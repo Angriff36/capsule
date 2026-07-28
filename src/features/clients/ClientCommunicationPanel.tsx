@@ -5,6 +5,7 @@ import {
   useCreateClientCommunication,
   useListClientCommunication,
 } from "../../lib/manifest-convex-react";
+import { formatDate, formatTime } from "../../lib/format";
 import { EmptyState, Section, Skeleton } from "../../ui/primitives";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 
@@ -50,10 +51,7 @@ function mediumLabel(value: string): string {
 function occurredLabel(value?: number | null): string {
   return value == null
     ? "Date not recorded"
-    : new Date(value).toLocaleString([], {
-        dateStyle: "medium",
-        timeStyle: "short",
-      });
+    : `${formatDate(value)} ${formatTime(value)}`;
 }
 
 /** Shared manual communication timeline for Contact and Event detail surfaces. */

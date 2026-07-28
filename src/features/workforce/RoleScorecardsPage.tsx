@@ -7,6 +7,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { PersonRoleDirectory } from "../admin/PersonRoleDirectory";
 import { TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
@@ -42,10 +43,6 @@ function localDateEpoch(value: FormDataEntryValue | null) {
   const text = String(value ?? "");
   if (!text) return undefined;
   return new Date(`${text}T12:00:00`).getTime();
-}
-
-function formatEpoch(value: number | null | undefined) {
-  return value ? new Date(value).toLocaleDateString() : "—";
 }
 
 export function RoleScorecardsPage() {
@@ -365,9 +362,9 @@ export function RoleScorecardsPage() {
                               : "—"}
                           </td>
                           <td className="text-ink-2">
-                            {formatEpoch(row.effectiveFrom)}
+                            {formatDate(row.effectiveFrom)}
                             {row.effectiveTo
-                              ? ` → ${formatEpoch(row.effectiveTo)}`
+                              ? ` → ${formatDate(row.effectiveTo)}`
                               : ""}
                           </td>
                           <td className="text-ink-2">v{row.version}</td>

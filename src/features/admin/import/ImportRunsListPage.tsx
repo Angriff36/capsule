@@ -240,7 +240,7 @@ export function ImportRunsListPage() {
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 text-slate-600 rounded-md text-sm font-medium hover:bg-slate-100"
+                className="px-4 py-2 text-ink-2 rounded-md text-sm font-medium hover:bg-inset"
               >
                 Cancel
               </button>
@@ -386,7 +386,7 @@ export function ImportRunsListPage() {
                   return (
                     <tr
                       key={run._id}
-                      className="border-b border-line hover:bg-slate-50"
+                      className="border-b border-line hover:bg-inset"
                     >
                       <td className="py-3 px-4">
                         {SOURCE_SYSTEM_LABELS[run.sourceSystem] ||

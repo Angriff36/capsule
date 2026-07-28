@@ -193,7 +193,7 @@ export function EventDetailPage() {
           </span>
         }
         lead={
-          <span className="font-mono text-[12px]">
+          <span className="text-[12px]">
             {formatStatusLabel(event.eventType)} ·{" "}
             {(() => {
               const client = clients?.find((c) => c._id === event.clientId);

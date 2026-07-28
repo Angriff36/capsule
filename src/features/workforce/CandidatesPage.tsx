@@ -12,6 +12,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useIngestKmCandidates } from "../../lib/hiringPipeline";
 import { TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
@@ -54,10 +55,6 @@ function localDateEpoch(value: FormDataEntryValue | null): number | undefined {
   const text = String(value ?? "");
   if (!text) return undefined;
   return new Date(`${text}T12:00:00`).getTime();
-}
-
-function formatEpoch(value: number | null | undefined): string {
-  return value ? new Date(value).toLocaleDateString() : "—";
 }
 
 export function CandidatesPage() {
@@ -359,7 +356,7 @@ export function CandidatesPage() {
                     </p>
                     <h2>{candidate.fullName}</h2>
                     <p className="text-ink-2 mt-1">
-                      Applied {formatEpoch(candidate.appliedAt)}
+                      Applied {formatDate(candidate.appliedAt)}
                       {candidate.email ? ` · ${candidate.email}` : ""}
                       {candidate.phone ? ` · ${candidate.phone}` : ""}
                     </p>
@@ -476,7 +473,7 @@ export function CandidatesPage() {
                       <tbody>
                         {candidateInterviews.map((row) => (
                           <tr key={row._id}>
-                            <td>{formatEpoch(row.scheduledFor)}</td>
+                            <td>{formatDate(row.scheduledFor)}</td>
                             <td>{personName(row.interviewerPersonId)}</td>
                             <td>
                               <span className="badge">{row.outcome}</span>
@@ -512,7 +509,7 @@ export function CandidatesPage() {
                                 </span>
                               ) : (
                                 <span className="text-ink-2">
-                                  {formatEpoch(row.conductedAt)}
+                                  {formatDate(row.conductedAt)}
                                 </span>
                               )}
                             </td>

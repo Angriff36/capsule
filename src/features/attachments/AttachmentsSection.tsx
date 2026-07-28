@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from "convex/react";
 import { useRef, useState } from "react";
 import { api } from "../../lib/api";
+import { formatDate, formatTime } from "../../lib/format";
 import {
   useAttachmentRemove,
   useCreateAttachment,
@@ -127,7 +128,7 @@ export function AttachmentsSection({
                 <p className="text-[12px] text-ink-2">
                   {formatSize(row.fileSize)}
                   {row.uploadedAt
-                    ? ` · ${new Date(row.uploadedAt).toLocaleString()}`
+                    ? ` · ${formatDate(row.uploadedAt)} ${formatTime(row.uploadedAt)}`
                     : ""}
                   {row.uploadedById ? ` · uploaded by ${row.uploadedById}` : ""}
                 </p>

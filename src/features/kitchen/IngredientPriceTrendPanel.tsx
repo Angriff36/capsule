@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { formatDate, formatMoneyExact } from "../../lib/format";
 import {
   observationTime,
   priceChange,
@@ -10,19 +11,6 @@ type VendorOption = {
   _id: string;
   name: string;
 };
-
-const money = new Intl.NumberFormat("en-US", {
-  style: "currency",
-  currency: "USD",
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-});
-
-const date = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-});
 
 function trendPath(observations: IngredientPriceObservationInput[]) {
   const chronological = sortPriceObservations(observations).reverse();
@@ -45,7 +33,7 @@ function trendPath(observations: IngredientPriceObservationInput[]) {
 
 function observedDate(observation: IngredientPriceObservationInput) {
   const at = observationTime(observation);
-  return at ? date.format(new Date(at)) : "Date unavailable";
+  return at ? formatDate(at) : "Date unavailable";
 }
 
 export function IngredientPriceTrendPanel({
@@ -80,7 +68,7 @@ export function IngredientPriceTrendPanel({
         ? "is-up"
         : "is-down";
   const changeLabel = change
-    ? `${change.amount > 0 ? "+" : ""}${money.format(change.amount)}${change.percent == null ? "" : ` · ${change.percent > 0 ? "+" : ""}${change.percent.toFixed(1)}%`}`
+    ? `${change.amount > 0 ? "+" : ""}${formatMoneyExact(change.amount)}${change.percent == null ? "" : ` · ${change.percent > 0 ? "+" : ""}${change.percent.toFixed(1)}%`}`
     : "First observation";
 
   return (
@@ -122,7 +110,7 @@ export function IngredientPriceTrendPanel({
             <div>
               <span>Latest confirmed</span>
               <strong data-testid="latest-confirmed-price">
-                {money.format(Number(current.unitPrice))}
+                {formatMoneyExact(Number(current.unitPrice))}
                 <small> / {current.unit}</small>
               </strong>
               <em>
@@ -172,7 +160,7 @@ export function IngredientPriceTrendPanel({
                     </td>
                     <td>
                       <strong>
-                        {money.format(Number(observation.unitPrice))}
+                        {formatMoneyExact(Number(observation.unitPrice))}
                       </strong>
                       <span> / {observation.unit}</span>
                     </td>

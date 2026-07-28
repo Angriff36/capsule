@@ -8,6 +8,7 @@ import {
   useListInvoice,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatMoneyExact } from "../../lib/format";
 import {
   CLOSEOUT_EVIDENCE_CATEGORIES,
   RecordPhotoCapture,
@@ -216,20 +217,11 @@ export function CloseoutPage() {
                           </Link>
                           <small>
                             Revenue{" "}
-                            {Number(row.actualRevenue ?? 0).toLocaleString(
-                              undefined,
-                              { style: "currency", currency: "USD" },
-                            )}
+                            {formatMoneyExact(Number(row.actualRevenue ?? 0))}
                           </small>
                         </td>
                         <td>
-                          {Number(row.grossProfit ?? 0).toLocaleString(
-                            undefined,
-                            {
-                              style: "currency",
-                              currency: "USD",
-                            },
-                          )}
+                          {formatMoneyExact(Number(row.grossProfit ?? 0))}
                         </td>
                         <td>
                           {row.actualHeadcount}/{row.expectedHeadcount}

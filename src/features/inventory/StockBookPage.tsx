@@ -19,6 +19,7 @@ import {
   useListStockTransfer,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
+import { formatDate } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
@@ -57,8 +58,7 @@ const expiresWithin = (item: any, horizonDays: number) => {
   );
   return soonest !== Infinity && soonest < Date.now() + horizonDays * DAY_MS;
 };
-const dateLabel = (value: number | null | undefined) =>
-  value == null ? "—" : new Date(value).toLocaleDateString();
+const dateLabel = formatDate;
 // Date-only input, stored as end of the labeled local day so a lot stays
 // issuable through its use-by date (matches the consume guard cutoff).
 const promptExpiry = (label: string, current: number | null | undefined) => {

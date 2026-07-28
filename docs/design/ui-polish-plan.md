@@ -43,7 +43,7 @@ Pure sweeps; safe to delegate to composer-2.5 with grep-verifiable done-criteria
 
 ## Phase 1 — One system, everywhere
 
-**1.1 Promote the ledger vocabulary into the shared layer.** The bespoke `supply-*` / `working-ledger` / `data-table` skins are the *good-looking* screens — so the shared system adopts them rather than deleting them. Move the best of `supply.css`/`HomeDashboard.css` patterns into `app.css` `@layer components` as: `.masthead` (eyebrow + display-title + meta line), `.ledger-table`, `.kpi-strip` (the PrepBoard 4-up `<dl>` grid), `.folio-section`. Then delete per-feature duplicates file by file. Target: 30 feature CSS files → single digits (page-specific layout only).
+**1.1 Adopt the existing global ledger vocabulary.** (Corrected 2026-07-28: `supply-masthead`/`supply-table`/`working-ledger`/`operations-stage`/`data-table` already live in `app.css` — they are shared, just domain-named. The ~29 per-feature CSS files are page-specific layout, not duplicated systems.) So 1.1 collapses into 1.2: put every page on the shared masthead/ledger classes; no extraction or renaming churn needed.
 
 **1.2 `PageHeader` (or the new masthead) on all ~103 pages.** Kill the 90 hand-rolled `<h1>`s. Every page gets: eyebrow (workspace name), title, one-line lead written for the *user's job* (not the entity name), actions right-aligned.
 
@@ -73,7 +73,7 @@ Screen-by-screen passes, in traffic order. Design-taste work — route to a tast
 
 **3.3 Workspace sub-nav parity.** 7 of 12 areas have `*WorkspaceNav`; give the remaining areas the same second tier so depth is always visible.
 
-**3.4 Mobile nav.** The rail is `max-md:hidden` with no replacement — add a bottom tab bar (Home, Events, My Day, Kitchen, More) for `md:hidden`. MyDayPage's audience works on phones.
+**3.4 Mobile nav.** (Corrected 2026-07-28: a mobile "Menu" dropdown already exists in the Topbar for `max-md` — the survey's "no mobile nav" was wrong.) Optional polish only: a bottom tab bar (Home, Events, My Day, More) would beat the dropdown for field staff, but the dropdown covers the need.
 
 ## Phase 4 — The wow layer
 

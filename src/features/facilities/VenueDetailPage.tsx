@@ -13,6 +13,7 @@ import {
   venueVendorRelationshipsListPath,
 } from "./facilitiesRoutes";
 import { StatusChip } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { VenueNotesPanel } from "./VenueNotesPanel";
 import { VenueRoomsPanel } from "./VenueRoomsPanel";
@@ -769,7 +770,7 @@ export function VenueDetailPage() {
             <dt className="text-sm font-medium text-gray-500">Registered</dt>
             <dd className="col-span-2 text-sm text-gray-900">
               {venue.registeredAt
-                ? new Date(venue.registeredAt).toLocaleDateString()
+                ? formatDate(venue.registeredAt)
                 : "Not registered"}
             </dd>
           </div>
@@ -777,7 +778,7 @@ export function VenueDetailPage() {
             <div className="grid grid-cols-1 gap-1 sm:grid-cols-3">
               <dt className="text-sm font-medium text-gray-500">Deactivated</dt>
               <dd className="col-span-2 text-sm text-gray-900">
-                {new Date(venue.deactivatedAt).toLocaleDateString()}
+                {formatDate(venue.deactivatedAt)}
                 {venue.deactivationReason && ` (${venue.deactivationReason})`}
               </dd>
             </div>

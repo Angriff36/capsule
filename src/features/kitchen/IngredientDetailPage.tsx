@@ -11,6 +11,7 @@ import {
   useListComponentIngredient,
   useListVendor,
 } from "../../lib/manifest-convex-react";
+import { formatMoneyExact } from "../../lib/format";
 import { useTrackRecent } from "../../lib/recents";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
@@ -392,7 +393,8 @@ export function IngredientDetailPage() {
               {latestPrice ? "Confirmed cost / unit" : "Catalog cost / unit"}
             </dt>
             <dd>
-              ${resolvedPrice.costPerUnit.toFixed(2)} / {resolvedPrice.unit}
+              {formatMoneyExact(resolvedPrice.costPerUnit)} /{" "}
+              {resolvedPrice.unit}
             </dd>
           </div>
           <div>
