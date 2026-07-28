@@ -43,6 +43,16 @@ export interface ComponentIngredientProfitabilityInput extends Deletable {
   unit: UnitOfMeasure;
 }
 
+export interface DishIngredientProfitabilityInput extends Deletable {
+  id: string;
+  dishId: string;
+  ingredientId: string;
+  quantity: number | string;
+  unit: UnitOfMeasure;
+  wasteFactor?: number | string | null;
+  addedAt?: unknown;
+}
+
 export interface IngredientProfitabilityInput extends Deletable {
   id: string;
   name: string;
@@ -86,10 +96,47 @@ export interface BuildMenuProfitabilityInput {
   menuDishes: MenuDishProfitabilityInput[];
   dishes: DishProfitabilityInput[];
   dishComponents: DishComponentProfitabilityInput[];
+  dishIngredients: DishIngredientProfitabilityInput[];
   componentIngredients: ComponentIngredientProfitabilityInput[];
   ingredients: IngredientProfitabilityInput[];
   priceObservations: IngredientPriceObservationInput[];
   grossMarginTarget?: number;
+}
+
+type DirectDishIngredientCostStatus =
+  "priced" | "missing_ingredient" | "missing_price" | "incompatible_unit";
+
+function priceDirectDishIngredientLine(
+  line: DishIngredientProfitabilityInput,
+  ingredientsById: Map<string, ComponentCostIngredientInput>,
+): { extendedCost: number; status: DirectDishIngredientCostStatus } {
+  const ingredient = ingredientsById.get(line.ingredientId);
+  if (!ingredient) {
+    return { extendedCost: 0, status: "missing_ingredient" };
+  }
+
+  const costPerUnit = Number(ingredient.costPerUnit);
+  if (!Number.isFinite(costPerUnit) || costPerUnit <= 0) {
+    return { extendedCost: 0, status: "missing_price" };
+  }
+
+  if (line.unit !== ingredient.unit) {
+    return { extendedCost: 0, status: "incompatible_unit" };
+  }
+
+  const quantity = Number(line.quantity);
+  const wasteFactor = line.wasteFactor != null ? Number(line.wasteFactor) : 1;
+  if (!Number.isFinite(quantity) || quantity <= 0) {
+    return { extendedCost: 0, status: "missing_price" };
+  }
+  if (!Number.isFinite(wasteFactor) || wasteFactor <= 0) {
+    return { extendedCost: 0, status: "missing_price" };
+  }
+
+  return {
+    extendedCost: quantity * wasteFactor * costPerUnit,
+    status: "priced",
+  };
 }
 
 function isActive(value: Deletable): boolean {
@@ -120,6 +167,7 @@ export function buildMenuProfitability({
   menuDishes,
   dishes,
   dishComponents,
+  dishIngredients,
   componentIngredients,
   ingredients,
   priceObservations,
@@ -162,13 +210,25 @@ export function buildMenuProfitability({
     existing.push(line);
     linesByComponent.set(line.componentId, existing);
   }
+  const linesByDish = new Map<string, DishIngredientProfitabilityInput[]>();
+  for (const line of dishIngredients.filter(isActive)) {
+    const existing = linesByDish.get(line.dishId) ?? [];
+    existing.push(line);
+    linesByDish.set(line.dishId, existing);
+  }
+  const ingredientsById = new Map(
+    costingIngredients.map((ingredient) => [ingredient.id, ingredient]),
+  );
 
   const rows = menuDishes.filter(isActive).map<MenuProfitabilityRow>((line) => {
     const dish = dishesById.get(line.dishId);
     const attachments = attachmentsByDish.get(line.dishId) ?? [];
+    const directLines = (linesByDish.get(line.dishId) ?? []).filter(
+      (directLine) => directLine.addedAt != null,
+    );
     let componentCost = 0;
-    let incompleteCostLineCount = attachments.length ? 0 : 1;
-    let costComplete = attachments.length > 0;
+    let incompleteCostLineCount = 0;
+    let pricedLineCount = 0;
 
     for (const attachment of attachments) {
       const componentLines = linesByComponent.get(attachment.componentId) ?? [];
@@ -192,14 +252,32 @@ export function buildMenuProfitability({
         summary.isComplete &&
         summary.costPerYieldUnit != null;
 
-      if (!componentIsComplete) {
-        costComplete = false;
+      if (componentIsComplete) {
+        pricedLineCount += 1;
+      } else {
         incompleteCostLineCount += Math.max(1, summary.incompleteLineCount);
       }
       if (summary.costPerYieldUnit != null) {
         componentCost += summary.costPerYieldUnit;
       }
     }
+
+    for (const directLine of directLines) {
+      const priced = priceDirectDishIngredientLine(directLine, ingredientsById);
+      if (priced.status === "priced") {
+        pricedLineCount += 1;
+        componentCost += priced.extendedCost;
+      } else {
+        incompleteCostLineCount += 1;
+      }
+    }
+
+    const hasAnyCostSource = attachments.length > 0 || directLines.length > 0;
+    if (!hasAnyCostSource) {
+      incompleteCostLineCount = 1;
+    }
+    const costComplete =
+      hasAnyCostSource && pricedLineCount > 0 && incompleteCostLineCount === 0;
 
     const price = sellingPrice(line.sellingPrice);
     const grossMarginAmount =

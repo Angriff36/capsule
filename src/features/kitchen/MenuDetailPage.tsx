@@ -6,6 +6,7 @@ import {
   useGetMenu,
   useListDish,
   useListDishComponent,
+  useListDishIngredient,
   useListIngredient,
   useListIngredientPriceObservation,
   useListMenuDish,
@@ -52,6 +53,7 @@ export function MenuDetailPage() {
   const dishes = useListDish();
   const menuDishes = useListMenuDish();
   const dishComponents = useListDishComponent();
+  const dishIngredients = useListDishIngredient();
   const components = useListComponent();
   const componentIngredients = useListComponentIngredient();
   const ingredients = useListIngredient();
@@ -120,6 +122,16 @@ export function MenuDetailPage() {
           batchMultiplier: attachment.batchMultiplier,
           deletedAt: attachment.deletedAt,
         })),
+        dishIngredients: (dishIngredients ?? []).map((line) => ({
+          id: line._id,
+          dishId: line.dishId,
+          ingredientId: line.ingredientId,
+          quantity: line.quantity,
+          unit: line.unit,
+          wasteFactor: line.wasteFactor,
+          addedAt: line.addedAt,
+          deletedAt: line.deletedAt,
+        })),
         componentIngredients: (componentIngredients ?? []).map((line) => ({
           id: line._id,
           componentId: line.componentId,
@@ -140,6 +152,7 @@ export function MenuDetailPage() {
     [
       dishes,
       dishComponents,
+      dishIngredients,
       ingredients,
       priceObservations,
       componentIngredients,
@@ -150,6 +163,7 @@ export function MenuDetailPage() {
     dishes === undefined ||
     menuDishes === undefined ||
     dishComponents === undefined ||
+    dishIngredients === undefined ||
     componentIngredients === undefined ||
     ingredients === undefined ||
     priceObservations === undefined;
