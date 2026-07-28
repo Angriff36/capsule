@@ -128,6 +128,14 @@ export interface ProposalRevisionSnapshot {
     catalogPrice: number | null;
     overrideReason: string | null;
   }>;
+  // Optional upgrades offered separately from priced lines. Active rows only
+  // (deletedAt null, addedAt set) are frozen into the revision at send.
+  enhancements: Array<{
+    name: string;
+    description: string | null;
+    price: number;
+    sortOrder: number;
+  }>;
   tenant: {
     name: string;
   };
@@ -261,6 +269,23 @@ export async function buildProposalRevisionSnapshot(
     )
   ).sort((a: any, b: any) => a.sortOrder - b.sortOrder);
 
+  const enhancementRows = (
+    await ctx.db
+      .query("proposalEnhancements")
+      .withIndex("by_proposalId", (q: any) => q.eq("proposalId", proposal._id))
+      .collect()
+  ).filter(
+    (row: any) => row.deletedAt == null && row.addedAt != null,
+  );
+  const enhancementsData = enhancementRows
+    .map((row: any) => ({
+      name: row.name,
+      description: row.description ?? null,
+      price: row.price,
+      sortOrder: row.sortOrder,
+    }))
+    .sort((a: any, b: any) => a.sortOrder - b.sortOrder);
+
   const snapshot: ProposalRevisionSnapshot = {
     proposal: {
       id: proposal._id.toString(),
@@ -289,6 +314,7 @@ export async function buildProposalRevisionSnapshot(
     venue: await resolveVenueLogistics(ctx, proposal),
     dishSelections: dishSelectionsData,
     lineItems: lineItemsData,
+    enhancements: enhancementsData,
     tenant: {
       name: tenantName,
     },

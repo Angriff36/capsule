@@ -36,6 +36,11 @@ type PendingSignatureView = {
     guestCount: number;
     venueName: string | null;
   };
+  enhancements: Array<{
+    name: string;
+    description: string | null;
+    price: number;
+  }>;
 };
 
 async function resolvePendingRequest(
@@ -46,6 +51,10 @@ async function resolvePendingRequest(
   if (!requestId) return null;
   const request = await ctx.db.get(requestId);
   if (!request || request.deletedAt != null) return null;
+  // Public click-to-accept is only valid for internal requests. External
+  // providers (docusign, …) complete via their own verified callbacks; their
+  // row ids must not double as public bearer tokens (sol review 2026-07-28).
+  if (request.provider !== "internal") return null;
   if (request.status !== "requested") return null;
   if (request.expiresAt != null && request.expiresAt <= Date.now()) return null;
   return request;
@@ -77,6 +86,9 @@ export const getPendingSignatureRequest = query({
     }
     const proposal = (snapshot.proposal ?? {}) as Record<string, unknown>;
     const client = (snapshot.client ?? {}) as Record<string, unknown>;
+    const enhancements = Array.isArray(snapshot.enhancements)
+      ? (snapshot.enhancements as Array<Record<string, unknown>>)
+      : [];
     const num = (value: unknown, fallback = 0): number =>
       typeof value === "number" && Number.isFinite(value) ? value : fallback;
     const str = (value: unknown): string | null =>
@@ -102,6 +114,20 @@ export const getPendingSignatureRequest = query({
         guestCount: num(proposal.guestCount),
         venueName: str(proposal.venueName),
       },
+      enhancements: enhancements
+        .map((item, index) => ({
+          sortOrder: num(item.sortOrder, index),
+          name: typeof item.name === "string" ? item.name : "",
+          description: str(item.description),
+          price: num(item.price),
+        }))
+        .filter((item) => item.name.length > 0)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map(({ name, description, price }) => ({
+          name,
+          description,
+          price,
+        })),
     };
   },
 });
@@ -123,6 +149,20 @@ export const completeSignature = mutation({
     ctx,
     { token, signerIpAddress, signerUserAgent },
   ): Promise<{ ok: true }> => {
+    // Idempotent re-click/reload after a committed acceptance: the signature
+    // and the proposal accept land in one transaction, so a completed internal
+    // request means the whole acceptance already succeeded.
+    const completedId = ctx.db.normalizeId("signatureRequests", token);
+    const priorRequest = completedId ? await ctx.db.get(completedId) : null;
+    if (
+      priorRequest &&
+      priorRequest.deletedAt == null &&
+      priorRequest.provider === "internal" &&
+      priorRequest.status === "completed"
+    ) {
+      return { ok: true };
+    }
+
     const request = await resolvePendingRequest(ctx, token);
     if (!request) {
       throw new ConvexError(
@@ -159,11 +199,32 @@ export const completeSignature = mutation({
       createdAt: now,
     });
 
-    if (request.proposalId) {
-      const proposalId = ctx.db.normalizeId("proposals", request.proposalId);
-      const proposal: Doc<"proposals"> | null = proposalId
-        ? await ctx.db.get(proposalId)
-        : null;
+    {
+      // The revision is what the signer saw — it is the authoritative binding.
+      // A caller-supplied request.proposalId naming a different proposal than
+      // the displayed revision's would accept B while showing A (sol review
+      // 2026-07-28), so the accept target derives from the revision itself.
+      const revision = await ctx.db.get(request.proposalRevisionId);
+      if (
+        !revision ||
+        revision.deletedAt != null ||
+        revision.tenantId !== request.tenantId
+      ) {
+        throw new ConvexError(
+          "The proposal for this acceptance link is unavailable. Please contact us.",
+        );
+      }
+      if (
+        request.proposalId &&
+        String(request.proposalId) !== String(revision.proposalId)
+      ) {
+        throw new ConvexError(
+          "This acceptance link is inconsistent. Please contact us for a new one.",
+        );
+      }
+      const proposal: Doc<"proposals"> | null = await ctx.db.get(
+        revision.proposalId,
+      );
       if (
         !proposal ||
         proposal.deletedAt != null ||

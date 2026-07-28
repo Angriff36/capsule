@@ -65,6 +65,11 @@ type SharedProposal = {
     unit: string | null;
     amount: number;
   }>;
+  enhancements: Array<{
+    name: string;
+    description: string | null;
+    price: number;
+  }>;
   revisionNumber: number;
   capturedAt: number | null;
   linkCreatedAt: number | null;
@@ -104,6 +109,9 @@ export const getSharedProposal = query({
     const client = (snapshot.client ?? {}) as Record<string, unknown>;
     const lineItems = Array.isArray(snapshot.lineItems)
       ? (snapshot.lineItems as Array<Record<string, unknown>>)
+      : [];
+    const enhancements = Array.isArray(snapshot.enhancements)
+      ? (snapshot.enhancements as Array<Record<string, unknown>>)
       : [];
     const num = (value: unknown, fallback = 0): number =>
       typeof value === "number" && Number.isFinite(value) ? value : fallback;
@@ -168,6 +176,20 @@ export const getSharedProposal = query({
         unit: str(line.unit),
         amount: num(line.amount),
       })),
+      enhancements: enhancements
+        .map((item, index) => ({
+          sortOrder: num(item.sortOrder, index),
+          name: typeof item.name === "string" ? item.name : "",
+          description: str(item.description),
+          price: num(item.price),
+        }))
+        .filter((item) => item.name.length > 0)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map(({ name, description, price }) => ({
+          name,
+          description,
+          price,
+        })),
       revisionNumber: revision.revisionNumber,
       capturedAt: revision.capturedAt ?? null,
       linkCreatedAt: link.createdAt ?? null,

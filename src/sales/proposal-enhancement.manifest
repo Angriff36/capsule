@@ -1,0 +1,101 @@
+// Capsule Proposal Enhancements — optional upgrades/add-ons offered on a
+// proposal (handoff P4: "Enhancements/upgrades section"). Distinct from
+// ProposalLineItem: enhancements are OFFERED, not yet sold — they render as an
+// "Optional Enhancements" section on the share page and PDF with their own
+// prices, and become real line items only when the client says yes. Captured
+// into the revision snapshot at send (convex/lib/proposalRevision.ts).
+
+use "./proposal.manifest"
+
+// ---------------------------------------------------------------------------
+// ProposalEnhancement — optional upgrade offered on a proposal
+// ---------------------------------------------------------------------------
+
+entity ProposalEnhancement mixin TenantScoped, SoftDeletable {
+  key [tenantId, id]
+  timestamps
+  versionProperty version: number
+
+  property required proposalId: uuid
+  property required name: string = ""
+  property description: string?
+  // Offered price the client sees for this optional upgrade.
+  property required price: money(12, 2) = 0
+  property required sortOrder: int = 0
+  property addedAt: datetime?
+  property removedAt: datetime?
+
+  belongsTo proposal: Proposal fields [tenantId, proposalId] references [tenantId, id]
+
+  constraint enhancementComplete: self.addedAt == null or (length(trim(self.name)) > 0 and self.price >= 0) "Enhancements require a name and a non-negative price"
+
+  default policy proposalEnhancementRead read: roleAllows(user.role, "salesAccess") "Sales staff may read proposal enhancements"
+  default policy proposalEnhancementWrite write: roleAllows(user.role, "salesAccess") "Sales staff may write proposal enhancements through commands"
+  default policy proposalEnhancementExecute execute: roleAllows(user.role, "salesAccess") "Sales staff may execute proposal enhancement commands"
+
+  // Offer an enhancement. Like line items, only editable while the proposal
+  // is still a draft — a sent proposal's revision snapshot is immutable.
+  command offer(
+    proposalId: uuid,
+    name: string,
+    price: money(12, 2),
+    optional description: string,
+    optional sortOrder: int
+  ) {
+    guard self.addedAt == null
+    guard self.deletedAt == null
+    guard self.proposal != null and self.proposal.status == "draft"
+    constraint offerEnhancementProposalMatch: proposalId == self.proposalId "Offer proposalId must match the seeded proposal reference"
+    constraint offerEnhancementName: length(trim(name)) > 0 "Enhancement name is required"
+    constraint offerEnhancementPrice: price >= 0 "Enhancement price cannot be negative"
+    mutate proposalId = proposalId
+    mutate name = name
+    mutate description = description
+    mutate price = price
+    mutate sortOrder = sortOrder != null ? sortOrder : 0
+    mutate addedAt = now()
+    emit ProposalEnhancementOffered {
+      enhancementId: self.id
+      tenantId: self.tenantId
+      proposalId: proposalId
+      name: name
+      price: price
+    }
+  }
+
+  command withdraw() {
+    guard self.addedAt != null
+    guard self.removedAt == null
+    guard self.deletedAt == null
+    guard self.proposal != null and self.proposal.status == "draft"
+    mutate removedAt = now()
+    mutate deletedAt = now()
+    emit ProposalEnhancementWithdrawn {
+      enhancementId: self.id
+      tenantId: self.tenantId
+      proposalId: self.proposalId
+      name: self.name
+    }
+  }
+
+  store ProposalEnhancement in durable
+}
+
+// ---------------------------------------------------------------------------
+// Events
+// ---------------------------------------------------------------------------
+
+event ProposalEnhancementOffered: "proposal_enhancement.offered" {
+  enhancementId: string
+  tenantId: string
+  proposalId: string
+  name: string
+  price: money(12, 2)
+}
+
+event ProposalEnhancementWithdrawn: "proposal_enhancement.withdrawn" {
+  enhancementId: string
+  tenantId: string
+  proposalId: string
+  name: string
+}
