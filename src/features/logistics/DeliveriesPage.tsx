@@ -6,6 +6,7 @@ import {
   useDeliveryCancel,
   useDeliveryConfirmDelivery,
   useDeliveryMarkFailed,
+  useDeliverySchedule,
   useDeliveryStartTransit,
   useListEvent,
   useListDelivery,
@@ -13,6 +14,10 @@ import {
   useListPerson,
   useListVehicle,
 } from "../../lib/manifest-convex-react";
+import {
+  useAssignDriver,
+  useUnassignDriver,
+} from "../facilities/driverAssignment";
 import {
   useAssignVehicle,
   useUnassignVehicle,
@@ -37,9 +42,12 @@ export function DeliveriesPage() {
   const events = useListEvent();
   const people = useListPerson();
   const vehicles = useListVehicle();
+  const assignDriver = useAssignDriver();
+  const unassignDriver = useUnassignDriver();
   const assignVehicle = useAssignVehicle();
   const unassignVehicle = useUnassignVehicle();
   const createDelivery = useCreateDelivery();
+  const scheduleDelivery = useDeliverySchedule();
   const startTransit = useDeliveryStartTransit();
   const confirmDelivery = useDeliveryConfirmDelivery();
   const markFailed = useDeliveryMarkFailed();
@@ -108,16 +116,26 @@ export function DeliveriesPage() {
       );
       return;
     }
+    const scheduleArgs = {
+      packListId,
+      eventId: pack.eventId,
+      destination: String(data.get("destination") || "").trim(),
+      windowStartsAt: toEpoch(data.get("windowStartsAt")),
+      windowEndsAt: toEpoch(data.get("windowEndsAt")),
+      driverId: String(data.get("driverId") || "") || undefined,
+      notes: String(data.get("notes") || "") || undefined,
+    };
+    const existing = activeRows.find((row) => row.packListId === packListId);
     void run("create-delivery", async () => {
-      await createDelivery({
-        packListId,
-        eventId: pack.eventId,
-        destination: String(data.get("destination") || "").trim(),
-        windowStartsAt: toEpoch(data.get("windowStartsAt")),
-        windowEndsAt: toEpoch(data.get("windowEndsAt")),
-        driverId: String(data.get("driverId") || "") || undefined,
-        notes: String(data.get("notes") || "") || undefined,
-      });
+      if (existing) {
+        await scheduleDelivery({
+          docId: existing._id,
+          version: existing.version,
+          ...scheduleArgs,
+        });
+      } else {
+        await createDelivery(scheduleArgs);
+      }
       form.reset();
       setShowCreate(false);
       setNotice("Delivery scheduled.");
@@ -164,6 +182,28 @@ export function DeliveriesPage() {
         setNotice(`Delivery updated (${key}).`);
       });
     })();
+  };
+
+  const changeDriver = (
+    row: { _id: string; version: number; destination: string },
+    driverId: string,
+  ) => {
+    void run(`${row._id}:driver`, async () => {
+      if (driverId) {
+        await assignDriver({
+          deliveryId: row._id as Id<"deliveries">,
+          driverId: driverId as Id<"people">,
+          version: row.version,
+        });
+        setNotice(`Driver assigned to ${row.destination}.`);
+      } else {
+        await unassignDriver({
+          deliveryId: row._id as Id<"deliveries">,
+          version: row.version,
+        });
+        setNotice(`Driver cleared from ${row.destination}.`);
+      }
+    });
   };
 
   const changeVehicle = (
@@ -362,7 +402,29 @@ export function DeliveriesPage() {
                         {packName(row.packListId)}
                         <small>{eventName(row.eventId)}</small>
                       </td>
-                      <td>{personName(row.driverId)}</td>
+                      <td>
+                        {String(row.status) === "scheduled" ||
+                        String(row.status) === "in_transit" ? (
+                          <select
+                            className="input"
+                            aria-label={`Driver for ${row.destination}`}
+                            value={row.driverId ?? ""}
+                            disabled={busy != null}
+                            onChange={(event) =>
+                              changeDriver(row, event.currentTarget.value)
+                            }
+                          >
+                            <option value="">No driver</option>
+                            {drivers.map((person) => (
+                              <option key={person._id} value={person._id}>
+                                {person.givenName} {person.familyName}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          personName(row.driverId)
+                        )}
+                      </td>
                       <td>
                         {String(row.status) === "scheduled" ||
                         String(row.status) === "in_transit" ? (
@@ -407,6 +469,11 @@ export function DeliveriesPage() {
                         <div className="supply-row-actions">
                           {policy
                             .deliveryActions(String(row.status))
+                            .filter(
+                              (action) =>
+                                action.key !== "startTransit" ||
+                                row.driverId != null,
+                            )
                             .map((action) => (
                               <button
                                 key={action.key}
