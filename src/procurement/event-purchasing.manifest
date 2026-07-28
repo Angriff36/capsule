@@ -443,3 +443,56 @@ on EventDishConfirmedFromProposal fanOut DishIngredient where dishId = payload.s
     servings: payload.quantityServings
     purchasingWeekStart: payload.purchasingWeekStart
   }
+
+// Editing a dish must re-drive the events that already use it. Without this the
+// cascade only ever fires on EventDishAdded, so adding an ingredient to a dish
+// already on an event changes nothing and the operator has to remove and re-add
+// it to see demand — which is exactly what made the chain look dead.
+on DishIngredientAdded fanOut EventDish where dishId = payload.dishId
+  run EventIngredientContribution.record
+  match eventDishId = self.id, componentId = null, ingredientId = payload.ingredientId, unit = payload.unit
+  else create
+  params {
+    eventId: self.eventId
+    eventDishId: self.id
+    dishId: payload.dishId
+    componentId: null
+    ingredientId: payload.ingredientId
+    quantity: payload.quantity * self.quantityServings
+    unit: payload.unit
+    servings: self.quantityServings
+  }
+
+// Same for a corrected quantity — retyping 5 to 4 has to move demand.
+on DishIngredientQuantityAdjusted fanOut EventDish where dishId = payload.dishId
+  run EventIngredientContribution.record
+  match eventDishId = self.id, componentId = null, ingredientId = payload.ingredientId, unit = payload.unit
+  else create
+  params {
+    eventId: self.eventId
+    eventDishId: self.id
+    dishId: payload.dishId
+    componentId: null
+    ingredientId: payload.ingredientId
+    quantity: payload.quantity * self.quantityServings
+    unit: payload.unit
+    servings: self.quantityServings
+  }
+
+// And attaching a component to a dish re-seeds the events already using it.
+// This is the hole that made the purchasing chain look dead for a whole day:
+// a component was attached, nothing happened, and the only way to see demand
+// was to remove the dish from the event and add it back.
+on DishComponentAttached fanOut EventDish where dishId = payload.dishId
+  run EventDishComponentSeed.seed
+  match eventDishId = self.id, componentId = payload.componentId
+  else create
+  params {
+    eventId: self.eventId
+    eventDishId: self.id
+    dishId: payload.dishId
+    componentId: payload.componentId
+    servings: self.quantityServings
+    yieldQuantity: payload.yieldQuantity
+    batchMultiplier: payload.batchMultiplier
+  }

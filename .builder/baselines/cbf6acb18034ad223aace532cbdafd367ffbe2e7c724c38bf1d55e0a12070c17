@@ -7766,33 +7766,6 @@ async function __runDishComponentAttach(ctx: MutationCtx, { docId, dishId, compo
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, dishComponentId: docId, tenantId: __after.tenantId, dishId: dishId, componentId: componentId, yieldQuantity: yieldQuantity, batchMultiplier: ((batchMultiplier != null) ? batchMultiplier : 1), sortOrder: ((sortOrder != null) ? sortOrder : 0), role: role, _subject: { entity: "DishComponent", command: "attach", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "DishComponentAttached", entity: "DishComponent", entityId: docId, payload: { dishComponentId: docId, tenantId: __after.tenantId, dishId: dishId, componentId: componentId, yieldQuantity: yieldQuantity, batchMultiplier: ((batchMultiplier != null) ? batchMultiplier : 1), sortOrder: ((sortOrder != null) ? sortOrder : 0), role: role }, createdAt: Date.now() });
-    // Reactions
-    const fanRows0 = (await ctx.db.query("eventDishes").withIndex("by_dishId", (q) => q.eq("dishId", payload.dishId)).collect()).filter((d) => (d as any).deletedAt == null);
-    for (const __row of fanRows0) {
-      const target = __row;
-      const __fanMatch0_raw = await ctx.db.query("eventDishComponentSeeds").withIndex("by_eventDishId", (q) => q.eq("eventDishId", (__row as any)._id)).collect();
-      const __fanMatch0_rows = __fanMatch0_raw.filter((d) => (d as any).eventDishId === (__row as any)._id && (d as any).componentId === payload.componentId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
-      const __fanMatch0_id = __fanMatch0_rows.length > 0 ? (__fanMatch0_rows[0] as any)._id : null;
-      if (__fanMatch0_id) {
-        await __runEventDishComponentSeedSeed(ctx, { docId: __fanMatch0_id, eventId: __row.eventId, eventDishId: (__row as any)._id, dishId: payload.dishId, componentId: payload.componentId, servings: __row.quantityServings, yieldQuantity: payload.yieldQuantity, batchMultiplier: payload.batchMultiplier } as any);
-      } else {
-        const __elseArgs: Record<string, any> = { eventId: __row.eventId, eventDishId: (__row as any)._id, dishId: payload.dishId, componentId: payload.componentId, servings: __row.quantityServings, yieldQuantity: payload.yieldQuantity, batchMultiplier: payload.batchMultiplier };
-        const __elseDoc: Record<string, any> = {
-          tenantId: __auth.tenantId,
-          servings: 0,
-          yieldQuantity: 1,
-          batchMultiplier: 1,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          version: 0,
-        };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","servings","yieldQuantity","batchMultiplier","purchasingWeekStart","seededAt","createdAt","updatedAt"] as string[]) {
-          if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
-        }
-        const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
-      }
-    }
     return { ...doc, ...updates };
 }
 
@@ -7874,33 +7847,6 @@ export const DishComponent_createViaAttach = mutation({
     const docId = await ctx.db.insert("dishComponents", doc as any);
     const payload: Record<string, any> = { _id: docId, id: docId, ...doc, result: { _id: docId, id: docId, ...doc }, dishComponentId: docId, tenantId: doc.tenantId, dishId: doc.dishId, componentId: doc.componentId, yieldQuantity: doc.yieldQuantity, batchMultiplier: ((doc.batchMultiplier != null) ? doc.batchMultiplier : 1), sortOrder: ((doc.sortOrder != null) ? doc.sortOrder : 0), role: doc.role, _subject: { entity: "DishComponent", command: "attach", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "DishComponentAttached", entity: "DishComponent", entityId: docId, payload: { dishComponentId: docId, tenantId: doc.tenantId, dishId: doc.dishId, componentId: doc.componentId, yieldQuantity: doc.yieldQuantity, batchMultiplier: ((doc.batchMultiplier != null) ? doc.batchMultiplier : 1), sortOrder: ((doc.sortOrder != null) ? doc.sortOrder : 0), role: doc.role }, createdAt: Date.now() });
-    // Reactions
-    const fanRows0 = (await ctx.db.query("eventDishes").withIndex("by_dishId", (q) => q.eq("dishId", payload.dishId)).collect()).filter((d) => (d as any).deletedAt == null);
-    for (const __row of fanRows0) {
-      const target = __row;
-      const __fanMatch0_raw = await ctx.db.query("eventDishComponentSeeds").withIndex("by_eventDishId", (q) => q.eq("eventDishId", (__row as any)._id)).collect();
-      const __fanMatch0_rows = __fanMatch0_raw.filter((d) => (d as any).eventDishId === (__row as any)._id && (d as any).componentId === payload.componentId && (d as any).deletedAt == null).sort((a, b) => String((a as any)._id).localeCompare(String((b as any)._id)));
-      const __fanMatch0_id = __fanMatch0_rows.length > 0 ? (__fanMatch0_rows[0] as any)._id : null;
-      if (__fanMatch0_id) {
-        await __runEventDishComponentSeedSeed(ctx, { docId: __fanMatch0_id, eventId: __row.eventId, eventDishId: (__row as any)._id, dishId: payload.dishId, componentId: payload.componentId, servings: __row.quantityServings, yieldQuantity: payload.yieldQuantity, batchMultiplier: payload.batchMultiplier } as any);
-      } else {
-        const __elseArgs: Record<string, any> = { eventId: __row.eventId, eventDishId: (__row as any)._id, dishId: payload.dishId, componentId: payload.componentId, servings: __row.quantityServings, yieldQuantity: payload.yieldQuantity, batchMultiplier: payload.batchMultiplier };
-        const __elseDoc: Record<string, any> = {
-          tenantId: __auth.tenantId,
-          servings: 0,
-          yieldQuantity: 1,
-          batchMultiplier: 1,
-          createdAt: Date.now(),
-          updatedAt: Date.now(),
-          version: 0,
-        };
-        for (const __k of ["deletedAt","eventId","eventDishId","dishId","componentId","servings","yieldQuantity","batchMultiplier","purchasingWeekStart","seededAt","createdAt","updatedAt"] as string[]) {
-          if (__elseArgs[__k] !== undefined) __elseDoc[__k] = __elseArgs[__k];
-        }
-        const __elseId = await ctx.db.insert("eventDishComponentSeeds", __elseDoc as any);
-        await __runEventDishComponentSeedSeed(ctx, { docId: __elseId, ...__elseArgs } as any);
-      }
-    }
     const __result = { docId };
     if (args.idempotencyKey !== undefined) {
       await __setCommandIdempotency(ctx, args.idempotencyKey, "DishComponent_createViaAttach", __result);
