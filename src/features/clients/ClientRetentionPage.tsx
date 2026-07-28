@@ -168,10 +168,9 @@ export function ClientRetentionPage() {
           <p className="eyebrow">Clients · Retention</p>
           <h1 className="display-title mt-2">Client retention</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Repeat booking rate compares {priorYear} clients against{" "}
-            {currentYear} bookings. Clients active last year with nothing booked
-            this year are churn candidates — open an outreach task so someone
-            reaches out.
+            Who came back this year — and who hasn't yet. For clients who booked
+            in {priorYear} but not {currentYear}, open a follow-up task so
+            someone reaches out before they book elsewhere.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -214,7 +213,7 @@ export function ClientRetentionPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Churn candidates</p>
+            <p className="eyebrow">Worth a call</p>
             <h2>No {currentYear} booking yet</h2>
           </div>
           <span>{loading ? "…" : `${churnCandidates.length} clients`}</span>
@@ -223,7 +222,7 @@ export function ClientRetentionPage() {
           <TableSkeleton rows={4} />
         ) : churnCandidates.length === 0 ? (
           <div className="document-empty">
-            <p>No churn candidates.</p>
+            <p>No one to chase.</p>
             <span>
               Every {priorYear} client either rebooked for {currentYear} or is
               archived.
@@ -290,7 +289,7 @@ export function ClientRetentionPage() {
         ) : openTasks.length === 0 ? (
           <div className="document-empty">
             <p>No open outreach tasks.</p>
-            <span>Open one from the churn candidate list above.</span>
+            <span>Open one from the list above.</span>
           </div>
         ) : (
           <table className="data-table">

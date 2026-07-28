@@ -309,9 +309,9 @@ export function LotTraceabilityPage() {
         </span>
         {unattributed > 0 ? (
           <span className="lot-trace-unattributed">
-            {unattributed} historical consumed reservation
-            {unattributed === 1 ? "" : "s"} lack lot provenance and cannot be
-            evaluated against a receipt-date recall window.
+            {unattributed} older used-up reservation
+            {unattributed === 1 ? " isn't" : "s aren't"} tied to a lot, so they
+            can't be traced back to a delivery date in a recall.
           </span>
         ) : null}
       </aside>

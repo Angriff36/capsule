@@ -41,7 +41,7 @@ export function EventSourceProvenancePanel({
     <EventTabPanel
       eyebrow="Source"
       title="Imported record"
-      description="This event was brought in from an external system. The mapping below is the migration provenance used for reconciliation."
+      description="This event was brought in from another system. Here's where it came from and how it was matched up."
       testId="event-source-provenance-panel"
     >
       <ul className="space-y-2">
@@ -57,7 +57,7 @@ export function EventSourceProvenancePanel({
               </span>
               <StatusChip status={link.conflictStatus} />
               {!link.verified ? (
-                <span className="text-ink-3">· unverified</span>
+                <span className="text-ink-3">· not yet checked</span>
               ) : null}
               {link.importedAt ? (
                 <span className="text-ink-3">
@@ -67,13 +67,13 @@ export function EventSourceProvenancePanel({
             </div>
             <dl className="mt-2 grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
               <div>
-                <dt className="text-ink-3">External ID</dt>
+                <dt className="text-ink-3">Reference in the old system</dt>
                 <dd className="break-all text-ink-2">
                   {link.externalId || "—"}
                 </dd>
               </div>
               <div>
-                <dt className="text-ink-3">Record type</dt>
+                <dt className="text-ink-3">Imported as</dt>
                 <dd className="text-ink-2">{link.recordType || "—"}</dd>
               </div>
             </dl>
@@ -83,7 +83,7 @@ export function EventSourceProvenancePanel({
             {link.rawSourceData ? (
               <details className="mt-2">
                 <summary className="cursor-pointer text-ink-3">
-                  Raw source data
+                  Original import details
                 </summary>
                 <pre className="mt-1 max-h-64 overflow-auto rounded-sm bg-inset p-2 text-[11px] text-ink-2">
                   {prettySourceData(link.rawSourceData)}

@@ -69,7 +69,7 @@ export function KitchenCommandDeckTaskPanel({
           <h2>{event.title}</h2>
           <p>
             {progress.total === 0
-              ? "No prep tasks yet — add dishes on the event menu, or sync prep from dish templates."
+              ? "No prep tasks yet — add dishes on the event menu, or load prep from dish templates."
               : `${progress.completed}/${progress.total} steps · ${progress.pct}% complete`}
           </p>
         </div>

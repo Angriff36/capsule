@@ -44,7 +44,7 @@ export function PurchasingCommandForm({
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
         <div>
-          <p className="eyebrow">Governed procurement command</p>
+          <p className="eyebrow">Purchasing</p>
           <h2>{FORM_TITLES[form]}</h2>
         </div>
         <div className="supply-row-actions">

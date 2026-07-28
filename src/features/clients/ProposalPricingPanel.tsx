@@ -200,10 +200,9 @@ export function ProposalPricingPanel({
 
   return (
     <div className="rounded-sm border border-line bg-inset p-4">
-      <p className="eyebrow">Pricing lines (spec §5.4)</p>
+      <p className="eyebrow">Pricing</p>
       <p className="mt-1 text-[12px] text-ink-2">
-        Totals recomputed by the shared pricing engine — the same path the draft
-        form and the published revision use.
+        The priced lines behind this proposal's total.
         {editable
           ? " Edit a line to revise it; changes recompute the totals."
           : ""}
@@ -338,7 +337,7 @@ export function ProposalPricingPanel({
           </label>
           {editorIsOverride ? (
             <label className="flex-1 min-w-[16rem]">
-              <span className="field-label">Override reason (spec §5.4)</span>
+              <span className="field-label">Why the price changed</span>
               <input
                 className="input"
                 value={editor.overrideReason}

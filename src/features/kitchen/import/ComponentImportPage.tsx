@@ -172,7 +172,7 @@ export function ComponentImportPage() {
     if (!review || busy || !reviewIsReady(review)) return;
     setFailure(null);
     setBusy(true);
-    announce("Finalizing import through generated commands.");
+    announce("Saving your import…");
     try {
       const finalizer = new ComponentImportFinalizer({
         createIngredient: (input) =>

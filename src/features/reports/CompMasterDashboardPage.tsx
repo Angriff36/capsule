@@ -470,17 +470,17 @@ export function CompMasterDashboardPage() {
 
       {/* Evidence Trail */}
       <div className="mt-4 rounded-lg border border-line bg-panel p-4">
-        <h4 className="text-sm font-semibold text-ink-900">Evidence Trail</h4>
+        <h4 className="text-sm font-semibold text-ink-900">
+          Where these numbers come from
+        </h4>
         <div className="mt-2 text-sm text-ink-600">
           <p>
             <strong>Data Sources:</strong>
           </p>
           <ul className="list-inside list-disc mt-1 space-y-1">
-            <li>Event records (quoted price, assigned salesperson, stage)</li>
-            <li>
-              Revenue Attribution records (approved status, amounts, splits)
-            </li>
-            <li>Person records (salesperson identity)</li>
+            <li>Events (quoted price, assigned salesperson, stage)</li>
+            <li>Revenue attributions (approval, amounts, splits)</li>
+            <li>Team members (who the salesperson is)</li>
           </ul>
           <p className="mt-2">
             <strong>Commission Formula:</strong> Event Quoted Price × Venue

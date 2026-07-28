@@ -67,7 +67,9 @@ export function SyncErrorsPanel() {
     setBusyId(e._id);
     try {
       if (!e.rawPayload) {
-        throw new Error("No stored payload to retry");
+        throw new Error(
+          "The original message data wasn't saved, so this can't be retried.",
+        );
       }
       // rawPayload is JSON.stringify of the original ingestInboundMessage args.
       const payload = JSON.parse(e.rawPayload);
@@ -90,11 +92,11 @@ export function SyncErrorsPanel() {
     >
       <div className="flex items-baseline justify-between">
         <h2 className="text-[14px] font-semibold text-warn">
-          Sync errors{" "}
+          Messages that didn't come through{" "}
           <span className="font-normal text-warn">({pending.length})</span>
         </h2>
         <p className="text-[11px] text-warn">
-          Inbound deliveries that failed to parse — retry or dismiss.
+          These messages couldn't be read — retry or dismiss them.
         </p>
       </div>
       {failure ? <FailureBanner failure={failure} /> : null}
@@ -129,7 +131,7 @@ export function SyncErrorsPanel() {
               {e.rawPayload ? (
                 <details className="mt-1">
                   <summary className="cursor-pointer text-[10.5px] text-ink-3">
-                    Raw payload
+                    Original message data
                   </summary>
                   <pre className="mt-1 max-h-40 overflow-auto rounded-sm bg-inset p-2 text-[10.5px] text-ink-2">
                     {e.rawPayload}

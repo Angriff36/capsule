@@ -110,8 +110,8 @@ export function EventMarginTab({ eventId }: Props) {
       <div>
         <h2 className="font-display text-lg">Margin</h2>
         <p className="text-[13px] text-ink-2">
-          Food cost uses Manifest Event.estimatedFoodCost. Labor and equipment
-          use live committed figures when present.
+          Food cost uses this event's estimated food cost. Labor and equipment
+          use live committed figures when available.
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">

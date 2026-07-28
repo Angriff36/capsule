@@ -244,7 +244,7 @@ export function TimsKPIsDashboardPage() {
         revenue: event.quotedPrice || 0,
         date: event.startsAt ? formatDate(event.startsAt) : "",
         headcount: event.expectedHeadcount || 0,
-        venueId: event.venueId || "N/A",
+        venueId: event.venueId || "—",
       }));
   }, [events]);
 
@@ -441,7 +441,7 @@ export function TimsKPIsDashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Tim's KPIs Dashboard"
-        lead="Comprehensive operational metrics with record-level reconciliation. Live tenant data from Capsule events, closeouts, and leads."
+        lead="The numbers that run the business, live from your events, closeouts, and leads — with the detail behind each one a click away."
       />
 
       <DashboardGrid items={dashboardItems} />
@@ -449,13 +449,13 @@ export function TimsKPIsDashboardPage() {
       {/* Reconciliation Note */}
       <div className="mt-6 rounded-lg border border-ink-200 bg-ink-50 p-4">
         <h4 className="text-sm font-semibold text-ink-900">
-          Reconciliation Access
+          Where these numbers come from
         </h4>
         <p className="mt-1 text-sm text-ink-600">
-          All KPIs load live from tenant-scoped data. Click venue names to view
-          venue detail pages with full event history. Revenue attribution tracks
-          venue commissions and sales splits. Food cost percentages derive from
-          EventCloseout records with actual vs. budgeted comparison.
+          Every number updates live from your own data. Click a venue name to
+          see its full event history. Revenue attribution tracks venue
+          commissions and sales splits. Food cost percentages come from event
+          closeouts, comparing actual against budgeted.
         </p>
       </div>
     </div>

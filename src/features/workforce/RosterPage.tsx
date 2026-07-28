@@ -444,7 +444,7 @@ export function RosterPage() {
           <form className="supply-form" onSubmit={submitAssignment}>
             <div className="supply-form-heading">
               <div>
-                <p className="eyebrow">New governed assignment</p>
+                <p className="eyebrow">New assignment</p>
                 <h2>Assign a person to an event</h2>
               </div>
               <button
@@ -601,7 +601,7 @@ export function RosterPage() {
           <form className="supply-form" onSubmit={submitShift}>
             <div className="supply-form-heading">
               <div>
-                <p className="eyebrow">New governed shift</p>
+                <p className="eyebrow">New shift</p>
                 <h2>Schedule a shift</h2>
               </div>
               <button className="btn btn-primary" disabled={busy != null}>

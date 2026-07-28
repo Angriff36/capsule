@@ -68,9 +68,8 @@ export function ReportCreateForm({
       onSubmit={onSubmit}
     >
       <p className="text-[13px] text-ink-2">
-        Save a governed report definition. Result rendering stays deferred —
-        this library only stores configuration you can rename, share, archive,
-        and restore.
+        Save a report setup you can rename, share, archive, and restore later.
+        This library stores your settings — it doesn't draw the chart yet.
       </p>
       <label className="block space-y-1">
         <span className="text-[12px] text-ink-3">Name</span>

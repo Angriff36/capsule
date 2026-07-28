@@ -62,11 +62,11 @@ export function RolePermissionAuditView({
     <Section title="Role permission audit" count={snapshot?.members.length}>
       <div className="flex flex-wrap items-start justify-between gap-4 border-b border-line p-4">
         <div className="max-w-2xl">
-          <p className="font-medium text-ink">Least-privilege snapshot</p>
+          <p className="font-medium text-ink">Who can do what</p>
           <p className="mt-1 text-[12px] leading-relaxed text-ink-3">
-            Capture every current organization member, their assigned role, and
-            the effective Manifest policy capabilities inherited by that role.
-            Elevated grants are highlighted for periodic admin review.
+            Capture every current team member, their role, and everything that
+            role lets them do. Broader access is highlighted so you can review
+            it from time to time.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -132,7 +132,7 @@ export function RolePermissionAuditView({
                   <tr>
                     <th className="th">Member</th>
                     <th className="th">Assigned role</th>
-                    <th className="th">Manifest policies satisfied</th>
+                    <th className="th">What this role can do</th>
                     <th className="th">Access review</th>
                   </tr>
                 </thead>
@@ -162,7 +162,7 @@ export function RolePermissionAuditView({
                       <td className="border-b border-line px-3 py-3">
                         {member.manifestPolicies.length === 0 ? (
                           <span className="text-[11px] text-danger">
-                            No recognized role policies
+                            This role grants no recognized access
                           </span>
                         ) : (
                           <div className="flex max-w-xl flex-wrap gap-1.5">
@@ -210,10 +210,9 @@ export function RolePermissionAuditView({
           )}
 
           <p className="px-4 py-3 text-[10px] leading-relaxed text-ink-3">
-            This snapshot reflects role inheritance declared in{" "}
-            <code>src/foundation/base.manifest</code>. A highlighted capability
-            grants lead, manager, domain-manager, or organization-admin access;
-            it is a review prompt, not an automatic policy denial.
+            Highlighted items grant lead, manager, or admin-level access. A
+            highlight is a prompt to review — it doesn't block anyone from
+            working.
           </p>
         </div>
       )}

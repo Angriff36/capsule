@@ -119,9 +119,9 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
       <div className="grid gap-5 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.8fr)]">
         <div>
           <p className="max-w-2xl text-[13px] leading-relaxed text-ink-2">
-            Send a structured JSON payload to an external HTTP endpoint when a
-            subscribed event happens — connect Zapier, Make, or a custom system
-            without a separate API. Payloads are signed with
+            Automatically notify another system — Zapier, Make, or something
+            custom — whenever something you choose happens in Capsule. Each
+            notification is signed with
             <span className="font-mono"> X-Capsule-Signature</span>{" "}
             (HMAC-SHA256) when you provide a secret.
           </p>

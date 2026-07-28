@@ -77,7 +77,7 @@ export function PermissionsPage() {
     <div className="operations-stage space-y-6">
       <PageHeader
         title="Permissions"
-        lead="Team roles decide what each person can do. Organization access switches turn whole domains off for everyone — commands fail closed and those areas leave the nav."
+        lead="Team roles decide what each person can do. The switches below turn whole areas of Capsule off for everyone — switched-off areas stop working and disappear from the menu."
       />
       <AdminWorkspaceNav />
       {!canEdit && (

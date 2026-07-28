@@ -30,7 +30,7 @@ export function AuthGate({ children }: { children?: ReactNode }) {
     <>
       <AuthLoading>
         <GateShell title="Checking your session…">
-          <p className="text-ink-2">Talking to the identity provider.</p>
+          <p className="text-ink-2">Signing you in.</p>
         </GateShell>
       </AuthLoading>
       <Unauthenticated>
@@ -102,11 +102,11 @@ function MembershipRequired({
   return (
     <GateShell title="Workspace membership setup required">
       <p className="leading-relaxed text-ink-2">
-        You are signed in, but your account has not been assigned {missing} yet,
-        so Capsule keeps everything locked. Choose or create a Clerk
-        organization (workspace), then confirm your session token includes{" "}
+        You are signed in, but your account has not been given {missing} yet, so
+        Capsule keeps everything locked. Choose or create your workspace below.
+        If it still won't unlock, ask whoever set up your sign-in to add the{" "}
         <code className="font-mono">role</code> and{" "}
-        <code className="font-mono">tenantId</code> claims.
+        <code className="font-mono">tenantId</code> details to your account.
       </p>
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <OrganizationSwitcher
@@ -127,7 +127,7 @@ function MembershipRequired({
           </button>
         </SignOutButton>
         <span className="text-[12px] text-ink-3">
-          Claims template:{" "}
+          Setup reference for your technician:{" "}
           <span className="font-mono">
             {`{"role":"{{org.role}}","tenantId":"{{org.id}}"}`}
           </span>
@@ -141,9 +141,8 @@ export function AuthSetupRequired() {
   return (
     <GateShell title="Authentication setup required">
       <p className="leading-relaxed text-ink-2">
-        CapsuleX has no development identity fallback: without a verified
-        sign-in the backend rejects every request. Finish the local
-        configuration to continue:
+        Capsule can't start until sign-in is configured. Finish this one-time
+        setup to continue:
       </p>
       <ol className="mt-4 list-decimal space-y-1.5 pl-5 text-[12.5px] leading-relaxed text-ink-2">
         <li>

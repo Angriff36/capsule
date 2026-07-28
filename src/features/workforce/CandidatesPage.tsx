@@ -227,9 +227,8 @@ export function CandidatesPage() {
           <p className="mt-3 max-w-160 text-ink-2">
             Add candidates and move them through application, screening,
             interview, and decision — then hire or reject. Paste a KM
-            interview-tool export to import candidates idempotently;
-            re-importing the same export updates source-linked records without
-            duplicating them.
+            interview-tool export to bring candidates in; re-importing the same
+            export updates the existing candidates instead of duplicating them.
           </p>
         </div>
         <div aria-label="Candidate actions">

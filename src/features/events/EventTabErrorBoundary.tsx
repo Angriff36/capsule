@@ -41,9 +41,9 @@ export class EventTabErrorBoundary extends Component<Props, State> {
           <p className="mt-1 text-[13px] text-ink-2">{message}</p>
           {needsConvexSync ? (
             <p className="mt-2 text-[12px] text-ink-3">
-              The app UI is ahead of the Convex backend. Run{" "}
+              This screen is newer than the server behind it. Run{" "}
               <code className="font-mono">bun run dev:convex</code> locally (or
-              deploy) so new queries/mutations are available, then reload.
+              deploy the latest version), then reload this page.
             </p>
           ) : null}
           <button

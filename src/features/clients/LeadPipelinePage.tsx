@@ -15,6 +15,7 @@ import {
   useListReferralSource,
 } from "../../lib/manifest-convex-react";
 import { api, type Id } from "../../lib/api";
+import { formatDate } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { TableSkeleton } from "../../ui/primitives";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
@@ -322,9 +323,9 @@ export function LeadPipelinePage() {
           <p className="eyebrow">Clients · Pipeline</p>
           <h1 className="display-title mt-2">Lead pipeline</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Capture the inquiry first. Qualify the work, forecast its value,
-            then create the client and proposal only when the conversation is
-            ready.
+            Every inquiry in one place, from first call to booked business. Jot
+            it down when the phone rings, then move it across the board as the
+            conversation progresses.
           </p>
         </div>
         <button
@@ -526,13 +527,7 @@ export function LeadPipelinePage() {
                       <time
                         dateTime={new Date(lead.capturedAt ?? 0).toISOString()}
                       >
-                        {new Date(lead.capturedAt ?? 0).toLocaleDateString(
-                          undefined,
-                          {
-                            month: "short",
-                            day: "numeric",
-                          },
-                        )}
+                        {formatDate(lead.capturedAt)}
                       </time>
                     </div>
                     <h3>{leadName(lead)}</h3>
@@ -544,7 +539,11 @@ export function LeadPipelinePage() {
                       </p>
                     ) : null}
                     <div className="lead-card-value">
-                      <strong>{currency.format(lead.estimatedValue)}</strong>
+                      <strong>
+                        {lead.estimatedValue > 0
+                          ? currency.format(lead.estimatedValue)
+                          : "—"}
+                      </strong>
                       <span>{lead.probability}% likely</span>
                     </div>
                     <div className="lead-probability-track" aria-hidden="true">
@@ -656,8 +655,7 @@ export function LeadPipelinePage() {
                         onSubmit={(event) => submitProposal(lead, event)}
                       >
                         <p>
-                          Create the offer and mark it sent in one explicit
-                          action.
+                          This creates the proposal and marks it sent in one go.
                         </p>
                         <label>
                           Proposal title

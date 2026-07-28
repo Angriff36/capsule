@@ -98,15 +98,14 @@ export function ClientDuplicateReview({
     >
       <div className="ledger-heading">
         <div>
-          <p className="eyebrow">Data quality</p>
-          <h2>Probable duplicate clients</h2>
+          <p className="eyebrow">Housekeeping</p>
+          <h2>Possible duplicate clients</h2>
         </div>
         <span>{candidates.length} to review</span>
       </div>
       <p className="max-w-180 text-[13px] text-ink-2">
-        Name and email similarities are suggestions, not automatic blocks.
-        Review both accounts before merging. An administrator completes the
-        merge because commercial and billing records move with the account.
+        These pairs look like the same client entered twice. Review both before
+        merging — everything from the duplicate moves to the client you keep.
       </p>
 
       {!selected ? (
@@ -155,8 +154,8 @@ export function ClientDuplicateReview({
           </div>
           <p className="mt-4 text-[13px] text-ink-2">
             {duplicate && primary
-              ? `${clientDisplayName(duplicate._id, [duplicate])}'s events, contacts, communication, commercial, and billing history will move to ${clientDisplayName(primary._id, [primary])}. The duplicate account will be soft-deleted.`
-              : "Choose the primary client account."}
+              ? `Everything on ${clientDisplayName(duplicate._id, [duplicate])} — events, contacts, conversations, and billing — will move to ${clientDisplayName(primary._id, [primary])}. The duplicate goes away.`
+              : "Choose which client to keep."}
           </p>
           <div className="supply-row-actions mt-4">
             <button

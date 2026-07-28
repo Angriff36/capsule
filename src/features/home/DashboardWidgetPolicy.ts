@@ -64,8 +64,8 @@ export const DASHBOARD_WIDGET_CATALOG: DashboardWidgetCatalogItem[] = [
   {
     id: "recent_activity",
     title: "Recent activity",
-    description: "Latest changes across active operating records.",
-    eyebrow: "Live ledger",
+    description: "The latest changes across your business.",
+    eyebrow: "What's new",
     href: "/reports",
     tone: "ink",
   },
@@ -396,14 +396,14 @@ export class DashboardWidgetPolicy {
       recent_activity: {
         ...get("recent_activity"),
         metric: String(activity.length),
-        metricLabel: "latest record changes",
+        metricLabel: "recent updates",
         rows: activity.map((item) => ({
           label: item.label,
           value: relativeTime(item.timestamp, now),
           meta: item.meta,
           href: item.href,
         })),
-        emptyMessage: "No recent operating changes are visible.",
+        emptyMessage: "Nothing new just yet.",
       },
       cash_forecast: {
         ...get("cash_forecast"),

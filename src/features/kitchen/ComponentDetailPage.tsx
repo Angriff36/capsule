@@ -538,8 +538,8 @@ export function ComponentDetailPage() {
             <div className="document-empty">
               <p>No ingredient lines yet.</p>
               <span>
-                Publication remains governed by the generated Component command;
-                this screen does not invent an ingredient prerequisite.
+                You can still publish this component — ingredient lines are
+                optional.
               </span>
             </div>
           )}

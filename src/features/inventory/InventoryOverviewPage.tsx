@@ -44,7 +44,7 @@ const QUICK_LINKS = [
   {
     label: "Audit log",
     path: "/inventory/audit",
-    description: "Every governed stock movement with its provenance.",
+    description: "Every stock movement and where it came from.",
   },
   {
     label: "Waste",

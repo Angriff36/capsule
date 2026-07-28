@@ -137,9 +137,9 @@ export function ContractDocumentPage() {
           <p className="eyebrow">Clients · Contracts · Document</p>
           <h1 className="display-title mt-2">Contract document</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Review the agreement, then export it as a PDF via the print dialog
-            (choose “Save as PDF”). Send the PDF for signature; record the
-            signature on the contract once it returns.
+            Review the agreement, then export it as a PDF (choose “Save as PDF”
+            in the print dialog). Send it to your client for signature, then log
+            the signature when it comes back.
           </p>
         </div>
         <div className="supply-row-actions">

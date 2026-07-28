@@ -664,7 +664,7 @@ export function InvoiceDetailPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Lifecycle</p>
+            <p className="eyebrow">Invoice</p>
             <h2>Actions</h2>
           </div>
         </div>

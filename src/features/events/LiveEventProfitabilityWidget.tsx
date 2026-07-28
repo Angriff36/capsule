@@ -94,7 +94,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
           <h2>Margin at this moment</h2>
         </div>
         <span className="live-profitability__refresh">
-          {loading ? "Syncing records…" : "Updates with committed records"}
+          {loading ? "Updating…" : "Updates as costs come in"}
         </span>
       </header>
 

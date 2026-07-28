@@ -116,10 +116,10 @@ export function ProposalMenuSelectionPanel({
 
   return (
     <div className="rounded-sm border border-line bg-inset p-4">
-      <p className="eyebrow">Client menu selection</p>
+      <p className="eyebrow">Menu</p>
       <p className="mt-1 text-[12px] text-ink-2">
-        Dishes picked from the published catalog. On acceptance with a linked
-        event, selections become that event&apos;s dish lines automatically.
+        Dishes picked from your menu catalog. When the proposal is accepted with
+        a linked event, the menu copies onto that event automatically.
       </p>
 
       {activeSelections.length === 0 ? (

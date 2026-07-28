@@ -341,7 +341,7 @@ function EquipmentForm({
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
         <div>
-          <p className="eyebrow">Governed facilities command</p>
+          <p className="eyebrow">Equipment</p>
           <h2>{editing ? "Edit equipment details" : "Register equipment"}</h2>
         </div>
         <div className="supply-row-actions">

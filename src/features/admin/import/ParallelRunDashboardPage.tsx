@@ -414,8 +414,9 @@ export function ParallelRunDashboardPage() {
         <div>
           <h1 className="display-title">Parallel Run Dashboard</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Daily comparison of TPP and Capsule data for migration validation.
-            Drill into discrepancies to verify data integrity before cutover.
+            A daily side-by-side of TPP and Capsule, so you can confirm
+            everything came over correctly before switching for good. Dig into
+            any differences below.
           </p>
         </div>
       </header>
@@ -437,7 +438,7 @@ export function ParallelRunDashboardPage() {
             <div className="bg-white p-4 rounded-lg shadow">
               <h3 className="text-sm font-medium text-ink-3">TPP Events</h3>
               <p className="text-2xl font-bold">
-                {tppRecordCounts.total ?? "N/A"}
+                {tppRecordCounts.total ?? "—"}
               </p>
               <p className="text-xs text-ink-3">
                 {latestTppImport
@@ -768,7 +769,7 @@ export function ParallelRunDashboardPage() {
                         <td>
                           {event.startsAt
                             ? new Date(event.startsAt).toLocaleDateString()
-                            : "N/A"}
+                            : "—"}
                         </td>
                         <td>
                           <StatusChip status={String(event.stage)} />
@@ -776,7 +777,7 @@ export function ParallelRunDashboardPage() {
                         <td>
                           {event.updatedAt
                             ? new Date(event.updatedAt).toLocaleString()
-                            : "N/A"}
+                            : "—"}
                         </td>
                         <td>
                           <Link
@@ -798,23 +799,22 @@ export function ParallelRunDashboardPage() {
           <section className="working-ledger mt-6">
             <div className="ledger-heading">
               <div>
-                <h2>Unresolved Mappings</h2>
+                <h2>Records still to match</h2>
                 <p className="text-sm text-ink-2">
-                  External record links pending verification or conflict
-                  resolution.
+                  Imported records that still need to be checked or matched up.
                 </p>
               </div>
-              <span>{unresolvedMappings.length} mappings</span>
+              <span>{unresolvedMappings.length} records</span>
             </div>
             <div className="supply-table-wrap">
               <table className="supply-table">
                 <thead>
                   <tr>
-                    <th>Source System</th>
-                    <th>Record Type</th>
-                    <th>External ID</th>
-                    <th>Capsule ID</th>
-                    <th>Conflict Status</th>
+                    <th>Old system</th>
+                    <th>Type</th>
+                    <th>Reference in the old system</th>
+                    <th>Capsule record</th>
+                    <th>Status</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -881,7 +881,7 @@ export function ParallelRunDashboardPage() {
               <div>
                 <h2>Recent Import Runs</h2>
                 <p className="text-sm text-ink-2">
-                  Source data for TPP comparison metrics.
+                  The imports these comparisons are based on.
                 </p>
               </div>
               <span>{completedImportRuns.length} runs</span>
@@ -931,7 +931,7 @@ export function ParallelRunDashboardPage() {
                           <td>
                             {run.startTime
                               ? new Date(run.startTime).toLocaleDateString()
-                              : "N/A"}
+                              : "—"}
                           </td>
                           <td>{recordCount.toLocaleString()}</td>
                           <td>
@@ -970,8 +970,8 @@ export function ParallelRunDashboardPage() {
                 (&gt;5-10%) - investigation required
               </li>
               <li>
-                • <strong>Unresolved mappings</strong>: External record links
-                that need verification before cutover
+                • <strong>Records still to match</strong>: Imported records to
+                double-check before the final switch
               </li>
               <li>
                 • <strong>Recent changes</strong>: Events modified in the last

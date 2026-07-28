@@ -277,7 +277,7 @@ export function DeliveriesPage() {
         <form className="supply-form" onSubmit={submitCreate}>
           <div className="supply-form-heading">
             <div>
-              <p className="eyebrow">New governed delivery</p>
+              <p className="eyebrow">New delivery</p>
               <h2>Schedule delivery</h2>
             </div>
             <button className="btn btn-primary" disabled={busy != null}>

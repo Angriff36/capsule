@@ -190,14 +190,14 @@ export function ProposalsPage() {
           const ok = await prompt.askConfirm({
             title: "Accept proposal",
             description:
-              "Acceptance records the commercial win. Menu selections will copy to the linked event's dishes.",
+              "Mark this proposal as accepted. The client's menu choices will copy over to the linked event.",
             confirmLabel: "Accept proposal",
           });
           if (!ok) return;
           void run(`${row._id}:accept`, async () => {
             await accept({ docId: row._id, version: row.version });
             setNotice(
-              "Proposal accepted. Menu selections were copied to the linked event's dishes.",
+              "Proposal accepted. The client's menu choices were copied to the linked event.",
             );
           });
           return;
@@ -213,7 +213,7 @@ export function ProposalsPage() {
           const values = await prompt.askFields({
             title: "Accept proposal",
             description:
-              "Acceptance records the commercial win. Link an existing event to copy the client's menu selections onto it as dish lines.",
+              "Mark this proposal as accepted. Link an event and the client's menu choices carry over to it.",
             fields: [
               {
                 name: "eventId",
@@ -221,7 +221,7 @@ export function ProposalsPage() {
                 required: false,
                 placeholder: "No event — link later",
                 helper:
-                  "Menu selections feed the linked event's dishes on accept.",
+                  "Menu choices copy to the linked event when you accept.",
                 options: linkableEvents.map((event) => ({
                   value: event._id,
                   label: String(event.title || event._id),
@@ -236,7 +236,7 @@ export function ProposalsPage() {
           const ok = await prompt.askConfirm({
             title: "Accept proposal",
             description:
-              "Acceptance records the commercial win. Create or link the Event from Events afterward — Manifest does not mint one from ProposalAccepted.",
+              "Mark this proposal as accepted. You can create the event for it right after.",
             confirmLabel: "Accept proposal",
           });
           if (!ok) return;
@@ -245,8 +245,8 @@ export function ProposalsPage() {
           await accept({ docId: row._id, version: row.version, eventId });
           setNotice(
             eventId
-              ? "Proposal accepted. Menu selections were copied to the linked event's dishes."
-              : "Proposal accepted. Use Create Event on the row to continue planning.",
+              ? "Proposal accepted. The client's menu choices were copied to the linked event."
+              : "Proposal accepted. Use Create Event on the row to book it.",
           );
         });
         return;
@@ -400,7 +400,15 @@ export function ProposalsPage() {
           });
         if (key === "markViewed") await markViewed(args);
         if (key === "expire") await expire(args);
-        setNotice(`Proposal updated (${key}).`);
+        setNotice(
+          key === "send"
+            ? "Proposal sent."
+            : key === "markViewed"
+              ? "Proposal marked as viewed."
+              : key === "expire"
+                ? "Proposal marked as expired."
+                : "Proposal updated.",
+        );
       });
     })();
   };
@@ -412,10 +420,10 @@ export function ProposalsPage() {
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Clients · Proposals</p>
-          <h1 className="display-title mt-2">Sales proposals</h1>
+          <h1 className="display-title mt-2">Proposals</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Draft → send → accept/decline. Acceptance does not create an Event;
-            finish planning in Events, then draft a Contract against that Event.
+            Priced offers your clients can accept with one click. When a
+            proposal is accepted, turn it into a booked event.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -629,7 +637,7 @@ export function ProposalsPage() {
                             disabled={busy != null}
                             onClick={() => invoke(row, "requestSignature")}
                           >
-                            Request Signature
+                            Request signature
                           </button>
                         )}
                         {(String(row.status) === "sent" ||

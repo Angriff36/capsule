@@ -242,7 +242,7 @@ export function EmailNotificationSettingsPage() {
                     type="button"
                     role="switch"
                     aria-checked={subscribed}
-                    aria-label={`${detail.label} email subscription`}
+                    aria-label={`${detail.label} email notifications`}
                     disabled={busy != null}
                     data-testid={`email-toggle-${category}`}
                     onClick={() => {
@@ -302,11 +302,11 @@ export function EmailNotificationSettingsPage() {
                     OFF
                   </span>
                   <h3 className="mt-5 font-display text-2xl">
-                    This dispatch is paused
+                    This email is paused
                   </h3>
                   <p className="mt-3 text-[13px] leading-relaxed text-ink-2">
-                    The server returned no email payload for this category. Turn
-                    it back on whenever you want these summaries again.
+                    Nothing is being sent for this category right now. Turn it
+                    back on whenever you want these summaries again.
                   </p>
                 </div>
               </div>

@@ -136,7 +136,7 @@ export function HomePage() {
       <QueryLoadState
         loadingTooLong={loadingTooLong}
         title="Assembling your dashboard"
-        detail="Subscribing to events, finance, stock, and staffing records."
+        detail="Loading your events, invoices, stock, and staffing."
       />
     );
   }
@@ -150,13 +150,14 @@ export function HomePage() {
           <p className="eyebrow">Home / {roleLabel}</p>
           <h1 className="display-title">Today, at a glance.</h1>
           <p>
-            Your pinned operating signals, refreshed as Capsule records change.
-            Keep the board spare or pin the full six—this view belongs to you.
+            Your pinned view of the business — it updates itself as work
+            happens. Keep the board spare or pin the full six—this view belongs
+            to you.
           </p>
         </div>
         <div className="dashboard-masthead__actions">
           <span className="dashboard-live-stamp">
-            <i /> Convex subscriptions live
+            <i /> Live
           </span>
           <button
             type="button"
@@ -184,9 +185,7 @@ export function HomePage() {
           <div>
             <p className="eyebrow">A clear desk</p>
             <h2>No widgets pinned</h2>
-            <p>
-              Choose the signals you want waiting here when you open Capsule.
-            </p>
+            <p>Choose what you want waiting here when you open Capsule.</p>
             <button
               type="button"
               className="btn btn-primary"

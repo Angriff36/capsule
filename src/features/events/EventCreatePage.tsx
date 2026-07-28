@@ -306,7 +306,7 @@ export function EventCreatePage() {
       </Link>
       <PageHeader
         title="New event"
-        lead="Establish the account, place, schedule, service brief, and commercial baseline."
+        lead="The essentials for a new booking — who it's for, where, when, and the budget."
       />
 
       {failure ? <FailureBanner failure={failure} /> : null}

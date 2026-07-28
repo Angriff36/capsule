@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   useCreateClient,
   useCreateClientMerge,
@@ -9,7 +9,14 @@ import {
   useListEvent,
 } from "../../lib/manifest-convex-react";
 import { useActionPrompt } from "../../ui/action-prompt";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatDate, formatMoney } from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
+import {
+  EmptyState,
+  PageHeader,
+  StatusChip,
+  TableSkeleton,
+} from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientDuplicateReview } from "./ClientDuplicateReview";
@@ -25,7 +32,21 @@ function optional(value: string): string | undefined {
   return trimmed || undefined;
 }
 
+/** Per-client booking rollup derived from the events the page already loads. */
+interface ClientEventStats {
+  upcoming: number;
+  lastPastAt: number;
+  lifetimeValue: number;
+}
+
+const EMPTY_STATS: ClientEventStats = {
+  upcoming: 0,
+  lastPastAt: 0,
+  lifetimeValue: 0,
+};
+
 export function ClientsPage() {
+  const navigate = useNavigate();
   const clients = useListClient();
   const contacts = useListClientContact();
   const events = useListEvent();
@@ -34,6 +55,7 @@ export function ClientsPage() {
   const createClientMerge = useCreateClientMerge();
   const [showRegister, setShowRegister] = useState(false);
   const [showArchived, setShowArchived] = useState(false);
+  const [showDuplicates, setShowDuplicates] = useState(false);
   const [clientType, setClientType] = useState<"company" | "person">("company");
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
@@ -47,13 +69,48 @@ export function ClientsPage() {
   const registered = (clients ?? []).filter(
     (row) => row.deletedAt == null && row.registeredAt != null,
   );
-  const visible = showArchived
-    ? registered
-    : registered.filter((row) => String(row.status) !== "archived");
   const duplicateCandidates = useMemo(
     () => findProbableClientDuplicates(clients ?? []),
     [clients],
   );
+
+  const statsByClient = useMemo(() => {
+    const now = Date.now();
+    const map = new Map<string, ClientEventStats>();
+    for (const row of events ?? []) {
+      if (row.deletedAt != null) continue;
+      const clientId = String(row.clientId);
+      const stats = map.get(clientId) ?? { ...EMPTY_STATS };
+      if (String(row.stage) !== "cancelled") {
+        stats.lifetimeValue += Number(row.quotedPrice ?? 0);
+      }
+      const startsAt = Number(row.startsAt ?? 0);
+      if (startsAt > now) {
+        stats.upcoming += 1;
+      } else if (startsAt > 0) {
+        stats.lastPastAt = Math.max(stats.lastPastAt, startsAt);
+      }
+      map.set(clientId, stats);
+    }
+    return map;
+  }, [events]);
+
+  const visible = useMemo(() => {
+    const list = showArchived
+      ? registered
+      : registered.filter((row) => String(row.status) !== "archived");
+    return [...list].sort((a, b) => {
+      const aStats = statsByClient.get(String(a._id)) ?? EMPTY_STATS;
+      const bStats = statsByClient.get(String(b._id)) ?? EMPTY_STATS;
+      if (bStats.upcoming !== aStats.upcoming)
+        return bStats.upcoming - aStats.upcoming;
+      if (bStats.lifetimeValue !== aStats.lifetimeValue)
+        return bStats.lifetimeValue - aStats.lifetimeValue;
+      return clientDisplayName(a._id, [a]).localeCompare(
+        clientDisplayName(b._id, [b]),
+      );
+    });
+  }, [registered, showArchived, statsByClient]);
 
   const reviewCandidate = (candidate: ClientDuplicateCandidate) => {
     setSelectedCandidateId(candidate.id);
@@ -109,7 +166,7 @@ export function ClientsPage() {
     void (async () => {
       const confirmed = await prompt.askConfirm({
         title: "Merge duplicate client?",
-        description: `${clientDisplayName(duplicate._id, [duplicate])}'s events, contacts, communication, commercial, and billing history will move to ${clientDisplayName(primary._id, [primary])}. The duplicate account will be soft-deleted.`,
+        description: `Everything on ${clientDisplayName(duplicate._id, [duplicate])} — events, contacts, conversations, and billing — will move to ${clientDisplayName(primary._id, [primary])}. The duplicate goes away.`,
         confirmLabel: "Merge client",
         tone: "danger",
       });
@@ -126,7 +183,7 @@ export function ClientsPage() {
         setSelectedCandidateId(null);
         setPrimaryClientId(null);
         setNotice(
-          "Duplicate merged. Events and communication history now appear on the primary client.",
+          "Duplicates merged. Their events and conversation history now live on the client you kept.",
         );
       } catch (error) {
         setFailure(error);
@@ -163,8 +220,8 @@ export function ClientsPage() {
         setClientType("company");
         setNotice(
           created?.docId
-            ? "Client registered. Open the account to add contacts or draft a proposal."
-            : "Client registered.",
+            ? "Client added. Open them to add contacts or start a proposal."
+            : "Client added.",
         );
       } catch (error) {
         setFailure(error);
@@ -174,50 +231,66 @@ export function ClientsPage() {
     })();
   };
 
+  const dataLoaded =
+    clients !== undefined &&
+    contacts !== undefined &&
+    events !== undefined &&
+    communications !== undefined;
+
   return (
-    <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Clients · Accounts</p>
-          <h1 className="display-title mt-2">Client accounts</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Register a client, manage contacts, then draft proposals and
-            contracts. Event creation after proposal acceptance stays a separate
-            Events step.
-          </p>
-        </div>
-        <div className="supply-row-actions">
+    <div className="space-y-4">
+      <PageHeader
+        title="Clients"
+        lead="Everyone you cook for — who they are, what's coming up, and what they're worth."
+        actions={[
           <button
+            key="archived"
             className="btn btn-ghost"
             type="button"
             onClick={() => setShowArchived((value) => !value)}
           >
             {showArchived ? "Hide archived" : "Show archived"}
-          </button>
+          </button>,
           <button
+            key="add"
             className="btn btn-primary"
             type="button"
             onClick={() => setShowRegister((value) => !value)}
           >
-            {showRegister ? "Close form" : "Register client"}
-          </button>
-        </div>
-      </header>
+            {showRegister ? "Close" : "Add client"}
+          </button>,
+        ]}
+      />
       <ClientsWorkspaceNav />
       {host}
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="text-[13px] text-ink-2" role="status">
           {notice}
         </p>
+      ) : null}
+      {dataLoaded && duplicateCandidates.length > 0 ? (
+        <div className="flex items-center gap-2 text-[12px] text-ink-2">
+          <span className="chip border-warn/30 bg-warn-soft text-warn">
+            {duplicateCandidates.length} possible duplicate
+            {duplicateCandidates.length === 1 ? "" : "s"}
+          </span>
+          <button
+            className="text-link cursor-pointer"
+            type="button"
+            onClick={() => setShowDuplicates((value) => !value)}
+          >
+            {showDuplicates ? "Hide" : "Review"}
+          </button>
+        </div>
       ) : null}
 
       {showRegister ? (
         <form className="supply-form" onSubmit={submitRegister}>
           <div className="supply-form-heading">
             <div>
-              <p className="eyebrow">Register</p>
-              <h2>New client</h2>
+              <p className="eyebrow">New</p>
+              <h2>Add a client</h2>
             </div>
           </div>
           <label>
@@ -241,11 +314,11 @@ export function ClientsPage() {
           ) : (
             <>
               <label>
-                Given name
+                First name
                 <input name="givenName" required />
               </label>
               <label>
-                Family name
+                Last name
                 <input name="familyName" />
               </label>
             </>
@@ -276,15 +349,12 @@ export function ClientsPage() {
             <textarea name="notes" rows={2} />
           </label>
           <button className="btn btn-primary" type="submit" disabled={busy}>
-            {busy ? "Registering…" : "Register client"}
+            {busy ? "Saving…" : "Save client"}
           </button>
         </form>
       ) : null}
 
-      {clients !== undefined &&
-      contacts !== undefined &&
-      events !== undefined &&
-      communications !== undefined ? (
+      {dataLoaded && showDuplicates ? (
         <ClientDuplicateReview
           candidates={duplicateCandidates}
           selectedCandidateId={selectedCandidateId}
@@ -301,53 +371,85 @@ export function ClientsPage() {
         />
       ) : null}
 
-      <section className="working-ledger">
-        <div className="ledger-heading">
-          <div>
-            <p className="eyebrow">Accounts</p>
-            <h2>Clients</h2>
-          </div>
-          <span>{visible.length} clients</span>
-        </div>
+      <div className="card overflow-x-auto">
         {clients === undefined ? (
           <TableSkeleton rows={5} />
         ) : visible.length === 0 ? (
-          <div className="document-empty">
-            <p>No client accounts yet.</p>
-            <span>Register a client to start proposals and contracts.</span>
-          </div>
+          <EmptyState
+            title="No clients yet"
+            hint="Add your first client to start sending proposals."
+            action={
+              <button
+                className="btn btn-primary"
+                type="button"
+                onClick={() => setShowRegister(true)}
+              >
+                Add client
+              </button>
+            }
+          />
         ) : (
-          <table className="data-table">
+          <table className="w-full">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Status</th>
-                <th>Terms</th>
+                <th className="th w-full">Client</th>
+                <th className="th">Contact</th>
+                <th className="th text-right">Upcoming</th>
+                <th className="th">Last event</th>
+                <th className="th text-right">Lifetime value</th>
+                <th className="th">Status</th>
+                <th className="th">Terms</th>
               </tr>
             </thead>
             <tbody>
-              {visible.map((row) => (
-                <tr key={row._id}>
-                  <td>
-                    <Link
-                      className="text-link"
-                      to={CLIENTS_ROUTES.detail(row._id)}
-                    >
-                      {clientDisplayName(row._id, clients)}
-                    </Link>
-                  </td>
-                  <td>{String(row.clientType)}</td>
-                  <td>
-                    <StatusChip status={String(row.status)} />
-                  </td>
-                  <td>{Number(row.paymentTermsDays ?? 30)} days</td>
-                </tr>
-              ))}
+              {visible.map((row) => {
+                const stats = statsByClient.get(String(row._id)) ?? EMPTY_STATS;
+                const contactLine = [row.email, row.phone]
+                  .filter(Boolean)
+                  .join(" · ");
+                return (
+                  <tr
+                    key={row._id}
+                    onClick={() => navigate(CLIENTS_ROUTES.detail(row._id))}
+                    className="cursor-pointer transition-colors hover:bg-inset/60"
+                  >
+                    <td className="td w-full max-w-0 truncate">
+                      <span className="font-medium">
+                        {clientDisplayName(row._id, clients)}
+                      </span>
+                      <span className="ml-2 text-[12px] text-ink-3">
+                        {formatStatusLabel(String(row.clientType))}
+                      </span>
+                    </td>
+                    <td className="td text-[12px] text-ink-3">
+                      {contactLine || "—"}
+                    </td>
+                    <td className="td text-right font-mono">
+                      {stats.upcoming > 0 ? stats.upcoming : "—"}
+                    </td>
+                    <td className="td font-mono text-[12px]">
+                      {stats.lastPastAt > 0
+                        ? formatDate(stats.lastPastAt)
+                        : "—"}
+                    </td>
+                    <td className="td text-right font-mono">
+                      {stats.lifetimeValue > 0
+                        ? formatMoney(stats.lifetimeValue)
+                        : "—"}
+                    </td>
+                    <td className="td">
+                      <StatusChip status={String(row.status)} />
+                    </td>
+                    <td className="td text-[12px] text-ink-2">
+                      {Number(row.paymentTermsDays ?? 30)} days
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
-      </section>
+      </div>
     </div>
   );
 }

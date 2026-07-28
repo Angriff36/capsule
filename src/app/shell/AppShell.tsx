@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Outlet } from "react-router-dom";
+import { PageGuide } from "../guide/PageGuide";
 import { WifiOffIcon } from "../../ui/icons";
 import { AnnouncementBanner } from "../../features/announcements/AnnouncementBanner";
 import { CommandPalette } from "./CommandPalette";
@@ -80,6 +81,7 @@ export function AppShell() {
         <AnnouncementBanner />
         <main className="app-canvas min-h-0 flex-1 overflow-y-auto">
           <div className="workspace-sheet mx-auto max-w-[1440px] px-12 py-11 max-xl:px-8 max-md:px-5 max-md:py-7">
+            <PageGuide />
             <Outlet />
           </div>
         </main>

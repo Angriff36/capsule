@@ -142,7 +142,7 @@ export function PackListsPage() {
         <form className="supply-form" onSubmit={submitCreate}>
           <div className="supply-form-heading">
             <div>
-              <p className="eyebrow">New governed pack list</p>
+              <p className="eyebrow">New pack list</p>
               <h2>Open a pack list</h2>
             </div>
             <button className="btn btn-primary" disabled={busy != null}>

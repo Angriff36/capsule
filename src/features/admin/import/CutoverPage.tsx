@@ -486,13 +486,13 @@ export function CutoverPage() {
 
       {/* Help text */}
       <div className="text-sm text-ink-2 space-y-1">
-        <p className="font-medium">Cutover Process (§6.6):</p>
+        <p className="font-medium">How the final switch works:</p>
         <ol className="list-decimal list-inside space-y-1">
-          <li>Run final delta import from TPP</li>
-          <li>Resolve all critical unresolved mappings (verified=false)</li>
-          <li>Document rollback plan</li>
-          <li>Get business stakeholder approval</li>
-          <li>Execute GO decision</li>
+          <li>Run one last import to catch anything new in TPP</li>
+          <li>Match up every remaining imported record</li>
+          <li>Write down the plan for switching back, just in case</li>
+          <li>Get sign-off from the business</li>
+          <li>Approve the switch</li>
           <li>Set TPP to read-only</li>
         </ol>
       </div>

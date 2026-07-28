@@ -10,7 +10,7 @@ interface QueryLoadStateProps {
 /** Shared skeleton + slow-load ErrorState for detail/list query waits. */
 export function QueryLoadState({
   title = "Still loading",
-  detail = "The workspace has not returned this record yet. Check the session or backend connection, then retry.",
+  detail = "This is taking longer than it should. Check your internet connection, then try again.",
   loadingTooLong,
   onRetry = () => window.location.reload(),
 }: QueryLoadStateProps) {

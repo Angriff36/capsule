@@ -362,8 +362,8 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
 
       {canRevise ? null : (
         <p className="mt-3 text-[12.5px] text-ink-3">
-          Core planning revisions are disabled while the event is past planning.
-          Headcount stays editable only where the lifecycle still allows it.
+          Core planning details lock once the event moves past planning.
+          Headcount can still be changed until the event is underway.
         </p>
       )}
     </EventTabPanel>

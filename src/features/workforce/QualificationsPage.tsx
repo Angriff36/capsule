@@ -136,7 +136,7 @@ export function QualificationsPage() {
         <form className="supply-form" onSubmit={submitGrant}>
           <div className="supply-form-heading">
             <div>
-              <p className="eyebrow">New governed qualification</p>
+              <p className="eyebrow">New qualification</p>
               <h2>Grant a qualification</h2>
             </div>
             <button className="btn btn-primary" disabled={busy != null}>

@@ -159,11 +159,10 @@ export function EventCostSummaryReport({
           <div>
             <p>Method</p>
             <span>
-              Revenue totals event-linked invoices and excludes deleted, voided,
-              and written-off records. Costs use the governed closeout snapshot;
-              equipment/vendor hire and miscellaneous/waste retain the current
-              closeout bucket meanings until dedicated checkout and expense
-              ledgers ship.
+              Revenue adds up this event's invoices, leaving out any that were
+              deleted, voided, or written off. Costs come from the closeout you
+              recorded for the event; equipment/vendor hire and
+              miscellaneous/waste follow the closeout categories.
             </span>
           </div>
           <div>

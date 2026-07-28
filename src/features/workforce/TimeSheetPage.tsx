@@ -124,8 +124,8 @@ export function TimeSheetPage() {
           <p className="eyebrow">Staff · Time</p>
           <h1 className="display-title mt-2">Time sheet & availability</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Clock time against governed records with explicit correction
-            provenance, and keep availability as a declared/withdrawn ledger.
+            Clock your team in and out, fix mistakes with a note about why, and
+            keep everyone's availability up to date.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -154,7 +154,7 @@ export function TimeSheetPage() {
         <form className="supply-form" onSubmit={submitClockIn}>
           <div className="supply-form-heading">
             <div>
-              <p className="eyebrow">New governed time record</p>
+              <p className="eyebrow">New time entry</p>
               <h2>Clock in</h2>
             </div>
             <button className="btn btn-primary" disabled={busy != null}>
@@ -250,7 +250,7 @@ export function TimeSheetPage() {
         ) : activeRecords.length === 0 ? (
           <div className="document-empty">
             <p>No time has been recorded.</p>
-            <span>Clock a person in to open a governed time record.</span>
+            <span>Clock someone in to start their first time entry.</span>
           </div>
         ) : (
           <div className="supply-table-wrap">

@@ -132,8 +132,8 @@ export function DemandLedgerPage() {
           <p className="eyebrow">Inventory · Demand ledger</p>
           <h1 className="display-title mt-2">What service requires</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Event-scoped ingredient requirements with visible provenance and
-            governed handoff into purchasing.
+            What each event needs, ingredient by ingredient — where each amount
+            came from, and a clean handoff into purchasing.
           </p>
         </div>
         <div className="supply-masthead-actions">
@@ -193,7 +193,7 @@ export function DemandLedgerPage() {
         <form className="supply-form" onSubmit={submitDemand}>
           <div className="supply-form-heading">
             <div>
-              <p className="eyebrow">New governed requirement</p>
+              <p className="eyebrow">New requirement</p>
               <h2>Calculate demand</h2>
             </div>
             <button className="btn btn-primary" disabled={busy != null}>
@@ -256,7 +256,7 @@ export function DemandLedgerPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <p className="eyebrow">Demand provenance</p>
+            <p className="eyebrow">Where each amount comes from</p>
             <h2>Event requirements</h2>
           </div>
           <span>{activeDemands.length} lines</span>

@@ -16,7 +16,15 @@ import {
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { useTrackRecent } from "../../lib/recents";
-import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
+import { formatDate } from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
+import {
+  ErrorState,
+  PageHeader,
+  Section,
+  StatusChip,
+  TableSkeleton,
+} from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
 import { FINANCE_ROUTES } from "../finance/financeRoutes";
 import { ClientCommunicationPanel } from "./ClientCommunicationPanel";
@@ -73,7 +81,7 @@ export function ClientDetailPage() {
     invoices === undefined
   ) {
     return (
-      <div className="operations-stage supply-stage">
+      <div className="space-y-4">
         <ClientsWorkspaceNav />
         <TableSkeleton rows={6} />
       </div>
@@ -189,90 +197,118 @@ export function ClientDetailPage() {
   };
 
   const name = clientDisplayName(client._id, [client]);
+  const profileLine = [
+    formatStatusLabel(String(client.clientType)),
+    client.email,
+    client.phone,
+    client.website,
+    `Net ${Number(client.paymentTermsDays ?? 30)} terms`,
+    client.registeredAt != null
+      ? `Client since ${formatDate(Number(client.registeredAt))}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join(" · ");
 
   return (
-    <div className="operations-stage supply-stage">
-      <header className="supply-masthead">
-        <div>
-          <p className="eyebrow">Clients · Account</p>
-          <h1 className="display-title mt-2">{name}</h1>
-          <p className="mt-3 max-w-160 text-ink-2">
-            Contacts, proposals, and contracts for this account. After accepting
-            a proposal, create or link the Event from Events — acceptance does
-            not mint one automatically.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
+    <div className="space-y-4">
+      <PageHeader
+        title={
+          <span className="inline-flex flex-wrap items-center gap-2">
+            {name}
             <StatusChip status={String(client.status)} />
-            <Link className="text-link text-[13px]" to={CLIENTS_ROUTES.root}>
-              ← All clients
+          </span>
+        }
+        lead={
+          <span className="text-[13px]">
+            {profileLine}
+            {" · "}
+            <Link className="text-link" to={CLIENTS_ROUTES.root}>
+              All clients
             </Link>
-          </div>
-        </div>
-        <div className="supply-row-actions">
-          {actions.map((action) => (
-            <button
-              key={action.key}
+          </span>
+        }
+        actions={
+          <>
+            {actions.map((action) => (
+              <button
+                key={action.key}
+                className="btn btn-ghost"
+                type="button"
+                disabled={busy != null}
+                onClick={() => invokeClient(action.key)}
+              >
+                {action.label}
+              </button>
+            ))}
+            <Link
               className="btn btn-ghost"
-              type="button"
-              disabled={busy != null}
-              onClick={() => invokeClient(action.key)}
+              to={FINANCE_ROUTES.issueInvoice({ clientId: client._id })}
             >
-              {action.label}
+              Issue invoice
+            </Link>
+            <button
+              className="btn btn-primary"
+              type="button"
+              onClick={() => setShowContact((value) => !value)}
+            >
+              {showContact ? "Close" : "Add contact"}
             </button>
-          ))}
-          <Link
-            className="btn btn-ghost"
-            to={FINANCE_ROUTES.issueInvoice({ clientId: client._id })}
-          >
-            Issue invoice
-          </Link>
-          <button
-            className="btn btn-primary"
-            type="button"
-            onClick={() => setShowContact((value) => !value)}
-          >
-            {showContact ? "Close form" : "Add contact"}
-          </button>
-        </div>
-      </header>
+          </>
+        }
+      />
       <ClientsWorkspaceNav />
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="text-[13px] text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
       {host}
 
-      <form className="supply-form" onSubmit={submitAccountContact}>
-        <div className="supply-form-heading">
-          <div>
-            <p className="eyebrow">Account</p>
-            <h2>Primary contact channels</h2>
-          </div>
-        </div>
-        <label>
-          Email
-          <input name="email" type="email" defaultValue={client.email ?? ""} />
-        </label>
-        <label>
-          Phone
-          <input name="phone" defaultValue={client.phone ?? ""} />
-        </label>
-        <label>
-          Website
-          <input name="website" defaultValue={client.website ?? ""} />
-        </label>
-        <button
-          className="btn btn-ghost"
-          type="submit"
-          disabled={
-            busy === "change-contact" || String(client.status) !== "active"
-          }
-        >
-          Save account contact
-        </button>
-      </form>
+      <Section title="Proposals & contracts" count={clientProposals.length}>
+        <p className="px-3 py-3 text-[13px] text-ink-2">
+          {clientProposals.length} proposal
+          {clientProposals.length === 1 ? "" : "s"} · {clientContracts.length}{" "}
+          contract{clientContracts.length === 1 ? "" : "s"} for this client.
+          Open{" "}
+          <Link className="text-link" to={CLIENTS_ROUTES.proposals}>
+            Proposals
+          </Link>{" "}
+          or{" "}
+          <Link className="text-link" to={CLIENTS_ROUTES.contracts}>
+            Contracts
+          </Link>{" "}
+          to send, accept, or sign.
+        </p>
+      </Section>
+
+      <Section title="Invoices" count={clientInvoices.length}>
+        {clientInvoices.length === 0 ? (
+          <p className="px-3 py-3 text-[13px] text-ink-2">
+            No invoices yet.{" "}
+            <Link
+              className="text-link"
+              to={FINANCE_ROUTES.issueInvoice({ clientId: client._id })}
+            >
+              Issue an invoice
+            </Link>{" "}
+            for this client.
+          </p>
+        ) : (
+          <p className="px-3 py-3 text-[13px] text-ink-2">
+            {clientInvoices.length} invoice
+            {clientInvoices.length === 1 ? "" : "s"} — see them in the{" "}
+            <Link
+              className="text-link"
+              to={`${FINANCE_ROUTES.invoices}?clientId=${encodeURIComponent(client._id)}`}
+            >
+              billing ledger
+            </Link>
+            .
+          </p>
+        )}
+      </Section>
 
       <ClientContactsPanel
         showAddForm={showContact}
@@ -298,62 +334,37 @@ export function ClientDetailPage() {
         target={{ kind: "contacts", contacts: clientContacts }}
       />
 
+      <form className="supply-form" onSubmit={submitAccountContact}>
+        <div className="supply-form-heading">
+          <div>
+            <p className="eyebrow">Profile</p>
+            <h2>Contact details</h2>
+          </div>
+        </div>
+        <label>
+          Email
+          <input name="email" type="email" defaultValue={client.email ?? ""} />
+        </label>
+        <label>
+          Phone
+          <input name="phone" defaultValue={client.phone ?? ""} />
+        </label>
+        <label>
+          Website
+          <input name="website" defaultValue={client.website ?? ""} />
+        </label>
+        <button
+          className="btn btn-ghost"
+          type="submit"
+          disabled={
+            busy === "change-contact" || String(client.status) !== "active"
+          }
+        >
+          Save contact details
+        </button>
+      </form>
+
       <AttachmentsSection parentType="client" parentId={client._id} />
-
-      <section className="working-ledger">
-        <div className="ledger-heading">
-          <div>
-            <p className="eyebrow">Pipeline</p>
-            <h2>Proposals & contracts</h2>
-          </div>
-        </div>
-        <p className="text-[13px] text-ink-2">
-          {clientProposals.length} proposals · {clientContracts.length}{" "}
-          contracts — manage lifecycle on{" "}
-          <Link className="text-link" to={CLIENTS_ROUTES.proposals}>
-            Proposals
-          </Link>{" "}
-          /{" "}
-          <Link className="text-link" to={CLIENTS_ROUTES.contracts}>
-            Contracts
-          </Link>
-          .
-        </p>
-      </section>
-
-      <section className="working-ledger">
-        <div className="ledger-heading">
-          <div>
-            <p className="eyebrow">Billing</p>
-            <h2>Invoices</h2>
-          </div>
-          <span>{clientInvoices.length}</span>
-        </div>
-        {clientInvoices.length === 0 ? (
-          <p className="text-[13px] text-ink-2">
-            No invoices yet.{" "}
-            <Link
-              className="text-link"
-              to={FINANCE_ROUTES.issueInvoice({ clientId: client._id })}
-            >
-              Issue an invoice
-            </Link>{" "}
-            for this account.
-          </p>
-        ) : (
-          <p className="text-[13px] text-ink-2">
-            {clientInvoices.length} invoice
-            {clientInvoices.length === 1 ? "" : "s"} — open the{" "}
-            <Link
-              className="text-link"
-              to={`${FINANCE_ROUTES.invoices}?clientId=${encodeURIComponent(client._id)}`}
-            >
-              finance ledger
-            </Link>{" "}
-            filtered to this client.
-          </p>
-        )}
-      </section>
     </div>
   );
 }

@@ -149,7 +149,7 @@ export function VendorOrderPage() {
       (candidate) => candidate._id === String(data.get("purchaseNeedId")),
     );
     if (!need) {
-      setFailure(new Error("Select an open PurchaseNeed."));
+      setFailure(new Error("Choose an open purchase need first."));
       return;
     }
     void run("create-line", async () => {
@@ -300,18 +300,17 @@ export function VendorOrderPage() {
         <div className="order-state">
           <StatusChip status={String(order.status)} />
           <strong>{formatMoneyExact(Number(order.totalAmount))}</strong>
-          <span>Projected number precision</span>
+          <span>Order total</span>
         </div>
       </header>
       <InventoryWorkspaceNav />
       <aside className="supply-degraded" role="note">
         <strong>
-          Receipt is a governed fact, not an automatic stock update
+          Marking an order received does not update your stock counts
         </strong>
         <span>
-          Receiving does not automatically update stock while that reaction is
-          unverified. Record the receipt here, then use the Stock book’s
-          generated receive command when inventory physically changes.
+          Record the receipt here, then log the delivery in the Stock book once
+          the goods are physically put away.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -490,7 +489,8 @@ export function VendorOrderPage() {
           <div className="document-empty">
             <p>No lines have been added.</p>
             <span>
-              Choose an open PurchaseNeed to preserve demand provenance.
+              Choose an open purchase need so the order stays tied to the event
+              that created it.
             </span>
           </div>
         ) : (
@@ -519,7 +519,7 @@ export function VendorOrderPage() {
                       <span>
                         {lineNeeds.length
                           ? `${lineNeeds.length} contributing purchase need${lineNeeds.length === 1 ? "" : "s"}`
-                          : "No PurchaseNeed link"}
+                          : "Not tied to a purchase need"}
                       </span>
                       {lineNeeds.map((need) => (
                         <small key={need._id}>

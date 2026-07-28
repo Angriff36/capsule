@@ -298,8 +298,8 @@ export function ProposalCreateForm({
           <h2>{fromEvent ? "Proposal from event" : "New proposal"}</h2>
           {fromEvent ? (
             <p className="text-[13px] text-ink-2">
-              Linked to "{fromEvent.title}". Client is locked to that event's
-              client; the proposal belongs to this event (spec §5.3).
+              Linked to "{fromEvent.title}" — this proposal belongs to that
+              event and its client.
             </p>
           ) : null}
         </div>
@@ -386,10 +386,10 @@ export function ProposalCreateForm({
             />
           </label>
           <div className="mt-1">
-            <p className="eyebrow">Pricing lines (spec §5.4)</p>
+            <p className="eyebrow">Pricing</p>
             <p className="text-[12px] text-ink-2">
-              Per person / per unit / flat / percentage / package. Subtotal and
-              total are computed by the shared pricing engine.
+              Price per person, per unit, flat, percentage, or as a package. The
+              subtotal and total update as you add lines.
             </p>
             {draftLines.length === 0 ? (
               <p className="mt-2 text-[13px] text-ink-2">
@@ -531,7 +531,7 @@ export function ProposalCreateForm({
                             <td colSpan={8}>
                               <label className="flex items-center gap-2">
                                 <span className="field-label">
-                                  Override reason (spec §5.4)
+                                  Why the price changed
                                 </span>
                                 <input
                                   className="input flex-1"

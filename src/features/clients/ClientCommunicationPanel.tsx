@@ -289,7 +289,7 @@ export function ClientCommunicationPanelView({
           </div>
         ) : communications.length === 0 ? (
           <EmptyState
-            title="No conversations recorded"
+            title="No conversations yet"
             hint="Add the first call, email, or meeting note for this client."
           />
         ) : (

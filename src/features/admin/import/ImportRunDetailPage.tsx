@@ -534,22 +534,22 @@ export function ImportRunDetailPage() {
               }
             />
             <p className="text-xs text-ink-2 mt-2">
-              Paste TPP {commitNoun} rows. Each is parsed, created as a{" "}
+              Paste {commitNoun} rows from TPP. Each one is read, created as a{" "}
               {commitNoun === "contact"
                 ? "Client account"
                 : commitNoun === "event"
-                  ? "Event (client/venue resolved from prior imports)"
+                  ? "Event (its client and venue are found from earlier imports)"
                   : commitNoun === "lead"
-                    ? "Lead (pre-client inquiry; client linked later on conversion)"
+                    ? "Lead (an inquiry — it links to a client if it converts)"
                     : commitNoun === "payment"
-                      ? "reconciliation-reference link staged in the queue (no Payment entity; matched to a Capsule payment later via markMatched — spec §6.4)"
+                      ? "payment reference in the matching queue (it gets matched to a Capsule payment later)"
                       : commitNoun === "menu"
-                        ? "Dish (menu catalog item; requires kitchenAccess; price preserved on the link — Dish has no price field)"
+                        ? "Dish in your menu catalog (needs kitchen access; the old price is kept with the import details)"
                         : commitNoun === "pack list"
-                          ? "PackList + PackListItems (source event resolved from a prior events import; unrecognized items land as free-text lines — spec §6.3)"
+                          ? "pack list with its items (tied to the event from an earlier import; unrecognized items come in as plain text lines)"
                           : "Venue"}
-              , and linked to this run. Re-running is safe (already-linked rows
-              are skipped).
+              , and tied to this import. Running it again is safe (rows already
+              brought in are skipped).
             </p>
             <div className="mt-4 flex gap-3">
               <button
@@ -744,40 +744,33 @@ export function ImportRunDetailPage() {
           </h2>
         </div>
         <div className="p-4">
-          <h3 className="font-medium text-sm mb-2">Stage Transitions</h3>
+          <h3 className="font-medium text-sm mb-2">Moving an import forward</h3>
           <ul className="text-sm text-ink-2 space-y-1">
             <li>
-              • <strong>Record Parse</strong>: After parsing source data, enter
-              record counts to move to validating
+              • <strong>Record Parse</strong>: After the file is read, enter how
+              many rows were found to move on to checking
             </li>
             <li>
-              • <strong>Validate</strong>: Mark parsed data as validated and
-              move to review
+              • <strong>Validate</strong>: Mark the data as checked and move to
+              review
             </li>
             <li>
-              • <strong>Begin Review</strong>: Start the review phase for manual
-              verification
+              • <strong>Begin Review</strong>: Look the data over yourself
+              before it's saved
             </li>
             <li>
-              • <strong>Approve &amp; Commit</strong>: Finalize record counts,
-              then paste source rows to materialize entities (venues → Venue,
-              contacts → Client account, events → Event with client/venue
-              resolved from prior imports, leads → Lead pre-client inquiry,
-              payments → reconciliation-reference links staged in the queue for
-              matching to a Capsule payment, menus → Dish catalog items with
-              price preserved on the link, pack lists → PackList + PackListItems
-              with the source event resolved from a prior events import) and
-              link them to this run
-              (venues/contacts/events/leads/payments/menus/pack lists datasets
-              only)
+              • <strong>Approve &amp; Commit</strong>: Confirm the counts, then
+              paste rows from your old system to create the real records —
+              venues, client accounts, events, leads, payment references, menu
+              dishes, and pack lists — all tied to this import
             </li>
             <li>
               • <strong>Fail</strong>: Mark the import as failed (requires
               failure details)
             </li>
             <li>
-              • <strong>Revert</strong>: Supersede the links created by a
-              completed import (venues are left for operator deactivation)
+              • <strong>Revert</strong>: Undo what a finished import brought in
+              (venues stay — deactivate them yourself if needed)
             </li>
           </ul>
         </div>

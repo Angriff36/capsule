@@ -169,8 +169,8 @@ export function ReportsPage() {
         <div>
           <h1 className="display-title">Saved reports</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Governed report definitions you can save, rename, share, archive,
-            and restore. Chart result rendering is not part of this slice.
+            Report setups you can save, rename, share, archive, and restore. A
+            saved report keeps your settings — it doesn't draw the chart yet.
           </p>
         </div>
         <div className="supply-row-actions">

@@ -142,12 +142,12 @@ export function ImportRunsListPage() {
     <div className="operations-stage supply-stage">
       <header className="supply-masthead">
         <div>
-          <p className="eyebrow">Import · Framework</p>
+          <p className="eyebrow">Import</p>
           <h1 className="display-title mt-2">Import Runs</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Manage data import runs from external systems (TPP Legacy, CSV
-            Export, API Sync). Track import status, review records, and commit
-            data.
+            Bring data over from your old systems (TPP, CSV files, connected
+            apps). Follow each import's progress, review what came in, and save
+            it when it looks right.
           </p>
         </div>
         <div className="flex gap-3">
@@ -464,26 +464,29 @@ export function ImportRunsListPage() {
           </h2>
         </div>
         <div className="p-4">
-          <h3 className="font-medium text-sm mb-2">Lifecycle Stages</h3>
+          <h3 className="font-medium text-sm mb-2">
+            How an import moves along
+          </h3>
           <ol className="text-sm text-ink-2 space-y-1 list-decimal list-inside">
             <li>
-              <strong>Started</strong>: Import run initialized, ready for
-              parsing
+              <strong>Started</strong>: The import is set up and ready to read
+              your file
             </li>
             <li>
-              <strong>Parsing</strong>: Source data is being parsed and
-              transformed
+              <strong>Parsing</strong>: Capsule is reading your file and getting
+              it into shape
             </li>
             <li>
-              <strong>Validating</strong>: Parsed data is being validated
-              against schema rules
+              <strong>Validating</strong>: Capsule is checking the data for
+              problems
             </li>
             <li>
-              <strong>Reviewing</strong>: Data is ready for review before commit
+              <strong>Reviewing</strong>: The data is ready for you to look over
+              before it's saved
             </li>
             <li>
-              <strong>Committing</strong>: Validated data is being committed to
-              the database
+              <strong>Committing</strong>: The checked data is being saved into
+              Capsule
             </li>
             <li>
               <strong>Completed</strong>: Import finished successfully (can be
@@ -493,8 +496,7 @@ export function ImportRunsListPage() {
               <strong>Failed</strong>: Import failed with error details
             </li>
             <li>
-              <strong>Reverted</strong>: Previously completed import was rolled
-              back
+              <strong>Reverted</strong>: A finished import was undone
             </li>
           </ol>
           <h3 className="font-medium text-sm mb-2 mt-4">Actions</h3>

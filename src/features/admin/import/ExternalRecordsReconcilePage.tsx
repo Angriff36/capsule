@@ -213,11 +213,12 @@ export function ExternalRecordsReconcilePage() {
     <div className="operations-stage supply-stage">
       <header className="supply-masthead">
         <div>
-          <p className="eyebrow">Import · Reconciliation</p>
-          <h1 className="display-title mt-2">External Record Links</h1>
+          <p className="eyebrow">Import · Matching</p>
+          <h1 className="display-title mt-2">Imported records to match up</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Review and resolve external system records mapped to Capsule
-            entities. Imported records awaiting reconciliation appear here.
+            Check what came over from your old system and confirm each record
+            matches the right thing in Capsule. Anything still waiting shows
+            here.
           </p>
         </div>
       </header>
@@ -225,7 +226,7 @@ export function ExternalRecordsReconcilePage() {
       <AdminWorkspaceNav />
 
       {error ? (
-        <ErrorState title="Reconciliation failed" detail={error} />
+        <ErrorState title="Couldn't finish matching" detail={error} />
       ) : null}
 
       {notice ? (
@@ -252,7 +253,7 @@ export function ExternalRecordsReconcilePage() {
               htmlFor="source-system-filter"
               className="block text-sm font-medium text-ink-2 mb-1"
             >
-              Source System
+              Old system
             </label>
             <select
               id="source-system-filter"
@@ -271,7 +272,7 @@ export function ExternalRecordsReconcilePage() {
 
           <div className="ml-auto">
             <p className="text-sm text-ink-2">
-              {filteredRecords.length} record(s) awaiting reconciliation
+              {filteredRecords.length} waiting to be matched
             </p>
           </div>
         </div>
@@ -324,18 +325,18 @@ export function ExternalRecordsReconcilePage() {
                     className="w-4 h-4"
                   />
                 </th>
+                <th className="text-left py-3 px-4 font-medium">Old system</th>
+                <th className="text-left py-3 px-4 font-medium">Type</th>
                 <th className="text-left py-3 px-4 font-medium">
-                  Source System
+                  Reference in the old system
                 </th>
-                <th className="text-left py-3 px-4 font-medium">Record Type</th>
-                <th className="text-left py-3 px-4 font-medium">External ID</th>
                 <th className="text-left py-3 px-4 font-medium">
-                  Capsule Entity
+                  In Capsule as
                 </th>
-                <th className="text-left py-3 px-4 font-medium">Capsule ID</th>
                 <th className="text-left py-3 px-4 font-medium">
-                  Conflict Status
+                  Capsule record
                 </th>
+                <th className="text-left py-3 px-4 font-medium">Status</th>
                 <th className="text-left py-3 px-4 font-medium">Created</th>
                 <th className="text-left py-3 px-4 font-medium">Actions</th>
               </tr>
@@ -344,7 +345,7 @@ export function ExternalRecordsReconcilePage() {
               {filteredRecords.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="text-center py-8 text-ink-2">
-                    No records awaiting reconciliation. Great job!
+                    Everything has been matched up. Great job!
                   </td>
                 </tr>
               ) : (
@@ -378,7 +379,9 @@ export function ExternalRecordsReconcilePage() {
                     </td>
                     <td className="py-3 px-4 font-mono text-xs">
                       {record.capsuleId || (
-                        <span className="text-ink-3 italic">Unlinked</span>
+                        <span className="text-ink-3 italic">
+                          Not linked yet
+                        </span>
                       )}
                     </td>
                     <td className="py-3 px-4">
@@ -476,7 +479,7 @@ export function ExternalRecordsReconcilePage() {
       <div className="card mt-4">
         <div className="border-b border-line px-3">
           <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
-            Reconciliation Workflow
+            How matching works
           </h2>
         </div>
         <div className="p-4">
@@ -484,11 +487,11 @@ export function ExternalRecordsReconcilePage() {
           <ul className="text-sm text-ink-2 space-y-1">
             <li>
               • <strong>Match</strong>: Link an imported payment reference to an
-              existing Capsule payment, then mark it resolved (spec §6.4).
+              existing Capsule payment, then mark it resolved.
             </li>
             <li>
-              • <strong>Verify</strong>: Confirm a mapping is correct; the
-              record is marked verified and resolved and leaves this queue.
+              • <strong>Verify</strong>: Confirm a match is correct; the record
+              is marked done and leaves this list.
             </li>
             <li>
               • <strong>Skip</strong>: Mark as resolved with a note. Use this
@@ -499,12 +502,12 @@ export function ExternalRecordsReconcilePage() {
           <h3 className="font-medium text-sm mb-2 mt-4">Status Guide</h3>
           <ul className="text-sm text-ink-2 space-y-1">
             <li>
-              • Records with <strong>Conflict</strong> status require resolution
-              before they leave this queue.
+              • Records marked <strong>Conflict</strong> need to be sorted out
+              before they leave this list.
             </li>
             <li>
-              • Filter by source system to focus on specific imports (TPP
-              Legacy, QuickBooks, etc.).
+              • Filter by old system to focus on specific imports (TPP,
+              QuickBooks, etc.).
             </li>
             <li>
               • Select multiple records to perform bulk Verify / Skip actions.

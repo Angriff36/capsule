@@ -74,7 +74,7 @@ export function WasteRecordForm({ onClose }: { onClose: () => void }) {
     <form className="supply-form" onSubmit={submit} data-testid="waste-form">
       <div className="supply-form-heading">
         <div>
-          <p className="eyebrow">Governed inventory command</p>
+          <p className="eyebrow">Inventory</p>
           <h2>Record waste</h2>
         </div>
         <div className="supply-row-actions">

@@ -372,10 +372,9 @@ export function StockBookPage() {
       <aside className="supply-degraded" role="note">
         <strong>Live stock facts</strong>
         <span>
-          Quantities use the current number projection; search and exact decimal
-          precision remain degraded. Available stock is on hand minus active
-          reservations — PAR alerts and suggested purchase quantities derive
-          from those live totals.
+          Available stock is what's on hand minus what's reserved for events —
+          low-stock alerts and suggested purchase quantities come from those
+          live totals. Search and exact decimals can be slightly imprecise.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -670,7 +669,10 @@ export function StockBookPage() {
         ) : activeReservations.length === 0 ? (
           <div className="document-empty">
             <p>No stock is reserved.</p>
-            <span>Reservations retain event and stock-line provenance.</span>
+            <span>
+              Reserve stock for an event and it will show here, linked to that
+              event.
+            </span>
           </div>
         ) : (
           <div className="supply-table-wrap">
@@ -824,7 +826,7 @@ function SupplyStockForm({
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
         <div>
-          <p className="eyebrow">Governed inventory command</p>
+          <p className="eyebrow">Inventory</p>
           <h2>
             {kind === "location"
               ? "Register storage"

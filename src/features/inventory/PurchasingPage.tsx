@@ -385,9 +385,9 @@ export function PurchasingPage() {
       <aside className="supply-degraded" role="note">
         <strong>Automatic weekly draft</strong>
         <span>
-          Add dishes, set headcount, approve the event — Manifest consolidates
-          ingredient shortages into one DRAFT VendorOrder for the purchasing
-          week. Approval never auto-submits.
+          Add dishes, set headcount, approve the event — Capsule rolls the
+          ingredient shortages into one draft vendor order for the week. Nothing
+          is sent to a vendor until you submit it.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}

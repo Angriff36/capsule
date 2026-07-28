@@ -204,12 +204,12 @@ export function ProposalTemplatesPage() {
     <div className="operations-stage">
       <header className="training-masthead">
         <div>
-          <p className="eyebrow">Sales · Proposal Templates</p>
-          <h1 className="display-title mt-2">Reusable proposal templates.</h1>
+          <p className="eyebrow">Clients · Proposal templates</p>
+          <h1 className="display-title mt-2">Proposal templates</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Define proposal templates with default terms, section visibility,
-            and pricing preferences. Templates help maintain consistency and
-            speed up proposal creation.
+            Start new proposals from a template — your standard terms, sections,
+            and tax rates come pre-filled, so every proposal looks the same and
+            takes half the time.
           </p>
         </div>
         <div aria-label="Proposal template actions">

@@ -206,10 +206,10 @@ export function MessageInboxPage() {
       });
       setNotice(
         result.isDuplicate
-          ? "Duplicate provider message — no new record created (idempotent)."
+          ? "This message was already logged — nothing new was added."
           : result.threadCreated
-            ? "Created a new thread and ingested the message."
-            : "Ingested the inbound message into the existing thread.",
+            ? "Started a new thread and logged the message."
+            : "Logged the message in the existing thread.",
       );
       setLiMsgId("");
       setLiBody("");
@@ -321,7 +321,7 @@ export function MessageInboxPage() {
           </select>
           <input
             className="input"
-            placeholder="From (sender identity)"
+            placeholder="From (email or phone)"
             value={ntSender}
             onChange={(e) => setNtSender(e.target.value)}
           />
@@ -472,7 +472,7 @@ export function MessageInboxPage() {
                         : "Only provider threads (with a provider thread id) can ingest inbound"
                     }
                   >
-                    {showLog ? "Cancel" : "Log inbound"}
+                    {showLog ? "Cancel" : "Log incoming message"}
                   </button>
                   <button
                     type="button"
@@ -514,7 +514,7 @@ export function MessageInboxPage() {
                       />
                     </div>
                     <button type="submit" className="btn btn-primary self-end">
-                      Ingest
+                      Log message
                     </button>
                   </form>
                 ) : null}

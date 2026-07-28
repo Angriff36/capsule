@@ -97,9 +97,7 @@ export function ContractsPage() {
       });
       form.reset();
       setShowDraft(false);
-      setNotice(
-        "Contract drafted. Send it, mark viewed, then record signature.",
-      );
+      setNotice("Contract drafted. Send it to your client when it's ready.");
     });
   };
 
@@ -120,7 +118,7 @@ export function ContractsPage() {
             signedBy,
           });
           setNotice(
-            "Contract signed. Confirm the Event from Events if confirmation is still pending.",
+            "Contract signed. If the event isn't confirmed yet, confirm it on the Events page.",
           );
         });
         return;
@@ -146,7 +144,15 @@ export function ContractsPage() {
         if (key === "send") await send(args);
         if (key === "markViewed") await markViewed(args);
         if (key === "expire") await expire(args);
-        setNotice(`Contract updated (${key}).`);
+        setNotice(
+          key === "send"
+            ? "Contract sent."
+            : key === "markViewed"
+              ? "Contract marked as viewed."
+              : key === "expire"
+                ? "Contract marked as expired."
+                : "Contract updated.",
+        );
       });
     })();
   };
@@ -159,10 +165,10 @@ export function ContractsPage() {
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Clients · Contracts</p>
-          <h1 className="display-title mt-2">Client contracts</h1>
+          <h1 className="display-title mt-2">Contracts</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Draft a contract against an existing Event, send it, mark viewed,
-            then record the signature. Signing does not auto-confirm the Event.
+            Written agreements for booked events. Draft one, send it to your
+            client, and log the signature when it comes back.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -201,7 +207,7 @@ export function ContractsPage() {
           </div>
           {activeClients.length === 0 || draftableEvents.length === 0 ? (
             <p className="text-[13px] text-ink-2">
-              Need an active client and an open Event.{" "}
+              You need an active client and an open event first.{" "}
               <Link className="text-link" to={CLIENTS_ROUTES.root}>
                 Clients
               </Link>{" "}

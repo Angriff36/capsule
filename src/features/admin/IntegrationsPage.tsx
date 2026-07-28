@@ -280,8 +280,9 @@ export function IntegrationsPage() {
 
             {!connection.providerConfigured ? (
               <div className="mt-4 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-[12px] leading-relaxed text-warn">
-                Add the Google OAuth client ID, client secret, and authorized
-                redirect URI to the Convex environment before connecting.
+                Google Calendar isn't set up on the server yet. Ask your
+                technician to add the Google OAuth client ID, client secret, and
+                authorized redirect URI, then connect.
                 {connection.redirectUri ? (
                   <span className="mt-1 block font-mono">
                     {connection.redirectUri}
@@ -380,9 +381,9 @@ export function IntegrationsPage() {
 
             {!qboStatus.providerConfigured ? (
               <div className="mt-4 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-[12px] leading-relaxed text-warn">
-                Add the QuickBooks OAuth client ID, client secret, and
-                authorized redirect URI to the Convex environment before
-                connecting.
+                QuickBooks isn't set up on the server yet. Ask your technician
+                to add the QuickBooks OAuth client ID, client secret, and
+                authorized redirect URI, then connect.
                 {qboStatus.redirectUri ? (
                   <span className="mt-1 block font-mono">
                     {qboStatus.redirectUri}
@@ -482,9 +483,9 @@ export function IntegrationsPage() {
 
             {!smsStatus.providerConfigured ? (
               <div className="mt-4 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-[12px] leading-relaxed text-warn">
-                Add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and
-                TWILIO_FROM_NUMBER to the Convex environment before enabling SMS
-                alerts.
+                Text messaging isn't set up on the server yet. Ask your
+                technician to add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and
+                TWILIO_FROM_NUMBER, then enable SMS alerts.
               </div>
             ) : null}
 
