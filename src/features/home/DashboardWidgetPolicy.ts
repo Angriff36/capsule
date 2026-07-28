@@ -1,4 +1,5 @@
 import { formatDate, formatMoney } from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
 
 export const DASHBOARD_WIDGET_IDS = [
   "upcoming_events",
@@ -288,13 +289,13 @@ export class DashboardWidgetPolicy {
       ...events.map((row) => ({
         timestamp: rowTimestamp(row),
         label: row.title || "Untitled event",
-        meta: `Event · ${String(row.stage ?? "updated").replaceAll("_", " ")}`,
+        meta: `Event · ${formatStatusLabel(String(row.stage ?? "updated"))}`,
         href: `/events/${row._id}`,
       })),
       ...invoices.map((row) => ({
         timestamp: rowTimestamp(row),
         label: row.invoiceNumber || "Invoice",
-        meta: `Invoice · ${String(row.status ?? "updated").replaceAll("_", " ")}`,
+        meta: `Invoice · ${formatStatusLabel(String(row.status ?? "updated"))}`,
         href: `/finance/invoices/${row._id}`,
       })),
       ...inventory.map((row) => ({
@@ -307,7 +308,7 @@ export class DashboardWidgetPolicy {
       ...assignments.map((row) => ({
         timestamp: rowTimestamp(row),
         label: eventsById.get(String(row.eventId))?.title || "Staff assignment",
-        meta: `Staff · ${String(row.status ?? "updated").replaceAll("_", " ")}`,
+        meta: `Staff · ${formatStatusLabel(String(row.status ?? "updated"))}`,
         href: "/staff/roster",
       })),
       ...payments.map((row) => ({
