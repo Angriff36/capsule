@@ -15,7 +15,9 @@ import {
   useListVendorOrder,
   useListVendorOrderLine,
   useListVendorOrderLineDemand,
+  useCreateWeeklyPurchasingConfig,
   useListWeeklyPurchasingConfig,
+  useWeeklyPurchasingConfigConfigure,
   usePurchaseNeedCancel,
   usePurchaseNeedMarkFulfilled,
   usePurchaseNeedMarkOrdered,
@@ -60,6 +62,8 @@ export function PurchasingPage() {
   const purchasingConfigs = useListWeeklyPurchasingConfig();
   const setApprovalThreshold =
     useWeeklyPurchasingConfigSetOrderApprovalThreshold();
+  const configureWeeklyPurchasing = useWeeklyPurchasingConfigConfigure();
+  const createWeeklyPurchasingConfig = useCreateWeeklyPurchasingConfig();
   const [form, setForm] = useState<"vendor" | "order" | "contact" | null>(null);
   const [contactVendorId, setContactVendorId] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -235,6 +239,55 @@ export function PurchasingPage() {
   );
   const approvalThreshold =
     purchasingConfig?.orderApprovalThresholdAmount ?? null;
+  const defaultVendorId = purchasingConfig?.defaultVendorId ?? null;
+
+  // The PurchaseNeedOpened → routeNeed reaction can only build the weekly
+  // draft once a default vendor is configured; without this control the
+  // WeeklyPurchasingConfig.configure command had no UI caller at all.
+  const editDefaultVendor = () => {
+    void (async () => {
+      if (activeVendors.length === 0) {
+        setFailure(
+          new Error("Onboard a vendor first — the default routes to one."),
+        );
+        return;
+      }
+      const values = await prompt.askFields({
+        title: "Default purchasing vendor",
+        description:
+          "Approved-event shortages route to this vendor's weekly draft order.",
+        fields: [
+          {
+            name: "vendorId",
+            label: "Vendor",
+            required: true,
+            defaultValue: defaultVendorId ?? undefined,
+            options: activeVendors
+              .filter((vendor) => String(vendor.status) === "active")
+              .map((vendor) => ({
+                value: vendor._id,
+                label: String(vendor.name ?? vendor._id),
+              })),
+          },
+        ],
+        confirmLabel: "Set default vendor",
+      });
+      if (!values?.vendorId) return;
+      void run("default-vendor", async () => {
+        if (purchasingConfig) {
+          await configureWeeklyPurchasing({
+            docId: purchasingConfig._id,
+            version: purchasingConfig.version,
+            defaultVendorId: values.vendorId,
+          });
+        } else {
+          await createWeeklyPurchasingConfig({
+            defaultVendorId: values.vendorId,
+          });
+        }
+      });
+    })();
+  };
 
   const editApprovalThreshold = () => {
     void (async () => {
@@ -308,6 +361,15 @@ export function PurchasingPage() {
             {approvalThreshold != null
               ? `Approval threshold: $${Number(approvalThreshold).toFixed(2)}`
               : "Approval threshold: off"}
+          </button>
+          <button
+            className="btn btn-ghost"
+            disabled={busy != null}
+            onClick={editDefaultVendor}
+          >
+            {defaultVendorId != null
+              ? `Default vendor: ${vendorName(defaultVendorId)}`
+              : "Default vendor: not set"}
           </button>
           <button className="btn btn-ghost" onClick={() => setForm("vendor")}>
             Onboard vendor
