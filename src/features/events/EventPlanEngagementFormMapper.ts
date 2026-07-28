@@ -5,6 +5,7 @@ export type EventPlanEngagementFormInput = {
   venueId: string;
   venue: Doc<"venues"> | undefined;
   title: string;
+  eventTypeRaw: string;
   occasionId: string;
   serviceStyleId: string;
   salespersonId: string;
@@ -36,8 +37,12 @@ export class EventPlanEngagementFormMapper {
     this.requireIds(input.clientId, input.venueId);
     const schedule = this.parseSchedule(input);
     const title = input.title.trim();
+    // Event.planEngagement requires eventType — omitting it fails the command
+    // schema, so the form collects it explicitly.
+    const eventType = input.eventTypeRaw.trim();
     const primaryContactName = input.primaryContactName.trim();
     if (!title) throw new Error("Event title is required.");
+    if (!eventType) throw new Error("Event type is required.");
     if (!primaryContactName) {
       throw new Error("Primary contact name is required.");
     }
@@ -46,6 +51,7 @@ export class EventPlanEngagementFormMapper {
       clientId: input.clientId as Id<"clients">,
       venueId: input.venueId as Id<"venues">,
       title,
+      eventType,
       startsAt: schedule.startsAt,
       endsAt: schedule.endsAt,
       expectedHeadcount: schedule.expectedHeadcount,

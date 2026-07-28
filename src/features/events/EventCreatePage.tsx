@@ -207,6 +207,7 @@ export function EventCreatePage() {
         venueId,
         venue,
         title: String(data.get("title") ?? ""),
+        eventTypeRaw: String(data.get("eventType") ?? ""),
         occasionId,
         serviceStyleId,
         salespersonId,
@@ -267,6 +268,20 @@ export function EventCreatePage() {
                 Event title
                 <input name="title" className="input" required autoFocus />
                 <FieldError name="title" errors={errors} touched={touched} />
+              </label>
+              <label className="field-label sm:col-span-2">
+                Event type
+                <input
+                  name="eventType"
+                  className="input"
+                  placeholder="Wedding, corporate lunch, holiday dinner…"
+                  required
+                />
+                <FieldError
+                  name="eventType"
+                  errors={errors}
+                  touched={touched}
+                />
               </label>
               <label className="field-label">
                 Occasion
