@@ -174,7 +174,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                   return (
                     <label
                       key={entry.type}
-                      className={`flex cursor-pointer items-start gap-2 rounded-sm border border-line bg-surface-2 px-3 py-2 text-[12px] ${
+                      className={`flex cursor-pointer items-start gap-2 rounded-sm border border-line bg-inset px-3 py-2 text-[12px] ${
                         checked ? "border-ok/50" : ""
                       }`}
                     >
@@ -224,7 +224,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
         </div>
 
         <div className="space-y-4">
-          <div className="rounded-sm border border-line bg-surface-2 p-4">
+          <div className="rounded-sm border border-line bg-inset p-4">
             <p className="eyebrow">Registered endpoints</p>
             {endpoints === undefined ? (
               <p className="mt-2 text-[12px] text-ink-3">Loading…</p>
@@ -295,7 +295,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
             )}
           </div>
 
-          <div className="rounded-sm border border-line bg-surface-2 p-4">
+          <div className="rounded-sm border border-line bg-inset p-4">
             <p className="eyebrow">Recent deliveries</p>
             {deliveries === undefined ? (
               <p className="mt-2 text-[12px] text-ink-3">Loading…</p>

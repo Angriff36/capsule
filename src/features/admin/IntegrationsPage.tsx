@@ -327,7 +327,7 @@ export function IntegrationsPage() {
             </div>
           </div>
 
-          <dl className="grid content-start gap-3 rounded-sm border border-line bg-surface-2 p-4 text-[12px]">
+          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-[12px]">
             <div className="flex items-center justify-between gap-4">
               <dt className="text-ink-3">Connection</dt>
               <dd className="font-semibold text-ink">
@@ -428,7 +428,7 @@ export function IntegrationsPage() {
             </div>
           </div>
 
-          <dl className="grid content-start gap-3 rounded-sm border border-line bg-surface-2 p-4 text-[12px]">
+          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-[12px]">
             <div className="flex items-center justify-between gap-4">
               <dt className="text-ink-3">Connection</dt>
               <dd className="font-semibold text-ink">
@@ -515,7 +515,7 @@ export function IntegrationsPage() {
             </div>
           </div>
 
-          <dl className="grid content-start gap-3 rounded-sm border border-line bg-surface-2 p-4 text-[12px]">
+          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-[12px]">
             <div className="flex items-center justify-between gap-4">
               <dt className="text-ink-3">Provider</dt>
               <dd className="font-semibold text-ink">

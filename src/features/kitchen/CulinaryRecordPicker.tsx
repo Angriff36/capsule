@@ -45,7 +45,7 @@ export function CulinaryRecordPicker({
   const exact = culinaryCanonicalMatcher.likelyDuplicate(records, query);
 
   return (
-    <div className="space-y-3 rounded-xs border border-line bg-surface p-3">
+    <div className="space-y-3 rounded-xs border border-line bg-panel p-3">
       <label className="field-label">
         {label ?? `Search ${kind === "dish" ? "dishes" : "ingredients"}`}
         <input

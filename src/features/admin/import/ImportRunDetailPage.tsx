@@ -111,7 +111,7 @@ export function ImportRunDetailPage() {
           <p>Import run not found</p>
           <Link
             to={importRunsListPath()}
-            className="text-primary hover:text-primary-darker"
+            className="text-brand hover:text-brand"
           >
             Back to Import Runs
           </Link>
@@ -334,7 +334,7 @@ export function ImportRunDetailPage() {
         <div className="flex items-center gap-4">
           <Link
             to={importRunsListPath()}
-            className="text-ink-2 hover:text-ink-1 text-sm"
+            className="text-ink-2 hover:text-ink text-sm"
           >
             ← Import Runs
           </Link>
@@ -356,7 +356,7 @@ export function ImportRunDetailPage() {
       <AdminWorkspaceNav />
 
       {error ? (
-        <p className="card border-error/30 bg-error-soft px-4 py-3 text-[13px] text-error">
+        <p className="card border-danger/30 bg-danger-soft px-4 py-3 text-[13px] text-danger">
           {error}
         </p>
       ) : null}
@@ -370,7 +370,7 @@ export function ImportRunDetailPage() {
           <button
             type="button"
             onClick={clearNotice}
-            className="ml-4 text-ok hover:text-ok-darker"
+            className="ml-4 text-ok hover:text-ok"
           >
             Dismiss
           </button>
@@ -421,7 +421,7 @@ export function ImportRunDetailPage() {
                 className={`px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50 ${
                   transition.next === "failed" || transition.next === "reverted"
                     ? "bg-slate-200 text-slate-700 hover:bg-slate-300"
-                    : "bg-primary text-white hover:bg-primary-darker"
+                    : "bg-brand text-white hover:bg-brand"
                 }`}
               >
                 {isBusy ? "Processing..." : transition.label}
@@ -447,7 +447,7 @@ export function ImportRunDetailPage() {
           <div className="p-4">
             <label
               htmlFor="recordCounts"
-              className="block text-sm font-medium text-ink-1 mb-2"
+              className="block text-sm font-medium text-ink mb-2"
             >
               Record Counts (JSON)
             </label>
@@ -467,7 +467,7 @@ export function ImportRunDetailPage() {
                 type="button"
                 onClick={handleRecordParse}
                 disabled={busy === "recordParse"}
-                className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium disabled:opacity-50"
+                className="px-4 py-2 bg-brand text-white rounded-md text-sm font-medium disabled:opacity-50"
               >
                 {busy === "recordParse" ? "Saving..." : "Save & Continue"}
               </button>
@@ -497,7 +497,7 @@ export function ImportRunDetailPage() {
           <div className="p-4">
             <label
               htmlFor="sourceRows"
-              className="block text-sm font-medium text-ink-1 mb-2"
+              className="block text-sm font-medium text-ink mb-2"
             >
               {commitNounLabel} source rows (JSON array)
             </label>
@@ -546,7 +546,7 @@ export function ImportRunDetailPage() {
                 type="button"
                 onClick={handleCommitSource}
                 disabled={busy === "commit"}
-                className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium disabled:opacity-50"
+                className="px-4 py-2 bg-brand text-white rounded-md text-sm font-medium disabled:opacity-50"
               >
                 {busy === "commit"
                   ? "Committing..."
@@ -577,49 +577,49 @@ export function ImportRunDetailPage() {
         <div className="p-4">
           <dl className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <dt className="font-medium text-ink-1">Source System</dt>
+              <dt className="font-medium text-ink">Source System</dt>
               <dd className="mt-1 text-ink-2">
                 {SOURCE_SYSTEM_LABELS[importRun.sourceSystem] ||
                   importRun.sourceSystem}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Dataset Type</dt>
+              <dt className="font-medium text-ink">Dataset Type</dt>
               <dd className="mt-1 text-ink-2">
                 {DATASET_TYPE_LABELS[importRun.datasetType] ||
                   importRun.datasetType}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Status</dt>
+              <dt className="font-medium text-ink">Status</dt>
               <dd className="mt-1">
                 <StatusChip status={statusLabel} />
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Total Records</dt>
+              <dt className="font-medium text-ink">Total Records</dt>
               <dd className="mt-1 text-ink-2">{totalRecords}</dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Started At</dt>
+              <dt className="font-medium text-ink">Started At</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDate(importRun.startTime)}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Completed At</dt>
+              <dt className="font-medium text-ink">Completed At</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDate(importRun.completionTime)}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Actor ID</dt>
+              <dt className="font-medium text-ink">Actor ID</dt>
               <dd className="mt-1 text-ink-2 font-mono text-xs">
                 {importRun.actorId || "—"}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Checksum</dt>
+              <dt className="font-medium text-ink">Checksum</dt>
               <dd className="mt-1 text-ink-2 font-mono text-xs">
                 {importRun.checksum || "—"}
               </dd>
@@ -638,49 +638,49 @@ export function ImportRunDetailPage() {
         <div className="p-4">
           <dl className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <dt className="font-medium text-ink-1">Started</dt>
+              <dt className="font-medium text-ink">Started</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDate(importRun.startTime)}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Parsed At</dt>
+              <dt className="font-medium text-ink">Parsed At</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDate(importRun.parsedAt)}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Validated At</dt>
+              <dt className="font-medium text-ink">Validated At</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDate(importRun.validatedAt)}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Review Started At</dt>
+              <dt className="font-medium text-ink">Review Started At</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDate(importRun.reviewStartedAt)}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Review Approved At</dt>
+              <dt className="font-medium text-ink">Review Approved At</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDate(importRun.reviewApprovedAt)}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Commit Started At</dt>
+              <dt className="font-medium text-ink">Commit Started At</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDate(importRun.commitStartedAt)}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">Reverted At</dt>
+              <dt className="font-medium text-ink">Reverted At</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDate(importRun.revertedAt)}
               </dd>
             </div>
             <div>
-              <dt className="font-medium text-ink-1">End Time</dt>
+              <dt className="font-medium text-ink">End Time</dt>
               <dd className="mt-1 text-ink-2">
                 {formatDate(importRun.endTime)}
               </dd>
@@ -701,7 +701,7 @@ export function ImportRunDetailPage() {
             <dl className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
               {Object.entries(counts).map(([type, count]) => (
                 <div key={type}>
-                  <dt className="font-medium text-ink-1 capitalize">{type}</dt>
+                  <dt className="font-medium text-ink capitalize">{type}</dt>
                   <dd className="mt-1 text-ink-2">{count}</dd>
                 </div>
               ))}
@@ -712,14 +712,14 @@ export function ImportRunDetailPage() {
 
       {/* Failure Details Section */}
       {importRun.status === "failed" && importRun.failureDetails ? (
-        <div className="card mt-4 border-error/30">
+        <div className="card mt-4 border-danger/30">
           <div className="border-b border-line px-3">
-            <h2 className="text-[11px] font-semibold tracking-[0.08em] text-error uppercase py-2">
+            <h2 className="text-[11px] font-semibold tracking-[0.08em] text-danger uppercase py-2">
               Failure Details
             </h2>
           </div>
           <div className="p-4">
-            <pre className="text-sm text-error whitespace-pre-wrap">
+            <pre className="text-sm text-danger whitespace-pre-wrap">
               {importRun.failureDetails}
             </pre>
           </div>

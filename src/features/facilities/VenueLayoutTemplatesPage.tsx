@@ -8,6 +8,7 @@ import {
   useVenueLayoutTemplateReactivate,
   useVenueLayoutTemplateRevise,
 } from "../../lib/manifest-convex-react";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   venueDetailPath,
   venueLayoutTemplatesListPath,
@@ -217,7 +218,7 @@ export function VenueLayoutTemplatesPage() {
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold text-ink-1">Layout Templates</h1>
+          <h1 className="text-xl font-semibold text-ink">Layout Templates</h1>
           <p className="text-[13px] text-ink-3">
             {venueId ? (
               <>
@@ -246,7 +247,7 @@ export function VenueLayoutTemplatesPage() {
 
       {formOpen ? (
         <form
-          className="mb-6 rounded-lg border border-line-2 bg-surface-1 p-4"
+          className="mb-6 rounded-lg border border-line-2 bg-panel p-4"
           onSubmit={submit}
         >
           <div className="grid gap-3 md:grid-cols-2">
@@ -337,11 +338,13 @@ export function VenueLayoutTemplatesPage() {
                       {!BATTLE_BOARD_LAYOUT_TYPES.includes(
                         section.type as (typeof BATTLE_BOARD_LAYOUT_TYPES)[number],
                       ) ? (
-                        <option value="">{section.type}</option>
+                        <option value="">
+                          {formatStatusLabel(section.type)}
+                        </option>
                       ) : null}
                       {BATTLE_BOARD_LAYOUT_TYPES.map((type) => (
                         <option key={type} value={type}>
-                          {type}
+                          {formatStatusLabel(type)}
                         </option>
                       ))}
                     </select>
@@ -419,7 +422,7 @@ export function VenueLayoutTemplatesPage() {
                 return (
                   <tr key={template._id} className="border-t border-line-2">
                     <td className="py-2 pr-3">
-                      <div className="font-medium text-ink-1">
+                      <div className="font-medium text-ink">
                         {template.name}
                       </div>
                       {template.description ? (

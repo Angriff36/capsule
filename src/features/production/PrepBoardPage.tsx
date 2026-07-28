@@ -424,8 +424,8 @@ export function PrepBoardPage() {
       </aside>
       <div aria-live="polite" aria-atomic="true">
         {notice ? (
-          <div className="card border-success/40 px-4 py-3" role="status">
-            <p className="font-semibold text-success">Prep board updated</p>
+          <div className="card border-ok/40 px-4 py-3" role="status">
+            <p className="font-semibold text-ok">Prep board updated</p>
             <p className="mt-1 text-[12px] text-ink-2">{notice}</p>
           </div>
         ) : null}

@@ -336,7 +336,7 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
       </div>
 
       {!linked ? (
-        <p className="mt-3 rounded-lg bg-warning-soft px-3 py-2 text-[12px] text-ink-2">
+        <p className="mt-3 rounded-lg bg-warn-soft px-3 py-2 text-[12px] text-ink-2">
           Ask a manager to link this staff profile to your sign-in before using
           shift swaps.
         </p>

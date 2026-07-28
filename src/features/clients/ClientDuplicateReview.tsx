@@ -45,7 +45,7 @@ function AccountChoice({
           onChange={onChoose}
         />
         <span>
-          <strong className="block text-ink-1">
+          <strong className="block text-ink">
             {clientDisplayName(client._id, [client])}
           </strong>
           <span className="mt-1 block text-[13px] text-ink-2">

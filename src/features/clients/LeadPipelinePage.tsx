@@ -15,6 +15,7 @@ import {
   useListReferralSource,
 } from "../../lib/manifest-convex-react";
 import { api, type Id } from "../../lib/api";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { TableSkeleton } from "../../ui/primitives";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
@@ -521,7 +522,7 @@ export function LeadPipelinePage() {
                     data-testid={`lead-card-${lead._id}`}
                   >
                     <div className="lead-card-topline">
-                      <span>{lead.source}</span>
+                      <span>{formatStatusLabel(lead.source)}</span>
                       <time
                         dateTime={new Date(lead.capturedAt ?? 0).toISOString()}
                       >

@@ -285,7 +285,7 @@ export function ProposalPricingPanel({
       )}
 
       {editor ? (
-        <div className="mt-2 flex flex-wrap items-end gap-2 rounded-sm border border-line bg-surface p-2">
+        <div className="mt-2 flex flex-wrap items-end gap-2 rounded-sm border border-line bg-panel p-2">
           <label className="flex-1 min-w-[12rem]">
             <span className="field-label">Description</span>
             <input

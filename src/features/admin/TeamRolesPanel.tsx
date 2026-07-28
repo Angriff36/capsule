@@ -6,6 +6,7 @@ import {
   usePersonLinkAccount,
   usePersonUnlinkAccount,
 } from "../../lib/manifest-convex-react";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { EmptyState, ErrorState, Section } from "../../ui/primitives";
 import { PersonRoleDirectory } from "./PersonRoleDirectory";
 
@@ -328,7 +329,7 @@ function TeamRolesTable({
                   {person.givenName} {person.familyName}
                 </strong>
                 <span className="mt-0.5 block text-[11px] text-ink-3">
-                  {person.email} · {person.status}
+                  {person.email} · {formatStatusLabel(person.status)}
                 </span>
               </td>
               <td className="border-b border-line px-3 py-3 text-[11px]">

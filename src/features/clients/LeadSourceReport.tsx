@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { formatStatusLabel } from "../../lib/statusLabels";
 
 // Revenue + conversion rate by acquisition source, derived entirely from the
 // captured lead list (source, estimatedValue, convertedAt). Read-side view is
@@ -85,7 +86,7 @@ export function LeadSourceReport({ leads }: { leads: SourceLead[] }) {
         <tbody>
           {rows.map((row) => (
             <tr key={row.source} data-testid={`source-row-${row.source}`}>
-              <th scope="row">{row.source}</th>
+              <th scope="row">{formatStatusLabel(row.source)}</th>
               <td>{row.count}</td>
               <td>{row.converted}</td>
               <td data-testid={`source-conversion-${row.source}`}>

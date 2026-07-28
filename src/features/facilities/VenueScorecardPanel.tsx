@@ -134,7 +134,7 @@ export function VenueScorecardPanel({ venueId }: { venueId: string }) {
             events reference it.
           </p>
         ) : (
-          <dl className="grid content-start gap-3 rounded-sm border border-line bg-surface-2 p-4 text-[12px] sm:grid-cols-2 sm:gap-x-8">
+          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-[12px] sm:grid-cols-2 sm:gap-x-8">
             <Metric label="Events booked" value={String(metrics.totalEvents)} />
             <Metric label="Completed" value={String(metrics.completedEvents)} />
             <Metric label="Upcoming" value={String(metrics.upcomingEvents)} />

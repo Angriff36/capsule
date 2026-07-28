@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import type { Id } from "../../lib/api";
 import { relativeDays } from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useEventApprove,
   useEventBeginExecution,
@@ -193,7 +194,7 @@ export function EventDetailPage() {
         }
         lead={
           <span className="font-mono text-[12px]">
-            {event.eventType} ·{" "}
+            {formatStatusLabel(event.eventType)} ·{" "}
             {(() => {
               const client = clients?.find((c) => c._id === event.clientId);
               const name = clientDisplayName(event.clientId, clients);

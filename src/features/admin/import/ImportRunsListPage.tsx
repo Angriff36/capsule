@@ -154,7 +154,7 @@ export function ImportRunsListPage() {
           <button
             type="button"
             onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium hover:bg-primary-darker"
+            className="px-4 py-2 bg-brand text-white rounded-md text-sm font-medium hover:bg-brand"
           >
             {showForm ? "Cancel" : "New Import Run"}
           </button>
@@ -174,7 +174,7 @@ export function ImportRunsListPage() {
               <div>
                 <label
                   htmlFor="sourceSystem"
-                  className="block text-sm font-medium text-ink-1 mb-1"
+                  className="block text-sm font-medium text-ink mb-1"
                 >
                   Source System
                 </label>
@@ -196,7 +196,7 @@ export function ImportRunsListPage() {
               <div>
                 <label
                   htmlFor="datasetType"
-                  className="block text-sm font-medium text-ink-1 mb-1"
+                  className="block text-sm font-medium text-ink mb-1"
                 >
                   Dataset Type
                 </label>
@@ -216,7 +216,7 @@ export function ImportRunsListPage() {
               <div>
                 <label
                   htmlFor="checksum"
-                  className="block text-sm font-medium text-ink-1 mb-1"
+                  className="block text-sm font-medium text-ink mb-1"
                 >
                   Checksum (optional)
                 </label>
@@ -233,7 +233,7 @@ export function ImportRunsListPage() {
               <button
                 type="submit"
                 disabled={busy === "start"}
-                className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium disabled:opacity-50"
+                className="px-4 py-2 bg-brand text-white rounded-md text-sm font-medium disabled:opacity-50"
               >
                 {busy === "start" ? "Starting..." : "Start Import"}
               </button>
@@ -250,7 +250,7 @@ export function ImportRunsListPage() {
       ) : null}
 
       {error ? (
-        <p className="card border-error/30 bg-error-soft px-4 py-3 text-[13px] text-error mt-4">
+        <p className="card border-danger/30 bg-danger-soft px-4 py-3 text-[13px] text-danger mt-4">
           {error}
         </p>
       ) : null}
@@ -264,7 +264,7 @@ export function ImportRunsListPage() {
           <button
             type="button"
             onClick={clearNotice}
-            className="ml-4 text-ok hover:text-ok-darker"
+            className="ml-4 text-ok hover:text-ok"
           >
             Dismiss
           </button>
@@ -416,7 +416,7 @@ export function ImportRunsListPage() {
                         <div className="flex items-center gap-2">
                           <Link
                             to={importRunDetailPath(run._id)}
-                            className="text-primary hover:text-primary-darker text-sm font-medium"
+                            className="text-brand hover:text-brand text-sm font-medium"
                           >
                             View
                           </Link>
@@ -428,7 +428,7 @@ export function ImportRunsListPage() {
                                 handleMarkFailed(run._id, run._id, run.version)
                               }
                               disabled={busy === `fail-${run._id}`}
-                              className="text-error hover:text-error-darker text-sm disabled:opacity-50"
+                              className="text-danger hover:text-danger text-sm disabled:opacity-50"
                             >
                               {busy === `fail-${run._id}` ? "..." : "Fail"}
                             </button>

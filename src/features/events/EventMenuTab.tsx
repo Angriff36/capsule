@@ -143,7 +143,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             return (
               <li
                 key={selection._id}
-                className="flex flex-wrap gap-4 border border-line bg-surface p-3"
+                className="flex flex-wrap gap-4 border border-line bg-panel p-3"
               >
                 <DishPrimaryImage
                   storageId={dish?.primaryImageStorageId}

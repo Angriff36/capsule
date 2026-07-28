@@ -1,4 +1,5 @@
 import type { Doc } from "../../lib/api";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { clientDisplayName } from "../events/clientName";
 
 /** Key client fields for a hover preview — no navigation required. */
@@ -10,7 +11,8 @@ export function ClientPreviewCard({ client }: { client: Doc<"clients"> }) {
         {clientDisplayName(client._id, [client])}
       </span>
       <span className="block text-[11px] text-ink-3 capitalize">
-        {client.clientType} · {client.status}
+        {formatStatusLabel(client.clientType)} ·{" "}
+        {formatStatusLabel(client.status)}
       </span>
       {client.email && (
         <span className="block truncate text-[12px] text-ink-2">

@@ -137,7 +137,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
 
       {error ? <p className="text-[13px] text-danger">{error}</p> : null}
       {notice ? (
-        <p className="text-[13px] text-success" role="status">
+        <p className="text-[13px] text-ok" role="status">
           {notice}
         </p>
       ) : null}

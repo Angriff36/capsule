@@ -201,7 +201,7 @@ export function ComponentVersionHistoryPanel({
                           {d.ingredientName}
                           {d.status !== "same" ? (
                             <span
-                              className={`ml-1 font-mono text-[10px] ${d.status === "removed" ? "text-danger" : d.status === "added" ? "text-success" : "text-warning"}`}
+                              className={`ml-1 font-mono text-[10px] ${d.status === "removed" ? "text-danger" : d.status === "added" ? "text-ok" : "text-warn"}`}
                             >
                               {d.status}
                             </span>

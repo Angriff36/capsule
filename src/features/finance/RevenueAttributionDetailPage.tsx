@@ -218,9 +218,7 @@ export function RevenueAttributionDetailPage() {
           {attribution && !isNew && existingEvent && (
             <p className="mt-3 max-w-160 text-ink-2">
               Event: {existingEvent.title} · Status:{" "}
-              <StatusChip status={attribution.status.replace(/_/g, " ")}>
-                {attribution.status}
-              </StatusChip>
+              <StatusChip status={attribution.status} />
             </p>
           )}
         </div>
@@ -286,7 +284,7 @@ export function RevenueAttributionDetailPage() {
                     : usd(attribution.fixedAmount)}
                 </dd>
                 <dt>Calculated allocation</dt>
-                <dd className="text-success font-semibold">
+                <dd className="text-ok font-semibold">
                   {usd(calculatedAllocation)}
                 </dd>
               </dl>
@@ -326,9 +324,7 @@ export function RevenueAttributionDetailPage() {
               <div>
                 <dt>Status</dt>
                 <dd>
-                  <StatusChip status={attribution.status.replace(/_/g, " ")}>
-                    {attribution.status}
-                  </StatusChip>
+                  <StatusChip status={attribution.status} />
                 </dd>
               </div>
               {attribution.approvedAt && (

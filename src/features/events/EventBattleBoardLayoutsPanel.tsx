@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type { Id } from "../../lib/api";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useCreateEventLayoutSection,
   useEventLayoutSectionRemove,
@@ -222,11 +223,13 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
                     {BATTLE_BOARD_LAYOUT_TYPES.includes(
                       section.type as (typeof BATTLE_BOARD_LAYOUT_TYPES)[number],
                     ) ? null : (
-                      <option value={section.type}>{section.type}</option>
+                      <option value={section.type}>
+                        {formatStatusLabel(section.type)}
+                      </option>
                     )}
                     {BATTLE_BOARD_LAYOUT_TYPES.map((type) => (
                       <option key={type} value={type}>
-                        {type}
+                        {formatStatusLabel(type)}
                       </option>
                     ))}
                   </select>

@@ -237,7 +237,7 @@ export function ExternalRecordsReconcilePage() {
           <button
             type="button"
             onClick={clearNotice}
-            className="ml-4 text-ok hover:text-ok-darker"
+            className="ml-4 text-ok hover:text-ok"
           >
             Dismiss
           </button>
@@ -286,7 +286,7 @@ export function ExternalRecordsReconcilePage() {
               type="button"
               onClick={verifySelected}
               disabled={busy}
-              className="px-4 py-2 bg-primary text-white rounded-md text-sm font-medium disabled:opacity-50"
+              className="px-4 py-2 bg-brand text-white rounded-md text-sm font-medium disabled:opacity-50"
             >
               Verify Selected
             </button>
@@ -431,7 +431,7 @@ export function ExternalRecordsReconcilePage() {
                               type="button"
                               onClick={() => void matchPayment(record._id)}
                               disabled={busy || !matchPaymentId}
-                              className="px-3 py-1 bg-primary text-white rounded-md text-xs font-medium disabled:opacity-50"
+                              className="px-3 py-1 bg-brand text-white rounded-md text-xs font-medium disabled:opacity-50"
                             >
                               Link
                             </button>
@@ -455,7 +455,7 @@ export function ExternalRecordsReconcilePage() {
                               setMatchPaymentId("");
                             }}
                             disabled={busy}
-                            className="px-3 py-1 text-primary rounded-md text-xs font-medium hover:bg-primary/10 disabled:opacity-50"
+                            className="px-3 py-1 text-brand rounded-md text-xs font-medium hover:bg-brand/10 disabled:opacity-50"
                           >
                             Match
                           </button>

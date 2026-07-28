@@ -35,10 +35,10 @@ function chipColor(view: ConnectionView): string {
   if (view.status === "error")
     return "border-danger/40 bg-danger/10 text-danger";
   if (view.status === "connected" && view.chargesEnabled) {
-    return "border-success/40 bg-success/10 text-success";
+    return "border-ok/40 bg-ok/10 text-ok";
   }
   if (view.status === "connected" || view.status === "pending") {
-    return "border-warning/40 bg-warning/10 text-warning";
+    return "border-warn/40 bg-warn/10 text-warn";
   }
   return "border-line-2 bg-inset text-ink-2";
 }
@@ -173,7 +173,7 @@ export function StripeConnectSection() {
 
         {error ? <ErrorState title="Stripe" detail={error} /> : null}
         {notice ? (
-          <p className="text-[12px] text-success" role="status">
+          <p className="text-[12px] text-ok" role="status">
             {notice}
           </p>
         ) : null}
@@ -195,7 +195,7 @@ export function StripeConnectSection() {
         </div>
 
         {current.status === "connected" && !current.chargesEnabled ? (
-          <p className="text-[12px] text-warning">
+          <p className="text-[12px] text-warn">
             Stripe needs more details before this account can accept payments.
             Continue onboarding, then refresh.
           </p>
@@ -203,7 +203,7 @@ export function StripeConnectSection() {
         {current.status === "connected" &&
         current.chargesEnabled &&
         !current.payoutsEnabled ? (
-          <p className="text-[12px] text-warning">
+          <p className="text-[12px] text-warn">
             Payments are enabled, but Stripe has not enabled payouts yet — add
             your bank details in Stripe to receive the money.
           </p>

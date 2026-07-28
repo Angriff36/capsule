@@ -1,5 +1,6 @@
 import type { Doc } from "../../lib/api";
 import { formatMoney } from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
 
 /** Key ingredient fields for a hover preview — no navigation required. */
 export function IngredientPreviewCard({
@@ -22,7 +23,7 @@ export function IngredientPreviewCard({
       </span>
       {allergens.length > 0 && (
         <span className="block text-[12px] text-ink-2">
-          Allergens: {allergens.join(", ").replace(/_/g, " ")}
+          Allergens: {allergens.map((a) => formatStatusLabel(a)).join(", ")}
         </span>
       )}
     </span>

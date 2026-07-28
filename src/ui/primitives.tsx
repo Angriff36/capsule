@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { type EventStage, STAGE_LABEL } from "../features/events/eventStatus";
+import { formatStatusLabel, statusChipClass } from "../lib/statusLabels";
 
 const STAGE_CHIP: Record<EventStage, string> = {
   quote: "border-line-2 bg-mute-soft text-ink-2",
@@ -29,10 +30,11 @@ export function StatusChip({
   const cls =
     color ??
     (STAGE_CHIP as Record<string, string>)[status] ??
+    statusChipClass(status) ??
     "border-line-2 bg-inset text-ink-2";
   return (
     <span className={`chip ${cls}`}>
-      {children ?? label ?? known ?? status}
+      {children ?? label ?? known ?? formatStatusLabel(status)}
     </span>
   );
 }

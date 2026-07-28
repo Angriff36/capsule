@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import { EmptyState, Section } from "../../ui/primitives";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import {
@@ -147,7 +148,7 @@ export function RolePermissionAuditView({
                           {member.displayName}
                         </strong>
                         <span className="mt-0.5 block text-[11px] text-ink-3">
-                          {member.email} · {member.status}
+                          {member.email} · {formatStatusLabel(member.status)}
                         </span>
                       </td>
                       <td className="border-b border-line px-3 py-3">

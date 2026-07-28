@@ -96,7 +96,7 @@ export function ComponentStockSuggestions() {
 
   return (
     <section
-      className="border border-line bg-surface"
+      className="border border-line bg-panel"
       data-testid="component-stock-suggestions"
     >
       <button

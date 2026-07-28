@@ -125,7 +125,7 @@ export function SyncErrorsPanel() {
                   </span>
                 ) : null}
               </div>
-              <p className="mt-1 text-[12px] text-ink-1">{e.errorMessage}</p>
+              <p className="mt-1 text-[12px] text-ink">{e.errorMessage}</p>
               {e.rawPayload ? (
                 <details className="mt-1">
                   <summary className="cursor-pointer text-[10.5px] text-ink-3">

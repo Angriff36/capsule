@@ -1,6 +1,7 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { api, type Doc, type Id } from "../../lib/api";
 import { formatDate, formatTime } from "../../lib/format";
+import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useCorrectiveActionClose,
   useCreateCorrectiveAction,
@@ -25,7 +26,7 @@ const CATEGORIES = [
   "other",
 ] as const;
 
-const label = (value: string) => value.replace(/_/g, " ");
+const label = (value: string) => formatStatusLabel(value);
 
 type IncidentAction = {
   kind: "resolve" | "dismiss" | "closeCorrective";
