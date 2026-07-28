@@ -102,6 +102,7 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
     guard self.deletedAt == null
     guard self.requestedAt == null "Request already initiated"
     guard user.id != null
+    guard user.personId != null "Link your account to a staff profile before requesting signatures"
 
     // Validate proposal revision exists and is not from a superseded proposal
     guard self.proposalRevision != null "Proposal revision not found"
@@ -114,11 +115,15 @@ entity SignatureRequest mixin TenantScoped, SoftDeletable {
     mutate recipientContactId = recipientContactId
     mutate provider = provider != null ? provider : "internal"
     mutate expiresAt = expiresAt != null ? expiresAt : now() + (30 * 24 * 60 * 60 * 1000)  // Default 30 days
-    // Use entity ID as the callback token for idempotent webhooks
-    mutate callbackToken = self.id
+    // No stored callbackToken for the internal flow: the public acceptance seam
+    // (convex/signatureAcceptance.ts) uses the row's Convex _id as the bearer
+    // token, same as the shareLinks precedent. callbackToken stays reserved for
+    // external e-sign providers that supply their own webhook token.
     mutate status = "requested"
     mutate requestedAt = now()
-    mutate requestedByPersonId = user.id
+    // Clerk ids don't fit a Person FK — personId comes from the linked staff
+    // profile (see Person.linkAccount; same fix as PrepTask.claim).
+    mutate requestedByPersonId = user.personId
 
     emit SignatureRequested {
       signatureRequestId: self.id
@@ -283,16 +288,12 @@ event SignatureRevoked: "signature_request.revoked" {
   revokedAt: datetime
 }
 
-// Acceptance cascade (spec §5.5: the bottom CTA "must be functional, not
-// decorative"). When a client completes a signature, drive the bound Proposal
-// through accept so its status flips sent/viewed → accepted and the downstream
-// ProposalAccepted cascade (ProposalDishSelection → EventDish.confirmFromProposal)
-// fires — without this the digitally-signed proposal stays "sent" forever.
-// Runs as a server-side reaction with system authority: the public acceptance
-// page holds no sales role, so Proposal.accept (salesExecute policy) cannot be
-// a client-callable command — the reaction is the designed bridge, exactly like
-// the Client.markMerged / Equipment.updateCondition cascades. A null proposalId
-// (revisionless/legacy request) makes the resolve target falsy and skips
-// cleanly. If Proposal.accept throws (already accepted / expired) the whole
-// complete rolls back — correct: a signature that cannot accept is invalid.
+// Acceptance cascade (spec §5.5). Declared intent: SignatureCompleted drives
+// the bound Proposal through accept. CAUTION: as of 2026-07-29 the generator
+// does not project `run` reactions into Convex at all (convex/sagas.ts is
+// empty; emits only insert into the manifestEvents ledger) — this reaction is
+// inert at runtime. The working path is the authored public seam
+// convex/signatureAcceptance.ts, which completes the request AND performs the
+// proposal accept in the same mutation. If reaction projection ever lands,
+// the seam's direct accept must be reconciled with this declaration.
 on SignatureCompleted run Proposal.accept resolve payload.proposalId

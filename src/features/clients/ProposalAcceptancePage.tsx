@@ -1,23 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../lib/api";
+import { formatDate, formatMoneyExact } from "../../lib/format";
 import { publicErrorMessage } from "../../lib/publicErrorMessage";
 import { ErrorState, TableSkeleton } from "../../ui/primitives";
 
 /**
- * Client-facing proposal acceptance page.
+ * Client-facing proposal acceptance page (#115).
  *
- * Public route (no auth) accessed via signature request token.
- * Displays proposal details and captures acceptance with IP/UserAgent audit trail.
- *
- * Flow:
- * 1. Operator sends proposal → creates ProposalRevision
- * 2. Operator creates SignatureRequest against revision
- * 3. SignatureRequest contains callbackToken (used as URL param)
- * 4. Client visits /accept/:callbackToken
- * 5. Page loads proposal details from signature request
- * 6. Client clicks "Accept" → calls SignatureRequest.complete
- * 7. SignatureRequest.complete emits SignatureCompleted event
- * 8. Manifest reaction triggers Proposal.accept
+ * Public route (no auth) accessed via signature request token — the
+ * SignatureRequest's Convex `_id`, minted into the /accept/<token> link at
+ * request time. Data and acceptance go through the authored public seam
+ * `convex/signatureAcceptance.ts` (token-authorized, shareLinks posture);
+ * the seam completes the request AND accepts the proposal in one mutation.
  */
 // callbackToken is a prop: App renders this page directly off useMatch (no
 // <Route> context), so useParams() here would always be empty and every link
@@ -27,148 +22,31 @@ export function ProposalAcceptancePage({
 }: {
   callbackToken: string;
 }) {
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<unknown>(null);
   const [accepted, setAccepted] = useState(false);
-  const [signatureRequest, setSignatureRequest] = useState<{
-    recipientName: string;
-    recipientEmail: string;
-    proposalRevision: {
-      snapshot: string;
-      changeSummary: string;
-      revisionNumber: number;
-      capturedAt: number;
-    };
-    status: string;
-    expiresAt: number | null;
-  } | null>(null);
-  const [proposalData, setProposalData] = useState<{
-    title: string;
-    total: number;
-    clientName: string;
-    terms: string | null;
-    eventDate: number | null;
-    guestCount: number;
-    venueName: string | null;
-  } | null>(null);
-
-  useEffect(() => {
-    if (!callbackToken) {
-      setError(new Error("Invalid acceptance link"));
-      setLoading(false);
-      return;
-    }
-
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Load signature request by callback token
-        const response = await fetch(
-          `${import.meta.env.VITE_CONVEX_URL}/api/queries/SignatureRequest.pendingByToken`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ callbackToken }),
-          },
-        );
-
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error("Acceptance link not found or has expired");
-          }
-          throw new Error(`Failed to load acceptance link: ${response.status}`);
-        }
-
-        const data = await response.json();
-        if (!data || data.length === 0) {
-          throw new Error("Acceptance link not found or has expired");
-        }
-
-        const sigRequest = data[0];
-        setSignatureRequest(sigRequest);
-
-        // Parse proposal snapshot
-        if (sigRequest.proposalRevision?.snapshot) {
-          const snapshot = JSON.parse(sigRequest.proposalRevision.snapshot);
-          setProposalData({
-            title: snapshot.proposal.title,
-            total: snapshot.proposal.total,
-            clientName: snapshot.client.name,
-            terms: snapshot.proposal.terms,
-            eventDate: snapshot.proposal.eventDate,
-            guestCount: snapshot.proposal.guestCount,
-            venueName: snapshot.proposal.venueName,
-          });
-        }
-      } catch (err) {
-        setError(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [callbackToken]);
+  const [busy, setBusy] = useState(false);
+  const pending = useQuery(
+    api.signatureAcceptance.getPendingSignatureRequest,
+    callbackToken ? { token: callbackToken } : "skip",
+  );
+  const complete = useMutation(api.signatureAcceptance.completeSignature);
 
   const handleAccept = async () => {
-    if (!callbackToken || !signatureRequest) return;
-
+    if (!callbackToken || busy) return;
+    setBusy(true);
+    setError(null);
     try {
-      setError(null);
-      const ipInfo = await fetch("https://api.ipify.org?format=json")
-        .then((r) => r.json())
-        .catch(() => ({ ip: null }));
-
-      const response = await fetch(
-        `${import.meta.env.VITE_CONVEX_URL}/api/mutations/SignatureRequest.complete`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            callbackToken,
-            signedArtifactReference: `accepted-at-${Date.now()}`,
-            signerIpAddress: ipInfo.ip,
-            signerUserAgent: navigator.userAgent,
-          }),
-        },
-      );
-
-      if (!response.ok) {
-        const error = await response.text();
-        throw new Error(error || "Failed to record acceptance");
-      }
-
+      await complete({
+        token: callbackToken,
+        signerUserAgent: navigator.userAgent,
+      });
       setAccepted(true);
     } catch (err) {
       setError(err);
+    } finally {
+      setBusy(false);
     }
   };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-full max-w-2xl p-8">
-          <TableSkeleton rows={3} />
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-full max-w-2xl p-8">
-          <ErrorState
-            title="Unable to load acceptance page"
-            detail={publicErrorMessage(
-              error,
-              "Please contact us if this problem persists",
-            )}
-          />
-        </div>
-      </div>
-    );
-  }
 
   if (accepted) {
     return (
@@ -189,22 +67,32 @@ export function ProposalAcceptancePage({
     );
   }
 
-  if (!proposalData || !signatureRequest) {
+  if (!callbackToken || pending === null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="w-full max-w-2xl p-8">
           <ErrorState
-            title="Proposal details unavailable"
-            detail="We couldn't load the proposal details. Please contact us for assistance."
+            title="Unable to load acceptance page"
+            detail="This acceptance link is invalid, expired, or already used. Please contact us if this problem persists."
           />
         </div>
       </div>
     );
   }
 
-  const formattedTotal = Number(proposalData.total).toFixed(2);
-  const formattedDate = proposalData.eventDate
-    ? new Date(proposalData.eventDate).toLocaleDateString()
+  if (pending === undefined) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-full max-w-2xl p-8">
+          <TableSkeleton rows={3} />
+        </div>
+      </div>
+    );
+  }
+
+  const formattedTotal = formatMoneyExact(Number(pending.proposal.total));
+  const formattedDate = pending.proposal.eventDate
+    ? formatDate(pending.proposal.eventDate)
     : "TBD";
 
   return (
@@ -217,10 +105,8 @@ export function ProposalAcceptancePage({
               Proposal Acceptance
             </h1>
             <p className="text-blue-100 mt-1">
-              Revision {signatureRequest.proposalRevision.revisionNumber} •{" "}
-              {new Date(
-                signatureRequest.proposalRevision.capturedAt,
-              ).toLocaleDateString()}
+              Revision {pending.revisionNumber}
+              {pending.capturedAt ? ` • ${formatDate(pending.capturedAt)}` : ""}
             </p>
           </div>
 
@@ -228,9 +114,11 @@ export function ProposalAcceptancePage({
           <div className="p-8">
             <div className="mb-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                {proposalData.title}
+                {pending.proposal.title}
               </h2>
-              <p className="text-gray-600">For: {proposalData.clientName}</p>
+              <p className="text-gray-600">
+                For: {pending.proposal.clientName}
+              </p>
             </div>
 
             <div className="bg-gray-50 rounded-lg p-6 mb-6">
@@ -244,13 +132,15 @@ export function ProposalAcceptancePage({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Guests:</span>
-                  <span className="font-medium">{proposalData.guestCount}</span>
+                  <span className="font-medium">
+                    {pending.proposal.guestCount}
+                  </span>
                 </div>
-                {proposalData.venueName && (
+                {pending.proposal.venueName && (
                   <div className="flex justify-between">
                     <span className="text-gray-600">Venue:</span>
                     <span className="font-medium">
-                      {proposalData.venueName}
+                      {pending.proposal.venueName}
                     </span>
                   </div>
                 )}
@@ -262,30 +152,44 @@ export function ProposalAcceptancePage({
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Total Amount</p>
                   <p className="text-3xl font-bold text-gray-900">
-                    ${formattedTotal}
+                    {formattedTotal}
                   </p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm text-gray-500">
-                    Revision {signatureRequest.proposalRevision.revisionNumber}
+                    Revision {pending.revisionNumber}
                   </p>
-                  <p className="text-xs text-gray-400">
-                    {signatureRequest.proposalRevision.changeSummary}
-                  </p>
+                  {pending.changeSummary ? (
+                    <p className="text-xs text-gray-400">
+                      {pending.changeSummary}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </div>
 
-            {proposalData.terms && (
+            {pending.proposal.terms && (
               <div className="mb-6">
                 <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
                   Terms
                 </h3>
                 <p className="text-gray-700 text-sm whitespace-pre-wrap">
-                  {proposalData.terms}
+                  {pending.proposal.terms}
                 </p>
               </div>
             )}
+
+            {error ? (
+              <div className="mb-6">
+                <ErrorState
+                  title="Unable to record acceptance"
+                  detail={publicErrorMessage(
+                    error,
+                    "Please contact us if this problem persists",
+                  )}
+                />
+              </div>
+            ) : null}
 
             {/* Acceptance Notice */}
             <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
@@ -300,9 +204,10 @@ export function ProposalAcceptancePage({
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={handleAccept}
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
+                disabled={busy}
+                className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white font-semibold py-3 px-6 rounded-lg transition-colors"
               >
-                Accept Proposal
+                {busy ? "Recording…" : "Accept Proposal"}
               </button>
               <a
                 href="mailto:"
@@ -315,9 +220,8 @@ export function ProposalAcceptancePage({
             {/* Footer Info */}
             <div className="mt-8 pt-6 border-t border-gray-200 text-center">
               <p className="text-xs text-gray-500">
-                This acceptance is being recorded for{" "}
-                {signatureRequest.recipientName} (
-                {signatureRequest.recipientEmail})
+                This acceptance is being recorded for {pending.recipientName} (
+                {pending.recipientEmail})
               </p>
               <p className="text-xs text-gray-400 mt-1">
                 If this is not you, please contact us immediately.

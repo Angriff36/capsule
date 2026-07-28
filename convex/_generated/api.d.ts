@@ -50,6 +50,7 @@ import type * as recurringEvents from "../recurringEvents.js";
 import type * as sagas from "../sagas.js";
 import type * as search from "../search.js";
 import type * as shareLinks from "../shareLinks.js";
+import type * as signatureAcceptance from "../signatureAcceptance.js";
 import type * as smsAlerts from "../smsAlerts.js";
 import type * as sourceProvenance from "../sourceProvenance.js";
 import type * as staffSelfReviews from "../staffSelfReviews.js";
@@ -108,6 +109,7 @@ declare const fullApi: ApiFromModules<{
   sagas: typeof sagas;
   search: typeof search;
   shareLinks: typeof shareLinks;
+  signatureAcceptance: typeof signatureAcceptance;
   smsAlerts: typeof smsAlerts;
   sourceProvenance: typeof sourceProvenance;
   staffSelfReviews: typeof staffSelfReviews;
