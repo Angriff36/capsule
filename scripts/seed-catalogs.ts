@@ -142,12 +142,15 @@ async function main(): Promise<void> {
     for (const [index, row] of target.rows.entries()) {
       if (have.has(row.code)) continue;
       client.setAuth(await auth.resolveJwt());
+      // No idempotencyKey: commandIdempotencyKeys is globally keyed (no tenant
+      // column), so a shared key would replay tenant A's cached result for
+      // tenant B. The list-first skip above is the tenant-scoped idempotency;
+      // the per-tenant code-unique constraint is the backstop.
       await client.mutation(target.create, {
         name: row.name,
         code: row.code,
         sortOrder: index,
         description: row.description,
-        idempotencyKey: `seed-${target.label}-${row.code}`,
       });
       created += 1;
       console.log(`  + ${target.label}: ${row.name}`);
