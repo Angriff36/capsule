@@ -39,7 +39,10 @@ Steps 1–3 of the previous handoff are **done**. What is left:
 3. **Approve Test Event and watch purchasing.** Demand lines read
    "Opens on Event approve", so `PurchaseNeed` → `VendorOrder.ensureWeeklyDraft`
    → `VendorOrderLine` is still unproven. Approving Test Event is the next
-   real test of the chain.
+   real test of the chain. Note this gate is *why* "dishes don't trigger a
+   purchase order" — nothing is broken, the event has simply never been
+   approved. Whether purchasing should accrue during planning is a product
+   decision nobody has made.
 4. **Delete the leftover fabricated tasks.** Two `completed` prep tasks from
    the invented Tito templates survive on Test Event by design — standing a
    dish down leaves finished work alone. They no longer appear anywhere in the

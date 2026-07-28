@@ -579,6 +579,15 @@ export function App() {
               path="/kitchen/event-menu"
               element={<Navigate to="/events" replace />}
             />
+            {/* Recipes became Components. Old links 404'd without this. */}
+            <Route
+              path="/kitchen/recipes"
+              element={<Navigate to="/kitchen/components" replace />}
+            />
+            <Route
+              path="/kitchen/recipes/:id"
+              element={<Navigate to="/kitchen/components" replace />}
+            />
             <Route
               path="/kitchen/allergens"
               element={<Navigate to="/kitchen/dishes" replace />}
