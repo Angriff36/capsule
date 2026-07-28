@@ -43,7 +43,13 @@ export function ProposalEnhancementsPanel({
   const reviseEnhancement = useProposalEnhancementRevise();
   const withdrawEnhancement = useProposalEnhancementWithdraw();
   const [editorOpen, setEditorOpen] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
+  // Version captured at Edit-click so a concurrent revision by another user
+  // surfaces as VERSION_MISMATCH instead of being silently overwritten.
+  const [editing, setEditing] = useState<{
+    id: string;
+    version: number;
+    sortOrder: number;
+  } | null>(null);
   const [editor, setEditor] = useState<EnhancementEditor>(emptyEditor);
   const [busy, setBusy] = useState(false);
 
@@ -63,7 +69,7 @@ export function ProposalEnhancementsPanel({
     try {
       await fn();
       setEditorOpen(false);
-      setEditingId(null);
+      setEditing(null);
       setEditor(emptyEditor());
     } catch (e) {
       onFailure?.(e instanceof Error ? e : new Error(String(e)));
@@ -84,20 +90,15 @@ export function ProposalEnhancementsPanel({
       return;
     }
     const description = editor.description.trim() || undefined;
-    if (editingId) {
-      const existing = rows.find((row) => row._id === editingId);
-      if (!existing) {
-        onFailure?.(new Error("This enhancement is no longer editable."));
-        return;
-      }
+    if (editing) {
       void runEdit(() =>
         reviseEnhancement({
-          docId: editingId as Id<"proposalEnhancements">,
-          version: Number(existing.version),
+          docId: editing.id as Id<"proposalEnhancements">,
+          version: editing.version,
           name,
           price,
           description,
-          sortOrder: Number(existing.sortOrder),
+          sortOrder: editing.sortOrder,
         }),
       );
       return;
@@ -152,7 +153,11 @@ export function ProposalEnhancementsPanel({
                       type="button"
                       disabled={busy}
                       onClick={() => {
-                        setEditingId(row._id);
+                        setEditing({
+                          id: row._id,
+                          version: Number(row.version),
+                          sortOrder: Number(row.sortOrder),
+                        });
                         setEditor({
                           name: row.name,
                           price: String(row.price ?? ""),
@@ -226,7 +231,7 @@ export function ProposalEnhancementsPanel({
             disabled={busy}
             onClick={saveEditor}
           >
-            {editingId ? "Save" : "Add"}
+            {editing ? "Save" : "Add"}
           </button>
           <button
             className="btn btn-ghost btn-sm"
@@ -234,7 +239,7 @@ export function ProposalEnhancementsPanel({
             disabled={busy}
             onClick={() => {
               setEditorOpen(false);
-              setEditingId(null);
+              setEditing(null);
               setEditor(emptyEditor());
             }}
           >
