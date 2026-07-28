@@ -3,6 +3,7 @@ import {
   useListClient,
   useListInvoice,
   useListOrganization,
+  useListPayment,
 } from "../../lib/manifest-convex-react";
 import {
   EmptyState,
@@ -25,6 +26,15 @@ import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 const OPEN_STATUSES = ["sent", "viewed", "overdue", "partial"];
 
 const ATTENTION_LIMIT = 8;
+
+const functionalAmount = (
+  amount: number,
+  exchangeRate: number | string | null | undefined,
+): number => {
+  const rawRate = Number(exchangeRate ?? 1);
+  const rate = Number.isFinite(rawRate) && rawRate > 0 ? rawRate : 1;
+  return amount * rate;
+};
 
 const quickLinks: { label: string; path: string; description: string }[] = [
   {
@@ -140,9 +150,11 @@ const clientLabel = (row: {
 
 export function FinanceOverviewPage() {
   const invoices = useListInvoice();
+  const payments = useListPayment();
   const clients = useListClient();
   const organizations = useListOrganization();
-  const loading = invoices === undefined || clients === undefined;
+  const loading =
+    invoices === undefined || payments === undefined || clients === undefined;
 
   const functionalCurrencyCode = normalizeCurrencyCode(
     organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,
@@ -154,7 +166,8 @@ export function FinanceOverviewPage() {
     OPEN_STATUSES.includes(String(row.status)),
   );
   const outstandingTotal = openRows.reduce(
-    (sum, row) => sum + Number(row.amountDue ?? 0),
+    (sum, row) =>
+      sum + functionalAmount(Number(row.amountDue ?? 0), row.exchangeRate),
     0,
   );
   const overdueCount = openRows.filter(
@@ -162,13 +175,26 @@ export function FinanceOverviewPage() {
   ).length;
   const now = new Date();
   const monthStartMs = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-  const paidThisMonth = activeRows
+  const monthEndMs = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    1,
+  ).getTime();
+  const invoicesById = new Map(activeRows.map((row) => [String(row._id), row]));
+  const paidThisMonth = (payments ?? [])
     .filter(
       (row) =>
-        String(row.status) === "paid" &&
-        Number(row.paidAt ?? 0) >= monthStartMs,
+        row.deletedAt == null &&
+        String(row.status) === "completed" &&
+        Number(row.settledAt ?? 0) >= monthStartMs &&
+        Number(row.settledAt ?? 0) < monthEndMs,
     )
-    .reduce((sum, row) => sum + Number(row.total ?? 0), 0);
+    .reduce((sum, row) => {
+      const invoice = invoicesById.get(String(row.invoiceId));
+      return (
+        sum + functionalAmount(Number(row.amount ?? 0), invoice?.exchangeRate)
+      );
+    }, 0);
   const draftCount = activeRows.filter(
     (row) => String(row.status) === "draft",
   ).length;
