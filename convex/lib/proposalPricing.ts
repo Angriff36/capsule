@@ -42,7 +42,7 @@ async function activeLines(
   return (
     await ctx.db
       .query("proposalLineItems")
-      .withIndex("by_proposalId", (q: any) => q.eq(proposalId))
+      .withIndex("by_proposalId", (q: any) => q.eq("proposalId", proposalId))
       .collect()
   ).filter((row: any) => row.deletedAt == null);
 }

@@ -192,7 +192,7 @@ export async function buildProposalRevisionSnapshot(
   const dishSelections = (
     await ctx.db
       .query("proposalDishSelections")
-      .withIndex("by_proposalId", (q: any) => q.eq(proposal._id))
+      .withIndex("by_proposalId", (q: any) => q.eq("proposalId", proposal._id))
       .collect()
   ).filter((row: any) => row.deletedAt == null);
 
@@ -229,7 +229,7 @@ export async function buildProposalRevisionSnapshot(
   const lineItems = (
     await ctx.db
       .query("proposalLineItems")
-      .withIndex("by_proposalId", (q: any) => q.eq(proposal._id))
+      .withIndex("by_proposalId", (q: any) => q.eq("proposalId", proposal._id))
       .collect()
   ).filter((row: any) => row.deletedAt == null);
   const lineItemsData = (
@@ -320,7 +320,7 @@ export const captureProposalRevision = internalMutation({
     const existingRevisions = (
       await ctx.db
         .query("proposalRevisions")
-        .withIndex("by_proposalId", (q: any) => q.eq(proposalId))
+        .withIndex("by_proposalId", (q: any) => q.eq("proposalId", proposalId))
         .collect()
     ).filter((row: any) => row.deletedAt == null);
 
@@ -408,7 +408,7 @@ export const sendProposalWithRevisionCapture = mutation({
     const overrideLines = (
       await ctx.db
         .query("proposalLineItems")
-        .withIndex("by_proposalId", (q: any) => q.eq(args.docId))
+        .withIndex("by_proposalId", (q: any) => q.eq("proposalId", args.docId))
         .collect()
     ).filter((row: any) => row.deletedAt == null && row.menuDishId != null);
     for (const line of overrideLines) {
