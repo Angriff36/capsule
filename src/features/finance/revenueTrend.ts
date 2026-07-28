@@ -1,5 +1,6 @@
 export type RevenueGranularity = "week" | "month" | "quarter";
-export type RevenueBreakdown = "event_type" | "client" | "service_line";
+export type RevenueBreakdown =
+  "event_type" | "client" | "service_line" | "venue" | "on_premise";
 
 type DateValue = Date | number | string | null | undefined;
 
@@ -28,6 +29,13 @@ export type RevenueClient = {
 export type RevenueEvent = {
   _id: string;
   eventType?: string | null;
+  venueId?: string | null;
+};
+
+export type RevenueVenue = {
+  _id: string;
+  name?: string | null;
+  onPremise?: boolean | null;
 };
 
 export type RevenuePeriod = {
@@ -144,11 +152,16 @@ function clientLabel(client: RevenueClient | undefined): string {
   return client.companyName?.trim() || "Unnamed client";
 }
 
+function venueLabel(venue: RevenueVenue | undefined): string {
+  return venue?.name?.trim() || "Unnamed venue";
+}
+
 function categoryFor(
   invoice: RevenueInvoice,
   breakdown: RevenueBreakdown,
   clientsById: ReadonlyMap<string, RevenueClient>,
   eventsById: ReadonlyMap<string, RevenueEvent>,
+  venuesById: ReadonlyMap<string, RevenueVenue>,
 ): { key: string; label: string } {
   if (breakdown === "service_line") {
     return { key: "catering-services", label: "Catering services" };
@@ -156,6 +169,32 @@ function categoryFor(
   if (breakdown === "client") {
     const key = String(invoice.clientId || "unknown-client");
     return { key, label: clientLabel(clientsById.get(key)) };
+  }
+  if (breakdown === "venue" || breakdown === "on_premise") {
+    if (!invoice.eventId) {
+      return breakdown === "venue"
+        ? { key: "unlinked", label: "Unlinked invoices" }
+        : { key: "unknown", label: "Unknown" };
+    }
+    const event = eventsById.get(String(invoice.eventId));
+    if (!event?.venueId) {
+      return breakdown === "venue"
+        ? { key: "unlinked", label: "Unlinked invoices" }
+        : { key: "unknown", label: "Unknown" };
+    }
+    const venue = venuesById.get(String(event.venueId));
+    if (breakdown === "venue") {
+      if (!venue) {
+        return { key: "unknown-venue", label: "Unknown venue" };
+      }
+      return { key: String(event.venueId), label: venueLabel(venue) };
+    }
+    if (!venue || venue.onPremise == null) {
+      return { key: "unknown", label: "Unknown" };
+    }
+    return venue.onPremise
+      ? { key: "on-premise", label: "On-premise" }
+      : { key: "off-premise", label: "Off-premise" };
   }
   if (!invoice.eventId) {
     return { key: "unlinked", label: "Unlinked invoices" };
@@ -169,6 +208,7 @@ export function buildRevenueTrend({
   invoices,
   clients,
   events,
+  venues,
   granularity,
   breakdown,
   functionalCurrencyCode = "USD",
@@ -177,6 +217,7 @@ export function buildRevenueTrend({
   invoices: readonly RevenueInvoice[];
   clients: readonly RevenueClient[];
   events: readonly RevenueEvent[];
+  venues: readonly RevenueVenue[];
   granularity: RevenueGranularity;
   breakdown: RevenueBreakdown;
   functionalCurrencyCode?: string;
@@ -184,6 +225,7 @@ export function buildRevenueTrend({
 }): RevenueTrend {
   const clientsById = new Map(clients.map((row) => [String(row._id), row]));
   const eventsById = new Map(events.map((row) => [String(row._id), row]));
+  const venuesById = new Map(venues.map((row) => [String(row._id), row]));
   const periodCount = PERIOD_COUNT[granularity];
   const finalStart = startOfPeriod(now, granularity);
   const rangeStart = shiftPeriod(finalStart, -(periodCount - 1), granularity);
@@ -238,7 +280,13 @@ export function buildRevenueTrend({
     const issuedAt = validDate(invoice.issuedAt ?? invoice.createdAt);
     const total = invoice.functionalTotal;
     if (!issuedAt || !Number.isFinite(total)) continue;
-    const category = categoryFor(invoice, breakdown, clientsById, eventsById);
+    const category = categoryFor(
+      invoice,
+      breakdown,
+      clientsById,
+      eventsById,
+      venuesById,
+    );
     categoryLabels.set(category.key, category.label);
 
     for (const period of periods) {

@@ -4,6 +4,7 @@ import {
   useListEvent,
   useListInvoice,
   useListOrganization,
+  useListVenue,
 } from "../../lib/manifest-convex-react";
 import { normalizeCurrencyCode } from "../../lib/format";
 import { formatCurrencyLabel } from "../../lib/currency";
@@ -19,6 +20,7 @@ import {
   type RevenueInvoice,
   type RevenuePeriod,
   type RevenueTrend,
+  type RevenueVenue,
 } from "./revenueTrend";
 
 const CATEGORY_COLORS = [
@@ -69,8 +71,11 @@ const dateRange = new Intl.DateTimeFormat(undefined, {
 
 function chartCategories(categories: RevenueCategory[]): RevenueCategory[] {
   if (categories.length <= CATEGORY_COLORS.length) return categories;
-  const leading = categories.slice(0, CATEGORY_COLORS.length - 1);
-  const remainder = categories.slice(CATEGORY_COLORS.length - 1);
+  const ranked = [...categories].sort(
+    (a, b) => b.currentTotal - a.currentTotal,
+  );
+  const leading = ranked.slice(0, CATEGORY_COLORS.length - 1);
+  const remainder = ranked.slice(CATEGORY_COLORS.length - 1);
   return [
     ...leading,
     {
@@ -305,6 +310,7 @@ export function RevenueTrendsDashboard({
   invoices,
   clients,
   events,
+  venues,
   functionalCurrencyCode,
   loading = false,
   now,
@@ -312,6 +318,7 @@ export function RevenueTrendsDashboard({
   invoices: readonly RevenueInvoice[];
   clients: readonly RevenueClient[];
   events: readonly RevenueEvent[];
+  venues: readonly RevenueVenue[];
   functionalCurrencyCode: string;
   loading?: boolean;
   now: Date;
@@ -325,6 +332,7 @@ export function RevenueTrendsDashboard({
         invoices,
         clients,
         events,
+        venues,
         granularity,
         breakdown,
         functionalCurrencyCode,
@@ -334,6 +342,7 @@ export function RevenueTrendsDashboard({
       breakdown,
       clients,
       events,
+      venues,
       functionalCurrencyCode,
       granularity,
       invoices,
@@ -395,6 +404,8 @@ export function RevenueTrendsDashboard({
             <option value="event_type">Event type</option>
             <option value="client">Client</option>
             <option value="service_line">Service line</option>
+            <option value="venue">Venue</option>
+            <option value="on_premise">On/off premise</option>
           </select>
         </label>
       </section>
@@ -518,8 +529,13 @@ export function RevenueTrendsPage() {
   const invoices = useListInvoice();
   const clients = useListClient();
   const events = useListEvent();
+  const venueRows = useListVenue();
   const organizations = useListOrganization();
   const now = useMemo(() => new Date(), []);
+  const venues = useMemo(
+    () => (venueRows ?? []).filter((row) => row.deletedAt == null),
+    [venueRows],
+  );
   const functionalCurrencyCode = normalizeCurrencyCode(
     organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,
     "USD",
@@ -530,11 +546,13 @@ export function RevenueTrendsPage() {
       invoices={invoices ?? []}
       clients={clients ?? []}
       events={events ?? []}
+      venues={venues}
       functionalCurrencyCode={functionalCurrencyCode}
       loading={
         invoices === undefined ||
         clients === undefined ||
         events === undefined ||
+        venueRows === undefined ||
         organizations === undefined
       }
       now={now}
