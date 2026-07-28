@@ -43,10 +43,14 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   // Headcount uses self.targetHeadcount (sibling computed; Convex helpers assign in order).
   computed requiredBatches: int = max_of(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => line.component.servesPerYield > 0 ? ceil(self.targetHeadcount / line.component.servesPerYield) : 0)
   computed requiredYieldQuantity: decimal(10, 2) = max_of(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.component.servesPerYield > 0 ? ceil(self.targetHeadcount / line.component.servesPerYield) : 0) * line.component.yieldQuantity)
-  // Sum of ceil(headcount / servesPerYield) × same-unit ingredient batch cost per attached component.
+  // Sum of ceil(headcount / servesPerYield) × same-unit ingredient batch cost per attached component,
+  // PLUS the dish's own direct ingredient lines (DishIngredient quantities are
+  // per serving, so they scale by targetHeadcount). Without the second term a
+  // dish costed only through direct lines — the shape the dish page builds —
+  // reported $0 estimated food cost on every event.
   // Batch cost is inlined (not line.component.liveBatchCost) so Convex hydrate can load
   // component.ingredientLines → ingredient without a nested compute pass.
-  computed estimatedCost: money(12, 2) = sum(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.component.servesPerYield > 0 ? ceil(self.targetHeadcount / line.component.servesPerYield) : 0) * sum(filter(line.component.ingredientLines, (il) => il.deletedAt == null and il.addedAt != null), (il) => il.unit == il.ingredient.unit ? il.quantity * (il.wasteFactor != null ? il.wasteFactor : 1) * il.ingredient.costPerUnit : 0))
+  computed estimatedCost: money(12, 2) = sum(filter(self.dish.componentLines, (line) => line.deletedAt == null and line.attachedAt != null), (line) => (line.component.servesPerYield > 0 ? ceil(self.targetHeadcount / line.component.servesPerYield) : 0) * sum(filter(line.component.ingredientLines, (il) => il.deletedAt == null and il.addedAt != null), (il) => il.unit == il.ingredient.unit ? il.quantity * (il.wasteFactor != null ? il.wasteFactor : 1) * il.ingredient.costPerUnit : 0)) + self.targetHeadcount * sum(filter(self.dish.ingredientLines, (dl) => dl.deletedAt == null and dl.addedAt != null), (dl) => dl.unit == dl.ingredient.unit ? dl.quantity * (dl.wasteFactor != null ? dl.wasteFactor : 1) * dl.ingredient.costPerUnit : 0)
 
   // Zero servings = 86'd / not serving; remove() is the other path.
   constraint eventDishServingsNonnegative: self.addedAt == null or self.quantityServings >= 0 "Event dish servings cannot be negative"
