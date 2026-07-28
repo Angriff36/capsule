@@ -25,6 +25,7 @@ import {
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
+import { classifyCommandFailure } from "../events/CommandFailure";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
@@ -67,6 +68,7 @@ export function PackListDetailPage() {
   const [showTemplates, setShowTemplates] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const [failureItemId, setFailureItemId] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const { prompt, host } = useActionPrompt(busy != null);
   const { loadingTooLong } = useSlowQuery(packList);
@@ -133,12 +135,18 @@ export function PackListDetailPage() {
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
+    setFailureItemId(null);
     setNotice(null);
     setBusy(key);
     try {
       await work();
     } catch (error) {
       setFailure(error);
+      // Item run keys are `${itemId}:${action}` — remember the row so the
+      // error can render next to it, not only in the page-top banner (#118).
+      setFailureItemId(
+        key.includes(":") ? key.slice(0, key.indexOf(":")) : null,
+      );
     } finally {
       setBusy(null);
     }
@@ -464,7 +472,7 @@ export function PackListDetailPage() {
       ) : null}
 
       {showTemplates && canAddItems ? (
-        <section className="mt-3 rounded-lg border border-line-2 bg-surface-1 p-3">
+        <section className="mt-3 rounded-lg border border-line-2 bg-panel p-3">
           <div className="flex items-center justify-between">
             <p className="eyebrow">Generate from a template</p>
             <Link
@@ -493,7 +501,7 @@ export function PackListDetailPage() {
                     className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line-2 p-2"
                   >
                     <div>
-                      <span className="font-medium text-ink-1">
+                      <span className="font-medium text-ink">
                         {template.name}
                       </span>
                       {suggested ? (
@@ -538,6 +546,14 @@ export function PackListDetailPage() {
           busy={busy}
           dishName={dishName}
           itemActions={(status) => policy.packItemActions(status)}
+          failedItem={
+            failureItemId && failure
+              ? {
+                  id: failureItemId,
+                  message: classifyCommandFailure(failure).title,
+                }
+              : null
+          }
           onAdd={() => setShowAdd(true)}
           onInvokeItem={(item, key) => void invokeItem(item, key)}
           canSelectItem={itemBulkable}

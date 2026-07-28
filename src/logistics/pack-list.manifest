@@ -277,7 +277,9 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.status == "listed"
     guard self.listedAt != null
     guard self.deletedAt == null
-    guard self.packList != null and self.packList.status == "packing"
+    // Stragglers stay packable after the list moves on (packed/loaded/dispatched):
+    // the record of what physically went out matters more than state purity (#118).
+    guard self.packList != null and (self.packList.status == "packing" or self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
     constraint markPackedQuantityPositive: packedQuantity > 0 "Packed quantity must be positive"
     constraint markPackedNotOver: packedQuantity <= self.requiredQuantity "Packed quantity cannot exceed required quantity"
     compute previousStatus = self.status
@@ -304,7 +306,8 @@ entity PackListItem mixin TenantScoped, SoftDeletable {
     guard self.status == "listed"
     guard self.listedAt != null
     guard self.deletedAt == null
-    guard self.packList != null and self.packList.status == "packing"
+    // Same relaxation as markPacked (#118): stragglers stay recordable post-dispatch.
+    guard self.packList != null and (self.packList.status == "packing" or self.packList.status == "packed" or self.packList.status == "loaded" or self.packList.status == "dispatched")
     compute previousStatus = self.status
     mutate status = "missing"
     mutate missingAt = now()

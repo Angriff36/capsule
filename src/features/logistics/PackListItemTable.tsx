@@ -27,6 +27,7 @@ interface PackListItemTableProps {
   onToggleItem: (id: string, on: boolean) => void;
   onToggleAll: (on: boolean) => void;
   selectableCount: number;
+  failedItem?: { id: string; message: string } | null;
 }
 
 export function PackListItemTable({
@@ -44,6 +45,7 @@ export function PackListItemTable({
   onToggleItem,
   onToggleAll,
   selectableCount,
+  failedItem,
 }: PackListItemTableProps) {
   if (loading) return <TableSkeleton rows={5} />;
   if (items.length === 0) {
@@ -109,6 +111,11 @@ export function PackListItemTable({
                 <strong>{item.description}</strong>
                 {dishName(item.dishId) ? (
                   <small>{dishName(item.dishId)}</small>
+                ) : null}
+                {failedItem?.id === item._id ? (
+                  <small className="block text-danger" role="alert">
+                    {failedItem.message}
+                  </small>
                 ) : null}
               </td>
               <td>
