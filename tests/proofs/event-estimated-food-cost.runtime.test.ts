@@ -188,4 +188,129 @@ describe("runtime proof: Event.estimatedFoodCost ↔ EventDish.estimatedCost", (
 
     await assertEqualCosts(S.costPerUnitUpdated);
   });
+
+  it("includes same-unit direct dish ingredient lines and ignores mismatched units", async () => {
+    const proof = harness();
+    const tenantId = "tenant-event-estimated-food-cost-direct";
+    const sales = proof.asRole({
+      subject: "sales-food-cost-direct",
+      role: "sales_manager",
+      tenantId,
+    });
+    const events = proof.asRole({
+      subject: "events-food-cost-direct",
+      role: "event_manager",
+      tenantId,
+    });
+    const kitchen = proof.asRole({
+      subject: "kitchen-food-cost-direct",
+      role: "kitchen_manager",
+      tenantId,
+    });
+
+    const directIngredient = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Ingredient_createViaIntroduce,
+      {
+        name: "Direct-line protein",
+        unit: "pound",
+        costPerUnit: 12.5,
+        allergens: [],
+        category: "protein",
+      },
+    )) as { docId: string };
+    const mismatchedIngredient = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Ingredient_createViaIntroduce,
+      {
+        name: "Mismatched direct-line ingredient",
+        unit: "pound",
+        costPerUnit: 999,
+        allergens: [],
+        category: "other",
+      },
+    )) as { docId: string };
+    const dish = (await proof.executeCommand(
+      kitchen,
+      api.mutations.Dish_createViaIntroduce,
+      {
+        name: "Direct-line entrée",
+        portionSize: 1,
+        portionUnit: "portion",
+        category: "entrée",
+      },
+    )) as { docId: string };
+
+    await proof.executeCommand(
+      kitchen,
+      api.mutations.DishIngredient_createViaAdd,
+      {
+        dishId: dish.docId,
+        ingredientId: directIngredient.docId,
+        quantity: 0.5,
+        unit: "pound",
+        wasteFactor: 1,
+      },
+    );
+    await proof.executeCommand(
+      kitchen,
+      api.mutations.DishIngredient_createViaAdd,
+      {
+        dishId: dish.docId,
+        ingredientId: mismatchedIngredient.docId,
+        quantity: 1,
+        unit: "kilogram",
+        wasteFactor: 1,
+      },
+    );
+
+    const client = (await proof.executeCommand(
+      sales,
+      api.mutations.Client_createViaRegister,
+      {
+        clientType: "company",
+        companyName: "Direct-line food-cost client",
+      },
+    )) as { docId: string };
+    const event = (await proof.executeCommand(
+      sales,
+      api.mutations.Event_createViaPlanEngagement,
+      {
+        clientId: client.docId,
+        title: "Direct-line food-cost dinner",
+        eventType: "catering",
+        startsAt: S.startsAt,
+        endsAt: S.endsAt,
+        expectedHeadcount: 60,
+        primaryContactName: "Direct Cost Checker",
+        budgetAmount: 1000,
+        quotedPrice: 1200,
+      },
+    )) as { docId: string };
+
+    await proof.executeCommand(
+      events,
+      api.mutations.EventDish_createViaAddToEvent,
+      {
+        eventId: event.docId,
+        dishId: dish.docId,
+        quantityServings: 60,
+      },
+    );
+
+    const eventRow = (await events.query(api.queries.getEvent, {
+      id: event.docId as never,
+    })) as { estimatedFoodCost?: number } | null;
+    const eventDishes = (await events.query(
+      api.queries.listEventDishByEventId,
+      {
+        eventId: event.docId as never,
+      },
+    )) as Array<{ estimatedCost?: number; deletedAt?: number | null }>;
+    const activeDish = eventDishes.find((row) => row.deletedAt == null);
+
+    // 60 guests × 0.5 pound × $12.50; the kilogram/pound line contributes 0.
+    expect(activeDish?.estimatedCost).toBe(375);
+    expect(eventRow?.estimatedFoodCost).toBe(375);
+  });
 });

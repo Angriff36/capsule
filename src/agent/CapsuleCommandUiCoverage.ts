@@ -90,7 +90,10 @@ export const CAPABILITY_UI_SURFACES: Readonly<
     hooks: ["useCreateVendor"],
     surfaces: ["src/features/inventory/PurchasingPage.tsx"],
   },
-  "WeeklyPurchasingConfig.configure": null,
+  "WeeklyPurchasingConfig.configure": {
+    hooks: ["useWeeklyPurchasingConfigConfigure"],
+    surfaces: ["src/features/inventory/PurchasingPage.tsx"],
+  },
   "Event.planEngagement": {
     hooks: ["useCreateEvent"],
     surfaces: ["src/features/events/EventCreatePage.tsx"],
