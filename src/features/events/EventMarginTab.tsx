@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { formatMoney } from "../../lib/format";
+import { useEventLaborSummary } from "../facilities/useLaborSummary";
 import {
   useGetEvent,
   useListEquipment,
@@ -40,6 +41,9 @@ export function EventMarginTab({ eventId }: Props) {
   const payroll = useListPayrollInput();
   const equipment = useListEquipment();
   const equipmentReservations = useListEquipmentReservation();
+  // Live labor from clocked time × pay rates (laborSummary seam). Payroll
+  // inputs are only the fallback — their rate fields are encrypted-stripped.
+  const clockedLabor = useEventLaborSummary(eventId);
 
   const estimatedFoodCost = Number(
     (event as { estimatedFoodCost?: number } | null | undefined)
@@ -76,8 +80,10 @@ export function EventMarginTab({ eventId }: Props) {
         payrollInputs: payroll ?? [],
         equipment: equipment ?? [],
         equipmentReservations: equipmentReservations ?? [],
+        clockedLabor,
       }),
     [
+      clockedLabor,
       demands,
       equipment,
       equipmentReservations,

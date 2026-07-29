@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useEventLaborSummary } from "../facilities/useLaborSummary";
 import {
   useListEquipment,
   useListEquipmentReservation,
@@ -31,6 +32,8 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
   const payrollInputs = useListPayrollInput();
   const equipment = useListEquipment();
   const equipmentReservations = useListEquipmentReservation();
+  // Live labor from clocked time × pay rates (laborSummary seam).
+  const clockedLabor = useEventLaborSummary(eventId);
   const loading = [
     invoices,
     demands,
@@ -54,8 +57,10 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
         payrollInputs: payrollInputs ?? [],
         equipment: equipment ?? [],
         equipmentReservations: equipmentReservations ?? [],
+        clockedLabor,
       }),
     [
+      clockedLabor,
       demands,
       equipment,
       equipmentReservations,
@@ -174,9 +179,9 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
                   {formatMoney(result.laborCost)}
                 </strong>
                 <small>
-                  {hours.format(result.laborHours)} reviewed hours ·{" "}
-                  {result.payrollInputCount} payroll input
-                  {result.payrollInputCount === 1 ? "" : "s"}
+                  {(clockedLabor?.recordCount ?? 0) > 0
+                    ? `${hours.format(result.laborHours)} clocked hours · ${result.payrollInputCount} time record${result.payrollInputCount === 1 ? "" : "s"}`
+                    : `${hours.format(result.laborHours)} reviewed hours · ${result.payrollInputCount} payroll input${result.payrollInputCount === 1 ? "" : "s"}`}
                 </small>
               </div>
             </article>
@@ -217,9 +222,9 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
 
           <footer className="live-profitability__footer">
             Revenue uses issued, non-void event invoices. Ingredient value uses
-            submitted purchase contributions; labor uses reviewed payroll
-            amounts or explicit rates; equipment uses active rented catalog
-            value. Final closeout may differ.
+            submitted purchase contributions; labor uses clocked time × pay
+            rates (falling back to reviewed payroll amounts); equipment uses
+            active rented catalog value. Final closeout may differ.
           </footer>
         </>
       )}

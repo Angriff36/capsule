@@ -1,4 +1,4 @@
-import type { FormEvent } from "react";
+import { useRef, type FormEvent } from "react";
 
 type EventOption = {
   _id: string;
@@ -6,6 +6,30 @@ type EventOption = {
   expectedHeadcount?: number | null;
   quotedPrice?: number | null;
   budgetAmount?: number | null;
+};
+
+export type LaborSummary = {
+  cost: number;
+  totalMinutes: number;
+  unpricedMinutes: number;
+  recordCount: number;
+  peopleMissingRates: string[];
+};
+
+/** Existing draft closeout being re-captured (reconciled) instead of created. */
+export type CloseoutDraft = {
+  _id: string;
+  version: number;
+  eventId: string;
+  actualRevenue?: number | null;
+  budgetedRevenue?: number | null;
+  actualIngredientCost?: number | null;
+  actualWasteCost?: number | null;
+  actualLaborCost?: number | null;
+  actualVendorCost?: number | null;
+  budgetedCost?: number | null;
+  expectedHeadcount?: number | null;
+  actualHeadcount?: number | null;
 };
 
 const money = (value: FormDataEntryValue | null) => {
@@ -76,15 +100,67 @@ export class CloseoutCapturePayloadBuilder {
   }
 }
 
+function LaborProvenance({
+  labor,
+}: {
+  labor: LaborSummary | null | undefined;
+}) {
+  if (labor === undefined) {
+    return (
+      <span className="text-[11px] text-ink-3">Loading clocked time…</span>
+    );
+  }
+  if (labor === null) {
+    return (
+      <span className="text-[11px] text-ink-3">
+        Clocked-time totals are available to finance, event, and workforce
+        managers.
+      </span>
+    );
+  }
+  if (labor.recordCount === 0) {
+    return (
+      <span className="text-[11px] text-warn">
+        No clocked time is attached to this event — staff clock-ins link to it
+        via their assigned shift. Enter labor manually if time was not tracked.
+      </span>
+    );
+  }
+  return (
+    <span className="text-[11px] text-ink-3">
+      {labor.recordCount} clocked shift{labor.recordCount === 1 ? "" : "s"} ·{" "}
+      {(labor.totalMinutes / 60).toFixed(1)} h · ${labor.cost.toFixed(2)}
+      {labor.peopleMissingRates.length > 0 ? (
+        <span className="text-warn">
+          {" "}
+          — no pay rate set for {labor.peopleMissingRates.join(", ")} (their
+          hours are priced at $0; set rates under Admin → Permissions)
+        </span>
+      ) : null}
+    </span>
+  );
+}
+
 export function CloseoutCaptureForm({
   events,
+  selectedEventId,
+  onSelectEvent,
+  labor,
+  draft,
   busy,
   onSubmit,
 }: {
   events: EventOption[];
+  selectedEventId: string | null;
+  onSelectEvent: (eventId: string) => void;
+  labor: LaborSummary | null | undefined;
+  /** When set, the form reconciles this existing draft closeout. */
+  draft: CloseoutDraft | null;
   busy: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const laborInputRef = useRef<HTMLInputElement>(null);
+
   if (events.length === 0) {
     return (
       <form className="supply-form" onSubmit={(e) => e.preventDefault()}>
@@ -103,12 +179,18 @@ export function CloseoutCaptureForm({
   }
 
   const defaults = events[0]!;
+  const eventId = selectedEventId ?? String(draft?.eventId ?? defaults._id);
+  const selected = events.find((event) => event._id === eventId) ?? defaults;
+  const laborDefault =
+    draft?.actualLaborCost != null && Number(draft.actualLaborCost) > 0
+      ? Number(draft.actualLaborCost)
+      : (labor?.cost ?? 0);
 
   return (
-    <form className="supply-form" onSubmit={onSubmit}>
+    <form className="supply-form" onSubmit={onSubmit} key={draft?._id ?? "new"}>
       <div className="supply-form-heading">
         <div>
-          <p className="eyebrow">Capture</p>
+          <p className="eyebrow">{draft ? "Reconcile" : "Capture"}</p>
           <h2>Event closeout</h2>
         </div>
       </div>
@@ -118,7 +200,9 @@ export function CloseoutCaptureForm({
           className="input"
           name="eventId"
           required
-          defaultValue={defaults._id}
+          value={eventId}
+          disabled={draft != null}
+          onChange={(event) => onSelectEvent(event.target.value)}
         >
           {events.map((event) => (
             <option key={event._id} value={event._id}>
@@ -126,6 +210,7 @@ export function CloseoutCaptureForm({
             </option>
           ))}
         </select>
+        {draft ? <input type="hidden" name="eventId" value={eventId} /> : null}
       </label>
       <div className="supply-form-grid">
         <label className="field-label">
@@ -137,7 +222,10 @@ export function CloseoutCaptureForm({
             min="0"
             step="0.01"
             required
-            defaultValue={String(defaults.quotedPrice ?? 0)}
+            key={`rev:${eventId}`}
+            defaultValue={String(
+              draft?.actualRevenue || selected.quotedPrice || 0,
+            )}
           />
         </label>
         <label className="field-label">
@@ -149,7 +237,10 @@ export function CloseoutCaptureForm({
             min="0"
             step="0.01"
             required
-            defaultValue={String(defaults.quotedPrice ?? 0)}
+            key={`brev:${eventId}`}
+            defaultValue={String(
+              draft?.budgetedRevenue || selected.quotedPrice || 0,
+            )}
           />
         </label>
         <label className="field-label">
@@ -161,7 +252,10 @@ export function CloseoutCaptureForm({
             min="0"
             step="0.01"
             required
-            defaultValue={String(defaults.budgetAmount ?? 0)}
+            key={`bcost:${eventId}`}
+            defaultValue={String(
+              draft?.budgetedCost || selected.budgetAmount || 0,
+            )}
           />
         </label>
       </div>
@@ -175,7 +269,8 @@ export function CloseoutCaptureForm({
             min="0"
             step="0.01"
             required
-            defaultValue="0"
+            key={`ing:${eventId}`}
+            defaultValue={String(draft?.actualIngredientCost ?? 0)}
           />
         </label>
         <label className="field-label">
@@ -187,20 +282,37 @@ export function CloseoutCaptureForm({
             min="0"
             step="0.01"
             required
-            defaultValue="0"
+            key={`waste:${eventId}`}
+            defaultValue={String(draft?.actualWasteCost ?? 0)}
           />
         </label>
         <label className="field-label">
           Labor cost
           <input
+            ref={laborInputRef}
             className="input"
             name="actualLaborCost"
             type="number"
             min="0"
             step="0.01"
             required
-            defaultValue="0"
+            key={`labor:${eventId}`}
+            defaultValue={laborDefault.toFixed(2)}
           />
+          <LaborProvenance labor={labor} />
+          {labor != null && labor.recordCount > 0 ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm mt-1 self-start"
+              onClick={() => {
+                if (laborInputRef.current) {
+                  laborInputRef.current.value = labor.cost.toFixed(2);
+                }
+              }}
+            >
+              Use clocked total (${labor.cost.toFixed(2)})
+            </button>
+          ) : null}
         </label>
         <label className="field-label">
           Vendor cost
@@ -211,7 +323,8 @@ export function CloseoutCaptureForm({
             min="0"
             step="0.01"
             required
-            defaultValue="0"
+            key={`vendor:${eventId}`}
+            defaultValue={String(draft?.actualVendorCost ?? 0)}
           />
         </label>
       </div>
@@ -224,7 +337,10 @@ export function CloseoutCaptureForm({
             type="number"
             min="0"
             required
-            defaultValue={String(defaults.expectedHeadcount ?? 0)}
+            key={`ehc:${eventId}`}
+            defaultValue={String(
+              draft?.expectedHeadcount || selected.expectedHeadcount || 0,
+            )}
           />
         </label>
         <label className="field-label">
@@ -235,7 +351,10 @@ export function CloseoutCaptureForm({
             type="number"
             min="0"
             required
-            defaultValue={String(defaults.expectedHeadcount ?? 0)}
+            key={`ahc:${eventId}`}
+            defaultValue={String(
+              draft?.actualHeadcount || selected.expectedHeadcount || 0,
+            )}
           />
         </label>
       </div>
@@ -253,7 +372,11 @@ export function CloseoutCaptureForm({
       </label>
       <div className="supply-row-actions">
         <button className="btn btn-primary" type="submit" disabled={busy}>
-          {busy ? "Capturing…" : "Capture closeout"}
+          {busy
+            ? "Saving…"
+            : draft
+              ? "Save reconciled closeout"
+              : "Capture closeout"}
         </button>
       </div>
     </form>

@@ -1,9 +1,11 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { useOrganization, useUser } from "@clerk/react";
+import { usePayRates } from "../facilities/useLaborSummary";
 import {
   useCreatePerson,
   usePersonAssignRole,
   usePersonLinkAccount,
+  usePersonSetPayRate,
   usePersonUnlinkAccount,
 } from "../../lib/manifest-convex-react";
 import { formatStatusLabel } from "../../lib/statusLabels";
@@ -38,6 +40,17 @@ export function TeamRolesPanel({
   const assignRole = usePersonAssignRole();
   const linkAccount = usePersonLinkAccount();
   const unlinkAccount = usePersonUnlinkAccount();
+  const setPayRate = usePersonSetPayRate();
+  // hourlyRate is private (stripped from listPerson); rates come from the
+  // laborSummary seam, readable by workforce/finance managers and admins.
+  const payRates = usePayRates();
+  const rateByPersonId = useMemo(
+    () =>
+      new Map(
+        (payRates ?? []).map((row) => [row.personId, row.hourlyRate] as const),
+      ),
+    [payRates],
+  );
   const { user } = useUser();
   const { memberships } = useOrganization({
     memberships: { infinite: true, pageSize: 50 },
@@ -165,6 +178,29 @@ export function TeamRolesPanel({
     }
   }
 
+  async function onSetPayRate(person: TeamPerson, hourlyRate: number) {
+    if (!canEdit) return;
+    setBusy(person._id);
+    setError(null);
+    setNotice(null);
+    try {
+      await setPayRate({
+        docId: person._id,
+        hourlyRate,
+        version: person.version,
+      });
+      setNotice(
+        `Set ${person.givenName} ${person.familyName} to $${hourlyRate.toFixed(2)}/h. Labor costs and payroll estimates now use this rate.`,
+      );
+    } catch (error_) {
+      setError(
+        error_ instanceof Error ? error_.message : "Could not set pay rate.",
+      );
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function onAssignRole(person: TeamPerson, role: string) {
     if (!canEdit || !PersonRoleDirectory.isAssignable(role)) return;
     if (role === person.role) return;
@@ -271,6 +307,8 @@ export function TeamRolesPanel({
         canEdit={canEdit}
         busy={busy}
         onAssignRole={onAssignRole}
+        onSetPayRate={onSetPayRate}
+        rateByPersonId={rateByPersonId}
         clerkMembers={clerkMembers}
         linkedSubjectIds={linkedSubjectIds}
         onLinkAccount={onLinkAccount}
@@ -286,6 +324,8 @@ function TeamRolesTable({
   canEdit,
   busy,
   onAssignRole,
+  onSetPayRate,
+  rateByPersonId,
   clerkMembers,
   linkedSubjectIds,
   onLinkAccount,
@@ -296,6 +336,8 @@ function TeamRolesTable({
   canEdit: boolean;
   busy: string | null;
   onAssignRole: (person: TeamPerson, role: string) => Promise<void>;
+  onSetPayRate: (person: TeamPerson, hourlyRate: number) => Promise<void>;
+  rateByPersonId: ReadonlyMap<string, number | null>;
   clerkMembers: readonly {
     userId: string;
     name: string;
@@ -324,6 +366,7 @@ function TeamRolesTable({
             <th className="th">Member</th>
             <th className="th">Linked sign-in</th>
             <th className="th">Capsule role</th>
+            <th className="th">Hourly rate</th>
           </tr>
         </thead>
         <tbody>
@@ -354,6 +397,15 @@ function TeamRolesTable({
                   canEdit={canEdit}
                   busy={busy === person._id}
                   onAssignRole={onAssignRole}
+                />
+              </td>
+              <td className="border-b border-line px-3 py-3">
+                <PersonPayRateCell
+                  person={person}
+                  rate={rateByPersonId.get(person._id) ?? null}
+                  canEdit={canEdit}
+                  busy={busy === person._id}
+                  onSetPayRate={onSetPayRate}
                 />
               </td>
             </tr>
@@ -398,6 +450,65 @@ function PersonRoleCell({
         <option value={person.role}>{person.role}</option>
       )}
     </select>
+  );
+}
+
+function PersonPayRateCell({
+  person,
+  rate,
+  canEdit,
+  busy,
+  onSetPayRate,
+}: Readonly<{
+  person: TeamPerson;
+  rate: number | null;
+  canEdit: boolean;
+  busy: boolean;
+  onSetPayRate: (person: TeamPerson, hourlyRate: number) => Promise<void>;
+}>) {
+  // null = never set; 0 is a valid volunteer/zero rate.
+  const hasRate = rate != null;
+
+  if (!canEdit) {
+    return hasRate ? (
+      <span className="text-ink-2">${rate.toFixed(2)}/h</span>
+    ) : (
+      <span className="text-warn">No rate set</span>
+    );
+  }
+
+  return (
+    <form
+      className="flex items-center gap-1"
+      onSubmit={(event) => {
+        event.preventDefault();
+        const raw = String(
+          new FormData(event.currentTarget).get("hourlyRate") ?? "",
+        ).trim();
+        if (raw === "") return;
+        const value = Number(raw);
+        if (Number.isFinite(value) && value >= 0 && value !== rate) {
+          void onSetPayRate(person, value);
+        }
+      }}
+    >
+      <input
+        key={rate ?? "unset"}
+        name="hourlyRate"
+        className="input w-24"
+        type="number"
+        min="0"
+        step="0.01"
+        defaultValue={hasRate ? rate.toFixed(2) : ""}
+        placeholder="0.00"
+        aria-label={`Hourly rate for ${person.givenName} ${person.familyName}`}
+        disabled={busy}
+      />
+      <button type="submit" className="btn btn-ghost btn-sm" disabled={busy}>
+        {busy ? "…" : "Set"}
+      </button>
+      {hasRate ? null : <span className="text-[11px] text-warn">unset</span>}
+    </form>
   );
 }
 

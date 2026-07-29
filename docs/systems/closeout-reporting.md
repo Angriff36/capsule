@@ -54,11 +54,16 @@ Payroll compilation is read-only: it does not materialize a second stored
 summary or submit payroll. ADP and Paychex companies may still need to map the
 export columns to their account-specific earning codes or import template.
 
-**Known blocker:** `finance_manager` does not currently have the
-`workforceAccess` capability required by the generated TimeRecord query, so its
-export omits clock-derived hours. Admin/owner roles can read both sources.
-[Issue #39](https://github.com/Angriff36/capsule/issues/39) tracks the Manifest
-policy correction and regeneration.
+**Resolved (2026-07-29):** `finance_manager` still lacks `workforceAccess`, but
+payroll and closeout no longer read time records through the generated
+workforce queries. The authored seam `convex/laborSummary.ts` serves
+clock-derived hours, pay rates, and labor-cost aggregates to
+finance/workforce managers (and admin tier) directly:
+`payrollTimeRecords` feeds the export preview, `eventLaborSummary` pre-fills
+closeout labor, and `personPeriodLaborSummary` pre-fills payroll inputs.
+`Person.hourlyRate` is a `private` field (stripped from `listPerson`); raw
+rates are only exposed via the seam's `listPayRates` to
+workforce/finance managers.
 
 ## Cross-system handoffs
 

@@ -1,11 +1,14 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import {
+  usePayRates,
+  usePayrollTimeRecords,
+} from "../facilities/useLaborSummary";
+import {
   useCreatePayrollInput,
   useListEvent,
   useListPayrollInput,
   useListPerson,
-  useListTimeRecord,
   usePayrollInputFinalize,
   usePayrollInputMarkVoided,
 } from "../../lib/manifest-convex-react";
@@ -44,7 +47,10 @@ const initialPeriod = () => {
 
 export function PayrollPage() {
   const payrollInputs = useListPayrollInput();
-  const timeRecords = useListTimeRecord();
+  // Authored seam: finance managers lack workforceAccess, so the generated
+  // listTimeRecord returns [] for them — clocked hours come from laborSummary.
+  const timeRecords = usePayrollTimeRecords();
+  const payRates = usePayRates();
   const people = useListPerson();
   const events = useListEvent();
   const createPayroll = useCreatePayrollInput();
@@ -75,6 +81,22 @@ export function PayrollPage() {
     return person
       ? `${person.givenName} ${person.familyName}`.trim()
       : "Unknown person";
+  };
+
+  // Estimated gross from pay rates (laborSummary seam — Person.hourlyRate is
+  // private and stripped from listPerson). The CSV stays hours-only (the
+  // processor applies final rates); this is operator visibility.
+  const rateByPersonId = useMemo(
+    () =>
+      new Map(
+        (payRates ?? []).map((row) => [row.personId, row.hourlyRate] as const),
+      ),
+    [payRates],
+  );
+  const estimatedGross = (personId: string, totalHours: number) => {
+    const rate = rateByPersonId.get(personId);
+    if (rate == null || !Number.isFinite(rate)) return null;
+    return totalHours * rate;
   };
 
   const run = async (key: string, work: () => Promise<void>) => {
@@ -321,21 +343,35 @@ export function PayrollPage() {
                       <th>Overtime</th>
                       <th>Recorded</th>
                       <th>Manual adjustment</th>
+                      <th>Est. gross</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {payrollExport.document.rows.map((row) => (
-                      <tr key={row.personId}>
-                        <td>
-                          <strong>{row.employeeName}</strong>
-                          <small>{row.employeeId}</small>
-                        </td>
-                        <td>{row.regularHours.toFixed(2)} h</td>
-                        <td>{row.overtimeHours.toFixed(2)} h</td>
-                        <td>{row.recordedHours.toFixed(2)} h</td>
-                        <td>{row.manualAdjustmentHours.toFixed(2)} h</td>
-                      </tr>
-                    ))}
+                    {payrollExport.document.rows.map((row) => {
+                      const gross = estimatedGross(
+                        row.personId,
+                        row.regularHours + row.overtimeHours,
+                      );
+                      return (
+                        <tr key={row.personId}>
+                          <td>
+                            <strong>{row.employeeName}</strong>
+                            <small>{row.employeeId}</small>
+                          </td>
+                          <td>{row.regularHours.toFixed(2)} h</td>
+                          <td>{row.overtimeHours.toFixed(2)} h</td>
+                          <td>{row.recordedHours.toFixed(2)} h</td>
+                          <td>{row.manualAdjustmentHours.toFixed(2)} h</td>
+                          <td>
+                            {gross == null ? (
+                              <span className="text-warn">no rate</span>
+                            ) : (
+                              `$${gross.toFixed(2)}`
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -409,6 +445,15 @@ export function PayrollPage() {
                       <small>
                         ({row.regularMinutes} reg / {row.overtimeMinutes} OT)
                       </small>
+                      {(() => {
+                        const gross = estimatedGross(
+                          String(row.personId),
+                          Number(row.totalMinutes ?? 0) / 60,
+                        );
+                        return gross == null ? null : (
+                          <small>est. ${gross.toFixed(2)}</small>
+                        );
+                      })()}
                     </td>
                     <td>
                       <StatusChip status={String(row.status)} />

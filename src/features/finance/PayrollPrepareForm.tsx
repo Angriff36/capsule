@@ -1,4 +1,5 @@
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
+import { usePersonPeriodLaborSummary } from "../facilities/useLaborSummary";
 
 type PersonOption = {
   _id: string;
@@ -50,7 +51,7 @@ export class PayrollPreparePayloadBuilder {
     }
     // Rates/grossAmount are private encrypted money in source; Convex schema
     // still projects them as number while encryption stores ciphertext — omit
-    // until Manifest projects encrypted money storage correctly.
+    // until Manifest projects encrypted money storage correctly (issue #76).
     return {
       personId,
       periodStart,
@@ -75,6 +76,22 @@ export function PayrollPrepareForm({
   busy: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
+  const [personId, setPersonId] = useState("");
+  const [periodStart, setPeriodStart] = useState("");
+  const [periodEnd, setPeriodEnd] = useState("");
+  const [overtime, setOvertime] = useState(0);
+
+  const startAt = periodStart ? new Date(periodStart).getTime() : Number.NaN;
+  const endAt = periodEnd ? new Date(periodEnd).getTime() : Number.NaN;
+  const windowReady =
+    personId !== "" &&
+    Number.isFinite(startAt) &&
+    Number.isFinite(endAt) &&
+    endAt >= startAt;
+  const clocked = usePersonPeriodLaborSummary(
+    windowReady ? { personId, periodStart: startAt, periodEnd: endAt } : null,
+  );
+
   const activePeople = people.filter(
     (person) => person.deletedAt == null && String(person.status) === "active",
   );
@@ -96,6 +113,12 @@ export function PayrollPrepareForm({
     );
   }
 
+  // Clocked minutes are the TOTAL; overtime is carved out of them, never
+  // added on top (a 45h week is 45h split regular/OT, not 45h + OT).
+  const clockedTotal = clocked?.totalMinutes ?? 0;
+  const regularDefault = Math.max(0, clockedTotal - overtime);
+  const rate = clocked?.hourlyRate ?? null;
+
   return (
     <form className="supply-form" onSubmit={onSubmit}>
       <div className="supply-form-heading">
@@ -106,7 +129,13 @@ export function PayrollPrepareForm({
       </div>
       <label className="field-label">
         Person
-        <select className="input" name="personId" required defaultValue="">
+        <select
+          className="input"
+          name="personId"
+          required
+          value={personId}
+          onChange={(event) => setPersonId(event.target.value)}
+        >
           <option value="" disabled>
             Select person
           </option>
@@ -125,6 +154,8 @@ export function PayrollPrepareForm({
             name="periodStart"
             type="datetime-local"
             required
+            value={periodStart}
+            onChange={(event) => setPeriodStart(event.target.value)}
           />
         </label>
         <label className="field-label">
@@ -134,6 +165,8 @@ export function PayrollPrepareForm({
             name="periodEnd"
             type="datetime-local"
             required
+            value={periodEnd}
+            onChange={(event) => setPeriodEnd(event.target.value)}
           />
         </label>
       </div>
@@ -141,13 +174,29 @@ export function PayrollPrepareForm({
         <label className="field-label">
           Regular minutes
           <input
+            key={
+              windowReady
+                ? `${personId}:${periodStart}:${periodEnd}:${overtime}`
+                : "blank"
+            }
             className="input"
             name="regularMinutes"
             type="number"
             min="0"
             required
-            defaultValue="2400"
+            defaultValue={String(regularDefault)}
           />
+          {clocked ? (
+            <span className="text-[11px] text-ink-3">
+              {clocked.recordCount === 0
+                ? "No closed time records in this period — enter minutes manually."
+                : `${clocked.recordCount} closed time record${clocked.recordCount === 1 ? "" : "s"} · ${(clockedTotal / 60).toFixed(1)} h clocked total`}
+            </span>
+          ) : (
+            <span className="text-[11px] text-ink-3">
+              Pick a person and period to pull clocked minutes automatically.
+            </span>
+          )}
         </label>
         <label className="field-label">
           Overtime minutes
@@ -157,10 +206,27 @@ export function PayrollPrepareForm({
             type="number"
             min="0"
             required
-            defaultValue="0"
+            value={String(overtime)}
+            onChange={(event) =>
+              setOvertime(
+                Math.max(0, Math.trunc(Number(event.target.value) || 0)),
+              )
+            }
           />
+          <span className="text-[11px] text-ink-3">
+            Overtime moves minutes out of regular — the clocked total stays the
+            same.
+          </span>
         </label>
       </div>
+      {clocked && clocked.overlappingInputCount > 0 ? (
+        <p className="text-[12px] text-warn" role="status">
+          {clocked.overlappingInputCount} existing payroll input
+          {clocked.overlappingInputCount === 1 ? "" : "s"} already overlap
+          {clocked.overlappingInputCount === 1 ? "s" : ""} this person and
+          period — finalizing both would double-count hours in the export.
+        </p>
+      ) : null}
       <label className="field-label">
         Event (optional)
         <select className="input" name="eventId" defaultValue="">
@@ -174,10 +240,28 @@ export function PayrollPrepareForm({
             ))}
         </select>
       </label>
-      <p className="text-[12px] text-ink-3">
-        This records hours only. Pay rates and gross amounts are applied by your
-        payroll processor after you export the CSV.
-      </p>
+      {personId && clocked !== undefined ? (
+        rate != null ? (
+          clockedTotal > 0 ? (
+            <p className="text-[12px] text-ink-3">
+              Estimated base pay at ${rate.toFixed(2)}/h: $
+              {((clockedTotal / 60) * rate).toFixed(2)} (overtime premium not
+              included). The export CSV carries hours; your processor applies
+              final rates.
+            </p>
+          ) : (
+            <p className="text-[12px] text-ink-3">
+              Rate on file: ${rate.toFixed(2)}/h. The export CSV carries hours;
+              your processor applies final rates.
+            </p>
+          )
+        ) : clocked === null ? null : (
+          <p className="text-[12px] text-warn">
+            No hourly rate set for this person — set one under Admin →
+            Permissions so labor costs and estimates use real numbers.
+          </p>
+        )
+      ) : null}
       <label className="field-label">
         Notes
         <textarea className="input" name="notes" rows={2} />

@@ -5,6 +5,7 @@ import {
   useCreateTimeRecord,
   useListAvailabilityWindow,
   useListPerson,
+  useListShift,
   useListTimeRecord,
   useTimeRecordClockOut,
   useTimeRecordCorrect,
@@ -27,6 +28,7 @@ export function TimeSheetPage() {
   const records = useListTimeRecord();
   const windows = useListAvailabilityWindow();
   const people = useListPerson();
+  const shifts = useListShift();
   const clockIn = useCreateTimeRecord();
   const clockOut = useTimeRecordClockOut();
   const correct = useTimeRecordCorrect();
@@ -59,13 +61,44 @@ export function TimeSheetPage() {
     }
   };
 
+  // Attach the clock-in to the person's current shift (and its event) so
+  // worked time is event-attributable — closeout labor and event margin
+  // read clocked time by event.
+  const currentShiftFor = (personId: string) => {
+    const now = Date.now();
+    const slack = 2 * 60 * 60 * 1000;
+    return (shifts ?? [])
+      .filter(
+        (shift) =>
+          shift.deletedAt == null &&
+          String(shift.personId) === personId &&
+          ["scheduled", "started"].includes(String(shift.status)),
+      )
+      .sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0))
+      .find(
+        (shift) =>
+          shift.startsAt != null &&
+          shift.endsAt != null &&
+          now >= shift.startsAt - slack &&
+          now <= shift.endsAt + slack,
+      );
+  };
+
   const submitClockIn = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
     void run("clock-in", async () => {
+      const personId = String(data.get("personId"));
+      const shift = currentShiftFor(personId);
       await clockIn({
-        personId: String(data.get("personId")),
+        personId,
+        ...(shift
+          ? {
+              shiftId: shift._id,
+              ...(shift.eventId ? { eventId: shift.eventId } : {}),
+            }
+          : {}),
         notes: String(data.get("notes") || "") || undefined,
       });
       form.reset();

@@ -281,6 +281,14 @@ function calculateEquipmentCost(
   };
 }
 
+export type ClockedLaborSummary = {
+  cost: number;
+  totalMinutes: number;
+  unpricedMinutes: number;
+  recordCount: number;
+  peopleMissingRates: readonly string[];
+};
+
 export function buildLiveEventProfitability({
   eventId,
   invoices,
@@ -291,6 +299,7 @@ export function buildLiveEventProfitability({
   payrollInputs,
   equipment,
   equipmentReservations,
+  clockedLabor,
 }: {
   eventId: string;
   invoices: readonly ProfitabilityInvoice[];
@@ -301,6 +310,13 @@ export function buildLiveEventProfitability({
   payrollInputs: readonly ProfitabilityPayrollInput[];
   equipment: readonly ProfitabilityEquipment[];
   equipmentReservations: readonly ProfitabilityEquipmentReservation[];
+  /**
+   * Live clocked-hours labor from the laborSummary seam. When present with
+   * records it is the labor source; payroll inputs are the fallback only.
+   * (Generated queries strip PayrollInput's encrypted rate fields, so
+   * payroll-input pricing is blind to rates on the client — issue #76.)
+   */
+  clockedLabor?: ClockedLaborSummary | null;
 }): LiveEventProfitability {
   const eventKey = key(eventId);
   const includedInvoices = invoices.filter(
@@ -321,7 +337,16 @@ export function buildLiveEventProfitability({
     lines,
     lineDemands,
   });
-  const labor = calculateLaborCost(eventKey, payrollInputs);
+  const payrollLabor = calculateLaborCost(eventKey, payrollInputs);
+  const useClocked = clockedLabor != null && clockedLabor.recordCount > 0;
+  const labor = useClocked
+    ? {
+        cost: clockedLabor.cost,
+        totalMinutes: clockedLabor.totalMinutes,
+        unpricedMinutes: clockedLabor.unpricedMinutes,
+        inputCount: clockedLabor.recordCount,
+      }
+    : payrollLabor;
   const equipmentTotal = calculateEquipmentCost(
     eventKey,
     equipment,

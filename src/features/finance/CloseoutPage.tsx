@@ -1,7 +1,9 @@
 import { Fragment, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { useEventLaborSummary } from "../facilities/useLaborSummary";
 import {
   useCreateEventCloseout,
+  useEventCloseoutCapture,
   useEventCloseoutFinalize,
   useListEvent,
   useListEventCloseout,
@@ -16,6 +18,7 @@ import {
 import {
   CloseoutCaptureForm,
   CloseoutCapturePayloadBuilder,
+  type CloseoutDraft,
 } from "./CloseoutCaptureForm";
 import { CloseoutLifecyclePolicy } from "./CloseoutLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
@@ -31,9 +34,12 @@ export function CloseoutPage() {
   const events = useListEvent();
   const invoices = useListInvoice();
   const createCloseout = useCreateEventCloseout();
+  const captureCloseout = useEventCloseoutCapture();
   const finalize = useEventCloseoutFinalize();
   const [showCapture, setShowCapture] = useState(false);
   const [showFinalized, setShowFinalized] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<CloseoutDraft | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -67,6 +73,19 @@ export function CloseoutPage() {
     ? eventFor(String(summaryCloseout.eventId))
     : undefined;
 
+  // The event whose clocked labor the capture form is showing.
+  const formEventId =
+    draft?.eventId != null
+      ? String(draft.eventId)
+      : (selectedEventId ?? capturableEvents[0]?._id ?? null);
+  const labor = useEventLaborSummary(
+    showCapture && formEventId ? formEventId : null,
+  );
+
+  const formEvents = draft
+    ? (events ?? []).filter((event) => event._id === String(draft.eventId))
+    : capturableEvents;
+
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
     setNotice(null);
@@ -80,18 +99,52 @@ export function CloseoutPage() {
     }
   };
 
+  const openCapture = () => {
+    setDraft(null);
+    setSelectedEventId(null);
+    setShowCapture(true);
+  };
+
+  const openReconcile = (row: (typeof activeCloseouts)[number]) => {
+    setDraft({
+      _id: String(row._id),
+      version: Number(row.version),
+      eventId: String(row.eventId),
+      actualRevenue: row.actualRevenue,
+      budgetedRevenue: row.budgetedRevenue,
+      actualIngredientCost: row.actualIngredientCost,
+      actualWasteCost: row.actualWasteCost,
+      actualLaborCost: row.actualLaborCost,
+      actualVendorCost: row.actualVendorCost,
+      budgetedCost: row.budgetedCost,
+      expectedHeadcount: row.expectedHeadcount,
+      actualHeadcount: row.actualHeadcount,
+    });
+    setShowCapture(true);
+  };
+
   const submitCapture = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
     try {
       const payload = payloadBuilder.fromForm(new FormData(form));
       void run("capture-closeout", async () => {
-        await createCloseout(payload);
+        if (draft) {
+          await captureCloseout({
+            docId: draft._id,
+            version: draft.version,
+            ...payload,
+          });
+          setNotice("Closeout reconciled. Finalize when numbers are final.");
+        } else {
+          await createCloseout(payload);
+          setNotice(
+            "Closeout captured as draft. Finalize when numbers are final.",
+          );
+        }
         form.reset();
         setShowCapture(false);
-        setNotice(
-          "Closeout captured as draft. Finalize when numbers are final.",
-        );
+        setDraft(null);
       });
     } catch (error) {
       setFailure(error);
@@ -116,7 +169,8 @@ export function CloseoutPage() {
           <h1 className="display-title mt-2">Event closeouts</h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Capture reconciled revenue, cost, and headcount for a closed-out
-            event, then finalize to freeze the folio.
+            event, then finalize to freeze the folio. Labor pre-fills from
+            clocked time and pay rates.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -130,7 +184,9 @@ export function CloseoutPage() {
           <button
             className="btn btn-primary"
             type="button"
-            onClick={() => setShowCapture((value) => !value)}
+            onClick={() =>
+              showCapture ? setShowCapture(false) : openCapture()
+            }
           >
             {showCapture ? "Close form" : "Capture closeout"}
           </button>
@@ -155,7 +211,11 @@ export function CloseoutPage() {
 
       {showCapture ? (
         <CloseoutCaptureForm
-          events={capturableEvents}
+          events={formEvents}
+          selectedEventId={formEventId}
+          onSelectEvent={setSelectedEventId}
+          labor={labor}
+          draft={draft}
           busy={busy === "capture-closeout"}
           onSubmit={submitCapture}
         />
@@ -184,7 +244,7 @@ export function CloseoutPage() {
               <button
                 type="button"
                 className="btn btn-primary btn-sm"
-                onClick={() => setShowCapture(true)}
+                onClick={openCapture}
               >
                 Capture closeout
               </button>
@@ -231,6 +291,16 @@ export function CloseoutPage() {
                         </td>
                         <td>
                           <div className="supply-row-actions">
+                            {String(row.status) === "draft" ? (
+                              <button
+                                className="btn btn-ghost btn-sm"
+                                type="button"
+                                disabled={busy != null}
+                                onClick={() => openReconcile(row)}
+                              >
+                                Reconcile
+                              </button>
+                            ) : null}
                             {policy
                               .closeoutActions(
                                 String(row.status),

@@ -266,6 +266,34 @@ export function MyDayPage() {
     (row) => String(row.status) === "open" && row.clockInAt != null,
   );
 
+  // Attach the clock-in to my current shift (and its event) so worked time is
+  // event-attributable — labor cost in closeouts and margin reads from it.
+  // Best match: a shift whose window covers now (±2h slack), else today's
+  // first upcoming shift.
+  const clockInShift = (() => {
+    const now = Date.now();
+    const slack = 2 * 60 * 60 * 1000;
+    const dayStart = new Date();
+    dayStart.setHours(0, 0, 0, 0);
+    const dayEnd = new Date();
+    dayEnd.setHours(23, 59, 59, 999);
+    return (
+      myShifts.find(
+        (shift) =>
+          shift.startsAt != null &&
+          shift.endsAt != null &&
+          now >= shift.startsAt - slack &&
+          now <= shift.endsAt + slack,
+      ) ??
+      myShifts.find(
+        (shift) =>
+          shift.startsAt != null &&
+          shift.startsAt >= dayStart.getTime() &&
+          shift.startsAt <= dayEnd.getTime(),
+      )
+    );
+  })();
+
   const startOfToday = new Date();
   startOfToday.setHours(0, 0, 0, 0);
   const endOfToday = new Date();
@@ -419,6 +447,14 @@ export function MyDayPage() {
               onClick={() =>
                 perform("clock-in", "clock-in", "Clock in", {
                   personId: me._id,
+                  ...(clockInShift
+                    ? {
+                        shiftId: clockInShift._id,
+                        ...(clockInShift.eventId
+                          ? { eventId: clockInShift.eventId }
+                          : {}),
+                      }
+                    : {}),
                 })
               }
             >

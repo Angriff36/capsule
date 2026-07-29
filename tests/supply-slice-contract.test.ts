@@ -73,7 +73,7 @@ describe("Demand, stock, and purchasing slice contract", () => {
       "Approve releases purchasing",
     );
     expect(read("src/features/inventory/VendorOrderPage.tsx")).toContain(
-      "Receiving does not automatically update stock",
+      "Marking an order received does not update your stock counts",
     );
   });
 
