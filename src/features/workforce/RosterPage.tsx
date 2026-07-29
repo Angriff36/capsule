@@ -372,16 +372,29 @@ export function RosterPage() {
   };
 
   const invokeShift = (row: any, key: string) => {
+    if (key === "cancel") {
+      void (async () => {
+        const reason = (
+          await prompt.askReason({
+            title: "Cancel shift",
+            description: "Cancel this scheduled shift.",
+            label: "Cancellation reason",
+            confirmLabel: "Cancel shift",
+            tone: "danger",
+          })
+        )?.trim();
+        if (!reason) return;
+        await run(`${row._id}:${key}`, async () => {
+          await cancelShift({ docId: row._id, version: row.version, reason });
+        });
+      })();
+      return;
+    }
     void run(`${row._id}:${key}`, async () => {
       const args = { docId: row._id, version: row.version };
       if (key === "start") await startShift(args);
       if (key === "complete") await completeShift(args);
       if (key === "markNoShow") await shiftNoShow(args);
-      if (key === "cancel") {
-        const reason = window.prompt("Cancellation reason")?.trim();
-        if (!reason) return;
-        await cancelShift({ ...args, reason });
-      }
     });
   };
 

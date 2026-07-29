@@ -10,7 +10,8 @@ import {
   useTimeRecordCorrect,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatDate, formatTime } from "../../lib/format";
+import { useActionPrompt } from "../../ui/action-prompt";
+import { formatDate, formatTime, toDatetimeLocalValue } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -31,6 +32,7 @@ export function TimeSheetPage() {
   const correct = useTimeRecordCorrect();
   const declare = useCreateAvailabilityWindow();
   const withdraw = useAvailabilityWindowWithdraw();
+  const { prompt, host } = useActionPrompt();
   const [showForm, setShowForm] = useState<"clockIn" | "declare" | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
@@ -93,16 +95,35 @@ export function TimeSheetPage() {
       const args = { docId: row._id, version: row.version };
       if (key === "clockOut") await clockOut(args);
       if (key === "correct") {
-        const clockInRaw = window
-          .prompt("Corrected clock-in (e.g. 2026-07-17 08:00)")
-          ?.trim();
-        if (!clockInRaw) return;
-        const clockOutRaw = window
-          .prompt("Corrected clock-out (e.g. 2026-07-17 16:30)")
-          ?.trim();
-        if (!clockOutRaw) return;
-        const clockInAt = new Date(clockInRaw).getTime();
-        const clockOutAt = new Date(clockOutRaw).getTime();
+        const values = await prompt.askFields({
+          title: "Correct this time record",
+          description: "Set the right clock-in and clock-out times.",
+          fields: [
+            {
+              name: "clockInAt",
+              label: "Clock in",
+              inputType: "datetime-local",
+              defaultValue: row.clockInAt
+                ? toDatetimeLocalValue(Number(row.clockInAt))
+                : undefined,
+              required: true,
+            },
+            {
+              name: "clockOutAt",
+              label: "Clock out",
+              inputType: "datetime-local",
+              defaultValue: row.clockOutAt
+                ? toDatetimeLocalValue(Number(row.clockOutAt))
+                : undefined,
+              required: true,
+            },
+          ],
+          confirmLabel: "Save correction",
+        });
+        if (!values) return;
+        const clockInAt = new Date(String(values.clockInAt)).getTime();
+        const clockOutAt = new Date(String(values.clockOutAt)).getTime();
+        if (!Number.isFinite(clockInAt) || !Number.isFinite(clockOutAt)) return;
         await correct({ ...args, clockInAt, clockOutAt });
       }
     });
@@ -119,6 +140,7 @@ export function TimeSheetPage() {
 
   return (
     <div className="operations-stage supply-stage">
+      {host}
       <header className="supply-masthead">
         <div>
           <p className="eyebrow">Staff · Time</p>

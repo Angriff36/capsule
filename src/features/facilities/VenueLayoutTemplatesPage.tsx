@@ -14,6 +14,7 @@ import {
   venueLayoutTemplatesListPath,
 } from "./facilitiesRoutes";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import {
   classifyCommandFailure,
   type CommandFailure,
@@ -89,6 +90,7 @@ export function VenueLayoutTemplatesPage() {
   const [sectionsDirty, setSectionsDirty] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const { prompt, host } = useActionPrompt();
 
   const venueName = (id: string | null | undefined) =>
     (venues ?? []).find((v) => v._id === id && v.deletedAt == null)?.name ??
@@ -241,6 +243,7 @@ export function VenueLayoutTemplatesPage() {
       </div>
 
       <FacilitiesWorkspaceNav />
+      {host}
 
       {failure ? <FailureBanner failure={failure} /> : null}
 
@@ -471,20 +474,33 @@ export function VenueLayoutTemplatesPage() {
                             className="btn btn-ghost min-h-10"
                             disabled={busy != null}
                             onClick={() => {
-                              // Reason is optional (archiving is reversible);
-                              // cancel the prompt to archive without one.
-                              const reason = window.prompt(
-                                "Archive reason (optional)",
-                              );
-                              if (reason == null) return;
-                              const trimmed = reason.trim();
-                              void run(`archive:${template._id}`, () =>
-                                archiveTemplate({
-                                  docId: template._id,
-                                  version: template.version,
-                                  reason: trimmed || undefined,
-                                }),
-                              );
+                              void (async () => {
+                                // Reason is optional (archiving is
+                                // reversible); leave it blank to archive
+                                // without one.
+                                const values = await prompt.askFields({
+                                  title: "Archive template",
+                                  description: `Archive ${template.name}. You can reactivate it later.`,
+                                  fields: [
+                                    {
+                                      name: "reason",
+                                      label: "Archive reason",
+                                      placeholder: "Optional",
+                                      required: false,
+                                    },
+                                  ],
+                                  confirmLabel: "Archive template",
+                                });
+                                if (values == null) return;
+                                const trimmed = (values.reason ?? "").trim();
+                                await run(`archive:${template._id}`, () =>
+                                  archiveTemplate({
+                                    docId: template._id,
+                                    version: template.version,
+                                    reason: trimmed || undefined,
+                                  }),
+                                );
+                              })();
                             }}
                           >
                             Archive

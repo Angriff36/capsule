@@ -61,16 +61,13 @@ const expiresWithin = (item: any, horizonDays: number) => {
 const dateLabel = formatDate;
 // Date-only input, stored as end of the labeled local day so a lot stays
 // issuable through its use-by date (matches the consume guard cutoff).
-const promptExpiry = (label: string, current: number | null | undefined) => {
-  const raw = window.prompt(
-    `${label} (YYYY-MM-DD, blank to clear)`,
-    current == null ? "" : new Date(current).toLocaleDateString("en-CA"),
-  );
-  if (raw == null) return undefined; // cancelled
+const toExpiryInput = (current: number | null | undefined) =>
+  current == null ? "" : new Date(current).toLocaleDateString("en-CA");
+const parseExpiryInput = (raw: string) => {
   const trimmed = raw.trim();
-  if (!trimmed) return null;
+  if (!trimmed) return null; // blank clears the stored date
   const time = new Date(`${trimmed}T23:59:59.999`).getTime();
-  return Number.isFinite(time) ? time : undefined;
+  return Number.isFinite(time) ? time : undefined; // undefined = invalid
 };
 
 export function StockBookPage() {
@@ -258,35 +255,77 @@ export function StockBookPage() {
   };
 
   const stockAction = (item: any, action: "receive" | "recount") => {
-    const label =
-      action === "receive" ? "Quantity received" : "Actual quantity";
-    const quantity = Number(window.prompt(label));
-    if (
-      !Number.isFinite(quantity) ||
-      quantity < 0 ||
-      (action === "receive" && quantity === 0)
-    )
-      return;
-    void run(`${item._id}:${action}`, async () => {
-      const base = { docId: item._id, version: item.version };
-      if (action === "receive") await receiveStock({ ...base, quantity });
-      else await recount({ ...base, actualQuantity: quantity });
-    });
+    void (async () => {
+      const values = await prompt.askFields({
+        title: action === "receive" ? "Receive stock" : "Recount stock",
+        description: `${ingredientName(item.ingredientId)} at ${locationName(
+          item.locationId,
+        )} (${item.unit}).`,
+        fields: [
+          {
+            name: "quantity",
+            label:
+              action === "receive" ? "Quantity received" : "Actual quantity",
+            inputType: "number",
+            required: true,
+          },
+        ],
+        confirmLabel: action === "receive" ? "Receive" : "Save recount",
+      });
+      if (!values) return;
+      const quantity = Number(values.quantity);
+      if (
+        !Number.isFinite(quantity) ||
+        quantity < 0 ||
+        (action === "receive" && quantity === 0)
+      )
+        return;
+      void run(`${item._id}:${action}`, async () => {
+        const base = { docId: item._id, version: item.version };
+        if (action === "receive") await receiveStock({ ...base, quantity });
+        else await recount({ ...base, actualQuantity: quantity });
+      });
+    })();
   };
 
   const expiryAction = (item: any) => {
-    const bestBeforeAt = promptExpiry("Best before", item.bestBeforeAt);
-    if (bestBeforeAt === undefined) return;
-    const useByAt = promptExpiry("Use by", item.useByAt);
-    if (useByAt === undefined) return;
-    void run(`${item._id}:dates`, async () => {
-      await setExpiry({
-        docId: item._id,
-        version: item.version,
-        bestBeforeAt: bestBeforeAt ?? undefined,
-        useByAt: useByAt ?? undefined,
+    void (async () => {
+      const values = await prompt.askFields({
+        title: "Set freshness dates",
+        description:
+          "Dates apply through the end of the labeled day. Leave a field blank to clear it.",
+        fields: [
+          {
+            name: "bestBeforeAt",
+            label: "Best before (YYYY-MM-DD)",
+            defaultValue: toExpiryInput(item.bestBeforeAt),
+            placeholder: "YYYY-MM-DD",
+            required: false,
+          },
+          {
+            name: "useByAt",
+            label: "Use by (YYYY-MM-DD)",
+            defaultValue: toExpiryInput(item.useByAt),
+            placeholder: "YYYY-MM-DD",
+            required: false,
+          },
+        ],
+        confirmLabel: "Save dates",
       });
-    });
+      if (!values) return;
+      const bestBeforeAt = parseExpiryInput(values.bestBeforeAt ?? "");
+      if (bestBeforeAt === undefined) return;
+      const useByAt = parseExpiryInput(values.useByAt ?? "");
+      if (useByAt === undefined) return;
+      void run(`${item._id}:dates`, async () => {
+        await setExpiry({
+          docId: item._id,
+          version: item.version,
+          bestBeforeAt: bestBeforeAt ?? undefined,
+          useByAt: useByAt ?? undefined,
+        });
+      });
+    })();
   };
 
   const levelsAction = (item: any) => {
@@ -334,14 +373,30 @@ export function StockBookPage() {
   };
 
   const reservationAction = (reservation: any, key: string) => {
+    if (key === "release") {
+      void (async () => {
+        const reason = (
+          await prompt.askReason({
+            title: "Release reservation",
+            description: "Return this reserved stock to available.",
+            label: "Release reason",
+            confirmLabel: "Release reservation",
+          })
+        )?.trim();
+        if (!reason) return;
+        void run(`${reservation._id}:${key}`, async () => {
+          await releaseReservation({
+            docId: reservation._id,
+            version: reservation.version,
+            reason,
+          });
+        });
+      })();
+      return;
+    }
     void run(`${reservation._id}:${key}`, async () => {
       const args = { docId: reservation._id, version: reservation.version };
       if (key === "consume") await consumeReservation(args);
-      if (key === "release") {
-        const reason = window.prompt("Release reason")?.trim();
-        if (!reason) return;
-        await releaseReservation({ ...args, reason });
-      }
     });
   };
 

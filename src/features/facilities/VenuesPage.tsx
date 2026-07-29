@@ -8,6 +8,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { venueDetailPath } from "./facilitiesRoutes";
 import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 
@@ -57,6 +58,7 @@ export function VenuesPage() {
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt();
 
   const rows = (venues ?? []).filter((item) => item.deletedAt == null);
   const activeRows = rows.filter(
@@ -126,7 +128,13 @@ export function VenuesPage() {
     const key = `${id}:toggle`;
     void run(key, async () => {
       if (venue.status === "active") {
-        const reason = window.prompt("Reason for deactivation:");
+        const reason = await prompt.askReason({
+          title: "Deactivate venue",
+          description: `Take ${venue.name} out of active use.`,
+          label: "Reason for deactivation",
+          confirmLabel: "Deactivate venue",
+          tone: "danger",
+        });
         if (!reason) return;
         await deactivate({ docId: id, version: venue.version, reason });
       } else {
@@ -153,6 +161,7 @@ export function VenuesPage() {
         }
       />
       <FacilitiesWorkspaceNav />
+      {host}
 
       {failure != null && <SupplyFailureBanner error={failure} />}
 

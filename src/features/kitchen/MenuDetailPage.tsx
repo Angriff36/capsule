@@ -21,6 +21,7 @@ import {
 import { formatMoneyExact } from "../../lib/format";
 import { useTrackRecent } from "../../lib/recents";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -71,6 +72,7 @@ export function MenuDetailPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [pdfLayout, setPdfLayout] = useState<MenuPdfLayout>("card");
+  const { prompt, host } = useActionPrompt();
   const selectedMenuDishes = useMemo(
     () =>
       (menuDishes ?? []).filter(
@@ -267,6 +269,7 @@ export function MenuDetailPage() {
         ← Menu index
       </Link>
       <KitchenBookNav />
+      {host}
       {failure ? (
         <div className="mt-4">
           <CulinaryFailureBanner error={failure} />
@@ -333,26 +336,42 @@ export function MenuDetailPage() {
               className="btn btn-ghost"
               disabled={busy != null || menuDishes === undefined}
               onClick={() => {
-                const isTemplate = !menu.isTemplate;
-                const name = window
-                  .prompt(
-                    isTemplate ? "Template name" : "New menu name",
-                    isTemplate ? `${menu.name} template` : menu.name,
-                  )
-                  ?.trim();
-                if (!name) return;
-                setNotice(null);
-                void run("duplicate", async () => {
-                  const createdId = await duplicateMenu({
-                    source: menu,
-                    dishLines: selectedMenuDishes,
-                    name,
-                    isTemplate,
-                    createMenu,
-                    createMenuDish,
+                void (async () => {
+                  const isTemplate = !menu.isTemplate;
+                  const values = await prompt.askFields({
+                    title: isTemplate
+                      ? "Save as template"
+                      : "New menu from template",
+                    description: isTemplate
+                      ? "Save this menu as a reusable template."
+                      : "Create a new menu from this template.",
+                    fields: [
+                      {
+                        name: "name",
+                        label: isTemplate ? "Template name" : "New menu name",
+                        defaultValue: isTemplate
+                          ? `${menu.name} template`
+                          : menu.name,
+                        required: true,
+                      },
+                    ],
+                    confirmLabel: isTemplate ? "Save template" : "Create menu",
                   });
-                  navigate(menuPath(createdId));
-                });
+                  const name = values?.name?.trim();
+                  if (!name) return;
+                  setNotice(null);
+                  await run("duplicate", async () => {
+                    const createdId = await duplicateMenu({
+                      source: menu,
+                      dishLines: selectedMenuDishes,
+                      name,
+                      isTemplate,
+                      createMenu,
+                      createMenuDish,
+                    });
+                    navigate(menuPath(createdId));
+                  });
+                })();
               }}
             >
               {busy === "duplicate"
@@ -371,26 +390,35 @@ export function MenuDetailPage() {
                 }
                 disabled={busy != null}
                 onClick={() => {
-                  const reason = ["unpublish", "archive"].includes(action.key)
-                    ? window.prompt("Reason")?.trim()
-                    : undefined;
-                  if (
-                    ["unpublish", "archive"].includes(action.key) &&
-                    !reason
-                  ) {
-                    return;
-                  }
-                  void run(action.key, async () => {
-                    const args = { docId: menu._id, version: menu.version };
-                    if (action.key === "markPublished") await publish(args);
-                    if (action.key === "unpublish") {
-                      await unpublish({ ...args, reason: reason! });
+                  void (async () => {
+                    const needsReason = ["unpublish", "archive"].includes(
+                      action.key,
+                    );
+                    const reason = needsReason
+                      ? (
+                          await prompt.askReason({
+                            title: action.label,
+                            description: `${action.label} this menu.`,
+                            label: "Reason",
+                            confirmLabel: action.label,
+                          })
+                        )?.trim()
+                      : undefined;
+                    if (needsReason && !reason) {
+                      return;
                     }
-                    if (action.key === "archive") {
-                      await archive({ ...args, reason: reason! });
-                    }
-                    if (action.key === "restore") await restore(args);
-                  });
+                    await run(action.key, async () => {
+                      const args = { docId: menu._id, version: menu.version };
+                      if (action.key === "markPublished") await publish(args);
+                      if (action.key === "unpublish") {
+                        await unpublish({ ...args, reason: reason! });
+                      }
+                      if (action.key === "archive") {
+                        await archive({ ...args, reason: reason! });
+                      }
+                      if (action.key === "restore") await restore(args);
+                    });
+                  })();
                 }}
               >
                 {busy === action.key ? "Working…" : action.label}

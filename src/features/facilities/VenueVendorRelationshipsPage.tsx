@@ -13,6 +13,7 @@ import {
   venueVendorRelationshipsListPath,
 } from "./facilitiesRoutes";
 import { PageHeader, StatusChip, TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
 import { formatDate } from "../../lib/format";
 import {
@@ -81,6 +82,7 @@ export function VenueVendorRelationshipsPage() {
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const { prompt, host } = useActionPrompt(busy != null);
 
   const venue = useMemo(
     () => (venues ?? []).find((v) => v._id === venueId && v.deletedAt == null),
@@ -168,8 +170,14 @@ export function VenueVendorRelationshipsPage() {
     });
   };
 
-  const handleRetire = (id: string, vendorName: string) => {
-    const reason = prompt(`Retire relationship with ${vendorName}. Reason:`);
+  const handleRetire = async (id: string, vendorName: string) => {
+    const reason = await prompt.askReason({
+      title: "Retire relationship",
+      description: `Retire the relationship with ${vendorName}.`,
+      label: "Reason",
+      confirmLabel: "Retire relationship",
+      tone: "danger",
+    });
     if (!reason?.trim()) return;
 
     void run(`retire-${id}`, async () => {
@@ -229,6 +237,7 @@ export function VenueVendorRelationshipsPage() {
         }
       />
       <FacilitiesWorkspaceNav />
+      {host}
 
       {failure && (
         <FailureBanner failure={failure} onDismiss={() => setFailure(null)} />
@@ -561,7 +570,10 @@ export function VenueVendorRelationshipsPage() {
                         <button
                           type="button"
                           onClick={() =>
-                            handleRetire(row._id, getVendorName(row.vendorId))
+                            void handleRetire(
+                              row._id,
+                              getVendorName(row.vendorId),
+                            )
                           }
                           disabled={busy === `retire-${row._id}`}
                           className="ml-2 text-danger hover:underline disabled:opacity-50"

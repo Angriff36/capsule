@@ -10,6 +10,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { formatMoney } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { EquipmentMaintenanceBoard } from "./EquipmentMaintenanceBoard";
 import { FacilitiesWorkspaceNav } from "./FacilitiesWorkspaceNav";
@@ -44,6 +45,7 @@ export function EquipmentCatalogPage() {
   const [editing, setEditing] = useState<EquipmentDetailRow | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt();
 
   const rows = (equipment ?? []).filter((item) => item.deletedAt == null);
   const activeRows = rows.filter((item) => item.status === "active");
@@ -108,14 +110,44 @@ export function EquipmentCatalogPage() {
     void run(`${item._id}:${key}`, async () => {
       const base = { docId: item._id, version: item.version };
       if (key === "recount") {
-        const quantity = Number(window.prompt("Actual quantity"));
+        const values = await prompt.askFields({
+          title: "Recount equipment",
+          description: `Record the actual counted quantity for ${item.name}.`,
+          fields: [
+            {
+              name: "quantity",
+              label: "Actual quantity",
+              inputType: "number",
+              defaultValue: String(item.quantity),
+              required: true,
+            },
+          ],
+          confirmLabel: "Save recount",
+        });
+        if (!values) return;
+        const quantity = Number(values.quantity);
         if (!Number.isInteger(quantity) || quantity < 0) return;
         await recount({ ...base, actualQuantity: quantity });
       }
       if (key === "condition") {
-        const condition = window
-          .prompt(`Condition (${CONDITIONS.join(", ")})`, item.condition)
-          ?.trim();
+        const values = await prompt.askFields({
+          title: "Update condition",
+          description: `Set the current condition of ${item.name}.`,
+          fields: [
+            {
+              name: "condition",
+              label: "Condition",
+              defaultValue: String(item.condition),
+              options: CONDITIONS.map((condition) => ({
+                value: condition,
+                label: condition.replace("_", " "),
+              })),
+              required: true,
+            },
+          ],
+          confirmLabel: "Update condition",
+        });
+        const condition = values?.condition?.trim();
         if (!condition || !CONDITIONS.includes(condition as any)) return;
         await updateCondition({
           ...base,
@@ -123,7 +155,15 @@ export function EquipmentCatalogPage() {
         });
       }
       if (key === "retire") {
-        const reason = window.prompt("Retirement reason")?.trim();
+        const reason = (
+          await prompt.askReason({
+            title: "Retire equipment",
+            description: `Retire ${item.name} from the catalog.`,
+            label: "Retirement reason",
+            confirmLabel: "Retire equipment",
+            tone: "danger",
+          })
+        )?.trim();
         if (!reason) return;
         await retire({ ...base, reason });
       }
@@ -156,6 +196,7 @@ export function EquipmentCatalogPage() {
         </div>
       </header>
       <FacilitiesWorkspaceNav />
+      {host}
       {failure ? <SupplyFailureBanner error={failure} /> : null}
       {showForm ? (
         <EquipmentForm

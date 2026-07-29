@@ -7,6 +7,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { PersonRoleDirectory } from "../admin/PersonRoleDirectory";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -55,6 +56,7 @@ export function RoleScorecardsPage() {
   const [expectations, setExpectations] = useState<Expectation[]>([
     { metric: "", target: "" },
   ]);
+  const { prompt, host } = useActionPrompt();
 
   const rows = (scorecards ?? []).filter((row) => row.deletedAt == null);
   const editing =
@@ -140,9 +142,12 @@ export function RoleScorecardsPage() {
   };
 
   const handleArchive = async (id: string) => {
-    const reason = window.prompt(
-      "Archive reason (this scorecard stays in history):",
-    );
+    const reason = await prompt.askReason({
+      title: "Archive scorecard",
+      description: "This scorecard stays in history after archiving.",
+      label: "Archive reason",
+      confirmLabel: "Archive scorecard",
+    });
     if (!reason?.trim()) return;
     setFailure(null);
     try {
@@ -189,6 +194,7 @@ export function RoleScorecardsPage() {
       </header>
 
       <WorkforceWorkspaceNav />
+      {host}
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
 
       {open ? (
@@ -382,7 +388,7 @@ export function RoleScorecardsPage() {
                                 </button>
                                 <button
                                   className="btn-link btn-link-compact text-ink-2"
-                                  onClick={() => handleArchive(row._id)}
+                                  onClick={() => void handleArchive(row._id)}
                                 >
                                   Archive
                                 </button>

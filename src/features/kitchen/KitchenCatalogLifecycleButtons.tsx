@@ -1,3 +1,4 @@
+import { useActionPrompt } from "../../ui/action-prompt";
 import { CulinaryLifecyclePolicy } from "./CulinaryLifecyclePolicy";
 import type { KitchenSection } from "./kitchenRoutes";
 
@@ -37,6 +38,7 @@ export function KitchenCatalogLifecycleButtons({
   run,
   commands,
 }: Props) {
+  const { prompt, host } = useActionPrompt();
   const deletedAt = item.deletedAt ?? null;
   const actions =
     section === "ingredients"
@@ -55,37 +57,52 @@ export function KitchenCatalogLifecycleButtons({
   if (!actions.length) return null;
 
   const invoke = (key: string) => {
-    const needsReason = key === "unpublish" || key === "archive";
-    const reason = needsReason ? window.prompt("Reason")?.trim() : undefined;
-    if (needsReason && !reason) return;
+    void (async () => {
+      const needsReason = key === "unpublish" || key === "archive";
+      const reason = needsReason
+        ? (
+            await prompt.askReason({
+              title: key === "unpublish" ? "Unpublish menu" : "Archive menu",
+              description:
+                key === "unpublish"
+                  ? "Take this menu back off the published list."
+                  : "Archive this menu.",
+              label: "Reason",
+              confirmLabel: key === "unpublish" ? "Unpublish" : "Archive",
+            })
+          )?.trim()
+        : undefined;
+      if (needsReason && !reason) return;
 
-    void run(`${item._id}:${key}`, async () => {
-      const args = { docId: item._id, version: item.version };
-      if (key === "purge") {
-        if (section === "ingredients") {
-          await commands.purgeIngredient(args);
-        } else if (section === "components") {
-          await commands.purgeComponent?.(args);
-        } else {
-          await commands.purgeDish(args);
+      await run(`${item._id}:${key}`, async () => {
+        const args = { docId: item._id, version: item.version };
+        if (key === "purge") {
+          if (section === "ingredients") {
+            await commands.purgeIngredient(args);
+          } else if (section === "components") {
+            await commands.purgeComponent?.(args);
+          } else {
+            await commands.purgeDish(args);
+          }
         }
-      }
-      if (key === "reinstate") {
-        await (section === "ingredients"
-          ? commands.reinstateIngredient(args)
-          : commands.reinstateDish(args));
-      }
-      if (key === "markPublished") await commands.publishMenu(args);
-      if (key === "unpublish") {
-        await commands.unpublishMenu({ ...args, reason });
-      }
-      if (key === "archive") await commands.archiveMenu({ ...args, reason });
-      if (key === "restore") await commands.restoreMenu(args);
-    });
+        if (key === "reinstate") {
+          await (section === "ingredients"
+            ? commands.reinstateIngredient(args)
+            : commands.reinstateDish(args));
+        }
+        if (key === "markPublished") await commands.publishMenu(args);
+        if (key === "unpublish") {
+          await commands.unpublishMenu({ ...args, reason });
+        }
+        if (key === "archive") await commands.archiveMenu({ ...args, reason });
+        if (key === "restore") await commands.restoreMenu(args);
+      });
+    })();
   };
 
   return (
     <div className="culinary-row-actions">
+      {host}
       {actions.map((action) => (
         <button
           key={action.key}

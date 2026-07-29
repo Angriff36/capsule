@@ -20,6 +20,7 @@ import {
   type CommandFailure,
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { PACK_LIST_UNITS, type PackListUnit } from "./packListUnits";
 
@@ -110,6 +111,7 @@ export function PackListTemplatesPage() {
   const [venueRequirement, setVenueRequirement] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const { prompt, host } = useActionPrompt();
 
   const styleName = (id: string | null | undefined) =>
     (serviceStyles ?? []).find((s) => s._id === id && s.deletedAt == null)
@@ -192,13 +194,21 @@ export function PackListTemplatesPage() {
     event.preventDefault();
     const trimmed = name.trim();
     if (!trimmed) {
-      alert("Template name is required");
+      setFailure({
+        category: "validation",
+        title: "Check the entered details",
+        detail: "Template name is required.",
+      });
       return;
     }
     const min = parseBand(guestCountMin);
     const max = parseBand(guestCountMax);
     if (min != null && max != null && max < min) {
-      alert("Guest-count band max must be greater than or equal to min.");
+      setFailure({
+        category: "validation",
+        title: "Check the entered details",
+        detail: "Guest-count band max must be greater than or equal to min.",
+      });
       return;
     }
     const itemsJson = JSON.stringify(items);
@@ -284,6 +294,7 @@ export function PackListTemplatesPage() {
         }
       />
       <LogisticsWorkspaceNav />
+      {host}
 
       {failure ? <FailureBanner failure={failure} /> : null}
 
@@ -586,20 +597,33 @@ export function PackListTemplatesPage() {
                             className="btn btn-ghost min-h-10"
                             disabled={busy != null}
                             onClick={() => {
-                              // Reason is optional (archiving is reversible);
-                              // cancel the prompt to archive without one.
-                              const reason = window.prompt(
-                                "Archive reason (optional)",
-                              );
-                              if (reason == null) return;
-                              const trimmed = reason.trim();
-                              void run(`archive:${template._id}`, () =>
-                                archiveTemplate({
-                                  docId: template._id,
-                                  version: template.version,
-                                  reason: trimmed || undefined,
-                                }),
-                              );
+                              void (async () => {
+                                // Reason is optional (archiving is
+                                // reversible); leave it blank to archive
+                                // without one.
+                                const values = await prompt.askFields({
+                                  title: "Archive template",
+                                  description: `Archive ${template.name}. You can reactivate it later.`,
+                                  fields: [
+                                    {
+                                      name: "reason",
+                                      label: "Archive reason",
+                                      placeholder: "Optional",
+                                      required: false,
+                                    },
+                                  ],
+                                  confirmLabel: "Archive template",
+                                });
+                                if (values == null) return;
+                                const trimmed = (values.reason ?? "").trim();
+                                await run(`archive:${template._id}`, () =>
+                                  archiveTemplate({
+                                    docId: template._id,
+                                    version: template.version,
+                                    reason: trimmed || undefined,
+                                  }),
+                                );
+                              })();
                             }}
                           >
                             Archive

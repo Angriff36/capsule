@@ -16,6 +16,7 @@ import {
 import { useTrackRecent } from "../../lib/recents";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { useUndoToast } from "../../ui/useUndoToast";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
@@ -47,6 +48,7 @@ export function DishDetailPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { notifyUndo, host: undoHost } = useUndoToast();
+  const { prompt, host } = useActionPrompt();
 
   if (!id) return <ErrorState title="Dish not found" />;
   if (dish === undefined) {
@@ -107,6 +109,7 @@ export function DishDetailPage() {
         </div>
       ) : null}
       {undoHost}
+      {host}
       <header className="culinary-header-compact">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
@@ -253,20 +256,26 @@ export function DishDetailPage() {
                   className="btn btn-ghost"
                   disabled={busy != null}
                   onClick={() => {
-                    const reason = window
-                      .prompt(
-                        `Merge "${dish.name}" into "${match.name}"? Reason`,
-                      )
-                      ?.trim();
-                    if (!reason) return;
-                    void run("mergeInto", async () => {
-                      await mergeInto({
-                        docId: dish._id,
-                        version: dish.version,
-                        targetDishId: match._id,
-                        reason,
+                    void (async () => {
+                      const reason = (
+                        await prompt.askReason({
+                          title: "Merge dishes",
+                          description: `Merge "${dish.name}" into "${match.name}".`,
+                          label: "Reason",
+                          confirmLabel: "Merge dishes",
+                          tone: "danger",
+                        })
+                      )?.trim();
+                      if (!reason) return;
+                      await run("mergeInto", async () => {
+                        await mergeInto({
+                          docId: dish._id,
+                          version: dish.version,
+                          targetDishId: match._id,
+                          reason,
+                        });
                       });
-                    });
+                    })();
                   }}
                 >
                   Merge this into that

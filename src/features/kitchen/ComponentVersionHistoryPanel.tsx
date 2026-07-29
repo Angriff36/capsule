@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { formatDate, formatTime } from "../../lib/format";
+import { useActionPrompt } from "../../ui/action-prompt";
 import {
   diffComponentLines,
   diffComponentScalars,
@@ -52,6 +53,7 @@ export function ComponentVersionHistoryPanel({
 
   const [leftId, setLeftId] = useState<string>("");
   const [rightId, setRightId] = useState<string>(CURRENT);
+  const { prompt, host } = useActionPrompt(busy);
 
   const dataFor = (id: string): ComponentSnapshotData | null => {
     if (id === CURRENT) return currentData;
@@ -78,6 +80,7 @@ export function ComponentVersionHistoryPanel({
         <h2>Version history</h2>
         <span>{history.length} snapshots</span>
       </div>
+      {host}
 
       {history.length === 0 ? (
         <div className="document-empty">
@@ -112,15 +115,17 @@ export function ComponentVersionHistoryPanel({
                     className="btn btn-ghost btn-sm"
                     disabled={busy}
                     onClick={() => {
-                      const data = parseComponentSnapshot(row.snapshot);
-                      if (!data) return;
-                      if (
-                        !window.confirm(
-                          `Restore this draft to Edition ${row.versionNumber}? Current values will be captured first.`,
-                        )
-                      )
-                        return;
-                      onRestore(data, `Edition ${row.versionNumber}`);
+                      void (async () => {
+                        const data = parseComponentSnapshot(row.snapshot);
+                        if (!data) return;
+                        const confirmed = await prompt.askConfirm({
+                          title: "Restore version",
+                          description: `Restore this draft to Edition ${row.versionNumber}? Current values will be captured first.`,
+                          confirmLabel: "Restore",
+                        });
+                        if (!confirmed) return;
+                        onRestore(data, `Edition ${row.versionNumber}`);
+                      })();
                     }}
                   >
                     Restore

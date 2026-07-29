@@ -13,6 +13,7 @@ import {
   venueVendorRelationshipsListPath,
 } from "./facilitiesRoutes";
 import { StatusChip } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { formatDate } from "../../lib/format";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { VenueNotesPanel } from "./VenueNotesPanel";
@@ -71,6 +72,7 @@ export function VenueDetailPage() {
   const [showEditForm, setShowEditForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt();
 
   if (id === "skip" || venue === undefined) {
     return (
@@ -168,8 +170,14 @@ export function VenueDetailPage() {
     });
   };
 
-  const handleDeactivate = () => {
-    const reason = window.prompt("Reason for deactivation:");
+  const handleDeactivate = async () => {
+    const reason = await prompt.askReason({
+      title: "Deactivate venue",
+      description: `Take ${venue.name} out of active use.`,
+      label: "Reason for deactivation",
+      confirmLabel: "Deactivate venue",
+      tone: "danger",
+    });
     if (!reason) return;
     void run("deactivate", async () => {
       await deactivate({
@@ -207,6 +215,7 @@ export function VenueDetailPage() {
         />
       </div>
 
+      {host}
       {failure != null && <SupplyFailureBanner error={failure} />}
 
       {/* Venue Header */}
@@ -799,7 +808,7 @@ export function VenueDetailPage() {
           <button
             className="btn btn-danger mt-4"
             type="button"
-            onClick={handleDeactivate}
+            onClick={() => void handleDeactivate()}
             disabled={busy === "deactivate"}
           >
             {busy === "deactivate" ? "Deactivating..." : "Deactivate Venue"}

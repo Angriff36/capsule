@@ -20,6 +20,7 @@ import {
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { culinaryCatalogVisibility } from "./CulinaryCatalogVisibility";
@@ -74,6 +75,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const [showCreate, setShowCreate] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt();
 
   const data = { components, ingredients, dishes, menus }[section];
   const rows = useMemo(() => {
@@ -117,9 +119,11 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         );
         if (
           duplicate &&
-          !window.confirm(
-            `An ingredient named "${duplicate.name}" already exists (edition ${duplicate.editionNumber ?? 1}). Create anyway? Prefer linking a new edition from the ingredient detail when you mean a version.`,
-          )
+          !(await prompt.askConfirm({
+            title: "Possible duplicate ingredient",
+            description: `An ingredient named "${duplicate.name}" already exists (edition ${duplicate.editionNumber ?? 1}). Prefer linking a new edition from the ingredient detail when you mean a version.`,
+            confirmLabel: "Create anyway",
+          }))
         ) {
           return;
         }
@@ -163,9 +167,11 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         );
         if (
           duplicate &&
-          !window.confirm(
-            `A dish named "${duplicate.name}" already exists (edition ${duplicate.editionNumber ?? 1}). Create anyway? Use dish detail → Create new edition for a versioned edition.`,
-          )
+          !(await prompt.askConfirm({
+            title: "Possible duplicate dish",
+            description: `A dish named "${duplicate.name}" already exists (edition ${duplicate.editionNumber ?? 1}). Use dish detail → Create new edition for a versioned edition.`,
+            confirmLabel: "Create anyway",
+          }))
         ) {
           return;
         }
@@ -243,6 +249,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
       </header>
 
       <KitchenBookNav />
+      {host}
       {failure ? (
         <div className="mt-4">
           <CulinaryFailureBanner error={failure} />

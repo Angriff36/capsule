@@ -28,6 +28,7 @@ import {
 import { ComponentVersionHistoryPanel } from "./ComponentVersionHistoryPanel";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import { CulinaryEntityLink } from "./CulinaryEntityLink";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
@@ -81,6 +82,7 @@ export function ComponentDetailPage() {
   const [showLineForm, setShowLineForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
+  const { prompt, host } = useActionPrompt();
   const draftForm = useFormDraft(`component-revise:${id ?? "none"}`);
 
   if (!id) return <ErrorState title="Component not found" />;
@@ -339,6 +341,7 @@ export function ComponentDetailPage() {
         ← Component index
       </Link>
       <KitchenBookNav />
+      {host}
       {failure ? (
         <div className="mt-4">
           <CulinaryFailureBanner error={failure} />
@@ -497,19 +500,37 @@ export function ComponentDetailPage() {
                       className="btn btn-ghost btn-sm"
                       disabled={busy != null}
                       onClick={() => {
-                        const quantity = Number(
-                          window.prompt("Quantity", String(line.quantity)),
-                        );
-                        if (!Number.isFinite(quantity) || quantity <= 0) return;
-                        void run(`adjust:${line._id}`, async () => {
-                          await captureBefore("Adjusted ingredient line");
-                          await adjustLine({
-                            docId: line._id,
-                            quantity,
-                            unit: line.unit,
-                            version: line.version,
+                        void (async () => {
+                          const values = await prompt.askFields({
+                            title: "Adjust quantity",
+                            description: `New quantity for ${ingredientName(
+                              line.ingredientId,
+                            )} (${String(line.unit)}).`,
+                            fields: [
+                              {
+                                name: "quantity",
+                                label: "Quantity",
+                                inputType: "number",
+                                defaultValue: String(line.quantity),
+                                required: true,
+                              },
+                            ],
+                            confirmLabel: "Adjust quantity",
                           });
-                        });
+                          if (!values) return;
+                          const quantity = Number(values.quantity);
+                          if (!Number.isFinite(quantity) || quantity <= 0)
+                            return;
+                          await run(`adjust:${line._id}`, async () => {
+                            await captureBefore("Adjusted ingredient line");
+                            await adjustLine({
+                              docId: line._id,
+                              quantity,
+                              unit: line.unit,
+                              version: line.version,
+                            });
+                          });
+                        })();
                       }}
                     >
                       Adjust
@@ -518,16 +539,28 @@ export function ComponentDetailPage() {
                       className="btn btn-ghost btn-sm"
                       disabled={busy != null}
                       onClick={() => {
-                        const reason = window.prompt("Removal reason")?.trim();
-                        if (!reason) return;
-                        void run(`remove:${line._id}`, async () => {
-                          await captureBefore("Removed ingredient line");
-                          await removeLine({
-                            docId: line._id,
-                            reason,
-                            version: line.version,
+                        void (async () => {
+                          const reason = (
+                            await prompt.askReason({
+                              title: "Remove ingredient line",
+                              description: `Remove ${ingredientName(
+                                line.ingredientId,
+                              )} from this component.`,
+                              label: "Removal reason",
+                              confirmLabel: "Remove line",
+                              tone: "danger",
+                            })
+                          )?.trim();
+                          if (!reason) return;
+                          await run(`remove:${line._id}`, async () => {
+                            await captureBefore("Removed ingredient line");
+                            await removeLine({
+                              docId: line._id,
+                              reason,
+                              version: line.version,
+                            });
                           });
-                        });
+                        })();
                       }}
                     >
                       Remove

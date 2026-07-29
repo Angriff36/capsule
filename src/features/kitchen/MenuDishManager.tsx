@@ -5,6 +5,7 @@ import {
   useMenuDishUpdateDetails,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryRecordPicker, type PickerDish } from "./CulinaryRecordPicker";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
@@ -40,6 +41,7 @@ export function MenuDishManager({
   const updateDetails = useMenuDishUpdateDetails();
   const [showPicker, setShowPicker] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const { prompt, host } = useActionPrompt();
 
   const lines = useMemo(
     () =>
@@ -68,6 +70,7 @@ export function MenuDishManager({
         <h2>Dishes on this menu</h2>
         <span>{lines.length} dishes</span>
       </div>
+      {host}
       <div className="mb-3 flex flex-wrap gap-2">
         <button
           type="button"
@@ -200,17 +203,25 @@ export function MenuDishManager({
                     className="btn btn-ghost"
                     disabled={busy != null}
                     onClick={() => {
-                      const reason = window
-                        .prompt("Reason for removing this dish")
-                        ?.trim();
-                      if (!reason) return;
-                      void run(`remove:${line._id}`, () =>
-                        removeMenuDish({
-                          docId: line._id,
-                          version: line.version,
-                          reason,
-                        }),
-                      );
+                      void (async () => {
+                        const reason = (
+                          await prompt.askReason({
+                            title: "Remove dish",
+                            description: `Remove ${dish?.name ?? "this dish"} from the menu.`,
+                            label: "Reason for removing this dish",
+                            confirmLabel: "Remove dish",
+                            tone: "danger",
+                          })
+                        )?.trim();
+                        if (!reason) return;
+                        await run(`remove:${line._id}`, () =>
+                          removeMenuDish({
+                            docId: line._id,
+                            version: line.version,
+                            reason,
+                          }),
+                        );
+                      })();
                     }}
                   >
                     Remove

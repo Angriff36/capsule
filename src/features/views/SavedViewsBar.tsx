@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { type ReportSubjectArea, useSavedViews } from "./useSavedViews";
 
 type Props<S> = {
@@ -30,6 +31,7 @@ export function SavedViewsBar<S>({
   const [selected, setSelected] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { prompt, host } = useActionPrompt(busy);
   const appliedDefault = useRef(false);
 
   // Run a saved-view mutation, surfacing failures instead of a silent no-op.
@@ -64,11 +66,16 @@ export function SavedViewsBar<S>({
     if (view) onApply(view.state);
   };
 
-  // ponytail: native prompt/confirm — the app has no lightweight text-input modal
-  // and a name prompt does not warrant building one. Swap for an inline field if
-  // the UX bar rises.
+  // Action-prompt panel instead of window.prompt/confirm — native dialogs are
+  // unavailable in embedded browser contexts.
   const onSave = async () => {
-    const name = window.prompt("Name this view")?.trim();
+    const values = await prompt.askFields({
+      title: "Save view",
+      description: "Save the current filters, sort, and columns as a view.",
+      fields: [{ name: "name", label: "View name", required: true }],
+      confirmLabel: "Save view",
+    });
+    const name = values?.name?.trim();
     if (!name) return;
     await guardedRun(() => save(name, currentState, views.length === 0));
   };
@@ -118,11 +125,19 @@ export function SavedViewsBar<S>({
             type="button"
             className="btn btn-ghost btn-sm"
             onClick={() => {
-              if (!window.confirm(`Delete view “${current.name}”?`)) return;
-              void guardedRun(async () => {
-                await remove(current.id);
-                setSelected("");
-              });
+              void (async () => {
+                const confirmed = await prompt.askConfirm({
+                  title: "Delete view",
+                  description: `Delete view “${current.name}”? This cannot be undone.`,
+                  confirmLabel: "Delete view",
+                  tone: "danger",
+                });
+                if (!confirmed) return;
+                await guardedRun(async () => {
+                  await remove(current.id);
+                  setSelected("");
+                });
+              })();
             }}
             disabled={busy}
           >
@@ -135,6 +150,7 @@ export function SavedViewsBar<S>({
           {error}
         </span>
       ) : null}
+      <div className="w-full">{host}</div>
     </div>
   );
 }
