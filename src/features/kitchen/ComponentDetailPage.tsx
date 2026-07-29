@@ -16,7 +16,7 @@ import {
   useComponentPurge,
   useComponentRetract,
   useComponentReviseDraft,
-  useComponentSnapshotCapture,
+  useCreateComponentSnapshot,
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
 import { useAuthStatus } from "../../lib/useAuthStatus";
@@ -70,7 +70,9 @@ export function ComponentDetailPage() {
   const createLine = useCreateComponentIngredient();
   const adjustLine = useComponentIngredientAdjustQuantity();
   const removeLine = useComponentIngredientRemove();
-  const captureSnapshot = useComponentSnapshotCapture();
+  // Creation path: the governed create hook (ComponentSnapshot_createViaCapture),
+  // not the entity-command hook which targets an existing doc via docId.
+  const captureSnapshot = useCreateComponentSnapshot();
   const snapshots = useListComponentSnapshot();
   const people = useListPerson();
   const authStatus = useAuthStatus();

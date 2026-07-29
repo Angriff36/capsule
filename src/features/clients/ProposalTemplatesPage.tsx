@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import {
+  useCreateProposalTemplate,
   useProposalTemplateArchive,
-  useProposalTemplateDefine,
   useProposalTemplateReactivate,
   useProposalTemplateRevise,
   useListProposalTemplate,
@@ -52,7 +52,9 @@ function formatVisibleSections(value: string[] | null | undefined): string {
 
 export function ProposalTemplatesPage() {
   const templates = useListProposalTemplate();
-  const define = useProposalTemplateDefine();
+  // Creation path: the governed create hook (ProposalTemplate_createViaDefine),
+  // not the entity-command hook which targets an existing doc via docId.
+  const define = useCreateProposalTemplate();
   const revise = useProposalTemplateRevise();
   const archive = useProposalTemplateArchive();
   const reactivate = useProposalTemplateReactivate();

@@ -1,8 +1,8 @@
 import { useState, type FormEvent } from "react";
 import {
   useListRoleScorecard,
+  useCreateRoleScorecard,
   useRoleScorecardArchive,
-  useRoleScorecardDefine,
   useRoleScorecardReactivate,
 } from "../../lib/manifest-convex-react";
 import { PersonRoleDirectory } from "../admin/PersonRoleDirectory";
@@ -42,7 +42,9 @@ function localDateEpoch(value: FormDataEntryValue | null) {
 
 export function RoleScorecardsPage() {
   const scorecards = useListRoleScorecard();
-  const define = useRoleScorecardDefine();
+  // Creation must use the governed creation hook (RoleScorecard_createViaDefine);
+  // the entity-command variant targets an existing docId and fails on create.
+  const define = useCreateRoleScorecard();
   const archive = useRoleScorecardArchive();
   const reactivate = useRoleScorecardReactivate();
 

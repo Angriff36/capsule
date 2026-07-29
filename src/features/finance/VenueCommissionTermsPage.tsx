@@ -1,8 +1,8 @@
 import { useMemo, useState, type FormEvent } from "react";
 import {
+  useCreateVenueCommissionTerm,
   useListVenueCommissionTerm,
   useListVenue,
-  useVenueCommissionTermDefine,
   useVenueCommissionTermRevise,
   useVenueCommissionTermRetire,
 } from "../../lib/manifest-convex-react";
@@ -34,7 +34,9 @@ const termStatus = (term: {
 export function VenueCommissionTermsPage() {
   const venueTerms = useListVenueCommissionTerm();
   const venues = useListVenue();
-  const defineTerm = useVenueCommissionTermDefine();
+  // Creation path: the governed create hook (VenueCommissionTerm_createViaDefine),
+  // not the entity-command hook which targets an existing doc via docId.
+  const defineTerm = useCreateVenueCommissionTerm();
   const reviseTerm = useVenueCommissionTermRevise();
   const retire = useVenueCommissionTermRetire();
   const [editingId, setEditingId] = useState<string | null>(null);

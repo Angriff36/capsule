@@ -125,7 +125,7 @@ export function classifyCommandFailure(error: unknown): CommandFailure {
       category: "validation",
       title: "Check the entered details",
       detail:
-        "One or more fields are missing or invalid. Confirm client, venue, dates, headcount, contact, and pricing, then try again.",
+        "One or more fields are missing or invalid. Double-check what you entered, then try again.",
     };
   }
   if (/ConcurrencyConflict|VERSION_MISMATCH/i.test(detail)) {
