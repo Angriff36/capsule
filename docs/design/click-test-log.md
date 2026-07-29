@@ -32,6 +32,40 @@ Owner directive: every place an action can take place must be manually tested **
 
 **Staff section: COMPLETE — 13/13 tabs.** 6 bugs found by clicking (4 broken creates, review nullable chain incl. generator issue #126, window.prompt breakage), all fixed; 2 raw-enum polish leaks logged (hiring card, qualification type).
 
+## Kitchen section — tested
+
+| Tab | Actions | Result |
+|---|---|---|
+| Ingredients | create (13th record) | **PASS** |
+| Components | create → detail → publish | **PASS** (copy leak: empty state says "through the generated Manifest command" — fix) |
+| Dishes | create → attach ingredient line (demand copy confirms) | **PASS** |
+| Menus | create (draft) | **PASS** |
+| Allergen matrix | select menu → disclosure builds (4 dishes) | **PASS** (Export PDF untested) |
+| Prep board / My Day prep | claim/start/done tested via My Day | **PASS** |
+| KDS, event-menu, import, detail panels (components/prep/containers) | — | TODO |
+
+## Events section — tested
+
+| Item | Result |
+|---|---|
+| Create via sectioned form (Basics only + side-panel client/venue) | **PASS** — full detail page opens. Occasion dropdown EMPTY (known unseeded catalog #113, other agent). |
+| Restored Guests tab | **PASS** — invite guest, RSVP actions render, Confirm works (leak: raw `tree_nuts` on guest card) |
+| Restored Incidents tab | **PASS** — report incident (Service/OPEN/MEDIUM + lifecycle buttons) |
+| Lifecycle | **PASS** — submit for approval → approve (PLANNING → PENDING APPROVAL → APPROVED) |
+| Menu tab, Timeline, Layouts, Staffing tab (new picker), Photos, BEO download, portal copy, templates, capacity | TODO |
+
+## Clients section — tested this round
+
+| Item | Result |
+|---|---|
+| Add client | **PASS** (row appears with contact) |
+| Lead capture | **PASS** (required `source` field has no placeholder — minor; card lands on board) |
+| Pipeline move/convert, proposal draft/send, template create (retest post-fix), contracts draft (retest option labels), retention, quote convert, inbox paste form | TODO |
+
+## Round-3 fixes shipped (`400d453`)
+- window.prompt/confirm/alert purged app-wide (18 files) after "prompt() is not supported" broke Time sheet Correct live; all flows now use the action-prompt panel.
+- Re-tests needed post-deploy: Time Correct, StockBook receive/recount, Equipment condition/retire, Venue deactivate, MenuDetail duplicate, template archive, saved views.
+
 ## Remaining sections (every actionable control per tab)
 
 - [ ] Events: list filters/saved views, create (done earlier via form test? re-verify submit), detail tabs incl. restored Guests/Inventory/Incidents, lifecycle actions, templates, capacity, briefing
