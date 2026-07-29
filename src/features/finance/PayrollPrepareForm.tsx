@@ -80,6 +80,8 @@ export function PayrollPrepareForm({
   const [periodStart, setPeriodStart] = useState("");
   const [periodEnd, setPeriodEnd] = useState("");
   const [overtime, setOvertime] = useState(0);
+  // Manual edit wins over the clocked prefill until person/period changes.
+  const [regularOverride, setRegularOverride] = useState<string | null>(null);
 
   const startAt = periodStart ? new Date(periodStart).getTime() : Number.NaN;
   const endAt = periodEnd ? new Date(periodEnd).getTime() : Number.NaN;
@@ -134,7 +136,10 @@ export function PayrollPrepareForm({
           name="personId"
           required
           value={personId}
-          onChange={(event) => setPersonId(event.target.value)}
+          onChange={(event) => {
+            setPersonId(event.target.value);
+            setRegularOverride(null);
+          }}
         >
           <option value="" disabled>
             Select person
@@ -155,7 +160,10 @@ export function PayrollPrepareForm({
             type="datetime-local"
             required
             value={periodStart}
-            onChange={(event) => setPeriodStart(event.target.value)}
+            onChange={(event) => {
+              setPeriodStart(event.target.value);
+              setRegularOverride(null);
+            }}
           />
         </label>
         <label className="field-label">
@@ -166,7 +174,10 @@ export function PayrollPrepareForm({
             type="datetime-local"
             required
             value={periodEnd}
-            onChange={(event) => setPeriodEnd(event.target.value)}
+            onChange={(event) => {
+              setPeriodEnd(event.target.value);
+              setRegularOverride(null);
+            }}
           />
         </label>
       </div>
@@ -174,17 +185,13 @@ export function PayrollPrepareForm({
         <label className="field-label">
           Regular minutes
           <input
-            key={
-              windowReady
-                ? `${personId}:${periodStart}:${periodEnd}:${overtime}`
-                : "blank"
-            }
             className="input"
             name="regularMinutes"
             type="number"
             min="0"
             required
-            defaultValue={String(regularDefault)}
+            value={regularOverride ?? String(regularDefault)}
+            onChange={(event) => setRegularOverride(event.target.value)}
           />
           {clocked ? (
             <span className="text-[11px] text-ink-3">

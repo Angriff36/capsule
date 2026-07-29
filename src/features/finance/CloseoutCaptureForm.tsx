@@ -296,7 +296,7 @@ export function CloseoutCaptureForm({
             min="0"
             step="0.01"
             required
-            key={`labor:${eventId}`}
+            key={`labor:${eventId}:${labor === undefined ? "loading" : "ready"}`}
             defaultValue={laborDefault.toFixed(2)}
           />
           <LaborProvenance labor={labor} />
