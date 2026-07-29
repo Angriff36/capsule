@@ -26640,9 +26640,7 @@ async function __runPersonAssignRole(ctx: MutationCtx, { docId, role, version }:
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, personId: docId, tenantId: __after.tenantId, role: role, _subject: { entity: "Person", command: "assignRole", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonRoleAssigned", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: __after.tenantId, role: role }, createdAt: Date.now() });
-    const __ret: Record<string, any> = { ...doc, ...updates };
-    delete (__ret as any).hourlyRate;
-    return __ret;
+    return { ...doc, ...updates };
 }
 
 export const Person_assignRole = mutation({
@@ -26693,9 +26691,7 @@ async function __runPersonCorrectIdentity(ctx: MutationCtx, { docId, givenName, 
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, personId: docId, tenantId: __after.tenantId, givenName: givenName, familyName: familyName, _subject: { entity: "Person", command: "correctIdentity", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonIdentityCorrected", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: __after.tenantId, givenName: givenName, familyName: familyName }, createdAt: Date.now() });
-    const __ret: Record<string, any> = { ...doc, ...updates };
-    delete (__ret as any).hourlyRate;
-    return __ret;
+    return { ...doc, ...updates };
 }
 
 export const Person_correctIdentity = mutation({
@@ -26756,9 +26752,7 @@ async function __runPersonDeactivate(ctx: MutationCtx, { docId, version }: any, 
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, personId: docId, tenantId: __after.tenantId, _subject: { entity: "Person", command: "deactivate", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonDeactivated", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: __after.tenantId }, createdAt: Date.now() });
-    const __ret: Record<string, any> = { ...doc, ...updates };
-    delete (__ret as any).hourlyRate;
-    return __ret;
+    return { ...doc, ...updates };
 }
 
 export const Person_deactivate = mutation({
@@ -26815,9 +26809,7 @@ async function __runPersonHire(ctx: MutationCtx, { docId, givenName, familyName,
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, personId: docId, tenantId: __after.tenantId, email: email, role: __after.role, _subject: { entity: "Person", command: "hire", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonHired", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: __after.tenantId, email: email, role: __after.role }, createdAt: Date.now() });
-    const __ret: Record<string, any> = { ...doc, ...updates };
-    delete (__ret as any).hourlyRate;
-    return __ret;
+    return { ...doc, ...updates };
 }
 
 export const Person_hire = mutation({
@@ -26941,9 +26933,7 @@ async function __runPersonLinkAccount(ctx: MutationCtx, { docId, authSubjectId, 
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, personId: docId, tenantId: __after.tenantId, authSubjectId: authSubjectId, _subject: { entity: "Person", command: "linkAccount", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonAccountLinked", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: __after.tenantId, authSubjectId: authSubjectId }, createdAt: Date.now() });
-    const __ret: Record<string, any> = { ...doc, ...updates };
-    delete (__ret as any).hourlyRate;
-    return __ret;
+    return { ...doc, ...updates };
 }
 
 export const Person_linkAccount = mutation({
@@ -27002,9 +26992,7 @@ async function __runPersonReactivate(ctx: MutationCtx, { docId, version }: any, 
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, personId: docId, tenantId: __after.tenantId, _subject: { entity: "Person", command: "reactivate", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonReactivated", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: __after.tenantId }, createdAt: Date.now() });
-    const __ret: Record<string, any> = { ...doc, ...updates };
-    delete (__ret as any).hourlyRate;
-    return __ret;
+    return { ...doc, ...updates };
 }
 
 export const Person_reactivate = mutation({
@@ -27050,9 +27038,7 @@ async function __runPersonSetPayRate(ctx: MutationCtx, { docId, hourlyRate, vers
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, personId: docId, tenantId: __after.tenantId, hourlyRate: hourlyRate, _subject: { entity: "Person", command: "setPayRate", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonPayRateSet", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: __after.tenantId, hourlyRate: hourlyRate }, createdAt: Date.now() });
-    const __ret: Record<string, any> = { ...doc, ...updates };
-    delete (__ret as any).hourlyRate;
-    return __ret;
+    return { ...doc, ...updates };
 }
 
 export const Person_setPayRate = mutation({
@@ -27098,9 +27084,7 @@ async function __runPersonSetSmsAlerts(ctx: MutationCtx, { docId, optIn, version
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, personId: docId, tenantId: __after.tenantId, optIn: optIn, _subject: { entity: "Person", command: "setSmsAlerts", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonSmsAlertsChanged", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: __after.tenantId, optIn: optIn }, createdAt: Date.now() });
-    const __ret: Record<string, any> = { ...doc, ...updates };
-    delete (__ret as any).hourlyRate;
-    return __ret;
+    return { ...doc, ...updates };
 }
 
 export const Person_setSmsAlerts = mutation({
@@ -27161,9 +27145,7 @@ async function __runPersonTerminate(ctx: MutationCtx, { docId, reason, version }
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, personId: docId, tenantId: __after.tenantId, reason: reason, _subject: { entity: "Person", command: "terminate", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonTerminated", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: __after.tenantId, reason: reason }, createdAt: Date.now() });
-    const __ret: Record<string, any> = { ...doc, ...updates };
-    delete (__ret as any).hourlyRate;
-    return __ret;
+    return { ...doc, ...updates };
 }
 
 export const Person_terminate = mutation({
@@ -27211,9 +27193,7 @@ async function __runPersonUnlinkAccount(ctx: MutationCtx, { docId, version }: an
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, personId: docId, tenantId: __after.tenantId, _subject: { entity: "Person", command: "unlinkAccount", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "PersonAccountUnlinked", entity: "Person", entityId: docId, payload: { personId: docId, tenantId: __after.tenantId }, createdAt: Date.now() });
-    const __ret: Record<string, any> = { ...doc, ...updates };
-    delete (__ret as any).hourlyRate;
-    return __ret;
+    return { ...doc, ...updates };
 }
 
 export const Person_unlinkAccount = mutation({

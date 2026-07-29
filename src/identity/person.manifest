@@ -71,6 +71,11 @@ entity Person mixin TenantScoped, SoftDeletable {
   property required status: PersonStatus = "active"
   property hireDate: datetime?
   property terminationDate: datetime?
+  // Hourly pay rate. Nullable so pre-existing rows pass Convex schema
+  // validation. `private` keeps wages out of the broad staffAccess read
+  // surface; privileged reads go through the authored convex/laborSummary.ts
+  // seam (workforce/finance managers).
+  property private hourlyRate: money(12, 2)?
   // Opt-in for high-urgency SMS alerts (delivery dispatched, event T-2h,
   // critical allergen incident). Nullable so pre-existing rows pass Convex
   // schema validation; treated as false when unset.
@@ -143,6 +148,20 @@ entity Person mixin TenantScoped, SoftDeletable {
       tenantId: self.tenantId
       givenName: givenName
       familyName: familyName
+    }
+  }
+
+  // Set the hourly pay rate. Uses the default workforce write/execute
+  // policies (workforce managers set pay). Drives live labor-cost math in
+  // closeouts and reports.
+  command setPayRate(hourlyRate: number) {
+    guard self.deletedAt == null
+    constraint payRateNonNegative: hourlyRate >= 0 "Hourly rate must be zero or more"
+    mutate hourlyRate = hourlyRate
+    emit PersonPayRateSet {
+      personId: self.id
+      tenantId: self.tenantId
+      hourlyRate: hourlyRate
     }
   }
 
@@ -271,6 +290,12 @@ event PersonRoleAssigned: "person.role_assigned" {
   personId: string
   tenantId: string
   role: string
+}
+
+event PersonPayRateSet: "person.pay_rate_set" {
+  personId: string
+  tenantId: string
+  hourlyRate: number
 }
 
 event PersonSmsAlertsChanged: "person.sms_alerts_changed" {

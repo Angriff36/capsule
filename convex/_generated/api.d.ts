@@ -27,6 +27,7 @@ import type * as inventoryAudit from "../inventoryAudit.js";
 import type * as invoicePayments from "../invoicePayments.js";
 import type * as invoiceReminders from "../invoiceReminders.js";
 import type * as kmParser from "../kmParser.js";
+import type * as laborSummary from "../laborSummary.js";
 import type * as lib_authContext from "../lib/authContext.js";
 import type * as lib_clientPortalToken from "../lib/clientPortalToken.js";
 import type * as lib_encryption from "../lib/encryption.js";
@@ -86,6 +87,7 @@ declare const fullApi: ApiFromModules<{
   invoicePayments: typeof invoicePayments;
   invoiceReminders: typeof invoiceReminders;
   kmParser: typeof kmParser;
+  laborSummary: typeof laborSummary;
   "lib/authContext": typeof lib_authContext;
   "lib/clientPortalToken": typeof lib_clientPortalToken;
   "lib/encryption": typeof lib_encryption;
