@@ -31,7 +31,15 @@ const DATASET_TYPE_LABELS: Record<string, string> = {
   menus: "Menus",
   venues: "Venues",
   payments: "Payments",
+  pack_list: "Pack Lists",
 };
+
+// This dashboard compares the events dataset — events are the spine every
+// other imported record hangs off, so they are the §6.5 parallel-run gate.
+const COMPARISON_DATASET = "events";
+
+// Comparison window: the last 30 days.
+const COMPARISON_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 
 // Event stage labels for comparison
 const STAGE_LABELS: Record<string, string> = {
@@ -47,13 +55,6 @@ const STAGE_LABELS: Record<string, string> = {
   closed_out: "Closed Out",
 };
 
-// Future: TPP_STAGE_MAPPING may be used for more detailed stage comparisons
-// const TPP_STAGE_MAPPING: Record<string, string> = {
-//   quote: "Quote", planning: "Planning", pending_approval: "Pending Approval",
-//   approved: "Approved", sales_lock: "Confirmed", executing: "Confirmed",
-//   final: "Final", completed: "Completed", cancelled: "Cancelled", closed_out: "Closed",
-// };
-
 interface ComparisonMetric {
   label: string;
   capsuleCount: number;
@@ -63,13 +64,6 @@ interface ComparisonMetric {
   status: "match" | "warning" | "error";
 }
 
-// Future: DailySnapshot may be used for historical comparison trends
-// interface DailySnapshot {
-//   date: string;
-//   totalEvents: number;
-//   status: "match" | "warning" | "error";
-// }
-
 export function ParallelRunDashboardPage() {
   const capsuleEvents = useListEvent();
   const importRuns = useListImportRun();
@@ -78,12 +72,14 @@ export function ParallelRunDashboardPage() {
   const occasions = useListOccasion();
   const venues = useListVenue();
 
-  // Fixed date range for initial dashboard (30 days back)
-  const selectedDateRange = {
-    start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    end: new Date(),
-  };
-  const selectedDataset = "events"; // Fixed to events for now
+  // Computed once per mount so downstream memos are stable across renders.
+  const selectedDateRange = useMemo(
+    () => ({
+      start: new Date(Date.now() - COMPARISON_WINDOW_MS),
+      end: new Date(),
+    }),
+    [],
+  );
 
   // Filter events by date range
   const filteredEvents = useMemo(() => {
@@ -103,12 +99,12 @@ export function ParallelRunDashboardPage() {
     return importRuns.filter(
       (run) =>
         run.status === "completed" &&
-        run.datasetType === selectedDataset &&
+        run.datasetType === COMPARISON_DATASET &&
         run.startTime &&
         new Date(run.startTime) >= selectedDateRange.start &&
         new Date(run.startTime) <= selectedDateRange.end,
     );
-  }, [importRuns, selectedDataset, selectedDateRange]);
+  }, [importRuns, selectedDateRange]);
 
   // Get latest completed import run for TPP comparison
   const latestTppImport = useMemo(() => {
@@ -408,18 +404,18 @@ export function ParallelRunDashboardPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <AdminWorkspaceNav />
-
       <header className="supply-masthead">
         <div>
           <h1 className="display-title">Parallel Run Dashboard</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            A daily side-by-side of TPP and Capsule, so you can confirm
-            everything came over correctly before switching for good. Dig into
-            any differences below.
+            A daily side-by-side of TPP and Capsule events over the last 30
+            days, so you can confirm everything came over correctly before
+            switching for good. Dig into any differences below.
           </p>
         </div>
       </header>
+
+      <AdminWorkspaceNav />
 
       {loading ? (
         <TableSkeleton rows={5} />
@@ -452,7 +448,7 @@ export function ParallelRunDashboardPage() {
                 className={`text-2xl font-bold ${
                   filteredEvents.length - (tppRecordCounts.total ?? 0) === 0
                     ? "text-ok"
-                    : "text-orange-600"
+                    : "text-warn"
                 }`}
               >
                 {filteredEvents.length - (tppRecordCounts.total ?? 0)}
@@ -465,9 +461,7 @@ export function ParallelRunDashboardPage() {
               </h3>
               <p
                 className={`text-2xl font-bold ${
-                  unresolvedMappings.length === 0
-                    ? "text-ok"
-                    : "text-orange-600"
+                  unresolvedMappings.length === 0 ? "text-ok" : "text-warn"
                 }`}
               >
                 {unresolvedMappings.length}
@@ -508,18 +502,14 @@ export function ParallelRunDashboardPage() {
                       <td>{metric.capsuleCount.toLocaleString()}</td>
                       <td>{metric.tppCount.toLocaleString()}</td>
                       <td
-                        className={
-                          metric.diff === 0 ? "text-ok" : "text-orange-600"
-                        }
+                        className={metric.diff === 0 ? "text-ok" : "text-warn"}
                       >
                         {metric.diff > 0 ? "+" : ""}
                         {metric.diff.toLocaleString()}
                       </td>
                       <td
                         className={
-                          metric.diffPercent === 0
-                            ? "text-ok"
-                            : "text-orange-600"
+                          metric.diffPercent === 0 ? "text-ok" : "text-warn"
                         }
                       >
                         {metric.diffPercent.toFixed(1)}%
@@ -536,9 +526,7 @@ export function ParallelRunDashboardPage() {
                       <td>${revenueMetric.tppCount.toLocaleString()}</td>
                       <td
                         className={
-                          revenueMetric.diff === 0
-                            ? "text-ok"
-                            : "text-orange-600"
+                          revenueMetric.diff === 0 ? "text-ok" : "text-warn"
                         }
                       >
                         {revenueMetric.diff > 0 ? "+" : ""}$
@@ -548,7 +536,7 @@ export function ParallelRunDashboardPage() {
                         className={
                           revenueMetric.diffPercent === 0
                             ? "text-ok"
-                            : "text-orange-600"
+                            : "text-warn"
                         }
                       >
                         {revenueMetric.diffPercent.toFixed(1)}%
@@ -592,9 +580,7 @@ export function ParallelRunDashboardPage() {
                         <td>{item.capsule}</td>
                         <td>{item.tpp}</td>
                         <td
-                          className={
-                            item.diff === 0 ? "text-ok" : "text-orange-600"
-                          }
+                          className={item.diff === 0 ? "text-ok" : "text-warn"}
                         >
                           {item.diff > 0 ? "+" : ""}
                           {item.diff}
@@ -631,9 +617,7 @@ export function ParallelRunDashboardPage() {
                         <td>{item.capsule}</td>
                         <td>{item.tpp}</td>
                         <td
-                          className={
-                            item.diff === 0 ? "text-ok" : "text-orange-600"
-                          }
+                          className={item.diff === 0 ? "text-ok" : "text-warn"}
                         >
                           {item.diff > 0 ? "+" : ""}
                           {item.diff}
@@ -670,9 +654,7 @@ export function ParallelRunDashboardPage() {
                         <td>{item.capsule}</td>
                         <td>{item.tpp}</td>
                         <td
-                          className={
-                            item.diff === 0 ? "text-ok" : "text-orange-600"
-                          }
+                          className={item.diff === 0 ? "text-ok" : "text-warn"}
                         >
                           {item.diff > 0 ? "+" : ""}
                           {item.diff}
@@ -709,9 +691,7 @@ export function ParallelRunDashboardPage() {
                         <td>{item.capsule}</td>
                         <td>{item.tpp}</td>
                         <td
-                          className={
-                            item.diff === 0 ? "text-ok" : "text-orange-600"
-                          }
+                          className={item.diff === 0 ? "text-ok" : "text-warn"}
                         >
                           {item.diff > 0 ? "+" : ""}
                           {item.diff}

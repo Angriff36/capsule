@@ -1,10 +1,8 @@
 import { useMemo } from "react";
 import {
   useListEvent,
-  useListEventCloseout,
   useListPrepTask,
   useListPackList,
-  useListPerson,
 } from "@/lib/manifest-convex-react";
 import {
   DashboardGrid,
@@ -19,28 +17,21 @@ import { formatCount } from "@/lib/format";
 /**
  * Mangia Dashboard Round 4 (Priority 41)
  *
- * Operational metrics with visual hierarchy for day-to-day operations management.
+ * Day-to-day operations board, live from Capsule data: today's events,
+ * prep and pack progress, staffing, week-to-date performance, and alerts.
  * Ports the existing Mangia deliverable's measures onto live Capsule data.
- *
- * Features:
- * - Today's operations snapshot (events, staffing, prep, packing)
- * - Production metrics (food cost, waste, yield)
- * - Kitchen status (prep tasks, batch completion)
- * - Logistics status (pack lists, equipment, delivery)
- * - Team status (shifts, check-ins)
- * - Week-to-date performance
- * - Operational alerts and blockers
  */
 
 export function MangiaDashboardPage() {
   const events = useListEvent();
-  const closeouts = useListEventCloseout();
   const prepTasks = useListPrepTask();
   const packLists = useListPackList();
-  const people = useListPerson();
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const today = useMemo(() => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }, []);
 
   // Today's operations snapshot
   const todaySnapshot = useMemo(() => {
@@ -192,7 +183,7 @@ export function MangiaDashboardPage() {
     if (todaySnapshot.executingEvents > 3) {
       alerts.push({
         severity: "medium",
-        message: `${todaySnapshot.executingEvents} events executing concurrently`,
+        message: `${todaySnapshot.executingEvents} events running at the same time`,
       });
     }
 
@@ -259,13 +250,11 @@ export function MangiaDashboardPage() {
       id: "today-header",
       size: "full",
       content: (
-        <div className="rounded-lg border-2 border-brand-200 bg-brand-50 p-4">
+        <div className="rounded-lg border-2 border-brand/30 bg-brand-soft p-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold text-brand-900">
-                Today's Operations
-              </h3>
-              <p className="text-sm text-brand-700">
+              <h3 className="font-semibold text-brand">Today's Operations</h3>
+              <p className="text-sm text-brand">
                 {today.toLocaleDateString("en-US", {
                   weekday: "long",
                   month: "long",
@@ -274,10 +263,10 @@ export function MangiaDashboardPage() {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-3xl font-bold text-brand-900">
+              <p className="text-3xl font-bold text-brand">
                 {todaySnapshot.totalEvents}
               </p>
-              <p className="text-sm text-brand-700">Events Scheduled</p>
+              <p className="text-sm text-brand">Events Scheduled</p>
             </div>
           </div>
         </div>
@@ -433,8 +422,8 @@ export function MangiaDashboardPage() {
           data={dailyTrendData}
           xAxisKey="day"
           series={[
-            { dataKey: "revenue", name: "Revenue", color: "#3b82f6" },
-            { dataKey: "guests", name: "Guests", color: "#10b981" },
+            { dataKey: "revenue", name: "Revenue", color: "var(--color-info)" },
+            { dataKey: "guests", name: "Guests", color: "var(--color-ok)" },
           ]}
           height={250}
           formatYAxis={formatCount}
@@ -455,7 +444,9 @@ export function MangiaDashboardPage() {
             { status: "Blocked", count: prepStatus.blocked },
           ]}
           xAxisKey="status"
-          series={[{ dataKey: "count", name: "Tasks", color: "#8b5cf6" }]}
+          series={[
+            { dataKey: "count", name: "Tasks", color: "var(--color-brand)" },
+          ]}
           height={250}
         />
       ),
@@ -473,7 +464,9 @@ export function MangiaDashboardPage() {
             { status: "Dispatched", count: packStatus.dispatched },
           ]}
           xAxisKey="status"
-          series={[{ dataKey: "count", name: "Lists", color: "#f59e0b" }]}
+          series={[
+            { dataKey: "count", name: "Lists", color: "var(--color-accent)" },
+          ]}
           height={250}
         />
       ),
@@ -485,34 +478,27 @@ export function MangiaDashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Mangia Operational Dashboard"
-        lead="Day-to-day operations metrics with visual hierarchy. Events, staffing, prep, packing, and logistics status."
+        lead="Today's events, prep and pack progress, staffing, and week-to-date performance — the day's operations at a glance."
       />
 
       <DashboardGrid items={dashboardItems} />
 
       {/* Alerts Section */}
       {alerts.length > 0 && (
-        <div className="mt-6 rounded-lg border border-ink-200 bg-ink-50 p-4">
-          <h4 className="text-sm font-semibold text-ink-900">
-            Operational Alerts
-          </h4>
+        <div className="mt-6 rounded-lg border border-line bg-inset p-4">
+          <h4 className="text-sm font-semibold text-ink">Needs Attention</h4>
           <div className="mt-2 space-y-1">
             {alerts.map((alert, index) => (
               <div
                 key={index}
                 className={`rounded px-2 py-1 text-sm ${
                   alert.severity === "high"
-                    ? "bg-accent-100 text-accent-900"
+                    ? "bg-danger-soft text-danger"
                     : alert.severity === "medium"
-                      ? "bg-warn-100 text-warn-900"
-                      : "bg-info-100 text-info-900"
+                      ? "bg-warn-soft text-warn"
+                      : "bg-info-soft text-info"
                 }`}
               >
-                {alert.severity === "high"
-                  ? "⚠️"
-                  : alert.severity === "medium"
-                    ? "📍"
-                    : "ℹ️"}{" "}
                 {alert.message}
               </div>
             ))}
@@ -521,24 +507,26 @@ export function MangiaDashboardPage() {
       )}
 
       {/* Legend */}
-      <div className="mt-6 rounded-lg border border-ink-200 bg-ink-50 p-4">
-        <h4 className="text-sm font-semibold text-ink-900">Visual Hierarchy</h4>
-        <div className="mt-2 grid grid-cols-4 gap-4 text-sm text-ink-600">
+      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
+        <h4 className="text-sm font-semibold text-ink">
+          How to read this board
+        </h4>
+        <div className="mt-2 grid grid-cols-4 gap-4 text-sm text-ink-2">
           <div>
-            <p className="font-medium text-ink-900">Today</p>
-            <p>Current day operations snapshot</p>
+            <p className="font-medium text-ink">Today</p>
+            <p>What's happening right now</p>
           </div>
           <div>
-            <p className="font-medium text-ink-900">Week</p>
-            <p>Week-to-date performance trends</p>
+            <p className="font-medium text-ink">Week</p>
+            <p>How the week is going so far</p>
           </div>
           <div>
-            <p className="font-medium text-ink-900">Status</p>
+            <p className="font-medium text-ink">Status</p>
             <p>Prep, pack, and staffing progress</p>
           </div>
           <div>
-            <p className="font-medium text-ink-900">Alerts</p>
-            <p>Blockers requiring attention</p>
+            <p className="font-medium text-ink">Needs attention</p>
+            <p>Anything that could hold up an event</p>
           </div>
         </div>
       </div>

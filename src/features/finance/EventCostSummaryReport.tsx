@@ -145,7 +145,7 @@ export function EventCostSummaryReport({
                 </div>
                 <div className="event-cost-report-bar" aria-hidden="true">
                   <i
-                    className={`is-${bucket.key}`}
+                    className={"is-" + bucket.key}
                     style={{ width: `${(bucket.amount / maxCost) * 100}%` }}
                   />
                 </div>

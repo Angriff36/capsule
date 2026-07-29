@@ -65,25 +65,25 @@ export function BarChart({
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
           {showGrid && (
-            <CartesianGrid strokeDasharray="3 3" className="stroke-ink-200" />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-line" />
           )}
           <XAxis
             dataKey={orientation === "horizontal" ? undefined : xAxisKey}
             type={orientation === "horizontal" ? "number" : "category"}
-            className="text-xs text-ink-600"
+            className="text-xs text-ink-2"
             tick={{ fill: "currentColor" }}
           />
           <YAxis
             type={orientation === "horizontal" ? "category" : "number"}
             dataKey={orientation === "horizontal" ? xAxisKey : undefined}
-            className="text-xs text-ink-600"
+            className="text-xs text-ink-2"
             tick={{ fill: "currentColor" }}
             tickFormatter={orientation === "vertical" ? formatYAxis : undefined}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "white",
-              border: "1px solid #e5e7eb",
+              backgroundColor: "var(--color-panel)",
+              border: "1px solid var(--color-line)",
               borderRadius: "0.5rem",
             }}
           />

@@ -36,12 +36,12 @@ export interface StatCardProps {
 }
 
 const TONE_STYLES = {
-  brand: "bg-brand-50 border-brand-200 text-brand-900",
-  accent: "bg-accent-50 border-accent-200 text-accent-900",
-  warn: "bg-warn-50 border-warn-200 text-warn-900",
-  info: "bg-info-50 border-info-200 text-info-900",
-  ok: "bg-ok-50 border-ok-200 text-ok-900",
-  ink: "bg-ink-50 border-ink-200 text-ink-900",
+  brand: "bg-brand-soft border-brand/30 text-ink",
+  accent: "bg-accent-soft border-accent/30 text-ink",
+  warn: "bg-warn-soft border-warn/30 text-ink",
+  info: "bg-info-soft border-info/30 text-ink",
+  ok: "bg-ok-soft border-ok/30 text-ink",
+  ink: "bg-panel border-line text-ink",
 } as const;
 
 const SIZE_STYLES = {
@@ -91,10 +91,10 @@ export function StatCard({
         : "—";
   const trendColor =
     main.trend?.direction === "up"
-      ? "text-ok-600"
+      ? "text-ok"
       : main.trend?.direction === "down"
-        ? "text-warn-600"
-        : "text-ink-500";
+        ? "text-warn"
+        : "text-ink-3";
 
   return (
     <div
@@ -108,9 +108,9 @@ export function StatCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-medium text-ink-600">{title}</h3>
+            <h3 className="text-sm font-medium text-ink-2">{title}</h3>
             {isLive && (
-              <span className="h-2 w-2 animate-pulse rounded-full bg-ok-500" />
+              <span className="h-2 w-2 animate-pulse rounded-full bg-ok" />
             )}
           </div>
           <div className="mt-1 flex items-baseline gap-2">
@@ -124,7 +124,7 @@ export function StatCard({
             )}
           </div>
         </div>
-        {icon && <div className="text-ink-400">{icon}</div>}
+        {icon && <div className="text-ink-3">{icon}</div>}
       </div>
 
       {rows.length > 0 && (
@@ -134,7 +134,7 @@ export function StatCard({
               key={index}
               className="flex items-baseline justify-between text-sm"
             >
-              <span className="text-ink-600">{row.label}</span>
+              <span className="text-ink-2">{row.label}</span>
               <span className="font-medium">
                 {formatValue(row.value, row.format)}
               </span>

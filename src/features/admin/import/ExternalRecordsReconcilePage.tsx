@@ -8,7 +8,7 @@ import {
   useExternalRecordLinkUpdateCapsuleId,
   useExternalRecordLinkVerifyLink,
 } from "../../../lib/manifest-convex-react";
-import { ErrorState, StatusChip } from "../../../ui/primitives";
+import { ErrorState, StatusChip, TableSkeleton } from "../../../ui/primitives";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 
 // Source system labels
@@ -287,7 +287,7 @@ export function ExternalRecordsReconcilePage() {
               type="button"
               onClick={verifySelected}
               disabled={busy}
-              className="px-4 py-2 bg-brand text-white rounded-md text-sm font-medium disabled:opacity-50"
+              className="btn btn-primary"
             >
               Verify Selected
             </button>
@@ -295,14 +295,14 @@ export function ExternalRecordsReconcilePage() {
               type="button"
               onClick={skipSelected}
               disabled={busy}
-              className="px-4 py-2 bg-inset text-ink-2 rounded-md text-sm font-medium disabled:opacity-50"
+              className="btn btn-secondary"
             >
               Skip Selected
             </button>
             <button
               type="button"
               onClick={() => setSelectedIds(new Set())}
-              className="px-4 py-2 text-ink-2 rounded-md text-sm font-medium hover:bg-inset"
+              className="btn btn-ghost"
             >
               Clear Selection
             </button>
@@ -342,7 +342,13 @@ export function ExternalRecordsReconcilePage() {
               </tr>
             </thead>
             <tbody>
-              {filteredRecords.length === 0 ? (
+              {allRecords === undefined || payments === undefined ? (
+                <tr>
+                  <td colSpan={9} className="py-4">
+                    <TableSkeleton rows={4} />
+                  </td>
+                </tr>
+              ) : filteredRecords.length === 0 ? (
                 <tr>
                   <td colSpan={9} className="text-center py-8 text-ink-2">
                     Everything has been matched up. Great job!
@@ -434,7 +440,7 @@ export function ExternalRecordsReconcilePage() {
                               type="button"
                               onClick={() => void matchPayment(record._id)}
                               disabled={busy || !matchPaymentId}
-                              className="px-3 py-1 bg-brand text-white rounded-md text-xs font-medium disabled:opacity-50"
+                              className="btn btn-primary btn-sm"
                             >
                               Link
                             </button>
@@ -445,7 +451,7 @@ export function ExternalRecordsReconcilePage() {
                                 setMatchPaymentId("");
                               }}
                               disabled={busy}
-                              className="px-3 py-1 text-ink-2 rounded-md text-xs font-medium hover:bg-inset"
+                              className="btn btn-ghost btn-sm"
                             >
                               Cancel
                             </button>
@@ -458,7 +464,7 @@ export function ExternalRecordsReconcilePage() {
                               setMatchPaymentId("");
                             }}
                             disabled={busy}
-                            className="px-3 py-1 text-brand rounded-md text-xs font-medium hover:bg-brand/10 disabled:opacity-50"
+                            className="btn btn-secondary btn-sm"
                           >
                             Match
                           </button>

@@ -5,6 +5,7 @@ import {
   useListPrepTaskComment,
   useListPerson,
 } from "../../lib/manifest-convex-react";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 
 const CATEGORY_LABEL: Record<string, string> = {
   note: "Note",
@@ -41,6 +42,7 @@ type PersonLike = {
   givenName: string;
   familyName: string;
   authSubjectId?: string | null;
+  deletedAt?: number | string | null;
 };
 
 function personName(person: PersonLike | undefined) {
@@ -49,12 +51,23 @@ function personName(person: PersonLike | undefined) {
 }
 
 function personForComment(
-  comment: { authorPersonId: string; authorName: string },
+  comment: {
+    authorPersonId?: string | null;
+    authorName?: string | null;
+    authorAuthSubjectId?: string | null;
+  },
   people: PersonLike[] | undefined,
-): { label: string; person: PersonLike | null } {
-  const match = people?.find((p) => p._id === comment.authorPersonId);
-  if (match) return { label: personName(match), person: match };
-  return { label: comment.authorName ?? "Unknown", person: null };
+): string {
+  const byId = comment.authorPersonId
+    ? people?.find((p) => p._id === comment.authorPersonId)
+    : undefined;
+  if (byId) return personName(byId);
+  if (comment.authorName) return comment.authorName;
+  const bySubject = comment.authorAuthSubjectId
+    ? people?.find((p) => p.authSubjectId === comment.authorAuthSubjectId)
+    : undefined;
+  if (bySubject) return personName(bySubject);
+  return "Unknown";
 }
 
 /**
@@ -64,6 +77,7 @@ function personForComment(
  */
 export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
   const { user } = useUser();
+  const authStatus = useAuthStatus();
   const comments = useListPrepTaskComment();
   const people = useListPerson();
   const createComment = useCreatePrepTaskComment();
@@ -84,6 +98,21 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
     [people, task.assignedToId],
   );
 
+  const myPersonId = authStatus?.personId ?? null;
+  const me = useMemo(
+    () =>
+      myPersonId
+        ? people?.find((p) => p._id === myPersonId && p.deletedAt == null)
+        : undefined,
+    [people, myPersonId],
+  );
+  const myName = me ? personName(me) : (user?.fullName?.trim() ?? "");
+  // The post command rejects a notification aimed at the poster themselves, so
+  // omit the owner fields when the current user owns the task.
+  const ownerIsMe =
+    (task.assignedToId != null && task.assignedToId === myPersonId) ||
+    (taskOwner?.authSubjectId != null && taskOwner.authSubjectId === user?.id);
+
   const [draft, setDraft] = useState("");
   const [category, setCategory] = useState<
     "note" | "blocker" | "substitution" | "status_update"
@@ -103,10 +132,14 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
       eventDishId: task.eventDishId ?? undefined,
       category,
       body,
-      authorPersonId: user?.id ? undefined : undefined,
-      authorName: user?.id ? undefined : undefined,
-      taskOwnerAssignedToId: task.assignedToId ?? undefined,
-      taskOwnerAuthSubjectId: taskOwner?.authSubjectId ?? undefined,
+      authorPersonId: myPersonId ?? undefined,
+      authorName: myName || undefined,
+      taskOwnerAssignedToId: ownerIsMe
+        ? undefined
+        : (task.assignedToId ?? undefined),
+      taskOwnerAuthSubjectId: ownerIsMe
+        ? undefined
+        : (taskOwner?.authSubjectId ?? undefined),
     })
       .then(() => {
         setDraft("");
@@ -117,10 +150,7 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
   };
 
   return (
-    <section
-      className="prep-task-thread"
-      aria-label={`Comments for ${task.name ?? "prep task"}`}
-    >
+    <section aria-label={`Comments for ${task.name ?? "prep task"}`}>
       <h3 className="text-[12px] font-semibold tracking-wide text-ink-2 uppercase">
         Prep thread
         <span className="ml-1.5 font-mono text-ink-3 normal-case">
@@ -140,7 +170,7 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
           </li>
         ) : (
           taskComments.map((comment) => {
-            const author = personForComment(comment, people);
+            const authorLabel = personForComment(comment, people);
             const tone =
               CATEGORY_TONE[comment.category ?? "note"] ?? CATEGORY_TONE.note;
             return (
@@ -150,7 +180,7 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
               >
                 <div className="flex flex-wrap items-baseline gap-2">
                   <span className="text-[12.5px] font-medium">
-                    {author.label}
+                    {authorLabel}
                   </span>
                   <span
                     className={`rounded-xs border px-1.5 py-0.5 text-[10px] font-medium tracking-wide uppercase ${tone}`}
@@ -172,7 +202,7 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
       </ul>
       <form
         onSubmit={submit}
-        className="prep-thread-form mt-3 space-y-2"
+        className="mt-3 space-y-2"
         aria-label="Post a comment"
       >
         <div className="flex gap-2">
@@ -212,7 +242,7 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
             </p>
           ) : (
             <span className="text-[11.5px] text-ink-3">
-              {draft.trim().length}/2000
+              {myName ? `Posting as ${myName}` : ""}
             </span>
           )}
           <button

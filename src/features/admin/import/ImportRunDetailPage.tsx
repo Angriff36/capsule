@@ -13,6 +13,7 @@ import { api } from "../../../lib/api";
 import { formatDate, formatTime } from "../../../lib/format";
 import { importRunsListPath } from "./importRoutes";
 import { StatusChip } from "../../../ui/primitives";
+import { useActionPrompt } from "../../../ui/action-prompt";
 import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 
 // Source system labels
@@ -86,11 +87,16 @@ export function ImportRunDetailPage() {
   const commitImportRun = useAction(api.importCommit.commitImportRun);
   const revertImportRun = useAction(api.importCommit.revertImportRun);
 
+  const { prompt, host } = useActionPrompt();
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [showRecordCountsForm, setShowRecordCountsForm] = useState(false);
   const [recordCountsInput, setRecordCountsInput] = useState("{}");
+  // Final-counts confirmation card for Approve & Commit (prefilled from the
+  // run's parsed counts; mirrors the record-counts card pattern above).
+  const [showFinalCountsForm, setShowFinalCountsForm] = useState(false);
+  const [finalCountsInput, setFinalCountsInput] = useState("{}");
   // Source-row commit form state — shared by the venues/contacts/events/leads/
   // payments/menus datasets (each pastes a JSON array of TPP rows into the
   // authored commitImportRun).
@@ -201,14 +207,14 @@ export function ImportRunDetailPage() {
     });
   };
 
-  const handleApproveReview = async () => {
-    const countsStr = prompt(
-      "Enter final record counts (JSON format):",
-      importRun.recordCounts,
-    );
-    if (!countsStr?.trim()) return;
+  const handleApproveReview = () => {
+    setFinalCountsInput(importRun.recordCounts || "{}");
+    setShowFinalCountsForm(true);
+  };
+
+  const handleApproveReviewSubmit = () => {
     try {
-      JSON.parse(countsStr);
+      JSON.parse(finalCountsInput);
     } catch {
       setError("Invalid JSON format for record counts");
       return;
@@ -217,8 +223,9 @@ export function ImportRunDetailPage() {
       await approveReview({
         docId: importRun._id,
         version: importRun.version,
-        finalRecordCounts: countsStr,
+        finalRecordCounts: finalCountsInput,
       });
+      setShowFinalCountsForm(false);
     });
   };
 
@@ -270,7 +277,15 @@ export function ImportRunDetailPage() {
   };
 
   const handleMarkFailed = async () => {
-    const reason = prompt("Enter failure details:");
+    const reason = await prompt.askReason({
+      title: "Mark Import Failed",
+      description:
+        "Record why this run failed so the next attempt knows what went wrong.",
+      label: "Failure details",
+      placeholder: "What went wrong…",
+      confirmLabel: "Mark failed",
+      tone: "danger",
+    });
     if (!reason?.trim()) return;
     void run("markFailed", async () => {
       await markFailed({
@@ -281,14 +296,15 @@ export function ImportRunDetailPage() {
     });
   };
 
-  const handleRevert = () => {
-    if (
-      !confirm(
-        "Revert this import? All ExternalRecordLinks created by this run are superseded (imported records are left in place for operator deactivation).",
-      )
-    ) {
-      return;
-    }
+  const handleRevert = async () => {
+    const confirmed = await prompt.askConfirm({
+      title: "Revert Import",
+      description:
+        "The records this import linked are marked superseded. Imported venues and other entities stay in place — deactivate them yourself if needed.",
+      confirmLabel: "Revert import",
+      tone: "danger",
+    });
+    if (!confirmed) return;
     setError(null);
     setNotice(null);
     setBusy("revert");
@@ -365,6 +381,8 @@ export function ImportRunDetailPage() {
 
       <AdminWorkspaceNav />
 
+      {host}
+
       {error ? (
         <p className="card border-danger/30 bg-danger-soft px-4 py-3 text-[13px] text-danger">
           {error}
@@ -415,10 +433,10 @@ export function ImportRunDetailPage() {
                   handleCommit();
                   break;
                 case "failed":
-                  handleMarkFailed();
+                  void handleMarkFailed();
                   break;
                 case "reverted":
-                  handleRevert();
+                  void handleRevert();
                   break;
               }
             };
@@ -428,10 +446,10 @@ export function ImportRunDetailPage() {
                 type="button"
                 onClick={handleClick}
                 disabled={isBusy}
-                className={`px-4 py-2 rounded-md text-sm font-medium disabled:opacity-50 ${
+                className={`btn ${
                   transition.next === "failed" || transition.next === "reverted"
-                    ? "bg-inset text-ink-2 hover:bg-line-2"
-                    : "bg-brand text-white hover:bg-brand"
+                    ? "btn-ghost"
+                    : "btn-primary"
                 }`}
               >
                 {isBusy ? "Processing..." : transition.label}
@@ -477,7 +495,7 @@ export function ImportRunDetailPage() {
                 type="button"
                 onClick={handleRecordParse}
                 disabled={busy === "recordParse"}
-                className="px-4 py-2 bg-brand text-white rounded-md text-sm font-medium disabled:opacity-50"
+                className="btn btn-primary"
               >
                 {busy === "recordParse" ? "Saving..." : "Save & Continue"}
               </button>
@@ -487,7 +505,54 @@ export function ImportRunDetailPage() {
                   setShowRecordCountsForm(false);
                   setRecordCountsInput("{}");
                 }}
-                className="px-4 py-2 text-ink-2 rounded-md text-sm font-medium hover:bg-inset"
+                className="btn btn-ghost"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {/* Final Record Counts (Approve & Commit) */}
+      {showFinalCountsForm ? (
+        <div className="card mt-4">
+          <div className="border-b border-line px-3">
+            <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+              Confirm Final Record Counts
+            </h2>
+          </div>
+          <div className="p-4">
+            <label
+              htmlFor="finalRecordCounts"
+              className="block text-sm font-medium text-ink mb-2"
+            >
+              Final record counts (JSON)
+            </label>
+            <textarea
+              id="finalRecordCounts"
+              value={finalCountsInput}
+              onChange={(e) => setFinalCountsInput(e.target.value)}
+              className="w-full px-3 py-2 border border-line rounded-md text-sm font-mono"
+              rows={6}
+            />
+            <p className="text-xs text-ink-2 mt-2">
+              Confirm (or correct) the counts before the reviewed data is
+              approved for commit.
+            </p>
+            <div className="mt-4 flex gap-3">
+              <button
+                type="button"
+                onClick={handleApproveReviewSubmit}
+                disabled={busy === "approveReview"}
+                className="btn btn-primary"
+              >
+                {busy === "approveReview" ? "Approving..." : "Approve & Commit"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowFinalCountsForm(false)}
+                className="btn btn-ghost"
               >
                 Cancel
               </button>
@@ -556,7 +621,7 @@ export function ImportRunDetailPage() {
                 type="button"
                 onClick={handleCommitSource}
                 disabled={busy === "commit"}
-                className="px-4 py-2 bg-brand text-white rounded-md text-sm font-medium disabled:opacity-50"
+                className="btn btn-primary"
               >
                 {busy === "commit"
                   ? "Committing..."
@@ -568,7 +633,7 @@ export function ImportRunDetailPage() {
                   setShowSourceForm(false);
                   setSourceRowsInput("[]");
                 }}
-                className="px-4 py-2 text-ink-2 rounded-md text-sm font-medium hover:bg-inset"
+                className="btn btn-ghost"
               >
                 Cancel
               </button>

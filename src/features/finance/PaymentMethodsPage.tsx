@@ -203,9 +203,14 @@ export function PaymentMethodsPage() {
             </p>
           ) : (
             <>
-              <label>
+              <label className="field-label">
                 Client
-                <select name="clientId" required defaultValue="">
+                <select
+                  className="input"
+                  name="clientId"
+                  required
+                  defaultValue=""
+                >
                   <option value="" disabled>
                     Select client
                   </option>
@@ -217,9 +222,13 @@ export function PaymentMethodsPage() {
                 </select>
               </label>
               <div className="supply-form-grid">
-                <label>
+                <label className="field-label">
                   Type
-                  <select name="methodType" defaultValue="card">
+                  <select
+                    className="input"
+                    name="methodType"
+                    defaultValue="card"
+                  >
                     {METHOD_TYPES.map((type) => (
                       <option key={type} value={type}>
                         {type}
@@ -227,13 +236,18 @@ export function PaymentMethodsPage() {
                     ))}
                   </select>
                 </label>
-                <label>
+                <label className="field-label">
                   Provider
-                  <input name="provider" placeholder="e.g. Visa" />
+                  <input
+                    className="input"
+                    name="provider"
+                    placeholder="e.g. Visa"
+                  />
                 </label>
-                <label>
+                <label className="field-label">
                   Last four
                   <input
+                    className="input"
                     name="lastFour"
                     maxLength={4}
                     placeholder="1234"
@@ -245,9 +259,9 @@ export function PaymentMethodsPage() {
                 <input name="isDefault" type="checkbox" />
                 Set as default for this client
               </label>
-              <label>
+              <label className="field-label">
                 Notes
-                <textarea name="notes" rows={2} />
+                <textarea className="input" name="notes" rows={2} />
               </label>
               <div className="supply-row-actions">
                 <button

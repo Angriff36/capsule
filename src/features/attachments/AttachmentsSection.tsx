@@ -134,7 +134,6 @@ export function AttachmentsSection({
                   {row.uploadedAt
                     ? ` · ${formatDate(row.uploadedAt)} ${formatTime(row.uploadedAt)}`
                     : ""}
-                  {row.uploadedById ? ` · uploaded by ${row.uploadedById}` : ""}
                 </p>
               </div>
               <button

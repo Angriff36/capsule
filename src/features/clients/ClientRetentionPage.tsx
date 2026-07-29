@@ -8,6 +8,7 @@ import {
   useListClientOutreachTask,
   useListEvent,
 } from "../../lib/manifest-convex-react";
+import { formatDate } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
@@ -84,8 +85,6 @@ export function computeRetention(
       : `${Math.round((rebookedCount / rows.length) * 100)}%`;
   return { rows, rebookedCount, rateLabel };
 }
-
-const eventDate = new Intl.DateTimeFormat(undefined, { dateStyle: "medium" });
 
 export function ClientRetentionPage() {
   const clients = useListClient();
@@ -252,7 +251,7 @@ export function ClientRetentionPage() {
                   <td>{row.priorYearEvents}</td>
                   <td>
                     {row.lastPriorYearEventAt
-                      ? eventDate.format(row.lastPriorYearEventAt)
+                      ? formatDate(row.lastPriorYearEventAt)
                       : "—"}
                   </td>
                   <td>
@@ -313,11 +312,7 @@ export function ClientRetentionPage() {
                     </Link>
                   </td>
                   <td>{String(task.reason)}</td>
-                  <td>
-                    {task.openedAt != null
-                      ? eventDate.format(Number(task.openedAt))
-                      : "—"}
-                  </td>
+                  <td>{formatDate(task.openedAt)}</td>
                   <td>
                     <div className="supply-row-actions">
                       <button

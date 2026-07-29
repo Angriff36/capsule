@@ -80,6 +80,17 @@
   background: rgb(255 254 250 / 0.72);
 }
 
+/* Event picker: long event titles must shrink inside the auto-fit grid
+   instead of blowing the column out. */
+.tip-event-field {
+  min-width: 0;
+}
+
+.tip-event-field select {
+  min-width: 0;
+  text-overflow: ellipsis;
+}
+
 .tip-money-input {
   position: relative;
   display: block;
@@ -428,6 +439,13 @@
   @page {
     size: landscape;
     margin: 0.45in;
+  }
+  /* Screen-only chrome (masthead, controls, actions) never prints. The
+     page-level isolation trick (hide body, show only the sheet) lives in a
+     mount-scoped <style> in TipDistributionPage.tsx so it cannot leak into
+     printing other pages. */
+  .tip-no-print {
+    display: none !important;
   }
   .tip-print-sheet {
     margin: 0;

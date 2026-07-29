@@ -5,7 +5,7 @@ import {
   useTimeOffRequestApprove,
   useTimeOffRequestDecline,
 } from "../../lib/manifest-convex-react";
-import { StatusChip, TableSkeleton } from "../../ui/primitives";
+import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
@@ -98,12 +98,10 @@ export function TimeOffRequestsPage() {
         {requests === undefined || people === undefined ? (
           <TableSkeleton rows={4} />
         ) : pending.length === 0 ? (
-          <div className="empty-state">
-            <strong>Nothing waiting</strong>
-            <span>
-              New staff requests will appear here and in notifications.
-            </span>
-          </div>
+          <EmptyState
+            title="Nothing waiting"
+            hint="New staff requests will appear here and in notifications."
+          />
         ) : (
           <div className="grid gap-3 p-4 md:grid-cols-2">
             {pending.map((request) => (

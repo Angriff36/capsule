@@ -135,6 +135,9 @@
   transform: translateY(-2px);
 }
 
+.dashboard-widget--brand {
+  --widget-tone: var(--color-brand);
+}
 .dashboard-widget--accent {
   --widget-tone: var(--color-accent-deep);
 }

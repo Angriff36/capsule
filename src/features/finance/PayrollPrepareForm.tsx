@@ -104,9 +104,9 @@ export function PayrollPrepareForm({
           <h2>Payroll input</h2>
         </div>
       </div>
-      <label>
+      <label className="field-label">
         Person
-        <select name="personId" required defaultValue="">
+        <select className="input" name="personId" required defaultValue="">
           <option value="" disabled>
             Select person
           </option>
@@ -118,19 +118,30 @@ export function PayrollPrepareForm({
         </select>
       </label>
       <div className="supply-form-grid">
-        <label>
+        <label className="field-label">
           Period start
-          <input name="periodStart" type="datetime-local" required />
+          <input
+            className="input"
+            name="periodStart"
+            type="datetime-local"
+            required
+          />
         </label>
-        <label>
+        <label className="field-label">
           Period end
-          <input name="periodEnd" type="datetime-local" required />
+          <input
+            className="input"
+            name="periodEnd"
+            type="datetime-local"
+            required
+          />
         </label>
       </div>
       <div className="supply-form-grid">
-        <label>
+        <label className="field-label">
           Regular minutes
           <input
+            className="input"
             name="regularMinutes"
             type="number"
             min="0"
@@ -138,9 +149,10 @@ export function PayrollPrepareForm({
             defaultValue="2400"
           />
         </label>
-        <label>
+        <label className="field-label">
           Overtime minutes
           <input
+            className="input"
             name="overtimeMinutes"
             type="number"
             min="0"
@@ -149,9 +161,9 @@ export function PayrollPrepareForm({
           />
         </label>
       </div>
-      <label>
+      <label className="field-label">
         Event (optional)
-        <select name="eventId" defaultValue="">
+        <select className="input" name="eventId" defaultValue="">
           <option value="">No linked event</option>
           {events
             .filter((event) => event.deletedAt == null)
@@ -163,12 +175,12 @@ export function PayrollPrepareForm({
         </select>
       </label>
       <p className="text-[12px] text-ink-3">
-        Hourly/overtime rates and gross amount are deferred until encrypted
-        money fields project to Convex storage correctly.
+        This records hours only. Pay rates and gross amounts are applied by your
+        payroll processor after you export the CSV.
       </p>
-      <label>
+      <label className="field-label">
         Notes
-        <textarea name="notes" rows={2} />
+        <textarea className="input" name="notes" rows={2} />
       </label>
       <div className="supply-row-actions">
         <button className="btn btn-primary" type="submit" disabled={busy}>

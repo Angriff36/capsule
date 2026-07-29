@@ -98,6 +98,16 @@
   font-size: 11px;
 }
 
+/* Currency variant: the unit box leads ($ 1,000.00) instead of trailing. */
+.tax-percent-input.is-prefix {
+  grid-template-columns: 42px minmax(0, 1fr);
+}
+
+.tax-percent-input.is-prefix span {
+  border: 1px solid var(--color-line-2);
+  border-right: 0;
+}
+
 .tax-applicability-fieldset {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

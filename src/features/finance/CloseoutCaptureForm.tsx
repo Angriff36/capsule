@@ -112,9 +112,14 @@ export function CloseoutCaptureForm({
           <h2>Event closeout</h2>
         </div>
       </div>
-      <label>
+      <label className="field-label">
         Closed-out event
-        <select name="eventId" required defaultValue={defaults._id}>
+        <select
+          className="input"
+          name="eventId"
+          required
+          defaultValue={defaults._id}
+        >
           {events.map((event) => (
             <option key={event._id} value={event._id}>
               {event.title || "Untitled event"}
@@ -123,9 +128,10 @@ export function CloseoutCaptureForm({
         </select>
       </label>
       <div className="supply-form-grid">
-        <label>
+        <label className="field-label">
           Actual revenue
           <input
+            className="input"
             name="actualRevenue"
             type="number"
             min="0"
@@ -134,9 +140,10 @@ export function CloseoutCaptureForm({
             defaultValue={String(defaults.quotedPrice ?? 0)}
           />
         </label>
-        <label>
+        <label className="field-label">
           Budgeted revenue
           <input
+            className="input"
             name="budgetedRevenue"
             type="number"
             min="0"
@@ -145,9 +152,10 @@ export function CloseoutCaptureForm({
             defaultValue={String(defaults.quotedPrice ?? 0)}
           />
         </label>
-        <label>
+        <label className="field-label">
           Budgeted cost
           <input
+            className="input"
             name="budgetedCost"
             type="number"
             min="0"
@@ -158,9 +166,10 @@ export function CloseoutCaptureForm({
         </label>
       </div>
       <div className="supply-form-grid">
-        <label>
+        <label className="field-label">
           Ingredient cost
           <input
+            className="input"
             name="actualIngredientCost"
             type="number"
             min="0"
@@ -169,9 +178,10 @@ export function CloseoutCaptureForm({
             defaultValue="0"
           />
         </label>
-        <label>
+        <label className="field-label">
           Waste cost
           <input
+            className="input"
             name="actualWasteCost"
             type="number"
             min="0"
@@ -180,9 +190,10 @@ export function CloseoutCaptureForm({
             defaultValue="0"
           />
         </label>
-        <label>
+        <label className="field-label">
           Labor cost
           <input
+            className="input"
             name="actualLaborCost"
             type="number"
             min="0"
@@ -191,9 +202,10 @@ export function CloseoutCaptureForm({
             defaultValue="0"
           />
         </label>
-        <label>
+        <label className="field-label">
           Vendor cost
           <input
+            className="input"
             name="actualVendorCost"
             type="number"
             min="0"
@@ -204,9 +216,10 @@ export function CloseoutCaptureForm({
         </label>
       </div>
       <div className="supply-form-grid">
-        <label>
+        <label className="field-label">
           Expected headcount
           <input
+            className="input"
             name="expectedHeadcount"
             type="number"
             min="0"
@@ -214,9 +227,10 @@ export function CloseoutCaptureForm({
             defaultValue={String(defaults.expectedHeadcount ?? 0)}
           />
         </label>
-        <label>
+        <label className="field-label">
           Actual headcount
           <input
+            className="input"
             name="actualHeadcount"
             type="number"
             min="0"
@@ -225,17 +239,17 @@ export function CloseoutCaptureForm({
           />
         </label>
       </div>
-      <label>
+      <label className="field-label">
         Unresolved issues
-        <textarea name="unresolvedIssues" rows={2} />
+        <textarea className="input" name="unresolvedIssues" rows={2} />
       </label>
-      <label>
+      <label className="field-label">
         Performance notes
-        <textarea name="performanceNotes" rows={2} />
+        <textarea className="input" name="performanceNotes" rows={2} />
       </label>
-      <label>
+      <label className="field-label">
         Notes
-        <textarea name="notes" rows={2} />
+        <textarea className="input" name="notes" rows={2} />
       </label>
       <div className="supply-row-actions">
         <button className="btn btn-primary" type="submit" disabled={busy}>

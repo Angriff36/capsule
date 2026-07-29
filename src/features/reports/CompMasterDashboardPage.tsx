@@ -11,23 +11,15 @@ import {
 import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
-import { PageHeader, StatusChip } from "@/ui/primitives";
-import { formatDate, formatMoney, formatPercent } from "@/lib/format";
+import { PageHeader } from "@/ui/primitives";
+import { formatDate, formatMoney } from "@/lib/format";
 
 /**
  * Comp Master Dashboard (Priority 39)
  *
- * Status and source evidence for compensation deliverables and calculations.
- * Tracks sales commissions, revenue attribution, and performance against targets.
- *
- * Features:
- * - Commission calculations (3% basis)
- * - Revenue attribution by salesperson
- * - Venue commission tracking
- * - Referral source attribution
- * - Target vs. actual performance
- * - Payment status tracking
- * - Evidence trail for audit
+ * Sales commission tracking on the 3% basis: commission by salesperson,
+ * paid vs. pending amounts, and the top events behind each number — all
+ * computed live from events, revenue attributions, and team members.
  */
 
 export function CompMasterDashboardPage() {
@@ -141,27 +133,6 @@ export function CompMasterDashboardPage() {
     };
   }, [events, attributions, people]);
 
-  // Commission targets and status
-  const commissionTargets = useMemo(() => {
-    if (!commissionMetrics) return null;
-
-    const monthlyTarget = 15000; // Example target
-    const totalCommission = commissionMetrics.totalCommission;
-    const pctOfTarget = (totalCommission / monthlyTarget) * 100;
-
-    return {
-      monthlyTarget,
-      totalCommission,
-      pctOfTarget,
-      status:
-        pctOfTarget >= 100
-          ? "exceeded"
-          : pctOfTarget >= 75
-            ? "on-track"
-            : "behind",
-    };
-  }, [commissionMetrics]);
-
   // Payment status breakdown
   const paymentStatus = useMemo(() => {
     if (!commissionMetrics) return null;
@@ -256,34 +227,23 @@ export function CompMasterDashboardPage() {
       ),
     },
     {
-      id: "target-status",
+      id: "attributed-revenue",
       size: "small",
       content: (
         <StatCard
-          title="Monthly Target"
+          title="Attributed Revenue"
           main={{
-            value: commissionTargets?.pctOfTarget || 0,
-            format: "percent" as const,
+            value: commissionMetrics?.totalRevenue || 0,
+            format: "currency" as const,
           }}
           rows={[
             {
-              label: "Target",
-              value: commissionTargets?.monthlyTarget || 0,
-              format: "currency" as const,
-            },
-            {
-              label: "Commission",
-              value: commissionTargets?.totalCommission || 0,
-              format: "currency" as const,
+              label: "Salespeople",
+              value: commissionMetrics?.salespeople.length || 0,
+              format: "number" as const,
             },
           ]}
-          tone={
-            commissionTargets?.status === "exceeded"
-              ? "ok"
-              : commissionTargets?.status === "on-track"
-                ? "info"
-                : "warn"
-          }
+          tone="ok"
           isLive
         />
       ),
@@ -300,7 +260,7 @@ export function CompMasterDashboardPage() {
           }}
           rows={[
             {
-              label: "Paid YTD",
+              label: "Paid",
               value: paymentStatus?.paid || 0,
               format: "currency" as const,
             },
@@ -349,11 +309,15 @@ export function CompMasterDashboardPage() {
           }
           xAxisKey="salesperson"
           series={[
-            { dataKey: "commission", name: "Commission", color: "#3b82f6" },
+            {
+              dataKey: "commission",
+              name: "Commission",
+              color: "var(--color-info)",
+            },
             {
               dataKey: "revenue",
               name: "Attributed Revenue",
-              color: "#10b981",
+              color: "var(--color-ok)",
             },
           ]}
           height={300}
@@ -433,62 +397,30 @@ export function CompMasterDashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Comp Master Dashboard"
-        lead="Compensation tracking with 3% commission basis. Status and evidence for commission deliverables, payment tracking, and revenue attribution."
+        lead="Sales commission tracking on the 3% basis: who earned what, what's been approved, and the events behind each number."
       />
-
-      <div className="mb-4 flex items-center gap-4 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-ok-500" />
-          <span>Exceeded Target</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-brand-500" />
-          <span>On Track</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-warn-500" />
-          <span>Behind Target</span>
-        </div>
-      </div>
 
       <DashboardGrid items={dashboardItems} />
 
-      {/* Compensation Policy Note */}
-      <div className="mt-6 rounded-lg border border-ink-200 bg-ink-50 p-4">
-        <h4 className="text-sm font-semibold text-ink-900">
-          Commission Policy
-        </h4>
-        <p className="mt-1 text-sm text-ink-600">
-          Sales commissions calculated at 3% of booked revenue after revenue
-          attribution rules apply. Venue splits and referral fees are deducted
-          before commission calculation. Commissions are paid monthly upon event
-          completion and payment collection. Attributions must be approved
-          before commission is marked as paid. Source evidence maintained in
-          Revenue Attribution records.
-        </p>
-      </div>
-
       {/* Evidence Trail */}
-      <div className="mt-4 rounded-lg border border-line bg-panel p-4">
-        <h4 className="text-sm font-semibold text-ink-900">
+      <div className="mt-6 rounded-lg border border-line bg-panel p-4">
+        <h4 className="text-sm font-semibold text-ink">
           Where these numbers come from
         </h4>
-        <div className="mt-2 text-sm text-ink-600">
+        <div className="mt-2 text-sm text-ink-2">
           <p>
-            <strong>Data Sources:</strong>
+            Commissions are 3% of attributed revenue. When revenue attribution
+            records exist, the allocated amounts are used; otherwise the event's
+            quoted price is credited to the assigned salesperson.
           </p>
-          <ul className="list-inside list-disc mt-1 space-y-1">
-            <li>Events (quoted price, assigned salesperson, stage)</li>
-            <li>Revenue attributions (approval, amounts, splits)</li>
-            <li>Team members (who the salesperson is)</li>
+          <ul className="list-inside list-disc mt-2 space-y-1">
+            <li>Events: quoted price, assigned salesperson, stage</li>
+            <li>Revenue attributions: allocated amounts and approval</li>
+            <li>Team members: who the salesperson is</li>
           </ul>
           <p className="mt-2">
-            <strong>Commission Formula:</strong> Event Quoted Price × Venue
-            Attribution % × Referral Deduction × 3%
-          </p>
-          <p className="mt-1">
-            <strong>Payment Status:</strong> Paid = Approved Revenue Attribution
-            with settled payment; Pending = Unapproved or unsettled
+            Paid means the revenue attribution is approved; pending means it's
+            still waiting on approval.
           </p>
         </div>
       </div>

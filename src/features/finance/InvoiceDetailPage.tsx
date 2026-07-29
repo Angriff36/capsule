@@ -845,17 +845,19 @@ export function InvoiceDetailPage() {
         {showCreditMemo && canIssueCreditMemo ? (
           <form className="supply-form mt-4" onSubmit={onIssueCreditMemo}>
             <div className="supply-form-grid">
-              <label>
+              <label className="field-label">
                 Credit memo number
                 <input
+                  className="input"
                   name="creditMemoNumber"
                   required
                   defaultValue={`CM-${String(invoice.invoiceNumber || invoice._id).slice(-12)}-${relatedCreditMemos.length + 1}`}
                 />
               </label>
-              <label>
+              <label className="field-label">
                 Amount
                 <input
+                  className="input"
                   name="amount"
                   type="number"
                   min="0.01"
@@ -864,9 +866,10 @@ export function InvoiceDetailPage() {
                   required
                 />
               </label>
-              <label>
+              <label className="field-label">
                 Credit outcome
                 <select
+                  className="input"
                   name="disposition"
                   value={creditDisposition}
                   onChange={(event) =>
@@ -887,9 +890,14 @@ export function InvoiceDetailPage() {
                 </select>
               </label>
               {creditDisposition === "apply_to_balance" ? (
-                <label>
+                <label className="field-label">
                   Open invoice
-                  <select name="targetInvoiceId" required defaultValue="">
+                  <select
+                    className="input"
+                    name="targetInvoiceId"
+                    required
+                    defaultValue=""
+                  >
                     <option value="" disabled>
                       Choose an invoice
                     </option>
@@ -902,9 +910,10 @@ export function InvoiceDetailPage() {
                   </select>
                 </label>
               ) : null}
-              <label style={{ gridColumn: "1 / -1" }}>
+              <label className="field-label supply-span-2">
                 Reason
                 <textarea
+                  className="input"
                   name="reason"
                   rows={3}
                   required
@@ -1045,9 +1054,10 @@ export function InvoiceDetailPage() {
         {depositPaidAt == null ? (
           <form className="supply-form mt-4" onSubmit={onSetDeposit}>
             <div className="supply-form-grid">
-              <label>
+              <label className="field-label">
                 Deposit amount
                 <input
+                  className="input"
                   name="depositAmount"
                   type="number"
                   min="0"
@@ -1211,9 +1221,10 @@ export function InvoiceDetailPage() {
           onSubmit={onConfigureReminderSchedule}
         >
           <div className="supply-form-grid">
-            <label>
+            <label className="field-label">
               Days relative to due date
               <input
+                className="input"
                 name="reminderOffsets"
                 value={reminderOffsetsInput}
                 onChange={(event) =>

@@ -8,10 +8,7 @@ type Props = {
 
 export function EventDetailTabs({ active, onChange }: Props) {
   return (
-    <nav
-      className="event-detail-tabs flex flex-wrap gap-1 border-b border-line"
-      aria-label="Event sections"
-    >
+    <nav className="event-detail-tabs" aria-label="Event sections">
       {EVENT_DETAIL_TABS.map((tab) => {
         const isActive = tab.key === active;
         return (

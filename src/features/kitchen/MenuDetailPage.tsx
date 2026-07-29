@@ -18,6 +18,7 @@ import {
   useMenuRestore,
   useMenuUnpublish,
 } from "../../lib/manifest-convex-react";
+import { formatMoneyExact } from "../../lib/format";
 import { useTrackRecent } from "../../lib/recents";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
@@ -406,11 +407,11 @@ export function MenuDetailPage() {
           </div>
           <div>
             <dt>Base price</dt>
-            <dd>{menu.basePrice}</dd>
+            <dd>{formatMoneyExact(Number(menu.basePrice))}</dd>
           </div>
           <div>
             <dt>Per person</dt>
-            <dd>{menu.pricePerPerson}</dd>
+            <dd>{formatMoneyExact(Number(menu.pricePerPerson))}</dd>
           </div>
           <div>
             <dt>Guests</dt>

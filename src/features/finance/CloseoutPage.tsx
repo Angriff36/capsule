@@ -313,7 +313,11 @@ export function CloseoutPage() {
       </section>
 
       <p className="mt-4 text-[12px] text-ink-3">
-        Payroll inputs and saved report definitions remain deferred. Use{" "}
+        Payroll inputs live under{" "}
+        <Link className="text-link" to={FINANCE_ROUTES.payroll}>
+          Payroll
+        </Link>
+        . Use{" "}
         <Link className="text-link" to={FINANCE_ROUTES.invoices}>
           Invoices
         </Link>{" "}

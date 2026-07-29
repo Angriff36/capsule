@@ -228,7 +228,9 @@ export function TipDistributionPage() {
 
   return (
     <div className="tip-stage">
-      <style>{`@media print { body * { visibility: hidden; } .tip-print-sheet, .tip-print-sheet * { visibility: visible; } .tip-print-sheet { position: absolute; inset: 0; width: 100%; } .tip-no-print { display: none !important; } }`}</style>
+      {/* Mount-scoped print isolation: hides everything except the sheet while
+          this page is open. The .tip-no-print rules live in the page CSS. */}
+      <style>{`@media print { body * { visibility: hidden; } .tip-print-sheet, .tip-print-sheet * { visibility: visible; } .tip-print-sheet { position: absolute; inset: 0; width: 100%; } }`}</style>
       <header className="tip-masthead tip-no-print">
         <div>
           <p className="eyebrow">Finance · Event settlement</p>
@@ -536,10 +538,9 @@ export function TipDistributionPage() {
             </button>
           </div>
           <p className="tip-bridge-note tip-no-print">
-            Payroll inputs are created in prepared state for review. Gratuity is
-            stored inside the encrypted payroll note until encrypted money
-            storage is corrected; the payroll export recognizes this versioned
-            amount.
+            Each share is created as a prepared payroll input for review — no
+            pay goes out until you finalize it in Payroll. The gratuity amount
+            is recorded on the payroll note and carried into the payroll export.
           </p>
         </>
       )}

@@ -3,8 +3,6 @@ import {
   useListEvent,
   useListEventCloseout,
   useListLead,
-  useListClient,
-  useListPerson,
   useListVenue,
 } from "@/lib/manifest-convex-react";
 import {
@@ -16,7 +14,7 @@ import { BarChart } from "@/ui/charts/BarChart";
 import { LineChart } from "@/ui/charts/LineChart";
 import { TableDisplay } from "@/ui/charts/TableDisplay";
 import { PageHeader } from "@/ui/primitives";
-import { formatDate, formatMoney, formatCount } from "@/lib/format";
+import { formatDate, formatMoney } from "@/lib/format";
 
 /**
  * Tim's KPIs Dashboard (Priority 35)
@@ -39,8 +37,6 @@ export function TimsKPIsDashboardPage() {
   const events = useListEvent();
   const closeouts = useListEventCloseout();
   const leads = useListLead();
-  const clients = useListClient();
-  const people = useListPerson();
   const venues = useListVenue();
 
   // Revenue KPIs
@@ -244,7 +240,6 @@ export function TimsKPIsDashboardPage() {
         revenue: event.quotedPrice || 0,
         date: event.startsAt ? formatDate(event.startsAt) : "",
         headcount: event.expectedHeadcount || 0,
-        venueId: event.venueId || "—",
       }));
   }, [events]);
 
@@ -381,7 +376,13 @@ export function TimsKPIsDashboardPage() {
         <LineChart
           data={monthlyRevenueData}
           xAxisKey="month"
-          series={[{ dataKey: "revenue", name: "Revenue", color: "#3b82f6" }]}
+          series={[
+            {
+              dataKey: "revenue",
+              name: "Revenue",
+              color: "var(--color-info)",
+            },
+          ]}
           height={250}
           formatYAxis={formatMoney}
         />
@@ -395,7 +396,9 @@ export function TimsKPIsDashboardPage() {
         <BarChart
           data={venuePerformanceData}
           xAxisKey="venue"
-          series={[{ dataKey: "revenue", name: "Revenue", color: "#10b981" }]}
+          series={[
+            { dataKey: "revenue", name: "Revenue", color: "var(--color-ok)" },
+          ]}
           height={300}
           orientation="horizontal"
           formatYAxis={formatMoney}
@@ -410,7 +413,13 @@ export function TimsKPIsDashboardPage() {
         <BarChart
           data={serviceStyleData}
           xAxisKey="serviceStyle"
-          series={[{ dataKey: "revenue", name: "Revenue", color: "#8b5cf6" }]}
+          series={[
+            {
+              dataKey: "revenue",
+              name: "Revenue",
+              color: "var(--color-brand)",
+            },
+          ]}
           height={300}
           formatYAxis={formatMoney}
         />
@@ -447,15 +456,15 @@ export function TimsKPIsDashboardPage() {
       <DashboardGrid items={dashboardItems} />
 
       {/* Reconciliation Note */}
-      <div className="mt-6 rounded-lg border border-ink-200 bg-ink-50 p-4">
-        <h4 className="text-sm font-semibold text-ink-900">
+      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
+        <h4 className="text-sm font-semibold text-ink">
           Where these numbers come from
         </h4>
-        <p className="mt-1 text-sm text-ink-600">
-          Every number updates live from your own data. Click a venue name to
-          see its full event history. Revenue attribution tracks venue
-          commissions and sales splits. Food cost percentages come from event
-          closeouts, comparing actual against budgeted.
+        <p className="mt-1 text-sm text-ink-2">
+          Every number updates live from your own data. Revenue comes from
+          completed events' quoted prices. Food cost percentages come from event
+          closeouts, comparing actual against budgeted. Lead numbers come from
+          your sales pipeline.
         </p>
       </div>
     </div>

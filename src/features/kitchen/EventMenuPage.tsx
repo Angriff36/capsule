@@ -307,7 +307,7 @@ export function EventMenuPage() {
                 className="btn btn-primary"
                 disabled={!eventId || busy != null}
               >
-                {busy === "select" ? "Selecting…" : "Select dish"}
+                {busy === "addToEvent" ? "Adding…" : "Select dish"}
               </button>
             </div>
             <div className="culinary-create-grid">

@@ -102,15 +102,23 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
     if (!template) return;
     const templateSections = parseSections(template.sections);
     if (templateSections.length === 0) {
-      alert("That template has no sections to copy.");
+      setFailure(
+        classifyCommandFailure(
+          new Error("That template has no sections to copy."),
+        ),
+      );
       return;
     }
     // Validate every section BEFORE any mutation so a bad template (e.g. a
     // blank type from a hand-edit) fails fast instead of leaving a partial copy.
     const invalidIndex = templateSections.findIndex((s) => !s.type.trim());
     if (invalidIndex >= 0) {
-      alert(
-        `Section ${invalidIndex + 1} has a blank type. Fix the template before copying.`,
+      setFailure(
+        classifyCommandFailure(
+          new Error(
+            `Section ${invalidIndex + 1} has a blank type. Fix the template before copying.`,
+          ),
+        ),
       );
       return;
     }

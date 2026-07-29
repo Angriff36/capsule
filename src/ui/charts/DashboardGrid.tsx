@@ -43,12 +43,12 @@ export function DashboardGrid({ items, className }: DashboardGridProps) {
             {(item.title || item.subtitle) && (
               <div className="mb-2">
                 {item.title && (
-                  <h3 className="text-sm font-semibold text-ink-900">
+                  <h3 className="text-sm font-semibold text-ink">
                     {item.title}
                   </h3>
                 )}
                 {item.subtitle && (
-                  <p className="text-xs text-ink-500">{item.subtitle}</p>
+                  <p className="text-xs text-ink-3">{item.subtitle}</p>
                 )}
               </div>
             )}

@@ -532,11 +532,6 @@ export function QuoteSubmissionPage() {
           </form>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="max-w-3xl mx-auto px-4 py-8 text-center text-sm text-ink-3">
-        <p>Questions? Contact us at info@catering-example.com</p>
-      </footer>
     </div>
   );
 }

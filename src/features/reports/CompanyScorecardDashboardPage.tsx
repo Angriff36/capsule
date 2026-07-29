@@ -3,261 +3,181 @@ import {
   useListEvent,
   useListEventCloseout,
   useListLead,
-  useListVenue,
 } from "@/lib/manifest-convex-react";
 import {
   DashboardGrid,
   type DashboardGridSize,
 } from "@/ui/charts/DashboardGrid";
-import { StatCard } from "@/ui/charts/StatCard";
 import { BarChart } from "@/ui/charts/BarChart";
-import { PageHeader, StatusChip } from "@/ui/primitives";
-import { formatMoney, formatPercent, formatCount } from "@/lib/format";
+import { PageHeader } from "@/ui/primitives";
+import { formatMoney, formatCount, formatPercent } from "@/lib/format";
 
 /**
  * Company Scorecard Dashboard (Priority 37)
  *
- * Executive scorecard with metrics, targets, actuals, trends, owner, and status.
- * Tracks business performance against strategic goals.
- *
- * Features:
- * - Revenue targets vs. actuals
- * - Food cost percentage targets
- * - Profit margin tracking
- * - Lead conversion goals
- * - Event volume targets
- * - Venue utilization metrics
- * - Monthly performance trends
- * - Owner assignment for each metric
+ * Executive scorecard of the core monthly numbers — revenue, food cost,
+ * profit margin, lead conversion, completed events, and guests — with
+ * real month-over-month movement computed from events, closeouts, and
+ * leads. Capsule doesn't store company targets or metric owners, so the
+ * cards show live actuals and how they moved against last month.
  */
 
 interface ScorecardMetric {
   id: string;
   name: string;
-  owner: string;
-  target: number;
-  actual: number;
+  current: number | null;
+  previous: number | null;
   unit: "currency" | "percent" | "count";
-  status: "ahead" | "on-track" | "behind" | "at-risk";
-  trend: "up" | "flat" | "down";
+  /** Which direction counts as an improvement for this metric. */
+  goodDirection: "up" | "down";
+}
+
+interface MonthNumbers {
+  revenue: number;
+  foodCostPct: number | null;
+  profitMargin: number | null;
+  conversionRate: number | null;
+  completedEvents: number;
+  guests: number;
 }
 
 export function CompanyScorecardDashboardPage() {
   const events = useListEvent();
   const closeouts = useListEventCloseout();
   const leads = useListLead();
-  const venues = useListVenue();
 
-  // Current month calculations
   const now = new Date();
   const currentMonth = now.getMonth();
   const currentYear = now.getFullYear();
 
-  const currentMonthEvents = useMemo(() => {
-    if (!events) return [];
-    return events.filter((e) => {
-      if (!e.startsAt) return false;
-      const date = new Date(e.startsAt);
-      return (
-        date.getMonth() === currentMonth && date.getFullYear() === currentYear
+  const monthNumbers = useMemo(() => {
+    const compute = (year: number, month: number): MonthNumbers => {
+      const inMonth = (ts: number | null | undefined) => {
+        if (!ts) return false;
+        const date = new Date(ts);
+        return date.getMonth() === month && date.getFullYear() === year;
+      };
+
+      const monthEvents = (events || []).filter((e) => inMonth(e.startsAt));
+      const revenue = monthEvents.reduce(
+        (sum, e) => sum + (e.quotedPrice || 0),
+        0,
       );
-    });
-  }, [events, currentMonth, currentYear]);
-
-  const currentMonthRevenue = useMemo(() => {
-    return currentMonthEvents.reduce((sum, e) => sum + (e.quotedPrice || 0), 0);
-  }, [currentMonthEvents]);
-
-  const currentMonthFoodCost = useMemo(() => {
-    if (!closeouts) return 0;
-    const monthCloseouts = closeouts.filter((c) => {
-      const eventDate = c.finalizedAt ?? c.capturedAt ?? c.createdAt;
-      if (!eventDate) return false;
-      const date = new Date(eventDate);
-      return (
-        date.getMonth() === currentMonth && date.getFullYear() === currentYear
+      const completedEvents = monthEvents.filter(
+        (e) => e.stage === "completed",
+      ).length;
+      const guests = monthEvents.reduce(
+        (sum, e) => sum + (e.expectedHeadcount || 0),
+        0,
       );
-    });
-    const totalCost = monthCloseouts.reduce(
-      (sum, c) => sum + (c.actualIngredientCost || 0),
-      0,
-    );
-    const totalRevenue = monthCloseouts.reduce(
-      (sum, c) => sum + c.grossProfit + (c.actualIngredientCost || 0),
-      0,
-    );
-    return totalRevenue > 0 ? (totalCost / totalRevenue) * 100 : 0;
-  }, [closeouts, currentMonth, currentYear]);
 
-  const currentMonthCloseouts = useMemo(() => {
-    if (!closeouts) return [];
-    return closeouts.filter((c) => {
-      const eventDate = c.finalizedAt ?? c.capturedAt ?? c.createdAt;
-      if (!eventDate) return false;
-      const date = new Date(eventDate);
-      return (
-        date.getMonth() === currentMonth && date.getFullYear() === currentYear
+      const monthCloseouts = (closeouts || []).filter((c) =>
+        inMonth(c.finalizedAt ?? c.capturedAt ?? c.createdAt),
       );
-    });
-  }, [closeouts, currentMonth, currentYear]);
-
-  const avgProfitMargin = useMemo(() => {
-    if (currentMonthCloseouts.length === 0) return 0;
-    const totalRevenue = currentMonthCloseouts.reduce(
-      (sum, c) => sum + c.grossProfit + (c.actualIngredientCost || 0),
-      0,
-    );
-    const totalProfit = currentMonthCloseouts.reduce(
-      (sum, c) => sum + c.grossProfit,
-      0,
-    );
-    return totalRevenue > 0 ? (totalProfit / totalRevenue) * 100 : 0;
-  }, [currentMonthCloseouts]);
-
-  const currentMonthLeads = useMemo(() => {
-    if (!leads) return [];
-    return leads.filter((l) => {
-      if (!l.createdAt) return false;
-      const date = new Date(l.createdAt);
-      return (
-        date.getMonth() === currentMonth && date.getFullYear() === currentYear
+      const closeoutCost = monthCloseouts.reduce(
+        (sum, c) => sum + (c.actualIngredientCost || 0),
+        0,
       );
-    });
-  }, [leads, currentMonth, currentYear]);
+      const closeoutRevenue = monthCloseouts.reduce(
+        (sum, c) => sum + c.grossProfit + (c.actualIngredientCost || 0),
+        0,
+      );
+      const closeoutProfit = monthCloseouts.reduce(
+        (sum, c) => sum + c.grossProfit,
+        0,
+      );
+      const foodCostPct =
+        closeoutRevenue > 0 ? (closeoutCost / closeoutRevenue) * 100 : null;
+      const profitMargin =
+        closeoutRevenue > 0 ? (closeoutProfit / closeoutRevenue) * 100 : null;
 
-  const conversionRate = useMemo(() => {
-    if (currentMonthLeads.length === 0) return 0;
-    const converted = currentMonthLeads.filter(
-      (l) => l.stage === "converted",
-    ).length;
-    return (converted / currentMonthLeads.length) * 100;
-  }, [currentMonthLeads]);
+      const monthLeads = (leads || []).filter((l) => inMonth(l.createdAt));
+      const conversionRate =
+        monthLeads.length > 0
+          ? (monthLeads.filter((l) => l.stage === "converted").length /
+              monthLeads.length) *
+            100
+          : null;
 
-  // Scorecard metrics with targets
+      return {
+        revenue,
+        foodCostPct,
+        profitMargin,
+        conversionRate,
+        completedEvents,
+        guests,
+      };
+    };
+
+    const previousDate = new Date(currentYear, currentMonth - 1, 1);
+    return {
+      current: compute(currentYear, currentMonth),
+      previous: compute(previousDate.getFullYear(), previousDate.getMonth()),
+    };
+  }, [events, closeouts, leads, currentMonth, currentYear]);
+
   const scorecardMetrics: ScorecardMetric[] = [
     {
       id: "monthly-revenue",
       name: "Monthly Revenue",
-      owner: "Leadership",
-      target: 500000,
-      actual: currentMonthRevenue,
+      current: monthNumbers.current.revenue,
+      previous: monthNumbers.previous.revenue,
       unit: "currency",
-      status:
-        currentMonthRevenue >= 500000
-          ? "ahead"
-          : currentMonthRevenue >= 400000
-            ? "on-track"
-            : currentMonthRevenue >= 300000
-              ? "behind"
-              : "at-risk",
-      trend: "up",
+      goodDirection: "up",
     },
     {
       id: "food-cost-pct",
       name: "Food Cost %",
-      owner: "Executive Chef",
-      target: 30,
-      actual: currentMonthFoodCost,
+      current: monthNumbers.current.foodCostPct,
+      previous: monthNumbers.previous.foodCostPct,
       unit: "percent",
-      status:
-        currentMonthFoodCost <= 30
-          ? "ahead"
-          : currentMonthFoodCost <= 32
-            ? "on-track"
-            : currentMonthFoodCost <= 35
-              ? "behind"
-              : "at-risk",
-      trend: currentMonthFoodCost <= 30 ? "up" : "down",
+      goodDirection: "down",
     },
     {
       id: "profit-margin",
       name: "Profit Margin",
-      owner: "CFO",
-      target: 25,
-      actual: avgProfitMargin,
+      current: monthNumbers.current.profitMargin,
+      previous: monthNumbers.previous.profitMargin,
       unit: "percent",
-      status:
-        avgProfitMargin >= 25
-          ? "ahead"
-          : avgProfitMargin >= 22
-            ? "on-track"
-            : avgProfitMargin >= 18
-              ? "behind"
-              : "at-risk",
-      trend: "up",
+      goodDirection: "up",
     },
     {
       id: "lead-conversion",
       name: "Lead Conversion",
-      owner: "Sales Director",
-      target: 35,
-      actual: conversionRate,
+      current: monthNumbers.current.conversionRate,
+      previous: monthNumbers.previous.conversionRate,
       unit: "percent",
-      status:
-        conversionRate >= 35
-          ? "ahead"
-          : conversionRate >= 30
-            ? "on-track"
-            : conversionRate >= 25
-              ? "behind"
-              : "at-risk",
-      trend: "flat",
+      goodDirection: "up",
     },
     {
       id: "event-count",
-      name: "Monthly Events",
-      owner: "Operations Director",
-      target: 25,
-      actual: currentMonthEvents.filter((e) => e.stage === "completed").length,
+      name: "Events Completed",
+      current: monthNumbers.current.completedEvents,
+      previous: monthNumbers.previous.completedEvents,
       unit: "count",
-      status:
-        currentMonthEvents.length >= 25
-          ? "ahead"
-          : currentMonthEvents.length >= 20
-            ? "on-track"
-            : currentMonthEvents.length >= 15
-              ? "behind"
-              : "at-risk",
-      trend: "up",
+      goodDirection: "up",
     },
     {
-      id: "venue-utilization",
-      name: "Venue Utilization",
-      owner: "Operations Director",
-      target: 80,
-      actual: venues
-        ? (currentMonthEvents.length / (venues.length * 30)) * 100
-        : 0,
-      unit: "percent",
-      status: "on-track",
-      trend: "flat",
+      id: "guests",
+      name: "Guests This Month",
+      current: monthNumbers.current.guests,
+      previous: monthNumbers.previous.guests,
+      unit: "count",
+      goodDirection: "up",
     },
   ];
 
-  // Monthly trend data
+  // Monthly trend data (last 6 months of revenue)
   const monthlyTrendData = useMemo(() => {
-    if (!events || !closeouts) return [];
+    if (!events) return [];
 
-    const monthMap = new Map<
-      string,
-      {
-        revenue: number;
-        foodCost: number;
-        profitMargin: number;
-        eventCount: number;
-      }
-    >();
+    const monthMap = new Map<string, { revenue: number; eventCount: number }>();
 
     // Populate with last 6 months
     for (let i = 5; i >= 0; i--) {
       const date = new Date(currentYear, currentMonth - i, 1);
       const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-      monthMap.set(monthKey, {
-        revenue: 0,
-        foodCost: 0,
-        profitMargin: 0,
-        eventCount: 0,
-      });
+      monthMap.set(monthKey, { revenue: 0, eventCount: 0 });
     }
 
     events.forEach((event) => {
@@ -272,64 +192,12 @@ export function CompanyScorecardDashboardPage() {
       data.eventCount += 1;
     });
 
-    closeouts.forEach((closeout) => {
-      const eventDate =
-        closeout.finalizedAt ?? closeout.capturedAt ?? closeout.createdAt;
-      if (!eventDate) return;
-      const date = new Date(eventDate);
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-
-      if (!monthMap.has(monthKey)) return;
-
-      const data = monthMap.get(monthKey)!;
-      const revenue =
-        closeout.grossProfit + (closeout.actualIngredientCost || 0);
-      data.foodCost += closeout.actualIngredientCost || 0;
-      if (revenue > 0) {
-        data.profitMargin += (closeout.grossProfit / revenue) * 100;
-      }
-    });
-
-    // Calculate averages
     return Array.from(monthMap.entries()).map(([month, data]) => ({
       month,
       revenue: data.revenue,
-      foodCost: data.eventCount > 0 ? (data.foodCost / data.revenue) * 100 : 0,
-      profitMargin:
-        data.eventCount > 0 ? data.profitMargin / data.eventCount : 0,
       eventCount: data.eventCount,
     }));
-  }, [events, closeouts, currentYear, currentMonth]);
-
-  const STATUS_COLORS = {
-    ahead: "bg-ok-50 border-ok-200 text-ok-900",
-    "on-track": "bg-brand-50 border-brand-200 text-brand-900",
-    behind: "bg-warn-50 border-warn-200 text-warn-900",
-    "at-risk": "bg-accent-50 border-accent-200 text-accent-900",
-  } as const;
-
-  const STATUS_LABELS = {
-    ahead: "Ahead",
-    "on-track": "On Track",
-    behind: "Behind",
-    "at-risk": "At Risk",
-  };
-
-  const formatValue = (
-    value: number,
-    unit: ScorecardMetric["unit"],
-  ): string => {
-    switch (unit) {
-      case "currency":
-        return formatMoney(value);
-      case "percent":
-        return formatPercent(value / 100);
-      case "count":
-        return formatCount(value);
-      default:
-        return String(value);
-    }
-  };
+  }, [events, currentYear, currentMonth]);
 
   const dashboardItems: Array<{
     id: string;
@@ -337,36 +205,11 @@ export function CompanyScorecardDashboardPage() {
     content: React.ReactNode;
     title?: string;
   }> = [
-    {
-      id: "revenue-target",
-      size: "medium",
-      content: <MetricCard metric={scorecardMetrics[0]} />,
-    },
-    {
-      id: "food-cost-target",
-      size: "medium",
-      content: <MetricCard metric={scorecardMetrics[1]} />,
-    },
-    {
-      id: "profit-target",
-      size: "medium",
-      content: <MetricCard metric={scorecardMetrics[2]} />,
-    },
-    {
-      id: "conversion-target",
-      size: "medium",
-      content: <MetricCard metric={scorecardMetrics[3]} />,
-    },
-    {
-      id: "events-target",
-      size: "medium",
-      content: <MetricCard metric={scorecardMetrics[4]} />,
-    },
-    {
-      id: "utilization-target",
-      size: "medium",
-      content: <MetricCard metric={scorecardMetrics[5]} />,
-    },
+    ...scorecardMetrics.map((metric) => ({
+      id: metric.id,
+      size: "medium" as const,
+      content: <MetricCard metric={metric} />,
+    })),
     {
       id: "monthly-trends",
       size: "full",
@@ -374,7 +217,13 @@ export function CompanyScorecardDashboardPage() {
         <BarChart
           data={monthlyTrendData}
           xAxisKey="month"
-          series={[{ dataKey: "revenue", name: "Revenue", color: "#3b82f6" }]}
+          series={[
+            {
+              dataKey: "revenue",
+              name: "Revenue",
+              color: "var(--color-brand)",
+            },
+          ]}
           height={300}
           formatYAxis={formatMoney}
         />
@@ -387,41 +236,21 @@ export function CompanyScorecardDashboardPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Company Scorecard"
-        lead="Executive metrics with targets, actuals, trends, and owner assignments. Track performance against strategic goals."
+        lead="The core monthly numbers with real month-over-month movement, live from your events, closeouts, and leads."
       />
-
-      <div className="mb-4 flex items-center gap-4 text-sm">
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-ok-500" />
-          <span>Ahead of Target</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-brand-500" />
-          <span>On Track</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-warn-500" />
-          <span>Behind Target</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="h-3 w-3 rounded-full bg-accent-500" />
-          <span>At Risk</span>
-        </div>
-      </div>
 
       <DashboardGrid items={dashboardItems} />
 
-      {/* Scorecard Legend */}
-      <div className="mt-6 rounded-lg border border-ink-200 bg-ink-50 p-4">
-        <h4 className="text-sm font-semibold text-ink-900">
-          Scorecard Methodology
+      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
+        <h4 className="text-sm font-semibold text-ink">
+          Where these numbers come from
         </h4>
-        <p className="mt-1 text-sm text-ink-600">
-          Metrics are evaluated monthly against quarterly targets refreshed by
-          leadership. Status reflects current performance relative to target
-          thresholds. Owners are responsible for reporting metric status in
-          executive L10 meetings. Historical trends track 6-month performance
-          for seasonality analysis.
+        <p className="mt-1 text-sm text-ink-2">
+          Revenue and guest counts come from events scheduled this month. Food
+          cost and profit margin come from finished event closeouts. Lead
+          conversion counts leads created this month that converted. Capsule
+          doesn't store company targets yet, so each card compares this month
+          against last month instead.
         </p>
       </div>
     </div>
@@ -429,82 +258,53 @@ export function CompanyScorecardDashboardPage() {
 }
 
 function MetricCard({ metric }: { metric: ScorecardMetric }) {
-  const STATUS_COLORS = {
-    ahead: "bg-ok-50 border-ok-200 text-ok-900",
-    "on-track": "bg-brand-50 border-brand-200 text-brand-900",
-    behind: "bg-warn-50 border-warn-200 text-warn-900",
-    "at-risk": "bg-accent-50 border-accent-200 text-accent-900",
-  } as const;
-
-  const STATUS_LABELS = {
-    ahead: "Ahead",
-    "on-track": "On Track",
-    behind: "Behind",
-    "at-risk": "At Risk",
-  };
-
-  const formatValue = (
-    value: number,
-    unit: ScorecardMetric["unit"],
-  ): string => {
-    switch (unit) {
+  const formatValue = (value: number): string => {
+    switch (metric.unit) {
       case "currency":
         return formatMoney(value);
       case "percent":
-        return `${value.toFixed(1)}%`;
+        return formatPercent(value);
       case "count":
         return formatCount(value);
-      default:
-        return String(value);
     }
   };
 
-  const pctOfTarget = (metric.actual / metric.target) * 100;
-  const variance = metric.actual - metric.target;
+  const change =
+    metric.current != null && metric.previous != null && metric.previous !== 0
+      ? ((metric.current - metric.previous) / Math.abs(metric.previous)) * 100
+      : null;
+  const improving =
+    change == null
+      ? null
+      : metric.goodDirection === "up"
+        ? change >= 0
+        : change <= 0;
 
   return (
-    <div className={`rounded-lg border p-4 ${STATUS_COLORS[metric.status]}`}>
-      <div className="mb-3 flex items-start justify-between">
-        <div>
-          <h3 className="font-semibold">{metric.name}</h3>
-          <p className="text-xs opacity-75">Owner: {metric.owner}</p>
-        </div>
-        <StatusChip status={metric.status} />
-      </div>
+    <div className="rounded-lg border border-line bg-panel p-4">
+      <h3 className="font-semibold text-ink">{metric.name}</h3>
 
-      <div className="mb-3 flex items-baseline justify-between">
-        <span className="text-2xl font-bold">
-          {formatValue(metric.actual, metric.unit)}
+      <div className="mt-2 flex items-baseline justify-between">
+        <span className="text-2xl font-bold text-ink">
+          {metric.current != null ? formatValue(metric.current) : "—"}
         </span>
-        <span className="text-sm opacity-75">
-          Target: {formatValue(metric.target, metric.unit)}
-        </span>
-      </div>
-
-      <div className="mb-2">
-        <div className="mb-1 flex items-center justify-between text-xs">
-          <span>{pctOfTarget.toFixed(0)}% of target</span>
-          <span className={variance >= 0 ? "text-ok-700" : "text-accent-700"}>
-            {variance >= 0 ? "+" : ""}
-            {formatValue(variance, metric.unit)}
+        {change != null ? (
+          <span
+            className={`text-sm font-medium ${improving ? "text-ok" : "text-danger"}`}
+          >
+            {change >= 0 ? "▲" : "▼"} {Math.abs(change).toFixed(1)}% vs last
+            month
           </span>
-        </div>
-        <div className="h-2 w-full rounded-full bg-current/20">
-          <div
-            className={`h-2 rounded-full ${variance >= 0 ? "bg-ok-500" : "bg-accent-500"}`}
-            style={{ width: `${Math.min(Math.max(pctOfTarget, 0), 100)}%` }}
-          />
-        </div>
+        ) : null}
       </div>
 
-      <div className="text-xs opacity-75">
-        Trend:{" "}
-        {metric.trend === "up"
-          ? "↑ Improving"
-          : metric.trend === "flat"
-            ? "→ Stable"
-            : "↓ Declining"}
-      </div>
+      <p className="mt-2 text-xs text-ink-3">
+        {metric.current == null
+          ? "Nothing recorded yet this month."
+          : metric.previous != null
+            ? `Last month: ${formatValue(metric.previous)}`
+            : "No data for last month yet."}
+      </p>
     </div>
   );
 }

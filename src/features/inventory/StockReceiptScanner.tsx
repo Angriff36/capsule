@@ -65,6 +65,14 @@ interface BarcodeDetectorConstructor {
   new (): BarcodeDetectorInstance;
 }
 
+// Full class names are spelled out (never assembled by interpolation) so the
+// undefined-class checker can match every variant against StockReceiptScanner.css.
+const FEEDBACK_TONE_CLASS = {
+  ok: "is-ok",
+  warn: "is-warn",
+  danger: "is-danger",
+} as const;
+
 const idFromUnknown = (value: unknown) =>
   typeof value === "string" && value.trim() ? value.trim() : null;
 
@@ -615,7 +623,7 @@ export function StockReceiptScanner({
       {feedback ? (
         <div
           data-testid="stock-receipt-feedback"
-          className={`stock-receipt-feedback is-${feedback.tone}`}
+          className={`stock-receipt-feedback ${FEEDBACK_TONE_CLASS[feedback.tone]}`}
           role={feedback.tone === "danger" ? "alert" : "status"}
         >
           <span aria-hidden="true" />

@@ -137,17 +137,17 @@ export function TableDisplay({
       )}
     >
       {(title || subtitle || onExport) && (
-        <div className="flex items-center justify-between border-b border-ink-200 px-4 py-3">
+        <div className="flex items-center justify-between border-b border-line px-4 py-3">
           <div>
             {title && (
-              <h3 className="text-base font-semibold text-ink-900">{title}</h3>
+              <h3 className="text-base font-semibold text-ink">{title}</h3>
             )}
-            {subtitle && <p className="text-sm text-ink-500">{subtitle}</p>}
+            {subtitle && <p className="text-sm text-ink-3">{subtitle}</p>}
           </div>
           {onExport && (
             <button
               onClick={onExport}
-              className="rounded border border-ink-300 px-3 py-1.5 text-sm text-ink-600 hover:bg-ink-50"
+              className="rounded border border-line-2 px-3 py-1.5 text-sm text-ink-2 hover:bg-inset"
             >
               Export CSV
             </button>
@@ -157,24 +157,22 @@ export function TableDisplay({
 
       <div style={{ height }} className="overflow-auto">
         <table className="w-full text-sm">
-          <thead className="bg-ink-50">
+          <thead className="bg-inset">
             <tr>
               {columns.map((col) => (
                 <th
                   key={col.key}
                   onClick={() => handleSort(col.key)}
                   className={clsx(
-                    "px-4 py-2 font-medium text-ink-700",
+                    "px-4 py-2 font-medium text-ink-2",
                     alignClass[col.align || "left"],
-                    sortable &&
-                      col.sortable &&
-                      "cursor-pointer hover:bg-ink-100",
+                    sortable && col.sortable && "cursor-pointer hover:bg-inset",
                   )}
                 >
                   <div className="flex items-center gap-1">
                     {col.header}
                     {sortable && col.sortable && (
-                      <span className="text-ink-400">
+                      <span className="text-ink-3">
                         {sortColumn === col.key
                           ? sortDirection === "asc"
                             ? "↑"
@@ -187,14 +185,14 @@ export function TableDisplay({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-ink-200">
+          <tbody className="divide-y divide-line">
             {sortedData.map((row, rowIndex) => (
-              <tr key={rowIndex} className="hover:bg-ink-50/50">
+              <tr key={rowIndex} className="hover:bg-inset/50">
                 {columns.map((col) => (
                   <td
                     key={col.key}
                     className={clsx(
-                      "px-4 py-2 text-ink-600",
+                      "px-4 py-2 text-ink-2",
                       alignClass[col.align || "left"],
                     )}
                   >
@@ -208,7 +206,7 @@ export function TableDisplay({
       </div>
 
       {data.length === 0 && (
-        <div className="px-4 py-8 text-center text-ink-500">
+        <div className="px-4 py-8 text-center text-ink-3">
           <p>No data available</p>
         </div>
       )}

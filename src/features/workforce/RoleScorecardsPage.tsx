@@ -249,9 +249,12 @@ export function RoleScorecardsPage() {
             </label>
             <div className="field-label col-span-2">
               Expectations (metric · target)
-              <div className="checkbox-group">
+              <div className="flex flex-col items-start gap-2">
                 {expectations.map((row, index) => (
-                  <div key={index} className="supply-form-grid">
+                  <div
+                    key={index}
+                    className="grid w-full grid-cols-[1fr_1fr_auto] items-center gap-2"
+                  >
                     <input
                       className="input"
                       placeholder="Metric (e.g. On-time arrival)"
@@ -368,7 +371,7 @@ export function RoleScorecardsPage() {
                           </td>
                           <td className="text-right">
                             {row.status === "active" ? (
-                              <>
+                              <span className="inline-flex items-center gap-3">
                                 <button
                                   className="btn-link btn-link-compact"
                                   onClick={() => startRevise(row._id)}
@@ -381,7 +384,7 @@ export function RoleScorecardsPage() {
                                 >
                                   Archive
                                 </button>
-                              </>
+                              </span>
                             ) : (
                               <button
                                 className="btn-link btn-link-compact"

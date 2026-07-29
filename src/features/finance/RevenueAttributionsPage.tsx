@@ -8,6 +8,7 @@ import {
   useRevenueAttributionRequestApproval,
   useRevenueAttributionUpdate,
 } from "../../lib/manifest-convex-react";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import {
   formatDate as formatDateShared,
@@ -44,8 +45,7 @@ export function RevenueAttributionsPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [rejectingId, setRejectingId] = useState<string | null>(null);
-  const [rejectionReason, setRejectionReason] = useState("");
+  const { prompt, host } = useActionPrompt(busy != null);
 
   const configuredAttributions = (attributions ?? [])
     .filter((attr) => attr.deletedAt == null)
@@ -108,24 +108,27 @@ export function RevenueAttributionsPage() {
     });
   };
 
-  const handleReject = () => {
-    if (!rejectingId || !rejectionReason.trim()) {
-      setFailure(new Error("Rejection reason is required."));
-      return;
-    }
-    const attr = attributions?.find((a) => a._id === rejectingId);
-    if (!attr) return;
-
-    void run(`reject:${rejectingId}`, async () => {
-      await reject({
-        docId: rejectingId,
-        version: attr.version,
-        rejectionReason: rejectionReason.trim(),
+  const handleReject = (attr: { _id: string; version: number }) => {
+    void (async () => {
+      const reason = await prompt.askReason({
+        title: "Reject attribution",
+        description:
+          "Explain why this attribution is being rejected. The submitter can revise and resubmit.",
+        label: "Rejection reason",
+        placeholder: "Explain what needs to be corrected…",
+        confirmLabel: "Reject",
+        tone: "danger",
       });
-      setNotice("Attribution rejected.");
-      setRejectingId(null);
-      setRejectionReason("");
-    });
+      if (!reason) return;
+      void run(`reject:${attr._id}`, async () => {
+        await reject({
+          docId: attr._id,
+          version: attr.version,
+          rejectionReason: reason,
+        });
+        setNotice("Attribution rejected.");
+      });
+    })();
   };
 
   const handleUpdateDraft = (
@@ -184,6 +187,7 @@ export function RevenueAttributionsPage() {
           {notice}
         </p>
       ) : null}
+      {host}
 
       {configuredAttributions.length === 0 ? (
         <div className="document-empty">
@@ -273,7 +277,7 @@ export function RevenueAttributionsPage() {
                           <button
                             className="text-link text-ink-2"
                             disabled={busy != null}
-                            onClick={() => setRejectingId(attr._id)}
+                            onClick={() => handleReject(attr)}
                           >
                             Reject
                           </button>
@@ -301,55 +305,6 @@ export function RevenueAttributionsPage() {
               })}
             </tbody>
           </table>
-        </div>
-      )}
-
-      {/* Rejection reason modal */}
-      {rejectingId && (
-        <div className="modal-overlay" onClick={() => setRejectingId(null)}>
-          <div className="modal-panel" onClick={(e) => e.stopPropagation()}>
-            <h2>Reject attribution</h2>
-            <p className="text-ink-2">
-              Explain why this attribution is being rejected. The submitter can
-              revise and resubmit.
-            </p>
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                handleReject();
-              }}
-            >
-              <label>
-                Rejection reason
-                <textarea
-                  required
-                  rows={3}
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  placeholder="Explain what needs to be corrected…"
-                />
-              </label>
-              <div className="flex gap-2 justify-end">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => {
-                    setRejectingId(null);
-                    setRejectionReason("");
-                  }}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="btn btn-danger"
-                  disabled={busy != null || !rejectionReason.trim()}
-                >
-                  {busy?.startsWith("reject:") ? "Rejecting…" : "Reject"}
-                </button>
-              </div>
-            </form>
-          </div>
         </div>
       )}
     </div>

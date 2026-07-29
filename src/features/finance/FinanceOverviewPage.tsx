@@ -224,11 +224,11 @@ export function FinanceOverviewPage() {
 
   return (
     <div className="space-y-4">
-      <FinanceWorkspaceNav />
       <PageHeader
         title="Finance"
         lead="Money owed, money collected, and where to act next."
       />
+      <FinanceWorkspaceNav />
 
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line lg:grid-cols-4">
         <div className="bg-panel px-4 py-3">

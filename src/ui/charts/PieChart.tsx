@@ -21,16 +21,16 @@ import {
  */
 
 const DEFAULT_COLORS = [
-  "#3b82f6", // brand-500
-  "#8b5cf6", // accent-500
-  "#f59e0b", // warn-500
-  "#10b981", // ok-500
-  "#6b7280", // ink-500
-  "#ec4899", // pink-500
-  "#14b8a6", // teal-500
-  "#f97316", // orange-500
-  "#06b6d4", // cyan-500
-  "#a855f7", // purple-500
+  "var(--color-brand)",
+  "var(--color-accent)",
+  "var(--color-info)",
+  "var(--color-ok)",
+  "var(--color-warn)",
+  "var(--color-danger)",
+  "var(--color-ink-2)",
+  "var(--color-accent-deep)",
+  "var(--color-sage-2)",
+  "var(--color-ink-3)",
 ];
 
 export interface PieChartProps {
@@ -80,8 +80,8 @@ export function PieChart({
           </Pie>
           <Tooltip
             contentStyle={{
-              backgroundColor: "white",
-              border: "1px solid #e5e7eb",
+              backgroundColor: "var(--color-panel)",
+              border: "1px solid var(--color-line)",
               borderRadius: "0.5rem",
             }}
           />

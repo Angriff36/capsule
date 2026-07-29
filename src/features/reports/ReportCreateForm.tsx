@@ -1,4 +1,5 @@
 import type { FormEvent } from "react";
+import { formatStatusLabel } from "../../lib/statusLabels";
 
 export const REPORT_SUBJECT_AREAS = [
   "events",
@@ -21,6 +22,13 @@ export const REPORT_SHARING_SCOPES = [
 export type ReportSubjectArea = (typeof REPORT_SUBJECT_AREAS)[number];
 export type ReportChartType = (typeof REPORT_CHART_TYPES)[number];
 export type ReportSharingScope = (typeof REPORT_SHARING_SCOPES)[number];
+
+/** Plain-language labels for sharing scopes, shared with the reports table. */
+export const SHARING_SCOPE_LABELS: Record<ReportSharingScope, string> = {
+  owner_only: "Only me",
+  team: "My team",
+  tenant_wide: "Whole company",
+};
 
 /** Builds a SavedReportDefinition.createDefinition payload from the create form. */
 export class ReportCreatePayloadBuilder {
@@ -92,7 +100,7 @@ export function ReportCreateForm({
           >
             {REPORT_SUBJECT_AREAS.map((area) => (
               <option key={area} value={area}>
-                {area}
+                {formatStatusLabel(area)}
               </option>
             ))}
           </select>
@@ -107,7 +115,7 @@ export function ReportCreateForm({
           >
             {REPORT_CHART_TYPES.map((type) => (
               <option key={type} value={type}>
-                {type}
+                {formatStatusLabel(type)}
               </option>
             ))}
           </select>
@@ -122,20 +130,18 @@ export function ReportCreateForm({
           >
             {REPORT_SHARING_SCOPES.map((scope) => (
               <option key={scope} value={scope}>
-                {scope.replaceAll("_", " ")}
+                {SHARING_SCOPE_LABELS[scope]}
               </option>
             ))}
           </select>
         </label>
       </div>
       <label className="block space-y-1">
-        <span className="text-[12px] text-ink-3">
-          Notes (stored in definition)
-        </span>
+        <span className="text-[12px] text-ink-3">Notes (optional)</span>
         <input
           name="notes"
           className="input w-full"
-          placeholder="Optional UI notes"
+          placeholder="Anything you want to remember about this report"
           disabled={busy}
         />
       </label>

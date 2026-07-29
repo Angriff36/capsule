@@ -227,7 +227,7 @@ export function ContractsPage() {
                   </option>
                   {draftableEvents.map((row) => (
                     <option key={row._id} value={row._id}>
-                      {row.name || row._id} (
+                      {row.title || row._id} (
                       {clientDisplayName(row.clientId, clients)})
                     </option>
                   ))}

@@ -3,122 +3,28 @@ import {
   useListEvent,
   useListLead,
   useListEventCloseout,
-  useListPerson,
 } from "@/lib/manifest-convex-react";
 import {
   DashboardGrid,
   type DashboardGridSize,
 } from "@/ui/charts/DashboardGrid";
 import { StatCard } from "@/ui/charts/StatCard";
-import { BarChart } from "@/ui/charts/BarChart";
-import { TableDisplay } from "@/ui/charts/TableDisplay";
-import { PageHeader } from "@/ui/primitives";
-import {
-  formatDate,
-  formatMoney,
-  formatPercent,
-  formatCount,
-} from "@/lib/format";
+import { PageHeader, Section, EmptyState } from "@/ui/primitives";
+import { formatMoney } from "@/lib/format";
 
 /**
  * L10 Dashboard (Priority 40)
  *
- * Entrepreneurial Operating System (EOS) L10 meeting metrics.
- * Scorecard, rocks/priorities, issues, action items, and meeting-period history.
- *
- * Features:
- * - Company scorecard metrics
- * - Rocks/priorities tracking with deadlines
- * - Issues list with severity
- * - Action items with owners and due dates
- * - Weekly meeting period history
- * - To-do list status
- * - Headlines and wins celebration
+ * Weekly leadership meeting board: this week's wins and the company
+ * scorecard, all derived live from events, leads, and closeouts.
+ * Rocks, issues, and to-dos are not tracked in Capsule, so those
+ * sections show an honest empty state instead of placeholder data.
  */
-
-// Simulated data for L10-specific items (rocks, issues, todos)
-// In production, these would come from dedicated entities
-const MOCK_ROCKS = [
-  {
-    title: "Launch catering CRM",
-    owner: "Sarah",
-    deadline: "2026-09-30",
-    status: "on-track",
-  },
-  {
-    title: "Hire 2 senior chefs",
-    owner: "Marco",
-    deadline: "2026-08-15",
-    status: "behind",
-  },
-  {
-    title: "Open second venue",
-    owner: "James",
-    deadline: "2026-12-31",
-    status: "on-track",
-  },
-  {
-    title: "Implement inventory system",
-    owner: "Lisa",
-    deadline: "2026-07-31",
-    status: "complete",
-  },
-];
-
-const MOCK_ISSUES = [
-  {
-    title: "Kitchen equipment delay",
-    severity: "high",
-    owner: "Marco",
-    age: 14,
-  },
-  { title: "Venue AC malfunction", severity: "high", owner: "James", age: 3 },
-  {
-    title: "Staffing shortage weekends",
-    severity: "medium",
-    owner: "Sarah",
-    age: 28,
-  },
-  {
-    title: "Food cost variance over 32%",
-    severity: "medium",
-    owner: "Marco",
-    age: 7,
-  },
-];
-
-const MOCK_TODOS = [
-  {
-    task: "Review weekly financials",
-    owner: "CFO",
-    due: "2026-07-28",
-    status: "done",
-  },
-  {
-    task: "Update sales pipeline",
-    owner: "Sales Director",
-    due: "2026-07-28",
-    status: "done",
-  },
-  {
-    task: "Approve vendor contracts",
-    owner: "Ops Director",
-    due: "2026-07-29",
-    status: "pending",
-  },
-  {
-    task: "Schedule team training",
-    owner: "HR Manager",
-    due: "2026-07-30",
-    status: "pending",
-  },
-];
 
 export function L10DashboardPage() {
   const events = useListEvent();
   const leads = useListLead();
   const closeouts = useListEventCloseout();
-  const people = useListPerson();
 
   // This week's wins
   const weeklyWins = useMemo(() => {
@@ -209,39 +115,6 @@ export function L10DashboardPage() {
     };
   }, [events, closeouts, leads]);
 
-  // Rock status summary
-  const rockSummary = useMemo(() => {
-    return {
-      total: MOCK_ROCKS.length,
-      complete: MOCK_ROCKS.filter((r) => r.status === "complete").length,
-      onTrack: MOCK_ROCKS.filter((r) => r.status === "on-track").length,
-      behind: MOCK_ROCKS.filter((r) => r.status === "behind").length,
-    };
-  }, []);
-
-  // Issue summary
-  const issueSummary = useMemo(() => {
-    return {
-      total: MOCK_ISSUES.length,
-      high: MOCK_ISSUES.filter((i) => i.severity === "high").length,
-      medium: MOCK_ISSUES.filter((i) => i.severity === "medium").length,
-      low: MOCK_ISSUES.filter((i) => i.severity === "low").length,
-    };
-  }, []);
-
-  // To-do summary
-  const todoSummary = useMemo(() => {
-    return {
-      total: MOCK_TODOS.length,
-      done: MOCK_TODOS.filter((t) => t.status === "done").length,
-      pending: MOCK_TODOS.filter((t) => t.status === "pending").length,
-      overdue: MOCK_TODOS.filter((t) => {
-        const due = new Date(t.due);
-        return t.status !== "done" && due < new Date();
-      }).length,
-    };
-  }, []);
-
   const dashboardItems: Array<{
     id: string;
     size: DashboardGridSize;
@@ -253,32 +126,32 @@ export function L10DashboardPage() {
       id: "wins-header",
       size: "full",
       content: (
-        <div className="rounded-lg border-2 border-ok-200 bg-ok-50 p-4">
-          <h3 className="font-semibold text-ok-900">🎉 This Week's Wins</h3>
+        <div className="rounded-lg border-2 border-ok/30 bg-ok-soft p-4">
+          <h3 className="font-semibold text-ok">This Week's Wins</h3>
           <div className="mt-3 grid grid-cols-4 gap-4">
             <div>
-              <p className="text-2xl font-bold text-ok-900">
+              <p className="text-2xl font-bold text-ok">
                 {weeklyWins.completedEvents}
               </p>
-              <p className="text-sm text-ok-700">Events Completed</p>
+              <p className="text-sm text-ok">Events Completed</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-ok-900">
+              <p className="text-2xl font-bold text-ok">
                 {formatMoney(weeklyWins.revenue)}
               </p>
-              <p className="text-sm text-ok-700">Revenue Booked</p>
+              <p className="text-sm text-ok">Revenue Booked</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-ok-900">
+              <p className="text-2xl font-bold text-ok">
                 {weeklyWins.newLeads}
               </p>
-              <p className="text-sm text-ok-700">New Leads</p>
+              <p className="text-sm text-ok">New Leads</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-ok-900">
+              <p className="text-2xl font-bold text-ok">
                 {weeklyWins.convertedLeads}
               </p>
-              <p className="text-sm text-ok-700">Converted</p>
+              <p className="text-sm text-ok">Converted</p>
             </div>
           </div>
         </div>
@@ -317,14 +190,6 @@ export function L10DashboardPage() {
             value: scorecardMetrics.foodCostPct,
             format: "percent" as const,
           }}
-          rows={[
-            {
-              label: "Target: ≤30%",
-              value:
-                scorecardMetrics.foodCostPct <= 30 ? "On Target" : "Off Target",
-            },
-          ]}
-          tone={scorecardMetrics.foodCostPct <= 30 ? "ok" : "warn"}
           isLive
         />
       ),
@@ -341,230 +206,34 @@ export function L10DashboardPage() {
         />
       ),
     },
-    // Rocks summary
-    {
-      id: "rocks-summary",
-      size: "medium",
-      content: (
-        <div className="rounded-lg border border-line bg-panel p-4">
-          <h3 className="font-semibold text-ink-900">Rocks / Priorities</h3>
-          <div className="mt-3 flex items-center justify-around text-center">
-            <div>
-              <p className="text-2xl font-bold text-ink-900">
-                {rockSummary.total}
-              </p>
-              <p className="text-xs text-ink-600">Total</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-ok-600">
-                {rockSummary.complete}
-              </p>
-              <p className="text-xs text-ink-600">Complete</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-brand-600">
-                {rockSummary.onTrack}
-              </p>
-              <p className="text-xs text-ink-600">On Track</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-warn-600">
-                {rockSummary.behind}
-              </p>
-              <p className="text-xs text-ink-600">Behind</p>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    // Issues summary
-    {
-      id: "issues-summary",
-      size: "medium",
-      content: (
-        <div className="rounded-lg border border-line bg-panel p-4">
-          <h3 className="font-semibold text-ink-900">Issues</h3>
-          <div className="mt-3 flex items-center justify-around text-center">
-            <div>
-              <p className="text-2xl font-bold text-ink-900">
-                {issueSummary.total}
-              </p>
-              <p className="text-xs text-ink-600">Open</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-accent-600">
-                {issueSummary.high}
-              </p>
-              <p className="text-xs text-ink-600">High</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-warn-600">
-                {issueSummary.medium}
-              </p>
-              <p className="text-xs text-ink-600">Medium</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-brand-600">
-                {issueSummary.low}
-              </p>
-              <p className="text-xs text-ink-600">Low</p>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    // To-do summary
-    {
-      id: "todos-summary",
-      size: "medium",
-      content: (
-        <div className="rounded-lg border border-line bg-panel p-4">
-          <h3 className="font-semibold text-ink-900">To-Dos</h3>
-          <div className="mt-3 flex items-center justify-around text-center">
-            <div>
-              <p className="text-2xl font-bold text-ink-900">
-                {todoSummary.total}
-              </p>
-              <p className="text-xs text-ink-600">Total</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-ok-600">
-                {todoSummary.done}
-              </p>
-              <p className="text-xs text-ink-600">Done</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-brand-600">
-                {todoSummary.pending}
-              </p>
-              <p className="text-xs text-ink-600">Pending</p>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-accent-600">
-                {todoSummary.overdue}
-              </p>
-              <p className="text-xs text-ink-600">Overdue</p>
-            </div>
-          </div>
-        </div>
-      ),
-    },
-    // Rocks table
-    {
-      id: "rocks-table",
-      size: "full",
-      content: (
-        <TableDisplay
-          columns={[
-            {
-              key: "title",
-              header: "Rock / Priority",
-              type: "string" as const,
-            },
-            { key: "owner", header: "Owner", type: "string" as const },
-            { key: "deadline", header: "Deadline", type: "string" as const },
-            { key: "status", header: "Status", type: "string" as const },
-          ]}
-          data={MOCK_ROCKS.map((r) => ({
-            title: r.title,
-            owner: r.owner,
-            deadline: formatDate(new Date(r.deadline).getTime()),
-            status:
-              r.status === "complete"
-                ? "✓ Complete"
-                : r.status === "on-track"
-                  ? "→ On Track"
-                  : "⚠ Behind",
-          }))}
-          height={200}
-        />
-      ),
-      title: "Company Rocks / Priorities",
-    },
-    // Issues table
-    {
-      id: "issues-table",
-      size: "full",
-      content: (
-        <TableDisplay
-          columns={[
-            { key: "title", header: "Issue", type: "string" as const },
-            { key: "severity", header: "Severity", type: "string" as const },
-            { key: "owner", header: "Owner", type: "string" as const },
-            { key: "age", header: "Days Open", type: "number" as const },
-          ]}
-          data={MOCK_ISSUES.map((i) => ({
-            title: i.title,
-            severity:
-              i.severity === "high"
-                ? "🔴 High"
-                : i.severity === "medium"
-                  ? "🟡 Medium"
-                  : "🟢 Low",
-            owner: i.owner,
-            age: i.age,
-          }))}
-          height={200}
-        />
-      ),
-      title: "Issues List",
-    },
-    // To-dos table
-    {
-      id: "todos-table",
-      size: "full",
-      content: (
-        <TableDisplay
-          columns={[
-            { key: "task", header: "To-Do", type: "string" as const },
-            { key: "owner", header: "Owner", type: "string" as const },
-            { key: "due", header: "Due Date", type: "string" as const },
-            { key: "status", header: "Status", type: "string" as const },
-          ]}
-          data={MOCK_TODOS.map((t) => ({
-            task: t.task,
-            owner: t.owner,
-            due: formatDate(new Date(t.due).getTime()),
-            status:
-              t.status === "done"
-                ? "✓ Done"
-                : new Date(t.due) < new Date() && t.status !== "done"
-                  ? "⚠ Overdue"
-                  : "→ Pending",
-          }))}
-          height={200}
-        />
-      ),
-      title: "To-Do List",
-    },
   ];
 
   return (
     <div className="operations-stage supply-stage">
       <PageHeader
         title="L10 Meeting Dashboard"
-        lead="Entrepreneurial Operating System (EOS) L10 metrics: Scorecard, Rocks, Issues, To-Dos, and weekly wins."
+        lead="Live numbers for your weekly leadership meeting: this week's wins and the company scorecard, straight from your events, leads, and closeouts."
       />
 
       <DashboardGrid items={dashboardItems} />
 
+      <div className="mt-6">
+        <Section title="Rocks, issues, and to-dos">
+          <EmptyState
+            title="Rocks, issues, and to-dos aren't tracked in Capsule."
+            hint="This board shows only live numbers from your events, leads, and closeouts. Keep your 90-day priorities, issues list, and meeting to-dos in your meeting notes for now."
+          />
+        </Section>
+      </div>
+
       {/* L10 Framework Note */}
-      <div className="mt-6 rounded-lg border border-ink-200 bg-ink-50 p-4">
-        <h4 className="text-sm font-semibold text-ink-900">
-          About L10 Meetings
-        </h4>
-        <p className="mt-1 text-sm text-ink-600">
-          The L10 is a weekly 90-minute meeting for leadership to review the
+      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
+        <h4 className="text-sm font-semibold text-ink">About L10 Meetings</h4>
+        <p className="mt-1 text-sm text-ink-2">
+          The L10 is a weekly 90-minute leadership meeting to review the
           business, solve issues, and stay aligned on priorities. Scorecard
-          metrics track business health. Rocks are 90-day priorities that move
-          the company forward. Issues are resolved using the IDS method
-          (Identify, Discuss, Solve). To-Dos are commitments with clear owners
-          and due dates.
-        </p>
-        <p className="mt-2 text-sm text-ink-600">
-          <strong>Meeting cadence:</strong> Weekly every Monday at 9am.{" "}
-          <strong>Attendees:</strong> Leadership team.
-          <strong>Duration:</strong> 90 minutes max.
+          numbers track business health, and wins open the meeting on what went
+          right this week.
         </p>
       </div>
     </div>

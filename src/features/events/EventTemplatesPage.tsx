@@ -12,6 +12,7 @@ import {
   useListMenu,
 } from "../../lib/manifest-convex-react";
 import { ArrowLeftIcon, PlusIcon } from "../../ui/icons";
+import { useActionPrompt } from "../../ui/action-prompt";
 import {
   EmptyState,
   PageHeader,
@@ -67,6 +68,7 @@ export function EventTemplatesPage() {
   const [sourceEventId, setSourceEventId] = useState(fromEventId);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const { prompt, host } = useActionPrompt(busy);
 
   const rows = useMemo(
     () =>
@@ -137,8 +139,16 @@ export function EventTemplatesPage() {
     });
   };
 
-  const archive = (template: TemplateDoc) => {
-    const reason = window.prompt("Archive reason")?.trim();
+  const archive = async (template: TemplateDoc) => {
+    const reason = await prompt.askReason({
+      title: `Archive "${template.name}"`,
+      description:
+        "Archived templates leave the picker until reactivated. Events already created from it are unaffected.",
+      label: "Archive reason",
+      placeholder: "e.g. Menu retired for the season",
+      confirmLabel: "Archive template",
+      tone: "danger",
+    });
     if (!reason) return;
     void run(async () => {
       await archiveTemplate({
@@ -184,6 +194,7 @@ export function EventTemplatesPage() {
       />
 
       {failure ? <FailureBanner failure={failure} /> : null}
+      {host}
 
       {showForm || editing ? (
         <form
@@ -406,7 +417,7 @@ export function EventTemplatesPage() {
                             type="button"
                             className="btn btn-ghost btn-sm"
                             disabled={busy}
-                            onClick={() => archive(template)}
+                            onClick={() => void archive(template)}
                           >
                             Archive
                           </button>

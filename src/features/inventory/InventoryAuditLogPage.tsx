@@ -276,9 +276,7 @@ export function InventoryAuditLogPage() {
                       <small>{formatTime(entry.occurredAt)}</small>
                     </td>
                     <td>
-                      <span
-                        className={`inventory-audit-action inventory-audit-action--${entryTone(entry)}`}
-                      >
+                      <span className={actionToneClass(entryTone(entry))}>
                         {entry.action}
                       </span>
                       <strong>{entry.reason}</strong>
@@ -307,9 +305,7 @@ export function InventoryAuditLogPage() {
                         {formatQuantity(entry.quantityAfter)} {entry.unit}
                       </strong>
                     </td>
-                    <td
-                      className={`supply-number inventory-audit-delta inventory-audit-delta--${entry.delta < 0 ? "down" : entry.delta > 0 ? "up" : "flat"}`}
-                    >
+                    <td className={deltaClass(entry.delta)}>
                       {formatSignedQuantity(entry.delta)}
                     </td>
                     <td>
@@ -349,11 +345,32 @@ function AuditStat({
   );
 }
 
-function entryTone(entry: ChainedInventoryAuditEntry): string {
+function entryTone(
+  entry: ChainedInventoryAuditEntry,
+): "in" | "out" | "neutral" {
   if (entry.action === "Waste" || entry.action === "Issued") return "out";
   if (entry.delta > 0) return "in";
   if (entry.delta < 0) return "out";
   return "neutral";
+}
+
+// Full class names are spelled out (never assembled by interpolation) so the
+// undefined-class checker can match every variant against the page CSS.
+function actionToneClass(tone: "in" | "out" | "neutral"): string {
+  if (tone === "in") return "inventory-audit-action inventory-audit-action--in";
+  if (tone === "out")
+    return "inventory-audit-action inventory-audit-action--out";
+  return "inventory-audit-action";
+}
+
+function deltaClass(delta: number): string {
+  const variant =
+    delta > 0
+      ? "inventory-audit-delta--up"
+      : delta < 0
+        ? "inventory-audit-delta--down"
+        : "inventory-audit-delta--flat";
+  return `supply-number inventory-audit-delta ${variant}`;
 }
 
 function formatQuantity(value: number): string {

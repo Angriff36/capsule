@@ -14,6 +14,8 @@ import {
   ReportCreateForm,
   ReportCreatePayloadBuilder,
   REPORT_SHARING_SCOPES,
+  SHARING_SCOPE_LABELS,
+  type ReportSharingScope,
 } from "./ReportCreateForm";
 import { ReportLifecyclePolicy } from "./ReportLifecyclePolicy";
 import { ReportsFailureBanner } from "./ReportsFailureBanner";
@@ -63,7 +65,7 @@ export function ReportsPage() {
         await createReport(payload);
         form.reset();
         setShowCreate(false);
-        setNotice("Report definition saved.");
+        setNotice("Report saved.");
       });
     } catch (error) {
       setFailure(error);
@@ -125,29 +127,25 @@ export function ReportsPage() {
     void (async () => {
       const values = await prompt.askFields({
         title: "Change sharing",
-        description:
-          "Use owner_only, team, or tenant_wide. Managers and the owner may change this.",
+        description: "Choose who can see this saved report.",
         fields: [
           {
             name: "sharingScope",
-            label: "Sharing scope",
+            label: "Who can see it",
             defaultValue: String(row.sharingScope ?? "owner_only"),
             required: true,
-            helper: "owner_only | team | tenant_wide",
+            options: REPORT_SHARING_SCOPES.map((scope) => ({
+              value: scope,
+              label: SHARING_SCOPE_LABELS[scope],
+            })),
           },
         ],
         confirmLabel: "Update sharing",
       });
       if (!values) return;
       const sharingScope = String(values.sharingScope || "").trim();
-      if (
-        !REPORT_SHARING_SCOPES.includes(
-          sharingScope as (typeof REPORT_SHARING_SCOPES)[number],
-        )
-      ) {
-        setFailure(
-          new Error("Sharing must be owner_only, team, or tenant_wide."),
-        );
+      if (!REPORT_SHARING_SCOPES.includes(sharingScope as ReportSharingScope)) {
+        setFailure(new Error("Choose who can see this report."));
         return;
       }
       void run(`${row._id}:share`, async () => {
@@ -186,7 +184,7 @@ export function ReportsPage() {
             type="button"
             onClick={() => setShowCreate((value) => !value)}
           >
-            {showCreate ? "Close form" : "New definition"}
+            {showCreate ? "Close form" : "New report"}
           </button>
         </div>
       </header>
@@ -209,17 +207,18 @@ export function ReportsPage() {
       <section className="working-ledger">
         <div className="ledger-heading">
           <div>
-            <h2>Definitions</h2>
+            <h2>Saved reports</h2>
           </div>
-          <span>{visibleRows.length} rows</span>
+          <span>{visibleRows.length} saved</span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
         ) : visibleRows.length === 0 ? (
           <div className="document-empty">
-            <p>No saved report definitions.</p>
+            <p>No saved reports yet.</p>
             <span>
-              Save a definition to keep chart configuration under governance.
+              Save a report to keep its name, chart type, and sharing settings
+              here for later.
             </span>
             <div className="mt-3 flex justify-center">
               <button
@@ -227,7 +226,7 @@ export function ReportsPage() {
                 className="btn btn-primary btn-sm"
                 onClick={() => setShowCreate(true)}
               >
-                New definition
+                New report
               </button>
             </div>
           </div>
@@ -259,9 +258,9 @@ export function ReportsPage() {
                       <td>{formatStatusLabel(String(row.subjectArea))}</td>
                       <td>{formatStatusLabel(String(row.chartType))}</td>
                       <td>
-                        {formatStatusLabel(
-                          String(row.sharingScope || "owner_only"),
-                        )}
+                        {(SHARING_SCOPE_LABELS as Record<string, string>)[
+                          String(row.sharingScope ?? "owner_only")
+                        ] ?? formatStatusLabel(String(row.sharingScope))}
                       </td>
                       <td>
                         <StatusChip status={status} />

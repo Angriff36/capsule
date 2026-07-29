@@ -1,0 +1,49 @@
+/* Print-ready allergen briefing sheet. The document is always light paper —
+   pin the light-theme tokens locally so the sheet stays legible in dark mode,
+   on screen and in the printed output. */
+.briefing-document {
+  --color-ink: #24322d;
+  --color-ink-2: #53615b;
+  --color-ink-3: #7b867f;
+  --color-line: #dde1d9;
+  --color-line-2: #c8cec5;
+  --color-panel: #fffefa;
+  --color-inset: #f1f3ed;
+  --color-ok: #3d7253;
+  --color-ok-soft: #e4efe2;
+  --color-info: #40598a;
+  --color-info-soft: #e4e9f4;
+  --color-warn: #8a641c;
+  --color-warn-soft: #f5ecd4;
+  --color-danger: #a23a2b;
+  --color-danger-soft: #f7e2dc;
+  --color-accent: #c8783f;
+  --color-accent-soft: #f3e2d4;
+  border: 1px solid var(--color-line);
+  background: #fff;
+  color: var(--color-ink);
+}
+
+/* Browser print → "Save as PDF": only the sheet is visible on paper. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .briefing-document,
+  .briefing-document * {
+    visibility: visible;
+  }
+
+  .briefing-document {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    padding: 0;
+    border: 0;
+  }
+
+  .briefing-no-print {
+    display: none !important;
+  }
+}

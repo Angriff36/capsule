@@ -58,7 +58,7 @@ export function RevenueAttributionDetailPage() {
   const referralSources = useListReferralSource();
   const clients = useListClient();
   const event = useGetEvent(
-    (attribution?.eventId ?? isNew) ? "skip" : (attribution?.eventId ?? "skip"),
+    isNew || !attribution?.eventId ? "skip" : attribution.eventId,
   );
 
   const create = useRevenueAttributionCreate();
@@ -143,8 +143,11 @@ export function RevenueAttributionDetailPage() {
     event.preventDefault();
     if (isNew) {
       void run("create", async () => {
+        // Note: the routed paths always carry an :id, so this create branch is
+        // unreachable today — attributions are created from event detail pages.
+        // If a standalone create route is ever added it must supply an eventId.
         await create({
-          eventId: "", // Will be set from URL param or form
+          eventId: "",
           attributionType,
           allocationMethod,
           percentBasis: allocationMethod === "percent" ? percentBasis : 0,
@@ -254,11 +257,12 @@ export function RevenueAttributionDetailPage() {
                 : usd(attribution.fixedAmount)}
               .
             </p>
-            <label>
+            <label className="field-label">
               Event revenue
-              <div className="tax-percent-input">
+              <div className="tax-percent-input is-prefix">
                 <span>$</span>
                 <input
+                  className="input"
                   type="number"
                   min="0"
                   step="0.01"
@@ -267,29 +271,35 @@ export function RevenueAttributionDetailPage() {
                   placeholder="0.00"
                 />
               </div>
-              <small>
+              <small className="field-help">
                 Current event total:{" "}
                 {usd(Number(existingEvent.quotedPrice) || 0)}
               </small>
             </label>
             <div className="form-summary">
-              <dl>
-                <dt>Allocation method</dt>
-                <dd>
-                  {attribution.allocationMethod === "percent"
-                    ? "Percent"
-                    : "Fixed"}
-                </dd>
-                <dt>Basis</dt>
-                <dd>
-                  {attribution.allocationMethod === "percent"
-                    ? `${attribution.percentBasis}%`
-                    : usd(attribution.fixedAmount)}
-                </dd>
-                <dt>Calculated allocation</dt>
-                <dd className="text-ok font-semibold">
-                  {usd(calculatedAllocation)}
-                </dd>
+              <dl className="supply-detail-list">
+                <div>
+                  <dt>Allocation method</dt>
+                  <dd>
+                    {attribution.allocationMethod === "percent"
+                      ? "Percent"
+                      : "Fixed"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Basis</dt>
+                  <dd>
+                    {attribution.allocationMethod === "percent"
+                      ? `${attribution.percentBasis}%`
+                      : usd(attribution.fixedAmount)}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Calculated allocation</dt>
+                  <dd className="text-ok font-semibold">
+                    {usd(calculatedAllocation)}
+                  </dd>
+                </div>
               </dl>
             </div>
             <button
@@ -356,9 +366,10 @@ export function RevenueAttributionDetailPage() {
             </div>
           </div>
 
-          <label>
+          <label className="field-label">
             Attribution type
             <select
+              className="input"
               value={attributionType}
               onChange={(e) =>
                 setAttributionType(e.target.value as AttributionType)
@@ -373,9 +384,10 @@ export function RevenueAttributionDetailPage() {
             </select>
           </label>
 
-          <label>
+          <label className="field-label">
             Allocation method
             <select
+              className="input"
               value={allocationMethod}
               onChange={(e) =>
                 setAllocationMethod(e.target.value as AllocationMethod)
@@ -388,10 +400,11 @@ export function RevenueAttributionDetailPage() {
           </label>
 
           {allocationMethod === "percent" ? (
-            <label>
+            <label className="field-label">
               Percent basis
               <div className="tax-percent-input">
                 <input
+                  className="input"
                   type="number"
                   min="0"
                   max="100"
@@ -405,11 +418,12 @@ export function RevenueAttributionDetailPage() {
               </div>
             </label>
           ) : (
-            <label>
+            <label className="field-label">
               Fixed amount
-              <div className="tax-percent-input">
+              <div className="tax-percent-input is-prefix">
                 <span>$</span>
                 <input
+                  className="input"
                   type="number"
                   min="0"
                   step="0.01"
@@ -423,9 +437,10 @@ export function RevenueAttributionDetailPage() {
           )}
 
           {isVenueCommission && (
-            <label>
+            <label className="field-label">
               Venue
               <select
+                className="input"
                 value={venueId}
                 onChange={(e) => setVenueId(e.target.value)}
                 disabled={!canEdit}
@@ -443,9 +458,10 @@ export function RevenueAttributionDetailPage() {
           )}
 
           {isSalesCommission && (
-            <label>
+            <label className="field-label">
               Salesperson
               <select
+                className="input"
                 value={salespersonId}
                 onChange={(e) => setSalespersonId(e.target.value)}
                 disabled={!canEdit}
@@ -473,9 +489,10 @@ export function RevenueAttributionDetailPage() {
           )}
 
           {isReferralFee && (
-            <label>
+            <label className="field-label">
               Referral source
               <select
+                className="input"
                 value={referralSourceId}
                 onChange={(e) => setReferralSourceId(e.target.value)}
                 disabled={!canEdit}
@@ -494,9 +511,10 @@ export function RevenueAttributionDetailPage() {
 
           {isPartnerSplit && (
             <>
-              <label>
+              <label className="field-label">
                 Partner person
                 <select
+                  className="input"
                   value={partnerPersonId}
                   onChange={(e) => setPartnerPersonId(e.target.value)}
                   disabled={!canEdit}
@@ -515,9 +533,10 @@ export function RevenueAttributionDetailPage() {
                     ))}
                 </select>
               </label>
-              <label>
+              <label className="field-label">
                 Partner client
                 <select
+                  className="input"
                   value={partnerClientId}
                   onChange={(e) => setPartnerClientId(e.target.value)}
                   disabled={!canEdit}
@@ -539,9 +558,10 @@ export function RevenueAttributionDetailPage() {
             </>
           )}
 
-          <label>
+          <label className="field-label">
             Reason
             <input
+              className="input"
               type="text"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -551,9 +571,10 @@ export function RevenueAttributionDetailPage() {
           </label>
 
           {!isNew && (
-            <label>
+            <label className="field-label">
               Notes
               <textarea
+                className="input"
                 rows={3}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}

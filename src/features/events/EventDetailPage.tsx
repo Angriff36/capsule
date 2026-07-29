@@ -44,6 +44,10 @@ import { clientDisplayName } from "./clientName";
 import { EventClientTab } from "./EventClientTab";
 import { EventDetailTabs } from "./EventDetailTabs";
 import { EventEquipmentPanel } from "./EventEquipmentPanel";
+import { EventGuestPanel } from "./EventGuestPanel";
+import { EventIncidentPanel } from "./EventIncidentPanel";
+import { EventInventoryPanel } from "./EventInventoryPanel";
+import { EventTabIntro } from "./EventTabIntro";
 import {
   type EventLifecycleActionKey,
   eventLifecyclePolicy,
@@ -459,6 +463,17 @@ export function EventDetailPage() {
           />
         </EventTabErrorBoundary>
       ) : null}
+      {activeTab === "guests" ? (
+        <EventTabErrorBoundary tabLabel="Guests" key="guests">
+          <section className="space-y-4" data-testid="event-guests-tab">
+            <EventTabIntro
+              title="Guests"
+              description="Invite guests, track RSVPs and table assignments, and record dietary needs that feed the allergen briefing."
+            />
+            <EventGuestPanel eventId={event._id} />
+          </section>
+        </EventTabErrorBoundary>
+      ) : null}
       {activeTab === "photos" ? (
         <EventTabErrorBoundary tabLabel="Event Photo Gallery" key="photos">
           <EventPhotosTab eventId={event._id} />
@@ -502,6 +517,36 @@ export function EventDetailPage() {
             startsAt={event.startsAt}
             endsAt={event.endsAt}
           />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "inventory" ? (
+        <EventTabErrorBoundary tabLabel="Inventory" key="inventory">
+          <section className="space-y-4" data-testid="event-inventory-tab">
+            <EventTabIntro
+              title="Inventory"
+              description="Reserve ingredient stock against this event's demand, then issue the holds as product leaves storage."
+            />
+            <EventInventoryPanel
+              eventId={event._id}
+              eventStage={String(event.stage)}
+              busy={busy}
+              onBusy={setBusy}
+              onError={(error) =>
+                setFailure(error == null ? null : classifyCommandFailure(error))
+              }
+            />
+          </section>
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "incidents" ? (
+        <EventTabErrorBoundary tabLabel="Incidents" key="incidents">
+          <section className="space-y-4" data-testid="event-incidents-tab">
+            <EventTabIntro
+              title="Incidents"
+              description="Report and resolve safety, allergen, and service incidents for this event. Allergen incidents open a required corrective action."
+            />
+            <EventIncidentPanel eventId={event._id} />
+          </section>
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "margin" ? (

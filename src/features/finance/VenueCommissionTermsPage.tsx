@@ -7,14 +7,9 @@ import {
   useVenueCommissionTermRetire,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import {
-  formatDate as formatDateShared,
-  formatMoneyExact,
-} from "../../lib/format";
+import { formatDate as formatDateShared } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
-
-const usd = formatMoneyExact;
 
 const formatDate = (date: string | number | null | undefined) => {
   if (!date) return "—";
@@ -79,12 +74,16 @@ export function VenueCommissionTermsPage() {
     event.preventDefault();
     const form = event.currentTarget;
     const data = new FormData(form);
-    const venueId = data.get("venueId") as string;
+    // Disabled selects are excluded from FormData, so a revise keeps the
+    // term's existing venue.
+    const venueId = editing
+      ? String(editing.venueId)
+      : (data.get("venueId") as string);
     const commissionPercent = Number(data.get("commissionPercent"));
     const effectiveStartDate = data.get("effectiveStartDate") as string;
     const effectiveEndDate =
       (data.get("effectiveEndDate") as string | null) || null;
-    const notes = (data.get("notes") as string | null) || null;
+    const notes = String(data.get("notes") ?? "").trim() || undefined;
 
     if (!venueId) {
       setFailure(new Error("Select a venue for this commission term."));
@@ -198,28 +197,31 @@ export function VenueCommissionTermsPage() {
               </button>
             ) : null}
           </div>
-          <label>
+          <label className="field-label">
             Venue
-            <select name="venueId" required disabled={!!editing}>
+            <select
+              className="input"
+              name="venueId"
+              required
+              disabled={!!editing}
+              defaultValue={editing ? String(editing.venueId) : ""}
+            >
               <option value="">Select venue…</option>
               {venues
                 .filter((v) => v.deletedAt == null)
                 .sort((a, b) => String(a.name).localeCompare(String(b.name)))
                 .map((venue) => (
-                  <option
-                    key={venue._id}
-                    value={venue._id}
-                    selected={editing?.venueId === venue._id}
-                  >
+                  <option key={venue._id} value={venue._id}>
                     {venue.name}
                   </option>
                 ))}
             </select>
           </label>
-          <label>
+          <label className="field-label">
             Commission percent
             <div className="tax-percent-input">
               <input
+                className="input"
                 name="commissionPercent"
                 type="number"
                 min="0"
@@ -232,9 +234,10 @@ export function VenueCommissionTermsPage() {
               <span>%</span>
             </div>
           </label>
-          <label>
+          <label className="field-label">
             Effective start date
             <input
+              className="input"
               name="effectiveStartDate"
               type="date"
               required
@@ -247,9 +250,10 @@ export function VenueCommissionTermsPage() {
               }
             />
           </label>
-          <label>
+          <label className="field-label">
             Effective end date
             <input
+              className="input"
               name="effectiveEndDate"
               type="date"
               defaultValue={
@@ -260,11 +264,14 @@ export function VenueCommissionTermsPage() {
                   : ""
               }
             />
-            <small>Optional; leave blank for indefinite term</small>
+            <small className="field-help">
+              Optional; leave blank for indefinite term
+            </small>
           </label>
-          <label>
+          <label className="field-label">
             Notes
             <textarea
+              className="input"
               name="notes"
               rows={2}
               defaultValue={editing?.notes ?? ""}

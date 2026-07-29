@@ -6,6 +6,7 @@ import {
   useProposalTemplateRevise,
   useListProposalTemplate,
 } from "../../lib/manifest-convex-react";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
@@ -22,32 +23,24 @@ const PROPOSAL_SECTIONS = [
   { id: "acceptance_cta", label: "Acceptance CTA" },
 ] as const;
 
+const ALL_SECTION_IDS = () => new Set(PROPOSAL_SECTIONS.map((s) => s.id));
+
 function parsePercentage(value: FormDataEntryValue | null): number | undefined {
   if (!value) return undefined;
   const num = parseFloat(String(value));
   return Number.isFinite(num) && num >= 0 && num <= 100 ? num / 100 : undefined;
 }
 
+/** Table display: stored fraction → "8.50%". */
 function formatPercentage(value: number | null | undefined): string {
   if (value == null) return "";
   return `${(value * 100).toFixed(2)}%`;
 }
 
-function parseVisibleSections(
-  value: FormDataEntryValue | null,
-): string[] | undefined {
-  if (!value) return undefined;
-  const trimmed = String(value).trim();
-  if (!trimmed) return undefined;
-  try {
-    const parsed = JSON.parse(trimmed);
-    if (Array.isArray(parsed)) {
-      return parsed as string[];
-    }
-    return [trimmed];
-  } catch {
-    return undefined;
-  }
+/** Number-input default: stored fraction → "8.5" (a % sign would blank the input). */
+function percentInputValue(value: number | null | undefined): string {
+  if (value == null) return "";
+  return String(Math.round((value * 100 + Number.EPSILON) * 100) / 100);
 }
 
 function formatVisibleSections(value: string[] | null | undefined): string {
@@ -68,14 +61,25 @@ export function ProposalTemplatesPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [failure, setFailure] = useState<unknown>(null);
-  const [archiveModal, setArchiveModal] = useState<string | null>(null);
-  const [selectedSections, setSelectedSections] = useState<Set<string>>(
-    new Set(PROPOSAL_SECTIONS.map((s) => s.id)),
-  );
+  const [selectedSections, setSelectedSections] =
+    useState<Set<string>>(ALL_SECTION_IDS);
+  const { prompt, host } = useActionPrompt(busy);
 
   const activeTemplates = (templates ?? []).filter(
     (row) => row.deletedAt == null,
   );
+
+  const closeForm = () => {
+    setOpen(false);
+    setEditingId(null);
+    setSelectedSections(ALL_SECTION_IDS());
+  };
+
+  const openForCreate = () => {
+    setEditingId(null);
+    setSelectedSections(ALL_SECTION_IDS());
+    setOpen(true);
+  };
 
   const submitDefine = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -101,8 +105,7 @@ export function ProposalTemplatesPage() {
             : undefined,
         });
         form.reset();
-        setOpen(false);
-        setSelectedSections(new Set(PROPOSAL_SECTIONS.map((s) => s.id)));
+        closeForm();
       } catch (error) {
         setFailure(error);
       } finally {
@@ -135,8 +138,7 @@ export function ProposalTemplatesPage() {
             ? Number.parseInt(String(data.get("validityDays")), 10)
             : undefined,
         });
-        setEditingId(null);
-        setSelectedSections(new Set(PROPOSAL_SECTIONS.map((s) => s.id)));
+        closeForm();
       } catch (error) {
         setFailure(error);
       } finally {
@@ -145,29 +147,39 @@ export function ProposalTemplatesPage() {
     })();
   };
 
-  const handleArchive = async () => {
-    if (!archiveModal) return;
-    const reason = prompt("Archive reason:");
-    if (!reason?.trim()) return;
-
-    setFailure(null);
-    try {
-      await archive({
-        id: archiveModal,
-        reason,
+  const handleArchive = (id: string) => {
+    void (async () => {
+      const reason = await prompt.askReason({
+        title: "Archive template",
+        description:
+          "The template stops being offered for new proposals. Existing proposals keep their content, and you can reactivate it anytime.",
+        label: "Archive reason",
+        placeholder: "e.g. Replaced by the 2027 wedding template",
+        confirmLabel: "Archive template",
+        tone: "danger",
       });
-      setArchiveModal(null);
-    } catch (error) {
-      setFailure(error);
-    }
+      if (!reason) return;
+      setFailure(null);
+      setBusy(true);
+      try {
+        await archive({ id, reason });
+      } catch (error) {
+        setFailure(error);
+      } finally {
+        setBusy(false);
+      }
+    })();
   };
 
   const handleReactivate = async (id: string) => {
     setFailure(null);
+    setBusy(true);
     try {
       await reactivate({ id });
     } catch (error) {
       setFailure(error);
+    } finally {
+      setBusy(false);
     }
   };
 
@@ -187,22 +199,9 @@ export function ProposalTemplatesPage() {
   const editingTemplate =
     editingId != null ? activeTemplates.find((t) => t._id === editingId) : null;
 
-  // Initialize selected sections when editing
-  if (editingTemplate && editingTemplate.visibleSections) {
-    const editingSet = new Set<string>(
-      (editingTemplate.visibleSections as string[]) ?? [],
-    );
-    if (
-      Array.from(selectedSections).sort().join(",") !==
-      Array.from(editingSet).sort().join(",")
-    ) {
-      setSelectedSections(editingSet);
-    }
-  }
-
   return (
-    <div className="operations-stage">
-      <header className="training-masthead">
+    <div className="operations-stage supply-stage">
+      <header className="supply-masthead">
         <div>
           <p className="eyebrow">Clients · Proposal templates</p>
           <h1 className="display-title mt-2">Proposal templates</h1>
@@ -212,15 +211,18 @@ export function ProposalTemplatesPage() {
             takes half the time.
           </p>
         </div>
-        <div aria-label="Proposal template actions">
-          <button className="btn btn-primary" onClick={() => setOpen(!open)}>
-            {open ? "Close" : "New template"}
-          </button>
-        </div>
+        <button
+          className="btn btn-primary"
+          type="button"
+          onClick={() => (open ? closeForm() : openForCreate())}
+        >
+          {open ? "Close" : "New template"}
+        </button>
       </header>
 
       <ClientsWorkspaceNav />
       {failure ? <CrmFailureBanner error={failure} /> : null}
+      {host}
 
       {open ? (
         <form
@@ -311,7 +313,9 @@ export function ProposalTemplatesPage() {
                 min="0"
                 max="100"
                 placeholder="8.5"
-                defaultValue={formatPercentage(editingTemplate?.defaultTaxRate)}
+                defaultValue={percentInputValue(
+                  editingTemplate?.defaultTaxRate,
+                )}
               />
             </label>
             <label className="field-label">
@@ -324,7 +328,7 @@ export function ProposalTemplatesPage() {
                 min="0"
                 max="100"
                 placeholder="20"
-                defaultValue={formatPercentage(
+                defaultValue={percentInputValue(
                   editingTemplate?.defaultServiceChargePercent,
                 )}
               />
@@ -349,13 +353,7 @@ export function ProposalTemplatesPage() {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => {
-                setOpen(false);
-                setEditingId(null);
-                setSelectedSections(
-                  new Set(PROPOSAL_SECTIONS.map((s) => s.id)),
-                );
-              }}
+              onClick={closeForm}
             >
               Cancel
             </button>
@@ -363,41 +361,44 @@ export function ProposalTemplatesPage() {
         </form>
       ) : null}
 
-      {loading ? (
-        <TableSkeleton />
-      ) : (
-        <table className="data-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Visible sections</th>
-              <th>Defaults</th>
-              <th>Status</th>
-              <th className="text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {activeTemplates.length === 0 ? (
+      <section className="working-ledger">
+        <div className="ledger-heading">
+          <div>
+            <p className="eyebrow">Library</p>
+            <h2>Templates</h2>
+          </div>
+          <span>{loading ? "…" : activeTemplates.length}</span>
+        </div>
+        {loading ? (
+          <TableSkeleton />
+        ) : activeTemplates.length === 0 ? (
+          <EmptyState
+            title="No proposal templates yet"
+            hint="Create your first template to get started."
+            action={
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={openForCreate}
+              >
+                New template
+              </button>
+            }
+          />
+        ) : (
+          <table className="data-table">
+            <thead>
               <tr>
-                <td colSpan={6}>
-                  <EmptyState
-                    title="No proposal templates yet"
-                    hint="Create your first template to get started."
-                    action={
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={() => setOpen(true)}
-                      >
-                        New template
-                      </button>
-                    }
-                  />
-                </td>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Visible sections</th>
+                <th>Defaults</th>
+                <th>Status</th>
+                <th className="text-right">Actions</th>
               </tr>
-            ) : (
-              activeTemplates.map((row) => (
+            </thead>
+            <tbody>
+              {activeTemplates.map((row) => (
                 <tr key={row._id}>
                   <td>
                     <strong>{row.name}</strong>
@@ -427,6 +428,7 @@ export function ProposalTemplatesPage() {
                       <>
                         <button
                           className="btn-link btn-link-compact"
+                          disabled={busy}
                           onClick={() => {
                             setEditingId(row._id);
                             setSelectedSections(
@@ -439,7 +441,8 @@ export function ProposalTemplatesPage() {
                         </button>
                         <button
                           className="btn-link btn-link-compact text-ink-2"
-                          onClick={() => setArchiveModal(row._id)}
+                          disabled={busy}
+                          onClick={() => handleArchive(row._id)}
                         >
                           Archive
                         </button>
@@ -447,41 +450,19 @@ export function ProposalTemplatesPage() {
                     ) : (
                       <button
                         className="btn-link btn-link-compact"
-                        onClick={() => handleReactivate(row._id)}
+                        disabled={busy}
+                        onClick={() => void handleReactivate(row._id)}
                       >
                         Reactivate
                       </button>
                     )}
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      )}
-
-      {archiveModal && (
-        <div className="modal-backdrop">
-          <div className="modal-panel">
-            <h3>Archive template</h3>
-            <p className="text-ink-2">
-              Are you sure you want to archive this template? It will no longer
-              be available for new proposals.
-            </p>
-            <div className="modal-actions">
-              <button
-                className="btn btn-secondary"
-                onClick={() => setArchiveModal(null)}
-              >
-                Cancel
-              </button>
-              <button className="btn btn-primary" onClick={handleArchive}>
-                Archive
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              ))}
+            </tbody>
+          </table>
+        )}
+      </section>
     </div>
   );
 }

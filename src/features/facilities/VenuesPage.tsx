@@ -420,7 +420,7 @@ export function VenuesPage() {
 
       {rows.length === 0 ? (
         <div className="rounded-md bg-inset p-8 text-center text-ink-3">
-          No venues yet. Click "Add Venue" to create one.
+          No venues yet. Click "Add venue" to create one.
         </div>
       ) : (
         <div className="overflow-hidden rounded-md border border-line">

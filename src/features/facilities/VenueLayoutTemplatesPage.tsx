@@ -152,16 +152,12 @@ export function VenueLayoutTemplatesPage() {
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    // The name input and venue select are `required`, so native validation
+    // reports empty values before submit; these guards are a safety net.
     const trimmed = name.trim();
-    if (!trimmed) {
-      alert("Template name is required");
-      return;
-    }
+    if (!trimmed) return;
     const targetVenueId = formVenueId.trim();
-    if (!targetVenueId) {
-      alert("Venue is required");
-      return;
-    }
+    if (!targetVenueId) return;
     const sectionsJson = JSON.stringify(sections);
 
     void run("save", async () => {
@@ -217,7 +213,6 @@ export function VenueLayoutTemplatesPage() {
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 py-6">
-      <FacilitiesWorkspaceNav />
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-ink">Layout Templates</h1>
@@ -245,6 +240,8 @@ export function VenueLayoutTemplatesPage() {
         </button>
       </div>
 
+      <FacilitiesWorkspaceNav />
+
       {failure ? <FailureBanner failure={failure} /> : null}
 
       {formOpen ? (
@@ -263,6 +260,7 @@ export function VenueLayoutTemplatesPage() {
                   value={formVenueId}
                   onChange={(e) => setFormVenueId(e.target.value)}
                   disabled={busy != null}
+                  required
                 >
                   <option value="">Select a venue…</option>
                   {(venues ?? [])
@@ -283,6 +281,7 @@ export function VenueLayoutTemplatesPage() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Standard wedding layout"
                 disabled={busy != null}
+                required
               />
             </label>
           </div>

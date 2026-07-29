@@ -1,3 +1,5 @@
+import { readInvoiceLineItems } from "./invoiceTax";
+
 export type RevenueGranularity = "week" | "month" | "quarter";
 export type RevenueBreakdown =
   "event_type" | "client" | "service_line" | "venue" | "on_premise";
@@ -15,6 +17,8 @@ export type RevenueInvoice = {
   deletedAt?: DateValue;
   currencyCode?: string | null;
   exchangeRate?: number | string | null;
+  /** Stored line-item snapshots; used for the service-line breakdown. */
+  lineItems?: unknown;
 };
 
 export type RevenueClient = {
@@ -156,6 +160,40 @@ function venueLabel(venue: RevenueVenue | undefined): string {
   return venue?.name?.trim() || "Unnamed venue";
 }
 
+const SERVICE_LINE_LABELS: Record<string, string> = {
+  food: "Food",
+  service: "Service",
+  rental: "Rentals",
+};
+
+/** One or more revenue shares per invoice; fractions always sum to 1. */
+type CategoryShare = { key: string; label: string; fraction: number };
+
+/**
+ * Service-line revenue follows each invoice's stored line-item categories,
+ * splitting the invoice total in proportion to line totals. Invoices issued
+ * before line items existed carry no detail and land in "Not itemized".
+ */
+function serviceLineShares(invoice: RevenueInvoice): CategoryShare[] {
+  const lines = readInvoiceLineItems(invoice.lineItems);
+  const totals = new Map<string, number>();
+  let sum = 0;
+  for (const line of lines) {
+    const amount = Math.max(0, line.total || line.subtotal);
+    if (amount <= 0) continue;
+    totals.set(line.category, (totals.get(line.category) ?? 0) + amount);
+    sum += amount;
+  }
+  if (sum <= 0) {
+    return [{ key: "not-itemized", label: "Not itemized", fraction: 1 }];
+  }
+  return [...totals.entries()].map(([category, amount]) => ({
+    key: `line:${category}`,
+    label: SERVICE_LINE_LABELS[category] ?? category,
+    fraction: amount / sum,
+  }));
+}
+
 function categoryFor(
   invoice: RevenueInvoice,
   breakdown: RevenueBreakdown,
@@ -163,9 +201,6 @@ function categoryFor(
   eventsById: ReadonlyMap<string, RevenueEvent>,
   venuesById: ReadonlyMap<string, RevenueVenue>,
 ): { key: string; label: string } {
-  if (breakdown === "service_line") {
-    return { key: "catering-services", label: "Catering services" };
-  }
   if (breakdown === "client") {
     const key = String(invoice.clientId || "unknown-client");
     return { key, label: clientLabel(clientsById.get(key)) };
@@ -280,14 +315,22 @@ export function buildRevenueTrend({
     const issuedAt = validDate(invoice.issuedAt ?? invoice.createdAt);
     const total = invoice.functionalTotal;
     if (!issuedAt || !Number.isFinite(total)) continue;
-    const category = categoryFor(
-      invoice,
-      breakdown,
-      clientsById,
-      eventsById,
-      venuesById,
-    );
-    categoryLabels.set(category.key, category.label);
+    const shares: CategoryShare[] =
+      breakdown === "service_line"
+        ? serviceLineShares(invoice)
+        : [
+            {
+              ...categoryFor(
+                invoice,
+                breakdown,
+                clientsById,
+                eventsById,
+                venuesById,
+              ),
+              fraction: 1,
+            },
+          ];
+    for (const share of shares) categoryLabels.set(share.key, share.label);
 
     for (const period of periods) {
       const currentTime = issuedAt.getTime();
@@ -296,8 +339,10 @@ export function buildRevenueTrend({
         currentTime < period.end.getTime()
       ) {
         period.currentTotal += total;
-        period.currentByCategory[category.key] =
-          (period.currentByCategory[category.key] ?? 0) + total;
+        for (const share of shares) {
+          period.currentByCategory[share.key] =
+            (period.currentByCategory[share.key] ?? 0) + total * share.fraction;
+        }
         currentInvoiceCount += 1;
         break;
       }
@@ -308,8 +353,10 @@ export function buildRevenueTrend({
         currentTime < priorEnd.getTime()
       ) {
         period.priorTotal += total;
-        period.priorByCategory[category.key] =
-          (period.priorByCategory[category.key] ?? 0) + total;
+        for (const share of shares) {
+          period.priorByCategory[share.key] =
+            (period.priorByCategory[share.key] ?? 0) + total * share.fraction;
+        }
         break;
       }
     }

@@ -7,11 +7,14 @@ export type EventDetailTab =
   | "menu"
   | "equipment"
   | "client"
+  | "guests"
   | "photos"
   | "timeline"
   | "layouts"
   | "recurring"
   | "staffing"
+  | "inventory"
+  | "incidents"
   | "margin";
 
 export const EVENT_DETAIL_TABS: readonly {
@@ -22,11 +25,14 @@ export const EVENT_DETAIL_TABS: readonly {
   { key: "menu", label: "Menu" },
   { key: "equipment", label: "Equipment" },
   { key: "client", label: "Client Information" },
+  { key: "guests", label: "Guests" },
   { key: "photos", label: "Event Photo Gallery" },
   { key: "timeline", label: "Timeline" },
   { key: "layouts", label: "Layouts" },
   { key: "recurring", label: "Recurring Schedule" },
   { key: "staffing", label: "Staffing" },
+  { key: "inventory", label: "Inventory" },
+  { key: "incidents", label: "Incidents" },
   { key: "margin", label: "Margin" },
 ] as const;
 

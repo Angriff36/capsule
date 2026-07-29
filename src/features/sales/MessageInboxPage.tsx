@@ -92,6 +92,37 @@ export function MessageInboxPage() {
   const [envJson, setEnvJson] = useState("");
   const [envBusy, setEnvBusy] = useState(false);
 
+  const submitEnvelope = async () => {
+    const rawJson = envJson.trim();
+    if (!rawJson || envBusy) return;
+    setFailure(null);
+    setNotice(null);
+    setEnvBusy(true);
+    try {
+      const result = await ingestEnvelope({
+        provider: envProvider,
+        rawJson,
+      });
+      if (result.recorded === "ingested") {
+        setEnvJson("");
+        setShowEnv(false);
+        if (result.threadId) setSelectedId(result.threadId);
+        setNotice("Message logged from the pasted payload.");
+      } else {
+        // Kept open with the payload intact so an obvious typo can be fixed;
+        // the raw payload is also saved in the review queue below.
+        setNotice(
+          result.reason ??
+            "That payload couldn't be read — it was saved to the review queue below.",
+        );
+      }
+    } catch (e) {
+      fail(e);
+    } finally {
+      setEnvBusy(false);
+    }
+  };
+
   const visibleThreads = useMemo(
     () => (threads ?? []).filter((t) => t.deletedAt == null),
     [threads],
@@ -283,13 +314,28 @@ export function MessageInboxPage() {
             alongside each thread.
           </p>
         </div>
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={() => setShowNew((v) => !v)}
-        >
-          {showNew ? "Cancel" : "New thread"}
-        </button>
+        <div className="supply-row-actions">
+          <button
+            type="button"
+            className="btn btn-ghost"
+            onClick={() => {
+              setShowEnv((v) => !v);
+              setShowNew(false);
+            }}
+          >
+            {showEnv ? "Cancel paste" : "Paste incoming message"}
+          </button>
+          <button
+            type="button"
+            className="btn btn-primary"
+            onClick={() => {
+              setShowNew((v) => !v);
+              setShowEnv(false);
+            }}
+          >
+            {showNew ? "Cancel" : "New thread"}
+          </button>
+        </div>
       </header>
       <ClientsWorkspaceNav />
       {failure ? <FailureBanner failure={failure} /> : null}
@@ -340,6 +386,54 @@ export function MessageInboxPage() {
           <button type="submit" className="btn btn-primary">
             Open
           </button>
+        </form>
+      ) : null}
+
+      {showEnv ? (
+        <form
+          className="mb-4 grid gap-3 rounded-sm border border-line-2 bg-panel p-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            void submitEnvelope();
+          }}
+        >
+          <p className="text-[12px] text-ink-2">
+            Paste the raw message data from your email, SMS, or social provider
+            (JSON). Readable messages land in the right thread; anything that
+            can't be read is saved to the review queue below instead of being
+            lost.
+          </p>
+          <div className="grid gap-3 md:grid-cols-[120px_1fr_auto]">
+            <select
+              className="input"
+              value={envProvider}
+              onChange={(e) => setEnvProvider(e.target.value)}
+              aria-label="Provider"
+            >
+              {Object.entries(PROVIDER_LABEL)
+                .filter(([k]) => k !== "internal")
+                .map(([k, v]) => (
+                  <option key={k} value={k}>
+                    {v}
+                  </option>
+                ))}
+            </select>
+            <textarea
+              className="input font-mono text-[12px]"
+              rows={4}
+              placeholder='{"threadId": "…", "messageId": "…", "from": "…", "body": "…"}'
+              value={envJson}
+              onChange={(e) => setEnvJson(e.target.value)}
+              aria-label="Raw provider message payload"
+            />
+            <button
+              type="submit"
+              className="btn btn-primary self-end"
+              disabled={envBusy || envJson.trim().length === 0}
+            >
+              {envBusy ? "Logging…" : "Log message"}
+            </button>
+          </div>
         </form>
       ) : null}
 

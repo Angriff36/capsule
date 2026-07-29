@@ -16,6 +16,7 @@ import {
   useListTimeOffRequest,
 } from "../../lib/manifest-convex-react";
 import { StatusChip } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
 
@@ -49,6 +50,10 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
   const cancelNeed = useEventStaffNeedCancel();
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const [needPersonIds, setNeedPersonIds] = useState<Record<string, string>>(
+    {},
+  );
+  const { prompt, host } = useActionPrompt(busy != null);
 
   const eventAssignments = useMemo(
     () =>
@@ -124,6 +129,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
         </p>
       </div>
       {failure ? <FailureBanner failure={failure} /> : null}
+      {host}
 
       <form
         className="grid gap-2 rounded-xs border border-line p-3 sm:grid-cols-4"
@@ -290,42 +296,72 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <StatusChip status={String(need.status)} />
-                {need.status === "open" && activePeople[0] ? (
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    disabled={busy != null}
-                    onClick={() =>
-                      void run(`claim:${need._id}`, () =>
-                        claimNeed({
-                          docId: need._id,
-                          version: need.version,
-                          personId: activePeople[0]!._id,
-                        }),
-                      )
-                    }
-                  >
-                    Claim as {personLabel(activePeople[0])}
-                  </button>
-                ) : null}
                 {(need.status === "open" || need.status === "claimed") &&
-                activePeople[0] ? (
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    disabled={busy != null}
-                    onClick={() =>
-                      void run(`fill:${need._id}`, () =>
-                        fillNeed({
-                          docId: need._id,
-                          version: need.version,
-                          personId: activePeople[0]!._id,
-                        }),
-                      )
-                    }
-                  >
-                    Fill
-                  </button>
+                activePeople.length > 0 ? (
+                  <>
+                    <label className="field-label">
+                      <span className="sr-only">Person for {need.role}</span>
+                      <select
+                        className="field-input w-44"
+                        value={needPersonIds[need._id] ?? ""}
+                        disabled={busy != null}
+                        onChange={(changeEvent) =>
+                          setNeedPersonIds((current) => ({
+                            ...current,
+                            [need._id]: changeEvent.target.value,
+                          }))
+                        }
+                      >
+                        <option value="">Choose person…</option>
+                        {activePeople.map((person) => {
+                          const conflict = conflictsFor(person._id);
+                          return (
+                            <option key={person._id} value={person._id}>
+                              {personLabel(person)}
+                              {conflict.overlappingShifts.length
+                                ? " · shift conflict"
+                                : ""}
+                              {conflict.approvedOff.length ? " · time off" : ""}
+                            </option>
+                          );
+                        })}
+                      </select>
+                    </label>
+                    {need.status === "open" ? (
+                      <button
+                        type="button"
+                        className="btn btn-ghost"
+                        disabled={busy != null || !needPersonIds[need._id]}
+                        onClick={() =>
+                          void run(`claim:${need._id}`, () =>
+                            claimNeed({
+                              docId: need._id,
+                              version: need.version,
+                              personId: needPersonIds[need._id]!,
+                            }),
+                          )
+                        }
+                      >
+                        Hold for them
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      disabled={busy != null || !needPersonIds[need._id]}
+                      onClick={() =>
+                        void run(`fill:${need._id}`, () =>
+                          fillNeed({
+                            docId: need._id,
+                            version: need.version,
+                            personId: needPersonIds[need._id]!,
+                          }),
+                        )
+                      }
+                    >
+                      Fill shift
+                    </button>
+                  </>
                 ) : null}
                 {need.status === "open" || need.status === "claimed" ? (
                   <button
@@ -333,15 +369,25 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
                     className="btn btn-ghost"
                     disabled={busy != null}
                     onClick={() => {
-                      const reason = window.prompt("Cancel reason")?.trim();
-                      if (!reason) return;
-                      void run(`cancel:${need._id}`, () =>
-                        cancelNeed({
-                          docId: need._id,
-                          version: need.version,
-                          reason,
-                        }),
-                      );
+                      void (async () => {
+                        const reason = await prompt.askReason({
+                          title: "Cancel open shift",
+                          description:
+                            "Record why this open shift is coming down.",
+                          label: "Cancellation reason",
+                          placeholder: "e.g. Covered by a reassignment",
+                          confirmLabel: "Cancel shift",
+                          tone: "danger",
+                        });
+                        if (!reason) return;
+                        void run(`cancel:${need._id}`, () =>
+                          cancelNeed({
+                            docId: need._id,
+                            version: need.version,
+                            reason,
+                          }),
+                        );
+                      })();
                     }}
                   >
                     Cancel

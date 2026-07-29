@@ -127,14 +127,9 @@ export function VenueVendorRelationshipsPage() {
       const targetVenueId = venueId || String(data.get("venueId") ?? "").trim();
       const targetVendorId = String(data.get("vendorId") ?? "").trim();
 
-      if (!targetVenueId) {
-        alert("Venue is required");
-        return;
-      }
-      if (!targetVendorId) {
-        alert("Vendor is required");
-        return;
-      }
+      // Both selects are `required`, so native validation blocks empty values
+      // before submit; these guards are a belt-and-suspenders no-op.
+      if (!targetVenueId || !targetVendorId) return;
 
       await createRelationship({
         venueId: targetVenueId,
@@ -162,10 +157,12 @@ export function VenueVendorRelationshipsPage() {
     });
   };
 
+  // Generated command hooks read `docId` (not `id`) — passing `id` leaves
+  // docId undefined and the mutation rejects every call.
   const handleStatusChange = (id: string, newStatus: StatusValue) => {
     void run(`status-${id}`, async () => {
       await reviseStatus({
-        id,
+        docId: id,
         status: newStatus,
       });
     });
@@ -177,7 +174,7 @@ export function VenueVendorRelationshipsPage() {
 
     void run(`retire-${id}`, async () => {
       await retireRelationship({
-        id,
+        docId: id,
         reason: reason.trim(),
       });
     });

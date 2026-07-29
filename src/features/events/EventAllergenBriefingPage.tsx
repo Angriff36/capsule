@@ -10,16 +10,8 @@ import {
 import { formatDate, formatTime } from "../../lib/format";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { eventDetailPath } from "./eventRoutes";
-
 // ponytail: browser print → "Save as PDF"; same approach as ContractDocumentPage.
-const PRINT_STYLE = `
-@media print {
-  body * { visibility: hidden; }
-  .briefing-document, .briefing-document * { visibility: visible; }
-  .briefing-document { position: absolute; inset: 0 auto auto 0; width: 100%; padding: 0; }
-  .briefing-no-print { display: none !important; }
-}
-`;
+import "./EventAllergenBriefingPage.css";
 
 const allergenLabel = (value: string) => value.replaceAll("_", " ");
 const normalize = (value: string) =>
@@ -135,7 +127,6 @@ export function EventAllergenBriefingPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <style>{PRINT_STYLE}</style>
       <header className="supply-masthead briefing-no-print">
         <div>
           <p className="eyebrow">Events · Allergen briefing</p>
@@ -160,7 +151,7 @@ export function EventAllergenBriefingPage() {
         </div>
       </header>
 
-      <article className="briefing-document mx-auto mt-6 max-w-200 bg-white p-8 text-ink">
+      <article className="briefing-document mx-auto mt-6 max-w-200 p-8">
         <header className="flex items-start justify-between">
           <div>
             <h1 className="text-xl font-semibold">
@@ -258,7 +249,8 @@ export function EventAllergenBriefingPage() {
               </h2>
               {flaggedGuests.length === 0 ? (
                 <p className="mt-2 text-[13px] text-ink-2">
-                  No guest dietary restrictions were captured at booking.
+                  No guest dietary restrictions were captured at booking. Record
+                  them on the event&rsquo;s Guests tab as RSVPs come in.
                 </p>
               ) : (
                 <ul className="mt-2 space-y-1.5 text-[13px]">

@@ -13,12 +13,12 @@ import { useTenantBranding } from "../admin/tenantBranding";
 
 // ponytail: browser print → "Save as PDF" instead of a PDF library; add
 // @react-pdf/renderer only if programmatic PDF bytes (email attachment) land.
+// The shared `.print-sheet` rules in app.css print only the document region;
+// this page-scoped override flips the global landscape @page to portrait,
+// which is what a contract should print as.
 const PRINT_STYLE = `
 @media print {
-  body * { visibility: hidden; }
-  .contract-document, .contract-document * { visibility: visible; }
-  .contract-document { position: absolute; inset: 0 auto auto 0; width: 100%; padding: 0; }
-  .contract-no-print { display: none !important; }
+  @page { size: portrait; margin: 0.5in; }
 }
 `;
 
@@ -132,7 +132,7 @@ export function ContractDocumentPage() {
   return (
     <div className="operations-stage supply-stage">
       <style>{PRINT_STYLE}</style>
-      <header className="supply-masthead contract-no-print">
+      <header className="supply-masthead">
         <div>
           <p className="eyebrow">Clients · Contracts · Document</p>
           <h1 className="display-title mt-2">Contract document</h1>
@@ -157,7 +157,7 @@ export function ContractDocumentPage() {
       </header>
 
       <article
-        className="contract-document mx-auto mt-6 max-w-200 bg-white p-8 text-ink"
+        className="contract-document print-sheet mx-auto mt-6 max-w-200 bg-white p-8 text-ink"
         style={
           {
             "--document-primary": branding.primaryColor,
@@ -366,9 +366,7 @@ export function ContractDocumentPage() {
         )}
       </article>
 
-      <div className="contract-no-print">
-        <AttachmentsSection parentType="contract" parentId={contract._id} />
-      </div>
+      <AttachmentsSection parentType="contract" parentId={contract._id} />
     </div>
   );
 }

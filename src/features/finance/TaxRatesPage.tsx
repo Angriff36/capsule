@@ -193,19 +193,21 @@ export function TaxRatesPage() {
               </button>
             ) : null}
           </div>
-          <label>
+          <label className="field-label">
             Rate name
             <input
+              className="input"
               name="name"
               required
               defaultValue={String(editing?.name ?? "")}
               placeholder="State sales tax"
             />
           </label>
-          <label>
+          <label className="field-label">
             Percentage
             <div className="tax-percent-input">
               <input
+                className="input"
                 name="percentage"
                 type="number"
                 min="0.0001"

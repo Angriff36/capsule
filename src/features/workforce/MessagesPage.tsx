@@ -178,13 +178,10 @@ export function MessagesPage() {
       {people === undefined || messages === undefined ? (
         <TableSkeleton rows={4} />
       ) : me == null ? (
-        <div className="empty-state">
-          <strong>No staff profile linked to your account</strong>
-          <span>
-            Ask a manager to link your sign-in to your staff record to send and
-            receive messages.
-          </span>
-        </div>
+        <EmptyState
+          title="No staff profile linked to your account"
+          hint="Ask a manager to link your sign-in to your staff record to send and receive messages."
+        />
       ) : (
         <section
           className="working-ledger grid md:grid-cols-[260px_1fr]"
@@ -225,9 +222,11 @@ export function MessagesPage() {
 
           <div className="flex min-h-100 flex-col">
             {selected == null ? (
-              <div className="empty-state m-4">
-                <strong>Pick a teammate</strong>
-                <span>Select someone on the left to open your thread.</span>
+              <div className="m-4">
+                <EmptyState
+                  title="Pick a teammate"
+                  hint="Select someone on the left to open your thread."
+                />
               </div>
             ) : (
               <>

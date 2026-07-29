@@ -350,7 +350,7 @@ export function ProfitMarginDashboard({
               {costBuckets.map((bucket) => (
                 <i
                   key={bucket.key}
-                  className={`is-${bucket.key}`}
+                  className={"is-" + bucket.key}
                   style={{ width: `${(bucket.value / totalCost) * 100}%` }}
                   title={`${bucket.label}: ${formatMoney(bucket.value)}`}
                 />
@@ -359,7 +359,7 @@ export function ProfitMarginDashboard({
             <div className="profit-cost-legend">
               {costBuckets.map((bucket) => (
                 <div key={bucket.key}>
-                  <i className={`is-${bucket.key}`} aria-hidden="true" />
+                  <i className={"is-" + bucket.key} aria-hidden="true" />
                   <span>{bucket.label}</span>
                   <strong>{formatMoney(bucket.value)}</strong>
                   <small>
@@ -476,9 +476,9 @@ export function ProfitMarginDashboard({
         <p>
           Only finalized closeouts are included. Gross margin is revenue less
           food cost. Net margin is revenue less food, labor, equipment/vendor
-          hire, and overhead/miscellaneous costs. The current closeout model
-          stores waste and miscellaneous spend together; this report presents
-          that bucket as overheads until a dedicated overhead ledger is modeled.
+          hire, and overhead/miscellaneous costs. Closeouts record waste and
+          miscellaneous spend as one number, so this report shows that combined
+          bucket as overheads.
         </p>
         {report.excludedCloseoutCount > 0 ? (
           <p role="note">

@@ -7,7 +7,6 @@ import {
 import { TableSkeleton } from "../../ui/primitives";
 import { formatDate, formatMoney } from "../../lib/format";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
-import { ReportFilterBar } from "./ReportFilterBar";
 import { useFinanceReportFilters } from "./useFinanceReportFilters";
 import {
   buildFoodCostReport,
@@ -162,6 +161,7 @@ export function FoodCostPercentageDashboard({
   loading = false,
   now,
   venuePremiseFilter = "all",
+  onVenuePremiseChange,
 }: {
   closeouts: readonly FoodCostCloseout[];
   events: readonly FoodCostEvent[];
@@ -169,6 +169,7 @@ export function FoodCostPercentageDashboard({
   loading?: boolean;
   now: Date;
   venuePremiseFilter?: "on" | "off" | "all";
+  onVenuePremiseChange?: (value: "on" | "off" | "all") => void;
 }) {
   const [granularity, setGranularity] = useState<FoodCostGranularity>("month");
   const [target, setTarget] = useState(initialTarget);
@@ -264,6 +265,23 @@ export function FoodCostPercentageDashboard({
             ))}
           </div>
         </div>
+        {onVenuePremiseChange ? (
+          <label className="field-label food-cost-venue-filter">
+            Venue type
+            <select
+              className="input"
+              aria-label="Filter by venue type"
+              value={venuePremiseFilter}
+              onChange={(event) =>
+                onVenuePremiseChange(event.target.value as "on" | "off" | "all")
+              }
+            >
+              <option value="all">All venues</option>
+              <option value="on">On-premise</option>
+              <option value="off">Off-premise</option>
+            </select>
+          </label>
+        ) : null}
         <label className="food-cost-target-control">
           <span>Target food cost</span>
           <span className="food-cost-target-input">
@@ -524,23 +542,18 @@ function FoodCostPercentagePageWithFilters({
   loading: boolean;
   now: Date;
 }) {
-  const { filters } = useFinanceReportFilters();
+  // Venue premise lives in the URL so a filtered view can be shared.
+  const { filters, setFilter } = useFinanceReportFilters();
 
   return (
-    <>
-      <ReportFilterBar
-        showVenuePremise={true}
-        showTarget={false}
-        showView={false}
-      />
-      <FoodCostPercentageDashboard
-        closeouts={closeouts}
-        events={events}
-        venueMap={venueMap}
-        loading={loading}
-        now={now}
-        venuePremiseFilter={filters.venuePremise}
-      />
-    </>
+    <FoodCostPercentageDashboard
+      closeouts={closeouts}
+      events={events}
+      venueMap={venueMap}
+      loading={loading}
+      now={now}
+      venuePremiseFilter={filters.venuePremise}
+      onVenuePremiseChange={(value) => setFilter("venuePremise", value)}
+    />
   );
 }

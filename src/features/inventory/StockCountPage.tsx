@@ -697,7 +697,11 @@ export function StockCountPage() {
 
                     {String(activeLine.status) === "counted" ? (
                       <div
-                        className={`stock-count-reconcile ${needsAdjustment ? "has-variance" : "is-match"}`}
+                        className={
+                          needsAdjustment
+                            ? "stock-count-reconcile has-variance"
+                            : "stock-count-reconcile"
+                        }
                       >
                         <div>
                           <span>

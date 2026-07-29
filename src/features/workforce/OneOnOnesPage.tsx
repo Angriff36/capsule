@@ -244,9 +244,12 @@ export function OneOnOnesPage() {
             </label>
             <div className="field-label col-span-2">
               Goals
-              <div className="checkbox-group">
+              <div className="flex flex-col items-start gap-2">
                 {goals.map((row, index) => (
-                  <div key={index} className="supply-form-grid">
+                  <div
+                    key={index}
+                    className="grid w-full grid-cols-[1fr_auto] items-center gap-2"
+                  >
                     <input
                       className="input"
                       placeholder="Goal for this period"
@@ -297,9 +300,12 @@ export function OneOnOnesPage() {
             </label>
             <div className="field-label col-span-2">
               Decisions
-              <div className="checkbox-group">
+              <div className="flex flex-col items-start gap-2">
                 {decisions.map((row, index) => (
-                  <div key={index} className="supply-form-grid">
+                  <div
+                    key={index}
+                    className="grid w-full grid-cols-[1fr_auto] items-center gap-2"
+                  >
                     <input
                       className="input"
                       placeholder="Decision recorded"

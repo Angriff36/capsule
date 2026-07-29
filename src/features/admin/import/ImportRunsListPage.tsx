@@ -8,6 +8,18 @@ import {
 } from "../../../lib/manifest-convex-react";
 import { importRunDetailPath } from "./importRoutes";
 import { StatusChip, TableSkeleton } from "../../../ui/primitives";
+import { useActionPrompt } from "../../../ui/action-prompt";
+import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
+
+type SourceSystem = "tpp_legacy" | "csv_export" | "api_sync";
+type DatasetType =
+  | "events"
+  | "contacts"
+  | "leads"
+  | "menus"
+  | "venues"
+  | "payments"
+  | "pack_list";
 
 // Source system labels
 const SOURCE_SYSTEM_LABELS: Record<string, string> = {
@@ -44,6 +56,7 @@ export function ImportRunsListPage() {
   const startImport = useImportRunStart();
   const markFailed = useImportRunMarkFailed();
   const revertImport = useImportRunRevert();
+  const { prompt, host } = useActionPrompt();
 
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
@@ -90,8 +103,10 @@ export function ImportRunsListPage() {
     const data = new FormData(element);
     void run("start", async () => {
       await startImport({
-        sourceSystem: (data.get("sourceSystem") ?? "tpp_legacy") as any,
-        datasetType: (data.get("datasetType") ?? "events") as any,
+        sourceSystem: String(
+          data.get("sourceSystem") ?? "tpp_legacy",
+        ) as SourceSystem,
+        datasetType: String(data.get("datasetType") ?? "events") as DatasetType,
         actorId: data.get("actorId")?.toString().trim() || undefined,
         checksum: data.get("checksum")?.toString().trim() || undefined,
       });
@@ -105,7 +120,15 @@ export function ImportRunsListPage() {
     id: string,
     version: number,
   ) => {
-    const reason = prompt("Enter failure details:");
+    const reason = await prompt.askReason({
+      title: "Mark Import Failed",
+      description:
+        "Record why this run failed so the next attempt knows what went wrong.",
+      label: "Failure details",
+      placeholder: "What went wrong…",
+      confirmLabel: "Mark failed",
+      tone: "danger",
+    });
     if (!reason?.trim()) return;
     void run(`fail-${id}`, async () => {
       await markFailed({
@@ -117,13 +140,14 @@ export function ImportRunsListPage() {
   };
 
   const handleRevert = async (runId: string, id: string, version: number) => {
-    if (
-      !confirm(
-        "Are you sure you want to revert this import? This will rollback all imported data.",
-      )
-    ) {
-      return;
-    }
+    const confirmed = await prompt.askConfirm({
+      title: "Revert Import",
+      description:
+        "Reverting rolls back everything this import brought in. This can't be undone from here.",
+      confirmLabel: "Revert import",
+      tone: "danger",
+    });
+    if (!confirmed) return;
     void run(`revert-${id}`, async () => {
       await revertImport({ docId: runId, version });
     });
@@ -154,12 +178,16 @@ export function ImportRunsListPage() {
           <button
             type="button"
             onClick={() => setShowForm(!showForm)}
-            className="px-4 py-2 bg-brand text-white rounded-md text-sm font-medium hover:bg-brand"
+            className="btn btn-primary"
           >
-            {showForm ? "Cancel" : "New Import Run"}
+            {showForm ? "Cancel" : "New import run"}
           </button>
         </div>
       </header>
+
+      <AdminWorkspaceNav />
+
+      {host}
 
       {/* New import form */}
       {showForm ? (
@@ -233,14 +261,14 @@ export function ImportRunsListPage() {
               <button
                 type="submit"
                 disabled={busy === "start"}
-                className="px-4 py-2 bg-brand text-white rounded-md text-sm font-medium disabled:opacity-50"
+                className="btn btn-primary"
               >
                 {busy === "start" ? "Starting..." : "Start Import"}
               </button>
               <button
                 type="button"
                 onClick={() => setShowForm(false)}
-                className="px-4 py-2 text-ink-2 rounded-md text-sm font-medium hover:bg-inset"
+                className="btn btn-ghost"
               >
                 Cancel
               </button>
@@ -440,7 +468,7 @@ export function ImportRunsListPage() {
                                 handleRevert(run._id, run._id, run.version)
                               }
                               disabled={busy === `revert-${run._id}`}
-                              className="text-warn hover:text-warn-darker text-sm disabled:opacity-50"
+                              className="text-warn hover:underline text-sm disabled:opacity-50"
                             >
                               {busy === `revert-${run._id}` ? "..." : "Revert"}
                             </button>

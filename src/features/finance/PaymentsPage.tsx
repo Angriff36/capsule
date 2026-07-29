@@ -240,9 +240,10 @@ export function PaymentsPage() {
             </p>
           ) : (
             <>
-              <label>
+              <label className="field-label">
                 Invoice
                 <select
+                  className="input"
                   name="invoiceId"
                   required
                   value={selectedInvoiceId}
@@ -259,9 +260,13 @@ export function PaymentsPage() {
                   ))}
                 </select>
               </label>
-              <label>
+              <label className="field-label">
                 Stored payment method
-                <select name="paymentMethodId" defaultValue="">
+                <select
+                  className="input"
+                  name="paymentMethodId"
+                  defaultValue=""
+                >
                   <option value="">None — use method kind below</option>
                   {clientMethods.map((method) => (
                     <option key={method._id} value={method._id}>
@@ -285,9 +290,10 @@ export function PaymentsPage() {
                 ) : null}
               </label>
               <div className="supply-form-grid">
-                <label>
+                <label className="field-label">
                   Amount
                   <input
+                    className="input"
                     name="amount"
                     type="number"
                     min="0.01"
@@ -295,9 +301,9 @@ export function PaymentsPage() {
                     required
                   />
                 </label>
-                <label>
+                <label className="field-label">
                   Method kind
-                  <select name="method" defaultValue="card">
+                  <select className="input" name="method" defaultValue="card">
                     <option value="card">Card</option>
                     <option value="check">Check</option>
                     <option value="cash">Cash</option>
@@ -306,9 +312,9 @@ export function PaymentsPage() {
                   </select>
                 </label>
               </div>
-              <label>
+              <label className="field-label">
                 Notes
-                <textarea name="notes" rows={2} />
+                <textarea className="input" name="notes" rows={2} />
               </label>
               <div className="supply-row-actions">
                 <button

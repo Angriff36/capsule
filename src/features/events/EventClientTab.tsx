@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
-import { useListClient, useListPerson } from "../../lib/manifest-convex-react";
+import { useListClient } from "../../lib/manifest-convex-react";
 import { ClientCommunicationPanel } from "../clients/ClientCommunicationPanel";
 import { clientDisplayName } from "./clientName";
 
@@ -28,7 +28,6 @@ export function EventClientTab({
   operationalRequirements,
 }: Props) {
   const clients = useListClient();
-  const people = useListPerson();
   const client = clients?.find((row) => row._id === clientId);
   const name = clientDisplayName(clientId, clients);
 
@@ -119,8 +118,7 @@ export function EventClientTab({
         </div>
       </dl>
       <p className="text-[12px] text-ink-3">
-        Edit contact and requirements in the summary header above.{" "}
-        {(people ?? []).length} people in the workspace roster for staffing.
+        Edit the contact and requirements on the Overview tab.
       </p>
       <ClientCommunicationPanel
         target={{

@@ -6,13 +6,12 @@ import {
   useEventDishRemove,
   useListDish,
   useListEventDish,
-  useListComponent,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
-import { dishPath, componentPath } from "../kitchen/kitchenRoutes";
+import { dishPath } from "../kitchen/kitchenRoutes";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
@@ -26,7 +25,6 @@ type Props = {
 
 export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const dishes = useListDish();
-  const components = useListComponent();
   const eventDishes = useListEventDish();
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();

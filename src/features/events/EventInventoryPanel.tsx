@@ -229,7 +229,18 @@ export function EventInventoryPanel({
     eventDemands.length === 0 &&
     eventReservations.length === 0
   ) {
-    return null;
+    return (
+      <section className="card space-y-2 px-3 py-3">
+        <p className="eyebrow">Inventory</p>
+        <h2 className="text-[15px] font-semibold text-ink">
+          Stock reservations
+        </h2>
+        <p className="text-[13px] text-ink-2">
+          Nothing to reserve yet. Add dishes on the Menu tab to create
+          ingredient demand, then approve the event to reserve stock against it.
+        </p>
+      </section>
+    );
   }
 
   return (

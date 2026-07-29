@@ -515,9 +515,10 @@ export function RevenueTrendsDashboard({
         </p>
         {breakdown === "service_line" ? (
           <p role="note">
-            Invoices currently store one summary service line, so all revenue is
-            shown as <strong>Catering services</strong>. More service-line
-            detail will appear when invoice line items are modeled.
+            Service lines follow each invoice's line-item categories — food,
+            service, and rentals — splitting the invoice total in proportion to
+            its lines. Invoices issued without line detail appear as{" "}
+            <strong>Not itemized</strong>.
           </p>
         ) : null}
       </aside>

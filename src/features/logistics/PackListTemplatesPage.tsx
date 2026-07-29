@@ -20,6 +20,7 @@ import {
   type CommandFailure,
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
+import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { PACK_LIST_UNITS, type PackListUnit } from "./packListUnits";
 
 // Mirrors PackListItem's editable equipment fields; stored as a JSON string on
@@ -259,31 +260,30 @@ export function PackListTemplatesPage() {
   const loading = templates === undefined;
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 py-6">
-      <div className="mb-4">
-        <PageHeader
-          title="Pack List Templates"
-          lead={
-            <>
-              Reusable equipment pack lists an event can generate into its load
-              sheet.{" "}
-              <Link className="link" to="/logistics/packs">
-                Pack lists
-              </Link>
-            </>
-          }
-          actions={
-            <button
-              type="button"
-              className="btn btn-primary min-h-10"
-              disabled={busy != null}
-              onClick={formOpen ? resetForm : openCreate}
-            >
-              {formOpen ? "Close" : "+ New template"}
-            </button>
-          }
-        />
-      </div>
+    <div className="operations-stage supply-stage">
+      <PageHeader
+        title="Pack list templates"
+        lead={
+          <>
+            Reusable equipment pack lists an event can generate into its load
+            sheet.{" "}
+            <Link className="link" to="/logistics/packs">
+              Pack lists
+            </Link>
+          </>
+        }
+        actions={
+          <button
+            type="button"
+            className="btn btn-primary min-h-10"
+            disabled={busy != null}
+            onClick={formOpen ? resetForm : openCreate}
+          >
+            {formOpen ? "Close" : "+ New template"}
+          </button>
+        }
+      />
+      <LogisticsWorkspaceNav />
 
       {failure ? <FailureBanner failure={failure} /> : null}
 

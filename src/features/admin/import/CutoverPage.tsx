@@ -20,6 +20,7 @@ import { PageHeader, TableSkeleton } from "../../../ui/primitives";
 import { useActionPrompt } from "../../../ui/action-prompt";
 import { formatDate } from "@/lib/format";
 import { useAuthStatus } from "@/lib/useAuthStatus";
+import { AdminWorkspaceNav } from "../AdminWorkspaceNav";
 
 interface ValidationCheck {
   passed: boolean;
@@ -30,7 +31,9 @@ interface ValidationCheck {
 }
 
 export function CutoverPage() {
-  const { prompt } = useActionPrompt();
+  // `host` renders the prompt panel — without it askReason/askConfirm would
+  // show nothing and their promises would never resolve.
+  const { prompt, host } = useActionPrompt();
   const authStatus = useAuthStatus();
   const isAdmin =
     authStatus?.role === "admin" ||
@@ -191,6 +194,7 @@ export function CutoverPage() {
           title="TPP Migration Cutover"
           lead="Final validation and go/no-go gate for TPP migration."
         />
+        <AdminWorkspaceNav />
         <TableSkeleton rows={8} />
       </div>
     );
@@ -208,6 +212,9 @@ export function CutoverPage() {
           </Link>
         }
       />
+      <AdminWorkspaceNav />
+
+      {host}
 
       {/* Error banner */}
       {error && (
@@ -242,11 +249,11 @@ export function CutoverPage() {
       )}
 
       {cutoverStatus.status === "rolled_back" && (
-        <div className="flex items-center gap-3 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-          <AlertTriangle className="w-5 h-5 text-orange-600" />
+        <div className="flex items-center gap-3 p-4 bg-warn-soft border border-warn/40 rounded-lg">
+          <AlertTriangle className="w-5 h-5 text-warn" />
           <div>
             <p className="font-medium">Cutover Rolled Back</p>
-            <p className="text-sm text-orange-700">
+            <p className="text-sm text-warn">
               Emergency rollback executed on{" "}
               {formatDate(cutoverStatus.decidedAt)}.
             </p>
@@ -256,7 +263,7 @@ export function CutoverPage() {
 
       {/* Warnings */}
       {validation.warnings && validation.warnings.length > 0 && (
-        <div className="p-4 bg-orange-50 border border-orange-200 rounded-lg">
+        <div className="p-4 bg-warn-soft border border-warn/40 rounded-lg">
           <div className="space-y-1">
             <p className="font-medium">Warnings</p>
             <ul className="list-disc list-inside text-sm space-y-1">
@@ -411,15 +418,7 @@ export function CutoverPage() {
             <>
               <button
                 type="button"
-                className={`btn btn-lg ${
-                  validation.canProceed &&
-                  localApproval &&
-                  localRollbackPlan &&
-                  isAdmin &&
-                  !isSubmitting
-                    ? "bg-ok hover:bg-ok"
-                    : "bg-ok opacity-50 cursor-not-allowed"
-                }`}
+                className="btn btn-lg border-ok bg-ok text-white"
                 disabled={
                   !validation.canProceed ||
                   !localApproval ||
@@ -470,7 +469,7 @@ export function CutoverPage() {
               Cutover was rejected. Address blockers and retry when ready.
             </div>
           ) : cutoverStatus.status === "rolled_back" ? (
-            <div className="p-4 bg-orange-50 rounded-lg text-sm text-orange-700">
+            <div className="p-4 bg-warn-soft rounded-lg text-sm text-warn">
               Cutover was rolled back. Review the rollback plan and retry when
               ready.
             </div>

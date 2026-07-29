@@ -140,13 +140,24 @@ export function VendorContractsPage() {
 
   return (
     <div className="operations-stage supply-stage">
-      <header>
-        <p className="eyebrow">Procurement</p>
-        <h1 className="display-title mt-2">Vendor contracts</h1>
-        <p className="mt-3 text-ink-2">
-          Agreed pricing tiers, payment terms, and delivery lead times per
-          vendor. Prices lock when a contract is activated.
-        </p>
+      <header className="supply-masthead">
+        <div>
+          <p className="eyebrow">Procurement · Vendor contracts</p>
+          <h1 className="display-title mt-2">Vendor contracts</h1>
+          <p className="mt-3 max-w-160 text-ink-2">
+            Agreed pricing tiers, payment terms, and delivery lead times per
+            vendor. Prices lock when a contract is activated.
+          </p>
+        </div>
+        <div className="supply-masthead-actions">
+          <button
+            className="btn btn-primary"
+            disabled={busy != null}
+            onClick={() => setShowDraftForm((value) => !value)}
+          >
+            {showDraftForm ? "Close contract form" : "Draft contract"}
+          </button>
+        </div>
       </header>
       <InventoryWorkspaceNav />
       {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -171,18 +182,6 @@ export function VendorContractsPage() {
           })}
         </aside>
       ) : null}
-
-      <section className="order-controls">
-        <div className="supply-row-actions">
-          <button
-            className="btn btn-primary"
-            disabled={busy != null}
-            onClick={() => setShowDraftForm((value) => !value)}
-          >
-            {showDraftForm ? "Close contract form" : "Draft contract"}
-          </button>
-        </div>
-      </section>
 
       {showDraftForm ? (
         <form className="supply-form" onSubmit={submitDraft}>

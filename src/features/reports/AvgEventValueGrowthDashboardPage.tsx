@@ -222,7 +222,6 @@ export function AvgEventValueGrowthDashboardPage() {
           avgEventValue: data.totalRevenue / data.eventCount,
           eventCount: data.eventCount,
           totalRevenue: data.totalRevenue,
-          growth: 0, // Would need historical data to calculate
         };
       })
       .sort((a, b) => b.avgEventValue - a.avgEventValue);
@@ -445,7 +444,7 @@ export function AvgEventValueGrowthDashboardPage() {
             {
               dataKey: "avgEventValue",
               name: "Avg Event Value",
-              color: "#3b82f6",
+              color: "var(--color-info)",
             },
           ]}
           height={250}
@@ -463,7 +462,11 @@ export function AvgEventValueGrowthDashboardPage() {
           data={byServiceStyle}
           xAxisKey="serviceStyle"
           series={[
-            { dataKey: "avgEventValue", name: "Avg Value", color: "#8b5cf6" },
+            {
+              dataKey: "avgEventValue",
+              name: "Avg Value",
+              color: "var(--color-brand)",
+            },
           ]}
           height={300}
           formatYAxis={formatMoney}
@@ -479,7 +482,11 @@ export function AvgEventValueGrowthDashboardPage() {
           data={byOccasion}
           xAxisKey="occasion"
           series={[
-            { dataKey: "avgEventValue", name: "Avg Value", color: "#10b981" },
+            {
+              dataKey: "avgEventValue",
+              name: "Avg Value",
+              color: "var(--color-ok)",
+            },
           ]}
           height={300}
           formatYAxis={formatMoney}
@@ -550,7 +557,11 @@ export function AvgEventValueGrowthDashboardPage() {
           data={sizeValueData.filter((d) => d.eventCount > 0)}
           xAxisKey="headcount"
           series={[
-            { dataKey: "avgEventValue", name: "Avg Value", color: "#f59e0b" },
+            {
+              dataKey: "avgEventValue",
+              name: "Avg Value",
+              color: "var(--color-accent)",
+            },
           ]}
           height={300}
           formatYAxis={formatMoney}
@@ -570,17 +581,16 @@ export function AvgEventValueGrowthDashboardPage() {
       <DashboardGrid items={dashboardItems} />
 
       {/* Analysis Note */}
-      <div className="mt-6 rounded-lg border border-ink-200 bg-ink-50 p-4">
-        <h4 className="text-sm font-semibold text-ink-900">
-          Value Driver Analysis
+      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
+        <h4 className="text-sm font-semibold text-ink">
+          What drives event value
         </h4>
-        <p className="mt-1 text-sm text-ink-600">
-          Average event value trends reflect pricing strategy, mix shifts, and
-          headcount patterns. Growth rates compare current month to previous
-          month (MoM) and same month last year (YoY). Breakdowns identify
-          high-value segments: service styles, occasions, venues, and
-          top-performing salespeople. Size correlation shows how event scale
-          impacts value.
+        <p className="mt-1 text-sm text-ink-2">
+          Average event value reflects pricing, the mix of event types, and
+          guest counts. Growth compares this month to last month (MoM) and to
+          the same month last year (YoY). The breakdowns show which service
+          styles, occasions, venues, and salespeople bring in the most valuable
+          events, and how event size affects the price.
         </p>
       </div>
     </div>

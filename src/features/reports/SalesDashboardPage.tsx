@@ -50,49 +50,51 @@ export function SalesDashboardPage() {
   const pipelineData = useMemo(() => {
     if (!leads) return [];
 
-    const stageCounts = leads.reduce(
-      (acc, lead) => {
-        const stage = (lead.stage?.toLowerCase() || "new") as LeadStage;
-        acc[stage] = (acc[stage] || 0) + 1;
-        return acc;
-      },
-      {} as Record<string, number>,
-    );
+    const stageCounts = new Map<string, number>();
+    leads.forEach((lead) => {
+      const stage = String(lead.stage || "new");
+      stageCounts.set(stage, (stageCounts.get(stage) || 0) + 1);
+    });
 
-    return Object.entries(stageCounts)
+    return Array.from(stageCounts.entries())
+      .sort(
+        ([a], [b]) =>
+          (STAGE_ORDER[a as LeadStage] || 99) -
+          (STAGE_ORDER[b as LeadStage] || 99),
+      )
       .map(([stage, count]) => ({
         stage: formatStage(stage),
-        count: count as number,
-        value: count as number,
-      }))
-      .sort(
-        (a, b) =>
-          (STAGE_ORDER[a.stage as LeadStage] || 99) -
-          (STAGE_ORDER[b.stage as LeadStage] || 99),
-      );
+        count,
+      }));
   }, [leads]);
 
   // Calculate conversion metrics
   const conversionMetrics = useMemo(() => {
-    if (!leads || leads.length === 0)
-      return { totalLeads: 0, conversionRate: 0, qualifiedRate: 0 };
+    if (!leads || leads.length === 0) {
+      return {
+        totalLeads: 0,
+        conversionRate: 0,
+        qualifiedRate: 0,
+        convertedCount: 0,
+      };
+    }
 
     const totalLeads = leads.length;
-    const converted = leads.filter(
-      (l) => l.stage?.toLowerCase() === "converted",
-    ).length;
-    const qualified = leads.filter(
-      (l) =>
-        l.stage?.toLowerCase() === "qualified" ||
-        l.stage?.toLowerCase() === "proposalSent" ||
-        l.stage?.toLowerCase() === "negotiating" ||
-        l.stage?.toLowerCase() === "converted",
+    const QUALIFIED_STAGES: readonly string[] = [
+      "qualified",
+      "proposalSent",
+      "negotiating",
+      "converted",
+    ];
+    const converted = leads.filter((l) => l.stage === "converted").length;
+    const qualified = leads.filter((l) =>
+      QUALIFIED_STAGES.includes(l.stage || ""),
     ).length;
 
     return {
       totalLeads,
-      conversionRate: totalLeads > 0 ? (converted / totalLeads) * 100 : 0,
-      qualifiedRate: totalLeads > 0 ? (qualified / totalLeads) * 100 : 0,
+      conversionRate: (converted / totalLeads) * 100,
+      qualifiedRate: (qualified / totalLeads) * 100,
       convertedCount: converted,
     };
   }, [leads]);
@@ -217,12 +219,12 @@ export function SalesDashboardPage() {
           rows={[
             {
               label: "Qualified",
-              value: conversionMetrics.qualifiedRate.toFixed(1),
+              value: conversionMetrics.qualifiedRate,
               format: "percent" as const,
             },
             {
               label: "Converted",
-              value: conversionMetrics.conversionRate.toFixed(1),
+              value: conversionMetrics.conversionRate,
               format: "percent" as const,
             },
           ]}
@@ -273,7 +275,7 @@ export function SalesDashboardPage() {
           rows={[
             {
               label: "Converted",
-              value: conversionMetrics.convertedCount || 0,
+              value: conversionMetrics.convertedCount,
               format: "number" as const,
             },
             {
@@ -317,7 +319,9 @@ export function SalesDashboardPage() {
         <BarChart
           data={pipelineData}
           xAxisKey="stage"
-          series={[{ dataKey: "count", name: "Leads", color: "#3b82f6" }]}
+          series={[
+            { dataKey: "count", name: "Leads", color: "var(--color-info)" },
+          ]}
           height={250}
         />
       ),
@@ -372,13 +376,11 @@ export function SalesDashboardPage() {
       <DashboardGrid items={dashboardItems} />
 
       {/* Commission Basis Note */}
-      <div className="mt-6 rounded-lg border border-ink-200 bg-ink-50 p-4">
-        <h4 className="text-sm font-semibold text-ink-900">Commission Basis</h4>
-        <p className="mt-1 text-sm text-ink-600">
-          Sales commissions are calculated at 3% of booked revenue. Commission
-          attribution is managed through the Revenue Attribution system with
-          venue splits and referral fees applied before final commission
-          calculation.
+      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
+        <h4 className="text-sm font-semibold text-ink">Commission Basis</h4>
+        <p className="mt-1 text-sm text-ink-2">
+          Sales commissions are calculated at 3% of booked revenue. The Comp
+          Master dashboard has the full commission breakdown by salesperson.
         </p>
       </div>
     </div>

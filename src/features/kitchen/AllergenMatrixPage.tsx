@@ -215,7 +215,7 @@ export function AllergenMatrixPage() {
           <p>No dishes on this {menuId ? "menu" : "event"} yet.</p>
         </div>
       ) : (
-        <section className="card allergen-matrix-sheet print-sheet mt-4">
+        <section className="card print-sheet mt-4">
           <header className="allergen-matrix-heading">
             <div>
               <p className="eyebrow">Allergen disclosure</p>

@@ -206,7 +206,7 @@ export function LotTraceabilityPage() {
         {loading ? (
           <TableSkeleton rows={7} />
         ) : !hasFilter ? (
-          <div className="document-empty lot-trace-empty">
+          <div className="document-empty">
             <p>Enter a supplier lot or a lot receipt-date range.</p>
             <span>
               Results update immediately and include only stock issues with a
@@ -214,7 +214,7 @@ export function LotTraceabilityPage() {
             </span>
           </div>
         ) : rows.length === 0 && !invalidRange ? (
-          <div className="document-empty lot-trace-empty">
+          <div className="document-empty">
             <p>No affected events matched this trace.</p>
             <span>
               Check the supplier label, widen the date range, or confirm that

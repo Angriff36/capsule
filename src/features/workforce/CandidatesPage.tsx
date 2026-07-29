@@ -423,7 +423,7 @@ export function CandidatesPage() {
                   </label>
                   <div className="field-label">
                     <span>&nbsp;</span>
-                    <div className="checkbox-group">
+                    <div className="supply-row-actions">
                       <button
                         type="button"
                         className="btn btn-secondary"
@@ -480,7 +480,7 @@ export function CandidatesPage() {
                             <td>{row.notes || "—"}</td>
                             <td className="text-right">
                               {row.outcome === "pending" ? (
-                                <span className="checkbox-group">
+                                <span className="inline-flex items-center gap-3">
                                   <button
                                     className="btn-link btn-link-compact"
                                     onClick={() =>

@@ -21,7 +21,7 @@
 }
 
 .event-cost-report-actions span {
-  color: var(--ink-3);
+  color: var(--color-ink-3);
   font-size: 11px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -247,6 +247,10 @@
   background: #31574f;
 }
 
+.event-cost-report-bar .is-ingredient {
+  background: #31574f;
+}
+
 .event-cost-report-bar .is-labor {
   background: #40598a;
 }
@@ -324,12 +328,15 @@
     margin: 0.3in;
   }
 
-  body * {
+  /* Scoped to pages that actually show the report — this stylesheet stays in
+     the bundle after the Closeout page loads, and an unscoped `body *` rule
+     would blank out printing on every other page. */
+  body:has(.event-cost-report) * {
     visibility: hidden !important;
   }
 
-  .event-cost-report,
-  .event-cost-report * {
+  body:has(.event-cost-report) .event-cost-report,
+  body:has(.event-cost-report) .event-cost-report * {
     visibility: visible !important;
   }
 

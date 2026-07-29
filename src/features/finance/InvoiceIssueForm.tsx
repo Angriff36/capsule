@@ -180,9 +180,10 @@ export function InvoiceIssueForm({
       </div>
 
       <div className="invoice-composer-basics">
-        <label>
+        <label className="field-label">
           Client
           <select
+            className="input"
             name="clientId"
             required
             value={selectedClientId}
@@ -198,13 +199,18 @@ export function InvoiceIssueForm({
             ))}
           </select>
         </label>
-        <label>
+        <label className="field-label">
           Invoice number
-          <input name="invoiceNumber" required placeholder="INV-2026-001" />
+          <input
+            className="input"
+            name="invoiceNumber"
+            required
+            placeholder="INV-2026-001"
+          />
         </label>
-        <label>
+        <label className="field-label">
           Event (optional)
-          <select name="eventId" defaultValue={eventDefault}>
+          <select className="input" name="eventId" defaultValue={eventDefault}>
             <option value="">No linked event</option>
             {events
               .filter((row) => row.deletedAt == null)
@@ -215,9 +221,10 @@ export function InvoiceIssueForm({
               ))}
           </select>
         </label>
-        <label>
+        <label className="field-label">
           Invoice currency
           <select
+            className="input"
             name="currencyCode"
             value={normalizedCurrencyCode}
             onChange={(event) => {
@@ -241,9 +248,10 @@ export function InvoiceIssueForm({
             Tenant functional currency is {formatCurrencyLabel(functionalCode)}.
           </span>
         </label>
-        <label>
+        <label className="field-label">
           Exchange rate to {formatCurrencyLabel(functionalCode)}
           <input
+            className="input"
             name="exchangeRate"
             type="number"
             min={isFunctionalCurrency ? 1 : 0.000001}
@@ -295,9 +303,10 @@ export function InvoiceIssueForm({
                 <span className="invoice-line-number">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <label className="invoice-line-description">
+                <label className="field-label invoice-line-description">
                   Description
                   <input
+                    className="input"
                     aria-label={`Line ${index + 1} description`}
                     required
                     value={line.description}
@@ -307,9 +316,10 @@ export function InvoiceIssueForm({
                     placeholder="Menu, staffing, or rentals"
                   />
                 </label>
-                <label>
+                <label className="field-label">
                   Category
                   <select
+                    className="input"
                     aria-label={`Line ${index + 1} category`}
                     value={line.category}
                     onChange={(event) =>
@@ -327,9 +337,10 @@ export function InvoiceIssueForm({
                     ))}
                   </select>
                 </label>
-                <label>
+                <label className="field-label">
                   Quantity
                   <input
+                    className="input"
                     aria-label={`Line ${index + 1} quantity`}
                     type="number"
                     min="0.01"
@@ -345,9 +356,10 @@ export function InvoiceIssueForm({
                     }
                   />
                 </label>
-                <label>
+                <label className="field-label">
                   Unit price
                   <input
+                    className="input"
                     aria-label={`Line ${index + 1} unit price`}
                     type="number"
                     min="0"
@@ -408,9 +420,10 @@ export function InvoiceIssueForm({
       <div className="invoice-composer-footer">
         <div className="invoice-composer-terms">
           <div className="supply-form-grid">
-            <label>
+            <label className="field-label">
               Discount
               <input
+                className="input"
                 name="discountAmount"
                 type="number"
                 min="0"
@@ -422,23 +435,24 @@ export function InvoiceIssueForm({
                 }
               />
             </label>
-            <label>
+            <label className="field-label">
               Payment terms (days)
               <input
+                className="input"
                 name="paymentTermsDays"
                 type="number"
                 min="0"
                 defaultValue="30"
               />
             </label>
-            <label>
+            <label className="field-label">
               Due date
-              <input name="dueDate" type="datetime-local" />
+              <input className="input" name="dueDate" type="datetime-local" />
             </label>
           </div>
-          <label>
+          <label className="field-label">
             Notes
-            <textarea name="notes" rows={2} />
+            <textarea className="input" name="notes" rows={2} />
           </label>
         </div>
 

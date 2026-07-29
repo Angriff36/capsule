@@ -86,8 +86,11 @@ export function QuoteSubmissionsReviewPage() {
 
   if (submissions === undefined) {
     return (
-      <div className="p-6">
-        <PageHeader title="Quote Requests" />
+      <div className="p-6 max-w-6xl mx-auto">
+        <div className="mb-4">
+          <PageHeader title="Quote requests" />
+        </div>
+        <ClientsWorkspaceNav />
         <TableSkeleton />
       </div>
     );

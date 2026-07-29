@@ -56,7 +56,7 @@ export function EventSetupProgress({
       key: "staff",
       label: "Staff assigned",
       ready: event == null ? undefined : Boolean(event.hasStaffAssigned),
-      fixTo: "/staff/roster",
+      fixTo: `/events/${eventId}?tab=staffing`,
       fixLabel: "Assign staff",
     },
   ];
