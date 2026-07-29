@@ -62,8 +62,7 @@ export function PerformanceReviewsPage() {
         await createReview({
           personId: String(data.get("personId")),
           reviewerId: String(data.get("reviewerId")),
-          // The schema is nullable (not optional) — "no event" must be null.
-          eventId: (data.get("eventId") as string | null) || null,
+          eventId: (data.get("eventId") as string | null) || undefined,
           reviewDate: localDateEpoch(data.get("reviewDate")),
           reliabilityRating: Number(data.get("reliabilityRating")),
           qualityRating: Number(data.get("qualityRating")),

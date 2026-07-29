@@ -86,6 +86,7 @@ describe("governed creation mappings", () => {
       "ProposalDishSelection_createViaSelect",
       "ProposalLineItem_createViaAddLine",
       "ProposalRevision_createViaCapture",
+      "ProposalEnhancement_createViaOffer",
       "ProposalTemplate_createViaDefine",
       "Proposal_createViaDraft",
       "Qualification_createViaGrant",

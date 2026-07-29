@@ -37,7 +37,7 @@ entity PerformanceReview mixin TenantScoped, SoftDeletable {
   command record(
     personId: uuid,
     reviewerId: uuid,
-    eventId: uuid?,
+    optional eventId: uuid,
     reviewDate: datetime,
     reliabilityRating: int,
     qualityRating: int,
