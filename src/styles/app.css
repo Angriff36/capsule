@@ -1659,14 +1659,21 @@
   overflow-x: auto;
 }
 
-.supply-table {
+/* data-table is the same ledger table without the min-width, for panel-sized
+   tables. Several pages used the class before it existed — it is now real. */
+.supply-table,
+.data-table {
   width: 100%;
-  min-width: 760px;
   border-collapse: collapse;
   font-size: 12px;
 }
 
-.supply-table th {
+.supply-table {
+  min-width: 760px;
+}
+
+.supply-table th,
+.data-table th {
   padding: 0.7rem 0.8rem;
   color: var(--color-ink-3);
   font-size: 9px;
@@ -1676,22 +1683,27 @@
   text-transform: uppercase;
 }
 
-.supply-table td {
+.supply-table td,
+.data-table td {
   padding: 0.85rem 0.8rem;
   border-top: 1px solid var(--color-line);
   vertical-align: middle;
 }
 
-.supply-table tbody tr:hover {
+.supply-table tbody tr:hover,
+.data-table tbody tr:hover {
   background: var(--color-inset);
 }
 
 .supply-table td strong,
-.supply-table td small {
+.supply-table td small,
+.data-table td strong,
+.data-table td small {
   display: block;
 }
 
 .supply-table td small,
+.data-table td small,
 .supply-muted {
   margin-top: 2px;
   color: var(--color-ink-3);

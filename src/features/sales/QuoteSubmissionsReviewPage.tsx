@@ -100,13 +100,12 @@ export function QuoteSubmissionsReviewPage() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
-      <ClientsWorkspaceNav />
-      <div className="mb-6 mt-4">
+      <div className="mb-4">
         <PageHeader
-          title="Quote Requests"
+          title="Quote requests"
           lead={
             <>
-              Self-service submissions from the public quote form.{" "}
+              Quotes people asked for through your website.{" "}
               {pendingCount > 0 ? (
                 <span className="text-warn font-medium">
                   {pendingCount} awaiting conversion
@@ -126,6 +125,7 @@ export function QuoteSubmissionsReviewPage() {
           }
         />
       </div>
+      <ClientsWorkspaceNav />
 
       {failure && (
         <FailureBanner failure={failure} onDismiss={() => setFailure(null)} />
@@ -163,10 +163,10 @@ export function QuoteSubmissionsReviewPage() {
       {visible.length === 0 ? (
         <EmptyState
           title="No quote requests yet"
-          hint="Submissions from the public quote form appear here for conversion."
+          hint="When someone asks for a quote on your website, it lands here."
           action={
             <Link to="/quote" className="btn btn-ghost btn-sm">
-              Open the public /quote form
+              See the quote form your clients use
             </Link>
           }
         />
