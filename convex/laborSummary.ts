@@ -67,6 +67,13 @@ type LaborSummary = {
   peopleMissingRates: string[];
 };
 
+type EventLaborSummary = LaborSummary & {
+  /** Forecast from scheduled shifts × rates — the labor picture BEFORE anyone clocks in. */
+  scheduledMinutes: number;
+  scheduledCost: number;
+  scheduledShiftCount: number;
+};
+
 function personName(person: Doc<"people"> | undefined, id: string): string {
   if (!person) return `Unknown person (${id.slice(0, 6)}…)`;
   return (
@@ -147,10 +154,12 @@ async function tenantTimeRecords(
     .collect();
 }
 
+const SCHEDULED_SHIFT_STATUSES = new Set(["scheduled", "started", "completed"]);
+
 /** Aggregate labor for one event (direct eventId or via the record's shift). */
 export const eventLaborSummary = query({
   args: { eventId: v.id("events") },
-  handler: async (ctx, args): Promise<LaborSummary | null> => {
+  handler: async (ctx, args): Promise<EventLaborSummary | null> => {
     const auth = await getAuthContext(ctx);
     if (!canReadLaborAggregates(auth.role)) return null;
     const eventId = String(args.eventId);
@@ -173,7 +182,39 @@ export const eventLaborSummary = query({
         : undefined;
       return viaShift === eventId;
     });
-    return summarize(matching, people);
+
+    // Scheduled-labor forecast: committed shifts × person rates. This is the
+    // pre-event labor picture (the worksheet's "Scheduled Cost") — clocked
+    // time replaces it as reality once people punch in.
+    let scheduledMinutes = 0;
+    let scheduledCost = 0;
+    let scheduledShiftCount = 0;
+    for (const shift of shifts) {
+      if (
+        shift.deletedAt != null ||
+        String(shift.eventId ?? "") !== eventId ||
+        !SCHEDULED_SHIFT_STATUSES.has(String(shift.status)) ||
+        shift.startsAt == null ||
+        shift.endsAt == null ||
+        shift.endsAt <= shift.startsAt
+      ) {
+        continue;
+      }
+      const minutes = (shift.endsAt - shift.startsAt) / 60_000;
+      scheduledMinutes += minutes;
+      scheduledShiftCount += 1;
+      const rate = people.get(String(shift.personId))?.hourlyRate;
+      if (typeof rate === "number" && Number.isFinite(rate) && rate >= 0) {
+        scheduledCost += (minutes / 60) * rate;
+      }
+    }
+
+    return {
+      ...summarize(matching, people),
+      scheduledMinutes: Math.round(scheduledMinutes),
+      scheduledCost: Math.round((scheduledCost + Number.EPSILON) * 100) / 100,
+      scheduledShiftCount,
+    };
   },
 });
 

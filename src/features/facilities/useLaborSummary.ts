@@ -8,7 +8,7 @@
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
 
-export type EventLaborSummary = {
+type LaborSummaryBase = {
   cost: number;
   totalMinutes: number;
   unpricedMinutes: number;
@@ -16,7 +16,14 @@ export type EventLaborSummary = {
   peopleMissingRates: string[];
 };
 
-export type PersonPeriodLaborSummary = EventLaborSummary & {
+export type EventLaborSummary = LaborSummaryBase & {
+  /** Forecast from scheduled shifts × rates (pre-event labor picture). */
+  scheduledMinutes: number;
+  scheduledCost: number;
+  scheduledShiftCount: number;
+};
+
+export type PersonPeriodLaborSummary = LaborSummaryBase & {
   hourlyRate: number | null;
   overlappingInputCount: number;
 };

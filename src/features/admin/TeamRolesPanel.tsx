@@ -106,6 +106,7 @@ export function TeamRolesPanel({
     const givenName = String(data.get("givenName") ?? "").trim();
     const familyName = String(data.get("familyName") ?? "").trim();
     const email = String(data.get("email") ?? "").trim();
+    const phone = String(data.get("phone") ?? "").trim();
     const role = String(data.get("role") ?? "staff");
     const authSubjectId = String(data.get("authSubjectId") ?? "").trim();
     if (!givenName || !familyName || !email) {
@@ -125,6 +126,7 @@ export function TeamRolesPanel({
         familyName,
         email,
         role,
+        ...(phone ? { phone } : {}),
         ...(authSubjectId ? { authSubjectId } : {}),
       });
       form.reset();
@@ -266,6 +268,10 @@ export function TeamRolesPanel({
           <label className="block text-[12px]">
             <span className="meta-term">Email</span>
             <input name="email" type="email" className="input mt-1" required />
+          </label>
+          <label className="block text-[12px]">
+            <span className="meta-term">Phone (for SMS alerts)</span>
+            <input name="phone" type="tel" className="input mt-1" />
           </label>
           <label className="block text-[12px]">
             <span className="meta-term">Capsule role</span>

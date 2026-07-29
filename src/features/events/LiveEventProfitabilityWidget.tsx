@@ -181,7 +181,9 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
                 <small>
                   {(clockedLabor?.recordCount ?? 0) > 0
                     ? `${hours.format(result.laborHours)} clocked hours · ${result.payrollInputCount} time record${result.payrollInputCount === 1 ? "" : "s"}`
-                    : `${hours.format(result.laborHours)} reviewed hours · ${result.payrollInputCount} payroll input${result.payrollInputCount === 1 ? "" : "s"}`}
+                    : (clockedLabor?.scheduledShiftCount ?? 0) > 0
+                      ? `${hours.format(result.laborHours)} scheduled hours · ${result.payrollInputCount} shift${result.payrollInputCount === 1 ? "" : "s"} (forecast)`
+                      : `${hours.format(result.laborHours)} reviewed hours · ${result.payrollInputCount} payroll input${result.payrollInputCount === 1 ? "" : "s"}`}
                 </small>
               </div>
             </article>

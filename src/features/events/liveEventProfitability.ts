@@ -287,6 +287,9 @@ export type ClockedLaborSummary = {
   unpricedMinutes: number;
   recordCount: number;
   peopleMissingRates: readonly string[];
+  scheduledMinutes?: number;
+  scheduledCost?: number;
+  scheduledShiftCount?: number;
 };
 
 export function buildLiveEventProfitability({
@@ -339,6 +342,12 @@ export function buildLiveEventProfitability({
   });
   const payrollLabor = calculateLaborCost(eventKey, payrollInputs);
   const useClocked = clockedLabor != null && clockedLabor.recordCount > 0;
+  // Before anyone clocks in, the scheduled-shift forecast (shifts × rates)
+  // is the best labor number — the same figure a staffing worksheet prints.
+  const useScheduled =
+    !useClocked &&
+    payrollLabor.inputCount === 0 &&
+    (clockedLabor?.scheduledShiftCount ?? 0) > 0;
   const labor = useClocked
     ? {
         cost: clockedLabor.cost,
@@ -346,7 +355,14 @@ export function buildLiveEventProfitability({
         unpricedMinutes: clockedLabor.unpricedMinutes,
         inputCount: clockedLabor.recordCount,
       }
-    : payrollLabor;
+    : useScheduled
+      ? {
+          cost: clockedLabor!.scheduledCost ?? 0,
+          totalMinutes: clockedLabor!.scheduledMinutes ?? 0,
+          unpricedMinutes: 0,
+          inputCount: clockedLabor!.scheduledShiftCount ?? 0,
+        }
+      : payrollLabor;
   const equipmentTotal = calculateEquipmentCost(
     eventKey,
     equipment,
