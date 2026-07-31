@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 bun run secrets
 bun scripts/builder-regen-guard.ts --check-staged
 bunx lint-staged

@@ -250,11 +250,11 @@ export function MangiaDashboardPage() {
       id: "today-header",
       size: "full",
       content: (
-        <div className="rounded-lg border-2 border-brand/30 bg-brand-soft p-4">
+        <div className="rounded-sm border-2 border-brand/30 bg-brand-soft p-4">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-brand">Today's Operations</h3>
-              <p className="text-sm text-brand">
+              <p className="text-xs text-brand">
                 {today.toLocaleDateString("en-US", {
                   weekday: "long",
                   month: "long",
@@ -263,10 +263,10 @@ export function MangiaDashboardPage() {
               </p>
             </div>
             <div className="text-right">
-              <p className="text-3xl font-bold text-brand">
+              <p className="text-2xl font-bold text-brand">
                 {todaySnapshot.totalEvents}
               </p>
-              <p className="text-sm text-brand">Events Scheduled</p>
+              <p className="text-xs text-brand">Events Scheduled</p>
             </div>
           </div>
         </div>
@@ -485,13 +485,13 @@ export function MangiaDashboardPage() {
 
       {/* Alerts Section */}
       {alerts.length > 0 && (
-        <div className="mt-6 rounded-lg border border-line bg-inset p-4">
-          <h4 className="text-sm font-semibold text-ink">Needs Attention</h4>
+        <div className="mt-6 rounded-sm border border-line bg-inset p-4">
+          <h4 className="text-xs font-semibold text-ink">Needs Attention</h4>
           <div className="mt-2 space-y-1">
             {alerts.map((alert, index) => (
               <div
                 key={index}
-                className={`rounded px-2 py-1 text-sm ${
+                className={`rounded-xs px-2 py-1 text-xs ${
                   alert.severity === "high"
                     ? "bg-danger-soft text-danger"
                     : alert.severity === "medium"
@@ -507,11 +507,11 @@ export function MangiaDashboardPage() {
       )}
 
       {/* Legend */}
-      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
-        <h4 className="text-sm font-semibold text-ink">
+      <div className="mt-6 rounded-sm border border-line bg-inset p-4">
+        <h4 className="text-xs font-semibold text-ink">
           How to read this board
         </h4>
-        <div className="mt-2 grid grid-cols-4 gap-4 text-sm text-ink-2">
+        <div className="mt-2 grid grid-cols-4 gap-4 text-xs text-ink-2">
           <div>
             <p className="font-medium text-ink">Today</p>
             <p>What's happening right now</p>

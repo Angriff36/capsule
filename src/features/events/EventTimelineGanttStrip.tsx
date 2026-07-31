@@ -50,9 +50,7 @@ export function GanttStrip({
             key={activity._id}
             className="grid grid-cols-[9rem_1fr] items-center gap-2"
           >
-            <span className="truncate text-[11.5px] text-ink-2">
-              {activity.name}
-            </span>
+            <span className="truncate text-xs text-ink-2">{activity.name}</span>
             <div className="relative h-4 rounded-xs bg-line/40">
               <div
                 className={`absolute top-0 h-4 rounded-xs ${BAR_COLORS[index % BAR_COLORS.length]}`}
@@ -65,7 +63,7 @@ export function GanttStrip({
       })}
       <div className="grid grid-cols-[9rem_1fr] gap-2 pt-1">
         <span />
-        <div className="flex justify-between font-mono text-[10px] text-ink-3">
+        <div className="flex justify-between font-mono text-2xs text-ink-3">
           <span>
             {formatDate(min)} {formatTime(min)}
           </span>

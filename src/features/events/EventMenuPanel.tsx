@@ -166,7 +166,7 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
     <section className="card space-y-4 p-4">
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg">Menu</h2>
-        <span className="text-[12px] text-ink-3">
+        <span className="text-sm text-ink-3">
           {selections.length} dishes
           {foodCostTotal > 0
             ? ` · est. food ${formatMoneyExact(foodCostTotal)}`

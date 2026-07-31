@@ -265,12 +265,12 @@ export function ClientsPage() {
       {host}
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="text-[13px] text-ink-2" role="status">
+        <p className="text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
       {dataLoaded && duplicateCandidates.length > 0 ? (
-        <div className="flex items-center gap-2 text-[12px] text-ink-2">
+        <div className="flex items-center gap-2 text-sm text-ink-2">
           <span className="chip border-warn/30 bg-warn-soft text-warn">
             {duplicateCandidates.length} possible duplicate
             {duplicateCandidates.length === 1 ? "" : "s"}
@@ -417,17 +417,17 @@ export function ClientsPage() {
                       <span className="font-medium">
                         {clientDisplayName(row._id, clients)}
                       </span>
-                      <span className="ml-2 text-[12px] text-ink-3">
+                      <span className="ml-2 text-sm text-ink-3">
                         {formatStatusLabel(String(row.clientType))}
                       </span>
                     </td>
-                    <td className="td text-[12px] text-ink-3">
+                    <td className="td text-sm text-ink-3">
                       {contactLine || "—"}
                     </td>
                     <td className="td text-right font-mono">
                       {stats.upcoming > 0 ? stats.upcoming : "—"}
                     </td>
-                    <td className="td font-mono text-[12px]">
+                    <td className="td font-mono text-sm">
                       {stats.lastPastAt > 0
                         ? formatDate(stats.lastPastAt)
                         : "—"}
@@ -440,7 +440,7 @@ export function ClientsPage() {
                     <td className="td">
                       <StatusChip status={String(row.status)} />
                     </td>
-                    <td className="td text-[12px] text-ink-2">
+                    <td className="td text-sm text-ink-2">
                       {Number(row.paymentTermsDays ?? 30)} days
                     </td>
                   </tr>

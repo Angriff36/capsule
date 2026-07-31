@@ -68,10 +68,10 @@ export function TimeOffRequestCard({
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="eyebrow text-brand">Time off</p>
-            <h2 className="mt-1 text-[18px] font-semibold tracking-[-0.02em]">
+            <h2 className="mt-1 text-xl font-semibold tracking-[-0.02em]">
               Request days away
             </h2>
-            <p className="mt-1 text-[12.5px] leading-relaxed text-ink-2">
+            <p className="mt-1 text-sm leading-relaxed text-ink-2">
               Send the dates and a short reason. Your manager will review it
               here; approved dates cannot be assigned a shift.
             </p>
@@ -108,7 +108,7 @@ export function TimeOffRequestCard({
             />
           </label>
           <button
-            className="btn btn-primary w-full py-3 text-[15px]"
+            className="btn btn-primary w-full py-3 text-lg"
             disabled={busy != null}
           >
             {busy === "submit-time-off" ? "Sending…" : "Send request"}
@@ -140,16 +140,16 @@ export function TimeOffRequestCard({
             {myRequests.slice(0, 6).map((request) => (
               <li key={request._id} className="py-3 first:pt-0 last:pb-0">
                 <div className="flex items-center justify-between gap-3">
-                  <p className="text-[13.5px] font-semibold">
+                  <p className="text-base font-semibold">
                     {requestRange(request.startsAt, request.endsAt)}
                   </p>
                   <StatusChip status={String(request.status)} />
                 </div>
-                <p className="mt-1 text-[12.5px] leading-relaxed text-ink-2">
+                <p className="mt-1 text-sm leading-relaxed text-ink-2">
                   {request.reason}
                 </p>
                 {request.responseNote ? (
-                  <p className="mt-1.5 rounded-xs bg-inset px-2 py-1.5 text-[12px] text-ink-2">
+                  <p className="mt-1.5 rounded-xs bg-inset px-2 py-1.5 text-sm text-ink-2">
                     Manager note: {request.responseNote}
                   </p>
                 ) : null}

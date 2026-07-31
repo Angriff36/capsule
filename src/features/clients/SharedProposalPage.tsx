@@ -137,22 +137,22 @@ export function SharedProposalPage({ token }: { token: string }) {
   return (
     <div className="min-h-screen bg-canvas py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-panel rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-panel rounded-sm shadow-lg overflow-hidden">
           <div className="border-b border-line bg-brand-soft px-8 py-6">
-            <h1 className="text-2xl font-bold text-brand">{proposal.title}</h1>
+            <h1 className="text-xl font-bold text-brand">{proposal.title}</h1>
             <p className="text-ink-2 mt-1">
               Prepared for {data.clientName}
               {proposal.proposalNumber ? ` · ${proposal.proposalNumber}` : ""}
             </p>
-            <p className="text-ink-3 text-xs mt-1">
+            <p className="text-ink-3 text-2xs mt-1">
               Revision {data.revisionNumber}
               {data.capturedAt ? ` · ${formatDate(data.capturedAt)}` : ""}
             </p>
           </div>
 
           <div className="p-8">
-            <div className="bg-inset rounded-lg p-6 mb-6">
-              <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-4">
+            <div className="bg-inset rounded-sm p-6 mb-6">
+              <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-4">
                 Event Details
               </h3>
               <div className="space-y-2">
@@ -180,8 +180,8 @@ export function SharedProposalPage({ token }: { token: string }) {
             </div>
 
             {venueLogisticsRows.length > 0 && (
-              <div className="bg-inset rounded-lg p-6 mb-6">
-                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-4">
+              <div className="bg-inset rounded-sm p-6 mb-6">
+                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-4">
                   Venue Logistics
                 </h3>
                 <div className="space-y-2">
@@ -199,7 +199,7 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {lineItems.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-3">
+                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
                   Pricing Breakdown
                 </h3>
                 <div className="divide-y divide-line">
@@ -210,7 +210,7 @@ export function SharedProposalPage({ token }: { token: string }) {
                     >
                       <div>
                         <p className="text-ink">{line.description}</p>
-                        <p className="text-xs text-ink-3">
+                        <p className="text-2xs text-ink-3">
                           {PRICING_BASIS_LABEL[line.pricingBasis] ??
                             line.pricingBasis}
                           {line.unit ? ` · ${line.unit}` : ""}
@@ -227,7 +227,7 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {enhancements.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-3">
+                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
                   Optional Enhancements
                 </h3>
                 <div className="divide-y divide-line">
@@ -239,7 +239,7 @@ export function SharedProposalPage({ token }: { token: string }) {
                       <div>
                         <p className="text-ink">{item.name}</p>
                         {item.description ? (
-                          <p className="text-xs text-ink-3">
+                          <p className="text-2xs text-ink-3">
                             {item.description}
                           </p>
                         ) : null}
@@ -254,14 +254,14 @@ export function SharedProposalPage({ token }: { token: string }) {
             )}
 
             <div className="bg-info-soft border-l-4 border-info p-6 mb-6 space-y-2">
-              <div className="flex justify-between text-sm">
+              <div className="flex justify-between text-xs">
                 <span className="text-ink-2">Subtotal</span>
                 <span className="font-medium">
                   {formatMoneyExact(proposal.subtotal ?? 0)}
                 </span>
               </div>
               {proposal.taxAmount > 0 && (
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs">
                   <span className="text-ink-2">Tax</span>
                   <span className="font-medium">
                     {formatMoneyExact(proposal.taxAmount ?? 0)}
@@ -269,7 +269,7 @@ export function SharedProposalPage({ token }: { token: string }) {
                 </div>
               )}
               {proposal.discountAmount > 0 && (
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs">
                   <span className="text-ink-2">Discount</span>
                   <span className="font-medium">
                     -{formatMoneyExact(proposal.discountAmount ?? 0)}
@@ -278,7 +278,7 @@ export function SharedProposalPage({ token }: { token: string }) {
               )}
               <div className="flex justify-between items-center pt-2 border-t border-info/40">
                 <span className="text-ink-2">Total</span>
-                <span className="text-2xl font-bold text-ink">
+                <span className="text-xl font-bold text-ink">
                   {formatMoneyExact(proposal.total ?? 0)}
                 </span>
               </div>
@@ -286,10 +286,10 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {proposal.terms && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-2">
+                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
                   Terms
                 </h3>
-                <p className="text-ink-2 text-sm whitespace-pre-wrap">
+                <p className="text-ink-2 text-xs whitespace-pre-wrap">
                   {proposal.terms}
                 </p>
               </div>
@@ -297,17 +297,17 @@ export function SharedProposalPage({ token }: { token: string }) {
 
             {proposal.notes && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-2">
+                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
                   Notes
                 </h3>
-                <p className="text-ink-2 text-sm whitespace-pre-wrap">
+                <p className="text-ink-2 text-xs whitespace-pre-wrap">
                   {proposal.notes}
                 </p>
               </div>
             )}
 
             <div className="mt-8 pt-6 border-t border-line text-center">
-              <p className="text-xs text-ink-3">
+              <p className="text-2xs text-ink-3">
                 {linkExpiresAt != null
                   ? `This link expires ${formatDate(linkExpiresAt)}. `
                   : ""}

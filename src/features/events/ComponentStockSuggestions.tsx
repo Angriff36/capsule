@@ -106,14 +106,12 @@ export function ComponentStockSuggestions() {
         onClick={() => setOpen((value) => !value)}
       >
         <span>
-          <span className="text-[15px] font-semibold">
-            Suggested from stock
-          </span>
-          <span className="ml-2 text-[13px] text-ink-2">
+          <span className="text-lg font-semibold">Suggested from stock</span>
+          <span className="ml-2 text-base text-ink-2">
             Components you can mostly make with ingredients already on hand
           </span>
         </span>
-        <span className="text-[13px] text-ink-3">{open ? "Hide" : "Show"}</span>
+        <span className="text-base text-ink-3">{open ? "Hide" : "Show"}</span>
       </button>
       {open ? (
         <div className="border-t border-line p-3">
@@ -123,7 +121,7 @@ export function ComponentStockSuggestions() {
               <Skeleton className="h-5" />
             </div>
           ) : suggestions.length === 0 ? (
-            <p className="text-[13px] text-ink-2">
+            <p className="text-base text-ink-2">
               No published components have ingredient coverage from current
               stock.
             </p>
@@ -137,13 +135,13 @@ export function ComponentStockSuggestions() {
                 >
                   <Link
                     to={componentPath(suggestion.componentId)}
-                    className="text-[14px] font-medium hover:underline"
+                    className="text-lg font-medium hover:underline"
                   >
                     {suggestion.name}
                   </Link>
-                  <span className="flex items-center gap-2 whitespace-nowrap font-mono text-[11px] text-ink-3">
+                  <span className="flex items-center gap-2 whitespace-nowrap font-mono text-xs text-ink-3">
                     <span
-                      className="inline-block h-1.5 w-24 overflow-hidden rounded bg-line"
+                      className="inline-block h-1.5 w-24 overflow-hidden rounded-xs bg-line"
                       aria-hidden
                     >
                       <span

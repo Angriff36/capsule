@@ -106,13 +106,11 @@ function LaborProvenance({
   labor: LaborSummary | null | undefined;
 }) {
   if (labor === undefined) {
-    return (
-      <span className="text-[11px] text-ink-3">Loading clocked time…</span>
-    );
+    return <span className="text-xs text-ink-3">Loading clocked time…</span>;
   }
   if (labor === null) {
     return (
-      <span className="text-[11px] text-ink-3">
+      <span className="text-xs text-ink-3">
         Clocked-time totals are available to finance, event, and workforce
         managers.
       </span>
@@ -120,14 +118,14 @@ function LaborProvenance({
   }
   if (labor.recordCount === 0) {
     return (
-      <span className="text-[11px] text-warn">
+      <span className="text-xs text-warn">
         No clocked time is attached to this event — staff clock-ins link to it
         via their assigned shift. Enter labor manually if time was not tracked.
       </span>
     );
   }
   return (
-    <span className="text-[11px] text-ink-3">
+    <span className="text-xs text-ink-3">
       {labor.recordCount} clocked shift{labor.recordCount === 1 ? "" : "s"} ·{" "}
       {(labor.totalMinutes / 60).toFixed(1)} h · ${labor.cost.toFixed(2)}
       {labor.peopleMissingRates.length > 0 ? (
@@ -170,7 +168,7 @@ export function CloseoutCaptureForm({
             <h2>Event closeout</h2>
           </div>
         </div>
-        <p className="text-[13px] text-ink-2">
+        <p className="text-base text-ink-2">
           No closed-out events are waiting for capture. Complete and close out
           an event from Events first.
         </p>

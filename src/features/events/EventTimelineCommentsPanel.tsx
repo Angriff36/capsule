@@ -78,7 +78,7 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
         authStatus === undefined ? (
           <Skeleton className="h-4 w-48" />
         ) : (
-          <p className="text-[13px] text-ink-3">
+          <p className="text-base text-ink-3">
             Your account isn&apos;t linked to a staff profile, so you can&apos;t
             post comments.
           </p>
@@ -100,7 +100,7 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
             });
           }}
         >
-          <p className="text-[12px] text-ink-3">Posting as {myName}</p>
+          <p className="text-sm text-ink-3">Posting as {myName}</p>
           <label className="field-label">
             <span>Comment</span>
             <textarea
@@ -124,8 +124,8 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
       <ul className="mt-3 divide-y divide-line-2 rounded-sm border border-line-2 bg-panel">
         {eventComments.map((comment) => (
           <li key={comment._id} className="px-3 py-2.5">
-            <p className="text-[13px] text-ink">{comment.body}</p>
-            <p className="mt-1 font-mono text-[11px] text-ink-3">
+            <p className="text-base text-ink">{comment.body}</p>
+            <p className="mt-1 font-mono text-xs text-ink-3">
               {comment.authorName}
               {comment.postedAt
                 ? ` · ${formatDate(comment.postedAt)} ${formatTime(comment.postedAt)}`
@@ -151,7 +151,7 @@ export function EventTimelineCommentsPanel({ eventId }: Props) {
           </li>
         ))}
         {eventComments.length === 0 ? (
-          <li className="px-3 py-3 text-[13px] text-ink-3">
+          <li className="px-3 py-3 text-base text-ink-3">
             No planning comments yet.
           </li>
         ) : null}

@@ -194,7 +194,7 @@ export function CommandPalette({
             if (e.key === "Enter") commands[active]?.run();
           }}
           placeholder="Search events, clients, invoices… (e.g. “unpaid invoices over 30 days”)"
-          className="h-11 w-full border-b border-line bg-transparent px-4 text-[14px] outline-none placeholder:text-ink-3"
+          className="h-11 w-full border-b border-line bg-transparent px-4 text-lg outline-none placeholder:text-ink-3"
         />
         <ul className="max-h-80 overflow-y-auto py-1.5">
           {commands.length === 0 && !searchLoading && (
@@ -216,7 +216,7 @@ export function CommandPalette({
                 <span className="text-ink-3">{c.icon}</span>
                 <span className="truncate">{c.label}</span>
                 {c.status ? <StatusChip status={c.status} /> : null}
-                <span className="ml-auto text-[10.5px] tracking-wider text-ink-3 uppercase">
+                <span className="ml-auto text-2xs tracking-wider text-ink-3 uppercase">
                   {c.hint}
                 </span>
               </button>

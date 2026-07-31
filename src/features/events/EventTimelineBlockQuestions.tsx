@@ -88,7 +88,7 @@ export function EventTimelineBlockQuestions({ eventId, activityId }: Props) {
             authStatus === undefined ? (
               <Skeleton className="h-4 w-48" />
             ) : (
-              <p className="text-[12px] text-ink-3">
+              <p className="text-sm text-ink-3">
                 Your account isn&apos;t linked to a staff profile, so you
                 can&apos;t post questions.
               </p>
@@ -132,8 +132,8 @@ export function EventTimelineBlockQuestions({ eventId, activityId }: Props) {
           <ul className="divide-y divide-line-2 rounded-sm border border-line-2 bg-canvas">
             {blockComments.map((comment) => (
               <li key={comment._id} className="px-2.5 py-2">
-                <p className="text-[12.5px] text-ink">{comment.body}</p>
-                <p className="mt-1 font-mono text-[10.5px] text-ink-3">
+                <p className="text-sm text-ink">{comment.body}</p>
+                <p className="mt-1 font-mono text-2xs text-ink-3">
                   {comment.authorName}
                   {comment.postedAt
                     ? ` · ${formatDate(comment.postedAt)} ${formatTime(comment.postedAt)}`
@@ -159,7 +159,7 @@ export function EventTimelineBlockQuestions({ eventId, activityId }: Props) {
               </li>
             ))}
             {blockComments.length === 0 ? (
-              <li className="px-2.5 py-2 text-[12px] text-ink-3">
+              <li className="px-2.5 py-2 text-sm text-ink-3">
                 No questions on this block yet.
               </li>
             ) : null}

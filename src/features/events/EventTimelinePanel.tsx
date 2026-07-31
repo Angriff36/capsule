@@ -295,7 +295,7 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
   return (
     <div className="space-y-3" data-testid="event-timeline-panel">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-2">
+        <p className="text-sm font-semibold uppercase tracking-[0.08em] text-ink-2">
           Event timeline{" "}
           <span className="font-mono text-ink-3 normal-case">
             {activities.length} {activities.length === 1 ? "entry" : "entries"}

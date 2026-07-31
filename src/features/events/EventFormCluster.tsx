@@ -10,9 +10,9 @@ type Props = {
 export function EventFormCluster({ title, hint, children }: Props) {
   return (
     <div className="rounded-sm border border-line-2 bg-panel p-3">
-      <p className="text-[13px] font-semibold text-ink">{title}</p>
+      <p className="text-base font-semibold text-ink">{title}</p>
       {hint ? (
-        <p className="mt-0.5 text-[11.5px] leading-snug text-ink-3">{hint}</p>
+        <p className="mt-0.5 text-xs leading-snug text-ink-3">{hint}</p>
       ) : null}
       <div className="mt-3 space-y-3">{children}</div>
     </div>

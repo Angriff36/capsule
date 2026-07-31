@@ -118,7 +118,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
     <Section title="Outbound webhooks">
       <div className="grid gap-5 p-4 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.8fr)]">
         <div>
-          <p className="max-w-2xl text-[13px] leading-relaxed text-ink-2">
+          <p className="max-w-2xl text-base leading-relaxed text-ink-2">
             Automatically notify another system — Zapier, Make, or something
             custom — whenever something you choose happens in Capsule. Each
             notification is signed with
@@ -133,7 +133,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
           ) : null}
           {notice ? (
             <p
-              className="card mt-4 border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok"
+              className="card mt-4 border-ok/30 bg-ok-soft px-4 py-3 text-base text-ok"
               role="status"
             >
               {notice}
@@ -165,7 +165,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
               />
             </label>
             <fieldset className="mt-1">
-              <legend className="mb-1 text-[12px] font-medium text-ink-2">
+              <legend className="mb-1 text-sm font-medium text-ink-2">
                 Events to send
               </legend>
               <div className="grid gap-2 sm:grid-cols-2">
@@ -174,7 +174,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                   return (
                     <label
                       key={entry.type}
-                      className={`flex cursor-pointer items-start gap-2 rounded-sm border border-line bg-inset px-3 py-2 text-[12px] ${
+                      className={`flex cursor-pointer items-start gap-2 rounded-sm border border-line bg-inset px-3 py-2 text-sm ${
                         checked ? "border-ok/50" : ""
                       }`}
                     >
@@ -189,10 +189,10 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                         <span className="font-medium text-ink">
                           {entry.label}
                         </span>
-                        <span className="mt-0.5 block text-[11px] text-ink-3">
+                        <span className="mt-0.5 block text-xs text-ink-3">
                           {entry.description}
                         </span>
-                        <span className="mt-0.5 block font-mono text-[10px] text-ink-3">
+                        <span className="mt-0.5 block font-mono text-2xs text-ink-3">
                           {entry.type}
                         </span>
                       </span>
@@ -210,7 +210,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                 disabled={!canManage || busy}
                 autoComplete="off"
               />
-              <span className="mt-1 block text-[11px] font-normal text-ink-3">
+              <span className="mt-1 block text-xs font-normal text-ink-3">
                 Stored encrypted. Verify the signature on the receiver to
                 confirm authenticity.
               </span>
@@ -238,14 +238,14 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                 {endpoints.map((endpoint) => (
                   <li
                     key={endpoint.endpointId}
-                    className="rounded-sm border border-line bg-panel p-3 text-[12px]"
+                    className="rounded-sm border border-line bg-panel p-3 text-sm"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <p className="font-semibold text-ink">
                           {endpoint.label}
                         </p>
-                        <p className="mt-0.5 truncate font-mono text-[11px] text-ink-3">
+                        <p className="mt-0.5 truncate font-mono text-xs text-ink-3">
                           {endpoint.url}
                         </p>
                       </div>
@@ -287,7 +287,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                         </span>
                       ) : null}
                     </div>
-                    <p className="mt-2 text-[11px] text-ink-3">
+                    <p className="mt-2 text-xs text-ink-3">
                       Registered {formatWhen(endpoint.registeredAt)}
                     </p>
                   </li>
@@ -306,11 +306,11 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                 hint="Deliveries appear here once an event fires."
               />
             ) : (
-              <ul className="mt-3 divide-y divide-line text-[12px]">
+              <ul className="mt-3 divide-y divide-line text-sm">
                 {deliveries.map((delivery) => (
                   <li key={delivery.deliveryId} className="py-2">
                     <div className="flex items-center justify-between gap-3">
-                      <span className="font-mono text-[11px] text-ink-3">
+                      <span className="font-mono text-xs text-ink-3">
                         {delivery.eventType}
                       </span>
                       <span
@@ -330,7 +330,7 @@ export function WebhooksSection({ canManage }: { canManage: boolean }) {
                       <span>{formatWhen(delivery.deliveredAt)}</span>
                     </div>
                     {delivery.error ? (
-                      <p className="mt-0.5 text-[11px] text-danger">
+                      <p className="mt-0.5 text-xs text-danger">
                         {delivery.error}
                       </p>
                     ) : null}

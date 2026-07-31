@@ -99,7 +99,7 @@ export function StatCard({
   return (
     <div
       className={clsx(
-        "rounded-lg border border-line bg-panel",
+        "rounded-sm border border-line bg-panel",
         TONE_STYLES[tone],
         SIZE_STYLES[size],
         className,
@@ -108,17 +108,17 @@ export function StatCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-sm font-medium text-ink-2">{title}</h3>
+            <h3 className="text-xs font-medium text-ink-2">{title}</h3>
             {isLive && (
               <span className="h-2 w-2 animate-pulse rounded-full bg-ok" />
             )}
           </div>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-2xl font-semibold tracking-tight">
+            <span className="text-xl font-semibold tracking-tight">
               {formatValue(main.value, main.format)}
             </span>
             {main.trend && (
-              <span className={clsx("text-sm font-medium", trendColor)}>
+              <span className={clsx("text-xs font-medium", trendColor)}>
                 {trendIcon} {Math.abs(main.trend.value)}%
               </span>
             )}
@@ -132,7 +132,7 @@ export function StatCard({
           {rows.map((row, index) => (
             <div
               key={index}
-              className="flex items-baseline justify-between text-sm"
+              className="flex items-baseline justify-between text-xs"
             >
               <span className="text-ink-2">{row.label}</span>
               <span className="font-medium">

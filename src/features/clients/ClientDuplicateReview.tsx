@@ -48,16 +48,16 @@ function AccountChoice({
           <strong className="block text-ink">
             {clientDisplayName(client._id, [client])}
           </strong>
-          <span className="mt-1 block text-[13px] text-ink-2">
+          <span className="mt-1 block text-base text-ink-2">
             {client.email || "No email"}
           </span>
-          <span className="mt-3 block text-[12px] text-ink-2">
+          <span className="mt-3 block text-sm text-ink-2">
             {counts.events} events · {counts.contacts} contacts ·{" "}
             {counts.communications} communications
           </span>
         </span>
       </span>
-      <span className="mt-3 block text-[12px] font-semibold uppercase tracking-wide text-ink-2">
+      <span className="mt-3 block text-sm font-semibold uppercase tracking-wide text-ink-2">
         {selected ? "Keep as primary" : "Merge this duplicate"}
       </span>
     </label>
@@ -103,7 +103,7 @@ export function ClientDuplicateReview({
         </div>
         <span>{candidates.length} to review</span>
       </div>
-      <p className="max-w-180 text-[13px] text-ink-2">
+      <p className="max-w-180 text-base text-ink-2">
         These pairs look like the same client entered twice. Review both before
         merging — everything from the duplicate moves to the client you keep.
       </p>
@@ -121,7 +121,7 @@ export function ClientDuplicateReview({
                   {" ↔ "}
                   {clientDisplayName(candidate.second._id, [candidate.second])}
                 </strong>
-                <p className="mt-1 text-[12px] text-ink-2">
+                <p className="mt-1 text-sm text-ink-2">
                   {candidate.reasons.join(" · ")} ·{" "}
                   {Math.round(candidate.confidence * 100)}% confidence
                 </p>
@@ -152,7 +152,7 @@ export function ClientDuplicateReview({
               onChoose={() => onChoosePrimary(String(selected.second._id))}
             />
           </div>
-          <p className="mt-4 text-[13px] text-ink-2">
+          <p className="mt-4 text-base text-ink-2">
             {duplicate && primary
               ? `Everything on ${clientDisplayName(duplicate._id, [duplicate])} — events, contacts, conversations, and billing — will move to ${clientDisplayName(primary._id, [primary])}. The duplicate goes away.`
               : "Choose which client to keep."}

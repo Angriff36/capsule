@@ -119,13 +119,13 @@ export function ProposalEnhancementsPanel({
   return (
     <div className="rounded-sm border border-line bg-inset p-4">
       <p className="eyebrow">Optional enhancements</p>
-      <p className="mt-1 text-[12px] text-ink-2">
+      <p className="mt-1 text-sm text-ink-2">
         Add-on upgrades the client may choose separately from the base proposal
         total.
         {editable ? " Add or remove items while the proposal is a draft." : ""}
       </p>
       {rows.length === 0 ? (
-        <p className="mt-2 text-[13px] text-ink-2">
+        <p className="mt-2 text-base text-ink-2">
           No optional enhancements on this proposal.
         </p>
       ) : (

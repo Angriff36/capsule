@@ -91,7 +91,7 @@ export function useActionPrompt(busy = false): {
     <div aria-live="polite" aria-atomic="true">
       {notice ? (
         <p
-          className="mt-3 rounded-sm border border-line bg-inset px-3 py-2 text-[12px] text-ink-2"
+          className="mt-3 rounded-sm border border-line bg-inset px-3 py-2 text-sm text-ink-2"
           role="status"
         >
           {notice}

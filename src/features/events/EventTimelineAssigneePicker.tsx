@@ -13,14 +13,24 @@ type Props = {
   readonly selection: TimelineAssigneeSelection;
   readonly staffOptions: readonly TimelineStaffOption[];
   readonly disabled?: boolean;
+  /** Already-formatted "who has this block", including any legacy
+   *  responsibleParty fallback. Shown on the collapsed row. */
+  readonly summaryLabel?: string;
   readonly onChange: (next: TimelineAssigneeSelection) => void;
 };
 
-/** Multi-select for Everyone/FOH/BOH plus event-staffed people. */
+/**
+ * Multi-select for Everyone/FOH/BOH plus event-staffed people.
+ *
+ * Collapsed by default: a run sheet is 20+ blocks, and an open checkbox list on
+ * every one of them buries the times and block names it is meant to annotate.
+ * Native <details> so it stays keyboard- and screen-reader-operable for free.
+ */
 export function EventTimelineAssigneePicker({
   selection,
   staffOptions,
   disabled = false,
+  summaryLabel,
   onChange,
 }: Props) {
   const teamSet = new Set(selection.teams);
@@ -48,19 +58,40 @@ export function EventTimelineAssigneePicker({
     });
   };
 
+  const chosen = summaryLabel?.trim()
+    ? summaryLabel.split(", ").filter(Boolean)
+    : [];
+  const summary =
+    chosen.length === 0
+      ? "Anyone"
+      : chosen.length <= 2
+        ? chosen.join(", ")
+        : `${chosen.slice(0, 2).join(", ")} +${chosen.length - 2}`;
+
   return (
-    <div
-      className="space-y-2 rounded-sm border border-line-2 bg-canvas px-2.5 py-2"
+    <details
+      className="group rounded-sm border border-line-2 bg-canvas px-2.5 py-1.5"
       data-testid="timeline-assignee-picker"
     >
-      <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">
-        Assigned to
-      </p>
-      <div className="flex flex-wrap gap-3">
+      <summary className="flex cursor-pointer list-none items-center gap-2 text-sm text-ink-2 marker:content-none">
+        <span className="text-xs font-semibold tracking-[0.06em] text-ink-3 uppercase">
+          Assigned to
+        </span>
+        <span className={chosen.length === 0 ? "text-ink-3" : "text-ink"}>
+          {summary}
+        </span>
+        <span className="ml-auto text-xs text-ink-3 group-open:hidden">
+          Edit
+        </span>
+        <span className="ml-auto hidden text-xs text-ink-3 group-open:inline">
+          Done
+        </span>
+      </summary>
+      <div className="mt-2 flex flex-wrap gap-3">
         {TIMELINE_ASSIGNEE_TEAMS.map((team) => (
           <label
             key={team}
-            className="inline-flex items-center gap-1.5 text-[12.5px] text-ink"
+            className="inline-flex items-center gap-1.5 text-sm text-ink"
           >
             <input
               type="checkbox"
@@ -74,15 +105,15 @@ export function EventTimelineAssigneePicker({
         ))}
       </div>
       {staffOptions.length === 0 ? (
-        <p className="text-[12px] text-ink-3">
+        <p className="mt-2 text-sm text-ink-3">
           No staff on this event yet — add people on the Staffing tab.
         </p>
       ) : (
-        <div className="flex max-h-36 flex-col gap-1.5 overflow-y-auto">
+        <div className="mt-2 flex max-h-36 flex-col gap-1.5 overflow-y-auto pb-1">
           {staffOptions.map((option) => (
             <label
               key={option.personId}
-              className="inline-flex items-center gap-1.5 text-[12.5px] text-ink"
+              className="inline-flex items-center gap-1.5 text-sm text-ink"
             >
               <input
                 type="checkbox"
@@ -96,6 +127,6 @@ export function EventTimelineAssigneePicker({
           ))}
         </div>
       )}
-    </div>
+    </details>
   );
 }

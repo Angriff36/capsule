@@ -31,7 +31,7 @@ export function EventMenuStockShortageBanner({
 }: Props) {
   if (shortages.length === 0) return null;
   return (
-    <div className="mt-4 card border-danger/40 px-3 py-3 text-[13px]">
+    <div className="mt-4 card border-danger/40 px-3 py-3 text-base">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <p className="font-medium text-danger">
@@ -59,7 +59,7 @@ export function EventMenuStockShortageBanner({
               return (
                 <li
                   key={`${row.ingredientId}:${row.unit}`}
-                  className="rounded-xl border border-danger/20 bg-paper px-3 py-3"
+                  className="rounded-sm border border-danger/20 bg-panel px-3 py-3"
                 >
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <strong className="text-ink">
@@ -70,7 +70,7 @@ export function EventMenuStockShortageBanner({
                         {ingredient?.name ?? row.ingredientId}
                       </CulinaryEntityLink>
                     </strong>
-                    <span className="font-mono text-[11px] text-danger">
+                    <span className="font-mono text-xs text-danger">
                       Short {row.shortageQuantity} {row.unit} · held{" "}
                       {row.reservedQuantity} of {row.requiredQuantity}
                     </span>
@@ -86,7 +86,7 @@ export function EventMenuStockShortageBanner({
                           key={suggestion.ingredientId}
                           className="grid gap-1 border-t border-line pt-2 sm:grid-cols-[2rem_1fr_auto] sm:items-center"
                         >
-                          <span className="font-mono text-[10px] text-ink-3">
+                          <span className="font-mono text-2xs text-ink-3">
                             #{index + 1}
                           </span>
                           <div>
@@ -96,13 +96,13 @@ export function EventMenuStockShortageBanner({
                             >
                               {suggestion.name}
                             </CulinaryEntityLink>
-                            <p className="mt-1 text-[11px] text-ink-3">
+                            <p className="mt-1 text-xs text-ink-3">
                               {suggestion.availableQuantity} {suggestion.unit}{" "}
                               available · covers {suggestion.coverageQuantity}{" "}
                               {suggestion.unit}
                             </p>
                           </div>
-                          <div className="flex flex-wrap gap-2 text-[11px]">
+                          <div className="flex flex-wrap gap-2 text-xs">
                             <span
                               className={
                                 suggestion.allergenCompatible
@@ -125,7 +125,7 @@ export function EventMenuStockShortageBanner({
                       ))}
                     </ol>
                   ) : (
-                    <p className="mt-2 text-[11px] text-ink-3">
+                    <p className="mt-2 text-xs text-ink-3">
                       {mappedCount
                         ? "Mapped substitutes have no unreserved stock in this unit."
                         : "No substitutes are mapped for this ingredient yet."}

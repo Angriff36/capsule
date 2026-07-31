@@ -126,12 +126,12 @@ export function AnnouncementsPage() {
         title="Announcements"
         lead="Post pinned banners (new policy, safety reminder, upcoming training) that every member sees until they expire or are dismissed."
         actions={
-          <span className="text-[12px] text-ink-3">{activeCount} active</span>
+          <span className="text-sm text-ink-3">{activeCount} active</span>
         }
       />
       <AdminWorkspaceNav />
       {!canManage ? (
-        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-[13px] text-warn">
+        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-base text-warn">
           Only organization managers can post or remove announcements. Members
           see them as banners and dismiss them individually.
         </div>
@@ -141,7 +141,7 @@ export function AnnouncementsPage() {
       ) : null}
       {notice ? (
         <p
-          className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok"
+          className="card border-ok/30 bg-ok-soft px-4 py-3 text-base text-ok"
           role="status"
         >
           {notice}
@@ -232,7 +232,7 @@ export function AnnouncementsPage() {
                 >
                   <div className="min-w-0 flex-1">
                     <p className="flex flex-wrap items-center gap-2">
-                      <span className="text-[13px] font-semibold text-ink">
+                      <span className="text-base font-semibold text-ink">
                         {row.title}
                       </span>
                       <span className="chip border-line-2 bg-inset text-ink-2">
@@ -253,10 +253,10 @@ export function AnnouncementsPage() {
                         </span>
                       )}
                     </p>
-                    <p className="mt-1 text-[12px] leading-relaxed whitespace-pre-wrap text-ink-2">
+                    <p className="mt-1 text-sm leading-relaxed whitespace-pre-wrap text-ink-2">
                       {row.body}
                     </p>
-                    <p className="mt-1 text-[10.5px] text-ink-3">
+                    <p className="mt-1 text-2xs text-ink-3">
                       Expires {dateFormat.format(row.expiresAt as number)}
                     </p>
                   </div>

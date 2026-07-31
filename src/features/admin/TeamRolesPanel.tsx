@@ -230,14 +230,14 @@ export function TeamRolesPanel({
   return (
     <Section title="Team roles" count={activePeople.length}>
       <div className="space-y-4 border-b border-line p-4">
-        <p className="max-w-3xl text-[12px] leading-relaxed text-ink-3">
+        <p className="max-w-3xl text-sm leading-relaxed text-ink-3">
           Capsule permissions come from the role on each hired team member once
           they are linked to a sign-in. Clerk only proves who signed in and
           which organization they belong to — it does not decide kitchen vs
           sales vs admin inside Capsule.
         </p>
         {user?.id ? (
-          <p className="text-[11px] text-ink-3">
+          <p className="text-xs text-ink-3">
             Your Clerk user id (paste when hiring yourself):{" "}
             <code className="font-mono text-ink-2">{user.id}</code>
           </p>
@@ -246,9 +246,7 @@ export function TeamRolesPanel({
           <ErrorState title="Team role update failed" detail={error} />
         ) : null}
         {notice ? (
-          <output className="banner banner-ok block text-[13px]">
-            {notice}
-          </output>
+          <output className="banner banner-ok block text-base">{notice}</output>
         ) : null}
       </div>
 
@@ -257,23 +255,23 @@ export function TeamRolesPanel({
           className="grid gap-3 border-b border-line p-4 sm:grid-cols-2 lg:grid-cols-3"
           onSubmit={(event) => void onHire(event)}
         >
-          <label className="block text-[12px]">
+          <label className="block text-sm">
             <span className="meta-term">First name</span>
             <input name="givenName" className="input mt-1" required />
           </label>
-          <label className="block text-[12px]">
+          <label className="block text-sm">
             <span className="meta-term">Last name</span>
             <input name="familyName" className="input mt-1" required />
           </label>
-          <label className="block text-[12px]">
+          <label className="block text-sm">
             <span className="meta-term">Email</span>
             <input name="email" type="email" className="input mt-1" required />
           </label>
-          <label className="block text-[12px]">
+          <label className="block text-sm">
             <span className="meta-term">Phone (for SMS alerts)</span>
             <input name="phone" type="tel" className="input mt-1" />
           </label>
-          <label className="block text-[12px]">
+          <label className="block text-sm">
             <span className="meta-term">Capsule role</span>
             <select name="role" className="input mt-1" defaultValue="admin">
               {PersonRoleDirectory.ASSIGNABLE_ROLES.map((role) => (
@@ -283,7 +281,7 @@ export function TeamRolesPanel({
               ))}
             </select>
           </label>
-          <label className="block text-[12px] sm:col-span-2">
+          <label className="block text-sm sm:col-span-2">
             <span className="meta-term">Link Clerk member</span>
             <select name="authSubjectId" className="input mt-1" defaultValue="">
               <option value="">Link later</option>
@@ -382,11 +380,11 @@ function TeamRolesTable({
                 <strong className="block text-ink">
                   {person.givenName} {person.familyName}
                 </strong>
-                <span className="mt-0.5 block text-[11px] text-ink-3">
+                <span className="mt-0.5 block text-xs text-ink-3">
                   {person.email} · {formatStatusLabel(person.status)}
                 </span>
               </td>
-              <td className="border-b border-line px-3 py-3 text-[11px]">
+              <td className="border-b border-line px-3 py-3 text-xs">
                 <PersonLinkCell
                   person={person}
                   canEdit={canEdit}
@@ -513,7 +511,7 @@ function PersonPayRateCell({
       <button type="submit" className="btn btn-ghost btn-sm" disabled={busy}>
         {busy ? "…" : "Set"}
       </button>
-      {hasRate ? null : <span className="text-[11px] text-warn">unset</span>}
+      {hasRate ? null : <span className="text-xs text-warn">unset</span>}
     </form>
   );
 }
@@ -546,7 +544,7 @@ function PersonLinkCell({
     return (
       <div className="grid gap-1">
         <span className="text-ink-2">{member?.name ?? "Linked account"}</span>
-        <code className="font-mono text-[10px] text-ink-3">
+        <code className="font-mono text-2xs text-ink-3">
           {person.authSubjectId}
         </code>
         {canEdit ? (

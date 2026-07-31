@@ -74,7 +74,7 @@ export function EventWeatherPanel({
               key={day.date}
               data-testid="event-weather-day"
               data-adverse={day.adverse ? "true" : "false"}
-              className={`rounded-sm border p-2.5 text-[12.5px] ${
+              className={`rounded-sm border p-2.5 text-sm ${
                 day.adverse
                   ? "border-warn/50 bg-warn-soft/50"
                   : "border-line-2 bg-panel"

@@ -41,7 +41,7 @@ export function PrepActionReasonForm({
           <h3 id={headingId} className="mt-1 text-base font-semibold text-ink">
             {isBlocking ? "Block prep line" : "Cancel prep line"}
           </h3>
-          <p id={helperId} className="mt-1 text-[12px] text-ink-2">
+          <p id={helperId} className="mt-1 text-sm text-ink-2">
             {isBlocking
               ? `Explain what is stopping ${taskName} so the next cook knows what to resolve.`
               : `Record why ${taskName} is being removed from the production sheet.`}

@@ -24,8 +24,8 @@ type Props = {
 function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-xs border border-line bg-inset/40 px-3 py-2">
-      <p className="text-[11px] uppercase tracking-wide text-ink-3">{label}</p>
-      <p className="font-mono text-[16px] text-ink">{value}</p>
+      <p className="text-xs uppercase tracking-wide text-ink-3">{label}</p>
+      <p className="font-mono text-xl text-ink">{value}</p>
     </div>
   );
 }
@@ -108,14 +108,14 @@ export function EventMarginTab({ eventId }: Props) {
     return <TableSkeleton rows={3} />;
   }
   if (event === null) {
-    return <p className="text-[13px] text-ink-2">Event unavailable.</p>;
+    return <p className="text-base text-ink-2">Event unavailable.</p>;
   }
 
   return (
     <section className="space-y-4" data-testid="event-margin-tab">
       <div>
         <h2 className="font-display text-lg">Margin</h2>
-        <p className="text-[13px] text-ink-2">
+        <p className="text-base text-ink-2">
           Food cost uses this event's estimated food cost. Labor and equipment
           use live committed figures when available.
         </p>

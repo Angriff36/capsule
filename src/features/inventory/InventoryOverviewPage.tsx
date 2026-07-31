@@ -222,7 +222,7 @@ export function InventoryOverviewPage() {
                     <span className="block truncate font-medium text-ink">
                       {row.title}
                     </span>
-                    <span className="block text-[12px] text-ink-3">
+                    <span className="block text-sm text-ink-3">
                       {row.detail}
                     </span>
                   </span>
@@ -240,7 +240,7 @@ export function InventoryOverviewPage() {
             <li key={link.path}>
               <Link to={link.path} className="block px-3 py-2.5 hover:bg-inset">
                 <span className="block font-medium text-ink">{link.label}</span>
-                <span className="block text-[12px] text-ink-3">
+                <span className="block text-sm text-ink-3">
                   {link.description}
                 </span>
               </Link>

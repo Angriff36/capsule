@@ -219,9 +219,9 @@ export function AllergenMatrixPage() {
           <header className="allergen-matrix-heading">
             <div>
               <p className="eyebrow">Allergen disclosure</p>
-              <h2 className="font-display mt-1 text-3xl">{scopeName}</h2>
+              <h2 className="font-display mt-1 text-2xl">{scopeName}</h2>
             </div>
-            <span className="font-mono text-[11px] text-ink-3">
+            <span className="font-mono text-xs text-ink-3">
               Prepared {formatDate(Date.now())} · {rows.length} dishes
             </span>
           </header>

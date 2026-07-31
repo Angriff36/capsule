@@ -340,7 +340,7 @@ export function MessageInboxPage() {
       <ClientsWorkspaceNav />
       {failure ? <FailureBanner failure={failure} /> : null}
       {notice ? (
-        <p className="mb-3 rounded-sm bg-ok-soft px-4 py-2 text-[13px] text-ok">
+        <p className="mb-3 rounded-sm bg-ok-soft px-4 py-2 text-base text-ok">
           {notice}
         </p>
       ) : null}
@@ -397,7 +397,7 @@ export function MessageInboxPage() {
             void submitEnvelope();
           }}
         >
-          <p className="text-[12px] text-ink-2">
+          <p className="text-sm text-ink-2">
             Paste the raw message data from your email, SMS, or social provider
             (JSON). Readable messages land in the right thread; anything that
             can't be read is saved to the review queue below instead of being
@@ -419,7 +419,7 @@ export function MessageInboxPage() {
                 ))}
             </select>
             <textarea
-              className="input font-mono text-[12px]"
+              className="input font-mono text-sm"
               rows={4}
               placeholder='{"threadId": "…", "messageId": "…", "from": "…", "body": "…"}'
               value={envJson}
@@ -469,20 +469,20 @@ export function MessageInboxPage() {
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[13px] font-medium">
+                      <span className="text-base font-medium">
                         {threadTitle(t)}
                       </span>
-                      <span className="rounded-full bg-brand-soft px-2 py-0.5 text-[10px] font-medium text-brand">
+                      <span className="rounded-full bg-brand-soft px-2 py-0.5 text-2xs font-medium text-brand">
                         {PROVIDER_LABEL[t.provider] ?? t.provider}
                       </span>
                     </div>
-                    <p className="text-[11px] text-ink-3">
+                    <p className="text-xs text-ink-3">
                       {contactName(t.contactId) ?? t.senderIdentity ?? "—"}
                       {leadName(t.leadId) ? ` · ${leadName(t.leadId)}` : ""}
                       {t.status === "archived" ? " · archived" : ""}
                     </p>
                     {lastAt > 0 ? (
-                      <p className="text-[10.5px] text-ink-3">
+                      <p className="text-2xs text-ink-3">
                         {timeFormat.format(lastAt)}
                       </p>
                     ) : null}
@@ -502,10 +502,10 @@ export function MessageInboxPage() {
               <>
                 <div className="flex flex-wrap items-center gap-2 border-b border-line-2 px-4 py-3">
                   <div className="mr-auto">
-                    <p className="text-[15px] font-semibold">
+                    <p className="text-lg font-semibold">
                       {threadTitle(selected)}
                     </p>
-                    <p className="text-[11px] text-ink-3">
+                    <p className="text-xs text-ink-3">
                       {PROVIDER_LABEL[selected.provider] ?? selected.provider}
                       {selected.providerAccountId
                         ? ` · ${selected.providerAccountId}`
@@ -615,7 +615,7 @@ export function MessageInboxPage() {
 
                 <div className="flex-1 space-y-2 overflow-y-auto px-4 py-3">
                   {threadMessages.length === 0 ? (
-                    <p className="text-[12px] text-ink-3">
+                    <p className="text-sm text-ink-3">
                       No messages yet. Reply or log an inbound below.
                     </p>
                   ) : (
@@ -630,10 +630,10 @@ export function MessageInboxPage() {
                               : "mr-auto border border-line-2 bg-panel"
                           }`}
                         >
-                          <p className="text-[13px] leading-relaxed whitespace-pre-wrap">
+                          <p className="text-base leading-relaxed whitespace-pre-wrap">
                             {m.bodyText}
                           </p>
-                          <p className="mt-1 text-[10.5px] text-ink-3">
+                          <p className="mt-1 text-2xs text-ink-3">
                             {m.createdAt ? formatTime(m.createdAt) : ""}
                             {m.senderIdentity ? ` · ${m.senderIdentity}` : ""}
                           </p>

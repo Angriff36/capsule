@@ -15,17 +15,15 @@ export function FailureBanner({
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-[12.5px] font-semibold text-danger">
-            {failure.title}
-          </p>
-          <p className="mt-0.5 text-[12px] leading-relaxed text-ink-2">
+          <p className="text-sm font-semibold text-danger">{failure.title}</p>
+          <p className="mt-0.5 text-sm leading-relaxed text-ink-2">
             {failure.detail}
           </p>
         </div>
         {onDismiss ? (
           <button
             type="button"
-            className="btn btn-ghost text-[12px]"
+            className="btn btn-ghost text-sm"
             onClick={onDismiss}
             aria-label="Dismiss"
           >
@@ -36,7 +34,7 @@ export function FailureBanner({
       {failure.action?.reload ? (
         <button
           type="button"
-          className="btn btn-ghost mt-2 text-[12px]"
+          className="btn btn-ghost mt-2 text-sm"
           onClick={() => window.location.reload()}
         >
           {failure.action.label}

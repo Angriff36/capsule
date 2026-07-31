@@ -86,13 +86,13 @@ function FormSection({
     <details className="card group" open={defaultOpen}>
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 select-none [&::-webkit-details-marker]:hidden">
         <span className="min-w-0">
-          <span className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase">
+          <span className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase">
             {title}
             <span className="ml-1.5 font-mono text-ink-3 normal-case">
               {count}
             </span>
           </span>
-          <span className="mt-0.5 block text-[11px] text-ink-3">{hint}</span>
+          <span className="mt-0.5 block text-xs text-ink-3">{hint}</span>
         </span>
         <ChevronRightIcon
           width={12}
@@ -300,7 +300,7 @@ export function EventCreatePage() {
     <div className="space-y-4">
       <Link
         to="/events"
-        className="inline-flex items-center gap-1.5 text-[12px] text-ink-3 hover:text-ink"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink"
       >
         <ArrowLeftIcon width={12} height={12} /> All events
       </Link>
@@ -410,7 +410,7 @@ export function EventCreatePage() {
                 <FieldError name="endsAt" errors={errors} touched={touched} />
               </label>
               <div className="grid gap-3 sm:col-span-2 sm:grid-cols-3">
-                <p className="text-[11px] font-medium tracking-[0.08em] text-ink-3 uppercase sm:col-span-3">
+                <p className="text-xs font-medium tracking-[0.08em] text-ink-3 uppercase sm:col-span-3">
                   Primary contact
                 </p>
                 <label className="field-label">
@@ -589,11 +589,11 @@ export function EventCreatePage() {
                   <Skeleton className="h-8" />
                 </div>
               ) : template === null ? (
-                <p className="p-3 text-[12px] text-ink-3">
+                <p className="p-3 text-sm text-ink-3">
                   This template no longer exists.
                 </p>
               ) : (
-                <div className="space-y-1.5 p-3 text-[12px] text-ink-2">
+                <div className="space-y-1.5 p-3 text-sm text-ink-2">
                   <p className="font-medium text-ink">{template.name}</p>
                   <p>
                     {String(template.clientType)} client ·{" "}
@@ -609,7 +609,7 @@ export function EventCreatePage() {
                   {template.notes ? (
                     <p className="text-ink-3">{template.notes}</p>
                   ) : null}
-                  <p className="pt-1 text-[11px] leading-relaxed text-ink-3">
+                  <p className="pt-1 text-xs leading-relaxed text-ink-3">
                     Headcount is pre-filled from this template. Adjust anything
                     before creating.
                   </p>
@@ -641,7 +641,7 @@ export function EventCreatePage() {
                     </select>
                   </label>
                   {activeClients.length === 0 ? (
-                    <p className="text-[12px] text-ink-3">
+                    <p className="text-sm text-ink-3">
                       No active client accounts are available.
                     </p>
                   ) : null}
@@ -687,13 +687,13 @@ export function EventCreatePage() {
                     </select>
                   </label>
                   {selectedVenue ? (
-                    <p className="text-[11.5px] leading-relaxed text-ink-3">
+                    <p className="text-xs leading-relaxed text-ink-3">
                       {venueAddress(selectedVenue) ?? "No address recorded"} ·
                       capacity {selectedVenue.capacity}
                     </p>
                   ) : null}
                   {activeVenues.length === 0 ? (
-                    <p className="text-[12px] text-ink-3">
+                    <p className="text-sm text-ink-3">
                       No active venues are available.
                     </p>
                   ) : null}
@@ -720,7 +720,7 @@ export function EventCreatePage() {
           >
             {busy === "event" ? "Creating event…" : "Create event"}
           </button>
-          <p className="text-[11px] leading-relaxed text-ink-3">
+          <p className="text-xs leading-relaxed text-ink-3">
             Creation is policy-checked by the generated Client, Venue, and Event
             commands. Any denial or guard failure appears above.
           </p>

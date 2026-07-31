@@ -63,7 +63,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="font-display text-lg">Event menu</h2>
-          <p className="text-[13px] text-ink-2">
+          <p className="text-base text-ink-2">
             Customer-facing dishes for this event — images, allergens, and
             servings.
           </p>
@@ -153,16 +153,16 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                   <div className="flex flex-wrap items-center gap-2">
                     <Link
                       to={dish ? dishPath(dish._id) : "#"}
-                      className="text-[15px] font-semibold hover:underline"
+                      className="text-lg font-semibold hover:underline"
                     >
                       {dish?.name ?? "Unknown dish"}
                     </Link>
                     <AllergenIconRow codes={dish?.allergenSummary} />
                   </div>
-                  <p className="text-[13px] text-ink-2">
+                  <p className="text-base text-ink-2">
                     {dish?.description || "No description yet."}
                   </p>
-                  <p className="font-mono text-[11px] text-ink-3">
+                  <p className="font-mono text-xs text-ink-3">
                     {selection.course || "Uncategorized"}
                     {" · "}
                     {selection.quantityServings} servings

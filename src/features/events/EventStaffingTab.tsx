@@ -123,7 +123,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
     <section className="space-y-4" data-testid="event-staffing-tab">
       <div>
         <h2 className="font-display text-lg">Staffing</h2>
-        <p className="text-[13px] text-ink-2">
+        <p className="text-base text-ink-2">
           Assign people, post open shifts for claim, and watch availability
           conflicts.
         </p>
@@ -201,7 +201,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
                 >
                   {person ? personLabel(person) : assignment.personId}
                 </Link>
-                <p className="font-mono text-[11px] text-ink-3">
+                <p className="font-mono text-xs text-ink-3">
                   {assignment.role}
                   {assignment.startsAt
                     ? ` · ${formatTime(assignment.startsAt)}`
@@ -235,14 +235,14 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
           );
         })}
         {eventAssignments.length === 0 ? (
-          <li className="px-3 py-3 text-[13px] text-ink-3">
+          <li className="px-3 py-3 text-base text-ink-3">
             No staff assigned yet.
           </li>
         ) : null}
       </ul>
 
       <div className="space-y-2">
-        <h3 className="text-[14px] font-semibold">Open / claimable shifts</h3>
+        <h3 className="text-lg font-semibold">Open / claimable shifts</h3>
         <form
           className="grid gap-2 sm:grid-cols-3"
           onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
@@ -287,7 +287,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
             >
               <div>
                 <p className="font-medium">{need.role}</p>
-                <p className="text-[12px] text-ink-3">
+                <p className="text-sm text-ink-3">
                   {need.description || "No description"}
                   {need.startsAt
                     ? ` · ${formatDate(need.startsAt)} ${formatTime(need.startsAt)}`
@@ -397,7 +397,7 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
             </li>
           ))}
           {eventNeeds.length === 0 ? (
-            <li className="px-3 py-3 text-[13px] text-ink-3">
+            <li className="px-3 py-3 text-base text-ink-3">
               No open shifts posted. Post one so eligible staff can claim it.
             </li>
           ) : null}

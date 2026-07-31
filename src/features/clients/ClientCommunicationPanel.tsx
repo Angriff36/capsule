@@ -190,19 +190,19 @@ export function ClientCommunicationPanelView({
       }
     >
       <div className="space-y-3 p-3">
-        <p className="max-w-180 text-[12px] leading-relaxed text-ink-2">
+        <p className="max-w-180 text-sm leading-relaxed text-ink-2">
           Calls, emails, and meetings stay together here so the next person
           knows what the client was told.
         </p>
 
         {target.kind === "contacts" && activeContacts.length === 0 ? (
-          <p className="rounded-xs border border-line bg-inset/40 p-3 text-[12px] text-ink-2">
+          <p className="rounded-xs border border-line bg-inset/40 p-3 text-sm text-ink-2">
             Add an active contact before recording a conversation.
           </p>
         ) : null}
         {failure ? <CrmFailureBanner error={failure} /> : null}
         {notice ? (
-          <p className="text-[12px] text-ok" role="status">
+          <p className="text-sm text-ok" role="status">
             {notice}
           </p>
         ) : null}
@@ -308,22 +308,22 @@ export function ClientCommunicationPanelView({
                     aria-hidden="true"
                   />
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                    <span className="chip border-brand/20 bg-sage-1/55 text-brand">
+                    <span className="chip border-brand/20 bg-sage/55 text-brand">
                       {mediumLabel(String(communication.medium))}
                     </span>
-                    <time className="font-mono text-[10px] text-ink-3">
+                    <time className="font-mono text-2xs text-ink-3">
                       {occurredLabel(communication.occurredAt)}
                     </time>
                     {contact ? (
-                      <span className="text-[11px] text-ink-3">
+                      <span className="text-xs text-ink-3">
                         with {contactName(contact)}
                       </span>
                     ) : null}
                   </div>
-                  <p className="mt-2 whitespace-pre-wrap text-[13px] leading-relaxed text-ink">
+                  <p className="mt-2 whitespace-pre-wrap text-base leading-relaxed text-ink">
                     {communication.summary}
                   </p>
-                  <p className="mt-2 text-[10px] font-medium uppercase tracking-[0.08em] text-ink-3">
+                  <p className="mt-2 text-2xs font-medium uppercase tracking-[0.08em] text-ink-3">
                     Added by {communication.authorName}
                   </p>
                 </article>

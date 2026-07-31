@@ -104,9 +104,9 @@ export function DishIngredientsPanel({ dishId }: Props) {
         <span>{rows.length} lines</span>
       </div>
 
-      {error ? <p className="text-[13px] text-danger">{error}</p> : null}
+      {error ? <p className="text-base text-danger">{error}</p> : null}
       {notice ? (
-        <p className="text-[13px] text-ok" role="status">
+        <p className="text-base text-ok" role="status">
           {notice}
         </p>
       ) : null}
@@ -129,10 +129,10 @@ export function DishIngredientsPanel({ dishId }: Props) {
               data-testid="dish-ingredient-row"
             >
               <div>
-                <p className="text-[14px] font-medium text-ink">
+                <p className="text-lg font-medium text-ink">
                   {ingredientName(String(line.ingredientId))}
                 </p>
-                <p className="font-mono text-[11px] text-ink-3">
+                <p className="font-mono text-xs text-ink-3">
                   {line.quantity} {String(line.unit)} per serving
                   {line.prepNotes ? ` · ${line.prepNotes}` : ""}
                 </p>
@@ -151,7 +151,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
       )}
 
       <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAdd}>
-        <label className="block text-[12px] sm:col-span-2">
+        <label className="block text-sm sm:col-span-2">
           <span className="meta-term">Ingredient</span>
           <select name="ingredientId" className="input mt-1" required>
             <option value="">Select an ingredient…</option>
@@ -164,7 +164,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
               ))}
           </select>
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Per serving</span>
           <input
             name="quantity"
@@ -176,7 +176,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
             className="input mt-1"
           />
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Unit</span>
           <select
             name="unit"
@@ -191,7 +191,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
             ))}
           </select>
         </label>
-        <label className="block text-[12px] sm:col-span-2">
+        <label className="block text-sm sm:col-span-2">
           <span className="meta-term">Prep note</span>
           <input
             name="prepNotes"

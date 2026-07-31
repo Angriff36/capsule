@@ -123,13 +123,13 @@ export function PersonalDataExportView({
       <AdminWorkspaceNav />
 
       {!canExport ? (
-        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-[13px] text-warn">
+        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-base text-warn">
           Only an organization admin can prepare personal data exports.
         </div>
       ) : null}
       {notice ? (
         <p
-          className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok"
+          className="card border-ok/30 bg-ok-soft px-4 py-3 text-base text-ok"
           role="status"
         >
           {notice}
@@ -199,7 +199,7 @@ export function PersonalDataExportView({
                               : "Client contact"}
                           </span>
                         </span>
-                        <span className="mt-1 block truncate text-[12px] text-ink-3">
+                        <span className="mt-1 block truncate text-sm text-ink-3">
                           {[subject.email, subject.detail, subject.status]
                             .filter(Boolean)
                             .join(" · ")}
@@ -236,7 +236,7 @@ export function PersonalDataExportView({
                   <h3 className="mt-1 font-display text-xl text-ink">
                     {dataPackage.subject.displayName}
                   </h3>
-                  <p className="mt-1 text-[12px] text-ink-3">
+                  <p className="mt-1 text-sm text-ink-3">
                     {recordCount} {recordCount === 1 ? "record" : "records"}{" "}
                     across {sections.length}{" "}
                     {sections.length === 1 ? "section" : "sections"}
@@ -260,14 +260,14 @@ export function PersonalDataExportView({
                 </div>
 
                 <div className="mt-4">
-                  <p className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase">
+                  <p className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase">
                     Included sections
                   </p>
                   <ul className="mt-2 grid gap-2 sm:grid-cols-2">
                     {sections.map(([name, records]) => (
                       <li
                         key={name}
-                        className="flex items-center justify-between rounded-xs border border-line px-3 py-2 text-[12px]"
+                        className="flex items-center justify-between rounded-xs border border-line px-3 py-2 text-sm"
                       >
                         <span className="text-ink-2">{labelSection(name)}</span>
                         <span className="font-mono text-ink-3">
@@ -278,7 +278,7 @@ export function PersonalDataExportView({
                   </ul>
                 </div>
 
-                <p className="mt-4 text-[11px] leading-relaxed text-ink-3">
+                <p className="mt-4 text-xs leading-relaxed text-ink-3">
                   JSON preserves the complete nested structure. CSV uses
                   section, record, field, and value columns so mixed record
                   types stay in one spreadsheet-safe file.

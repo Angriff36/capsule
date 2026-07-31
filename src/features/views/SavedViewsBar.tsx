@@ -146,7 +146,7 @@ export function SavedViewsBar<S>({
         </>
       ) : null}
       {error ? (
-        <span className="text-[12px] text-ink-3" role="status">
+        <span className="text-sm text-ink-3" role="status">
           {error}
         </span>
       ) : null}

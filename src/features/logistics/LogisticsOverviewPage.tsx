@@ -188,13 +188,13 @@ export function LogisticsOverviewPage() {
                     <span className="block truncate font-medium text-ink">
                       {row.title}
                     </span>
-                    <span className="block text-[12px] text-ink-3">
+                    <span className="block text-sm text-ink-3">
                       {row.detail}
                     </span>
                   </span>
                   <span className="flex items-center gap-2">
                     <span
-                      className={`text-[12px] ${row.tone === "danger" ? "text-danger" : "text-warn"}`}
+                      className={`text-sm ${row.tone === "danger" ? "text-danger" : "text-warn"}`}
                     >
                       {row.reason}
                     </span>
@@ -218,7 +218,7 @@ export function LogisticsOverviewPage() {
                 <span className="w-36 shrink-0 font-medium text-ink">
                   {section.label}
                 </span>
-                <span className="text-[12px] text-ink-2">
+                <span className="text-sm text-ink-2">
                   {SECTION_DESCRIPTIONS[section.key]}
                 </span>
               </Link>

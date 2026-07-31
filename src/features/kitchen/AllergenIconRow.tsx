@@ -29,7 +29,7 @@ export function AllergenIconRow({ codes, className }: Props) {
   if (resolved.length === 0) {
     return (
       <span
-        className={className ?? "text-[11px] text-ink-3"}
+        className={className ?? "text-xs text-ink-3"}
         aria-label="No allergens listed"
       >
         —
@@ -45,7 +45,7 @@ export function AllergenIconRow({ codes, className }: Props) {
       {resolved.map((allergen) => (
         <li key={allergen.code}>
           <span
-            className="inline-flex min-w-[1.5rem] items-center justify-center rounded-xs border border-line bg-inset px-1 py-0.5 font-mono text-[10px] font-semibold text-ink"
+            className="inline-flex min-w-[1.5rem] items-center justify-center rounded-xs border border-line bg-inset px-1 py-0.5 font-mono text-2xs font-semibold text-ink"
             title={allergen.label}
             aria-label={allergen.label}
           >

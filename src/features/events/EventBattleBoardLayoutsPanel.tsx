@@ -200,7 +200,7 @@ export function EventBattleBoardLayoutsPanel({ eventId }: Props) {
       ) : null}
 
       {eventSections.length === 0 ? (
-        <p className="text-[13px] text-ink-3">
+        <p className="text-base text-ink-3">
           No layout sections yet. Add Buffet, Bar, Parking, or another area.
         </p>
       ) : (

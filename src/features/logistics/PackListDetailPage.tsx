@@ -457,7 +457,7 @@ export function PackListDetailPage() {
       <LogisticsWorkspaceNav />
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
@@ -472,18 +472,18 @@ export function PackListDetailPage() {
       ) : null}
 
       {showTemplates && canAddItems ? (
-        <section className="mt-3 rounded-lg border border-line-2 bg-panel p-3">
+        <section className="mt-3 rounded-sm border border-line-2 bg-panel p-3">
           <div className="flex items-center justify-between">
             <p className="eyebrow">Generate from a template</p>
             <Link
-              className="text-link text-[13px]"
+              className="text-link text-base"
               to="/logistics/pack-templates"
             >
               Manage templates
             </Link>
           </div>
           {activeTemplates.length === 0 ? (
-            <p className="mt-2 text-[13px] text-ink-3">
+            <p className="mt-2 text-base text-ink-3">
               No active pack list templates yet.{" "}
               <Link className="link" to="/logistics/pack-templates">
                 Create one
@@ -498,18 +498,18 @@ export function PackListDetailPage() {
                 return (
                   <li
                     key={template._id}
-                    className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line-2 p-2"
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-sm border border-line-2 p-2"
                   >
                     <div>
                       <span className="font-medium text-ink">
                         {template.name}
                       </span>
                       {suggested ? (
-                        <span className="ml-2 rounded-full border border-ok/30 bg-ok-soft px-2 py-0.5 text-[11px] text-ok">
+                        <span className="ml-2 rounded-full border border-ok/30 bg-ok-soft px-2 py-0.5 text-xs text-ok">
                           Suggested for this event
                         </span>
                       ) : null}
-                      <span className="ml-2 text-[12px] text-ink-3">
+                      <span className="ml-2 text-sm text-ink-3">
                         {count} {count === 1 ? "item" : "items"}
                       </span>
                     </div>

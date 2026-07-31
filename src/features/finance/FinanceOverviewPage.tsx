@@ -255,7 +255,7 @@ export function FinanceOverviewPage() {
                 : formatMoney(paidThisMonth, functionalCurrencyCode)}
           </dd>
           {!loading && paymentsUnreadable ? (
-            <p className="mt-1 text-[11px] text-ink-3">
+            <p className="mt-1 text-xs text-ink-3">
               Requires finance access to read payments.
             </p>
           ) : null}
@@ -272,7 +272,7 @@ export function FinanceOverviewPage() {
         title="Needs attention"
         count={loading ? undefined : openRows.length}
         actions={
-          <Link className="text-link text-[12px]" to={FINANCE_ROUTES.invoices}>
+          <Link className="text-link text-sm" to={FINANCE_ROUTES.invoices}>
             All invoices
           </Link>
         }
@@ -304,7 +304,7 @@ export function FinanceOverviewPage() {
                     <p className="font-medium text-ink">
                       {row.invoiceNumber || "Draft invoice"}
                     </p>
-                    <p className="mt-0.5 text-[12px] text-ink-3">
+                    <p className="mt-0.5 text-sm text-ink-3">
                       {nameForClient(String(row.clientId))}
                       {row.dueDate != null
                         ? ` · due ${formatDate(Number(row.dueDate))} (${relativeDays(Number(row.dueDate))})`
@@ -312,7 +312,7 @@ export function FinanceOverviewPage() {
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[13px] text-ink-2">
+                    <span className="font-mono text-base text-ink-2">
                       {formatMoney(
                         Number(row.amountDue ?? 0),
                         normalizeCurrencyCode(
@@ -336,9 +336,7 @@ export function FinanceOverviewPage() {
             <li key={link.path} className="bg-panel">
               <Link className="block px-3 py-2.5 hover:bg-inset" to={link.path}>
                 <p className="font-medium text-ink">{link.label}</p>
-                <p className="mt-0.5 text-[12px] text-ink-3">
-                  {link.description}
-                </p>
+                <p className="mt-0.5 text-sm text-ink-3">{link.description}</p>
               </Link>
             </li>
           ))}

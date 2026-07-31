@@ -95,12 +95,12 @@ export function BulkActionBar({
       aria-label="Bulk actions"
     >
       <div className="card flex flex-wrap items-center gap-3 border-line bg-panel px-4 py-3 shadow-lg">
-        <span className="text-[13px] font-semibold text-ink">
+        <span className="text-base font-semibold text-ink">
           {count} {noun}
           {count === 1 ? "" : "s"} selected
         </span>
         {progress ? (
-          <span className="text-[12px] text-ink-2" aria-live="polite">
+          <span className="text-sm text-ink-2" aria-live="polite">
             Working… {progress.done}/{progress.total}
           </span>
         ) : null}

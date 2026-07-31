@@ -43,9 +43,9 @@ Runs toolchain pin check, typecheck, Prettier (`format:check`), secret scan, tes
 
 Live app: **https://capsule-tau-eight.vercel.app** (Vercel project `capsule`,
 team `ryans-projects-471134dd`, GitHub-linked, production branch `main`).
-Backend: Convex prod deployment **tangible-skunk-448**
-(https://tangible-skunk-448.convex.cloud — dashboard:
-https://dashboard.convex.dev/d/tangible-skunk-448). Auth: Clerk dev instance
+Backend: Convex prod deployment **impartial-mule-193**
+(https://impartial-mule-193.convex.cloud — dashboard:
+https://dashboard.convex.dev/d/impartial-mule-193). Auth: Clerk dev instance
 `golden-koi-11` (test keys — swap for a Clerk production instance before real
 customers).
 
@@ -55,7 +55,7 @@ The app is TWO deployables. Ship the backend first, then the frontend:
 2. **Backend (only if `convex/` output or `src/**/*.manifest` changed):**
    run `bun run manifest:regen` first when manifests changed, then
    `npx convex deploy -y` — pushes functions/schema/indexes to
-   tangible-skunk-448. Backend env vars live on the deployment:
+   impartial-mule-193. Backend env vars live on the deployment:
    `npx convex env set KEY value --prod` (CLERK_JWT_ISSUER_DOMAIN is already
    set to the golden-koi-11 issuer).
 3. **Frontend:** pushing/merging to `main` auto-deploys via the GitHub

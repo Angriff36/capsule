@@ -156,7 +156,7 @@ function CardMedia({
           storageId={item.primaryImageStorageId}
           alt={item.name}
           size="thumb"
-          className="rounded-[10px]"
+          className="rounded-sm"
         />
       </div>
     );

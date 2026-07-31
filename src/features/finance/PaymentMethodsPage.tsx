@@ -179,7 +179,7 @@ export function PaymentMethodsPage() {
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
@@ -194,7 +194,7 @@ export function PaymentMethodsPage() {
             </div>
           </div>
           {registeredClients.length === 0 ? (
-            <p className="text-[13px] text-ink-2">
+            <p className="text-base text-ink-2">
               No registered clients.{" "}
               <Link className="text-link" to={CLIENTS_ROUTES.root}>
                 Register a client

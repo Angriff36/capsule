@@ -31,7 +31,7 @@ export function KitchenCatalogCreateForm({ section, busy, onSubmit }: Props) {
       <div className="culinary-create-heading">
         <div>
           <p className="eyebrow">New record</p>
-          <h2 className="font-display text-2xl">
+          <h2 className="font-display text-xl">
             Add {KITCHEN_SECTION_SINGULAR[section]}
           </h2>
         </div>

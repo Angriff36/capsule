@@ -109,7 +109,7 @@ function SetupProgressRow({ item }: { readonly item: SetupItem }) {
   let action;
   if (item.ready === false) {
     const linkClass =
-      "inline-flex items-center gap-0.5 text-[12px] font-medium text-link";
+      "inline-flex items-center gap-0.5 text-sm font-medium text-link";
     action = item.fixTo.startsWith("#") ? (
       <a href={item.fixTo} className={linkClass}>
         {item.fixLabel}
@@ -123,14 +123,14 @@ function SetupProgressRow({ item }: { readonly item: SetupItem }) {
     );
   } else {
     action = (
-      <span className="text-[12px] text-ink-3">
+      <span className="text-sm text-ink-3">
         {item.ready === true ? "Ready" : "Checking…"}
       </span>
     );
   }
 
   return (
-    <li className="flex items-center justify-between gap-3 px-3 py-2.5 text-[13px]">
+    <li className="flex items-center justify-between gap-3 px-3 py-2.5 text-base">
       <span className="flex items-center gap-2">
         <SetupReadyIcon ready={item.ready} />
         <span className={item.ready === false ? "text-ink" : "text-ink-2"}>

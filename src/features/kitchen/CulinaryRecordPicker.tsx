@@ -58,7 +58,7 @@ export function CulinaryRecordPicker({
       </label>
       {exact && !excluded.has(exact._id) ? (
         <p
-          className="rounded-xs border border-warn/40 bg-warn/10 px-2 py-1.5 text-[12px] text-ink"
+          className="rounded-xs border border-warn/40 bg-warn/10 px-2 py-1.5 text-sm text-ink"
           role="status"
         >
           Likely existing match: <strong>{exact.name}</strong>
@@ -89,8 +89,8 @@ export function CulinaryRecordPicker({
               />
             ) : null}
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[14px] font-medium">{row.name}</p>
-              <p className="text-[11px] text-ink-3">
+              <p className="truncate text-lg font-medium">{row.name}</p>
+              <p className="text-xs text-ink-3">
                 Edition {row.editionNumber ?? 1}
                 {row.description ? ` · ${row.description.slice(0, 80)}` : ""}
               </p>

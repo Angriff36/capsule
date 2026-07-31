@@ -41,13 +41,13 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
     <header className="app-shell-header flex h-16 shrink-0 items-center gap-3 border-b border-line/70 bg-panel/95 px-5 max-sm:px-3">
       <Link
         to="/"
-        className="mr-1 hidden h-8 w-8 place-items-center rounded-full bg-brand font-display text-[17px] text-white max-md:grid"
+        className="mr-1 hidden h-8 w-8 place-items-center rounded-full bg-brand font-display text-xl text-white max-md:grid"
         aria-label="Capsule home"
       >
         C
       </Link>
       <details className="group relative hidden max-md:block">
-        <summary className="flex h-8 cursor-pointer list-none items-center rounded-xs border border-line px-2.5 text-[11px] font-medium text-ink-2 transition-colors hover:bg-inset [&::-webkit-details-marker]:hidden">
+        <summary className="flex h-8 cursor-pointer list-none items-center rounded-xs border border-line px-2.5 text-xs font-medium text-ink-2 transition-colors hover:bg-inset [&::-webkit-details-marker]:hidden">
           Menu
         </summary>
         <nav
@@ -58,7 +58,7 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
             <Link
               key={area.path}
               to={area.path}
-              className="flex h-9 items-center gap-2.5 rounded-xs px-2.5 text-[12px] text-ink-2 transition-colors hover:bg-inset hover:text-ink"
+              className="flex h-9 items-center gap-2.5 rounded-xs px-2.5 text-sm text-ink-2 transition-colors hover:bg-inset hover:text-ink"
             >
               <area.icon />
               {area.label}
@@ -137,19 +137,17 @@ function AccountMenu() {
           elements: {
             rootBox: "flex items-center",
             organizationSwitcherTrigger:
-              "h-8 rounded-xs border border-transparent px-2 text-[12px] text-ink-2 hover:border-line-2 hover:bg-inset",
+              "h-8 rounded-xs border border-transparent px-2 text-sm text-ink-2 hover:border-line-2 hover:bg-inset",
           },
         }}
       />
       <div className="text-right max-sm:hidden">
-        <p className="max-w-40 truncate text-[12px] leading-tight font-medium">
+        <p className="max-w-40 truncate text-sm leading-tight font-medium">
           {user?.fullName ??
             user?.primaryEmailAddress?.emailAddress ??
             "Account"}
         </p>
-        <p className="text-[10.5px] leading-tight text-ink-3">
-          {WORKSPACE_NAME}
-        </p>
+        <p className="text-2xs leading-tight text-ink-3">{WORKSPACE_NAME}</p>
       </div>
       <Link
         to="/settings/email"

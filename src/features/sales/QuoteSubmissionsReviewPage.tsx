@@ -121,7 +121,7 @@ export function QuoteSubmissionsReviewPage() {
           actions={
             <Link
               to="/clients/pipeline"
-              className="text-sm text-ink-2 hover:text-ink underline"
+              className="text-xs text-ink-2 hover:text-ink underline"
             >
               View lead pipeline →
             </Link>
@@ -134,13 +134,13 @@ export function QuoteSubmissionsReviewPage() {
         <FailureBanner failure={failure} onDismiss={() => setFailure(null)} />
       )}
       {partialErrors && (
-        <div className="mb-4 p-3 bg-warn-soft border border-warn/40 rounded-lg text-sm text-warn">
+        <div className="mb-4 p-3 bg-warn-soft border border-warn/40 rounded-sm text-xs text-warn">
           {partialErrors}
         </div>
       )}
 
       {lastConverted && (
-        <div className="mb-4 p-4 bg-ok-soft border border-ok/40 rounded-lg text-sm text-ok">
+        <div className="mb-4 p-4 bg-ok-soft border border-ok/40 rounded-sm text-xs text-ok">
           <p className="font-medium">
             Converted “{lastConverted.clientName}” into a lead, event, and draft
             proposal.
@@ -178,7 +178,7 @@ export function QuoteSubmissionsReviewPage() {
           {visible.map((sub) => (
             <div
               key={sub._id}
-              className="bg-panel border border-line rounded-lg p-4"
+              className="bg-panel border border-line rounded-sm p-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -191,18 +191,18 @@ export function QuoteSubmissionsReviewPage() {
                       color={STATUS_TONE[sub.status ?? "pending"]}
                     />
                   </div>
-                  <p className="text-sm text-ink-2 mt-1">
+                  <p className="text-xs text-ink-2 mt-1">
                     {sub.email}
                     {sub.phone ? ` · ${sub.phone}` : ""}
                   </p>
                 </div>
-                <div className="text-right text-sm text-ink-2 shrink-0">
+                <div className="text-right text-xs text-ink-2 shrink-0">
                   <div>
                     {sub.eventDate ? formatDate(sub.eventDate) : "No date"}
                   </div>
                   <div>{sub.guestCount ?? 0} guests</div>
                   {sub.submittedAt && (
-                    <div className="text-xs text-ink-3">
+                    <div className="text-2xs text-ink-3">
                       submitted {formatDate(sub.submittedAt)}
                     </div>
                   )}
@@ -210,7 +210,7 @@ export function QuoteSubmissionsReviewPage() {
               </div>
 
               {(sub.venueName || sub.venueAddress) && (
-                <p className="text-sm text-ink-2 mt-2">
+                <p className="text-xs text-ink-2 mt-2">
                   {[sub.venueName, sub.venueAddress]
                     .filter(Boolean)
                     .join(" — ")}
@@ -220,10 +220,10 @@ export function QuoteSubmissionsReviewPage() {
               {(sub.menuPreferences ||
                 sub.dietaryRestrictions ||
                 sub.notes) && (
-                <dl className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
+                <dl className="mt-2 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
                   {sub.menuPreferences && (
                     <div>
-                      <dt className="text-xs uppercase text-ink-3">
+                      <dt className="text-2xs uppercase text-ink-3">
                         Menu prefs
                       </dt>
                       <dd className="text-ink-2">{sub.menuPreferences}</dd>
@@ -231,13 +231,13 @@ export function QuoteSubmissionsReviewPage() {
                   )}
                   {sub.dietaryRestrictions && (
                     <div>
-                      <dt className="text-xs uppercase text-ink-3">Dietary</dt>
+                      <dt className="text-2xs uppercase text-ink-3">Dietary</dt>
                       <dd className="text-ink-2">{sub.dietaryRestrictions}</dd>
                     </div>
                   )}
                   {sub.notes && (
                     <div>
-                      <dt className="text-xs uppercase text-ink-3">Notes</dt>
+                      <dt className="text-2xs uppercase text-ink-3">Notes</dt>
                       <dd className="text-ink-2">{sub.notes}</dd>
                     </div>
                   )}
@@ -246,7 +246,7 @@ export function QuoteSubmissionsReviewPage() {
 
               {sub.status === "failed" &&
                 (sub.errorMessage || sub.processingErrors) && (
-                  <div className="mt-2 p-2 bg-danger-soft border border-danger/40 rounded text-xs text-danger">
+                  <div className="mt-2 p-2 bg-danger-soft border border-danger/40 rounded-xs text-2xs text-danger">
                     {sub.errorMessage && (
                       <div className="font-medium">{sub.errorMessage}</div>
                     )}
@@ -257,7 +257,7 @@ export function QuoteSubmissionsReviewPage() {
                 )}
 
               {sub.status === "completed" && sub.eventId && (
-                <p className="mt-3 text-sm">
+                <p className="mt-3 text-xs">
                   <Link
                     to={`/events/${sub.eventId}`}
                     className="text-ink-2 underline"

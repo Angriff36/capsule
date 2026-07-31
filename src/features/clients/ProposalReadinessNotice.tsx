@@ -70,7 +70,7 @@ export function ProposalReadinessNotice({
 
   return (
     <div
-      className="rounded-sm border border-line-2 bg-panel p-3 text-[12px]"
+      className="rounded-sm border border-line-2 bg-panel p-3 text-sm"
       data-testid="proposal-readiness-notice"
     >
       {provenance ? (

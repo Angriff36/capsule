@@ -86,7 +86,7 @@ export function IngredientNutritionEditor({
         </div>
         {!canEdit && <span>Reinstate to edit</span>}
       </div>
-      <p className="max-w-160 text-[13px] text-ink-2">
+      <p className="max-w-160 text-base text-ink-2">
         Values for one {ingredient.unit} of this ingredient. Components and
         menus aggregate these into per-portion panels. Leave a field blank when
         the value is unknown.
@@ -99,10 +99,7 @@ export function IngredientNutritionEditor({
         }}
       >
         {NUTRIENTS.map((nutrient) => (
-          <label
-            key={nutrient.key}
-            className="grid gap-1 text-[12px] text-ink-2"
-          >
+          <label key={nutrient.key} className="grid gap-1 text-sm text-ink-2">
             <span>
               {nutrient.label} ({nutrient.unit})
             </span>

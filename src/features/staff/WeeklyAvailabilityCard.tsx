@@ -63,7 +63,7 @@ export function WeeklyAvailabilityCard({
           {showAdd ? "Close" : "Add"}
         </button>
       </div>
-      <p className="mt-1 text-[12.5px] text-ink-3">
+      <p className="mt-1 text-sm text-ink-3">
         The days and hours you can generally work each week.
       </p>
       {showAdd ? (
@@ -87,7 +87,7 @@ export function WeeklyAvailabilityCard({
             <input name="until" className="input" type="time" required />
           </label>
           <button
-            className="btn btn-primary w-full py-3 text-[15px]"
+            className="btn btn-primary w-full py-3 text-lg"
             disabled={busy != null}
           >
             {busy === "weekly-declare" ? "Saving…" : "Save weekly availability"}
@@ -115,10 +115,10 @@ export function WeeklyAvailabilityCard({
           {mine.map((row) => (
             <li key={row._id} className="flex items-center gap-3 py-3">
               <div className="min-w-0 flex-1">
-                <p className="text-[14px] font-semibold">
+                <p className="text-lg font-semibold">
                   {DAY_NAMES[row.dayOfWeek] ?? `Day ${row.dayOfWeek}`}
                 </p>
-                <p className="text-[12.5px] text-ink-2">
+                <p className="text-sm text-ink-2">
                   {bandLabel(row.startMinute, row.endMinute)}
                 </p>
               </div>

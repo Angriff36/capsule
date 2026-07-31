@@ -124,7 +124,7 @@ export function KitchenCommandDeckTaskPanel({
                 storageId={dish.primaryImageStorageId}
                 alt={dish.name}
                 size="thumb"
-                className="rounded-[10px] shadow-md"
+                className="rounded-sm shadow-md"
               />
               <div className="kcd-dish-copy">
                 <div className="flex flex-wrap items-center gap-2">

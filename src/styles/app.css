@@ -47,6 +47,19 @@
 
   --radius-xs: 3px;
   --radius-sm: 5px;
+
+  /* Type scale — the ONLY text sizes in the app. Raw text-[Npx] is rejected by
+     scripts/check-type-scale.ts; add a step here instead of a one-off size.
+     Font-size only, no paired line-height: every call site inherits normal
+     leading, so a size change never also shifts vertical rhythm. */
+  --text-2xs: 10px;
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 13px;
+  --text-lg: 15px;
+  --text-xl: 18px;
+  --text-2xl: 24px;
+  --text-3xl: 28px;
 }
 
 /* Dark scheme — same editorial palette shifted to lamplight: deep green-black
@@ -166,7 +179,7 @@
     @apply border-danger/40 bg-panel text-danger hover:bg-danger-soft;
   }
   .btn-sm {
-    @apply h-6.5 px-2 text-[12px];
+    @apply h-6.5 px-2 text-sm;
   }
   .input {
     @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink placeholder:text-ink-3 focus:border-accent;
@@ -178,35 +191,35 @@
     @apply cursor-pointer;
   }
   .field-label {
-    @apply grid gap-1 text-[11px] font-medium tracking-[0.02em] text-ink-2;
+    @apply grid gap-1 text-xs font-medium tracking-[0.02em] text-ink-2;
   }
   .chip {
-    @apply inline-flex h-[19px] items-center gap-1 rounded-full border px-2 text-[10px] font-semibold tracking-[0.07em] uppercase;
+    @apply inline-flex h-[19px] items-center gap-1 rounded-full border px-2 text-2xs font-semibold tracking-[0.07em] uppercase;
   }
   .card {
     @apply rounded-sm border border-line bg-panel;
   }
   .th {
-    @apply border-b border-line-2 px-3 py-2 text-left text-[10.5px] font-semibold tracking-[0.08em] whitespace-nowrap text-ink-3 uppercase;
+    @apply border-b border-line-2 px-3 py-2 text-left text-2xs font-semibold tracking-[0.08em] whitespace-nowrap text-ink-3 uppercase;
   }
   .td {
     @apply h-9 border-b border-line px-3 py-0 align-middle whitespace-nowrap;
   }
   .kbd {
-    @apply inline-flex h-[17px] min-w-[17px] items-center justify-center rounded-xs border border-line-2 bg-inset px-1 font-mono text-[10px] text-ink-2;
+    @apply inline-flex h-[17px] min-w-[17px] items-center justify-center rounded-xs border border-line-2 bg-inset px-1 font-mono text-2xs text-ink-2;
   }
   .label {
-    @apply mb-1 block text-[11px] font-semibold tracking-[0.05em] text-ink-2 uppercase;
+    @apply mb-1 block text-xs font-semibold tracking-[0.05em] text-ink-2 uppercase;
   }
   .meta-term {
-    @apply text-[10.5px] font-semibold tracking-[0.08em] text-ink-3 uppercase;
+    @apply text-2xs font-semibold tracking-[0.08em] text-ink-3 uppercase;
   }
 
   .font-display {
     font-family: var(--font-display);
   }
   .eyebrow {
-    @apply text-[9.5px] font-semibold tracking-[0.18em] text-ink-3 uppercase;
+    @apply text-2xs font-semibold tracking-[0.18em] text-ink-3 uppercase;
   }
   .display-title {
     font-family: var(--font-display);
@@ -225,7 +238,7 @@
     line-height: 0.98;
   }
   .text-link {
-    @apply items-center gap-2 text-[11px] font-semibold tracking-[0.04em] text-brand uppercase transition-colors hover:text-accent-deep;
+    @apply items-center gap-2 text-xs font-semibold tracking-[0.04em] text-brand uppercase transition-colors hover:text-accent-deep;
   }
 
   /* The following classes were used across features before they were ever
@@ -235,19 +248,19 @@
     @apply text-brand hover:underline;
   }
   .btn-link {
-    @apply inline-flex cursor-pointer items-center gap-1 text-[12px] font-medium text-brand hover:underline disabled:cursor-not-allowed disabled:opacity-45;
+    @apply inline-flex cursor-pointer items-center gap-1 text-sm font-medium text-brand hover:underline disabled:cursor-not-allowed disabled:opacity-45;
   }
   .btn-link-compact {
-    @apply text-[11px];
+    @apply text-xs;
   }
   .btn-lg {
-    @apply h-9 px-4 text-[13px];
+    @apply h-9 px-4 text-base;
   }
   .empty-state {
-    @apply px-4 py-8 text-center text-[12.5px] text-ink-3;
+    @apply px-4 py-8 text-center text-sm text-ink-3;
   }
   .banner {
-    @apply block rounded-sm border px-3 py-2.5 text-[12.5px];
+    @apply block rounded-sm border px-3 py-2.5 text-sm;
   }
   .banner-ok {
     @apply border-ok/40 bg-ok-soft text-ok;
@@ -269,11 +282,11 @@
     @apply mt-4 flex items-center justify-end gap-2;
   }
   .checkbox-group {
-    @apply flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[12px];
+    @apply flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm;
   }
   .checkbox-label,
   .supply-check {
-    @apply inline-flex cursor-pointer items-center gap-1.5 text-[12px] text-ink-2;
+    @apply inline-flex cursor-pointer items-center gap-1.5 text-sm text-ink-2;
   }
   .supply-form-actions {
     @apply mt-3 flex flex-wrap items-center gap-2;
@@ -282,19 +295,19 @@
     @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink placeholder:text-ink-3 focus:border-accent;
   }
   .field-hint {
-    @apply mt-1 text-[11px] text-ink-3;
+    @apply mt-1 text-xs text-ink-3;
   }
   .field-label-text {
-    @apply text-[10.5px] font-semibold tracking-[0.08em] text-ink-3 uppercase;
+    @apply text-2xs font-semibold tracking-[0.08em] text-ink-3 uppercase;
   }
   .form-summary {
-    @apply rounded-xs border border-line bg-inset px-3 py-2 text-[12px] text-ink-2;
+    @apply rounded-xs border border-line bg-inset px-3 py-2 text-sm text-ink-2;
   }
   .supply-detail-list {
-    @apply grid gap-2 text-[12.5px];
+    @apply grid gap-2 text-sm;
   }
   .supply-detail-list dt {
-    @apply text-[10.5px] font-semibold tracking-[0.08em] text-ink-3 uppercase;
+    @apply text-2xs font-semibold tracking-[0.08em] text-ink-3 uppercase;
   }
   .supply-detail-list dd {
     @apply text-ink;

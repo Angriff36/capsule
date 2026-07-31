@@ -191,7 +191,7 @@ export function ContractsPage() {
       <ClientsWorkspaceNav />
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
@@ -206,7 +206,7 @@ export function ContractsPage() {
             </div>
           </div>
           {activeClients.length === 0 || draftableEvents.length === 0 ? (
-            <p className="text-[13px] text-ink-2">
+            <p className="text-base text-ink-2">
               You need an active client and an open event first.{" "}
               <Link className="text-link" to={CLIENTS_ROUTES.root}>
                 Clients

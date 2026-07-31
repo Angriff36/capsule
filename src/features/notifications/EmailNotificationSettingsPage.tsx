@@ -175,8 +175,8 @@ export function EmailNotificationSettingsPage() {
           <div className="flex items-end justify-between gap-4 border-b border-line-2 pb-5">
             <div>
               <p className="eyebrow">Personal delivery board</p>
-              <h2 className="mt-2 font-display text-2xl">Your inbox mix</h2>
-              <p className="mt-2 max-w-lg text-[13px] leading-relaxed text-ink-2">
+              <h2 className="mt-2 font-display text-xl">Your inbox mix</h2>
+              <p className="mt-2 max-w-lg text-base leading-relaxed text-ink-2">
                 Sent to{" "}
                 {user?.primaryEmailAddress?.emailAddress ??
                   "your account email"}
@@ -184,10 +184,10 @@ export function EmailNotificationSettingsPage() {
               </p>
             </div>
             <div className="shrink-0 text-right">
-              <strong className="font-mono text-2xl text-brand">
+              <strong className="font-mono text-xl text-brand">
                 {enabledCount}/4
               </strong>
-              <span className="block text-[10px] tracking-[0.12em] text-ink-3 uppercase">
+              <span className="block text-2xs tracking-[0.12em] text-ink-3 uppercase">
                 channels live
               </span>
             </div>
@@ -200,7 +200,7 @@ export function EmailNotificationSettingsPage() {
           ) : null}
           {notice ? (
             <p
-              className="mt-4 rounded-xs border border-ok/30 bg-ok-soft px-4 py-3 text-[12.5px] text-ok"
+              className="mt-4 rounded-xs border border-ok/30 bg-ok-soft px-4 py-3 text-sm text-ok"
               role="status"
             >
               {notice}
@@ -220,7 +220,7 @@ export function EmailNotificationSettingsPage() {
                   className="grid grid-cols-[38px_minmax(0,1fr)_auto] items-center gap-3 py-5"
                   data-testid={`email-category-${category}`}
                 >
-                  <span className="grid h-8 w-8 place-items-center rounded-full border border-line-2 bg-inset font-mono text-[10px] font-bold text-ink-2">
+                  <span className="grid h-8 w-8 place-items-center rounded-full border border-line-2 bg-inset font-mono text-2xs font-bold text-ink-2">
                     0{index + 1}
                   </span>
                   <div className="min-w-0">
@@ -231,10 +231,10 @@ export function EmailNotificationSettingsPage() {
                     >
                       {detail.label}
                     </button>
-                    <p className="mt-1 text-[12px] leading-relaxed text-ink-2">
+                    <p className="mt-1 text-sm leading-relaxed text-ink-2">
                       {detail.description}
                     </p>
-                    <p className="mt-1 font-mono text-[9.5px] tracking-[0.09em] text-ink-3 uppercase">
+                    <p className="mt-1 font-mono text-2xs tracking-[0.09em] text-ink-3 uppercase">
                       {detail.cadence}
                     </p>
                   </div>
@@ -271,11 +271,11 @@ export function EmailNotificationSettingsPage() {
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="eyebrow">Branded HTML preview</p>
-              <h2 className="mt-2 font-display text-2xl">
+              <h2 className="mt-2 font-display text-xl">
                 {EMAIL_NOTIFICATION_CATEGORY_DETAILS[previewCategory].label}
               </h2>
             </div>
-            <span className="rounded-full border border-line-2 bg-panel px-3 py-1.5 font-mono text-[9px] tracking-[0.1em] text-ink-3 uppercase">
+            <span className="rounded-full border border-line-2 bg-panel px-3 py-1.5 font-mono text-2xs tracking-[0.1em] text-ink-3 uppercase">
               Server rendered
             </span>
           </div>
@@ -298,13 +298,13 @@ export function EmailNotificationSettingsPage() {
                 data-testid="email-preview-paused"
               >
                 <div className="max-w-sm">
-                  <span className="mx-auto grid h-12 w-12 place-items-center rounded-full border border-line-2 bg-panel font-mono text-[11px] text-ink-3">
+                  <span className="mx-auto grid h-12 w-12 place-items-center rounded-full border border-line-2 bg-panel font-mono text-xs text-ink-3">
                     OFF
                   </span>
-                  <h3 className="mt-5 font-display text-2xl">
+                  <h3 className="mt-5 font-display text-xl">
                     This email is paused
                   </h3>
-                  <p className="mt-3 text-[13px] leading-relaxed text-ink-2">
+                  <p className="mt-3 text-base leading-relaxed text-ink-2">
                     Nothing is being sent for this category right now. Turn it
                     back on whenever you want these summaries again.
                   </p>

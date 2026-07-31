@@ -157,7 +157,7 @@ export function EventAllergenBriefingPage() {
             <h1 className="text-xl font-semibold">
               Allergen briefing · {event.title}
             </h1>
-            <p className="mt-1 text-[13px] text-ink-2">
+            <p className="mt-1 text-base text-ink-2">
               {event.startsAt != null
                 ? `${formatDate(event.startsAt)} ${formatTime(event.startsAt)}`
                 : "Date TBD"}
@@ -176,10 +176,10 @@ export function EventAllergenBriefingPage() {
           <>
             {conflicts.length ? (
               <section className="mt-6 break-inside-avoid rounded-xs border border-warn/40 bg-warn-soft/50 p-3">
-                <h2 className="text-[13px] font-semibold uppercase tracking-wide">
+                <h2 className="text-base font-semibold uppercase tracking-wide">
                   Watch list — guest allergen on the menu
                 </h2>
-                <ul className="mt-2 space-y-1 text-[13px]">
+                <ul className="mt-2 space-y-1 text-base">
                   {conflicts.map((conflict, index) => (
                     <li key={index}>
                       <strong>{conflict.guestName}</strong> —{" "}
@@ -192,17 +192,17 @@ export function EventAllergenBriefingPage() {
             ) : null}
 
             <section className="mt-6 break-inside-avoid">
-              <h2 className="border-b border-line-2 pb-1 text-[13px] font-semibold uppercase tracking-wide">
+              <h2 className="border-b border-line-2 pb-1 text-base font-semibold uppercase tracking-wide">
                 Menu &amp; allergens
               </h2>
               {menu.length === 0 ? (
-                <p className="mt-2 text-[13px] text-ink-2">
+                <p className="mt-2 text-base text-ink-2">
                   No dishes are on this event&rsquo;s menu yet.
                 </p>
               ) : (
-                <table className="mt-2 w-full text-left text-[13px]">
+                <table className="mt-2 w-full text-left text-base">
                   <thead>
-                    <tr className="border-b border-line-2 text-[11px] uppercase tracking-wide text-ink-2">
+                    <tr className="border-b border-line-2 text-xs uppercase tracking-wide text-ink-2">
                       <th className="py-1 pr-3 font-medium">Course</th>
                       <th className="py-1 pr-3 font-medium">Dish</th>
                       <th className="py-1 pr-3 font-medium">Allergens</th>
@@ -221,7 +221,7 @@ export function EventAllergenBriefingPage() {
                         <td className="py-1.5 pr-3">
                           {dish?.name ?? "Unknown dish"}
                           {row.specialInstructions ? (
-                            <span className="block text-[11.5px] text-ink-2">
+                            <span className="block text-xs text-ink-2">
                               {row.specialInstructions}
                             </span>
                           ) : null}
@@ -244,16 +244,16 @@ export function EventAllergenBriefingPage() {
             </section>
 
             <section className="mt-6 break-inside-avoid">
-              <h2 className="border-b border-line-2 pb-1 text-[13px] font-semibold uppercase tracking-wide">
+              <h2 className="border-b border-line-2 pb-1 text-base font-semibold uppercase tracking-wide">
                 Guest dietary restrictions
               </h2>
               {flaggedGuests.length === 0 ? (
-                <p className="mt-2 text-[13px] text-ink-2">
+                <p className="mt-2 text-base text-ink-2">
                   No guest dietary restrictions were captured at booking. Record
                   them on the event&rsquo;s Guests tab as RSVPs come in.
                 </p>
               ) : (
-                <ul className="mt-2 space-y-1.5 text-[13px]">
+                <ul className="mt-2 space-y-1.5 text-base">
                   {flaggedGuests.map((guest) => (
                     <li key={guest._id}>
                       <strong>{guest.name}</strong>
@@ -279,7 +279,7 @@ export function EventAllergenBriefingPage() {
               )}
             </section>
 
-            <footer className="mt-8 border-t border-line-2 pt-2 text-[11px] text-ink-2">
+            <footer className="mt-8 border-t border-line-2 pt-2 text-xs text-ink-2">
               Generated from Capsule · Event ref {event._id} · Review together
               at the pre-event huddle before service.
             </footer>

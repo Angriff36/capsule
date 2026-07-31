@@ -166,14 +166,14 @@ export function StripeConnectSection() {
   return (
     <Section title="Stripe payments">
       <div className="grid gap-4 p-4">
-        <p className="text-[12px] text-ink-2">
+        <p className="text-sm text-ink-2">
           Card and bank payments for your invoices. Money goes straight to your
           own Stripe account — Capsule never holds it.
         </p>
 
         {error ? <ErrorState title="Stripe" detail={error} /> : null}
         {notice ? (
-          <p className="text-[12px] text-ok" role="status">
+          <p className="text-sm text-ok" role="status">
             {notice}
           </p>
         ) : null}
@@ -183,19 +183,17 @@ export function StripeConnectSection() {
             {chipLabel(current)}
           </StatusChip>
           {current.displayName ? (
-            <span className="text-[12px] text-ink-2">
-              {current.displayName}
-            </span>
+            <span className="text-sm text-ink-2">{current.displayName}</span>
           ) : null}
           {current.externalAccountId ? (
-            <code className="font-mono text-[11px] text-ink-3">
+            <code className="font-mono text-xs text-ink-3">
               {current.externalAccountId}
             </code>
           ) : null}
         </div>
 
         {current.status === "connected" && !current.chargesEnabled ? (
-          <p className="text-[12px] text-warn">
+          <p className="text-sm text-warn">
             Stripe needs more details before this account can accept payments.
             Continue onboarding, then refresh.
           </p>
@@ -203,13 +201,13 @@ export function StripeConnectSection() {
         {current.status === "connected" &&
         current.chargesEnabled &&
         !current.payoutsEnabled ? (
-          <p className="text-[12px] text-warn">
+          <p className="text-sm text-warn">
             Payments are enabled, but Stripe has not enabled payouts yet — add
             your bank details in Stripe to receive the money.
           </p>
         ) : null}
         {current.lastErrorMessage ? (
-          <p className="text-[12px] text-danger">{current.lastErrorMessage}</p>
+          <p className="text-sm text-danger">{current.lastErrorMessage}</p>
         ) : null}
 
         <div className="flex flex-wrap gap-2">
@@ -248,7 +246,7 @@ export function StripeConnectSection() {
         </div>
 
         {!canManage ? (
-          <p className="text-[12px] text-ink-3">
+          <p className="text-sm text-ink-3">
             Ask an admin to connect Stripe for this workspace.
           </p>
         ) : null}

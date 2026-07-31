@@ -136,9 +136,9 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         <span>{rows.length} tasks</span>
       </div>
 
-      {error ? <p className="text-[13px] text-danger">{error}</p> : null}
+      {error ? <p className="text-base text-danger">{error}</p> : null}
       {notice ? (
-        <p className="text-[13px] text-ok" role="status">
+        <p className="text-base text-ok" role="status">
           {notice}
         </p>
       ) : null}
@@ -165,10 +165,8 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                 data-testid="dish-prep-template-row"
               >
                 <div>
-                  <p className="text-[14px] font-medium text-ink">
-                    {task.name}
-                  </p>
-                  <p className="font-mono text-[11px] text-ink-3">
+                  <p className="text-lg font-medium text-ink">{task.name}</p>
+                  <p className="font-mono text-xs text-ink-3">
                     {task.category} · {task.taskType}
                     {task.station ? ` · ${task.station}` : ""}
                     {task.defaultQuantity != null
@@ -180,16 +178,14 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                   {component ? (
                     <Link
                       to={componentPath(component._id)}
-                      className="text-[13px] text-accent underline-offset-2 hover:underline"
+                      className="text-base text-accent underline-offset-2 hover:underline"
                     >
                       Component: {component.name}
                     </Link>
                   ) : task.componentId ? (
-                    <span className="text-[12px] text-ink-3">
-                      Component linked
-                    </span>
+                    <span className="text-sm text-ink-3">Component linked</span>
                   ) : (
-                    <span className="text-[12px] text-ink-3">No component</span>
+                    <span className="text-sm text-ink-3">No component</span>
                   )}
                   <button
                     type="button"
@@ -207,7 +203,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
       )}
 
       <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAdd}>
-        <label className="block text-[12px] sm:col-span-2">
+        <label className="block text-sm sm:col-span-2">
           <span className="meta-term">Task</span>
           <input
             name="name"
@@ -216,7 +212,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             required
           />
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Category</span>
           <select
             name="category"
@@ -231,7 +227,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             ))}
           </select>
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Station</span>
           <input
             name="station"
@@ -241,7 +237,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             onChange={(e) => setStation(e.target.value)}
           />
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Per guest (0 = one each)</span>
           <input
             name="defaultQuantity"
@@ -255,7 +251,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             className="input mt-1"
           />
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Unit</span>
           <select
             name="defaultUnit"
@@ -270,7 +266,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
             ))}
           </select>
         </label>
-        <label className="block text-[12px] sm:col-span-2">
+        <label className="block text-sm sm:col-span-2">
           <span className="meta-term">Notes</span>
           <input
             name="instructions"

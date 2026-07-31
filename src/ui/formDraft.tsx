@@ -133,7 +133,7 @@ export function DraftRestoreBanner({
       role="status"
       className="card flex flex-wrap items-center justify-between gap-2 border-line px-3 py-2"
     >
-      <p className="text-[12px] text-ink-2">
+      <p className="text-sm text-ink-2">
         Unsaved draft found from {new Date(draft.savedAt).toLocaleString()}.
       </p>
       <div className="flex gap-2">

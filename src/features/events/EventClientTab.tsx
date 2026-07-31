@@ -35,16 +35,14 @@ export function EventClientTab({
     <section className="space-y-4" data-testid="event-client-tab">
       <div>
         <h2 className="font-display text-lg">Client information</h2>
-        <p className="text-[13px] text-ink-2">
+        <p className="text-base text-ink-2">
           Event-specific contacts and hospitality notes. Full CRM records stay
           linked.
         </p>
       </div>
       <dl className="grid gap-3 sm:grid-cols-2">
         <div>
-          <dt className="text-[11px] uppercase tracking-wide text-ink-3">
-            Client
-          </dt>
+          <dt className="text-xs uppercase tracking-wide text-ink-3">Client</dt>
           <dd>
             {client ? (
               <Link
@@ -59,15 +57,13 @@ export function EventClientTab({
           </dd>
         </div>
         <div>
-          <dt className="text-[11px] uppercase tracking-wide text-ink-3">
+          <dt className="text-xs uppercase tracking-wide text-ink-3">
             Primary contact
           </dt>
           <dd>{primaryContactName || "—"}</dd>
         </div>
         <div>
-          <dt className="text-[11px] uppercase tracking-wide text-ink-3">
-            Email
-          </dt>
+          <dt className="text-xs uppercase tracking-wide text-ink-3">Email</dt>
           <dd>
             {primaryContactEmail ? (
               <a href={`mailto:${primaryContactEmail}`} className="underline">
@@ -79,9 +75,7 @@ export function EventClientTab({
           </dd>
         </div>
         <div>
-          <dt className="text-[11px] uppercase tracking-wide text-ink-3">
-            Phone
-          </dt>
+          <dt className="text-xs uppercase tracking-wide text-ink-3">Phone</dt>
           <dd>
             {primaryContactPhone ? (
               <a href={`tel:${primaryContactPhone}`} className="underline">
@@ -93,31 +87,31 @@ export function EventClientTab({
           </dd>
         </div>
         <div className="sm:col-span-2">
-          <dt className="text-[11px] uppercase tracking-wide text-ink-3">
+          <dt className="text-xs uppercase tracking-wide text-ink-3">
             Dietary / accessibility
           </dt>
-          <dd className="whitespace-pre-wrap text-[13px]">
+          <dd className="whitespace-pre-wrap text-base">
             {accessibilityNeeds || "None recorded for this event."}
           </dd>
         </div>
         <div className="sm:col-span-2">
-          <dt className="text-[11px] uppercase tracking-wide text-ink-3">
+          <dt className="text-xs uppercase tracking-wide text-ink-3">
             Service requirements
           </dt>
-          <dd className="whitespace-pre-wrap text-[13px]">
+          <dd className="whitespace-pre-wrap text-base">
             {serviceRequirements || "—"}
           </dd>
         </div>
         <div className="sm:col-span-2">
-          <dt className="text-[11px] uppercase tracking-wide text-ink-3">
+          <dt className="text-xs uppercase tracking-wide text-ink-3">
             Operational notes
           </dt>
-          <dd className="whitespace-pre-wrap text-[13px]">
+          <dd className="whitespace-pre-wrap text-base">
             {operationalRequirements || "—"}
           </dd>
         </div>
       </dl>
-      <p className="text-[12px] text-ink-3">
+      <p className="text-sm text-ink-3">
         Edit the contact and requirements on the Overview tab.
       </p>
       <ClientCommunicationPanel

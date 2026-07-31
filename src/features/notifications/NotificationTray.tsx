@@ -137,7 +137,7 @@ export function NotificationTray() {
       >
         <BellIcon />
         {unreadCount > 0 && (
-          <span className="absolute top-0.5 right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-[9.5px] leading-none font-semibold text-white">
+          <span className="absolute top-0.5 right-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-brand px-1 text-2xs leading-none font-semibold text-white">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
@@ -149,14 +149,14 @@ export function NotificationTray() {
             <button
               type="button"
               onClick={() => markRead(notifications.map((n) => n.id))}
-              className="cursor-pointer text-[11px] font-medium text-brand hover:underline"
+              className="cursor-pointer text-xs font-medium text-brand hover:underline"
             >
               Mark all read
             </button>
           )}
         </div>
         {notifications.length === 0 ? (
-          <p className="mt-1.5 text-[12px] leading-relaxed text-ink-3">
+          <p className="mt-1.5 text-sm leading-relaxed text-ink-3">
             Nothing needs your attention right now.
           </p>
         ) : (
@@ -173,7 +173,7 @@ export function NotificationTray() {
                     }}
                     className="block rounded-xs px-2 py-1.5 transition-colors hover:bg-inset"
                   >
-                    <span className="flex items-center gap-1.5 text-[10.5px] text-ink-3">
+                    <span className="flex items-center gap-1.5 text-2xs text-ink-3">
                       {unread && (
                         <span
                           className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand"
@@ -183,7 +183,7 @@ export function NotificationTray() {
                       {NOTIFICATION_KIND_LABELS[n.kind]} · {relativeDays(n.at)}
                     </span>
                     <span
-                      className={`mt-0.5 block text-[12px] leading-snug ${unread ? "font-medium text-ink" : "text-ink-2"}`}
+                      className={`mt-0.5 block text-sm leading-snug ${unread ? "font-medium text-ink" : "text-ink-2"}`}
                     >
                       {n.message}
                     </span>

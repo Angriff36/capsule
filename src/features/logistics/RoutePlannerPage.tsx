@@ -307,7 +307,7 @@ export function RoutePlannerPage() {
               </tbody>
             </table>
             {manualOrder ? (
-              <p className="mt-3 text-[13px] text-ink-2">
+              <p className="mt-3 text-base text-ink-2">
                 Custom order.{" "}
                 <button
                   className="text-link"

@@ -220,7 +220,7 @@ export function ClientDetailPage() {
           </span>
         }
         lead={
-          <span className="text-[13px]">
+          <span className="text-base">
             {profileLine}
             {" · "}
             <Link className="text-link" to={CLIENTS_ROUTES.root}>
@@ -260,14 +260,14 @@ export function ClientDetailPage() {
       <ClientsWorkspaceNav />
       {failure ? <CrmFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="text-[13px] text-ink-2" role="status">
+        <p className="text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
       {host}
 
       <Section title="Proposals & contracts" count={clientProposals.length}>
-        <p className="px-3 py-3 text-[13px] text-ink-2">
+        <p className="px-3 py-3 text-base text-ink-2">
           {clientProposals.length} proposal
           {clientProposals.length === 1 ? "" : "s"} · {clientContracts.length}{" "}
           contract{clientContracts.length === 1 ? "" : "s"} for this client.
@@ -285,7 +285,7 @@ export function ClientDetailPage() {
 
       <Section title="Invoices" count={clientInvoices.length}>
         {clientInvoices.length === 0 ? (
-          <p className="px-3 py-3 text-[13px] text-ink-2">
+          <p className="px-3 py-3 text-base text-ink-2">
             No invoices yet.{" "}
             <Link
               className="text-link"
@@ -296,7 +296,7 @@ export function ClientDetailPage() {
             for this client.
           </p>
         ) : (
-          <p className="px-3 py-3 text-[13px] text-ink-2">
+          <p className="px-3 py-3 text-base text-ink-2">
             {clientInvoices.length} invoice
             {clientInvoices.length === 1 ? "" : "s"} — see them in the{" "}
             <Link

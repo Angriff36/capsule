@@ -98,7 +98,7 @@ export function AttachmentsSection({
         </div>
       </div>
       {error ? (
-        <p className="mt-2 text-[13px] text-danger" role="alert">
+        <p className="mt-2 text-base text-danger" role="alert">
           {error}
         </p>
       ) : null}
@@ -119,7 +119,7 @@ export function AttachmentsSection({
               <div className="min-w-0">
                 {row.url ? (
                   <a
-                    className="text-link text-[13px]"
+                    className="text-link text-base"
                     href={row.url}
                     target="_blank"
                     rel="noreferrer"
@@ -127,9 +127,9 @@ export function AttachmentsSection({
                     {row.fileName}
                   </a>
                 ) : (
-                  <span className="text-[13px]">{row.fileName}</span>
+                  <span className="text-base">{row.fileName}</span>
                 )}
-                <p className="text-[12px] text-ink-2">
+                <p className="text-sm text-ink-2">
                   {formatSize(row.fileSize)}
                   {row.uploadedAt
                     ? ` · ${formatDate(row.uploadedAt)} ${formatTime(row.uploadedAt)}`

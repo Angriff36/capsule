@@ -168,7 +168,7 @@ export function EventIncidentPanel({ eventId }: { eventId: Id<"events"> }) {
               Description
               <input name="description" className="input" required autoFocus />
             </label>
-            <p className="text-[11.5px] text-ink-3 sm:col-span-3">
+            <p className="text-xs text-ink-3 sm:col-span-3">
               Allergen incidents notify the coordination team, open a required
               corrective action, and stay locked until it is closed.
             </p>
@@ -224,25 +224,25 @@ export function EventIncidentPanel({ eventId }: { eventId: Id<"events"> }) {
                           </span>
                         ) : null}
                       </div>
-                      <p className="mt-1 text-[12px] leading-snug text-ink-2">
+                      <p className="mt-1 text-sm leading-snug text-ink-2">
                         {incident.description}
                       </p>
-                      <p className="mt-1 font-mono text-[10.5px] text-ink-3">
+                      <p className="mt-1 font-mono text-2xs text-ink-3">
                         {formatDate(incident.reportedAt)}{" "}
                         {formatTime(incident.reportedAt)}
                       </p>
                       {incident.resolution ? (
-                        <p className="mt-1 text-[11.5px] text-ink-2">
+                        <p className="mt-1 text-xs text-ink-2">
                           Resolution: {incident.resolution}
                         </p>
                       ) : null}
                       {incident.dismissalReason ? (
-                        <p className="mt-1 text-[11.5px] text-ink-2">
+                        <p className="mt-1 text-xs text-ink-2">
                           Dismissed: {incident.dismissalReason}
                         </p>
                       ) : null}
                       {corrective ? (
-                        <p className="mt-1 text-[11.5px] text-ink-2">
+                        <p className="mt-1 text-xs text-ink-2">
                           Corrective action ({label(String(corrective.status))}
                           ): {corrective.description}
                           {corrective.resolutionNotes

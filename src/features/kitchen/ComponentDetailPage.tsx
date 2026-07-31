@@ -459,7 +459,7 @@ export function ComponentDetailPage() {
             </label>
             {scaleFactor != null ? (
               <>
-                <span className="font-mono text-[11px] text-ink-3">
+                <span className="font-mono text-xs text-ink-3">
                   × {scaleFactor.toFixed(2)} of the canonical component (preview
                   only — component is unchanged)
                 </span>
@@ -480,7 +480,7 @@ export function ComponentDetailPage() {
                   <strong>
                     {scaled(Number(line.quantity))} {String(line.unit)}
                     {scaleFactor != null ? (
-                      <span className="font-mono text-[10px] text-ink-3">
+                      <span className="font-mono text-2xs text-ink-3">
                         {" "}
                         (base {line.quantity})
                       </span>
@@ -697,7 +697,7 @@ export function ComponentDetailPage() {
                 <CulinaryEntityLink kind="dish" id={dish._id}>
                   <span className="font-display text-xl">{dish.name}</span>
                 </CulinaryEntityLink>
-                <span className="font-mono text-[10px] text-ink-3">
+                <span className="font-mono text-2xs text-ink-3">
                   {dish.portionSize} {String(dish.portionUnit)} ·{" "}
                   {formatStatusLabel(String(dish.status))}
                 </span>
@@ -734,7 +734,7 @@ function ComponentEditForm({
       <div className="culinary-create-heading">
         <div>
           <p className="eyebrow">Draft editor</p>
-          <h2 className="font-display text-2xl">Revise component</h2>
+          <h2 className="font-display text-xl">Revise component</h2>
         </div>
         <button className="btn btn-primary" disabled={busy}>
           {busy ? "Saving…" : "Save draft"}

@@ -88,10 +88,10 @@ function Fact({
 }) {
   return (
     <div className="rounded-sm border border-line-2 bg-panel px-3 py-2.5">
-      <dt className="text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-3">
+      <dt className="text-xs font-semibold uppercase tracking-[0.06em] text-ink-3">
         {label}
       </dt>
-      <dd className="mt-1 font-mono text-[13px] text-ink">{children}</dd>
+      <dd className="mt-1 font-mono text-base text-ink">{children}</dd>
     </div>
   );
 }

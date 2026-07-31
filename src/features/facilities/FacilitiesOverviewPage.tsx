@@ -159,7 +159,7 @@ export function FacilitiesOverviewPage() {
                     <span className="block truncate font-medium text-ink">
                       {row.title}
                     </span>
-                    <span className="block truncate text-[12px] text-ink-3">
+                    <span className="block truncate text-sm text-ink-3">
                       {row.detail}
                     </span>
                   </span>
@@ -185,12 +185,12 @@ export function FacilitiesOverviewPage() {
               <span className="flex items-baseline justify-between gap-2">
                 <span className="font-medium text-ink">{section.label}</span>
                 {!isLoading && sectionCounts[section.key] != null ? (
-                  <span className="font-mono text-[12px] text-ink-3">
+                  <span className="font-mono text-sm text-ink-3">
                     {sectionCounts[section.key]}
                   </span>
                 ) : null}
               </span>
-              <span className="mt-0.5 block text-[12px] text-ink-3">
+              <span className="mt-0.5 block text-sm text-ink-3">
                 {SECTION_HINTS[section.key]}
               </span>
             </Link>

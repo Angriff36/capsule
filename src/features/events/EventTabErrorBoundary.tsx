@@ -35,12 +35,12 @@ export class EventTabErrorBoundary extends Component<Props, State> {
           role="alert"
           data-testid="event-tab-error"
         >
-          <p className="text-[14px] font-semibold text-ink">
+          <p className="text-lg font-semibold text-ink">
             {this.props.tabLabel} could not load
           </p>
-          <p className="mt-1 text-[13px] text-ink-2">{message}</p>
+          <p className="mt-1 text-base text-ink-2">{message}</p>
           {needsConvexSync ? (
-            <p className="mt-2 text-[12px] text-ink-3">
+            <p className="mt-2 text-sm text-ink-3">
               This screen is newer than the server behind it. Run{" "}
               <code className="font-mono">bun run dev:convex</code> locally (or
               deploy the latest version), then reload this page.

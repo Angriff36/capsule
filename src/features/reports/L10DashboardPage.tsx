@@ -126,32 +126,30 @@ export function L10DashboardPage() {
       id: "wins-header",
       size: "full",
       content: (
-        <div className="rounded-lg border-2 border-ok/30 bg-ok-soft p-4">
+        <div className="rounded-sm border-2 border-ok/30 bg-ok-soft p-4">
           <h3 className="font-semibold text-ok">This Week's Wins</h3>
           <div className="mt-3 grid grid-cols-4 gap-4">
             <div>
-              <p className="text-2xl font-bold text-ok">
+              <p className="text-xl font-bold text-ok">
                 {weeklyWins.completedEvents}
               </p>
-              <p className="text-sm text-ok">Events Completed</p>
+              <p className="text-xs text-ok">Events Completed</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-ok">
+              <p className="text-xl font-bold text-ok">
                 {formatMoney(weeklyWins.revenue)}
               </p>
-              <p className="text-sm text-ok">Revenue Booked</p>
+              <p className="text-xs text-ok">Revenue Booked</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-ok">
-                {weeklyWins.newLeads}
-              </p>
-              <p className="text-sm text-ok">New Leads</p>
+              <p className="text-xl font-bold text-ok">{weeklyWins.newLeads}</p>
+              <p className="text-xs text-ok">New Leads</p>
             </div>
             <div>
-              <p className="text-2xl font-bold text-ok">
+              <p className="text-xl font-bold text-ok">
                 {weeklyWins.convertedLeads}
               </p>
-              <p className="text-sm text-ok">Converted</p>
+              <p className="text-xs text-ok">Converted</p>
             </div>
           </div>
         </div>
@@ -227,9 +225,9 @@ export function L10DashboardPage() {
       </div>
 
       {/* L10 Framework Note */}
-      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
-        <h4 className="text-sm font-semibold text-ink">About L10 Meetings</h4>
-        <p className="mt-1 text-sm text-ink-2">
+      <div className="mt-6 rounded-sm border border-line bg-inset p-4">
+        <h4 className="text-xs font-semibold text-ink">About L10 Meetings</h4>
+        <p className="mt-1 text-xs text-ink-2">
           The L10 is a weekly 90-minute leadership meeting to review the
           business, solve issues, and stay aligned on priorities. Scorecard
           numbers track business health, and wins open the meeting on what went

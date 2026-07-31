@@ -252,7 +252,7 @@ export function IntegrationsPage() {
       <AdminWorkspaceNav />
 
       {!connection.canManage ? (
-        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-[13px] text-warn">
+        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-base text-warn">
           Only an organization manager can change shared integrations.
         </div>
       ) : null}
@@ -261,7 +261,7 @@ export function IntegrationsPage() {
       ) : null}
       {notice ? (
         <p
-          className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok"
+          className="card border-ok/30 bg-ok-soft px-4 py-3 text-base text-ok"
           role="status"
         >
           {notice}
@@ -271,7 +271,7 @@ export function IntegrationsPage() {
       <Section title="Google Calendar">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">
           <div>
-            <p className="max-w-2xl text-[13px] leading-relaxed text-ink-2">
+            <p className="max-w-2xl text-base leading-relaxed text-ink-2">
               Approved events are added to the connected primary calendar with
               their name, date and time, venue, and expected headcount.
               Reschedules and planning changes update the same entry;
@@ -279,7 +279,7 @@ export function IntegrationsPage() {
             </p>
 
             {!connection.providerConfigured ? (
-              <div className="mt-4 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-[12px] leading-relaxed text-warn">
+              <div className="mt-4 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-sm leading-relaxed text-warn">
                 Google Calendar isn't set up on the server yet. Ask your
                 technician to add the Google OAuth client ID, client secret, and
                 authorized redirect URI, then connect.
@@ -328,7 +328,7 @@ export function IntegrationsPage() {
             </div>
           </div>
 
-          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-[12px]">
+          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-sm">
             <div className="flex items-center justify-between gap-4">
               <dt className="text-ink-3">Connection</dt>
               <dd className="font-semibold text-ink">
@@ -372,7 +372,7 @@ export function IntegrationsPage() {
       <Section title="QuickBooks Online">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">
           <div>
-            <p className="max-w-2xl text-[13px] leading-relaxed text-ink-2">
+            <p className="max-w-2xl text-base leading-relaxed text-ink-2">
               Confirmed invoices and received payments are pushed to your
               QuickBooks Online accounts receivable. Clients are matched to
               QuickBooks customers by name on first sync, creating the customer
@@ -380,7 +380,7 @@ export function IntegrationsPage() {
             </p>
 
             {!qboStatus.providerConfigured ? (
-              <div className="mt-4 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-[12px] leading-relaxed text-warn">
+              <div className="mt-4 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-sm leading-relaxed text-warn">
                 QuickBooks isn't set up on the server yet. Ask your technician
                 to add the QuickBooks OAuth client ID, client secret, and
                 authorized redirect URI, then connect.
@@ -429,7 +429,7 @@ export function IntegrationsPage() {
             </div>
           </div>
 
-          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-[12px]">
+          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-sm">
             <div className="flex items-center justify-between gap-4">
               <dt className="text-ink-3">Connection</dt>
               <dd className="font-semibold text-ink">
@@ -473,7 +473,7 @@ export function IntegrationsPage() {
       <Section title="SMS alerts (Twilio)">
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,0.7fr)]">
           <div>
-            <p className="max-w-2xl text-[13px] leading-relaxed text-ink-2">
+            <p className="max-w-2xl text-base leading-relaxed text-ink-2">
               Opted-in staff receive a text message on three high-urgency
               triggers: a delivery is dispatched, an event starts in about two
               hours, and a critical allergen incident is reported. Each person
@@ -482,7 +482,7 @@ export function IntegrationsPage() {
             </p>
 
             {!smsStatus.providerConfigured ? (
-              <div className="mt-4 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-[12px] leading-relaxed text-warn">
+              <div className="mt-4 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-sm leading-relaxed text-warn">
                 Text messaging isn't set up on the server yet. Ask your
                 technician to add TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and
                 TWILIO_FROM_NUMBER, then enable SMS alerts.
@@ -516,7 +516,7 @@ export function IntegrationsPage() {
             </div>
           </div>
 
-          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-[12px]">
+          <dl className="grid content-start gap-3 rounded-sm border border-line bg-inset p-4 text-sm">
             <div className="flex items-center justify-between gap-4">
               <dt className="text-ink-3">Provider</dt>
               <dd className="font-semibold text-ink">

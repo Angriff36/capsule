@@ -72,7 +72,7 @@ export function AppShell() {
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar onOpenPalette={() => setPaletteOpen(true)} />
         {!online && (
-          <div className="flex items-center gap-2 border-b border-warn/30 bg-warn-soft px-4 py-1.5 text-[12px] font-medium text-warn">
+          <div className="flex items-center gap-2 border-b border-warn/30 bg-warn-soft px-4 py-1.5 text-sm font-medium text-warn">
             <WifiOffIcon width={13} height={13} />
             Offline — showing the last synced data. Changes will fail until the
             connection returns.

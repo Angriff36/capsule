@@ -300,7 +300,7 @@ export function PackListTemplatesPage() {
 
       {formOpen ? (
         <form
-          className="mb-6 rounded-lg border border-line-2 bg-panel p-4"
+          className="mb-6 rounded-sm border border-line-2 bg-panel p-4"
           onSubmit={submit}
         >
           <div className="grid gap-3 md:grid-cols-2">
@@ -414,7 +414,7 @@ export function PackListTemplatesPage() {
               </button>
             </div>
             {items.length === 0 ? (
-              <p className="text-[13px] text-ink-3">
+              <p className="text-base text-ink-3">
                 No items yet. Add chafing dishes, utensils, equipment, etc.
               </p>
             ) : (
@@ -422,7 +422,7 @@ export function PackListTemplatesPage() {
                 {items.map((item, index) => (
                   <div
                     key={index}
-                    className="grid gap-2 rounded-md border border-line-2 p-2 md:grid-cols-[1fr_8rem_8rem_auto]"
+                    className="grid gap-2 rounded-sm border border-line-2 p-2 md:grid-cols-[1fr_8rem_8rem_auto]"
                   >
                     <input
                       className="input"
@@ -518,8 +518,8 @@ export function PackListTemplatesPage() {
         />
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-left text-[12px] uppercase text-ink-3">
+          <table className="w-full text-xs">
+            <thead className="text-left text-sm uppercase text-ink-3">
               <tr>
                 <th className="py-2 pr-3">Name</th>
                 <th className="py-2 pr-3">Scope</th>
@@ -543,12 +543,12 @@ export function PackListTemplatesPage() {
                         {template.name}
                       </div>
                       {template.description ? (
-                        <div className="text-[12px] text-ink-3">
+                        <div className="text-sm text-ink-3">
                           {template.description}
                         </div>
                       ) : null}
                     </td>
-                    <td className="py-2 pr-3 text-[12px] text-ink-2">
+                    <td className="py-2 pr-3 text-sm text-ink-2">
                       {template.serviceStyleId
                         ? `Style: ${styleName(template.serviceStyleId)}`
                         : null}

@@ -164,10 +164,10 @@ export function MessagesPage() {
           </p>
         </div>
         <div className="rounded-sm border border-brand/20 bg-brand-soft px-5 py-4 text-center">
-          <p className="text-[28px] leading-none font-semibold text-brand">
+          <p className="text-3xl leading-none font-semibold text-brand">
             {totalUnread}
           </p>
-          <p className="mt-1 text-[11px] font-medium tracking-wide text-ink-2 uppercase">
+          <p className="mt-1 text-xs font-medium tracking-wide text-ink-2 uppercase">
             Unread
           </p>
         </div>
@@ -201,7 +201,7 @@ export function MessagesPage() {
                     <button
                       type="button"
                       onClick={() => setSelectedPersonId(String(person._id))}
-                      className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded-xs px-2 py-1.5 text-left text-[13px] transition-colors hover:bg-inset ${
+                      className={`flex w-full cursor-pointer items-center justify-between gap-2 rounded-xs px-2 py-1.5 text-left text-base transition-colors hover:bg-inset ${
                         person._id === selectedPersonId
                           ? "bg-inset font-medium"
                           : ""
@@ -209,7 +209,7 @@ export function MessagesPage() {
                     >
                       <span>{personName(person)}</span>
                       {unread > 0 && (
-                        <span className="grid h-4.5 min-w-4.5 place-items-center rounded-full bg-brand px-1 text-[10px] leading-none font-semibold text-white">
+                        <span className="grid h-4.5 min-w-4.5 place-items-center rounded-full bg-brand px-1 text-2xs leading-none font-semibold text-white">
                           {unread}
                         </span>
                       )}
@@ -231,7 +231,7 @@ export function MessagesPage() {
             ) : (
               <>
                 <div className="border-b border-line-2 px-4 py-3">
-                  <p className="text-[15px] font-semibold">
+                  <p className="text-lg font-semibold">
                     {personName(selected.person)}
                   </p>
                 </div>
@@ -253,10 +253,10 @@ export function MessagesPage() {
                               : "mr-auto border border-line-2 bg-panel"
                           }`}
                         >
-                          <p className="text-[13px] leading-relaxed whitespace-pre-wrap">
+                          <p className="text-base leading-relaxed whitespace-pre-wrap">
                             {m.body}
                           </p>
-                          <p className="mt-1 text-[10.5px] text-ink-3">
+                          <p className="mt-1 text-2xs text-ink-3">
                             {timeFormat.format(m.createdAt ?? 0)}
                             {mine && m.readAt != null ? " · Read" : ""}
                           </p>

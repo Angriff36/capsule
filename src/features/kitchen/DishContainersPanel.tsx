@@ -108,9 +108,9 @@ export function DishContainersPanel({ dishId }: Props) {
         <span>{rows.length} containers</span>
       </div>
 
-      {error ? <p className="text-[13px] text-danger">{error}</p> : null}
+      {error ? <p className="text-base text-danger">{error}</p> : null}
       {notice ? (
-        <p className="text-[13px] text-ok" role="status">
+        <p className="text-base text-ok" role="status">
           {notice}
         </p>
       ) : null}
@@ -133,15 +133,15 @@ export function DishContainersPanel({ dishId }: Props) {
               data-testid="dish-container-row"
             >
               <div>
-                <p className="text-[14px] font-medium text-ink">{row.name}</p>
-                <p className="font-mono text-[11px] text-ink-3">
+                <p className="text-lg font-medium text-ink">{row.name}</p>
+                <p className="font-mono text-xs text-ink-3">
                   {SERVICE_LABEL[String(row.serviceMethod)] ??
                     String(row.serviceMethod)}{" "}
                   · holds {row.servingsPerContainer}
                   {row.baseQuantity ? ` · +${row.baseQuantity} always` : ""}
                 </p>
                 {row.equipmentNotes ? (
-                  <p className="text-[11px] text-ink-2">{row.equipmentNotes}</p>
+                  <p className="text-xs text-ink-2">{row.equipmentNotes}</p>
                 ) : null}
               </div>
               <button
@@ -158,7 +158,7 @@ export function DishContainersPanel({ dishId }: Props) {
       )}
 
       <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onDefine}>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Container</span>
           <input
             name="name"
@@ -167,7 +167,7 @@ export function DishContainersPanel({ dishId }: Props) {
             required
           />
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Service method</span>
           <select
             name="serviceMethod"
@@ -181,7 +181,7 @@ export function DishContainersPanel({ dishId }: Props) {
             ))}
           </select>
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Servings per container</span>
           <input
             name="servingsPerContainer"
@@ -192,7 +192,7 @@ export function DishContainersPanel({ dishId }: Props) {
             required
           />
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Always send (extra)</span>
           <input
             name="baseQuantity"
@@ -202,7 +202,7 @@ export function DishContainersPanel({ dishId }: Props) {
             className="input mt-1"
           />
         </label>
-        <label className="block text-[12px] sm:col-span-2">
+        <label className="block text-sm sm:col-span-2">
           <span className="meta-term">Equipment / handling notes</span>
           <input
             name="equipmentNotes"

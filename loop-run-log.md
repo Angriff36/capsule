@@ -50,6 +50,95 @@ Append one entry per run. Prune entries older than 30 days.
 <!-- Loop appends below this line -->
 ```json
 {
+  "run_id": "2026-07-30T02:00:30Z",
+  "pattern": "daily-triage",
+  "source": "glm-tick",
+  "verdict": "NOOP",
+  "reason": "STATE.md contains loop-pause-all (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"
+}
+```
+
+```json
+{
+  "run_id": "2026-07-29T00:15:00Z",
+  "pattern": "product-loop",
+  "source": "product-loop",
+  "verdict": "NOOP",
+  "reason": "loop-pause-all active (human stop 2026-07-24T03:21:00Z still active)"
+}
+```
+
+```json
+{
+  "run_id": "2026-07-29T00:25:00Z",
+  "pattern": "product-loop",
+  "source": "product-loop",
+  "verdict": "NOOP",
+  "reason": "STATE.md contains loop-pause-all (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"
+}
+```
+
+```json
+{
+  "run_id": "2026-07-29T00:20:00Z",
+  "pattern": "product-loop",
+  "source": "glm-tick",
+  "verdict": "NOOP",
+  "reason": "STATE.md contains loop-pause-all (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"
+}
+```
+
+```json
+{
+  "run_id": "2026-07-29T00:10:00Z",
+  "pattern": "product-loop",
+  "source": "product-loop",
+  "verdict": "NOOP",
+  "reason": "STATE.md contains loop-pause-all (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1",
+  "duration_s": 10,
+  "items_attempted": 0,
+  "actions_taken": 0,
+  "escalations": 0,
+  "tokens_estimate": 15000,
+  "outcome": "no-op"
+}
+```
+
+```json
+{
+  "run_id": "2026-07-29T00:05:14Z",
+  "pattern": "daily-triage",
+  "source": "glm-tick",
+  "verdict": "NOOP",
+  "reason": "STATE.md contains loop-pause-all (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"
+}
+```
+```json
+{
+  "run_id": "2026-07-28T00:05:00Z",
+  "pattern": "product-loop",
+  "source": "product-loop",
+  "verdict": "NOOP",
+  "reason": "STATE.md contains loop-pause-all (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"
+}
+```
+
+```json
+{
+  "run_id": "2026-07-28T00:00:01Z",
+  "pattern": "product-loop",
+  "duration_s": 2,
+  "items_attempted": 0,
+  "actions_taken": 0,
+  "escalations": 0,
+  "rejections": 0,
+  "tokens_estimate": 8000,
+  "outcome": "no-op",
+  "details": "loop-pause-all active in STATE.md (human stop 2026-07-24T03:21:00Z) - exiting immediately per iteration contract §1"
+}
+```
+```json
+{
   "run_id": "2026-07-27T00:00:00Z",
   "pattern": "product-loop",
   "source": "product-loop",
@@ -198,3 +287,10 @@ Append one entry per run. Prune entries older than 30 days.
 {"run_id":"2026-07-25T02:01:00Z","pattern":"product-loop","source":"product-loop","outcome":"PAUSED","details":"loop-pause-all in STATE.md — human requested stop 2026-07-24T03:21:00Z. Exiting immediately per iteration contract §1"}
 {"run_id":"2026-07-26T18:01:13Z","pattern":"product-loop","source":"product-loop","outcome":"no-op","details":"loop-pause-all in STATE.md (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"}
 {"run_id":"2026-07-27T00:00:00Z","pattern":"product-loop","source":"product-loop","outcome":"PAUSED","details":"loop-pause-all in STATE.md (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"}
+{"run_id":"2026-07-28T00:00:02Z","pattern":"product-loop","source":"glm-tick","duration_s":2,"items_attempted":0,"actions_taken":0,"escalations":0,"rejections":0,"tokens_estimate":6000,"outcome":"no-op","details":"loop-pause-all active in STATE.md (human stop 2026-07-24T03:21:00Z) — exiting immediately per iteration contract §1"}
+{"run_id":"2026-07-28T00:00:00Z","pattern":"product-loop","source":"product-loop","duration_s":5,"items_attempted":0,"actions_taken":0,"escalations":0,"rejections":0,"tokens_estimate":8000,"outcome":"no-op","details":"STATE.md contains loop-pause-all (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"}
+[2026-07-28T22:15:28Z] GLM-tick: loop-pause-all active, no action taken
+{"run_id":"2026-07-28T22:45:00Z","pattern":"product-loop","source":"product-loop","duration_s":2,"items_attempted":0,"actions_taken":0,"escalations":0,"rejections":0,"tokens_estimate":6000,"outcome":"no-op","details":"loop-pause-all active in STATE.md (human stop 2026-07-24T03:21:00Z) — exiting immediately per iteration contract §1"}
+{"run_id":"2026-07-28T23:45:00Z","pattern":"product-loop","source":"product-loop","duration_s":3,"items_attempted":0,"actions_taken":0,"escalations":0,"rejections":0,"tokens_estimate":7000,"outcome":"no-op","details":"loop-pause-all active in STATE.md (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"}
+{"run_id":"2026-07-29T00:00:00Z","pattern":"product-loop","source":"product-loop","duration_s":2,"items_attempted":0,"actions_taken":0,"escalations":0,"rejections":0,"tokens_estimate":7000,"outcome":"no-op","details":"loop-pause-all active in STATE.md (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"}
+{"run_id":"2026-07-31T02:01:07Z","pattern":"product-loop","source":"product-loop","verdict":"NOOP","reason":"STATE.md contains loop-pause-all (human stop 2026-07-24T03:21:00Z still active) — exiting immediately per iteration contract §1"}

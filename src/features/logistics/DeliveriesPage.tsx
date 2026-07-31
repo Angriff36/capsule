@@ -267,7 +267,7 @@ export function DeliveriesPage() {
       <LogisticsWorkspaceNav />
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
@@ -341,7 +341,7 @@ export function DeliveriesPage() {
             </label>
           </div>
           {schedulablePacks.length === 0 ? (
-            <p className="mt-3 text-[13px] text-ink-2">
+            <p className="mt-3 text-base text-ink-2">
               No packed pack lists are ready.{" "}
               <Link className="text-link" to="/logistics/packs">
                 Finish packing first

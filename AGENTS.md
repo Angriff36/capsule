@@ -191,15 +191,20 @@ Convex agent skills for common tasks can be installed by running
 
 ## Deploying (agents: read before touching anything deploy-shaped)
 
-**Manual deploys are HUMAN-AUTHORIZED only.** No loop or agent runs
-`npx convex deploy`, `vercel deploy`, or edits Vercel/Clerk settings without
-the human explicitly asking in the current conversation.
+**Normal Git pushes are allowed.** Feature/PR branch pushes may run CI. A push
+or merge to `main` is allowed once the required CI is green and the independent
+cross-model review gate has APPROVED; that normal deployment path does not need
+separate human deploy authorization.
+
+**Manual deploy commands and settings changes are HUMAN-AUTHORIZED only.** No
+loop or agent runs `npx convex deploy`, `vercel deploy`, or edits Vercel/Clerk
+settings without the human explicitly asking in the current conversation.
 
 **Pushing `main` deploys BOTH frontend and Convex backend** (since
 `cc24315`, 2026-07-24): `vercel.json`'s `buildCommand` is
 `convex deploy --cmd 'vite build'`, so every Vercel production build pushes
-Convex functions/schema to prod (`tangible-skunk-448`) together with the UI.
-An authorized `git push` to `main` therefore ships everything CI verified —
+Convex functions/schema to prod (`impartial-mule-193`) together with the UI.
+A gate-approved `git push` to `main` therefore ships everything CI verified —
 no separate `npx convex deploy -y` step is needed for changes that ride a
 `main` push. (Before `cc24315`, Vercel shipped only the UI and new Convex
 queries would Server Error until a manual deploy — that skew is why the
@@ -209,7 +214,7 @@ When the human asks for a MANUAL deploy (no `main` push involved):
 
 1. Backend first, if `convex/` or manifests changed:
    `bun run manifest:regen` (manifest changes only) → `npx convex deploy -y`
-   → prod deployment `tangible-skunk-448`.
+   → prod deployment `impartial-mule-193`.
 2. Frontend: `vercel deploy --prod --yes --archive=tgz`.
 
 Invariants agents must not break (each broke a real deploy once):

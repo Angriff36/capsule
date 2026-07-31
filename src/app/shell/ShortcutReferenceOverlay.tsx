@@ -60,13 +60,13 @@ export function ShortcutReferenceOverlay({
               if (e.key === "Escape") onClose();
             }}
             placeholder="Search keyboard shortcuts…"
-            className="h-full w-full bg-transparent text-[14px] outline-none placeholder:text-ink-3"
+            className="h-full w-full bg-transparent text-lg outline-none placeholder:text-ink-3"
           />
           <span className="kbd shrink-0">Esc</span>
         </div>
         <div className="max-h-80 overflow-y-auto px-2 py-2">
           {groups.length === 0 && (
-            <p className="px-3 py-6 text-center text-[13px] text-ink-3">
+            <p className="px-3 py-6 text-center text-base text-ink-3">
               No shortcuts match “{query}”.
             </p>
           )}
@@ -82,18 +82,18 @@ export function ShortcutReferenceOverlay({
                       className="flex items-center gap-3 rounded-xs px-3 py-2"
                     >
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[13px] font-medium">
+                        <p className="truncate text-base font-medium">
                           {s.label}
                         </p>
                         {s.description ? (
-                          <p className="truncate text-[11.5px] text-ink-3">
+                          <p className="truncate text-xs text-ink-3">
                             {s.description}
                           </p>
                         ) : null}
                       </div>
                       <div className="flex shrink-0 items-center gap-1">
                         {keys.length === 0 ? (
-                          <span className="text-[11px] text-ink-3">—</span>
+                          <span className="text-xs text-ink-3">—</span>
                         ) : (
                           keys.map((k, i) => (
                             <span key={i} className="kbd">

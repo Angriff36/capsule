@@ -117,13 +117,13 @@ export function ProposalMenuSelectionPanel({
   return (
     <div className="rounded-sm border border-line bg-inset p-4">
       <p className="eyebrow">Menu</p>
-      <p className="mt-1 text-[12px] text-ink-2">
+      <p className="mt-1 text-sm text-ink-2">
         Dishes picked from your menu catalog. When the proposal is accepted with
         a linked event, the menu copies onto that event automatically.
       </p>
 
       {activeSelections.length === 0 ? (
-        <p className="mt-3 text-[13px] text-ink-2">No dishes selected yet.</p>
+        <p className="mt-3 text-base text-ink-2">No dishes selected yet.</p>
       ) : (
         <table className="data-table mt-3">
           <thead>
@@ -191,7 +191,7 @@ export function ProposalMenuSelectionPanel({
 
       {editable ? (
         publishedMenus.length === 0 ? (
-          <p className="mt-3 text-[13px] text-ink-2">
+          <p className="mt-3 text-base text-ink-2">
             No published menus in the catalog yet. Publish a menu in Kitchen to
             offer dishes here.
           </p>
@@ -205,7 +205,7 @@ export function ProposalMenuSelectionPanel({
               if (lines.length === 0) return null;
               return (
                 <div key={menu._id} className="mt-2">
-                  <p className="text-[13px] font-semibold text-ink">
+                  <p className="text-base font-semibold text-ink">
                     {String(menu.name)}
                   </p>
                   <div className="mt-1 flex flex-wrap gap-2">

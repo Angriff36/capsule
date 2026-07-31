@@ -101,7 +101,7 @@ export function PreferredVendorRankingEditor({
         </div>
         <span>{orderedIds.length} ranked</span>
       </div>
-      <p className="max-w-160 text-[13px] text-ink-2">
+      <p className="max-w-160 text-base text-ink-2">
         Weekly purchase drafts use the first choice. Lower-ranked vendors stay
         visible as quick alternatives for the buyer.
       </p>
@@ -113,14 +113,14 @@ export function PreferredVendorRankingEditor({
             return (
               <li
                 key={vendorId}
-                className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-paper px-4 py-3"
+                className="flex flex-wrap items-center gap-3 rounded-sm border border-line bg-panel px-4 py-3"
               >
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink text-[12px] font-semibold text-paper">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink text-sm font-semibold text-panel">
                   {index + 1}
                 </span>
                 <div className="min-w-48 flex-1">
                   <strong>{vendor?.name ?? "Unavailable vendor"}</strong>
-                  <span className="ml-2 text-[11px] text-ink-3">
+                  <span className="ml-2 text-xs text-ink-3">
                     {index === 0 ? "Primary default" : "Fallback"}
                   </span>
                 </div>
@@ -169,7 +169,7 @@ export function PreferredVendorRankingEditor({
       )}
 
       <div className="mt-4 flex flex-wrap items-end gap-2">
-        <label className="grid min-w-0 flex-1 basis-48 gap-1 text-[12px] text-ink-2">
+        <label className="grid min-w-0 flex-1 basis-48 gap-1 text-sm text-ink-2">
           Add vendor
           <select
             className="input"

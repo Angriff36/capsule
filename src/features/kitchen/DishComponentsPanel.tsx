@@ -114,9 +114,9 @@ export function DishComponentsPanel({ dishId }: Props) {
         <span>{rows.length} attached</span>
       </div>
 
-      {error ? <p className="text-[13px] text-danger">{error}</p> : null}
+      {error ? <p className="text-base text-danger">{error}</p> : null}
       {notice ? (
-        <p className="text-[13px] text-ok" role="status">
+        <p className="text-base text-ok" role="status">
           {notice}
         </p>
       ) : null}
@@ -146,16 +146,16 @@ export function DishComponentsPanel({ dishId }: Props) {
                   {component ? (
                     <Link
                       to={componentPath(component._id)}
-                      className="text-[14px] font-medium text-accent underline-offset-2 hover:underline"
+                      className="text-lg font-medium text-accent underline-offset-2 hover:underline"
                     >
                       {component.name}
                     </Link>
                   ) : (
-                    <p className="text-[14px] font-medium text-ink">
+                    <p className="text-lg font-medium text-ink">
                       Component unavailable
                     </p>
                   )}
-                  <p className="font-mono text-[11px] text-ink-3">
+                  <p className="font-mono text-xs text-ink-3">
                     yields {row.yieldQuantity}
                     {component?.yieldUnit
                       ? ` ${String(component.yieldUnit)}`
@@ -179,7 +179,7 @@ export function DishComponentsPanel({ dishId }: Props) {
       )}
 
       <form className="mt-3 grid gap-2 sm:grid-cols-2" onSubmit={onAttach}>
-        <label className="block text-[12px] sm:col-span-2">
+        <label className="block text-sm sm:col-span-2">
           <span className="meta-term">Component</span>
           <select name="componentId" className="input mt-1" defaultValue="">
             <option value="">Select a component…</option>
@@ -190,7 +190,7 @@ export function DishComponentsPanel({ dishId }: Props) {
             ))}
           </select>
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">
             Yield (0 = the component&apos;s own)
           </span>
@@ -203,7 +203,7 @@ export function DishComponentsPanel({ dishId }: Props) {
             className="input mt-1"
           />
         </label>
-        <label className="block text-[12px]">
+        <label className="block text-sm">
           <span className="meta-term">Batch multiplier</span>
           <input
             name="batchMultiplier"
@@ -214,7 +214,7 @@ export function DishComponentsPanel({ dishId }: Props) {
             className="input mt-1"
           />
         </label>
-        <label className="block text-[12px] sm:col-span-2">
+        <label className="block text-sm sm:col-span-2">
           <span className="meta-term">Role (optional)</span>
           <input
             name="role"

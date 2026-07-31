@@ -136,12 +136,12 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="eyebrow">Shift swaps</p>
-          <p className="mt-1 text-[12.5px] leading-relaxed text-ink-3">
+          <p className="mt-1 text-sm leading-relaxed text-ink-3">
             You confirm first, your coworker accepts, then a manager makes the
             assignment change.
           </p>
         </div>
-        <span className="rounded-full bg-brand-soft px-2.5 py-1 text-[11px] font-semibold text-brand">
+        <span className="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-semibold text-brand">
           3-step check
         </span>
       </div>
@@ -150,7 +150,7 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
 
       {incoming.length > 0 ? (
         <div className="mt-4 space-y-3" data-testid="incoming-shift-swaps">
-          <p className="text-[12px] font-semibold uppercase tracking-wide text-ink-3">
+          <p className="text-sm font-semibold uppercase tracking-wide text-ink-3">
             Waiting for you
           </p>
           {incoming.map((request) => {
@@ -158,12 +158,12 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
             return (
               <article
                 key={request._id}
-                className="rounded-xl border border-brand/20 bg-brand-soft/40 p-3"
+                className="rounded-sm border border-brand/20 bg-brand-soft/40 p-3"
               >
-                <p className="text-[14px] font-semibold">
+                <p className="text-lg font-semibold">
                   {personName(String(request.requesterPersonId))}
                 </p>
-                <p className="mt-0.5 text-[12.5px] text-ink-2">
+                <p className="mt-0.5 text-sm text-ink-2">
                   {shift?.startsAt
                     ? dateTime.format(shift.startsAt)
                     : "Shift unavailable"}
@@ -206,7 +206,7 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
       ) : null}
 
       <div className="mt-4 space-y-3">
-        <p className="text-[12px] font-semibold uppercase tracking-wide text-ink-3">
+        <p className="text-sm font-semibold uppercase tracking-wide text-ink-3">
           Your upcoming shifts
         </p>
         {myScheduledShifts.length === 0 ? (
@@ -240,14 +240,14 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
             return (
               <article
                 key={shift._id}
-                className="rounded-xl border border-line-2 p-3"
+                className="rounded-sm border border-line-2 p-3"
               >
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[14px] font-semibold">
+                    <p className="text-lg font-semibold">
                       {dateTime.format(shift.startsAt)}
                     </p>
-                    <p className="text-[12.5px] text-ink-2">
+                    <p className="text-sm text-ink-2">
                       {shift.role || "Scheduled shift"}
                     </p>
                   </div>
@@ -273,7 +273,7 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
 
                 {existing ? (
                   <div className="mt-3 flex items-center justify-between border-t border-line-2 pt-3">
-                    <p className="text-[12px] text-ink-3">
+                    <p className="text-sm text-ink-3">
                       You → {personName(String(existing.recipientPersonId))} →
                       manager
                     </p>
@@ -315,7 +315,7 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
                       </select>
                     </label>
                     {candidates.length === 0 ? (
-                      <p className="text-[12px] text-ink-3">
+                      <p className="text-sm text-ink-3">
                         No linked staff are free and credentialed for this time.
                       </p>
                     ) : null}
@@ -342,7 +342,7 @@ export function ShiftSwapCard({ person }: ShiftSwapCardProps) {
       </div>
 
       {!linked ? (
-        <p className="mt-3 rounded-lg bg-warn-soft px-3 py-2 text-[12px] text-ink-2">
+        <p className="mt-3 rounded-sm bg-warn-soft px-3 py-2 text-sm text-ink-2">
           Ask a manager to link this staff profile to your sign-in before using
           shift swaps.
         </p>

@@ -102,18 +102,18 @@ export function AnnouncementBanner() {
               data-category={a.category}
             >
               <span
-                className={`mt-0.5 shrink-0 rounded-xs border px-1.5 py-0.5 text-[9.5px] font-semibold tracking-wide uppercase ${style.chip}`}
+                className={`mt-0.5 shrink-0 rounded-xs border px-1.5 py-0.5 text-2xs font-semibold tracking-wide uppercase ${style.chip}`}
               >
                 {style.label}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[12.5px] font-semibold leading-snug text-ink">
+                <p className="text-sm font-semibold leading-snug text-ink">
                   {a.title}
                 </p>
-                <p className="mt-0.5 text-[12px] leading-relaxed text-ink-2">
+                <p className="mt-0.5 text-sm leading-relaxed text-ink-2">
                   {a.body}
                 </p>
-                <p className="mt-0.5 text-[10.5px] text-ink-3">
+                <p className="mt-0.5 text-2xs text-ink-3">
                   Until {dateFormat.format(a.expiresAt as number)}
                 </p>
               </div>

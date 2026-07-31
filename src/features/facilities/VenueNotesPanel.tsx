@@ -89,7 +89,7 @@ export function VenueNotesPanel({ venueId }: Props) {
     <div className="space-y-4">
       <div>
         <h3 className="text-lg font-semibold text-ink">Venue Notes</h3>
-        <p className="text-[13px] text-ink-3">
+        <p className="text-base text-ink-3">
           Structured notes about this venue for institutional memory.
         </p>
       </div>
@@ -97,7 +97,7 @@ export function VenueNotesPanel({ venueId }: Props) {
       {failure ? <FailureBanner failure={failure} /> : null}
 
       {me == null ? (
-        <p className="text-[13px] text-ink-3">
+        <p className="text-base text-ink-3">
           {authStatus === undefined
             ? "Loading…"
             : "Your account isn't linked to a staff profile, so you can't post notes."}
@@ -123,7 +123,7 @@ export function VenueNotesPanel({ venueId }: Props) {
             });
           }}
         >
-          <p className="text-[12px] text-ink-3">Posting as {myName}</p>
+          <p className="text-sm text-ink-3">Posting as {myName}</p>
 
           <div className="grid grid-cols-2 gap-3">
             <label className="field-label">
@@ -191,10 +191,10 @@ export function VenueNotesPanel({ venueId }: Props) {
                       📌
                     </span>
                   ) : null}
-                  <span className="text-[12px] font-medium text-ink-2 uppercase">
+                  <span className="text-sm font-medium text-ink-2 uppercase">
                     {CATEGORY_LABELS[note.category] || note.category}
                   </span>
-                  <span className="text-[11px] px-1.5 py-0.5 rounded bg-inset text-ink-3">
+                  <span className="text-xs px-1.5 py-0.5 rounded-xs bg-inset text-ink-3">
                     {note.visibility === "public"
                       ? "Public"
                       : note.visibility === "management_only"
@@ -202,8 +202,8 @@ export function VenueNotesPanel({ venueId }: Props) {
                         : "Internal"}
                   </span>
                 </div>
-                <p className="text-[13px] text-ink mt-1">{note.content}</p>
-                <p className="mt-1 font-mono text-[11px] text-ink-3">
+                <p className="text-base text-ink mt-1">{note.content}</p>
+                <p className="mt-1 font-mono text-xs text-ink-3">
                   {note.authorName}
                   {note.postedAt
                     ? ` · ${formatDate(note.postedAt)} ${formatTime(note.postedAt)}`
@@ -256,7 +256,7 @@ export function VenueNotesPanel({ venueId }: Props) {
           </li>
         ))}
         {venueNotes.length === 0 ? (
-          <li className="px-3 py-3 text-[13px] text-ink-3">
+          <li className="px-3 py-3 text-base text-ink-3">
             No notes yet. Add a note to record important information about this
             venue.
           </li>

@@ -151,13 +151,13 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
 
   return (
     <section aria-label={`Comments for ${task.name ?? "prep task"}`}>
-      <h3 className="text-[12px] font-semibold tracking-wide text-ink-2 uppercase">
+      <h3 className="text-sm font-semibold tracking-wide text-ink-2 uppercase">
         Prep thread
         <span className="ml-1.5 font-mono text-ink-3 normal-case">
           {taskComments.length}
         </span>
       </h3>
-      <p className="mt-1 text-[11.5px] text-ink-3">
+      <p className="mt-1 text-xs text-ink-3">
         Log blockers, substitutions, or notes without changing the task status.
         {taskOwner
           ? ` Notifies ${personName(taskOwner)}.`
@@ -165,7 +165,7 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
       </p>
       <ul className="mt-2 space-y-2">
         {taskComments.length === 0 ? (
-          <li className="rounded-sm border border-dashed border-line-2 px-3 py-2 text-[12px] text-ink-3">
+          <li className="rounded-sm border border-dashed border-line-2 px-3 py-2 text-sm text-ink-3">
             No notes yet.
           </li>
         ) : (
@@ -179,20 +179,18 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
                 className="rounded-sm border border-line-2 bg-panel px-3 py-2"
               >
                 <div className="flex flex-wrap items-baseline gap-2">
-                  <span className="text-[12.5px] font-medium">
-                    {authorLabel}
-                  </span>
+                  <span className="text-sm font-medium">{authorLabel}</span>
                   <span
-                    className={`rounded-xs border px-1.5 py-0.5 text-[10px] font-medium tracking-wide uppercase ${tone}`}
+                    className={`rounded-xs border px-1.5 py-0.5 text-2xs font-medium tracking-wide uppercase ${tone}`}
                   >
                     {CATEGORY_LABEL[comment.category ?? "note"] ??
                       comment.category}
                   </span>
-                  <span className="text-[10.5px] text-ink-3">
+                  <span className="text-2xs text-ink-3">
                     {timeFormat.format(comment.postedAt ?? 0)}
                   </span>
                 </div>
-                <p className="mt-1 whitespace-pre-wrap text-[13px] leading-relaxed">
+                <p className="mt-1 whitespace-pre-wrap text-base leading-relaxed">
                   {comment.body}
                 </p>
               </li>
@@ -237,11 +235,11 @@ export function PrepTaskCommentThread({ task }: { task: PrepTaskLike }) {
         />
         <div className="flex items-center justify-between gap-2">
           {failure ? (
-            <p className="text-[11.5px] text-danger" role="alert">
+            <p className="text-xs text-danger" role="alert">
               Could not post: {String((failure as Error)?.message ?? failure)}
             </p>
           ) : (
-            <span className="text-[11.5px] text-ink-3">
+            <span className="text-xs text-ink-3">
               {myName ? `Posting as ${myName}` : ""}
             </span>
           )}

@@ -50,7 +50,7 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
       </button>
       {state.kind === "ready" ? (
         <a
-          className="text-[11px] font-medium text-brand underline underline-offset-2"
+          className="text-xs font-medium text-brand underline underline-offset-2"
           href={state.url}
           target="_blank"
           rel="noreferrer"
@@ -59,7 +59,7 @@ export function EventClientPortalShare({ eventId }: { eventId: Id<"events"> }) {
         </a>
       ) : null}
       {state.kind === "error" ? (
-        <span className="max-w-52 text-[11px] text-danger" role="alert">
+        <span className="max-w-52 text-xs text-danger" role="alert">
           {state.message}
         </span>
       ) : null}

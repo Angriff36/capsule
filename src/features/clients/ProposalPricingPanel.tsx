@@ -201,14 +201,14 @@ export function ProposalPricingPanel({
   return (
     <div className="rounded-sm border border-line bg-inset p-4">
       <p className="eyebrow">Pricing</p>
-      <p className="mt-1 text-[12px] text-ink-2">
+      <p className="mt-1 text-sm text-ink-2">
         The priced lines behind this proposal's total.
         {editable
           ? " Edit a line to revise it; changes recompute the totals."
           : ""}
       </p>
       {rows.length === 0 ? (
-        <p className="mt-2 text-[13px] text-ink-2">
+        <p className="mt-2 text-base text-ink-2">
           No pricing lines on this proposal.
         </p>
       ) : (
@@ -413,7 +413,7 @@ export function ProposalPricingPanel({
         </button>
       ) : null}
 
-      <p className="mt-2 text-[13px] text-ink-2">
+      <p className="mt-2 text-base text-ink-2">
         Subtotal{" "}
         <span className="tabular-nums">{recomputed.subtotal.toFixed(2)}</span> ·
         Tax{" "}

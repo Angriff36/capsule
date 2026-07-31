@@ -108,7 +108,7 @@ export function ComponentImportSourcePane({
               }}
             />
             {sheetFilename ? (
-              <span className="font-mono text-[11px] text-ink-3">
+              <span className="font-mono text-xs text-ink-3">
                 {sheetFilename}
               </span>
             ) : null}
@@ -128,7 +128,7 @@ export function ComponentImportSourcePane({
               }}
             />
             {linesFilename ? (
-              <span className="font-mono text-[11px] text-ink-3">
+              <span className="font-mono text-xs text-ink-3">
                 {linesFilename}
               </span>
             ) : null}
@@ -148,13 +148,13 @@ export function ComponentImportSourcePane({
               }}
             />
             {textFilename ? (
-              <span className="font-mono text-[11px] text-ink-3">
+              <span className="font-mono text-xs text-ink-3">
                 {textFilename}
               </span>
             ) : null}
           </label>
           {fileStatus ? (
-            <p className="font-mono text-[11px] text-ink-3">{fileStatus}</p>
+            <p className="font-mono text-xs text-ink-3">{fileStatus}</p>
           ) : null}
         </div>
       )}
@@ -207,7 +207,7 @@ export function ComponentImportReviewPane({
       >
         <div className="component-import-empty">
           <p className="eyebrow">Waiting</p>
-          <h3 className="font-display text-3xl">
+          <h3 className="font-display text-2xl">
             Structure the house book entry.
           </h3>
           <p>
@@ -331,7 +331,7 @@ export function ComponentImportReviewPane({
 
       <div className="component-import-lines-head">
         <h3>Components</h3>
-        <span className="font-mono text-[11px] text-ink-3">
+        <span className="font-mono text-xs text-ink-3">
           {review.lines.length} lines
         </span>
       </div>

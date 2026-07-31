@@ -25,7 +25,7 @@ export function RecentsMenu() {
       <div className="absolute top-9.5 right-0 z-30 w-72 rounded-sm border border-line-2 bg-panel p-3 shadow-[0_6px_24px_-8px_rgba(34,30,22,0.25)]">
         <p className="font-medium">Recently opened</p>
         {recents.length === 0 ? (
-          <p className="mt-1.5 text-[12px] leading-relaxed text-ink-3">
+          <p className="mt-1.5 text-sm leading-relaxed text-ink-3">
             Records you open will show up here for quick access.
           </p>
         ) : (
@@ -37,10 +37,10 @@ export function RecentsMenu() {
                   onClick={closeMenu}
                   className="block rounded-xs px-2 py-1.5 transition-colors hover:bg-inset"
                 >
-                  <span className="text-[10.5px] tracking-wider text-ink-3 uppercase">
+                  <span className="text-2xs tracking-wider text-ink-3 uppercase">
                     {r.type} · {relativeDays(r.at)}
                   </span>
-                  <span className="mt-0.5 block truncate text-[12px] leading-snug text-ink-2">
+                  <span className="mt-0.5 block truncate text-sm leading-snug text-ink-2">
                     {r.label}
                   </span>
                 </Link>

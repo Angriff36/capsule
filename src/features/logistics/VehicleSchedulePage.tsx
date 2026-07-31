@@ -141,7 +141,7 @@ export function VehicleSchedulePage() {
       <LogisticsWorkspaceNav />
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
@@ -170,7 +170,7 @@ export function VehicleSchedulePage() {
           </div>
         ) : (
           <div className="mt-4">
-            <div className="flex text-[11px] text-ink-2">
+            <div className="flex text-xs text-ink-2">
               <div className="w-44 shrink-0" />
               <div className="relative h-4 flex-1">
                 {HOUR_MARKS.map((hour) => (
@@ -196,7 +196,7 @@ export function VehicleSchedulePage() {
                   className="flex items-center border-t border-line py-2"
                 >
                   <div className="w-44 shrink-0 pr-3">
-                    <strong className="block text-[13px]">
+                    <strong className="block text-base">
                       {vehicle.registration}
                     </strong>
                     <small className="text-ink-2">
@@ -206,7 +206,7 @@ export function VehicleSchedulePage() {
                         : `${runs.length} run${runs.length === 1 ? "" : "s"}`}
                     </small>
                   </div>
-                  <div className="relative h-9 flex-1 rounded bg-inset">
+                  <div className="relative h-9 flex-1 rounded-xs bg-inset">
                     {HOUR_MARKS.slice(1, -1).map((hour) => (
                       <span
                         key={hour}
@@ -231,7 +231,7 @@ export function VehicleSchedulePage() {
                       return (
                         <span
                           key={run._id}
-                          className="absolute inset-y-1 overflow-hidden rounded bg-accent/80 px-1.5 text-[11px] leading-7 whitespace-nowrap text-white"
+                          className="absolute inset-y-1 overflow-hidden rounded-xs bg-accent/80 px-1.5 text-xs leading-7 whitespace-nowrap text-white"
                           style={{ left: `${left}%`, width: `${width}%` }}
                           title={`${run.destination} · ${formatTime(run.windowStartsAt ?? startsAt)} → ${formatTime(run.windowEndsAt ?? endsAt)}`}
                         >

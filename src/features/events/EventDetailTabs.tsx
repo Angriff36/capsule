@@ -17,8 +17,8 @@ export function EventDetailTabs({ active, onChange }: Props) {
             type="button"
             className={
               isActive
-                ? "border-b-2 border-ink px-3 py-2 text-[13px] font-semibold text-ink"
-                : "border-b-2 border-transparent px-3 py-2 text-[13px] text-ink-2 hover:text-ink"
+                ? "border-b-2 border-ink px-3 py-2 text-base font-semibold text-ink"
+                : "border-b-2 border-transparent px-3 py-2 text-base text-ink-2 hover:text-ink"
             }
             aria-current={isActive ? "page" : undefined}
             onClick={() => onChange(tab.key)}

@@ -241,11 +241,11 @@ export function CompanyScorecardDashboardPage() {
 
       <DashboardGrid items={dashboardItems} />
 
-      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
-        <h4 className="text-sm font-semibold text-ink">
+      <div className="mt-6 rounded-sm border border-line bg-inset p-4">
+        <h4 className="text-xs font-semibold text-ink">
           Where these numbers come from
         </h4>
-        <p className="mt-1 text-sm text-ink-2">
+        <p className="mt-1 text-xs text-ink-2">
           Revenue and guest counts come from events scheduled this month. Food
           cost and profit margin come from finished event closeouts. Lead
           conversion counts leads created this month that converted. Capsule
@@ -281,16 +281,16 @@ function MetricCard({ metric }: { metric: ScorecardMetric }) {
         : change <= 0;
 
   return (
-    <div className="rounded-lg border border-line bg-panel p-4">
+    <div className="rounded-sm border border-line bg-panel p-4">
       <h3 className="font-semibold text-ink">{metric.name}</h3>
 
       <div className="mt-2 flex items-baseline justify-between">
-        <span className="text-2xl font-bold text-ink">
+        <span className="text-xl font-bold text-ink">
           {metric.current != null ? formatValue(metric.current) : "—"}
         </span>
         {change != null ? (
           <span
-            className={`text-sm font-medium ${improving ? "text-ok" : "text-danger"}`}
+            className={`text-xs font-medium ${improving ? "text-ok" : "text-danger"}`}
           >
             {change >= 0 ? "▲" : "▼"} {Math.abs(change).toFixed(1)}% vs last
             month
@@ -298,7 +298,7 @@ function MetricCard({ metric }: { metric: ScorecardMetric }) {
         ) : null}
       </div>
 
-      <p className="mt-2 text-xs text-ink-3">
+      <p className="mt-2 text-2xs text-ink-3">
         {metric.current == null
           ? "Nothing recorded yet this month."
           : metric.previous != null

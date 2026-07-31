@@ -323,7 +323,7 @@ export function VehicleMaintenancePage() {
       <LogisticsWorkspaceNav />
 
       <div
-        className="mt-3 flex gap-4 text-[13px] text-ink-2"
+        className="mt-3 flex gap-4 text-base text-ink-2"
         aria-label="Maintenance totals"
       >
         <span data-testid="maintenance-overdue-count">
@@ -339,7 +339,7 @@ export function VehicleMaintenancePage() {
 
       {overdueCount > 0 ? (
         <div
-          className="mt-3 rounded border border-danger/40 bg-danger/10 px-4 py-3 text-[13px] text-danger"
+          className="mt-3 rounded-xs border border-danger/40 bg-danger/10 px-4 py-3 text-base text-danger"
           role="alert"
           data-testid="maintenance-overdue-alert"
         >
@@ -353,7 +353,7 @@ export function VehicleMaintenancePage() {
       ) : null}
       {failure ? <LogisticsFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}

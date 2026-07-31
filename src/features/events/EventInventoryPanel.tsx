@@ -232,10 +232,8 @@ export function EventInventoryPanel({
     return (
       <section className="card space-y-2 px-3 py-3">
         <p className="eyebrow">Inventory</p>
-        <h2 className="text-[15px] font-semibold text-ink">
-          Stock reservations
-        </h2>
-        <p className="text-[13px] text-ink-2">
+        <h2 className="text-lg font-semibold text-ink">Stock reservations</h2>
+        <p className="text-base text-ink-2">
           Nothing to reserve yet. Add dishes on the Menu tab to create
           ingredient demand, then approve the event to reserve stock against it.
         </p>
@@ -248,10 +246,8 @@ export function EventInventoryPanel({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="eyebrow">Inventory</p>
-          <h2 className="text-[15px] font-semibold text-ink">
-            Stock reservations
-          </h2>
-          <p className="mt-1 text-[12px] text-ink-3">
+          <h2 className="text-lg font-semibold text-ink">Stock reservations</h2>
+          <p className="mt-1 text-sm text-ink-3">
             Reserve available stock, then issue holds when product leaves
             storage for the event.
           </p>
@@ -273,20 +269,20 @@ export function EventInventoryPanel({
             Reserve stock
           </button>
         ) : (
-          <p className="text-[12px] text-ink-3">
+          <p className="text-sm text-ink-3">
             Approve the event to reserve stock.
           </p>
         )}
       </div>
 
       {eventDemands.length === 0 ? (
-        <p className="text-[13px] text-ink-3">
+        <p className="text-base text-ink-3">
           No ingredient demand rows for this event yet.
         </p>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-[13px]">
-            <thead className="text-[11px] uppercase tracking-wide text-ink-3">
+          <table className="w-full text-left text-base">
+            <thead className="text-xs uppercase tracking-wide text-ink-3">
               <tr>
                 <th className="py-1 pr-3 font-medium">Ingredient</th>
                 <th className="py-1 pr-3 font-medium">Need</th>
@@ -329,10 +325,10 @@ export function EventInventoryPanel({
 
       {eventReservations.length > 0 ? (
         <div className="space-y-2 border-t border-line/60 pt-3">
-          <p className="text-[12px] font-medium text-ink">Event holds</p>
+          <p className="text-sm font-medium text-ink">Event holds</p>
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-[13px]">
-              <thead className="text-[11px] uppercase tracking-wide text-ink-3">
+            <table className="w-full text-left text-base">
+              <thead className="text-xs uppercase tracking-wide text-ink-3">
                 <tr>
                   <th className="py-1 pr-3 font-medium">Ingredient</th>
                   <th className="py-1 pr-3 font-medium">Location</th>
@@ -375,7 +371,7 @@ export function EventInventoryPanel({
                           Issue stock
                         </button>
                       ) : (
-                        <span className="text-[12px] text-ink-3">—</span>
+                        <span className="text-sm text-ink-3">—</span>
                       )}
                     </td>
                   </tr>
@@ -383,14 +379,12 @@ export function EventInventoryPanel({
               </tbody>
             </table>
           </div>
-          {lastIssue ? (
-            <p className="text-[12px] text-ink-2">{lastIssue}</p>
-          ) : null}
+          {lastIssue ? <p className="text-sm text-ink-2">{lastIssue}</p> : null}
         </div>
       ) : null}
 
       {ran ? (
-        <div className="space-y-2 border-t border-line/60 pt-3 text-[13px]">
+        <div className="space-y-2 border-t border-line/60 pt-3 text-base">
           {created.length === 0 && shortages.length === 0 ? (
             <p className="text-ink-2">
               Nothing new to reserve — demand is already covered by active

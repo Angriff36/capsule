@@ -71,8 +71,7 @@ const timeLabel = (ms?: number | null) => formatTime(ms);
 const ROW_BTN = "btn btn-ghost btn-sm py-2 max-sm:min-h-11";
 const ROW_BTN_PRIMARY = "btn btn-primary btn-sm py-2 max-sm:min-h-11";
 /** Full-width primary action inside a card. */
-const BLOCK_BTN =
-  "btn btn-primary mt-3 w-full py-3 text-[15px] max-sm:min-h-11";
+const BLOCK_BTN = "btn btn-primary mt-3 w-full py-3 text-lg max-sm:min-h-11";
 
 /**
  * Phone-first view for field staff: shifts, clock in/out, prep, packing,
@@ -225,7 +224,7 @@ export function MyDayPage() {
       <MobileFrame>
         <section className="card px-4 py-4">
           <p className="eyebrow">Who are you?</p>
-          <p className="mt-2 text-[13px] leading-relaxed text-ink-2">
+          <p className="mt-2 text-base leading-relaxed text-ink-2">
             Your sign-in is not linked to a staff profile yet. Pick your name
             once — it is remembered on this phone.
           </p>
@@ -233,7 +232,7 @@ export function MyDayPage() {
             {activePeople.map((person) => (
               <button
                 key={person._id}
-                className="btn btn-ghost w-full justify-start py-3 text-[15px] max-sm:min-h-11"
+                className="btn btn-ghost w-full justify-start py-3 text-lg max-sm:min-h-11"
                 onClick={() => choosePerson(person._id)}
               >
                 {person.givenName} {person.familyName}
@@ -422,7 +421,7 @@ export function MyDayPage() {
 
       <Section title="Time clock">
         <div className="px-4 py-4">
-          <p className="text-[13px] text-ink-2">
+          <p className="text-base text-ink-2">
             {openRecord
               ? `Clocked in at ${timeLabel(openRecord.clockInAt)}`
               : "You are not clocked in."}
@@ -475,10 +474,10 @@ export function MyDayPage() {
             {myShifts.map((shift) => (
               <li key={shift._id} className="flex items-center gap-3 py-3">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[14px] font-semibold">
+                  <p className="text-lg font-semibold">
                     {dayLabel(shift.startsAt)}
                   </p>
-                  <p className="text-[12.5px] text-ink-2">
+                  <p className="text-sm text-ink-2">
                     {timeLabel(shift.startsAt)} – {timeLabel(shift.endsAt)}
                     {shift.role ? ` · ${shift.role}` : ""}
                   </p>
@@ -535,7 +534,7 @@ export function MyDayPage() {
             />
           ) : (
             <div className="px-4 py-4">
-              <p className="text-[13px] leading-relaxed text-ink-2">
+              <p className="text-base leading-relaxed text-ink-2">
                 Review each shift summary and let your manager know you received
                 it.
               </p>
@@ -625,10 +624,10 @@ export function MyDayPage() {
               return (
                 <li key={task._id} className="flex items-center gap-3 py-3">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[14px] font-semibold">
+                    <p className="truncate text-lg font-semibold">
                       {task.name?.trim() || "Prep task"}
                     </p>
-                    <p className="text-[12.5px] text-ink-2">
+                    <p className="text-sm text-ink-2">
                       {task.station ? `${task.station} · ` : ""}
                       due {task.dueAt ? timeLabel(task.dueAt) : "today"}
                     </p>
@@ -680,10 +679,10 @@ export function MyDayPage() {
             {openPackItems.map((item) => (
               <li key={item._id} className="flex items-center gap-3 py-3">
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[14px] font-semibold">
+                  <p className="truncate text-lg font-semibold">
                     {item.description || "Item"}
                   </p>
-                  <p className="text-[12.5px] text-ink-2">
+                  <p className="text-sm text-ink-2">
                     {listName(item.packListId)} · {item.requiredQuantity}{" "}
                     {item.unit}
                   </p>
@@ -730,7 +729,7 @@ export function MyDayPage() {
         <div data-testid="my-deliveries">
           <Section title="Assigned deliveries" count={myDeliveries.length}>
             <div className="px-4 py-4">
-              <p className="text-[12.5px] text-ink-3">
+              <p className="text-sm text-ink-3">
                 Capture proof at the drop-off so dispatch can see it
                 immediately.
               </p>
@@ -742,10 +741,10 @@ export function MyDayPage() {
                     <li key={delivery._id} className="py-3">
                       <div className="flex items-center gap-3">
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-[14px] font-semibold">
+                          <p className="truncate text-lg font-semibold">
                             {delivery.destination}
                           </p>
-                          <p className="text-[12.5px] text-ink-2">
+                          <p className="text-sm text-ink-2">
                             {dayLabel(delivery.windowStartsAt)} ·{" "}
                             {timeLabel(delivery.windowStartsAt)}–
                             {timeLabel(delivery.windowEndsAt)}
@@ -786,7 +785,7 @@ export function MyDayPage() {
         <div data-testid="my-closeouts">
           <Section title="Venue closeouts" count={fieldCloseouts.length}>
             <div className="px-4 py-4">
-              <p className="text-[12.5px] text-ink-3">
+              <p className="text-sm text-ink-3">
                 Capture venue, leftover-food, and equipment-return evidence
                 before the team leaves.
               </p>
@@ -798,10 +797,10 @@ export function MyDayPage() {
                     <li key={closeout._id} className="py-3">
                       <div className="flex items-center gap-3">
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-[14px] font-semibold">
+                          <p className="truncate text-lg font-semibold">
                             {eventTitle(String(closeout.eventId))}
                           </p>
-                          <p className="text-[12.5px] text-ink-2">
+                          <p className="text-sm text-ink-2">
                             {closeout.capturedAt
                               ? `Captured ${formatDate(closeout.capturedAt)} ${formatTime(closeout.capturedAt)}`
                               : "Ready for venue photos"}
@@ -856,7 +855,7 @@ export function MyDayPage() {
         }
       >
         <div className="px-4 py-4">
-          <p className="text-[12.5px] text-ink-3">
+          <p className="text-sm text-ink-3">
             Add a one-time window when you can work outside your usual weekly
             availability.
           </p>
@@ -909,7 +908,7 @@ export function MyDayPage() {
               {myWindows.map((window) => (
                 <li key={window._id} className="flex items-center gap-3 py-3">
                   <div className="min-w-0 flex-1">
-                    <p className="text-[14px] font-semibold">
+                    <p className="text-lg font-semibold">
                       {dayLabel(window.startsAt)}
                       {window.kind === "unavailable" ? (
                         <span className="ml-2 inline-flex align-middle">
@@ -917,7 +916,7 @@ export function MyDayPage() {
                         </span>
                       ) : null}
                     </p>
-                    <p className="text-[12.5px] text-ink-2">
+                    <p className="text-sm text-ink-2">
                       {timeLabel(window.startsAt)} – {timeLabel(window.endsAt)}
                     </p>
                   </div>
@@ -957,10 +956,10 @@ function MobileFrame({
   return (
     <div className="min-h-dvh bg-canvas">
       <header className="sticky top-0 z-10 flex items-center gap-2.5 border-b border-line-2 bg-canvas px-4 py-3">
-        <span className="grid h-6 w-6 place-items-center rounded-xs bg-accent font-mono text-[12px] font-bold text-white">
+        <span className="grid h-6 w-6 place-items-center rounded-xs bg-accent font-mono text-sm font-bold text-white">
           C
         </span>
-        <p className="min-w-0 flex-1 truncate text-[13px] leading-tight font-semibold">
+        <p className="min-w-0 flex-1 truncate text-base leading-tight font-semibold">
           {subtitle ?? "My Day"}
         </p>
         {onSwitchPerson ? (
@@ -998,7 +997,7 @@ function OfflineStatusBar({
         <div
           role="status"
           data-testid="offline-banner"
-          className="flex items-center gap-2 rounded-xs border border-warn/30 bg-warn-soft px-3 py-2 text-[12px] font-medium text-warn"
+          className="flex items-center gap-2 rounded-xs border border-warn/30 bg-warn-soft px-3 py-2 text-sm font-medium text-warn"
         >
           <WifiOffIcon width={13} height={13} />
           Offline — showing the last synced data.
@@ -1014,7 +1013,7 @@ function OfflineStatusBar({
     <div
       role="status"
       data-testid="offline-pending"
-      className="flex flex-col gap-1.5 rounded-xs border border-brand/30 bg-brand-soft px-3 py-2.5 text-[12px]"
+      className="flex flex-col gap-1.5 rounded-xs border border-brand/30 bg-brand-soft px-3 py-2.5 text-sm"
     >
       <div className="flex items-center justify-between gap-2">
         <p className="font-medium text-brand">

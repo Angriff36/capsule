@@ -173,7 +173,7 @@ export function IngredientDetailsEditor({
 
       <div className="mt-6">
         <div className="culinary-section-heading">
-          <h3 className="text-[15px] font-semibold text-ink">Allergens</h3>
+          <h3 className="text-lg font-semibold text-ink">Allergens</h3>
           <span>{allergens.length} flagged</span>
         </div>
         <fieldset
@@ -186,7 +186,7 @@ export function IngredientDetailsEditor({
             return (
               <label
                 key={allergen.code}
-                className="flex items-center gap-2 rounded-xl border border-line bg-paper px-3 py-2 text-[13px]"
+                className="flex items-center gap-2 rounded-sm border border-line bg-panel px-3 py-2 text-base"
               >
                 <input
                   type="checkbox"

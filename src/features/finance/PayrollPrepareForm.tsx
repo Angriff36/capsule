@@ -107,7 +107,7 @@ export function PayrollPrepareForm({
             <h2>Payroll input</h2>
           </div>
         </div>
-        <p className="text-[13px] text-ink-2">
+        <p className="text-base text-ink-2">
           No active people are available. Hire team members under Admin →
           Permissions first.
         </p>
@@ -194,13 +194,13 @@ export function PayrollPrepareForm({
             onChange={(event) => setRegularOverride(event.target.value)}
           />
           {clocked ? (
-            <span className="text-[11px] text-ink-3">
+            <span className="text-xs text-ink-3">
               {clocked.recordCount === 0
                 ? "No closed time records in this period — enter minutes manually."
                 : `${clocked.recordCount} closed time record${clocked.recordCount === 1 ? "" : "s"} · ${(clockedTotal / 60).toFixed(1)} h clocked total`}
             </span>
           ) : (
-            <span className="text-[11px] text-ink-3">
+            <span className="text-xs text-ink-3">
               Pick a person and period to pull clocked minutes automatically.
             </span>
           )}
@@ -220,14 +220,14 @@ export function PayrollPrepareForm({
               )
             }
           />
-          <span className="text-[11px] text-ink-3">
+          <span className="text-xs text-ink-3">
             Overtime moves minutes out of regular — the clocked total stays the
             same.
           </span>
         </label>
       </div>
       {clocked && clocked.overlappingInputCount > 0 ? (
-        <p className="text-[12px] text-warn" role="status">
+        <p className="text-sm text-warn" role="status">
           {clocked.overlappingInputCount} existing payroll input
           {clocked.overlappingInputCount === 1 ? "" : "s"} already overlap
           {clocked.overlappingInputCount === 1 ? "s" : ""} this person and
@@ -250,20 +250,20 @@ export function PayrollPrepareForm({
       {personId && clocked !== undefined ? (
         rate != null ? (
           clockedTotal > 0 ? (
-            <p className="text-[12px] text-ink-3">
+            <p className="text-sm text-ink-3">
               Estimated base pay at ${rate.toFixed(2)}/h: $
               {((clockedTotal / 60) * rate).toFixed(2)} (overtime premium not
               included). The export CSV carries hours; your processor applies
               final rates.
             </p>
           ) : (
-            <p className="text-[12px] text-ink-3">
+            <p className="text-sm text-ink-3">
               Rate on file: ${rate.toFixed(2)}/h. The export CSV carries hours;
               your processor applies final rates.
             </p>
           )
         ) : clocked === null ? null : (
-          <p className="text-[12px] text-warn">
+          <p className="text-sm text-warn">
             No hourly rate set for this person — set one under Admin →
             Permissions so labor costs and estimates use real numbers.
           </p>

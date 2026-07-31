@@ -185,7 +185,7 @@ export function EventDetailPage() {
     <div className="space-y-4">
       <Link
         to="/events"
-        className="inline-flex items-center gap-1.5 text-[12px] text-ink-3 hover:text-ink"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink"
       >
         <ArrowLeftIcon width={12} height={12} /> All events
       </Link>
@@ -197,7 +197,7 @@ export function EventDetailPage() {
           </span>
         }
         lead={
-          <span className="text-[12px]">
+          <span className="text-sm">
             {formatStatusLabel(event.eventType)} ·{" "}
             {(() => {
               const client = clients?.find((c) => c._id === event.clientId);
@@ -327,7 +327,7 @@ export function EventDetailPage() {
       />
 
       {pdfNotice ? (
-        <p className="text-[13px] text-ink-2" role="status">
+        <p className="text-base text-ink-2" role="status">
           {pdfNotice}
         </p>
       ) : null}

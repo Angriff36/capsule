@@ -246,7 +246,7 @@ export function VenueVendorRelationshipsPage() {
       {showForm && (
         <form
           onSubmit={submit}
-          className="space-y-4 rounded bg-panel p-6 shadow"
+          className="space-y-4 rounded-xs bg-panel p-6 shadow"
         >
           <h2 className="text-lg font-semibold text-ink">
             Establish Vendor Relationship
@@ -254,7 +254,7 @@ export function VenueVendorRelationshipsPage() {
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Venue *
               </label>
               <select
@@ -262,7 +262,7 @@ export function VenueVendorRelationshipsPage() {
                 required
                 disabled={!!venueId}
                 defaultValue={venueId ?? ""}
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               >
                 <option value="">Select venue...</option>
                 {filteredVenues.map((v) => (
@@ -274,13 +274,13 @@ export function VenueVendorRelationshipsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Vendor *
               </label>
               <select
                 name="vendorId"
                 required
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               >
                 <option value="">Select vendor...</option>
                 {filteredVendors.map((v) => (
@@ -292,14 +292,14 @@ export function VenueVendorRelationshipsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Category *
               </label>
               <select
                 name="category"
                 required
                 defaultValue="other"
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               >
                 {CATEGORIES.map((cat) => (
                   <option key={cat.value} value={cat.value}>
@@ -310,14 +310,14 @@ export function VenueVendorRelationshipsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Status *
               </label>
               <select
                 name="status"
                 required
                 defaultValue="approved"
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               >
                 {STATUSES.map((st) => (
                   <option key={st.value} value={st.value}>
@@ -328,29 +328,29 @@ export function VenueVendorRelationshipsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Effective From
               </label>
               <input
                 type="date"
                 name="effectiveFrom"
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Effective Until
               </label>
               <input
                 type="date"
                 name="effectiveUntil"
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Discount Percent
               </label>
               <input
@@ -360,12 +360,12 @@ export function VenueVendorRelationshipsPage() {
                 max="100"
                 step="0.01"
                 placeholder="0.00"
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Minimum Order
               </label>
               <input
@@ -374,66 +374,66 @@ export function VenueVendorRelationshipsPage() {
                 min="0"
                 step="0.01"
                 placeholder="0.00"
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Payment Terms
               </label>
               <input
                 type="text"
                 name="paymentTerms"
                 placeholder="e.g., Net 30"
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Insurance Certificate
               </label>
               <input
                 type="text"
                 name="insuranceCertificate"
                 placeholder="Certificate number or reference"
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Insurance Expiry
               </label>
               <input
                 type="date"
                 name="insuranceExpiry"
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Compliance Notes
               </label>
               <textarea
                 name="complianceNotes"
                 rows={2}
                 placeholder="Special requirements, certifications, etc."
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-ink-2">
+              <label className="block text-xs font-medium text-ink-2">
                 Notes
               </label>
               <textarea
                 name="notes"
                 rows={2}
                 placeholder="Additional notes..."
-                className="mt-1 block w-full rounded-md border-line-2 shadow-sm focus:border-accent sm:text-sm"
+                className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
             </div>
           </div>
@@ -459,30 +459,30 @@ export function VenueVendorRelationshipsPage() {
         </form>
       )}
 
-      <div className="rounded bg-panel shadow">
+      <div className="rounded-xs bg-panel shadow">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-line">
             <thead className="bg-inset">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-ink-3">
+                <th className="px-6 py-3 text-left text-2xs font-medium uppercase text-ink-3">
                   Venue
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-ink-3">
+                <th className="px-6 py-3 text-left text-2xs font-medium uppercase text-ink-3">
                   Vendor
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-ink-3">
+                <th className="px-6 py-3 text-left text-2xs font-medium uppercase text-ink-3">
                   Category
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-ink-3">
+                <th className="px-6 py-3 text-left text-2xs font-medium uppercase text-ink-3">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-ink-3">
+                <th className="px-6 py-3 text-left text-2xs font-medium uppercase text-ink-3">
                   Effective
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-ink-3">
+                <th className="px-6 py-3 text-left text-2xs font-medium uppercase text-ink-3">
                   Discount
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium uppercase text-ink-3">
+                <th className="px-6 py-3 text-right text-2xs font-medium uppercase text-ink-3">
                   Actions
                 </th>
               </tr>
@@ -522,7 +522,7 @@ export function VenueVendorRelationshipsPage() {
                       <td className="whitespace-nowrap px-6 py-4">
                         {getVendorName(row.vendorId)}
                       </td>
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-ink">
+                      <td className="whitespace-nowrap px-6 py-4 text-xs text-ink">
                         {categoryLabel(row.category)}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4">
@@ -532,12 +532,12 @@ export function VenueVendorRelationshipsPage() {
                           color={statusInfo?.color}
                         />
                         {isExpired && (
-                          <span className="ml-2 text-xs text-danger">
+                          <span className="ml-2 text-2xs text-danger">
                             (Expired)
                           </span>
                         )}
                       </td>
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-ink-3">
+                      <td className="whitespace-nowrap px-6 py-4 text-xs text-ink-3">
                         {row.effectiveFrom
                           ? formatDate(row.effectiveFrom)
                           : "-"}
@@ -546,10 +546,10 @@ export function VenueVendorRelationshipsPage() {
                           ? formatDate(row.effectiveUntil)
                           : "Ongoing"}
                       </td>
-                      <td className="whitespace-nowrap px-6 py-4 text-sm text-ink">
+                      <td className="whitespace-nowrap px-6 py-4 text-xs text-ink">
                         {row.discountPercent ? `${row.discountPercent}%` : "-"}
                       </td>
-                      <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
+                      <td className="whitespace-nowrap px-6 py-4 text-right text-xs">
                         <select
                           value={row.status}
                           onChange={(e) =>
@@ -559,7 +559,7 @@ export function VenueVendorRelationshipsPage() {
                             )
                           }
                           disabled={busy === `status-${row._id}`}
-                          className="rounded border-line-2 text-sm focus:border-accent disabled:opacity-50"
+                          className="rounded-xs border-line-2 text-xs focus:border-accent disabled:opacity-50"
                         >
                           {STATUSES.map((st) => (
                             <option key={st.value} value={st.value}>
@@ -593,7 +593,7 @@ export function VenueVendorRelationshipsPage() {
           <div className="border-t border-line bg-inset px-6 py-3">
             <Link
               to={venueVendorRelationshipsListPath()}
-              className="text-sm font-medium text-brand hover:underline"
+              className="text-xs font-medium text-brand hover:underline"
             >
               View all vendor relationships →
             </Link>

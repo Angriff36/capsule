@@ -265,7 +265,7 @@ export function EventMenuPage() {
               <div className="culinary-create-heading">
                 <div>
                   <p className="eyebrow">Menu template</p>
-                  <h2 className="font-display text-2xl">
+                  <h2 className="font-display text-xl">
                     Start from a template
                   </h2>
                 </div>
@@ -301,7 +301,7 @@ export function EventMenuPage() {
             <div className="culinary-create-heading">
               <div>
                 <p className="eyebrow">Dish selection</p>
-                <h2 className="font-display text-2xl">Add to event</h2>
+                <h2 className="font-display text-xl">Add to event</h2>
               </div>
               <button
                 className="btn btn-primary"

@@ -31,7 +31,7 @@ export function DishPrimaryImage({
   if (!storageId) {
     return (
       <div
-        className={`flex items-center justify-center border border-dashed border-line bg-inset text-[11px] text-ink-3 ${SIZE_CLASS[size]} ${className ?? ""}`}
+        className={`flex items-center justify-center border border-dashed border-line bg-inset text-xs text-ink-3 ${SIZE_CLASS[size]} ${className ?? ""}`}
         role="img"
         aria-label={`${alt} — no image`}
       >
@@ -52,7 +52,7 @@ export function DishPrimaryImage({
   if (!url) {
     return (
       <div
-        className={`flex items-center justify-center border border-line bg-inset text-[11px] text-ink-3 ${SIZE_CLASS[size]} ${className ?? ""}`}
+        className={`flex items-center justify-center border border-line bg-inset text-xs text-ink-3 ${SIZE_CLASS[size]} ${className ?? ""}`}
         role="img"
         aria-label={`${alt} — image unavailable`}
       >

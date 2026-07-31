@@ -312,7 +312,7 @@ export function InvoicesPage() {
       </header>
       <FinanceWorkspaceNav />
       {prefillClientId || prefillEventId ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           Showing invoices
           {prefillClientId ? " for the linked client" : ""}
           {prefillEventId ? " tied to the linked event" : ""}.{" "}
@@ -330,7 +330,7 @@ export function InvoicesPage() {
       ) : null}
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}

@@ -213,7 +213,7 @@ export function BrandingPage() {
       />
       <AdminWorkspaceNav />
       {!canEdit ? (
-        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-[13px] text-warn">
+        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-base text-warn">
           Only an organization manager can change document branding.
         </div>
       ) : null}
@@ -222,7 +222,7 @@ export function BrandingPage() {
       ) : null}
       {notice ? (
         <p
-          className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok"
+          className="card border-ok/30 bg-ok-soft px-4 py-3 text-base text-ok"
           role="status"
         >
           {notice}
@@ -369,7 +369,7 @@ export function BrandingPage() {
                   setLogoFile(event.target.files?.[0] ?? null)
                 }
               />
-              <span className="mt-1 block text-[11px] font-normal text-ink-3">
+              <span className="mt-1 block text-xs font-normal text-ink-3">
                 PNG, JPEG, or WebP · up to 10 MB · transparent PNG works best.
               </span>
             </label>
@@ -419,7 +419,7 @@ export function BrandingPage() {
                   </option>
                 ))}
               </select>
-              <span className="mt-1 block text-[11px] font-normal text-ink-3">
+              <span className="mt-1 block text-xs font-normal text-ink-3">
                 Invoices can be issued in any ISO 4217 currency; exchange rates
                 are stamped at issue so historical reports never drift.
               </span>
@@ -429,7 +429,7 @@ export function BrandingPage() {
             ) : null}
             {currencyNotice ? (
               <p
-                className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok"
+                className="card border-ok/30 bg-ok-soft px-4 py-3 text-base text-ok"
                 role="status"
               >
                 {currencyNotice}
@@ -468,26 +468,26 @@ export function BrandingPage() {
                       className="mb-4 max-h-14 max-w-44 object-contain object-left"
                     />
                   ) : null}
-                  <h2 className="font-display text-2xl">
+                  <h2 className="font-display text-xl">
                     {previewBrand.displayName}
                   </h2>
-                  <p className="mt-2 whitespace-pre-line text-[11px] leading-relaxed text-white/70">
+                  <p className="mt-2 whitespace-pre-line text-xs leading-relaxed text-white/70">
                     {previewBrand.address || "Your business address"}
                   </p>
                 </div>
-                <span className="font-mono text-[10px] tracking-[0.18em] text-white/70">
+                <span className="font-mono text-2xs tracking-[0.18em] text-white/70">
                   PROPOSAL
                 </span>
               </div>
             </header>
             <div className="px-7 py-8 text-ink">
-              <p className="text-[9px] font-semibold tracking-[0.16em] text-[var(--preview-accent)] uppercase">
+              <p className="text-2xs font-semibold tracking-[0.16em] text-[var(--preview-accent)] uppercase">
                 Prepared for
               </p>
-              <h3 className="mt-2 font-display text-2xl">
+              <h3 className="mt-2 font-display text-xl">
                 Hawthorne Summer Dinner
               </h3>
-              <div className="mt-7 grid grid-cols-2 gap-6 border-y border-line py-5 text-[11px]">
+              <div className="mt-7 grid grid-cols-2 gap-6 border-y border-line py-5 text-xs">
                 <div>
                   <span className="text-ink-3">Event date</span>
                   <strong className="mt-1 block">August 24, 2026</strong>
@@ -498,7 +498,7 @@ export function BrandingPage() {
                 </div>
               </div>
               <div className="mt-7 flex items-end justify-between gap-5">
-                <p className="max-w-72 text-[11px] leading-relaxed text-ink-2">
+                <p className="max-w-72 text-xs leading-relaxed text-ink-2">
                   The same identity is applied automatically across every
                   customer-facing PDF.
                 </p>

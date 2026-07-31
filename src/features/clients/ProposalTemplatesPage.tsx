@@ -410,7 +410,7 @@ export function ProposalTemplatesPage() {
                     {formatVisibleSections(row.visibleSections)}
                   </td>
                   <td className="text-ink-2">
-                    <div className="text-xs">
+                    <div className="text-2xs">
                       {row.defaultTaxRate != null
                         ? `Tax: ${formatPercentage(row.defaultTaxRate)}`
                         : null}

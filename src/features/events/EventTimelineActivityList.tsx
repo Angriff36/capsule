@@ -144,7 +144,7 @@ export function EventTimelineActivityList({
                 <div className="flex min-w-0 gap-2">
                   <button
                     type="button"
-                    className="mt-0.5 cursor-grab rounded-sm border border-line-2 bg-canvas px-1.5 py-1 font-mono text-[11px] text-ink-3 active:cursor-grabbing"
+                    className="mt-0.5 cursor-grab rounded-sm border border-line-2 bg-canvas px-1.5 py-1 font-mono text-xs text-ink-3 active:cursor-grabbing"
                     draggable={!isBusy}
                     onDragStart={onDragStart(activity._id)}
                     aria-label={`Drag to reorder ${activity.name}`}
@@ -154,14 +154,13 @@ export function EventTimelineActivityList({
                   </button>
                   <div className="min-w-0">
                     <h4 className="font-medium text-ink">{activity.name}</h4>
-                    <p className="mt-1 font-mono text-[11px] text-ink-3">
+                    <p className="mt-1 font-mono text-xs text-ink-3">
                       {formatDate(activity.startsAt)}{" "}
                       {formatTime(activity.startsAt)}
                       {endsLabel}
-                      {partyLabel ? ` · ${partyLabel}` : ""}
                     </p>
                     {activity.notes ? (
-                      <p className="mt-1 text-[11.5px] text-ink-2">
+                      <p className="mt-1 text-xs text-ink-2">
                         {activity.notes}
                       </p>
                     ) : null}
@@ -192,6 +191,7 @@ export function EventTimelineActivityList({
                   selection={selection}
                   staffOptions={staffOptions}
                   disabled={isBusy}
+                  summaryLabel={partyLabel}
                   onChange={(next) => onAssigneesChange(activity, next)}
                 />
               </div>

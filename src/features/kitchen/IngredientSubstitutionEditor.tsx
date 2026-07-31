@@ -83,7 +83,7 @@ export function IngredientSubstitutionEditor({
         </div>
         <span>{selectedIds.length} mapped</span>
       </div>
-      <p className="max-w-160 text-[13px] text-ink-2">
+      <p className="max-w-160 text-base text-ink-2">
         When this ingredient cannot cover component demand, the event menu ranks
         these alternatives by allergen compatibility and unit-cost impact.
       </p>
@@ -104,11 +104,11 @@ export function IngredientSubstitutionEditor({
             return (
               <li
                 key={candidateId}
-                className="flex flex-wrap items-center gap-3 rounded-xl border border-line bg-paper px-4 py-3"
+                className="flex flex-wrap items-center gap-3 rounded-sm border border-line bg-panel px-4 py-3"
               >
                 <div className="min-w-48 flex-1">
                   <strong>{candidate?.name ?? "Unavailable ingredient"}</strong>
-                  <p className="mt-1 text-[11px] text-ink-3">
+                  <p className="mt-1 text-xs text-ink-3">
                     {candidate
                       ? costDeltaLabel(
                           candidate.costPerUnit - ingredient.costPerUnit,
@@ -154,7 +154,7 @@ export function IngredientSubstitutionEditor({
       )}
 
       <div className="mt-4 flex flex-wrap items-end gap-2">
-        <label className="grid min-w-0 flex-1 basis-48 gap-1 text-[12px] text-ink-2">
+        <label className="grid min-w-0 flex-1 basis-48 gap-1 text-sm text-ink-2">
           Add substitute
           <select
             className="input"

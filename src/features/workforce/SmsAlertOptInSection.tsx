@@ -47,14 +47,14 @@ export function SmsAlertOptInSection({ people }: { people: Doc<"people">[] }) {
         </div>
         <span>{optedInCount} opted in</span>
       </div>
-      <p className="mt-1 max-w-160 text-[13px] leading-relaxed text-ink-2">
+      <p className="mt-1 max-w-160 text-base leading-relaxed text-ink-2">
         Opted-in staff receive a text for delivery dispatch, events starting in
         about two hours, and critical allergen incidents. Enable the Twilio
         provider in Admin → Integrations for messages to send.
       </p>
       {error ? (
         <div
-          className="mt-3 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-[13px] text-warn"
+          className="mt-3 rounded-sm border border-warn/30 bg-warn-soft px-4 py-3 text-base text-warn"
           role="status"
         >
           {error}

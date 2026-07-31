@@ -37,7 +37,7 @@ export function PageGuide() {
         >
           <span
             aria-hidden="true"
-            className="grid h-3.5 w-3.5 place-items-center rounded-full border border-current text-[9px] font-semibold"
+            className="grid h-3.5 w-3.5 place-items-center rounded-full border border-current text-2xs font-semibold"
           >
             ?
           </span>
@@ -57,13 +57,13 @@ export function PageGuide() {
           <p className="eyebrow text-brand">
             {guide.title} — what this page is for
           </p>
-          <p className="mt-1 max-w-3xl text-[13px] leading-relaxed text-ink">
+          <p className="mt-1 max-w-3xl text-base leading-relaxed text-ink">
             {guide.purpose}
           </p>
-          <ol className="mt-2 max-w-3xl space-y-1 text-[12.5px] leading-relaxed text-ink-2">
+          <ol className="mt-2 max-w-3xl space-y-1 text-sm leading-relaxed text-ink-2">
             {guide.steps.map((step, index) => (
               <li key={step} className="flex gap-2">
-                <span className="font-mono text-[11px] text-brand">
+                <span className="font-mono text-xs text-brand">
                   {index + 1}.
                 </span>
                 {step}

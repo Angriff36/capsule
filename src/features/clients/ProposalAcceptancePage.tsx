@@ -52,9 +52,9 @@ export function ProposalAcceptancePage({
     return (
       <div className="min-h-screen flex items-center justify-center bg-canvas">
         <div className="w-full max-w-2xl p-8">
-          <div className="bg-panel rounded-lg shadow-lg p-8 text-center">
-            <div className="text-ok text-6xl mb-4">✓</div>
-            <h1 className="text-2xl font-bold text-ink mb-2">
+          <div className="bg-panel rounded-sm shadow-lg p-8 text-center">
+            <div className="text-ok text-3xl mb-4">✓</div>
+            <h1 className="text-xl font-bold text-ink mb-2">
               Proposal Accepted
             </h1>
             <p className="text-ink-2">
@@ -98,10 +98,10 @@ export function ProposalAcceptancePage({
   return (
     <div className="min-h-screen bg-canvas py-12 px-4">
       <div className="max-w-3xl mx-auto">
-        <div className="bg-panel rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-panel rounded-sm shadow-lg overflow-hidden">
           {/* Header */}
           <div className="border-b border-line bg-brand-soft px-8 py-6">
-            <h1 className="text-2xl font-bold text-brand">
+            <h1 className="text-xl font-bold text-brand">
               Proposal Acceptance
             </h1>
             <p className="text-ink-2 mt-1">
@@ -119,8 +119,8 @@ export function ProposalAcceptancePage({
               <p className="text-ink-2">For: {pending.proposal.clientName}</p>
             </div>
 
-            <div className="bg-inset rounded-lg p-6 mb-6">
-              <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-4">
+            <div className="bg-inset rounded-sm p-6 mb-6">
+              <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-4">
                 Event Details
               </h3>
               <div className="space-y-2">
@@ -147,10 +147,10 @@ export function ProposalAcceptancePage({
 
             {pending.enhancements.length > 0 && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-3">
+                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-3">
                   Optional Enhancements
                 </h3>
-                <ul className="space-y-2 text-sm text-ink-2">
+                <ul className="space-y-2 text-xs text-ink-2">
                   {pending.enhancements.map((item, index) => (
                     <li
                       key={index}
@@ -159,7 +159,7 @@ export function ProposalAcceptancePage({
                       <span>
                         {item.name}
                         {item.description ? (
-                          <span className="block text-xs text-ink-3">
+                          <span className="block text-2xs text-ink-3">
                             {item.description}
                           </span>
                         ) : null}
@@ -176,17 +176,17 @@ export function ProposalAcceptancePage({
             <div className="bg-info-soft border-l-4 border-info p-6 mb-6">
               <div className="flex justify-between items-center">
                 <div>
-                  <p className="text-sm text-ink-2 mb-1">Total Amount</p>
-                  <p className="text-3xl font-bold text-ink">
+                  <p className="text-xs text-ink-2 mb-1">Total Amount</p>
+                  <p className="text-2xl font-bold text-ink">
                     {formattedTotal}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-ink-3">
+                  <p className="text-xs text-ink-3">
                     Revision {pending.revisionNumber}
                   </p>
                   {pending.changeSummary ? (
-                    <p className="text-xs text-ink-3">
+                    <p className="text-2xs text-ink-3">
                       {pending.changeSummary}
                     </p>
                   ) : null}
@@ -196,10 +196,10 @@ export function ProposalAcceptancePage({
 
             {pending.proposal.terms && (
               <div className="mb-6">
-                <h3 className="text-sm font-semibold text-ink-3 uppercase tracking-wide mb-2">
+                <h3 className="text-xs font-semibold text-ink-3 uppercase tracking-wide mb-2">
                   Terms
                 </h3>
-                <p className="text-ink-2 text-sm whitespace-pre-wrap">
+                <p className="text-ink-2 text-xs whitespace-pre-wrap">
                   {pending.proposal.terms}
                 </p>
               </div>
@@ -219,7 +219,7 @@ export function ProposalAcceptancePage({
 
             {/* Acceptance Notice */}
             <div className="bg-warn-soft border-l-4 border-warn p-4 mb-6">
-              <p className="text-sm text-warn">
+              <p className="text-xs text-warn">
                 By clicking "Accept Proposal," you confirm that you have
                 reviewed and agree to the proposal terms and pricing shown
                 above.
@@ -242,11 +242,11 @@ export function ProposalAcceptancePage({
 
             {/* Footer Info */}
             <div className="mt-8 pt-6 border-t border-line text-center">
-              <p className="text-xs text-ink-3">
+              <p className="text-2xs text-ink-3">
                 This acceptance is being recorded for {pending.recipientName} (
                 {pending.recipientEmail})
               </p>
-              <p className="text-xs text-ink-3 mt-1">
+              <p className="text-2xs text-ink-3 mt-1">
                 If this is not you, please contact us immediately.
               </p>
             </div>

@@ -132,7 +132,7 @@ export function TableDisplay({
   return (
     <div
       className={clsx(
-        "overflow-hidden rounded-lg border border-line bg-panel",
+        "overflow-hidden rounded-sm border border-line bg-panel",
         className,
       )}
     >
@@ -142,12 +142,12 @@ export function TableDisplay({
             {title && (
               <h3 className="text-base font-semibold text-ink">{title}</h3>
             )}
-            {subtitle && <p className="text-sm text-ink-3">{subtitle}</p>}
+            {subtitle && <p className="text-xs text-ink-3">{subtitle}</p>}
           </div>
           {onExport && (
             <button
               onClick={onExport}
-              className="rounded border border-line-2 px-3 py-1.5 text-sm text-ink-2 hover:bg-inset"
+              className="rounded-xs border border-line-2 px-3 py-1.5 text-xs text-ink-2 hover:bg-inset"
             >
               Export CSV
             </button>
@@ -156,7 +156,7 @@ export function TableDisplay({
       )}
 
       <div style={{ height }} className="overflow-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-xs">
           <thead className="bg-inset">
             <tr>
               {columns.map((col) => (

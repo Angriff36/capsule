@@ -216,7 +216,7 @@ export function PaymentsPage() {
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
@@ -231,7 +231,7 @@ export function PaymentsPage() {
             </div>
           </div>
           {payableInvoices.length === 0 ? (
-            <p className="text-[13px] text-ink-2">
+            <p className="text-base text-ink-2">
               No payable invoices.{" "}
               <Link className="text-link" to={FINANCE_ROUTES.invoices}>
                 Issue and send an invoice

@@ -62,7 +62,7 @@ export function IngredientCostingEditor({
         </div>
         {!canEdit && <span>Reinstate to edit</span>}
       </div>
-      <p className="max-w-160 text-[13px] text-ink-2">
+      <p className="max-w-160 text-base text-ink-2">
         Sets the catalog cost used when no receipt price is available. Changing
         it needs kitchen manage access. Confirmed receipt prices still come from
         purchasing receives.
@@ -71,7 +71,7 @@ export function IngredientCostingEditor({
         className="mt-4 flex flex-wrap items-end gap-2"
         onSubmit={(event) => void save(event)}
       >
-        <label className="grid min-w-40 flex-1 basis-40 gap-1 text-[12px] text-ink-2">
+        <label className="grid min-w-40 flex-1 basis-40 gap-1 text-sm text-ink-2">
           <span>Cost per {ingredient.unit}</span>
           <input
             className="input"

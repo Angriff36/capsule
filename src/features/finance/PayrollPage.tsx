@@ -230,7 +230,7 @@ export function PayrollPage() {
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
@@ -259,7 +259,7 @@ export function PayrollPage() {
             Download CSV
           </button>
         </div>
-        <p className="text-[13px] text-ink-2">
+        <p className="text-base text-ink-2">
           Completed time records supply clocked hours. A finalized payroll input
           becomes the reviewed total for that person and period; its difference
           from clocked time is shown as the manual adjustment.
@@ -303,11 +303,11 @@ export function PayrollPage() {
             </select>
           </label>
         </div>
-        <p className="mt-3 text-[12px] text-ink-3">
+        <p className="mt-3 text-sm text-ink-3">
           {`${PAYROLL_PROCESSORS.find((item) => item.value === processor)?.detail ?? ""} CSV opens in Excel; company-specific earning codes or import mappings may still be required by ADP or Paychex.`}
         </p>
         {payrollExport.error ? (
-          <p className="mt-3 text-[13px] text-danger" role="alert">
+          <p className="mt-3 text-base text-danger" role="alert">
             {payrollExport.error}
           </p>
         ) : null}
@@ -321,7 +321,7 @@ export function PayrollPage() {
               <span>{`${payrollExport.document.timeRecordCount} time records · ${payrollExport.document.payrollInputCount} finalized inputs`}</span>
             </div>
             {payrollExport.document.fallbackEmployeeIdCount > 0 ? (
-              <p className="mb-3 text-[12px] text-warn" role="status">
+              <p className="mb-3 text-sm text-warn" role="status">
                 {`${payrollExport.document.fallbackEmployeeIdCount} employee ID${payrollExport.document.fallbackEmployeeIdCount === 1 ? " uses" : "s use"} the Capsule person ID because no employee number is set.`}
               </p>
             ) : null}
@@ -484,7 +484,7 @@ export function PayrollPage() {
         )}
       </section>
 
-      <p className="mt-4 text-[12px] text-ink-3">
+      <p className="mt-4 text-sm text-ink-3">
         Saved report definitions live under{" "}
         <Link className="text-link" to="/reports">
           Reports

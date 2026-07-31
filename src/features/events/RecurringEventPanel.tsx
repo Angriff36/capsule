@@ -81,7 +81,7 @@ function ScheduleSummary({
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xs border border-accent/25 bg-accent-soft/30 p-3">
           <div>
             <span className="eyebrow">Recurring Draft</span>
-            <p className="mt-1 text-[12px] leading-relaxed text-ink-2">
+            <p className="mt-1 text-sm leading-relaxed text-ink-2">
               Occurrence {recurrence.recurrenceSequence ?? "—"} was prepared
               from the source Event and remains in Draft for operator review.
             </p>
@@ -96,7 +96,7 @@ function ScheduleSummary({
       );
     }
     return (
-      <p className="text-[12px] leading-relaxed text-ink-3">
+      <p className="text-sm leading-relaxed text-ink-3">
         Create future copies of this Event for review. Every copy stays in Draft
         until an operator submits and approves it.
       </p>
@@ -106,19 +106,19 @@ function ScheduleSummary({
     <div className="grid gap-2 sm:grid-cols-3">
       <div className="rounded-xs border border-line bg-inset/45 p-2.5">
         <span className="eyebrow">Cadence</span>
-        <strong className="mt-1 block text-[13px] text-ink">
+        <strong className="mt-1 block text-base text-ink">
           {frequencyLabel(recurrence.recurrenceFrequency)}
         </strong>
       </div>
       <div className="rounded-xs border border-line bg-inset/45 p-2.5">
         <span className="eyebrow">Drafts created</span>
-        <strong className="mt-1 block font-mono text-[13px] text-ink">
+        <strong className="mt-1 block font-mono text-base text-ink">
           {generatedDrafts}
         </strong>
       </div>
       <div className="rounded-xs border border-line bg-inset/45 p-2.5">
         <span className="eyebrow">Next Draft</span>
-        <strong className="mt-1 block text-[12px] text-ink">
+        <strong className="mt-1 block text-sm text-ink">
           {recurrence.recurrenceActive &&
           typeof recurrence.recurrenceNextStartsAt === "number"
             ? `${formatDate(recurrence.recurrenceNextStartsAt)} · ${formatTime(recurrence.recurrenceNextStartsAt)}`
@@ -216,7 +216,7 @@ export function RecurringEventPanelView({
               </button>
             ) : null}
             {!canConfigure ? (
-              <span className="text-[11px] text-ink-3">
+              <span className="text-xs text-ink-3">
                 Return this Event to an editable planning stage to change its
                 recurring schedule.
               </span>
@@ -304,7 +304,7 @@ export function RecurringEventPanelView({
                 </button>
               ) : null}
             </div>
-            <p className="sm:col-span-2 lg:col-span-4 text-[11px] leading-relaxed text-ink-3">
+            <p className="sm:col-span-2 lg:col-span-4 text-xs leading-relaxed text-ink-3">
               {previewStartsAt != null
                 ? `First future Draft: ${formatDate(previewStartsAt)} at ${formatTime(previewStartsAt)}. `
                 : "Set the Event schedule before adding recurrence. "}

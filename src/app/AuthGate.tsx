@@ -42,7 +42,7 @@ export function AuthGate({ children }: { children?: ReactNode }) {
       <AuthRefreshing>
         <div
           role="status"
-          className="fixed inset-x-0 top-0 z-50 flex items-center justify-center gap-2 border-b border-warn/30 bg-warn-soft px-4 py-1 text-[12px] font-medium text-warn"
+          className="fixed inset-x-0 top-0 z-50 flex items-center justify-center gap-2 border-b border-warn/30 bg-warn-soft px-4 py-1 text-sm font-medium text-warn"
         >
           Refreshing your session… your work is untouched.
         </div>
@@ -77,7 +77,7 @@ function SignInScreen() {
       <div className="flex flex-col items-center gap-6">
         <CapsuleWordmark />
         <SignIn />
-        <p className="max-w-90 text-center text-[11.5px] leading-relaxed text-ink-3">
+        <p className="max-w-90 text-center text-xs leading-relaxed text-ink-3">
           Operations access is granted by your workspace administrator. Signing
           in does not create a workspace.
         </p>
@@ -115,7 +115,7 @@ function MembershipRequired({
           afterSelectOrganizationUrl="/"
         />
         {organization ? (
-          <span className="text-[12px] text-ink-3">
+          <span className="text-sm text-ink-3">
             Active org: <span className="font-mono">{organization.id}</span>
           </span>
         ) : null}
@@ -126,7 +126,7 @@ function MembershipRequired({
             Sign out
           </button>
         </SignOutButton>
-        <span className="text-[12px] text-ink-3">
+        <span className="text-sm text-ink-3">
           Setup reference for your technician:{" "}
           <span className="font-mono">
             {`{"role":"{{org.role}}","tenantId":"{{org.id}}"}`}
@@ -144,7 +144,7 @@ export function AuthSetupRequired() {
         Capsule can't start until sign-in is configured. Finish this one-time
         setup to continue:
       </p>
-      <ol className="mt-4 list-decimal space-y-1.5 pl-5 text-[12.5px] leading-relaxed text-ink-2">
+      <ol className="mt-4 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-ink-2">
         <li>
           Put <code className="font-mono">VITE_CLERK_PUBLISHABLE_KEY</code> in{" "}
           <code className="font-mono">.env.local</code> (never commit it).
@@ -175,9 +175,7 @@ function GateShell({
     <div className="grid min-h-dvh place-items-center bg-canvas px-6">
       <div className="card max-w-130 px-6 py-6">
         <CapsuleWordmark />
-        <h1 className="mt-5 text-[19px] font-semibold tracking-tight">
-          {title}
-        </h1>
+        <h1 className="mt-5 text-xl font-semibold tracking-tight">{title}</h1>
         <div className="mt-2">{children}</div>
       </div>
     </div>
@@ -187,10 +185,10 @@ function GateShell({
 function CapsuleWordmark() {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="grid h-6 w-6 place-items-center rounded-xs bg-accent font-mono text-[12px] font-bold text-white">
+      <span className="grid h-6 w-6 place-items-center rounded-xs bg-accent font-mono text-sm font-bold text-white">
         C
       </span>
-      <span className="text-[13px] font-semibold tracking-[0.14em] uppercase">
+      <span className="text-base font-semibold tracking-[0.14em] uppercase">
         Capsule
       </span>
     </div>

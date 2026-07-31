@@ -456,11 +456,11 @@ export function TimsKPIsDashboardPage() {
       <DashboardGrid items={dashboardItems} />
 
       {/* Reconciliation Note */}
-      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
-        <h4 className="text-sm font-semibold text-ink">
+      <div className="mt-6 rounded-sm border border-line bg-inset p-4">
+        <h4 className="text-xs font-semibold text-ink">
           Where these numbers come from
         </h4>
-        <p className="mt-1 text-sm text-ink-2">
+        <p className="mt-1 text-xs text-ink-2">
           Every number updates live from your own data. Revenue comes from
           completed events' quoted prices. Food cost percentages come from event
           closeouts, comparing actual against budgeted. Lead numbers come from

@@ -155,7 +155,7 @@ export function InvoiceIssueForm({
             <h2>New invoice</h2>
           </div>
         </div>
-        <p className="text-[13px] text-ink-2">
+        <p className="text-base text-ink-2">
           No active clients are available. Register a client from Events (sales)
           before issuing an invoice.
         </p>
@@ -244,7 +244,7 @@ export function InvoiceIssueForm({
               </option>
             ))}
           </select>
-          <span className="mt-1 block text-[11px] font-normal text-ink-3">
+          <span className="mt-1 block text-xs font-normal text-ink-3">
             Tenant functional currency is {formatCurrencyLabel(functionalCode)}.
           </span>
         </label>
@@ -261,7 +261,7 @@ export function InvoiceIssueForm({
             value={exchangeRate}
             onChange={(event) => setExchangeRate(event.target.value)}
           />
-          <span className="mt-1 block text-[11px] font-normal text-ink-3">
+          <span className="mt-1 block text-xs font-normal text-ink-3">
             {isFunctionalCurrency
               ? "Locked at 1.000000 — invoice is already in the functional currency."
               : `1 ${normalizedCurrencyCode} = ${parsedExchangeRate || 0} ${functionalCode} (recorded at issue).`}
@@ -492,7 +492,7 @@ export function InvoiceIssueForm({
             </div>
           </dl>
           {isFunctionalCurrency ? null : (
-            <p className="text-[11px] text-ink-3" role="status">
+            <p className="text-xs text-ink-3" role="status">
               Functional equivalent ·{" "}
               {formatMoney(functionalEquivalent ?? 0, functionalCode)}
             </p>

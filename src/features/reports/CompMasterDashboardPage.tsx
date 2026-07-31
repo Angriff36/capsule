@@ -403,11 +403,11 @@ export function CompMasterDashboardPage() {
       <DashboardGrid items={dashboardItems} />
 
       {/* Evidence Trail */}
-      <div className="mt-6 rounded-lg border border-line bg-panel p-4">
-        <h4 className="text-sm font-semibold text-ink">
+      <div className="mt-6 rounded-sm border border-line bg-panel p-4">
+        <h4 className="text-xs font-semibold text-ink">
           Where these numbers come from
         </h4>
-        <div className="mt-2 text-sm text-ink-2">
+        <div className="mt-2 text-xs text-ink-2">
           <p>
             Commissions are 3% of attributed revenue. When revenue attribution
             records exist, the allocated amounts are used; otherwise the event's

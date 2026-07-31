@@ -29,9 +29,9 @@ export function EventTabPanel({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="eyebrow">{eyebrow}</p>
-          <h3 className="mt-1 text-[15px] font-semibold text-ink">{title}</h3>
+          <h3 className="mt-1 text-lg font-semibold text-ink">{title}</h3>
           {description ? (
-            <p className="mt-1 max-w-xl text-[12.5px] leading-relaxed text-ink-2">
+            <p className="mt-1 max-w-xl text-sm leading-relaxed text-ink-2">
               {description}
             </p>
           ) : null}

@@ -188,7 +188,7 @@ export function DishDetailPage() {
       {dish.description ? (
         <p className="culinary-lead">{dish.description}</p>
       ) : (
-        <p className="text-[13px] text-ink-3">
+        <p className="text-base text-ink-3">
           No customer-facing description yet.
         </p>
       )}
@@ -247,7 +247,7 @@ export function DishDetailPage() {
               >
                 <Link
                   to={dishPath(match._id)}
-                  className="text-[13px] hover:underline"
+                  className="text-base hover:underline"
                 >
                   {match.name} · ed. {match.editionNumber ?? 1}
                 </Link>
@@ -284,7 +284,7 @@ export function DishDetailPage() {
             ))}
           </ul>
         ) : (
-          <p className="mt-2 text-[13px] text-ink-3">
+          <p className="mt-2 text-base text-ink-3">
             No similarly named dishes.
           </p>
         )}
@@ -303,7 +303,7 @@ export function DishDetailPage() {
                 className="flex items-center justify-between border-b border-line py-3"
               >
                 <span>{event!.title ?? event!.name}</span>
-                <span className="font-mono text-[10px] text-ink-3">
+                <span className="font-mono text-2xs text-ink-3">
                   {entry.quantityServings} servings · {entry.course || "—"}
                 </span>
               </li>

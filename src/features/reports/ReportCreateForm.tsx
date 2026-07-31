@@ -75,12 +75,12 @@ export function ReportCreateForm({
       className="mt-4 space-y-3 border border-line bg-panel p-4"
       onSubmit={onSubmit}
     >
-      <p className="text-[13px] text-ink-2">
+      <p className="text-base text-ink-2">
         Save a report setup you can rename, share, archive, and restore later.
         This library stores your settings — it doesn't draw the chart yet.
       </p>
       <label className="block space-y-1">
-        <span className="text-[12px] text-ink-3">Name</span>
+        <span className="text-sm text-ink-3">Name</span>
         <input
           name="name"
           required
@@ -91,7 +91,7 @@ export function ReportCreateForm({
       </label>
       <div className="grid gap-3 sm:grid-cols-3">
         <label className="block space-y-1">
-          <span className="text-[12px] text-ink-3">Subject area</span>
+          <span className="text-sm text-ink-3">Subject area</span>
           <select
             name="subjectArea"
             className="input w-full"
@@ -106,7 +106,7 @@ export function ReportCreateForm({
           </select>
         </label>
         <label className="block space-y-1">
-          <span className="text-[12px] text-ink-3">Chart type</span>
+          <span className="text-sm text-ink-3">Chart type</span>
           <select
             name="chartType"
             className="input w-full"
@@ -121,7 +121,7 @@ export function ReportCreateForm({
           </select>
         </label>
         <label className="block space-y-1">
-          <span className="text-[12px] text-ink-3">Sharing</span>
+          <span className="text-sm text-ink-3">Sharing</span>
           <select
             name="sharingScope"
             className="input w-full"
@@ -137,7 +137,7 @@ export function ReportCreateForm({
         </label>
       </div>
       <label className="block space-y-1">
-        <span className="text-[12px] text-ink-3">Notes (optional)</span>
+        <span className="text-sm text-ink-3">Notes (optional)</span>
         <input
           name="notes"
           className="input w-full"

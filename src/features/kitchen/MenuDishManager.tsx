@@ -81,7 +81,7 @@ export function MenuDishManager({
           {showPicker ? "Hide dish picker" : "Add dish"}
         </button>
         {!canEdit ? (
-          <p className="text-[12px] text-ink-3">
+          <p className="text-sm text-ink-3">
             Menu must be in draft to add or reorder dishes.
           </p>
         ) : null}
@@ -132,7 +132,7 @@ export function MenuDishManager({
                 />
                 <div className="min-w-0 flex-1">
                   <p className="font-medium">{dish?.name ?? "Unknown dish"}</p>
-                  <p className="text-[12px] text-ink-3">
+                  <p className="text-sm text-ink-3">
                     Edition {dish?.editionNumber ?? 1}
                     {line.course ? ` · ${line.course}` : ""}
                     {line.sellingPrice != null
@@ -140,7 +140,7 @@ export function MenuDishManager({
                       : ""}
                   </p>
                   {dish?.description ? (
-                    <p className="text-[12px] text-ink-2 line-clamp-2">
+                    <p className="text-sm text-ink-2 line-clamp-2">
                       {dish.description}
                     </p>
                   ) : null}

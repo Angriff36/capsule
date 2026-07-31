@@ -327,7 +327,7 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
               </label>
             </div>
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="font-mono text-[11px] text-ink-3">
+              <span className="font-mono text-xs text-ink-3">
                 {formatMoney(budgetAmount)} / {formatMoney(quotedPrice)}
               </span>
               <button
@@ -361,7 +361,7 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
       />
 
       {canRevise ? null : (
-        <p className="mt-3 text-[12.5px] text-ink-3">
+        <p className="mt-3 text-sm text-ink-3">
           Core planning details lock once the event moves past planning.
           Headcount can still be changed until the event is underway.
         </p>

@@ -51,7 +51,7 @@ export function PageHeader({
   return (
     <header className="page-header flex flex-wrap items-end justify-between gap-3 border-b border-line pb-4">
       <div>
-        <h1 className="font-display text-[21px] font-semibold tracking-tight">
+        <h1 className="font-display text-2xl font-semibold tracking-tight">
           {title}
         </h1>
         {lead ? <p className="mt-0.5 text-ink-2">{lead}</p> : null}
@@ -77,7 +77,7 @@ export function Section({
   return (
     <section className="card">
       <div className="flex h-9 items-center justify-between border-b border-line px-3">
-        <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase">
+        <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase">
           {title}
           {count != null && (
             <span className="ml-1.5 font-mono text-ink-3 normal-case">
@@ -105,7 +105,7 @@ export function EmptyState({
   return (
     <div className="px-4 py-8 text-center">
       <p className="font-medium text-ink-2">{title}</p>
-      {hint ? <p className="mt-1 text-[12px] text-ink-3">{hint}</p> : null}
+      {hint ? <p className="mt-1 text-sm text-ink-3">{hint}</p> : null}
       {action ? (
         <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
           {action}
@@ -127,7 +127,7 @@ export function ErrorState({
   return (
     <div className="card border-danger/40 px-4 py-6 text-center" role="alert">
       <p className="font-semibold text-danger">{title}</p>
-      {detail ? <p className="mt-1 text-[12px] text-ink-2">{detail}</p> : null}
+      {detail ? <p className="mt-1 text-sm text-ink-2">{detail}</p> : null}
       {onRetry ? (
         <button
           type="button"

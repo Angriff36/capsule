@@ -7,24 +7,22 @@ export function ClientPreviewCard({ client }: { client: Doc<"clients"> }) {
   const location = [client.city, client.region].filter(Boolean).join(", ");
   return (
     <span className="block space-y-1.5">
-      <span className="block text-[13px] font-medium text-ink">
+      <span className="block text-base font-medium text-ink">
         {clientDisplayName(client._id, [client])}
       </span>
-      <span className="block text-[11px] text-ink-3 capitalize">
+      <span className="block text-xs text-ink-3 capitalize">
         {formatStatusLabel(client.clientType)} ·{" "}
         {formatStatusLabel(client.status)}
       </span>
       {client.email && (
-        <span className="block truncate text-[12px] text-ink-2">
+        <span className="block truncate text-sm text-ink-2">
           {client.email}
         </span>
       )}
       {client.phone && (
-        <span className="block text-[12px] text-ink-2">{client.phone}</span>
+        <span className="block text-sm text-ink-2">{client.phone}</span>
       )}
-      {location && (
-        <span className="block text-[12px] text-ink-2">{location}</span>
-      )}
+      {location && <span className="block text-sm text-ink-2">{location}</span>}
     </span>
   );
 }

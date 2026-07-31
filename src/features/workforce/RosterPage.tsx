@@ -437,7 +437,7 @@ export function RosterPage() {
             <h2>Event assignments</h2>
           </div>
           <div className="supply-row-actions">
-            <span className="font-mono text-[10px] text-ink-3 uppercase">
+            <span className="font-mono text-2xs text-ink-3 uppercase">
               {activeAssignments.length} assignments
             </span>
             <button
@@ -596,7 +596,7 @@ export function RosterPage() {
             <h2>Weekly shifts</h2>
           </div>
           <div className="supply-row-actions">
-            <span className="font-mono text-[10px] text-ink-3 uppercase">
+            <span className="font-mono text-2xs text-ink-3 uppercase">
               {selectedWeekShifts.length} shifts
             </span>
             <button

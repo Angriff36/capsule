@@ -152,15 +152,15 @@ export function QuoteSubmissionPage() {
   if (success) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100 flex items-center justify-center p-4">
-        <div className="max-w-md w-full bg-panel rounded-lg shadow-lg p-8 text-center">
+        <div className="max-w-md w-full bg-panel rounded-sm shadow-lg p-8 text-center">
           <div className="mx-auto w-16 h-16 bg-ok-soft rounded-full flex items-center justify-center mb-6">
             <CheckIcon className="w-8 h-8 text-ok" />
           </div>
-          <h1 className="text-2xl font-bold text-ink mb-4">
+          <h1 className="text-xl font-bold text-ink mb-4">
             Quote Request Submitted
           </h1>
           <p className="text-ink-2 mb-6">{success.message}</p>
-          <div className="text-sm text-ink-3 mb-8">
+          <div className="text-xs text-ink-3 mb-8">
             Reference ID: {success.submissionId}
           </div>
           <a href="/" className="btn btn-primary">
@@ -189,14 +189,14 @@ export function QuoteSubmissionPage() {
 
       {/* Form */}
       <main className="max-w-3xl mx-auto px-4 py-8">
-        <div className="bg-panel rounded-lg shadow-lg p-6 md:p-8">
+        <div className="bg-panel rounded-sm shadow-lg p-6 md:p-8">
           <p className="text-ink-2 mb-8">
             Tell us about your event and we'll get back to you within 24-48
             hours with a customized proposal.
           </p>
 
           {error && (
-            <div className="mb-6 p-4 bg-danger-soft border border-danger/40 rounded-lg">
+            <div className="mb-6 p-4 bg-danger-soft border border-danger/40 rounded-sm">
               <p className="text-danger">{error}</p>
             </div>
           )}
@@ -215,7 +215,7 @@ export function QuoteSubmissionPage() {
                 <div>
                   <label
                     htmlFor="clientName"
-                    className="block text-sm font-medium text-ink-2 mb-1"
+                    className="block text-xs font-medium text-ink-2 mb-1"
                   >
                     Name *
                   </label>
@@ -224,7 +224,7 @@ export function QuoteSubmissionPage() {
                     id="clientName"
                     name="clientName"
                     required
-                    className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                    className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                     placeholder="Your full name"
                     disabled={busy}
                   />
@@ -238,7 +238,7 @@ export function QuoteSubmissionPage() {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-ink-2 mb-1"
+                    className="block text-xs font-medium text-ink-2 mb-1"
                   >
                     Email *
                   </label>
@@ -247,7 +247,7 @@ export function QuoteSubmissionPage() {
                     id="email"
                     name="email"
                     required
-                    className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                    className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                     placeholder="your@email.com"
                     disabled={busy}
                   />
@@ -257,7 +257,7 @@ export function QuoteSubmissionPage() {
                 <div>
                   <label
                     htmlFor="phone"
-                    className="block text-sm font-medium text-ink-2 mb-1"
+                    className="block text-xs font-medium text-ink-2 mb-1"
                   >
                     Phone
                   </label>
@@ -265,7 +265,7 @@ export function QuoteSubmissionPage() {
                     type="tel"
                     id="phone"
                     name="phone"
-                    className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                    className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                     placeholder="(555) 123-4567"
                     disabled={busy}
                   />
@@ -283,7 +283,7 @@ export function QuoteSubmissionPage() {
                   <div>
                     <label
                       htmlFor="eventDate"
-                      className="block text-sm font-medium text-ink-2 mb-1"
+                      className="block text-xs font-medium text-ink-2 mb-1"
                     >
                       Event Date *
                     </label>
@@ -293,7 +293,7 @@ export function QuoteSubmissionPage() {
                       name="eventDate"
                       required
                       min={new Date().toISOString().split("T")[0]}
-                      className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                      className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                       disabled={busy}
                     />
                     <FieldError
@@ -306,7 +306,7 @@ export function QuoteSubmissionPage() {
                   <div>
                     <label
                       htmlFor="eventEndTime"
-                      className="block text-sm font-medium text-ink-2 mb-1"
+                      className="block text-xs font-medium text-ink-2 mb-1"
                     >
                       End Time
                     </label>
@@ -314,7 +314,7 @@ export function QuoteSubmissionPage() {
                       type="time"
                       id="eventEndTime"
                       name="eventEndTime"
-                      className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                      className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                       disabled={busy}
                     />
                   </div>
@@ -323,7 +323,7 @@ export function QuoteSubmissionPage() {
                 <div>
                   <label
                     htmlFor="guestCount"
-                    className="block text-sm font-medium text-ink-2 mb-1"
+                    className="block text-xs font-medium text-ink-2 mb-1"
                   >
                     Expected Guests *
                   </label>
@@ -333,7 +333,7 @@ export function QuoteSubmissionPage() {
                     name="guestCount"
                     required
                     min="1"
-                    className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                    className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                     placeholder="50"
                     disabled={busy}
                   />
@@ -348,14 +348,14 @@ export function QuoteSubmissionPage() {
                   <div>
                     <label
                       htmlFor="serviceStyleId"
-                      className="block text-sm font-medium text-ink-2 mb-1"
+                      className="block text-xs font-medium text-ink-2 mb-1"
                     >
                       Service Style
                     </label>
                     <select
                       id="serviceStyleId"
                       name="serviceStyleId"
-                      className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                      className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                       disabled={busy}
                     >
                       <option value="">Select service style...</option>
@@ -370,14 +370,14 @@ export function QuoteSubmissionPage() {
                   <div>
                     <label
                       htmlFor="occasionId"
-                      className="block text-sm font-medium text-ink-2 mb-1"
+                      className="block text-xs font-medium text-ink-2 mb-1"
                     >
                       Occasion
                     </label>
                     <select
                       id="occasionId"
                       name="occasionId"
-                      className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                      className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                       disabled={busy}
                     >
                       <option value="">Select occasion...</option>
@@ -401,7 +401,7 @@ export function QuoteSubmissionPage() {
                 <div>
                   <label
                     htmlFor="venueName"
-                    className="block text-sm font-medium text-ink-2 mb-1"
+                    className="block text-xs font-medium text-ink-2 mb-1"
                   >
                     Venue Name
                   </label>
@@ -409,7 +409,7 @@ export function QuoteSubmissionPage() {
                     type="text"
                     id="venueName"
                     name="venueName"
-                    className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                    className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                     placeholder="e.g., The Grand Ballroom"
                     disabled={busy}
                   />
@@ -418,7 +418,7 @@ export function QuoteSubmissionPage() {
                 <div>
                   <label
                     htmlFor="venueAddress"
-                    className="block text-sm font-medium text-ink-2 mb-1"
+                    className="block text-xs font-medium text-ink-2 mb-1"
                   >
                     Venue Address
                   </label>
@@ -426,7 +426,7 @@ export function QuoteSubmissionPage() {
                     type="text"
                     id="venueAddress"
                     name="venueAddress"
-                    className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                    className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                     placeholder="123 Main St, City, State ZIP"
                     disabled={busy}
                   />
@@ -443,7 +443,7 @@ export function QuoteSubmissionPage() {
                 <div>
                   <label
                     htmlFor="menuPreferences"
-                    className="block text-sm font-medium text-ink-2 mb-1"
+                    className="block text-xs font-medium text-ink-2 mb-1"
                   >
                     Menu Preferences
                   </label>
@@ -451,7 +451,7 @@ export function QuoteSubmissionPage() {
                     id="menuPreferences"
                     name="menuPreferences"
                     rows={3}
-                    className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                    className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                     placeholder="e.g., Plated dinner with beef and chicken options..."
                     disabled={busy}
                   />
@@ -460,7 +460,7 @@ export function QuoteSubmissionPage() {
                 <div>
                   <label
                     htmlFor="dietaryRestrictions"
-                    className="block text-sm font-medium text-ink-2 mb-1"
+                    className="block text-xs font-medium text-ink-2 mb-1"
                   >
                     Dietary Restrictions
                   </label>
@@ -468,7 +468,7 @@ export function QuoteSubmissionPage() {
                     id="dietaryRestrictions"
                     name="dietaryRestrictions"
                     rows={2}
-                    className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                    className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                     placeholder="e.g., Vegetarian, gluten-free, nut allergies..."
                     disabled={busy}
                   />
@@ -484,7 +484,7 @@ export function QuoteSubmissionPage() {
               <div>
                 <label
                   htmlFor="notes"
-                  className="block text-sm font-medium text-ink-2 mb-1"
+                  className="block text-xs font-medium text-ink-2 mb-1"
                 >
                   Any other details about your event?
                 </label>
@@ -492,7 +492,7 @@ export function QuoteSubmissionPage() {
                   id="notes"
                   name="notes"
                   rows={3}
-                  className="w-full px-4 py-2 border border-line-2 rounded-lg focus:border-accent"
+                  className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
                   placeholder="Tell us about your vision, theme, special requests..."
                   disabled={busy}
                 />
@@ -507,10 +507,10 @@ export function QuoteSubmissionPage() {
                   id="consent"
                   name="consent"
                   required
-                  className="mt-1 h-4 w-4 text-ink border-line-2 rounded"
+                  className="mt-1 h-4 w-4 text-ink border-line-2 rounded-xs"
                   disabled={busy}
                 />
-                <label htmlFor="consent" className="ml-3 text-sm text-ink-2">
+                <label htmlFor="consent" className="ml-3 text-xs text-ink-2">
                   I consent to the processing of my personal data for the
                   purpose of preparing a quote for my event. I understand my
                   data will be handled according to the privacy policy.

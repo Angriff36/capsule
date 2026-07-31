@@ -74,10 +74,10 @@ export function TimeOffRequestsPage() {
           </p>
         </div>
         <div className="rounded-sm border border-brand/20 bg-brand-soft px-5 py-4 text-center">
-          <p className="text-[28px] leading-none font-semibold text-brand">
+          <p className="text-3xl leading-none font-semibold text-brand">
             {pending.length}
           </p>
-          <p className="mt-1 text-[11px] font-medium tracking-wide text-ink-2 uppercase">
+          <p className="mt-1 text-xs font-medium tracking-wide text-ink-2 uppercase">
             Awaiting review
           </p>
         </div>
@@ -91,7 +91,7 @@ export function TimeOffRequestsPage() {
             <p className="eyebrow">Needs a decision</p>
             <h2>Pending requests</h2>
           </div>
-          <span className="text-[12px] text-ink-3">
+          <span className="text-sm text-ink-3">
             Oldest requests stay visible until reviewed
           </span>
         </div>
@@ -111,16 +111,16 @@ export function TimeOffRequestsPage() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-[15px] font-semibold">
+                    <p className="text-lg font-semibold">
                       {personName(String(request.personId))}
                     </p>
-                    <p className="mt-0.5 text-[12px] font-medium text-brand">
+                    <p className="mt-0.5 text-sm font-medium text-brand">
                       {formatRange(request.startsAt, request.endsAt)}
                     </p>
                   </div>
                   <StatusChip status="pending" />
                 </div>
-                <p className="mt-3 min-h-10 text-[13px] leading-relaxed text-ink-2">
+                <p className="mt-3 min-h-10 text-base leading-relaxed text-ink-2">
                   {request.reason}
                 </p>
                 <div className="mt-4 grid grid-cols-2 gap-2">

@@ -622,7 +622,7 @@ export function InvoiceDetailPage() {
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
@@ -635,7 +635,7 @@ export function InvoiceDetailPage() {
             <h2>Linked records</h2>
           </div>
         </div>
-        <p className="text-[13px] text-ink-2">
+        <p className="text-base text-ink-2">
           Client:{" "}
           <Link
             className="text-link"
@@ -743,7 +743,7 @@ export function InvoiceDetailPage() {
             <h2>Balance</h2>
           </div>
           {isForeignCurrency ? (
-            <span className="text-[11px] text-ink-3">
+            <span className="text-xs text-ink-3">
               1 {invoiceCurrencyCode} = {exchangeRate} {functionalCurrencyCode}{" "}
               · recorded at issue
             </span>
@@ -823,7 +823,7 @@ export function InvoiceDetailPage() {
           </div>
           <span>{relatedCreditMemos.length}</span>
         </div>
-        <p className="text-[13px] text-ink-2">
+        <p className="text-base text-ink-2">
           Preserve the paid invoice while recording a pricing correction,
           service recovery, or other post-event credit.
         </p>
@@ -838,7 +838,7 @@ export function InvoiceDetailPage() {
           </div>
         </dl>
         {invoice.status === "paid" && !canIssueCreditMemo ? (
-          <p className="mt-3 text-[13px] text-ink-2" role="status">
+          <p className="mt-3 text-base text-ink-2" role="status">
             The full paid amount has already been credited.
           </p>
         ) : null}
@@ -1087,13 +1087,13 @@ export function InvoiceDetailPage() {
             <h2 id="payment-link-title">Stripe payment link</h2>
           </div>
         </div>
-        <p className="mt-3 max-w-160 text-[13px] text-ink-2">
+        <p className="mt-3 max-w-160 text-base text-ink-2">
           Share a secure Stripe checkout link so the client can pay this invoice
           online without calling in. Confirmed Stripe payments are recorded here
           and applied to the balance.
         </p>
         {paymentLinkLoading ? (
-          <p className="mt-3 text-[13px] text-ink-2" role="status">
+          <p className="mt-3 text-base text-ink-2" role="status">
             Loading payment link…
           </p>
         ) : paymentLink ? (
@@ -1156,7 +1156,7 @@ export function InvoiceDetailPage() {
           ) : null}
         </div>
         {!paymentLinkAvailable && !paymentLink ? (
-          <p className="mt-3 text-[13px] text-ink-2" role="status">
+          <p className="mt-3 text-base text-ink-2" role="status">
             Send the invoice with a balance due to generate a payment link.
           </p>
         ) : null}
@@ -1170,7 +1170,7 @@ export function InvoiceDetailPage() {
           </div>
           <span>{reminderSchedule?.offsetsDays.length ?? 0}</span>
         </div>
-        <p className="mt-3 max-w-160 text-[13px] text-ink-2">
+        <p className="mt-3 max-w-160 text-base text-ink-2">
           Capsule emails the client a branded reminder with this invoice PDF and
           a fresh Stripe payment link. Paid, voided, and written-off invoices
           stop automatically.
@@ -1207,12 +1207,12 @@ export function InvoiceDetailPage() {
           </div>
         ) : null}
         {dueDate == null ? (
-          <p className="mt-3 text-[13px] text-ink-2" role="status">
+          <p className="mt-3 text-base text-ink-2" role="status">
             This invoice was issued without a due date, so automatic reminders
             cannot be scheduled.
           </p>
         ) : !reminderAutomationAvailable ? (
-          <p className="mt-3 text-[13px] text-ink-2" role="status">
+          <p className="mt-3 text-base text-ink-2" role="status">
             Send the invoice with a balance due to activate reminder automation.
           </p>
         ) : null}

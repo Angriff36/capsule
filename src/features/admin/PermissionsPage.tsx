@@ -81,12 +81,12 @@ export function PermissionsPage() {
       />
       <AdminWorkspaceNav />
       {!canEdit && (
-        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-[13px] text-warn">
+        <div className="card border-warn/30 bg-warn-soft px-4 py-3 text-base text-warn">
           Only a Capsule admin can change these settings.
         </div>
       )}
       {authStatus.hasRole ? (
-        <div className="card border-line bg-inset px-4 py-3 text-[13px] text-ink-2">
+        <div className="card border-line bg-inset px-4 py-3 text-base text-ink-2">
           Your Capsule role is{" "}
           <strong className="text-ink">
             {String(authStatus.role).replaceAll("_", " ")}
@@ -97,7 +97,7 @@ export function PermissionsPage() {
       {error && <ErrorState title="Permission change failed" detail={error} />}
       <TeamRolesPanel people={people} canEdit={canEdit} />
       <Section title="Organization access">
-        <div className="border-b border-line px-4 py-3 text-[12px] leading-relaxed text-ink-3">
+        <div className="border-b border-line px-4 py-3 text-sm leading-relaxed text-ink-3">
           Off means nobody in this organization can use that domain (including
           admins), until you turn it back on here. Administration stays in the
           nav so you can always reach this page.
@@ -113,7 +113,7 @@ export function PermissionsPage() {
               >
                 <div>
                   <p className="font-medium text-ink">{label}</p>
-                  <p className="mt-1 text-[12px] text-ink-3">{detail}</p>
+                  <p className="mt-1 text-sm text-ink-3">{detail}</p>
                 </div>
                 <button
                   type="button"

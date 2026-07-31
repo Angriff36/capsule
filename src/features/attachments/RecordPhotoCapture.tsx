@@ -312,8 +312,8 @@ export function RecordPhotoCaptureView({
     >
       <div className="min-w-0">
         <p className="eyebrow">Field photos</p>
-        <h3 className="mt-1 text-[15px] font-semibold text-ink">{title}</h3>
-        <p className="mt-1 max-w-xl text-[12.5px] leading-relaxed text-ink-2">
+        <h3 className="mt-1 text-lg font-semibold text-ink">{title}</h3>
+        <p className="mt-1 max-w-xl text-sm leading-relaxed text-ink-2">
           {description}
         </p>
       </div>
@@ -322,7 +322,7 @@ export function RecordPhotoCaptureView({
         <div className="mt-4">
           <p
             id={`${testId}-category-label`}
-            className="text-[12px] font-semibold uppercase tracking-[0.08em] text-ink-2"
+            className="text-sm font-semibold uppercase tracking-[0.08em] text-ink-2"
           >
             Add a photo by type
           </p>
@@ -347,10 +347,10 @@ export function RecordPhotoCaptureView({
                   }`}
                   onClick={() => chooseCategoryAndPickPhoto(category.value)}
                 >
-                  <span className="block text-[13px] font-semibold">
+                  <span className="block text-base font-semibold">
                     {category.label}
                   </span>
-                  <span className="mt-0.5 block text-[11.5px] leading-snug text-ink-3">
+                  <span className="mt-0.5 block text-xs leading-snug text-ink-3">
                     {category.hint}
                   </span>
                 </button>
@@ -358,7 +358,7 @@ export function RecordPhotoCaptureView({
             })}
           </div>
           {selectedCategoryLabel ? (
-            <p className="mt-2 text-[12px] text-ink-2" role="status">
+            <p className="mt-2 text-sm text-ink-2" role="status">
               Next photo will be tagged as{" "}
               <strong className="text-ink">{selectedCategoryLabel}</strong>.
             </p>
@@ -423,12 +423,12 @@ export function RecordPhotoCaptureView({
       </div>
 
       {error ? (
-        <p className="mt-3 text-[13px] text-danger" role="alert">
+        <p className="mt-3 text-base text-danger" role="alert">
           {error}
         </p>
       ) : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ok" role="status">
+        <p className="mt-3 text-base text-ok" role="status">
           {notice}
         </p>
       ) : null}
@@ -461,20 +461,20 @@ export function RecordPhotoCaptureView({
                   />
                 </a>
               ) : (
-                <div className="grid aspect-[4/3] place-items-center bg-canvas px-3 text-center text-[12px] text-ink-3">
+                <div className="grid aspect-[4/3] place-items-center bg-canvas px-3 text-center text-sm text-ink-3">
                   Preview unavailable
                 </div>
               )}
               <div className="p-2.5">
                 {evidenceLabel(photo.evidenceType, evidenceCategories) ? (
-                  <p className="mb-1 inline-flex rounded-full border border-line-2 bg-inset px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-ink-2">
+                  <p className="mb-1 inline-flex rounded-full border border-line-2 bg-inset px-2 py-0.5 text-2xs font-semibold uppercase tracking-[0.06em] text-ink-2">
                     {evidenceLabel(photo.evidenceType, evidenceCategories)}
                   </p>
                 ) : null}
-                <p className="truncate text-[12.5px] font-semibold text-ink">
+                <p className="truncate text-sm font-semibold text-ink">
                   {photo.fileName}
                 </p>
-                <p className="mt-0.5 text-[11px] text-ink-3">
+                <p className="mt-0.5 text-xs text-ink-3">
                   {formatSize(photo.fileSize)}
                   {photo.uploadedAt
                     ? ` · ${formatDate(photo.uploadedAt)} ${formatTime(photo.uploadedAt)}`

@@ -63,7 +63,7 @@ export function RolePermissionAuditView({
       <div className="flex flex-wrap items-start justify-between gap-4 border-b border-line p-4">
         <div className="max-w-2xl">
           <p className="font-medium text-ink">Who can do what</p>
-          <p className="mt-1 text-[12px] leading-relaxed text-ink-3">
+          <p className="mt-1 text-sm leading-relaxed text-ink-3">
             Capture every current team member, their role, and everything that
             role lets them do. Broader access is highlighted so you can review
             it from time to time.
@@ -147,7 +147,7 @@ export function RolePermissionAuditView({
                         <strong className="block text-ink">
                           {member.displayName}
                         </strong>
-                        <span className="mt-0.5 block text-[11px] text-ink-3">
+                        <span className="mt-0.5 block text-xs text-ink-3">
                           {member.email} · {formatStatusLabel(member.status)}
                         </span>
                       </td>
@@ -155,13 +155,13 @@ export function RolePermissionAuditView({
                         <span className="chip border-line-2 bg-inset text-ink-2">
                           {member.roleLabel}
                         </span>
-                        <code className="mt-1.5 block text-[10px] text-ink-3">
+                        <code className="mt-1.5 block text-2xs text-ink-3">
                           {member.role}
                         </code>
                       </td>
                       <td className="border-b border-line px-3 py-3">
                         {member.manifestPolicies.length === 0 ? (
-                          <span className="text-[11px] text-danger">
+                          <span className="text-xs text-danger">
                             This role grants no recognized access
                           </span>
                         ) : (
@@ -173,7 +173,7 @@ export function RolePermissionAuditView({
                                 <code
                                   key={policy}
                                   className={
-                                    "rounded-xs border px-1.5 py-1 text-[10px] " +
+                                    "rounded-xs border px-1.5 py-1 text-2xs " +
                                     (elevated
                                       ? "border-warn/30 bg-warn-soft text-warn"
                                       : "border-line bg-inset text-ink-2")
@@ -192,7 +192,7 @@ export function RolePermissionAuditView({
                             <span className="chip border-warn/30 bg-warn-soft text-warn">
                               Elevated access
                             </span>
-                            <p className="mt-1.5 max-w-xs text-[10px] leading-relaxed text-ink-3">
+                            <p className="mt-1.5 max-w-xs text-2xs leading-relaxed text-ink-3">
                               {member.elevatedPolicies.join(", ")}
                             </p>
                           </div>
@@ -209,7 +209,7 @@ export function RolePermissionAuditView({
             </div>
           )}
 
-          <p className="px-4 py-3 text-[10px] leading-relaxed text-ink-3">
+          <p className="px-4 py-3 text-2xs leading-relaxed text-ink-3">
             Highlighted items grant lead, manager, or admin-level access. A
             highlight is a prompt to review — it doesn't block anyone from
             working.
@@ -234,8 +234,7 @@ function SnapshotMetric({
       <span className="meta-term block">{label}</span>
       <strong
         className={
-          "mt-1 block font-mono text-[13px] " +
-          (warn ? "text-warn" : "text-ink")
+          "mt-1 block font-mono text-base " + (warn ? "text-warn" : "text-ink")
         }
       >
         {value}

@@ -231,7 +231,7 @@ export function ExternalRecordsReconcilePage() {
 
       {notice ? (
         <p
-          className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok"
+          className="card border-ok/30 bg-ok-soft px-4 py-3 text-base text-ok"
           role="status"
         >
           {notice}
@@ -251,7 +251,7 @@ export function ExternalRecordsReconcilePage() {
           <div>
             <label
               htmlFor="source-system-filter"
-              className="block text-sm font-medium text-ink-2 mb-1"
+              className="block text-xs font-medium text-ink-2 mb-1"
             >
               Old system
             </label>
@@ -259,7 +259,7 @@ export function ExternalRecordsReconcilePage() {
               id="source-system-filter"
               value={selectedSourceSystem ?? ""}
               onChange={(e) => setSelectedSourceSystem(e.target.value || null)}
-              className="min-w-48 px-3 py-2 border border-line-2 rounded-md text-sm"
+              className="min-w-48 px-3 py-2 border border-line-2 rounded-sm text-xs"
             >
               <option value="">All Systems</option>
               {Object.entries(SOURCE_SYSTEM_LABELS).map(([value, label]) => (
@@ -271,7 +271,7 @@ export function ExternalRecordsReconcilePage() {
           </div>
 
           <div className="ml-auto">
-            <p className="text-sm text-ink-2">
+            <p className="text-xs text-ink-2">
               {filteredRecords.length} waiting to be matched
             </p>
           </div>
@@ -280,7 +280,7 @@ export function ExternalRecordsReconcilePage() {
         {/* Bulk actions */}
         {selectedIds.size > 0 ? (
           <div className="flex items-center gap-3 p-4 bg-inset border-b border-line">
-            <span className="text-sm font-medium">
+            <span className="text-xs font-medium">
               {selectedIds.size} record(s) selected
             </span>
             <button
@@ -311,7 +311,7 @@ export function ExternalRecordsReconcilePage() {
 
         {/* Records table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-line bg-inset">
                 <th className="text-left py-3 px-4 font-medium">
@@ -376,14 +376,14 @@ export function ExternalRecordsReconcilePage() {
                       {RECORD_TYPE_LABELS[record.capsuleEntity] ||
                         record.capsuleEntity}
                     </td>
-                    <td className="py-3 px-4 font-mono text-xs">
+                    <td className="py-3 px-4 font-mono text-2xs">
                       {record.externalId}
                     </td>
                     <td className="py-3 px-4">
                       {RECORD_TYPE_LABELS[record.capsuleEntity] ||
                         record.capsuleEntity}
                     </td>
-                    <td className="py-3 px-4 font-mono text-xs">
+                    <td className="py-3 px-4 font-mono text-2xs">
                       {record.capsuleId || (
                         <span className="text-ink-3 italic">
                           Not linked yet
@@ -419,7 +419,7 @@ export function ExternalRecordsReconcilePage() {
                                 setMatchPaymentId(e.target.value)
                               }
                               disabled={busy}
-                              className="px-2 py-1 border border-line-2 rounded-md text-xs min-w-56"
+                              className="px-2 py-1 border border-line-2 rounded-sm text-2xs min-w-56"
                             >
                               <option value="">Select Capsule payment…</option>
                               {candidatePayments.map((payment) => (
@@ -484,13 +484,13 @@ export function ExternalRecordsReconcilePage() {
       {/* Help text */}
       <div className="card mt-4">
         <div className="border-b border-line px-3">
-          <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+          <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
             How matching works
           </h2>
         </div>
         <div className="p-4">
-          <h3 className="font-medium text-sm mb-2">Actions</h3>
-          <ul className="text-sm text-ink-2 space-y-1">
+          <h3 className="font-medium text-xs mb-2">Actions</h3>
+          <ul className="text-xs text-ink-2 space-y-1">
             <li>
               • <strong>Match</strong>: Link an imported payment reference to an
               existing Capsule payment, then mark it resolved.
@@ -505,8 +505,8 @@ export function ExternalRecordsReconcilePage() {
               later.
             </li>
           </ul>
-          <h3 className="font-medium text-sm mb-2 mt-4">Status Guide</h3>
-          <ul className="text-sm text-ink-2 space-y-1">
+          <h3 className="font-medium text-xs mb-2 mt-4">Status Guide</h3>
+          <ul className="text-xs text-ink-2 space-y-1">
             <li>
               • Records marked <strong>Conflict</strong> need to be sorted out
               before they leave this list.

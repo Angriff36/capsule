@@ -193,7 +193,7 @@ export function ImportRunsListPage() {
       {showForm ? (
         <div className="card mt-4">
           <div className="border-b border-line px-3">
-            <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+            <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
               Start New Import Run
             </h2>
           </div>
@@ -202,7 +202,7 @@ export function ImportRunsListPage() {
               <div>
                 <label
                   htmlFor="sourceSystem"
-                  className="block text-sm font-medium text-ink mb-1"
+                  className="block text-xs font-medium text-ink mb-1"
                 >
                   Source System
                 </label>
@@ -210,7 +210,7 @@ export function ImportRunsListPage() {
                   id="sourceSystem"
                   name="sourceSystem"
                   required
-                  className="w-full px-3 py-2 border border-line rounded-md text-sm"
+                  className="w-full px-3 py-2 border border-line rounded-sm text-xs"
                 >
                   {Object.entries(SOURCE_SYSTEM_LABELS).map(
                     ([value, label]) => (
@@ -224,7 +224,7 @@ export function ImportRunsListPage() {
               <div>
                 <label
                   htmlFor="datasetType"
-                  className="block text-sm font-medium text-ink mb-1"
+                  className="block text-xs font-medium text-ink mb-1"
                 >
                   Dataset Type
                 </label>
@@ -232,7 +232,7 @@ export function ImportRunsListPage() {
                   id="datasetType"
                   name="datasetType"
                   required
-                  className="w-full px-3 py-2 border border-line rounded-md text-sm"
+                  className="w-full px-3 py-2 border border-line rounded-sm text-xs"
                 >
                   {Object.entries(DATASET_TYPE_LABELS).map(([value, label]) => (
                     <option key={value} value={value}>
@@ -244,7 +244,7 @@ export function ImportRunsListPage() {
               <div>
                 <label
                   htmlFor="checksum"
-                  className="block text-sm font-medium text-ink mb-1"
+                  className="block text-xs font-medium text-ink mb-1"
                 >
                   Checksum (optional)
                 </label>
@@ -252,7 +252,7 @@ export function ImportRunsListPage() {
                   type="text"
                   id="checksum"
                   name="checksum"
-                  className="w-full px-3 py-2 border border-line rounded-md text-sm"
+                  className="w-full px-3 py-2 border border-line rounded-sm text-xs"
                   placeholder="SHA-256 checksum"
                 />
               </div>
@@ -278,14 +278,14 @@ export function ImportRunsListPage() {
       ) : null}
 
       {error ? (
-        <p className="card border-danger/30 bg-danger-soft px-4 py-3 text-[13px] text-danger mt-4">
+        <p className="card border-danger/30 bg-danger-soft px-4 py-3 text-base text-danger mt-4">
           {error}
         </p>
       ) : null}
 
       {notice ? (
         <p
-          className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok mt-4"
+          className="card border-ok/30 bg-ok-soft px-4 py-3 text-base text-ok mt-4"
           role="status"
         >
           {notice}
@@ -305,7 +305,7 @@ export function ImportRunsListPage() {
           <div>
             <label
               htmlFor="source-filter"
-              className="block text-sm font-medium text-ink-2 mb-1"
+              className="block text-xs font-medium text-ink-2 mb-1"
             >
               Source System
             </label>
@@ -313,7 +313,7 @@ export function ImportRunsListPage() {
               id="source-filter"
               value={sourceSystemFilter}
               onChange={(e) => setSourceSystemFilter(e.target.value)}
-              className="min-w-40 px-3 py-2 border border-line rounded-md text-sm"
+              className="min-w-40 px-3 py-2 border border-line rounded-sm text-xs"
             >
               <option value="">All Sources</option>
               {Object.entries(SOURCE_SYSTEM_LABELS).map(([value, label]) => (
@@ -326,7 +326,7 @@ export function ImportRunsListPage() {
           <div>
             <label
               htmlFor="dataset-filter"
-              className="block text-sm font-medium text-ink-2 mb-1"
+              className="block text-xs font-medium text-ink-2 mb-1"
             >
               Dataset Type
             </label>
@@ -334,7 +334,7 @@ export function ImportRunsListPage() {
               id="dataset-filter"
               value={datasetTypeFilter}
               onChange={(e) => setDatasetTypeFilter(e.target.value)}
-              className="min-w-40 px-3 py-2 border border-line rounded-md text-sm"
+              className="min-w-40 px-3 py-2 border border-line rounded-sm text-xs"
             >
               <option value="">All Types</option>
               {Object.entries(DATASET_TYPE_LABELS).map(([value, label]) => (
@@ -347,7 +347,7 @@ export function ImportRunsListPage() {
           <div>
             <label
               htmlFor="status-filter"
-              className="block text-sm font-medium text-ink-2 mb-1"
+              className="block text-xs font-medium text-ink-2 mb-1"
             >
               Status
             </label>
@@ -355,7 +355,7 @@ export function ImportRunsListPage() {
               id="status-filter"
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="min-w-40 px-3 py-2 border border-line rounded-md text-sm"
+              className="min-w-40 px-3 py-2 border border-line rounded-sm text-xs"
             >
               <option value="">All Statuses</option>
               {Object.entries(STATUS_LABELS).map(([value, label]) => (
@@ -366,7 +366,7 @@ export function ImportRunsListPage() {
             </select>
           </div>
           <div className="ml-auto">
-            <p className="text-sm text-ink-2">
+            <p className="text-xs text-ink-2">
               {filteredRuns.length} import run(s)
             </p>
           </div>
@@ -374,7 +374,7 @@ export function ImportRunsListPage() {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-xs">
             <thead>
               <tr className="border-b border-line bg-inset">
                 <th className="text-left py-3 px-4 font-medium">Source</th>
@@ -444,7 +444,7 @@ export function ImportRunsListPage() {
                         <div className="flex items-center gap-2">
                           <Link
                             to={importRunDetailPath(run._id)}
-                            className="text-brand hover:text-brand text-sm font-medium"
+                            className="text-brand hover:text-brand text-xs font-medium"
                           >
                             View
                           </Link>
@@ -456,7 +456,7 @@ export function ImportRunsListPage() {
                                 handleMarkFailed(run._id, run._id, run.version)
                               }
                               disabled={busy === `fail-${run._id}`}
-                              className="text-danger hover:text-danger text-sm disabled:opacity-50"
+                              className="text-danger hover:text-danger text-xs disabled:opacity-50"
                             >
                               {busy === `fail-${run._id}` ? "..." : "Fail"}
                             </button>
@@ -468,7 +468,7 @@ export function ImportRunsListPage() {
                                 handleRevert(run._id, run._id, run.version)
                               }
                               disabled={busy === `revert-${run._id}`}
-                              className="text-warn hover:underline text-sm disabled:opacity-50"
+                              className="text-warn hover:underline text-xs disabled:opacity-50"
                             >
                               {busy === `revert-${run._id}` ? "..." : "Revert"}
                             </button>
@@ -487,15 +487,15 @@ export function ImportRunsListPage() {
       {/* Help text */}
       <div className="card mt-4">
         <div className="border-b border-line px-3">
-          <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+          <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
             Import Run Workflow
           </h2>
         </div>
         <div className="p-4">
-          <h3 className="font-medium text-sm mb-2">
+          <h3 className="font-medium text-xs mb-2">
             How an import moves along
           </h3>
-          <ol className="text-sm text-ink-2 space-y-1 list-decimal list-inside">
+          <ol className="text-xs text-ink-2 space-y-1 list-decimal list-inside">
             <li>
               <strong>Started</strong>: The import is set up and ready to read
               your file
@@ -527,8 +527,8 @@ export function ImportRunsListPage() {
               <strong>Reverted</strong>: A finished import was undone
             </li>
           </ol>
-          <h3 className="font-medium text-sm mb-2 mt-4">Actions</h3>
-          <ul className="text-sm text-ink-2 space-y-1">
+          <h3 className="font-medium text-xs mb-2 mt-4">Actions</h3>
+          <ul className="text-xs text-ink-2 space-y-1">
             <li>
               • <strong>View</strong>: See detailed import run information and
               stage transitions

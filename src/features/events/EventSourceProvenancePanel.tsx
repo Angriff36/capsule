@@ -49,7 +49,7 @@ export function EventSourceProvenancePanel({
           <li
             key={`${link.sourceSystem}-${link.externalId}-${index}`}
             data-testid="event-source-provenance-link"
-            className="rounded-sm border border-line-2 bg-panel p-3 text-[12.5px]"
+            className="rounded-sm border border-line-2 bg-panel p-3 text-sm"
           >
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
               <span className="font-medium text-ink">
@@ -85,7 +85,7 @@ export function EventSourceProvenancePanel({
                 <summary className="cursor-pointer text-ink-3">
                   Original import details
                 </summary>
-                <pre className="mt-1 max-h-64 overflow-auto rounded-sm bg-inset p-2 text-[11px] text-ink-2">
+                <pre className="mt-1 max-h-64 overflow-auto rounded-sm bg-inset p-2 text-xs text-ink-2">
                   {prettySourceData(link.rawSourceData)}
                 </pre>
               </details>
@@ -115,7 +115,7 @@ function StatusChip({ status }: { readonly status: string }) {
   };
   return (
     <span
-      className={`inline-flex items-center rounded-sm border px-1.5 py-0.5 text-[11px] font-medium ${entry.cls}`}
+      className={`inline-flex items-center rounded-sm border px-1.5 py-0.5 text-xs font-medium ${entry.cls}`}
     >
       {entry.label}
     </span>

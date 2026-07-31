@@ -173,7 +173,7 @@ export function VenueCommissionTermsPage() {
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
@@ -350,7 +350,7 @@ export function VenueCommissionTermsPage() {
                           Retire
                         </button>
                       ) : (
-                        <span className="text-ink-2 text-sm">Retired</span>
+                        <span className="text-ink-2 text-xs">Retired</span>
                       )}
                     </div>
                   </article>

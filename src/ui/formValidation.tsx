@@ -112,7 +112,7 @@ export function FieldError({
   const message = errors[name];
   if (!message || !touched[name]) return null;
   return (
-    <p role="alert" className="mt-1 text-[11px] font-medium text-danger">
+    <p role="alert" className="mt-1 text-xs font-medium text-danger">
       {message}
     </p>
   );

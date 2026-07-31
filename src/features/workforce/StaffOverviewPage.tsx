@@ -192,7 +192,7 @@ export function StaffOverviewPage() {
                     <span className="block truncate font-medium text-ink">
                       {row.title}
                     </span>
-                    <span className="block truncate text-[12px] text-ink-2">
+                    <span className="block truncate text-sm text-ink-2">
                       {row.detail}
                     </span>
                   </span>
@@ -215,7 +215,7 @@ export function StaffOverviewPage() {
                 <span className="block font-medium text-ink">
                   {section.label}
                 </span>
-                <span className="mt-0.5 block text-[12px] text-ink-2">
+                <span className="mt-0.5 block text-sm text-ink-2">
                   {SECTION_DESCRIPTIONS[section.key]}
                 </span>
               </Link>

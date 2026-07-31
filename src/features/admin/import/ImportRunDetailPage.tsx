@@ -351,7 +351,7 @@ export function ImportRunDetailPage() {
         <div className="flex items-center gap-4">
           <Link
             to={importRunsListPath()}
-            className="text-ink-2 hover:text-ink text-sm"
+            className="text-ink-2 hover:text-ink text-xs"
           >
             ← Import Runs
           </Link>
@@ -367,7 +367,7 @@ export function ImportRunDetailPage() {
             {DATASET_TYPE_LABELS[importRun.datasetType]}
             <button
               type="button"
-              className="ml-3 font-mono text-[11px] text-ink-3 hover:text-ink"
+              className="ml-3 font-mono text-xs text-ink-3 hover:text-ink"
               title="Copy the internal run ID for support"
               onClick={() =>
                 void navigator.clipboard.writeText(String(importRun._id))
@@ -384,14 +384,14 @@ export function ImportRunDetailPage() {
       {host}
 
       {error ? (
-        <p className="card border-danger/30 bg-danger-soft px-4 py-3 text-[13px] text-danger">
+        <p className="card border-danger/30 bg-danger-soft px-4 py-3 text-base text-danger">
           {error}
         </p>
       ) : null}
 
       {notice ? (
         <p
-          className="card border-ok/30 bg-ok-soft px-4 py-3 text-[13px] text-ok"
+          className="card border-ok/30 bg-ok-soft px-4 py-3 text-base text-ok"
           role="status"
         >
           {notice}
@@ -408,7 +408,7 @@ export function ImportRunDetailPage() {
       {/* Actions Section */}
       <div className="card mt-4">
         <div className="border-b border-line px-3">
-          <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+          <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
             Available Actions
           </h2>
         </div>
@@ -457,7 +457,7 @@ export function ImportRunDetailPage() {
             );
           })}
           {availableTransitions.length === 0 ? (
-            <span className="text-ink-2 text-sm">
+            <span className="text-ink-2 text-xs">
               No actions available for this status
             </span>
           ) : null}
@@ -468,14 +468,14 @@ export function ImportRunDetailPage() {
       {showRecordCountsForm ? (
         <div className="card mt-4">
           <div className="border-b border-line px-3">
-            <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+            <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
               Record Parse Counts
             </h2>
           </div>
           <div className="p-4">
             <label
               htmlFor="recordCounts"
-              className="block text-sm font-medium text-ink mb-2"
+              className="block text-xs font-medium text-ink mb-2"
             >
               Record Counts (JSON)
             </label>
@@ -483,11 +483,11 @@ export function ImportRunDetailPage() {
               id="recordCounts"
               value={recordCountsInput}
               onChange={(e) => setRecordCountsInput(e.target.value)}
-              className="w-full px-3 py-2 border border-line rounded-md text-sm font-mono"
+              className="w-full px-3 py-2 border border-line rounded-sm text-xs font-mono"
               rows={6}
               placeholder='{"events": 100, "contacts": 50}'
             />
-            <p className="text-xs text-ink-2 mt-2">
+            <p className="text-2xs text-ink-2 mt-2">
               Enter the count of each record type parsed from the source data.
             </p>
             <div className="mt-4 flex gap-3">
@@ -518,14 +518,14 @@ export function ImportRunDetailPage() {
       {showFinalCountsForm ? (
         <div className="card mt-4">
           <div className="border-b border-line px-3">
-            <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+            <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
               Confirm Final Record Counts
             </h2>
           </div>
           <div className="p-4">
             <label
               htmlFor="finalRecordCounts"
-              className="block text-sm font-medium text-ink mb-2"
+              className="block text-xs font-medium text-ink mb-2"
             >
               Final record counts (JSON)
             </label>
@@ -533,10 +533,10 @@ export function ImportRunDetailPage() {
               id="finalRecordCounts"
               value={finalCountsInput}
               onChange={(e) => setFinalCountsInput(e.target.value)}
-              className="w-full px-3 py-2 border border-line rounded-md text-sm font-mono"
+              className="w-full px-3 py-2 border border-line rounded-sm text-xs font-mono"
               rows={6}
             />
-            <p className="text-xs text-ink-2 mt-2">
+            <p className="text-2xs text-ink-2 mt-2">
               Confirm (or correct) the counts before the reviewed data is
               approved for commit.
             </p>
@@ -565,14 +565,14 @@ export function ImportRunDetailPage() {
       {showSourceForm ? (
         <div className="card mt-4">
           <div className="border-b border-line px-3">
-            <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+            <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
               Commit {commitNounLabel} Source Rows
             </h2>
           </div>
           <div className="p-4">
             <label
               htmlFor="sourceRows"
-              className="block text-sm font-medium text-ink mb-2"
+              className="block text-xs font-medium text-ink mb-2"
             >
               {commitNounLabel} source rows (JSON array)
             </label>
@@ -580,7 +580,7 @@ export function ImportRunDetailPage() {
               id="sourceRows"
               value={sourceRowsInput}
               onChange={(e) => setSourceRowsInput(e.target.value)}
-              className="w-full px-3 py-2 border border-line rounded-md text-sm font-mono"
+              className="w-full px-3 py-2 border border-line rounded-sm text-xs font-mono"
               rows={8}
               placeholder={
                 commitNoun === "contact"
@@ -598,7 +598,7 @@ export function ImportRunDetailPage() {
                             : '[{"VenueID":"V1","VenueName":"Grand Hall","VenueType":"On Premise","Address":"1 Main St","City":"Austin","State":"TX","ZipCode":"78701","Capacity":200,"ContactName":"...","ContactPhone":"...","ContactEmail":"..."}]'
               }
             />
-            <p className="text-xs text-ink-2 mt-2">
+            <p className="text-2xs text-ink-2 mt-2">
               Paste {commitNoun} rows from TPP. Each one is read, created as a{" "}
               {commitNoun === "contact"
                 ? "Client account"
@@ -645,12 +645,12 @@ export function ImportRunDetailPage() {
       {/* Details Section */}
       <div className="card mt-4">
         <div className="border-b border-line px-3">
-          <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+          <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
             Import Run Details
           </h2>
         </div>
         <div className="p-4">
-          <dl className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <dl className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div>
               <dt className="font-medium text-ink">Source System</dt>
               <dd className="mt-1 text-ink-2">
@@ -689,13 +689,13 @@ export function ImportRunDetailPage() {
             </div>
             <div>
               <dt className="font-medium text-ink">Actor ID</dt>
-              <dd className="mt-1 text-ink-2 font-mono text-xs">
+              <dd className="mt-1 text-ink-2 font-mono text-2xs">
                 {importRun.actorId || "—"}
               </dd>
             </div>
             <div>
               <dt className="font-medium text-ink">Checksum</dt>
-              <dd className="mt-1 text-ink-2 font-mono text-xs">
+              <dd className="mt-1 text-ink-2 font-mono text-2xs">
                 {importRun.checksum || "—"}
               </dd>
             </div>
@@ -706,12 +706,12 @@ export function ImportRunDetailPage() {
       {/* Timeline Section */}
       <div className="card mt-4">
         <div className="border-b border-line px-3">
-          <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+          <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
             Stage Timeline
           </h2>
         </div>
         <div className="p-4">
-          <dl className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <dl className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div>
               <dt className="font-medium text-ink">Started</dt>
               <dd className="mt-1 text-ink-2">
@@ -768,12 +768,12 @@ export function ImportRunDetailPage() {
       {Object.keys(counts).length > 0 ? (
         <div className="card mt-4">
           <div className="border-b border-line px-3">
-            <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+            <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
               Record Counts by Type
             </h2>
           </div>
           <div className="p-4">
-            <dl className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-sm">
+            <dl className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
               {Object.entries(counts).map(([type, count]) => (
                 <div key={type}>
                   <dt className="font-medium text-ink capitalize">{type}</dt>
@@ -789,12 +789,12 @@ export function ImportRunDetailPage() {
       {importRun.status === "failed" && importRun.failureDetails ? (
         <div className="card mt-4 border-danger/30">
           <div className="border-b border-line px-3">
-            <h2 className="text-[11px] font-semibold tracking-[0.08em] text-danger uppercase py-2">
+            <h2 className="text-xs font-semibold tracking-[0.08em] text-danger uppercase py-2">
               Failure Details
             </h2>
           </div>
           <div className="p-4">
-            <pre className="max-h-60 overflow-auto rounded-xs bg-inset p-3 font-mono text-[12px] whitespace-pre-wrap text-danger">
+            <pre className="max-h-60 overflow-auto rounded-xs bg-inset p-3 font-mono text-sm whitespace-pre-wrap text-danger">
               {importRun.failureDetails}
             </pre>
           </div>
@@ -804,13 +804,13 @@ export function ImportRunDetailPage() {
       {/* Help Text */}
       <div className="card mt-4">
         <div className="border-b border-line px-3">
-          <h2 className="text-[11px] font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
+          <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase py-2">
             Import Run Actions Guide
           </h2>
         </div>
         <div className="p-4">
-          <h3 className="font-medium text-sm mb-2">Moving an import forward</h3>
-          <ul className="text-sm text-ink-2 space-y-1">
+          <h3 className="font-medium text-xs mb-2">Moving an import forward</h3>
+          <ul className="text-xs text-ink-2 space-y-1">
             <li>
               • <strong>Record Parse</strong>: After the file is read, enter how
               many rows were found to move on to checking

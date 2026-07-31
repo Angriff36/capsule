@@ -423,29 +423,29 @@ export function ParallelRunDashboardPage() {
         <>
           {/* Summary Cards */}
           <section className="grid grid-cols-1 gap-4 md:grid-cols-4 mt-6">
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-ink-3">Capsule Events</h3>
-              <p className="text-2xl font-bold">{filteredEvents.length}</p>
-              <p className="text-xs text-ink-3">
+            <div className="bg-white p-4 rounded-sm shadow">
+              <h3 className="text-xs font-medium text-ink-3">Capsule Events</h3>
+              <p className="text-xl font-bold">{filteredEvents.length}</p>
+              <p className="text-2xs text-ink-3">
                 {selectedDateRange.start.toLocaleDateString()} -{" "}
                 {selectedDateRange.end.toLocaleDateString()}
               </p>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-ink-3">TPP Events</h3>
-              <p className="text-2xl font-bold">
+            <div className="bg-white p-4 rounded-sm shadow">
+              <h3 className="text-xs font-medium text-ink-3">TPP Events</h3>
+              <p className="text-xl font-bold">
                 {tppRecordCounts.total ?? "—"}
               </p>
-              <p className="text-xs text-ink-3">
+              <p className="text-2xs text-ink-3">
                 {latestTppImport
                   ? `Imported ${new Date(latestTppImport.startTime ?? 0).toLocaleDateString()}`
                   : "No recent import"}
               </p>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-ink-3">Difference</h3>
+            <div className="bg-white p-4 rounded-sm shadow">
+              <h3 className="text-xs font-medium text-ink-3">Difference</h3>
               <p
-                className={`text-2xl font-bold ${
+                className={`text-xl font-bold ${
                   filteredEvents.length - (tppRecordCounts.total ?? 0) === 0
                     ? "text-ok"
                     : "text-warn"
@@ -453,20 +453,20 @@ export function ParallelRunDashboardPage() {
               >
                 {filteredEvents.length - (tppRecordCounts.total ?? 0)}
               </p>
-              <p className="text-xs text-ink-3">Events variance</p>
+              <p className="text-2xs text-ink-3">Events variance</p>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow">
-              <h3 className="text-sm font-medium text-ink-3">
+            <div className="bg-white p-4 rounded-sm shadow">
+              <h3 className="text-xs font-medium text-ink-3">
                 Unresolved Mappings
               </h3>
               <p
-                className={`text-2xl font-bold ${
+                className={`text-xl font-bold ${
                   unresolvedMappings.length === 0 ? "text-ok" : "text-warn"
                 }`}
               >
                 {unresolvedMappings.length}
               </p>
-              <p className="text-xs text-ink-3">
+              <p className="text-2xs text-ink-3">
                 {unresolvedMappings.length === 0
                   ? "All verified"
                   : "Need resolution"}
@@ -574,7 +574,7 @@ export function ParallelRunDashboardPage() {
                   <tbody>
                     {salespersonBreakdown.map((item) => (
                       <tr key={item.id}>
-                        <td className="font-mono text-sm">
+                        <td className="font-mono text-xs">
                           {item.id.slice(0, 8)}...
                         </td>
                         <td>{item.capsule}</td>
@@ -702,7 +702,7 @@ export function ParallelRunDashboardPage() {
                       <tr>
                         <td
                           colSpan={4}
-                          className="text-center text-sm text-ink-3"
+                          className="text-center text-xs text-ink-3"
                         >
                           +{venueBreakdown.length - 10} more venues
                         </td>
@@ -780,7 +780,7 @@ export function ParallelRunDashboardPage() {
             <div className="ledger-heading">
               <div>
                 <h2>Records still to match</h2>
-                <p className="text-sm text-ink-2">
+                <p className="text-xs text-ink-2">
                   Imported records that still need to be checked or matched up.
                 </p>
               </div>
@@ -814,7 +814,7 @@ export function ParallelRunDashboardPage() {
                         </td>
                         <td>{link.recordType}</td>
                         <td
-                          className="font-mono text-[11px] text-ink-3"
+                          className="font-mono text-xs text-ink-3"
                           title={link.externalId}
                         >
                           {link.externalId.slice(0, 16)}…
@@ -837,7 +837,7 @@ export function ParallelRunDashboardPage() {
                               View
                             </Link>
                           ) : (
-                            <span className="text-sm text-ink-3">
+                            <span className="text-xs text-ink-3">
                               No action
                             </span>
                           )}
@@ -849,7 +849,7 @@ export function ParallelRunDashboardPage() {
               </table>
             </div>
             {unresolvedMappings.length > 50 && (
-              <p className="mt-3 text-sm text-center text-ink-3">
+              <p className="mt-3 text-xs text-center text-ink-3">
                 Showing 50 of {unresolvedMappings.length} unresolved mappings
               </p>
             )}
@@ -860,7 +860,7 @@ export function ParallelRunDashboardPage() {
             <div className="ledger-heading">
               <div>
                 <h2>Recent Import Runs</h2>
-                <p className="text-sm text-ink-2">
+                <p className="text-xs text-ink-2">
                   The imports these comparisons are based on.
                 </p>
               </div>
@@ -932,11 +932,11 @@ export function ParallelRunDashboardPage() {
           </section>
 
           {/* Help Text */}
-          <section className="mt-6 p-4 bg-info-soft border border-info/40 rounded-lg">
+          <section className="mt-6 p-4 bg-info-soft border border-info/40 rounded-sm">
             <h3 className="font-semibold text-info">
               Understanding the Dashboard
             </h3>
-            <ul className="mt-2 space-y-1 text-sm text-info">
+            <ul className="mt-2 space-y-1 text-xs text-info">
               <li>
                 • <strong>Match status</strong>: Capsule and TPP counts are
                 identical

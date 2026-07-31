@@ -297,7 +297,7 @@ export function ProposalCreateForm({
           <p className="eyebrow">Draft</p>
           <h2>{fromEvent ? "Proposal from event" : "New proposal"}</h2>
           {fromEvent ? (
-            <p className="text-[13px] text-ink-2">
+            <p className="text-base text-ink-2">
               Linked to "{fromEvent.title}" — this proposal belongs to that
               event and its client.
             </p>
@@ -310,7 +310,7 @@ export function ProposalCreateForm({
         onDiscard={draftForm.discard}
       />
       {!hasClientSource ? (
-        <p className="text-[13px] text-ink-2">
+        <p className="text-base text-ink-2">
           No active clients.{" "}
           <Link className="text-link" to={CLIENTS_ROUTES.root}>
             Register a client
@@ -387,12 +387,12 @@ export function ProposalCreateForm({
           </label>
           <div className="mt-1">
             <p className="eyebrow">Pricing</p>
-            <p className="text-[12px] text-ink-2">
+            <p className="text-sm text-ink-2">
               Price per person, per unit, flat, percentage, or as a package. The
               subtotal and total update as you add lines.
             </p>
             {draftLines.length === 0 ? (
-              <p className="mt-2 text-[13px] text-ink-2">
+              <p className="mt-2 text-base text-ink-2">
                 No pricing lines yet — add one to price the proposal.
               </p>
             ) : (
@@ -562,7 +562,7 @@ export function ProposalCreateForm({
             >
               Add line
             </button>
-            <p className="mt-2 text-[13px] text-ink-2">
+            <p className="mt-2 text-base text-ink-2">
               Subtotal (from lines):{" "}
               <span className="tabular-nums">
                 {draftPricing.subtotal.toFixed(2)}
@@ -591,7 +591,7 @@ export function ProposalCreateForm({
               onChange={(e) => setDraftDiscount(Number(e.target.value) || 0)}
             />
           </label>
-          <p className="text-[13px] font-semibold text-ink">
+          <p className="text-base font-semibold text-ink">
             Total:{" "}
             <span className="tabular-nums">
               {draftPricing.total.toFixed(2)}

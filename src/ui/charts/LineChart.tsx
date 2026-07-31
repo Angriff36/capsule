@@ -64,11 +64,11 @@ export function LineChart({
           )}
           <XAxis
             dataKey={xAxisKey}
-            className="text-xs text-ink-2"
+            className="text-2xs text-ink-2"
             tick={{ fill: "currentColor" }}
           />
           <YAxis
-            className="text-xs text-ink-2"
+            className="text-2xs text-ink-2"
             tick={{ fill: "currentColor" }}
             tickFormatter={formatYAxis}
           />

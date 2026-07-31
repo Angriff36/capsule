@@ -98,12 +98,12 @@ export function EventsListPage() {
               role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
-              className={`h-8 shrink-0 cursor-pointer border-r border-line px-3 text-[12px] font-medium last:border-r-0 ${
+              className={`h-8 shrink-0 cursor-pointer border-r border-line px-3 text-sm font-medium last:border-r-0 ${
                 tab === t ? "bg-inset text-ink" : "text-ink-2 hover:text-ink"
               }`}
             >
               {t === "all" ? "All" : STAGE_LABEL[t]}
-              <span className="ml-1.5 font-mono text-[11px] text-ink-3">
+              <span className="ml-1.5 font-mono text-xs text-ink-3">
                 {counts[t] ?? 0}
               </span>
             </button>
@@ -176,7 +176,7 @@ export function EventsListPage() {
                   <td className="td w-full max-w-0 truncate">
                     <span className="font-medium">{e.title}</span>
                     {e.venueName ? (
-                      <span className="ml-2 text-[12px] text-ink-3">
+                      <span className="ml-2 text-sm text-ink-3">
                         {e.venueName}
                       </span>
                     ) : null}
@@ -184,7 +184,7 @@ export function EventsListPage() {
                   <td className="td text-ink-2">
                     {clientDisplayName(e.clientId, clients)}
                   </td>
-                  <td className="td font-mono text-[12px]">
+                  <td className="td font-mono text-sm">
                     {formatDate(e.startsAt)}
                     {e.startsAt != null ? (
                       <span className="ml-2 text-ink-3">

@@ -37,10 +37,10 @@ const clientLabel = (row: {
 function Section({ label, children }: { label: string; children: ReactNode }) {
   return (
     <section className="mt-6 break-inside-avoid">
-      <h2 className="border-b border-line-2 pb-1 text-[13px] font-semibold uppercase tracking-wide">
+      <h2 className="border-b border-line-2 pb-1 text-base font-semibold uppercase tracking-wide">
         {label}
       </h2>
-      <div className="mt-2 text-[13px] leading-relaxed">{children}</div>
+      <div className="mt-2 text-base leading-relaxed">{children}</div>
     </section>
   );
 }
@@ -65,14 +65,14 @@ function SignatureBlock({
 }) {
   return (
     <div className="mt-6">
-      <p className="text-[12px] uppercase tracking-wide text-ink-2">{role}</p>
+      <p className="text-sm uppercase tracking-wide text-ink-2">{role}</p>
       <div className="mt-8 border-b border-ink" />
-      <div className="mt-1 flex justify-between text-[12px]">
+      <div className="mt-1 flex justify-between text-sm">
         <span>Signature{name ? `: ${name}` : ""}</span>
         <span>Date{signedAt != null ? `: ${formatDate(signedAt)}` : ""}</span>
       </div>
       <div className="mt-6 border-b border-ink" />
-      <p className="mt-1 text-[12px]">Printed name</p>
+      <p className="mt-1 text-sm">Printed name</p>
     </div>
   );
 }
@@ -178,17 +178,17 @@ export function ContractDocumentPage() {
               {branding.displayName}
             </p>
             {branding.address ? (
-              <p className="mt-1 whitespace-pre-line text-[10px] leading-relaxed text-ink-2">
+              <p className="mt-1 whitespace-pre-line text-2xs leading-relaxed text-ink-2">
                 {branding.address}
               </p>
             ) : null}
           </div>
           <div className="text-right">
-            <p className="text-[9px] font-semibold tracking-[0.16em] text-[var(--document-accent)] uppercase">
+            <p className="text-2xs font-semibold tracking-[0.16em] text-[var(--document-accent)] uppercase">
               Catering agreement
             </p>
             <h1 className="mt-2 text-xl font-semibold">{contract.title}</h1>
-            <p className="mt-1 text-[13px] text-ink-2">
+            <p className="mt-1 text-base text-ink-2">
               Contract{" "}
               {contract.contractNumber
                 ? `#${contract.contractNumber}`
@@ -351,14 +351,14 @@ export function ContractDocumentPage() {
                 <SignatureBlock role="Service provider (countersignature)" />
               </div>
               {signed ? (
-                <p className="mt-4 text-[12px] text-ink-2">
+                <p className="mt-4 text-sm text-ink-2">
                   Signature recorded in Capsule by {String(contract.signedBy)}{" "}
                   on {formatDate(contract.signedAt)}.
                 </p>
               ) : null}
             </Section>
 
-            <footer className="mt-8 border-t border-line-2 pt-2 text-[11px] text-ink-2">
+            <footer className="mt-8 border-t border-line-2 pt-2 text-xs text-ink-2">
               {branding.displayName} · Contract ref {contract._id} · Drafted{" "}
               {formatDate(contract.draftedAt ?? contract._creationTime)}
             </footer>

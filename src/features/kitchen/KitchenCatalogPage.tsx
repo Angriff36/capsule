@@ -267,9 +267,9 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         <div className="component-index-heading">
           <div>
             <p className="eyebrow">Live index</p>
-            <h2 className="font-display mt-1 text-3xl">{title}</h2>
+            <h2 className="font-display mt-1 text-2xl">{title}</h2>
           </div>
-          <span className="font-mono text-[11px] text-ink-3">
+          <span className="font-mono text-xs text-ink-3">
             {rows.length} records
           </span>
         </div>
@@ -285,7 +285,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           {section === "dishes" ||
           section === "ingredients" ||
           section === "components" ? (
-            <label className="flex items-center gap-2 text-sm text-ink-2">
+            <label className="flex items-center gap-2 text-xs text-ink-2">
               <input
                 type="checkbox"
                 checked={showHidden}
@@ -312,7 +312,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
               </div>
               <div>
                 <p className="eyebrow">Blank first edition</p>
-                <h3 className="font-display mt-2 text-4xl">
+                <h3 className="font-display mt-2 text-3xl">
                   Every kitchen needs a house book.
                 </h3>
                 <p className="mt-3 max-w-110 text-ink-2">

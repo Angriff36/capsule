@@ -376,9 +376,9 @@ export function SalesDashboardPage() {
       <DashboardGrid items={dashboardItems} />
 
       {/* Commission Basis Note */}
-      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
-        <h4 className="text-sm font-semibold text-ink">Commission Basis</h4>
-        <p className="mt-1 text-sm text-ink-2">
+      <div className="mt-6 rounded-sm border border-line bg-inset p-4">
+        <h4 className="text-xs font-semibold text-ink">Commission Basis</h4>
+        <p className="mt-1 text-xs text-ink-2">
           Sales commissions are calculated at 3% of booked revenue. The Comp
           Master dashboard has the full commission breakdown by salesperson.
         </p>

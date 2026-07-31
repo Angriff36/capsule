@@ -143,7 +143,7 @@ Last: [first session]
 
 ## Last Session Bridge
 [Emergency bridge — running bridge was not updated]
-Files: src/styles/app.css (edit), src/features/sales/QuoteSubmissionsReviewPage.tsx (edit)
+Files: src/features/events/EventTimelineAssigneePicker.tsx (edit)
 
 # === END COGNILAYER ===
 

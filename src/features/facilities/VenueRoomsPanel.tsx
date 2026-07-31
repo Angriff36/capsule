@@ -144,7 +144,7 @@ export function VenueRoomsPanel({ venueId }: Props) {
     <div className="space-y-4">
       <div>
         <h3 className="text-lg font-semibold text-ink">Rooms & Spaces</h3>
-        <p className="text-[13px] text-ink-3">
+        <p className="text-base text-ink-3">
           Bookable rooms and spaces within this venue (ballrooms, dining rooms,
           prep kitchens, outdoor areas).
         </p>
@@ -307,21 +307,21 @@ export function VenueRoomsPanel({ venueId }: Props) {
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[13px] font-medium text-ink">
+                    <span className="text-base font-medium text-ink">
                       {row.name}
                     </span>
-                    <span className="text-[11px] px-1.5 py-0.5 rounded bg-inset text-ink-3">
+                    <span className="text-xs px-1.5 py-0.5 rounded-xs bg-inset text-ink-3">
                       {ROOM_TYPES[row.roomType] || row.roomType}
                     </span>
                   </div>
-                  <p className="mt-1 text-[12px] text-ink-3">
+                  <p className="mt-1 text-sm text-ink-3">
                     Capacity {row.capacity ?? 0}
                     {row.squareFootage != null
                       ? ` · ${row.squareFootage} sq. ft.`
                       : ""}
                   </p>
                   {row.description ? (
-                    <p className="mt-1 text-[13px] text-ink whitespace-pre-wrap">
+                    <p className="mt-1 text-base text-ink whitespace-pre-wrap">
                       {row.description}
                     </p>
                   ) : null}
@@ -353,7 +353,7 @@ export function VenueRoomsPanel({ venueId }: Props) {
           </li>
         ))}
         {venueRooms.length === 0 ? (
-          <li className="px-3 py-3 text-[13px] text-ink-3">
+          <li className="px-3 py-3 text-base text-ink-3">
             No rooms yet. Add the spaces within this venue that events book.
           </li>
         ) : null}

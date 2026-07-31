@@ -91,11 +91,11 @@ export function SyncErrorsPanel() {
       data-testid="sync-errors-panel"
     >
       <div className="flex items-baseline justify-between">
-        <h2 className="text-[14px] font-semibold text-warn">
+        <h2 className="text-lg font-semibold text-warn">
           Messages that didn't come through{" "}
           <span className="font-normal text-warn">({pending.length})</span>
         </h2>
-        <p className="text-[11px] text-warn">
+        <p className="text-xs text-warn">
           These messages couldn't be read — retry or dismiss them.
         </p>
       </div>
@@ -109,31 +109,29 @@ export function SyncErrorsPanel() {
               className="rounded-sm border border-warn/40 bg-panel px-3 py-2"
             >
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-warn-soft px-2 py-0.5 text-[10px] font-medium text-warn">
+                <span className="rounded-full bg-warn-soft px-2 py-0.5 text-2xs font-medium text-warn">
                   {e.sourceSystem}
                 </span>
-                <span className="text-[10px] text-ink-3">{e.recordType}</span>
-                <span className="text-[10px] text-ink-3">
+                <span className="text-2xs text-ink-3">{e.recordType}</span>
+                <span className="text-2xs text-ink-3">
                   · {KIND_LABEL[e.kind] ?? e.kind}
                 </span>
                 {e.externalId ? (
-                  <span className="text-[10px] text-ink-3">
-                    · {e.externalId}
-                  </span>
+                  <span className="text-2xs text-ink-3">· {e.externalId}</span>
                 ) : null}
                 {e.recordedAt ? (
-                  <span className="ml-auto text-[10px] text-ink-3">
+                  <span className="ml-auto text-2xs text-ink-3">
                     {formatTime(e.recordedAt)}
                   </span>
                 ) : null}
               </div>
-              <p className="mt-1 text-[12px] text-ink">{e.errorMessage}</p>
+              <p className="mt-1 text-sm text-ink">{e.errorMessage}</p>
               {e.rawPayload ? (
                 <details className="mt-1">
-                  <summary className="cursor-pointer text-[10.5px] text-ink-3">
+                  <summary className="cursor-pointer text-2xs text-ink-3">
                     Original message data
                   </summary>
-                  <pre className="mt-1 max-h-40 overflow-auto rounded-sm bg-inset p-2 text-[10.5px] text-ink-2">
+                  <pre className="mt-1 max-h-40 overflow-auto rounded-sm bg-inset p-2 text-2xs text-ink-2">
                     {e.rawPayload}
                   </pre>
                 </details>

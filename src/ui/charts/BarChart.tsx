@@ -70,13 +70,13 @@ export function BarChart({
           <XAxis
             dataKey={orientation === "horizontal" ? undefined : xAxisKey}
             type={orientation === "horizontal" ? "number" : "category"}
-            className="text-xs text-ink-2"
+            className="text-2xs text-ink-2"
             tick={{ fill: "currentColor" }}
           />
           <YAxis
             type={orientation === "horizontal" ? "category" : "number"}
             dataKey={orientation === "horizontal" ? xAxisKey : undefined}
-            className="text-xs text-ink-2"
+            className="text-2xs text-ink-2"
             tick={{ fill: "currentColor" }}
             tickFormatter={orientation === "vertical" ? formatYAxis : undefined}
           />

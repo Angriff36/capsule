@@ -581,11 +581,11 @@ export function AvgEventValueGrowthDashboardPage() {
       <DashboardGrid items={dashboardItems} />
 
       {/* Analysis Note */}
-      <div className="mt-6 rounded-lg border border-line bg-inset p-4">
-        <h4 className="text-sm font-semibold text-ink">
+      <div className="mt-6 rounded-sm border border-line bg-inset p-4">
+        <h4 className="text-xs font-semibold text-ink">
           What drives event value
         </h4>
-        <p className="mt-1 text-sm text-ink-2">
+        <p className="mt-1 text-xs text-ink-2">
           Average event value reflects pricing, the mix of event types, and
           guest counts. Growth compares this month to last month (MoM) and to
           the same month last year (YoY). The breakdowns show which service

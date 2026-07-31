@@ -99,10 +99,10 @@ export function ComponentVersionHistoryPanel({
                 className="flex flex-wrap items-center justify-between gap-2 px-3 py-2.5"
               >
                 <div>
-                  <p className="text-[13px] text-ink">
+                  <p className="text-base text-ink">
                     Edition {row.versionNumber} · {row.changeSummary}
                   </p>
-                  <p className="mt-0.5 font-mono text-[11px] text-ink-3">
+                  <p className="mt-0.5 font-mono text-xs text-ink-3">
                     {row.capturedByName || "Unknown"} ·{" "}
                     {row.capturedAt
                       ? `${formatDate(row.capturedAt)} ${formatTime(row.capturedAt)}`
@@ -170,12 +170,12 @@ export function ComponentVersionHistoryPanel({
 
           {left && right ? (
             <div className="mt-4 space-y-4">
-              <div className="grid grid-cols-[10rem_1fr_1fr] gap-2 text-[13px]">
-                <div className="font-mono text-[11px] text-ink-3">Field</div>
-                <div className="font-mono text-[11px] text-ink-3">
+              <div className="grid grid-cols-[10rem_1fr_1fr] gap-2 text-base">
+                <div className="font-mono text-xs text-ink-3">Field</div>
+                <div className="font-mono text-xs text-ink-3">
                   {labelFor(effectiveLeft)}
                 </div>
-                <div className="font-mono text-[11px] text-ink-3">
+                <div className="font-mono text-xs text-ink-3">
                   {labelFor(rightId)}
                 </div>
                 {scalarDiff.map((d) => (
@@ -194,19 +194,19 @@ export function ComponentVersionHistoryPanel({
                   <h3 className="font-display text-lg">Ingredient lines</h3>
                 </div>
                 {lineDiff.length === 0 ? (
-                  <p className="text-[13px] text-ink-3">No ingredient lines.</p>
+                  <p className="text-base text-ink-3">No ingredient lines.</p>
                 ) : (
                   <ul className="divide-y divide-line-2 rounded-sm border border-line-2 bg-panel">
                     {lineDiff.map((d) => (
                       <li
                         key={d.ingredientId}
-                        className="grid grid-cols-[10rem_1fr_1fr] gap-2 px-3 py-2 text-[13px]"
+                        className="grid grid-cols-[10rem_1fr_1fr] gap-2 px-3 py-2 text-base"
                       >
                         <span className="text-ink">
                           {d.ingredientName}
                           {d.status !== "same" ? (
                             <span
-                              className={`ml-1 font-mono text-[10px] ${d.status === "removed" ? "text-danger" : d.status === "added" ? "text-ok" : "text-warn"}`}
+                              className={`ml-1 font-mono text-2xs ${d.status === "removed" ? "text-danger" : d.status === "added" ? "text-ok" : "text-warn"}`}
                             >
                               {d.status}
                             </span>

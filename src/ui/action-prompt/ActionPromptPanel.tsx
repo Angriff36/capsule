@@ -66,7 +66,7 @@ export function ActionPromptPanel({
           <h3 id={headingId} className="mt-1 text-base font-semibold text-ink">
             {request.title}
           </h3>
-          <p id={helperId} className="mt-1 text-[12px] text-ink-2">
+          <p id={helperId} className="mt-1 text-sm text-ink-2">
             {request.description}
           </p>
         </div>
@@ -108,9 +108,7 @@ export function ActionPromptPanel({
                   {field.label}
                 </label>
                 {field.helper ? (
-                  <p className="mt-0.5 text-[11px] text-ink-3">
-                    {field.helper}
-                  </p>
+                  <p className="mt-0.5 text-xs text-ink-3">{field.helper}</p>
                 ) : null}
                 {field.options ? (
                   <select

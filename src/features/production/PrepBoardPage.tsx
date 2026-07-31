@@ -426,7 +426,7 @@ export function PrepBoardPage() {
         {notice ? (
           <div className="card border-ok/40 px-4 py-3" role="status">
             <p className="font-semibold text-ok">Prep board updated</p>
-            <p className="mt-1 text-[12px] text-ink-2">{notice}</p>
+            <p className="mt-1 text-sm text-ink-2">{notice}</p>
           </div>
         ) : null}
       </div>
@@ -443,7 +443,7 @@ export function PrepBoardPage() {
             <div>
               <p className="eyebrow">New production line</p>
               <h2 id="prep-task-form-heading">Add prep task</h2>
-              <p className="mt-1 text-[12px] text-ink-2">
+              <p className="mt-1 text-sm text-ink-2">
                 Connect the item to its event, quantity, finish location, and
                 working instruction.
               </p>
@@ -577,7 +577,7 @@ export function PrepBoardPage() {
           <div>
             <p className="eyebrow">Event production</p>
             <h2>Prep sheet</h2>
-            <p className="mt-1 text-[12px] text-ink-2">
+            <p className="mt-1 text-sm text-ink-2">
               Finish location leads each line, followed by service, item,
               quantity, and readiness.
             </p>
@@ -592,7 +592,7 @@ export function PrepBoardPage() {
             <p className="font-semibold text-ink">
               Loading the production sheet…
             </p>
-            <p className="mt-1 text-[12px] text-ink-2">
+            <p className="mt-1 text-sm text-ink-2">
               Gathering prep lines, event names, ingredients, and quality
               checks.
             </p>
@@ -868,7 +868,7 @@ export function PrepBoardPage() {
             <div>
               <p className="eyebrow">Prep thread</p>
               <h2>{taskLabel(threadTask)}</h2>
-              <p className="mt-1 text-[12px] text-ink-2">
+              <p className="mt-1 text-sm text-ink-2">
                 {eventName(threadTask.eventId)} ·{" "}
                 {threadTask.station || "Unassigned"} ·{" "}
                 {String(threadTask.status)}

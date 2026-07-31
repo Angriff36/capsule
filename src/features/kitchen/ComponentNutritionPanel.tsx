@@ -37,7 +37,7 @@ export function ComponentNutritionPanel({
         </div>
         <span>{portionLabel}</span>
       </div>
-      <p className="max-w-160 text-[13px] text-ink-2">
+      <p className="max-w-160 text-base text-ink-2">
         Aggregated from each ingredient's per-unit values, converted into the
         ingredient's catalog unit. Ingredients without recorded nutrition are
         not counted.
@@ -50,13 +50,13 @@ export function ComponentNutritionPanel({
         {NUTRIENTS.map((nutrient) => (
           <div
             key={nutrient.key}
-            className="rounded-xl border border-line bg-paper px-3 py-2"
+            className="rounded-sm border border-line bg-panel px-3 py-2"
           >
-            <dt className="text-[11px] uppercase tracking-wide text-ink-3">
+            <dt className="text-xs uppercase tracking-wide text-ink-3">
               {nutrient.label}
             </dt>
             <dd
-              className="mt-1 font-mono text-[15px] text-ink"
+              className="mt-1 font-mono text-lg text-ink"
               data-testid={`nutrient-${nutrient.key}`}
             >
               {loading || totals == null
@@ -68,7 +68,7 @@ export function ComponentNutritionPanel({
       </dl>
 
       {!loading && coverageNote ? (
-        <p className="mt-3 text-[12px] text-ink-3" role="status">
+        <p className="mt-3 text-sm text-ink-3" role="status">
           {coverageNote}
         </p>
       ) : null}

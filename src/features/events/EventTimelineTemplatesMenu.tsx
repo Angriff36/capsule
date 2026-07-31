@@ -54,7 +54,7 @@ export function EventTimelineTemplatesMenu({ disabled, onPick }: Props) {
         >
           {BATTLE_BOARD_TASK_TEMPLATE_GROUPS.map((group) => (
             <div key={group} className="mb-2 last:mb-0">
-              <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-3">
+              <p className="px-2 py-1 text-2xs font-semibold uppercase tracking-[0.08em] text-ink-3">
                 {group}
               </p>
               <ul>
@@ -65,7 +65,7 @@ export function EventTimelineTemplatesMenu({ disabled, onPick }: Props) {
                     <button
                       type="button"
                       role="menuitem"
-                      className="w-full rounded-xs px-2 py-1.5 text-left text-[13px] text-ink hover:bg-inset"
+                      className="w-full rounded-xs px-2 py-1.5 text-left text-base text-ink hover:bg-inset"
                       onClick={() => {
                         onPick(template);
                         setOpen(false);
@@ -75,7 +75,7 @@ export function EventTimelineTemplatesMenu({ disabled, onPick }: Props) {
                         {template.label}
                       </span>
                       {template.defaultTeam ? (
-                        <span className="block text-[11px] text-ink-3">
+                        <span className="block text-xs text-ink-3">
                           {template.defaultTeam}
                           {template.notes ? ` · ${template.notes}` : ""}
                         </span>

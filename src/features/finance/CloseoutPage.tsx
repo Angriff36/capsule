@@ -195,7 +195,7 @@ export function CloseoutPage() {
       <FinanceWorkspaceNav />
       {failure ? <FinanceFailureBanner error={failure} /> : null}
       {notice ? (
-        <p className="mt-3 text-[13px] text-ink-2" role="status">
+        <p className="mt-3 text-base text-ink-2" role="status">
           {notice}
         </p>
       ) : null}
@@ -353,9 +353,7 @@ export function CloseoutPage() {
                                 : "Photos"}
                             </button>
                             {String(row.status) === "finalized" ? (
-                              <span className="text-[12px] text-ink-3">
-                                Frozen
-                              </span>
+                              <span className="text-sm text-ink-3">Frozen</span>
                             ) : null}
                           </div>
                         </td>
@@ -382,7 +380,7 @@ export function CloseoutPage() {
         )}
       </section>
 
-      <p className="mt-4 text-[12px] text-ink-3">
+      <p className="mt-4 text-sm text-ink-3">
         Payroll inputs live under{" "}
         <Link className="text-link" to={FINANCE_ROUTES.payroll}>
           Payroll

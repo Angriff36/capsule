@@ -146,7 +146,7 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
                 placeholder="Comma-separated"
               />
             </label>
-            <label className="flex items-center gap-2 self-end pb-2 text-[12px] text-ink-2">
+            <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink-2">
               <input name="specialMealRequired" type="checkbox" /> Special meal
               required
             </label>
@@ -189,7 +189,7 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
                           </span>
                         ) : null}
                       </div>
-                      <p className="mt-1 text-[11.5px] text-ink-3">
+                      <p className="mt-1 text-xs text-ink-3">
                         {guest.email ?? guest.phone ?? "No contact recorded"}
                         {guest.tableAssignment
                           ? ` · Table ${guest.tableAssignment}`
@@ -198,7 +198,7 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
                       {guest.dietaryRestrictions?.length ||
                       guest.allergenRestrictions?.length ||
                       guest.accessibilityNeeds?.length ? (
-                        <p className="mt-1 text-[11.5px] text-ink-2">
+                        <p className="mt-1 text-xs text-ink-2">
                           {[
                             ...(guest.dietaryRestrictions ?? []),
                             ...(guest.allergenRestrictions ?? []),
@@ -207,7 +207,7 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
                         </p>
                       ) : null}
                       {guest.checkedInAt != null ? (
-                        <p className="mt-1 font-mono text-[10.5px] text-ink-3">
+                        <p className="mt-1 font-mono text-2xs text-ink-3">
                           {formatDate(guest.checkedInAt)}{" "}
                           {formatTime(guest.checkedInAt)}
                         </p>
