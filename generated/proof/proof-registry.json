@@ -1,8 +1,8 @@
 {
   "schemaVersion": "manifest-proof-registry/v1",
-  "irHash": "02547568129db51d6db56e74eeedeb3bb2f56046301b996d5843ecd237c308d4:02b2674c6e44510a2eabac4a11423d05bf3829b1efadd2949ed73d27472c4d35:0316c79111f8aecc2a5b6841ff2be359239be8cb207727655dcf8ba4ccd2c3e4:063098d983627c3f373f099c9ce3c6eccd5000574581d3ecb66c7c30a83b04ec:097db3fc846d0f2756e7b603f1f3cfc1c8e91aa9f77925b7e1c219ac534e1024:0a9f778281608cd26bb45eaeabccf8dc2ec51f97fb5a4f3b637ddca88919dcf6:0c43a1ddefaa37ecbeb665e18cb607148b27b4caa16aac19e64a991a9a8cde10:0c5e93243568ed44b613fd741c9e8766d3767999f669b39e91de6b564a158c52:0f5f4fe542932fa133ec9d857a43dd1f154fd5915cb9104048bed9f9180b34f1:106467e5fb7a675584d5fa4d51ac9de735b2cd1f238b36097f0ea3fe9ce414bf:10a4578b3480dd31d00e465253a2acaa870b3601494a81fb52be4b7d0695fb50:13f1e75e07e9fe66bd78ff4b6313c18863e7251d8ad1b24cf507ac74cd27cda8:17a5e94b0cdfe6bd9e152c479f7f24175a1d18a7c905a1c56048540faf1c1b33:1854a8f2359e581edc177de41a884783adcbcc85bfca1efe56fa53942d9bb922:1bdc29a437d612960607853048cf04be41d705e613b4022491b00ae40bef273b:1ea55b1f21c746804d7ea3ef889c0667f5f194f320e1f68f8393b112d4ac6cb9:20593c7f1d327933a51765bc1fd2cd00843e5511d2ec52332a76cda26fb0a599:233a533b83ca52b8fbd1471e60ed35d120138cd2d577bafd693e5a80159a2167:2384313b99425303fa556c75f79b9884d057d3bd6071ee748d39d560060d170f:24a28a86ed8d5207cebd1e31bc068bb1065c0f925e17f683711d771b797f0a94:32f51dd9ae7a652a2973f8589a259c355bb6c65bbfb7abed64f0777d35083bce:333a126f8772eee9ff42055a3c6b75e456fbba489287f70de878417f99607eb4:333e9f62f3a0b49dd08db012882eb22057ed1490e30f1a3be80996a3dd5ed7d5:34acaa884f2cf0bb9e2bb301781e0b8493bb0020d7ff964d1b4c874b7e892f34:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:3e7c1710e05670a2800bffb82dbf3607cde483da977fc26484f9708d71054db2:47848f229cc65024ca546b952593124b433bc30a6b4d40c8608eacbff74ab7e5:49e8712d17029f56c9fbcfe07725636976ab9e9162711104778f495c48f4f66a:4c9eaacf7e582b38d786ebc07601a7158093608fb2a3eddb96b2c0e3ef1758c8:4f7eb03bb569a4a5c990aabba0bc5302a24f629fd5a26ee46844f327add4bbf6:57b83c655e43c341dadff6f6967aed2edcaa7401db6e3e813b941c9d9ec1f7ee:632aead8d9d3d12223e0d162bfff9111fa627016012aa38c77a50b042a2e700e:655c7ec59913731e36379a6dbfc96ffa707de95a0ace967c885d5b034f976a74:6638bfd4c511e63bfb150b8061f43d677f93bda8a512148a8cd2ff51234fe110:67b5b75c4f199776db21cd4efd34a9635a44a8646e17a17f314d2f2e0de7d831:6ab5316476685e336a35a59852d8d6da3c23003a5ccda03fff304fd5f4679d29:6d4ef205ddca620d3d8c4df06a5736a61d0ebefada7ed4def9db7cc57ea4b904:6e5aa7f5c3265d6ea3b946cf133ed0288da838ebc99fb8ee951a123f4afd28cd:741dd603d6d5d46af0106082424b0b15cef21c9c606f08ec35b24d004ea37e7f:741f7b32bdcb02c6ece79e9101843062251ece4010aed363c0c0a185af61fb93:74309d55c80d2fe6f8488e07b3e96290a95697e34c092c4f464ffb91887e284b:760d7ab4a4f2dc13f8f28b7043e15f159579b0e0517f14892d6f7898e36a6526:76f3b82292116de4dbcfe21d903e47ad0a04b69d54679ae3a8bc2176a74efb3d:77a0b952992183b0044a401049c361756355f5d7dc835f69e60d36d6ce8d8a4e:788d143b59b9b6205de60fe37f24334de9c471745e2f08ffc4d9879fc50b82fc:7abe26602908cb318bd00232566db7324fb3e990f90df331908805bcb4ca8c33:84f9853e498082ac21fa58b27383a008c9c068919870193687d10bbaae2301e5:889487f2a4623ddc90c5d30da2946baf50b962592b3f833e3125a39ddc5285f2:900775182df3a259afebb9c31862eadafc6bbdec6d8f3fd5dd55001e14f6f589:91f7a31501c2ea80c03376344b06b6c20d190abf36a50699331330fab2fdd5c8:9287f818468dd0b04949b87630a11cf848ce6c62f1fc08c75910b3724bd15228:95ee3ff6742a80062709b54da69d8df7217c3cf5f833f302cbd5c554d9ca5825:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:97996bb0225e4d09ca9f3233bb87c518d59bdb0aa7f40fc7942a364b1f9032d4:9a8e0b7ff8934904da0db020db63cec868c55b9d0a363ab0a5da0192c7e66650:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a098daa45bf91fe196343d87a406f96e8f9b9b8b60fdca74c5ed1c93d19a8b2d:a0e2925a5a7d2f146574c197e89952d83049782108ada892a53c87a65105ad6b:a158e69550d1471508ddfbd78f2941af0974863fb57a64bfd28160257c5bfd43:a6e2566eb5317f08df2d2d26a7da7cc66765fd6b34efa7f2f73f19a9a3e53f4c:a7c16c5034498040d967f3e5b6674e39a675a9f1a54dd6a8d3649ecc5184da49:add29a8cc2a2ee66b8869910f71ffc57b4b002e641022a5fcc52f150f45e2e64:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:b0c79dec26d22dd1d5d2669adfbfeb7111dd55a2aab46ca6108ed06c500bfa65:b75f1c760ade62fd9abf33b8f3f20889e1deb832c78f5f12ed2e66ad3b06c735:b84efd99bf9cc24012aa4878eeb9a1227dec1c71a2964b544fded5923266471a:be14681d328a203d1d17acdfe2255be5d23c9d2d5ea0e4177f484f29a4e38977:c4c5e7ea3db8cead5baff1af1f614cecd44f92eb347dc7fed2c67e3aaedb1177:c9226301df7528db1c4a4575eded7ea1545f7093b6e9eb7aacccd028f98ea214:cabb3d721184454e6197c3b51ad513712b04642b05775eb540a53f807159e2e7:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:cfd3f63f28e209efbcb595ad4213aefe472f404b76538660d27817a45ea19e4e:d080d946752ebc2d1a2f66ce735d3a61e44af93a4b43293cfc32aadcbf0a93a9:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d68ce48244ea6935fdc5db7ed618c3e6a3eb13337566a2b1cacc7e29aa0f270d:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:d91f0bdc8b57b8105251a6cb7bc79608480679588e80c6e97940f3baedddbf3e:dd98c359a76aa5ba822e15992ffba97c85bddbb224b81a8fc72808d8fb1156ae:e6371e5a54a60125d23ec584d9372eb3d6390fb47d9c02d692e9c3e81e54f054:e74b9b5daa7d95fce8cdb2c07b6aa64c2324ceacb79698bf2d1dee829c408cdc:ea70c7aadfb8e4901c56bec7a5d9fb2d54019326589f6c33e40d38e9ab95c0f9:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:ec851d60f1af324012d9e86dce4e5ef35aff2dbab5c4bf06656698bb358e561e:f0c18656b05048b52def70aa6b4e9c5591d99c7da9b6a57712bcf57cefffe34b:f6213ea2db82a8ee4bb293bcd779b3d77bdadc069771e7c28e5f69024b42edb4:f7ea0484a3d9fd77faee9e11de0f26369930bef4d4f8df587104394601b2bdef:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321:f9416be6404f3534e9810933f0b9bedad6b7280982da3a18434d0cbce353ae6a:fc0795686fff5bab628659ab193381694c24903cf0930be34b7bbc6165bf417b",
+  "irHash": "02547568129db51d6db56e74eeedeb3bb2f56046301b996d5843ecd237c308d4:02b2674c6e44510a2eabac4a11423d05bf3829b1efadd2949ed73d27472c4d35:0316c79111f8aecc2a5b6841ff2be359239be8cb207727655dcf8ba4ccd2c3e4:063098d983627c3f373f099c9ce3c6eccd5000574581d3ecb66c7c30a83b04ec:097db3fc846d0f2756e7b603f1f3cfc1c8e91aa9f77925b7e1c219ac534e1024:0a9f778281608cd26bb45eaeabccf8dc2ec51f97fb5a4f3b637ddca88919dcf6:0c43a1ddefaa37ecbeb665e18cb607148b27b4caa16aac19e64a991a9a8cde10:0c5e93243568ed44b613fd741c9e8766d3767999f669b39e91de6b564a158c52:0f5f4fe542932fa133ec9d857a43dd1f154fd5915cb9104048bed9f9180b34f1:106467e5fb7a675584d5fa4d51ac9de735b2cd1f238b36097f0ea3fe9ce414bf:10a4578b3480dd31d00e465253a2acaa870b3601494a81fb52be4b7d0695fb50:173ca8e4a96d27f5af185426431f191c89ef36ba0c338a7623ec6084e7c4f980:17a5e94b0cdfe6bd9e152c479f7f24175a1d18a7c905a1c56048540faf1c1b33:1854a8f2359e581edc177de41a884783adcbcc85bfca1efe56fa53942d9bb922:1bdc29a437d612960607853048cf04be41d705e613b4022491b00ae40bef273b:1ea55b1f21c746804d7ea3ef889c0667f5f194f320e1f68f8393b112d4ac6cb9:20593c7f1d327933a51765bc1fd2cd00843e5511d2ec52332a76cda26fb0a599:233a533b83ca52b8fbd1471e60ed35d120138cd2d577bafd693e5a80159a2167:2384313b99425303fa556c75f79b9884d057d3bd6071ee748d39d560060d170f:24a28a86ed8d5207cebd1e31bc068bb1065c0f925e17f683711d771b797f0a94:32f51dd9ae7a652a2973f8589a259c355bb6c65bbfb7abed64f0777d35083bce:333a126f8772eee9ff42055a3c6b75e456fbba489287f70de878417f99607eb4:333e9f62f3a0b49dd08db012882eb22057ed1490e30f1a3be80996a3dd5ed7d5:34acaa884f2cf0bb9e2bb301781e0b8493bb0020d7ff964d1b4c874b7e892f34:3c2d3f96cbef1830a7e438517dc409890342020bb2d09fc2fce6822ecf4ae07b:3e7c1710e05670a2800bffb82dbf3607cde483da977fc26484f9708d71054db2:47848f229cc65024ca546b952593124b433bc30a6b4d40c8608eacbff74ab7e5:49e8712d17029f56c9fbcfe07725636976ab9e9162711104778f495c48f4f66a:4c9eaacf7e582b38d786ebc07601a7158093608fb2a3eddb96b2c0e3ef1758c8:4f7eb03bb569a4a5c990aabba0bc5302a24f629fd5a26ee46844f327add4bbf6:57b83c655e43c341dadff6f6967aed2edcaa7401db6e3e813b941c9d9ec1f7ee:632aead8d9d3d12223e0d162bfff9111fa627016012aa38c77a50b042a2e700e:655c7ec59913731e36379a6dbfc96ffa707de95a0ace967c885d5b034f976a74:6638bfd4c511e63bfb150b8061f43d677f93bda8a512148a8cd2ff51234fe110:67b5b75c4f199776db21cd4efd34a9635a44a8646e17a17f314d2f2e0de7d831:6ab5316476685e336a35a59852d8d6da3c23003a5ccda03fff304fd5f4679d29:6d4ef205ddca620d3d8c4df06a5736a61d0ebefada7ed4def9db7cc57ea4b904:6e5aa7f5c3265d6ea3b946cf133ed0288da838ebc99fb8ee951a123f4afd28cd:741dd603d6d5d46af0106082424b0b15cef21c9c606f08ec35b24d004ea37e7f:741f7b32bdcb02c6ece79e9101843062251ece4010aed363c0c0a185af61fb93:74309d55c80d2fe6f8488e07b3e96290a95697e34c092c4f464ffb91887e284b:760d7ab4a4f2dc13f8f28b7043e15f159579b0e0517f14892d6f7898e36a6526:76f3b82292116de4dbcfe21d903e47ad0a04b69d54679ae3a8bc2176a74efb3d:77a0b952992183b0044a401049c361756355f5d7dc835f69e60d36d6ce8d8a4e:788d143b59b9b6205de60fe37f24334de9c471745e2f08ffc4d9879fc50b82fc:7abe26602908cb318bd00232566db7324fb3e990f90df331908805bcb4ca8c33:84f9853e498082ac21fa58b27383a008c9c068919870193687d10bbaae2301e5:889487f2a4623ddc90c5d30da2946baf50b962592b3f833e3125a39ddc5285f2:900775182df3a259afebb9c31862eadafc6bbdec6d8f3fd5dd55001e14f6f589:91f7a31501c2ea80c03376344b06b6c20d190abf36a50699331330fab2fdd5c8:9287f818468dd0b04949b87630a11cf848ce6c62f1fc08c75910b3724bd15228:95ee3ff6742a80062709b54da69d8df7217c3cf5f833f302cbd5c554d9ca5825:96b5958136a1a09ee039422008844ec9239f72349635f56a5a46ecb6a8b45740:97996bb0225e4d09ca9f3233bb87c518d59bdb0aa7f40fc7942a364b1f9032d4:9a8e0b7ff8934904da0db020db63cec868c55b9d0a363ab0a5da0192c7e66650:9fc13ca84328827fc296bd873c818b5ccfa2781f872ec388e8d3daf8bb9d7ad4:a098daa45bf91fe196343d87a406f96e8f9b9b8b60fdca74c5ed1c93d19a8b2d:a0e2925a5a7d2f146574c197e89952d83049782108ada892a53c87a65105ad6b:a158e69550d1471508ddfbd78f2941af0974863fb57a64bfd28160257c5bfd43:a6e2566eb5317f08df2d2d26a7da7cc66765fd6b34efa7f2f73f19a9a3e53f4c:a7c16c5034498040d967f3e5b6674e39a675a9f1a54dd6a8d3649ecc5184da49:add29a8cc2a2ee66b8869910f71ffc57b4b002e641022a5fcc52f150f45e2e64:af653fe005f5b502b2803942d786a45871816926df89798a7d9be75eb4edeaff:b0c79dec26d22dd1d5d2669adfbfeb7111dd55a2aab46ca6108ed06c500bfa65:b75f1c760ade62fd9abf33b8f3f20889e1deb832c78f5f12ed2e66ad3b06c735:b84efd99bf9cc24012aa4878eeb9a1227dec1c71a2964b544fded5923266471a:be14681d328a203d1d17acdfe2255be5d23c9d2d5ea0e4177f484f29a4e38977:c4c5e7ea3db8cead5baff1af1f614cecd44f92eb347dc7fed2c67e3aaedb1177:c9226301df7528db1c4a4575eded7ea1545f7093b6e9eb7aacccd028f98ea214:cabb3d721184454e6197c3b51ad513712b04642b05775eb540a53f807159e2e7:cd14f5e1e9288cf3333ee5651e68a8950fb0022e9a4df947250e981fef5627d7:cf141cf2ebb6a35c32b1b78e9ca9210aa701c62140893533666ea07e4e7f1c2d:cfd3f63f28e209efbcb595ad4213aefe472f404b76538660d27817a45ea19e4e:d080d946752ebc2d1a2f66ce735d3a61e44af93a4b43293cfc32aadcbf0a93a9:d1c8e9bf945607639ca720a2f7b0f5819e0add00adf99f7a6a0098748c2c87d2:d229f9cb368bf3c9fab0eb4f9819b5cd9dd5e3c2aeacf351be77c29531533f1a:d42158155248e729c7f6c0d953412b64694a10568af4ee4ba1b9885104915afc:d68ce48244ea6935fdc5db7ed618c3e6a3eb13337566a2b1cacc7e29aa0f270d:d734ba9287bb449fad867011f13ea06e9ed4ea523f81065b1788aa578732e6b8:d91f0bdc8b57b8105251a6cb7bc79608480679588e80c6e97940f3baedddbf3e:dd98c359a76aa5ba822e15992ffba97c85bddbb224b81a8fc72808d8fb1156ae:e6371e5a54a60125d23ec584d9372eb3d6390fb47d9c02d692e9c3e81e54f054:e74b9b5daa7d95fce8cdb2c07b6aa64c2324ceacb79698bf2d1dee829c408cdc:ea70c7aadfb8e4901c56bec7a5d9fb2d54019326589f6c33e40d38e9ab95c0f9:ea8e764f3555eee1381b681fba30974755c9317d22b80db43cc44fd691eb6368:f0c18656b05048b52def70aa6b4e9c5591d99c7da9b6a57712bcf57cefffe34b:f6213ea2db82a8ee4bb293bcd779b3d77bdadc069771e7c28e5f69024b42edb4:f7ea0484a3d9fd77faee9e11de0f26369930bef4d4f8df587104394601b2bdef:f92884e85fb2092e41b2b4692e08db1f20b8f2be26828d5b95974786ce8c1321:f9416be6404f3534e9810933f0b9bedad6b7280982da3a18434d0cbce353ae6a:fc0795686fff5bab628659ab193381694c24903cf0930be34b7bbc6165bf417b",
   "versions": {
-    "manifestVersion": "3.6.44",
+    "manifestVersion": "3.6.45",
     "projection": "convex",
     "preset": {
       "id": "convex-application",
@@ -17,7 +17,7 @@
       "command": "declare",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -32,7 +32,7 @@
       "command": "withdraw",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -49,7 +49,7 @@
       "expectedConsequence": "Invoice.stageClientMerge",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -66,7 +66,7 @@
       "expectedConsequence": "Payment.stageClientMerge",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -82,7 +82,7 @@
       "runtimeTest": "tests/proofs/component-import-finalize.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -97,7 +97,7 @@
       "command": "publishVersion",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -112,7 +112,7 @@
       "command": "purge",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -127,7 +127,7 @@
       "command": "retire",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -142,7 +142,7 @@
       "command": "retract",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -157,7 +157,7 @@
       "command": "reviseDraft",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -172,7 +172,7 @@
       "command": "setServesPerYield",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -188,7 +188,7 @@
       "runtimeTest": "tests/proofs/component-import-finalize.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -203,7 +203,7 @@
       "command": "adjustQuantity",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -218,7 +218,7 @@
       "command": "remove",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -233,7 +233,7 @@
       "command": "setWasteFactor",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -250,7 +250,7 @@
       "expectedConsequence": "Invoice.applyCredit",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -267,7 +267,7 @@
       "expectedConsequence": "Invoice.recordCreditMemo",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -282,7 +282,7 @@
       "command": "cancel",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -298,7 +298,7 @@
       "runtimeTest": "tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -313,7 +313,7 @@
       "command": "markFailed",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -329,7 +329,7 @@
       "runtimeTest": "tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -345,7 +345,7 @@
       "runtimeTest": "tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -360,7 +360,7 @@
       "command": "classifyAllergens",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -375,7 +375,7 @@
       "command": "clearPrimaryImage",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -390,7 +390,7 @@
       "command": "introduce",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -405,7 +405,7 @@
       "command": "linkAsEdition",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -420,7 +420,7 @@
       "command": "mergeInto",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -435,7 +435,7 @@
       "command": "purge",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -450,7 +450,7 @@
       "command": "reinstate",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -465,7 +465,7 @@
       "command": "retire",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -480,7 +480,7 @@
       "command": "reviseDetails",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -495,7 +495,7 @@
       "command": "setPrimaryImage",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -510,7 +510,7 @@
       "command": "updatePortioning",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -527,7 +527,7 @@
       "expectedConsequence": "EventAssignment.assign",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -544,7 +544,7 @@
       "expectedConsequence": "IngredientDemand.ensurePurchaseEligible",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -561,7 +561,7 @@
       "expectedConsequence": "Invoice.issue",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -578,7 +578,7 @@
       "expectedConsequence": "PackList.open",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -595,7 +595,7 @@
       "expectedConsequence": "PurchaseNeed.create",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -610,7 +610,7 @@
       "command": "assign",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -625,7 +625,7 @@
       "command": "checkIn",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -640,7 +640,7 @@
       "command": "checkOut",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -655,7 +655,7 @@
       "command": "confirm",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -670,7 +670,7 @@
       "command": "markNoShow",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -685,7 +685,7 @@
       "command": "unassign",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -702,7 +702,7 @@
       "expectedConsequence": "Delivery.cancel",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -719,7 +719,7 @@
       "expectedConsequence": "Invoice.markVoided",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -736,7 +736,7 @@
       "expectedConsequence": "PackList.cancel",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -753,7 +753,7 @@
       "expectedConsequence": "PrepTask.standDown",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -770,7 +770,7 @@
       "expectedConsequence": "PurchaseNeed.cancel",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -787,7 +787,7 @@
       "expectedConsequence": "EventCloseout.capture",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -803,7 +803,7 @@
       "runtimeTest": "tests/proofs/event-closeout-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -819,7 +819,7 @@
       "runtimeTest": "tests/proofs/event-closeout-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -836,7 +836,7 @@
       "expectedConsequence": "PrepTask.open",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -853,7 +853,7 @@
       "expectedConsequence": "PackListItem.addItem",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -870,7 +870,7 @@
       "expectedConsequence": "PrepTask.standDown",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -887,7 +887,7 @@
       "expectedConsequence": "IngredientDemand.syncFromContributions",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -904,7 +904,7 @@
       "expectedConsequence": "EventAssignment.assign",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -919,7 +919,7 @@
       "command": "classifyAllergens",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -934,7 +934,7 @@
       "command": "configureSubstitutes",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -949,7 +949,7 @@
       "command": "discontinue",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -965,7 +965,7 @@
       "runtimeTest": "tests/proofs/component-import-finalize.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -980,7 +980,7 @@
       "command": "linkAsEdition",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -995,7 +995,7 @@
       "command": "mergeInto",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1010,7 +1010,7 @@
       "command": "purge",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1025,7 +1025,7 @@
       "command": "reinstate",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1040,7 +1040,7 @@
       "command": "setNutrition",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1055,7 +1055,7 @@
       "command": "setPreferredVendor",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1070,7 +1070,7 @@
       "command": "setPreferredVendors",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1085,7 +1085,7 @@
       "command": "updateCosting",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1100,7 +1100,7 @@
       "command": "updateDetails",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1115,7 +1115,7 @@
       "command": "calculate",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1130,7 +1130,7 @@
       "command": "confirm",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1145,7 +1145,7 @@
       "command": "ensurePurchaseEligible",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1160,7 +1160,7 @@
       "command": "fulfill",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1175,7 +1175,7 @@
       "command": "markReleased",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1190,7 +1190,7 @@
       "command": "recalculate",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1205,7 +1205,7 @@
       "command": "supersede",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1220,7 +1220,7 @@
       "command": "syncFromContributions",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1237,7 +1237,7 @@
       "expectedConsequence": "PurchaseNeed.reviseRequired",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1256,7 +1256,7 @@
       "runtimeTest": "tests/proofs/ingredient-demand-confirm.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1271,7 +1271,7 @@
       "command": "applyCredit",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1286,7 +1286,7 @@
       "command": "applyPayment",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1302,7 +1302,7 @@
       "runtimeTest": "tests/proofs/invoice-payment-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1317,7 +1317,7 @@
       "command": "markDepositPaid",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1332,7 +1332,7 @@
       "command": "markOverdue",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1347,7 +1347,7 @@
       "command": "markViewed",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1362,7 +1362,7 @@
       "command": "markVoided",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1377,7 +1377,7 @@
       "command": "reassignClient",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1392,7 +1392,7 @@
       "command": "recordCreditMemo",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1407,7 +1407,7 @@
       "command": "recordRefund",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1423,7 +1423,7 @@
       "runtimeTest": "tests/proofs/invoice-payment-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1438,7 +1438,7 @@
       "command": "sendBalanceReminder",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1453,7 +1453,7 @@
       "command": "setDeposit",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1468,7 +1468,7 @@
       "command": "stageClientMerge",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1483,7 +1483,7 @@
       "command": "writeOff",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1500,7 +1500,7 @@
       "expectedConsequence": "Invoice.reassignClient",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1515,7 +1515,7 @@
       "command": "archive",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1530,7 +1530,7 @@
       "command": "draft",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1545,7 +1545,7 @@
       "command": "markPublished",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1560,7 +1560,7 @@
       "command": "restore",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1575,7 +1575,7 @@
       "command": "reviseDetails",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1590,7 +1590,7 @@
       "command": "unpublish",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1605,7 +1605,7 @@
       "command": "updatePricing",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1620,7 +1620,7 @@
       "command": "cancel",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1635,7 +1635,7 @@
       "command": "dispatch",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1650,7 +1650,7 @@
       "command": "markLoaded",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1666,7 +1666,7 @@
       "runtimeTest": "tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1682,7 +1682,7 @@
       "runtimeTest": "tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1698,7 +1698,7 @@
       "runtimeTest": "tests/proofs/pack-list-delivery-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1713,7 +1713,7 @@
       "command": "addItem",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1728,7 +1728,7 @@
       "command": "adjustQuantity",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1743,7 +1743,7 @@
       "command": "markMissing",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1758,7 +1758,7 @@
       "command": "markPacked",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1775,7 +1775,7 @@
       "expectedConsequence": "EventDish.requestContainerPack",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1792,7 +1792,7 @@
       "expectedConsequence": "Delivery.schedule",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1807,7 +1807,7 @@
       "command": "beginProcessing",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1822,7 +1822,7 @@
       "command": "disputeReconciliation",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1837,7 +1837,7 @@
       "command": "fail",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1852,7 +1852,7 @@
       "command": "markMatched",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1867,7 +1867,7 @@
       "command": "reassignClient",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1883,7 +1883,7 @@
       "runtimeTest": "tests/proofs/invoice-payment-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1898,7 +1898,7 @@
       "command": "refund",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1914,7 +1914,7 @@
       "runtimeTest": "tests/proofs/invoice-payment-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1929,7 +1929,7 @@
       "command": "stageClientMerge",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1944,7 +1944,7 @@
       "command": "updateProviderTransactionIds",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1959,7 +1959,7 @@
       "command": "verifyReconciliation",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1976,7 +1976,7 @@
       "expectedConsequence": "Payment.reassignClient",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -1995,7 +1995,7 @@
       "runtimeTest": "tests/proofs/invoice-payment-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2011,7 +2011,7 @@
       "runtimeTest": "tests/proofs/payroll-input-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2026,7 +2026,7 @@
       "command": "markVoided",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2042,7 +2042,7 @@
       "runtimeTest": "tests/proofs/payroll-input-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2057,7 +2057,7 @@
       "command": "assign",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2072,7 +2072,7 @@
       "command": "cancel",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2087,7 +2087,7 @@
       "command": "claim",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2102,7 +2102,7 @@
       "command": "complete",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2117,7 +2117,7 @@
       "command": "markBlocked",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2132,7 +2132,7 @@
       "command": "open",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2147,7 +2147,7 @@
       "command": "refreshGenerated",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2162,7 +2162,7 @@
       "command": "release",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2177,7 +2177,7 @@
       "command": "revise",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2192,7 +2192,7 @@
       "command": "standDown",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2207,7 +2207,7 @@
       "command": "start",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2222,7 +2222,7 @@
       "command": "unblock",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2239,7 +2239,7 @@
       "expectedConsequence": "PrepTaskDependency.satisfy",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2254,7 +2254,7 @@
       "command": "assignToDraft",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2269,7 +2269,7 @@
       "command": "cancel",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2284,7 +2284,7 @@
       "command": "create",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2299,7 +2299,7 @@
       "command": "markDraftOrdered",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2314,7 +2314,7 @@
       "command": "markFulfilled",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2329,7 +2329,7 @@
       "command": "markOrdered",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2344,7 +2344,7 @@
       "command": "reviseRequired",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2361,7 +2361,7 @@
       "expectedConsequence": "IngredientDemand.markReleased",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2378,7 +2378,7 @@
       "expectedConsequence": "WeeklyPurchasingConfig.routeNeed",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2393,7 +2393,7 @@
       "command": "expire",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2408,7 +2408,7 @@
       "command": "grant",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2423,7 +2423,7 @@
       "command": "revoke",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2438,7 +2438,7 @@
       "command": "fail",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2453,7 +2453,7 @@
       "command": "open",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2468,7 +2468,7 @@
       "command": "pass",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2483,7 +2483,7 @@
       "command": "reinspect",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2502,7 +2502,7 @@
       "runtimeTest": "tests/proofs/quality-check-fail-block.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2517,7 +2517,7 @@
       "command": "applyApprovedSwap",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2532,7 +2532,7 @@
       "command": "cancel",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2548,7 +2548,7 @@
       "runtimeTest": "tests/proofs/shift-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2563,7 +2563,7 @@
       "command": "markNoShow",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2579,7 +2579,7 @@
       "runtimeTest": "tests/proofs/shift-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2594,7 +2594,7 @@
       "command": "stageApprovedSwap",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2610,7 +2610,7 @@
       "runtimeTest": "tests/proofs/shift-lifecycle.runtime.test.ts",
       "status": "runtime_proven",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2627,7 +2627,7 @@
       "expectedConsequence": "Shift.stageApprovedSwap",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2644,7 +2644,7 @@
       "expectedConsequence": "Shift.applyApprovedSwap",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2659,7 +2659,7 @@
       "command": "clockIn",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2674,7 +2674,7 @@
       "command": "clockOut",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2689,7 +2689,7 @@
       "command": "correct",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2706,7 +2706,7 @@
       "expectedConsequence": "PurchaseNeed.assignToDraft",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
@@ -2723,7 +2723,7 @@
       "expectedConsequence": "PurchaseNeed.markDraftOrdered",
       "status": "generated",
       "versions": {
-        "manifestVersion": "3.6.44",
+        "manifestVersion": "3.6.45",
         "projection": "convex",
         "preset": {
           "id": "convex-application",
