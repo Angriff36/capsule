@@ -175,6 +175,14 @@ Reviewer APPROVE = authorization to merge. Reviewer REJECT = fix or escalate
 to the human; never merge over a rejection. The PR body must name the
 reviewing model and its verdict.
 
+RYAN_APPROVED 2026-08-01: **Green CI + independent cross-model APPROVE is
+FULL push/merge authorization.** No additional owner sign-off is required to
+push to main or merge a PR (this repo and Angriff36/Manifest alike) once the
+required gates pass and a non-authoring model has approved the diff. Do not
+hold reviewed, green work waiting for a human. Everything else in this gate
+(never self-approve, never merge over a REJECT, name the reviewer in the PR
+body) still applies.
+
 <!-- convex-ai-start -->
 
 This project uses [Convex](https://convex.dev) as its backend.
