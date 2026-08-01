@@ -255,7 +255,7 @@ export function MangiaDashboardPage() {
             <div>
               <h3 className="font-semibold text-brand">Today's Operations</h3>
               <p className="text-xs text-brand">
-                {today.toLocaleDateString("en-US", {
+                {new Date().toLocaleDateString("en-US", {
                   weekday: "long",
                   month: "long",
                   day: "numeric",

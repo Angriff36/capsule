@@ -26,6 +26,15 @@ export function CompMasterDashboardPage() {
   const events = useListEvent();
   const attributions = useListRevenueAttribution();
   const people = useListPerson();
+  const cancelledEventIds = useMemo(
+    () =>
+      new Set(
+        (events || [])
+          .filter((event) => event.stage === "cancelled")
+          .map((event) => event._id),
+      ),
+    [events],
+  );
 
   // Commission metrics (3% basis)
   const commissionMetrics = useMemo(() => {
@@ -48,7 +57,8 @@ export function CompMasterDashboardPage() {
     // Calculate from revenue attributions first, then fall back to assigned events
     if (attributions && attributions.length > 0) {
       attributions.forEach((attr) => {
-        if (!attr.salespersonId) return;
+        if (!attr.salespersonId || cancelledEventIds.has(String(attr.eventId)))
+          return;
 
         const person = people.find((p) => p._id === attr.salespersonId);
         if (!person) return;
@@ -79,7 +89,12 @@ export function CompMasterDashboardPage() {
     } else {
       // Fallback to event.assignedToId
       events.forEach((event) => {
-        if (!event.assignedToId || event.quotedPrice == null) return;
+        if (
+          event.stage === "cancelled" ||
+          !event.assignedToId ||
+          event.quotedPrice == null
+        )
+          return;
 
         const person = people.find((p) => p._id === event.assignedToId);
         if (!person) return;
@@ -131,7 +146,7 @@ export function CompMasterDashboardPage() {
         0,
       ),
     };
-  }, [events, attributions, people]);
+  }, [events, attributions, people, cancelledEventIds]);
 
   // Payment status breakdown
   const paymentStatus = useMemo(() => {
@@ -143,7 +158,8 @@ export function CompMasterDashboardPage() {
 
     // Current month commission
     const currentMonthAttributions = (attributions || []).filter((attr) => {
-      if (!attr.createdAt) return false;
+      if (!attr.createdAt || cancelledEventIds.has(String(attr.eventId)))
+        return false;
       const date = new Date(attr.createdAt);
       return (
         date.getMonth() === currentMonth && date.getFullYear() === currentYear
@@ -163,7 +179,7 @@ export function CompMasterDashboardPage() {
       pending: commissionMetrics.totalPending,
       total: commissionMetrics.totalCommission,
     };
-  }, [commissionMetrics, attributions]);
+  }, [commissionMetrics, attributions, cancelledEventIds]);
 
   // Top events by commission
   const topEventsByCommission = useMemo(() => {
@@ -172,7 +188,7 @@ export function CompMasterDashboardPage() {
     const COMMISSION_RATE = 0.03;
 
     return events
-      .filter((e) => e.quotedPrice != null)
+      .filter((e) => e.stage !== "cancelled" && e.quotedPrice != null)
       .map((event) => {
         const person = event.assignedToId
           ? people.find((p) => p._id === event.assignedToId)
