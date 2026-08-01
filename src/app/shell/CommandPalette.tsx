@@ -60,13 +60,18 @@ export function CommandPalette({
   const events = useListEvent();
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const disabledCapabilities = authStatus?.disabledCapabilities;
-  const { hits: searchHits, loading: searchLoading } =
-    useNaturalLanguageSearch(query);
+  const { hits: searchHits, loading: searchLoading } = useNaturalLanguageSearch(
+    query,
+    open,
+  );
 
   useEffect(() => {
+    // Reset on close too: the component stays mounted, so a lingering query
+    // would keep the searchAll subscription alive after navigation and let a
+    // late server error crash whatever page the user landed on (#133).
+    setQuery("");
+    setActive(0);
     if (open) {
-      setQuery("");
-      setActive(0);
       requestAnimationFrame(() => inputRef.current?.focus());
     }
   }, [open]);

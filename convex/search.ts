@@ -63,7 +63,7 @@ const ENTITY_KEYWORDS: Record<string, string[]> = {
   vendor: ["vendor", "vendors", "supplier", "suppliers"],
   dish: ["dish", "dishes"],
   menu: ["menu", "menus"],
-  recipe: ["recipe", "recipes"],
+  component: ["recipe", "recipes", "component", "components"],
   ingredient: ["ingredient", "ingredients"],
   lead: ["lead", "leads"],
   proposal: ["proposal", "proposals", "quote", "quotes"],
@@ -259,13 +259,15 @@ const TEXT_TARGETS: SearchTarget[] = [
     label: (d) => String(d.name ?? "Unnamed menu"),
   },
   {
-    kind: "recipe",
-    table: "recipes",
+    // Recipes became Components; there is no `recipes` table. Querying a
+    // nonexistent table throws server-side and killed every text search (#133).
+    kind: "component",
+    table: "components",
     index: "search_name",
     field: "name",
-    hint: "Recipe",
-    path: (d) => `/kitchen/recipes/${d._id}`,
-    label: (d) => String(d.name ?? "Unnamed recipe"),
+    hint: "Component",
+    path: (d) => `/kitchen/components/${d._id}`,
+    label: (d) => String(d.name ?? "Unnamed component"),
   },
   {
     kind: "ingredient",

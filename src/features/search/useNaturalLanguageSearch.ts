@@ -17,7 +17,11 @@ export interface SearchHit {
  * date/age intent ("events next week", "overdue 30 days") resolves server-side
  * without the query reading Date.now() itself.
  */
-export function useNaturalLanguageSearch(rawQuery: string, debounceMs = 180) {
+export function useNaturalLanguageSearch(
+  rawQuery: string,
+  enabled = true,
+  debounceMs = 180,
+) {
   const [debounced, setDebounced] = useState(rawQuery);
 
   useEffect(() => {
@@ -27,13 +31,16 @@ export function useNaturalLanguageSearch(rawQuery: string, debounceMs = 180) {
 
   const trimmed = debounced.trim();
   const args = useMemo(() => {
-    if (trimmed.length < 2) return "skip" as const;
+    // `enabled` bypasses the debounce so closing the palette drops the
+    // subscription on the very next render — a late server error must not
+    // crash the page the user navigated to (#133).
+    if (!enabled || trimmed.length < 2) return "skip" as const;
     return { query: trimmed, now: Date.now() } as const;
-  }, [trimmed]);
+  }, [trimmed, enabled]);
 
   const hits = useQuery(api.search.searchAll, args);
   return {
     hits: (hits ?? []) as SearchHit[],
-    loading: hits === undefined && trimmed.length >= 2,
+    loading: hits === undefined && enabled && trimmed.length >= 2,
   };
 }
