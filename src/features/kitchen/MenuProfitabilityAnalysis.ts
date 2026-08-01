@@ -35,6 +35,11 @@ export interface DishComponentProfitabilityInput extends Deletable {
   batchMultiplier: number | string;
 }
 
+export interface ComponentProfitabilityInput extends Deletable {
+  id: string;
+  yieldQuantity: number | string;
+}
+
 export interface ComponentIngredientProfitabilityInput extends Deletable {
   id: string;
   componentId: string;
@@ -96,6 +101,7 @@ export interface BuildMenuProfitabilityInput {
   menuDishes: MenuDishProfitabilityInput[];
   dishes: DishProfitabilityInput[];
   dishComponents: DishComponentProfitabilityInput[];
+  components: ComponentProfitabilityInput[];
   dishIngredients: DishIngredientProfitabilityInput[];
   componentIngredients: ComponentIngredientProfitabilityInput[];
   ingredients: IngredientProfitabilityInput[];
@@ -167,6 +173,7 @@ export function buildMenuProfitability({
   menuDishes,
   dishes,
   dishComponents,
+  components,
   dishIngredients,
   componentIngredients,
   ingredients,
@@ -201,6 +208,9 @@ export function buildMenuProfitability({
     existing.push(attachment);
     attachmentsByDish.set(attachment.dishId, existing);
   }
+  const componentsById = new Map(
+    components.filter(isActive).map((component) => [component.id, component]),
+  );
   const linesByComponent = new Map<
     string,
     ComponentIngredientProfitabilityInput[]
@@ -231,8 +241,11 @@ export function buildMenuProfitability({
     let pricedLineCount = 0;
 
     for (const attachment of attachments) {
+      const component = componentsById.get(attachment.componentId);
       const componentLines = linesByComponent.get(attachment.componentId) ?? [];
-      const yieldQuantity = positiveNumber(attachment.yieldQuantity);
+      const yieldQuantity =
+        positiveNumber(attachment.yieldQuantity) ??
+        (component ? positiveNumber(component.yieldQuantity) : null);
       const batchMultiplier = positiveNumber(attachment.batchMultiplier);
       const summary = calculateComponentCost({
         lines: componentLines.map((componentLine) => ({
@@ -246,6 +259,7 @@ export function buildMenuProfitability({
         yieldQuantity: yieldQuantity ?? 0,
       });
       const componentIsComplete =
+        component != null &&
         componentLines.length > 0 &&
         batchMultiplier != null &&
         yieldQuantity != null &&

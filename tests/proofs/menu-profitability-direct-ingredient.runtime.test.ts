@@ -72,6 +72,7 @@ async function loadMenuProfitability(kitchen: KitchenRole, menuId: string) {
     menuDishes,
     dishes,
     dishComponents,
+    components,
     dishIngredients,
     componentIngredients,
     ingredients,
@@ -80,6 +81,7 @@ async function loadMenuProfitability(kitchen: KitchenRole, menuId: string) {
     kitchen.query(api.queries.listMenuDish),
     kitchen.query(api.queries.listDish),
     kitchen.query(api.queries.listDishComponent),
+    kitchen.query(api.queries.listComponent),
     kitchen.query(api.queries.listDishIngredient),
     kitchen.query(api.queries.listComponentIngredient),
     kitchen.query(api.queries.listIngredient),
@@ -115,6 +117,13 @@ async function loadMenuProfitability(kitchen: KitchenRole, menuId: string) {
         yieldQuantity: attachment.yieldQuantity as number | string,
         batchMultiplier: attachment.batchMultiplier as number | string,
         deletedAt: attachment.deletedAt,
+      }),
+    ),
+    components: (components as Array<Record<string, unknown>>).map(
+      (component) => ({
+        id: String(component._id),
+        yieldQuantity: component.yieldQuantity as number | string,
+        deletedAt: component.deletedAt,
       }),
     ),
     dishIngredients: (dishIngredients as Array<Record<string, unknown>>).map(

@@ -125,6 +125,11 @@ export function MenuDetailPage() {
           batchMultiplier: attachment.batchMultiplier,
           deletedAt: attachment.deletedAt,
         })),
+        components: (components ?? []).map((component) => ({
+          id: component._id,
+          yieldQuantity: component.yieldQuantity,
+          deletedAt: component.deletedAt,
+        })),
         dishIngredients: (dishIngredients ?? []).map((line) => ({
           id: line._id,
           dishId: line.dishId,
@@ -155,6 +160,7 @@ export function MenuDetailPage() {
     [
       dishes,
       dishComponents,
+      components,
       dishIngredients,
       ingredients,
       priceObservations,
@@ -166,6 +172,7 @@ export function MenuDetailPage() {
     dishes === undefined ||
     menuDishes === undefined ||
     dishComponents === undefined ||
+    components === undefined ||
     dishIngredients === undefined ||
     componentIngredients === undefined ||
     ingredients === undefined ||
