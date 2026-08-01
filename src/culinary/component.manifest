@@ -40,7 +40,9 @@ entity Component mixin TenantScoped, SoftDeletable {
   // Live batch cost from non-deleted ingredient lines (Ingredient.costPerUnit).
   // Inlined line cost (not line.liveIngredientCost) so Convex projection can emit one expression.
   computed liveBatchCost: money(12, 2) = sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * (line.wasteFactor != null ? line.wasteFactor : 1) * line.ingredient.costPerUnit : 0)
-  computed liveCostPerGuest: money(12, 2) = self.servesPerYield > 0 ? sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * (line.wasteFactor != null ? line.wasteFactor : 1) * line.ingredient.costPerUnit : 0) / self.servesPerYield : 0
+  // Costing divides by yieldQuantity — the guests-per-batch authority since the
+  // #132 divisor fix (#134). servesPerYield stays for nutrition only.
+  computed liveCostPerGuest: money(12, 2) = self.yieldQuantity > 0 ? sum(filter(self.ingredientLines, (line) => line.deletedAt == null and line.addedAt != null), (line) => line.unit == line.ingredient.unit ? line.quantity * (line.wasteFactor != null ? line.wasteFactor : 1) * line.ingredient.costPerUnit : 0) / self.yieldQuantity : 0
 
   constraint componentIdentityComplete: self.draftedAt == null or length(trim(self.name)) > 0 "Drafted components require a name"
   constraint componentYieldPositive: self.yieldQuantity > 0 "Component yield quantity must be positive"
