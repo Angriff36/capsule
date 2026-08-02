@@ -343,15 +343,28 @@ export function ClientDetailPage() {
         </div>
         <label>
           Email
-          <input name="email" type="email" defaultValue={client.email ?? ""} />
+          <input
+            name="email"
+            type="email"
+            defaultValue={client.email ?? ""}
+            className="input"
+          />
         </label>
         <label>
           Phone
-          <input name="phone" defaultValue={client.phone ?? ""} />
+          <input
+            name="phone"
+            defaultValue={client.phone ?? ""}
+            className="input"
+          />
         </label>
         <label>
           Website
-          <input name="website" defaultValue={client.website ?? ""} />
+          <input
+            name="website"
+            defaultValue={client.website ?? ""}
+            className="input"
+          />
         </label>
         <button
           className="btn btn-ghost"

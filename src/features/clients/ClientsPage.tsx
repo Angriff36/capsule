@@ -309,27 +309,27 @@ export function ClientsPage() {
           {clientType === "company" ? (
             <label>
               Company name
-              <input name="companyName" required />
+              <input name="companyName" required className="input" />
             </label>
           ) : (
             <>
               <label>
                 First name
-                <input name="givenName" required />
+                <input name="givenName" required className="input" />
               </label>
               <label>
                 Last name
-                <input name="familyName" />
+                <input name="familyName" className="input" />
               </label>
             </>
           )}
           <label>
             Email
-            <input name="email" type="email" />
+            <input name="email" type="email" className="input" />
           </label>
           <label>
             Phone
-            <input name="phone" />
+            <input name="phone" className="input" />
           </label>
           <label>
             Payment terms (days)
@@ -339,6 +339,7 @@ export function ClientsPage() {
               min={0}
               max={365}
               defaultValue={30}
+              className="input"
             />
           </label>
           <label className="supply-check">
@@ -346,7 +347,7 @@ export function ClientsPage() {
           </label>
           <label>
             Notes
-            <textarea name="notes" rows={2} />
+            <textarea name="notes" rows={2} className="input" />
           </label>
           <button className="btn btn-primary" type="submit" disabled={busy}>
             {busy ? "Saving…" : "Save client"}
