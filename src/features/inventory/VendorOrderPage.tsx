@@ -445,8 +445,7 @@ export function VendorOrderPage() {
                 className="input"
                 type="number"
                 min={0}
-                step="any"
-                defaultValue={0}
+                step="0.01"
                 required
               />
             </label>
