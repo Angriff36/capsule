@@ -331,12 +331,18 @@ export function ProposalCreateForm({
                 )} — from event "${fromEvent.title}"`}
                 disabled
                 readOnly
+                className="input"
               />
             </label>
           ) : (
             <label>
               Client
-              <select name="clientId" required defaultValue="">
+              <select
+                name="clientId"
+                required
+                defaultValue=""
+                className="input"
+              >
                 <option value="" disabled>
                   Select client
                 </option>
@@ -350,7 +356,12 @@ export function ProposalCreateForm({
           )}
           <label>
             Title
-            <input name="title" required defaultValue={prefill?.title ?? ""} />
+            <input
+              name="title"
+              required
+              defaultValue={prefill?.title ?? ""}
+              className="input"
+            />
           </label>
           <label>
             Guest count
@@ -360,11 +371,16 @@ export function ProposalCreateForm({
               min={0}
               value={draftGuestCount}
               onChange={(e) => setDraftGuestCount(Number(e.target.value) || 0)}
+              className="input"
             />
           </label>
           <label>
             Event type
-            <input name="eventType" defaultValue={prefill?.eventType ?? ""} />
+            <input
+              name="eventType"
+              defaultValue={prefill?.eventType ?? ""}
+              className="input"
+            />
           </label>
           <label>
             Event date
@@ -372,17 +388,23 @@ export function ProposalCreateForm({
               name="eventDate"
               type="date"
               defaultValue={prefill?.eventDate}
+              className="input"
             />
           </label>
           <label>
             Venue name
-            <input name="venueName" defaultValue={prefill?.venueName ?? ""} />
+            <input
+              name="venueName"
+              defaultValue={prefill?.venueName ?? ""}
+              className="input"
+            />
           </label>
           <label>
             Venue address
             <input
               name="venueAddress"
               defaultValue={prefill?.venueAddress ?? ""}
+              className="input"
             />
           </label>
           <div className="mt-1">
@@ -578,6 +600,7 @@ export function ProposalCreateForm({
               min={0}
               value={draftTax}
               onChange={(e) => setDraftTax(Number(e.target.value) || 0)}
+              className="input"
             />
           </label>
           <label>
@@ -589,6 +612,7 @@ export function ProposalCreateForm({
               min={0}
               value={draftDiscount}
               onChange={(e) => setDraftDiscount(Number(e.target.value) || 0)}
+              className="input"
             />
           </label>
           <p className="text-base font-semibold text-ink">
@@ -603,6 +627,7 @@ export function ProposalCreateForm({
               name="notes"
               rows={4}
               placeholder="List menu items, one per line"
+              className="input"
             />
           </label>
           <label>
@@ -611,6 +636,7 @@ export function ProposalCreateForm({
               name="expiresAt"
               type="date"
               defaultValue={defaultValidityDate()}
+              className="input"
             />
           </label>
           <label>
@@ -619,6 +645,7 @@ export function ProposalCreateForm({
               name="terms"
               rows={3}
               placeholder="Deposit, service, cancellation, or other terms"
+              className="input"
             />
           </label>
           <button
