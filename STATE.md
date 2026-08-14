@@ -1,48 +1,52 @@
 # Loop State — capsule
 
-loop-pause-all
-
-Last run: 2026-07-24T03:15:42Z (PR #107 Fixes #55; CI green; issue closed)
-Paused: 2026-07-24T03:21:00Z — human requested stop loop
+Last run: 2026-08-14T14:30:00Z (queue-drain tick, NO-OP)
+Resumed: 2026-08-01 — human requested loop continue (pause of 2026-07-24 removed)
 
 ## High Priority
 
-**All remaining open issues are non-fixable in loop (platform / product):**
+**ESCALATED (2/3 failures reached - scope/product decision needed):**
+- #141: [High] Create Event from proposal drops data — ESCALATED (2/3 failures). Needs: proposal→event linking for menu copy cascade, real venue selection (not free-text), proper local datetime conversion, end time prefill. Product decision needed: comprehensive fix vs scoped approach.
+
+**Recently shipped (awaiting human merge on draft PRs):**
+- #156: ✅ FIXED (PR #156, Codex APPROVED) — CI green, awaiting human merge
+- #155: ✅ FIXED (PR #155) — CI green, awaiting human merge
+- #154: ✅ FIXED (PR #154) — CI green, awaiting human merge
+- #153: ✅ FIXED (PR #153) — CI green, awaiting human merge
+- #152: ✅ FIXED (PR #152) — CI green, awaiting human merge
+
+**Stale loop PRs (likely conflicting, need human rebase/close decision):**
+- #102-#107: 6 PRs (auth, schema, MCP, recipe, prep tasks, deny-guard, ownership, format) — from 2026-07-24, likely conflicting with recent main changes
+- #127-#131: 5 Dependabot PRs — clerk, zod major versions failing (non-blocking); fontsource, vite, react-dom upgrades stale
+
+**Remaining UI audit issues (Medium/Low - not High Priority):**
+- #142-#151: Pack-list errors, equipment/reservation dead-ends, dish tags discarded, food cost missing, time records not event-linked, date field mangling, stock unit unconstrained, polish cluster
+
+**Platform/Escalated (non-fixable in loop):**
+- #136: [Critical] Invoice numbers raw DB IDs — ESCALATED (requires sequential invoice number generator + event→invoice link architecture)
 - #98: Builder upstream (filed)
-- #77-#72: Manifest platform limitations
-- #54-#50: Manifest/Convex platform
-- #44, #43: Convex platform
+- #77-#72, #54-#50, #44, #43: Manifest/Convex platform limitations
 - #34: Email infra (product decision needed)
 - #25: fanOut bug (Manifest)
-
-**Draft PRs awaiting human merge:** #92, #93, #95–#107 (CI-green where last checked)
-
-**✅ Recent ticks:** #55→#107, #15→#106, #18→#105, #24→#104 (+ prior)
-
-**Platform/Escalated (not Capsule-loop-fixable):** #98 (Builder), #77–#72 (Manifest), #54–#50, #44, #43, #34, #25
+- #125: UI audit gaps (backend/product decisions)
+- #124: Dashboard parity delta list
+- #123: Inbound message capture (external prerequisites)
+- #122: Nowsta payroll sync (blocked on API credentials)
+- #121: Owner input needed (commission/split basis)
+- #119: Occasion/service style selects render empty in production
+- #113: bun run seed is a no-op
 
 ## Watch List
 
-- Main CI: GREEN (PR #107 check passed)
-- After merge of Manifest/Convex PRs: human `npx convex deploy -y`
-- Worktrees: survivors with unpushed work listed below
+- Main CI: GREEN (latest SUCCESS 2026-08-12)
+- 2 failing Dependabot PRs: clerk/react-6.12.8, zod-4.4.3 (major version upgrades, not blocking)
+- 10 draft PRs awaiting human merge (#156-#152, #127-#131)
+- Worktrees: 12 survivors (2026-08-13T13:30:00Z): prod-20260721T2100-OD055-payment-method-default (ahead=2), prod-202607211313-S2-client-outstanding-balance (ahead=1), prod-20260721T2355-S7-packlist-access-widening (ahead=1), prod-20260721T2136-S6-event-attendance-counts (ahead=1), prod-20260721T1852-OD056-saved-report-owner (ahead=1), prod-20260721T2340-issue35-preptask-claim (ahead=1), prod-20260722T1000-S5-ingredient-totals (ahead=2), prod-20260721T2345-S5-ingredient-totals (ahead=1), prod-20260721T2115-issue32-wiring-drift (ahead=1), prod-20260721T2000-S6-event-attendance (ahead=1), fix-20260721T1645-actions-checkout-v7 (ahead=1), dep-20260721T1600-actions-checkout-7 (ahead=1)
 
-## Worktree Survivors (unpushed work - preserve)
+## Recent Noise (ignored this run)
 
-- dep-20260721T1600-actions-checkout-7 [1612ca5, ahead=1]
-- fix-20260721T1645-actions-checkout-v7 [9fd577c, ahead=1]
-- fix-20260723T2037-issue-24-savedreport-owner [fb3dbf8, ahead=12]
-- prod-202607211313-S2-client-outstanding-balance [9031c63, ahead=1]
-- prod-20260721T1852-OD056-saved-report-owner [9dd1b20, ahead=1]
-- prod-20260721T2000-S6-event-attendance [f945e0f, ahead=1]
-- prod-20260721T2100-OD055-payment-method-default [0b3f680, ahead=2]
-- prod-20260721T2115-issue32-wiring-drift [2459d6d, ahead=1]
-- prod-20260721T2136-S6-event-attendance-counts [d517984, ahead=1]
-- prod-20260721T2340-issue35-preptask-claim [b497f25, ahead=1]
-- prod-20260721T2345-S5-ingredient-totals [bc13023, ahead=1]
-- prod-20260721T2355-S7-packlist-access-widening [a714427, ahead=1]
-- prod-20260722T1000-S5-ingredient-totals [e67e9eb, ahead=2]
+- None this run - all recent issues are genuine defects from UI audit or platform limitations
 
 ## Post-Run Critique
 
-- #55 needed surgical mutations patches (restore fanOut deletedAt filter + reinstate previousQuantity guard order) because Builder baseline/codegen quirks — keep baselined mutations until IR emits correctly
+- Triage complete (2026-08-14T14:30:00Z): NO-OP tick. Queue drained — no new actionable High Priority items. #156-#152 await human merge (all MERGEABLE + CI SUCCESS, #156 Codex APPROVED). #141 ESCALATED (2/3 failures) needs product decision: comprehensive fix vs scoped approach. Stale loop PRs (#102-#107, #127-#131) need human rebase/close. CI healthy (latest main SUCCESS 2026-08-11, Dependabot clerk/zod major-version failures non-blocking). 12 worktree survivors. Budget: ~15k tokens this run vs 2M cap.
