@@ -8,7 +8,10 @@ export function ClientsWorkspaceNav() {
         <NavLink
           key={section.key}
           to={section.path}
-          end={section.key === "accounts"}
+          // "accounts" (/clients) and "proposals" (/clients/proposals) are
+          // prefixes of sibling tabs — without `end` two underlines light up
+          // at once (e.g. on /clients/proposals/templates).
+          end={section.key === "accounts" || section.key === "proposals"}
           className={({ isActive }) => (isActive ? "active" : undefined)}
         >
           {section.label}
