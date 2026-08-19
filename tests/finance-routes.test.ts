@@ -9,6 +9,10 @@ import {
 import { CloseoutLifecyclePolicy } from "../src/features/finance/CloseoutLifecyclePolicy";
 import { CommercialLifecyclePolicy } from "../src/features/finance/CommercialLifecyclePolicy";
 import { PaymentsLedgerPresenter } from "../src/features/finance/PaymentsLedgerPresenter";
+import {
+  formatInvoiceNumber,
+  invoiceNumberFormatter,
+} from "../src/features/finance/invoiceNumberDisplay";
 import { PaymentMethodLifecyclePolicy } from "../src/features/finance/PaymentMethodLifecyclePolicy";
 import { PayrollLifecyclePolicy } from "../src/features/finance/PayrollLifecyclePolicy";
 import {
@@ -207,13 +211,16 @@ describe("Finance routes and lifecycle bindings", () => {
   });
 
   it("default payments view never claims a bare 0 while settled rows exist", () => {
-    // Mirrors the prod bug: default view showed "0 payments / No open
-    // payments" while Show settled revealed 2 COMPLETED totaling $15,300.
+    // QA 176 FAIL on prod: default badge still "0 PAYMENTS" with $15,300
+    // COMPLETED hidden, no notice, one row showing raw invoice id
+    // NN74XC7N0PDK5CMKM5Z8ZN7GBD8BDP6Q. Control-only is not enough.
     const presenter = new PaymentsLedgerPresenter();
     const rows = [
-      { status: "completed", amount: 12000 },
-      { status: "completed", amount: 3300 },
+      { status: "COMPLETED", amount: 11700, settledAt: 1 },
+      { status: "completed", amount: 3600, settledAt: 2 },
     ];
+    expect(presenter.isTerminal("COMPLETED")).toBe(true);
+    expect(presenter.isTerminal("completed")).toBe(true);
     expect(presenter.openRows(rows)).toHaveLength(0);
 
     const summary = presenter.settledSummary(rows);
@@ -223,8 +230,12 @@ describe("Finance routes and lifecycle bindings", () => {
 
     // Heading count is honest — never a bare "0 payments" with money hidden.
     expect(presenter.countLabel(0, summary.hiddenCount, false)).toBe(
-      "0 open · 2 settled",
+      "2 settled hidden",
     );
+    expect(presenter.countLabel(0, summary.hiddenCount, false)).not.toBe(
+      "0 payments",
+    );
+    expect(presenter.headingCount(rows, false)).toBe("2 settled hidden");
     // Empty state names the filter and the hidden total.
     const notice = presenter.hiddenSettledNotice(summary);
     expect(notice).toContain("2 completed payments");
@@ -237,6 +248,7 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(presenter.countLabel(2, summary.hiddenCount, true)).toBe(
       "2 payments",
     );
+    expect(presenter.headingCount(rows, true)).toBe("2 payments");
     expect(presenter.countLabel(0, 0, false)).toBe("0 payments");
     expect(presenter.hiddenSettledNotice(presenter.settledSummary([]))).toBe(
       null,
@@ -265,19 +277,41 @@ describe("Finance routes and lifecycle bindings", () => {
     // Rows and copy must come from the presenter, not an inline blind filter.
     expect(page).toContain("PaymentsLedgerPresenter");
     expect(page).toMatch(/ledger\.openRows\(activeRows\)/);
-    expect(page).toMatch(/ledger\.countLabel\(/);
+    expect(page).toMatch(/ledger\.headingCount\(activeRows,/);
     expect(page).toMatch(/ledger\.hiddenSettledNotice\(/);
     expect(page).toMatch(/ledger\.showSettledLabel\(/);
     // The heading count must not be a hardcoded `${n} payments` again.
     expect(page).not.toMatch(/\{visibleRows\.length\} payments/);
+    // 11px document-empty span was invisible in dark mode. The notice has
+    // to live in a text-base status line, not inside that span.
+    expect(page).not.toContain("<span>{hiddenSettledNotice}</span>");
+    expect(page).toMatch(
+      /hiddenSettledNotice \? \(\s*<p className="mt-3 text-base text-ink-2" role="status">/,
+    );
+    expect(page).toContain("{hiddenSettledNotice}");
     // Empty state JSX: "No open payments" is allowed only when the hidden
     // settled notice (and one-click Show settled) is wired next to it.
     expect(page).toContain('className="document-empty"');
     expect(page).toContain("<p>No open payments.</p>");
     expect(page).toContain("{hiddenSettledNotice ? (");
-    expect(page).toContain("<span>{hiddenSettledNotice}</span>");
     expect(page).toMatch(/onClick=\{\(\) => setShowTerminal\(true\)\}/);
     expect(page).toContain("{ledger.showSettledLabel(settledSummary)}");
+    // Same class as Holiday folio: raw event-looking invoice ids get a
+    // human INV- ref, not NN74XC7N0PDK5CMKM5Z8ZN7GBD8BDP6Q.
+    expect(page).toContain(
+      "formatInvoiceNumber(invoice?.invoiceNumber, invoice?._id)",
+    );
+  });
+
+  it("treats uppercase 32-char invoice ids as raw document ids", () => {
+    const raw = "NN74XC7N0PDK5CMKM5Z8ZN7GBD8BDP6Q";
+    expect(invoiceNumberFormatter.isRawDocumentId(raw)).toBe(true);
+    expect(formatInvoiceNumber(raw, "jx7invoiceidxxxxxxxxxxxxxx8bd5qp")).toBe(
+      "INV-8BD5QP",
+    );
+    expect(formatInvoiceNumber("INV-2026-QA1", "anything")).toBe(
+      "INV-2026-QA1",
+    );
   });
 
   it("keeps the server-side zero-balance send refusal (manifest + generated command)", () => {
