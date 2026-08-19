@@ -1,5 +1,7 @@
 export type EventCreatePrefill = {
   clientId?: string;
+  /** Accepted proposal to book: pre-fills the form and links + copies its menu on create. */
+  proposalId?: string;
 };
 
 export type EventDetailTab =
@@ -39,13 +41,14 @@ export const EVENT_DETAIL_TABS: readonly {
 const EVENTS_NEW_PATH = "/events/new";
 const TAB_KEYS = new Set<string>(EVENT_DETAIL_TABS.map((tab) => tab.key));
 
-/** Builds /events/new?clientId= deep links from CRM (e.g. accepted Proposal). */
+/** Builds /events/new?clientId=&proposalId= deep links from CRM (e.g. accepted Proposal). */
 export class EventCreateLinkBuilder {
   build(prefill: EventCreatePrefill = {}): string {
-    if (!prefill.clientId) return EVENTS_NEW_PATH;
     const params = new URLSearchParams();
-    params.set("clientId", prefill.clientId);
-    return `${EVENTS_NEW_PATH}?${params.toString()}`;
+    if (prefill.clientId) params.set("clientId", prefill.clientId);
+    if (prefill.proposalId) params.set("proposalId", prefill.proposalId);
+    const query = params.toString();
+    return query ? `${EVENTS_NEW_PATH}?${query}` : EVENTS_NEW_PATH;
   }
 }
 
