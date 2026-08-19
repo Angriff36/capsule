@@ -14,38 +14,15 @@ import { ConvexHttpClient } from "convex/browser";
 import { api } from "../convex/_generated/api";
 import { CapsuleAgentAuthManager } from "../src/agent/CapsuleAgentAuthManager";
 
+import { SERVICE_STYLE_CATALOG } from "../src/features/events/serviceStyleCatalog";
+
 interface CatalogRow {
   name: string;
   code: string;
   description?: string;
 }
 
-const SERVICE_STYLES: CatalogRow[] = [
-  {
-    name: "Full Service",
-    code: "full-service",
-    description:
-      "Staffed onsite service. TPP: Buffet - Cook Onsite, Plated Dinner, Action Station, Family Style, Private Chef, Bar.",
-  },
-  {
-    name: "Limited Service",
-    code: "limited-service",
-    description:
-      "Delivered hot or ready-to-heat with limited staffing. TPP: Buffet - Bring Hot, Ready To Heat - CPU, Ready To Heat - Delivery.",
-  },
-  {
-    name: "Drop Off",
-    code: "drop-off",
-    description:
-      "Delivered, no service staff. TPP: Drop Off, Drop Off - Individual, Pickup.",
-  },
-  {
-    name: "Vending",
-    code: "vending",
-    description:
-      "Vending and food-truck service. TPP: Vending, Food Truck Window.",
-  },
-];
+const SERVICE_STYLES: CatalogRow[] = [...SERVICE_STYLE_CATALOG];
 
 const OCCASIONS: CatalogRow[] = [
   { name: "Corporate Event", code: "corporate-event" },

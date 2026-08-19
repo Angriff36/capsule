@@ -38,7 +38,14 @@ export const EVENT_DETAIL_TABS: readonly {
   { key: "margin", label: "Margin" },
 ] as const;
 
+const EVENTS_INDEX_PATH = "/events";
 const EVENTS_NEW_PATH = "/events/new";
+
+/** Exact events list path — never a record id. */
+export function eventsIndexPath(): string {
+  return EVENTS_INDEX_PATH;
+}
+
 const TAB_KEYS = new Set<string>(EVENT_DETAIL_TABS.map((tab) => tab.key));
 
 /** Builds /events/new?clientId=&proposalId= deep links from CRM (e.g. accepted Proposal). */

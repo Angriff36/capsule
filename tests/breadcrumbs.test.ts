@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { breadcrumbsForPath } from "../src/app/shell/breadcrumbs";
+import { eventsIndexPath } from "../src/features/events/eventRoutes";
 
 function labels(pathname: string): string[] {
   return breadcrumbsForPath(pathname).map((crumb) => crumb.label);
@@ -34,5 +35,19 @@ describe("breadcrumbsForPath", () => {
     expect(labels("/kitchen/dishes")).toEqual(["Kitchen", "Dishes"]);
     expect(labels("/kitchen/dishes/abc")).toEqual(["Kitchen", "Dishes"]);
     expect(labels("/events/new")).toEqual(["Events", "New event"]);
+  });
+});
+
+describe("events index breadcrumb target", () => {
+  it("keeps /events on the list, never a specific event detail", () => {
+    const crumbs = breadcrumbsForPath("/events");
+    expect(crumbs.map((crumb) => crumb.label)).toEqual(["Events"]);
+    for (const crumb of crumbs) {
+      if (!crumb.to) continue;
+      expect(crumb.to).toBe(eventsIndexPath());
+      expect(crumb.to).not.toMatch(/^\/events\/.+/);
+      expect(crumb.to).not.toContain("nn7ez3fz56ya246m6p17az2ad58crnwg");
+      expect(crumb.to).not.toContain("test-event-id");
+    }
   });
 });
