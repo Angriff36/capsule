@@ -192,6 +192,16 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         navigate(dishPath(created.docId));
         return;
       } else {
+        const minGuests = Number(data.get("minGuests"));
+        const maxGuests = Number(data.get("maxGuests"));
+
+        // Validate guest range before submission (matches Manifest constraint wording)
+        if (minGuests > 0 && maxGuests > 0 && minGuests > maxGuests) {
+          throw new Error(
+            "Menu max guests must be zero (unlimited) or at least min guests",
+          );
+        }
+
         await createMenu({
           name: String(data.get("name") ?? "").trim(),
           description: optional(data.get("description")),
@@ -199,8 +209,8 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           isTemplate: data.get("isTemplate") === "on",
           basePrice: Number(data.get("basePrice")),
           pricePerPerson: Number(data.get("pricePerPerson")),
-          minGuests: Number(data.get("minGuests")),
-          maxGuests: Number(data.get("maxGuests")),
+          minGuests,
+          maxGuests,
         });
       }
       form.reset();
