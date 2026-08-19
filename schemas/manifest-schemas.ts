@@ -3009,6 +3009,7 @@ export const VendorOrderLineSchema = z.object({
   receivedQuantity: z.number().min(0).default(0),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]).default("each"),
   unitCost: z.number().min(0).default(0),
+  lineTotalAmount: z.number().nullable().optional(),
   discrepancyQuantity: z.number().nullable().optional(),
   discrepancyNotes: z.string().nullable().optional(),
   status: z.enum(["pending", "added", "receiving", "complete", "cancelled"]).default("pending"),
@@ -7711,6 +7712,7 @@ export const VendorOrderEnsureWeeklyDraftParamsSchema = z.object({
   ingredientId: z.string().min(1),
   requiredQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
+  orderSequence: z.number().int(),
 });
 
 export type VendorOrderEnsureWeeklyDraftParams = z.infer<typeof VendorOrderEnsureWeeklyDraftParamsSchema>;
@@ -7754,6 +7756,13 @@ export const VendorOrderSubmitForApprovalParamsSchema = z.object({});
 
 export type VendorOrderSubmitForApprovalParams = z.infer<typeof VendorOrderSubmitForApprovalParamsSchema>;
 
+// Command: syncLineTotals on VendorOrder
+export const VendorOrderSyncLineTotalsParamsSchema = z.object({
+  lineSubtotal: z.number(),
+});
+
+export type VendorOrderSyncLineTotalsParams = z.infer<typeof VendorOrderSyncLineTotalsParamsSchema>;
+
 // Command: updateTotals on VendorOrder
 export const VendorOrderUpdateTotalsParamsSchema = z.object({
   subtotal: z.number(),
@@ -7791,7 +7800,6 @@ export const VendorOrderLineEnsureWeeklyLineParamsSchema = z.object({
   onHand: z.number(),
   contributionQuantity: z.number(),
   unit: z.enum(["each", "gram", "kilogram", "ounce", "pound", "milliliter", "liter", "teaspoon", "tablespoon", "cup", "pint", "quart", "gallon", "portion", "serving", "batch", "melon", "bottle"]),
-  unitCost: z.number(),
   purchaseNeedId: z.string().uuid(),
   ingredientDemandId: z.string().min(1),
 });
