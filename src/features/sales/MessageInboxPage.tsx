@@ -16,6 +16,7 @@ import { FailureBanner } from "../events/FailureBanner";
 import { formatTime } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { ClientsWorkspaceNav } from "../clients/ClientsWorkspaceNav";
+import { PasteIncomingMessageForm } from "./PasteIncomingMessageForm";
 import { SyncErrorsPanel } from "./SyncErrorsPanel";
 import type { Doc } from "../../lib/api";
 
@@ -85,43 +86,11 @@ export function MessageInboxPage() {
   const [liBody, setLiBody] = useState("");
   const [liSender, setLiSender] = useState("");
 
-  // Paste-provider-envelope inline form (§4.4 parse boundary — a malformed
-  // envelope lands in the sync-error queue instead of being silently lost).
-  const [showEnv, setShowEnv] = useState(false);
-  const [envProvider, setEnvProvider] = useState<string>("email");
-  const [envJson, setEnvJson] = useState("");
-  const [envBusy, setEnvBusy] = useState(false);
-
-  const submitEnvelope = async () => {
-    const rawJson = envJson.trim();
-    if (!rawJson || envBusy) return;
-    setFailure(null);
-    setNotice(null);
-    setEnvBusy(true);
-    try {
-      const result = await ingestEnvelope({
-        provider: envProvider,
-        rawJson,
-      });
-      if (result.recorded === "ingested") {
-        setEnvJson("");
-        setShowEnv(false);
-        if (result.threadId) setSelectedId(result.threadId);
-        setNotice("Message logged from the pasted payload.");
-      } else {
-        // Kept open with the payload intact so an obvious typo can be fixed;
-        // the raw payload is also saved in the review queue below.
-        setNotice(
-          result.reason ??
-            "That payload couldn't be read — it was saved to the review queue below.",
-        );
-      }
-    } catch (e) {
-      fail(e);
-    } finally {
-      setEnvBusy(false);
-    }
-  };
+  // Paste-incoming-message inline form. Defaults to a human form (from,
+  // message, optional thread); a raw provider JSON envelope stays available
+  // behind its Advanced toggle (§4.4 parse boundary — a malformed envelope
+  // lands in the sync-error queue instead of being silently lost).
+  const [showPaste, setShowPaste] = useState(false);
 
   const visibleThreads = useMemo(
     () => (threads ?? []).filter((t) => t.deletedAt == null),
@@ -319,18 +288,18 @@ export function MessageInboxPage() {
             type="button"
             className="btn btn-ghost"
             onClick={() => {
-              setShowEnv((v) => !v);
+              setShowPaste((v) => !v);
               setShowNew(false);
             }}
           >
-            {showEnv ? "Cancel paste" : "Paste incoming message"}
+            {showPaste ? "Cancel paste" : "Paste incoming message"}
           </button>
           <button
             type="button"
             className="btn btn-primary"
             onClick={() => {
               setShowNew((v) => !v);
-              setShowEnv(false);
+              setShowPaste(false);
             }}
           >
             {showNew ? "Cancel" : "New thread"}
@@ -389,52 +358,27 @@ export function MessageInboxPage() {
         </form>
       ) : null}
 
-      {showEnv ? (
-        <form
-          className="mb-4 grid gap-3 rounded-sm border border-line-2 bg-panel p-4"
-          onSubmit={(e) => {
-            e.preventDefault();
-            void submitEnvelope();
+      {showPaste ? (
+        <PasteIncomingMessageForm
+          threads={visibleThreads}
+          ingestMessage={(args) => {
+            setFailure(null);
+            setNotice(null);
+            return ingest(args);
           }}
-        >
-          <p className="text-sm text-ink-2">
-            Paste the raw message data from your email, SMS, or social provider
-            (JSON). Readable messages land in the right thread; anything that
-            can't be read is saved to the review queue below instead of being
-            lost.
-          </p>
-          <div className="grid gap-3 md:grid-cols-[120px_1fr_auto]">
-            <select
-              className="input"
-              value={envProvider}
-              onChange={(e) => setEnvProvider(e.target.value)}
-              aria-label="Provider"
-            >
-              {Object.entries(PROVIDER_LABEL)
-                .filter(([k]) => k !== "internal")
-                .map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {v}
-                  </option>
-                ))}
-            </select>
-            <textarea
-              className="input font-mono text-sm"
-              rows={4}
-              placeholder='{"threadId": "…", "messageId": "…", "from": "…", "body": "…"}'
-              value={envJson}
-              onChange={(e) => setEnvJson(e.target.value)}
-              aria-label="Raw provider message payload"
-            />
-            <button
-              type="submit"
-              className="btn btn-primary self-end"
-              disabled={envBusy || envJson.trim().length === 0}
-            >
-              {envBusy ? "Logging…" : "Log message"}
-            </button>
-          </div>
-        </form>
+          ingestEnvelope={(args) => {
+            setFailure(null);
+            setNotice(null);
+            return ingestEnvelope(args);
+          }}
+          onLogged={(loggedNotice, threadId) => {
+            setNotice(loggedNotice);
+            if (threadId) setSelectedId(threadId);
+            setShowPaste(false);
+          }}
+          onRejected={(rejectedNotice) => setNotice(rejectedNotice)}
+          onFailure={fail}
+        />
       ) : null}
 
       {threads === undefined || messages === undefined ? (
