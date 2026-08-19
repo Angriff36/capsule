@@ -4,9 +4,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { describe, expect, it } from "vitest";
 import { EventStaffingCoverageView } from "../../../src/features/events/EventStaffingCoverageView";
+import { EventTimelineAssigneePicker } from "../../../src/features/events/EventTimelineAssigneePicker";
 import { EventTimelineStaffRoster } from "../../../src/features/events/eventTimelineStaffRoster";
+import { formatTime } from "../../../src/lib/format";
 
 const EVENT_ID = "evt_staffing_1";
+const FOUR_PM = Date.parse("2026-07-30T16:00:00");
 
 const renee = {
   _id: "person_renee",
@@ -28,6 +31,7 @@ const filledNeed = {
   filledByPersonId: renee._id,
   version: 2,
   description: "Bar coverage",
+  startsAt: FOUR_PM,
 };
 
 const serverAssignment = {
@@ -149,5 +153,39 @@ describe("filled open shift shows who covered it", () => {
     expect(tab).toContain("staffNeeds: eventNeeds");
     expect(timeline).toContain("useListEventStaffNeed");
     expect(timeline).toContain("staffNeeds");
+  });
+
+  it("paints the FILLED roster entry with the same time fragment as assignments", () => {
+    const roster = EventTimelineStaffRoster.staffingRosterEntries({
+      eventId: EVENT_ID,
+      assignments: [serverAssignment],
+      people: [renee, sam],
+      staffNeeds: [filledNeed],
+    });
+    const filled = roster.find((row) => row.source === "filled_need");
+    expect(filled?.startsAt).toBe(FOUR_PM);
+    const html = renderCoverage();
+    const rosterBlock = html.split('data-testid="event-staffing-roster"')[1];
+    const rosterHtml = rosterBlock.split('data-testid="event-staff-needs"')[0];
+    expect(rosterHtml).toContain(`Bartender · ${formatTime(FOUR_PM)}`);
+    expect(html).toContain("Bartender — Renee Kopf");
+  });
+
+  it("names timeline assignee checkboxes with the person label", () => {
+    const html = renderToStaticMarkup(
+      createElement(EventTimelineAssigneePicker, {
+        selection: { teams: [], personIds: [] },
+        staffOptions: [
+          { personId: renee._id, label: "Renee Kopf" },
+          { personId: sam._id, label: "Sam Server" },
+        ],
+        onChange: () => undefined,
+      }),
+    );
+    expect(html).toContain('aria-label="Renee Kopf"');
+    expect(html).toContain('aria-label="Sam Server"');
+    expect(html).toContain('aria-label="Everyone"');
+    expect(html).toContain('aria-label="FOH"');
+    expect(html).toContain('aria-label="BOH"');
   });
 });
