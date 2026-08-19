@@ -5,6 +5,7 @@ import {
   useEventTimelineActivityAdjust,
   useEventTimelineActivityRemove,
   useListEventAssignment,
+  useListEventStaffNeed,
   useListEventTimelineActivity,
   useListPerson,
 } from "../../lib/manifest-convex-react";
@@ -71,6 +72,7 @@ const remapper = new TimelineSlotRemapper();
 export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
   const allRecords = useListEventTimelineActivity();
   const assignments = useListEventAssignment();
+  const staffNeeds = useListEventStaffNeed();
   const people = useListPerson();
   const records = useMemo(
     () => allRecords?.filter((row) => row.eventId === eventId),
@@ -101,8 +103,9 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
         eventId,
         assignments,
         people,
+        staffNeeds,
       }),
-    [assignments, eventId, people],
+    [assignments, eventId, people, staffNeeds],
   );
 
   const personNameById = useMemo(() => {
