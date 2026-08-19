@@ -88,7 +88,10 @@ export function EventCostSummaryReport({
               {asOf ? formatDate(asOf.getTime()) : "Not finalized"}
             </strong>
             <small>
-              {summary.headcount.actual}/{summary.headcount.expected} guests
+              {summary.unreconciled && summary.headcount.actual === 0
+                ? "—"
+                : summary.headcount.actual}
+              /{summary.headcount.expected} guests
             </small>
           </div>
         </header>
@@ -98,31 +101,54 @@ export function EventCostSummaryReport({
           aria-label="Margin summary"
         >
           <div>
-            <span>Invoiced revenue</span>
+            <span>Billed revenue</span>
             <strong data-testid="invoiced-revenue">
               {formatMoney(summary.invoicedRevenue)}
             </strong>
             <small>
-              {summary.invoiceCount} invoice
+              {summary.invoiceCount} billed invoice
               {summary.invoiceCount === 1 ? "" : "s"}
+              {summary.draftInvoiceCount > 0
+                ? ` · ${formatMoney(summary.draftInvoiceTotal)} still in ${summary.draftInvoiceCount} draft${summary.draftInvoiceCount === 1 ? "" : "s"}`
+                : ""}
             </small>
           </div>
           <div>
             <span>Total event cost</span>
             <strong data-testid="total-event-cost">
-              {formatMoney(summary.totalCost)}
-            </strong>
-            <small>reconciled closeout</small>
-          </div>
-          <div className={summary.margin < 0 ? "is-negative" : "is-positive"}>
-            <span>Resulting margin</span>
-            <strong data-testid="resulting-margin">
-              {formatMoney(summary.margin)}
+              {summary.costsPending ? "—" : formatMoney(summary.totalCost)}
             </strong>
             <small>
-              {summary.marginPercent == null
-                ? "No invoiced revenue"
-                : `${percent.format(summary.marginPercent)}% of revenue`}
+              {summary.costsPending
+                ? "no costs reconciled yet"
+                : summary.unreconciled
+                  ? "draft closeout — not reconciled"
+                  : "reconciled closeout"}
+            </small>
+          </div>
+          <div
+            className={
+              summary.costsPending
+                ? undefined
+                : summary.margin < 0
+                  ? "is-negative"
+                  : "is-positive"
+            }
+          >
+            <span>Resulting margin</span>
+            <strong data-testid="resulting-margin">
+              {summary.costsPending ? "—" : formatMoney(summary.margin)}
+            </strong>
+            <small>
+              {summary.costsPending
+                ? `Awaiting cost reconciliation — ${formatMoney(summary.invoicedRevenue)} billed${
+                    summary.draftInvoiceCount > 0
+                      ? `, ${formatMoney(summary.draftInvoiceTotal)} in drafts`
+                      : ""
+                  }`
+                : summary.marginPercent == null
+                  ? "No invoiced revenue"
+                  : `${percent.format(summary.marginPercent)}% of revenue`}
             </small>
           </div>
         </section>
@@ -133,7 +159,11 @@ export function EventCostSummaryReport({
               <p>Cost ledger</p>
               <h3>Where the event spend landed</h3>
             </div>
-            <strong>{formatMoney(summary.totalCost)}</strong>
+            <strong>
+              {summary.costsPending
+                ? "Not reconciled"
+                : formatMoney(summary.totalCost)}
+            </strong>
           </div>
 
           <div className="event-cost-report-costs">
@@ -159,19 +189,27 @@ export function EventCostSummaryReport({
           <div>
             <p>Method</p>
             <span>
-              Revenue adds up this event's invoices, leaving out any that were
-              deleted, voided, or written off. Costs come from the closeout you
-              recorded for the event; equipment/vendor hire and
-              miscellaneous/waste follow the closeout categories.
+              Revenue adds up this event's billed invoices — sent through paid.
+              Drafts are reported separately and never counted as revenue;
+              deleted, voided, and written-off invoices are left out. Costs come
+              from the closeout you recorded for the event; equipment/ vendor
+              hire and miscellaneous/waste follow the closeout categories.
             </span>
           </div>
           <div>
             <p>Reconciliation</p>
             <span>
-              Closeout revenue {formatMoney(summary.reconciledRevenue)}
-              {Math.abs(revenueDifference) >= 0.01
-                ? ` · ${formatMoney(Math.abs(revenueDifference))} ${revenueDifference > 0 ? "more" : "less"} invoiced`
-                : " · matches invoiced revenue"}
+              {summary.unreconciled
+                ? `Closeout not reconciled yet — billed ${formatMoney(summary.invoicedRevenue)} · collected ${formatMoney(summary.collectedTotal)}${
+                    summary.draftInvoiceCount > 0
+                      ? ` · ${formatMoney(summary.draftInvoiceTotal)} in ${summary.draftInvoiceCount} unsent draft${summary.draftInvoiceCount === 1 ? "" : "s"}`
+                      : ""
+                  }`
+                : `Closeout revenue ${formatMoney(summary.reconciledRevenue)}${
+                    Math.abs(revenueDifference) >= 0.01
+                      ? ` · ${formatMoney(Math.abs(revenueDifference))} ${revenueDifference > 0 ? "more" : "less"} invoiced`
+                      : " · matches invoiced revenue"
+                  }`}
             </span>
             {summary.invoiceNumbers.length > 0 ? (
               <span>Invoices: {summary.invoiceNumbers.join(", ")}</span>
