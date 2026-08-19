@@ -16,7 +16,9 @@ const NOW = Date.parse("2026-08-19T18:00:00Z");
 const qa1 = {
   invoiceNumber: "INV-2026-QA1",
   _id: "k17qa1invoice000000000000000001",
-  amountDue: 11700,
+  amountDue: 0,
+  total: 3600,
+  amountPaid: 3600,
   currencyCode: "USD",
   status: "paid",
 };
@@ -79,8 +81,18 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
     );
   });
 
-  it("paints #INV-2026-QA1 — $11,700 for the gallery invoice", () => {
-    expect(invoiceSearchLabel(qa1)).toBe("#INV-2026-QA1 — $11,700");
+  it("paid gallery invoice paints billed total, not $0 due", () => {
+    // QA 194 leftover: #INV-2026-QA1 — $0 PAID while payments $3,600 COMPLETED.
+    expect(invoiceSearchLabel(qa1)).toBe("#INV-2026-QA1 — $3,600");
+    expect(
+      invoiceSearchLabel({
+        invoiceNumber: "INV-8BD5QP",
+        _id: "draft-due",
+        amountDue: 900,
+        total: 900,
+        currencyCode: "USD",
+      }),
+    ).toBe("#INV-8BD5QP — $900");
   });
 
   it("searchAll uses parseSearchQuery and invoiceMatchesQuery, not hyphen-split includes", () => {
