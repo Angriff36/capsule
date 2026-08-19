@@ -7,17 +7,29 @@
   --dispatch-ink: var(--color-ink);
   --dispatch-paper: var(--color-panel);
   --dispatch-signal: var(--color-accent);
-  --dispatch-signal-soft: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  --dispatch-signal-soft: color-mix(
+    in srgb,
+    var(--color-accent) 14%,
+    transparent
+  );
   --dispatch-grid: color-mix(in srgb, var(--color-ink) 6%, transparent);
   --dispatch-muted: var(--color-ink-2);
   --dispatch-faint: var(--color-ink-3);
-  --dispatch-surface: color-mix(in srgb, var(--color-ink) 5%, var(--color-panel));
+  --dispatch-surface: color-mix(
+    in srgb,
+    var(--color-ink) 5%,
+    var(--color-panel)
+  );
   --dispatch-surface-strong: color-mix(
     in srgb,
     var(--color-ink) 8%,
     var(--color-panel)
   );
-  --dispatch-surface-soft: color-mix(in srgb, var(--color-ink) 3%, var(--color-panel));
+  --dispatch-surface-soft: color-mix(
+    in srgb,
+    var(--color-ink) 3%,
+    var(--color-panel)
+  );
   --dispatch-inset: var(--color-inset);
   --dispatch-header-veil: linear-gradient(
     110deg,
@@ -28,8 +40,16 @@
   --dispatch-ok-ink: var(--color-ok);
   --dispatch-ok-soft: color-mix(in srgb, var(--color-ok) 14%, transparent);
   --dispatch-alert-ink: var(--color-danger);
-  --dispatch-alert-soft: color-mix(in srgb, var(--color-danger) 16%, transparent);
-  --dispatch-release: color-mix(in srgb, var(--color-accent) 55%, var(--color-ink-2));
+  --dispatch-alert-soft: color-mix(
+    in srgb,
+    var(--color-danger) 16%,
+    transparent
+  );
+  --dispatch-release: color-mix(
+    in srgb,
+    var(--color-accent) 55%,
+    var(--color-ink-2)
+  );
   overflow-x: auto;
   border: 1px solid
     color-mix(in srgb, var(--color-line) 75%, var(--dispatch-ink));

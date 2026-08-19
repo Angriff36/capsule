@@ -2,7 +2,10 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 const css = readFileSync("src/features/events/EventEquipmentPanel.css", "utf8");
-const page = readFileSync("src/features/events/EventEquipmentPanel.tsx", "utf8");
+const page = readFileSync(
+  "src/features/events/EventEquipmentPanel.tsx",
+  "utf8",
+);
 
 describe("dispatch board follows html theme tokens", () => {
   it("paints paper/ink from inherited --color-*, not hardcoded cream", () => {
