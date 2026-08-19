@@ -33,7 +33,7 @@ describe("lead pipeline card VALUE input", () => {
     expect(css).toContain("container-type: inline-size");
     expect(css).toContain("@container (max-width: 19.5rem)");
     expect(css).toContain("minmax(7rem, 1.15fr)");
-    expect(css).toContain(".lead-card-editor select[name=\"stage\"]");
+    expect(css).toContain('.lead-card-editor select[name="stage"]');
     expect(css).toContain("min-width: 7rem");
     expect(css).not.toContain("minmax(0, 1.15fr)");
     expect(css).not.toContain("minmax(26px");
