@@ -26,6 +26,7 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { InvoiceIssueForm } from "./InvoiceIssueForm";
+import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 
 const policy = new CommercialLifecyclePolicy();
 
@@ -410,7 +411,7 @@ export function InvoicesPage() {
                         {canSend(row) ? (
                           <input
                             type="checkbox"
-                            aria-label={`Select invoice ${row.invoiceNumber || "draft"}`}
+                            aria-label={`Select invoice ${formatInvoiceNumber(row.invoiceNumber, row._id) || "draft"}`}
                             checked={selection.isSelected(row._id)}
                             disabled={busy != null}
                             onChange={(event) =>
@@ -425,7 +426,8 @@ export function InvoicesPage() {
                           to={FINANCE_ROUTES.invoiceDetail(row._id)}
                         >
                           <strong>
-                            {row.invoiceNumber || "Draft invoice"}
+                            {formatInvoiceNumber(row.invoiceNumber, row._id) ||
+                              "Draft invoice"}
                           </strong>
                         </Link>
                         <small>
