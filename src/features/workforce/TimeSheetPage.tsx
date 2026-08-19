@@ -23,6 +23,8 @@ import {
   currentShiftFor,
   persistClockOut,
   persistPrimaryTimeRecord,
+  timeRecordLedgerState,
+  type TimeRecordLedgerRow,
 } from "./timeRecordEntry";
 
 const policy = new WorkforceLifecyclePolicy();
@@ -125,6 +127,10 @@ export function TimeSheetClockInForm({
       </div>
     </form>
   );
+}
+
+export function TimeSheetRecordState({ row }: { row: TimeRecordLedgerRow }) {
+  return <StatusChip status={timeRecordLedgerState(row)} />;
 }
 
 export function TimeSheetPage() {
@@ -433,8 +439,7 @@ export function TimeSheetPage() {
                       {row.breakMinutes ?? 0} min
                     </td>
                     <td>
-                      <StatusChip status={String(row.status)} />
-                      {row.correctedAt ? <small>corrected</small> : null}
+                      <TimeSheetRecordState row={row} />
                     </td>
                     <td>
                       <div className="supply-row-actions">

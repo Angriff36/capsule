@@ -193,6 +193,35 @@ export async function persistClockOut(
   });
 }
 
+/**
+ * Hidden persistPrimaryTimeRecord is clockIn (v1) → clockOut (v2) →
+ * correct(window) (v3). That first correct is not a user Correct click —
+ * there is no separate flag on TimeRecord. Ledger STATE is attendance
+ * (open / closed) until a later correct write (version > 3).
+ */
+export const HIDDEN_PRIMARY_CORRECT_VERSION = 3;
+
+export type TimeRecordLedgerRow = {
+  status?: unknown;
+  version?: unknown;
+  clockInAt?: unknown;
+  clockOutAt?: unknown;
+  correctedAt?: unknown;
+};
+
+/** Attendance state painted in the Time sheet STATE column. */
+export function timeRecordLedgerState(row: TimeRecordLedgerRow): string {
+  const status = String(row.status ?? "");
+  if (status !== "corrected") return status;
+  const version = Number(row.version);
+  const firstWrite =
+    !Number.isFinite(version) || version <= HIDDEN_PRIMARY_CORRECT_VERSION;
+  if (!firstWrite) return "corrected";
+  return row.clockOutAt != null && String(row.clockOutAt) !== ""
+    ? "closed"
+    : "open";
+}
+
 export const CLOCK_OUT_PROMPT_FIELDS = [
   {
     name: "clockOutAt",
