@@ -19127,6 +19127,11 @@ async function __runInventoryItemOpen(ctx: MutationCtx, { docId, ingredientId, l
     const doc = await ctx.db.get(docId) as Record<string, any> | null;
     if (!doc) throw new Error("InventoryItem not found");
     if ((doc as any).tenantId !== __auth.tenantId) throw new Error("InventoryItem not found");
+    const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, doc.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
+    {
+      const __fk = ((doc as any) as any).ingredientId;
+      ((doc as any) as any).ingredient = __fk != null ? await ctx.db.get(__fk as any) : null;
+    }
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock items");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may write stock items through commands");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may execute stock item commands");
@@ -19134,6 +19139,7 @@ async function __runInventoryItemOpen(ctx: MutationCtx, { docId, ingredientId, l
     if (!((doc.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((ingredientId === doc.ingredientId))) throw new Error("Open ingredientId must match the seeded ingredient reference");
     if (!((locationId === doc.locationId))) throw new Error("Open locationId must match the seeded location reference");
+    if (!(((__rel_ingredient != null) && (unit === __rel_ingredient.unit)))) throw new Error("Stock line unit must match the ingredient's catalog unit — units do not convert");
     if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("Quantity on hand cannot be negative");
     if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("Par level cannot be negative");
     if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("Reorder threshold cannot be negative");
@@ -19217,6 +19223,7 @@ export const InventoryItem_createViaOpen = mutation({
       locationId: args.locationId,
       unit: args.unit
     };
+    const __rel_ingredient = await __resolveRelation(ctx, "ingredients", [__auth.tenantId, __draft.ingredientId], ["tenantId","id"], "tenantId", __auth.tenantId);
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may read stock items");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may write stock items through commands");
     if (!(checkRole(user, "inventoryAccess"))) throw new Error("Inventory staff may execute stock item commands");
@@ -19224,6 +19231,7 @@ export const InventoryItem_createViaOpen = mutation({
     if (!((__draft.deletedAt == null))) throw new Error("Guard 1 failed");
     if (!((ingredientId === __draft.ingredientId))) throw new Error("Open ingredientId must match the seeded ingredient reference");
     if (!((locationId === __draft.locationId))) throw new Error("Open locationId must match the seeded location reference");
+    if (!(((__rel_ingredient != null) && (unit === __rel_ingredient.unit)))) throw new Error("Stock line unit must match the ingredient's catalog unit — units do not convert");
     if (!(((quantityOnHand == null) || (quantityOnHand >= 0)))) throw new Error("Quantity on hand cannot be negative");
     if (!(((parLevel == null) || (parLevel >= 0)))) throw new Error("Par level cannot be negative");
     if (!(((reorderThreshold == null) || (reorderThreshold >= 0)))) throw new Error("Reorder threshold cannot be negative");
