@@ -16,6 +16,10 @@ import {
 } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+// This page renders tax-workspace surfaces (tax-period-stamp). Routes are lazy
+// chunks, so landing directly on this page without this import gets no styles
+// and the header stat runs together ("Pending approval00 total").
+import "./taxWorkspace.css";
 
 const usd = formatMoneyExact;
 

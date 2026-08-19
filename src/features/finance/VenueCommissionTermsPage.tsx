@@ -10,6 +10,11 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate as formatDateShared } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+// This page renders tax-workspace surfaces (tax-period-stamp, tax-config-grid).
+// The stylesheet must be imported here too: routes are lazy chunks, so landing
+// directly on this page otherwise gets no styles and the header stat runs
+// together ("Active terms00 configured").
+import "./taxWorkspace.css";
 
 const formatDate = (date: string | number | null | undefined) => {
   if (!date) return "—";
