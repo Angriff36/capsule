@@ -178,8 +178,16 @@ export function deriveNotifications(
     if (item.deletedAt != null || item.removedAt != null) continue;
     // Domain semantics (isBelowReorder): a zero threshold means the line is
     // not tracked — no alert. Kills the dead "0 each on hand (reorder at 0)"
-    // rows that unconfigured stock lines used to produce.
-    if (!isBelowReorder(item)) continue;
+    // rows that unconfigured stock lines used to produce. Pass the two
+    // quantities explicitly so a server computed cannot override the shared
+    // predicate.
+    if (
+      !isBelowReorder({
+        quantityOnHand: item.quantityOnHand,
+        reorderThreshold: item.reorderThreshold,
+      })
+    )
+      continue;
     const name =
       ingredientNames.get(item.ingredientId as string) ?? "An ingredient";
     const message =
