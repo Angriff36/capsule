@@ -14,6 +14,10 @@ import { EmptyState, Section, Skeleton, StatusChip } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { eventGuestPolicy } from "./EventGuestPolicy";
 import { FailureBanner } from "./FailureBanner";
+import {
+  assessGuestListCoverage,
+  GuestListCoverageNotice,
+} from "./GuestListCoverageNotice";
 
 type GuestAction = {
   kind: "decline" | "table" | "withdraw";
@@ -29,7 +33,13 @@ function list(value: string): string[] | undefined {
   return values.length ? values : undefined;
 }
 
-export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
+export function EventGuestPanel({
+  eventId,
+  expectedHeadcount,
+}: {
+  eventId: Id<"events">;
+  expectedHeadcount?: number | null;
+}) {
   const eventGuests = useQuery(api.queries.listEventGuestByEventId, {
     eventId,
   });
@@ -105,6 +115,11 @@ export function EventGuestPanel({ eventId }: { eventId: Id<"events"> }) {
     >
       <div className="space-y-3 p-3">
         {failure ? <FailureBanner failure={failure} /> : null}
+        {eventGuests !== undefined ? (
+          <GuestListCoverageNotice
+            coverage={assessGuestListCoverage(guests.length, expectedHeadcount)}
+          />
+        ) : null}
         {showInvite ? (
           <form
             onSubmit={submitInvite}

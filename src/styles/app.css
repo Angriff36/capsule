@@ -532,6 +532,48 @@
     color: var(--color-brand);
   }
 
+  /* The icon rail is ~860px tall at full spacing (12 areas + mark + theme
+     toggle + drawer). Laptop-height windows are shorter, so without these
+     steps the rail overflows the h-dvh shell, grows the document, and creates
+     the dead second scrollbar / dark void the shell's overflow-clip now
+     guards against — but the rail must also FIT so every area stays
+     clickable. Two compression steps keep the whole rail on screen down to
+     ~600px-tall windows. */
+  @media (max-height: 900px) {
+    .capsule-mark {
+      margin-top: 8px;
+    }
+    .icon-nav {
+      gap: 5px;
+      padding-top: 16px;
+    }
+    .icon-nav a {
+      width: 38px;
+      height: 38px;
+    }
+    .module-drawer {
+      margin-bottom: 8px;
+    }
+  }
+  @media (max-height: 760px) {
+    .icon-nav {
+      gap: 2px;
+      padding-top: 8px;
+    }
+    .icon-nav a {
+      width: 34px;
+      height: 34px;
+    }
+    .icon-nav-rule {
+      margin: 2px 0;
+    }
+    .theme-toggle,
+    .module-drawer > summary {
+      width: 34px;
+      height: 34px;
+    }
+  }
+
   .journal-masthead {
     display: flex;
     align-items: flex-end;
