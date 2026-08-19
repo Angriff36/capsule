@@ -80,6 +80,23 @@ function ratio(foodCost: number, revenue: number): number | null {
   return revenue <= 0 ? null : (foodCost / revenue) * 100;
 }
 
+/**
+ * $0 revenue is not a missing target. QA: WINDOW RATIO read
+ * "No revenue target" while Target food cost was 30% saved,
+ * because "No revenue" was concatenated with " target".
+ */
+export function foodCostVarianceCopy(variancePts: number | null): string {
+  if (variancePts == null) return "No revenue to score";
+  if (Math.abs(variancePts) < 0.05) return "On target";
+  return `${Math.abs(variancePts).toFixed(1)} pts ${variancePts > 0 ? "over" : "under"}`;
+}
+
+export function foodCostAgainstTargetCopy(variancePts: number | null): string {
+  const core = foodCostVarianceCopy(variancePts);
+  if (variancePts == null || core === "On target") return core;
+  return `${core} target`;
+}
+
 function startOfPeriod(date: Date, granularity: FoodCostGranularity): Date {
   const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
   if (granularity === "week") {
