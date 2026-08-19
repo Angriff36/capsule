@@ -6,6 +6,7 @@ import {
   invoiceMatchesQuery,
   invoiceSearchLabel,
   invoiceStatusFilter,
+  keepInvoiceForSearch,
   parseSearchQuery,
   shouldQueryInvoices,
 } from "../convex/lib/parseSearchQuery";
@@ -85,10 +86,31 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
   it("searchAll uses parseSearchQuery and invoiceMatchesQuery, not hyphen-split includes", () => {
     const search = readFileSync("convex/search.ts", "utf8");
     expect(search).toContain("parseSearchQuery");
-    expect(search).toContain("invoiceMatchesQuery");
     expect(search).toContain("invoiceSearchLabel");
     expect(search).toContain('from "./lib/parseSearchQuery"');
     expect(search).not.toContain("function parseQuery");
     expect(search).not.toContain("num.includes(textTerm.toLowerCase())");
+  });
+
+  it("queryInvoices uses invoiceStatusFilter so paid INV-* lookup is not unpaid-only", () => {
+    // QA Gallery INV-2026-QA1 is billed. A helper-only assertion still
+    // passes if queryInvoices drops invoiceStatusFilter and always skips paid.
+    const hash = parseSearchQuery("#INV-2026-QA1", NOW);
+    const statuses = invoiceStatusFilter(hash);
+    expect(shouldQueryInvoices(hash)).toBe(true);
+    expect(statuses).toBeNull();
+    expect(keepInvoiceForSearch(qa1, hash, statuses)).toBe(true);
+
+    const unpaid = parseSearchQuery("unpaid invoices", NOW);
+    expect(keepInvoiceForSearch(qa1, unpaid, invoiceStatusFilter(unpaid))).toBe(
+      false,
+    );
+
+    const search = readFileSync("convex/search.ts", "utf8");
+    expect(search).toContain("invoiceStatusFilter(parsed)");
+    expect(search).toContain("shouldQueryInvoices(parsed)");
+    expect(search).toContain("keepInvoiceForSearch(inv, parsed, statuses)");
+    expect(search).not.toContain("unpaidStatuses");
+    expect(search).not.toContain("if (statuses && !statuses.has");
   });
 });

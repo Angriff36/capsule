@@ -272,6 +272,22 @@ export function invoiceMatchesQuery(
   return haystacks.some((h) => h.includes(q));
 }
 
+/**
+ * Production gate for queryInvoices. Null `statuses` is INV-* number lookup
+ * and must keep paid (QA Gallery INV-2026-QA1 is billed). A Set skips
+ * statuses that are not in it.
+ */
+export function keepInvoiceForSearch(
+  inv: { status?: unknown; invoiceNumber?: unknown; _id?: unknown },
+  parsed: ParsedSearchQuery,
+  statuses: Set<string> | null,
+): boolean {
+  if (statuses != null && !statuses.has(String(inv.status ?? ""))) {
+    return false;
+  }
+  return invoiceMatchesQuery(inv, parsed);
+}
+
 export function invoiceSearchLabel(inv: {
   invoiceNumber?: unknown;
   _id?: unknown;

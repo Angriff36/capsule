@@ -13,9 +13,9 @@ import { query, type QueryCtx } from "./_generated/server";
 import { v } from "convex/values";
 import { getAuthContext, requireTenant } from "./lib/authContext";
 import {
-  invoiceMatchesQuery,
   invoiceSearchLabel,
   invoiceStatusFilter,
+  keepInvoiceForSearch,
   parseSearchQuery,
   shouldQueryInvoices,
   type ParsedSearchQuery,
@@ -320,8 +320,8 @@ async function queryInvoices(
 
   const out: SearchHit[] = [];
   for (const inv of rows) {
-    if (statuses && !statuses.has(String(inv.status))) continue;
-    if (!invoiceMatchesQuery(inv, parsed)) continue;
+    // Null filter includes paid (QA Gallery INV-2026-QA1 is billed).
+    if (!keepInvoiceForSearch(inv, parsed, statuses)) continue;
     if (ageThreshold !== null) {
       const anchor = inv.dueDate ?? inv.issuedAt;
       if (anchor == null || anchor > ageThreshold) continue;
