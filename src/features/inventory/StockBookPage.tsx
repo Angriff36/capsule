@@ -28,23 +28,6 @@ import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { stockRowDomId, useFocusedStockRow } from "./useFocusedStockRow";
 
-const UNITS = [
-  "each",
-  "gram",
-  "kilogram",
-  "ounce",
-  "pound",
-  "milliliter",
-  "liter",
-  "teaspoon",
-  "tablespoon",
-  "cup",
-  "pint",
-  "quart",
-  "gallon",
-  "portion",
-] as const;
-
 const policy = new SupplyLifecyclePolicy();
 
 const DAY_MS = 86_400_000;
@@ -177,10 +160,17 @@ export function StockBookPage() {
         });
       }
       if (current === "stock") {
+        const ingredient = (ingredients ?? []).find(
+          (candidate) => candidate._id === String(data.get("ingredientId")),
+        );
+        if (!ingredient) throw new Error("Select an ingredient.");
         await createItem({
-          ingredientId: String(data.get("ingredientId")),
+          ingredientId: ingredient._id,
           locationId: String(data.get("locationId")),
-          unit: String(data.get("unit")) as (typeof UNITS)[number],
+          // Locked to the ingredient's catalog unit: nothing converts between
+          // units, so a diverging stock unit silently breaks on-hand vs demand
+          // math and low-stock alerts (issue #150).
+          unit: ingredient.unit,
           quantityOnHand: Number(data.get("quantityOnHand")),
           parLevel: Number(data.get("parLevel")),
           reorderThreshold: Number(data.get("reorderThreshold")),
@@ -884,6 +874,13 @@ function SupplyStockForm({
   onSubmit,
   onClose,
 }: any) {
+  const [stockIngredientId, setStockIngredientId] = useState("");
+  const stockIngredient =
+    kind === "stock" && stockIngredientId
+      ? ingredients.find(
+          (candidate: any) => candidate._id === stockIngredientId,
+        )
+      : undefined;
   const transferDestinations =
     kind === "transfer" && transferSource
       ? items.filter(
@@ -938,7 +935,13 @@ function SupplyStockForm({
           <>
             <label className="field-label">
               Ingredient
-              <select name="ingredientId" className="input" required>
+              <select
+                name="ingredientId"
+                className="input"
+                required
+                value={stockIngredientId}
+                onChange={(event) => setStockIngredientId(event.target.value)}
+              >
                 <option value="">Select ingredient</option>
                 {ingredients
                   .filter(
@@ -970,11 +973,19 @@ function SupplyStockForm({
             </label>
             <label className="field-label">
               Unit
-              <select name="unit" className="input">
-                {UNITS.map((unit) => (
-                  <option key={unit}>{unit}</option>
-                ))}
-              </select>
+              <input
+                className="input"
+                value={
+                  stockIngredient
+                    ? String(stockIngredient.unit)
+                    : "Select an ingredient"
+                }
+                readOnly
+              />
+              <span className="field-hint">
+                Locked to the ingredient's catalog unit so on-hand stock counts
+                in the same unit as event demand.
+              </span>
             </label>
             {["quantityOnHand", "parLevel", "reorderThreshold", "unitCost"].map(
               (name) => (
