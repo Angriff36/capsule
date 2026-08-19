@@ -234,7 +234,11 @@ export function ProposalPricingPanel({
                   {Number(row.unitPrice).toFixed(2)}
                 </td>
                 <td className="tabular-nums">
-                  {row.pricingBasis === "per_unit" ? Number(row.quantity) : "—"}
+                  {row.pricingBasis === "per_unit"
+                    ? Number(row.quantity)
+                    : row.pricingBasis === "per_person"
+                      ? `${guestCount} guests`
+                      : "—"}
                 </td>
                 <td className="tabular-nums">
                   {(recomputed.lines[index]?.amount ?? 0).toFixed(2)}
