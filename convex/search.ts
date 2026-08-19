@@ -307,36 +307,49 @@ async function queryInvoices(
 ): Promise<SearchHit[]> {
   const statuses = invoiceStatusFilter(parsed);
 
-  const rows = await ctx.db
-    .query("invoices")
-    .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-    .filter((q) => q.eq(q.field("deletedAt"), null))
-    .take(120);
-
   const ageThreshold =
     parsed.agedOverDays !== null && parsed.invoiceNumbers.length === 0
       ? now - parsed.agedOverDays * DAY_MS
       : null;
 
+  // Invoices have no invoiceNumber index. take(120) missed billed
+  // INV-2026-QA1 and draft INV-8BJQS7 when they were not on the first page.
+  const PAGE = 100;
+  const MAX_SCAN = 2500;
+  const MAX_HITS = 15;
   const out: SearchHit[] = [];
-  for (const inv of rows) {
-    // Null filter includes paid (QA Gallery INV-2026-QA1 is billed).
-    if (!keepInvoiceForSearch(inv, parsed, statuses)) continue;
-    if (ageThreshold !== null) {
-      const anchor = inv.dueDate ?? inv.issuedAt;
-      if (anchor == null || anchor > ageThreshold) continue;
+  let cursor: string | null = null;
+  let scanned = 0;
+
+  while (scanned < MAX_SCAN && out.length < MAX_HITS) {
+    const page = await ctx.db
+      .query("invoices")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
+      .filter((q) => q.eq(q.field("deletedAt"), null))
+      .paginate({ numItems: PAGE, cursor });
+    scanned += page.page.length;
+    for (const inv of page.page) {
+      // Null filter includes paid (QA Gallery INV-2026-QA1 is billed).
+      if (!keepInvoiceForSearch(inv, parsed, statuses)) continue;
+      if (ageThreshold !== null) {
+        const anchor = inv.dueDate ?? inv.issuedAt;
+        if (anchor == null || anchor > ageThreshold) continue;
+      }
+      out.push({
+        kind: "invoice",
+        id: String(inv._id),
+        label: invoiceSearchLabel(inv),
+        hint: invoiceHint(inv, now),
+        path: `/finance/invoices/${inv._id}`,
+        score: parsed.invoiceNumbers.length > 0 ? 0.9 : 0.5,
+      });
+      if (out.length >= MAX_HITS) break;
     }
-    out.push({
-      kind: "invoice",
-      id: String(inv._id),
-      label: invoiceSearchLabel(inv),
-      hint: invoiceHint(inv, now),
-      path: `/finance/invoices/${inv._id}`,
-      score: parsed.invoiceNumbers.length > 0 ? 0.9 : 0.5,
-    });
+    if (page.isDone) break;
+    cursor = page.continueCursor;
   }
   out.sort((a, b) => b.score - a.score);
-  return out.slice(0, 15);
+  return out.slice(0, MAX_HITS);
 }
 
 function invoiceHint(inv: any, now: number): string {
