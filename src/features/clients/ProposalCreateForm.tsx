@@ -319,73 +319,103 @@ export function ProposalCreateForm({
         </p>
       ) : (
         <>
-          {fromEvent ? (
-            <label>
-              Client
-              <input type="hidden" name="clientId" value={fromEvent.clientId} />
-              <input type="hidden" name="eventId" value={fromEvent._id} />
+          <div className="supply-form-grid">
+            {fromEvent ? (
+              <label className="field-label supply-span-2">
+                Client
+                <input
+                  type="hidden"
+                  name="clientId"
+                  value={fromEvent.clientId}
+                />
+                <input type="hidden" name="eventId" value={fromEvent._id} />
+                <input
+                  className="input"
+                  value={`${clientDisplayName(
+                    fromEvent.clientId,
+                    clients,
+                  )} — from event "${fromEvent.title}"`}
+                  disabled
+                  readOnly
+                />
+              </label>
+            ) : (
+              <label className="field-label supply-span-2">
+                Client
+                <select
+                  className="input"
+                  name="clientId"
+                  required
+                  defaultValue=""
+                >
+                  <option value="" disabled>
+                    Select client
+                  </option>
+                  {activeClients.map((row) => (
+                    <option key={row._id} value={row._id}>
+                      {clientDisplayName(row._id, clients)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            )}
+            <label className="field-label">
+              Title
               <input
-                value={`${clientDisplayName(
-                  fromEvent.clientId,
-                  clients,
-                )} — from event "${fromEvent.title}"`}
-                disabled
-                readOnly
+                className="input"
+                name="title"
+                required
+                defaultValue={prefill?.title ?? ""}
               />
             </label>
-          ) : (
-            <label>
-              Client
-              <select name="clientId" required defaultValue="">
-                <option value="" disabled>
-                  Select client
-                </option>
-                {activeClients.map((row) => (
-                  <option key={row._id} value={row._id}>
-                    {clientDisplayName(row._id, clients)}
-                  </option>
-                ))}
-              </select>
+            <label className="field-label">
+              Guest count
+              <input
+                className="input"
+                name="guestCount"
+                type="number"
+                min={0}
+                value={draftGuestCount}
+                onChange={(e) =>
+                  setDraftGuestCount(Number(e.target.value) || 0)
+                }
+              />
             </label>
-          )}
-          <label>
-            Title
-            <input name="title" required defaultValue={prefill?.title ?? ""} />
-          </label>
-          <label>
-            Guest count
-            <input
-              name="guestCount"
-              type="number"
-              min={0}
-              value={draftGuestCount}
-              onChange={(e) => setDraftGuestCount(Number(e.target.value) || 0)}
-            />
-          </label>
-          <label>
-            Event type
-            <input name="eventType" defaultValue={prefill?.eventType ?? ""} />
-          </label>
-          <label>
-            Event date
-            <input
-              name="eventDate"
-              type="date"
-              defaultValue={prefill?.eventDate}
-            />
-          </label>
-          <label>
-            Venue name
-            <input name="venueName" defaultValue={prefill?.venueName ?? ""} />
-          </label>
-          <label>
-            Venue address
-            <input
-              name="venueAddress"
-              defaultValue={prefill?.venueAddress ?? ""}
-            />
-          </label>
-          <div className="mt-1">
+            <label className="field-label">
+              Event type
+              <input
+                className="input"
+                name="eventType"
+                defaultValue={prefill?.eventType ?? ""}
+              />
+            </label>
+            <label className="field-label">
+              Event date
+              <input
+                className="input"
+                name="eventDate"
+                type="date"
+                defaultValue={prefill?.eventDate}
+              />
+            </label>
+            <label className="field-label">
+              Venue name
+              <input
+                className="input"
+                name="venueName"
+                defaultValue={prefill?.venueName ?? ""}
+              />
+            </label>
+            <label className="field-label">
+              Venue address
+              <input
+                className="input"
+                name="venueAddress"
+                defaultValue={prefill?.venueAddress ?? ""}
+              />
+            </label>
+          </div>
+          <div className="mt-4">
             <p className="eyebrow">Pricing</p>
             <p className="text-sm text-ink-2">
               Price per person, per unit, flat, percentage, or as a package. The
@@ -569,65 +599,76 @@ export function ProposalCreateForm({
               </span>
             </p>
           </div>
-          <label>
-            Tax
-            <input
-              name="taxAmount"
-              type="number"
-              step="0.01"
-              min={0}
-              value={draftTax}
-              onChange={(e) => setDraftTax(Number(e.target.value) || 0)}
-            />
-          </label>
-          <label>
-            Discount
-            <input
-              name="discountAmount"
-              type="number"
-              step="0.01"
-              min={0}
-              value={draftDiscount}
-              onChange={(e) => setDraftDiscount(Number(e.target.value) || 0)}
-            />
-          </label>
-          <p className="text-base font-semibold text-ink">
+          <div className="supply-form-grid">
+            <label className="field-label">
+              Tax
+              <input
+                className="input"
+                name="taxAmount"
+                type="number"
+                step="0.01"
+                min={0}
+                value={draftTax}
+                onChange={(e) => setDraftTax(Number(e.target.value) || 0)}
+              />
+            </label>
+            <label className="field-label">
+              Discount
+              <input
+                className="input"
+                name="discountAmount"
+                type="number"
+                step="0.01"
+                min={0}
+                value={draftDiscount}
+                onChange={(e) => setDraftDiscount(Number(e.target.value) || 0)}
+              />
+            </label>
+          </div>
+          <p className="mt-3 text-base font-semibold text-ink">
             Total:{" "}
             <span className="tabular-nums">
               {draftPricing.total.toFixed(2)}
             </span>
           </p>
-          <label>
-            Proposed menu
-            <textarea
-              name="notes"
-              rows={4}
-              placeholder="List menu items, one per line"
-            />
-          </label>
-          <label>
-            Valid through
-            <input
-              name="expiresAt"
-              type="date"
-              defaultValue={defaultValidityDate()}
-            />
-          </label>
-          <label>
-            Terms
-            <textarea
-              name="terms"
-              rows={3}
-              placeholder="Deposit, service, cancellation, or other terms"
-            />
-          </label>
-          <button
-            className="btn btn-primary"
-            type="submit"
-            disabled={busy === "draft-proposal"}
-          >
-            Draft proposal
-          </button>
+          <div className="supply-form-grid">
+            <label className="field-label supply-span-2">
+              Proposed menu
+              <textarea
+                className="input"
+                name="notes"
+                rows={4}
+                placeholder="List menu items, one per line"
+              />
+            </label>
+            <label className="field-label">
+              Valid through
+              <input
+                className="input"
+                name="expiresAt"
+                type="date"
+                defaultValue={defaultValidityDate()}
+              />
+            </label>
+            <label className="field-label supply-span-2">
+              Terms
+              <textarea
+                className="input"
+                name="terms"
+                rows={3}
+                placeholder="Deposit, service, cancellation, or other terms"
+              />
+            </label>
+          </div>
+          <div className="supply-form-actions">
+            <button
+              className="btn btn-primary"
+              type="submit"
+              disabled={busy === "draft-proposal"}
+            >
+              Draft proposal
+            </button>
+          </div>
         </>
       )}
     </form>
