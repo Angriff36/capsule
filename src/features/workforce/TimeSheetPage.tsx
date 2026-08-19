@@ -16,6 +16,7 @@ import { formatDate, formatTime, toDatetimeLocalValue } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const policy = new WorkforceLifecyclePolicy();
 
@@ -268,19 +269,17 @@ export function TimeSheetPage() {
             </label>
             <label className="field-label">
               From
-              <input
+              <BoundedDateTimeLocalInput
                 name="startsAt"
                 className="input"
-                type="datetime-local"
                 required
               />
             </label>
             <label className="field-label">
               Until
-              <input
+              <BoundedDateTimeLocalInput
                 name="endsAt"
                 className="input"
-                type="datetime-local"
                 required
               />
             </label>

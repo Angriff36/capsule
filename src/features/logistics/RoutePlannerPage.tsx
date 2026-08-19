@@ -13,6 +13,7 @@ import {
   suggestVisitOrder,
   type GeoPoint,
 } from "./routePlanner";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -179,9 +180,8 @@ export function RoutePlannerPage() {
           </p>
         </div>
         <div className="supply-row-actions">
-          <input
+          <BoundedDateInput
             className="input"
-            type="date"
             aria-label="Route day"
             value={day}
             onChange={(event) => {

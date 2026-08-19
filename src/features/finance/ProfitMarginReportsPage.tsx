@@ -19,6 +19,7 @@ import {
   type ProfitMetrics,
 } from "./profitMarginReport";
 import "./ProfitMarginReportsPage.css";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const compactMoney = new Intl.NumberFormat(undefined, {
   style: "currency",
@@ -243,9 +244,8 @@ export function ProfitMarginDashboard({
       <section className="profit-margin-controls" aria-label="Report filters">
         <label>
           From
-          <input
+          <BoundedDateInput
             className="input"
-            type="date"
             value={rangeStart}
             max={rangeEnd}
             onChange={(event) => setRangeStart(event.target.value)}
@@ -253,9 +253,8 @@ export function ProfitMarginDashboard({
         </label>
         <label>
           Through
-          <input
+          <BoundedDateInput
             className="input"
-            type="date"
             value={rangeEnd}
             min={rangeStart}
             onChange={(event) => setRangeEnd(event.target.value)}

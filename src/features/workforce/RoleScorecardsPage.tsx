@@ -11,6 +11,7 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 // A measurable expectation row — serialized to a JSON string on the
 // `expectations` property (additive shape; no schema migration to extend).
@@ -244,10 +245,9 @@ export function RoleScorecardsPage() {
             </label>
             <label className="field-label">
               Effective from (optional)
-              <input
+              <BoundedDateInput
                 name="effectiveFrom"
                 className="input"
-                type="date"
                 defaultValue={
                   editing?.effectiveFrom
                     ? new Date(editing.effectiveFrom).toISOString().slice(0, 10)

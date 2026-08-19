@@ -19,6 +19,7 @@ import {
   PRICING_BASIS_LABELS,
   type PricingBasis,
 } from "../../lib/pricing";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 // In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
 // as strings for clean editing; parsed for the central calc on submit/preview.
@@ -391,10 +392,9 @@ export function ProposalCreateForm({
             </label>
             <label className="field-label">
               Event date
-              <input
+              <BoundedDateInput
                 className="input"
                 name="eventDate"
-                type="date"
                 defaultValue={prefill?.eventDate}
               />
             </label>
@@ -643,10 +643,9 @@ export function ProposalCreateForm({
             </label>
             <label className="field-label">
               Valid through
-              <input
+              <BoundedDateInput
                 className="input"
                 name="expiresAt"
-                type="date"
                 defaultValue={defaultValidityDate()}
               />
             </label>

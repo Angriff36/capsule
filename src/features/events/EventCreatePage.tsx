@@ -30,6 +30,7 @@ import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
 import { eventDetailPath } from "./eventRoutes";
 import { proposalEventPrefill } from "./ProposalEventPrefill";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const VENUE_TYPES = [
   ["client_site", "Client site"],
@@ -455,9 +456,8 @@ export function EventCreatePage() {
               </label>
               <label className="field-label">
                 Starts
-                <input
+                <BoundedDateTimeLocalInput
                   name="startsAt"
-                  type="datetime-local"
                   defaultValue={proposalPrefill.startsAtLocal}
                   className="input"
                   required
@@ -466,9 +466,8 @@ export function EventCreatePage() {
               </label>
               <label className="field-label">
                 Ends
-                <input
+                <BoundedDateTimeLocalInput
                   name="endsAt"
-                  type="datetime-local"
                   className="input"
                   required
                 />

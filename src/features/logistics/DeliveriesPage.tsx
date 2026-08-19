@@ -29,6 +29,7 @@ import { RecordPhotoCapture } from "../attachments/RecordPhotoCapture";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsLifecyclePolicy } from "./LogisticsLifecyclePolicy";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const policy = new LogisticsLifecyclePolicy();
 
@@ -308,19 +309,17 @@ export function DeliveriesPage() {
             </label>
             <label className="field-label">
               Window starts
-              <input
+              <BoundedDateTimeLocalInput
                 name="windowStartsAt"
                 className="input"
-                type="datetime-local"
                 required
               />
             </label>
             <label className="field-label">
               Window ends
-              <input
+              <BoundedDateTimeLocalInput
                 name="windowEndsAt"
                 className="input"
-                type="datetime-local"
                 required
               />
             </label>

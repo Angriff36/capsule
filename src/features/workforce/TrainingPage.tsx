@@ -13,6 +13,7 @@ import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import "./TrainingPage.css";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const starterModules = [
   {
@@ -357,12 +358,7 @@ export function TrainingPage() {
             </label>
             <label className="field-label">
               Completed
-              <input
-                name="completedAt"
-                className="input"
-                type="date"
-                required
-              />
+              <BoundedDateInput name="completedAt" className="input" required />
             </label>
             <label className="field-label">
               Assessment score

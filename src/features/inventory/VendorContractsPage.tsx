@@ -15,6 +15,7 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate, formatMoneyExact } from "../../lib/format";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const EXPIRY_ALERT_DAYS = 30;
@@ -216,11 +217,11 @@ export function VendorContractsPage() {
             </label>
             <label className="field-label">
               Starts
-              <input name="startsAt" className="input" type="date" required />
+              <BoundedDateInput name="startsAt" className="input" required />
             </label>
             <label className="field-label">
               Ends
-              <input name="endsAt" className="input" type="date" required />
+              <BoundedDateInput name="endsAt" className="input" required />
             </label>
             <label className="field-label">
               Payment terms (days)

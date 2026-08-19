@@ -17,6 +17,7 @@ import {
 import { formatMoney } from "../../lib/format";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import "./taxWorkspace.css";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 type ClientOption = {
   _id: string;
@@ -447,7 +448,7 @@ export function InvoiceIssueForm({
             </label>
             <label className="field-label">
               Due date
-              <input className="input" name="dueDate" type="datetime-local" />
+              <BoundedDateTimeLocalInput className="input" name="dueDate" />
             </label>
           </div>
           <label className="field-label">

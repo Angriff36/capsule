@@ -16,6 +16,7 @@ import {
   type CapacityEventCard,
 } from "./eventCapacityPlanner";
 import "./EventCapacityPlannerPage.css";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const weekday = new Intl.DateTimeFormat("en-US", { weekday: "short" });
 const monthDay = new Intl.DateTimeFormat("en-US", {
@@ -143,8 +144,7 @@ export function EventCapacityPlannerPage() {
         >
           <label>
             From
-            <input
-              type="date"
+            <BoundedDateInput
               value={startDate}
               max={endDate}
               onChange={(event) => setStartDate(event.target.value)}
@@ -154,8 +154,7 @@ export function EventCapacityPlannerPage() {
           <span aria-hidden="true">→</span>
           <label>
             Through
-            <input
-              type="date"
+            <BoundedDateInput
               value={endDate}
               min={startDate}
               onChange={(event) => setEndDate(event.target.value)}
