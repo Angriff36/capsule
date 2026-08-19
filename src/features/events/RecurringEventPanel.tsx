@@ -2,7 +2,7 @@ import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { formatDate, formatTime } from "../../lib/format";
 import {
-  recurringEventStartsAt,
+  firstFutureRecurringOccurrence,
   type EventRecurrenceEndCondition,
   type EventRecurrenceFrequency,
 } from "../../lib/eventRecurrence";
@@ -68,8 +68,10 @@ function frequencyLabel(value?: EventRecurrenceFrequency | null): string {
 
 function ScheduleSummary({
   recurrence,
+  now,
 }: {
   recurrence: RecurringEventSnapshot;
+  now: number;
 }) {
   const generatedDrafts = Math.max(
     Number(recurrence.recurrenceGeneratedCount ?? 1) - 1,
@@ -120,11 +122,18 @@ function ScheduleSummary({
         <span className="eyebrow">Next Draft</span>
         <strong className="mt-1 block text-sm text-ink">
           {recurrence.recurrenceActive &&
-          typeof recurrence.recurrenceNextStartsAt === "number"
-            ? `${formatDate(recurrence.recurrenceNextStartsAt)} · ${formatTime(recurrence.recurrenceNextStartsAt)}`
-            : recurrence.recurrenceCompletedAt != null
-              ? "Series complete"
-              : "Stopped"}
+          typeof recurrence.recurrenceNextStartsAt === "number" ? (
+            <>
+              {`${formatDate(recurrence.recurrenceNextStartsAt)} · ${formatTime(recurrence.recurrenceNextStartsAt)}`}
+              {recurrence.recurrenceNextStartsAt <= now ? (
+                <span className="ml-1.5 text-warn">(overdue)</span>
+              ) : null}
+            </>
+          ) : recurrence.recurrenceCompletedAt != null ? (
+            "Series complete"
+          ) : (
+            "Stopped"
+          )}
         </strong>
       </div>
     </div>
@@ -150,10 +159,12 @@ export function RecurringEventPanelView({
   const [condition, setCondition] = useState<EventRecurrenceEndCondition>(
     recurrence.recurrenceEndCondition ?? "on_date",
   );
-  const previewStartsAt = useMemo(
+  const now = Date.now();
+  const eventAlreadyPast = typeof startsAt === "number" && startsAt < now;
+  const preview = useMemo(
     () =>
       typeof startsAt === "number"
-        ? recurringEventStartsAt(startsAt, frequency, 2)
+        ? firstFutureRecurringOccurrence(startsAt, frequency, Date.now())
         : undefined,
     [frequency, startsAt],
   );
@@ -193,7 +204,19 @@ export function RecurringEventPanelView({
     >
       <div className="space-y-3 p-3">
         {failure ? <FailureBanner failure={failure} /> : null}
-        <ScheduleSummary recurrence={recurrence} />
+        {!isRecurrenceInstance && eventAlreadyPast ? (
+          <div
+            className="rounded-xs border border-warn/30 bg-warn-soft p-3 text-sm leading-relaxed text-warn"
+            role="status"
+            data-testid="recurrence-past-warning"
+          >
+            <strong>This Event is already in the past.</strong> It started{" "}
+            {formatDate(startsAt)} at {formatTime(startsAt)}, so the recurring
+            series runs behind today — copies dated before now stay in Draft
+            until an operator reviews them.
+          </div>
+        ) : null}
+        <ScheduleSummary recurrence={recurrence} now={now} />
 
         {isRecurrenceInstance ? null : !editing ? (
           <div className="flex flex-wrap items-center gap-2 border-t border-line pt-3">
@@ -305,9 +328,16 @@ export function RecurringEventPanelView({
               ) : null}
             </div>
             <p className="sm:col-span-2 lg:col-span-4 text-xs leading-relaxed text-ink-3">
-              {previewStartsAt != null
-                ? `First future Draft: ${formatDate(previewStartsAt)} at ${formatTime(previewStartsAt)}. `
+              {preview != null
+                ? `First future Draft: ${formatDate(preview.startsAt)} at ${formatTime(preview.startsAt)}. `
                 : "Set the Event schedule before adding recurrence. "}
+              {preview != null && preview.pastDraftCount > 0 ? (
+                <span className="text-warn">
+                  {preview.pastDraftCount === 1
+                    ? "1 earlier date in this series is already past and will land as an overdue Draft. "
+                    : `${preview.pastDraftCount} earlier dates in this series are already past and will land as overdue Drafts. `}
+                </span>
+              ) : null}
               Drafts are prepared up to 90 days ahead. Updating the series does
               not alter Drafts already created.
             </p>

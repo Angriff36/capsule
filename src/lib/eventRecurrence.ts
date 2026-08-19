@@ -58,6 +58,33 @@ export function recurringEventStartsAt(
   return calendarOccurrence(anchorStartsAt, 0, offset);
 }
 
+export interface FirstFutureRecurringOccurrence {
+  /** One-based sequence of the first occurrence strictly after `now`. */
+  sequence: number;
+  startsAt: number;
+  /** Generated Draft dates (sequence >= 2) at or before `now`. */
+  pastDraftCount: number;
+}
+
+/**
+ * Walk the real series arithmetic to the first occurrence (sequence >= 2)
+ * that starts strictly after `now`. Never invents dates: every value comes
+ * from recurringEventStartsAt, so it matches what the materializer creates.
+ */
+export function firstFutureRecurringOccurrence(
+  anchorStartsAt: number,
+  frequency: EventRecurrenceFrequency,
+  now: number,
+): FirstFutureRecurringOccurrence {
+  let sequence = 2;
+  let startsAt = recurringEventStartsAt(anchorStartsAt, frequency, sequence);
+  while (startsAt <= now) {
+    sequence += 1;
+    startsAt = recurringEventStartsAt(anchorStartsAt, frequency, sequence);
+  }
+  return { sequence, startsAt, pastDraftCount: sequence - 2 };
+}
+
 export function recurrenceIncludesSequence(
   boundary: EventRecurrenceBoundary,
   startsAt: number,
