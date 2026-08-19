@@ -32,6 +32,7 @@ import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
+import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
 import { vendorContactRoleLabel } from "./vendorContactRoles";
 
 const policy = new SupplyLifecyclePolicy();
@@ -301,9 +302,7 @@ export function VendorOrderPage() {
         <div className="order-state">
           <StatusChip status={String(order.status)} />
           <strong>
-            {formatMoneyExact(
-              Number(order.liveTotalAmount ?? order.totalAmount),
-            )}
+            {formatMoneyExact(vendorOrderHeaderTotal(order, lines))}
           </strong>
           <span>Order total</span>
         </div>

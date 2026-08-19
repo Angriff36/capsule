@@ -38,6 +38,7 @@ import { suggestOrderQuantity } from "./reorderSuggestion";
 import { SeasonalDemandForecast } from "./SeasonalDemandForecast";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
+import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
 import { byVendorScore, computeVendorPerformance } from "./vendorPerformance";
 
 const policy = new SupplyLifecyclePolicy();
@@ -459,7 +460,7 @@ export function PurchasingPage() {
                     <td>{vendorName(order.vendorId)}</td>
                     <td className="supply-number">
                       {formatMoneyExact(
-                        Number(order.liveTotalAmount ?? order.totalAmount),
+                        vendorOrderHeaderTotal(order, lines),
                       )}
                     </td>
                     <td>
@@ -571,7 +572,7 @@ export function PurchasingPage() {
                     </td>
                     <td className="supply-number">
                       {formatMoneyExact(
-                        Number(order.liveTotalAmount ?? order.totalAmount),
+                        vendorOrderHeaderTotal(order, lines),
                       )}
                     </td>
                     <td>
