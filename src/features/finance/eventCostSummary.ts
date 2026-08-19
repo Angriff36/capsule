@@ -111,6 +111,8 @@ export function isUnreconciledCloseout(closeout: {
  */
 export function isCloseoutListProfitPending(closeout: {
   status?: string | null;
+  actualRevenue?: number | null;
+  grossProfit?: number | null;
   totalActualCost?: number | null;
   actualIngredientCost?: number | null;
   actualLaborCost?: number | null;
