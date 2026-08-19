@@ -1,6 +1,10 @@
 import { formatDate, formatMoney } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
-import { isBelowReorder, stockLineLink } from "../inventory/stockLevels";
+import {
+  catalogUnitForStockLine,
+  isBelowReorder,
+  stockLineLink,
+} from "../inventory/stockLevels";
 
 export const DASHBOARD_WIDGET_IDS = [
   "upcoming_events",
@@ -121,7 +125,7 @@ type InventoryRow = BaseRow & {
   unit?: string | null;
 };
 
-type IngredientRow = BaseRow & { name?: string | null };
+type IngredientRow = BaseRow & { name?: string | null; unit?: string | null };
 
 type AssignmentRow = BaseRow & {
   eventId?: string | null;
@@ -383,7 +387,7 @@ export class DashboardWidgetPolicy {
           label:
             ingredientsById.get(String(item.ingredientId)) || "Inventory item",
           value: `${number(item.quantityOnHand)} / ${number(item.reorderThreshold)}`,
-          meta: String(item.unit ?? "units"),
+          meta: catalogUnitForStockLine(item, facts.ingredients),
           href: stockLineLink(item._id),
         })),
         emptyMessage:

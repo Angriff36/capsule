@@ -10,6 +10,8 @@ import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { useFinanceReportFilters } from "./useFinanceReportFilters";
 import {
   buildFoodCostReport,
+  foodCostAgainstTargetCopy,
+  foodCostVarianceCopy,
   type FoodCostCloseout,
   type FoodCostEvent,
   type FoodCostGranularity,
@@ -39,12 +41,6 @@ function initialTarget(): number {
 
 function percentage(value: number | null): string {
   return value == null ? "—" : `${value.toFixed(1)}%`;
-}
-
-function variance(value: number | null): string {
-  if (value == null) return "No revenue";
-  if (Math.abs(value) < 0.05) return "On target";
-  return `${Math.abs(value).toFixed(1)} pts ${value > 0 ? "over" : "under"}`;
 }
 
 function FoodCostTrend({
@@ -143,7 +139,7 @@ function FoodCostTrend({
               >
                 <title>
                   {period.label}: {percentage(period.percentage)} ·{" "}
-                  {variance(period.variance)} target
+                  {foodCostAgainstTargetCopy(period.variance)}
                 </title>
               </circle>
             )}
@@ -345,7 +341,7 @@ function FoodCostReportBody({
           <strong data-testid="food-cost-window-ratio">
             {percentage(report.totalPercentage)}
           </strong>
-          <small>{variance(report.totalVariance)} target</small>
+          <small>{foodCostAgainstTargetCopy(report.totalVariance)}</small>
         </div>
         <div>
           <span>Ingredient cost</span>
@@ -431,7 +427,7 @@ function FoodCostReportBody({
                           <span
                             className={`food-cost-status ${period.aboveTarget ? "is-over" : "is-on-track"}`}
                           >
-                            {variance(period.variance)}
+                            {foodCostVarianceCopy(period.variance)}
                           </span>
                         </td>
                       </tr>
@@ -487,7 +483,7 @@ function FoodCostReportBody({
                       <span
                         className={`food-cost-status ${event.aboveTarget ? "is-over" : "is-on-track"}`}
                       >
-                        {variance(event.variance)}
+                        {foodCostVarianceCopy(event.variance)}
                       </span>
                     </td>
                   </tr>

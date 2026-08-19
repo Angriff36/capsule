@@ -1,7 +1,7 @@
 .food-cost-stage {
   --food-cost-green: #31574f;
   --food-cost-rust: #ad4e32;
-  --food-cost-paper: #f4f0e5;
+  --food-cost-paper: var(--color-panel);
   /* Local aliases onto the app theme so every rule below resolves (these
      shorthand names are not defined globally). */
   --line: var(--color-line);
@@ -41,7 +41,8 @@
   min-width: 250px;
   padding: 14px 16px;
   border: 1px solid rgba(49, 87, 79, 0.35);
-  background: rgba(255, 255, 255, 0.46);
+  background: var(--color-panel);
+  color: var(--color-ink);
   text-align: right;
 }
 

@@ -27,10 +27,12 @@ import { StockReceiptScanner } from "./StockReceiptScanner";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { stockRowDomId, useFocusedStockRow } from "./useFocusedStockRow";
+import { catalogUnitForStockLine } from "./stockLevels";
 
 const policy = new SupplyLifecyclePolicy();
 
 const DAY_MS = 86_400_000;
+
 export const SUPPLY_EDITOR_DOM_ID = "supply-stock-editor";
 
 /** Transfer Apply stays off until destination and qty are both set. */
@@ -122,6 +124,10 @@ export function StockBookPage() {
   );
   const ingredientName = (id: string) =>
     ingredients?.find((item) => item._id === id)?.name ?? "Unknown ingredient";
+  const unitFor = (item: {
+    ingredientId?: string | null;
+    unit?: string | null;
+  }) => catalogUnitForStockLine(item, ingredients ?? []);
   const locationName = (id: string) =>
     locations?.find((item) => item._id === id)?.name ?? "Unknown location";
   const eventName = (id: string) =>
@@ -278,7 +284,7 @@ export function StockBookPage() {
         title: action === "receive" ? "Receive stock" : "Recount stock",
         description: `${ingredientName(item.ingredientId)} at ${locationName(
           item.locationId,
-        )} (${item.unit}).`,
+        )} (${unitFor(item)}).`,
         fields: [
           {
             name: "quantity",
@@ -355,14 +361,14 @@ export function StockBookPage() {
         fields: [
           {
             name: "parLevel",
-            label: `PAR level (${item.unit})`,
+            label: `PAR level (${unitFor(item)})`,
             defaultValue: String(item.parLevel),
             inputType: "number",
             required: true,
           },
           {
             name: "reorderThreshold",
-            label: `Reorder threshold (${item.unit})`,
+            label: `Reorder threshold (${unitFor(item)})`,
             defaultValue: String(item.reorderThreshold),
             inputType: "number",
             required: true,
@@ -507,7 +513,7 @@ export function StockBookPage() {
                   <tr key={item._id}>
                     <td>
                       <strong>{ingredientName(item.ingredientId)}</strong>
-                      <small>{item.unit}</small>
+                      <small>{unitFor(item)}</small>
                     </td>
                     <td>{locationName(item.locationId)}</td>
                     <td className="supply-number">
@@ -519,7 +525,7 @@ export function StockBookPage() {
                     <td className="supply-number">{item.parLevel}</td>
                     <td className="supply-number">
                       <strong>
-                        {suggestedPurchase(item)} {item.unit}
+                        {suggestedPurchase(item)} {unitFor(item)}
                       </strong>
                     </td>
                     <td>
@@ -603,7 +609,7 @@ export function StockBookPage() {
                   <tr key={item._id}>
                     <td>
                       <strong>{ingredientName(item.ingredientId)}</strong>
-                      <small>{item.unit}</small>
+                      <small>{unitFor(item)}</small>
                     </td>
                     <td>{locationName(item.locationId)}</td>
                     <td className="supply-number">{item.quantityOnHand}</td>
@@ -668,7 +674,7 @@ export function StockBookPage() {
                   >
                     <td>
                       <strong>{ingredientName(item.ingredientId)}</strong>
-                      <small>{item.unit}</small>
+                      <small>{unitFor(item)}</small>
                     </td>
                     <td>{locationName(item.locationId)}</td>
                     <td className="supply-number">{item.quantityOnHand}</td>
@@ -1074,7 +1080,7 @@ function SupplyStockForm({
                     (location: any) =>
                       location._id === transferSource.locationId,
                   )?.name ?? "Location"
-                } (${transferSource.quantityOnHand} ${transferSource.unit} on hand)`}
+                } (${transferSource.quantityOnHand} ${catalogUnitForStockLine(transferSource, ingredients)} on hand)`}
                 readOnly
               />
             </label>
@@ -1094,7 +1100,8 @@ function SupplyStockForm({
                     {locations.find(
                       (location: any) => location._id === item.locationId,
                     )?.name ?? "Location"}{" "}
-                    ({item.quantityOnHand} {item.unit} on hand)
+                    ({item.quantityOnHand}{" "}
+                    {catalogUnitForStockLine(item, ingredients)} on hand)
                   </option>
                 ))}
               </select>
