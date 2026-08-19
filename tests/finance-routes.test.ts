@@ -147,6 +147,64 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(sendKeys("draft", "not-a-number")).not.toContain("send");
   });
 
+  it("selects only the 2 positive-due drafts out of the 4-row prod set", () => {
+    // Mirrors the prod QA data: two $0-due drafts + two positive drafts.
+    // Header "Select all sendable" must yield 2 (bar reads "Send 2"), and a
+    // bulk send over all four must target only the positive rows.
+    const policy = new CommercialLifecyclePolicy();
+    const rows = [
+      { _id: "inv-fri-lunch", status: "draft", amountDue: 0 },
+      { _id: "inv-harborview-900", status: "draft", amountDue: 900 },
+      { _id: "inv-harborview-0", status: "draft", amountDue: 0 },
+      { _id: "inv-gallery-3600", status: "draft", amountDue: 3600 },
+    ];
+    const canSend = (row: { status: unknown; amountDue?: unknown }) =>
+      policy
+        .invoiceActions(String(row.status), row)
+        .some((a) => a.key === "send");
+    const sendableRows = rows.filter(canSend);
+    expect(sendableRows.map((row) => row._id)).toEqual([
+      "inv-harborview-900",
+      "inv-gallery-3600",
+    ]);
+    // Bulk send re-filter: even if every row were ticked, no $0 row is sent.
+    expect(rows.filter(canSend)).toHaveLength(2);
+  });
+
+  it("locks the InvoicesPage sendable wiring to the balance-aware predicate", () => {
+    const page = readFileSync(
+      path.join(process.cwd(), "src/features/finance/InvoicesPage.tsx"),
+      "utf8",
+    );
+    // canSend and the per-row action list must both pass the row (with its
+    // amountDue) into the policy — a status-only call reintroduces the bug.
+    const balanceAwareCalls =
+      page.match(/invoiceActions\(\s*String\(row\.status\),\s*row,?\s*\)/g) ??
+      [];
+    expect(balanceAwareCalls.length).toBeGreaterThanOrEqual(2);
+    expect(page).not.toMatch(/invoiceActions\(\s*String\(row\.status\)\s*\)/);
+    // Header select-all operates on the balance-filtered set.
+    expect(page).toMatch(/sendableRows\s*=\s*visibleRows\.filter\(canSend\)/);
+    expect(page).toMatch(/useBulkSelection\(sendableRows\)/);
+    // Row checkbox renders only for sendable rows.
+    expect(page).toMatch(/\{canSend\(row\)\s*\?\s*\(/);
+    // Bulk send re-filters the selection before sending anything.
+    expect(page).toMatch(/selection\.selected\.filter\(canSend\)/);
+  });
+
+  it("locks the InvoiceDetailPage actions to the balance-aware predicate", () => {
+    const page = readFileSync(
+      path.join(process.cwd(), "src/features/finance/InvoiceDetailPage.tsx"),
+      "utf8",
+    );
+    expect(page).toMatch(
+      /invoiceActions\(\s*String\(invoice\.status\),\s*invoice,?\s*\)/,
+    );
+    expect(page).not.toMatch(
+      /invoiceActions\(\s*String\(invoice\.status\)\s*\)/,
+    );
+  });
+
   it("keeps the server-side zero-balance send refusal (manifest + generated command)", () => {
     // The Manifest domain is the authority: Invoice.send carries the
     // sendBalance constraint, and the generated Convex mutation enforces it
