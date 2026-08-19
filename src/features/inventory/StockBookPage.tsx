@@ -26,6 +26,7 @@ import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { StockReceiptScanner } from "./StockReceiptScanner";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
+import { stockRowDomId, useFocusedStockRow } from "./useFocusedStockRow";
 
 const UNITS = [
   "each",
@@ -97,6 +98,8 @@ export function StockBookPage() {
   const [failure, setFailure] = useState<unknown>(null);
   const [horizonDays, setHorizonDays] = useState(7);
   const { prompt, host } = useActionPrompt(busy != null);
+  // Notification deep links land on ?item=<id> — scroll to and highlight it.
+  const focusedItemId = useFocusedStockRow(items !== undefined);
 
   const activeItems = (items ?? []).filter((item) => item.deletedAt == null);
   const expiringItems = activeItems
@@ -639,7 +642,15 @@ export function StockBookPage() {
               </thead>
               <tbody>
                 {activeItems.map((item) => (
-                  <tr key={item._id}>
+                  <tr
+                    key={item._id}
+                    id={stockRowDomId(item._id)}
+                    className={
+                      item._id === focusedItemId
+                        ? "supply-row-focus"
+                        : undefined
+                    }
+                  >
                     <td>
                       <strong>{ingredientName(item.ingredientId)}</strong>
                       <small>{item.unit}</small>

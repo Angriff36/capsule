@@ -1802,6 +1802,14 @@
   background: var(--color-inset);
 }
 
+/* Row a notification deep link landed on (?item=…) — see useFocusedStockRow. */
+.supply-table tbody tr.supply-row-focus,
+.supply-table tbody tr.supply-row-focus:hover {
+  background: var(--color-warn-soft);
+  outline: 1px solid var(--color-warn);
+  outline-offset: -1px;
+}
+
 .supply-table td strong,
 .supply-table td small,
 .data-table td strong,
