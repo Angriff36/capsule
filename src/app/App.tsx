@@ -1,5 +1,5 @@
 import { Component, lazy, Suspense, type ReactNode } from "react";
-import { Navigate, Route, Routes, useMatch } from "react-router-dom";
+import { Navigate, Route, Routes, useMatch, useParams } from "react-router-dom";
 import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
 import { SharedProposalPage } from "../features/clients/SharedProposalPage";
@@ -78,6 +78,13 @@ const StaffOverviewPage = lazy(() =>
     default: module.StaffOverviewPage,
   })),
 );
+function RedirectPackListAlias() {
+  const { id } = useParams();
+  return (
+    <Navigate to={id ? `/logistics/packs/${id}` : "/logistics/packs"} replace />
+  );
+}
+
 const LogisticsOverviewPage = lazy(() =>
   import("../features/logistics/LogisticsOverviewPage").then((module) => ({
     default: module.LogisticsOverviewPage,
@@ -825,6 +832,22 @@ export function App() {
                   <LogisticsOverviewPage />
                 </SupplyRoute>
               }
+            />
+            <Route
+              path="/logistics/pack-lists"
+              element={<RedirectPackListAlias />}
+            />
+            <Route
+              path="/logistics/pack-lists/:id"
+              element={<RedirectPackListAlias />}
+            />
+            <Route
+              path="/logistics/packlists"
+              element={<RedirectPackListAlias />}
+            />
+            <Route
+              path="/logistics/packlists/:id"
+              element={<RedirectPackListAlias />}
             />
             <Route
               path="/logistics/packs"
