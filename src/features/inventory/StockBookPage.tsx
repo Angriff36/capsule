@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   useCreateInventoryItem,
   useCreateInventoryReservation,
@@ -32,6 +32,27 @@ import { catalogUnitForStockLine } from "./stockLevels";
 const policy = new SupplyLifecyclePolicy();
 
 const DAY_MS = 86_400_000;
+
+export const SUPPLY_EDITOR_DOM_ID = "supply-stock-editor";
+
+/** Transfer Apply stays off until destination and qty are both set. */
+export function supplyEditorCanApply(opts: {
+  busy: boolean;
+  kind: string;
+  destinationId?: string;
+  quantity?: string;
+  destinationCount?: number;
+}): boolean {
+  if (opts.busy) return false;
+  if (opts.kind === "transfer") {
+    if (!opts.destinationCount) return false;
+    if (!String(opts.destinationId ?? "").trim()) return false;
+    const q = Number(opts.quantity);
+    return Number.isFinite(q) && q > 0;
+  }
+  return true;
+}
+
 const HORIZON_DAYS = [3, 7, 14, 30] as const;
 
 const isExpired = (item: any) =>
@@ -895,8 +916,32 @@ function SupplyStockForm({
             item.unit === transferSource.unit,
         )
       : [];
+  const [destinationId, setDestinationId] = useState("");
+  const [transferQty, setTransferQty] = useState("");
+  const editorRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    const node = editorRef.current;
+    if (!node) return;
+    node.scrollIntoView({ block: "start", behavior: "smooth" });
+    const focusable = node.querySelector<HTMLElement>(
+      "select:not([disabled]), input:not([readonly]):not([disabled])",
+    );
+    focusable?.focus();
+  }, [kind, transferSource?._id]);
+  const canApply = supplyEditorCanApply({
+    busy,
+    kind,
+    destinationId,
+    quantity: transferQty,
+    destinationCount: transferDestinations.length,
+  });
   return (
-    <form className="supply-form" onSubmit={onSubmit}>
+    <form
+      id={SUPPLY_EDITOR_DOM_ID}
+      ref={editorRef}
+      className="supply-form"
+      onSubmit={onSubmit}
+    >
       <div className="supply-form-heading">
         <div>
           <p className="eyebrow">Inventory</p>
@@ -914,7 +959,7 @@ function SupplyStockForm({
           <button type="button" className="btn btn-ghost" onClick={onClose}>
             Cancel
           </button>
-          <button className="btn btn-primary" disabled={busy}>
+          <button className="btn btn-primary" disabled={!canApply}>
             {busy ? "Working…" : "Apply"}
           </button>
         </div>
@@ -1045,6 +1090,9 @@ function SupplyStockForm({
                 name="destinationInventoryItemId"
                 className="input"
                 required
+                autoFocus
+                value={destinationId}
+                onChange={(event) => setDestinationId(event.target.value)}
               >
                 <option value="">Select destination</option>
                 {transferDestinations.map((item: any) => (
@@ -1074,6 +1122,8 @@ function SupplyStockForm({
                 max={transferSource.quantityOnHand}
                 step="any"
                 required
+                value={transferQty}
+                onChange={(event) => setTransferQty(event.target.value)}
               />
             </label>
             <label className="field-label">
