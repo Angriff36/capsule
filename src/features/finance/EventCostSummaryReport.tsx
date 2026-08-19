@@ -116,19 +116,39 @@ export function EventCostSummaryReport({
           <div>
             <span>Total event cost</span>
             <strong data-testid="total-event-cost">
-              {formatMoney(summary.totalCost)}
-            </strong>
-            <small>reconciled closeout</small>
-          </div>
-          <div className={summary.margin < 0 ? "is-negative" : "is-positive"}>
-            <span>Resulting margin</span>
-            <strong data-testid="resulting-margin">
-              {formatMoney(summary.margin)}
+              {summary.costsPending ? "—" : formatMoney(summary.totalCost)}
             </strong>
             <small>
-              {summary.marginPercent == null
-                ? "No invoiced revenue"
-                : `${percent.format(summary.marginPercent)}% of revenue`}
+              {summary.costsPending
+                ? "no costs reconciled yet"
+                : summary.unreconciled
+                  ? "draft closeout — not reconciled"
+                  : "reconciled closeout"}
+            </small>
+          </div>
+          <div
+            className={
+              summary.costsPending
+                ? undefined
+                : summary.margin < 0
+                  ? "is-negative"
+                  : "is-positive"
+            }
+          >
+            <span>Resulting margin</span>
+            <strong data-testid="resulting-margin">
+              {summary.costsPending ? "—" : formatMoney(summary.margin)}
+            </strong>
+            <small>
+              {summary.costsPending
+                ? `Awaiting cost reconciliation — ${formatMoney(summary.invoicedRevenue)} billed${
+                    summary.draftInvoiceCount > 0
+                      ? `, ${formatMoney(summary.draftInvoiceTotal)} in drafts`
+                      : ""
+                  }`
+                : summary.marginPercent == null
+                  ? "No invoiced revenue"
+                  : `${percent.format(summary.marginPercent)}% of revenue`}
             </small>
           </div>
         </section>
@@ -139,7 +159,11 @@ export function EventCostSummaryReport({
               <p>Cost ledger</p>
               <h3>Where the event spend landed</h3>
             </div>
-            <strong>{formatMoney(summary.totalCost)}</strong>
+            <strong>
+              {summary.costsPending
+                ? "Not reconciled"
+                : formatMoney(summary.totalCost)}
+            </strong>
           </div>
 
           <div className="event-cost-report-costs">

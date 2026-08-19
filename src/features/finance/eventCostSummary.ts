@@ -73,6 +73,12 @@ export type EventCostSummary = {
    * 0 headcount are placeholders, not facts.
    */
   unreconciled: boolean;
+  /**
+   * True while the closeout is unreconciled AND every cost bucket is still
+   * the cascade-seeded $0. There is no cost truth yet, so "Total event cost
+   * $0.00" and a 100% margin must never be printed as reconciled fact.
+   */
+  costsPending: boolean;
   headcount: {
     actual: number;
     expected: number;
@@ -121,30 +127,34 @@ export function buildEventCostSummary({
   const includedInvoices = eventInvoices.filter(isBilledInvoice);
   const draftInvoices = eventInvoices.filter(isDraftInvoice);
 
+  const unreconciled = isUnreconciledCloseout(closeout);
+  const costSource = (reconciledLabel: string) =>
+    unreconciled ? "awaiting reconciliation" : reconciledLabel;
+
   const buckets: EventCostBucket[] = [
     {
       key: "ingredient",
       label: "Ingredient purchases",
       amount: amount(closeout.actualIngredientCost),
-      source: "Received purchases · reconciled at closeout",
+      source: `Received purchases · ${costSource("reconciled at closeout")}`,
     },
     {
       key: "labor",
       label: "Approved labor",
       amount: amount(closeout.actualLaborCost),
-      source: "Approved time · reconciled at closeout",
+      source: `Approved time · ${costSource("reconciled at closeout")}`,
     },
     {
       key: "equipment",
       label: "Equipment & vendor hire",
       amount: amount(closeout.actualVendorCost),
-      source: "Equipment and hire · reconciled vendor bucket",
+      source: `Equipment and hire · ${costSource("reconciled vendor bucket")}`,
     },
     {
       key: "miscellaneous",
       label: "Miscellaneous & waste",
       amount: amount(closeout.actualWasteCost),
-      source: "Other event spend · reconciled waste bucket",
+      source: `Other event spend · ${costSource("reconciled waste bucket")}`,
     },
   ];
 
@@ -154,6 +164,9 @@ export function buildEventCostSummary({
     0,
   );
   const margin = invoicedRevenue - totalCost;
+  // Cascade-seeded drafts carry $0 in every bucket. Until finance reconciles,
+  // that zero is a placeholder — margin against it would be a fake 100%.
+  const costsPending = unreconciled && totalCost === 0;
 
   return {
     event,
@@ -165,7 +178,9 @@ export function buildEventCostSummary({
     reconciledRevenue: amount(closeout.actualRevenue),
     margin,
     marginPercent:
-      invoicedRevenue === 0 ? null : (margin / invoicedRevenue) * 100,
+      costsPending || invoicedRevenue === 0
+        ? null
+        : (margin / invoicedRevenue) * 100,
     invoiceCount: includedInvoices.length,
     invoiceNumbers: includedInvoices
       .map((invoice) => String(invoice.invoiceNumber ?? "").trim())
@@ -179,7 +194,8 @@ export function buildEventCostSummary({
       (sum, invoice) => sum + amount(invoice.amountPaid),
       0,
     ),
-    unreconciled: isUnreconciledCloseout(closeout),
+    unreconciled,
+    costsPending,
     headcount: {
       actual: amount(closeout.actualHeadcount),
       // Cascade-seeded closeouts carry 0 — the event's planned headcount is

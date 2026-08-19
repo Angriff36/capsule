@@ -163,6 +163,41 @@ describe("buildEventCostSummary — folio separates billed, collected, drafts", 
     expect(summary.collectedTotal).toBe(200);
   });
 
+  it("never sells seeded $0 costs as a reconciled 100% margin (QA Gallery)", () => {
+    // Prod repro: Invoiced $7,200 vs cascade-seeded $0 costs printed
+    // "Total event cost $0.00 · reconciled closeout" and "+100% of revenue".
+    const summary = buildEventCostSummary({
+      event,
+      closeout: seededCloseout,
+      invoices: [invoice({ status: "paid", total: 7200, amountPaid: 7200 })],
+    });
+    expect(summary.invoicedRevenue).toBe(7200);
+    expect(summary.totalCost).toBe(0);
+    expect(summary.costsPending).toBe(true);
+    expect(summary.marginPercent).toBeNull();
+    for (const bucket of summary.buckets) {
+      expect(bucket.source).toContain("awaiting reconciliation");
+      expect(bucket.source).not.toContain("reconciled at closeout");
+    }
+  });
+
+  it("clears costsPending once the closeout carries reconciled numbers", () => {
+    const reconciled = buildEventCostSummary({
+      event,
+      closeout: {
+        eventId: "event-1",
+        status: "finalized",
+        actualRevenue: 7200,
+        actualIngredientCost: 1800,
+        actualLaborCost: 2400,
+      },
+      invoices: [invoice({ status: "paid", total: 7200, amountPaid: 7200 })],
+    });
+    expect(reconciled.costsPending).toBe(false);
+    expect(reconciled.totalCost).toBe(4200);
+    expect(reconciled.marginPercent).toBeCloseTo((3000 / 7200) * 100);
+  });
+
   it("flags cascade-seeded zero closeouts as unreconciled with real headcount", () => {
     const summary = buildEventCostSummary({
       event,
