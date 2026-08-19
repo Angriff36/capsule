@@ -107,12 +107,13 @@ export function QuoteSubmissionPage() {
       // strings would let the server parse the date-only value as UTC midnight
       // and the date+time value as local, landing the event on the wrong day.
       const dateStr = String(data.get("eventDate") ?? "");
+      const startTimeStr = String(data.get("eventStartTime") ?? "").trim();
       const endTimeStr = String(data.get("eventEndTime") ?? "").trim();
       const result = await submitQuote({
         clientName: optional(String(data.get("clientName") ?? "")) ?? "",
         email: optional(String(data.get("email") ?? "")) ?? "",
         phone: optional(String(data.get("phone") ?? "")),
-        eventDate: Date.parse(`${dateStr}T00:00`),
+        eventDate: Date.parse(`${dateStr}T${startTimeStr || "00:00"}`),
         eventEndTime: endTimeStr
           ? Date.parse(`${dateStr}T${endTimeStr}`)
           : undefined,
@@ -280,7 +281,7 @@ export function QuoteSubmissionPage() {
                 Event Details
               </h2>
               <div className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label
                       htmlFor="eventDate"
@@ -300,6 +301,22 @@ export function QuoteSubmissionPage() {
                       name="eventDate"
                       errors={errors}
                       touched={touched}
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="eventStartTime"
+                      className="block text-xs font-medium text-ink-2 mb-1"
+                    >
+                      Start Time
+                    </label>
+                    <input
+                      type="time"
+                      id="eventStartTime"
+                      name="eventStartTime"
+                      className="w-full px-4 py-2 border border-line-2 rounded-sm focus:border-accent"
+                      disabled={busy}
                     />
                   </div>
 

@@ -25,3 +25,24 @@ export function stockLineLink(inventoryItemId: string): string {
 
 /** Query-param key StockBookPage reads to scroll/highlight a stock line. */
 export const STOCK_FOCUS_PARAM = "item";
+
+export type CatalogUnitIngredient = {
+  _id: string;
+  unit?: string | null;
+};
+
+/**
+ * Paint stock quantities in the ingredient's catalog unit. Opening a line
+ * locks unit to catalog (#150 / PR 175); existing rows may still store
+ * "each" while the catalog says kilogram. Labels follow the catalog.
+ */
+export function catalogUnitForStockLine(
+  item: { ingredientId?: string | null; unit?: string | null },
+  ingredients: readonly CatalogUnitIngredient[],
+): string {
+  const catalog = ingredients.find(
+    (row) => row._id === item.ingredientId,
+  )?.unit;
+  const label = String(catalog ?? item.unit ?? "").trim();
+  return label || "unit";
+}

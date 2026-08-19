@@ -13,3 +13,18 @@ export const LOGISTICS_SECTIONS = [
 ] as const;
 
 export type LogisticsSection = (typeof LOGISTICS_SECTIONS)[number]["key"];
+
+/** Hyphenated / concatenated pack-list URLs 404'd; the book is /logistics/packs. */
+export function canonicalizePackListPath(pathname: string): string | null {
+  if (
+    pathname === "/logistics/pack-lists" ||
+    pathname === "/logistics/packlists"
+  ) {
+    return "/logistics/packs";
+  }
+  const match = pathname.match(
+    /^\/logistics\/(pack-lists|packlists)\/([^/]+)$/,
+  );
+  if (match) return `/logistics/packs/${match[2]}`;
+  return null;
+}
