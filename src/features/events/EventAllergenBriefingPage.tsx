@@ -10,6 +10,10 @@ import {
 import { formatDate, formatTime } from "../../lib/format";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { eventDetailPath } from "./eventRoutes";
+import {
+  assessGuestListCoverage,
+  GuestListCoverageNotice,
+} from "./GuestListCoverageNotice";
 // ponytail: browser print → "Save as PDF"; same approach as ContractDocumentPage.
 import "./EventAllergenBriefingPage.css";
 
@@ -51,6 +55,16 @@ export function EventAllergenBriefingPage() {
         ),
       );
   }, [eventDishes, dishes]);
+
+  // All recorded guests (any RSVP state) — the denominator the coverage
+  // warning compares against the sold headcount.
+  const invitedGuestCount = useMemo(
+    () =>
+      (eventGuests ?? []).filter(
+        (guest) => guest.invitedAt != null && guest.deletedAt == null,
+      ).length,
+    [eventGuests],
+  );
 
   const flaggedGuests = useMemo(
     () =>
@@ -174,6 +188,14 @@ export function EventAllergenBriefingPage() {
           <TableSkeleton rows={4} />
         ) : (
           <>
+            <div className="mt-4 empty:hidden">
+              <GuestListCoverageNotice
+                coverage={assessGuestListCoverage(
+                  invitedGuestCount,
+                  event.expectedHeadcount,
+                )}
+              />
+            </div>
             {conflicts.length ? (
               <section className="mt-6 break-inside-avoid rounded-xs border border-warn/40 bg-warn-soft/50 p-3">
                 <h2 className="text-base font-semibold uppercase tracking-wide">

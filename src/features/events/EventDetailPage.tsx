@@ -470,7 +470,10 @@ export function EventDetailPage() {
               title="Guests"
               description="Invite guests, track RSVPs and table assignments, and record dietary needs that feed the allergen briefing."
             />
-            <EventGuestPanel eventId={event._id} />
+            <EventGuestPanel
+              eventId={event._id}
+              expectedHeadcount={event.expectedHeadcount}
+            />
           </section>
         </EventTabErrorBoundary>
       ) : null}
