@@ -17,12 +17,10 @@ export function breadcrumbsForPath(pathname: string): Breadcrumb[] {
   const crumbs: Breadcrumb[] = [{ label: area.label, to: area.path }];
   if (pathname === area.path) return crumbs;
   const guide = guideForPath(pathname);
-  if (guide && guide.prefix !== area.path) {
+  if (guide && guide.title !== area.label) {
     crumbs.push({ label: guide.title, to: guide.prefix });
-    if (pathname !== guide.prefix) crumbs.push({ label: "Detail" });
     return crumbs;
   }
   if (pathname === `${area.path}/new`) crumbs.push({ label: "New" });
-  else crumbs.push({ label: "Detail" });
   return crumbs;
 }
