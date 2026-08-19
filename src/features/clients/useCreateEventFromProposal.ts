@@ -10,14 +10,14 @@ export type CreateEventFromProposalArgs = {
 
 export type CreateEventFromProposalResult = {
   docId: Id<"events">;
-  copiedDishCount: number;
 };
 
 /**
  * Books an accepted proposal into a new event in one transaction: creates the
- * event through the generated planEngagement command, copies the proposal's
- * menu selections into EventDish lines, and links Proposal.eventId. Authored
- * seam: convex/lib/proposalEventCreation.ts (issue #141).
+ * event through the generated planEngagement command, then runs the
+ * Proposal.linkEvent domain command, whose ProposalEventLinked cascade copies
+ * the proposal's menu selections into EventDish lines. Authored seam:
+ * convex/lib/proposalEventCreation.ts (issue #141).
  *
  * Lives in the clients feature (not features/events) so the events feature
  * keeps its "generated hooks only" integration guard intact.

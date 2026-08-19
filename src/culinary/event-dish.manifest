@@ -60,10 +60,17 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   constraint eventDishServingsNonnegative: self.addedAt == null or self.quantityServings >= 0 "Event dish servings cannot be negative"
   constraint eventDishHeadcountOverrideNonnegative: self.headcountOverride == null or self.headcountOverride >= 0 "Headcount override cannot be negative"
 
-  // Read: any staff on this tenant. Write/execute: managers+.
+  // Read: any staff on this tenant. Write/execute: managers and sales.
+  // Sales staff sell the menu (Event itself allows salesAccess writes and
+  // ProposalDishSelection is salesAccess) and the accept/link menu cascades
+  // (ProposalAccepted / ProposalEventLinked → confirmFromProposal) run with
+  // the accepting operator's auth — manager-only here meant a sales accept
+  // with a linked event threw mid-cascade. Gate on harm
+  // (domain-gating-restraint): a sales edit to event composition recalculates
+  // prep; it does not corrupt money.
   default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dishes"
-  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") "Managers may write event dishes through commands"
-  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") "Managers may execute event dish commands"
+  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") "Managers and sales staff may write event dishes through commands"
+  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") "Managers and sales staff may execute event dish commands"
 
   // Add this dish to the event (create).
   command addToEvent(

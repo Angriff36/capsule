@@ -147,3 +147,20 @@ on ProposalAccepted fanOut ProposalDishSelection where proposalId = payload.dish
     serviceStyle: self.serviceStyle
     specialInstructions: self.specialInstructions
   }
+
+// Post-acceptance link cascade (issue #141). Proposal.linkEvent fires when an
+// accepted-but-unlinked proposal (signature acceptance, or "accept now, book
+// later") is booked into an event after the fact. Same row set and the same
+// idempotent confirmFromProposal semantics as the acceptance cascade above.
+on ProposalEventLinked fanOut ProposalDishSelection where proposalId = payload.dishSelectionProposalId
+  run EventDish.confirmFromProposal
+  match eventId = payload.eventId, dishId = self.dishId
+  else create
+  params {
+    eventId: payload.eventId
+    dishId: self.dishId
+    quantityServings: self.quantityServings
+    course: self.course
+    serviceStyle: self.serviceStyle
+    specialInstructions: self.specialInstructions
+  }
