@@ -67,7 +67,12 @@ export function AppShell() {
   }, [paletteOpen]);
 
   return (
-    <div className="flex h-dvh bg-canvas">
+    // overflow-clip: the shell owns the viewport; the ONLY vertical scroller is
+    // <main> below. Without it, any descendant taller than the viewport (the
+    // icon rail on laptop-height windows, a wide board on an event tab) grows
+    // the document itself, adding a second dead window scrollbar that reveals
+    // the dark canvas "void" under the app instead of reaching the content.
+    <div className="flex h-dvh overflow-clip bg-canvas">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar onOpenPalette={() => setPaletteOpen(true)} />
