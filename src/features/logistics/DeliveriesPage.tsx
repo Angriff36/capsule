@@ -366,8 +366,11 @@ export function DeliveriesPage() {
           <div className="document-empty">
             <p>No active deliveries.</p>
             <span>
-              Schedule a delivery once a pack list is packed, loaded, or
-              dispatched.
+              Deliveries start from packed lists — open{" "}
+              <Link className="text-link" to="/logistics/packs">
+                Pack lists
+              </Link>{" "}
+              to pack an event first, then schedule the run here.
             </span>
             <div className="mt-3 flex justify-center">
               <button
