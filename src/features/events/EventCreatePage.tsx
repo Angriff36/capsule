@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc } from "../../lib/api";
+import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateClient,
   useCreateEvent,
@@ -147,7 +148,7 @@ export function EventCreatePage() {
   const proposal = useGetProposal(proposalId || "skip");
   const proposalDishSelections = useListProposalDishSelection();
   const createEventFromProposal = useCreateEventFromProposal();
-  const template = useGetEventTemplate(templateId || "skip");
+  const template = useRouteRecord(useGetEventTemplate, templateId || undefined);
   const menus = useListMenu();
   const templateMenuName = (menus ?? []).find(
     (menu) => menu._id === template?.menuId,

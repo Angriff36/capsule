@@ -15,6 +15,7 @@ import {
 import { StatusChip } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { formatDate } from "../../lib/format";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { VenueNotesPanel } from "./VenueNotesPanel";
 import { VenueRoomsPanel } from "./VenueRoomsPanel";
@@ -62,7 +63,7 @@ const booleanSelectValue = (stored: boolean | undefined | null): string =>
 
 export function VenueDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const venue = useGetVenue(id ?? "skip");
+  const venue = useRouteRecord(useGetVenue, id);
 
   const updateDetails = useVenueUpdateDetails();
   const changeCapacity = useVenueChangeCapacity();

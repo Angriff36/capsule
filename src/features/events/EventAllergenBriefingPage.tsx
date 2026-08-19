@@ -8,6 +8,7 @@ import {
   useListEventGuest,
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatTime } from "../../lib/format";
+import { isPlausibleConvexId, useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { eventDetailPath } from "./eventRoutes";
 // ponytail: browser print → "Save as PDF"; same approach as ContractDocumentPage.
@@ -20,8 +21,9 @@ const normalize = (value: string) =>
 /** Print-ready allergen briefing for the front-of-house pre-event huddle. */
 export function EventAllergenBriefingPage() {
   const { id } = useParams<{ id: string }>();
-  const eventId = (id ?? "skip") as Id<"events"> | "skip";
-  const event = useGetEvent(eventId);
+  const eventId = (isPlausibleConvexId(id) ? id : "skip") as
+    Id<"events"> | "skip";
+  const event = useRouteRecord(useGetEvent, id);
   const allEventDishes = useListEventDish();
   const eventDishes = useMemo(
     () =>

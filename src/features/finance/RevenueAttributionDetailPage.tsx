@@ -11,6 +11,7 @@ import {
   useRevenueAttributionApply,
   useRevenueAttributionUpdate,
 } from "../../lib/manifest-convex-react";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { StatusChip, FormSkeleton } from "../../ui/primitives";
 import {
   formatDate as formatDateShared,
@@ -52,7 +53,7 @@ export function RevenueAttributionDetailPage() {
   const isEditMode = mode === "edit";
   const isApplyMode = mode === "apply";
 
-  const attribution = useGetRevenueAttribution(id ?? "skip");
+  const attribution = useRouteRecord(useGetRevenueAttribution, id);
   const venues = useListVenue();
   const people = useListPerson();
   const referralSources = useListReferralSource();

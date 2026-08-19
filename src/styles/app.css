@@ -257,7 +257,9 @@
     @apply h-9 px-4 text-base;
   }
   .empty-state {
-    @apply px-4 py-8 text-center text-sm text-ink-3;
+    /* grid keeps the <strong> headline and <span> hint on separate lines —
+       inline they run together ("No message threads yetOpen a thread…"). */
+    @apply grid gap-1 px-4 py-8 text-center text-sm text-ink-3;
   }
   .banner {
     @apply block rounded-sm border px-3 py-2.5 text-sm;
@@ -1873,6 +1875,14 @@
 .supply-table tbody tr:hover,
 .data-table tbody tr:hover {
   background: var(--color-inset);
+}
+
+/* Row a notification deep link landed on (?item=…) — see useFocusedStockRow. */
+.supply-table tbody tr.supply-row-focus,
+.supply-table tbody tr.supply-row-focus:hover {
+  background: var(--color-warn-soft);
+  outline: 1px solid var(--color-warn);
+  outline-offset: -1px;
 }
 
 .supply-table td strong,

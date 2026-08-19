@@ -22,6 +22,7 @@ import {
   useBulkRun,
   useBulkSelection,
 } from "../../ui/bulk-select";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip } from "../../ui/primitives";
@@ -50,7 +51,7 @@ type TemplateSummary = {
 
 export function PackListDetailPage() {
   const { id } = useParams();
-  const packList = useGetPackList(id || "skip");
+  const packList = useRouteRecord(useGetPackList, id);
   const items = useListPackListItem();
   const events = useListEvent();
   const dishes = useListDish();

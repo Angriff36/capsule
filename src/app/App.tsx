@@ -478,8 +478,11 @@ class AppErrorBoundary extends Component<
           <ErrorState
             title="This screen failed to render"
             detail={
-              this.state.error.message ||
-              "Reload the page. If it keeps failing, check the browser console for the component stack."
+              // Raw messages leak internal query names / request ids in prod.
+              import.meta.env.DEV
+                ? this.state.error.message ||
+                  "Reload the page. If it keeps failing, check the browser console for the component stack."
+                : "Something went wrong loading this screen. Reload the page, and if it keeps failing let an admin know."
             }
             onRetry={() => window.location.reload()}
           />

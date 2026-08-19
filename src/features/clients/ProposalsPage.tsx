@@ -25,7 +25,7 @@ import { useActionPrompt } from "../../ui/action-prompt";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatMoneyExact } from "../../lib/format";
 import { clientDisplayName } from "../events/clientName";
-import { eventCreatePath } from "../events/eventRoutes";
+import { eventCreatePath, eventDetailPath } from "../events/eventRoutes";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
@@ -140,6 +140,21 @@ export function ProposalsPage() {
   const [enhancementsOpenFor, setEnhancementsOpenFor] = useState<string | null>(
     null,
   );
+
+  // Row deep link: /clients/proposals?proposal=<id> opens that proposal's
+  // detail panels (menu, pricing, enhancements) and scrolls the row into view,
+  // so each proposal has a shareable URL without a separate detail page.
+  const focusedProposalId = searchParams.get("proposal");
+  const proposalsLoaded = proposals !== undefined;
+  useEffect(() => {
+    if (!focusedProposalId || !proposalsLoaded) return;
+    setMenuOpenFor(focusedProposalId);
+    setPricingOpenFor(focusedProposalId);
+    setEnhancementsOpenFor(focusedProposalId);
+    document
+      .getElementById(`proposal-${focusedProposalId}`)
+      ?.scrollIntoView({ block: "start" });
+  }, [focusedProposalId, proposalsLoaded]);
 
   useEffect(() => {
     // "Create proposal" on an event navigates here with ?event=<id>; open the
@@ -503,8 +518,15 @@ export function ProposalsPage() {
               <tbody>
                 {visibleRows.map((row) => (
                   <Fragment key={row._id}>
-                    <tr>
-                      <td>{row.title}</td>
+                    <tr id={`proposal-${row._id}`}>
+                      <td>
+                        <Link
+                          className="text-link"
+                          to={`/clients/proposals?proposal=${row._id}`}
+                        >
+                          {row.title}
+                        </Link>
+                      </td>
                       <td>{clientDisplayName(row.clientId, clients)}</td>
                       <td className="supply-number">
                         {formatMoneyExact(Number(row.total ?? 0))}
@@ -680,18 +702,29 @@ export function ProposalsPage() {
                             </button>
                           ))}
                         {String(row.status) === "accepted" ? (
-                          <Link
-                            className="btn btn-ghost"
-                            // proposalId pre-fills the form from the proposal
-                            // and, when still unlinked, links the new event and
-                            // copies the accepted menu onto it (issue #141).
-                            to={eventCreatePath({
-                              clientId: String(row.clientId),
-                              proposalId: row._id,
-                            })}
-                          >
-                            Create Event
-                          </Link>
+                          // A linked event means the booking already exists —
+                          // offering Create Event again risks a duplicate.
+                          row.eventId ? (
+                            <Link
+                              className="btn btn-ghost"
+                              to={eventDetailPath(String(row.eventId))}
+                            >
+                              View event
+                            </Link>
+                          ) : (
+                            <Link
+                              className="btn btn-ghost"
+                              // proposalId pre-fills the form from the
+                              // proposal and links the new event + copies the
+                              // accepted menu onto it (issue #141).
+                              to={eventCreatePath({
+                                clientId: String(row.clientId),
+                                proposalId: row._id,
+                              })}
+                            >
+                              Create Event
+                            </Link>
+                          )
                         ) : null}
                       </td>
                     </tr>
@@ -700,6 +733,7 @@ export function ProposalsPage() {
                         <ProposalReadinessNotice
                           eventId={row.eventId ? String(row.eventId) : null}
                           status={String(row.status)}
+                          total={Number(row.total ?? 0)}
                           hasVenue={Boolean(
                             events?.find((e) => e._id === row.eventId)?.venueId,
                           )}

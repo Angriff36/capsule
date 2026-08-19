@@ -259,16 +259,33 @@ export function VehicleSchedulePage() {
         {loading ? (
           <TableSkeleton rows={2} />
         ) : unassignedRuns.length === 0 ? (
-          <div className="document-empty">
-            <p>Every delivery this day has a vehicle.</p>
-            <span>
-              Schedule more runs from{" "}
-              <Link className="text-link" to="/logistics/deliveries">
-                Deliveries
-              </Link>
-              .
-            </span>
-          </div>
+          dayRuns.length === 0 ? (
+            <div className="document-empty">
+              <p>No delivery runs scheduled this day.</p>
+              <span>
+                Runs start in{" "}
+                <Link className="text-link" to="/logistics/packs">
+                  Pack lists
+                </Link>
+                : pack the event's list, then schedule the run in{" "}
+                <Link className="text-link" to="/logistics/deliveries">
+                  Deliveries
+                </Link>{" "}
+                and it will show up here for a vehicle.
+              </span>
+            </div>
+          ) : (
+            <div className="document-empty">
+              <p>Every delivery this day has a vehicle.</p>
+              <span>
+                Schedule more runs from{" "}
+                <Link className="text-link" to="/logistics/deliveries">
+                  Deliveries
+                </Link>
+                .
+              </span>
+            </div>
+          )
         ) : (
           <div className="supply-table-wrap">
             <table className="supply-table">

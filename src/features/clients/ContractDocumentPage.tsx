@@ -6,6 +6,7 @@ import {
   useGetEvent,
 } from "../../lib/manifest-convex-react";
 import { formatDate, formatMoney, formatTime } from "../../lib/format";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
@@ -81,7 +82,7 @@ function SignatureBlock({
 export function ContractDocumentPage() {
   const { id } = useParams<{ id: string }>();
   const { branding, loading: brandingLoading } = useTenantBranding();
-  const contract = useGetContract(id ?? "skip");
+  const contract = useRouteRecord(useGetContract, id);
   const event = useGetEvent(
     contract?.eventId ? String(contract.eventId) : "skip",
   );
