@@ -29,9 +29,22 @@ export interface MyDayIdentityResolution<T extends MyDayPersonCandidate> {
 
 const LEGACY_DEVICE_KEY = "capsule.my-day.personId";
 
+/** Minimal storage surface so tests can inject an in-memory double. */
+export type PersonPickStorage = Pick<
+  Storage,
+  "getItem" | "setItem" | "removeItem"
+>;
+
+const browserStorage = (): PersonPickStorage | null =>
+  typeof localStorage === "undefined" ? null : localStorage;
+
 export class MyDayIdentityResolver {
-  private get storage(): Storage | null {
-    return typeof localStorage === "undefined" ? null : localStorage;
+  constructor(
+    private readonly storageProvider: () => PersonPickStorage | null = browserStorage,
+  ) {}
+
+  private get storage(): PersonPickStorage | null {
+    return this.storageProvider();
   }
 
   private storageKeyFor(userId: string): string {

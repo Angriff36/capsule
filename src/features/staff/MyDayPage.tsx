@@ -420,7 +420,7 @@ export function MyDayPage() {
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
       {loading ? <TableSkeleton rows={8} /> : null}
 
-      <div className="flex flex-col gap-4 lg:grid lg:grid-cols-2 lg:items-start lg:gap-5">
+      <div className="flex flex-col gap-4 md:grid md:grid-cols-2 md:items-start md:gap-5">
         <div className="flex min-w-0 flex-col gap-4">
           <Section title="Time clock">
             <div className="px-4 py-4">

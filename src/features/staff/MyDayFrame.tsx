@@ -43,7 +43,7 @@ export function MyDayFrame({
       </header>
       <main
         className={`mx-auto flex w-full flex-col gap-4 px-4 py-5 pb-16 ${
-          wide ? "max-w-md lg:max-w-5xl" : "max-w-md"
+          wide ? "max-w-md md:max-w-5xl" : "max-w-md"
         }`}
       >
         <PageHeader title="My Day" lead={formatDate(Date.now())} />
