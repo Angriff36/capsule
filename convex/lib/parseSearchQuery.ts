@@ -292,15 +292,36 @@ export function invoiceSearchLabel(inv: {
   invoiceNumber?: unknown;
   _id?: unknown;
   amountDue?: unknown;
+  total?: unknown;
+  amountPaid?: unknown;
   currencyCode?: unknown;
 }): string {
   const formatted = displayInvoiceNumber(inv.invoiceNumber, inv._id);
   const num = formatted ? `#${formatted.replace(/^#/, "")}` : "Invoice";
-  const due =
-    inv.amountDue != null
-      ? formatSearchCurrency(inv.amountDue, inv.currencyCode)
-      : "";
-  return due ? `${num} — ${due}` : num;
+  const amount = invoiceSearchMoney(inv);
+  const money =
+    amount != null ? formatSearchCurrency(amount, inv.currencyCode) : "";
+  return money ? `${num} — ${money}` : num;
+}
+
+/**
+ * Unpaid: remaining due. Paid gallery INV-2026-QA1 has amountDue 0 and
+ * billed $3,600 — prefer total/amountPaid so Ctrl-K does not paint $0 PAID.
+ */
+export function invoiceSearchMoney(inv: {
+  amountDue?: unknown;
+  total?: unknown;
+  amountPaid?: unknown;
+}): unknown {
+  const due = Number(inv.amountDue);
+  if (Number.isFinite(due) && due > 0) return inv.amountDue;
+  const total = Number(inv.total);
+  if (Number.isFinite(total) && total > 0) return inv.total;
+  const paid = Number(inv.amountPaid);
+  if (Number.isFinite(paid) && paid > 0) return inv.amountPaid;
+  if (inv.amountDue != null) return inv.amountDue;
+  if (inv.total != null) return inv.total;
+  return inv.amountPaid;
 }
 
 function formatSearchCurrency(amount: unknown, currencyCode?: unknown): string {
