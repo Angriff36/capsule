@@ -175,7 +175,7 @@ export const PAGE_GUIDES: PageGuide[] = [
     purpose:
       "What's on the shelf, what's running low, and what's on order from vendors.",
     steps: [
-      "Watch the Below PAR list — that's what to reorder.",
+      "Watch the Below reorder alerts — that's what to reorder.",
       "Use Purchasing to turn needs into vendor orders.",
     ],
   },
