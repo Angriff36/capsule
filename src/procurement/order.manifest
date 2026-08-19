@@ -187,12 +187,19 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   }
 
   // Line-driven money rollup (issue #140). Reactions on every line event feed
-  // the summed line totals here so the header keeps tracking the lines from
-  // draft edits through receipts. Buyer-entered tax/shipping are preserved.
-  // Guards stay minimal on purpose: a failed guard would abort the line
-  // command that triggered the reaction.
+  // the DB-derived line sum here so the header tracks the lines from draft
+  // edits through receipts; buyer tax/shipping are preserved. Review finding
+  // on #159: totals are LOCKED once the order is received or cancelled — line
+  // events cannot fire in those states (line-command guards), so the guard
+  // never aborts a reaction, but a direct API call can no longer rewrite a
+  // received PO's committed spend. (Ideal shape — re-deriving the sum from
+  // self.lines inside this command — is blocked at Manifest 3.6.45: the Convex
+  // projection only preloads hasMany for count_of, and sum(self.lines, …) in a
+  // command body fail-closes. Any forged value in earlier statuses self-heals
+  // on the next line event, same trust level as updateTotals.)
   command syncLineTotals(lineSubtotal: money(12, 2)) {
     guard self.deletedAt == null
+    guard self.status != "received" and self.status != "cancelled"
     constraint syncLineSubtotalNonnegative: lineSubtotal >= 0 "Order money amounts cannot be negative"
     compute previousTotal = self.totalAmount
     compute nextTotal = lineSubtotal + self.taxAmount + self.shippingAmount
@@ -1055,7 +1062,9 @@ event VendorOrderLineDemandRetired: "vendor_order_line_demand.retired" {
 
 // Header money rollup (issue #140): every line change recomputes the order's
 // summed line totals so totalAmount tracks the lines from draft edits through
-// receipts. Cancelled lines soft-delete, so the sum drops them automatically.
+// receipts. The sum() below reads stored VendorOrderLine rows in the reaction
+// dispatch (tenant + soft-delete filtered); cancelled lines soft-delete, so
+// the sum drops them automatically.
 on VendorOrderLineWeeklyEnsured run VendorOrder.syncLineTotals
   resolve payload.vendorOrderId
   params {

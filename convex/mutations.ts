@@ -40786,6 +40786,7 @@ async function __runVendorOrderSyncLineTotals(ctx: MutationCtx, { docId, lineSub
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
+    if (!(((doc.status !== "received") && (doc.status !== "cancelled")))) throw new Error("Guard 1 failed");
     if (!((lineSubtotal >= 0))) throw new Error("Order money amounts cannot be negative");
     const previousTotal = doc.totalAmount;
     const nextTotal = ((lineSubtotal + doc.taxAmount) + doc.shippingAmount);
