@@ -124,9 +124,13 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
     expect(end).toBeGreaterThan(start);
     const fn = search.slice(start, end);
     expect(fn).toContain(".paginate(");
-    expect(fn).toContain("MAX_SCAN");
+    expect(fn).toContain("MAX_PAGES");
     expect(fn).toContain("paginate({ numItems: PAGE, cursor })");
     expect(fn).not.toMatch(/\.take\(\s*120\s*\)/);
+    // QA 193: .filter(deletedAt === null) emptied pages (undefined ≠ null)
+    // and the scan spun 8–9s with no hits. Skip deleted in JS.
+    expect(fn).toContain("inv.deletedAt != null");
+    expect(fn).not.toContain('q.eq(q.field("deletedAt"), null)');
   });
 
   it("production build deploys Convex instead of a UI-only vite build", () => {
