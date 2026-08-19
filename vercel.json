@@ -1,4 +1,4 @@
 {
-  "buildCommand": "if [ \"$VERCEL_ENV\" = \"production\" ]; then convex deploy --cmd 'vite build'; else VITE_CONVEX_URL=\"${VITE_CONVEX_URL:-https://tangible-skunk-448.convex.cloud}\" vite build; fi",
+  "buildCommand": "bash scripts/vercel-build.sh",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 }
