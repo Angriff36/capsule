@@ -4,6 +4,7 @@ import {
   useListInventoryItem,
   useListVendor,
   useListVendorOrder,
+  useListVendorOrderLine,
 } from "../../lib/manifest-convex-react";
 import { formatCount, formatDate, formatMoneyExact } from "../../lib/format";
 import {
@@ -20,6 +21,7 @@ import {
   isBelowReorder,
   stockLineLink,
 } from "./stockLevels";
+import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
 
 // Vendor orders that left draft but have not fully arrived yet.
 const AWAITING_RECEIPT = new Set([
@@ -85,12 +87,14 @@ type AttentionRow = {
 export function InventoryOverviewPage() {
   const items = useListInventoryItem();
   const orders = useListVendorOrder();
+  const lines = useListVendorOrderLine();
   const vendors = useListVendor();
   const ingredients = useListIngredient();
 
   const loading =
     items === undefined ||
     orders === undefined ||
+    lines === undefined ||
     vendors === undefined ||
     ingredients === undefined;
 
@@ -127,8 +131,7 @@ export function InventoryOverviewPage() {
       String(order.status) === "draft" && order.sourceRangeStart != null,
   );
   const weeklyDraftTotal = weeklyDrafts.reduce(
-    (sum, order) =>
-      sum + Number(order.liveTotalAmount ?? order.totalAmount ?? 0),
+    (sum, order) => sum + vendorOrderHeaderTotal(order, lines),
     0,
   );
 
@@ -144,7 +147,7 @@ export function InventoryOverviewPage() {
       key: order._id,
       to: `/inventory/orders/${order._id}`,
       title: `${vendorName(order.vendorId)} order`,
-      detail: `${formatMoneyExact(Number(order.liveTotalAmount ?? order.totalAmount))}${
+      detail: `${formatMoneyExact(vendorOrderHeaderTotal(order, lines))}${
         order.sourceRangeStart != null
           ? ` · week of ${formatDate(order.sourceRangeStart)}`
           : ""
