@@ -50,6 +50,7 @@ import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { downloadInvoicePdf } from "./invoicePdf";
 import { readInvoiceLineItems, readTaxBreakdown } from "./invoiceTax";
 import "./taxWorkspace.css";
@@ -66,7 +67,10 @@ type ReminderScheduleView = {
 export function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const invoice = useGetInvoice(id ?? "skip");
-  useTrackRecent("Invoice", invoice?.invoiceNumber);
+  useTrackRecent(
+    "Invoice",
+    invoice ? formatInvoiceNumber(invoice.invoiceNumber, invoice._id) : null,
+  );
   const clients = useListClient();
   const creditMemos = useListCreditMemo();
   const events = useListEvent();
@@ -548,7 +552,8 @@ export function InvoiceDetailPage() {
             · Detail
           </p>
           <h1 className="display-title mt-2">
-            {invoice.invoiceNumber || "Untitled invoice"}
+            {formatInvoiceNumber(invoice.invoiceNumber, invoice._id) ||
+              "Untitled invoice"}
           </h1>
           <p className="mt-3 max-w-160 text-ink-2">
             Billed to{" "}
@@ -903,8 +908,11 @@ export function InvoiceDetailPage() {
                     </option>
                     {eligibleCreditTargets.map((target) => (
                       <option key={target._id} value={target._id}>
-                        {String(target.invoiceNumber || target._id)} ·{" "}
-                        {usd(target.amountDue)} due
+                        {formatInvoiceNumber(
+                          target.invoiceNumber,
+                          target._id,
+                        ) || String(target._id)}{" "}
+                        · {usd(target.amountDue)} due
                       </option>
                     ))}
                   </select>
@@ -991,7 +999,12 @@ export function InvoiceDetailPage() {
                             )}
                           >
                             Applied to{" "}
-                            {String(target?.invoiceNumber || "invoice")}
+                            {(target &&
+                              formatInvoiceNumber(
+                                target.invoiceNumber,
+                                target._id,
+                              )) ||
+                              "invoice"}
                           </Link>
                         ) : (
                           `${usd(memo.remainingAmount)} carried forward`
