@@ -232,6 +232,33 @@ describe("MyDayIdentityResolver", () => {
     expect(viaEmail.person?._id).not.toBe("person-bill");
   });
 
+  it("does not lock the unique linked bill when Clerk is Angriff and no Angriff Person exists", () => {
+    const resolution = resolver.resolve(
+      [billNamed],
+      "user_angriff",
+      null,
+      clerkAngriff,
+    );
+    expect(resolution.person).toBeUndefined();
+    expect(resolution.linkedToSignIn).toBe(false);
+    expect(resolution.person?._id).not.toBe("person-bill");
+  });
+
+  it("binds the unique linked Person when the name matches Clerk", () => {
+    const angriffLinked = {
+      ...angriffNamed,
+      authSubjectId: "user_angriff",
+    };
+    const resolution = resolver.resolve(
+      [angriffLinked],
+      "user_angriff",
+      null,
+      clerkAngriff,
+    );
+    expect(resolution.person).toBe(angriffLinked);
+    expect(resolution.linkedToSignIn).toBe(true);
+  });
+
   it("does not lock a differently-named unique link when Angriff is a candidate", () => {
     const namedMismatch = resolver.resolve(
       [billNamed, angriffNamed],

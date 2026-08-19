@@ -9,12 +9,13 @@
  *    (picker). First-match would lock Angriff to whoever was listed first
  *    (production: bill).
  * 3. The unique Person whose `authSubjectId` matches the signed-in account,
- *    only when that row is actually this human. If the unique link is a
- *    teammate (name/email does not match Clerk) AND an unlinked Person
- *    matches the signed-in human — or a remembered pick that is not the
- *    mismatched link exists — do not bind the teammate. Prefer an explicit
- *    pick of the matching Person; otherwise stay unbound (picker). Never
- *    lock a differently-named unique link when Angriff is a candidate.
+ *    only when that row is actually this human (name/email matches Clerk,
+ *    or there is no Clerk identity to compare). A differently-named unique
+ *    link — production: bill linked to Angriff's Clerk id, no Angriff
+ *    Person — never binds; stay unbound (picker). Prefer an explicit pick
+ *    of the matching Person; otherwise stay unbound. Never lock a
+ *    differently-named unique link when Angriff is a candidate, and never
+ *    fall back to the linked row on name mismatch.
  * 4. A profile this account explicitly picked earlier — only after the
  *    signed-in subject is known, never a Person already linked to a
  *    different account, and never a leftover pick whose name/email does
@@ -238,10 +239,8 @@ export class MyDayIdentityResolver {
         return { person: linked, linkedToSignIn: true };
       }
 
-      // Unique link is a differently-named teammate (production: bill
-      // has authSubjectId === Angriff's Clerk id). If Angriff is still
-      // a candidate — unlinked Person matching Clerk name/email, or a
-      // remembered pick that is not bill — do not bind bill.
+      // Name mismatch: never fall back to the linked row. Production FAIL
+      // was Clerk Angriff + unique linked bill and no Angriff Person.
       const nameMatches = people.filter(
         (person) =>
           person._id !== linked._id &&
@@ -252,9 +251,6 @@ export class MyDayIdentityResolver {
         usableStored && usableStored._id !== linked._id
           ? usableStored
           : undefined;
-      if (nameMatches.length === 0 && !storedAlt) {
-        return { person: linked, linkedToSignIn: true };
-      }
 
       // Explicit pick of the Clerk-matching Person survives (Switch).
       // Do not auto-bind an unlinked name match — stay unbound + picker.
