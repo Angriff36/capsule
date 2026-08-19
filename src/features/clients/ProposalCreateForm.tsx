@@ -13,6 +13,7 @@ import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { clientDisplayName } from "../events/clientName";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { useCatalogDishes } from "./useCatalogDishes";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import {
   computeProposalPricing,
   PRICING_BASES,
@@ -391,10 +392,9 @@ export function ProposalCreateForm({
             </label>
             <label className="field-label">
               Event date
-              <input
+              <BoundedDateInput
                 className="input"
                 name="eventDate"
-                type="date"
                 defaultValue={prefill?.eventDate}
               />
             </label>
@@ -643,10 +643,9 @@ export function ProposalCreateForm({
             </label>
             <label className="field-label">
               Valid through
-              <input
+              <BoundedDateInput
                 className="input"
                 name="expiresAt"
-                type="date"
                 defaultValue={defaultValidityDate()}
               />
             </label>

@@ -13,6 +13,7 @@ import type { Id } from "../../lib/api";
 import { Section, StatusChip } from "../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { FailureBanner } from "./FailureBanner";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 export interface RecurringEventSnapshot {
   recurrenceFrequency?: EventRecurrenceFrequency | null;
@@ -310,9 +311,8 @@ export function RecurringEventPanelView({
             {condition === "on_date" ? (
               <label className="field-label">
                 Final event date
-                <input
+                <BoundedDateInput
                   name="recurrenceEndsAt"
-                  type="date"
                   className="input"
                   value={endsAtInput}
                   onChange={(event) => setEndsAtInput(event.target.value)}

@@ -7,6 +7,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import {
   geocodeDestination,
   routeLegs,
@@ -179,9 +180,8 @@ export function RoutePlannerPage() {
           </p>
         </div>
         <div className="supply-row-actions">
-          <input
+          <BoundedDateInput
             className="input"
-            type="date"
             aria-label="Route day"
             value={day}
             onChange={(event) => {

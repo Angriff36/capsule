@@ -24,6 +24,7 @@ import {
   PAYROLL_PROCESSORS,
   type PayrollProcessor,
 } from "./payrollExport";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import {
   PayrollPrepareForm,
   PayrollPreparePayloadBuilder,
@@ -267,20 +268,18 @@ export function PayrollPage() {
         <div className="supply-form-grid mt-3">
           <label className="field-label">
             Period start
-            <input
+            <BoundedDateInput
               className="input"
               aria-label="Payroll period start"
-              type="date"
               value={periodStart}
               onChange={(event) => setPeriodStart(event.target.value)}
             />
           </label>
           <label className="field-label">
             Period end
-            <input
+            <BoundedDateInput
               className="input"
               aria-label="Payroll period end"
-              type="date"
               value={periodEnd}
               onChange={(event) => setPeriodEnd(event.target.value)}
             />

@@ -10,6 +10,7 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
 import { useAssignVehicle } from "../facilities/vehicleAssignment";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const HOUR_MARKS = [0, 6, 12, 18, 24];
@@ -122,9 +123,8 @@ export function VehicleSchedulePage() {
           >
             ← Previous
           </button>
-          <input
+          <BoundedDateInput
             className="input"
-            type="date"
             aria-label="Schedule day"
             value={day}
             onChange={(event) => setDay(event.currentTarget.value)}

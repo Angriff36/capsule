@@ -17,6 +17,7 @@ import {
 } from "./staffUtilization";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import "./StaffUtilizationPage.css";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const TARGET_STORAGE_KEY =
   "capsule.workforce.utilization-schedule-target-hours";
@@ -251,9 +252,8 @@ export function StaffUtilizationDashboard({
         <div className="staff-utilization-dates">
           <label className="field-label">
             From
-            <input
+            <BoundedDateInput
               className="input"
-              type="date"
               value={startDate}
               max={endDate}
               onChange={(event) => {
@@ -264,9 +264,8 @@ export function StaffUtilizationDashboard({
           </label>
           <label className="field-label">
             Through
-            <input
+            <BoundedDateInput
               className="input"
-              type="date"
               value={endDate}
               min={startDate}
               onChange={(event) => {

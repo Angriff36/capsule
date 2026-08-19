@@ -10,6 +10,7 @@ import { TableSkeleton } from "../../ui/primitives";
 import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const DIMENSIONS = [
   { key: "reliabilityRating", label: "Reliability" },
@@ -150,7 +151,7 @@ export function PerformanceReviewsPage() {
             </label>
             <label className="field-label">
               Review date
-              <input name="reviewDate" className="input" type="date" required />
+              <BoundedDateInput name="reviewDate" className="input" required />
             </label>
             {DIMENSIONS.map((dimension) => (
               <label key={dimension.key} className="field-label">

@@ -8,6 +8,7 @@ import {
 import { EventTimelineBlockQuestions } from "./EventTimelineBlockQuestions";
 import type { TimelineStaffOption } from "./eventTimelineStaffRoster";
 import { GanttStrip } from "./EventTimelineGanttStrip";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import {
   formatAssigneeLabel,
   isTimelineAssigneeTeam,
@@ -211,17 +212,15 @@ export function EventTimelineActivityList({
                   </label>
                   <label className="field-label">
                     <span>Starts</span>
-                    <input
+                    <BoundedDateTimeLocalInput
                       name="startsAt"
-                      type="datetime-local"
                       className="input"
                     />
                   </label>
                   <label className="field-label">
                     <span>Ends</span>
-                    <input
+                    <BoundedDateTimeLocalInput
                       name="endsAt"
-                      type="datetime-local"
                       className="input"
                     />
                   </label>

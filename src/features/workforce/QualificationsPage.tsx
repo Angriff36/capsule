@@ -11,6 +11,7 @@ import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const policy = new WorkforceLifecyclePolicy();
 const EXPIRY_ALERT_WINDOW_MS = 30 * 86_400_000;
@@ -166,7 +167,7 @@ export function QualificationsPage() {
             </label>
             <label className="field-label">
               Issued
-              <input name="issuedAt" className="input" type="date" required />
+              <BoundedDateInput name="issuedAt" className="input" required />
             </label>
             <label className="field-label">
               Type
@@ -196,7 +197,7 @@ export function QualificationsPage() {
             </label>
             <label className="field-label">
               Expires
-              <input name="expiresAt" className="input" type="date" />
+              <BoundedDateInput name="expiresAt" className="input" />
             </label>
             <label className="field-label">
               Document ref

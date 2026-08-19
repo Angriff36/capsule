@@ -8,6 +8,7 @@ import {
 import { formatDate, formatTime } from "../../lib/format";
 import { EmptyState, Section, Skeleton } from "../../ui/primitives";
 import { CrmFailureBanner } from "./CrmFailureBanner";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const MEDIA = ["call", "email", "meeting"] as const;
 
@@ -238,9 +239,8 @@ export function ClientCommunicationPanelView({
             )}
             <label className="field-label">
               Date &amp; time
-              <input
+              <BoundedDateTimeLocalInput
                 name="occurredAt"
-                type="datetime-local"
                 className="input"
                 defaultValue={localDateTimeValue()}
                 required

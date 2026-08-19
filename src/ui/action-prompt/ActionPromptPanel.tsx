@@ -1,4 +1,5 @@
 import { useId, useState, type FormEvent } from "react";
+import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../BoundedDateInputs";
 import type { ActionPromptRequest } from "./ActionPromptTypes";
 
 interface ActionPromptPanelProps {
@@ -139,6 +140,14 @@ export function ActionPromptPanel({
                     id={fieldId}
                     name={field.name}
                     type={field.inputType ?? "text"}
+                    // Unbounded datetime-local years grow to six digits while
+                    // typing (issue #148); cap at 9999 so the year commits
+                    // after four digits.
+                    max={
+                      field.inputType === "datetime-local"
+                        ? MAX_DATETIME_LOCAL_INPUT_VALUE
+                        : undefined
+                    }
                     className="input mt-1"
                     value={values[field.name] ?? ""}
                     required={field.required ?? true}

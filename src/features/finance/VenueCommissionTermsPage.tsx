@@ -15,6 +15,7 @@ import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 // directly on this page otherwise gets no styles and the header stat runs
 // together ("Active terms00 configured").
 import "./taxWorkspace.css";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const formatDate = (date: string | number | null | undefined) => {
   if (!date) return "—";
@@ -243,10 +244,9 @@ export function VenueCommissionTermsPage() {
           </label>
           <label className="field-label">
             Effective start date
-            <input
+            <BoundedDateInput
               className="input"
               name="effectiveStartDate"
-              type="date"
               required
               defaultValue={
                 editing
@@ -259,10 +259,9 @@ export function VenueCommissionTermsPage() {
           </label>
           <label className="field-label">
             Effective end date
-            <input
+            <BoundedDateInput
               className="input"
               name="effectiveEndDate"
-              type="date"
               defaultValue={
                 editing?.effectiveEndDate
                   ? new Date(editing.effectiveEndDate)
