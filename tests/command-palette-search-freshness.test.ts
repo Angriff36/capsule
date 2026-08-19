@@ -34,8 +34,10 @@ const harborview = [
 
 describe("Ctrl-K search is not one keystroke behind", () => {
   it("does not paint Harborview hits under a Northside query", () => {
-    expect(freshSearchHits("Northside", harborview)).toEqual([]);
-    expect(freshSearchHits("Harborview", harborview)).toHaveLength(3);
+    expect(freshSearchHits("Northside", "Harborview", harborview)).toEqual([]);
+    expect(
+      freshSearchHits("Harborview", "Harborview", harborview),
+    ).toHaveLength(3);
   });
 
   it("treats an in-flight debounce as pending so the palette says Searching… not No matches.", () => {
@@ -48,7 +50,7 @@ describe("Ctrl-K search is not one keystroke behind", () => {
         hitsPending: true,
       }),
     ).toBe(true);
-    expect(freshSearchHits("Harborview", [])).toEqual([]);
+    expect(freshSearchHits("Harborview", "", [])).toEqual([]);
   });
 
   it("useNaturalLanguageSearch paints freshSearchHits from the live rawQuery", () => {
@@ -59,8 +61,8 @@ describe("Ctrl-K search is not one keystroke behind", () => {
       "src/features/search/useNaturalLanguageSearch.ts",
       "utf8",
     );
-    expect(hook).toContain("freshSearchHits(rawQuery,");
-    expect(hook).not.toContain("freshSearchHits(debounced");
+    expect(hook).toContain("freshSearchHits(rawQuery, debounced");
+    expect(hook).not.toContain("freshSearchHits(debounced,");
     expect(hook).not.toContain("freshSearchHits(trimmed");
   });
 
@@ -76,6 +78,27 @@ describe("Ctrl-K search is not one keystroke behind", () => {
         hitsPending: false,
       }),
     ).toBe(true);
+  });
+
+  it("keeps settled NL invoice hits whose labels omit the raw query", () => {
+    // parseQuery consumes unpaid/invoices/over N days; invoiceLabel is
+    // "#number — $amount" with hint "Overdue Nd". Requiring the live string
+    // in label erases a successful search after debounce settles.
+    const overdue = [
+      {
+        kind: "invoice",
+        id: "inv1",
+        label: "#INV-2026-QA1 — $11,700.00",
+        hint: "Overdue 31d",
+        path: "/finance/invoices/inv1",
+        score: 0.5,
+      },
+    ] as const;
+    const nl = "unpaid invoices over 30 days";
+    expect(freshSearchHits(nl, nl, overdue)).toEqual([...overdue]);
+    expect(overdue[0].label.toLowerCase().includes(nl)).toBe(false);
+    // Still drop Harborview under Northside during debounce.
+    expect(freshSearchHits("Northside", "Harborview", harborview)).toEqual([]);
   });
 
   it("CommandPalette withholds No matches. while search is pending", () => {

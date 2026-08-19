@@ -13,16 +13,21 @@ export interface SearchHit {
 
 /**
  * Hits from the last committed (debounced) search must not paint as current
- * while the live query has moved on. Harborview results staying up under
- * "Northside", or "No matches." on Harborview because debounce hasn't fired,
- * is a false-negative. Prefix matches of the live query may still show.
+ * while the live query has moved on. Harborview under "Northside" is a
+ * stale cache — filter those labels. Once live === debounce the server
+ * already ran this query; NL intent is not in the label ("unpaid invoices
+ * over 30 days" → "#INV-1 — $900" / hint "Overdue 31d"), so requiring the
+ * raw string in label erases a successful search.
  */
 export function freshSearchHits(
   liveQuery: string,
+  debouncedQuery: string,
   serverHits: readonly SearchHit[],
 ): SearchHit[] {
-  const q = liveQuery.trim().toLowerCase();
-  if (q.length < 2) return [];
+  const live = liveQuery.trim();
+  if (live.length < 2) return [];
+  if (live === debouncedQuery.trim()) return [...serverHits];
+  const q = live.toLowerCase();
   return serverHits.filter((hit) => hit.label.toLowerCase().includes(q));
 }
 
@@ -40,7 +45,8 @@ export function isSearchPending(opts: {
 /**
  * Natural-language search across entities. Debounces the Convex call, skips
  * while the term is too short, and passes wall-clock `now` so date/age intent
- * resolves server-side. Painted hits always match the live query.
+ * resolves server-side. Stale caches are filtered to the live query;
+ * settled NL hits keep the server labels as returned.
  */
 export function useNaturalLanguageSearch(
   rawQuery: string,
@@ -72,7 +78,7 @@ export function useNaturalLanguageSearch(
     hitsPending: hits === undefined,
   });
   return {
-    hits: freshSearchHits(rawQuery, (hits ?? []) as SearchHit[]),
+    hits: freshSearchHits(rawQuery, debounced, (hits ?? []) as SearchHit[]),
     loading: pending,
   };
 }
