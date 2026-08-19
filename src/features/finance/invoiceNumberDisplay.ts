@@ -9,7 +9,7 @@
  */
 
 /** Lowercase alphanumeric with no separators at id-like length — not human. */
-const RAW_DOCUMENT_ID_PATTERN = /^[a-z0-9]{24,}$/;
+const RAW_DOCUMENT_ID_PATTERN = /^[a-z0-9]{24,}$/i;
 
 export class InvoiceNumberFormatter {
   isRawDocumentId(value: string): boolean {
