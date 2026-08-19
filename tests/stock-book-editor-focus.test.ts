@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   SUPPLY_EDITOR_DOM_ID,
   supplyEditorCanApply,
+  supplyEditorClosesOnKey,
 } from "../src/features/inventory/StockBookPage";
 
 describe("Stock book Transfer editor is not a no-op above the row", () => {
@@ -79,5 +80,17 @@ describe("Stock book Transfer editor is not a no-op above the row", () => {
     expect(page).toContain("focusable?.focus()");
     expect(page).toContain("supplyEditorCanApply");
     expect(page).toContain("autoFocus");
+  });
+
+  it("Escape closes the editor the same way Cancel does", () => {
+    expect(supplyEditorClosesOnKey("Escape")).toBe(true);
+    expect(supplyEditorClosesOnKey("Enter")).toBe(false);
+    const page = readFileSync(
+      "src/features/inventory/StockBookPage.tsx",
+      "utf8",
+    );
+    expect(page).toContain("supplyEditorClosesOnKey");
+    expect(page).toContain('addEventListener("keydown"');
+    expect(page).toContain("onClose()");
   });
 });
