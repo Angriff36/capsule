@@ -40786,7 +40786,7 @@ async function __runVendorOrderSyncLineTotals(ctx: MutationCtx, { docId, lineSub
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may write vendor orders through commands");
     if (!((checkRole(user, "procurementAccess") || checkRole(user, "manageAccess")))) throw new Error("Procurement and managers may execute vendor order commands");
     if (!((doc.deletedAt == null))) throw new Error("Guard 0 failed");
-    if (!(((doc.status !== "received") && (doc.status !== "cancelled")))) throw new Error("Guard 1 failed");
+    if (!(((doc.status === "draft") || (doc.status === "submitted")))) throw new Error("Guard 1 failed");
     if (!((lineSubtotal >= 0))) throw new Error("Order money amounts cannot be negative");
     const previousTotal = doc.totalAmount;
     const nextTotal = ((lineSubtotal + doc.taxAmount) + doc.shippingAmount);
@@ -41104,13 +41104,6 @@ async function __runVendorOrderLineCancelLine(ctx: MutationCtx, { docId, reason,
     const __after: Record<string, any> = { ...doc, ...updates };
     const payload: Record<string, any> = { id: docId, ...__after, result: { id: docId, ...__after }, vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __rel_vendorOrder.eventId, orderedQuantity: __after.orderedQuantity, receivedQuantity: __after.receivedQuantity, unit: __after.unit, reason: reason, _subject: { entity: "VendorOrderLine", command: "cancelLine", id: docId } };
     await ctx.db.insert("manifestEvents", { type: "VendorOrderLineCancelled", entity: "VendorOrderLine", entityId: docId, payload: { vendorOrderLineId: docId, tenantId: __after.tenantId, vendorOrderId: __after.vendorOrderId, ingredientId: __after.ingredientId, ingredientDemandId: __after.ingredientDemandId, eventId: __rel_vendorOrder.eventId, orderedQuantity: __after.orderedQuantity, receivedQuantity: __after.receivedQuantity, unit: __after.unit, reason: reason }, createdAt: Date.now() });
-    // Reactions
-    const __agg0_rows = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q) => q.eq("vendorOrderId", payload.vendorOrderId)).collect();
-    const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
-    const __agg0 = __agg0_rowsf.reduce((acc, d) => { const n = Number((d as any).lineTotalAmount); return acc + (Number.isFinite(n) ? n : 0); }, 0);
-    const reactionTarget0 = payload.vendorOrderId;
-    if (reactionTarget0) await __runVendorOrderSyncLineTotals(ctx, { docId: reactionTarget0, lineSubtotal: __agg0 } as any);
     return { ...doc, ...updates };
 }
 
@@ -41355,12 +41348,6 @@ async function __runVendorOrderLineRecordReceipt(ctx: MutationCtx, { docId, quan
       const __elseId = await ctx.db.insert("inventoryLots", __elseDoc as any);
       await __runInventoryLotRecord(ctx, { docId: __elseId, ...__elseArgs } as any);
     }
-    const __agg0_rows = await ctx.db.query("vendorOrderLines").withIndex("by_vendorOrderId", (q) => q.eq("vendorOrderId", payload.vendorOrderId)).collect();
-    const __tenant = ((await getAuthContext(ctx)) as any).tenantId ?? null;
-    const __agg0_rowsf = __agg0_rows.filter((d) => (d as any).deletedAt == null).filter((d) => (d as any).tenantId === __tenant);
-    const __agg0 = __agg0_rowsf.reduce((acc, d) => { const n = Number((d as any).lineTotalAmount); return acc + (Number.isFinite(n) ? n : 0); }, 0);
-    const reactionTarget2 = payload.vendorOrderId;
-    if (reactionTarget2) await __runVendorOrderSyncLineTotals(ctx, { docId: reactionTarget2, lineSubtotal: __agg0 } as any);
     return { ...doc, ...updates };
 }
 

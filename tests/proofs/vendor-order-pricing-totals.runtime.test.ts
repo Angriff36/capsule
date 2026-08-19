@@ -1,12 +1,15 @@
 /**
- * Runtime proof (issue #140 / PR #159 review): the purchase-order money path.
+ * Runtime proof (issue #140 / PR #159 review rounds 1–2): the PO money path.
  *
- * Drives the REAL generated Convex mutations end to end:
+ * Drives the REAL generated Convex mutations and queries end to end:
  * - auto-drafted lines price from the ingredient catalog (6.25/kg × 16 kg),
- * - the header total tracks line revise / cancel / receipt,
+ * - the user-facing header (liveTotalAmount, query-inlined computed) tracks
+ *   line revise / cancel / receipt,
  * - recordReceipt drives the header to $100.00 and markReceived keeps it,
  * - the draft gets a PO-<n> order number,
- * - a direct syncLineTotals(0) on a RECEIVED order is rejected.
+ * - a direct syncLineTotals(0) is rejected on CONFIRMED and on RECEIVED
+ *   orders (round-2 High: only draft/submitted may write stored totals),
+ *   and the header money is untouched by the attempts.
  *
  * Quantities are binary-exact (0.25 and 0.0625 per serving × 64 guests) so
  * money assertions are exact, not approximate. If ensureWeeklyLine ever goes
@@ -55,6 +58,7 @@ type OrderRow = {
   orderNumber?: string | null;
   subtotal: number;
   totalAmount: number;
+  liveTotalAmount?: number;
   deletedAt?: number | null;
 };
 
@@ -219,6 +223,17 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
       expect(mine).toHaveLength(1);
       return mine[0]!;
     };
+    // The user-facing header reads the query-inlined liveTotalAmount computed
+    // (the same field VendorOrderPage / the dashboard render) — the REAL
+    // generated query, not a raw table read.
+    const readLiveHeader = async (orderId: string): Promise<number> => {
+      const order = (await procurement.query(api.queries.getVendorOrder, {
+        id: orderId,
+      })) as OrderRow | null;
+      expect(order).not.toBeNull();
+      expect(order!.liveTotalAmount).toBeTypeOf("number");
+      return Number(order!.liveTotalAmount);
+    };
     const readLines = async (orderId: string): Promise<LineRow[]> => {
       const lines = (await procurement.run(async (ctx) =>
         ctx.db.query("vendorOrderLines").collect(),
@@ -250,8 +265,9 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
     expect(garnishLine.lineTotalAmount).toBe(8);
     expect(draft.subtotal).toBe(108);
     expect(draft.totalAmount).toBe(108);
+    expect(await readLiveHeader(draft._id)).toBe(108);
 
-    // Buyer revise: header follows to 16 × $5 + $8 = $88.
+    // Buyer revise: header follows to 16 × $5 + $8 = $88 (stored + live).
     await proof.executeCommand(
       procurement,
       api.mutations.VendorOrderLine_reviseQuantity,
@@ -262,23 +278,37 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
       },
     );
     expect((await readOrder()).totalAmount).toBe(88);
+    expect(await readLiveHeader(draft._id)).toBe(88);
 
-    // Cancel the garnish line: header drops its $8.
+    // Cancel the garnish line: the live header drops its $8 immediately.
     await proof.executeCommand(
       procurement,
       api.mutations.VendorOrderLine_cancelLine,
       { docId: garnishLine._id, reason: "Garnish sourced in-house" },
     );
-    expect((await readOrder()).totalAmount).toBe(80);
+    expect(await readLiveHeader(draft._id)).toBe(80);
 
-    // Submit → confirm → record receipt at the real $6.25: the receipt
-    // reaction must move the header from $80 to $100.
+    // Submit → confirm.
     await proof.executeCommand(procurement, api.mutations.VendorOrder_submit, {
       docId: draft._id,
     });
     await proof.executeCommand(procurement, api.mutations.VendorOrder_confirm, {
       docId: draft._id,
     });
+
+    // Round-2 High: a direct syncLineTotals(0) on a CONFIRMED committed PO
+    // must be rejected — only draft/submitted may write stored totals.
+    await expect(
+      proof.executeCommand(
+        procurement,
+        api.mutations.VendorOrder_syncLineTotals,
+        { docId: draft._id, lineSubtotal: 0 },
+      ),
+    ).rejects.toThrow();
+    expect(await readLiveHeader(draft._id)).toBe(80);
+
+    // Record receipt at the real $6.25: the header must move from $80 to
+    // $100 — driven purely by the line repricing, no writable header path.
     await proof.executeCommand(
       procurement,
       api.mutations.VendorOrderLine_recordReceipt,
@@ -290,15 +320,13 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
         supplierLotNumber: "LOT-QA-140",
       },
     );
-
-    const afterReceipt = await readOrder();
-    expect(afterReceipt.subtotal).toBe(100);
-    expect(afterReceipt.totalAmount).toBe(100);
+    expect(await readLiveHeader(draft._id)).toBe(100);
     const receivedLine = (await readLines(draft._id)).find(
       (row) => row._id === saffronLine._id,
     )!;
     expect(receivedLine.receivedQuantity).toBe(16);
     expect(receivedLine.unitCost).toBe(S.receiptPrice);
+    expect(receivedLine.lineTotalAmount).toBe(100);
     expect(receivedLine.status).toBe("complete");
 
     await proof.executeCommand(
@@ -308,9 +336,10 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
     );
     const received = await readOrder();
     expect(received.status).toBe("received");
-    expect(received.totalAmount).toBe(100);
+    expect(await readLiveHeader(draft._id)).toBe(100);
 
-    // Review finding: a direct syncLineTotals(0) must NOT zero a received PO.
+    // Round-1 High stays closed: syncLineTotals(0) on the RECEIVED PO is
+    // rejected too, and the $100 header is untouched.
     await expect(
       proof.executeCommand(
         procurement,
@@ -321,8 +350,6 @@ describe("runtime proof: PO lines price from catalog and the header total tracks
         },
       ),
     ).rejects.toThrow();
-    const afterForgeryAttempt = await readOrder();
-    expect(afterForgeryAttempt.subtotal).toBe(100);
-    expect(afterForgeryAttempt.totalAmount).toBe(100);
+    expect(await readLiveHeader(draft._id)).toBe(100);
   });
 });

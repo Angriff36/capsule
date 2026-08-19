@@ -68,6 +68,13 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
   computed needsSpendApproval: boolean = self.purchasingConfig != null and self.purchasingConfig.orderApprovalThresholdAmount != null and self.totalAmount > self.purchasingConfig.orderApprovalThresholdAmount
   // Raw child status fields via count_of — not child computeds (parent rollup limitation).
   computed hasIncompleteLines: boolean = count_of(self.lines, (line) => line.deletedAt == null and line.status != "cancelled" and line.status != "complete") > 0
+  // Live header money, derived from the lines at READ time (issue #140 review
+  // round 2): no command writes it, so no client can forge it in any status.
+  // Receipts and line cancels show immediately. Stored subtotal/totalAmount
+  // remain the as-submitted facts behind the spend-approval gate. Lambda reads
+  // raw stored line fields only (parent rollup limitation); pre-#140 lines
+  // with null lineTotalAmount contribute 0 until next touched.
+  computed liveTotalAmount: money(12, 2) = sum(self.lines, (line) => (line.deletedAt == null and line.lineTotalAmount != null) ? line.lineTotalAmount : 0) + self.taxAmount + self.shippingAmount
 
   constraint orderMoneyNonnegative: self.subtotal >= 0 and self.taxAmount >= 0 and self.shippingAmount >= 0 and self.totalAmount >= 0 "Order money amounts cannot be negative"
   constraint orderSourceRangeComplete: (self.sourceRangeStart == null and self.sourceRangeEnd == null) or (self.sourceRangeStart != null and self.sourceRangeEnd != null) "Order source range requires both a start and end"
@@ -186,20 +193,20 @@ entity VendorOrder mixin TenantScoped, SoftDeletable {
     }
   }
 
-  // Line-driven money rollup (issue #140). Reactions on every line event feed
-  // the DB-derived line sum here so the header tracks the lines from draft
-  // edits through receipts; buyer tax/shipping are preserved. Review finding
-  // on #159: totals are LOCKED once the order is received or cancelled — line
-  // events cannot fire in those states (line-command guards), so the guard
-  // never aborts a reaction, but a direct API call can no longer rewrite a
-  // received PO's committed spend. (Ideal shape — re-deriving the sum from
-  // self.lines inside this command — is blocked at Manifest 3.6.45: the Convex
-  // projection only preloads hasMany for count_of, and sum(self.lines, …) in a
-  // command body fail-closes. Any forged value in earlier statuses self-heals
-  // on the next line event, same trust level as updateTotals.)
+  // Stored-money rollup for DRAFT/SUBMITTED only (issue #140, review round 2).
+  // Draft-state line reactions feed the DB-derived line sum here so the stored
+  // subtotal/totalAmount stay accurate through the spend-approval gate — the
+  // same trust envelope as updateTotals. From confirmed onward NOTHING may
+  // write header money through this command (a forged lineSubtotal could zero
+  // committed spend); the user-facing header is the read-time liveTotalAmount
+  // computed instead, which tracks receipts and cancels with no writable path.
+  // (Re-deriving the sum from self.lines inside this command — no param at
+  // all — is blocked at Manifest 3.6.45: the Convex projection only preloads
+  // hasMany for count_of, and sum(self.lines, …) in a command body
+  // fail-closes with a denying throw.)
   command syncLineTotals(lineSubtotal: money(12, 2)) {
     guard self.deletedAt == null
-    guard self.status != "received" and self.status != "cancelled"
+    guard self.status == "draft" or self.status == "submitted"
     constraint syncLineSubtotalNonnegative: lineSubtotal >= 0 "Order money amounts cannot be negative"
     compute previousTotal = self.totalAmount
     compute nextTotal = lineSubtotal + self.taxAmount + self.shippingAmount
@@ -1060,11 +1067,15 @@ event VendorOrderLineDemandRetired: "vendor_order_line_demand.retired" {
   reason: string
 }
 
-// Header money rollup (issue #140): every line change recomputes the order's
-// summed line totals so totalAmount tracks the lines from draft edits through
-// receipts. The sum() below reads stored VendorOrderLine rows in the reaction
-// dispatch (tenant + soft-delete filtered); cancelled lines soft-delete, so
-// the sum drops them automatically.
+// Stored header rollup (issue #140): draft-state line changes recompute the
+// order's summed line totals so stored totalAmount is accurate at the
+// spend-approval gate. The sum() reads stored VendorOrderLine rows in the
+// reaction dispatch (tenant + soft-delete filtered). Only draft-only line
+// events react — syncLineTotals guards draft/submitted, and a reaction guard
+// failure would abort the triggering line command, so events that can fire on
+// confirmed orders (VendorOrderLineReceived, VendorOrderLineCancelled) must
+// NOT target it; from confirmed onward the header is the read-time
+// liveTotalAmount computed (review round 2 on #159).
 on VendorOrderLineWeeklyEnsured run VendorOrder.syncLineTotals
   resolve payload.vendorOrderId
   params {
@@ -1078,18 +1089,6 @@ on VendorOrderLineAdded run VendorOrder.syncLineTotals
   }
 
 on VendorOrderLineQuantityRevised run VendorOrder.syncLineTotals
-  resolve payload.vendorOrderId
-  params {
-    lineSubtotal: sum(VendorOrderLine where vendorOrderId == payload.vendorOrderId, of lineTotalAmount)
-  }
-
-on VendorOrderLineReceived run VendorOrder.syncLineTotals
-  resolve payload.vendorOrderId
-  params {
-    lineSubtotal: sum(VendorOrderLine where vendorOrderId == payload.vendorOrderId, of lineTotalAmount)
-  }
-
-on VendorOrderLineCancelled run VendorOrder.syncLineTotals
   resolve payload.vendorOrderId
   params {
     lineSubtotal: sum(VendorOrderLine where vendorOrderId == payload.vendorOrderId, of lineTotalAmount)

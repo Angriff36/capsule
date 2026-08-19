@@ -2991,6 +2991,7 @@ export const VendorOrderComputedSchema = VendorOrderSchema.extend({
   isOpenForReceiving: z.boolean(),
   needsSpendApproval: z.boolean(),
   hasIncompleteLines: z.boolean(),
+  liveTotalAmount: z.number(),
 });
 
 export type VendorOrder = z.infer<typeof VendorOrderSchema>;
