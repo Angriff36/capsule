@@ -68,9 +68,8 @@ export type EventCostSummary = {
   /** Cash already collected against billed invoices. */
   collectedTotal: number;
   /**
-   * True while the closeout is a draft with no reconciled revenue — the
-   * EventClosedOut cascade seeds drafts with zero actuals, so their $0 and
-   * 0 headcount are placeholders, not facts.
+   * True while the closeout is still a draft. Capture may stamp billed
+   * revenue onto a draft; that is not reconciliation. Finalize is.
    */
   unreconciled: boolean;
   /**
@@ -92,17 +91,15 @@ function amount(value: number | null | undefined): number {
 }
 
 /**
- * A draft closeout with no reconciled revenue is still waiting on truth —
- * the cascade-seeded zeros must never be presented as captured numbers.
+ * A draft closeout is still waiting on truth — billed-prefill revenue and
+ * cascade-seeded $0 costs must never be presented as a reconciled 100% margin.
+ * Finalize is what turns captured numbers into folio fact.
  */
 export function isUnreconciledCloseout(closeout: {
   status?: string | null;
   actualRevenue?: number | null;
 }): boolean {
-  return (
-    String(closeout.status ?? "draft") === "draft" &&
-    !(Number(closeout.actualRevenue ?? 0) > 0)
-  );
+  return String(closeout.status ?? "draft") === "draft";
 }
 
 /**
