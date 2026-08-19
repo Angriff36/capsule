@@ -669,16 +669,18 @@ export function InvoiceDetailPage() {
           </div>
         </div>
         <div className="supply-row-actions">
-          {policy.invoiceActions(String(invoice.status)).map((action) => (
-            <button
-              key={action.key}
-              className="btn btn-ghost"
-              disabled={busy != null}
-              onClick={() => invoke(action.key)}
-            >
-              {busy === action.key ? "Working…" : action.label}
-            </button>
-          ))}
+          {policy
+            .invoiceActions(String(invoice.status), invoice)
+            .map((action) => (
+              <button
+                key={action.key}
+                className="btn btn-ghost"
+                disabled={busy != null}
+                onClick={() => invoke(action.key)}
+              >
+                {busy === action.key ? "Working…" : action.label}
+              </button>
+            ))}
         </div>
       </section>
 

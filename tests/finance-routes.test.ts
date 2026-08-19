@@ -85,12 +85,12 @@ describe("Finance routes and lifecycle bindings", () => {
     const paymentMethods = new PaymentMethodLifecyclePolicy();
     const closeout = new CloseoutLifecyclePolicy();
     const payroll = new PayrollLifecyclePolicy();
-    expect(policy.invoiceActions("draft").map((a) => a.key)).toEqual(
-      expect.arrayContaining(["send", "void"]),
-    );
-    expect(policy.invoiceActions("sent").map((a) => a.key)).toEqual(
-      expect.arrayContaining(["markViewed", "markOverdue", "void"]),
-    );
+    expect(
+      policy.invoiceActions("draft", { amountDue: 900 }).map((a) => a.key),
+    ).toEqual(expect.arrayContaining(["send", "void"]));
+    expect(
+      policy.invoiceActions("sent", { amountDue: 900 }).map((a) => a.key),
+    ).toEqual(expect.arrayContaining(["markViewed", "markOverdue", "void"]));
     expect(policy.paymentActions("pending").map((a) => a.key)).toEqual(
       expect.arrayContaining(["beginProcessing", "settle", "fail"]),
     );
@@ -126,5 +126,43 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(PaymentMethodExpireLifecycle[0]?.from).toBe("active");
     expect(EventCloseoutFinalizeLifecycle[0]?.from).toBe("draft");
     expect(PayrollInputFinalizeLifecycle[0]?.from).toBe("prepared");
+  });
+
+  it("never treats a $0-due draft as sendable (bulk select, bulk send, per-row send)", () => {
+    const policy = new CommercialLifecyclePolicy();
+    const sendKeys = (status: string, amountDue: unknown) =>
+      policy.invoiceActions(status, { amountDue }).map((a) => a.key);
+
+    // Positive balance drafts stay sendable.
+    expect(sendKeys("draft", 900)).toContain("send");
+    expect(sendKeys("draft", 0.01)).toContain("send");
+
+    // $0-due (and malformed) drafts must not offer send, only the other
+    // lifecycle actions (void stays available so QA drafts remain manageable).
+    expect(sendKeys("draft", 0)).not.toContain("send");
+    expect(sendKeys("draft", 0)).toContain("void");
+    expect(sendKeys("draft", -25)).not.toContain("send");
+    expect(sendKeys("draft", undefined)).not.toContain("send");
+    expect(sendKeys("draft", null)).not.toContain("send");
+    expect(sendKeys("draft", "not-a-number")).not.toContain("send");
+  });
+
+  it("keeps the server-side zero-balance send refusal (manifest + generated command)", () => {
+    // The Manifest domain is the authority: Invoice.send carries the
+    // sendBalance constraint, and the generated Convex mutation enforces it
+    // even if a stale or hostile client submits a $0-due draft.
+    const manifest = readFileSync(
+      path.join(process.cwd(), "src/sales/invoice-core.manifest"),
+      "utf8",
+    );
+    expect(manifest).toMatch(
+      /constraint\s+sendBalance:\s*self\.amountDue\s*>\s*0/,
+    );
+
+    const mutations = readFileSync(
+      path.join(process.cwd(), "convex/mutations.ts"),
+      "utf8",
+    );
+    expect(mutations).toContain("Cannot send an invoice with zero balance");
   });
 });
