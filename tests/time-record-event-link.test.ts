@@ -9,15 +9,20 @@ import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../src/ui/BoundedDateInputs";
-import { TimeSheetClockInForm } from "../src/features/workforce/TimeSheetPage";
+import {
+  TimeSheetClockInForm,
+  TimeSheetRecordState,
+} from "../src/features/workforce/TimeSheetPage";
 import {
   CLOCK_OUT_PROMPT_FIELDS,
+  HIDDEN_PRIMARY_CORRECT_VERSION,
   buildClockInCreateArgs,
   currentShiftFor,
   parseTimeWindow,
   persistClockOut,
   persistPrimaryTimeRecord,
   resolveTimeRecordEventId,
+  timeRecordLedgerState,
 } from "../src/features/workforce/timeRecordEntry";
 
 const EVENT_ID = "evt_holiday_dinner";
@@ -86,6 +91,8 @@ describe("TimeSheet Clock in form (issue #149)", () => {
     expect(source).toContain("persistPrimaryTimeRecord");
     expect(source).toContain("persistClockOut");
     expect(source).toContain("CLOCK_OUT_PROMPT_FIELDS");
+    expect(source).toContain("<TimeSheetRecordState row={row} />");
+    expect(source).not.toContain("<small>corrected</small>");
   });
 });
 
@@ -253,5 +260,67 @@ describe("window parsing and clock-out", () => {
     );
     expect(shift?._id).toBe(SHIFT_ID);
     expect(shift?.eventId).toBe(EVENT_ID);
+  });
+});
+
+describe("Time sheet STATE after primary persist (QA 197 leftover)", () => {
+  it("first-write correct of a finished window is attendance CLOSED, not CORRECTED", () => {
+    expect(HIDDEN_PRIMARY_CORRECT_VERSION).toBe(3);
+    expect(
+      timeRecordLedgerState({
+        status: "corrected",
+        version: 3,
+        correctedAt: Date.now(),
+        clockInAt: FIVE_PM,
+        clockOutAt: TEN_PM,
+      }),
+    ).toBe("closed");
+  });
+
+  it("primary persist of a 5:00–10:00 window does not paint CORRECTED as STATE", async () => {
+    const api = mockApi();
+    const result = await persistPrimaryTimeRecord(api, {
+      personId: PERSON_ID,
+      eventId: EVENT_ID,
+      clockInAt: FIVE_PM,
+      clockOutAt: TEN_PM,
+    });
+    expect(result.window).toEqual({
+      clockInAt: FIVE_PM,
+      clockOutAt: TEN_PM,
+    });
+    expect(api.correct).toHaveBeenCalled();
+    // Hidden seam writes status "corrected" + correctedAt on version 3.
+    const row = {
+      status: "corrected",
+      version: 3,
+      correctedAt: Date.now(),
+      clockInAt: FIVE_PM,
+      clockOutAt: TEN_PM,
+    };
+    const html = renderToStaticMarkup(
+      createElement(TimeSheetRecordState, { row }),
+    );
+    expect(html).not.toMatch(/corrected/i);
+    expect(html).toMatch(/Closed/);
+  });
+
+  it("after-the-fact Correct still paints CORRECTED", () => {
+    const html = renderToStaticMarkup(
+      createElement(TimeSheetRecordState, {
+        row: {
+          status: "corrected",
+          version: 4,
+          correctedAt: Date.now(),
+          clockInAt: FIVE_PM,
+          clockOutAt: TEN_PM,
+        },
+      }),
+    );
+    expect(html).toMatch(/Corrected/);
+    expect(timeRecordLedgerState({ status: "open" })).toBe("open");
+    expect(
+      timeRecordLedgerState({ status: "closed", clockOutAt: TEN_PM }),
+    ).toBe("closed");
   });
 });
