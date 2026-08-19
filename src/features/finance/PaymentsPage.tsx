@@ -17,6 +17,7 @@ import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 import { PaymentsLedgerPresenter } from "./PaymentsLedgerPresenter";
 
 const policy = new CommercialLifecyclePolicy();
@@ -59,7 +60,10 @@ export function PaymentsPage() {
 
   const invoiceLabel = (id: string) => {
     const invoice = invoices?.find((row) => row._id === id);
-    return invoice?.invoiceNumber || "Unknown invoice";
+    return (
+      formatInvoiceNumber(invoice?.invoiceNumber, invoice?._id) ||
+      "Unknown invoice"
+    );
   };
 
   const selectedInvoice = invoices?.find(
@@ -203,7 +207,7 @@ export function PaymentsPage() {
             type="button"
             onClick={() => setShowTerminal((value) => !value)}
           >
-            {showTerminal ? "Hide settled" : "Show settled"}
+            {ledger.mastheadSettledLabel(settledSummary, showTerminal)}
           </button>
           <button
             className="btn btn-primary"
@@ -255,8 +259,11 @@ export function PaymentsPage() {
                   </option>
                   {payableInvoices.map((invoice) => (
                     <option key={invoice._id} value={invoice._id}>
-                      {invoice.invoiceNumber} · due{" "}
-                      {formatMoneyExact(Number(invoice.amountDue ?? 0))}
+                      {formatInvoiceNumber(
+                        invoice.invoiceNumber,
+                        invoice._id,
+                      ) || invoice.invoiceNumber}{" "}
+                      · due {formatMoneyExact(Number(invoice.amountDue ?? 0))}
                     </option>
                   ))}
                 </select>
@@ -337,39 +344,35 @@ export function PaymentsPage() {
             <p className="eyebrow">Collections</p>
             <h2>Payments</h2>
           </div>
-          <span>
-            {ledger.countLabel(
-              visibleRows.length,
-              settledSummary.hiddenCount,
-              showTerminal,
-            )}
-          </span>
+          <span>{ledger.headingCount(activeRows, showTerminal)}</span>
         </div>
+        {hiddenSettledNotice ? (
+          <p className="mt-3 text-base text-ink-2" role="status">
+            {hiddenSettledNotice}
+          </p>
+        ) : null}
         {loading ? (
           <TableSkeleton rows={5} />
         ) : visibleRows.length === 0 ? (
           <div className="document-empty">
             <p>No open payments.</p>
             {hiddenSettledNotice ? (
-              <>
-                <span>{hiddenSettledNotice}</span>
-                <div className="mt-3 flex justify-center gap-2">
-                  <button
-                    type="button"
-                    className="btn btn-primary btn-sm"
-                    onClick={() => setShowTerminal(true)}
-                  >
-                    {ledger.showSettledLabel(settledSummary)}
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
-                    onClick={() => setShowRecord(true)}
-                  >
-                    Record payment
-                  </button>
-                </div>
-              </>
+              <div className="mt-3 flex justify-center gap-2">
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  onClick={() => setShowTerminal(true)}
+                >
+                  {ledger.showSettledLabel(settledSummary)}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => setShowRecord(true)}
+                >
+                  Record payment
+                </button>
+              </div>
             ) : (
               <>
                 <span>Record a payment after an invoice is sent.</span>
