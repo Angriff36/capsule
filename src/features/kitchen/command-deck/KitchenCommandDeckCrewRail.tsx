@@ -7,6 +7,7 @@ type Props = Readonly<{
   rows: CrewLoadRow[];
   people: PersonLike[];
   armedPersonId: string | null;
+  assignableInView: number;
   onArm: (personId: string | null) => void;
 }>;
 
@@ -15,6 +16,7 @@ export function KitchenCommandDeckCrewRail({
   rows,
   people,
   armedPersonId,
+  assignableInView,
   onArm,
 }: Props) {
   const maxLoad = Math.max(1, ...rows.map((r) => r.load), 1);
@@ -87,8 +89,9 @@ export function KitchenCommandDeckCrewRail({
         </div>
         {armedPersonId ? (
           <p className="kcd-armed-banner">
-            Armed: {model.personLabel(model.findPerson(armedPersonId))} — click
-            Assign on a task or dish.
+            {assignableInView === 0
+              ? `Armed: ${model.personLabel(model.findPerson(armedPersonId))} — nothing to assign in this filter.`
+              : `Armed: ${model.personLabel(model.findPerson(armedPersonId))} — click Assign on a task or dish.`}
           </p>
         ) : null}
       </div>
