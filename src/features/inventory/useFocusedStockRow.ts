@@ -7,11 +7,14 @@ export const stockRowDomId = (inventoryItemId: string) =>
 
 /**
  * Reads `?item=<inventoryItemId>` (set by low-stock notification deep links,
- * see stockLineLink) and scrolls the matching stock-book row into view once
- * the table has data. Returns the focused id so the row can render
- * highlighted. No scroll latch: the effect deps already ignore live data
- * rerenders, and clicking a second alert while the stock book is open must
- * scroll again (the tray is a Link overlay, so only ?item= changes).
+ * see stockLineLink) and scrolls the matching stock-book row into view.
+ * `rowsReady` must be true only once the row DOM nodes exist — pass the same
+ * gate the table uses to render rows, not just one of its queries — because
+ * the effect does not retry a missed getElementById. Returns the focused id
+ * so the row can render highlighted. No scroll latch: the effect deps already
+ * ignore live data rerenders, and clicking a second alert while the stock
+ * book is open must scroll again (the tray is a Link overlay, so only
+ * ?item= changes).
  */
 export function useFocusedStockRow(rowsReady: boolean): string | null {
   const [searchParams] = useSearchParams();

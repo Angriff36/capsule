@@ -99,7 +99,12 @@ export function StockBookPage() {
   const [horizonDays, setHorizonDays] = useState(7);
   const { prompt, host } = useActionPrompt(busy != null);
   // Notification deep links land on ?item=<id> — scroll to and highlight it.
-  const focusedItemId = useFocusedStockRow(items !== undefined);
+  // rowsReady must match the table's own render gate (items AND ingredients
+  // AND locations); with items alone the effect can fire before the row
+  // nodes exist and getElementById misses with no retry.
+  const focusedItemId = useFocusedStockRow(
+    items !== undefined && ingredients !== undefined && locations !== undefined,
+  );
 
   const activeItems = (items ?? []).filter((item) => item.deletedAt == null);
   const expiringItems = activeItems
