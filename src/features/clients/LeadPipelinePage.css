@@ -451,7 +451,9 @@
 
 .lead-card-editor {
   display: grid;
-  grid-template-columns: 1.3fr 0.85fr 0.7fr auto;
+  /* Value is a dollar amount (QA: 500000 clipped to 500( at ~46px). Stage
+     may shrink; Value keeps a floor that fits 7-digit integers + cents. */
+  grid-template-columns: minmax(0, 1.15fr) minmax(7.5rem, 1.2fr) minmax(3.25rem, 0.65fr) auto;
   align-items: end;
   gap: 0.35rem;
   border-top: 1px solid var(--color-line);
@@ -468,6 +470,21 @@
   min-width: 0;
   padding: 0.45rem;
   font-size: 10px;
+}
+
+.lead-card-editor input[name="estimatedValue"] {
+  min-width: 7.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.lead-card-editor input[type="number"] {
+  appearance: textfield;
+}
+
+.lead-card-editor input[type="number"]::-webkit-inner-spin-button,
+.lead-card-editor input[type="number"]::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
 }
 
 .lead-card-editor .btn {
