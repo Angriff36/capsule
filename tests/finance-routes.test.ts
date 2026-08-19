@@ -243,6 +243,13 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(notice).toContain("hidden by the open-payments view");
     // The reveal is one click with an honest count.
     expect(presenter.showSettledLabel(summary)).toBe("Show 2 settled payments");
+    expect(presenter.mastheadSettledLabel(summary, false)).toBe(
+      "Show 2 settled payments",
+    );
+    expect(presenter.mastheadSettledLabel(summary, true)).toBe("Hide settled");
+    expect(
+      presenter.mastheadSettledLabel(presenter.settledSummary([]), false),
+    ).toBe("Show settled");
 
     // Once revealed (or with truly zero rows) the plain copy is fine.
     expect(presenter.countLabel(2, summary.hiddenCount, true)).toBe(
@@ -296,6 +303,12 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(page).toContain("{hiddenSettledNotice ? (");
     expect(page).toMatch(/onClick=\{\(\) => setShowTerminal\(true\)\}/);
     expect(page).toContain("{ledger.showSettledLabel(settledSummary)}");
+    expect(page).toContain(
+      "{ledger.mastheadSettledLabel(settledSummary, showTerminal)}",
+    );
+    expect(page).not.toContain(
+      'showTerminal ? "Hide settled" : "Show settled"',
+    );
     // Same class as Holiday folio: raw event-looking invoice ids get a
     // human INV- ref, not NN74XC7N0PDK5CMKM5Z8ZN7GBD8BDP6Q.
     expect(page).toContain(

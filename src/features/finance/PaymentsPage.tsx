@@ -207,7 +207,7 @@ export function PaymentsPage() {
             type="button"
             onClick={() => setShowTerminal((value) => !value)}
           >
-            {showTerminal ? "Hide settled" : "Show settled"}
+            {ledger.mastheadSettledLabel(settledSummary, showTerminal)}
           </button>
           <button
             className="btn btn-primary"

@@ -120,4 +120,15 @@ export class PaymentsLedgerPresenter {
   showSettledLabel(summary: SettledSummary): string {
     return `Show ${plural(summary.hiddenCount, "settled payment")}`;
   }
+
+  /**
+   * Masthead toggle — same honest count as the in-card button. A generic
+   * "Show settled" next to an honest in-card label is the leftover QA
+   * called out after 176 PASS.
+   */
+  mastheadSettledLabel(summary: SettledSummary, showTerminal: boolean): string {
+    if (showTerminal) return "Hide settled";
+    if (summary.hiddenCount > 0) return this.showSettledLabel(summary);
+    return "Show settled";
+  }
 }
