@@ -138,6 +138,23 @@ export function TimeSheetRecordState({ row }: { row: TimeRecordLedgerRow }) {
   return <StatusChip status={timeRecordLedgerState(row)} />;
 }
 
+/** Break column: null / 0 / missing paints an em dash, never "0 min". */
+export function timeRecordBreakLabel(breakMinutes: unknown): string {
+  const minutes = Number(breakMinutes);
+  if (!Number.isFinite(minutes) || minutes <= 0) return "—";
+  return `${minutes} min`;
+}
+
+export function TimeSheetBreakCell({
+  breakMinutes,
+}: {
+  breakMinutes?: unknown;
+}) {
+  return (
+    <td className="supply-number">{timeRecordBreakLabel(breakMinutes)}</td>
+  );
+}
+
 export function TimeSheetPage() {
   const records = useListTimeRecord();
   const windows = useListAvailabilityWindow();
@@ -440,9 +457,7 @@ export function TimeSheetPage() {
                         ? `${formatDate(row.clockOutAt)} ${formatTime(row.clockOutAt)}`
                         : "—"}
                     </td>
-                    <td className="supply-number">
-                      {row.breakMinutes ?? 0} min
-                    </td>
+                    <TimeSheetBreakCell breakMinutes={row.breakMinutes} />
                     <td>
                       <TimeSheetRecordState row={row} />
                     </td>

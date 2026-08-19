@@ -10,8 +10,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../src/ui/BoundedDateInputs";
 import {
+  TimeSheetBreakCell,
   TimeSheetClockInForm,
   TimeSheetRecordState,
+  timeRecordBreakLabel,
 } from "../src/features/workforce/TimeSheetPage";
 import {
   CLOCK_OUT_PROMPT_FIELDS,
@@ -25,6 +27,7 @@ import {
   persistPrimaryTimeRecord,
   resolveTimeRecordEventId,
   timeRecordLedgerState,
+  type TimeRecordLedgerRow,
 } from "../src/features/workforce/timeRecordEntry";
 
 const EVENT_ID = "evt_holiday_dinner";
@@ -377,5 +380,82 @@ describe("Time sheet STATE after primary persist (QA 197 leftover)", () => {
     expect(
       timeRecordLedgerState({ status: "closed", clockOutAt: TEN_PM }),
     ).toBe("closed");
+  });
+});
+
+describe("Time sheet break column (QA leftover after 197/201/202)", () => {
+  function ledgerBreakHtml(row: TimeRecordLedgerRow, breakMinutes: unknown) {
+    return renderToStaticMarkup(
+      createElement(
+        "tr",
+        null,
+        createElement(TimeSheetBreakCell, { breakMinutes }),
+        createElement("td", null, createElement(TimeSheetRecordState, { row })),
+      ),
+    );
+  }
+
+  it("closed/corrected row with no break does not paint 0 min", () => {
+    const closedRow = { status: "closed", clockOutAt: TEN_PM };
+    const correctedRow = {
+      status: "corrected",
+      version: 4,
+      createdAt: Date.now(),
+      clockInAt: FIVE_PM,
+      clockOutAt: TEN_PM,
+    };
+    const primaryClosed = hiddenPrimaryPersistLedgerRow({
+      clockInAt: FIVE_PM,
+      clockOutAt: TEN_PM,
+    });
+
+    expect(timeRecordLedgerState(closedRow)).toBe("closed");
+    expect(timeRecordLedgerState(correctedRow)).toBe("corrected");
+    expect(timeRecordLedgerState(primaryClosed)).toBe("closed");
+
+    for (const empty of [undefined, null, 0, "", "0"]) {
+      const closedHtml = ledgerBreakHtml(closedRow, empty);
+      const correctedHtml = ledgerBreakHtml(correctedRow, empty);
+      const primaryHtml = ledgerBreakHtml(primaryClosed, empty);
+      expect(closedHtml).toMatch(/Closed/);
+      expect(correctedHtml).toMatch(/Corrected/);
+      expect(primaryHtml).toMatch(/Closed/);
+      expect(closedHtml).not.toMatch(/0 min/);
+      expect(correctedHtml).not.toMatch(/0 min/);
+      expect(primaryHtml).not.toMatch(/0 min/);
+      expect(closedHtml).toContain("—");
+      expect(timeRecordBreakLabel(empty)).toBe("—");
+    }
+  });
+
+  it("a real 30 min break still paints", () => {
+    const closedHtml = ledgerBreakHtml(
+      { status: "closed", clockOutAt: TEN_PM },
+      30,
+    );
+    const correctedHtml = ledgerBreakHtml(
+      {
+        status: "corrected",
+        version: 4,
+        createdAt: Date.now(),
+        clockInAt: FIVE_PM,
+        clockOutAt: TEN_PM,
+      },
+      30,
+    );
+    expect(closedHtml).toMatch(/30 min/);
+    expect(correctedHtml).toMatch(/30 min/);
+    expect(closedHtml).not.toContain("—");
+    expect(timeRecordBreakLabel(30)).toBe("30 min");
+  });
+
+  it("TimeSheetPage paints TimeSheetBreakCell instead of 0 min fallback", () => {
+    const source = readFileSync(
+      "src/features/workforce/TimeSheetPage.tsx",
+      "utf8",
+    );
+    expect(source).toContain("<TimeSheetBreakCell");
+    expect(source).toContain("breakMinutes={row.breakMinutes}");
+    expect(source).not.toContain("{row.breakMinutes ?? 0} min");
   });
 });
