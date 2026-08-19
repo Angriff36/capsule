@@ -54,7 +54,7 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
     // No number token: every unpaid-status row matches the text filter.
     expect(
       invoiceMatchesQuery(
-        { invoiceNumber: "INV-8BJQS7", _id: "draft1", status: "draft" },
+        { invoiceNumber: "INV-8BJQS7", _id: "draft1" },
         parsed,
       ),
     ).toBe(true);
