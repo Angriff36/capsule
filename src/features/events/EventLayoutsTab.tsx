@@ -12,7 +12,7 @@ export function EventLayoutsTab({ eventId }: Props) {
     <section className="space-y-4" data-testid="event-layouts-tab">
       <EventTabIntro
         title="Layouts"
-        description="Define venue areas for this event and write setup notes for each section."
+        description="Define venue areas for this event and write setup notes for each section. Areas take any name, so two Bars can be told apart (“Main Bar”, “Patio Bar”)."
       />
       <EventBattleBoardLayoutsPanel eventId={eventId} />
     </section>
