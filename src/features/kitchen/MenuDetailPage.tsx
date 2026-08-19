@@ -20,6 +20,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
 import { useTrackRecent } from "../../lib/recents";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
@@ -50,7 +51,7 @@ const policy = new CulinaryLifecyclePolicy();
 export function MenuDetailPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const menu = useGetMenu(id ?? "skip");
+  const menu = useRouteRecord(useGetMenu, id);
   useTrackRecent("Menu", menu?.name);
   const dishes = useListDish();
   const menuDishes = useListMenuDish();

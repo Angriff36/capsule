@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
-import type { Id } from "../../lib/api";
 import { relativeDays } from "../../lib/format";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   useEventApprove,
@@ -70,8 +70,7 @@ export function EventDetailPage() {
   const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const activeTab = parseEventDetailTab(searchParams.get("tab"));
-  const eventId = (id ?? "skip") as Id<"events"> | "skip";
-  const event = useGetEvent(eventId);
+  const event = useRouteRecord(useGetEvent, id);
   const clients = useListClient();
   useTrackRecent("Event", event?.title);
   const dishes = useListDish();
