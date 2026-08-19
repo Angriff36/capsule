@@ -14,6 +14,7 @@ import { useReserveEquipment } from "../facilities/equipmentCheckout";
 import { SupplyFailureBanner } from "../inventory/SupplyFailureBanner";
 import { localDateTime } from "./eventDetailFormHelpers";
 import "./EventEquipmentPanel.css";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const CONDITIONS = [
   "excellent",
@@ -277,9 +278,8 @@ export function EventEquipmentPanel({
           </label>
           <label className="field-label">
             Checkout
-            <input
+            <BoundedDateTimeLocalInput
               name="startsAt"
-              type="datetime-local"
               className="input"
               defaultValue={localDateTime(defaultStart)}
               required
@@ -287,9 +287,8 @@ export function EventEquipmentPanel({
           </label>
           <label className="field-label">
             Expected back
-            <input
+            <BoundedDateTimeLocalInput
               name="endsAt"
-              type="datetime-local"
               className="input"
               defaultValue={localDateTime(defaultEnd)}
               required

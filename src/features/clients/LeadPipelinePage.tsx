@@ -23,6 +23,7 @@ import { ClientsWorkspaceNav } from "./ClientsWorkspaceNav";
 import { CrmFailureBanner } from "./CrmFailureBanner";
 import { LeadSourceReport } from "./LeadSourceReport";
 import "./LeadPipelinePage.css";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const STAGES = [
   { key: "new", label: "New", caption: "Fresh inquiries" },
@@ -694,7 +695,7 @@ export function LeadPipelinePage() {
                           </label>
                           <label>
                             Event date
-                            <input name="eventDate" type="date" />
+                            <BoundedDateInput name="eventDate" />
                           </label>
                         </div>
                         <button

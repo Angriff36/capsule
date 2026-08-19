@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { usePersonPeriodLaborSummary } from "../facilities/useLaborSummary";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 type PersonOption = {
   _id: string;
@@ -154,10 +155,9 @@ export function PayrollPrepareForm({
       <div className="supply-form-grid">
         <label className="field-label">
           Period start
-          <input
+          <BoundedDateTimeLocalInput
             className="input"
             name="periodStart"
-            type="datetime-local"
             required
             value={periodStart}
             onChange={(event) => {
@@ -168,10 +168,9 @@ export function PayrollPrepareForm({
         </label>
         <label className="field-label">
           Period end
-          <input
+          <BoundedDateTimeLocalInput
             className="input"
             name="periodEnd"
-            type="datetime-local"
             required
             value={periodEnd}
             onChange={(event) => {

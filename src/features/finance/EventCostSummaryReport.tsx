@@ -214,6 +214,9 @@ export function EventCostSummaryReport({
             {summary.invoiceNumbers.length > 0 ? (
               <span>Invoices: {summary.invoiceNumbers.join(", ")}</span>
             ) : null}
+            {summary.draftInvoiceNumbers.length > 0 ? (
+              <span>Drafts: {summary.draftInvoiceNumbers.join(", ")}</span>
+            ) : null}
           </div>
           {summary.notes.length > 0 ? (
             <div className="event-cost-report-notes">

@@ -4,6 +4,7 @@ import { EventDetailReviseContactPanels } from "./EventDetailReviseContactPanels
 import { localDateTime } from "./eventDetailFormHelpers";
 import { EventFormCluster } from "./EventFormCluster";
 import { EventTabPanel } from "./EventTabPanel";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 type ActiveVenue = {
   _id: Id<"venues">;
@@ -146,9 +147,8 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
             <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
               <label className="field-label">
                 <span>Starts</span>
-                <input
+                <BoundedDateTimeLocalInput
                   name="startsAt"
-                  type="datetime-local"
                   defaultValue={localDateTime(startsAt)}
                   className="input"
                   disabled={!canRevise}
@@ -158,9 +158,8 @@ export function EventDetailRevisePanels(props: EventDetailRevisePanelsProps) {
               </label>
               <label className="field-label">
                 <span>Ends</span>
-                <input
+                <BoundedDateTimeLocalInput
                   name="endsAt"
-                  type="datetime-local"
                   defaultValue={localDateTime(endsAt)}
                   className="input"
                   disabled={!canRevise}

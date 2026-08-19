@@ -44,6 +44,7 @@ import { SmsAlertOptInSection } from "./SmsAlertOptInSection";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const policy = new WorkforceLifecyclePolicy();
 const OVERTIME_THRESHOLD_STORAGE_KEY =
@@ -507,15 +508,11 @@ export function RosterPage() {
               </label>
               <label className="field-label">
                 Starts
-                <input
-                  name="startsAt"
-                  className="input"
-                  type="datetime-local"
-                />
+                <BoundedDateTimeLocalInput name="startsAt" className="input" />
               </label>
               <label className="field-label">
                 Ends
-                <input name="endsAt" className="input" type="datetime-local" />
+                <BoundedDateTimeLocalInput name="endsAt" className="input" />
               </label>
               <label className="field-label">
                 Notes
@@ -661,19 +658,17 @@ export function RosterPage() {
               </label>
               <label className="field-label">
                 Starts
-                <input
+                <BoundedDateTimeLocalInput
                   name="startsAt"
                   className="input"
-                  type="datetime-local"
                   required
                 />
               </label>
               <label className="field-label">
                 Ends
-                <input
+                <BoundedDateTimeLocalInput
                   name="endsAt"
                   className="input"
-                  type="datetime-local"
                   required
                 />
               </label>

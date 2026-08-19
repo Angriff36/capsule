@@ -15,6 +15,7 @@ import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 // ponytail: a focused set of hireable operational roles for the create-form
 // picker. roleAppliedFor is a free CapsuleRole, so a KM-sourced value outside
@@ -536,7 +537,7 @@ export function CandidatesPage() {
                   </label>
                   <label className="field-label">
                     Scheduled for (optional)
-                    <input name="scheduledFor" className="input" type="date" />
+                    <BoundedDateInput name="scheduledFor" className="input" />
                   </label>
                   <div className="field-label">
                     <span>&nbsp;</span>

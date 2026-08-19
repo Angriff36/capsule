@@ -1,4 +1,5 @@
 import { isBilledInvoice, isDraftInvoice } from "./invoiceBilling";
+import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 
 type DateValue = Date | number | string | null | undefined;
 
@@ -65,6 +66,8 @@ export type EventCostSummary = {
   /** Money written into draft invoices that were never sent. */
   draftInvoiceTotal: number;
   draftInvoiceCount: number;
+  /** Display numbers for those drafts, same formatter as the invoices list. */
+  draftInvoiceNumbers: string[];
   /** Cash already collected against billed invoices. */
   collectedTotal: number;
   /**
@@ -88,6 +91,32 @@ export type EventCostSummary = {
 function amount(value: number | null | undefined): number {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function displayInvoiceNumber(invoice: EventCostSummaryInvoice): string {
+  return (
+    formatInvoiceNumber(invoice.invoiceNumber, invoice._id) ??
+    String(invoice.invoiceNumber ?? "").trim()
+  );
+}
+
+function closeoutCostTotal(closeout: {
+  totalActualCost?: number | null;
+  actualIngredientCost?: number | null;
+  actualLaborCost?: number | null;
+  actualVendorCost?: number | null;
+  actualWasteCost?: number | null;
+}): { fromBuckets: number; total: number } {
+  const fromBuckets =
+    amount(closeout.actualIngredientCost) +
+    amount(closeout.actualLaborCost) +
+    amount(closeout.actualVendorCost) +
+    amount(closeout.actualWasteCost);
+  const total =
+    closeout.totalActualCost != null
+      ? amount(closeout.totalActualCost)
+      : fromBuckets;
+  return { fromBuckets, total };
 }
 
 /**
@@ -120,16 +149,26 @@ export function isCloseoutListProfitPending(closeout: {
   actualWasteCost?: number | null;
 }): boolean {
   if (!isUnreconciledCloseout(closeout)) return false;
-  const fromBuckets =
-    amount(closeout.actualIngredientCost) +
-    amount(closeout.actualLaborCost) +
-    amount(closeout.actualVendorCost) +
-    amount(closeout.actualWasteCost);
-  const total =
-    closeout.totalActualCost != null
-      ? amount(closeout.totalActualCost)
-      : fromBuckets;
+  const { fromBuckets, total } = closeoutCostTotal(closeout);
   return total === 0 && fromBuckets === 0;
+}
+
+/**
+ * Cost cell for the closeout list. Same pending contract as Gross profit:
+ * draft + $0 costs prints em dash, not $0.00.
+ */
+export function closeoutListedCost(closeout: {
+  status?: string | null;
+  actualRevenue?: number | null;
+  grossProfit?: number | null;
+  totalActualCost?: number | null;
+  actualIngredientCost?: number | null;
+  actualLaborCost?: number | null;
+  actualVendorCost?: number | null;
+  actualWasteCost?: number | null;
+}): number | null {
+  if (isCloseoutListProfitPending(closeout)) return null;
+  return closeoutCostTotal(closeout).total;
 }
 
 /**
@@ -209,14 +248,15 @@ export function buildEventCostSummary({
         ? null
         : (margin / invoicedRevenue) * 100,
     invoiceCount: includedInvoices.length,
-    invoiceNumbers: includedInvoices
-      .map((invoice) => String(invoice.invoiceNumber ?? "").trim())
-      .filter(Boolean),
+    invoiceNumbers: includedInvoices.map(displayInvoiceNumber).filter(Boolean),
     draftInvoiceTotal: draftInvoices.reduce(
       (sum, invoice) => sum + amount(invoice.total),
       0,
     ),
     draftInvoiceCount: draftInvoices.length,
+    draftInvoiceNumbers: draftInvoices
+      .map(displayInvoiceNumber)
+      .filter(Boolean),
     collectedTotal: includedInvoices.reduce(
       (sum, invoice) => sum + amount(invoice.amountPaid),
       0,
