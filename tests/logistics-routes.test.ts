@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { LOGISTICS_SECTIONS } from "../src/features/logistics/logisticsRoutes";
+import {
+  canonicalizePackListPath,
+  LOGISTICS_SECTIONS,
+} from "../src/features/logistics/logisticsRoutes";
 import { LogisticsLifecyclePolicy } from "../src/features/logistics/LogisticsLifecyclePolicy";
 import {
   PackListStartPackingLifecycle,
@@ -52,5 +55,30 @@ describe("Logistics routes and lifecycle bindings", () => {
     );
     expect(PackListStartPackingLifecycle[0]?.from).toBe("draft");
     expect(DeliveryConfirmDeliveryLifecycle[0]?.from).toBe("in_transit");
+  });
+});
+
+describe("pack-list URL aliases reach /logistics/packs", () => {
+  it("rewrites hyphenated and concatenated paths", () => {
+    expect(canonicalizePackListPath("/logistics/pack-lists")).toBe(
+      "/logistics/packs",
+    );
+    expect(canonicalizePackListPath("/logistics/packlists")).toBe(
+      "/logistics/packs",
+    );
+    expect(canonicalizePackListPath("/logistics/pack-lists/abc")).toBe(
+      "/logistics/packs/abc",
+    );
+    expect(canonicalizePackListPath("/logistics/packs")).toBe(null);
+  });
+
+  it("App.tsx redirects those aliases instead of 404ing", () => {
+    const app = readFileSync(
+      path.join(process.cwd(), "src/app/App.tsx"),
+      "utf8",
+    );
+    expect(app).toContain('path="/logistics/pack-lists"');
+    expect(app).toContain('path="/logistics/packlists"');
+    expect(app).toContain("RedirectPackListAlias");
   });
 });
