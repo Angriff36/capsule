@@ -445,6 +445,22 @@
     margin: 4px 0;
     background: var(--color-line-2);
   }
+  /* Short windows: the full icon rail (~860px with every workspace enabled)
+     is taller than the viewport. Scroll the rail internally instead of
+     letting it spill past the h-dvh shell — the spill used to stretch the
+     document (second scrollbar + dead band under the app). The scroll
+     container would clip the floating hover labels, so hide them here;
+     each link still carries a native title tooltip. */
+  @media (max-height: 900px) {
+    .icon-nav {
+      overflow-x: hidden;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+    .icon-nav a > span {
+      display: none;
+    }
+  }
   .module-drawer {
     position: relative;
     margin-bottom: 18px;
@@ -1519,6 +1535,63 @@
 
 .supply-span-2 {
   grid-column: span 2;
+}
+
+/* Many authored forms write bare <label>Text<input /></label> straight under
+   .supply-form without the field-label / input classes. Tailwind preflight
+   strips native control chrome, so those fields rendered as run-together
+   inline text (proposal-from-event, clients, workforce, finance forms).
+   Classless labels and controls inside a supply form now get the same
+   treatment as .field-label / .input; anything carrying a class keeps its
+   own styling. */
+.supply-form label:not([class]) {
+  display: grid;
+  gap: 0.25rem;
+  margin-top: 0.9rem;
+  font-size: var(--text-xs);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--color-ink-2);
+}
+
+.supply-form
+  input:not(
+    [class],
+    [type="checkbox"],
+    [type="radio"],
+    [type="hidden"],
+    [type="file"]
+  ),
+.supply-form select:not([class]),
+.supply-form textarea:not([class]) {
+  height: 2rem;
+  width: 100%;
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--color-line-2);
+  background: var(--color-panel);
+  padding: 0 0.625rem;
+  color: var(--color-ink);
+}
+
+.supply-form textarea:not([class]) {
+  height: auto;
+  min-height: 4rem;
+  padding: 0.5rem 0.625rem;
+}
+
+.supply-form select:not([class]) {
+  cursor: pointer;
+}
+
+.supply-form input:not([class])::placeholder,
+.supply-form textarea:not([class])::placeholder {
+  color: var(--color-ink-3);
+}
+
+.supply-form input:not([class]):focus,
+.supply-form select:not([class]):focus,
+.supply-form textarea:not([class]):focus {
+  border-color: var(--color-accent);
 }
 
 .working-ledger {

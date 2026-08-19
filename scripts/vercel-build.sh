@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
-# Vercel build entry (vercel.json buildCommand).
-#
-# Production: `convex deploy --cmd 'vite build'` — a main push ships the
-# Convex backend and the UI together (AGENTS.md invariant since cc24315;
-# removing this reintroduces the query-skew Server Errors).
-#
-# Preview/development: plain `vite build` with baked-in fallbacks for the
-# dev Convex deployment and the dev Clerk publishable key (pk_test_* is a
-# public client-side key, not a secret), so PR preview deployments can sign
-# in without per-branch Vercel env setup. Explicit env vars still win.
+# Vercel build entry — vercel.json buildCommand caps at 256 chars, so the
+# branch lives here. Production must keep deploying Convex together with the
+# UI (AGENTS.md invariant since cc24315; do not remove). Previews build the
+# UI only: Vercel does not inject VITE_* project env on preview, so fall back
+# to the public dev Convex URL and Clerk publishable key (pk_test_ keys are
+# public by design and ship in the JS bundle). Real env vars always win.
 set -euo pipefail
 
 if [ "${VERCEL_ENV:-}" = "production" ]; then
