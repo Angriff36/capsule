@@ -1,30 +1,55 @@
-/* Dispatch & return board — warehouse paper manifest. All colors route
-   through the --dispatch-* palette below so the board follows the app theme:
-   warm cream paper in light mode, lamplight panel tones in dark mode (the
-   .dark override at the end). Do not hardcode paper/ink literals in rules. */
+/* Dispatch & return board. Paper and ink inherit the app theme tokens from
+   html.dark / light — do not hardcode cream/ivory literals. A descendant
+   `.dark .equipment-dispatch` override shipped in prod and the board still
+   painted cream because those locals shadow the theme; bind --dispatch-*
+   to --color-* so dark mode cannot miss. */
 .equipment-dispatch {
-  --dispatch-ink: #17221d;
-  --dispatch-paper: #f2efe5;
-  --dispatch-signal: #e96234;
-  --dispatch-signal-soft: rgb(233 98 52 / 0.11);
-  --dispatch-grid: rgb(23 34 29 / 0.035);
-  --dispatch-muted: #5e675f;
-  --dispatch-faint: #7b827c;
-  --dispatch-surface: rgb(255 255 255 / 0.56);
-  --dispatch-surface-strong: rgb(255 255 255 / 0.74);
-  --dispatch-surface-soft: rgb(255 255 255 / 0.42);
-  --dispatch-inset: #e9e4d5;
+  --dispatch-ink: var(--color-ink);
+  --dispatch-paper: var(--color-panel);
+  --dispatch-signal: var(--color-accent);
+  --dispatch-signal-soft: color-mix(
+    in srgb,
+    var(--color-accent) 14%,
+    transparent
+  );
+  --dispatch-grid: color-mix(in srgb, var(--color-ink) 6%, transparent);
+  --dispatch-muted: var(--color-ink-2);
+  --dispatch-faint: var(--color-ink-3);
+  --dispatch-surface: color-mix(
+    in srgb,
+    var(--color-ink) 5%,
+    var(--color-panel)
+  );
+  --dispatch-surface-strong: color-mix(
+    in srgb,
+    var(--color-ink) 8%,
+    var(--color-panel)
+  );
+  --dispatch-surface-soft: color-mix(
+    in srgb,
+    var(--color-ink) 3%,
+    var(--color-panel)
+  );
+  --dispatch-inset: var(--color-inset);
   --dispatch-header-veil: linear-gradient(
     110deg,
-    rgb(255 255 255 / 0.62),
-    rgb(232 225 205 / 0.82)
+    color-mix(in srgb, var(--color-panel) 70%, transparent),
+    color-mix(in srgb, var(--color-inset) 88%, var(--color-ink) 6%)
   );
-  --dispatch-ok: #277a50;
-  --dispatch-ok-ink: #245b40;
-  --dispatch-ok-soft: rgb(39 122 80 / 0.1);
-  --dispatch-alert-ink: #a33c1f;
-  --dispatch-alert-soft: rgb(194 73 36 / 0.14);
-  --dispatch-release: #8a5b4b;
+  --dispatch-ok: var(--color-ok);
+  --dispatch-ok-ink: var(--color-ok);
+  --dispatch-ok-soft: color-mix(in srgb, var(--color-ok) 14%, transparent);
+  --dispatch-alert-ink: var(--color-danger);
+  --dispatch-alert-soft: color-mix(
+    in srgb,
+    var(--color-danger) 16%,
+    transparent
+  );
+  --dispatch-release: color-mix(
+    in srgb,
+    var(--color-accent) 55%,
+    var(--color-ink-2)
+  );
   overflow-x: auto;
   border: 1px solid
     color-mix(in srgb, var(--color-line) 75%, var(--dispatch-ink));
@@ -34,7 +59,7 @@
       22px,
     var(--dispatch-paper);
   color: var(--dispatch-ink);
-  box-shadow: 0 16px 36px rgb(23 34 29 / 0.08);
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--color-ink) 12%, transparent);
 }
 
 .equipment-dispatch__header {
@@ -134,7 +159,7 @@
   border: 1px solid color-mix(in srgb, var(--dispatch-ink) 28%, transparent);
   border-left: 5px solid var(--dispatch-signal);
   background: var(--dispatch-surface-strong);
-  box-shadow: 5px 5px 0 rgb(23 34 29 / 0.08);
+  box-shadow: 5px 5px 0 color-mix(in srgb, var(--color-ink) 12%, transparent);
 }
 
 .equipment-reserve-form__title {
@@ -359,39 +384,6 @@
 .equipment-inspection__actions {
   display: flex;
   gap: 8px;
-}
-
-/* Dark scheme — same board on lamplight panel tones instead of cream. Ink
-   flips to the app's pale sage, so every color-mix border/soft derived from
-   --dispatch-ink follows automatically. */
-.dark .equipment-dispatch {
-  --dispatch-ink: var(--color-ink);
-  --dispatch-paper: #232b26;
-  --dispatch-signal: #f0764a;
-  --dispatch-signal-soft: rgb(240 118 74 / 0.14);
-  --dispatch-grid: rgb(255 255 255 / 0.03);
-  --dispatch-muted: var(--color-ink-2);
-  --dispatch-faint: var(--color-ink-3);
-  --dispatch-surface: rgb(255 255 255 / 0.04);
-  --dispatch-surface-strong: rgb(255 255 255 / 0.06);
-  --dispatch-surface-soft: rgb(255 255 255 / 0.03);
-  --dispatch-inset: var(--color-inset);
-  --dispatch-header-veil: linear-gradient(
-    110deg,
-    rgb(255 255 255 / 0.05),
-    rgb(0 0 0 / 0.16)
-  );
-  --dispatch-ok: var(--color-ok);
-  --dispatch-ok-ink: var(--color-ok);
-  --dispatch-ok-soft: rgb(130 185 146 / 0.14);
-  --dispatch-alert-ink: var(--color-danger);
-  --dispatch-alert-soft: rgb(217 127 110 / 0.16);
-  --dispatch-release: #cfa08c;
-  box-shadow: 0 16px 36px rgb(0 0 0 / 0.35);
-}
-
-.dark .equipment-reserve-form {
-  box-shadow: 5px 5px 0 rgb(0 0 0 / 0.25);
 }
 
 @media (max-width: 1100px) {

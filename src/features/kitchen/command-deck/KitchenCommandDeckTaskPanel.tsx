@@ -4,7 +4,10 @@ import { AllergenIconRow } from "../AllergenIconRow";
 import { DishPrimaryImage } from "../../attachments/DishPrimaryImage";
 import { eventDetailMenuPath, componentPath } from "../kitchenRoutes";
 import { prepQuantityLabel } from "../prepQuantityLabel";
-import type { KitchenCommandDeckModel } from "./KitchenCommandDeckModel";
+import {
+  commandDeckFilterNoun,
+  type KitchenCommandDeckModel,
+} from "./KitchenCommandDeckModel";
 import type {
   CommandDeckFilter,
   EventLike,
@@ -47,16 +50,17 @@ export function KitchenCommandDeckTaskPanel({
   onSyncPrep,
 }: Props) {
   const selections = event ? model.selections(event._id) : [];
-  const progress = event
-    ? model.progress(event._id)
-    : { total: 0, completed: 0, pct: 0 };
+  const filterActive = model.filterIsActive(filter, assigneeFilter);
   const armed = model.findPerson(armedPersonId);
+  const headline = event
+    ? model.filteredHeadline(event._id, filter, assigneeFilter)
+    : "";
 
   if (!event) {
     return (
       <div className="kcd-stage-shell">
         <div className="kcd-empty">
-          Select an event on the left to orchestrate prep.
+          Select an event from the list to orchestrate prep.
         </div>
       </div>
     );
@@ -67,11 +71,7 @@ export function KitchenCommandDeckTaskPanel({
       <header className="kcd-stage-head">
         <div>
           <h2>{event.title}</h2>
-          <p>
-            {progress.total === 0
-              ? "No prep tasks yet — add dishes on the event menu, or load prep from dish templates."
-              : `${progress.completed}/${progress.total} steps · ${progress.pct}% complete`}
-          </p>
+          <p>{headline}</p>
         </div>
         <div className="kcd-stage-actions">
           <button
@@ -107,10 +107,21 @@ export function KitchenCommandDeckTaskPanel({
           filter,
           assigneeFilter,
         );
+        const allDishTasks = model.tasksForSelection(selection._id, "all", "");
         const assignable = model.assignableTasks(dishTasks);
         const dishDone = dishTasks.filter(
           (t) => t.status === "completed",
         ).length;
+        const matchingLine = filterActive
+          ? `${dishTasks.length} of ${allDishTasks.length} matching`
+          : dishTasks.length
+            ? `${dishDone}/${dishTasks.length} tasks`
+            : "No matching tasks";
+        const emptyLine = filterActive
+          ? `${dishTasks.length} of ${allDishTasks.length} steps match ${
+              assigneeFilter ? "this assignee" : commandDeckFilterNoun(filter)
+            }.`
+          : "No prep tasks for this dish in the current filters.";
 
         return (
           <section
@@ -134,9 +145,7 @@ export function KitchenCommandDeckTaskPanel({
                 <p className="kcd-dish-meta">
                   {selection.quantityServings} servings
                   {" · "}
-                  {dishTasks.length
-                    ? `${dishDone}/${dishTasks.length} tasks`
-                    : "No matching tasks"}
+                  {matchingLine}
                 </p>
               </div>
               {assignable.length > 0 ? (
@@ -162,7 +171,7 @@ export function KitchenCommandDeckTaskPanel({
                 className="kcd-task-meta"
                 style={{ padding: "0 1rem 0.85rem" }}
               >
-                No prep tasks for this dish in the current filters.
+                {emptyLine}
               </p>
             ) : (
               <ul className="kcd-task-list">

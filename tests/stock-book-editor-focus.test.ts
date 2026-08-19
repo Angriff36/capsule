@@ -45,6 +45,30 @@ describe("Stock book Transfer editor is not a no-op above the row", () => {
     ).toBe(false);
   });
 
+  it("Apply stays off when quantity is set but destination is empty", () => {
+    expect(
+      supplyEditorCanApply({
+        busy: false,
+        kind: "transfer",
+        destinationId: "",
+        quantity: "4",
+        destinationCount: 2,
+      }),
+    ).toBe(false);
+  });
+
+  it("Apply stays off when destination is set but quantity is 0", () => {
+    expect(
+      supplyEditorCanApply({
+        busy: false,
+        kind: "transfer",
+        destinationId: "dest1",
+        quantity: "0",
+        destinationCount: 2,
+      }),
+    ).toBe(false);
+  });
+
   it("editor scrolls into view and focuses a field when it opens", () => {
     const page = readFileSync(
       "src/features/inventory/StockBookPage.tsx",
