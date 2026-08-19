@@ -1,5 +1,6 @@
 import { formatDate, formatMoney } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
+import { isBelowReorder, stockLineLink } from "../inventory/stockLevels";
 
 export const DASHBOARD_WIDGET_IDS = [
   "upcoming_events",
@@ -48,7 +49,7 @@ export const DASHBOARD_WIDGET_CATALOG: DashboardWidgetCatalogItem[] = [
   {
     id: "low_stock_alerts",
     title: "Low-stock alerts",
-    description: "Inventory at or below its reorder point.",
+    description: "Inventory below its reorder point.",
     eyebrow: "Stock watch",
     href: "/inventory/stock",
     tone: "warn",
@@ -139,6 +140,8 @@ type PaymentRow = BaseRow & {
 type VendorOrderRow = BaseRow & {
   orderNumber?: string | null;
   totalAmount?: number | null;
+  /** Read-time line rollup (query-inlined computed); falls back to totalAmount. */
+  liveTotalAmount?: number | null;
   status?: string | null;
 };
 
@@ -255,8 +258,11 @@ export class DashboardWidgetPolicy {
     }
 
     const lowStock = inventory
-      .filter(
-        (item) => number(item.quantityOnHand) <= number(item.reorderThreshold),
+      .filter((item) =>
+        isBelowReorder({
+          quantityOnHand: number(item.quantityOnHand),
+          reorderThreshold: number(item.reorderThreshold),
+        }),
       )
       .sort(
         (a, b) =>
@@ -330,7 +336,11 @@ export class DashboardWidgetPolicy {
       .reduce((sum, invoice) => sum + number(invoice.amountDue), 0);
     const committedOrders = vendorOrders
       .filter((order) => COMMITTED_ORDER_STATUSES.has(String(order.status)))
-      .reduce((sum, order) => sum + number(order.totalAmount), 0);
+      .reduce(
+        (sum, order) =>
+          sum + number(order.liveTotalAmount ?? order.totalAmount),
+        0,
+      );
     const netCash = receivables30 - committedOrders;
 
     const get = (id: DashboardWidgetId) => catalog.get(id)!;
@@ -368,15 +378,16 @@ export class DashboardWidgetPolicy {
         ...get("low_stock_alerts"),
         metric: String(lowStock.length),
         metricLabel:
-          lowStock.length === 1 ? "item at reorder" : "items at reorder",
+          lowStock.length === 1 ? "item below reorder" : "items below reorder",
         rows: lowStock.slice(0, 4).map((item) => ({
           label:
             ingredientsById.get(String(item.ingredientId)) || "Inventory item",
           value: `${number(item.quantityOnHand)} / ${number(item.reorderThreshold)}`,
           meta: String(item.unit ?? "units"),
-          href: "/inventory/stock",
+          href: stockLineLink(item._id),
         })),
-        emptyMessage: "All visible stock is above its reorder point.",
+        emptyMessage:
+          "Every tracked stock line is at or above its reorder point.",
       },
       staff_schedule_gaps: {
         ...get("staff_schedule_gaps"),

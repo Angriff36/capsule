@@ -99,8 +99,10 @@ export function InvoicesPage() {
           !["paid", "voided", "written_off"].includes(String(row.status)),
       );
 
-  const canSend = (row: { status: unknown }) =>
-    policy.invoiceActions(String(row.status)).some((a) => a.key === "send");
+  const canSend = (row: { status: unknown; amountDue?: unknown }) =>
+    policy
+      .invoiceActions(String(row.status), row)
+      .some((a) => a.key === "send");
   const sendableRows = visibleRows.filter(canSend);
   const selection = useBulkSelection(sendableRows);
   const bulk = useBulkRun();
@@ -450,7 +452,7 @@ export function InvoicesPage() {
                             Open
                           </Link>
                           {policy
-                            .invoiceActions(String(row.status))
+                            .invoiceActions(String(row.status), row)
                             .map((action) => (
                               <button
                                 key={action.key}

@@ -31,9 +31,15 @@ export interface ProposalReadinessInput {
   readonly hasPricedLines: boolean;
   /** Already-sent proposals are history — warnings are pre-publication only. */
   readonly status: string;
+  /** The proposal's stored total (drives the zero-dollar live warning). */
+  readonly total?: number;
 }
 
 const PRE_PUBLICATION = new Set(["draft"]);
+// Statuses where Accept / Request signature are live and a $0 total means the
+// client could book a zero-dollar offer. Warns, never blocks (see restraint
+// note above).
+const ACCEPTANCE_LIVE = new Set(["sent", "viewed"]);
 
 export function ProposalReadinessNotice({
   eventId,
@@ -41,6 +47,7 @@ export function ProposalReadinessNotice({
   hasMenuSelections,
   hasPricedLines,
   status,
+  total = 0,
 }: ProposalReadinessInput) {
   // Provenance of the originating event: for an imported TPP event this is the
   // legacy record the proposal's fields were mapped from.
@@ -63,6 +70,11 @@ export function ProposalReadinessNotice({
     if (!hasPricedLines) {
       warnings.push("No priced line items — the total will not itemize.");
     }
+  }
+  if (ACCEPTANCE_LIVE.has(status) && total === 0) {
+    warnings.push(
+      "This proposal totals $0.00 — accepting or signing it books a zero-dollar offer. Add pricing on a new revision if that's not intended.",
+    );
   }
 
   const provenance = links && links.length > 0 ? links : null;

@@ -458,7 +458,9 @@ export function PurchasingPage() {
                     </td>
                     <td>{vendorName(order.vendorId)}</td>
                     <td className="supply-number">
-                      {formatMoneyExact(Number(order.totalAmount))}
+                      {formatMoneyExact(
+                        Number(order.liveTotalAmount ?? order.totalAmount),
+                      )}
                     </td>
                     <td>
                       <StatusChip status={String(order.status)} />
@@ -568,7 +570,9 @@ export function PurchasingPage() {
                         : "Weekly / general"}
                     </td>
                     <td className="supply-number">
-                      {formatMoneyExact(Number(order.totalAmount))}
+                      {formatMoneyExact(
+                        Number(order.liveTotalAmount ?? order.totalAmount),
+                      )}
                     </td>
                     <td>
                       <StatusChip status={String(order.status)} />
