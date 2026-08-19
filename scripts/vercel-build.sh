@@ -8,6 +8,10 @@
 set -euo pipefail
 
 if [ "${VERCEL_ENV:-}" = "production" ]; then
+  # package.json `build` also runs this file so a Vite-preset override
+  # cannot ship UI-only (QA 191: frontend 3dd95bb1, mule search still
+  # hyphen-split leftover).
+  echo "capsule vercel-build: production convex deploy + vite build"
   convex deploy --cmd 'vite build'
 else
   export VITE_CONVEX_URL="${VITE_CONVEX_URL:-https://tangible-skunk-448.convex.cloud}"
