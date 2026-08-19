@@ -17,8 +17,10 @@ import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { PaymentsLedgerPresenter } from "./PaymentsLedgerPresenter";
 
 const policy = new CommercialLifecyclePolicy();
+const ledger = new PaymentsLedgerPresenter();
 
 const money = (value: FormDataEntryValue | null) => {
   const amount = Number(String(value ?? "").trim());
@@ -49,12 +51,11 @@ export function PaymentsPage() {
       Number(row.amountDue ?? 0) > 0,
   );
   const activeRows = (payments ?? []).filter((row) => row.deletedAt == null);
-  const visibleRows = showTerminal
-    ? activeRows
-    : activeRows.filter(
-        (row) =>
-          !["completed", "failed", "refunded"].includes(String(row.status)),
-      );
+  const visibleRows = showTerminal ? activeRows : ledger.openRows(activeRows);
+  const settledSummary = ledger.settledSummary(activeRows);
+  const hiddenSettledNotice = showTerminal
+    ? null
+    : ledger.hiddenSettledNotice(settledSummary);
 
   const invoiceLabel = (id: string) => {
     const invoice = invoices?.find((row) => row._id === id);
@@ -336,23 +337,53 @@ export function PaymentsPage() {
             <p className="eyebrow">Collections</p>
             <h2>Payments</h2>
           </div>
-          <span>{visibleRows.length} payments</span>
+          <span>
+            {ledger.countLabel(
+              visibleRows.length,
+              settledSummary.hiddenCount,
+              showTerminal,
+            )}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
         ) : visibleRows.length === 0 ? (
           <div className="document-empty">
             <p>No open payments.</p>
-            <span>Record a payment after an invoice is sent.</span>
-            <div className="mt-3 flex justify-center">
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowRecord(true)}
-              >
-                Record payment
-              </button>
-            </div>
+            {hiddenSettledNotice ? (
+              <>
+                <span>{hiddenSettledNotice}</span>
+                <div className="mt-3 flex justify-center gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => setShowTerminal(true)}
+                  >
+                    {ledger.showSettledLabel(settledSummary)}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setShowRecord(true)}
+                  >
+                    Record payment
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <span>Record a payment after an invoice is sent.</span>
+                <div className="mt-3 flex justify-center">
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={() => setShowRecord(true)}
+                  >
+                    Record payment
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         ) : (
           <div className="supply-table-wrap">
