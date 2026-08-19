@@ -30,6 +30,7 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { EventCostSummaryReport } from "./EventCostSummaryReport";
+import { isCloseoutListProfitPending } from "./eventCostSummary";
 
 const policy = new CloseoutLifecyclePolicy();
 const payloadBuilder = new CloseoutCapturePayloadBuilder();
@@ -303,7 +304,7 @@ export function CloseoutPage() {
                           />
                         </td>
                         <td>
-                          {unreconciled && Number(row.grossProfit ?? 0) === 0
+                          {isCloseoutListProfitPending(row)
                             ? "—"
                             : formatMoneyExact(Number(row.grossProfit ?? 0))}
                         </td>

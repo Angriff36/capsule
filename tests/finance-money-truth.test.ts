@@ -6,8 +6,10 @@ import {
   rollupEventBilling,
 } from "../src/features/finance/invoiceBilling";
 import { buildRevenueTrend } from "../src/features/finance/revenueTrend";
+import { readFileSync } from "node:fs";
 import {
   buildEventCostSummary,
+  isCloseoutListProfitPending,
   isUnreconciledCloseout,
 } from "../src/features/finance/eventCostSummary";
 import { buildLiveEventProfitability } from "../src/features/events/liveEventProfitability";
@@ -248,6 +250,61 @@ describe("buildEventCostSummary — folio separates billed, collected, drafts", 
       expect(bucket.source).toContain("awaiting reconciliation");
       expect(bucket.source).not.toContain("reconciled at closeout");
     }
+  });
+
+  it("list Gross profit hides draft+$0 costs even when capture stored $7,200 profit", () => {
+    // Capture payload: grossProfit = actualRevenue - totalActualCost.
+    // Draft + billed $7200 + $0 costs → grossProfit 7200. Hiding only
+    // when grossProfit===0 would print $7,200.00 as list fact.
+    const captureSave = {
+      status: "draft",
+      actualRevenue: 7200,
+      totalActualCost: 0,
+      actualIngredientCost: 0,
+      actualLaborCost: 0,
+      actualVendorCost: 0,
+      actualWasteCost: 0,
+      grossProfit: 7200,
+    };
+    expect(isCloseoutListProfitPending(captureSave)).toBe(true);
+    const invertedGrossProfitZeroOnly =
+      isUnreconciledCloseout(captureSave) &&
+      Number(captureSave.grossProfit ?? 0) === 0;
+    expect(invertedGrossProfitZeroOnly).toBe(false);
+    expect(isCloseoutListProfitPending(captureSave)).not.toBe(
+      invertedGrossProfitZeroOnly,
+    );
+
+    // Draft + real costs can still show the draft number.
+    expect(
+      isCloseoutListProfitPending({
+        status: "draft",
+        actualRevenue: 7200,
+        totalActualCost: 1800,
+        actualIngredientCost: 1800,
+        grossProfit: 5400,
+      }),
+    ).toBe(false);
+
+    // Finalize still computes.
+    expect(
+      isCloseoutListProfitPending({
+        status: "finalized",
+        actualRevenue: 7200,
+        totalActualCost: 4200,
+        actualIngredientCost: 1800,
+        actualLaborCost: 2400,
+        grossProfit: 3000,
+      }),
+    ).toBe(false);
+  });
+
+  it("CloseoutPage Gross profit cell uses costsPending, not grossProfit===0", () => {
+    const page = readFileSync("src/features/finance/CloseoutPage.tsx", "utf8");
+    expect(page).toContain("isCloseoutListProfitPending");
+    expect(page).not.toContain(
+      "unreconciled && Number(row.grossProfit ?? 0) === 0",
+    );
   });
 });
 

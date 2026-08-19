@@ -103,6 +103,33 @@ export function isUnreconciledCloseout(closeout: {
 }
 
 /**
+ * Same money-truth as folio costsPending: a draft with $0 costs has no
+ * profit fact yet. Capture writes grossProfit = actualRevenue - totalActualCost,
+ * so billed-prefill + $0 costs stores grossProfit $7,200 — that must not
+ * print as Gross profit on the closeout list. Draft + real costs can show
+ * the draft number. Finalize still computes.
+ */
+export function isCloseoutListProfitPending(closeout: {
+  status?: string | null;
+  totalActualCost?: number | null;
+  actualIngredientCost?: number | null;
+  actualLaborCost?: number | null;
+  actualVendorCost?: number | null;
+  actualWasteCost?: number | null;
+}): boolean {
+  if (!isUnreconciledCloseout(closeout)) return false;
+  const fromBuckets =
+    amount(closeout.actualIngredientCost) +
+    amount(closeout.actualLaborCost) +
+    amount(closeout.actualVendorCost) +
+    amount(closeout.actualWasteCost);
+  const total =
+    closeout.totalActualCost != null ? amount(closeout.totalActualCost) : fromBuckets;
+  return total === 0 && fromBuckets === 0;
+}
+
+
+/**
  * Builds the printable event folio from the governed closeout snapshot and
  * linked invoices. Raw checkout and expense ledgers are not modeled yet, so
  * the existing vendor and waste closeout buckets remain explicitly labelled.
