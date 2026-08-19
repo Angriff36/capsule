@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { formatDate, formatTime } from "../../lib/format";
 import {
   firstFutureRecurringOccurrence,
+  type EventRecurrenceBoundary,
   type EventRecurrenceEndCondition,
   type EventRecurrenceFrequency,
 } from "../../lib/eventRecurrence";
@@ -159,14 +160,37 @@ export function RecurringEventPanelView({
   const [condition, setCondition] = useState<EventRecurrenceEndCondition>(
     recurrence.recurrenceEndCondition ?? "on_date",
   );
+  const [endsAtInput, setEndsAtInput] = useState(() =>
+    dateInputValue(recurrence.recurrenceEndsAt),
+  );
+  const [occurrenceLimitInput, setOccurrenceLimitInput] = useState(() =>
+    String(recurrence.recurrenceOccurrenceLimit ?? 12),
+  );
   const now = Date.now();
   const eventAlreadyPast = typeof startsAt === "number" && startsAt < now;
+  const previewBoundary = useMemo<EventRecurrenceBoundary | undefined>(() => {
+    if (condition === "on_date") {
+      const recurrenceEndsAt = endOfLocalDate(endsAtInput);
+      return recurrenceEndsAt != null
+        ? { endCondition: "on_date", recurrenceEndsAt }
+        : undefined;
+    }
+    const occurrenceLimit = Number(occurrenceLimitInput);
+    return Number.isSafeInteger(occurrenceLimit) && occurrenceLimit >= 2
+      ? { endCondition: "after_occurrences", occurrenceLimit }
+      : undefined;
+  }, [condition, endsAtInput, occurrenceLimitInput]);
   const preview = useMemo(
     () =>
       typeof startsAt === "number"
-        ? firstFutureRecurringOccurrence(startsAt, frequency, Date.now())
+        ? firstFutureRecurringOccurrence(
+            startsAt,
+            frequency,
+            Date.now(),
+            previewBoundary,
+          )
         : undefined,
-    [frequency, startsAt],
+    [frequency, startsAt, previewBoundary],
   );
 
   const submit = (formEvent: FormEvent<HTMLFormElement>) => {
@@ -290,7 +314,8 @@ export function RecurringEventPanelView({
                   name="recurrenceEndsAt"
                   type="date"
                   className="input"
-                  defaultValue={dateInputValue(recurrence.recurrenceEndsAt)}
+                  value={endsAtInput}
+                  onChange={(event) => setEndsAtInput(event.target.value)}
                   required
                 />
               </label>
@@ -303,7 +328,10 @@ export function RecurringEventPanelView({
                   min={2}
                   max={1000}
                   className="input"
-                  defaultValue={recurrence.recurrenceOccurrenceLimit ?? 12}
+                  value={occurrenceLimitInput}
+                  onChange={(event) =>
+                    setOccurrenceLimitInput(event.target.value)
+                  }
                   required
                 />
               </label>
@@ -328,9 +356,16 @@ export function RecurringEventPanelView({
               ) : null}
             </div>
             <p className="sm:col-span-2 lg:col-span-4 text-xs leading-relaxed text-ink-3">
-              {preview != null
-                ? `First future Draft: ${formatDate(preview.startsAt)} at ${formatTime(preview.startsAt)}. `
-                : "Set the Event schedule before adding recurrence. "}
+              {preview === undefined ? (
+                "Set the Event schedule before adding recurrence. "
+              ) : preview === null ? (
+                <span className="text-warn">
+                  No further Drafts: this schedule ends before any date after
+                  today.{" "}
+                </span>
+              ) : (
+                `First future Draft: ${formatDate(preview.startsAt)} at ${formatTime(preview.startsAt)}. `
+              )}
               {preview != null && preview.pastDraftCount > 0 ? (
                 <span className="text-warn">
                   {preview.pastDraftCount === 1
