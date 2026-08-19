@@ -36,6 +36,7 @@ import {
   reminderScheduledAt,
 } from "../../lib/invoiceReminderSchedule";
 import { useTrackRecent } from "../../lib/recents";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import {
   EmptyState,
@@ -65,7 +66,7 @@ type ReminderScheduleView = {
 
 export function InvoiceDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const invoice = useGetInvoice(id ?? "skip");
+  const invoice = useRouteRecord(useGetInvoice, id);
   useTrackRecent("Invoice", invoice?.invoiceNumber);
   const clients = useListClient();
   const creditMemos = useListCreditMemo();

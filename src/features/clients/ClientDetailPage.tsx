@@ -16,6 +16,7 @@ import {
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { useTrackRecent } from "../../lib/recents";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { formatDate } from "../../lib/format";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
@@ -43,7 +44,7 @@ function optional(value: string): string | undefined {
 
 export function ClientDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const client = useGetClient(id ?? "skip");
+  const client = useRouteRecord(useGetClient, id);
   useTrackRecent(
     "Client",
     client ? clientDisplayName(client._id, [client]) : undefined,

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
 import { AttachmentsSection } from "../attachments/AttachmentsSection";
 import { formatMoneyExact } from "../../lib/format";
+import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateVendorOrderLine,
   useGetVendorOrder,
@@ -37,7 +38,7 @@ const policy = new SupplyLifecyclePolicy();
 
 export function VendorOrderPage() {
   const { id } = useParams();
-  const order = useGetVendorOrder(id || "skip");
+  const order = useRouteRecord(useGetVendorOrder, id);
   const vendors = useListVendor();
   const vendorContacts = useListVendorContact();
   const lines = useListVendorOrderLine();

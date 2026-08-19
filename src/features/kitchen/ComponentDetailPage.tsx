@@ -19,6 +19,7 @@ import {
   useCreateComponentSnapshot,
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { useAuthStatus } from "../../lib/useAuthStatus";
 import {
   buildComponentSnapshotData,
@@ -57,7 +58,7 @@ function optional(value: FormDataEntryValue | null) {
 
 export function ComponentDetailPage() {
   const { id } = useParams();
-  const component = useGetComponent(id ?? "skip");
+  const component = useRouteRecord(useGetComponent, id);
   useTrackRecent("Component", component?.name);
   const ingredients = useListIngredient();
   const priceObservations = useListIngredientPriceObservation();
