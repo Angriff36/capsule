@@ -51,6 +51,33 @@ describe("Ctrl-K search is not one keystroke behind", () => {
     expect(freshSearchHits("Harborview", [])).toEqual([]);
   });
 
+  it("useNaturalLanguageSearch paints freshSearchHits from the live rawQuery", () => {
+    // Harborview cached hits under a typed Northside must drop immediately.
+    // Passing debounced/trimmed as the first arg keeps the suite green while
+    // the palette still paints one keystroke behind.
+    const hook = readFileSync(
+      "src/features/search/useNaturalLanguageSearch.ts",
+      "utf8",
+    );
+    expect(hook).toContain("freshSearchHits(rawQuery,");
+    expect(hook).not.toContain("freshSearchHits(debounced");
+    expect(hook).not.toContain("freshSearchHits(trimmed");
+  });
+
+  it("is pending while live query and debounce disagree, even with cached hits", () => {
+    // Northside with Harborview still on screen: hitsPending is false.
+    // Pending must be the live !== debounce disjunct, or the palette flashes
+    // No matches. and this suite still passes.
+    expect(
+      isSearchPending({
+        enabled: true,
+        liveQuery: "Northside",
+        debouncedQuery: "Harborview",
+        hitsPending: false,
+      }),
+    ).toBe(true);
+  });
+
   it("CommandPalette withholds No matches. while search is pending", () => {
     const page = readFileSync("src/app/shell/CommandPalette.tsx", "utf8");
     expect(page).toContain("No matches.");
