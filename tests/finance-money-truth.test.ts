@@ -9,6 +9,7 @@ import { buildRevenueTrend } from "../src/features/finance/revenueTrend";
 import { readFileSync } from "node:fs";
 import {
   buildEventCostSummary,
+  closeoutListedCost,
   isCloseoutListProfitPending,
   isUnreconciledCloseout,
 } from "../src/features/finance/eventCostSummary";
@@ -299,12 +300,95 @@ describe("buildEventCostSummary — folio separates billed, collected, drafts", 
     ).toBe(false);
   });
 
+  it("folio invoice numbers use the same formatter as the invoices list", () => {
+    // QA 170 residual: folio named billed INV-2026-QA1 while the invoices
+    // list showed the $3,600 draft as INV-8BJQS7. Folio printed raw
+    // invoiceNumber; the list runs formatInvoiceNumber(_id).
+    const billed = invoice({
+      _id: "jx7humanbilledid0000000000001",
+      status: "sent",
+      invoiceNumber: "INV-2026-QA1",
+      total: 3600,
+    });
+    const draftId = "m97draftxxxxxxxxxxxxxxxx8bjqs7";
+    const eventDocId = "k57eventidxxxxxxxxxxxxxxxxqa1xx";
+    const draft = invoice({
+      _id: draftId,
+      status: "draft",
+      invoiceNumber: eventDocId,
+      total: 3600,
+    });
+    const summary = buildEventCostSummary({
+      event,
+      closeout: seededCloseout,
+      invoices: [billed, draft],
+    });
+    expect(summary.invoiceNumbers).toEqual(["INV-2026-QA1"]);
+    expect(summary.draftInvoiceNumbers).toEqual(["INV-8BJQS7"]);
+    expect(summary.invoiceNumbers).not.toContain(eventDocId);
+    expect(summary.draftInvoiceNumbers).not.toContain(eventDocId);
+  });
+
+  it("formats a billed cascade-seeded eventId as INV- from the invoice _id", () => {
+    const invId = "n12billedxxxxxxxxxxxxxxxxabcd12";
+    const eventDocId = "k57eventxxxxxxxxxxxxxxxxxxzzzzzz";
+    const summary = buildEventCostSummary({
+      event,
+      closeout: seededCloseout,
+      invoices: [
+        invoice({
+          _id: invId,
+          status: "sent",
+          invoiceNumber: eventDocId,
+          total: 1200,
+        }),
+      ],
+    });
+    expect(summary.invoiceNumbers).toEqual(["INV-ABCD12"]);
+    expect(summary.invoiceNumbers[0]).not.toBe(eventDocId);
+  });
+
+  it("list Cost column hides draft+$0 costs the same way Gross profit does", () => {
+    const pending = {
+      status: "draft",
+      actualRevenue: 3600,
+      totalActualCost: 0,
+      actualIngredientCost: 0,
+      actualLaborCost: 0,
+      actualVendorCost: 0,
+      actualWasteCost: 0,
+      grossProfit: 3600,
+    };
+    expect(closeoutListedCost(pending)).toBeNull();
+    expect(
+      closeoutListedCost({
+        status: "draft",
+        actualRevenue: 3600,
+        totalActualCost: 1800,
+        actualIngredientCost: 1800,
+        grossProfit: 1800,
+      }),
+    ).toBe(1800);
+    expect(
+      closeoutListedCost({
+        status: "finalized",
+        actualRevenue: 3600,
+        totalActualCost: 1800,
+        actualIngredientCost: 1800,
+        grossProfit: 1800,
+      }),
+    ).toBe(1800);
+  });
+
   it("CloseoutPage Gross profit cell uses costsPending, not grossProfit===0", () => {
     const page = readFileSync("src/features/finance/CloseoutPage.tsx", "utf8");
     expect(page).toContain("isCloseoutListProfitPending");
     expect(page).not.toContain(
       "unreconciled && Number(row.grossProfit ?? 0) === 0",
     );
+    expect(page).toContain("<th>Billed</th>");
+    expect(page).toContain("<th>Cost</th>");
+    expect(page).toContain("closeoutListedCost");
   });
 });
 

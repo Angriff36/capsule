@@ -30,7 +30,10 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { EventCostSummaryReport } from "./EventCostSummaryReport";
-import { isCloseoutListProfitPending } from "./eventCostSummary";
+import {
+  closeoutListedCost,
+  isCloseoutListProfitPending,
+} from "./eventCostSummary";
 
 const policy = new CloseoutLifecyclePolicy();
 const payloadBuilder = new CloseoutCapturePayloadBuilder();
@@ -271,6 +274,8 @@ export function CloseoutPage() {
               <thead>
                 <tr>
                   <th>Event</th>
+                  <th>Billed</th>
+                  <th>Cost</th>
                   <th>Gross profit</th>
                   <th>Headcount</th>
                   <th>State</th>
@@ -288,6 +293,8 @@ export function CloseoutPage() {
                       ? Number(row.expectedHeadcount)
                       : Number(event?.expectedHeadcount ?? 0);
                   const actualHeadcount = Number(row.actualHeadcount ?? 0);
+                  const billing = billingFor(String(row.eventId));
+                  const listedCost = closeoutListedCost(row);
                   return (
                     <Fragment key={row._id}>
                       <tr>
@@ -298,10 +305,13 @@ export function CloseoutPage() {
                           >
                             <strong>{eventTitle(String(row.eventId))}</strong>
                           </Link>
-                          <CloseoutRevenueNote
-                            row={row}
-                            billing={billingFor(String(row.eventId))}
-                          />
+                          <CloseoutRevenueNote row={row} billing={billing} />
+                        </td>
+                        <td>{formatMoneyExact(billing.billedTotal)}</td>
+                        <td>
+                          {listedCost == null
+                            ? "—"
+                            : formatMoneyExact(listedCost)}
                         </td>
                         <td>
                           {isCloseoutListProfitPending(row)
@@ -388,7 +398,7 @@ export function CloseoutPage() {
                       </tr>
                       {photoCloseoutId === row._id ? (
                         <tr>
-                          <td colSpan={5} className="!p-3">
+                          <td colSpan={7} className="!p-3">
                             <RecordPhotoCapture
                               parentType="closeout"
                               parentId={row._id}

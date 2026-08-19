@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   useCreateEventDish,
   useEventDishAdjustServings,
+  useEventDishChangeCourse,
   useEventDishRemove,
   useListDish,
   useListEventDish,
@@ -28,6 +29,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const eventDishes = useListEventDish();
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
+  const changeCourse = useEventDishChangeCourse();
   const removeDish = useEventDishRemove();
   const { ready: prepSyncReady, syncStockForEvent } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
@@ -166,9 +168,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     {selection.course || "Uncategorized"}
                     {" · "}
                     {selection.quantityServings} servings
-                    {estimated > 0
-                      ? ` · est. ${formatMoneyExact(estimated)}`
-                      : ""}
+                    {" · est. "}
+                    {estimated > 0 ? formatMoneyExact(estimated) : "—"}
                   </p>
                 </div>
                 <form
@@ -184,15 +185,40 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                       quantityServings < 0
                     )
                       return;
-                    void run(`servings:${selection._id}`, () =>
-                      adjustServings({
-                        docId: selection._id,
-                        version: selection.version,
-                        quantityServings,
-                      }),
-                    );
+                    const nextCourse = String(data.get("course") ?? "").trim();
+                    const prevCourse = String(selection.course ?? "").trim();
+                    void run(`servings:${selection._id}`, async () => {
+                      let version = selection.version;
+                      if (nextCourse !== prevCourse) {
+                        await changeCourse({
+                          docId: selection._id,
+                          version,
+                          course: nextCourse || undefined,
+                          serviceStyle:
+                            String(selection.serviceStyle ?? "").trim() ||
+                            undefined,
+                        });
+                        version += 1;
+                      }
+                      if (quantityServings !== selection.quantityServings) {
+                        await adjustServings({
+                          docId: selection._id,
+                          version,
+                          quantityServings,
+                        });
+                      }
+                    });
                   }}
                 >
+                  <label className="field-label">
+                    Course
+                    <input
+                      className="field-input w-36"
+                      name="course"
+                      defaultValue={selection.course ?? ""}
+                      placeholder="Uncategorized"
+                    />
+                  </label>
                   <label className="field-label">
                     Servings
                     <input

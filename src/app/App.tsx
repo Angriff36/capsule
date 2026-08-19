@@ -10,6 +10,7 @@ import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
+import { eventMenuRedirectPath } from "../features/events/eventRoutes";
 import { HomePage } from "../features/home/HomePage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
 import { DishDetailPage } from "../features/kitchen/DishDetailPage";
@@ -78,6 +79,10 @@ const StaffOverviewPage = lazy(() =>
     default: module.StaffOverviewPage,
   })),
 );
+function RedirectEventMenuAlias() {
+  const { id } = useParams();
+  return <Navigate to={id ? eventMenuRedirectPath(id) : "/events"} replace />;
+}
 function RedirectPackListAlias() {
   const { id } = useParams();
   return (
@@ -575,6 +580,10 @@ export function App() {
             <Route
               path="/events/:id/allergen-briefing"
               element={<EventAllergenBriefingPage />}
+            />
+            <Route
+              path="/events/:id/menu"
+              element={<RedirectEventMenuAlias />}
             />
             <Route path="/kitchen" element={<KitchenDashboardPage />} />
             <Route
