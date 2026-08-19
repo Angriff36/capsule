@@ -27,7 +27,7 @@ import { StockReceiptScanner } from "./StockReceiptScanner";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { stockRowDomId, useFocusedStockRow } from "./useFocusedStockRow";
-import { catalogUnitForStockLine } from "./stockLevels";
+import { catalogUnitForStockLine, isBelowReorder } from "./stockLevels";
 
 const policy = new SupplyLifecyclePolicy();
 
@@ -110,10 +110,11 @@ export function StockBookPage() {
   const { prompt, host } = useActionPrompt(busy != null);
   // Notification deep links land on ?item=<id> — scroll to and highlight it.
   // rowsReady must match the table's own render gate (items AND ingredients
-  // AND locations); with items alone the effect can fire before the row
-  // nodes exist and getElementById misses with no retry.
+  // AND locations). Pass `items` as rowEpoch so a first land that paints
+  // with an empty list still retries once the focused row mounts.
   const focusedItemId = useFocusedStockRow(
     items !== undefined && ingredients !== undefined && locations !== undefined,
+    items,
   );
 
   const activeItems = (items ?? []).filter((item) => item.deletedAt == null);
@@ -152,14 +153,16 @@ export function StockBookPage() {
     qty4(item.quantityOnHand - reservedFor(item._id));
   const belowPar = (item: any) =>
     item.parLevel > 0 && availableFor(item) < item.parLevel;
-  const belowReorder = (item: any) =>
-    item.reorderThreshold > 0 && availableFor(item) < item.reorderThreshold;
   const suggestedPurchase = (item: any) =>
     qty4(Math.max(0, item.parLevel - availableFor(item)));
+  // Same predicate as the bell and home widget — quantityOnHand vs
+  // reorderThreshold, not available-vs-PAR (unconfigured 0/0 stays quiet).
   const lowStockItems = activeItems
-    .filter(belowPar)
+    .filter(isBelowReorder)
     .sort(
-      (a, b) => availableFor(a) / a.parLevel - availableFor(b) / b.parLevel,
+      (a, b) =>
+        a.quantityOnHand / Math.max(1, a.reorderThreshold) -
+        b.quantityOnHand / Math.max(1, b.reorderThreshold),
     );
 
   const run = async (key: string, work: () => Promise<void>) => {
@@ -362,7 +365,7 @@ export function StockBookPage() {
       const values = await prompt.askFields({
         title: "Set PAR & reorder levels",
         description:
-          "A low-stock alert appears when available stock (on hand minus active reservations) drops below PAR.",
+          "A low-stock alert appears when on-hand quantity is below a tracked reorder point (reorder threshold greater than zero).",
         fields: [
           {
             name: "parLevel",
@@ -456,9 +459,10 @@ export function StockBookPage() {
       <aside className="supply-degraded" role="note">
         <strong>Live stock facts</strong>
         <span>
-          Available stock is what's on hand minus what's reserved for events —
-          low-stock alerts and suggested purchase quantities come from those
-          live totals. Search and exact decimals can be slightly imprecise.
+          Available stock is what's on hand minus what's reserved for events.
+          Low-stock alerts follow on-hand vs a tracked reorder point (same
+          predicate as home and the bell). Suggested purchase still uses PAR
+          minus available. Search and exact decimals can be slightly imprecise.
         </span>
       </aside>
       {failure ? <SupplyFailureBanner error={failure} /> : null}
@@ -484,7 +488,7 @@ export function StockBookPage() {
         <div className="ledger-heading">
           <div>
             <p className="eyebrow">Low-stock alerts</p>
-            <h2>Below PAR</h2>
+            <h2>Below reorder</h2>
           </div>
           <span>{formatCountNoun(lowStockItems.length, "alert")}</span>
         </div>
@@ -494,10 +498,10 @@ export function StockBookPage() {
           <TableSkeleton rows={3} />
         ) : lowStockItems.length === 0 ? (
           <div className="document-empty">
-            <p>Every stock line with a PAR level is at or above it.</p>
+            <p>Every tracked stock line is at or above its reorder point.</p>
             <span>
-              Set a PAR level on a stock line (Levels action) to get alerted
-              when available stock drops below it.
+              Set a reorder threshold on a stock line (Levels action) to get
+              alerted when on-hand quantity drops below it.
             </span>
           </div>
         ) : (
@@ -507,8 +511,8 @@ export function StockBookPage() {
                 <tr>
                   <th>Ingredient</th>
                   <th>Location</th>
-                  <th>Available</th>
-                  <th>PAR</th>
+                  <th>On hand</th>
+                  <th>Reorder</th>
                   <th>Suggested purchase</th>
                   <th>State</th>
                 </tr>
@@ -522,23 +526,19 @@ export function StockBookPage() {
                     </td>
                     <td>{locationName(item.locationId)}</td>
                     <td className="supply-number">
-                      {availableFor(item)}
+                      {item.quantityOnHand}
                       {reservedFor(item._id) > 0
-                        ? ` (${item.quantityOnHand} − ${qty4(reservedFor(item._id))} reserved)`
+                        ? ` (${availableFor(item)} available)`
                         : ""}
                     </td>
-                    <td className="supply-number">{item.parLevel}</td>
+                    <td className="supply-number">{item.reorderThreshold}</td>
                     <td className="supply-number">
                       <strong>
                         {suggestedPurchase(item)} {unitFor(item)}
                       </strong>
                     </td>
                     <td>
-                      <StatusChip
-                        status={
-                          belowReorder(item) ? "reorder now" : "below par"
-                        }
-                      />
+                      <StatusChip status="reorder now" />
                     </td>
                   </tr>
                 ))}
@@ -686,12 +686,10 @@ export function StockBookPage() {
                     <td className="supply-number">{reservedFor(item._id)}</td>
                     <td className="supply-number">
                       {item.parLevel} / {item.reorderThreshold}
-                      {belowPar(item) ? (
-                        <StatusChip
-                          status={
-                            belowReorder(item) ? "reorder now" : "below par"
-                          }
-                        />
+                      {isBelowReorder(item) ? (
+                        <StatusChip status="reorder now" />
+                      ) : belowPar(item) ? (
+                        <StatusChip status="below par" />
                       ) : null}
                     </td>
                     <td>

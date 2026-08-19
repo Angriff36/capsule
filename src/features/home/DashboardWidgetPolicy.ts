@@ -264,8 +264,8 @@ export class DashboardWidgetPolicy {
     const lowStock = inventory
       .filter((item) =>
         isBelowReorder({
-          quantityOnHand: number(item.quantityOnHand),
-          reorderThreshold: number(item.reorderThreshold),
+          quantityOnHand: item.quantityOnHand ?? 0,
+          reorderThreshold: item.reorderThreshold ?? 0,
         }),
       )
       .sort(

@@ -2,7 +2,6 @@ import { Link } from "react-router-dom";
 import {
   useListIngredient,
   useListInventoryItem,
-  useListInventoryReservation,
   useListVendor,
   useListVendorOrder,
 } from "../../lib/manifest-convex-react";
@@ -16,7 +15,11 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
-import { catalogUnitForStockLine } from "./stockLevels";
+import {
+  catalogUnitForStockLine,
+  isBelowReorder,
+  stockLineLink,
+} from "./stockLevels";
 
 // Vendor orders that left draft but have not fully arrived yet.
 const AWAITING_RECEIPT = new Set([
@@ -36,7 +39,8 @@ const QUICK_LINKS = [
   {
     label: "Stock book",
     path: "/inventory/stock",
-    description: "Stock by ingredient and location, PAR alerts, reservations.",
+    description:
+      "Stock by ingredient and location, reorder alerts, reservations.",
   },
   {
     label: "Counts",
@@ -80,14 +84,12 @@ type AttentionRow = {
 
 export function InventoryOverviewPage() {
   const items = useListInventoryItem();
-  const reservations = useListInventoryReservation();
   const orders = useListVendorOrder();
   const vendors = useListVendor();
   const ingredients = useListIngredient();
 
   const loading =
     items === undefined ||
-    reservations === undefined ||
     orders === undefined ||
     vendors === undefined ||
     ingredients === undefined;
@@ -96,32 +98,23 @@ export function InventoryOverviewPage() {
   const activeOrders = (orders ?? []).filter(
     (order) => order.deletedAt == null,
   );
-  const activeReservations = (reservations ?? []).filter(
-    (reservation) => reservation.deletedAt == null,
-  );
 
   const ingredientName = (id: string) =>
     ingredients?.find((item) => item._id === id)?.name ?? "Unknown ingredient";
   const vendorName = (id: string) =>
     vendors?.find((item) => item._id === id)?.name ?? "Unknown vendor";
 
-  // Available = on hand minus active reservations (matches the stock book).
-  const qty4 = (value: number) => Math.round(value * 10000) / 10000;
-  const reservedFor = (itemId: string) =>
-    activeReservations
-      .filter(
-        (reservation) =>
-          reservation.inventoryItemId === itemId &&
-          reservation.status === "active",
-      )
-      .reduce((sum, reservation) => sum + Number(reservation.quantity), 0);
-  const availableFor = (item: any) =>
-    qty4(Number(item.quantityOnHand) - reservedFor(item._id));
-
   const lowStockItems = activeItems
-    .filter((item) => item.parLevel > 0 && availableFor(item) < item.parLevel)
+    .filter((item) =>
+      isBelowReorder({
+        quantityOnHand: item.quantityOnHand,
+        reorderThreshold: item.reorderThreshold,
+      }),
+    )
     .sort(
-      (a, b) => availableFor(a) / a.parLevel - availableFor(b) / b.parLevel,
+      (a, b) =>
+        Number(a.quantityOnHand) / Math.max(1, Number(a.reorderThreshold)) -
+        Number(b.quantityOnHand) / Math.max(1, Number(b.reorderThreshold)),
     );
   const openOrders = activeOrders.filter(
     (order) => !CLOSED_ORDER.has(String(order.status)),
@@ -142,13 +135,10 @@ export function InventoryOverviewPage() {
   const attention: AttentionRow[] = [
     ...lowStockItems.map((item) => ({
       key: item._id,
-      to: "/inventory/stock",
+      to: stockLineLink(item._id),
       title: ingredientName(item.ingredientId),
-      detail: `${availableFor(item)} of PAR ${item.parLevel} ${catalogUnitForStockLine(item, ingredients ?? [])} available`,
-      status:
-        item.reorderThreshold > 0 && availableFor(item) < item.reorderThreshold
-          ? "reorder now"
-          : "below par",
+      detail: `${Number(item.quantityOnHand)} of reorder ${Number(item.reorderThreshold)} ${catalogUnitForStockLine(item, ingredients ?? [])} on hand`,
+      status: "reorder now",
     })),
     ...awaitingReceipt.map((order) => ({
       key: order._id,
@@ -164,7 +154,7 @@ export function InventoryOverviewPage() {
   ].slice(0, 8);
 
   const kpis = [
-    { label: "Below PAR", value: formatCount(lowStockItems.length) },
+    { label: "Below reorder", value: formatCount(lowStockItems.length) },
     { label: "Open vendor orders", value: formatCount(openOrders.length) },
     { label: "Awaiting receipt", value: formatCount(awaitingReceipt.length) },
     { label: "Weekly draft total", value: formatMoneyExact(weeklyDraftTotal) },
@@ -198,7 +188,7 @@ export function InventoryOverviewPage() {
         ) : attention.length === 0 ? (
           <EmptyState
             title="Nothing needs attention"
-            hint="Stock is at or above PAR and no vendor orders are waiting on receipt."
+            hint="Tracked stock is at or above its reorder point and no vendor orders are waiting on receipt."
             action={
               <>
                 <Link to="/inventory/stock" className="btn btn-ghost btn-sm">

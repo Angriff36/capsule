@@ -11,11 +11,17 @@ export interface StockLevelFields {
   reorderThreshold: number;
 }
 
+/** Coerce list-query quantities; missing/non-numeric values are unconfigured 0. */
+export function stockQuantity(value: unknown): number {
+  const n = typeof value === "number" ? value : Number(value);
+  return Number.isFinite(n) ? n : 0;
+}
+
 /** Mirrors `computed isBelowReorder` — a zero threshold means "not tracked". */
 export function isBelowReorder(item: StockLevelFields): boolean {
-  return (
-    item.reorderThreshold > 0 && item.quantityOnHand < item.reorderThreshold
-  );
+  const reorderThreshold = stockQuantity(item.reorderThreshold);
+  const quantityOnHand = stockQuantity(item.quantityOnHand);
+  return reorderThreshold > 0 && quantityOnHand < reorderThreshold;
 }
 
 /** Deep link to the stock book with one stock line focused (see StockBookPage). */
