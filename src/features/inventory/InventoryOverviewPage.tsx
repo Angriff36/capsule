@@ -132,7 +132,8 @@ export function InventoryOverviewPage() {
       String(order.status) === "draft" && order.sourceRangeStart != null,
   );
   const weeklyDraftTotal = weeklyDrafts.reduce(
-    (sum, order) => sum + Number(order.totalAmount ?? 0),
+    (sum, order) =>
+      sum + Number(order.liveTotalAmount ?? order.totalAmount ?? 0),
     0,
   );
 
@@ -151,7 +152,7 @@ export function InventoryOverviewPage() {
       key: order._id,
       to: `/inventory/orders/${order._id}`,
       title: `${vendorName(order.vendorId)} order`,
-      detail: `${formatMoneyExact(Number(order.totalAmount))}${
+      detail: `${formatMoneyExact(Number(order.liveTotalAmount ?? order.totalAmount))}${
         order.sourceRangeStart != null
           ? ` · week of ${formatDate(order.sourceRangeStart)}`
           : ""
