@@ -14,6 +14,7 @@ import {
   useListComponent,
 } from "../../lib/manifest-convex-react";
 import { useTrackRecent } from "../../lib/recents";
+import { useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, Skeleton, StatusChip } from "../../ui/primitives";
 import { useUndoToast } from "../../ui/useUndoToast";
 import { useActionPrompt } from "../../ui/action-prompt";
@@ -34,7 +35,7 @@ const policy = new CulinaryLifecyclePolicy();
 
 export function DishDetailPage() {
   const { id } = useParams();
-  const dish = useGetDish(id ?? "skip");
+  const dish = useRouteRecord(useGetDish, id);
   useTrackRecent("Dish", dish?.name);
   const allDishes = useListDish();
   const components = useListComponent();

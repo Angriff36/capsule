@@ -26,6 +26,7 @@ import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { InvoiceIssueForm } from "./InvoiceIssueForm";
+import { formatInvoiceNumber } from "./invoiceNumberDisplay";
 
 const policy = new CommercialLifecyclePolicy();
 
@@ -98,8 +99,10 @@ export function InvoicesPage() {
           !["paid", "voided", "written_off"].includes(String(row.status)),
       );
 
-  const canSend = (row: { status: unknown }) =>
-    policy.invoiceActions(String(row.status)).some((a) => a.key === "send");
+  const canSend = (row: { status: unknown; amountDue?: unknown }) =>
+    policy
+      .invoiceActions(String(row.status), row)
+      .some((a) => a.key === "send");
   const sendableRows = visibleRows.filter(canSend);
   const selection = useBulkSelection(sendableRows);
   const bulk = useBulkRun();
@@ -410,7 +413,7 @@ export function InvoicesPage() {
                         {canSend(row) ? (
                           <input
                             type="checkbox"
-                            aria-label={`Select invoice ${row.invoiceNumber || "draft"}`}
+                            aria-label={`Select invoice ${formatInvoiceNumber(row.invoiceNumber, row._id) || "draft"}`}
                             checked={selection.isSelected(row._id)}
                             disabled={busy != null}
                             onChange={(event) =>
@@ -425,7 +428,8 @@ export function InvoicesPage() {
                           to={FINANCE_ROUTES.invoiceDetail(row._id)}
                         >
                           <strong>
-                            {row.invoiceNumber || "Draft invoice"}
+                            {formatInvoiceNumber(row.invoiceNumber, row._id) ||
+                              "Draft invoice"}
                           </strong>
                         </Link>
                         <small>
@@ -448,7 +452,7 @@ export function InvoicesPage() {
                             Open
                           </Link>
                           {policy
-                            .invoiceActions(String(row.status))
+                            .invoiceActions(String(row.status), row)
                             .map((action) => (
                               <button
                                 key={action.key}

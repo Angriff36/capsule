@@ -1,5 +1,6 @@
 import type { Doc } from "../../lib/api";
 import { formatDate, formatMoney } from "../../lib/format";
+import { isBelowReorder, stockLineLink } from "../inventory/stockLevels";
 
 /**
  * Client-derived notifications. Capsule reads are live Convex queries, so
@@ -175,14 +176,21 @@ export function deriveNotifications(
   );
   for (const item of src.inventoryItems ?? []) {
     if (item.deletedAt != null || item.removedAt != null) continue;
-    if (item.quantityOnHand > item.reorderThreshold) continue;
+    // Domain semantics (isBelowReorder): a zero threshold means the line is
+    // not tracked — no alert. Kills the dead "0 each on hand (reorder at 0)"
+    // rows that unconfigured stock lines used to produce.
+    if (!isBelowReorder(item)) continue;
     const name =
       ingredientNames.get(item.ingredientId as string) ?? "An ingredient";
+    const message =
+      item.quantityOnHand <= 0
+        ? `${name} is out of stock — reorder point is ${item.reorderThreshold} ${item.unit}`
+        : `${name} is low: ${item.quantityOnHand} ${item.unit} on hand — reorder point is ${item.reorderThreshold} ${item.unit}`;
     out.push({
       id: `low-stock:${item._id}`,
       kind: "low_stock",
-      message: `${name} is low: ${item.quantityOnHand} ${item.unit} on hand (reorder at ${item.reorderThreshold})`,
-      link: "/inventory/stock",
+      message,
+      link: stockLineLink(item._id),
       at: item.updatedAt ?? now,
     });
   }
