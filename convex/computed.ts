@@ -500,12 +500,15 @@ export function computeVendorOrder(doc: Record<string, any>): Record<string, any
   doc.needsSpendApproval = __needsSpendApproval;
   const __hasIncompleteLines = (((doc.lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
   doc.hasIncompleteLines = __hasIncompleteLines;
+  const __liveTotalAmount = ((((doc.lines) ?? []).map((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.lineTotalAmount != null)) ? line.lineTotalAmount : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) + doc.taxAmount) + doc.shippingAmount);
+  doc.liveTotalAmount = __liveTotalAmount;
   return {
     isDraft: __isDraft,
     isPendingApproval: __isPendingApproval,
     isOpenForReceiving: __isOpenForReceiving,
     needsSpendApproval: __needsSpendApproval,
     hasIncompleteLines: __hasIncompleteLines,
+    liveTotalAmount: __liveTotalAmount,
   };
 }
 

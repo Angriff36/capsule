@@ -36,6 +36,7 @@ import type * as lib_googleCalendar from "../lib/googleCalendar.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
 import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
 import type * as lib_proposalDraft from "../lib/proposalDraft.js";
+import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js";
 import type * as lib_proposalPricing from "../lib/proposalPricing.js";
 import type * as lib_proposalRevision from "../lib/proposalRevision.js";
 import type * as lib_qboSync from "../lib/qboSync.js";
@@ -96,6 +97,7 @@ declare const fullApi: ApiFromModules<{
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
   "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;
   "lib/proposalDraft": typeof lib_proposalDraft;
+  "lib/proposalEventCreation": typeof lib_proposalEventCreation;
   "lib/proposalPricing": typeof lib_proposalPricing;
   "lib/proposalRevision": typeof lib_proposalRevision;
   "lib/qboSync": typeof lib_qboSync;

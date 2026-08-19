@@ -60,10 +60,18 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   constraint eventDishServingsNonnegative: self.addedAt == null or self.quantityServings >= 0 "Event dish servings cannot be negative"
   constraint eventDishHeadcountOverrideNonnegative: self.headcountOverride == null or self.headcountOverride >= 0 "Headcount override cannot be negative"
 
-  // Read: any staff on this tenant. Write/execute: managers+.
+  // Read: any staff on this tenant. Write/execute policy admits managers AND
+  // sales ONLY because the accept/link menu cascades (ProposalAccepted /
+  // ProposalEventLinked → confirmFromProposal) run with the accepting
+  // operator's auth — manager-only policy meant a sales accept with a linked
+  // event threw mid-cascade. The language has no per-command policy override
+  // (guards-policies docs, Appendix E backlog), so every OTHER command below
+  // carries a manageAccess guard: composition edits (add/adjust/remove/
+  // course/notes/headcount/packing) stay manager-only exactly as before;
+  // sales gains only the proposal-confirmation path.
   default policy eventDishRead read: roleAllows(user.role, "staffAccess") "Employed staff may read event dishes"
-  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") "Managers may write event dishes through commands"
-  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") "Managers may execute event dish commands"
+  default policy eventDishWrite write: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") "Managers and sales staff may write event dishes through commands"
+  default policy eventDishExecute execute: roleAllows(user.role, "manageAccess") or roleAllows(user.role, "salesAccess") "Managers and sales staff may execute event dish commands"
 
   // Add this dish to the event (create).
   command addToEvent(
@@ -75,6 +83,9 @@ entity EventDish mixin TenantScoped, SoftDeletable {
     optional serviceStyle: string,
     optional specialInstructions: string
   ) {
+    // Menu composition is a manager call (policy admits sales only for the
+    // proposal-confirmation cascade — see default policies above).
+    guard roleAllows(user.role, "manageAccess")
     // This row is already live — don't double-add the same id.
     // To put the same Dish back after remove: allocate a NEW EventDish and call addToEvent.
     guard self.addedAt == null
@@ -109,6 +120,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   }
 
   command adjustServings(quantityServings: number) {
+    // Servings changes (incl. 86-to-zero) are a manager call — see policies.
+    guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
     // Live event + post-event correction. Zero = 86 without deleting the line.
@@ -129,6 +142,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
 
   // Override how many guests this dish is prepared for (0 clears → Event.expectedHeadcount).
   command setHeadcountOverride(headcountOverride: int) {
+    // Batch-scaling override is a manager call — see policies.
+    guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
     guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing" or self.event.stage == "completed" or self.event.stage == "closed_out")
@@ -144,6 +159,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   }
 
   command changeCourse(optional course: string, optional serviceStyle: string) {
+    // Course/service-style edits are a manager call — see policies.
+    guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
     guard self.event != null and (self.event.stage == "planning" or self.event.stage == "pending_approval" or self.event.stage == "approved" or self.event.stage == "executing")
@@ -160,6 +177,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   }
 
   command updateInstructions(optional specialInstructions: string) {
+    // Kitchen notes are a manager call — see policies.
+    guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
     // Notes are allowed through executing — kitchen/service still needs them.
@@ -216,6 +235,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   // path is PackList -> EventDish -> DishContainer, so this re-emits the pack
   // list id alongside this row's dish and servings for the second fanOut.
   command requestContainerPack(packListId: uuid) {
+    // Packing bridge stays manager-only (pre-existing behavior) — see policies.
+    guard roleAllows(user.role, "manageAccess")
     guard self.deletedAt == null
     emit EventDishContainerPackRequested {
       eventDishId: self.id
@@ -228,6 +249,8 @@ entity EventDish mixin TenantScoped, SoftDeletable {
   }
 
   command remove(reason: string) {
+    // Pulling a dish off an event is a manager call — see policies.
+    guard roleAllows(user.role, "manageAccess")
     guard self.addedAt != null
     guard self.deletedAt == null
     // Includes executing — ran out / pull from service. Not after the event is done/cancelled.

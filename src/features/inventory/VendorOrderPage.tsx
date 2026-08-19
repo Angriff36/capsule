@@ -300,7 +300,11 @@ export function VendorOrderPage() {
         </div>
         <div className="order-state">
           <StatusChip status={String(order.status)} />
-          <strong>{formatMoneyExact(Number(order.totalAmount))}</strong>
+          <strong>
+            {formatMoneyExact(
+              Number(order.liveTotalAmount ?? order.totalAmount),
+            )}
+          </strong>
           <span>Order total</span>
         </div>
       </header>

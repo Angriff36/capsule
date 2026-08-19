@@ -541,6 +541,7 @@ import {
   VendorOrderRequestChangesParamsSchema,
   VendorOrderSubmitForApprovalParamsSchema,
   VendorOrderSubmitParamsSchema,
+  VendorOrderSyncLineTotalsParamsSchema,
   VendorOrderUpdateTotalsParamsSchema,
   VendorReinstateParamsSchema,
   VendorSuspendParamsSchema,
@@ -8348,6 +8349,16 @@ export function useVendorOrderSubmitForApproval() {
   };
 }
 
+/** Mutation hook for VendorOrder.syncLineTotals. */
+export function useVendorOrderSyncLineTotals() {
+  const mutate = useMutation(api.mutations.VendorOrder_syncLineTotals);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = VendorOrderSyncLineTotalsParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for VendorOrder.updateTotals. */
 export function useVendorOrderUpdateTotals() {
   const mutate = useMutation(api.mutations.VendorOrder_updateTotals);
@@ -9000,4 +9011,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 960 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 961 as const;

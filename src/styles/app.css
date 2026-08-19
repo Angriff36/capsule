@@ -1509,6 +1509,11 @@
   gap: 0.45rem;
 }
 
+/* Inventory / facilities workspace sub-nav — a real tab strip: spaced links
+   over a baseline rule with a single active underline. The nav renders
+   NavLink anchors, so the anchor rules here (not the layered
+   .component-status-tabs button rules) carry the styling. Scrolls sideways
+   on narrow screens. */
 .supply-tabs {
   display: flex;
   margin: -0.5rem 0 0;
