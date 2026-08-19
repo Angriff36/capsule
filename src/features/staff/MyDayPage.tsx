@@ -52,6 +52,7 @@ import { myDayIdentityResolver } from "./MyDayIdentityResolver";
 import { ShiftSwapCard } from "./ShiftSwapCard";
 import { TimeOffRequestCard } from "./TimeOffRequestCard";
 import { WeeklyAvailabilityCard } from "./WeeklyAvailabilityCard";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const dayLabel = (ms?: number | null) =>
   ms == null
@@ -879,19 +880,17 @@ export function MyDayPage() {
                 >
                   <label className="field-label">
                     From
-                    <input
+                    <BoundedDateTimeLocalInput
                       name="startsAt"
                       className="input"
-                      type="datetime-local"
                       required
                     />
                   </label>
                   <label className="field-label">
                     Until
-                    <input
+                    <BoundedDateTimeLocalInput
                       name="endsAt"
                       className="input"
-                      type="datetime-local"
                       required
                     />
                   </label>

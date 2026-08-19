@@ -21,6 +21,7 @@ import {
   isTimelineAssigneeTeam,
 } from "./timelineAssigneeOptions";
 import { TimelineSlotRemapper } from "./timelineSlotRemapper";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 type TimelineActivity = Doc<"eventTimelineActivities">;
 
@@ -333,16 +334,15 @@ export function EventTimelinePanel({ eventId, defaultStartsAt }: Props) {
           </label>
           <label className="field-label">
             <span>Starts</span>
-            <input
+            <BoundedDateTimeLocalInput
               name="startsAt"
-              type="datetime-local"
               className="input"
               required
             />
           </label>
           <label className="field-label">
             <span>Ends (optional)</span>
-            <input name="endsAt" type="datetime-local" className="input" />
+            <BoundedDateTimeLocalInput name="endsAt" className="input" />
           </label>
           <label className="field-label">
             <span>Notes</span>

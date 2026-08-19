@@ -13,6 +13,7 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { AdminWorkspaceNav } from "./AdminWorkspaceNav";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const CATEGORY_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
   { value: "policyUpdate", label: "New policy" },
@@ -194,10 +195,9 @@ export function AnnouncementsPage() {
             </label>
             <label className="field-label">
               Expires
-              <input
+              <BoundedDateInput
                 name="expiresAt"
                 className="input"
-                type="date"
                 required
                 disabled={busy}
               />

@@ -14,6 +14,7 @@ import {
   teamsFromResponsibleParty,
   type TimelineAssigneeTeam,
 } from "./timelineAssigneeOptions";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 type TimelineActivity = Doc<"eventTimelineActivities">;
 
@@ -211,17 +212,15 @@ export function EventTimelineActivityList({
                   </label>
                   <label className="field-label">
                     <span>Starts</span>
-                    <input
+                    <BoundedDateTimeLocalInput
                       name="startsAt"
-                      type="datetime-local"
                       className="input"
                     />
                   </label>
                   <label className="field-label">
                     <span>Ends</span>
-                    <input
+                    <BoundedDateTimeLocalInput
                       name="endsAt"
-                      type="datetime-local"
                       className="input"
                     />
                   </label>

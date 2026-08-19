@@ -12,6 +12,7 @@ import {
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { LogisticsFailureBanner } from "./LogisticsFailureBanner";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const SOON_DAYS_MS = 7 * DAY_MS;
@@ -434,10 +435,9 @@ export function VehicleMaintenancePage() {
                 </label>
                 <label className="field-label">
                   First due
-                  <input
+                  <BoundedDateTimeLocalInput
                     name="nextDueAt"
                     className="input"
-                    type="datetime-local"
                     defaultValue={localDateTime(now + 90 * DAY_MS)}
                     required
                   />
@@ -545,10 +545,9 @@ export function VehicleMaintenancePage() {
             </label>
             <label className="field-label">
               Filled
-              <input
+              <BoundedDateTimeLocalInput
                 name="filledAt"
                 className="input"
-                type="datetime-local"
                 max={localDateTime(now)}
                 defaultValue={localDateTime(now)}
                 required
@@ -729,10 +728,9 @@ export function VehicleMaintenancePage() {
               </label>
               <label className="field-label">
                 Completed
-                <input
+                <BoundedDateTimeLocalInput
                   name="completedAt"
                   className="input"
-                  type="datetime-local"
                   max={localDateTime(now)}
                   defaultValue={localDateTime(now)}
                   required

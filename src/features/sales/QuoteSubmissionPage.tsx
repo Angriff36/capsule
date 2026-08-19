@@ -4,6 +4,7 @@ import { publicErrorMessage } from "../../lib/publicErrorMessage";
 import { api, type Id } from "../../lib/api";
 import { ArrowLeftIcon, CheckIcon } from "../../ui/icons";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 function optional(value: string): string | undefined {
   const trimmed = value.trim();
@@ -288,8 +289,7 @@ export function QuoteSubmissionPage() {
                     >
                       Event Date *
                     </label>
-                    <input
-                      type="date"
+                    <BoundedDateInput
                       id="eventDate"
                       name="eventDate"
                       required

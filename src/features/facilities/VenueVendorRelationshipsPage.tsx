@@ -21,6 +21,7 @@ import {
   type CommandFailure,
 } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 // Enum values from manifest
 const CATEGORIES = [
@@ -59,7 +60,7 @@ const STATUSES = [
 type CategoryValue = (typeof CATEGORIES)[number]["value"];
 type StatusValue = (typeof STATUSES)[number]["value"];
 
-// <input type="date"> yields "YYYY-MM-DD"; the manifest stores these as
+// <BoundedDateInput> yields "YYYY-MM-DD"; the manifest stores these as
 // datetime (epoch-ms), so convert before sending.
 const toDateEpoch = (raw: FormDataEntryValue | null): number | undefined => {
   const value = String(raw ?? "").trim();
@@ -331,8 +332,7 @@ export function VenueVendorRelationshipsPage() {
               <label className="block text-xs font-medium text-ink-2">
                 Effective From
               </label>
-              <input
-                type="date"
+              <BoundedDateInput
                 name="effectiveFrom"
                 className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
@@ -342,8 +342,7 @@ export function VenueVendorRelationshipsPage() {
               <label className="block text-xs font-medium text-ink-2">
                 Effective Until
               </label>
-              <input
-                type="date"
+              <BoundedDateInput
                 name="effectiveUntil"
                 className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
@@ -406,8 +405,7 @@ export function VenueVendorRelationshipsPage() {
               <label className="block text-xs font-medium text-ink-2">
                 Insurance Expiry
               </label>
-              <input
-                type="date"
+              <BoundedDateInput
                 name="insuranceExpiry"
                 className="mt-1 block w-full rounded-sm border-line-2 shadow-sm focus:border-accent sm:text-xs"
               />
