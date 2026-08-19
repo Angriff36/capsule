@@ -6,29 +6,12 @@ import { api } from "../../lib/api";
 import { WORKSPACE_NAME } from "../../lib/workspace";
 import { ChevronRightIcon, GearIcon, SearchIcon } from "../../ui/icons";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
+import { breadcrumbsForPath, type Breadcrumb } from "./breadcrumbs";
 import { RecentsMenu } from "./RecentsMenu";
 
-function useBreadcrumbs(): Array<{ label: string; to?: string }> {
+function useBreadcrumbs(): Breadcrumb[] {
   const { pathname } = useLocation();
-  if (pathname === "/") return [{ label: "Home" }];
-  if (pathname === "/settings/email") return [{ label: "Email settings" }];
-  if (pathname.startsWith("/kitchen")) {
-    const crumbs: Array<{ label: string; to?: string }> = [
-      { label: "Kitchen", to: "/kitchen" },
-    ];
-    if (pathname === "/kitchen") {
-      crumbs.push({ label: "Kitchen" });
-    }
-    return crumbs;
-  }
-  const area = navigationCatalog.areaForPath(pathname);
-  if (!area) return [{ label: "Capsule" }];
-  const crumbs: Array<{ label: string; to?: string }> = [
-    { label: area.label, to: area.path },
-  ];
-  if (pathname === `${area.path}/new`) crumbs.push({ label: "New" });
-  else if (pathname !== area.path) crumbs.push({ label: "Detail" });
-  return crumbs;
+  return breadcrumbsForPath(pathname);
 }
 
 export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {

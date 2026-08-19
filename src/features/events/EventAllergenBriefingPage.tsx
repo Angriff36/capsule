@@ -7,7 +7,7 @@ import {
   useListEventDish,
   useListEventGuest,
 } from "../../lib/manifest-convex-react";
-import { formatDate, formatTime } from "../../lib/format";
+import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { isPlausibleConvexId, useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { eventDetailPath } from "./eventRoutes";
@@ -15,6 +15,7 @@ import {
   assessGuestListCoverage,
   GuestListCoverageNotice,
 } from "./GuestListCoverageNotice";
+import { guestTableLabel } from "./guestTableLabel";
 // ponytail: browser print → "Save as PDF"; same approach as ContractDocumentPage.
 import "./EventAllergenBriefingPage.css";
 
@@ -184,7 +185,7 @@ export function EventAllergenBriefingPage() {
                 : "Date TBD"}
               {event.venueName ? ` · ${event.venueName}` : ""}
               {event.expectedHeadcount != null
-                ? ` · ${event.expectedHeadcount} guests expected`
+                ? ` · ${formatCountNoun(event.expectedHeadcount, "guest")} expected`
                 : ""}
             </p>
           </div>
@@ -294,7 +295,7 @@ export function EventAllergenBriefingPage() {
                     <li key={guest._id}>
                       <strong>{guest.name}</strong>
                       {guest.tableAssignment
-                        ? ` (Table ${guest.tableAssignment})`
+                        ? ` (${guestTableLabel(guest.tableAssignment)})`
                         : ""}
                       {guest.specialMealRequired ? (
                         <span className="ml-1.5 text-warn">

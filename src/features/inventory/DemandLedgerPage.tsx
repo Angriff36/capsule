@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreateIngredientDemand,
   useIngredientDemandFulfill,
@@ -259,7 +260,7 @@ export function DemandLedgerPage() {
             <p className="eyebrow">Where each amount comes from</p>
             <h2>Event requirements</h2>
           </div>
-          <span>{activeDemands.length} lines</span>
+          <span>{formatCountNoun(activeDemands.length, "line")}</span>
         </div>
         {demands === undefined ||
         events === undefined ||

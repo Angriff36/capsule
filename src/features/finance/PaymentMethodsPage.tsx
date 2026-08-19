@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePaymentMethod,
   useListClient,
@@ -283,7 +284,7 @@ export function PaymentMethodsPage() {
             <p className="eyebrow">Instruments</p>
             <h2>Payment methods</h2>
           </div>
-          <span>{visibleRows.length} methods</span>
+          <span>{formatCountNoun(visibleRows.length, "method")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />

@@ -3,7 +3,11 @@ import {
   observationTime,
   type IngredientPriceObservationInput,
 } from "./IngredientPriceHistory";
-import { formatDate, formatMoneyExact } from "../../lib/format";
+import {
+  formatCountNoun,
+  formatDate,
+  formatMoneyExact,
+} from "../../lib/format";
 
 type VendorOption = {
   _id: string;
@@ -44,7 +48,7 @@ export function VendorPriceComparisonPanel({
           <p className="eyebrow">Buying options</p>
           <h2 id="vendor-price-comparison-heading">Vendor price comparison</h2>
         </div>
-        <span>{rows.length} vendors</span>
+        <span>{formatCountNoun(rows.length, "vendor")}</span>
       </div>
       <p className="max-w-160 text-base text-ink-2">
         Most recent confirmed receipt price from each vendor, cheapest first.

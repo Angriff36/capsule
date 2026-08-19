@@ -18,6 +18,7 @@ import {
   assessGuestListCoverage,
   GuestListCoverageNotice,
 } from "./GuestListCoverageNotice";
+import { guestTableLabel } from "./guestTableLabel";
 
 type GuestAction = {
   kind: "decline" | "table" | "withdraw";
@@ -142,7 +143,7 @@ export function EventGuestPanel({
               <input
                 name="dietaryRestrictions"
                 className="input"
-                placeholder="Comma-separated"
+                placeholder="One per comma — e.g. vegan, gluten-free"
               />
             </label>
             <label className="field-label">
@@ -150,7 +151,7 @@ export function EventGuestPanel({
               <input
                 name="allergenRestrictions"
                 className="input"
-                placeholder="Comma-separated"
+                placeholder="One per comma — e.g. peanuts, shellfish"
               />
             </label>
             <label className="field-label">
@@ -158,7 +159,7 @@ export function EventGuestPanel({
               <input
                 name="accessibilityNeeds"
                 className="input"
-                placeholder="Comma-separated"
+                placeholder="One per comma — e.g. wheelchair access"
               />
             </label>
             <label className="flex items-center gap-2 self-end pb-2 text-sm text-ink-2">
@@ -207,7 +208,7 @@ export function EventGuestPanel({
                       <p className="mt-1 text-xs text-ink-3">
                         {guest.email ?? guest.phone ?? "No contact recorded"}
                         {guest.tableAssignment
-                          ? ` · Table ${guest.tableAssignment}`
+                          ? ` · ${guestTableLabel(guest.tableAssignment)}`
                           : ""}
                       </p>
                       {guest.dietaryRestrictions?.length ||

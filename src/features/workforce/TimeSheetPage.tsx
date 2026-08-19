@@ -13,7 +13,12 @@ import {
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
-import { formatDate, formatTime, toDatetimeLocalValue } from "../../lib/format";
+import {
+  formatCountNoun,
+  formatDate,
+  formatTime,
+  toDatetimeLocalValue,
+} from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
@@ -395,7 +400,7 @@ export function TimeSheetPage() {
             <p className="eyebrow">Attendance</p>
             <h2>Time records</h2>
           </div>
-          <span>{activeRecords.length} records</span>
+          <span>{formatCountNoun(activeRecords.length, "record")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />
@@ -473,7 +478,7 @@ export function TimeSheetPage() {
             <p className="eyebrow">Availability</p>
             <h2>Availability windows</h2>
           </div>
-          <span>{activeWindows.length} windows</span>
+          <span>{formatCountNoun(activeWindows.length, "window")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={4} />

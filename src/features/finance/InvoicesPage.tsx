@@ -20,7 +20,11 @@ import {
   useBulkSelection,
 } from "../../ui/bulk-select";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatMoney, normalizeCurrencyCode } from "../../lib/format";
+import {
+  formatCountNoun,
+  formatMoney,
+  normalizeCurrencyCode,
+} from "../../lib/format";
 import { CommercialLifecyclePolicy } from "./CommercialLifecyclePolicy";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
@@ -358,7 +362,7 @@ export function InvoicesPage() {
             <p className="eyebrow">Billing ledger</p>
             <h2>Invoices</h2>
           </div>
-          <span>{visibleRows.length} invoices</span>
+          <span>{formatCountNoun(visibleRows.length, "invoice")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />

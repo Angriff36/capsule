@@ -11,6 +11,7 @@ import {
   EmptyState,
   PageHeader,
   Section,
+  Skeleton,
   StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
@@ -141,25 +142,33 @@ export function StaffOverviewPage() {
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Active staff</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : activePeople.length}
+            {loading ? <Skeleton className="h-7 w-12" /> : activePeople.length}
           </dd>
         </div>
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Shifts next 7 days</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : upcomingShifts.length}
+            {loading ? (
+              <Skeleton className="h-7 w-12" />
+            ) : (
+              upcomingShifts.length
+            )}
           </dd>
         </div>
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Open requests</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : openRequestCount}
+            {loading ? <Skeleton className="h-7 w-12" /> : openRequestCount}
           </dd>
         </div>
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Unconfirmed assignments</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : unconfirmedAssignments.length}
+            {loading ? (
+              <Skeleton className="h-7 w-12" />
+            ) : (
+              unconfirmedAssignments.length
+            )}
           </dd>
         </div>
       </dl>

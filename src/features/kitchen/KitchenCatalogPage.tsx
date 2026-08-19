@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDish,
   useCreateIngredient,
@@ -21,6 +22,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
+import { useSuccessToast } from "../../ui/useSuccessToast";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { culinaryCanonicalMatcher } from "./CulinaryCanonicalMatcher";
 import { culinaryCatalogVisibility } from "./CulinaryCatalogVisibility";
@@ -76,6 +78,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
   const { prompt, host } = useActionPrompt();
+  const { notifySuccess, host: successToastHost } = useSuccessToast();
 
   const data = { components, ingredients, dishes, menus }[section];
   const rows = useMemo(() => {
@@ -146,6 +149,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
               )[]
             | undefined,
         });
+        notifySuccess(`Ingredient "${name}" created.`);
       } else if (section === "components") {
         const created = await createComponent({
           name: String(data.get("name") ?? "").trim(),
@@ -192,8 +196,9 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
         navigate(dishPath(created.docId));
         return;
       } else {
+        const name = String(data.get("name") ?? "").trim();
         await createMenu({
-          name: String(data.get("name") ?? "").trim(),
+          name,
           description: optional(data.get("description")),
           category: optional(data.get("category")),
           isTemplate: data.get("isTemplate") === "on",
@@ -202,6 +207,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
           minGuests: Number(data.get("minGuests")),
           maxGuests: Number(data.get("maxGuests")),
         });
+        notifySuccess(`Menu "${name}" created.`);
       }
       form.reset();
       setShowCreate(false);
@@ -250,6 +256,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
 
       <KitchenBookNav />
       {host}
+      {successToastHost}
       {failure ? (
         <div className="mt-4">
           <CulinaryFailureBanner error={failure} />
@@ -270,7 +277,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
             <h2 className="font-display mt-1 text-2xl">{title}</h2>
           </div>
           <span className="font-mono text-xs text-ink-3">
-            {rows.length} records
+            {formatCountNoun(rows.length, "record")}
           </span>
         </div>
         <div className="component-toolbar">

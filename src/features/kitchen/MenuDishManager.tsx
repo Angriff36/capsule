@@ -4,7 +4,7 @@ import {
   useMenuDishRemove,
   useMenuDishUpdateDetails,
 } from "../../lib/manifest-convex-react";
-import { formatMoneyExact } from "../../lib/format";
+import { formatCountNoun, formatMoneyExact } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { AllergenIconRow } from "./AllergenIconRow";
 import { CulinaryRecordPicker, type PickerDish } from "./CulinaryRecordPicker";
@@ -68,7 +68,7 @@ export function MenuDishManager({
     <section className="culinary-section">
       <div className="culinary-section-heading">
         <h2>Dishes on this menu</h2>
-        <span>{lines.length} dishes</span>
+        <span>{formatCountNoun(lines.length, "dish", "dishes")}</span>
       </div>
       {host}
       <div className="mb-3 flex flex-wrap gap-2">

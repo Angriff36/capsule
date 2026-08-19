@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { formatDate, formatTime } from "../../lib/format";
+import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import {
   diffComponentLines,
@@ -78,7 +78,7 @@ export function ComponentVersionHistoryPanel({
     <section className="culinary-section">
       <div className="culinary-section-heading">
         <h2>Version history</h2>
-        <span>{history.length} snapshots</span>
+        <span>{formatCountNoun(history.length, "snapshot")}</span>
       </div>
       {host}
 

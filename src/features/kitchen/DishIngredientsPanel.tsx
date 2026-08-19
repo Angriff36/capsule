@@ -1,11 +1,16 @@
 import { useState, type FormEvent } from "react";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDishIngredient,
   useDishIngredientRemove,
   useListDishIngredient,
   useListIngredient,
 } from "../../lib/manifest-convex-react";
-import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
+import {
+  SELECTABLE_UNITS,
+  UNIT_OF_MEASURE,
+} from "./import/UnitOfMeasureMapper";
+import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
 
 type Props = {
@@ -30,6 +35,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
   // Same reasoning as the prep-template form: a dish's lines share a unit far
   // more often than not, so it holds its last value instead of resetting.
   const [unit, setUnit] = useState("each");
+  const { prompt, host: promptHost } = useActionPrompt();
 
   const rows = (lines ?? [])
     .filter((line) => line.deletedAt == null && line.dishId === dishId)
@@ -79,7 +85,18 @@ export function DishIngredientsPanel({ dishId }: Props) {
     }
   }
 
-  async function onRemove(id: string, version: number | undefined) {
+  async function onRemove(
+    id: string,
+    version: number | undefined,
+    name: string,
+  ) {
+    const ok = await prompt.askConfirm({
+      title: "Remove ingredient",
+      description: `Remove "${name}" from this dish? Events using this dish stop demanding it.`,
+      confirmLabel: "Remove",
+      tone: "danger",
+    });
+    if (!ok) return;
     setBusy(id);
     setError(null);
     setNotice(null);
@@ -101,9 +118,10 @@ export function DishIngredientsPanel({ dishId }: Props) {
     <section className="culinary-section">
       <div className="culinary-section-heading">
         <h2>Ingredients</h2>
-        <span>{rows.length} lines</span>
+        <span>{formatCountNoun(rows.length, "line")}</span>
       </div>
 
+      {promptHost}
       {error ? <p className="text-base text-danger">{error}</p> : null}
       {notice ? (
         <p className="text-base text-ok" role="status">
@@ -141,7 +159,13 @@ export function DishIngredientsPanel({ dishId }: Props) {
                 type="button"
                 className="btn btn-ghost btn-sm"
                 disabled={busy != null}
-                onClick={() => void onRemove(line._id, line.version)}
+                onClick={() =>
+                  void onRemove(
+                    line._id,
+                    line.version,
+                    ingredientName(String(line.ingredientId)),
+                  )
+                }
               >
                 {busy === line._id ? "Working…" : "Remove"}
               </button>
@@ -184,7 +208,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
             value={unit}
             onChange={(e) => setUnit(e.target.value)}
           >
-            {UNIT_OF_MEASURE.map((u) => (
+            {SELECTABLE_UNITS.map((u) => (
               <option key={u} value={u}>
                 {u}
               </option>

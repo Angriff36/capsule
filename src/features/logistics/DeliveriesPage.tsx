@@ -1,6 +1,7 @@
 import { Fragment, useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDelivery,
   useDeliveryCancel,
@@ -357,7 +358,9 @@ export function DeliveriesPage() {
             <p className="eyebrow">Transit</p>
             <h2>Deliveries</h2>
           </div>
-          <span>{visibleRows.length} deliveries</span>
+          <span>
+            {formatCountNoun(visibleRows.length, "delivery", "deliveries")}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />

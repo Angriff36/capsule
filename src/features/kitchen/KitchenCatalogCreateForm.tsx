@@ -1,8 +1,8 @@
 import type { FormEvent } from "react";
-import { UNIT_OF_MEASURE } from "./import/UnitOfMeasureMapper";
+import { SELECTABLE_UNITS } from "./import/UnitOfMeasureMapper";
 import { KITCHEN_SECTION_SINGULAR, type KitchenSection } from "./kitchenRoutes";
 
-const UNITS = UNIT_OF_MEASURE;
+const UNITS = SELECTABLE_UNITS;
 
 function UnitField({ name, label }: { name: string; label: string }) {
   return (

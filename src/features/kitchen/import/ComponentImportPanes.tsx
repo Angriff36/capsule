@@ -1,3 +1,4 @@
+import { formatCountNoun } from "../../../lib/format";
 import type { ImportSourceMode } from "./ImportSourceReadiness";
 import type { ComponentImportReviewState } from "./ComponentImportTypes";
 
@@ -332,7 +333,7 @@ export function ComponentImportReviewPane({
       <div className="component-import-lines-head">
         <h3>Components</h3>
         <span className="font-mono text-xs text-ink-3">
-          {review.lines.length} lines
+          {formatCountNoun(review.lines.length, "line")}
         </span>
       </div>
 

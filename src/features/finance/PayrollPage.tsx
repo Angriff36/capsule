@@ -14,7 +14,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
@@ -315,9 +315,14 @@ export function PayrollPage() {
             <div className="ledger-heading mt-4">
               <div>
                 <p className="eyebrow">Export preview</p>
-                <h2>{payrollExport.document.rows.length} employees</h2>
+                <h2>
+                  {formatCountNoun(
+                    payrollExport.document.rows.length,
+                    "employee",
+                  )}
+                </h2>
               </div>
-              <span>{`${payrollExport.document.timeRecordCount} time records · ${payrollExport.document.payrollInputCount} finalized inputs`}</span>
+              <span>{`${formatCountNoun(payrollExport.document.timeRecordCount, "time record")} · ${formatCountNoun(payrollExport.document.payrollInputCount, "finalized input")}`}</span>
             </div>
             {payrollExport.document.fallbackEmployeeIdCount > 0 ? (
               <p className="mb-3 text-sm text-warn" role="status">
@@ -394,7 +399,7 @@ export function PayrollPage() {
             <p className="eyebrow">Export worksheet</p>
             <h2>Payroll inputs</h2>
           </div>
-          <span>{visibleRows.length} rows</span>
+          <span>{formatCountNoun(visibleRows.length, "row")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />

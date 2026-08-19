@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackListItem,
   useGetPackList,
@@ -538,7 +539,7 @@ export function PackListDetailPage() {
             <p className="eyebrow">Ruled load sheet</p>
             <h2>Pack items</h2>
           </div>
-          <span>{listItems.length} items</span>
+          <span>{formatCountNoun(listItems.length, "item")}</span>
         </div>
         <PackListItemTable
           loading={items === undefined || events === undefined}

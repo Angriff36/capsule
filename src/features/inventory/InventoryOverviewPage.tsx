@@ -11,6 +11,7 @@ import {
   EmptyState,
   PageHeader,
   Section,
+  Skeleton,
   StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
@@ -182,7 +183,7 @@ export function InventoryOverviewPage() {
           <div key={kpi.label} className="bg-panel px-4 py-3">
             <dt className="eyebrow">{kpi.label}</dt>
             <dd className="mt-1 text-xl font-semibold text-ink">
-              {loading ? "—" : kpi.value}
+              {loading ? <Skeleton className="h-7 w-16" /> : kpi.value}
             </dd>
           </div>
         ))}

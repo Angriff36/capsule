@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc } from "../../lib/api";
+import { formatCountNoun } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import {
   useCreateClient,
@@ -714,7 +715,7 @@ export function EventCreatePage() {
                   <p className="font-medium text-ink">{template.name}</p>
                   <p>
                     {String(template.clientType)} client ·{" "}
-                    {template.defaultHeadcount} guests
+                    {formatCountNoun(template.defaultHeadcount, "guest")}
                   </p>
                   {templateMenuName ? <p>Menu: {templateMenuName}</p> : null}
                   {template.defaultStaffRoles?.length ? (

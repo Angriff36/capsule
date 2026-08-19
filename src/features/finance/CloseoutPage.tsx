@@ -10,7 +10,7 @@ import {
   useListInvoice,
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatMoneyExact } from "../../lib/format";
+import { formatCountNoun, formatMoneyExact } from "../../lib/format";
 import {
   CLOSEOUT_EVIDENCE_CATEGORIES,
   RecordPhotoCapture,
@@ -245,7 +245,7 @@ export function CloseoutPage() {
             <p className="eyebrow">Reconciliation</p>
             <h2>Closeout folios</h2>
           </div>
-          <span>{visibleRows.length} closeouts</span>
+          <span>{formatCountNoun(visibleRows.length, "closeout")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDish,
   useDishLinkAsEdition,
@@ -294,7 +295,7 @@ export function DishDetailPage() {
       <section className="culinary-section">
         <div className="culinary-section-heading">
           <h2>Event uses</h2>
-          <span>{eventUses.length} events</span>
+          <span>{formatCountNoun(eventUses.length, "event")}</span>
         </div>
         {eventUses.length ? (
           <ul className="dish-uses">
