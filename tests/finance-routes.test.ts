@@ -270,8 +270,14 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(page).toMatch(/ledger\.showSettledLabel\(/);
     // The heading count must not be a hardcoded `${n} payments` again.
     expect(page).not.toMatch(/\{visibleRows\.length\} payments/);
-    // Empty state offers the one-click reveal of hidden settled rows.
+    // Empty state JSX: "No open payments" is allowed only when the hidden
+    // settled notice (and one-click Show settled) is wired next to it.
+    expect(page).toContain('className="document-empty"');
+    expect(page).toContain("<p>No open payments.</p>");
+    expect(page).toContain("{hiddenSettledNotice ? (");
+    expect(page).toContain("<span>{hiddenSettledNotice}</span>");
     expect(page).toMatch(/onClick=\{\(\) => setShowTerminal\(true\)\}/);
+    expect(page).toContain("{ledger.showSettledLabel(settledSummary)}");
   });
 
   it("keeps the server-side zero-balance send refusal (manifest + generated command)", () => {
