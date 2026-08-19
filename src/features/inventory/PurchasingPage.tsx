@@ -32,6 +32,7 @@ import {
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { formatDate, formatMoneyExact } from "../../lib/format";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { vendorOrderHeaderTotal } from "./vendorOrderTotals";
 import { PurchasingCommandForm } from "./PurchasingCommandForm";
 import { PurchasingQueueSplit } from "./PurchasingQueueSplit";
 import { suggestOrderQuantity } from "./reorderSuggestion";
@@ -458,9 +459,7 @@ export function PurchasingPage() {
                     </td>
                     <td>{vendorName(order.vendorId)}</td>
                     <td className="supply-number">
-                      {formatMoneyExact(
-                        Number(order.liveTotalAmount ?? order.totalAmount),
-                      )}
+                      {formatMoneyExact(vendorOrderHeaderTotal(order))}
                     </td>
                     <td>
                       <StatusChip status={String(order.status)} />
@@ -570,9 +569,7 @@ export function PurchasingPage() {
                         : "Weekly / general"}
                     </td>
                     <td className="supply-number">
-                      {formatMoneyExact(
-                        Number(order.liveTotalAmount ?? order.totalAmount),
-                      )}
+                      {formatMoneyExact(vendorOrderHeaderTotal(order))}
                     </td>
                     <td>
                       <StatusChip status={String(order.status)} />

@@ -30,6 +30,7 @@ import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { VendorOrderHeaderTotal } from "./VendorOrderHeaderTotal";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorContactRoleLabel } from "./vendorContactRoles";
@@ -300,11 +301,7 @@ export function VendorOrderPage() {
         </div>
         <div className="order-state">
           <StatusChip status={String(order.status)} />
-          <strong>
-            {formatMoneyExact(
-              Number(order.liveTotalAmount ?? order.totalAmount),
-            )}
-          </strong>
+          <VendorOrderHeaderTotal order={order} lines={orderLines} />
           <span>Order total</span>
         </div>
       </header>

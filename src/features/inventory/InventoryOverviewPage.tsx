@@ -7,6 +7,7 @@ import {
   useListVendorOrder,
 } from "../../lib/manifest-convex-react";
 import { formatCount, formatDate, formatMoneyExact } from "../../lib/format";
+import { vendorOrderHeaderTotal } from "./vendorOrderTotals";
 import {
   EmptyState,
   PageHeader,
@@ -133,8 +134,7 @@ export function InventoryOverviewPage() {
       String(order.status) === "draft" && order.sourceRangeStart != null,
   );
   const weeklyDraftTotal = weeklyDrafts.reduce(
-    (sum, order) =>
-      sum + Number(order.liveTotalAmount ?? order.totalAmount ?? 0),
+    (sum, order) => sum + vendorOrderHeaderTotal(order),
     0,
   );
 
@@ -153,7 +153,7 @@ export function InventoryOverviewPage() {
       key: order._id,
       to: `/inventory/orders/${order._id}`,
       title: `${vendorName(order.vendorId)} order`,
-      detail: `${formatMoneyExact(Number(order.liveTotalAmount ?? order.totalAmount))}${
+      detail: `${formatMoneyExact(vendorOrderHeaderTotal(order))}${
         order.sourceRangeStart != null
           ? ` · week of ${formatDate(order.sourceRangeStart)}`
           : ""
