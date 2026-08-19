@@ -27,9 +27,14 @@ import { useCreateEventFromProposal } from "../clients/useCreateEventFromProposa
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { cleanCommandArgs } from "./CleanCommandArgs";
 import { clientDisplayName } from "./clientName";
+import { eventCreateDisabledReason } from "./eventCreateGuards";
+import {
+  persistableServiceStyleId,
+  serviceStyleSelectOptions,
+} from "./serviceStyleCatalog";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
-import { eventDetailPath } from "./eventRoutes";
+import { eventDetailPath, eventsIndexPath } from "./eventRoutes";
 import { proposalEventPrefill } from "./ProposalEventPrefill";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
@@ -207,9 +212,7 @@ export function EventCreatePage() {
   const activeOccasions = (occasions ?? [])
     .filter((occasion) => occasion.status === "active")
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
-  const activeServiceStyles = (serviceStyles ?? [])
-    .filter((serviceStyle) => serviceStyle.status === "active")
-    .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
+  const serviceStyleOptions = serviceStyleSelectOptions(serviceStyles);
   const salespeople = (people ?? [])
     .filter(
       (person) =>
@@ -314,7 +317,7 @@ export function EventCreatePage() {
         title: String(data.get("title") ?? ""),
         eventTypeRaw: String(data.get("eventType") ?? ""),
         occasionId,
-        serviceStyleId,
+        serviceStyleId: persistableServiceStyleId(serviceStyleId),
         salespersonId,
         referralSourceId,
         startsAtRaw: String(data.get("startsAt") ?? ""),
@@ -348,10 +351,15 @@ export function EventCreatePage() {
     });
   };
 
+  const clientRequiredCopy = eventCreateDisabledReason({
+    busy: busy !== null,
+    clientId,
+  });
+
   return (
     <div className="space-y-4">
       <Link
-        to="/events"
+        to={eventsIndexPath()}
         className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink"
       >
         <ArrowLeftIcon width={12} height={12} /> All events
@@ -389,7 +397,7 @@ export function EventCreatePage() {
           >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
               <label className="field-label sm:col-span-2">
-                Event title
+                Event title *
                 <input
                   name="title"
                   className="input"
@@ -400,7 +408,7 @@ export function EventCreatePage() {
                 <FieldError name="title" errors={errors} touched={touched} />
               </label>
               <label className="field-label sm:col-span-2">
-                Event type
+                Event type *
                 <input
                   name="eventType"
                   className="input"
@@ -435,7 +443,7 @@ export function EventCreatePage() {
                 </select>
               </label>
               <label className="field-label">
-                Expected headcount
+                Expected headcount *
                 <input
                   name="expectedHeadcount"
                   type="number"
@@ -456,7 +464,7 @@ export function EventCreatePage() {
                 />
               </label>
               <label className="field-label">
-                Starts
+                Starts *
                 <BoundedDateTimeLocalInput
                   name="startsAt"
                   defaultValue={proposalPrefill.startsAtLocal}
@@ -466,7 +474,7 @@ export function EventCreatePage() {
                 <FieldError name="startsAt" errors={errors} touched={touched} />
               </label>
               <label className="field-label">
-                Ends
+                Ends *
                 <BoundedDateTimeLocalInput
                   name="endsAt"
                   className="input"
@@ -479,7 +487,7 @@ export function EventCreatePage() {
                   Primary contact
                 </p>
                 <label className="field-label">
-                  Name
+                  Name *
                   <input name="primaryContactName" className="input" required />
                   <FieldError
                     name="primaryContactName"
@@ -527,8 +535,8 @@ export function EventCreatePage() {
                   form="event-create-form"
                 >
                   <option value="">Select a service style</option>
-                  {activeServiceStyles.map((serviceStyle) => (
-                    <option key={serviceStyle._id} value={serviceStyle._id}>
+                  {serviceStyleOptions.map((serviceStyle) => (
+                    <option key={serviceStyle.id} value={serviceStyle.id}>
                       {serviceStyle.name}
                     </option>
                   ))}
@@ -566,7 +574,7 @@ export function EventCreatePage() {
           >
             <div className="grid gap-3 p-3 sm:grid-cols-2">
               <label className="field-label">
-                Budget amount
+                Budget amount *
                 <input
                   name="budgetAmount"
                   type="number"
@@ -583,7 +591,7 @@ export function EventCreatePage() {
                 />
               </label>
               <label className="field-label">
-                Quoted price
+                Quoted price *
                 <input
                   name="quotedPrice"
                   type="number"
@@ -742,7 +750,7 @@ export function EventCreatePage() {
               ) : (
                 <>
                   <label className="field-label">
-                    Account
+                    Account *
                     <select
                       value={clientId}
                       onChange={(event) => setClientId(event.target.value)}
@@ -761,6 +769,11 @@ export function EventCreatePage() {
                   {activeClients.length === 0 ? (
                     <p className="text-sm text-ink-3">
                       No active client accounts are available.
+                    </p>
+                  ) : null}
+                  {!clientId ? (
+                    <p className="text-sm text-ink-3" role="status">
+                      Client is required
                     </p>
                   ) : null}
                 </>
@@ -788,7 +801,7 @@ export function EventCreatePage() {
               ) : (
                 <>
                   <label className="field-label">
-                    Place
+                    Place *
                     <select
                       value={venueId}
                       onChange={(event) => setVenueId(event.target.value)}
@@ -838,6 +851,11 @@ export function EventCreatePage() {
           >
             {busy === "event" ? "Creating event…" : "Create event"}
           </button>
+          {clientRequiredCopy ? (
+            <p className="text-sm text-ink-3" role="status">
+              {clientRequiredCopy}
+            </p>
+          ) : null}
           <p className="text-xs leading-relaxed text-ink-3">
             Creation is policy-checked by the generated Client, Venue, and Event
             commands. Any denial or guard failure appears above.
