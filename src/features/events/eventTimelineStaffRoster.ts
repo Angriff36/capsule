@@ -22,6 +22,8 @@ export type StaffNeedRow = {
   readonly status?: string | null;
   readonly filledByPersonId?: string | null;
   readonly claimedByPersonId?: string | null;
+  readonly startsAt?: number | null;
+  readonly due?: number | null;
 };
 
 export type PersonRow = {
@@ -136,6 +138,7 @@ export class EventTimelineStaffRoster {
         role,
         status: "filled",
         source: "filled_need",
+        startsAt: need.startsAt ?? need.due ?? null,
       });
     }
 

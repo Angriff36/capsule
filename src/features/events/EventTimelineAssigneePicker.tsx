@@ -98,6 +98,7 @@ export function EventTimelineAssigneePicker({
               className="accent-brand"
               checked={teamSet.has(team)}
               disabled={disabled}
+              aria-label={team}
               onChange={() => toggleTeam(team)}
             />
             {team}
@@ -120,6 +121,7 @@ export function EventTimelineAssigneePicker({
                 className="accent-brand"
                 checked={personSet.has(option.personId)}
                 disabled={disabled}
+                aria-label={option.label}
                 onChange={() => togglePerson(option.personId)}
               />
               {option.label}
