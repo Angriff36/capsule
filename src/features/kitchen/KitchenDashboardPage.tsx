@@ -101,6 +101,11 @@ export function KitchenDashboardPage() {
 
   const selectedEvent = horizonEvents.find((e) => e._id === selectedEventId);
   const crewRows = model.crewLoad(horizonEvents.map((e) => e._id));
+  const assignableInView = selectedEvent
+    ? model.assignableTasks(
+        model.filterTasks(selectedEvent._id, filter, assigneeFilter),
+      ).length
+    : 0;
 
   const loading =
     events === undefined ||
@@ -308,6 +313,7 @@ export function KitchenDashboardPage() {
               rows={crewRows}
               people={people ?? []}
               armedPersonId={armedPersonId}
+              assignableInView={assignableInView}
               onArm={setArmedPersonId}
             />
           </aside>

@@ -15,6 +15,7 @@ import {
   TableSkeleton,
 } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { catalogUnitForStockLine } from "./stockLevels";
 
 // Vendor orders that left draft but have not fully arrived yet.
 const AWAITING_RECEIPT = new Set([
@@ -142,7 +143,7 @@ export function InventoryOverviewPage() {
       key: item._id,
       to: "/inventory/stock",
       title: ingredientName(item.ingredientId),
-      detail: `${availableFor(item)} of PAR ${item.parLevel} ${item.unit} available`,
+      detail: `${availableFor(item)} of PAR ${item.parLevel} ${catalogUnitForStockLine(item, ingredients ?? [])} available`,
       status:
         item.reorderThreshold > 0 && availableFor(item) < item.reorderThreshold
           ? "reorder now"

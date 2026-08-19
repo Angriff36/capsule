@@ -79,10 +79,15 @@ const StaffOverviewPage = lazy(() =>
     default: module.StaffOverviewPage,
   })),
 );
-
 function RedirectEventMenuAlias() {
   const { id } = useParams();
   return <Navigate to={id ? eventMenuRedirectPath(id) : "/events"} replace />;
+}
+function RedirectPackListAlias() {
+  const { id } = useParams();
+  return (
+    <Navigate to={id ? `/logistics/packs/${id}` : "/logistics/packs"} replace />
+  );
 }
 
 const LogisticsOverviewPage = lazy(() =>
@@ -836,6 +841,22 @@ export function App() {
                   <LogisticsOverviewPage />
                 </SupplyRoute>
               }
+            />
+            <Route
+              path="/logistics/pack-lists"
+              element={<RedirectPackListAlias />}
+            />
+            <Route
+              path="/logistics/pack-lists/:id"
+              element={<RedirectPackListAlias />}
+            />
+            <Route
+              path="/logistics/packlists"
+              element={<RedirectPackListAlias />}
+            />
+            <Route
+              path="/logistics/packlists/:id"
+              element={<RedirectPackListAlias />}
             />
             <Route
               path="/logistics/packs"
