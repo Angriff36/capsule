@@ -9,7 +9,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { CHIP_TONE_CLASS } from "../../lib/statusLabels";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
@@ -401,7 +401,7 @@ export function OneOnOnesPage() {
               <p className="eyebrow">One-on-one ledger</p>
               <h2>Held meetings</h2>
             </div>
-            <span>{heldMeetings.length} records</span>
+            <span>{formatCountNoun(heldMeetings.length, "record")}</span>
           </div>
           {heldMeetings.map((meeting) => {
             const meetingActions = liveActions.filter(

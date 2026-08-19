@@ -56,6 +56,20 @@ export class KitchenCommandDeckModel {
       .sort((a, b) => Number(a.startsAt) - Number(b.startsAt));
   }
 
+  /** First event at/after the window start — the empty rail offers to jump to it. */
+  nextEventAfterHorizon(): EventLike | undefined {
+    const windowStart = this.horizon.start().getTime();
+    return this.events
+      .filter(
+        (e) =>
+          e.deletedAt == null &&
+          e.startsAt != null &&
+          Number.isFinite(Number(e.startsAt)) &&
+          Number(e.startsAt) >= windowStart,
+      )
+      .sort((a, b) => Number(a.startsAt) - Number(b.startsAt))[0];
+  }
+
   tasksForEvent(eventId: string): PrepTaskLike[] {
     // Pulling a dish mid-service stands its prep down, but work already
     // completed keeps its record rather than being cancelled. Those tasks are

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { formatCount, formatTime } from "../../lib/format";
+import { formatCount, formatCountNoun, formatTime } from "../../lib/format";
 import {
   useListEvent,
   useListEventGuest,
@@ -247,7 +247,7 @@ export function EventCapacityPlannerPage() {
                   key={day.key}
                   className={`capacity-day${day.events.length ? " has-events" : ""}`}
                   role="gridcell"
-                  aria-label={`${fullDate.format(day.startsAt)}, ${day.events.length} events`}
+                  aria-label={`${fullDate.format(day.startsAt)}, ${formatCountNoun(day.events.length, "event")}`}
                   data-testid={`capacity-day-${day.key}`}
                 >
                   <header>

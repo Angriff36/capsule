@@ -12,7 +12,11 @@ import {
 } from "../../lib/manifest-convex-react";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatDate, formatMoneyExact } from "../../lib/format";
+import {
+  formatCountNoun,
+  formatDate,
+  formatMoneyExact,
+} from "../../lib/format";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
@@ -261,7 +265,7 @@ export function VendorContractsPage() {
             <p className="eyebrow">Agreements</p>
             <h2>Contracts</h2>
           </div>
-          <span>{liveContracts.length} contracts</span>
+          <span>{formatCountNoun(liveContracts.length, "contract")}</span>
         </div>
         {contracts === undefined ||
         vendors === undefined ||

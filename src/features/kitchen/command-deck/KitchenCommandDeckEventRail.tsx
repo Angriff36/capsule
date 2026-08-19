@@ -8,6 +8,8 @@ type Props = Readonly<{
   selectedEventId: string;
   onSelect: (eventId: string) => void;
   venueName: (venueId: string | null | undefined) => string;
+  nextEvent?: EventLike | null;
+  onJumpToEvent?: (event: EventLike) => void;
 }>;
 
 export function KitchenCommandDeckEventRail({
@@ -16,12 +18,27 @@ export function KitchenCommandDeckEventRail({
   selectedEventId,
   onSelect,
   venueName,
+  nextEvent,
+  onJumpToEvent,
 }: Props) {
   if (events.length === 0) {
     return (
-      <p className="kcd-empty">
-        No events in the next 7 days. Shift the horizon or add events.
-      </p>
+      <div className="kcd-empty">
+        <p>No events in this window.</p>
+        {nextEvent && onJumpToEvent ? (
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm mt-2"
+            onClick={() => onJumpToEvent(nextEvent)}
+            data-testid="command-deck-jump-next-event"
+          >
+            Next: {nextEvent.title} · {formatDate(nextEvent.startsAt)} — jump
+            there
+          </button>
+        ) : (
+          <p className="mt-1">Pick a date above or add events.</p>
+        )}
+      </div>
     );
   }
 

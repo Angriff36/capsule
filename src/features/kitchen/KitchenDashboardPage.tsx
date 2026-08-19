@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   useListDish,
   useListEvent,
@@ -15,6 +15,7 @@ import {
   usePrepTaskStart,
 } from "../../lib/manifest-convex-react";
 import { useAuthStatus } from "../../lib/useAuthStatus";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import { TableSkeleton } from "../../ui/primitives";
 import { CulinaryFailureBanner } from "./CulinaryFailureBanner";
 import { KitchenBookNav } from "./KitchenBookNav";
@@ -161,7 +162,7 @@ export function KitchenDashboardPage() {
     const label = model.personLabel(model.findPerson(personId));
     void run(`assign-dish:${dishTasks[0]?._id ?? "x"}`, async () => {
       const count = await actions.assignMany(dishTasks, personId);
-      showToast(`${count} tasks → ${label}`);
+      showToast(`${formatCountNoun(count, "task")} → ${label}`);
     });
   };
 
@@ -193,6 +194,17 @@ export function KitchenDashboardPage() {
           <button type="button" onClick={() => setHorizonOffset((v) => v + 7)}>
             Later
           </button>
+          <BoundedDateInput
+            aria-label="Jump to date"
+            title="Jump to date"
+            value={horizon.startDateValue()}
+            onChange={(e) => {
+              const offset = KitchenCommandDeckHorizon.offsetForDateValue(
+                e.target.value,
+              );
+              if (offset != null) setHorizonOffset(offset);
+            }}
+          />
         </fieldset>
         <KitchenCommandDeckFilters value={filter} onChange={setFilter} />
         <label className="kcd-field">
@@ -228,6 +240,19 @@ export function KitchenDashboardPage() {
               venueName={(id) =>
                 venues?.find((v) => v._id === id)?.name ?? "No venue"
               }
+              nextEvent={
+                horizonEvents.length === 0
+                  ? model.nextEventAfterHorizon()
+                  : null
+              }
+              onJumpToEvent={(event) => {
+                setHorizonOffset(
+                  KitchenCommandDeckHorizon.offsetForTimestamp(
+                    Number(event.startsAt),
+                  ),
+                );
+                setSelectedEventId(event._id);
+              }}
             />
           </aside>
 

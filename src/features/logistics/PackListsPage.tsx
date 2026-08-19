@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreatePackList,
   useListEvent,
@@ -190,7 +191,7 @@ export function PackListsPage() {
             <p className="eyebrow">Dispatch trace</p>
             <h2>Pack lists</h2>
           </div>
-          <span>{visibleRows.length} lists</span>
+          <span>{formatCountNoun(visibleRows.length, "list")}</span>
         </div>
         {loading ? (
           <TableSkeleton rows={5} />

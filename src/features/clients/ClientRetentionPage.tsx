@@ -8,7 +8,7 @@ import {
   useListClientOutreachTask,
   useListEvent,
 } from "../../lib/manifest-convex-react";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { clientDisplayName } from "../events/clientName";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
@@ -215,7 +215,9 @@ export function ClientRetentionPage() {
             <p className="eyebrow">Worth a call</p>
             <h2>No {currentYear} booking yet</h2>
           </div>
-          <span>{loading ? "…" : `${churnCandidates.length} clients`}</span>
+          <span>
+            {loading ? "…" : formatCountNoun(churnCandidates.length, "client")}
+          </span>
         </div>
         {loading ? (
           <TableSkeleton rows={4} />

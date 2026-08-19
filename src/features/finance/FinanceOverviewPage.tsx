@@ -9,6 +9,7 @@ import {
   EmptyState,
   PageHeader,
   Section,
+  Skeleton,
   StatusChip,
   TableSkeleton,
 } from "../../ui/primitives";
@@ -231,29 +232,39 @@ export function FinanceOverviewPage() {
       />
       <FinanceWorkspaceNav />
 
+      {/* While queries load, tiles pulse instead of showing "—" — an em-dash
+          reads as "no data", not "still fetching". */}
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line lg:grid-cols-4">
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Outstanding</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading
-              ? "—"
-              : formatMoney(outstandingTotal, functionalCurrencyCode)}
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : (
+              formatMoney(outstandingTotal, functionalCurrencyCode)
+            )}
           </dd>
         </div>
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Overdue invoices</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : formatCount(overdueCount)}
+            {loading ? (
+              <Skeleton className="h-7 w-12" />
+            ) : (
+              formatCount(overdueCount)
+            )}
           </dd>
         </div>
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Paid this month</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading
-              ? "—"
-              : paymentsUnreadable
-                ? "—"
-                : formatMoney(paidThisMonth, functionalCurrencyCode)}
+            {loading ? (
+              <Skeleton className="h-7 w-24" />
+            ) : paymentsUnreadable ? (
+              "—"
+            ) : (
+              formatMoney(paidThisMonth, functionalCurrencyCode)
+            )}
           </dd>
           {!loading && paymentsUnreadable ? (
             <p className="mt-1 text-xs text-ink-3">
@@ -264,7 +275,11 @@ export function FinanceOverviewPage() {
         <div className="bg-panel px-4 py-3">
           <dt className="eyebrow">Drafts waiting</dt>
           <dd className="mt-1 text-xl font-semibold text-ink">
-            {loading ? "—" : formatCount(draftCount)}
+            {loading ? (
+              <Skeleton className="h-7 w-12" />
+            ) : (
+              formatCount(draftCount)
+            )}
           </dd>
         </div>
       </dl>

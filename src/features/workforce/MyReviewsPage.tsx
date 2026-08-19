@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useMyReviews } from "../../lib/staffSelfReviews";
 import { TableSkeleton } from "../../ui/primitives";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 
 // Staff self-service view of their OWN recorded reviews (spec §9.4). Read-only
@@ -33,7 +33,7 @@ export function MyReviewsPage() {
             <p className="eyebrow">Your reviews</p>
             <h2>Recorded feedback</h2>
           </div>
-          <span>{reviews?.length ?? 0} records</span>
+          <span>{formatCountNoun(reviews?.length ?? 0, "record")}</span>
         </div>
         {reviews === undefined ? (
           <TableSkeleton rows={4} />

@@ -12,7 +12,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { useIngestKmCandidates } from "../../lib/hiringPipeline";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateInput } from "../../ui/BoundedDateInputs";
@@ -336,7 +336,7 @@ export function CandidatesPage() {
               <p className="eyebrow">Candidate pipeline</p>
               <h2>All candidates</h2>
             </div>
-            <span>{liveCandidates.length} records</span>
+            <span>{formatCountNoun(liveCandidates.length, "record")}</span>
           </div>
           {liveCandidates.map((candidate) => {
             const candidateInterviews = liveInterviews.filter(

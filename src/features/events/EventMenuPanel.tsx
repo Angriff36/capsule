@@ -11,7 +11,7 @@ import {
   useListComponent,
   useListComponentIngredient,
 } from "../../lib/manifest-convex-react";
-import { formatMoneyExact } from "../../lib/format";
+import { formatCountNoun, formatMoneyExact } from "../../lib/format";
 import {
   calculateComponentNutrition,
   sumPerGuestNutrition,
@@ -167,7 +167,7 @@ export function EventMenuPanel({ eventId, expectedHeadcount }: Props) {
       <div className="flex items-center justify-between">
         <h2 className="font-display text-lg">Menu</h2>
         <span className="text-sm text-ink-3">
-          {selections.length} dishes
+          {formatCountNoun(selections.length, "dish", "dishes")}
           {foodCostTotal > 0
             ? ` · est. food ${formatMoneyExact(foodCostTotal)}`
             : ""}

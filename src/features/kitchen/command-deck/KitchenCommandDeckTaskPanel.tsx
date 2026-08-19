@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { formatCountNoun } from "../../../lib/format";
 import { StatusChip } from "../../../ui/primitives";
 import { AllergenIconRow } from "../AllergenIconRow";
 import { DishPrimaryImage } from "../../attachments/DishPrimaryImage";
@@ -155,7 +156,7 @@ export function KitchenCommandDeckTaskPanel({
                   disabled={busy != null || !armedPersonId}
                   title={
                     armed
-                      ? `Assign ${assignable.length} tasks to ${model.personLabel(armed)}`
+                      ? `Assign ${formatCountNoun(assignable.length, "task")} to ${model.personLabel(armed)}`
                       : "Arm a cook on the right first"
                   }
                   onClick={() => onAssignDish(assignable)}

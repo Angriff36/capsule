@@ -27,7 +27,7 @@ import type { Id } from "../../lib/api";
 import { findApprovedTimeOffConflict } from "../../lib/timeOff";
 import { useScheduleShift } from "../../lib/workforceScheduling";
 import { EmptyState, StatusChip, TableSkeleton } from "../../ui/primitives";
-import { formatDate, formatTime } from "../../lib/format";
+import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { AvailabilityGridSection } from "./AvailabilityGridSection";
 import {
@@ -439,7 +439,7 @@ export function RosterPage() {
           </div>
           <div className="supply-row-actions">
             <span className="font-mono text-2xs text-ink-3 uppercase">
-              {activeAssignments.length} assignments
+              {formatCountNoun(activeAssignments.length, "assignment")}
             </span>
             <button
               type="button"
@@ -594,7 +594,7 @@ export function RosterPage() {
           </div>
           <div className="supply-row-actions">
             <span className="font-mono text-2xs text-ink-3 uppercase">
-              {selectedWeekShifts.length} shifts
+              {formatCountNoun(selectedWeekShifts.length, "shift")}
             </span>
             <button
               type="button"

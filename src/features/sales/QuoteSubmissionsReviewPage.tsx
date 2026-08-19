@@ -5,7 +5,7 @@ import { api } from "../../lib/api";
 import { useListQuoteSubmission } from "../../lib/manifest-convex-react";
 import { classifyCommandFailure } from "../events/CommandFailure";
 import { FailureBanner } from "../events/FailureBanner";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import {
   EmptyState,
   PageHeader,
@@ -200,7 +200,7 @@ export function QuoteSubmissionsReviewPage() {
                   <div>
                     {sub.eventDate ? formatDate(sub.eventDate) : "No date"}
                   </div>
-                  <div>{sub.guestCount ?? 0} guests</div>
+                  <div>{formatCountNoun(sub.guestCount ?? 0, "guest")}</div>
                   {sub.submittedAt && (
                     <div className="text-2xs text-ink-3">
                       submitted {formatDate(sub.submittedAt)}

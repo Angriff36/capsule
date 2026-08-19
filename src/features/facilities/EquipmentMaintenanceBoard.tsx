@@ -1,5 +1,5 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { formatDate, formatTime } from "../../lib/format";
+import { formatCountNoun, formatDate, formatTime } from "../../lib/format";
 import {
   useCreateEquipmentMaintenanceTask,
   useCreateEquipmentServiceEntry,
@@ -369,7 +369,10 @@ export function EquipmentMaintenanceBoard({
                     {isServiceOpen ? "Close log" : "Log service"}
                   </button>
                   {taskEntries.length > 1 ? (
-                    <small>{taskEntries.length} entries on file</small>
+                    <small>
+                      {formatCountNoun(taskEntries.length, "entry", "entries")}{" "}
+                      on file
+                    </small>
                   ) : null}
                 </div>
 

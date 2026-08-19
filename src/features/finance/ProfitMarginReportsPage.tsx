@@ -5,7 +5,7 @@ import {
   useListEventCloseout,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
-import { formatDate, formatMoney } from "../../lib/format";
+import { formatCountNoun, formatDate, formatMoney } from "../../lib/format";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import {
   buildProfitMarginCsv,
@@ -400,7 +400,10 @@ export function ProfitMarginDashboard({
                   </strong>
                   <small>
                     {formatMoney(report.bestSegment?.netProfit ?? 0)} across{" "}
-                    {report.bestSegment?.eventCount ?? 0} events
+                    {formatCountNoun(
+                      report.bestSegment?.eventCount ?? 0,
+                      "event",
+                    )}
                   </small>
                 </article>
                 <article
@@ -414,7 +417,10 @@ export function ProfitMarginDashboard({
                   </strong>
                   <small>
                     {formatMoney(report.weakestSegment?.netProfit ?? 0)} across{" "}
-                    {report.weakestSegment?.eventCount ?? 0} events
+                    {formatCountNoun(
+                      report.weakestSegment?.eventCount ?? 0,
+                      "event",
+                    )}
                   </small>
                 </article>
                 <ol>
@@ -424,7 +430,7 @@ export function ProfitMarginDashboard({
                       <div>
                         <strong>{segment.label}</strong>
                         <small>
-                          {segment.eventCount} events ·{" "}
+                          {formatCountNoun(segment.eventCount, "event")} ·{" "}
                           {formatMoney(segment.revenue)} revenue
                         </small>
                       </div>

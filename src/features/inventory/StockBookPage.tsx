@@ -19,7 +19,7 @@ import {
   useListStockTransfer,
   useListStorageLocation,
 } from "../../lib/manifest-convex-react";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { StatusChip, TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
@@ -486,7 +486,7 @@ export function StockBookPage() {
             <p className="eyebrow">Low-stock alerts</p>
             <h2>Below PAR</h2>
           </div>
-          <span>{lowStockItems.length} alerts</span>
+          <span>{formatCountNoun(lowStockItems.length, "alert")}</span>
         </div>
         {items === undefined ||
         ingredients === undefined ||
@@ -639,7 +639,7 @@ export function StockBookPage() {
             <p className="eyebrow">Stock position</p>
             <h2>Ingredient by location</h2>
           </div>
-          <span>{activeItems.length} lines</span>
+          <span>{formatCountNoun(activeItems.length, "line")}</span>
         </div>
         {items === undefined ||
         ingredients === undefined ||
@@ -754,7 +754,7 @@ export function StockBookPage() {
             <p className="eyebrow">Event claims</p>
             <h2>Reservations</h2>
           </div>
-          <span>{activeReservations.length} records</span>
+          <span>{formatCountNoun(activeReservations.length, "record")}</span>
         </div>
         {reservations === undefined || events === undefined ? (
           <TableSkeleton rows={5} />
@@ -841,7 +841,7 @@ export function StockBookPage() {
             <p className="eyebrow">Movement audit</p>
             <h2>Transfer history</h2>
           </div>
-          <span>{(transfers ?? []).length} transfers</span>
+          <span>{formatCountNoun((transfers ?? []).length, "transfer")}</span>
         </div>
         {transfers === undefined ? (
           <TableSkeleton rows={3} />

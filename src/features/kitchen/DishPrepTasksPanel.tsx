@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDishTask,
   useDishTaskRetire,
@@ -8,6 +9,7 @@ import {
 } from "../../lib/manifest-convex-react";
 import { componentPath } from "./kitchenRoutes";
 import { TableSkeleton } from "../../ui/primitives";
+import { useActionPrompt } from "../../ui/action-prompt";
 
 type Props = {
   dishId: string;
@@ -25,7 +27,9 @@ const CATEGORIES = [
   { value: "Side Items", label: "Side Items" },
 ] as const;
 
-// Ordered so the units the sheets actually use most come first.
+// Ordered so the units the sheets actually use most come first. "melon" stays
+// in the domain vocabulary for imported prep sheets but is not offered here —
+// it reads as leaked test data in a picker.
 const UNITS = [
   "each",
   "serving",
@@ -43,7 +47,6 @@ const UNITS = [
   "tablespoon",
   "teaspoon",
   "batch",
-  "melon",
   "bottle",
 ] as const;
 
@@ -57,12 +60,14 @@ export function DishPrepTasksPanel({ dishId }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  // A dish's tasks come off one sheet, so they share a category and station and
-  // mostly share a unit. form.reset() would send all three back to the default
-  // after every add and make the operator re-pick them once per task.
+  // A dish's tasks come off one sheet, so they share a category and mostly
+  // share a unit — those two hold their last value instead of resetting.
+  // Station is free text and clears with the rest of the form: a stale
+  // station silently mislabels the next row (issue #151 item 11).
   const [category, setCategory] = useState("Finish at Event");
   const [station, setStation] = useState("");
   const [unit, setUnit] = useState("each");
+  const { prompt, host: promptHost } = useActionPrompt();
 
   const rows = (tasks ?? [])
     .filter(
@@ -99,6 +104,7 @@ export function DishPrepTasksPanel({ dishId }: Props) {
         sortOrder: rows.length,
       });
       form.reset();
+      setStation("");
       setNotice(
         "Template added. Every event this dish is added to now opens this prep task.",
       );
@@ -111,7 +117,18 @@ export function DishPrepTasksPanel({ dishId }: Props) {
     }
   }
 
-  async function onRetire(id: string, version: number | undefined) {
+  async function onRetire(
+    id: string,
+    version: number | undefined,
+    name: string,
+  ) {
+    const ok = await prompt.askConfirm({
+      title: "Retire prep template",
+      description: `Retire "${name}"? New events using this dish will no longer open this prep task.`,
+      confirmLabel: "Retire",
+      tone: "danger",
+    });
+    if (!ok) return;
     setBusy(id);
     setError(null);
     setNotice(null);
@@ -133,9 +150,10 @@ export function DishPrepTasksPanel({ dishId }: Props) {
     <section className="culinary-section">
       <div className="culinary-section-heading">
         <h2>Prep task templates</h2>
-        <span>{rows.length} tasks</span>
+        <span>{formatCountNoun(rows.length, "task")}</span>
       </div>
 
+      {promptHost}
       {error ? <p className="text-base text-danger">{error}</p> : null}
       {notice ? (
         <p className="text-base text-ok" role="status">
@@ -191,7 +209,9 @@ export function DishPrepTasksPanel({ dishId }: Props) {
                     type="button"
                     className="btn btn-ghost btn-sm"
                     disabled={busy != null}
-                    onClick={() => void onRetire(task._id, task.version)}
+                    onClick={() =>
+                      void onRetire(task._id, task.version, task.name)
+                    }
                   >
                     {busy === task._id ? "Working…" : "Remove"}
                   </button>

@@ -7,7 +7,11 @@ import {
   useListPerson,
   useListShift,
 } from "../../lib/manifest-convex-react";
-import { formatDate, formatMoneyExact } from "../../lib/format";
+import {
+  formatCountNoun,
+  formatDate,
+  formatMoneyExact,
+} from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
@@ -511,8 +515,9 @@ export function TipDistributionPage() {
               </table>
             </div>
             <footer>
-              Prepared in Capsule · {calculation.shares.length} recipients ·
-              Every cent accounted for · Manager initials __________
+              Prepared in Capsule ·{" "}
+              {formatCountNoun(calculation.shares.length, "recipient")} · Every
+              cent accounted for · Manager initials __________
             </footer>
           </article>
 

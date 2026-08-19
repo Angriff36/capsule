@@ -1,5 +1,6 @@
 import type { FormEvent } from "react";
 import { VENDOR_CONTACT_ROLES } from "./vendorContactRoles";
+import { suggestOrderNumber } from "./vendorOrderNumber";
 
 type VendorOption = {
   _id: string;
@@ -162,7 +163,13 @@ export function PurchasingCommandForm({
             </label>
             <label className="field-label">
               Order number
-              <input name="orderNumber" className="input" />
+              {/* Prefilled so manual orders never land as "Unnumbered order";
+                  still editable to match a vendor's own PO scheme. */}
+              <input
+                name="orderNumber"
+                className="input"
+                defaultValue={suggestOrderNumber()}
+              />
             </label>
             <label className="field-label supply-span-2">
               Notes

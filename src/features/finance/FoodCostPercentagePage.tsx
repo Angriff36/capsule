@@ -5,7 +5,7 @@ import {
   useListVenue,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
-import { formatDate, formatMoney } from "../../lib/format";
+import { formatCountNoun, formatDate, formatMoney } from "../../lib/format";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
 import { useFinanceReportFilters } from "./useFinanceReportFilters";
 import {
@@ -446,7 +446,7 @@ function FoodCostReportBody({
             <p className="eyebrow">Event detail</p>
             <h2>Every plate, accounted for</h2>
           </div>
-          <span>{report.events.length} events</span>
+          <span>{formatCountNoun(report.events.length, "event")}</span>
         </div>
         {report.events.length === 0 ? null : (
           <div className="supply-table-wrap">

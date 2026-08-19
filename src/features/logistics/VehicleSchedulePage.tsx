@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Id } from "../../lib/api";
+import { formatCountNoun } from "../../lib/format";
 import {
   useListDelivery,
   useListEvent,
@@ -153,7 +154,8 @@ export function VehicleSchedulePage() {
             <h2>{new Date(dayStart).toLocaleDateString()}</h2>
           </div>
           <span>
-            {fleet.length} vehicles · {dayRuns.length} delivery runs
+            {formatCountNoun(fleet.length, "vehicle")} ·{" "}
+            {formatCountNoun(dayRuns.length, "delivery run")}
           </span>
         </div>
         {loading ? (

@@ -63,8 +63,11 @@ const ACTIONS: ReadonlyArray<
     lifecycle: EventLockForSalesLifecycle,
   },
   {
+    // The domain command moves sales_lock → executing (a sales-side "go"
+    // without beginExecution's ops-readiness guards), so the label says so
+    // instead of implying the event merely stays locked.
     key: "confirmSalesLock",
-    label: "Confirm sales lock",
+    label: "Confirm sales lock & start execution",
     kind: "primary",
     lifecycle: EventConfirmSalesLockLifecycle,
   },

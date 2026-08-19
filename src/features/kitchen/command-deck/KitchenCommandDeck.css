@@ -129,6 +129,24 @@
   color: var(--color-canvas);
 }
 
+.kcd-horizon-nav input[type="date"] {
+  border: 0;
+  background: transparent;
+  color: var(--color-ink-2);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.4rem 0.6rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.kcd-horizon-nav input[type="date"]:hover {
+  color: var(--color-ink);
+  background: color-mix(in srgb, var(--color-sage-2) 45%, transparent);
+}
+
 .kcd-filters {
   display: flex;
   flex-wrap: wrap;

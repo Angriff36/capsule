@@ -24,6 +24,24 @@ export const UNIT_OF_MEASURE = [
 
 export type UnitOfMeasure = (typeof UNIT_OF_MEASURE)[number];
 
+/**
+ * Units offered in manual unit pickers. "melon" stays in the closed
+ * vocabulary so the prep-sheet importer and existing rows keep validating,
+ * but it reads as leaked test data in a dropdown, so forms omit it.
+ */
+export const SELECTABLE_UNITS: readonly UnitOfMeasure[] =
+  UNIT_OF_MEASURE.filter((unit) => unit !== "melon");
+
+/** Picker options for an existing row: selectable units plus the row's current import-only unit. */
+export function unitOptionsFor(
+  current?: string | null,
+): readonly UnitOfMeasure[] {
+  if (!current || SELECTABLE_UNITS.includes(current as UnitOfMeasure)) {
+    return SELECTABLE_UNITS;
+  }
+  return [...SELECTABLE_UNITS, current as UnitOfMeasure];
+}
+
 const ALIASES: Record<string, UnitOfMeasure> = {
   each: "each",
   ea: "each",

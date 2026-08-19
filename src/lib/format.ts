@@ -63,6 +63,15 @@ export function formatCount(n: number | null | undefined): string {
   return n == null ? "—" : numFmt.format(n);
 }
 
+/** "1 record" / "2 records" — count badges never read "1 records". */
+export function formatCountNoun(
+  n: number,
+  noun: string,
+  plural = `${noun}s`,
+): string {
+  return `${numFmt.format(n)} ${n === 1 ? noun : plural}`;
+}
+
 export function formatPercent(n: number | null | undefined): string {
   return n == null ? "—" : `${n.toFixed(1)}%`;
 }

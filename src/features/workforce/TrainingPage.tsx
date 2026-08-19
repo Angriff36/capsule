@@ -9,7 +9,7 @@ import {
   useListTrainingModule,
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
-import { formatDate } from "../../lib/format";
+import { formatCountNoun, formatDate } from "../../lib/format";
 import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import "./TrainingPage.css";
@@ -484,7 +484,7 @@ export function TrainingPage() {
               <p className="eyebrow">Completion ledger</p>
               <h2>Passed assessments</h2>
             </div>
-            <span>{activeCompletions.length} records</span>
+            <span>{formatCountNoun(activeCompletions.length, "record")}</span>
           </div>
           {loading ? (
             <TableSkeleton rows={4} />
