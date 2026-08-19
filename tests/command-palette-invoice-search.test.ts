@@ -113,4 +113,39 @@ describe("Ctrl-K settled invoice NL paints invoice hits", () => {
     expect(search).not.toContain("unpaidStatuses");
     expect(search).not.toContain("if (statuses && !statuses.has");
   });
+
+  it("queryInvoices paginates instead of take(120)", () => {
+    // QA 191: billed INV-2026-QA1 / draft INV-8BJQS7 can sit past the
+    // first 120 tenant rows. Restoring .take(120) still passed helper tests.
+    const search = readFileSync("convex/search.ts", "utf8");
+    const start = search.indexOf("async function queryInvoices");
+    const end = search.indexOf("function invoiceHint", start);
+    expect(start).toBeGreaterThan(-1);
+    expect(end).toBeGreaterThan(start);
+    const fn = search.slice(start, end);
+    expect(fn).toContain(".paginate(");
+    expect(fn).toContain("MAX_SCAN");
+    expect(fn).toContain("paginate({ numItems: PAGE, cursor })");
+    expect(fn).not.toMatch(/\.take\(\s*120\s*\)/);
+  });
+
+  it("production build deploys Convex instead of a UI-only vite build", () => {
+    // QA 191 leftover: frontend 3dd95bb1 on mule, search still hyphen-split.
+    const pkg = JSON.parse(readFileSync("package.json", "utf8")) as {
+      scripts: { build: string };
+    };
+    expect(pkg.scripts.build).toBe("bash scripts/vercel-build.sh");
+    expect(pkg.scripts.build).not.toBe("vite build");
+    const vercel = JSON.parse(readFileSync("vercel.json", "utf8")) as {
+      buildCommand: string;
+    };
+    expect(vercel.buildCommand).toBe("bash scripts/vercel-build.sh");
+    const sh = readFileSync("scripts/vercel-build.sh", "utf8");
+    const prod =
+      sh
+        .split('if [ "${VERCEL_ENV:-}" = "production" ]; then')[1]
+        ?.split("else")[0] ?? "";
+    expect(prod).toContain("convex deploy --cmd 'vite build'");
+    expect(prod).not.toMatch(/^\s*vite build\s*$/m);
+  });
 });

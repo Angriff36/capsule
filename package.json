@@ -13,7 +13,7 @@
     "agent:mcp": "bun scripts/capsule-mcp.ts",
     "agent:mint-jwt": "bun scripts/capsule-mint-agent-jwt.ts",
     "baseline:decay": "bun scripts/check-baseline-decay.ts",
-    "build": "vite build",
+    "build": "bash scripts/vercel-build.sh",
     "check": "bun run toolchain && bun scripts/builder-regen-guard.ts --check-ownership && bun run proof:emit && bun run check:proof && bun run check:manifest-registry && bun run check:event-manifest && bun run check:culinary-manifest && bun run check:supply-manifest && bun run check:production-manifest && bun run check:workforce-manifest && bun run check:logistics-manifest && bun run check:commercial-manifest && bun run check:closeout-manifest && bun run check:payroll-manifest && bun run check:design-vocab && bun run typecheck && bun run format:check && bun run secrets && bun run test:coverage && bun run build && bun run baseline:decay",
     "check:closeout-manifest": "bun scripts/check-closeout-manifest-integration.ts",
     "check:commercial-manifest": "bun scripts/check-commercial-manifest-integration.ts",
