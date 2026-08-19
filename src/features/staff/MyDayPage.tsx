@@ -1,5 +1,5 @@
 import { useUser } from "@clerk/react";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import {
   useAvailabilityWindowWithdraw,
   useCreateAvailabilityWindow,
@@ -77,7 +77,7 @@ const BLOCK_BTN = "btn btn-primary mt-3 w-full py-3 text-lg max-sm:min-h-11";
  * admin AppShell so none of the admin-facing navigation appears.
  */
 export function MyDayPage() {
-  const { user } = useUser();
+  const { user, isLoaded: clerkLoaded } = useUser();
   const people = useCachedRead("people", useListPerson());
   const shifts = useCachedRead("shifts", useListShift());
   const scheduleNotices = useCachedRead(
@@ -149,25 +149,35 @@ export function MyDayPage() {
   useOfflineSync(runnersRef);
 
   const userId = user?.id;
+  const signedInSubjectId = clerkLoaded && userId ? userId : undefined;
   const [storedPersonId, setStoredPersonId] = useState<string | null>(() =>
-    myDayIdentityResolver.readStoredPersonId(userId),
+    myDayIdentityResolver.readStoredPersonId(signedInSubjectId),
   );
   const [showDeclare, setShowDeclare] = useState(false);
   const [openPhotoKey, setOpenPhotoKey] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<unknown>(null);
 
+  // Re-key the remembered pick when Clerk finishes loading or the account
+  // switches. A leftover device-global / previous-account pick must not stay
+  // in React state after the signed-in subject changes.
+  useEffect(() => {
+    setStoredPersonId(
+      myDayIdentityResolver.readStoredPersonId(signedInSubjectId),
+    );
+  }, [signedInSubjectId]);
+
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
   );
   const { person: me, linkedToSignIn } = myDayIdentityResolver.resolve(
     activePeople,
-    userId,
-    storedPersonId,
+    signedInSubjectId,
+    signedInSubjectId ? storedPersonId : null,
   );
 
   const choosePerson = (id: string) => {
-    myDayIdentityResolver.storePersonId(userId, id);
+    myDayIdentityResolver.storePersonId(signedInSubjectId, id);
     setStoredPersonId(id);
   };
 
@@ -212,7 +222,7 @@ export function MyDayPage() {
     void drainQueue(runnersRef.current).catch(setFailure);
   };
 
-  if (people === undefined) {
+  if (people === undefined || !clerkLoaded) {
     return (
       <MyDayFrame>
         <TableSkeleton rows={6} />
@@ -408,7 +418,7 @@ export function MyDayPage() {
         linkedToSignIn
           ? undefined
           : () => {
-              myDayIdentityResolver.clearStoredPersonId(userId);
+              myDayIdentityResolver.clearStoredPersonId(signedInSubjectId);
               setStoredPersonId(null);
             }
       }
