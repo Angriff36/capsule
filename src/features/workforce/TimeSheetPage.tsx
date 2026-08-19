@@ -4,6 +4,7 @@ import {
   useCreateAvailabilityWindow,
   useCreateTimeRecord,
   useListAvailabilityWindow,
+  useListEvent,
   useListPerson,
   useListShift,
   useListTimeRecord,
@@ -17,6 +18,12 @@ import { WorkforceFailureBanner } from "./WorkforceFailureBanner";
 import { WorkforceLifecyclePolicy } from "./WorkforceLifecyclePolicy";
 import { WorkforceWorkspaceNav } from "./WorkforceWorkspaceNav";
 import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
+import {
+  CLOCK_OUT_PROMPT_FIELDS,
+  currentShiftFor,
+  persistClockOut,
+  persistPrimaryTimeRecord,
+} from "./timeRecordEntry";
 
 const policy = new WorkforceLifecyclePolicy();
 
@@ -25,10 +32,106 @@ const toEpoch = (value: FormDataEntryValue | null) => {
   return Number.isFinite(time) ? time : Number.NaN;
 };
 
+type PersonOption = {
+  _id: string;
+  givenName: string;
+  familyName: string;
+};
+
+type EventOption = {
+  _id: string;
+  title?: string | null;
+  startsAt?: number | null;
+};
+
+export function TimeSheetClockInForm({
+  people,
+  events,
+  busy,
+  defaultClockInLocal,
+  onSubmit,
+}: {
+  people: readonly PersonOption[];
+  events: readonly EventOption[];
+  busy: boolean;
+  defaultClockInLocal: string;
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void;
+}) {
+  return (
+    <form
+      className="supply-form"
+      onSubmit={onSubmit}
+      data-testid="clock-in-form"
+    >
+      <div className="supply-form-heading">
+        <div>
+          <p className="eyebrow">New time entry</p>
+          <h2>Clock in</h2>
+        </div>
+        <button className="btn btn-primary" disabled={busy} type="submit">
+          {busy ? "Clocking…" : "Clock in"}
+        </button>
+      </div>
+      <p className="mt-2 max-w-160 text-ink-2">
+        Pick the event this time belongs to. Enter both times to record a
+        finished window (for example 5:00–10:00 PM). Leave clock-out empty to
+        stamp in now.
+      </p>
+      <div className="supply-form-grid">
+        <label className="field-label">
+          Person
+          <select name="personId" className="input" required>
+            <option value="">Select person</option>
+            {people.map((item) => (
+              <option key={item._id} value={item._id}>
+                {item.givenName} {item.familyName}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field-label">
+          Event
+          <select name="eventId" className="input" data-testid="clock-in-event">
+            <option value="">No event · unassigned</option>
+            {events.map((item) => (
+              <option key={item._id} value={item._id}>
+                {item.title?.trim() || "Untitled event"}
+                {item.startsAt ? ` · ${formatDate(item.startsAt)}` : ""}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="field-label">
+          Clock in
+          <BoundedDateTimeLocalInput
+            name="clockInAt"
+            className="input"
+            defaultValue={defaultClockInLocal}
+            data-testid="clock-in-at"
+          />
+        </label>
+        <label className="field-label">
+          Clock out
+          <BoundedDateTimeLocalInput
+            name="clockOutAt"
+            className="input"
+            data-testid="clock-out-at"
+          />
+        </label>
+        <label className="field-label">
+          Notes
+          <input name="notes" className="input" />
+        </label>
+      </div>
+    </form>
+  );
+}
+
 export function TimeSheetPage() {
   const records = useListTimeRecord();
   const windows = useListAvailabilityWindow();
   const people = useListPerson();
+  const events = useListEvent();
   const shifts = useListShift();
   const clockIn = useCreateTimeRecord();
   const clockOut = useTimeRecordClockOut();
@@ -45,9 +148,17 @@ export function TimeSheetPage() {
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
   );
+  const activeEvents = (events ?? [])
+    .filter((event) => event.deletedAt == null)
+    .sort((a, b) => (b.startsAt ?? 0) - (a.startsAt ?? 0));
   const personName = (id: string) => {
     const person = people?.find((row) => row._id === id);
     return person ? `${person.givenName} ${person.familyName}` : "Unknown";
+  };
+  const eventTitle = (id: string | null | undefined) => {
+    if (id == null || id === "") return "—";
+    const event = events?.find((row) => row._id === id);
+    return event?.title?.trim() || "Untitled event";
   };
 
   const run = async (key: string, work: () => Promise<void>) => {
@@ -62,27 +173,10 @@ export function TimeSheetPage() {
     }
   };
 
-  // Attach the clock-in to the person's current shift (and its event) so
-  // worked time is event-attributable — closeout labor and event margin
-  // read clocked time by event.
-  const currentShiftFor = (personId: string) => {
-    const now = Date.now();
-    const slack = 2 * 60 * 60 * 1000;
-    return (shifts ?? [])
-      .filter(
-        (shift) =>
-          shift.deletedAt == null &&
-          String(shift.personId) === personId &&
-          ["scheduled", "started"].includes(String(shift.status)),
-      )
-      .sort((a, b) => (a.startsAt ?? 0) - (b.startsAt ?? 0))
-      .find(
-        (shift) =>
-          shift.startsAt != null &&
-          shift.endsAt != null &&
-          now >= shift.startsAt - slack &&
-          now <= shift.endsAt + slack,
-      );
+  const timeApi = {
+    clockIn,
+    clockOut,
+    correct,
   };
 
   const submitClockIn = (event: FormEvent<HTMLFormElement>) => {
@@ -91,16 +185,13 @@ export function TimeSheetPage() {
     const data = new FormData(form);
     void run("clock-in", async () => {
       const personId = String(data.get("personId"));
-      const shift = currentShiftFor(personId);
-      await clockIn({
+      await persistPrimaryTimeRecord(timeApi, {
         personId,
-        ...(shift
-          ? {
-              shiftId: shift._id,
-              ...(shift.eventId ? { eventId: shift.eventId } : {}),
-            }
-          : {}),
+        eventId: String(data.get("eventId") || "") || undefined,
         notes: String(data.get("notes") || "") || undefined,
+        shift: currentShiftFor(personId, shifts),
+        clockInAt: data.get("clockInAt"),
+        clockOutAt: data.get("clockOutAt"),
       });
       form.reset();
       setShowForm(null);
@@ -127,7 +218,26 @@ export function TimeSheetPage() {
   const invokeTime = (row: any, key: string) => {
     void run(`${row._id}:${key}`, async () => {
       const args = { docId: row._id, version: row.version };
-      if (key === "clockOut") await clockOut(args);
+      if (key === "clockOut") {
+        const values = await prompt.askFields({
+          title: "Clock out",
+          description:
+            "Set the clock-out time. Use now or enter the time they actually finished.",
+          fields: [
+            {
+              ...CLOCK_OUT_PROMPT_FIELDS[0],
+              defaultValue: toDatetimeLocalValue(Date.now()),
+            },
+          ],
+          confirmLabel: "Clock out",
+        });
+        if (!values) return;
+        await persistClockOut(timeApi, {
+          ...args,
+          existingClockInAt: Number(row.clockInAt),
+          clockOutAt: values.clockOutAt,
+        });
+      }
       if (key === "correct") {
         const values = await prompt.askFields({
           title: "Correct this time record",
@@ -170,7 +280,10 @@ export function TimeSheetPage() {
   };
 
   const loading =
-    records === undefined || windows === undefined || people === undefined;
+    records === undefined ||
+    windows === undefined ||
+    people === undefined ||
+    events === undefined;
 
   return (
     <div className="operations-stage supply-stage">
@@ -180,8 +293,8 @@ export function TimeSheetPage() {
           <p className="eyebrow">Staff · Time</p>
           <h1 className="display-title mt-2">Time sheet & availability</h1>
           <p className="mt-3 max-w-160 text-ink-2">
-            Clock your team in and out, fix mistakes with a note about why, and
-            keep everyone's availability up to date.
+            Clock your team in and out, attach the hours to an event, and keep
+            everyone&apos;s availability up to date.
           </p>
         </div>
         <div className="supply-row-actions">
@@ -207,34 +320,13 @@ export function TimeSheetPage() {
       {failure ? <WorkforceFailureBanner error={failure} /> : null}
 
       {showForm === "clockIn" ? (
-        <form className="supply-form" onSubmit={submitClockIn}>
-          <div className="supply-form-heading">
-            <div>
-              <p className="eyebrow">New time entry</p>
-              <h2>Clock in</h2>
-            </div>
-            <button className="btn btn-primary" disabled={busy != null}>
-              {busy === "clock-in" ? "Clocking…" : "Clock in"}
-            </button>
-          </div>
-          <div className="supply-form-grid">
-            <label className="field-label">
-              Person
-              <select name="personId" className="input" required>
-                <option value="">Select person</option>
-                {activePeople.map((item) => (
-                  <option key={item._id} value={item._id}>
-                    {item.givenName} {item.familyName}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field-label">
-              Notes
-              <input name="notes" className="input" />
-            </label>
-          </div>
-        </form>
+        <TimeSheetClockInForm
+          people={activePeople}
+          events={activeEvents}
+          busy={busy != null}
+          defaultClockInLocal={toDatetimeLocalValue(Date.now())}
+          onSubmit={submitClockIn}
+        />
       ) : null}
 
       {showForm === "declare" ? (
@@ -312,6 +404,7 @@ export function TimeSheetPage() {
               <thead>
                 <tr>
                   <th>Person</th>
+                  <th>Event</th>
                   <th>Clock in</th>
                   <th>Clock out</th>
                   <th>Break</th>
@@ -325,6 +418,7 @@ export function TimeSheetPage() {
                     <td>
                       <strong>{personName(row.personId)}</strong>
                     </td>
+                    <td>{eventTitle(row.eventId)}</td>
                     <td>
                       {row.clockInAt
                         ? `${formatDate(row.clockInAt)} ${formatTime(row.clockInAt)}`
