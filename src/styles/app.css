@@ -443,6 +443,22 @@
     margin: 4px 0;
     background: var(--color-line-2);
   }
+  /* Short windows: the full icon rail (~860px with every workspace enabled)
+     is taller than the viewport. Scroll the rail internally instead of
+     letting it spill past the h-dvh shell — the spill used to stretch the
+     document (second scrollbar + dead band under the app). The scroll
+     container would clip the floating hover labels, so hide them here;
+     each link still carries a native title tooltip. */
+  @media (max-height: 900px) {
+    .icon-nav {
+      overflow-x: hidden;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+    .icon-nav a > span {
+      display: none;
+    }
+  }
   .module-drawer {
     position: relative;
     margin-bottom: 18px;

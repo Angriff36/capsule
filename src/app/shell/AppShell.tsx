@@ -67,7 +67,7 @@ export function AppShell() {
   }, [paletteOpen]);
 
   return (
-    <div className="flex h-dvh bg-canvas">
+    <div className="flex h-dvh overflow-hidden bg-canvas">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar onOpenPalette={() => setPaletteOpen(true)} />
