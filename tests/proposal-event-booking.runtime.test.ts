@@ -6,9 +6,12 @@
  * ProposalEventLinked → EventDish.confirmFromProposal cascade
  * (src/sales/proposal.manifest, src/sales/proposal-dish-selection.manifest):
  *   - accepted proposal → create event → menu selections copy (removed ones don't)
- *   - sales_staff can complete the whole flow (policy regression)
+ *   - sales_staff can complete the whole flow (policy regression) but stays
+ *     DENIED on direct EventDish composition (addToEvent/adjustServings/remove)
  *   - already-linked proposals reject, at the seam AND the domain command
  *   - a rejected double-booking creates no duplicate event
+ *   - linkEvent refuses a missing/fake eventId (even with no menu selections,
+ *     where the cascade would never run) and a wrong-client event
  */
 import { convexTest } from "convex-test";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -265,11 +268,18 @@ describe("accepted proposal → create event (issue #141)", () => {
     ).rejects.toThrow(/already linked/);
     expect(await liveEventCount(owner)).toBe(eventsAfterBooking);
 
-    // The domain command itself also refuses to re-link (guard eventId == null).
+    // The domain commands themselves also refuse to re-link (guard
+    // eventId == null): staging a new candidate fails, and so does a bare
+    // linkEvent.
+    await expect(
+      proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
+        docId: proposalId,
+        eventId: booked.docId,
+      }),
+    ).rejects.toThrow();
     await expect(
       proof.executeCommand(owner, api.mutations.Proposal_linkEvent, {
         docId: proposalId,
-        eventId: booked.docId,
       }),
     ).rejects.toThrow();
 
@@ -279,6 +289,171 @@ describe("accepted proposal → create event (issue #141)", () => {
     );
     expect((linked as { eventId?: string }).eventId).toBe(booked.docId);
     expect(await liveEventDishes(owner, booked.docId)).toHaveLength(1);
+  });
+
+  it("denies sales_staff direct EventDish composition (addToEvent/adjustServings/remove)", async () => {
+    const tenantId = "tenant-booking-deny";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-deny",
+      role: "owner",
+      tenantId,
+    });
+    const sales = proof.asRole({
+      subject: "sales-staff-deny",
+      role: "sales_staff",
+      tenantId,
+    });
+    const seed = await seedCatalog(proof, owner, tenantId);
+    const event = (await proof.executeCommand(
+      owner,
+      api.mutations.Event_createViaPlanEngagement,
+      { clientId: seed.clientId, ...EVENT_ARGS },
+    )) as { docId: string };
+    const line = (await proof.executeCommand(
+      owner,
+      api.mutations.EventDish_createViaAddToEvent,
+      { eventId: event.docId, dishId: seed.dishA.docId, quantityServings: 10 },
+    )) as { docId: string };
+
+    // The entity policy admits sales only for the proposal-confirmation
+    // cascade; every composition command carries a manageAccess guard.
+    await expect(
+      proof.executeCommand(sales, api.mutations.EventDish_createViaAddToEvent, {
+        eventId: event.docId,
+        dishId: seed.dishB.docId,
+        quantityServings: 5,
+      }),
+    ).rejects.toThrow(/Guard/);
+    await expect(
+      proof.executeCommand(sales, api.mutations.EventDish_adjustServings, {
+        docId: line.docId,
+        quantityServings: 1,
+      }),
+    ).rejects.toThrow(/Guard/);
+    await expect(
+      proof.executeCommand(sales, api.mutations.EventDish_remove, {
+        docId: line.docId,
+        reason: "sales should not be able to do this",
+      }),
+    ).rejects.toThrow(/Guard/);
+
+    // Managers still can (policy + guard both pass).
+    await proof.executeCommand(owner, api.mutations.EventDish_adjustServings, {
+      docId: line.docId,
+      quantityServings: 12,
+    });
+  });
+
+  it("linkEvent refuses a fake eventId even when no menu selections exist", async () => {
+    const tenantId = "tenant-booking-fake";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-fake",
+      role: "owner",
+      tenantId,
+    });
+    const seed = await seedCatalog(proof, owner, tenantId);
+    // Accepted proposal WITHOUT any dish selections — the cascade would never
+    // run, so only the linkEvent guards stand between a fake id and eventId.
+    const proposal = (await proof.executeCommand(
+      owner,
+      api.mutations.Proposal_createViaDraft,
+      {
+        clientId: seed.clientId,
+        title: "No-menu proposal",
+        subtotal: 100,
+        taxAmount: 0,
+        discountAmount: 0,
+        total: 100,
+      },
+    )) as { docId: string };
+    await proof.executeCommand(owner, api.mutations.Proposal_send, {
+      docId: proposal.docId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_markViewed, {
+      docId: proposal.docId,
+    });
+    await proof.executeCommand(owner, api.mutations.Proposal_accept, {
+      docId: proposal.docId,
+    });
+
+    // A malformed id cannot even be staged — the schema validator rejects it
+    // before any write (pendingEventId is a real v.id("events") column).
+    await expect(
+      proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
+        docId: proposal.docId,
+        eventId: "evt_does_not_exist",
+      }),
+    ).rejects.toThrow(/Validator/);
+
+    // A well-formed id that does not exist in THIS tenant (another tenant's
+    // event) stages, but linkEvent's tenant-bound pendingEvent resolve comes
+    // back null → guard rejects. Nothing links.
+    const foreignOwner = proof.asRole({
+      subject: "owner-foreign",
+      role: "owner",
+      tenantId: "tenant-booking-fake-other",
+    });
+    const foreignClient = (await proof.executeCommand(
+      foreignOwner,
+      api.mutations.Client_createViaRegister,
+      { clientType: "company", companyName: "Foreign tenant client" },
+    )) as { docId: string };
+    const foreignEvent = (await proof.executeCommand(
+      foreignOwner,
+      api.mutations.Event_createViaPlanEngagement,
+      { clientId: foreignClient.docId, ...EVENT_ARGS },
+    )) as { docId: string };
+    await proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
+      docId: proposal.docId,
+      eventId: foreignEvent.docId,
+    });
+    await expect(
+      proof.executeCommand(owner, api.mutations.Proposal_linkEvent, {
+        docId: proposal.docId,
+      }),
+    ).rejects.toThrow();
+
+    const row = await owner.run(async (ctx) =>
+      ctx.db.get(proposal.docId as never),
+    );
+    expect((row as { eventId?: string | null }).eventId ?? null).toBeNull();
+  });
+
+  it("linkEvent refuses an event that belongs to a different client", async () => {
+    const tenantId = "tenant-booking-xclient";
+    const proof = harness();
+    const owner = proof.asRole({
+      subject: "owner-xclient",
+      role: "owner",
+      tenantId,
+    });
+    const seed = await seedCatalog(proof, owner, tenantId);
+    const otherClient = (await proof.executeCommand(
+      owner,
+      api.mutations.Client_createViaRegister,
+      { clientType: "company", companyName: "Some other client" },
+    )) as { docId: string };
+    const foreignEvent = (await proof.executeCommand(
+      owner,
+      api.mutations.Event_createViaPlanEngagement,
+      { clientId: otherClient.docId, ...EVENT_ARGS },
+    )) as { docId: string };
+    const proposalId = await acceptedProposalWithMenu(proof, owner, seed);
+
+    await proof.executeCommand(owner, api.mutations.Proposal_stageEventLink, {
+      docId: proposalId,
+      eventId: foreignEvent.docId,
+    });
+    await expect(
+      proof.executeCommand(owner, api.mutations.Proposal_linkEvent, {
+        docId: proposalId,
+      }),
+    ).rejects.toThrow(/must belong to the proposal's client/);
+
+    const row = await owner.run(async (ctx) => ctx.db.get(proposalId as never));
+    expect((row as { eventId?: string | null }).eventId ?? null).toBeNull();
   });
 
   it("rejects proposals that are not accepted", async () => {

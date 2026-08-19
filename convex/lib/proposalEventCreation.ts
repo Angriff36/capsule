@@ -12,15 +12,20 @@
 // lib/proposalRevision.sendProposalWithRevisionCapture):
 //   1. Event_createViaPlanEngagement — creates the event (salesAccess or
 //      eventAccess policies, planEngagement guards/constraints).
-//   2. Proposal_linkEvent — the Proposal.linkEvent domain command
-//      (src/sales/proposal.manifest): links Proposal.eventId, emits
-//      ProposalEventLinked, and runs the ProposalDishSelection fanOut through
+//   2. Proposal_stageEventLink → Proposal_linkEvent — the domain's staged
+//      link handshake (src/sales/proposal.manifest, same shape as
+//      stageClientMerge → reassignClient): stage records the candidate id,
+//      linkEvent promotes it only after guarding through the resolved
+//      pendingEvent relation that the event exists in this tenant, is live,
+//      not cancelled, and belongs to the proposal's client. linkEvent then
+//      emits ProposalEventLinked, whose ProposalDishSelection fanOut runs
 //      EventDish.confirmFromProposal (src/sales/proposal-dish-selection.manifest)
-//      with the operator's auth — the same idempotent cascade accept-with-event
-//      uses, so the client's menu copies onto the new event.
+//      with the operator's auth — the same idempotent cascade
+//      accept-with-event uses, so the client's menu copies onto the new event.
 //
 // The pre-checks below only exist to fail fast with operator-readable errors
-// before any write; the domain command re-enforces all of them.
+// before any write; the domain commands are the authority and re-enforce all
+// of them (plus the event-side guards the seam cannot see).
 import { mutation } from "../_generated/server";
 import { api } from "../_generated/api";
 import type { Doc } from "../_generated/dataModel";
@@ -107,13 +112,18 @@ export const createEventFromAcceptedProposal = mutation({
       args.event,
     );
 
-    // 2. Link + menu cascade through the Proposal.linkEvent domain command.
-    // If the link or any cascaded dish confirmation fails, the uncaught throw
-    // rolls back the event creation too — no half-booked state.
-    await ctx.runMutation(api.mutations.Proposal_linkEvent, {
+    // 2. Staged link + menu cascade through the domain commands. If staging,
+    // the link guards, or any cascaded dish confirmation fails, the uncaught
+    // throw rolls back the event creation too — no half-booked state. The
+    // caller's optimistic version applies to the stage step; linkEvent runs
+    // against the staged row inside the same transaction.
+    await ctx.runMutation(api.mutations.Proposal_stageEventLink, {
       docId: args.proposalId,
       version: args.proposalVersion,
       eventId: created.docId,
+    });
+    await ctx.runMutation(api.mutations.Proposal_linkEvent, {
+      docId: args.proposalId,
     });
 
     return { docId: created.docId };

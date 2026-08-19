@@ -1827,6 +1827,7 @@ export default defineSchema({
     clientMergeAuthorizationId: v.optional(v.union(v.id("clientMerges"), v.null())),
     mergeTargetClientId: v.optional(v.union(v.id("clients"), v.null())),
     eventId: v.optional(v.union(v.id("events"), v.null())),
+    pendingEventId: v.optional(v.union(v.id("events"), v.null())),
     proposalNumber: v.optional(v.union(v.string(), v.null())),
     title: v.string(),
     eventDate: v.optional(v.union(v.number(), v.null())),
@@ -1861,6 +1862,7 @@ export default defineSchema({
     .index("by_clientMergeAuthorizationId", ["clientMergeAuthorizationId"])
     .index("by_mergeTargetClientId", ["mergeTargetClientId"])
     .index("by_eventId", ["eventId"])
+    .index("by_pendingEventId", ["pendingEventId"])
     .index("by_supersededById", ["supersededById"])
     .index("by_replacesProposalId", ["replacesProposalId"])
     .searchIndex("search_title", { searchField: "title", filterFields: ["tenantId"] }),

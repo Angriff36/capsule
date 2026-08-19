@@ -29,6 +29,13 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   property clientMergeAuthorizationId: uuid?
   property mergeTargetClientId: uuid?
   property eventId: uuid?
+  // Staged event link awaiting validation (stageEventLink → linkEvent
+  // handshake, issue #141 review). Same stage-then-commit shape as the
+  // clientMergeAuthorizationId / reassignClient flow below: the staged FK is
+  // written first so linkEvent can GUARD through the resolved relation that
+  // the event exists, is live, and belongs to this proposal's client — the
+  // expression language cannot resolve a relation from a raw command param.
+  property pendingEventId: uuid?
   property unique proposalNumber: string?
   property required searchable title: string = ""
   property eventDate: datetime?
@@ -61,6 +68,7 @@ entity Proposal mixin TenantScoped, SoftDeletable {
   ref clientMergeAuthorization: ClientMerge fields [tenantId, clientMergeAuthorizationId] references [tenantId, id]
   ref mergeTargetClient: Client fields [tenantId, mergeTargetClientId] references [tenantId, id]
   ref event: Event fields [tenantId, eventId] references [tenantId, id]
+  ref pendingEvent: Event fields [tenantId, pendingEventId] references [tenantId, id]
   ref supersededBy: Proposal fields [tenantId, supersededById] references [tenantId, id]
   ref replacesProposal: Proposal fields [tenantId, replacesProposalId] references [tenantId, id]
 
@@ -189,20 +197,47 @@ entity Proposal mixin TenantScoped, SoftDeletable {
 
   // Book an already-accepted proposal into its Event (issue #141). Signature
   // acceptance and "accept now, create the event after" both leave accepted
-  // proposals unlinked, and accept is the only other eventId writer. Emits
-  // the same dish-selection cascade key as accept-with-event so the client's
-  // menu copies onto the newly linked event
-  // (sales/proposal-dish-selection.manifest).
-  command linkEvent(eventId: uuid) {
+  // proposals unlinked, and accept is the only other eventId writer.
+  //
+  // Two-step handshake (same shape as stageClientMerge → reassignClient):
+  // stageEventLink records the candidate event id; linkEvent promotes it only
+  // after guarding THROUGH the resolved pendingEvent relation that the event
+  // exists in this tenant, is live, and belongs to the proposal's client —
+  // a raw command param cannot be relation-validated, and eventId must never
+  // persist a dangling or cross-client id (review High on #157).
+  command stageEventLink(eventId: uuid) {
     guard self.status == "accepted"
     guard self.deletedAt == null
     guard self.eventId == null
-    mutate eventId = eventId
+    mutate pendingEventId = eventId
+    emit ProposalEventLinkStaged {
+      proposalId: self.id
+      tenantId: self.tenantId
+      eventId: eventId
+    }
+  }
+
+  // Promote the staged link. Emits the dish-selection cascade key so the
+  // client's accepted menu copies onto the linked event
+  // (sales/proposal-dish-selection.manifest).
+  command linkEvent() {
+    guard self.status == "accepted"
+    guard self.deletedAt == null
+    guard self.eventId == null
+    guard self.pendingEventId != null
+    // Tenant-bound relation resolve: a missing or foreign-tenant event is null.
+    guard self.pendingEvent != null
+    guard self.pendingEvent.deletedAt == null
+    constraint linkEventNotCancelled: self.pendingEvent.stage != "cancelled" "Cannot link a cancelled event"
+    constraint linkEventClientMatch: self.pendingEvent.clientId == self.clientId "Linked event must belong to the proposal's client"
+    compute linkedEventId = self.pendingEventId
+    mutate eventId = self.pendingEventId
+    mutate pendingEventId = null
     emit ProposalEventLinked {
       proposalId: self.id
       tenantId: self.tenantId
       clientId: self.clientId
-      eventId: eventId
+      eventId: linkedEventId
       dishSelectionProposalId: self.id
     }
   }
@@ -338,6 +373,12 @@ event ProposalAccepted: "proposal.accepted" {
   // Non-null only when an Event was linked at accept time — keys the menu
   // selection → EventDish cascade (sales/proposal-dish-selection.manifest).
   dishSelectionProposalId: string?
+}
+
+event ProposalEventLinkStaged: "proposal.event_link_staged" {
+  proposalId: string
+  tenantId: string
+  eventId: string
 }
 
 event ProposalEventLinked: "proposal.event_linked" {
