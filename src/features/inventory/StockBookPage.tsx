@@ -53,6 +53,11 @@ export function supplyEditorCanApply(opts: {
   return true;
 }
 
+/** Esc dismisses the inline editor the same way Cancel does. */
+export function supplyEditorClosesOnKey(key: string): boolean {
+  return key === "Escape";
+}
+
 const HORIZON_DAYS = [3, 7, 14, 30] as const;
 
 const isExpired = (item: any) =>
@@ -928,6 +933,16 @@ function SupplyStockForm({
     );
     focusable?.focus();
   }, [kind, transferSource?._id]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (!supplyEditorClosesOnKey(event.key)) return;
+      event.preventDefault();
+      onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
   const canApply = supplyEditorCanApply({
     busy,
     kind,
