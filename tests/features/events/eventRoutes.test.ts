@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   eventDetailPath,
@@ -20,5 +21,14 @@ describe("eventRoutes tab helpers", () => {
 
   it("redirects old event menu links to the menu tab", () => {
     expect(eventMenuRedirectPath("evt9")).toBe("/events/evt9?tab=menu");
+  });
+});
+
+describe("event menu URL alias", () => {
+  it("App.tsx redirects /events/:id/menu to the menu tab", () => {
+    const app = readFileSync("src/app/App.tsx", "utf8");
+    expect(app).toContain('path="/events/:id/menu"');
+    expect(app).toContain("eventMenuRedirectPath");
+    expect(app).toContain("RedirectEventMenuAlias");
   });
 });

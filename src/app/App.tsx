@@ -1,5 +1,5 @@
 import { Component, lazy, Suspense, type ReactNode } from "react";
-import { Navigate, Route, Routes, useMatch } from "react-router-dom";
+import { Navigate, Route, Routes, useMatch, useParams } from "react-router-dom";
 import { ClientPortalPage } from "../features/clientPortal/ClientPortalPage";
 import { ProposalAcceptancePage } from "../features/clients/ProposalAcceptancePage";
 import { SharedProposalPage } from "../features/clients/SharedProposalPage";
@@ -10,6 +10,7 @@ import { EventCreatePage } from "../features/events/EventCreatePage";
 import { EventDetailPage } from "../features/events/EventDetailPage";
 import { EventsListPage } from "../features/events/EventsListPage";
 import { EventTemplatesPage } from "../features/events/EventTemplatesPage";
+import { eventMenuRedirectPath } from "../features/events/eventRoutes";
 import { HomePage } from "../features/home/HomePage";
 import { AllergenMatrixPage } from "../features/kitchen/AllergenMatrixPage";
 import { DishDetailPage } from "../features/kitchen/DishDetailPage";
@@ -78,6 +79,12 @@ const StaffOverviewPage = lazy(() =>
     default: module.StaffOverviewPage,
   })),
 );
+
+function RedirectEventMenuAlias() {
+  const { id } = useParams();
+  return <Navigate to={id ? eventMenuRedirectPath(id) : "/events"} replace />;
+}
+
 const LogisticsOverviewPage = lazy(() =>
   import("../features/logistics/LogisticsOverviewPage").then((module) => ({
     default: module.LogisticsOverviewPage,
@@ -568,6 +575,10 @@ export function App() {
             <Route
               path="/events/:id/allergen-briefing"
               element={<EventAllergenBriefingPage />}
+            />
+            <Route
+              path="/events/:id/menu"
+              element={<RedirectEventMenuAlias />}
             />
             <Route path="/kitchen" element={<KitchenDashboardPage />} />
             <Route
