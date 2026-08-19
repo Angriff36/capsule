@@ -8,7 +8,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(220px, 310px);
   gap: 2rem;
   align-items: end;
-  border-bottom: 1px solid rgb(49 87 79 / 0.22);
+  border-bottom: 1px solid var(--color-line-2);
   padding: 1.2rem 0 1.5rem;
 }
 
@@ -53,8 +53,8 @@
 .tip-total-card span,
 .tip-total-card small {
   display: block;
-  color: rgb(255 254 250 / 0.68);
-  font-size: 9px;
+  color: rgb(255 254 250 / 0.82);
+  font-size: 10px;
   letter-spacing: 0.11em;
   text-transform: uppercase;
 }
@@ -77,7 +77,9 @@
   border: 1px solid var(--color-line-2);
   border-top: 3px solid var(--color-accent);
   padding: 1rem;
-  background: rgb(255 254 250 / 0.72);
+  /* Theme token, not a hardcoded near-white: in dark mode the old light
+     overlay made the (light) field labels unreadable. */
+  background: var(--color-panel);
 }
 
 /* Event picker: long event titles must shrink inside the auto-fit grid
@@ -153,7 +155,7 @@
 
 .tip-methods small {
   color: var(--color-ink-3);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .tip-empty {
@@ -221,10 +223,15 @@
 .tip-print-sheet {
   margin-top: 1rem;
   border: 1px solid var(--color-line-2);
+  /* Theme tokens: the old hardcoded paper-white sheet made dark-theme (light)
+     text unreadable on screen. Print keeps paper colors below. */
   background:
-    linear-gradient(rgb(49 87 79 / 0.035) 1px, transparent 1px) 0 74px / 100%
-      38px,
-    #fffefa;
+    linear-gradient(
+        color-mix(in srgb, var(--color-ink) 4%, transparent) 1px,
+        transparent 1px
+      )
+      0 74px / 100% 38px,
+    var(--color-panel);
   box-shadow: 0 24px 55px -46px rgb(36 50 45 / 0.8);
 }
 
@@ -251,7 +258,7 @@
   display: block;
   margin-top: 0.35rem;
   color: var(--color-ink-3);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .tip-sheet-heading > div:last-child {
@@ -263,7 +270,7 @@
 
 .tip-sheet-heading > div:last-child span {
   color: var(--color-ink-3);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
@@ -292,7 +299,7 @@
   border-bottom: 1px solid var(--color-line-2);
   padding: 0.65rem 0.8rem;
   color: var(--color-ink-3);
-  font-size: 9px;
+  font-size: 10px;
   font-weight: 650;
   letter-spacing: 0.09em;
   text-align: left;
@@ -314,7 +321,7 @@
 .tip-print-sheet td > small {
   margin-top: 0.15rem;
   color: var(--color-ink-3);
-  font-size: 9px;
+  font-size: 10px;
 }
 
 .tip-print-sheet tbody tr.is-excluded {
@@ -360,7 +367,7 @@
   border-top: 1px solid var(--color-line-2);
   padding: 0.75rem 1.5rem;
   color: var(--color-ink-3);
-  font-size: 9px;
+  font-size: 10px;
   letter-spacing: 0.04em;
 }
 
@@ -451,6 +458,18 @@
     margin: 0;
     border-color: #555;
     box-shadow: none;
+    /* Paper colors regardless of the on-screen theme — dark-theme tokens
+       would print light ink on white paper. */
+    background: #fff;
+    color: #24322d;
+  }
+  .tip-print-sheet th,
+  .tip-print-sheet td > small,
+  .tip-print-sheet footer,
+  .tip-sheet-heading p:not(.eyebrow),
+  .tip-sheet-heading small,
+  .tip-sheet-heading > div:last-child span {
+    color: #53615b;
   }
   .tip-print-hours {
     display: inline;
