@@ -314,22 +314,26 @@ async function queryInvoices(
 
   // Invoices have no invoiceNumber index. take(120) missed billed
   // INV-2026-QA1 and draft INV-8BJQS7 when they were not on the first page.
+  // Do not .filter(deletedAt === null) before paginate: optional deletedAt
+  // is undefined, not null, so every page emptied, scanned never moved, and
+  // the query spun until timeout (QA 193: Searching… 8–9s then No matches).
+  // Skip deleted rows in JS like addHit (`deletedAt != null`).
   const PAGE = 100;
-  const MAX_SCAN = 2500;
+  const MAX_PAGES = 25;
   const MAX_HITS = 15;
   const out: SearchHit[] = [];
   let cursor: string | null = null;
-  let scanned = 0;
+  let pages = 0;
 
-  while (scanned < MAX_SCAN && out.length < MAX_HITS) {
+  while (pages < MAX_PAGES && out.length < MAX_HITS) {
     const page = await ctx.db
       .query("invoices")
       .withIndex("by_tenantId", (q) => q.eq("tenantId", tenantId))
-      .filter((q) => q.eq(q.field("deletedAt"), null))
       .paginate({ numItems: PAGE, cursor });
-    scanned += page.page.length;
+    pages += 1;
     for (const inv of page.page) {
-      // Null filter includes paid (QA Gallery INV-2026-QA1 is billed).
+      if (inv.deletedAt != null) continue;
+      // Null status filter includes paid (QA Gallery INV-2026-QA1 is billed).
       if (!keepInvoiceForSearch(inv, parsed, statuses)) continue;
       if (ageThreshold !== null) {
         const anchor = inv.dueDate ?? inv.issuedAt;
