@@ -21,9 +21,10 @@ import {
 } from "../../lib/format";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
+import { OPEN_INVOICE_STATUSES } from "./invoiceBilling";
 
 /** Invoice statuses with money still owed — the "needs attention" pool. */
-const OPEN_STATUSES = ["sent", "viewed", "overdue", "partial"];
+const OPEN_STATUSES: readonly string[] = OPEN_INVOICE_STATUSES;
 
 const ATTENTION_LIMIT = 8;
 

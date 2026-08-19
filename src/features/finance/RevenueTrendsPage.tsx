@@ -363,7 +363,7 @@ export function RevenueTrendsDashboard({
           <p className="eyebrow">Finance · Revenue intelligence</p>
           <h1 className="display-title mt-2">Revenue, in season.</h1>
           <p className="mt-3 max-w-180 text-ink-2">
-            Follow issued invoice revenue through the calendar, see who and what
+            Follow billed invoice revenue through the calendar, see who and what
             drives it, and compare every period with the same time last year.
           </p>
         </div>
@@ -423,7 +423,7 @@ export function RevenueTrendsDashboard({
               </span>
               <strong>{compactMoney.format(trend.currentTotal)}</strong>
               <small>
-                {trend.currentInvoiceCount} issued invoice
+                {trend.currentInvoiceCount} billed invoice
                 {trend.currentInvoiceCount === 1 ? "" : "s"}
                 {trend.foreignCurrencyInvoiceCount > 0
                   ? ` · ${trend.foreignCurrencyInvoiceCount} in other currencies`
@@ -480,10 +480,11 @@ export function RevenueTrendsDashboard({
             </div>
             {trend.currentTotal === 0 && trend.priorTotal === 0 ? (
               <div className="document-empty">
-                <p>No issued invoice revenue in this comparison window.</p>
+                <p>No billed invoice revenue in this comparison window.</p>
                 <span>
-                  Revenue appears here as invoices are issued. Voided,
-                  written-off, and deleted invoices are excluded.
+                  Revenue appears here once invoices are sent to the client.
+                  Drafts, voided, written-off, and deleted invoices are
+                  excluded.
                 </span>
               </div>
             ) : (
@@ -509,9 +510,11 @@ export function RevenueTrendsDashboard({
       <aside className="revenue-method-note">
         <span className="eyebrow">Method</span>
         <p>
-          Revenue uses invoice total on the issued date, with created date as a
-          legacy fallback. Voided, written-off, and deleted invoices are left
-          out. Prior-year weekly comparisons use the same weekday-aligned week.
+          Revenue counts only invoices billed to a client — sent, viewed,
+          overdue, partially paid, or paid — using the invoice total on the
+          issued date (created date as a legacy fallback). Drafts, voided,
+          written-off, and deleted invoices are left out. Prior-year weekly
+          comparisons use the same weekday-aligned week.
         </p>
         {breakdown === "service_line" ? (
           <p role="note">
