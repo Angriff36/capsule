@@ -33,6 +33,7 @@ import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
+import { vendorOrderTitle } from "./vendorOrderNumber";
 import { vendorContactRoleLabel } from "./vendorContactRoles";
 
 const policy = new SupplyLifecyclePolicy();
@@ -291,9 +292,7 @@ export function VendorOrderPage() {
       <header className="order-folio-masthead">
         <div>
           <p className="eyebrow">Vendor order · {order._id.slice(-8)}</p>
-          <h1 className="display-title mt-2">
-            {order.orderNumber || "Unnumbered order"}
-          </h1>
+          <h1 className="display-title mt-2">{vendorOrderTitle(order)}</h1>
           <p className="mt-3 text-ink-2">
             {vendor?.name ?? "Unknown vendor"} ·{" "}
             {order.eventId ? "Event order" : "General stock"}

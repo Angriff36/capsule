@@ -39,6 +39,7 @@ import { SeasonalDemandForecast } from "./SeasonalDemandForecast";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
 import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
+import { vendorOrderTitle } from "./vendorOrderNumber";
 import { byVendorScore, computeVendorPerformance } from "./vendorPerformance";
 
 const policy = new SupplyLifecyclePolicy();
@@ -558,9 +559,7 @@ export function PurchasingPage() {
                 {activeOrders.map((order) => (
                   <tr key={order._id}>
                     <td>
-                      <strong>
-                        {order.orderNumber || `Order ${order._id.slice(-8)}`}
-                      </strong>
+                      <strong>{vendorOrderTitle(order)}</strong>
                     </td>
                     <td>{vendorName(order.vendorId)}</td>
                     <td>
