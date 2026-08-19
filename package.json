@@ -64,7 +64,7 @@
     "react-dom": "^18.3.0",
     "react-router-dom": "^6.30.0",
     "recharts": "^3.10.1",
-    "zod": "3.25.76"
+    "zod": "4.4.3"
   },
   "devDependencies": {
     "@edge-runtime/vm": "^5.0.0",
