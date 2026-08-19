@@ -12,10 +12,9 @@ type CloseoutMoneyRow = {
 };
 
 function billingParts(billing: EventBillingRollup): string[] {
+  // Billed lives in its own list column. Keep collected/drafts here so
+  // the Event cell is status, not a second billed figure.
   const parts: string[] = [];
-  if (billing.billedTotal > 0) {
-    parts.push(`Billed ${formatMoneyExact(billing.billedTotal)}`);
-  }
   if (billing.collectedTotal > 0) {
     parts.push(`Collected ${formatMoneyExact(billing.collectedTotal)}`);
   }
@@ -45,10 +44,13 @@ export function CloseoutRevenueNote({
     );
   }
   const parts = billingParts(billing);
+  if (parts.length === 0 && billing.billedTotal === 0) {
+    return <small>Not reconciled — nothing billed yet</small>;
+  }
   return (
     <small>
       Not reconciled
-      {parts.length > 0 ? ` — ${parts.join(" · ")}` : " — nothing billed yet"}
+      {parts.length > 0 ? ` — ${parts.join(" · ")}` : ""}
     </small>
   );
 }

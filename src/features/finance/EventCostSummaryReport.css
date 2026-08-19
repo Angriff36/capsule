@@ -28,10 +28,10 @@
 }
 
 .event-cost-report {
-  --folio-ink: #1f2925;
-  --folio-muted: #6d746c;
-  --folio-line: rgba(31, 41, 37, 0.15);
-  --folio-paper: #f4f0e5;
+  --folio-ink: var(--color-ink);
+  --folio-muted: var(--color-ink-2);
+  --folio-line: var(--color-line);
+  --folio-paper: var(--color-panel);
   position: relative;
   overflow: hidden;
   max-width: 980px;
@@ -111,7 +111,7 @@
   min-width: 150px;
   padding: 13px 15px;
   border: 1px solid rgba(49, 87, 79, 0.32);
-  background: rgba(255, 255, 255, 0.35);
+  background: var(--folio-paper);
   text-align: right;
 }
 
@@ -146,7 +146,7 @@
 .event-cost-report-score > div {
   min-width: 0;
   padding: 24px 20px;
-  background: rgba(244, 240, 229, 0.94);
+  background: var(--folio-paper);
 }
 
 .event-cost-report-score > div:first-child {
