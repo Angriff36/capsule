@@ -126,10 +126,11 @@ export function isCloseoutListProfitPending(closeout: {
     amount(closeout.actualVendorCost) +
     amount(closeout.actualWasteCost);
   const total =
-    closeout.totalActualCost != null ? amount(closeout.totalActualCost) : fromBuckets;
+    closeout.totalActualCost != null
+      ? amount(closeout.totalActualCost)
+      : fromBuckets;
   return total === 0 && fromBuckets === 0;
 }
-
 
 /**
  * Builds the printable event folio from the governed closeout snapshot and
