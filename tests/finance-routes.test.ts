@@ -230,12 +230,12 @@ describe("Finance routes and lifecycle bindings", () => {
 
     // Heading count is honest — never a bare "0 payments" with money hidden.
     expect(presenter.countLabel(0, summary.hiddenCount, false)).toBe(
-      "2 settled hidden",
+      "0 open · 2 settled",
     );
     expect(presenter.countLabel(0, summary.hiddenCount, false)).not.toBe(
       "0 payments",
     );
-    expect(presenter.headingCount(rows, false)).toBe("2 settled hidden");
+    expect(presenter.headingCount(rows, false)).toBe("0 open · 2 settled");
     // Empty state names the filter and the hidden total.
     const notice = presenter.hiddenSettledNotice(summary);
     expect(notice).toContain("2 completed payments");

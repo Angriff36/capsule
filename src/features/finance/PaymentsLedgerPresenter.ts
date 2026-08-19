@@ -94,10 +94,9 @@ export class PaymentsLedgerPresenter {
     showTerminal: boolean,
   ): string {
     if (!showTerminal && hiddenCount > 0) {
-      if (visibleCount === 0) {
-        return `${hiddenCount} settled hidden`;
-      }
-      return `${visibleCount} open · ${hiddenCount} settled hidden`;
+      // QA 176 PASS: "0 OPEN · 2 SETTLED" is the signed-off badge. Do not
+      // rephrase it to "2 settled hidden".
+      return `${visibleCount} open · ${hiddenCount} settled`;
     }
     return plural(visibleCount, "payment");
   }
