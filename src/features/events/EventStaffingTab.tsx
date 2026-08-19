@@ -1,6 +1,4 @@
 import { useMemo, useState, type FormEvent } from "react";
-import { Link } from "react-router-dom";
-import { formatDate, formatTime } from "../../lib/format";
 import {
   useCreateEventAssignment,
   useCreateEventStaffNeed,
@@ -15,10 +13,17 @@ import {
   useListShift,
   useListTimeOffRequest,
 } from "../../lib/manifest-convex-react";
-import { StatusChip } from "../../ui/primitives";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
+import {
+  EventStaffingCoverageView,
+  type EventStaffNeedRow,
+} from "./EventStaffingCoverageView";
 import { FailureBanner } from "./FailureBanner";
+import {
+  EventTimelineStaffRoster,
+  type PersonRow,
+} from "./eventTimelineStaffRoster";
 
 type Props = {
   eventId: string;
@@ -26,13 +31,8 @@ type Props = {
   endsAt?: number | null;
 };
 
-function personLabel(person: {
-  givenName?: string | null;
-  familyName?: string | null;
-}): string {
-  return (
-    [person.givenName, person.familyName].filter(Boolean).join(" ") || "Staff"
-  );
+function personLabel(person: PersonRow): string {
+  return EventTimelineStaffRoster.labelFor(person);
 }
 
 export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
@@ -74,6 +74,16 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
   );
   const activePeople = (people ?? []).filter(
     (person) => person.deletedAt == null && person.status === "active",
+  );
+  const roster = useMemo(
+    () =>
+      EventTimelineStaffRoster.staffingRosterEntries({
+        eventId,
+        assignments: eventAssignments,
+        people: people ?? [],
+        staffNeeds: eventNeeds,
+      }),
+    [eventAssignments, eventId, eventNeeds, people],
   );
 
   const windowStart = Number(startsAt ?? 0);
@@ -185,224 +195,107 @@ export function EventStaffingTab({ eventId, startsAt, endsAt }: Props) {
         </button>
       </form>
 
-      <ul className="divide-y divide-line border border-line">
-        {eventAssignments.map((assignment) => {
-          const person = people?.find((row) => row._id === assignment.personId);
-          const conflict = conflictsFor(assignment.personId);
-          return (
-            <li
-              key={assignment._id}
-              className="flex flex-wrap items-center justify-between gap-2 px-3 py-2"
+      <EventStaffingCoverageView
+        roster={roster}
+        eventNeeds={eventNeeds as EventStaffNeedRow[]}
+        people={people ?? []}
+        activePeople={activePeople}
+        busy={busy}
+        needPersonIds={needPersonIds}
+        postForm={
+          <form
+            className="grid gap-2 sm:grid-cols-3"
+            onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
+              formEvent.preventDefault();
+              const data = new FormData(formEvent.currentTarget);
+              const role = String(data.get("role") ?? "").trim();
+              const description = String(data.get("description") ?? "").trim();
+              if (!role) return;
+              void run("postOpen", () =>
+                createNeed({
+                  eventId,
+                  role,
+                  description: description || undefined,
+                  startsAt: startsAt ?? undefined,
+                  endsAt: endsAt ?? undefined,
+                }),
+              );
+              formEvent.currentTarget.reset();
+            }}
+          >
+            <label className="field-label">
+              Role
+              <input name="role" className="field-input" required />
+            </label>
+            <label className="field-label">
+              Description
+              <input name="description" className="field-input" />
+            </label>
+            <button
+              type="submit"
+              className="btn btn-ghost self-end"
+              disabled={busy != null}
             >
-              <div>
-                <Link
-                  to="/staff/roster"
-                  className="font-medium underline-offset-2 hover:underline"
-                >
-                  {person ? personLabel(person) : assignment.personId}
-                </Link>
-                <p className="font-mono text-xs text-ink-3">
-                  {assignment.role}
-                  {assignment.startsAt
-                    ? ` · ${formatTime(assignment.startsAt)}`
-                    : ""}
-                  {conflict.overlappingShifts.length
-                    ? " · overlapping shift"
-                    : ""}
-                  {conflict.approvedOff.length ? " · approved time off" : ""}
-                  {conflict.available ? " · availability window ok" : ""}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                <StatusChip status={String(assignment.status)} />
-                <button
-                  type="button"
-                  className="btn btn-ghost"
-                  disabled={busy != null}
-                  onClick={() =>
-                    void run(`unassign:${assignment._id}`, () =>
-                      unassign({
-                        docId: assignment._id,
-                        version: assignment.version,
-                      }),
-                    )
-                  }
-                >
-                  Unassign
-                </button>
-              </div>
-            </li>
+              Post open shift
+            </button>
+          </form>
+        }
+        onNeedPersonChange={(needId, personId) =>
+          setNeedPersonIds((current) => ({
+            ...current,
+            [needId]: personId,
+          }))
+        }
+        onUnassign={(entry) => {
+          const target = entry.unassign;
+          if (!target) return;
+          void run(`unassign:${target.docId}`, () =>
+            unassign({
+              docId: target.docId,
+              version: target.version,
+            }),
           );
-        })}
-        {eventAssignments.length === 0 ? (
-          <li className="px-3 py-3 text-base text-ink-3">
-            No staff assigned yet.
-          </li>
-        ) : null}
-      </ul>
-
-      <div className="space-y-2">
-        <h3 className="text-lg font-semibold">Open / claimable shifts</h3>
-        <form
-          className="grid gap-2 sm:grid-cols-3"
-          onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
-            formEvent.preventDefault();
-            const data = new FormData(formEvent.currentTarget);
-            const role = String(data.get("role") ?? "").trim();
-            const description = String(data.get("description") ?? "").trim();
-            if (!role) return;
-            void run("postOpen", () =>
-              createNeed({
-                eventId,
-                role,
-                description: description || undefined,
-                startsAt: startsAt ?? undefined,
-                endsAt: endsAt ?? undefined,
+        }}
+        onClaim={(need, personId) =>
+          void run(`claim:${need._id}`, () =>
+            claimNeed({
+              docId: need._id,
+              version: need.version,
+              personId,
+            }),
+          )
+        }
+        onFill={(need, personId) =>
+          void run(`fill:${need._id}`, () =>
+            fillNeed({
+              docId: need._id,
+              version: need.version,
+              personId,
+            }),
+          )
+        }
+        onCancel={(need) => {
+          void (async () => {
+            const reason = await prompt.askReason({
+              title: "Cancel open shift",
+              description: "Record why this open shift is coming down.",
+              label: "Cancellation reason",
+              placeholder: "e.g. Covered by a reassignment",
+              confirmLabel: "Cancel shift",
+              tone: "danger",
+            });
+            if (!reason) return;
+            void run(`cancel:${need._id}`, () =>
+              cancelNeed({
+                docId: need._id,
+                version: need.version,
+                reason,
               }),
             );
-            formEvent.currentTarget.reset();
-          }}
-        >
-          <label className="field-label">
-            Role
-            <input name="role" className="field-input" required />
-          </label>
-          <label className="field-label">
-            Description
-            <input name="description" className="field-input" />
-          </label>
-          <button
-            type="submit"
-            className="btn btn-ghost self-end"
-            disabled={busy != null}
-          >
-            Post open shift
-          </button>
-        </form>
-        <ul className="divide-y divide-line border border-line">
-          {eventNeeds.map((need) => (
-            <li
-              key={need._id}
-              className="flex flex-wrap items-center justify-between gap-2 px-3 py-2"
-            >
-              <div>
-                <p className="font-medium">{need.role}</p>
-                <p className="text-sm text-ink-3">
-                  {need.description || "No description"}
-                  {need.startsAt
-                    ? ` · ${formatDate(need.startsAt)} ${formatTime(need.startsAt)}`
-                    : ""}
-                </p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <StatusChip status={String(need.status)} />
-                {(need.status === "open" || need.status === "claimed") &&
-                activePeople.length > 0 ? (
-                  <>
-                    <label className="field-label">
-                      <span className="sr-only">Person for {need.role}</span>
-                      <select
-                        className="field-input w-44"
-                        value={needPersonIds[need._id] ?? ""}
-                        disabled={busy != null}
-                        onChange={(changeEvent) =>
-                          setNeedPersonIds((current) => ({
-                            ...current,
-                            [need._id]: changeEvent.target.value,
-                          }))
-                        }
-                      >
-                        <option value="">Choose person…</option>
-                        {activePeople.map((person) => {
-                          const conflict = conflictsFor(person._id);
-                          return (
-                            <option key={person._id} value={person._id}>
-                              {personLabel(person)}
-                              {conflict.overlappingShifts.length
-                                ? " · shift conflict"
-                                : ""}
-                              {conflict.approvedOff.length ? " · time off" : ""}
-                            </option>
-                          );
-                        })}
-                      </select>
-                    </label>
-                    {need.status === "open" ? (
-                      <button
-                        type="button"
-                        className="btn btn-ghost"
-                        disabled={busy != null || !needPersonIds[need._id]}
-                        onClick={() =>
-                          void run(`claim:${need._id}`, () =>
-                            claimNeed({
-                              docId: need._id,
-                              version: need.version,
-                              personId: needPersonIds[need._id]!,
-                            }),
-                          )
-                        }
-                      >
-                        Hold for them
-                      </button>
-                    ) : null}
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      disabled={busy != null || !needPersonIds[need._id]}
-                      onClick={() =>
-                        void run(`fill:${need._id}`, () =>
-                          fillNeed({
-                            docId: need._id,
-                            version: need.version,
-                            personId: needPersonIds[need._id]!,
-                          }),
-                        )
-                      }
-                    >
-                      Fill shift
-                    </button>
-                  </>
-                ) : null}
-                {need.status === "open" || need.status === "claimed" ? (
-                  <button
-                    type="button"
-                    className="btn btn-ghost"
-                    disabled={busy != null}
-                    onClick={() => {
-                      void (async () => {
-                        const reason = await prompt.askReason({
-                          title: "Cancel open shift",
-                          description:
-                            "Record why this open shift is coming down.",
-                          label: "Cancellation reason",
-                          placeholder: "e.g. Covered by a reassignment",
-                          confirmLabel: "Cancel shift",
-                          tone: "danger",
-                        });
-                        if (!reason) return;
-                        void run(`cancel:${need._id}`, () =>
-                          cancelNeed({
-                            docId: need._id,
-                            version: need.version,
-                            reason,
-                          }),
-                        );
-                      })();
-                    }}
-                  >
-                    Cancel
-                  </button>
-                ) : null}
-              </div>
-            </li>
-          ))}
-          {eventNeeds.length === 0 ? (
-            <li className="px-3 py-3 text-base text-ink-3">
-              No open shifts posted. Post one so eligible staff can claim it.
-            </li>
-          ) : null}
-        </ul>
-      </div>
+          })();
+        }}
+        conflictsFor={conflictsFor}
+      />
     </section>
   );
 }
