@@ -38,6 +38,7 @@ import { suggestOrderQuantity } from "./reorderSuggestion";
 import { SeasonalDemandForecast } from "./SeasonalDemandForecast";
 import { SupplyFailureBanner } from "./SupplyFailureBanner";
 import { SupplyLifecyclePolicy } from "./SupplyLifecyclePolicy";
+import { vendorOrderHeaderTotal } from "./vendorOrderHeaderTotal";
 import { byVendorScore, computeVendorPerformance } from "./vendorPerformance";
 
 const policy = new SupplyLifecyclePolicy();
@@ -458,9 +459,7 @@ export function PurchasingPage() {
                     </td>
                     <td>{vendorName(order.vendorId)}</td>
                     <td className="supply-number">
-                      {formatMoneyExact(
-                        Number(order.liveTotalAmount ?? order.totalAmount),
-                      )}
+                      {formatMoneyExact(vendorOrderHeaderTotal(order, lines))}
                     </td>
                     <td>
                       <StatusChip status={String(order.status)} />
@@ -570,9 +569,7 @@ export function PurchasingPage() {
                         : "Weekly / general"}
                     </td>
                     <td className="supply-number">
-                      {formatMoneyExact(
-                        Number(order.liveTotalAmount ?? order.totalAmount),
-                      )}
+                      {formatMoneyExact(vendorOrderHeaderTotal(order, lines))}
                     </td>
                     <td>
                       <StatusChip status={String(order.status)} />
