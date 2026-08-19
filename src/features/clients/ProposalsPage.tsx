@@ -261,7 +261,7 @@ export function ProposalsPage() {
           setNotice(
             eventId
               ? "Proposal accepted. The client's menu choices were copied to the linked event."
-              : "Proposal accepted. Use Create Event on the row to book it.",
+              : "Proposal accepted. Use Create Event on the row to book it — the details and menu carry over.",
           );
         });
         return;
@@ -714,8 +714,12 @@ export function ProposalsPage() {
                           ) : (
                             <Link
                               className="btn btn-ghost"
+                              // proposalId pre-fills the form from the
+                              // proposal and links the new event + copies the
+                              // accepted menu onto it (issue #141).
                               to={eventCreatePath({
                                 clientId: String(row.clientId),
+                                proposalId: row._id,
                               })}
                             >
                               Create Event

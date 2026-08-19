@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { Doc } from "../../lib/api";
 import { useRouteRecord } from "../../lib/routeRecord";
@@ -7,24 +7,29 @@ import {
   useCreateEvent,
   useCreateVenue,
   useGetEventTemplate,
+  useGetProposal,
   useListClient,
   useListMenu,
   useListOccasion,
   useListPerson,
+  useListProposalDishSelection,
   useListReferralSource,
   useListServiceStyle,
   useListVenue,
 } from "../../lib/manifest-convex-react";
+import { formatMoneyExact } from "../../lib/format";
 import { ArrowLeftIcon, ChevronRightIcon } from "../../ui/icons";
 import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { FieldError, useFieldValidation } from "../../ui/formValidation";
 import { PageHeader, Section, Skeleton } from "../../ui/primitives";
+import { useCreateEventFromProposal } from "../clients/useCreateEventFromProposal";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
 import { cleanCommandArgs } from "./CleanCommandArgs";
 import { clientDisplayName } from "./clientName";
 import { eventPlanEngagementFormMapper } from "./EventPlanEngagementFormMapper";
 import { FailureBanner } from "./FailureBanner";
 import { eventDetailPath } from "./eventRoutes";
+import { proposalEventPrefill } from "./ProposalEventPrefill";
 
 const VENUE_TYPES = [
   ["client_site", "Client site"],
@@ -136,6 +141,13 @@ export function EventCreatePage() {
   const [searchParams] = useSearchParams();
   const prefillClientId = searchParams.get("clientId")?.trim() || "";
   const templateId = searchParams.get("templateId")?.trim() || "";
+  // Accepted proposal to book (issue #141): pre-fills the form; when the
+  // proposal is still unlinked, submit goes through the proposal-booking seam
+  // so the new event is linked and the accepted menu copies onto it.
+  const proposalId = searchParams.get("proposalId")?.trim() || "";
+  const proposal = useGetProposal(proposalId || "skip");
+  const proposalDishSelections = useListProposalDishSelection();
+  const createEventFromProposal = useCreateEventFromProposal();
   const template = useRouteRecord(useGetEventTemplate, templateId || undefined);
   const menus = useListMenu();
   const templateMenuName = (menus ?? []).find(
@@ -163,6 +175,20 @@ export function EventCreatePage() {
   const { errors, touched, formProps, handleSubmit } =
     useFieldValidation(eventFieldRules);
   const draftForm = useFormDraft("event-create");
+  const proposalPrefill = proposalEventPrefill.values(proposal);
+  const proposalLinkable = proposalEventPrefill.canLinkOnCreate(proposal);
+  const proposalMenuCount = proposalId
+    ? (proposalDishSelections ?? []).filter(
+        (selection) =>
+          selection.proposalId === proposalId && selection.deletedAt == null,
+      ).length
+    : 0;
+  // Proposal deep links may arrive without ?clientId= — seed it once loaded.
+  useEffect(() => {
+    if (proposal?.clientId) {
+      setClientId((current) => current || String(proposal.clientId));
+    }
+  }, [proposal?._id]);
 
   const activeClients = (clients ?? []).filter(
     (client) =>
@@ -198,6 +224,18 @@ export function EventCreatePage() {
     .filter((source) => source.status === "active")
     .sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0));
   const selectedVenue = activeVenues.find((venue) => venue._id === venueId);
+  // The proposal stores only a venue NAME; auto-select the matching saved
+  // venue once venues load (once per proposal — the operator can change it).
+  const [venueAutoFilledFor, setVenueAutoFilledFor] = useState<string | null>(
+    null,
+  );
+  useEffect(() => {
+    if (!proposal || venues === undefined) return;
+    if (venueAutoFilledFor === proposal._id) return;
+    setVenueAutoFilledFor(proposal._id);
+    const match = proposalEventPrefill.matchVenue(proposal, activeVenues);
+    if (match) setVenueId((current) => current || match._id);
+  }, [proposal, venues]);
 
   const run = async (
     kind: "client" | "venue" | "event",
@@ -291,7 +329,18 @@ export function EventCreatePage() {
           data.get("operationalRequirements") ?? "",
         ),
       });
-      const created = await createEvent(args);
+      // An accepted, still-unlinked proposal books through the seam: one
+      // transaction that creates the event, copies the proposal's menu
+      // selections, and links Proposal.eventId (issue #141). Everything else
+      // uses the plain generated create command, unchanged.
+      const created =
+        proposalLinkable && proposal
+          ? await createEventFromProposal({
+              proposalId: proposal._id,
+              proposalVersion: proposal.version,
+              event: args,
+            })
+          : await createEvent(args);
       draftForm.clear();
       navigate(eventDetailPath(created.docId));
     });
@@ -320,7 +369,7 @@ export function EventCreatePage() {
 
       <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,0.48fr)]">
         <form
-          key={template?._id ?? "blank"}
+          key={`${template?._id ?? "blank"}:${proposal?._id ?? "blank"}`}
           id="event-create-form"
           ref={draftForm.formRef}
           onSubmit={(event) => {
@@ -339,7 +388,13 @@ export function EventCreatePage() {
             <div className="grid gap-3 p-3 sm:grid-cols-2">
               <label className="field-label sm:col-span-2">
                 Event title
-                <input name="title" className="input" required autoFocus />
+                <input
+                  name="title"
+                  className="input"
+                  defaultValue={proposalPrefill.title}
+                  required
+                  autoFocus
+                />
                 <FieldError name="title" errors={errors} touched={touched} />
               </label>
               <label className="field-label sm:col-span-2">
@@ -348,7 +403,11 @@ export function EventCreatePage() {
                   name="eventType"
                   className="input"
                   placeholder="Wedding, corporate lunch, holiday dinner…"
-                  defaultValue={template?.eventType ?? undefined}
+                  defaultValue={
+                    proposalPrefill.eventType ??
+                    template?.eventType ??
+                    undefined
+                  }
                   required
                 />
                 <FieldError
@@ -380,7 +439,11 @@ export function EventCreatePage() {
                   type="number"
                   min={1}
                   max={100000}
-                  defaultValue={template?.defaultHeadcount ?? 1}
+                  defaultValue={
+                    proposalPrefill.expectedHeadcount ??
+                    template?.defaultHeadcount ??
+                    1
+                  }
                   className="input"
                   required
                 />
@@ -395,6 +458,7 @@ export function EventCreatePage() {
                 <input
                   name="startsAt"
                   type="datetime-local"
+                  defaultValue={proposalPrefill.startsAtLocal}
                   className="input"
                   required
                 />
@@ -525,7 +589,7 @@ export function EventCreatePage() {
                   type="number"
                   min={0}
                   step="0.01"
-                  defaultValue={0}
+                  defaultValue={proposalPrefill.quotedPrice ?? 0}
                   className="input"
                   required
                 />
@@ -583,6 +647,59 @@ export function EventCreatePage() {
         </form>
 
         <aside className="space-y-3 lg:sticky lg:top-4 lg:self-start">
+          {proposalId ? (
+            <Section title="Proposal">
+              {proposal === undefined ? (
+                <div className="p-3">
+                  <Skeleton className="h-8" />
+                </div>
+              ) : proposal === null ? (
+                <p className="p-3 text-sm text-ink-3">
+                  This proposal no longer exists.
+                </p>
+              ) : (
+                <div className="space-y-1.5 p-3 text-sm text-ink-2">
+                  <p className="font-medium text-ink">{proposal.title}</p>
+                  <p>
+                    {proposal.eventType ? `${proposal.eventType} · ` : ""}
+                    {Number(proposal.guestCount ?? 0)} guests ·{" "}
+                    {formatMoneyExact(Number(proposal.total ?? 0))}
+                  </p>
+                  {proposal.venueName ? (
+                    <p>
+                      Venue: {proposal.venueName}
+                      {proposal.venueAddress
+                        ? ` — ${proposal.venueAddress}`
+                        : ""}
+                    </p>
+                  ) : null}
+                  {proposalLinkable ? (
+                    <p className="pt-1 text-xs leading-relaxed text-ink-3">
+                      {proposalMenuCount > 0
+                        ? `Creating this event links it to the proposal and copies its ${proposalMenuCount} menu selection${proposalMenuCount === 1 ? "" : "s"} onto the event.`
+                        : "Creating this event links it to the proposal. It has no menu selections to copy."}
+                    </p>
+                  ) : proposal.eventId ? (
+                    <p className="pt-1 text-xs leading-relaxed text-ink-3">
+                      Already booked — this proposal is linked to an event.
+                      Creating another event here will not copy its menu.
+                    </p>
+                  ) : (
+                    <p className="pt-1 text-xs leading-relaxed text-ink-3">
+                      This proposal is {String(proposal.status)} — the event
+                      will be created without linking it.
+                    </p>
+                  )}
+                  {proposal.venueName && venues !== undefined && !venueId ? (
+                    <p className="text-xs leading-relaxed text-ink-3">
+                      No saved venue matched “{proposal.venueName}” — pick or
+                      create it in the Venue panel.
+                    </p>
+                  ) : null}
+                </div>
+              )}
+            </Section>
+          ) : null}
           {templateId ? (
             <Section title="Template">
               {template === undefined ? (

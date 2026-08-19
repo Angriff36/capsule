@@ -532,6 +532,48 @@
     color: var(--color-brand);
   }
 
+  /* The icon rail is ~860px tall at full spacing (12 areas + mark + theme
+     toggle + drawer). Laptop-height windows are shorter, so without these
+     steps the rail overflows the h-dvh shell, grows the document, and creates
+     the dead second scrollbar / dark void the shell's overflow-clip now
+     guards against — but the rail must also FIT so every area stays
+     clickable. Two compression steps keep the whole rail on screen down to
+     ~600px-tall windows. */
+  @media (max-height: 900px) {
+    .capsule-mark {
+      margin-top: 8px;
+    }
+    .icon-nav {
+      gap: 5px;
+      padding-top: 16px;
+    }
+    .icon-nav a {
+      width: 38px;
+      height: 38px;
+    }
+    .module-drawer {
+      margin-bottom: 8px;
+    }
+  }
+  @media (max-height: 760px) {
+    .icon-nav {
+      gap: 2px;
+      padding-top: 8px;
+    }
+    .icon-nav a {
+      width: 34px;
+      height: 34px;
+    }
+    .icon-nav-rule {
+      margin: 2px 0;
+    }
+    .theme-toggle,
+    .module-drawer > summary {
+      width: 34px;
+      height: 34px;
+    }
+  }
+
   .journal-masthead {
     display: flex;
     align-items: flex-end;
@@ -1467,8 +1509,41 @@
   gap: 0.45rem;
 }
 
+/* Inventory / facilities workspace sub-nav — a real tab strip: spaced links
+   over a baseline rule with a single active underline. The nav renders
+   NavLink anchors, so the anchor rules here (not the layered
+   .component-status-tabs button rules) carry the styling. Scrolls sideways
+   on narrow screens. */
 .supply-tabs {
+  display: flex;
   margin: -0.5rem 0 0;
+  gap: 1.6rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.supply-tabs a {
+  flex: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  padding: 0.6rem 0;
+  color: var(--color-ink-3);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: 140ms ease;
+}
+
+.supply-tabs a:hover {
+  color: var(--color-brand);
+}
+
+.supply-tabs a.active {
+  border-bottom-color: var(--color-accent);
+  color: var(--color-brand);
 }
 
 /* Event detail tab bar — underline tabs over a baseline rule. Wraps on wide
