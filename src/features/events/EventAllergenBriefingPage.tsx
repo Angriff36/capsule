@@ -11,6 +11,10 @@ import { formatDate, formatTime } from "../../lib/format";
 import { isPlausibleConvexId, useRouteRecord } from "../../lib/routeRecord";
 import { ErrorState, StatusChip, TableSkeleton } from "../../ui/primitives";
 import { eventDetailPath } from "./eventRoutes";
+import {
+  assessGuestListCoverage,
+  GuestListCoverageNotice,
+} from "./GuestListCoverageNotice";
 // ponytail: browser print → "Save as PDF"; same approach as ContractDocumentPage.
 import "./EventAllergenBriefingPage.css";
 
@@ -53,6 +57,16 @@ export function EventAllergenBriefingPage() {
         ),
       );
   }, [eventDishes, dishes]);
+
+  // All recorded guests (any RSVP state) — the denominator the coverage
+  // warning compares against the sold headcount.
+  const invitedGuestCount = useMemo(
+    () =>
+      (eventGuests ?? []).filter(
+        (guest) => guest.invitedAt != null && guest.deletedAt == null,
+      ).length,
+    [eventGuests],
+  );
 
   const flaggedGuests = useMemo(
     () =>
@@ -127,6 +141,11 @@ export function EventAllergenBriefingPage() {
     eventGuests === undefined ||
     dishes === undefined;
 
+  const guestListCoverage = assessGuestListCoverage(
+    invitedGuestCount,
+    event.expectedHeadcount,
+  );
+
   return (
     <div className="operations-stage supply-stage">
       <header className="supply-masthead briefing-no-print">
@@ -176,6 +195,9 @@ export function EventAllergenBriefingPage() {
           <TableSkeleton rows={4} />
         ) : (
           <>
+            <div className="mt-4 empty:hidden">
+              <GuestListCoverageNotice coverage={guestListCoverage} />
+            </div>
             {conflicts.length ? (
               <section className="mt-6 break-inside-avoid rounded-xs border border-warn/40 bg-warn-soft/50 p-3">
                 <h2 className="text-base font-semibold uppercase tracking-wide">
@@ -250,10 +272,22 @@ export function EventAllergenBriefingPage() {
                 Guest dietary restrictions
               </h2>
               {flaggedGuests.length === 0 ? (
-                <p className="mt-2 text-base text-ink-2">
-                  No guest dietary restrictions were captured at booking. Record
-                  them on the event&rsquo;s Guests tab as RSVPs come in.
-                </p>
+                // When the guest list itself is empty or sparse, "no
+                // restrictions captured" would read as "no allergies exist".
+                // Say the truth instead: restrictions are unknown, not absent.
+                guestListCoverage != null ? (
+                  <p className="mt-2 text-base text-ink-2">
+                    {guestListCoverage.severity === "empty"
+                      ? "No guests are recorded for this event, so dietary restrictions are unknown — not absent. Fill in the Guests tab before relying on this briefing."
+                      : `Only ${guestListCoverage.guestCount} of ${guestListCoverage.expectedHeadcount} expected guests are recorded, and none list restrictions so far. Restrictions for the missing guests are unknown — not absent.`}
+                  </p>
+                ) : (
+                  <p className="mt-2 text-base text-ink-2">
+                    No guest dietary restrictions were captured at booking.
+                    Record them on the event&rsquo;s Guests tab as RSVPs come
+                    in.
+                  </p>
+                )
               ) : (
                 <ul className="mt-2 space-y-1.5 text-base">
                   {flaggedGuests.map((guest) => (

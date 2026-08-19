@@ -1,3 +1,5 @@
+import { isBilledInvoice, isDraftInvoice } from "./invoiceBilling";
+
 type DateValue = Date | number | string | null | undefined;
 
 export type EventCostSummaryEvent = {
@@ -33,6 +35,7 @@ export type EventCostSummaryInvoice = {
   eventId?: string | null;
   invoiceNumber?: string | null;
   total?: number | null;
+  amountPaid?: number | null;
   status?: string | null;
   issuedAt?: DateValue;
   createdAt?: DateValue;
@@ -52,12 +55,29 @@ export type EventCostSummary = {
   asOf: DateValue;
   buckets: EventCostBucket[];
   totalCost: number;
+  /** Total across invoices actually billed (sent through paid) — not drafts. */
   invoicedRevenue: number;
   reconciledRevenue: number;
   margin: number;
   marginPercent: number | null;
   invoiceCount: number;
   invoiceNumbers: string[];
+  /** Money written into draft invoices that were never sent. */
+  draftInvoiceTotal: number;
+  draftInvoiceCount: number;
+  /** Cash already collected against billed invoices. */
+  collectedTotal: number;
+  /**
+   * True while the closeout is still a draft. Capture may stamp billed
+   * revenue onto a draft; that is not reconciliation. Finalize is.
+   */
+  unreconciled: boolean;
+  /**
+   * True while the closeout is unreconciled AND every cost bucket is still
+   * the cascade-seeded $0. There is no cost truth yet, so "Total event cost
+   * $0.00" and a 100% margin must never be printed as reconciled fact.
+   */
+  costsPending: boolean;
   headcount: {
     actual: number;
     expected: number;
@@ -65,11 +85,51 @@ export type EventCostSummary = {
   notes: string[];
 };
 
-const EXCLUDED_INVOICE_STATUSES = new Set(["voided", "written_off"]);
-
 function amount(value: number | null | undefined): number {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+/**
+ * A draft closeout is still waiting on truth — billed-prefill revenue and
+ * cascade-seeded $0 costs must never be presented as a reconciled 100% margin.
+ * Finalize is what turns captured numbers into folio fact.
+ */
+export function isUnreconciledCloseout(closeout: {
+  status?: string | null;
+  actualRevenue?: number | null;
+}): boolean {
+  return String(closeout.status ?? "draft") === "draft";
+}
+
+/**
+ * Same money-truth as folio costsPending: a draft with $0 costs has no
+ * profit fact yet. Capture writes grossProfit = actualRevenue - totalActualCost,
+ * so billed-prefill + $0 costs stores grossProfit $7,200 — that must not
+ * print as Gross profit on the closeout list. Draft + real costs can show
+ * the draft number. Finalize still computes.
+ */
+export function isCloseoutListProfitPending(closeout: {
+  status?: string | null;
+  actualRevenue?: number | null;
+  grossProfit?: number | null;
+  totalActualCost?: number | null;
+  actualIngredientCost?: number | null;
+  actualLaborCost?: number | null;
+  actualVendorCost?: number | null;
+  actualWasteCost?: number | null;
+}): boolean {
+  if (!isUnreconciledCloseout(closeout)) return false;
+  const fromBuckets =
+    amount(closeout.actualIngredientCost) +
+    amount(closeout.actualLaborCost) +
+    amount(closeout.actualVendorCost) +
+    amount(closeout.actualWasteCost);
+  const total =
+    closeout.totalActualCost != null
+      ? amount(closeout.totalActualCost)
+      : fromBuckets;
+  return total === 0 && fromBuckets === 0;
 }
 
 /**
@@ -86,37 +146,42 @@ export function buildEventCostSummary({
   closeout: EventCostSummaryCloseout;
   invoices: readonly EventCostSummaryInvoice[];
 }): EventCostSummary {
-  const includedInvoices = invoices.filter(
-    (invoice) =>
-      invoice.deletedAt == null &&
-      String(invoice.eventId ?? "") === String(event._id) &&
-      !EXCLUDED_INVOICE_STATUSES.has(String(invoice.status)),
+  const eventInvoices = invoices.filter(
+    (invoice) => String(invoice.eventId ?? "") === String(event._id),
   );
+  // Billed = sent through paid. Drafts are reported separately — folding
+  // them into revenue pretends unsent paperwork is money.
+  const includedInvoices = eventInvoices.filter(isBilledInvoice);
+  const draftInvoices = eventInvoices.filter(isDraftInvoice);
+
+  const unreconciled = isUnreconciledCloseout(closeout);
+  const costSource = (reconciledLabel: string) =>
+    unreconciled ? "awaiting reconciliation" : reconciledLabel;
 
   const buckets: EventCostBucket[] = [
     {
       key: "ingredient",
       label: "Ingredient purchases",
       amount: amount(closeout.actualIngredientCost),
-      source: "Received purchases · reconciled at closeout",
+      source: `Received purchases · ${costSource("reconciled at closeout")}`,
     },
     {
       key: "labor",
       label: "Approved labor",
       amount: amount(closeout.actualLaborCost),
-      source: "Approved time · reconciled at closeout",
+      source: `Approved time · ${costSource("reconciled at closeout")}`,
     },
     {
       key: "equipment",
       label: "Equipment & vendor hire",
       amount: amount(closeout.actualVendorCost),
-      source: "Equipment and hire · reconciled vendor bucket",
+      source: `Equipment and hire · ${costSource("reconciled vendor bucket")}`,
     },
     {
       key: "miscellaneous",
       label: "Miscellaneous & waste",
       amount: amount(closeout.actualWasteCost),
-      source: "Other event spend · reconciled waste bucket",
+      source: `Other event spend · ${costSource("reconciled waste bucket")}`,
     },
   ];
 
@@ -126,6 +191,9 @@ export function buildEventCostSummary({
     0,
   );
   const margin = invoicedRevenue - totalCost;
+  // Cascade-seeded drafts carry $0 in every bucket. Until finance reconciles,
+  // that zero is a placeholder — margin against it would be a fake 100%.
+  const costsPending = unreconciled && totalCost === 0;
 
   return {
     event,
@@ -137,14 +205,32 @@ export function buildEventCostSummary({
     reconciledRevenue: amount(closeout.actualRevenue),
     margin,
     marginPercent:
-      invoicedRevenue === 0 ? null : (margin / invoicedRevenue) * 100,
+      costsPending || invoicedRevenue === 0
+        ? null
+        : (margin / invoicedRevenue) * 100,
     invoiceCount: includedInvoices.length,
     invoiceNumbers: includedInvoices
       .map((invoice) => String(invoice.invoiceNumber ?? "").trim())
       .filter(Boolean),
+    draftInvoiceTotal: draftInvoices.reduce(
+      (sum, invoice) => sum + amount(invoice.total),
+      0,
+    ),
+    draftInvoiceCount: draftInvoices.length,
+    collectedTotal: includedInvoices.reduce(
+      (sum, invoice) => sum + amount(invoice.amountPaid),
+      0,
+    ),
+    unreconciled,
+    costsPending,
     headcount: {
       actual: amount(closeout.actualHeadcount),
-      expected: amount(closeout.expectedHeadcount ?? event.expectedHeadcount),
+      // Cascade-seeded closeouts carry 0 — the event's planned headcount is
+      // the honest expected figure until finance reconciles.
+      expected:
+        amount(closeout.expectedHeadcount) > 0
+          ? amount(closeout.expectedHeadcount)
+          : amount(event.expectedHeadcount),
     },
     notes: [
       closeout.unresolvedIssues

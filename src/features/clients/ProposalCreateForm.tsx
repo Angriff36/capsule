@@ -13,13 +13,13 @@ import { DraftRestoreBanner, useFormDraft } from "../../ui/formDraft";
 import { clientDisplayName } from "../events/clientName";
 import { CLIENTS_ROUTES } from "./clientsRoutes";
 import { useCatalogDishes } from "./useCatalogDishes";
-import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import {
   computeProposalPricing,
   PRICING_BASES,
   PRICING_BASIS_LABELS,
   type PricingBasis,
 } from "../../lib/pricing";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 // In-memory pricing line in the draft form (spec §5.4). Numeric inputs are kept
 // as strings for clean editing; parsed for the central calc on submit/preview.

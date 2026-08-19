@@ -1,6 +1,6 @@
 import { useId, useState, type FormEvent } from "react";
-import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../BoundedDateInputs";
 import type { ActionPromptRequest } from "./ActionPromptTypes";
+import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../BoundedDateInputs";
 
 interface ActionPromptPanelProps {
   request: ActionPromptRequest;

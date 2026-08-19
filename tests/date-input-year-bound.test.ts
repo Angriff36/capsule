@@ -126,3 +126,17 @@ describe("no bare native date inputs in authored UI", () => {
     ).toEqual([]);
   });
 });
+
+describe("EventCreatePage keeps #148 Starts prefill on the year-bounded input", () => {
+  it("proposal Starts defaultValue survives on BoundedDateTimeLocalInput", () => {
+    const page = readFileSync(
+      "src/features/events/EventCreatePage.tsx",
+      "utf8",
+    );
+    expect(page).toContain("BoundedDateTimeLocalInput");
+    expect(page).toContain("defaultValue={proposalPrefill.startsAtLocal}");
+    expect(page).not.toMatch(
+      /<input\b[^>]*type="datetime-local"[^>]*startsAt/s,
+    );
+  });
+});

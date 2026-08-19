@@ -8,13 +8,13 @@ import {
 import { EventTimelineBlockQuestions } from "./EventTimelineBlockQuestions";
 import type { TimelineStaffOption } from "./eventTimelineStaffRoster";
 import { GanttStrip } from "./EventTimelineGanttStrip";
-import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 import {
   formatAssigneeLabel,
   isTimelineAssigneeTeam,
   teamsFromResponsibleParty,
   type TimelineAssigneeTeam,
 } from "./timelineAssigneeOptions";
+import { BoundedDateTimeLocalInput } from "../../ui/BoundedDateInputs";
 
 type TimelineActivity = Doc<"eventTimelineActivities">;
 

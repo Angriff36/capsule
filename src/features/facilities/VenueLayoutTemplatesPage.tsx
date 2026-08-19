@@ -8,7 +8,6 @@ import {
   useVenueLayoutTemplateReactivate,
   useVenueLayoutTemplateRevise,
 } from "../../lib/manifest-convex-react";
-import { formatStatusLabel } from "../../lib/statusLabels";
 import {
   venueDetailPath,
   venueLayoutTemplatesListPath,
@@ -160,6 +159,17 @@ export function VenueLayoutTemplatesPage() {
     if (!trimmed) return;
     const targetVenueId = formVenueId.trim();
     if (!targetVenueId) return;
+    // Blank area names would fail the event-side copy (`add` requires a
+    // non-blank type), so reject them here with a pointer to the row.
+    const blankIndex = sections.findIndex((s) => !s.type.trim());
+    if (blankIndex >= 0) {
+      setFailure(
+        classifyCommandFailure(
+          new Error(`Section ${blankIndex + 1} needs an area name.`),
+        ),
+      );
+      return;
+    }
     const sectionsJson = JSON.stringify(sections);
 
     void run("save", async () => {
@@ -314,6 +324,11 @@ export function VenueLayoutTemplatesPage() {
                 + Add section
               </button>
             </div>
+            <datalist id="venue-layout-template-type-presets">
+              {BATTLE_BOARD_LAYOUT_TYPES.map((type) => (
+                <option key={type} value={type} />
+              ))}
+            </datalist>
             {sections.length === 0 ? (
               <p className="text-base text-ink-3">
                 No sections yet. Add Buffet, Bar, Parking, or another area.
@@ -325,33 +340,16 @@ export function VenueLayoutTemplatesPage() {
                     key={index}
                     className="grid gap-2 rounded-sm border border-line-2 p-2 md:grid-cols-[10rem_1fr_auto]"
                   >
-                    <select
+                    <input
                       className="input"
-                      value={
-                        BATTLE_BOARD_LAYOUT_TYPES.includes(
-                          section.type as (typeof BATTLE_BOARD_LAYOUT_TYPES)[number],
-                        )
-                          ? section.type
-                          : ""
-                      }
+                      value={section.type}
+                      list="venue-layout-template-type-presets"
                       disabled={busy != null}
+                      placeholder="Buffet, Main Bar, Patio Bar…"
                       onChange={(e) =>
                         updateSection(index, { type: e.target.value })
                       }
-                    >
-                      {!BATTLE_BOARD_LAYOUT_TYPES.includes(
-                        section.type as (typeof BATTLE_BOARD_LAYOUT_TYPES)[number],
-                      ) ? (
-                        <option value="">
-                          {formatStatusLabel(section.type)}
-                        </option>
-                      ) : null}
-                      {BATTLE_BOARD_LAYOUT_TYPES.map((type) => (
-                        <option key={type} value={type}>
-                          {formatStatusLabel(type)}
-                        </option>
-                      ))}
-                    </select>
+                    />
                     <input
                       className="input"
                       value={section.instructions ?? ""}

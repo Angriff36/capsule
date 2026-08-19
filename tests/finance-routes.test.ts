@@ -8,6 +8,7 @@ import {
 } from "../src/features/finance/financeRoutes";
 import { CloseoutLifecyclePolicy } from "../src/features/finance/CloseoutLifecyclePolicy";
 import { CommercialLifecyclePolicy } from "../src/features/finance/CommercialLifecyclePolicy";
+import { PaymentsLedgerPresenter } from "../src/features/finance/PaymentsLedgerPresenter";
 import { PaymentMethodLifecyclePolicy } from "../src/features/finance/PaymentMethodLifecyclePolicy";
 import { PayrollLifecyclePolicy } from "../src/features/finance/PayrollLifecyclePolicy";
 import {
@@ -203,6 +204,80 @@ describe("Finance routes and lifecycle bindings", () => {
     expect(page).not.toMatch(
       /invoiceActions\(\s*String\(invoice\.status\)\s*\)/,
     );
+  });
+
+  it("default payments view never claims a bare 0 while settled rows exist", () => {
+    // Mirrors the prod bug: default view showed "0 payments / No open
+    // payments" while Show settled revealed 2 COMPLETED totaling $15,300.
+    const presenter = new PaymentsLedgerPresenter();
+    const rows = [
+      { status: "completed", amount: 12000 },
+      { status: "completed", amount: 3300 },
+    ];
+    expect(presenter.openRows(rows)).toHaveLength(0);
+
+    const summary = presenter.settledSummary(rows);
+    expect(summary.hiddenCount).toBe(2);
+    expect(summary.completedCount).toBe(2);
+    expect(summary.completedTotal).toBe(15300);
+
+    // Heading count is honest — never a bare "0 payments" with money hidden.
+    expect(presenter.countLabel(0, summary.hiddenCount, false)).toBe(
+      "0 open · 2 settled",
+    );
+    // Empty state names the filter and the hidden total.
+    const notice = presenter.hiddenSettledNotice(summary);
+    expect(notice).toContain("2 completed payments");
+    expect(notice).toContain("$15,300.00");
+    expect(notice).toContain("hidden by the open-payments view");
+    // The reveal is one click with an honest count.
+    expect(presenter.showSettledLabel(summary)).toBe("Show 2 settled payments");
+
+    // Once revealed (or with truly zero rows) the plain copy is fine.
+    expect(presenter.countLabel(2, summary.hiddenCount, true)).toBe(
+      "2 payments",
+    );
+    expect(presenter.countLabel(0, 0, false)).toBe("0 payments");
+    expect(presenter.hiddenSettledNotice(presenter.settledSummary([]))).toBe(
+      null,
+    );
+
+    // Mixed terminal rows stay honest: failed/refunded count, completed total.
+    const mixed = presenter.settledSummary([
+      { status: "completed", amount: 500 },
+      { status: "failed", amount: 100 },
+      { status: "refunded", amount: 250 },
+      { status: "pending", amount: 75 },
+    ]);
+    expect(mixed.hiddenCount).toBe(3);
+    expect(mixed.completedTotal).toBe(500);
+    expect(presenter.hiddenSettledNotice(mixed)).toContain(
+      "3 settled payments",
+    );
+    expect(presenter.hiddenSettledNotice(mixed)).toContain("$500.00");
+  });
+
+  it("locks PaymentsPage to the settled-aware count and empty state", () => {
+    const page = readFileSync(
+      path.join(process.cwd(), "src/features/finance/PaymentsPage.tsx"),
+      "utf8",
+    );
+    // Rows and copy must come from the presenter, not an inline blind filter.
+    expect(page).toContain("PaymentsLedgerPresenter");
+    expect(page).toMatch(/ledger\.openRows\(activeRows\)/);
+    expect(page).toMatch(/ledger\.countLabel\(/);
+    expect(page).toMatch(/ledger\.hiddenSettledNotice\(/);
+    expect(page).toMatch(/ledger\.showSettledLabel\(/);
+    // The heading count must not be a hardcoded `${n} payments` again.
+    expect(page).not.toMatch(/\{visibleRows\.length\} payments/);
+    // Empty state JSX: "No open payments" is allowed only when the hidden
+    // settled notice (and one-click Show settled) is wired next to it.
+    expect(page).toContain('className="document-empty"');
+    expect(page).toContain("<p>No open payments.</p>");
+    expect(page).toContain("{hiddenSettledNotice ? (");
+    expect(page).toContain("<span>{hiddenSettledNotice}</span>");
+    expect(page).toMatch(/onClick=\{\(\) => setShowTerminal\(true\)\}/);
+    expect(page).toContain("{ledger.showSettledLabel(settledSummary)}");
   });
 
   it("keeps the server-side zero-balance send refusal (manifest + generated command)", () => {

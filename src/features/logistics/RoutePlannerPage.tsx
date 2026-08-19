@@ -7,13 +7,13 @@ import {
 } from "../../lib/manifest-convex-react";
 import { TableSkeleton } from "../../ui/primitives";
 import { LogisticsWorkspaceNav } from "./LogisticsWorkspaceNav";
-import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 import {
   geocodeDestination,
   routeLegs,
   suggestVisitOrder,
   type GeoPoint,
 } from "./routePlanner";
+import { BoundedDateInput } from "../../ui/BoundedDateInputs";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
