@@ -1,21 +1,15 @@
 import { formatMoneyExact } from "../../lib/format";
+import { isUnreconciledCloseout } from "./eventCostSummary";
 import type { EventBillingRollup } from "./invoiceBilling";
+
+// Single reconciliation predicate lives in eventCostSummary.ts; re-exported
+// here so closeout display components share one import site.
+export { isUnreconciledCloseout } from "./eventCostSummary";
 
 type CloseoutMoneyRow = {
   status?: string | null;
   actualRevenue?: number | null;
 };
-
-/**
- * A draft closeout with no reconciled revenue is still waiting on truth —
- * the EventClosedOut cascade seeds drafts with zero actuals, so printing
- * that $0 as "revenue" lies whenever priced work exists.
- */
-export function isUnreconciledCloseout(row: CloseoutMoneyRow): boolean {
-  return (
-    String(row.status) === "draft" && !(Number(row.actualRevenue ?? 0) > 0)
-  );
-}
 
 function billingParts(billing: EventBillingRollup): string[] {
   const parts: string[] = [];
@@ -79,8 +73,8 @@ export function BillingProvenance({
   ) {
     return (
       <span className="text-xs text-warn">
-        No invoices are linked to this event — the quoted price is only a
-        starting point until billing catches up.
+        No invoices are linked to this event — enter the reconciled revenue
+        manually. The quoted price is budget, not revenue.
       </span>
     );
   }

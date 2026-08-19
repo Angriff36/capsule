@@ -35,6 +35,7 @@ export type EventCostSummaryInvoice = {
   eventId?: string | null;
   invoiceNumber?: string | null;
   total?: number | null;
+  amountPaid?: number | null;
   status?: string | null;
   issuedAt?: DateValue;
   createdAt?: DateValue;
@@ -64,6 +65,14 @@ export type EventCostSummary = {
   /** Money written into draft invoices that were never sent. */
   draftInvoiceTotal: number;
   draftInvoiceCount: number;
+  /** Cash already collected against billed invoices. */
+  collectedTotal: number;
+  /**
+   * True while the closeout is a draft with no reconciled revenue — the
+   * EventClosedOut cascade seeds drafts with zero actuals, so their $0 and
+   * 0 headcount are placeholders, not facts.
+   */
+  unreconciled: boolean;
   headcount: {
     actual: number;
     expected: number;
@@ -74,6 +83,20 @@ export type EventCostSummary = {
 function amount(value: number | null | undefined): number {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+/**
+ * A draft closeout with no reconciled revenue is still waiting on truth —
+ * the cascade-seeded zeros must never be presented as captured numbers.
+ */
+export function isUnreconciledCloseout(closeout: {
+  status?: string | null;
+  actualRevenue?: number | null;
+}): boolean {
+  return (
+    String(closeout.status ?? "draft") === "draft" &&
+    !(Number(closeout.actualRevenue ?? 0) > 0)
+  );
 }
 
 /**
@@ -152,9 +175,19 @@ export function buildEventCostSummary({
       0,
     ),
     draftInvoiceCount: draftInvoices.length,
+    collectedTotal: includedInvoices.reduce(
+      (sum, invoice) => sum + amount(invoice.amountPaid),
+      0,
+    ),
+    unreconciled: isUnreconciledCloseout(closeout),
     headcount: {
       actual: amount(closeout.actualHeadcount),
-      expected: amount(closeout.expectedHeadcount ?? event.expectedHeadcount),
+      // Cascade-seeded closeouts carry 0 — the event's planned headcount is
+      // the honest expected figure until finance reconciles.
+      expected:
+        amount(closeout.expectedHeadcount) > 0
+          ? amount(closeout.expectedHeadcount)
+          : amount(event.expectedHeadcount),
     },
     notes: [
       closeout.unresolvedIssues

@@ -88,7 +88,10 @@ export function EventCostSummaryReport({
               {asOf ? formatDate(asOf.getTime()) : "Not finalized"}
             </strong>
             <small>
-              {summary.headcount.actual}/{summary.headcount.expected} guests
+              {summary.unreconciled && summary.headcount.actual === 0
+                ? "—"
+                : summary.headcount.actual}
+              /{summary.headcount.expected} guests
             </small>
           </div>
         </header>
@@ -172,10 +175,17 @@ export function EventCostSummaryReport({
           <div>
             <p>Reconciliation</p>
             <span>
-              Closeout revenue {formatMoney(summary.reconciledRevenue)}
-              {Math.abs(revenueDifference) >= 0.01
-                ? ` · ${formatMoney(Math.abs(revenueDifference))} ${revenueDifference > 0 ? "more" : "less"} invoiced`
-                : " · matches invoiced revenue"}
+              {summary.unreconciled
+                ? `Closeout not reconciled yet — billed ${formatMoney(summary.invoicedRevenue)} · collected ${formatMoney(summary.collectedTotal)}${
+                    summary.draftInvoiceCount > 0
+                      ? ` · ${formatMoney(summary.draftInvoiceTotal)} in ${summary.draftInvoiceCount} unsent draft${summary.draftInvoiceCount === 1 ? "" : "s"}`
+                      : ""
+                  }`
+                : `Closeout revenue ${formatMoney(summary.reconciledRevenue)}${
+                    Math.abs(revenueDifference) >= 0.01
+                      ? ` · ${formatMoney(Math.abs(revenueDifference))} ${revenueDifference > 0 ? "more" : "less"} invoiced`
+                      : " · matches invoiced revenue"
+                  }`}
             </span>
             {summary.invoiceNumbers.length > 0 ? (
               <span>Invoices: {summary.invoiceNumbers.join(", ")}</span>

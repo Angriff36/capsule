@@ -1,3 +1,5 @@
+import { isBilledInvoice } from "../finance/invoiceBilling";
+
 type MaybeNumber = number | string | null | undefined;
 
 type SoftDelete = {
@@ -98,7 +100,6 @@ const ACTIVE_RESERVATION_STATUSES = new Set([
   "checked_out",
   "returned",
 ]);
-const EXCLUDED_INVOICE_STATUSES = new Set(["voided", "written_off"]);
 
 const key = (value: unknown) => String(value ?? "");
 
@@ -322,12 +323,12 @@ export function buildLiveEventProfitability({
   clockedLabor?: ClockedLaborSummary | null;
 }): LiveEventProfitability {
   const eventKey = key(eventId);
+  // Confirmed revenue = invoices actually billed to the client (sent through
+  // paid), per invoiceBilling.ts. issuedAt alone is not enough — issue()
+  // stamps it while the invoice is still an unsent draft, and drafts are
+  // intent, not revenue.
   const includedInvoices = invoices.filter(
-    (invoice) =>
-      isActive(invoice) &&
-      key(invoice.eventId) === eventKey &&
-      invoice.issuedAt != null &&
-      !EXCLUDED_INVOICE_STATUSES.has(key(invoice.status)),
+    (invoice) => key(invoice.eventId) === eventKey && isBilledInvoice(invoice),
   );
   const confirmedRevenue = includedInvoices.reduce(
     (sum, invoice) => sum + amount(invoice.total),

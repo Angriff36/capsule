@@ -20,17 +20,20 @@ export const BILLED_INVOICE_STATUSES = [
   "paid",
 ] as const;
 
+// Fields stay loose (unknown / string unions) so every finance surface —
+// generated list rows, report row types, profitability inputs — can pass
+// its invoices through without adapter mapping.
 export type BillingInvoice = {
-  eventId?: string | null;
-  status?: string | null;
-  total?: number | null;
-  amountPaid?: number | null;
-  deletedAt?: Date | number | string | null;
+  eventId?: unknown;
+  status?: unknown;
+  total?: number | string | null;
+  amountPaid?: number | string | null;
+  deletedAt?: unknown;
 };
 
 const BILLED = new Set<string>(BILLED_INVOICE_STATUSES);
 
-function moneyAmount(value: number | null | undefined): number {
+function moneyAmount(value: number | string | null | undefined): number {
   const parsed = Number(value ?? 0);
   return Number.isFinite(parsed) ? parsed : 0;
 }

@@ -189,14 +189,13 @@ export function CloseoutCaptureForm({
     draft?.actualLaborCost != null && Number(draft.actualLaborCost) > 0
       ? Number(draft.actualLaborCost)
       : (labor?.cost ?? 0);
-  // Reconciled revenue comes from what was actually billed, not the
-  // proposal quote — the quote is only a fallback when nothing is invoiced.
+  // Reconciled revenue prefills only from what was actually billed. The
+  // quoted price never seeds this field — the quote belongs to budgeted
+  // revenue, and capture would store the prefill as reconciled fact.
   const revenueDefault =
     draft?.actualRevenue != null && Number(draft.actualRevenue) > 0
       ? Number(draft.actualRevenue)
-      : billing != null && billing.billedTotal > 0
-        ? billing.billedTotal
-        : Number(selected.quotedPrice ?? 0);
+      : (billing?.billedTotal ?? 0);
 
   return (
     <form className="supply-form" onSubmit={onSubmit} key={draft?._id ?? "new"}>
