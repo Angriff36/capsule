@@ -208,16 +208,46 @@ describe("buildEventCostSummary — folio separates billed, collected, drafts", 
     expect(summary.headcount.expected).toBe(24);
   });
 
-  it("treats reconciled revenue as fact once captured", () => {
+  it("treats every draft closeout as unreconciled, even after billed revenue is captured", () => {
+    // Capture-prefill writes actualRevenue from billedTotal while costs
+    // stay $0. Revenue on a draft is not reconciliation — finalize is.
     expect(
-      isUnreconciledCloseout({ status: "draft", actualRevenue: 3600 }),
-    ).toBe(false);
-    expect(
-      isUnreconciledCloseout({ status: "finalized", actualRevenue: 0 }),
-    ).toBe(false);
+      isUnreconciledCloseout({ status: "draft", actualRevenue: 7200 }),
+    ).toBe(true);
     expect(isUnreconciledCloseout({ status: "draft", actualRevenue: 0 })).toBe(
       true,
     );
+    expect(
+      isUnreconciledCloseout({ status: "finalized", actualRevenue: 0 }),
+    ).toBe(false);
+    expect(
+      isUnreconciledCloseout({ status: "finalized", actualRevenue: 7200 }),
+    ).toBe(false);
+  });
+
+  it("billed-prefill + $0 costs stays costsPending (capture save path)", () => {
+    const summary = buildEventCostSummary({
+      event,
+      closeout: {
+        eventId: "event-1",
+        status: "draft",
+        actualRevenue: 7200,
+        actualIngredientCost: 0,
+        actualLaborCost: 0,
+        actualVendorCost: 0,
+        actualWasteCost: 0,
+      },
+      invoices: [invoice({ status: "paid", total: 7200, amountPaid: 7200 })],
+    });
+    expect(summary.unreconciled).toBe(true);
+    expect(summary.costsPending).toBe(true);
+    expect(summary.totalCost).toBe(0);
+    expect(summary.invoicedRevenue).toBe(7200);
+    expect(summary.marginPercent).toBeNull();
+    for (const bucket of summary.buckets) {
+      expect(bucket.source).toContain("awaiting reconciliation");
+      expect(bucket.source).not.toContain("reconciled at closeout");
+    }
   });
 });
 
