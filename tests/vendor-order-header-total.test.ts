@@ -25,6 +25,16 @@ const receivedOrder = {
   shippingAmount: 0,
 };
 
+const submittedOrder = {
+  _id: "vo-submitted-100",
+  status: "submitted",
+  liveTotalAmount: 0,
+  totalAmount: 0,
+  subtotal: 0,
+  taxAmount: 0,
+  shippingAmount: 0,
+};
+
 const hundredDollarLine = {
   _id: "vol-saffron",
   vendorOrderId: "vo-received-100",
@@ -115,6 +125,15 @@ describe("vendorOrderHeaderTotal — received PO line $100 cannot paint header $
       }),
     ).toBe(80);
   });
+
+  it("submitted order with a $100 line cannot paint Needs Attention $0.00", () => {
+    const header = vendorOrderHeaderTotal(submittedOrder, [
+      { ...hundredDollarLine, vendorOrderId: "vo-submitted-100" },
+    ]);
+    expect(header).toBe(100);
+    expect(formatMoneyExact(header)).toBe("$100.00");
+    expect(formatMoneyExact(header)).not.toBe("$0.00");
+  });
 });
 
 describe("folio and purchasing ledgers use the header helper", () => {
@@ -133,5 +152,28 @@ describe("folio and purchasing ledgers use the header helper", () => {
     expect(purchasing).not.toContain(
       "order.liveTotalAmount ?? order.totalAmount",
     );
+  });
+
+  it("Needs Attention cannot paint $0.00 for a submitted/received $100 line", () => {
+    const overview = readFileSync(
+      "src/features/inventory/InventoryOverviewPage.tsx",
+      "utf8",
+    );
+    expect(overview).toContain("vendorOrderHeaderTotal(order, lines)");
+    expect(overview).not.toContain(
+      "order.liveTotalAmount ?? order.totalAmount",
+    );
+    const submittedPaint = formatMoneyExact(
+      vendorOrderHeaderTotal(submittedOrder, [
+        { ...hundredDollarLine, vendorOrderId: "vo-submitted-100" },
+      ]),
+    );
+    const receivedPaint = formatMoneyExact(
+      vendorOrderHeaderTotal(receivedOrder, [hundredDollarLine]),
+    );
+    expect(submittedPaint).toBe("$100.00");
+    expect(receivedPaint).toBe("$100.00");
+    expect(submittedPaint).not.toBe("$0.00");
+    expect(receivedPaint).not.toBe("$0.00");
   });
 });
