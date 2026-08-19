@@ -122,6 +122,11 @@ export function clockOutFilled(value: unknown): boolean {
  * inherited). A finished window (both datetimes) clock-ins, clocks out, then
  * applies the entered times so 5:00–10:00 PM does not require the Correct
  * button. Clock-in-now leaves the record open at now().
+ *
+ * Landing status is still "corrected" — correct() is the only generated
+ * command that writes arbitrary times, and it always mutates status. We do
+ * not invent a closed-window command (Builder-owned mutations / Zod). STATE
+ * paint treats that first write as attendance, not a user Correct.
  */
 export async function persistPrimaryTimeRecord(
   api: TimeRecordWriteApi,
@@ -196,10 +201,18 @@ export async function persistClockOut(
 /**
  * Hidden persistPrimaryTimeRecord is clockIn (v1) → clockOut (v2) →
  * correct(window) (v3). That first correct is not a user Correct click —
- * there is no separate flag on TimeRecord. Ledger STATE is attendance
- * (open / closed) until a later correct write (version > 3).
+ * there is no separate flag on TimeRecord.
+ *
+ * version<=3 alone cannot tell that hidden first write from a real user
+ * Correct that landed at v3 (Ryan Ostwind Jul 29 4:15–4:30, Josh Mitchell
+ * Jul 31 5:00–10:00). Hidden persist only exists after #197.
  */
 export const HIDDEN_PRIMARY_CORRECT_VERSION = 3;
+
+/** #197 merge — first instant hidden persist could create a TimeRecord. */
+export const HIDDEN_PRIMARY_PERSIST_SEAM_AT = Date.parse(
+  "2026-08-19T20:50:11.000Z",
+);
 
 export type TimeRecordLedgerRow = {
   status?: unknown;
@@ -207,16 +220,40 @@ export type TimeRecordLedgerRow = {
   clockInAt?: unknown;
   clockOutAt?: unknown;
   correctedAt?: unknown;
+  createdAt?: unknown;
 };
+
+/** Row shape after persistPrimaryTimeRecord writes a finished window. */
+export function hiddenPrimaryPersistLedgerRow(
+  window: TimeWindow,
+  createdAt = Date.now(),
+): TimeRecordLedgerRow {
+  return {
+    status: "corrected",
+    version: HIDDEN_PRIMARY_CORRECT_VERSION,
+    correctedAt: createdAt,
+    createdAt,
+    clockInAt: window.clockInAt,
+    clockOutAt: window.clockOutAt,
+  };
+}
+
+function isHiddenFirstWriteCorrect(row: TimeRecordLedgerRow): boolean {
+  const version = Number(row.version);
+  if (!Number.isFinite(version) || version > HIDDEN_PRIMARY_CORRECT_VERSION) {
+    return false;
+  }
+  const createdAt = toEpoch(row.createdAt);
+  // Missing createdAt: fail open to CORRECTED so pre-seam / unknown rows
+  // are not hidden by the v3 paint rule.
+  return createdAt != null && createdAt >= HIDDEN_PRIMARY_PERSIST_SEAM_AT;
+}
 
 /** Attendance state painted in the Time sheet STATE column. */
 export function timeRecordLedgerState(row: TimeRecordLedgerRow): string {
   const status = String(row.status ?? "");
   if (status !== "corrected") return status;
-  const version = Number(row.version);
-  const firstWrite =
-    !Number.isFinite(version) || version <= HIDDEN_PRIMARY_CORRECT_VERSION;
-  if (!firstWrite) return "corrected";
+  if (!isHiddenFirstWriteCorrect(row)) return "corrected";
   return row.clockOutAt != null && String(row.clockOutAt) !== ""
     ? "closed"
     : "open";

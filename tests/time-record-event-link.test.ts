@@ -16,8 +16,10 @@ import {
 import {
   CLOCK_OUT_PROMPT_FIELDS,
   HIDDEN_PRIMARY_CORRECT_VERSION,
+  HIDDEN_PRIMARY_PERSIST_SEAM_AT,
   buildClockInCreateArgs,
   currentShiftFor,
+  hiddenPrimaryPersistLedgerRow,
   parseTimeWindow,
   persistClockOut,
   persistPrimaryTimeRecord,
@@ -31,6 +33,8 @@ const SHIFT_ID = "sh_service";
 
 const FIVE_PM = Date.parse("2026-07-31T17:00:00");
 const TEN_PM = Date.parse("2026-07-31T22:00:00");
+const RYAN_IN = Date.parse("2026-07-29T04:15:00");
+const RYAN_OUT = Date.parse("2026-07-29T04:30:00");
 
 function renderClockInForm() {
   return renderToStaticMarkup(
@@ -266,14 +270,16 @@ describe("window parsing and clock-out", () => {
 describe("Time sheet STATE after primary persist (QA 197 leftover)", () => {
   it("first-write correct of a finished window is attendance CLOSED, not CORRECTED", () => {
     expect(HIDDEN_PRIMARY_CORRECT_VERSION).toBe(3);
+    expect(HIDDEN_PRIMARY_PERSIST_SEAM_AT).toBe(
+      Date.parse("2026-08-19T20:50:11.000Z"),
+    );
     expect(
-      timeRecordLedgerState({
-        status: "corrected",
-        version: 3,
-        correctedAt: Date.now(),
-        clockInAt: FIVE_PM,
-        clockOutAt: TEN_PM,
-      }),
+      timeRecordLedgerState(
+        hiddenPrimaryPersistLedgerRow({
+          clockInAt: FIVE_PM,
+          clockOutAt: TEN_PM,
+        }),
+      ),
     ).toBe("closed");
   });
 
@@ -290,19 +296,58 @@ describe("Time sheet STATE after primary persist (QA 197 leftover)", () => {
       clockOutAt: TEN_PM,
     });
     expect(api.correct).toHaveBeenCalled();
-    // Hidden seam writes status "corrected" + correctedAt on version 3.
-    const row = {
-      status: "corrected",
-      version: 3,
-      correctedAt: Date.now(),
-      clockInAt: FIVE_PM,
-      clockOutAt: TEN_PM,
-    };
+    // Hidden seam still writes status "corrected" + correctedAt on version 3.
+    // createdAt is at/after #197 so paint treats it as attendance, not Correct.
+    const row = hiddenPrimaryPersistLedgerRow(result.window!);
     const html = renderToStaticMarkup(
       createElement(TimeSheetRecordState, { row }),
     );
     expect(html).not.toMatch(/corrected/i);
     expect(html).toMatch(/Closed/);
+    expect(timeRecordLedgerState(row)).not.toBe("corrected");
+  });
+
+  it("pre-existing v3 corrected rows paint CORRECTED, not CLOSED", () => {
+    const ryan = {
+      status: "corrected",
+      version: 3,
+      createdAt: RYAN_IN,
+      correctedAt: RYAN_OUT,
+      clockInAt: RYAN_IN,
+      clockOutAt: RYAN_OUT,
+    };
+    const josh = {
+      status: "corrected",
+      version: 3,
+      createdAt: FIVE_PM,
+      correctedAt: TEN_PM,
+      clockInAt: FIVE_PM,
+      clockOutAt: TEN_PM,
+    };
+    expect(timeRecordLedgerState(ryan)).toBe("corrected");
+    expect(timeRecordLedgerState(josh)).toBe("corrected");
+    const ryanHtml = renderToStaticMarkup(
+      createElement(TimeSheetRecordState, { row: ryan }),
+    );
+    const joshHtml = renderToStaticMarkup(
+      createElement(TimeSheetRecordState, { row: josh }),
+    );
+    expect(ryanHtml).toMatch(/Corrected/);
+    expect(joshHtml).toMatch(/Corrected/);
+    expect(ryanHtml).not.toMatch(/Closed/);
+    expect(joshHtml).not.toMatch(/Closed/);
+  });
+
+  it("a v3 corrected row without createdAt paints CORRECTED, not CLOSED", () => {
+    expect(
+      timeRecordLedgerState({
+        status: "corrected",
+        version: 3,
+        correctedAt: Date.now(),
+        clockInAt: FIVE_PM,
+        clockOutAt: TEN_PM,
+      }),
+    ).toBe("corrected");
   });
 
   it("after-the-fact Correct still paints CORRECTED", () => {
@@ -311,6 +356,7 @@ describe("Time sheet STATE after primary persist (QA 197 leftover)", () => {
         row: {
           status: "corrected",
           version: 4,
+          createdAt: Date.now(),
           correctedAt: Date.now(),
           clockInAt: FIVE_PM,
           clockOutAt: TEN_PM,
@@ -318,6 +364,15 @@ describe("Time sheet STATE after primary persist (QA 197 leftover)", () => {
       }),
     );
     expect(html).toMatch(/Corrected/);
+    expect(
+      timeRecordLedgerState({
+        status: "corrected",
+        version: 4,
+        createdAt: Date.now(),
+        clockInAt: FIVE_PM,
+        clockOutAt: TEN_PM,
+      }),
+    ).toBe("corrected");
     expect(timeRecordLedgerState({ status: "open" })).toBe("open");
     expect(
       timeRecordLedgerState({ status: "closed", clockOutAt: TEN_PM }),
