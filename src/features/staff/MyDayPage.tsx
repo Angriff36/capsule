@@ -48,7 +48,10 @@ import {
   type MutationRunner,
 } from "./offlineStore";
 import { MyDayFrame, OfflineStatusBar } from "./MyDayFrame";
-import { myDayIdentityResolver } from "./MyDayIdentityResolver";
+import {
+  clerkSignedInLabel,
+  myDayIdentityResolver,
+} from "./MyDayIdentityResolver";
 import { ShiftSwapCard } from "./ShiftSwapCard";
 import { TimeOffRequestCard } from "./TimeOffRequestCard";
 import { WeeklyAvailabilityCard } from "./WeeklyAvailabilityCard";
@@ -150,9 +153,19 @@ export function MyDayPage() {
 
   const userId = user?.id;
   const signedInSubjectId = clerkLoaded && userId ? userId : undefined;
+  const clerkProfileName = {
+    firstName: user?.firstName,
+    lastName: user?.lastName,
+    fullName: user?.fullName,
+    email:
+      user?.primaryEmailAddress?.emailAddress ??
+      user?.emailAddresses?.[0]?.emailAddress,
+  };
+  const clerkDisplayName = clerkSignedInLabel(clerkProfileName);
   const [storedPersonId, setStoredPersonId] = useState<string | null>(() =>
     myDayIdentityResolver.readStoredPersonId(signedInSubjectId),
   );
+  const [forcePicker, setForcePicker] = useState(false);
   const [showDeclare, setShowDeclare] = useState(false);
   const [openPhotoKey, setOpenPhotoKey] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
@@ -165,6 +178,7 @@ export function MyDayPage() {
     setStoredPersonId(
       myDayIdentityResolver.readStoredPersonId(signedInSubjectId),
     );
+    setForcePicker(false);
   }, [signedInSubjectId]);
 
   const activePeople = (people ?? []).filter(
@@ -174,11 +188,21 @@ export function MyDayPage() {
     activePeople,
     signedInSubjectId,
     signedInSubjectId ? storedPersonId : null,
+    clerkProfileName,
   );
+  const linkedPersonName =
+    linkedToSignIn && me ? `${me.givenName} ${me.familyName}` : undefined;
 
   const choosePerson = (id: string) => {
     myDayIdentityResolver.storePersonId(signedInSubjectId, id);
     setStoredPersonId(id);
+    setForcePicker(false);
+  };
+
+  const switchPerson = () => {
+    myDayIdentityResolver.clearStoredPersonId(signedInSubjectId);
+    setStoredPersonId(null);
+    setForcePicker(true);
   };
 
   const run = (key: string, work: () => Promise<void>) => {
@@ -224,15 +248,15 @@ export function MyDayPage() {
 
   if (people === undefined || !clerkLoaded) {
     return (
-      <MyDayFrame>
+      <MyDayFrame signedInName={clerkDisplayName || undefined}>
         <TableSkeleton rows={6} />
       </MyDayFrame>
     );
   }
 
-  if (!me) {
+  if (!me || forcePicker) {
     return (
-      <MyDayFrame>
+      <MyDayFrame signedInName={clerkDisplayName || undefined}>
         <section className="card px-4 py-4">
           <p className="eyebrow">Who are you?</p>
           <p className="mt-2 text-base leading-relaxed text-ink-2">
@@ -413,15 +437,9 @@ export function MyDayPage() {
   return (
     <MyDayFrame
       wide
-      subtitle={`${me.givenName} ${me.familyName}`}
-      onSwitchPerson={
-        linkedToSignIn
-          ? undefined
-          : () => {
-              myDayIdentityResolver.clearStoredPersonId(signedInSubjectId);
-              setStoredPersonId(null);
-            }
-      }
+      signedInName={clerkDisplayName}
+      linkedPersonName={linkedPersonName}
+      onSwitchPerson={linkedToSignIn ? undefined : switchPerson}
     >
       <OfflineStatusBar
         online={online}

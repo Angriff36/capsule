@@ -10,16 +10,27 @@ import type { useQueuedActions } from "./offlineStore";
  * desktop-friendly width instead of a phone column centered on a big screen.
  */
 export function MyDayFrame({
-  subtitle,
+  signedInName,
+  linkedPersonName,
   onSwitchPerson,
   wide = false,
   children,
 }: {
-  subtitle?: string;
+  /** Clerk fullName / email — chip and PageHeader must never omit this. */
+  signedInName?: string;
+  /** Only when a Person is uniquely linked to this Clerk user.id. */
+  linkedPersonName?: string;
   onSwitchPerson?: () => void;
   wide?: boolean;
   children: React.ReactNode;
 }) {
+  const identityLabel =
+    signedInName && linkedPersonName && linkedPersonName !== signedInName
+      ? `${signedInName} · ${linkedPersonName}`
+      : (signedInName ?? "My Day");
+  const identityLead = signedInName
+    ? `${identityLabel} · ${formatDate(Date.now())}`
+    : formatDate(Date.now());
   return (
     <div className="min-h-dvh bg-canvas">
       <header className="sticky top-0 z-10 flex items-center gap-2.5 border-b border-line-2 bg-canvas px-4 py-3">
@@ -27,7 +38,7 @@ export function MyDayFrame({
           C
         </span>
         <p className="min-w-0 flex-1 truncate text-base leading-tight font-semibold">
-          {subtitle ?? "My Day"}
+          {identityLabel}
         </p>
         {onSwitchPerson ? (
           <button
@@ -46,7 +57,7 @@ export function MyDayFrame({
           wide ? "max-w-md md:max-w-5xl" : "max-w-md"
         }`}
       >
-        <PageHeader title="My Day" lead={formatDate(Date.now())} />
+        <PageHeader title="My Day" lead={identityLead} />
         {children}
       </main>
     </div>
