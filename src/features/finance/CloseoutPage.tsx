@@ -20,7 +20,12 @@ import {
   CloseoutCapturePayloadBuilder,
   type CloseoutDraft,
 } from "./CloseoutCaptureForm";
+import {
+  CloseoutRevenueNote,
+  isUnreconciledCloseout,
+} from "./CloseoutBillingTruth";
 import { CloseoutLifecyclePolicy } from "./CloseoutLifecyclePolicy";
+import { rollupEventBilling } from "./invoiceBilling";
 import { FinanceFailureBanner } from "./FinanceFailureBanner";
 import { FINANCE_ROUTES } from "./financeRoutes";
 import { FinanceWorkspaceNav } from "./FinanceWorkspaceNav";
@@ -85,6 +90,14 @@ export function CloseoutPage() {
   const formEvents = draft
     ? (events ?? []).filter((event) => event._id === String(draft.eventId))
     : capturableEvents;
+  const billingFor = (eventId: string) =>
+    rollupEventBilling(invoices ?? [], eventId);
+  const formBilling =
+    showCapture && formEventId
+      ? invoices === undefined
+        ? undefined
+        : billingFor(formEventId)
+      : null;
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -215,6 +228,7 @@ export function CloseoutPage() {
           selectedEventId={formEventId}
           onSelectEvent={setSelectedEventId}
           labor={labor}
+          billing={formBilling}
           draft={draft}
           busy={busy === "capture-closeout"}
           onSubmit={submitCapture}
@@ -265,6 +279,14 @@ export function CloseoutPage() {
               <tbody>
                 {visibleRows.map((row) => {
                   const event = eventFor(String(row.eventId));
+                  const unreconciled = isUnreconciledCloseout(row);
+                  // Seeded drafts carry zero headcount — the event's planned
+                  // headcount is the honest expected figure until reconciled.
+                  const expectedHeadcount =
+                    Number(row.expectedHeadcount ?? 0) > 0
+                      ? Number(row.expectedHeadcount)
+                      : Number(event?.expectedHeadcount ?? 0);
+                  const actualHeadcount = Number(row.actualHeadcount ?? 0);
                   return (
                     <Fragment key={row._id}>
                       <tr>
@@ -275,16 +297,21 @@ export function CloseoutPage() {
                           >
                             <strong>{eventTitle(String(row.eventId))}</strong>
                           </Link>
-                          <small>
-                            Revenue{" "}
-                            {formatMoneyExact(Number(row.actualRevenue ?? 0))}
-                          </small>
+                          <CloseoutRevenueNote
+                            row={row}
+                            billing={billingFor(String(row.eventId))}
+                          />
                         </td>
                         <td>
-                          {formatMoneyExact(Number(row.grossProfit ?? 0))}
+                          {unreconciled && Number(row.grossProfit ?? 0) === 0
+                            ? "—"
+                            : formatMoneyExact(Number(row.grossProfit ?? 0))}
                         </td>
                         <td>
-                          {row.actualHeadcount}/{row.expectedHeadcount}
+                          {unreconciled && actualHeadcount === 0
+                            ? "—"
+                            : actualHeadcount}
+                          /{expectedHeadcount}
                         </td>
                         <td>
                           <StatusChip status={String(row.status)} />

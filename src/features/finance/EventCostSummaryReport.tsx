@@ -98,13 +98,16 @@ export function EventCostSummaryReport({
           aria-label="Margin summary"
         >
           <div>
-            <span>Invoiced revenue</span>
+            <span>Billed revenue</span>
             <strong data-testid="invoiced-revenue">
               {formatMoney(summary.invoicedRevenue)}
             </strong>
             <small>
-              {summary.invoiceCount} invoice
+              {summary.invoiceCount} billed invoice
               {summary.invoiceCount === 1 ? "" : "s"}
+              {summary.draftInvoiceCount > 0
+                ? ` · ${formatMoney(summary.draftInvoiceTotal)} still in ${summary.draftInvoiceCount} draft${summary.draftInvoiceCount === 1 ? "" : "s"}`
+                : ""}
             </small>
           </div>
           <div>
@@ -159,10 +162,11 @@ export function EventCostSummaryReport({
           <div>
             <p>Method</p>
             <span>
-              Revenue adds up this event's invoices, leaving out any that were
-              deleted, voided, or written off. Costs come from the closeout you
-              recorded for the event; equipment/vendor hire and
-              miscellaneous/waste follow the closeout categories.
+              Revenue adds up this event's billed invoices — sent through paid.
+              Drafts are reported separately and never counted as revenue;
+              deleted, voided, and written-off invoices are left out. Costs come
+              from the closeout you recorded for the event; equipment/ vendor
+              hire and miscellaneous/waste follow the closeout categories.
             </span>
           </div>
           <div>

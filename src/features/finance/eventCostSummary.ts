@@ -1,3 +1,5 @@
+import { isBilledInvoice, isDraftInvoice } from "./invoiceBilling";
+
 type DateValue = Date | number | string | null | undefined;
 
 export type EventCostSummaryEvent = {
@@ -52,20 +54,22 @@ export type EventCostSummary = {
   asOf: DateValue;
   buckets: EventCostBucket[];
   totalCost: number;
+  /** Total across invoices actually billed (sent through paid) — not drafts. */
   invoicedRevenue: number;
   reconciledRevenue: number;
   margin: number;
   marginPercent: number | null;
   invoiceCount: number;
   invoiceNumbers: string[];
+  /** Money written into draft invoices that were never sent. */
+  draftInvoiceTotal: number;
+  draftInvoiceCount: number;
   headcount: {
     actual: number;
     expected: number;
   };
   notes: string[];
 };
-
-const EXCLUDED_INVOICE_STATUSES = new Set(["voided", "written_off"]);
 
 function amount(value: number | null | undefined): number {
   const parsed = Number(value ?? 0);
@@ -86,12 +90,13 @@ export function buildEventCostSummary({
   closeout: EventCostSummaryCloseout;
   invoices: readonly EventCostSummaryInvoice[];
 }): EventCostSummary {
-  const includedInvoices = invoices.filter(
-    (invoice) =>
-      invoice.deletedAt == null &&
-      String(invoice.eventId ?? "") === String(event._id) &&
-      !EXCLUDED_INVOICE_STATUSES.has(String(invoice.status)),
+  const eventInvoices = invoices.filter(
+    (invoice) => String(invoice.eventId ?? "") === String(event._id),
   );
+  // Billed = sent through paid. Drafts are reported separately — folding
+  // them into revenue pretends unsent paperwork is money.
+  const includedInvoices = eventInvoices.filter(isBilledInvoice);
+  const draftInvoices = eventInvoices.filter(isDraftInvoice);
 
   const buckets: EventCostBucket[] = [
     {
@@ -142,6 +147,11 @@ export function buildEventCostSummary({
     invoiceNumbers: includedInvoices
       .map((invoice) => String(invoice.invoiceNumber ?? "").trim())
       .filter(Boolean),
+    draftInvoiceTotal: draftInvoices.reduce(
+      (sum, invoice) => sum + amount(invoice.total),
+      0,
+    ),
+    draftInvoiceCount: draftInvoices.length,
     headcount: {
       actual: amount(closeout.actualHeadcount),
       expected: amount(closeout.expectedHeadcount ?? event.expectedHeadcount),

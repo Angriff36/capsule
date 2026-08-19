@@ -1,4 +1,6 @@
 import { useRef, type FormEvent } from "react";
+import { BillingProvenance } from "./CloseoutBillingTruth";
+import type { EventBillingRollup } from "./invoiceBilling";
 
 type EventOption = {
   _id: string;
@@ -144,6 +146,7 @@ export function CloseoutCaptureForm({
   selectedEventId,
   onSelectEvent,
   labor,
+  billing,
   draft,
   busy,
   onSubmit,
@@ -152,12 +155,15 @@ export function CloseoutCaptureForm({
   selectedEventId: string | null;
   onSelectEvent: (eventId: string) => void;
   labor: LaborSummary | null | undefined;
+  /** Billed / collected / drafted invoice totals for the selected event. */
+  billing: EventBillingRollup | null | undefined;
   /** When set, the form reconciles this existing draft closeout. */
   draft: CloseoutDraft | null;
   busy: boolean;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
 }) {
   const laborInputRef = useRef<HTMLInputElement>(null);
+  const revenueInputRef = useRef<HTMLInputElement>(null);
 
   if (events.length === 0) {
     return (
@@ -183,6 +189,14 @@ export function CloseoutCaptureForm({
     draft?.actualLaborCost != null && Number(draft.actualLaborCost) > 0
       ? Number(draft.actualLaborCost)
       : (labor?.cost ?? 0);
+  // Reconciled revenue comes from what was actually billed, not the
+  // proposal quote — the quote is only a fallback when nothing is invoiced.
+  const revenueDefault =
+    draft?.actualRevenue != null && Number(draft.actualRevenue) > 0
+      ? Number(draft.actualRevenue)
+      : billing != null && billing.billedTotal > 0
+        ? billing.billedTotal
+        : Number(selected.quotedPrice ?? 0);
 
   return (
     <form className="supply-form" onSubmit={onSubmit} key={draft?._id ?? "new"}>
@@ -214,17 +228,31 @@ export function CloseoutCaptureForm({
         <label className="field-label">
           Actual revenue
           <input
+            ref={revenueInputRef}
             className="input"
             name="actualRevenue"
             type="number"
             min="0"
             step="0.01"
             required
-            key={`rev:${eventId}`}
-            defaultValue={String(
-              draft?.actualRevenue || selected.quotedPrice || 0,
-            )}
+            key={`rev:${eventId}:${billing == null ? "loading" : "ready"}`}
+            defaultValue={revenueDefault.toFixed(2)}
           />
+          <BillingProvenance billing={billing} />
+          {billing != null && billing.billedTotal > 0 ? (
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm mt-1 self-start"
+              onClick={() => {
+                if (revenueInputRef.current) {
+                  revenueInputRef.current.value =
+                    billing.billedTotal.toFixed(2);
+                }
+              }}
+            >
+              Use billed total (${billing.billedTotal.toFixed(2)})
+            </button>
+          ) : null}
         </label>
         <label className="field-label">
           Budgeted revenue
