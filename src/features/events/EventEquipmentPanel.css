@@ -1,16 +1,40 @@
+/* Dispatch & return board — warehouse paper manifest. All colors route
+   through the --dispatch-* palette below so the board follows the app theme:
+   warm cream paper in light mode, lamplight panel tones in dark mode (the
+   .dark override at the end). Do not hardcode paper/ink literals in rules. */
 .equipment-dispatch {
   --dispatch-ink: #17221d;
   --dispatch-paper: #f2efe5;
   --dispatch-signal: #e96234;
+  --dispatch-signal-soft: rgb(233 98 52 / 0.11);
+  --dispatch-grid: rgb(23 34 29 / 0.035);
+  --dispatch-muted: #5e675f;
+  --dispatch-faint: #7b827c;
+  --dispatch-surface: rgb(255 255 255 / 0.56);
+  --dispatch-surface-strong: rgb(255 255 255 / 0.74);
+  --dispatch-surface-soft: rgb(255 255 255 / 0.42);
+  --dispatch-inset: #e9e4d5;
+  --dispatch-header-veil: linear-gradient(
+    110deg,
+    rgb(255 255 255 / 0.62),
+    rgb(232 225 205 / 0.82)
+  );
+  --dispatch-ok: #277a50;
+  --dispatch-ok-ink: #245b40;
+  --dispatch-ok-soft: rgb(39 122 80 / 0.1);
+  --dispatch-alert-ink: #a33c1f;
+  --dispatch-alert-soft: rgb(194 73 36 / 0.14);
+  --dispatch-release: #8a5b4b;
   overflow-x: auto;
-  border: 1px solid color-mix(in srgb, var(--line) 75%, var(--dispatch-ink));
+  border: 1px solid
+    color-mix(in srgb, var(--color-line) 75%, var(--dispatch-ink));
   border-radius: 12px;
   background:
-    linear-gradient(90deg, rgba(23, 34, 29, 0.035) 1px, transparent 1px) 0 0 /
-      22px 22px,
+    linear-gradient(90deg, var(--dispatch-grid) 1px, transparent 1px) 0 0 / 22px
+      22px,
     var(--dispatch-paper);
   color: var(--dispatch-ink);
-  box-shadow: 0 16px 36px rgba(23, 34, 29, 0.08);
+  box-shadow: 0 16px 36px rgb(23 34 29 / 0.08);
 }
 
 .equipment-dispatch__header {
@@ -19,12 +43,9 @@
   justify-content: space-between;
   gap: 24px;
   padding: 22px 24px 20px;
-  border-bottom: 1px solid rgba(23, 34, 29, 0.2);
-  background: linear-gradient(
-    110deg,
-    rgba(255, 255, 255, 0.62),
-    rgba(232, 225, 205, 0.82)
-  );
+  border-bottom: 1px solid
+    color-mix(in srgb, var(--dispatch-ink) 20%, transparent);
+  background: var(--dispatch-header-veil);
 }
 
 .equipment-dispatch__kicker,
@@ -32,7 +53,7 @@
 .equipment-checklist__window > span,
 .equipment-inspection > div:first-child span {
   margin: 0 0 5px;
-  color: #5e675f;
+  color: var(--dispatch-muted);
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
   font-weight: 700;
@@ -53,7 +74,7 @@
 .equipment-dispatch__header p:not(.equipment-dispatch__kicker) {
   max-width: 650px;
   margin: 7px 0 0;
-  color: #58625b;
+  color: var(--dispatch-muted);
   font-size: 13px;
   line-height: 1.55;
 }
@@ -68,9 +89,9 @@
   display: grid;
   grid-template-columns: repeat(3, auto);
   overflow: hidden;
-  border: 1px solid rgba(23, 34, 29, 0.25);
+  border: 1px solid color-mix(in srgb, var(--dispatch-ink) 25%, transparent);
   border-radius: 7px;
-  background: rgba(255, 255, 255, 0.56);
+  background: var(--dispatch-surface);
 }
 
 .equipment-dispatch__totals span {
@@ -78,14 +99,15 @@
   align-items: baseline;
   gap: 5px;
   padding: 7px 9px;
-  color: #657068;
+  color: var(--dispatch-muted);
   font-family: "IBM Plex Mono", monospace;
   font-size: 9px;
   text-transform: uppercase;
 }
 
 .equipment-dispatch__totals span + span {
-  border-left: 1px solid rgba(23, 34, 29, 0.16);
+  border-left: 1px solid
+    color-mix(in srgb, var(--dispatch-ink) 16%, transparent);
 }
 
 .equipment-dispatch__totals b {
@@ -95,10 +117,10 @@
 
 .equipment-dispatch__notice {
   margin: 14px 18px 0;
-  border-left: 3px solid #33835a;
-  background: rgba(51, 131, 90, 0.08);
+  border-left: 3px solid var(--dispatch-ok);
+  background: var(--dispatch-ok-soft);
   padding: 9px 12px;
-  color: #245b40;
+  color: var(--dispatch-ok-ink);
   font-size: 12px;
 }
 
@@ -109,10 +131,10 @@
   gap: 12px;
   margin: 16px 18px;
   padding: 16px;
-  border: 1px solid rgba(23, 34, 29, 0.28);
+  border: 1px solid color-mix(in srgb, var(--dispatch-ink) 28%, transparent);
   border-left: 5px solid var(--dispatch-signal);
-  background: rgba(255, 255, 255, 0.74);
-  box-shadow: 5px 5px 0 rgba(23, 34, 29, 0.08);
+  background: var(--dispatch-surface-strong);
+  box-shadow: 5px 5px 0 rgb(23 34 29 / 0.08);
 }
 
 .equipment-reserve-form__title {
@@ -140,8 +162,8 @@
   gap: 18px;
   margin: 18px;
   padding: 24px;
-  border: 1px dashed rgba(23, 34, 29, 0.34);
-  background: rgba(255, 255, 255, 0.42);
+  border: 1px dashed color-mix(in srgb, var(--dispatch-ink) 34%, transparent);
+  background: var(--dispatch-surface-soft);
 }
 
 .equipment-dispatch__empty > span {
@@ -153,7 +175,7 @@
 
 .equipment-dispatch__empty p {
   margin: 4px 0 0;
-  color: #667068;
+  color: var(--dispatch-muted);
   font-size: 12px;
 }
 
@@ -168,15 +190,15 @@
     minmax(220px, 1.25fr) minmax(170px, 0.8fr) minmax(165px, 0.8fr)
     minmax(165px, 0.8fr);
   gap: 0;
-  border-top: 1px solid rgba(23, 34, 29, 0.18);
-  background: rgba(255, 255, 255, 0.56);
+  border-top: 1px solid color-mix(in srgb, var(--dispatch-ink) 18%, transparent);
+  background: var(--dispatch-surface);
 }
 
 .equipment-checklist__row[data-status="checked_out"] {
   background: linear-gradient(
     90deg,
-    rgba(233, 98, 52, 0.11),
-    rgba(255, 255, 255, 0.58) 42%
+    var(--dispatch-signal-soft),
+    var(--dispatch-surface) 42%
   );
 }
 
@@ -194,7 +216,8 @@
 
 .equipment-checklist__window,
 .equipment-checkpoint {
-  border-left: 1px solid rgba(23, 34, 29, 0.15);
+  border-left: 1px solid
+    color-mix(in srgb, var(--dispatch-ink) 15%, transparent);
 }
 
 .equipment-checklist__identity {
@@ -226,7 +249,7 @@
 .equipment-checklist__identity div > span,
 .equipment-checklist__window small {
   margin-top: 4px;
-  color: #697269;
+  color: var(--dispatch-muted);
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
 }
@@ -245,7 +268,7 @@
   align-items: center;
   gap: 6px;
   margin-bottom: 9px;
-  color: #697269;
+  color: var(--dispatch-muted);
   font-family: "IBM Plex Mono", monospace;
   font-size: 10px;
   font-weight: 700;
@@ -254,7 +277,7 @@
 }
 
 .equipment-checkpoint[data-complete="true"] .equipment-checkpoint__label span {
-  color: #277a50;
+  color: var(--dispatch-ok);
 }
 
 .equipment-checkpoint__record strong,
@@ -278,25 +301,25 @@
 }
 
 .equipment-checkpoint__record > span[data-tone="match"] {
-  background: rgba(39, 122, 80, 0.12);
-  color: #1f6542;
+  background: var(--dispatch-ok-soft);
+  color: var(--dispatch-ok-ink);
 }
 
 .equipment-checkpoint__record > span[data-tone="changed"] {
-  background: rgba(194, 73, 36, 0.14);
-  color: #a33c1f;
+  background: var(--dispatch-alert-soft);
+  color: var(--dispatch-alert-ink);
 }
 
 .equipment-checkpoint__record small {
   margin-top: 5px;
-  color: #4f5951;
+  color: var(--dispatch-muted);
   font-size: 11px;
   line-height: 1.4;
 }
 
 .equipment-checkpoint__record time {
   margin-top: 5px;
-  color: #7b827c;
+  color: var(--dispatch-faint);
   font-family: "IBM Plex Mono", monospace;
   font-size: 9px;
 }
@@ -307,7 +330,7 @@
   top: 8px;
   border: 0;
   background: transparent;
-  color: #8a5b4b;
+  color: var(--dispatch-release);
   font-family: "IBM Plex Mono", monospace;
   font-size: 9px;
   text-decoration: underline;
@@ -323,8 +346,8 @@
   align-items: end;
   gap: 12px;
   padding: 14px 16px;
-  border-top: 1px solid rgba(23, 34, 29, 0.18);
-  background: #e9e4d5;
+  border-top: 1px solid color-mix(in srgb, var(--dispatch-ink) 18%, transparent);
+  background: var(--dispatch-inset);
   box-shadow: inset 5px 0 0 var(--dispatch-signal);
 }
 
@@ -336,6 +359,39 @@
 .equipment-inspection__actions {
   display: flex;
   gap: 8px;
+}
+
+/* Dark scheme — same board on lamplight panel tones instead of cream. Ink
+   flips to the app's pale sage, so every color-mix border/soft derived from
+   --dispatch-ink follows automatically. */
+.dark .equipment-dispatch {
+  --dispatch-ink: var(--color-ink);
+  --dispatch-paper: #232b26;
+  --dispatch-signal: #f0764a;
+  --dispatch-signal-soft: rgb(240 118 74 / 0.14);
+  --dispatch-grid: rgb(255 255 255 / 0.03);
+  --dispatch-muted: var(--color-ink-2);
+  --dispatch-faint: var(--color-ink-3);
+  --dispatch-surface: rgb(255 255 255 / 0.04);
+  --dispatch-surface-strong: rgb(255 255 255 / 0.06);
+  --dispatch-surface-soft: rgb(255 255 255 / 0.03);
+  --dispatch-inset: var(--color-inset);
+  --dispatch-header-veil: linear-gradient(
+    110deg,
+    rgb(255 255 255 / 0.05),
+    rgb(0 0 0 / 0.16)
+  );
+  --dispatch-ok: var(--color-ok);
+  --dispatch-ok-ink: var(--color-ok);
+  --dispatch-ok-soft: rgb(130 185 146 / 0.14);
+  --dispatch-alert-ink: var(--color-danger);
+  --dispatch-alert-soft: rgb(217 127 110 / 0.16);
+  --dispatch-release: #cfa08c;
+  box-shadow: 0 16px 36px rgb(0 0 0 / 0.35);
+}
+
+.dark .equipment-reserve-form {
+  box-shadow: 5px 5px 0 rgb(0 0 0 / 0.25);
 }
 
 @media (max-width: 1100px) {
@@ -361,11 +417,13 @@
 
   .equipment-checkpoint:nth-of-type(3) {
     border-left: 0;
-    border-top: 1px solid rgba(23, 34, 29, 0.15);
+    border-top: 1px solid
+      color-mix(in srgb, var(--dispatch-ink) 15%, transparent);
   }
 
   .equipment-checkpoint:nth-of-type(4) {
-    border-top: 1px solid rgba(23, 34, 29, 0.15);
+    border-top: 1px solid
+      color-mix(in srgb, var(--dispatch-ink) 15%, transparent);
   }
 
   .equipment-inspection {
@@ -402,7 +460,8 @@
   .equipment-checkpoint,
   .equipment-checkpoint:nth-of-type(3),
   .equipment-checkpoint:nth-of-type(4) {
-    border-top: 1px solid rgba(23, 34, 29, 0.15);
+    border-top: 1px solid
+      color-mix(in srgb, var(--dispatch-ink) 15%, transparent);
     border-left: 0;
   }
 }
