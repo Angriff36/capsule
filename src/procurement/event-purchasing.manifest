@@ -390,6 +390,7 @@ on PurchaseNeedReadyForWeeklyDraft run VendorOrder.ensureWeeklyDraft
     ingredientId: payload.ingredientId
     requiredQuantity: payload.requiredQuantity
     unit: payload.unit
+    orderSequence: count(VendorOrder where tenantId == payload.tenantId)
   }
 
 on VendorOrderWeeklyDraftEnsured run VendorOrderLine.ensureWeeklyLine
@@ -402,7 +403,6 @@ on VendorOrderWeeklyDraftEnsured run VendorOrderLine.ensureWeeklyLine
     onHand: sum(InventoryItem where ingredientId == payload.ingredientId, of quantityOnHand)
     contributionQuantity: payload.requiredQuantity
     unit: payload.unit
-    unitCost: 0
     purchaseNeedId: payload.purchaseNeedId
     ingredientDemandId: payload.ingredientDemandId
   }

@@ -11399,7 +11399,8 @@ export const listVendorOrder = query({
       (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
       (__row as any).needsSpendApproval = ((((__row as any).purchasingConfig != null) && ((__row as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__row as any).totalAmount > (__row as any).purchasingConfig.orderApprovalThresholdAmount));
       (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines });
+      (__row as any).liveTotalAmount = (((((__row as any).lines) ?? []).map((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.lineTotalAmount != null)) ? line.lineTotalAmount : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) + (__row as any).taxAmount) + (__row as any).shippingAmount);
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines, liveTotalAmount: (__row as any).liveTotalAmount });
     }
     return __projectedRows;
   },
@@ -11430,7 +11431,8 @@ export const getVendorOrder = query({
     (__doc as any).isOpenForReceiving = (((__doc as any).status === "confirmed") || ((__doc as any).status === "partially_received"));
     (__doc as any).needsSpendApproval = ((((__doc as any).purchasingConfig != null) && ((__doc as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__doc as any).totalAmount > (__doc as any).purchasingConfig.orderApprovalThresholdAmount));
     (__doc as any).hasIncompleteLines = ((((__doc as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-    const __hydrated = { ...(__doc as any), isDraft: (__doc as any).isDraft, isPendingApproval: (__doc as any).isPendingApproval, isOpenForReceiving: (__doc as any).isOpenForReceiving, needsSpendApproval: (__doc as any).needsSpendApproval, hasIncompleteLines: (__doc as any).hasIncompleteLines };
+    (__doc as any).liveTotalAmount = (((((__doc as any).lines) ?? []).map((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.lineTotalAmount != null)) ? line.lineTotalAmount : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) + (__doc as any).taxAmount) + (__doc as any).shippingAmount);
+    const __hydrated = { ...(__doc as any), isDraft: (__doc as any).isDraft, isPendingApproval: (__doc as any).isPendingApproval, isOpenForReceiving: (__doc as any).isOpenForReceiving, needsSpendApproval: (__doc as any).needsSpendApproval, hasIncompleteLines: (__doc as any).hasIncompleteLines, liveTotalAmount: (__doc as any).liveTotalAmount };
     return __hydrated;
   },
 });
@@ -11460,7 +11462,8 @@ export const listVendorOrderByTenantId = query({
       (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
       (__row as any).needsSpendApproval = ((((__row as any).purchasingConfig != null) && ((__row as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__row as any).totalAmount > (__row as any).purchasingConfig.orderApprovalThresholdAmount));
       (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines });
+      (__row as any).liveTotalAmount = (((((__row as any).lines) ?? []).map((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.lineTotalAmount != null)) ? line.lineTotalAmount : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) + (__row as any).taxAmount) + (__row as any).shippingAmount);
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines, liveTotalAmount: (__row as any).liveTotalAmount });
     }
     return __projectedRows;
   },
@@ -11492,7 +11495,8 @@ export const listVendorOrderByVendorId = query({
       (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
       (__row as any).needsSpendApproval = ((((__row as any).purchasingConfig != null) && ((__row as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__row as any).totalAmount > (__row as any).purchasingConfig.orderApprovalThresholdAmount));
       (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines });
+      (__row as any).liveTotalAmount = (((((__row as any).lines) ?? []).map((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.lineTotalAmount != null)) ? line.lineTotalAmount : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) + (__row as any).taxAmount) + (__row as any).shippingAmount);
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines, liveTotalAmount: (__row as any).liveTotalAmount });
     }
     return __projectedRows;
   },
@@ -11524,7 +11528,8 @@ export const listVendorOrderByEventId = query({
       (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
       (__row as any).needsSpendApproval = ((((__row as any).purchasingConfig != null) && ((__row as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__row as any).totalAmount > (__row as any).purchasingConfig.orderApprovalThresholdAmount));
       (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines });
+      (__row as any).liveTotalAmount = (((((__row as any).lines) ?? []).map((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.lineTotalAmount != null)) ? line.lineTotalAmount : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) + (__row as any).taxAmount) + (__row as any).shippingAmount);
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines, liveTotalAmount: (__row as any).liveTotalAmount });
     }
     return __projectedRows;
   },
@@ -11556,7 +11561,8 @@ export const listVendorOrderByPurchasingConfigId = query({
       (__row as any).isOpenForReceiving = (((__row as any).status === "confirmed") || ((__row as any).status === "partially_received"));
       (__row as any).needsSpendApproval = ((((__row as any).purchasingConfig != null) && ((__row as any).purchasingConfig.orderApprovalThresholdAmount != null)) && ((__row as any).totalAmount > (__row as any).purchasingConfig.orderApprovalThresholdAmount));
       (__row as any).hasIncompleteLines = ((((__row as any).lines) ?? []).filter((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.status !== "cancelled")) && (line.status !== "complete")))).length > 0);
-      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines });
+      (__row as any).liveTotalAmount = (((((__row as any).lines) ?? []).map((line: Doc<"vendorOrderLines">) => ((((line.deletedAt == null) && (line.lineTotalAmount != null)) ? line.lineTotalAmount : 0))).reduce((acc: number, v: unknown) => acc + (typeof v === "number" ? v : 0), 0) + (__row as any).taxAmount) + (__row as any).shippingAmount);
+      __projectedRows.push({ ...(__row as any), isDraft: (__row as any).isDraft, isPendingApproval: (__row as any).isPendingApproval, isOpenForReceiving: (__row as any).isOpenForReceiving, needsSpendApproval: (__row as any).needsSpendApproval, hasIncompleteLines: (__row as any).hasIncompleteLines, liveTotalAmount: (__row as any).liveTotalAmount });
     }
     return __projectedRows;
   },

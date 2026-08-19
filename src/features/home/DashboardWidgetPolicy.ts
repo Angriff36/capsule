@@ -140,6 +140,8 @@ type PaymentRow = BaseRow & {
 type VendorOrderRow = BaseRow & {
   orderNumber?: string | null;
   totalAmount?: number | null;
+  /** Read-time line rollup (query-inlined computed); falls back to totalAmount. */
+  liveTotalAmount?: number | null;
   status?: string | null;
 };
 
@@ -334,7 +336,11 @@ export class DashboardWidgetPolicy {
       .reduce((sum, invoice) => sum + number(invoice.amountDue), 0);
     const committedOrders = vendorOrders
       .filter((order) => COMMITTED_ORDER_STATUSES.has(String(order.status)))
-      .reduce((sum, order) => sum + number(order.totalAmount), 0);
+      .reduce(
+        (sum, order) =>
+          sum + number(order.liveTotalAmount ?? order.totalAmount),
+        0,
+      );
     const netCash = receivables30 - committedOrders;
 
     const get = (id: DashboardWidgetId) => catalog.get(id)!;
