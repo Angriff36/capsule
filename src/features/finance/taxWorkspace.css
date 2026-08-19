@@ -610,6 +610,18 @@
 
 /* ── Invoice detail: printed-document masthead ─────────────────────────── */
 
+/* The title column may hold long unbroken strings (legacy invoice numbers
+   were raw document ids). Let it shrink and wrap so the summary stamp never
+   gets pushed off-screen. */
+.invoice-doc-masthead > div:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.invoice-doc-masthead .display-title {
+  overflow-wrap: anywhere;
+}
+
 .invoice-doc-stamp {
   position: relative;
   z-index: 1;
