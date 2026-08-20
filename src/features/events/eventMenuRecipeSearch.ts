@@ -93,3 +93,63 @@ export function recipeAddSubmitSource(
   if (submitter != null) return "add-form-submit";
   return "search-key";
 }
+
+/** Real typing/paste in Search. Autofill and type=search restore are not this. */
+export function recipeSearchIsTypedInput(
+  inputType: string | undefined,
+): boolean {
+  return (
+    inputType === "insertText" ||
+    inputType === "insertFromPaste" ||
+    inputType === "insertCompositionText"
+  );
+}
+
+/**
+ * Qty digits and delayed autofill must not write Search.
+ * After a clear, only insertText / paste may refill it.
+ */
+export function recipeSearchAfterGuardedInput(input: {
+  current: RecipeSearchState;
+  nextValue: string;
+  focused: RecipeEditorField;
+  heldEmpty: boolean;
+  inputType?: string;
+}): { state: RecipeSearchState; heldEmpty: boolean } {
+  if (recipeEditorKeyOwner(input.focused) !== "search") {
+    return { state: input.current, heldEmpty: input.heldEmpty };
+  }
+  const next = recipeSearchAfterInput(input.nextValue);
+  if (next.query === "") {
+    return { state: recipeSearchCleared(), heldEmpty: true };
+  }
+  if (input.heldEmpty && !recipeSearchIsTypedInput(input.inputType)) {
+    return { state: recipeSearchCleared(), heldEmpty: true };
+  }
+  return { state: next, heldEmpty: false };
+}
+
+/** Backspace on an already-empty Search stays empty. */
+export function recipeSearchAfterEmptyBackspace(): RecipeSearchState {
+  return recipeSearchCleared();
+}
+
+/** Search keystrokes never become New ingredient name. */
+export function createNameAfterSearchInput(
+  _searchQuery: string,
+  createName: string,
+): string {
+  return createName;
+}
+
+/** Autofill / remount / search mirroring must not write create-name. */
+export function createNameAfterGuardedInput(input: {
+  current: string;
+  nextValue: string;
+  focused: RecipeEditorField;
+}): string {
+  if (recipeEditorKeyOwner(input.focused) !== "create-name") {
+    return input.current;
+  }
+  return input.nextValue;
+}

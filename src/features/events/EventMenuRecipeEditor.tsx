@@ -26,15 +26,24 @@ import {
 } from "./eventMenuRecipeIngredient";
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 import {
+  createNameAfterGuardedInput,
+  createNameAfterSearchInput,
   createNamePrefillFromSearch,
   recipeAddSubmitSource,
   recipeEditorFocusAfterCatalogPick,
+  recipeEditorKeyOwner,
   recipeLineCommitAllowed,
+  recipeSearchAfterEmptyBackspace,
+  recipeSearchAfterFocus,
+  recipeSearchAfterGuardedInput,
   recipeSearchAfterInput,
+  recipeSearchCleared,
   recipeSearchFromPick,
   recipeSearchTrapAppliesTo,
   searchKeyCommitsRecipeLine,
   shouldPreventRecipeAddSubmitFromSearchKey,
+  type RecipeEditorField,
+  type RecipeSearchState,
 } from "./eventMenuRecipeSearch";
 import {
   isSelectAllChord,
@@ -60,7 +69,83 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
   const [unit, setUnit] = useState("each");
   const [ingredientQuery, setIngredientQuery] = useState("");
   const [selectedIngredientId, setSelectedIngredientId] = useState("");
+  const [createName, setCreateName] = useState(() =>
+    createNamePrefillFromSearch(""),
+  );
   const addQtyRef = useRef<HTMLInputElement>(null);
+  const keyOwnerRef = useRef<RecipeEditorField>("other");
+  const searchHeldEmptyRef = useRef(true);
+  const searchStateRef = useRef<RecipeSearchState>(recipeSearchCleared());
+  searchStateRef.current = {
+    query: ingredientQuery,
+    selectedIngredientId,
+  };
+
+  function rememberKeyOwner(field: RecipeEditorField) {
+    keyOwnerRef.current = recipeEditorKeyOwner(field);
+  }
+
+  function applySearchState(state: RecipeSearchState, heldEmpty: boolean) {
+    searchStateRef.current = state;
+    searchHeldEmptyRef.current = heldEmpty;
+    setIngredientQuery(state.query);
+    setSelectedIngredientId(state.selectedIngredientId);
+    setCreateName((name) => createNameAfterSearchInput(state.query, name));
+  }
+
+  function applySearchDomInput(
+    target: HTMLInputElement,
+    nextValue: string,
+    inputType?: string,
+  ) {
+    const result = recipeSearchAfterGuardedInput({
+      current: searchStateRef.current,
+      nextValue,
+      focused: keyOwnerRef.current,
+      heldEmpty: searchHeldEmptyRef.current,
+      inputType,
+    });
+    if (target.value !== result.state.query) {
+      target.value = result.state.query;
+    }
+    applySearchState(result.state, result.heldEmpty);
+  }
+
+  function onRecipeSearchFocus(event: { currentTarget: HTMLInputElement }) {
+    rememberKeyOwner("search");
+    const next = recipeSearchAfterFocus(searchStateRef.current);
+    if (event.currentTarget.value !== next.query) {
+      event.currentTarget.value = next.query;
+    }
+    applySearchState(next, next.query === "" || searchHeldEmptyRef.current);
+  }
+
+  function onRecipeSearchBlur(event: { currentTarget: HTMLInputElement }) {
+    if (keyOwnerRef.current === "search") rememberKeyOwner("other");
+    const next = recipeSearchAfterFocus(searchStateRef.current);
+    if (event.currentTarget.value !== next.query) {
+      event.currentTarget.value = next.query;
+    }
+  }
+
+  function onCreateNameChange(event: {
+    currentTarget: HTMLInputElement;
+    target: { value: string };
+  }) {
+    const incoming = event.target.value;
+    const focused = keyOwnerRef.current;
+    setCreateName((current) => {
+      const next = createNameAfterGuardedInput({
+        current,
+        nextValue: incoming,
+        focused,
+      });
+      if (event.currentTarget.value !== next) {
+        event.currentTarget.value = next;
+      }
+      return next;
+    });
+  }
 
   const rows = (lines ?? [])
     .filter((line) => line.deletedAt == null && line.dishId === dishId)
@@ -112,8 +197,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
       unit: unit as (typeof UNIT_OF_MEASURE)[number],
       sortOrder: rows.length,
     });
-    setSelectedIngredientId("");
-    setIngredientQuery("");
+    applySearchState(recipeSearchCleared(), true);
   }
 
   async function onAddIngredient(event: FormEvent<HTMLFormElement>) {
@@ -185,8 +269,10 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
         setError("Ingredient was created but no id came back.");
         return;
       }
-      setSelectedIngredientId(ingredientId);
-      setIngredientQuery(parsed.value.name);
+      applySearchState(
+        { query: parsed.value.name, selectedIngredientId: ingredientId },
+        false,
+      );
       setUnit(parsed.value.unit);
       if (quantity > 0) {
         await addLine({
@@ -196,8 +282,8 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
           unit: parsed.value.unit,
           sortOrder: rows.length,
         });
-        setSelectedIngredientId("");
-        setIngredientQuery("");
+        applySearchState(recipeSearchCleared(), true);
+        setCreateName(createNamePrefillFromSearch(""));
         form.reset();
       }
     } catch (cause) {
@@ -393,27 +479,41 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
             <input
               className="field-input w-48"
               type="search"
+              role="searchbox"
               onKeyDown={trapSingleKeyNav}
               placeholder="Search catalog…"
               autoComplete="off"
               data-testid="event-menu-recipe-ingredient-search"
+              spellCheck={false}
               value={ingredientQuery}
               onChange={(event) => {
-                const next = recipeSearchAfterInput(event.target.value);
-                setIngredientQuery(next.query);
-                setSelectedIngredientId(next.selectedIngredientId);
+                applySearchDomInput(event.currentTarget, event.target.value);
               }}
               onInput={(event) => {
-                const next = recipeSearchAfterInput(event.currentTarget.value);
-                setIngredientQuery(next.query);
-                setSelectedIngredientId(next.selectedIngredientId);
+                applySearchDomInput(
+                  event.currentTarget,
+                  event.currentTarget.value,
+                  (event.nativeEvent as InputEvent).inputType,
+                );
               }}
+              onFocus={onRecipeSearchFocus}
+              onBlur={onRecipeSearchBlur}
               onKeyDownCapture={(event) => {
                 if (!recipeSearchTrapAppliesTo("search")) return;
                 if (isSelectAllChord(event)) {
                   event.preventDefault();
                   event.stopPropagation();
                   event.currentTarget.select();
+                  return;
+                }
+                if (
+                  event.key === "Backspace" &&
+                  event.currentTarget.value === ""
+                ) {
+                  event.preventDefault();
+                  const next = recipeSearchAfterEmptyBackspace();
+                  applySearchState(next, true);
+                  event.currentTarget.value = "";
                   return;
                 }
                 if (shouldPreventRecipeAddSubmitFromSearchKey(event.key)) {
@@ -439,8 +539,11 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                 defaultValue={1}
                 data-testid="event-menu-recipe-add-qty"
                 onMouseDown={(event) => {
+                  rememberKeyOwner("qty");
                   event.currentTarget.focus();
                 }}
+                autoComplete="off"
+                onFocus={() => rememberKeyOwner("qty")}
               />
             </label>
             <label className="field-label">
@@ -473,6 +576,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                 const field = document.querySelector<HTMLInputElement>(
                   '[data-testid="event-menu-create-ingredient-name"]',
                 );
+                rememberKeyOwner("create-name");
                 field?.focus();
               }}
             >
@@ -501,10 +605,10 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                     className="btn btn-ghost btn-sm"
                     onClick={() => {
                       const next = recipeSearchFromPick(row.id, row.name);
-                      setSelectedIngredientId(next.selectedIngredientId);
-                      setIngredientQuery(next.query);
+                      applySearchState(next, next.query === "");
                       if (row.unit) setUnit(String(row.unit));
                       if (recipeEditorFocusAfterCatalogPick() === "qty") {
+                        rememberKeyOwner("qty");
                         addQtyRef.current?.focus();
                       }
                     }}
@@ -535,11 +639,14 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
             <input
               className="field-input w-48"
               name="newIngredientName"
-              defaultValue={createNamePrefillFromSearch("")}
+              value={createName}
               placeholder="Carne asada"
               required
+              autoComplete="off"
               onKeyDown={trapSingleKeyNav}
               data-testid="event-menu-create-ingredient-name"
+              onFocus={() => rememberKeyOwner("create-name")}
+              onChange={onCreateNameChange}
             />
           </label>
           <label className="field-label">
