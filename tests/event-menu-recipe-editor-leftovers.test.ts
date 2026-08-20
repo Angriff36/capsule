@@ -9,16 +9,24 @@ import {
   trapSingleKeyNav,
 } from "../src/app/shell/singleKeyNav";
 import {
+  claimRecipeEditorField,
+  createNameAfterSearchClear,
+  createNameAfterSearchInput,
+  createNameAfterSearchPick,
+  createNamePrefillFromSearch,
   recipeEditorFocusAfterCatalogPick,
+  recipeEditorFocusAfterQtyPointer,
+  recipeEditorFocusAfterSearchPointer,
   recipeEditorKeyOwner,
   recipeLineCommitAllowed,
+  recipeSearchAcceptsInput,
   recipeSearchAfterFocus,
+  recipeSearchAfterForeignFieldKey,
   recipeSearchAfterInput,
   recipeSearchCleared,
   recipeSearchFromPick,
   recipeSearchFromTypedQuery,
   recipeSearchTrapAppliesTo,
-  createNamePrefillFromSearch,
   searchKeyCommitsRecipeLine,
   shouldPreventRecipeAddSubmitFromSearchKey,
 } from "../src/features/events/eventMenuRecipeSearch";
@@ -212,5 +220,81 @@ describe("218 leftover: click Per serving does not commit a row", () => {
     expect(qtyBlock).toContain(".focus(");
     expect(qtyBlock).not.toContain("addIngredientLine");
     expect(qtyBlock).not.toContain("addLine(");
+  });
+});
+
+describe("224 follow-up: qty digits never leak into Search catalog", () => {
+  it("rejects catalog input while Per serving owns the keys", () => {
+    expect(recipeSearchAcceptsInput("qty")).toBe(false);
+    expect(recipeSearchAcceptsInput("search")).toBe(true);
+    expect(recipeSearchAcceptsInput("create-name")).toBe(false);
+    expect(claimRecipeEditorField("qty")).toBe("qty");
+    expect(recipeEditorFocusAfterQtyPointer()).toBe("qty");
+    expect(recipeEditorFocusAfterSearchPointer()).toBe("search");
+    expect(recipeEditorKeyOwner("qty")).toBe("qty");
+    expect(recipeEditorKeyOwner("qty")).not.toBe("search");
+
+    const before = recipeSearchFromTypedQuery("tom");
+    expect(recipeSearchAfterForeignFieldKey(before, "1")).toEqual(before);
+    expect(recipeSearchAfterForeignFieldKey(before, "8")).toEqual(before);
+    expect(recipeSearchAfterForeignFieldKey(before, "178")).toEqual(before);
+    expect(
+      recipeSearchAfterForeignFieldKey(recipeSearchCleared(), "8"),
+    ).toEqual(recipeSearchCleared());
+
+    expect(editor).toContain("recipeSearchAcceptsInput");
+    expect(editor).toContain("recipeSearchAfterForeignFieldKey");
+    expect(editor).toContain("recipeEditorFocusAfterQtyPointer");
+    expect(editor).toContain("recipeEditorFocusAfterSearchPointer");
+    expect(editor).toContain("keyOwnerRef");
+    expect(editor).toContain("applyCatalogSearchInput");
+    expect(editor).toContain("searchRef.current?.blur()");
+    expect(editor).toContain("addQtyRef.current?.blur()");
+
+    const qtyAt = editor.indexOf('data-testid="event-menu-recipe-add-qty"');
+    const qtyBlock = editor.slice(Math.max(0, qtyAt - 280), qtyAt + 420);
+    expect(qtyBlock).toContain("onMouseDown");
+    expect(qtyBlock).toContain(".focus(");
+    expect(qtyBlock).toContain("recipeEditorFocusAfterQtyPointer");
+    expect(qtyBlock).not.toContain("trapSingleKeyNav");
+    expect(qtyBlock).not.toContain("setIngredientQuery");
+    expect(qtyBlock).not.toContain("applyCatalogSearchInput");
+  });
+});
+
+describe("224 follow-up: Search never live-mirrors into New ingredient name", () => {
+  it("keeps create-name on its own state through type, pick, clear, remount", () => {
+    expect(createNamePrefillFromSearch("cilantro")).toBe("");
+    expect(createNameAfterSearchInput("cilantro", "")).toBe("");
+    expect(createNameAfterSearchInput("cilantro", "Carne asada")).toBe(
+      "Carne asada",
+    );
+    expect(createNameAfterSearchPick("Cilantro", "")).toBe("");
+    expect(createNameAfterSearchPick("Cilantro", "Lime")).toBe("Lime");
+    expect(createNameAfterSearchClear("cilantro")).toBe("cilantro");
+    expect(createNameAfterSearchClear("")).toBe("");
+
+    expect(editor).toContain("createNameAfterSearchInput");
+    expect(editor).toContain("createNameAfterSearchPick");
+    expect(editor).toContain("createNamePrefillFromSearch");
+    expect(editor).toContain("value={createName}");
+    expect(editor).toContain('key="event-menu-create-ingredient-form"');
+    expect(editor).not.toMatch(
+      /name="newIngredientName"[\s\S]{0,200}defaultValue=\{ingredientQuery/,
+    );
+    expect(editor).not.toMatch(
+      /name="newIngredientName"[\s\S]{0,200}value=\{ingredientQuery/,
+    );
+    expect(editor).not.toMatch(/setCreateName\(\s*ingredientQuery/);
+    expect(editor).not.toMatch(/setCreateName\(\s*next\.query/);
+    expect(editor).not.toContain("useEffect");
+
+    const nameAt = editor.indexOf('name="newIngredientName"');
+    expect(nameAt).toBeGreaterThan(-1);
+    const nameBlock = editor.slice(nameAt, nameAt + 520);
+    expect(nameBlock).toContain("value={createName}");
+    expect(nameBlock).toContain("onKeyDown={trapSingleKeyNav}");
+    expect(nameBlock).not.toContain("ingredientQuery");
+    expect(nameBlock).not.toContain("defaultValue");
   });
 });

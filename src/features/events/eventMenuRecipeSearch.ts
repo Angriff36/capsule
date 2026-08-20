@@ -93,3 +93,52 @@ export function recipeAddSubmitSource(
   if (submitter != null) return "add-form-submit";
   return "search-key";
 }
+
+/** Last pointer/tab claim — delayed focus steal must not change this. */
+export function claimRecipeEditorField(
+  next: RecipeEditorField,
+): RecipeEditorField {
+  return next;
+}
+
+/** Catalog onChange/onInput applies only while Search owns the keys. */
+export function recipeSearchAcceptsInput(owner: RecipeEditorField): boolean {
+  return owner === "search";
+}
+
+/** Digits and Backspace typed for Per serving never rewrite Search catalog. */
+export function recipeSearchAfterForeignFieldKey(
+  state: RecipeSearchState,
+  _incomingValue: string,
+): RecipeSearchState {
+  return state;
+}
+
+/** Typing, picking, or clearing Search must leave New ingredient name alone. */
+export function createNameAfterSearchInput(
+  _searchQuery: string,
+  createName: string,
+): string {
+  return createName;
+}
+
+export function createNameAfterSearchPick(
+  _pickedName: string,
+  createName: string,
+): string {
+  return createName;
+}
+
+export function createNameAfterSearchClear(createName: string): string {
+  return createName;
+}
+
+/** Pointer on Per serving keeps qty; do not restore Search afterward. */
+export function recipeEditorFocusAfterQtyPointer(): "qty" {
+  return "qty";
+}
+
+/** Pointer on Search catalog keeps Search; Backspace must not edit qty. */
+export function recipeEditorFocusAfterSearchPointer(): "search" {
+  return "search";
+}
