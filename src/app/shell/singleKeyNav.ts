@@ -1,9 +1,14 @@
 /** Global single-key shortcuts (letter nav, `?`) must not steal keys from
  * text fields. Event menu recipe search is `type="search"` — still an INPUT. */
 
+export type ShortcutTargetLike = {
+  tagName?: string;
+  isContentEditable?: boolean;
+};
+
 export type SingleKeyNavEvent = {
   key: string;
-  target: EventTarget | null | undefined;
+  target?: ShortcutTargetLike | EventTarget | null;
   ctrlKey?: boolean;
   metaKey?: boolean;
   altKey?: boolean;
@@ -11,13 +16,10 @@ export type SingleKeyNavEvent = {
 
 /** True when the key originated in a field that should keep typed characters. */
 export function isEditableShortcutTarget(
-  target: EventTarget | null | undefined,
+  target: ShortcutTargetLike | EventTarget | null | undefined,
 ): boolean {
   if (target == null || typeof target !== "object") return false;
-  const el = target as {
-    tagName?: string;
-    isContentEditable?: boolean;
-  };
+  const el = target as ShortcutTargetLike;
   const tag = String(el.tagName ?? "").toUpperCase();
   return (
     tag === "INPUT" ||
