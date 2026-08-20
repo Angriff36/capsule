@@ -142,14 +142,48 @@ export function createNameAfterSearchInput(
   return createName;
 }
 
+/** Real typing/paste/delete in create-name. Autofill is not this. */
+export function createNameIsUserTypedInput(
+  inputType: string | undefined,
+): boolean {
+  if (recipeSearchIsTypedInput(inputType)) return true;
+  return (
+    inputType === "deleteContentBackward" ||
+    inputType === "deleteContentForward" ||
+    inputType === "deleteByCut" ||
+    inputType === "deleteByDrag"
+  );
+}
+
 /** Autofill / remount / search mirroring must not write create-name. */
 export function createNameAfterGuardedInput(input: {
   current: string;
   nextValue: string;
   focused: RecipeEditorField;
+  active?: boolean;
+  inputType?: string;
 }): string {
   if (recipeEditorKeyOwner(input.focused) !== "create-name") {
     return input.current;
   }
+  if (input.active === false) {
+    return input.current;
+  }
+  if ("inputType" in input && !createNameIsUserTypedInput(input.inputType)) {
+    return input.current;
+  }
   return input.nextValue;
 }
+
+/** Browser/autofill may write the create-name INPUT; React "" is a no-op. */
+export function restoreCreateNameDomValue(
+  field: { value: string } | null | undefined,
+  reactValue: string,
+): void {
+  if (field != null && field.value !== reactValue) {
+    field.value = reactValue;
+  }
+}
+
+/** Chrome must not pair create-name with the type=search catalog field. */
+export const CREATE_NAME_AUTOCOMPLETE = "event-menu-new-ingredient-name";

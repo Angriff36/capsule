@@ -1,4 +1,10 @@
-import { useMemo, useRef, useState, type FormEvent } from "react";
+import {
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import {
   useCreateDishContainer,
   useCreateDishIngredient,
@@ -26,8 +32,10 @@ import {
 } from "./eventMenuRecipeIngredient";
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 import {
+  CREATE_NAME_AUTOCOMPLETE,
   createNameAfterGuardedInput,
   createNamePrefillFromSearch,
+  restoreCreateNameDomValue,
   recipeAddSubmitSource,
   recipeEditorFocusAfterCatalogPick,
   recipeEditorKeyOwner,
@@ -72,6 +80,9 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     createNamePrefillFromSearch(""),
   );
   const addQtyRef = useRef<HTMLInputElement>(null);
+  const newIngredientInputRef = useRef<HTMLInputElement>(null);
+  const newIngredientStateRef = useRef(createName);
+  newIngredientStateRef.current = createName;
   const keyOwnerRef = useRef<RecipeEditorField>("other");
   const searchHeldEmptyRef = useRef(true);
   const searchStateRef = useRef<RecipeSearchState>(recipeSearchCleared());
@@ -84,11 +95,19 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     keyOwnerRef.current = recipeEditorKeyOwner(field);
   }
 
+  function syncNewIngredientInputDom() {
+    restoreCreateNameDomValue(
+      newIngredientInputRef.current,
+      newIngredientStateRef.current,
+    );
+  }
+
   function applySearchState(state: RecipeSearchState, heldEmpty: boolean) {
     searchStateRef.current = state;
     searchHeldEmptyRef.current = heldEmpty;
     setIngredientQuery(state.query);
     setSelectedIngredientId(state.selectedIngredientId);
+    syncNewIngredientInputDom();
   }
 
   function applySearchDomInput(
@@ -107,6 +126,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
       target.value = result.state.query;
     }
     applySearchState(result.state, result.heldEmpty);
+    queueMicrotask(syncNewIngredientInputDom);
   }
 
   function onRecipeSearchFocus(event: { currentTarget: HTMLInputElement }) {
@@ -116,6 +136,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
       event.currentTarget.value = next.query;
     }
     applySearchState(next, next.query === "" || searchHeldEmptyRef.current);
+    syncNewIngredientInputDom();
   }
 
   function onRecipeSearchBlur(event: { currentTarget: HTMLInputElement }) {
@@ -124,19 +145,24 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     if (event.currentTarget.value !== next.query) {
       event.currentTarget.value = next.query;
     }
+    syncNewIngredientInputDom();
   }
 
   function onCreateNameChange(event: {
     currentTarget: HTMLInputElement;
     target: { value: string };
+    nativeEvent: Event;
   }) {
     const incoming = event.target.value;
     const focused = keyOwnerRef.current;
+    const inputType = (event.nativeEvent as InputEvent).inputType;
     setCreateName((current) => {
       const next = createNameAfterGuardedInput({
         current,
         nextValue: incoming,
         focused,
+        active: document.activeElement === event.currentTarget,
+        inputType,
       });
       if (event.currentTarget.value !== next) {
         event.currentTarget.value = next;
@@ -144,6 +170,10 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
       return next;
     });
   }
+
+  useLayoutEffect(() => {
+    syncNewIngredientInputDom();
+  }, [ingredientQuery, createName]);
 
   const rows = (lines ?? [])
     .filter((line) => line.deletedAt == null && line.dishId === dishId)
@@ -518,6 +548,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                     const next = recipeSearchAfterEmptyBackspace();
                     applySearchState(next, true);
                     event.currentTarget.value = "";
+                    syncNewIngredientInputDom();
                     return;
                   }
                   if (shouldPreventRecipeAddSubmitFromSearchKey(event.key)) {
@@ -641,12 +672,31 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
           onSubmit={onCreateIngredient}
           data-testid="event-menu-create-ingredient-form"
         >
+          <input
+            type="text"
+            tabIndex={-1}
+            aria-hidden="true"
+            autoComplete="username"
+            name="eventMenuCreateIngredientAutofillSink"
+            defaultValue=""
+            data-testid="event-menu-create-ingredient-autofill-sink"
+            style={{
+              position: "absolute",
+              width: 1,
+              height: 1,
+              padding: 0,
+              border: 0,
+              opacity: 0,
+              pointerEvents: "none",
+            }}
+          />
           <label
             className="field-label"
             htmlFor="event-menu-create-ingredient-name"
           >
             New ingredient
             <input
+              ref={newIngredientInputRef}
               className="field-input w-48"
               id="event-menu-create-ingredient-name"
               name="newIngredientName"
@@ -654,7 +704,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
               value={createName}
               placeholder="Carne asada"
               required
-              autoComplete="off"
+              autoComplete={CREATE_NAME_AUTOCOMPLETE}
               spellCheck={false}
               onKeyDown={trapSingleKeyNav}
               data-testid="event-menu-create-ingredient-name"
