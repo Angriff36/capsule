@@ -12,12 +12,16 @@ import {
   recipeEditorFocusAfterCatalogPick,
   recipeEditorKeyOwner,
   recipeLineCommitAllowed,
+  recipeSearchAfterEmptyBackspace,
   recipeSearchAfterFocus,
+  recipeSearchAfterGuardedInput,
   recipeSearchAfterInput,
   recipeSearchCleared,
   recipeSearchFromPick,
   recipeSearchFromTypedQuery,
   recipeSearchTrapAppliesTo,
+  createNameAfterGuardedInput,
+  createNameAfterSearchInput,
   createNamePrefillFromSearch,
   searchKeyCommitsRecipeLine,
   shouldPreventRecipeAddSubmitFromSearchKey,
@@ -212,5 +216,125 @@ describe("218 leftover: click Per serving does not commit a row", () => {
     expect(qtyBlock).toContain(".focus(");
     expect(qtyBlock).not.toContain("addIngredientLine");
     expect(qtyBlock).not.toContain("addLine(");
+  });
+});
+
+describe("224 leftover: Per serving digits never write Search", () => {
+  it("rejects qty-owned keystrokes and delayed autofill into the catalog query", () => {
+    const empty = recipeSearchCleared();
+    const leaked = recipeSearchAfterGuardedInput({
+      current: empty,
+      nextValue: "1",
+      focused: "qty",
+      heldEmpty: true,
+      inputType: "insertText",
+    });
+    expect(leaked.state).toEqual(empty);
+    expect(recipeEditorKeyOwner("qty")).not.toBe("search");
+
+    const midQty = recipeSearchAfterGuardedInput({
+      current: empty,
+      nextValue: "8",
+      focused: "qty",
+      heldEmpty: true,
+    });
+    expect(midQty.state.query).toBe("");
+
+    const typed = recipeSearchAfterGuardedInput({
+      current: empty,
+      nextValue: "t",
+      focused: "search",
+      heldEmpty: true,
+      inputType: "insertText",
+    });
+    expect(typed.state.query).toBe("t");
+    expect(typed.heldEmpty).toBe(false);
+
+    expect(editor).toContain("recipeSearchAfterGuardedInput");
+    expect(editor).toContain('rememberKeyOwner("qty")');
+    expect(editor).toContain('role="searchbox"');
+  });
+});
+
+describe("224 leftover: Search does not copy into New ingredient name", () => {
+  it("keeps create-name independent across type, pick, clear, and remount", () => {
+    expect(createNameAfterSearchInput("cilantro", "")).toBe("");
+    expect(createNameAfterSearchInput("pico", "Carne asada")).toBe(
+      "Carne asada",
+    );
+    expect(
+      createNameAfterGuardedInput({
+        current: "",
+        nextValue: "cilantro",
+        focused: "search",
+      }),
+    ).toBe("");
+    expect(
+      createNameAfterGuardedInput({
+        current: "",
+        nextValue: "pico",
+        focused: "qty",
+      }),
+    ).toBe("");
+    expect(
+      createNameAfterGuardedInput({
+        current: "",
+        nextValue: "Radish",
+        focused: "create-name",
+      }),
+    ).toBe("Radish");
+
+    expect(editor).toContain("createNameAfterSearchInput");
+    expect(editor).toContain("createNameAfterGuardedInput");
+    expect(editor).toContain("value={createName}");
+    expect(editor).not.toMatch(
+      /name="newIngredientName"[\s\S]{0,160}value=\{ingredientQuery/,
+    );
+    expect(editor).not.toMatch(
+      /name="newIngredientName"[\s\S]{0,160}defaultValue=\{ingredientQuery/,
+    );
+  });
+});
+
+describe("224 leftover: cleared Search stays empty", () => {
+  it("rejects backspace-on-empty, blur, and click write-back of a prior query", () => {
+    let state = recipeSearchFromTypedQuery("pico");
+    state = recipeSearchAfterInput("");
+    expect(state).toEqual(recipeSearchCleared());
+
+    const backspace = recipeSearchAfterEmptyBackspace();
+    expect(backspace).toEqual(recipeSearchCleared());
+    const resurrect = recipeSearchAfterGuardedInput({
+      current: recipeSearchCleared(),
+      nextValue: "pico",
+      focused: "search",
+      heldEmpty: true,
+    });
+    expect(resurrect.state.query).toBe("");
+    expect(resurrect.heldEmpty).toBe(true);
+
+    const afterBlur = recipeSearchAfterFocus(recipeSearchCleared());
+    expect(afterBlur.query).toBe("");
+    const cilantro = recipeSearchAfterGuardedInput({
+      current: afterBlur,
+      nextValue: "cilantro",
+      focused: "search",
+      heldEmpty: true,
+      inputType: "insertReplacementText",
+    });
+    expect(cilantro.state.query).toBe("");
+
+    const qtyDigit = recipeSearchAfterGuardedInput({
+      current: recipeSearchCleared(),
+      nextValue: "8",
+      focused: "search",
+      heldEmpty: true,
+    });
+    expect(qtyDigit.state.query).toBe("");
+
+    expect(editor).toContain("recipeSearchAfterEmptyBackspace");
+    expect(editor).toContain("recipeSearchAfterFocus");
+    expect(editor).toContain("onBlur={onRecipeSearchBlur}");
+    expect(editor).not.toMatch(/onFocus=\{[^}]*setIngredientQuery/);
   });
 });
