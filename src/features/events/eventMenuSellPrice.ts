@@ -1,4 +1,5 @@
 const SELL_PREFIX = "SELL:";
+const PACKET_LINE = /^@capsule\.menu\s+(\{.*\})\s*$/;
 
 export type EventMenuSellLine = {
   eventDishId: string;
@@ -13,6 +14,32 @@ export type EventMenuSellRollup = {
   lines: EventMenuSellLine[];
   foodSellTotal: number;
 };
+
+function asNonnegativeNumber(value: unknown): number | null {
+  if (value == null || value === "") return null;
+  const next = Number(value);
+  return Number.isFinite(next) && next >= 0 ? next : null;
+}
+
+function parsePacketUnitSellPrice(
+  specialInstructions?: string | null,
+): number | null {
+  if (!specialInstructions) return null;
+  for (const line of specialInstructions.split("\n")) {
+    const match = line.trim().match(PACKET_LINE);
+    if (!match) continue;
+    try {
+      const parsed = JSON.parse(match[1] ?? "{}") as {
+        unitSellPrice?: unknown;
+      };
+      const value = asNonnegativeNumber(parsed.unitSellPrice);
+      if (value != null) return value;
+    } catch {
+      // Keep scanning leftover SELL:.
+    }
+  }
+  return null;
+}
 
 /** Parse a unit sell price encoded as `SELL:34.00` in EventDish.specialInstructions. */
 export function parseUnitSellPrice(
@@ -42,11 +69,15 @@ export function eventMenuSellTotals(
     dishId: string;
     name: string;
     servings: number;
+    unitSellPrice?: number | null;
     specialInstructions?: string | null;
   }[],
 ): EventMenuSellRollup {
   const priced = lines.map((line) => {
-    const unitSellPrice = parseUnitSellPrice(line.specialInstructions);
+    const unitSellPrice =
+      asNonnegativeNumber(line.unitSellPrice) ??
+      parsePacketUnitSellPrice(line.specialInstructions) ??
+      parseUnitSellPrice(line.specialInstructions);
     const servings = Number(line.servings);
     const guests = Number.isFinite(servings) && servings > 0 ? servings : 0;
     return {

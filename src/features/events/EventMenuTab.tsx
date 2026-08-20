@@ -5,6 +5,7 @@ import {
   useEventDishAdjustServings,
   useEventDishChangeCourse,
   useEventDishRemove,
+  useEventDishSetHeadcountOverride,
   useEventDishUpdateInstructions,
   useGetEvent,
   useListComponent,
@@ -36,12 +37,15 @@ import {
   eventMenuHeaderUnpricedNote,
   eventMenuUnpricedEstimateLabel,
 } from "./eventMenuCost";
-import { eventMenuContainerCountsForDish } from "./eventMenuContainers";
 import {
-  eventMenuSellTotals,
-  formatSellPriceInstruction,
-  parseUnitSellPrice,
-} from "./eventMenuSellPrice";
+  eventMenuContainerCountsForDish,
+  eventMenuLinePanCount,
+} from "./eventMenuContainers";
+import { eventMenuSellTotals } from "./eventMenuSellPrice";
+import {
+  parseEventMenuLineFields,
+  planEventMenuLineSave,
+} from "./eventMenuLineFields";
 import { suspectRowsFromRecipeLines } from "./eventMenuSuspectQuantity";
 
 type Props = {
@@ -64,6 +68,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const adjustServings = useEventDishAdjustServings();
   const changeCourse = useEventDishChangeCourse();
   const removeDish = useEventDishRemove();
+  const setHeadcountOverride = useEventDishSetHeadcountOverride();
   const updateInstructions = useEventDishUpdateInstructions();
   const { ready: prepSyncReady, syncStockForEvent } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
@@ -154,15 +159,19 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const sellRollup = useMemo(
     () =>
       eventMenuSellTotals(
-        selections.map((row) => ({
-          eventDishId: row._id,
-          dishId: row.dishId,
-          name:
-            dishes?.find((dish) => dish._id === row.dishId)?.name ??
-            "Unknown dish",
-          servings: Number(row.quantityServings),
-          specialInstructions: row.specialInstructions,
-        })),
+        selections.map((row) => {
+          const fields = parseEventMenuLineFields(row.specialInstructions);
+          return {
+            eventDishId: row._id,
+            dishId: row.dishId,
+            name:
+              dishes?.find((dish) => dish._id === row.dishId)?.name ??
+              "Unknown dish",
+            servings: Number(row.quantityServings),
+            unitSellPrice: fields.unitSellPrice,
+            specialInstructions: row.specialInstructions,
+          };
+        }),
       ),
     [dishes, selections],
   );
@@ -291,24 +300,35 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             const dishCost = eventMenuCostForDish(costRollup, selection._id);
             const estimated = dishCost?.foodCost ?? 0;
             const estimateKind = eventMenuDishEstimateKind(dishCost);
-            const pans = eventMenuContainerCountsForDish(
-              selection.dishId,
-              dishCost?.servings ?? Number(selection.quantityServings),
-              (containers ?? []).map((row) => ({
-                id: row._id,
-                dishId: row.dishId,
-                name: row.name,
-                servingsPerContainer: Number(row.servingsPerContainer),
-                baseQuantity: Number(row.baseQuantity ?? 0),
-                status: String(row.status),
-                deletedAt: row.deletedAt,
-              })),
-            );
-            const panLabel = pans
-              .map((row) => `${row.count} ${row.name}`)
-              .join(" · ");
+            const dishContainers = (containers ?? []).map((row) => ({
+              id: row._id,
+              dishId: row.dishId,
+              name: row.name,
+              servingsPerContainer: Number(row.servingsPerContainer),
+              baseQuantity: Number(row.baseQuantity ?? 0),
+              status: String(row.status),
+              deletedAt: row.deletedAt,
+            }));
             const servings =
               dishCost?.servings ?? Number(selection.quantityServings);
+            const lineFields = parseEventMenuLineFields(
+              selection.specialInstructions,
+            );
+            const pans = eventMenuContainerCountsForDish(
+              selection.dishId,
+              servings,
+              dishContainers,
+            );
+            const linePanCount = eventMenuLinePanCount(
+              lineFields.containerCount,
+              servings,
+              selection.dishId,
+              dishContainers,
+            );
+            const panLabel =
+              lineFields.containerCount != null
+                ? `${linePanCount} pans`
+                : pans.map((row) => `${row.count} ${row.name}`).join(" · ");
             const recipeFlags = suspectRowsFromRecipeLines(
               (dishIngredients ?? [])
                 .filter(
@@ -404,42 +424,37 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                   ) : null}
                 </div>
                 <form
+                  key={`${selection._id}:${selection.version}`}
                   className="flex flex-wrap items-end gap-2"
                   onSubmit={(formEvent: FormEvent<HTMLFormElement>) => {
                     formEvent.preventDefault();
                     const data = new FormData(formEvent.currentTarget);
-                    const quantityServings = Number(
-                      data.get("quantityServings"),
-                    );
+                    const plan = planEventMenuLineSave({
+                      currentInstructions: selection.specialInstructions,
+                      currentServings: Number(selection.quantityServings),
+                      nextSellRaw: String(data.get("unitSellPrice") ?? ""),
+                      nextServingsRaw: String(
+                        data.get("quantityServings") ?? "",
+                      ),
+                      nextContainerRaw: String(
+                        data.get("containerCount") ?? "",
+                      ),
+                    });
                     if (
-                      !Number.isFinite(quantityServings) ||
-                      quantityServings < 0
+                      !Number.isFinite(plan.quantityServings) ||
+                      plan.quantityServings < 0
                     )
                       return;
                     const nextCourse = String(data.get("course") ?? "").trim();
                     const prevCourse = String(selection.course ?? "").trim();
-                    const sellRaw = String(
-                      data.get("unitSellPrice") ?? "",
-                    ).trim();
-                    const nextSell = sellRaw === "" ? null : Number(sellRaw);
-                    const prevSell = parseUnitSellPrice(
-                      selection.specialInstructions,
-                    );
                     void run(`servings:${selection._id}`, async () => {
                       let version = selection.version;
-                      if (
-                        nextSell != null &&
-                        Number.isFinite(nextSell) &&
-                        nextSell >= 0 &&
-                        nextSell !== prevSell
-                      ) {
+                      if (plan.fieldsChanged) {
                         await updateInstructions({
                           docId: selection._id,
                           version,
-                          specialInstructions: formatSellPriceInstruction(
-                            nextSell,
-                            selection.specialInstructions,
-                          ),
+                          specialInstructions:
+                            plan.specialInstructions || undefined,
                         });
                         version += 1;
                       }
@@ -454,12 +469,20 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                         });
                         version += 1;
                       }
-                      if (quantityServings !== selection.quantityServings) {
+                      if (plan.servingsChanged) {
                         await adjustServings({
                           docId: selection._id,
                           version,
-                          quantityServings,
+                          quantityServings: plan.quantityServings,
                         });
+                        version += 1;
+                        if (plan.quantityServings > 0) {
+                          await setHeadcountOverride({
+                            docId: selection._id,
+                            version,
+                            headcountOverride: plan.quantityServings,
+                          });
+                        }
                       }
                     });
                   }}
@@ -481,9 +504,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                       type="number"
                       min={0}
                       step="0.01"
-                      defaultValue={
-                        parseUnitSellPrice(selection.specialInstructions) ?? ""
-                      }
+                      data-testid="event-menu-unit-sell-price"
+                      defaultValue={lineFields.unitSellPrice ?? ""}
                     />
                   </label>
                   <label className="field-label">
@@ -494,7 +516,20 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                       type="number"
                       min={0}
                       step={1}
+                      data-testid="event-menu-servings"
                       defaultValue={selection.quantityServings}
+                    />
+                  </label>
+                  <label className="field-label">
+                    Pans
+                    <input
+                      className="field-input w-20"
+                      name="containerCount"
+                      type="number"
+                      min={0}
+                      step={1}
+                      data-testid="event-menu-line-pans"
+                      defaultValue={lineFields.containerCount ?? ""}
                     />
                   </label>
                   <button
