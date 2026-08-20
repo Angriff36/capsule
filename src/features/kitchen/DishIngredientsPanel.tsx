@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { formatCountNoun } from "../../lib/format";
 import {
   useCreateDishIngredient,
+  useDishIngredientAdjustQuantity,
   useDishIngredientRemove,
   useListDishIngredient,
   useListIngredient,
@@ -12,6 +13,7 @@ import {
 } from "./import/UnitOfMeasureMapper";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
+import { applyDishIngredientRemoval } from "./dishIngredientRemoval";
 
 type Props = {
   dishId: string;
@@ -27,6 +29,7 @@ export function DishIngredientsPanel({ dishId }: Props) {
   const lines = useListDishIngredient();
   const ingredients = useListIngredient();
   const addLine = useCreateDishIngredient();
+  const adjustQuantity = useDishIngredientAdjustQuantity();
   const removeLine = useDishIngredientRemove();
 
   const [busy, setBusy] = useState<string | null>(null);
@@ -85,33 +88,69 @@ export function DishIngredientsPanel({ dishId }: Props) {
     }
   }
 
+  async function onSaveQty(
+    event: FormEvent<HTMLFormElement>,
+    line: (typeof rows)[number],
+  ) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const quantity = Number(data.get("quantity") ?? 0);
+    const nextUnit = String(data.get("unit") ?? line.unit);
+    if (!(quantity > 0)) {
+      setError("Quantity per serving must be greater than zero.");
+      return;
+    }
+    setBusy(`qty:${line._id}`);
+    setError(null);
+    setNotice(null);
+    try {
+      await adjustQuantity({
+        docId: line._id,
+        version: line.version,
+        quantity,
+        unit: nextUnit as (typeof UNIT_OF_MEASURE)[number],
+      });
+      setNotice("Quantity saved.");
+    } catch (cause) {
+      setError(
+        cause instanceof Error
+          ? cause.message
+          : "Could not save the recipe quantity.",
+      );
+    } finally {
+      setBusy(null);
+    }
+  }
+
   async function onRemove(
     id: string,
     version: number | undefined,
     name: string,
   ) {
-    const ok = await prompt.askConfirm({
+    const confirmed = await prompt.askConfirm({
       title: "Remove ingredient",
       description: `Remove "${name}" from this dish? Events using this dish stop demanding it.`,
       confirmLabel: "Remove",
+      cancelLabel: "Keep as-is",
       tone: "danger",
     });
-    if (!ok) return;
-    setBusy(id);
-    setError(null);
-    setNotice(null);
+    let intent: "keep" | "remove" = "keep";
     try {
-      await removeLine({ docId: id, version, reason: "Removed from dish" });
-      setNotice("Ingredient removed.");
+      intent = await applyDishIngredientRemoval({
+        confirmed,
+        remove: () =>
+          removeLine({ docId: id, version, reason: "Removed from dish" }),
+      });
     } catch (cause) {
       setError(
         cause instanceof Error
           ? cause.message
           : "Could not remove the ingredient.",
       );
-    } finally {
-      setBusy(null);
+      return;
     }
+    if (intent !== "remove") return;
+    setNotice("Ingredient removed.");
   }
 
   return (
@@ -146,19 +185,60 @@ export function DishIngredientsPanel({ dishId }: Props) {
               className="flex flex-wrap items-center justify-between gap-2 py-3"
               data-testid="dish-ingredient-row"
             >
-              <div>
-                <p className="text-lg font-medium text-ink">
-                  {ingredientName(String(line.ingredientId))}
-                </p>
-                <p className="font-mono text-xs text-ink-3">
-                  {line.quantity} {String(line.unit)} per serving
-                  {line.prepNotes ? ` · ${line.prepNotes}` : ""}
-                </p>
-              </div>
+              <form
+                className="flex flex-wrap items-end gap-2"
+                onSubmit={(event) => void onSaveQty(event, line)}
+              >
+                <div>
+                  <p className="text-lg font-medium text-ink">
+                    {ingredientName(String(line.ingredientId))}
+                  </p>
+                  {line.prepNotes ? (
+                    <p className="font-mono text-xs text-ink-3">
+                      {line.prepNotes}
+                    </p>
+                  ) : null}
+                </div>
+                <label className="block text-sm">
+                  <span className="meta-term">Qty</span>
+                  <input
+                    className="input mt-1 w-24"
+                    name="quantity"
+                    type="number"
+                    min={0}
+                    step="any"
+                    defaultValue={line.quantity}
+                    data-testid="kitchen-dish-recipe-qty"
+                  />
+                </label>
+                <label className="block text-sm">
+                  <span className="meta-term">Unit</span>
+                  <select
+                    className="input mt-1 w-28"
+                    name="unit"
+                    defaultValue={String(line.unit)}
+                    data-testid="kitchen-dish-recipe-unit"
+                  >
+                    {SELECTABLE_UNITS.map((value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="submit"
+                  className="btn btn-ghost btn-sm"
+                  disabled={busy != null}
+                >
+                  {busy === `qty:${line._id}` ? "Saving…" : "Save qty"}
+                </button>
+              </form>
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
                 disabled={busy != null}
+                data-testid="kitchen-dish-remove-ingredient"
                 onClick={() =>
                   void onRemove(
                     line._id,

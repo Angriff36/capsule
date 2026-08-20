@@ -30,8 +30,9 @@ export function ActionPromptPanel({
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    // Confirm-kind is click-only. Form submit / Enter / a Keep as-is button
+    // that lost type="button" must not confirm a destructive remove.
     if (request.kind === "confirm") {
-      onConfirm({});
       return;
     }
     if (request.kind === "reason") {
@@ -47,6 +48,15 @@ export function ActionPromptPanel({
       next[field.name] = value;
     }
     onConfirm({ values: next });
+  };
+
+  const cancel = (event: {
+    preventDefault: () => void;
+    stopPropagation: () => void;
+  }) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onDismiss();
   };
 
   return (
@@ -75,7 +85,8 @@ export function ActionPromptPanel({
           type="button"
           className="btn btn-ghost btn-sm"
           disabled={busy}
-          onClick={onDismiss}
+          data-testid="action-prompt-cancel"
+          onClick={cancel}
         >
           {cancelLabel}
         </button>
@@ -171,26 +182,40 @@ export function ActionPromptPanel({
           type="button"
           className="btn btn-ghost"
           disabled={busy}
-          onClick={onDismiss}
+          data-testid="action-prompt-cancel"
+          onClick={cancel}
         >
           {cancelLabel}
         </button>
-        <button
-          type="submit"
-          className={tone === "danger" ? "btn btn-danger" : "btn btn-primary"}
-          disabled={
-            busy ||
-            (request.kind === "reason" && !reason.trim()) ||
-            (request.kind === "fields" &&
-              request.fields.some(
-                (field) =>
-                  (field.required ?? true) &&
-                  !(values[field.name] ?? "").trim(),
-              ))
-          }
-        >
-          {busy ? "Working…" : request.confirmLabel}
-        </button>
+        {request.kind === "confirm" ? (
+          <button
+            type="button"
+            className={tone === "danger" ? "btn btn-danger" : "btn btn-primary"}
+            disabled={busy}
+            data-testid="action-prompt-confirm"
+            onClick={() => onConfirm({})}
+          >
+            {busy ? "Working…" : request.confirmLabel}
+          </button>
+        ) : (
+          <button
+            type="submit"
+            className={tone === "danger" ? "btn btn-danger" : "btn btn-primary"}
+            disabled={
+              busy ||
+              (request.kind === "reason" && !reason.trim()) ||
+              (request.kind === "fields" &&
+                request.fields.some(
+                  (field) =>
+                    (field.required ?? true) &&
+                    !(values[field.name] ?? "").trim(),
+                ))
+            }
+            data-testid="action-prompt-confirm"
+          >
+            {busy ? "Working…" : request.confirmLabel}
+          </button>
+        )}
       </div>
     </form>
   );
