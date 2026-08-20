@@ -2,13 +2,18 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   useListDish,
+  useListDishIngredient,
   useListEventDish,
+  useListIngredient,
   useListPrepTask,
 } from "../../lib/manifest-convex-react";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventTabIntro } from "./EventTabIntro";
-import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
+import {
+  suspectPrepQuantityFlag,
+  suspectRowsFromRecipeLines,
+} from "./eventMenuSuspectQuantity";
 
 type Props = {
   eventId: string;
@@ -18,6 +23,8 @@ type Props = {
 export function EventPrepTab({ eventId, eventStage }: Props) {
   const eventDishes = useListEventDish();
   const dishes = useListDish();
+  const dishIngredients = useListDishIngredient();
+  const ingredients = useListIngredient();
   const prepTasks = useListPrepTask();
   const { ready, syncPrepForDish } = useEventMenuSync();
   const [busy, setBusy] = useState(false);
@@ -138,22 +145,51 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
                   {task.dishId ? ` · ${dishName(String(task.dishId))}` : ""}
                 </p>
                 {(() => {
-                  const flag = suspectPrepQuantityFlag({
+                  const selection = selections.find(
+                    (row) =>
+                      row._id === task.eventDishId ||
+                      row.dishId === task.dishId,
+                  );
+                  const servings = Number(selection?.quantityServings ?? 0);
+                  const dishId = String(task.dishId ?? selection?.dishId ?? "");
+                  const recipeFlags = suspectRowsFromRecipeLines(
+                    (dishIngredients ?? [])
+                      .filter(
+                        (line) =>
+                          line.deletedAt == null && line.dishId === dishId,
+                      )
+                      .map((line) => ({
+                        name:
+                          ingredients?.find(
+                            (row) => row._id === line.ingredientId,
+                          )?.name ?? "",
+                        unit: String(line.unit),
+                        quantity: Number(line.quantity),
+                        prepNotes:
+                          (line as { prepNotes?: string | null }).prepNotes ??
+                          null,
+                      })),
+                    servings,
+                  );
+                  const taskFlag = suspectPrepQuantityFlag({
                     name: task.name,
                     unit: String(task.unit),
                     quantity: Number(task.quantity),
-                    servings: selections.find(
-                      (row) => row.dishId === task.dishId,
-                    )?.quantityServings,
+                    servings,
                   });
-                  return flag ? (
+                  const flags = [
+                    ...recipeFlags.map((row) => row.flag),
+                    ...(taskFlag ? [taskFlag] : []),
+                  ].filter((flag, index, all) => all.indexOf(flag) === index);
+                  return flags.map((flag) => (
                     <p
+                      key={flag}
                       className="text-sm text-danger"
                       data-testid="suspect-prep-quantity"
                     >
                       {flag}
                     </p>
-                  ) : null;
+                  ));
                 })()}
               </div>
             </li>

@@ -36,6 +36,7 @@ import {
   formatSellPriceInstruction,
   parseUnitSellPrice,
 } from "./eventMenuSellPrice";
+import { suspectRowsFromRecipeLines } from "./eventMenuSuspectQuantity";
 
 type Props = {
   eventId: string;
@@ -296,6 +297,25 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             const panLabel = pans
               .map((row) => `${row.count} ${row.name}`)
               .join(" · ");
+            const servings =
+              dishCost?.servings ?? Number(selection.quantityServings);
+            const recipeFlags = suspectRowsFromRecipeLines(
+              (dishIngredients ?? [])
+                .filter(
+                  (line) =>
+                    line.deletedAt == null && line.dishId === selection.dishId,
+                )
+                .map((line) => ({
+                  name:
+                    ingredients?.find((row) => row._id === line.ingredientId)
+                      ?.name ?? "",
+                  unit: String(line.unit),
+                  quantity: Number(line.quantity),
+                  prepNotes:
+                    (line as { prepNotes?: string | null }).prepNotes ?? null,
+                })),
+              servings,
+            );
             return (
               <li
                 key={selection._id}
@@ -340,6 +360,15 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                       {dishCost.mismatches[0]?.message}
                     </p>
                   ) : null}
+                  {recipeFlags.map((row) => (
+                    <p
+                      key={`${row.name}:${row.quantity}:${row.unit}`}
+                      className="text-sm text-danger"
+                      data-testid="suspect-prep-quantity"
+                    >
+                      {row.flag}
+                    </p>
+                  ))}
                   <button
                     type="button"
                     className="btn btn-ghost btn-sm"

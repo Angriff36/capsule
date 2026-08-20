@@ -160,6 +160,12 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                         unit: String(line.unit),
                         quantity: Number(line.quantity) * servings,
                         servings,
+                        suspect: /tpp unit looks wrong|keep 196/i.test(
+                          String(
+                            (line as { prepNotes?: string | null }).prepNotes ??
+                              "",
+                          ),
+                        ),
                       });
                       return flag ? (
                         <span

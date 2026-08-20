@@ -7,6 +7,8 @@ import {
 import { persistableServiceStyleId } from "../src/features/events/serviceStyleCatalog";
 import { eventCreateDisabledReason } from "../src/features/events/eventCreateGuards";
 import { eventsIndexPath } from "../src/features/events/eventRoutes";
+import { eventAllowsDraftPoFromNeeds } from "../src/features/events/EventDraftPoCoordinator";
+import { suspectRowsFromRecipeLines } from "../src/features/events/eventMenuSuspectQuantity";
 
 const read = (path: string) => readFileSync(path, "utf8");
 
@@ -150,7 +152,55 @@ describe("leftover returns fail this suite", () => {
     expect(tab).toContain("eventMenuSellTotals");
     expect(tab).toContain("unitSellPrice");
     expect(tab).toContain("food sell");
-    expect(prep).toContain("suspectPrepQuantityFlag");
+    expect(tab).toContain("suspectRowsFromRecipeLines");
+    expect(tab).toContain("suspect-prep-quantity");
+    expect(prep).toContain("suspectRowsFromRecipeLines");
     expect(prep).toContain("suspect-prep-quantity");
+    expect(prep).toContain("dishIngredients");
+  });
+});
+
+describe("PR 212 Highs must not return", () => {
+  it("High 1: draft PO is contract-stage only and does not call PurchaseNeed.create", () => {
+    expect(eventAllowsDraftPoFromNeeds("planning")).toBe(true);
+    expect(eventAllowsDraftPoFromNeeds("quote")).toBe(true);
+    expect(eventAllowsDraftPoFromNeeds("sales_lock")).toBe(true);
+    expect(eventAllowsDraftPoFromNeeds("approved")).toBe(false);
+    expect(eventAllowsDraftPoFromNeeds("pending_approval")).toBe(false);
+    expect(eventAllowsDraftPoFromNeeds("executing")).toBe(false);
+    const coordinator = read("src/features/events/EventDraftPoCoordinator.ts");
+    const button = read("src/features/events/EventDraftPoButton.tsx");
+    expect(coordinator).toContain('"planning"');
+    expect(coordinator).toContain('"quote"');
+    expect(coordinator).toContain('"sales_lock"');
+    expect(coordinator).not.toContain("pending_approval");
+    expect(coordinator).not.toContain('"approved"');
+    expect(coordinator).not.toContain("executing");
+    expect(coordinator).not.toMatch(/PurchaseNeed/);
+    expect(button).not.toMatch(/PurchaseNeed/);
+    expect(button).toContain("Draft PO from this event's needs");
+  });
+
+  it("High 2: menu card and post-sync prep flag 196 from recipe lines", () => {
+    const rows = suspectRowsFromRecipeLines(
+      [
+        { name: "Garnish kit", quantity: 1, unit: "each" },
+        { name: "Sliced radish", quantity: 2, unit: "pound", suspect: true },
+      ],
+      98,
+    );
+    expect(rows[0]?.quantity).toBe(196);
+    expect(rows[0]?.flag).toMatch(/196/);
+    expect(rows[0]?.flag).toMatch(/not converted/i);
+    const tab = read("src/features/events/EventMenuTab.tsx");
+    const prep = read("src/features/events/EventPrepTab.tsx");
+    const helper = read("src/features/events/eventMenuSuspectQuantity.ts");
+    expect(helper).toContain("suspect?: boolean");
+    expect(helper).toContain("suspectRowsFromRecipeLines");
+    expect(tab).toContain("suspectRowsFromRecipeLines");
+    expect(tab).toContain('data-testid="suspect-prep-quantity"');
+    expect(prep).toContain("suspectRowsFromRecipeLines");
+    expect(prep).toContain("dishIngredients");
+    expect(prep).toContain('data-testid="suspect-prep-quantity"');
   });
 });

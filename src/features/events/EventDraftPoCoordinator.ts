@@ -1,11 +1,4 @@
-const DRAFTABLE_STAGES = new Set([
-  "planning",
-  "quote",
-  "sales_lock",
-  "pending_approval",
-  "approved",
-  "executing",
-]);
+const DRAFTABLE_STAGES = new Set(["planning", "quote", "sales_lock"]);
 
 type SoftDelete = { deletedAt?: unknown };
 
@@ -82,7 +75,7 @@ function isActive(row: SoftDelete) {
   return row.deletedAt == null;
 }
 
-/** Planning events may draft a PO from needs — approval is not required. */
+/** Draft PO from needs is allowed only on planning, quote, and sales_lock. */
 export function eventAllowsDraftPoFromNeeds(stage: string): boolean {
   return DRAFTABLE_STAGES.has(String(stage));
 }
