@@ -182,9 +182,13 @@ describe("218 leftover: search does not live-mirror into create name", () => {
   it("does not prefill New ingredient name from Search catalog", () => {
     expect(createNamePrefillFromSearch("Carne Asada")).toBe("");
     expect(createNamePrefillFromSearch("black bean")).toBe("");
+    expect(createNamePrefillFromSearch("cilantro")).toBe("");
     expect(editor).toContain("createNamePrefillFromSearch");
     expect(editor).not.toMatch(
       /name="newIngredientName"[\s\S]{0,120}defaultValue=\{ingredientQuery/,
+    );
+    expect(editor).not.toMatch(
+      /name="newIngredientName"[\s\S]{0,240}\{ingredientQuery/,
     );
   });
 });
@@ -258,7 +262,12 @@ describe("224 leftover: Per serving digits never write Search", () => {
 
 describe("224 leftover: Search does not copy into New ingredient name", () => {
   it("keeps create-name independent across type, pick, clear, and remount", () => {
-    expect(createNameAfterSearchInput("cilantro", "")).toBe("");
+    let createName = createNamePrefillFromSearch("");
+    expect(createName).toBe("");
+    createName = createNameAfterSearchInput("cilantro", createName);
+    expect(createName).toBe("");
+    createName = createNameAfterSearchInput("", createName);
+    expect(createName).toBe("");
     expect(createNameAfterSearchInput("pico", "Carne asada")).toBe(
       "Carne asada",
     );
@@ -283,8 +292,9 @@ describe("224 leftover: Search does not copy into New ingredient name", () => {
         focused: "create-name",
       }),
     ).toBe("Radish");
+    expect(createNameAfterSearchInput("cilantro", "Radish")).toBe("Radish");
+    expect(createNameAfterSearchInput("", "Radish")).toBe("Radish");
 
-    expect(editor).toContain("createNameAfterSearchInput");
     expect(editor).toContain("createNameAfterGuardedInput");
     expect(editor).toContain("value={createName}");
     expect(editor).not.toMatch(
@@ -293,6 +303,25 @@ describe("224 leftover: Search does not copy into New ingredient name", () => {
     expect(editor).not.toMatch(
       /name="newIngredientName"[\s\S]{0,160}defaultValue=\{ingredientQuery/,
     );
+    expect(editor).not.toMatch(/newIngredientName[\s\S]{0,80}ingredientQuery/);
+    expect(editor).not.toMatch(
+      /value=\{createName\}[\s\S]{0,80}ingredientQuery/,
+    );
+
+    const applyAt = editor.indexOf("function applySearchState");
+    expect(applyAt).toBeGreaterThan(-1);
+    const applyBlock = editor.slice(
+      applyAt,
+      editor.indexOf("function applySearchDomInput"),
+    );
+    expect(applyBlock).not.toContain("setCreateName");
+    expect(applyBlock).not.toContain("createName");
+    expect(editor).not.toContain("createNameAfterSearchInput");
+
+    expect(editor).toContain('name="eventMenuRecipeCatalogSearch"');
+    expect(editor).toContain('name="newIngredientName"');
+    expect(editor).toContain('id="event-menu-create-ingredient-name"');
+    expect(editor).toContain('id="event-menu-recipe-ingredient-search"');
   });
 });
 

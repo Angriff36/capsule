@@ -27,7 +27,6 @@ import {
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 import {
   createNameAfterGuardedInput,
-  createNameAfterSearchInput,
   createNamePrefillFromSearch,
   recipeAddSubmitSource,
   recipeEditorFocusAfterCatalogPick,
@@ -90,7 +89,6 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     searchHeldEmptyRef.current = heldEmpty;
     setIngredientQuery(state.query);
     setSelectedIngredientId(state.selectedIngredientId);
-    setCreateName((name) => createNameAfterSearchInput(state.query, name));
   }
 
   function applySearchDomInput(
@@ -474,56 +472,64 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
           </ul>
         )}
         <div className="mt-2 flex flex-wrap items-end gap-2">
-          <label className="field-label">
-            Ingredient
-            <input
-              className="field-input w-48"
-              type="search"
-              role="searchbox"
-              onKeyDown={trapSingleKeyNav}
-              placeholder="Search catalog…"
-              autoComplete="off"
-              data-testid="event-menu-recipe-ingredient-search"
-              spellCheck={false}
-              value={ingredientQuery}
-              onChange={(event) => {
-                applySearchDomInput(event.currentTarget, event.target.value);
-              }}
-              onInput={(event) => {
-                applySearchDomInput(
-                  event.currentTarget,
-                  event.currentTarget.value,
-                  (event.nativeEvent as InputEvent).inputType,
-                );
-              }}
-              onFocus={onRecipeSearchFocus}
-              onBlur={onRecipeSearchBlur}
-              onKeyDownCapture={(event) => {
-                if (!recipeSearchTrapAppliesTo("search")) return;
-                if (isSelectAllChord(event)) {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  event.currentTarget.select();
-                  return;
-                }
-                if (
-                  event.key === "Backspace" &&
-                  event.currentTarget.value === ""
-                ) {
-                  event.preventDefault();
-                  const next = recipeSearchAfterEmptyBackspace();
-                  applySearchState(next, true);
-                  event.currentTarget.value = "";
-                  return;
-                }
-                if (shouldPreventRecipeAddSubmitFromSearchKey(event.key)) {
-                  event.preventDefault();
-                }
-              }}
-            />
-          </label>
+          <form autoComplete="off" onSubmit={(event) => event.preventDefault()}>
+            <label
+              className="field-label"
+              htmlFor="event-menu-recipe-ingredient-search"
+            >
+              Ingredient
+              <input
+                className="field-input w-48"
+                type="search"
+                role="searchbox"
+                id="event-menu-recipe-ingredient-search"
+                name="eventMenuRecipeCatalogSearch"
+                onKeyDown={trapSingleKeyNav}
+                placeholder="Search catalog…"
+                autoComplete="off"
+                data-testid="event-menu-recipe-ingredient-search"
+                spellCheck={false}
+                value={ingredientQuery}
+                onChange={(event) => {
+                  applySearchDomInput(event.currentTarget, event.target.value);
+                }}
+                onInput={(event) => {
+                  applySearchDomInput(
+                    event.currentTarget,
+                    event.currentTarget.value,
+                    (event.nativeEvent as InputEvent).inputType,
+                  );
+                }}
+                onFocus={onRecipeSearchFocus}
+                onBlur={onRecipeSearchBlur}
+                onKeyDownCapture={(event) => {
+                  if (!recipeSearchTrapAppliesTo("search")) return;
+                  if (isSelectAllChord(event)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    event.currentTarget.select();
+                    return;
+                  }
+                  if (
+                    event.key === "Backspace" &&
+                    event.currentTarget.value === ""
+                  ) {
+                    event.preventDefault();
+                    const next = recipeSearchAfterEmptyBackspace();
+                    applySearchState(next, true);
+                    event.currentTarget.value = "";
+                    return;
+                  }
+                  if (shouldPreventRecipeAddSubmitFromSearchKey(event.key)) {
+                    event.preventDefault();
+                  }
+                }}
+              />
+            </label>
+          </form>
           <form
             className="flex flex-wrap items-end gap-2"
+            autoComplete="off"
             onSubmit={onAddIngredient}
           >
             <label className="field-label" htmlFor="event-menu-recipe-add-qty">
@@ -631,18 +637,25 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
         )}
         <form
           className="mt-2 flex flex-wrap items-end gap-2"
+          autoComplete="off"
           onSubmit={onCreateIngredient}
           data-testid="event-menu-create-ingredient-form"
         >
-          <label className="field-label">
+          <label
+            className="field-label"
+            htmlFor="event-menu-create-ingredient-name"
+          >
             New ingredient
             <input
               className="field-input w-48"
+              id="event-menu-create-ingredient-name"
               name="newIngredientName"
+              type="text"
               value={createName}
               placeholder="Carne asada"
               required
               autoComplete="off"
+              spellCheck={false}
               onKeyDown={trapSingleKeyNav}
               data-testid="event-menu-create-ingredient-name"
               onFocus={() => rememberKeyOwner("create-name")}
