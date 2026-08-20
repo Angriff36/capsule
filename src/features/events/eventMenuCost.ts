@@ -81,11 +81,60 @@ export type EventMenuDishCost = {
 export type EventMenuCostRollup = {
   foodCost: number;
   costPerServing: number;
+  /** Event guest count / unique headcount — never Σ dish servings. */
   servings: number;
   pricedLineCount: number;
   mismatches: EventMenuUnitMismatch[];
   dishes: EventMenuDishCost[];
 };
+
+export type EventMenuDishEstimateKind = "priced" | "unit_mismatch" | "unpriced";
+
+/**
+ * Header servings are the event guest count (or the one shared dish
+ * headcount). Summing 20 dishes × 98 guests paints 1960 and is wrong.
+ */
+export function eventMenuHeaderServings(
+  expectedHeadcount: number,
+  dishServings: readonly number[],
+): number {
+  const guest = Number(expectedHeadcount);
+  if (Number.isFinite(guest) && guest > 0) return guest;
+  const unique = [
+    ...new Set(
+      dishServings.filter((value) => Number.isFinite(value) && value > 0),
+    ),
+  ];
+  if (unique.length === 1) return unique[0]!;
+  return 0;
+}
+
+export function eventMenuDishEstimateKind(
+  dish: EventMenuDishCost | undefined,
+): EventMenuDishEstimateKind {
+  if (!dish) return "unpriced";
+  if (dish.foodCost > 0) return "priced";
+  if (dish.mismatches.length > 0) return "unit_mismatch";
+  return "unpriced";
+}
+
+/** Label after "est." when the dish has no priced food cost. */
+export function eventMenuUnpricedEstimateLabel(
+  kind: EventMenuDishEstimateKind,
+): string {
+  if (kind === "unit_mismatch") return "— (units not converted)";
+  return "—";
+}
+
+export function eventMenuHeaderUnpricedNote(
+  rollup: EventMenuCostRollup,
+): string | null {
+  if (rollup.foodCost > 0) return null;
+  if (rollup.mismatches.length > 0) {
+    return "estimate unpriced (units not converted)";
+  }
+  return null;
+}
 
 export type BuildEventMenuCostInput = {
   eventId: string;
@@ -308,7 +357,10 @@ export function buildEventMenuCost(
     });
 
   const foodCost = dishes.reduce((sum, dish) => sum + dish.foodCost, 0);
-  const servings = dishes.reduce((sum, dish) => sum + dish.servings, 0);
+  const servings = eventMenuHeaderServings(
+    input.expectedHeadcount,
+    dishes.map((dish) => dish.servings),
+  );
   return {
     foodCost,
     costPerServing: servings > 0 ? foodCost / servings : 0,

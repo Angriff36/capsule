@@ -84,6 +84,8 @@ export type LiveEventProfitability = {
   rentalReservationCount: number;
   unpricedRentalReservationCount: number;
   hasIncompletePricing: boolean;
+  /** purchase = submitted PO; recipe = menu × catalog even when $0; none = no source. */
+  ingredientCostSource: "purchase" | "recipe" | "none";
 };
 
 const COMMITTED_ORDER_STATUSES = new Set([
@@ -375,12 +377,20 @@ export function buildLiveEventProfitability({
     equipment,
     equipmentReservations,
   );
+  const recipeProvided =
+    recipeEstimatedFoodCost != null &&
+    Number.isFinite(Number(recipeEstimatedFoodCost));
   const recipeFood = Number(recipeEstimatedFoodCost);
+  const ingredientCostSource = (
+    ingredient.cost > 0 ? "purchase" : recipeProvided ? "recipe" : "none"
+  ) as "purchase" | "recipe" | "none";
   const ingredientCost =
     ingredient.cost > 0
       ? ingredient.cost
-      : Number.isFinite(recipeFood) && recipeFood > 0
-        ? recipeFood
+      : ingredientCostSource === "recipe"
+        ? Number.isFinite(recipeFood) && recipeFood > 0
+          ? recipeFood
+          : 0
         : 0;
   const totalCommittedCost = ingredientCost + labor.cost + equipmentTotal.cost;
   const margin = confirmedRevenue - totalCommittedCost;
@@ -408,5 +418,6 @@ export function buildLiveEventProfitability({
     unpricedRentalReservationCount:
       equipmentTotal.unpricedRentalReservationCount,
     hasIncompletePricing,
+    ingredientCostSource,
   };
 }

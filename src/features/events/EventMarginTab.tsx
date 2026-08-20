@@ -217,9 +217,34 @@ export function EventMarginTab({ eventId }: Props) {
           value={budgetVariance == null ? "—" : formatMoney(budgetVariance)}
         />
       </div>
+      {recipeRollup.foodCost === 0 && recipeRollup.mismatches.length > 0 ? (
+        <p
+          className="text-sm text-danger"
+          data-testid="event-margin-recipe-unpriced"
+        >
+          Recipe estimate is $0 because recipe units do not match catalog. These
+          units are not converted. Food cost still uses the recipe estimate (no
+          submitted PO).
+        </p>
+      ) : recipeRollup.foodCost === 0 ? (
+        <p
+          className="text-sm text-ink-3"
+          data-testid="event-margin-recipe-zero"
+        >
+          Recipe estimate is $0 — no same-unit priced ingredient lines. Food
+          cost still uses the recipe estimate until a submitted PO exists.
+        </p>
+      ) : null}
       <LiveEventProfitabilityWidget
         eventId={eventId}
         recipeEstimatedFoodCost={recipeRollup.foodCost}
+        recipeUnpricedReason={
+          recipeRollup.foodCost === 0 && recipeRollup.mismatches.length > 0
+            ? "Recipe estimate is $0 because recipe units do not match catalog. These units are not converted."
+            : recipeRollup.foodCost === 0
+              ? "Recipe estimate is $0 — no same-unit priced ingredient lines."
+              : undefined
+        }
       />
     </section>
   );

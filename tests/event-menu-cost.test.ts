@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { buildEventMenuCost } from "../src/features/events/eventMenuCost";
+import {
+  buildEventMenuCost,
+  eventMenuDishEstimateKind,
+  eventMenuHeaderServings,
+  eventMenuHeaderUnpricedNote,
+  eventMenuUnpricedEstimateLabel,
+} from "../src/features/events/eventMenuCost";
 import { eventMenuContainerCount } from "../src/features/events/eventMenuContainers";
 
 // TEST DATA — catalog fixture for leftover 1, not product UI.
@@ -168,6 +174,117 @@ describe("event menu cost rollup", () => {
     expect(rollup.foodCost).toBeCloseTo(4);
     expect(rollup.mismatches).toEqual([]);
   });
+
+  it("header servings is guest count, not 20 dishes × 98", () => {
+    const eventDishes = Array.from({ length: 20 }, (_, index) => ({
+      id: `event-dish-${index}`,
+      eventId: "event-planning",
+      dishId: `dish-${index}`,
+      quantityServings: 98,
+    }));
+    const rollup = buildEventMenuCost({
+      eventId: "event-planning",
+      expectedHeadcount: 98,
+      eventDishes,
+      dishIngredients: [],
+      ingredients: [],
+    });
+    expect(eventMenuHeaderServings(98, Array(20).fill(98))).toBe(98);
+    expect(eventMenuHeaderServings(98, Array(20).fill(98))).not.toBe(1960);
+    expect(rollup.servings).toBe(98);
+    expect(rollup.servings).not.toBe(20 * 98);
+    expect(rollup.servings).not.toBe(1960);
+  });
+
+  it("same-unit catalog cost rolls up money (TEST DATA fixture, not product UI)", () => {
+    const rollup = buildEventMenuCost({
+      eventId: "event-planning",
+      expectedHeadcount: 98,
+      eventDishes: [
+        {
+          id: "event-dish-priced",
+          eventId: "event-planning",
+          dishId: "dish-priced",
+          quantityServings: 98,
+        },
+        ...Array.from({ length: 19 }, (_, index) => ({
+          id: `event-dish-empty-${index}`,
+          eventId: "event-planning",
+          dishId: `dish-empty-${index}`,
+          quantityServings: 98,
+        })),
+      ],
+      dishIngredients: [
+        {
+          id: "line-oil",
+          dishId: "dish-priced",
+          ingredientId: "ing-oil",
+          quantity: 1,
+          unit: "liter",
+          addedAt: 1,
+        },
+      ],
+      ingredients: [
+        {
+          id: "ing-oil",
+          name: "Olive oil",
+          unit: "liter",
+          costPerUnit: TEST_CATALOG_UNIT_COST,
+        },
+      ],
+    });
+    expect(rollup.servings).toBe(98);
+    expect(rollup.servings).not.toBe(1960);
+    expect(rollup.foodCost).toBeCloseTo(98 * TEST_CATALOG_UNIT_COST);
+    expect(rollup.costPerServing).toBeCloseTo(TEST_CATALOG_UNIT_COST);
+    expect(rollup.pricedLineCount).toBe(1);
+    expect(rollup.mismatches).toEqual([]);
+    const priced = rollup.dishes.find((dish) => dish.dishId === "dish-priced");
+    expect(eventMenuDishEstimateKind(priced)).toBe("priced");
+  });
+
+  it("mismatch estimate is an explicit unpriced label, not a missing rollup", () => {
+    const rollup = buildEventMenuCost({
+      eventId: "event-planning",
+      expectedHeadcount: 98,
+      eventDishes: [
+        {
+          id: "event-dish-pollo",
+          eventId: "event-planning",
+          dishId: "dish-pollo",
+          quantityServings: 98,
+        },
+      ],
+      dishIngredients: [
+        {
+          id: "line-tomato",
+          dishId: "dish-pollo",
+          ingredientId: "ing-tomato",
+          quantity: 1,
+          unit: "each",
+          addedAt: 1,
+        },
+      ],
+      ingredients: [
+        {
+          id: "ing-tomato",
+          name: "Heirloom Tomato",
+          unit: "kilogram",
+          costPerUnit: TEST_CATALOG_UNIT_COST,
+        },
+      ],
+    });
+    expect(rollup.foodCost).toBe(0);
+    expect(eventMenuDishEstimateKind(rollup.dishes[0])).toBe("unit_mismatch");
+    expect(
+      eventMenuUnpricedEstimateLabel(
+        eventMenuDishEstimateKind(rollup.dishes[0]),
+      ),
+    ).toBe("— (units not converted)");
+    expect(eventMenuHeaderUnpricedNote(rollup)).toBe(
+      "estimate unpriced (units not converted)",
+    );
+  });
 });
 
 describe("event menu container counts", () => {
@@ -202,5 +319,23 @@ describe("margin leftover 6 — recipe estimate is food cost when no PO exists",
     expect(result.ingredientCost).toBeCloseTo(612.5);
     expect(result.totalCommittedCost).toBeCloseTo(612.5);
     expect(result.marginPercent).not.toBeNull();
+    expect(result.ingredientCostSource).toBe("recipe");
+  });
+
+  it("keeps recipe as the food-cost source when the estimate is $0", () => {
+    const result = buildLiveEventProfitability({
+      eventId: "event-1",
+      invoices: [],
+      demands: [],
+      orders: [],
+      lines: [],
+      lineDemands: [],
+      payrollInputs: [],
+      equipment: [],
+      equipmentReservations: [],
+      recipeEstimatedFoodCost: 0,
+    });
+    expect(result.ingredientCost).toBe(0);
+    expect(result.ingredientCostSource).toBe("recipe");
   });
 });
