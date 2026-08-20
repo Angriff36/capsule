@@ -8,7 +8,6 @@ import {
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventTabIntro } from "./EventTabIntro";
-import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 
 type Props = {
   eventId: string;
@@ -137,21 +136,6 @@ export function EventPrepTab({ eventId, eventStage }: Props) {
                   {task.quantity} {String(task.unit)} · {String(task.status)}
                   {task.dishId ? ` · ${dishName(String(task.dishId))}` : ""}
                 </p>
-                {(() => {
-                  const flag = suspectPrepQuantityFlag({
-                    name: task.name,
-                    unit: String(task.unit),
-                    quantity: Number(task.quantity),
-                    servings: selections.find(
-                      (row) => row.dishId === task.dishId,
-                    )?.quantityServings,
-                  });
-                  return flag ? (
-                    <p className="text-sm text-danger" data-testid="suspect-prep-quantity">
-                      {flag}
-                    </p>
-                  ) : null;
-                })()}
               </div>
             </li>
           ))}
