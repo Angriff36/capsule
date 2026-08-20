@@ -1,6 +1,10 @@
-import { useId, useState, type FormEvent } from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import type { ActionPromptRequest } from "./ActionPromptTypes";
 import { MAX_DATETIME_LOCAL_INPUT_VALUE } from "../BoundedDateInputs";
+import {
+  ACTION_PROMPT_CONFIRM_ARM_MS,
+  shouldAcceptConfirmClick,
+} from "./confirmClickArm";
 
 interface ActionPromptPanelProps {
   request: ActionPromptRequest;
@@ -27,6 +31,39 @@ export function ActionPromptPanel({
 
   const tone = request.tone ?? "default";
   const cancelLabel = request.cancelLabel ?? "Keep as-is";
+
+  const [confirmArmed, setConfirmArmed] = useState(request.kind !== "confirm");
+
+  useEffect(() => {
+    if (request.kind !== "confirm") return;
+    setConfirmArmed(false);
+    const id = window.setTimeout(() => {
+      setConfirmArmed(true);
+    }, ACTION_PROMPT_CONFIRM_ARM_MS);
+    return () => window.clearTimeout(id);
+  }, [request.kind, request.title]);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onDismiss();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onDismiss]);
+
+  const rejectUnarmedConfirm = (event: {
+    preventDefault: () => void;
+    stopPropagation: () => void;
+  }) => {
+    if (shouldAcceptConfirmClick({ kind: request.kind, armed: confirmArmed })) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+  };
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -191,9 +228,22 @@ export function ActionPromptPanel({
           <button
             type="button"
             className={tone === "danger" ? "btn btn-danger" : "btn btn-primary"}
-            disabled={busy}
+            disabled={busy || !confirmArmed}
             data-testid="action-prompt-confirm"
-            onClick={() => onConfirm({})}
+            data-confirm-armed={confirmArmed ? "true" : "false"}
+            style={{ pointerEvents: confirmArmed ? "auto" : "none" }}
+            onMouseDown={rejectUnarmedConfirm}
+            onClick={() => {
+              if (
+                !shouldAcceptConfirmClick({
+                  kind: request.kind,
+                  armed: confirmArmed,
+                })
+              ) {
+                return;
+              }
+              onConfirm({});
+            }}
           >
             {busy ? "Working…" : request.confirmLabel}
           </button>

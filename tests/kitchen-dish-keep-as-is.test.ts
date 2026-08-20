@@ -4,6 +4,12 @@ import {
   applyDishIngredientRemoval,
   dishIngredientRemovalIntent,
 } from "../src/features/kitchen/dishIngredientRemoval";
+import {
+  ACTION_PROMPT_CONFIRM_ARM_MS,
+  confirmControlMountState,
+  isActionPromptConfirmArmed,
+  shouldAcceptConfirmClick,
+} from "../src/ui/action-prompt/confirmClickArm";
 import { ActionPromptController } from "../src/ui/action-prompt/ActionPromptController";
 import { ActionPromptSession } from "../src/ui/action-prompt/useActionPrompt";
 
@@ -100,5 +106,45 @@ describe("Keep as-is must not remove a dish ingredient", () => {
     );
     expect(session).toContain('result.status !== "confirmed"');
     expect(session).toContain("return false");
+  });
+
+  it("confirm is not clickable on the same tick the panel mounts", () => {
+    expect(isActionPromptConfirmArmed(0)).toBe(false);
+    expect(isActionPromptConfirmArmed(ACTION_PROMPT_CONFIRM_ARM_MS - 1)).toBe(
+      false,
+    );
+    expect(shouldAcceptConfirmClick({ kind: "confirm", armed: false })).toBe(
+      false,
+    );
+    const mount = confirmControlMountState(false);
+    expect(mount.disabled).toBe(true);
+    expect(mount.pointerEvents).toBe("none");
+    expect(mount.acceptsClick).toBe(false);
+  });
+
+  it("confirm becomes clickable only after the arm delay", () => {
+    expect(isActionPromptConfirmArmed(ACTION_PROMPT_CONFIRM_ARM_MS)).toBe(true);
+    expect(shouldAcceptConfirmClick({ kind: "confirm", armed: true })).toBe(
+      true,
+    );
+    const armed = confirmControlMountState(true);
+    expect(armed.disabled).toBe(false);
+    expect(armed.pointerEvents).toBe("auto");
+    expect(armed.acceptsClick).toBe(true);
+  });
+
+  it("confirm button stays inert until armed (click-through lock)", () => {
+    expect(promptPanel).toContain("ACTION_PROMPT_CONFIRM_ARM_MS");
+    expect(promptPanel).toContain("shouldAcceptConfirmClick");
+    expect(promptPanel).toContain('useState(request.kind !== "confirm")');
+    expect(promptPanel).toContain("disabled={busy || !confirmArmed}");
+    expect(promptPanel).toContain(
+      'data-confirm-armed={confirmArmed ? "true" : "false"}',
+    );
+    expect(promptPanel).toContain(
+      'style={{ pointerEvents: confirmArmed ? "auto" : "none" }}',
+    );
+    expect(promptPanel).toContain("onMouseDown={rejectUnarmedConfirm}");
+    expect(promptPanel).toContain('event.key === "Escape"');
   });
 });
