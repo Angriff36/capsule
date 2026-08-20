@@ -26,6 +26,7 @@ import {
 } from "./eventMenuRecipeIngredient";
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 import {
+  createNamePrefillFromSearch,
   recipeAddSubmitSource,
   recipeEditorFocusAfterCatalogPick,
   recipeLineCommitAllowed,
@@ -534,7 +535,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
             <input
               className="field-input w-48"
               name="newIngredientName"
-              defaultValue=""
+              defaultValue={createNamePrefillFromSearch("")}
               placeholder="Carne asada"
               required
               onKeyDown={trapSingleKeyNav}
