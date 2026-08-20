@@ -41,6 +41,15 @@ function parsePacketUnitSellPrice(
   return null;
 }
 
+/** Paint sell inputs as 2.00 / 0.50 / 1.00, not 2 / 0.5 / 1. */
+export function formatEventMenuSellInput(
+  value: number | null | undefined,
+): string {
+  if (value == null) return "";
+  const next = Number(value);
+  return Number.isFinite(next) && next >= 0 ? next.toFixed(2) : "";
+}
+
 /** Parse a unit sell price encoded as `SELL:34.00` in EventDish.specialInstructions. */
 export function parseUnitSellPrice(
   specialInstructions?: string | null,

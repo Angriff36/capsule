@@ -17,6 +17,9 @@ export type EventMenuContainerCount = {
   count: number;
 };
 
+/** Names already used on event menus. Free text still works; do not invent a huge vocab. */
+export const EVENT_MENU_CONTAINER_NAMES = ["Hotel pan", "Half pan"] as const;
+
 /** Pack count for headcount: ceil(servings / servingsPerContainer) + base extras. */
 export function eventMenuContainerCount(
   servings: number,

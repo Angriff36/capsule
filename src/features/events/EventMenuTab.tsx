@@ -41,7 +41,10 @@ import {
   eventMenuContainerCountsForDish,
   eventMenuLinePanCount,
 } from "./eventMenuContainers";
-import { eventMenuSellTotals } from "./eventMenuSellPrice";
+import {
+  eventMenuSellTotals,
+  formatEventMenuSellInput,
+} from "./eventMenuSellPrice";
 import {
   parseEventMenuLineFields,
   planEventMenuLineSave,
@@ -505,7 +508,9 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                       min={0}
                       step="0.01"
                       data-testid="event-menu-unit-sell-price"
-                      defaultValue={lineFields.unitSellPrice ?? ""}
+                      defaultValue={formatEventMenuSellInput(
+                        lineFields.unitSellPrice,
+                      )}
                     />
                   </label>
                   <label className="field-label">

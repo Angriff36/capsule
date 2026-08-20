@@ -52,6 +52,10 @@ describe("leftovers 1–6: event menu cost → prep → PO chain", () => {
     expect(editor).toContain("event-menu-recipe-editor");
     expect(editor).toContain("event-menu-container-count");
     expect(editor).toContain("Add ingredient");
+    expect(editor).toContain("useCreateIngredient");
+    expect(editor).toContain("event-menu-recipe-ingredient-search");
+    expect(editor).toContain("event-menu-create-ingredient");
+    expect(editor).not.toMatch(/<select[^>]*name="ingredientId"/);
     expect(editor).toContain("Add container");
     expect(editor).toContain("you do not need to leave the");
     expect(editor).toContain("useDishIngredientAdjustQuantity");
