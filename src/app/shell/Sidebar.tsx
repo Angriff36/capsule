@@ -2,6 +2,7 @@ import { Fragment, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useQuery } from "convex/react";
 import { api } from "../../lib/api";
+import { eventsIndexPath } from "../../features/events/eventRoutes";
 import { NAV_GROUPS } from "../nav";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
 import { MoonIcon, SunIcon } from "../../ui/icons";
@@ -55,7 +56,7 @@ export function Sidebar() {
             {areas.map((area) => (
               <NavLink
                 key={area.path}
-                to={area.path}
+                to={area.path === "/events" ? eventsIndexPath() : area.path}
                 end={area.path === "/"}
                 aria-label={area.label}
                 title={area.label}
@@ -78,7 +79,11 @@ export function Sidebar() {
             <Fragment key={group}>
               <p>{group}</p>
               {areas.map((area) => (
-                <NavLink key={area.path} to={area.path} end={area.path === "/"}>
+                <NavLink
+                  key={area.path}
+                  to={area.path === "/events" ? eventsIndexPath() : area.path}
+                  end={area.path === "/"}
+                >
                   <area.icon width={15} height={15} />
                   <span>{area.label}</span>
                 </NavLink>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { relativeDays } from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
@@ -65,7 +65,12 @@ import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
 import { FailureBanner } from "./FailureBanner";
 import { RecurringEventPanel } from "./RecurringEventPanel";
-import { type EventDetailTab, parseEventDetailTab } from "./eventRoutes";
+import {
+  eventDetailPath,
+  type EventDetailTab,
+  parseEventDetailTab,
+} from "./eventRoutes";
+import { rememberLastViewedEvent } from "./lastViewedEvent";
 
 export function EventDetailPage() {
   const { id } = useParams();
@@ -74,6 +79,10 @@ export function EventDetailPage() {
   const event = useRouteRecord(useGetEvent, id);
   const clients = useListClient();
   useTrackRecent("Event", event?.title);
+  useEffect(() => {
+    if (!id || event == null || event.deletedAt != null) return;
+    rememberLastViewedEvent(eventDetailPath(id, activeTab));
+  }, [activeTab, event, id]);
   const dishes = useListDish();
   const eventAssignments = useListEventAssignment();
   const eventDishes = useListEventDish();
