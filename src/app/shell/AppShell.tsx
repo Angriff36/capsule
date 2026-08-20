@@ -8,7 +8,7 @@ import { RouteErrorBoundary } from "./RouteErrorBoundary";
 import { ShellOnlineMonitor } from "./ShellOnlineMonitor";
 import { ShortcutReferenceOverlay } from "./ShortcutReferenceOverlay";
 import { Sidebar } from "./Sidebar";
-import { shouldFireSingleKeyNav } from "./singleKeyNav";
+import { isBrowserRefreshChord, shouldFireSingleKeyNav } from "./singleKeyNav";
 import { Topbar } from "./Topbar";
 
 const onlineMonitor = new ShellOnlineMonitor();
@@ -33,6 +33,7 @@ export function AppShell() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (isBrowserRefreshChord(e)) return;
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setPaletteOpen((v) => !v);
