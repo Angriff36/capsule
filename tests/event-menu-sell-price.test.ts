@@ -14,7 +14,10 @@ import {
   resolveContainerCount,
   resolveUnitSellPrice,
 } from "../src/features/events/eventMenuLineFields";
-import { eventMenuLinePanCount } from "../src/features/events/eventMenuContainers";
+import {
+  eventMenuLinePanCount,
+  eventMenuPansInputValue,
+} from "../src/features/events/eventMenuContainers";
 import {
   suspectPrepQuantityFlag,
   suspectRowsFromRecipeLines,
@@ -180,6 +183,48 @@ describe("first-class event menu line persist", () => {
     const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
     expect(tab).toContain('name="containerCount"');
     expect(tab).toContain('data-testid="event-menu-line-pans"');
+  });
+
+  it("reloads Pans=1 after save when leftover notes already say 1 Half pan", () => {
+    expect(parseEventMenuLineFields("1 Half pan").containerCount).toBe(1);
+    expect(parseEventMenuLineFields("3 Foil wrap").containerCount).toBe(3);
+    expect(
+      parseEventMenuLineFields("1 Own vessel - labeled GF").containerCount,
+    ).toBe(1);
+
+    const notesOnly = planEventMenuLineSave({
+      currentInstructions: "1 Half pan",
+      currentServings: 59,
+      nextSellRaw: "",
+      nextServingsRaw: "59",
+      nextContainerRaw: "",
+    });
+    expect(notesOnly.containerCount).toBe(1);
+    expect(notesOnly.specialInstructions).toMatch(/containerCount":1/);
+    expect(notesOnly.specialInstructions).toMatch(/Half pan/);
+    expect(
+      parseEventMenuLineFields(notesOnly.specialInstructions).containerCount,
+    ).toBe(1);
+
+    const typed = planEventMenuLineSave({
+      currentInstructions: "1 Half pan",
+      currentServings: 59,
+      nextSellRaw: "",
+      nextServingsRaw: "59",
+      nextContainerRaw: "1",
+    });
+    expect(typed.containerCount).toBe(1);
+    expect(typed.specialInstructions).toMatch(/containerCount":1/);
+    const reloaded = parseEventMenuLineFields(typed.specialInstructions);
+    expect(reloaded.containerCount).toBe(1);
+    expect(reloaded.notes).toMatch(/Half pan/);
+    expect(eventMenuPansInputValue(reloaded.containerCount, 3)).toBe(1);
+    expect(eventMenuPansInputValue(null, 3)).toBe(3);
+
+    const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
+    expect(tab).toContain("eventMenuPansInputValue");
+    expect(tab).toContain("lineFields.containerCount");
+    expect(tab).toContain("linePanCount");
   });
 
   it("keeps leftover SELL: as a read fallback only", () => {
