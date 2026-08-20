@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useMemo, useRef, useState, type FormEvent } from "react";
 import {
   useCreateDishContainer,
   useCreateDishIngredient,
@@ -25,7 +25,21 @@ import {
   resolveEventMenuRecipeIngredientId,
 } from "./eventMenuRecipeIngredient";
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
-import { trapSingleKeyNav } from "../../app/shell/singleKeyNav";
+import {
+  createNamePrefillFromSearch,
+  recipeAddSubmitSource,
+  recipeEditorFocusAfterCatalogPick,
+  recipeLineCommitAllowed,
+  recipeSearchAfterInput,
+  recipeSearchFromPick,
+  recipeSearchTrapAppliesTo,
+  searchKeyCommitsRecipeLine,
+  shouldPreventRecipeAddSubmitFromSearchKey,
+} from "./eventMenuRecipeSearch";
+import {
+  isSelectAllChord,
+  trapSingleKeyNav,
+} from "../../app/shell/singleKeyNav";
 
 type Props = {
   dishId: string;
@@ -46,6 +60,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
   const [unit, setUnit] = useState("each");
   const [ingredientQuery, setIngredientQuery] = useState("");
   const [selectedIngredientId, setSelectedIngredientId] = useState("");
+  const addQtyRef = useRef<HTMLInputElement>(null);
 
   const rows = (lines ?? [])
     .filter((line) => line.deletedAt == null && line.dishId === dishId)
@@ -103,6 +118,18 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
 
   async function onAddIngredient(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const submitter = (event.nativeEvent as SubmitEvent).submitter as {
+      tagName?: string;
+      textContent?: string | null;
+    } | null;
+    const source = recipeAddSubmitSource(submitter);
+    if (!recipeLineCommitAllowed(source)) return;
+    if (
+      searchKeyCommitsRecipeLine("Enter") ||
+      searchKeyCommitsRecipeLine("End")
+    ) {
+      return;
+    }
     const form = event.currentTarget;
     const data = new FormData(form);
     const quantity = Number(data.get("quantity") ?? 0);
@@ -360,73 +387,99 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
             })}
           </ul>
         )}
-        <form
-          className="mt-2 flex flex-wrap items-end gap-2"
-          onSubmit={onAddIngredient}
-        >
+        <div className="mt-2 flex flex-wrap items-end gap-2">
           <label className="field-label">
             Ingredient
             <input
               className="field-input w-48"
               type="search"
-              value={ingredientQuery}
-              onChange={(event) => {
-                setIngredientQuery(event.target.value);
-                setSelectedIngredientId("");
-              }}
               onKeyDown={trapSingleKeyNav}
               placeholder="Search catalog…"
               autoComplete="off"
               data-testid="event-menu-recipe-ingredient-search"
+              value={ingredientQuery}
+              onChange={(event) => {
+                const next = recipeSearchAfterInput(event.target.value);
+                setIngredientQuery(next.query);
+                setSelectedIngredientId(next.selectedIngredientId);
+              }}
+              onInput={(event) => {
+                const next = recipeSearchAfterInput(event.currentTarget.value);
+                setIngredientQuery(next.query);
+                setSelectedIngredientId(next.selectedIngredientId);
+              }}
+              onKeyDownCapture={(event) => {
+                if (!recipeSearchTrapAppliesTo("search")) return;
+                if (isSelectAllChord(event)) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  event.currentTarget.select();
+                  return;
+                }
+                if (shouldPreventRecipeAddSubmitFromSearchKey(event.key)) {
+                  event.preventDefault();
+                }
+              }}
             />
           </label>
-          <label className="field-label">
-            Per serving
-            <input
-              className="field-input w-24"
-              name="quantity"
-              type="number"
-              min={0}
-              step="any"
-              defaultValue={1}
-            />
-          </label>
-          <label className="field-label">
-            Unit
-            <select
-              className="field-input w-28"
-              value={unit}
-              onChange={(event) => setUnit(event.target.value)}
+          <form
+            className="flex flex-wrap items-end gap-2"
+            onSubmit={onAddIngredient}
+          >
+            <label className="field-label" htmlFor="event-menu-recipe-add-qty">
+              Per serving
+              <input
+                ref={addQtyRef}
+                className="field-input w-24"
+                id="event-menu-recipe-add-qty"
+                name="quantity"
+                type="number"
+                min={0}
+                step="any"
+                defaultValue={1}
+                data-testid="event-menu-recipe-add-qty"
+                onMouseDown={(event) => {
+                  event.currentTarget.focus();
+                }}
+              />
+            </label>
+            <label className="field-label">
+              Unit
+              <select
+                className="field-input w-28"
+                value={unit}
+                onChange={(event) => setUnit(event.target.value)}
+              >
+                {SELECTABLE_UNITS.map((value) => (
+                  <option key={value} value={value}>
+                    {value}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              type="submit"
+              className="btn btn-ghost"
+              disabled={busy != null}
             >
-              {SELECTABLE_UNITS.map((value) => (
-                <option key={value} value={value}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
-          <button
-            type="submit"
-            className="btn btn-ghost"
-            disabled={busy != null}
-          >
-            Add ingredient
-          </button>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            disabled={busy != null}
-            data-testid="event-menu-create-ingredient"
-            onClick={() => {
-              const field = document.querySelector<HTMLInputElement>(
-                '[data-testid="event-menu-create-ingredient-name"]',
-              );
-              field?.focus();
-            }}
-          >
-            Create ingredient
-          </button>
-        </form>
+              Add ingredient
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost"
+              disabled={busy != null}
+              data-testid="event-menu-create-ingredient"
+              onClick={() => {
+                const field = document.querySelector<HTMLInputElement>(
+                  '[data-testid="event-menu-create-ingredient-name"]',
+                );
+                field?.focus();
+              }}
+            >
+              Create ingredient
+            </button>
+          </form>
+        </div>
         {selectedIngredient ? (
           <p
             className="mt-1 text-sm text-ink-2"
@@ -447,9 +500,13 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                     type="button"
                     className="btn btn-ghost btn-sm"
                     onClick={() => {
-                      setSelectedIngredientId(row.id);
-                      setIngredientQuery(row.name);
+                      const next = recipeSearchFromPick(row.id, row.name);
+                      setSelectedIngredientId(next.selectedIngredientId);
+                      setIngredientQuery(next.query);
                       if (row.unit) setUnit(String(row.unit));
+                      if (recipeEditorFocusAfterCatalogPick() === "qty") {
+                        addQtyRef.current?.focus();
+                      }
                     }}
                   >
                     {row.name}
@@ -478,7 +535,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
             <input
               className="field-input w-48"
               name="newIngredientName"
-              defaultValue={ingredientQuery.trim()}
+              defaultValue={createNamePrefillFromSearch("")}
               placeholder="Carne asada"
               required
               onKeyDown={trapSingleKeyNav}
