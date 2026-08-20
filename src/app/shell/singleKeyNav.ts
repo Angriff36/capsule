@@ -56,17 +56,34 @@ export function isBrowserRefreshChord(event: SingleKeyNavEvent): boolean {
 
 /** Whether the global single-key nav listener should act on this keydown. */
 export function shouldFireSingleKeyNav(event: SingleKeyNavEvent): boolean {
+  if (isSelectAllChord(event)) return false;
   if (isBrowserRefreshChord(event)) return false;
   if (!isSingleKeyNavKey(event)) return false;
   if (isEditableShortcutTarget(event.target)) return false;
   return true;
 }
 
-/** App route for a keydown, or null. Refresh chords never map to a route. */
+/** App route for a keydown, or null. Refresh / select-all never map to a route. */
 export function appRouteForKeydown(event: SingleKeyNavEvent): string | null {
+  if (isSelectAllChord(event)) return null;
   if (isBrowserRefreshChord(event)) return null;
   if (!shouldFireSingleKeyNav(event)) return null;
   return null;
+}
+
+/** Ctrl/Cmd+A in a field selects that field's text — not a nav chord. */
+export function isSelectAllChord(event: SingleKeyNavEvent): boolean {
+  return (
+    (Boolean(event.ctrlKey) || Boolean(event.metaKey)) &&
+    event.key.toLowerCase() === "a"
+  );
+}
+
+/** Ctrl+A (and friends) never collapse the event-menu recipe editor. */
+export function isRecipeEditorCollapseChord(
+  _event: SingleKeyNavEvent,
+): boolean {
+  return false;
 }
 
 /** Stop the key from bubbling to the window single-key nav listener. */
