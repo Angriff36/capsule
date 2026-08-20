@@ -20,9 +20,12 @@ import {
   recipeSearchFromPick,
   recipeSearchFromTypedQuery,
   recipeSearchTrapAppliesTo,
+  CREATE_NAME_AUTOCOMPLETE,
   createNameAfterGuardedInput,
   createNameAfterSearchInput,
+  createNameIsUserTypedInput,
   createNamePrefillFromSearch,
+  restoreCreateNameDomValue,
   searchKeyCommitsRecipeLine,
   shouldPreventRecipeAddSubmitFromSearchKey,
 } from "../src/features/events/eventMenuRecipeSearch";
@@ -365,5 +368,114 @@ describe("224 leftover: cleared Search stays empty", () => {
     expect(editor).toContain("recipeSearchAfterFocus");
     expect(editor).toContain("onBlur={onRecipeSearchBlur}");
     expect(editor).not.toMatch(/onFocus=\{[^}]*setIngredientQuery/);
+  });
+});
+
+describe("228 leftover: Search typing never writes create-name", () => {
+  it("leaves createName empty for cilantro/pico and rejects search-owned onChange", () => {
+    let createName = createNamePrefillFromSearch("");
+    expect(createName).toBe("");
+
+    createName = createNameAfterSearchInput("cilantro", createName);
+    expect(createName).toBe("");
+    createName = createNameAfterGuardedInput({
+      current: createName,
+      nextValue: "cilantro",
+      focused: "search",
+      active: false,
+      inputType: "insertText",
+    });
+    expect(createName).toBe("");
+    const cilantroDom = { value: "cilantro" };
+    restoreCreateNameDomValue(cilantroDom, createName);
+    expect(cilantroDom.value).toBe("");
+
+    createName = createNameAfterSearchInput("pico", createName);
+    expect(createName).toBe("");
+    createName = createNameAfterGuardedInput({
+      current: createName,
+      nextValue: "pico",
+      focused: "search",
+      active: false,
+      inputType: "insertText",
+    });
+    expect(createName).toBe("");
+    const picoDom = { value: "pico" };
+    restoreCreateNameDomValue(picoDom, createName);
+    expect(picoDom.value).toBe("");
+
+    createName = createNameAfterSearchInput("", createName);
+    expect(createName).toBe("");
+    const clearedDom = { value: "pico" };
+    restoreCreateNameDomValue(clearedDom, createName);
+    expect(clearedDom.value).toBe("");
+
+    expect(
+      createNameAfterGuardedInput({
+        current: "",
+        nextValue: "cilantro",
+        focused: "search",
+        active: true,
+        inputType: "insertText",
+      }),
+    ).toBe("");
+    expect(
+      createNameAfterGuardedInput({
+        current: "",
+        nextValue: "pico",
+        focused: "create-name",
+        active: false,
+        inputType: "insertText",
+      }),
+    ).toBe("");
+    expect(
+      createNameAfterGuardedInput({
+        current: "",
+        nextValue: "cilantro",
+        focused: "create-name",
+        active: true,
+        inputType: "insertReplacementText",
+      }),
+    ).toBe("");
+    expect(
+      createNameAfterGuardedInput({
+        current: "",
+        nextValue: "pico",
+        focused: "create-name",
+        active: true,
+        inputType: undefined,
+      }),
+    ).toBe("");
+    expect(createNameIsUserTypedInput("insertText")).toBe(true);
+    expect(createNameIsUserTypedInput("insertReplacementText")).toBe(false);
+    expect(
+      createNameAfterGuardedInput({
+        current: "",
+        nextValue: "Radish",
+        focused: "create-name",
+        active: true,
+        inputType: "insertText",
+      }),
+    ).toBe("Radish");
+
+    const applyAt = editor.indexOf("function applySearchState");
+    expect(applyAt).toBeGreaterThan(-1);
+    const applyBlock = editor.slice(
+      applyAt,
+      editor.indexOf("function applySearchDomInput"),
+    );
+    expect(applyBlock).not.toContain("setCreateName");
+    expect(applyBlock).not.toMatch(/setCreateName\s*\(\s*ingredientQuery/);
+    expect(editor).not.toMatch(/setCreateName\s*\(\s*ingredientQuery/);
+    expect(editor).not.toMatch(/setCreateName\([^)]*ingredientQuery/);
+    expect(editor).toContain("syncNewIngredientInputDom");
+    expect(editor).toContain("restoreCreateNameDomValue");
+    expect(editor).toContain("CREATE_NAME_AUTOCOMPLETE");
+    expect(editor).not.toMatch(
+      /name="newIngredientName"[\s\S]{0,240}autoComplete="off"/,
+    );
+    expect(editor).toContain("eventMenuCreateIngredientAutofillSink");
+    expect(CREATE_NAME_AUTOCOMPLETE).not.toBe("off");
+    expect(CREATE_NAME_AUTOCOMPLETE).toBe("event-menu-new-ingredient-name");
   });
 });
