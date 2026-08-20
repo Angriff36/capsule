@@ -19,9 +19,16 @@ describe("leftovers 1–6: event menu cost → prep → PO chain", () => {
     expect(tab).toContain("event-menu-food-cost");
     expect(tab).toContain("formatMoneyExact(costRollup.foodCost)");
     expect(tab).not.toContain("6.25");
-    expect(tab).toMatch(/estimated > 0 \? formatMoneyExact\(estimated\) : "—"/);
+    expect(tab).toContain("eventMenuDishEstimateKind");
+    expect(tab).toContain("eventMenuUnpricedEstimateLabel");
+    expect(tab).toContain("eventMenuHeaderUnpricedNote");
     expect(tab).not.toMatch(
       /Number\(\(selection as \{ estimatedCost\?: number \}\)\.estimatedCost\)/,
+    );
+    const cost = read("src/features/events/eventMenuCost.ts");
+    expect(cost).toContain("eventMenuHeaderServings");
+    expect(cost).not.toMatch(
+      /dishes\.reduce\(\(sum, dish\) => sum \+ dish\.servings/,
     );
   });
 
@@ -94,6 +101,15 @@ describe("leftovers 1–6: event menu cost → prep → PO chain", () => {
     expect(live).toContain("recipeEstimatedFoodCost");
     expect(live).toContain("ingredient.cost > 0");
     expect(live).toContain("recipeFood");
+    expect(live).toContain("ingredientCostSource");
+    const widget = read("src/features/events/LiveEventProfitabilityWidget.tsx");
+    expect(widget).toContain("recipe × catalog estimate");
+    expect(widget).toContain("unit mismatches are not converted");
+    expect(widget).not.toMatch(
+      /Ingredient value uses\s+submitted purchase contributions;/,
+    );
+    expect(margin).toContain("event-margin-recipe-unpriced");
+    expect(margin).toContain("Food cost still uses the recipe");
   });
 });
 

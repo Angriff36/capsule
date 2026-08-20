@@ -29,7 +29,13 @@ import { FailureBanner } from "./FailureBanner";
 import { ComponentStockSuggestions } from "./ComponentStockSuggestions";
 import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventMenuRecipeEditor } from "./EventMenuRecipeEditor";
-import { buildEventMenuCost, eventMenuCostForDish } from "./eventMenuCost";
+import {
+  buildEventMenuCost,
+  eventMenuCostForDish,
+  eventMenuDishEstimateKind,
+  eventMenuHeaderUnpricedNote,
+  eventMenuUnpricedEstimateLabel,
+} from "./eventMenuCost";
 import { eventMenuContainerCountsForDish } from "./eventMenuContainers";
 import {
   eventMenuSellTotals,
@@ -161,6 +167,8 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     [dishes, selections],
   );
 
+  const headerUnpricedNote = eventMenuHeaderUnpricedNote(costRollup);
+
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
     setBusy(key);
@@ -202,6 +210,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           {formatMoneyExact(costRollup.costPerServing)} / serving
           {" · "}
           {costRollup.servings} servings
+          {headerUnpricedNote ? ` · ${headerUnpricedNote}` : ""}
           {sellRollup.foodSellTotal > 0
             ? ` · food sell ${formatMoneyExact(sellRollup.foodSellTotal)}`
             : ""}
@@ -281,6 +290,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             const dish = dishes?.find((row) => row._id === selection.dishId);
             const dishCost = eventMenuCostForDish(costRollup, selection._id);
             const estimated = dishCost?.foodCost ?? 0;
+            const estimateKind = eventMenuDishEstimateKind(dishCost);
             const pans = eventMenuContainerCountsForDish(
               selection.dishId,
               dishCost?.servings ?? Number(selection.quantityServings),
@@ -344,7 +354,9 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     {" · "}
                     {selection.quantityServings} servings
                     {" · est. "}
-                    {estimated > 0 ? formatMoneyExact(estimated) : "—"}
+                    {estimateKind === "priced"
+                      ? formatMoneyExact(estimated)
+                      : eventMenuUnpricedEstimateLabel(estimateKind)}
                     {(() => {
                       const sell = sellRollup.lines.find(
                         (line) => line.eventDishId === selection._id,
