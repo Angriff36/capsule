@@ -28,6 +28,12 @@ function asNonnegativeNumber(value: unknown): number | null {
   return Number.isFinite(next) && next >= 0 ? next : null;
 }
 
+/** Leftover notes like "1 Half pan" / "3 Foil wrap" carry the pans count. */
+function parseLeadingContainerCount(notes: string): number | null {
+  const match = String(notes).match(/^(\d+)(?:\s+|$)/);
+  return match ? asNonnegativeNumber(match[1]) : null;
+}
+
 function stripLegacySell(notes: string): string {
   return notes.replace(/(?:^|\n)SELL:-?\d+(?:\.\d+)?\n?/g, "").trim();
 }
@@ -67,10 +73,14 @@ export function parseEventMenuLineFields(
   if (unitSellPrice == null) {
     unitSellPrice = parseUnitSellPrice(raw);
   }
+  const notes = stripLegacySell(stripPacketLines(raw));
+  if (containerCount == null) {
+    containerCount = parseLeadingContainerCount(notes);
+  }
   return {
     unitSellPrice,
     containerCount,
-    notes: stripLegacySell(stripPacketLines(raw)),
+    notes,
   };
 }
 
@@ -134,10 +144,11 @@ export function planEventMenuLineSave(input: {
     input.nextSellRaw.trim() === ""
       ? null
       : asNonnegativeNumber(input.nextSellRaw);
-  const containerCount =
+  const typedCount =
     input.nextContainerRaw.trim() === ""
       ? null
       : asNonnegativeNumber(input.nextContainerRaw);
+  const containerCount = typedCount ?? current.containerCount;
   const quantityServings = eventMenuLineServings({
     quantityServings: Number(input.nextServingsRaw),
     expectedHeadcount: input.currentServings,

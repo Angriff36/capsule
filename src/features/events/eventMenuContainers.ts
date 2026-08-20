@@ -79,3 +79,14 @@ export function eventMenuLinePanCount(
     0,
   );
 }
+
+/** Value for the event-menu Pans number input: explicit/notes count, else computed packs. */
+export function eventMenuPansInputValue(
+  explicitCount: number | null | undefined,
+  computedCount = 0,
+): number | "" {
+  if (explicitCount != null && Number.isFinite(Number(explicitCount))) {
+    return Number(explicitCount);
+  }
+  return computedCount > 0 ? computedCount : "";
+}

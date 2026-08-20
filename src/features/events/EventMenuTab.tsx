@@ -40,6 +40,7 @@ import {
 import {
   eventMenuContainerCountsForDish,
   eventMenuLinePanCount,
+  eventMenuPansInputValue,
 } from "./eventMenuContainers";
 import { eventMenuSellTotals } from "./eventMenuSellPrice";
 import {
@@ -529,7 +530,10 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                       min={0}
                       step={1}
                       data-testid="event-menu-line-pans"
-                      defaultValue={lineFields.containerCount ?? ""}
+                      defaultValue={eventMenuPansInputValue(
+                        lineFields.containerCount,
+                        linePanCount,
+                      )}
                     />
                   </label>
                   <button
