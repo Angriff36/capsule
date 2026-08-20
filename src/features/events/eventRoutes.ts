@@ -7,6 +7,7 @@ export type EventCreatePrefill = {
 export type EventDetailTab =
   | "overview"
   | "menu"
+  | "prep"
   | "equipment"
   | "client"
   | "guests"
@@ -25,6 +26,7 @@ export const EVENT_DETAIL_TABS: readonly {
 }[] = [
   { key: "overview", label: "Overview" },
   { key: "menu", label: "Menu" },
+  { key: "prep", label: "Prep" },
   { key: "equipment", label: "Equipment" },
   { key: "client", label: "Client Information" },
   { key: "guests", label: "Guests" },

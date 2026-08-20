@@ -9,6 +9,7 @@ import {
   useInventoryReservationRelease,
   useListDish,
   useListDishComponent,
+  useListDishIngredient,
   useListDishTask,
   useListEvent,
   useListEventDish,
@@ -39,6 +40,7 @@ export function EventMenuPage() {
   const eventDishes = useListEventDish();
   const dishTasks = useListDishTask();
   const dishComponents = useListDishComponent();
+  const dishIngredients = useListDishIngredient();
   const components = useListComponent();
   const componentIngredients = useListComponentIngredient();
   const prepTasks = useListPrepTask();
@@ -111,6 +113,7 @@ export function EventMenuPage() {
         inventoryItems: inventoryItems as never,
         inventoryLots: inventoryLots as never,
         inventoryReservations: inventoryReservations as never,
+        dishIngredients: dishIngredients as never,
       }),
     );
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -453,7 +456,7 @@ export function EventMenuPage() {
                               quantityServings: quantity,
                               version: selection.version,
                             });
-                            const shortages = await menuSync().syncPrepForDish({
+                            const result = await menuSync().syncPrepForDish({
                               id: selection._id,
                               eventId: selection.eventId,
                               dishId: selection.dishId,
@@ -461,7 +464,7 @@ export function EventMenuPage() {
                               specialInstructions:
                                 selection.specialInstructions,
                             });
-                            setStockShortages(shortages);
+                            setStockShortages(result.shortages);
                           });
                         })();
                       }}

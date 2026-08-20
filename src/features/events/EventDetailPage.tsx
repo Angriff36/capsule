@@ -55,6 +55,7 @@ import {
 import { EventMarginTab } from "./EventMarginTab";
 import { EventMenuTab } from "./EventMenuTab";
 import { EventOverviewTab } from "./EventOverviewTab";
+import { EventPrepTab } from "./EventPrepTab";
 import { EventPhotosTab } from "./EventPhotosTab";
 import { EventStaffingTab } from "./EventStaffingTab";
 import { EventTabErrorBoundary } from "./EventTabErrorBoundary";
@@ -436,6 +437,11 @@ export function EventDetailPage() {
             eventId={event._id}
             expectedHeadcount={Number(event.expectedHeadcount) || 0}
           />
+        </EventTabErrorBoundary>
+      ) : null}
+      {activeTab === "prep" ? (
+        <EventTabErrorBoundary tabLabel="Prep" key="prep">
+          <EventPrepTab eventId={event._id} eventStage={String(event.stage)} />
         </EventTabErrorBoundary>
       ) : null}
       {activeTab === "equipment" ? (

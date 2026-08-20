@@ -198,4 +198,62 @@ describe("EventPrepCoordinator", () => {
       }),
     );
   });
+
+  it("generates prep from dish ingredients when the dish has no templates", async () => {
+    const createTask = vi.fn().mockResolvedValue({ docId: "prep-tomato" });
+    const coordinator = new EventPrepCoordinator({ createTask });
+    const result = await coordinator.sync({
+      eventDish: {
+        id: "event-dish-1",
+        eventId: "event-1",
+        dishId: "dish-pollo",
+        quantityServings: 98,
+      },
+      templates: [],
+      tasks: [],
+      demands: [],
+      skipDemand: true,
+      dishIngredients: [
+        {
+          id: "line-tomato",
+          dishId: "dish-pollo",
+          ingredientId: "ing-tomato",
+          name: "Heirloom Tomato",
+          quantity: 1,
+          unit: "each",
+        },
+      ],
+    });
+    expect(result.noOpReason).toBeUndefined();
+    expect(result.taskCount).toBe(1);
+    expect(createTask).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: "Prep Heirloom Tomato",
+        quantity: 98,
+        unit: "each",
+        ingredientId: "ing-tomato",
+        isGenerated: true,
+      }),
+    );
+  });
+
+  it("says why sync no-ops when there are no templates and no ingredients", async () => {
+    const createTask = vi.fn();
+    const coordinator = new EventPrepCoordinator({ createTask });
+    const result = await coordinator.sync({
+      eventDish: {
+        id: "event-dish-1",
+        eventId: "event-1",
+        dishId: "dish-pollo",
+        quantityServings: 98,
+      },
+      templates: [],
+      tasks: [],
+      demands: [],
+      dishIngredients: [],
+    });
+    expect(createTask).not.toHaveBeenCalled();
+    expect(result.taskCount).toBe(0);
+    expect(result.noOpReason).toMatch(/no prep templates and no ingredients/i);
+  });
 });

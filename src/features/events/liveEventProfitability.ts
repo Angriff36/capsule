@@ -304,6 +304,7 @@ export function buildLiveEventProfitability({
   equipment,
   equipmentReservations,
   clockedLabor,
+  recipeEstimatedFoodCost,
 }: {
   eventId: string;
   invoices: readonly ProfitabilityInvoice[];
@@ -321,6 +322,11 @@ export function buildLiveEventProfitability({
    * payroll-input pricing is blind to rates on the client — issue #76.)
    */
   clockedLabor?: ClockedLaborSummary | null;
+  /**
+   * Recipe × catalog (or receipt) food cost. Used when no submitted PO
+   * contribution exists so a costed menu is not $0 / Margin % —.
+   */
+  recipeEstimatedFoodCost?: number | null;
 }): LiveEventProfitability {
   const eventKey = key(eventId);
   // Confirmed revenue = invoices actually billed to the client (sent through
@@ -369,7 +375,14 @@ export function buildLiveEventProfitability({
     equipment,
     equipmentReservations,
   );
-  const totalCommittedCost = ingredient.cost + labor.cost + equipmentTotal.cost;
+  const recipeFood = Number(recipeEstimatedFoodCost);
+  const ingredientCost =
+    ingredient.cost > 0
+      ? ingredient.cost
+      : Number.isFinite(recipeFood) && recipeFood > 0
+        ? recipeFood
+        : 0;
+  const totalCommittedCost = ingredientCost + labor.cost + equipmentTotal.cost;
   const margin = confirmedRevenue - totalCommittedCost;
   const hasIncompletePricing =
     labor.unpricedMinutes > 0 ||
@@ -377,7 +390,7 @@ export function buildLiveEventProfitability({
 
   return {
     confirmedRevenue,
-    ingredientCost: ingredient.cost,
+    ingredientCost,
     laborCost: labor.cost,
     equipmentCost: equipmentTotal.cost,
     totalCommittedCost,

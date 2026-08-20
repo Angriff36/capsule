@@ -1,7 +1,9 @@
 import type {
   EventPrepDemand,
   EventPrepDish,
+  EventPrepDishIngredient,
   EventPrepDishTask,
+  EventPrepSyncResult,
   EventPrepTask,
   EventPrepUnit,
 } from "./EventPrepCoordinator";
@@ -25,7 +27,7 @@ type TaskInput = {
   ingredientId?: string;
   ingredientDemandId?: string;
   componentId?: string;
-  dishTaskId: string;
+  dishTaskId?: string;
   dishId: string;
   category?: string;
   taskType?: string;
@@ -61,16 +63,35 @@ type SyncInput = {
   templates: readonly EventPrepDishTask[];
   tasks: readonly EventPrepTask[];
   demands: readonly EventPrepDemand[];
+  dishIngredients?: readonly EventPrepDishIngredient[];
   skipDemand?: boolean;
 };
 
 type DemandGroup = DemandInput & { taskIds: string[] };
 
-/** Materializes DishTask templates into PrepTask rows (and optional task-based demand). */
+type PlannedItem = {
+  key: string;
+  template?: EventPrepDishTask;
+  ingredientLine?: EventPrepDishIngredient;
+  existing: EventPrepTask | undefined;
+  quantity: number;
+  unit: EventPrepUnit;
+  name: string;
+  ingredientId?: string;
+  componentId?: string | null;
+  category?: string;
+  taskType?: string;
+  instructions?: string;
+};
+
+const NO_SOURCE_REASON =
+  "This dish has no prep templates and no ingredients to generate prep from.";
+
+/** Materializes DishTask templates — or dish ingredients when no templates exist. */
 export class EventPrepTaskSynchronizer {
   constructor(private readonly ports: Ports) {}
 
-  async sync(input: SyncInput) {
+  async sync(input: SyncInput): Promise<EventPrepSyncResult> {
     const activeTemplates = input.templates
       .filter(
         (template) =>
@@ -92,20 +113,66 @@ export class EventPrepTaskSynchronizer {
         .filter((task) => task.dishTaskId != null)
         .map((task) => [task.dishTaskId!, task] as const),
     );
+    const existingByIngredient = new Map(
+      currentEventDishTasks
+        .filter(
+          (task) =>
+            task.isGenerated && task.ingredientId != null && !task.dishTaskId,
+        )
+        .map((task) => [task.ingredientId!, task] as const),
+    );
 
-    const planned = activeTemplates.map((template) => {
-      const existing = existingByTemplate.get(template.id);
-      const quantity = this.quantityFor(
-        template,
-        input.eventDish.quantityServings,
-      );
+    const planned: PlannedItem[] =
+      activeTemplates.length > 0
+        ? activeTemplates.map((template) => {
+            const existing = existingByTemplate.get(template.id);
+            const quantity = this.quantityFor(
+              template,
+              input.eventDish.quantityServings,
+            );
+            return {
+              key: `template:${template.id}`,
+              template,
+              existing,
+              quantity,
+              unit: template.defaultUnit ?? ("portion" as EventPrepUnit),
+              name: template.name,
+              ingredientId: template.ingredientId ?? undefined,
+              componentId: template.componentId,
+              category: template.category ?? undefined,
+              taskType: template.taskType ?? undefined,
+              instructions: template.instructions ?? undefined,
+            };
+          })
+        : (input.dishIngredients ?? [])
+            .filter(
+              (line) =>
+                line.deletedAt == null &&
+                line.dishId === input.eventDish.dishId &&
+                line.quantity > 0,
+            )
+            .map((line) => {
+              const quantity = line.quantity * input.eventDish.quantityServings;
+              return {
+                key: `ingredient:${line.ingredientId}`,
+                ingredientLine: line,
+                existing: existingByIngredient.get(line.ingredientId),
+                quantity,
+                unit: line.unit,
+                name: `Prep ${line.name?.trim() || "ingredient"}`,
+                ingredientId: line.ingredientId,
+                category: "from_recipe",
+                taskType: "manual",
+              };
+            });
+
+    if (planned.length === 0) {
       return {
-        template,
-        existing,
-        quantity,
-        unit: template.defaultUnit ?? ("portion" as EventPrepUnit),
+        taskCount: 0,
+        demandCount: 0,
+        noOpReason: NO_SOURCE_REASON,
       };
-    });
+    }
 
     const groups = new Map<string, DemandGroup>();
     const demandIds = await this.resolveDemandIds(
@@ -135,7 +202,7 @@ export class EventPrepTaskSynchronizer {
         }
         continue;
       }
-      const ingredientId = item.template.ingredientId ?? undefined;
+      const ingredientId = item.ingredientId;
       const demandId = ingredientId
         ? demandIds.get(
             this.demandKey({
@@ -148,22 +215,22 @@ export class EventPrepTaskSynchronizer {
       await this.ports.createTask!({
         eventDishId: input.eventDish.id,
         eventId: input.eventDish.eventId,
-        name: item.template.name,
+        name: item.name,
         quantity: item.quantity,
         unit: item.unit,
         ingredientId,
         ingredientDemandId: demandId,
-        componentId: item.template.componentId ?? undefined,
-        dishTaskId: item.template.id,
+        componentId: item.componentId ?? undefined,
+        dishTaskId: item.template?.id,
         dishId: input.eventDish.dishId,
-        category: item.template.category ?? undefined,
-        taskType: item.template.taskType ?? undefined,
+        category: item.category,
+        taskType: item.taskType,
         specialInstructions: this.instructionsFor(
-          item.template,
+          item.instructions,
           input.eventDish.specialInstructions,
         ),
         isGenerated: true,
-        idempotencyKey: `event-prep:${input.eventDish.id}:${item.template.id}`,
+        idempotencyKey: `event-prep:${input.eventDish.id}:${item.key}`,
       });
     }
 
@@ -173,12 +240,7 @@ export class EventPrepTaskSynchronizer {
   private async resolveDemandIds(
     input: SyncInput,
     eventTasks: EventPrepTask[],
-    planned: Array<{
-      template: EventPrepDishTask;
-      existing: EventPrepTask | undefined;
-      quantity: number;
-      unit: EventPrepUnit;
-    }>,
+    planned: PlannedItem[],
     groups: Map<string, DemandGroup>,
   ) {
     const demandIds = new Map<string, string>();
@@ -205,7 +267,7 @@ export class EventPrepTaskSynchronizer {
     for (const task of eventTasks) {
       if (!task.ingredientId || task.status === "completed") continue;
       const plannedTask = task.dishTaskId
-        ? planned.find((item) => item.template.id === task.dishTaskId)
+        ? planned.find((item) => item.template?.id === task.dishTaskId)
         : undefined;
       if (task.isGenerated && plannedTask) continue;
       this.addDemandContribution(groups, {
@@ -219,10 +281,10 @@ export class EventPrepTaskSynchronizer {
       });
     }
     for (const item of planned) {
-      if (!item.template.ingredientId) continue;
+      if (!item.ingredientId) continue;
       this.addDemandContribution(groups, {
         eventId: input.eventDish.eventId,
-        ingredientId: item.template.ingredientId,
+        ingredientId: item.ingredientId,
         requiredQuantity: item.quantity,
         unit: item.unit,
         servings: input.eventDish.quantityServings,
@@ -240,8 +302,6 @@ export class EventPrepTaskSynchronizer {
       );
       if (existing) {
         demandIds.set(this.demandKey(group), existing.id);
-        // Leave status calculated — Event.approve foreach-creates PurchaseNeed
-        // and markReleased. Do not auto-confirm (confirm theater removed).
         if (
           existing.requiredQuantity !== group.requiredQuantity &&
           this.ports.recalculateDemand
@@ -277,11 +337,11 @@ export class EventPrepTaskSynchronizer {
   }
 
   private instructionsFor(
-    template: EventPrepDishTask,
+    templateInstructions?: string | null,
     eventInstructions?: string | null,
   ) {
     return (
-      [template.instructions?.trim(), eventInstructions?.trim()]
+      [templateInstructions?.trim(), eventInstructions?.trim()]
         .filter(Boolean)
         .join("\n\n") || undefined
     );

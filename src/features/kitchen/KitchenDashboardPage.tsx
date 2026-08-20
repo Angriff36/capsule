@@ -317,16 +317,28 @@ export function KitchenDashboardPage() {
                   `sync:${selectedEvent._id}`,
                   async () => {
                     const rows = model.selections(selectedEvent._id);
+                    if (rows.length === 0) {
+                      throw new Error(
+                        "No dishes on this event, so Sync prep has nothing to create.",
+                      );
+                    }
+                    const reasons: string[] = [];
+                    let created = 0;
                     for (const row of rows) {
-                      await syncPrepForDish({
+                      const result = await syncPrepForDish({
                         id: row._id,
                         eventId: selectedEvent._id,
                         dishId: row.dishId,
                         quantityServings: Number(row.quantityServings) || 1,
                       });
+                      created += result.taskCount;
+                      if (result.noOpReason) reasons.push(result.noOpReason);
+                    }
+                    if (created === 0 && reasons.length > 0) {
+                      throw new Error(reasons[0] ?? "Sync prep did nothing.");
                     }
                   },
-                  "Prep synced from dish templates",
+                  "Prep synced from the event menu",
                 );
               }}
             />
