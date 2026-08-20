@@ -4,9 +4,18 @@
  * routes.
  */
 
+/** Plain { tagName, type } stubs in tests, plus real EventTargets. */
+export type ShortcutTargetLike = {
+  tagName?: string;
+  type?: string;
+  isContentEditable?: boolean;
+  role?: string;
+  getAttribute?: (name: string) => string | null;
+};
+
 export type SingleKeyNavEvent = {
   key: string;
-  target?: EventTarget | null;
+  target?: ShortcutTargetLike | EventTarget | null;
   ctrlKey?: boolean;
   metaKey?: boolean;
   altKey?: boolean;
@@ -15,15 +24,10 @@ export type SingleKeyNavEvent = {
 
 /** True when the key originated in a field that should keep typed characters. */
 export function isEditableShortcutTarget(
-  target: EventTarget | null | undefined,
+  target: ShortcutTargetLike | EventTarget | null | undefined,
 ): boolean {
   if (target == null || typeof target !== "object") return false;
-  const el = target as {
-    tagName?: string;
-    isContentEditable?: boolean;
-    role?: string;
-    getAttribute?: (name: string) => string | null;
-  };
+  const el = target as ShortcutTargetLike;
   const tag = String(el.tagName ?? "").toUpperCase();
   if (
     tag === "INPUT" ||

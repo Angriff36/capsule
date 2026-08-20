@@ -1,5 +1,6 @@
+// @vitest-environment jsdom
 import { readFileSync } from "node:fs";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import {
   isEditableShortcutTarget,
   shouldFireSingleKeyNav,
@@ -58,6 +59,10 @@ function trappedKeydown(
 }
 
 describe("event menu recipe search keeps typed keys", () => {
+  afterEach(() => {
+    document.body.replaceChildren();
+  });
+
   it("traps keydown on the catalog search input so single-key nav never sees it", () => {
     expect(editor).toContain('type="search"');
     expect(editor).toContain(
@@ -117,17 +122,30 @@ describe("event menu recipe search keeps typed keys", () => {
   });
 
   it("keydown on the recipe search input does not reach the window single-key nav", () => {
+    const input = document.createElement("input");
+    input.setAttribute("data-testid", "event-menu-recipe-ingredient-search");
+    input.setAttribute("type", "search");
+    input.addEventListener("keydown", trapSingleKeyNav);
+    document.body.appendChild(input);
+
     const reached: string[] = [];
     const paths: string[] = [];
+    const globalSingleKeyNav = (event: KeyboardEvent) => {
+      reached.push(event.key);
+      if (!shouldFireSingleKeyNav(event)) return;
+      const letter = event.key.toLowerCase();
+      if (letter === "i") paths.push("/inventory");
+      if (letter === "k") paths.push("/kitchen");
+    };
+    window.addEventListener("keydown", globalSingleKeyNav);
+
     for (const key of [..."Carne Asada", "i", "k"]) {
-      const fired = trappedKeydown(key, searchInputTarget());
-      if (fired != null) {
-        reached.push(key);
-        const letter = key.toLowerCase();
-        if (letter === "c" || letter === "i") paths.push("/inventory");
-        if (letter === "k") paths.push("/kitchen");
-      }
+      input.dispatchEvent(
+        new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }),
+      );
     }
+
+    window.removeEventListener("keydown", globalSingleKeyNav);
     expect(reached).toEqual([]);
     expect(paths).toEqual([]);
   });
