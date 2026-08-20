@@ -69,6 +69,21 @@ export function appRouteForKeydown(event: SingleKeyNavEvent): string | null {
   return null;
 }
 
+/** Ctrl/Cmd+A in a field selects that field's text — not a nav chord. */
+export function isSelectAllChord(event: SingleKeyNavEvent): boolean {
+  return (
+    (Boolean(event.ctrlKey) || Boolean(event.metaKey)) &&
+    event.key.toLowerCase() === "a"
+  );
+}
+
+/** Ctrl+A (and friends) never collapse the event-menu recipe editor. */
+export function isRecipeEditorCollapseChord(
+  _event: SingleKeyNavEvent,
+): boolean {
+  return false;
+}
+
 /** Stop the key from bubbling to the window single-key nav listener. */
 export function trapSingleKeyNav(event: { stopPropagation: () => void }): void {
   event.stopPropagation();
