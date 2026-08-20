@@ -78,3 +78,18 @@ export function shouldPreventRecipeAddSubmitFromSearchKey(
 export function createNamePrefillFromSearch(_query: string): string {
   return "";
 }
+
+/** Missing submitter is treated as a search key, not Add. */
+export function recipeAddSubmitSource(
+  submitter: {
+    tagName?: string;
+    textContent?: string | null;
+  } | null,
+): RecipeLineCommitSource {
+  const label = String(submitter?.textContent ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (/add ingredient/i.test(label)) return "add-button";
+  if (submitter != null) return "add-form-submit";
+  return "search-key";
+}
