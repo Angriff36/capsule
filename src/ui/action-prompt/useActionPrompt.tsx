@@ -42,7 +42,7 @@ export class ActionPromptSession {
     request: Omit<ConfirmPromptRequest, "kind">,
   ): Promise<boolean> {
     const result = await this.ask({ ...request, kind: "confirm" });
-    if (result.status === "dismissed") {
+    if (result.status !== "confirmed") {
       this.announceDismissed();
       return false;
     }
