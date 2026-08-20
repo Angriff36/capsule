@@ -143,3 +143,22 @@ describe("event menu leftover paint and defaults", () => {
     expect(tab).not.toContain('defaultValue={lineFields.unitSellPrice ?? ""}');
   });
 });
+
+describe("event menu recipe search key trap", () => {
+  it("traps keydown on the recipe search and create-name fields", () => {
+    expect(editor).toContain("trapSingleKeyNav");
+    expect(editor).toContain("onKeyDown={trapSingleKeyNav}");
+    const searchBlock = editor.slice(
+      editor.indexOf('type="search"'),
+      editor.indexOf('data-testid="event-menu-recipe-ingredient-search"') + 80,
+    );
+    expect(searchBlock).toContain("onKeyDown={trapSingleKeyNav}");
+    const nameAt = editor.indexOf('name="newIngredientName"');
+    expect(nameAt).toBeGreaterThan(-1);
+    const nameBlock = editor.slice(nameAt, nameAt + 400);
+    expect(nameBlock).toContain("onKeyDown={trapSingleKeyNav}");
+    expect(editor).not.toContain("showCreate");
+    expect(editor).toContain('data-testid="event-menu-create-ingredient-form"');
+    expect(editor).toContain('data-testid="event-menu-create-ingredient-name"');
+  });
+});

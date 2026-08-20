@@ -25,6 +25,7 @@ import {
   resolveEventMenuRecipeIngredientId,
 } from "./eventMenuRecipeIngredient";
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
+import { trapSingleKeyNav } from "../../app/shell/singleKeyNav";
 
 type Props = {
   dishId: string;
@@ -45,7 +46,6 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
   const [unit, setUnit] = useState("each");
   const [ingredientQuery, setIngredientQuery] = useState("");
   const [selectedIngredientId, setSelectedIngredientId] = useState("");
-  const [showCreate, setShowCreate] = useState(false);
 
   const rows = (lines ?? [])
     .filter((line) => line.deletedAt == null && line.dishId === dishId)
@@ -99,7 +99,6 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     });
     setSelectedIngredientId("");
     setIngredientQuery("");
-    setShowCreate(false);
   }
 
   async function onAddIngredient(event: FormEvent<HTMLFormElement>) {
@@ -172,7 +171,6 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
         });
         setSelectedIngredientId("");
         setIngredientQuery("");
-        setShowCreate(false);
         form.reset();
       }
     } catch (cause) {
@@ -376,6 +374,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                 setIngredientQuery(event.target.value);
                 setSelectedIngredientId("");
               }}
+              onKeyDown={trapSingleKeyNav}
               placeholder="Search catalog…"
               autoComplete="off"
               data-testid="event-menu-recipe-ingredient-search"
@@ -418,9 +417,14 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
             className="btn btn-ghost"
             disabled={busy != null}
             data-testid="event-menu-create-ingredient"
-            onClick={() => setShowCreate((open) => !open)}
+            onClick={() => {
+              const field = document.querySelector<HTMLInputElement>(
+                '[data-testid="event-menu-create-ingredient-name"]',
+              );
+              field?.focus();
+            }}
           >
-            {showCreate ? "Hide create ingredient" : "Create ingredient"}
+            Create ingredient
           </button>
         </form>
         {selectedIngredient ? (
@@ -464,69 +468,68 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
             Type to search the catalog. The picker is not a fixed list of names.
           </p>
         )}
-        {showCreate ? (
-          <form
-            className="mt-2 flex flex-wrap items-end gap-2"
-            onSubmit={onCreateIngredient}
-            data-testid="event-menu-create-ingredient-form"
-          >
-            <label className="field-label">
-              New ingredient
-              <input
-                className="field-input w-48"
-                name="newIngredientName"
-                defaultValue={ingredientQuery.trim()}
-                placeholder="Carne asada"
-                required
-                data-testid="event-menu-create-ingredient-name"
-              />
-            </label>
-            <label className="field-label">
-              Stock unit
-              <select
-                className="field-input w-28"
-                name="newIngredientUnit"
-                defaultValue={unit}
-              >
-                {SELECTABLE_UNITS.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field-label">
-              Catalog cost
-              <input
-                className="field-input w-24"
-                name="newIngredientCost"
-                type="number"
-                min={0}
-                step="0.01"
-                placeholder="0.00"
-                data-testid="event-menu-create-ingredient-cost"
-              />
-            </label>
-            <label className="field-label">
-              Per serving
-              <input
-                className="field-input w-24"
-                name="createQuantity"
-                type="number"
-                min={0}
-                step="any"
-                defaultValue={1}
-              />
-            </label>
-            <button
-              type="submit"
-              className="btn btn-ghost"
-              disabled={busy != null}
+        <form
+          className="mt-2 flex flex-wrap items-end gap-2"
+          onSubmit={onCreateIngredient}
+          data-testid="event-menu-create-ingredient-form"
+        >
+          <label className="field-label">
+            New ingredient
+            <input
+              className="field-input w-48"
+              name="newIngredientName"
+              defaultValue={ingredientQuery.trim()}
+              placeholder="Carne asada"
+              required
+              onKeyDown={trapSingleKeyNav}
+              data-testid="event-menu-create-ingredient-name"
+            />
+          </label>
+          <label className="field-label">
+            Stock unit
+            <select
+              className="field-input w-28"
+              name="newIngredientUnit"
+              defaultValue={unit}
             >
-              Create and add
-            </button>
-          </form>
-        ) : null}
+              {SELECTABLE_UNITS.map((value) => (
+                <option key={value} value={value}>
+                  {value}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field-label">
+            Catalog cost
+            <input
+              className="field-input w-24"
+              name="newIngredientCost"
+              type="number"
+              min={0}
+              step="0.01"
+              placeholder="0.00"
+              data-testid="event-menu-create-ingredient-cost"
+            />
+          </label>
+          <label className="field-label">
+            Per serving
+            <input
+              className="field-input w-24"
+              name="createQuantity"
+              type="number"
+              min={0}
+              step="any"
+              defaultValue={1}
+            />
+          </label>
+          <button
+            type="submit"
+            className="btn btn-ghost"
+            disabled={busy != null}
+          >
+            Create and add
+          </button>
+        </form>
       </div>
 
       <div>

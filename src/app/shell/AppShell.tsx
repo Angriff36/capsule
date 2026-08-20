@@ -8,6 +8,7 @@ import { RouteErrorBoundary } from "./RouteErrorBoundary";
 import { ShellOnlineMonitor } from "./ShellOnlineMonitor";
 import { ShortcutReferenceOverlay } from "./ShortcutReferenceOverlay";
 import { Sidebar } from "./Sidebar";
+import { shouldFireSingleKeyNav } from "./singleKeyNav";
 import { Topbar } from "./Topbar";
 
 const onlineMonitor = new ShellOnlineMonitor();
@@ -25,20 +26,6 @@ function useOnline() {
   return online;
 }
 
-/** True when the key event originated inside a text field or editable region,
- * where single-key shortcuts (like `?`) must not fire. */
-function isEditableTarget(e: KeyboardEvent): boolean {
-  const el = e.target as HTMLElement | null;
-  if (!el) return false;
-  const tag = el.tagName;
-  return (
-    tag === "INPUT" ||
-    tag === "TEXTAREA" ||
-    tag === "SELECT" ||
-    el.isContentEditable
-  );
-}
-
 export function AppShell() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
@@ -51,14 +38,7 @@ export function AppShell() {
         setPaletteOpen((v) => !v);
         return;
       }
-      if (
-        e.key === "?" &&
-        !e.ctrlKey &&
-        !e.metaKey &&
-        !e.altKey &&
-        !isEditableTarget(e) &&
-        !paletteOpen
-      ) {
+      if (e.key === "?" && shouldFireSingleKeyNav(e) && !paletteOpen) {
         e.preventDefault();
         setShortcutsOpen(true);
       }
