@@ -54,6 +54,10 @@ describe("leftovers 1–6: event menu cost → prep → PO chain", () => {
     expect(editor).toContain("Add ingredient");
     expect(editor).toContain("Add container");
     expect(editor).toContain("you do not need to leave the");
+    expect(editor).toContain("useDishIngredientAdjustQuantity");
+    expect(editor).toContain('data-testid="event-menu-recipe-qty"');
+    expect(editor).toContain('data-testid="event-menu-recipe-unit"');
+    expect(editor).toContain("Save qty");
   });
 
   it("4. prep generates from the event menu or says why sync no-op'd", () => {
@@ -149,6 +153,7 @@ describe("leftover returns fail this suite", () => {
       "src/features/events/eventMenuCost.ts",
       "src/features/events/eventMenuContainers.ts",
       "src/features/events/eventMenuSellPrice.ts",
+      "src/features/events/eventMenuLineFields.ts",
       "src/features/events/EventDraftPoCoordinator.ts",
       "src/features/events/EventMenuTab.tsx",
       "src/features/events/EventPrepTab.tsx",
@@ -168,6 +173,8 @@ describe("leftover returns fail this suite", () => {
     expect(tab).toContain("eventMenuSellTotals");
     expect(tab).toContain("unitSellPrice");
     expect(tab).toContain("food sell");
+    expect(tab).toContain("planEventMenuLineSave");
+    expect(tab).not.toContain("formatSellPriceInstruction");
     expect(tab).toContain("suspectRowsFromRecipeLines");
     expect(tab).toContain("suspect-prep-quantity");
     expect(prep).toContain("suspectRowsFromRecipeLines");

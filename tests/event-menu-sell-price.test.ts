@@ -6,6 +6,15 @@ import {
   parseUnitSellPrice,
 } from "../src/features/events/eventMenuSellPrice";
 import {
+  encodeEventMenuLineFields,
+  eventMenuLineServings,
+  parseEventMenuLineFields,
+  planEventMenuLineSave,
+  resolveContainerCount,
+  resolveUnitSellPrice,
+} from "../src/features/events/eventMenuLineFields";
+import { eventMenuLinePanCount } from "../src/features/events/eventMenuContainers";
+import {
   suspectPrepQuantityFlag,
   suspectRowsFromRecipeLines,
 } from "../src/features/events/eventMenuSuspectQuantity";
@@ -42,6 +51,147 @@ describe("event menu sell prices", () => {
       rollup.lines.find((line) => line.name === "Guacamole and Salsa Bar")
         ?.sellTotal,
     ).toBeCloseTo(485.1);
+  });
+});
+
+describe("first-class event menu line persist", () => {
+  it("saves sell price without requiring SELL: in notes", () => {
+    const plan = planEventMenuLineSave({
+      currentInstructions: "keep extra spicy",
+      currentServings: 98,
+      nextSellRaw: "34",
+      nextServingsRaw: "98",
+      nextContainerRaw: "",
+    });
+    expect(plan.unitSellPrice).toBe(34);
+    expect(plan.specialInstructions).not.toMatch(/SELL:/);
+    expect(parseUnitSellPrice(plan.specialInstructions)).toBeNull();
+    expect(
+      resolveUnitSellPrice({ specialInstructions: plan.specialInstructions }),
+    ).toBe(34);
+    expect(
+      eventMenuSellTotals([
+        {
+          eventDishId: "ed-1",
+          dishId: "dish-1",
+          name: "Menu Experience",
+          servings: 98,
+          unitSellPrice: 34,
+          specialInstructions: "",
+        },
+      ]).lines[0]?.unitSellPrice,
+    ).toBe(34);
+    const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
+    expect(tab).toContain("planEventMenuLineSave");
+    expect(tab).toContain('name="unitSellPrice"');
+    expect(tab).toContain('data-testid="event-menu-unit-sell-price"');
+    expect(tab).not.toContain("formatSellPriceInstruction");
+  });
+
+  it("persists $0 lemonade as a first-class sell price", () => {
+    const plan = planEventMenuLineSave({
+      currentInstructions: "",
+      currentServings: 98,
+      nextSellRaw: "0",
+      nextServingsRaw: "98",
+      nextContainerRaw: "",
+    });
+    expect(plan.unitSellPrice).toBe(0);
+    expect(plan.specialInstructions).not.toMatch(/SELL:/);
+    expect(
+      parseEventMenuLineFields(plan.specialInstructions).unitSellPrice,
+    ).toBe(0);
+    expect(
+      eventMenuSellTotals([
+        {
+          eventDishId: "ed-lemonade",
+          dishId: "dish-lemonade",
+          name: "Lemonade",
+          servings: 98,
+          unitSellPrice: 0,
+          specialInstructions: "",
+        },
+      ]).lines[0]?.unitSellPrice,
+    ).toBe(0);
+  });
+
+  it("persists per-row servings 59 instead of event guest count 98", () => {
+    const plan = planEventMenuLineSave({
+      currentInstructions: "",
+      currentServings: 98,
+      nextSellRaw: "",
+      nextServingsRaw: "59",
+      nextContainerRaw: "",
+    });
+    expect(plan.quantityServings).toBe(59);
+    expect(plan.servingsChanged).toBe(true);
+    expect(
+      eventMenuLineServings({ quantityServings: 59, expectedHeadcount: 98 }),
+    ).toBe(59);
+    expect(
+      eventMenuLineServings({ quantityServings: 59, expectedHeadcount: 98 }),
+    ).not.toBe(98);
+    const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
+    expect(tab).toContain("useEventDishAdjustServings");
+    expect(tab).toContain('name="quantityServings"');
+    expect(tab).toContain('data-testid="event-menu-servings"');
+    expect(tab).toContain("plan.quantityServings");
+  });
+
+  it("persists half-pan / container count on the event menu line", () => {
+    const plan = planEventMenuLineSave({
+      currentInstructions: "",
+      currentServings: 59,
+      nextSellRaw: "",
+      nextServingsRaw: "59",
+      nextContainerRaw: "3",
+    });
+    expect(plan.containerCount).toBe(3);
+    expect(plan.specialInstructions).toMatch(/containerCount":3/);
+    expect(
+      resolveContainerCount({ specialInstructions: plan.specialInstructions }),
+    ).toBe(3);
+    expect(
+      eventMenuLinePanCount(3, 98, "dish-beans", [
+        {
+          id: "c1",
+          dishId: "dish-beans",
+          name: "Half pan",
+          servingsPerContainer: 20,
+        },
+      ]),
+    ).toBe(3);
+    expect(
+      eventMenuLinePanCount(null, 98, "dish-beans", [
+        {
+          id: "c1",
+          dishId: "dish-beans",
+          name: "Half pan",
+          servingsPerContainer: 20,
+        },
+      ]),
+    ).toBe(5);
+    const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
+    expect(tab).toContain('name="containerCount"');
+    expect(tab).toContain('data-testid="event-menu-line-pans"');
+  });
+
+  it("keeps leftover SELL: as a read fallback only", () => {
+    expect(resolveUnitSellPrice({ specialInstructions: "SELL:4.95" })).toBe(
+      4.95,
+    );
+    expect(
+      resolveUnitSellPrice({
+        unitSellPrice: 34,
+        specialInstructions: "SELL:4.95",
+      }),
+    ).toBe(34);
+    const encoded = encodeEventMenuLineFields({
+      unitSellPrice: 2,
+      notes: "SELL:99.00 leftover should be stripped",
+    });
+    expect(encoded).not.toMatch(/SELL:/);
+    expect(parseEventMenuLineFields(encoded).unitSellPrice).toBe(2);
   });
 });
 

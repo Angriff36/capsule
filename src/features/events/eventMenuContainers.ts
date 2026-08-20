@@ -62,3 +62,20 @@ export function eventMenuContainerCountsForDish(
     })
     .filter((row) => row.count > 0);
 }
+
+/** Explicit pans on the event line win over dish-record computed packs. */
+export function eventMenuLinePanCount(
+  explicitCount: number | null | undefined,
+  servings: number,
+  dishId: string,
+  containers: readonly EventMenuContainer[],
+): number {
+  const explicit = Number(explicitCount);
+  if (explicitCount != null && Number.isFinite(explicit) && explicit >= 0) {
+    return explicit;
+  }
+  return eventMenuContainerCountsForDish(dishId, servings, containers).reduce(
+    (sum, row) => sum + row.count,
+    0,
+  );
+}

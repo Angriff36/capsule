@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import {
   useCreateDishContainer,
   useCreateDishIngredient,
+  useDishIngredientAdjustQuantity,
   useDishIngredientRemove,
   useListDishContainer,
   useListDishIngredient,
@@ -25,6 +26,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
   const ingredients = useListIngredient();
   const containers = useListDishContainer();
   const addLine = useCreateDishIngredient();
+  const adjustQuantity = useDishIngredientAdjustQuantity();
   const removeLine = useDishIngredientRemove();
   const defineContainer = useCreateDishContainer();
   const [busy, setBusy] = useState<string | null>(null);
@@ -142,9 +144,72 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                   key={line._id}
                   className="flex flex-wrap items-center justify-between gap-2 text-sm"
                 >
-                  <span>
-                    {ingredientName(String(line.ingredientId))} ·{" "}
-                    {line.quantity} {String(line.unit)}
+                  <form
+                    className="flex flex-wrap items-end gap-2"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      const data = new FormData(event.currentTarget);
+                      const quantity = Number(data.get("quantity") ?? 0);
+                      const nextUnit = String(data.get("unit") ?? line.unit);
+                      if (!(quantity > 0)) {
+                        setError("Recipe quantity must be greater than 0.");
+                        return;
+                      }
+                      setBusy(`qty:${line._id}`);
+                      setError(null);
+                      void adjustQuantity({
+                        docId: line._id,
+                        version: line.version,
+                        quantity,
+                        unit: nextUnit as (typeof UNIT_OF_MEASURE)[number],
+                      })
+                        .catch((cause) => {
+                          setError(
+                            cause instanceof Error
+                              ? cause.message
+                              : "Could not save the recipe quantity.",
+                          );
+                        })
+                        .finally(() => setBusy(null));
+                    }}
+                  >
+                    <span className="min-w-32 font-medium">
+                      {ingredientName(String(line.ingredientId))}
+                    </span>
+                    <label className="field-label">
+                      Qty
+                      <input
+                        className="field-input w-24"
+                        name="quantity"
+                        type="number"
+                        min={0}
+                        step="any"
+                        defaultValue={line.quantity}
+                        data-testid="event-menu-recipe-qty"
+                      />
+                    </label>
+                    <label className="field-label">
+                      Unit
+                      <select
+                        className="field-input w-28"
+                        name="unit"
+                        defaultValue={String(line.unit)}
+                        data-testid="event-menu-recipe-unit"
+                      >
+                        {SELECTABLE_UNITS.map((value) => (
+                          <option key={value} value={value}>
+                            {value}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <button
+                      type="submit"
+                      className="btn btn-ghost btn-sm"
+                      disabled={busy != null}
+                    >
+                      Save qty
+                    </button>
                     {mismatch ? (
                       <span
                         className="ml-2 text-danger"
@@ -176,21 +241,21 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                         </span>
                       ) : null;
                     })()}
-                  </span>
-                  <button
-                    type="button"
-                    className="btn btn-ghost btn-sm"
-                    disabled={busy != null}
-                    onClick={() =>
-                      void removeLine({
-                        docId: line._id,
-                        version: line.version,
-                        reason: "Removed from event menu recipe",
-                      })
-                    }
-                  >
-                    Remove
-                  </button>
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      disabled={busy != null}
+                      onClick={() =>
+                        void removeLine({
+                          docId: line._id,
+                          version: line.version,
+                          reason: "Removed from event menu recipe",
+                        })
+                      }
+                    >
+                      Remove
+                    </button>
+                  </form>
                 </li>
               );
             })}
