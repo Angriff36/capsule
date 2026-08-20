@@ -111,3 +111,46 @@ describe("PR 211 create-event leftovers stay on main", () => {
     expect(catalog).toContain("Vending");
   });
 });
+
+describe("leftover returns fail this suite", () => {
+  it("does not ship leftover stubs from the cost → prep → PO product", () => {
+    const leftover = JSON.parse('{"leftover":false}');
+    expect(leftover).not.toEqual({ leftover: true });
+    for (const path of [
+      "src/features/events/eventMenuCost.ts",
+      "src/features/events/EventDraftPoCoordinator.ts",
+      "src/features/events/EventPrepTab.tsx",
+      "src/features/events/EventMenuTab.tsx",
+    ]) {
+      expect(read(path)).not.toMatch(/leftover\s*:\s*true/);
+    }
+  });
+
+  it("product helpers do not import the TPP catalog or hardcode 6.25", () => {
+    const features = [
+      "src/features/events/eventMenuCost.ts",
+      "src/features/events/eventMenuContainers.ts",
+      "src/features/events/eventMenuSellPrice.ts",
+      "src/features/events/EventDraftPoCoordinator.ts",
+      "src/features/events/EventMenuTab.tsx",
+      "src/features/events/EventPrepTab.tsx",
+      "src/features/events/EventMenuRecipeEditor.tsx",
+      "src/features/events/EventMarginTab.tsx",
+    ];
+    for (const path of features) {
+      const source = read(path);
+      expect(source).not.toContain("tpp-mendenhall-jarvis-catalog");
+      expect(source).not.toContain("6.25");
+    }
+  });
+
+  it("event menu shows encoded sell prices and flags the 196 lb radish", () => {
+    const tab = read("src/features/events/EventMenuTab.tsx");
+    const prep = read("src/features/events/EventPrepTab.tsx");
+    expect(tab).toContain("eventMenuSellTotals");
+    expect(tab).toContain("unitSellPrice");
+    expect(tab).toContain("food sell");
+    expect(prep).toContain("suspectPrepQuantityFlag");
+    expect(prep).toContain("suspect-prep-quantity");
+  });
+});

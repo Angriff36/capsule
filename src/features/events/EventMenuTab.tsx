@@ -5,6 +5,7 @@ import {
   useEventDishAdjustServings,
   useEventDishChangeCourse,
   useEventDishRemove,
+  useEventDishUpdateInstructions,
   useGetEvent,
   useListComponent,
   useListComponentIngredient,
@@ -30,6 +31,11 @@ import { EventDraftPoButton } from "./EventDraftPoButton";
 import { EventMenuRecipeEditor } from "./EventMenuRecipeEditor";
 import { buildEventMenuCost, eventMenuCostForDish } from "./eventMenuCost";
 import { eventMenuContainerCountsForDish } from "./eventMenuContainers";
+import {
+  eventMenuSellTotals,
+  formatSellPriceInstruction,
+  parseUnitSellPrice,
+} from "./eventMenuSellPrice";
 
 type Props = {
   eventId: string;
@@ -51,6 +57,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const adjustServings = useEventDishAdjustServings();
   const changeCourse = useEventDishChangeCourse();
   const removeDish = useEventDishRemove();
+  const updateInstructions = useEventDishUpdateInstructions();
   const { ready: prepSyncReady, syncStockForEvent } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
   const [openRecipeId, setOpenRecipeId] = useState<string | null>(null);
@@ -137,6 +144,22 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     ],
   );
 
+  const sellRollup = useMemo(
+    () =>
+      eventMenuSellTotals(
+        selections.map((row) => ({
+          eventDishId: row._id,
+          dishId: row.dishId,
+          name:
+            dishes?.find((dish) => dish._id === row.dishId)?.name ??
+            "Unknown dish",
+          servings: Number(row.quantityServings),
+          specialInstructions: row.specialInstructions,
+        })),
+      ),
+    [dishes, selections],
+  );
+
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
     setBusy(key);
@@ -178,6 +201,9 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           {formatMoneyExact(costRollup.costPerServing)} / serving
           {" · "}
           {costRollup.servings} servings
+          {sellRollup.foodSellTotal > 0
+            ? ` · food sell ${formatMoneyExact(sellRollup.foodSellTotal)}`
+            : ""}
         </p>
       ) : null}
       {costRollup.mismatches.length > 0 ? (
@@ -299,6 +325,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     {selection.quantityServings} servings
                     {" · est. "}
                     {estimated > 0 ? formatMoneyExact(estimated) : "—"}
+                    {(() => {
+                      const sell = sellRollup.lines.find(
+                        (line) => line.eventDishId === selection._id,
+                      );
+                      return sell?.unitSellPrice != null
+                        ? ` · sell ${formatMoneyExact(sell.sellTotal)}`
+                        : "";
+                    })()}
                     {panLabel ? ` · ${panLabel}` : ""}
                   </p>
                   {dishCost && dishCost.mismatches.length > 0 ? (
@@ -343,8 +377,31 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                       return;
                     const nextCourse = String(data.get("course") ?? "").trim();
                     const prevCourse = String(selection.course ?? "").trim();
+                    const sellRaw = String(
+                      data.get("unitSellPrice") ?? "",
+                    ).trim();
+                    const nextSell = sellRaw === "" ? null : Number(sellRaw);
+                    const prevSell = parseUnitSellPrice(
+                      selection.specialInstructions,
+                    );
                     void run(`servings:${selection._id}`, async () => {
                       let version = selection.version;
+                      if (
+                        nextSell != null &&
+                        Number.isFinite(nextSell) &&
+                        nextSell >= 0 &&
+                        nextSell !== prevSell
+                      ) {
+                        await updateInstructions({
+                          docId: selection._id,
+                          version,
+                          specialInstructions: formatSellPriceInstruction(
+                            nextSell,
+                            selection.specialInstructions,
+                          ),
+                        });
+                        version += 1;
+                      }
                       if (nextCourse !== prevCourse) {
                         await changeCourse({
                           docId: selection._id,
@@ -373,6 +430,19 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                       name="course"
                       defaultValue={selection.course ?? ""}
                       placeholder="Uncategorized"
+                    />
+                  </label>
+                  <label className="field-label">
+                    Sell / serving
+                    <input
+                      className="field-input w-24"
+                      name="unitSellPrice"
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      defaultValue={
+                        parseUnitSellPrice(selection.specialInstructions) ?? ""
+                      }
                     />
                   </label>
                   <label className="field-label">
