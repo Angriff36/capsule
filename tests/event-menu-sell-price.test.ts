@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import {
   eventMenuSellTotals,
+  formatEventMenuSellInput,
   formatSellPriceInstruction,
   parseUnitSellPrice,
 } from "../src/features/events/eventMenuSellPrice";
@@ -26,6 +27,11 @@ import {
 } from "../scripts/tpp-mendenhall-jarvis-catalog";
 
 describe("event menu sell prices", () => {
+  it("paints sell inputs with two decimal places", () => {
+    expect(formatEventMenuSellInput(2)).toBe("2.00");
+    expect(formatEventMenuSellInput(0.5)).toBe("0.50");
+    expect(formatEventMenuSellInput(1)).toBe("1.00");
+  });
   it("parses SELL:34.00 from specialInstructions", () => {
     expect(parseUnitSellPrice("SELL:34.00")).toBe(34);
     expect(parseUnitSellPrice("notes\nSELL:4.95")).toBe(4.95);
