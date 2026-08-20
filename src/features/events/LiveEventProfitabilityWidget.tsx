@@ -23,7 +23,13 @@ const hours = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 1,
 });
 
-export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
+export function LiveEventProfitabilityWidget({
+  eventId,
+  recipeEstimatedFoodCost,
+}: {
+  eventId: string;
+  recipeEstimatedFoodCost?: number | null;
+}) {
   const invoices = useListInvoice();
   const demands = useListIngredientDemand();
   const orders = useListVendorOrder();
@@ -58,6 +64,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
         equipment: equipment ?? [],
         equipmentReservations: equipmentReservations ?? [],
         clockedLabor,
+        recipeEstimatedFoodCost,
       }),
     [
       clockedLabor,
@@ -70,6 +77,7 @@ export function LiveEventProfitabilityWidget({ eventId }: { eventId: string }) {
       lines,
       orders,
       payrollInputs,
+      recipeEstimatedFoodCost,
     ],
   );
 

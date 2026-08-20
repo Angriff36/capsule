@@ -31,6 +31,16 @@ export type EventPrepDishTask = {
   status: string;
 };
 
+export type EventPrepDishIngredient = {
+  id: string;
+  dishId: string;
+  ingredientId: string;
+  name?: string | null;
+  quantity: number;
+  unit: EventPrepUnit;
+  deletedAt?: number | null;
+};
+
 export type EventPrepTask = {
   id: string;
   eventDishId: string;
@@ -68,6 +78,12 @@ export type EventPrepDish = {
   specialInstructions?: string | null;
 };
 
+export type EventPrepSyncResult = {
+  taskCount: number;
+  demandCount: number;
+  noOpReason?: string;
+};
+
 type DemandInput = {
   eventId: string;
   ingredientId: string;
@@ -90,7 +106,7 @@ type TaskInput = {
   ingredientId?: string;
   ingredientDemandId?: string;
   componentId?: string;
-  dishTaskId: string;
+  dishTaskId?: string;
   dishId: string;
   category?: string;
   taskType?: string;
@@ -132,6 +148,7 @@ type SyncInput = {
   templates: readonly EventPrepDishTask[];
   tasks: readonly EventPrepTask[];
   demands: readonly EventPrepDemand[];
+  dishIngredients?: readonly EventPrepDishIngredient[];
   /**
    * When true, only materialize PrepTask rows.
    * Component → IngredientDemand is Manifest-owned (event-purchasing.manifest).
@@ -143,7 +160,7 @@ type SyncInput = {
 export class EventPrepCoordinator {
   constructor(private readonly ports: Ports) {}
 
-  async sync(input: SyncInput) {
+  async sync(input: SyncInput): Promise<EventPrepSyncResult> {
     return new EventPrepTaskSynchronizer(this.ports).sync(input);
   }
 }

@@ -50,6 +50,16 @@ type DemandRow = {
 type IngredientRow = {
   _id: string;
   unit: string;
+  name?: string | null;
+};
+
+type DishIngredientRow = {
+  _id: string;
+  dishId: string;
+  ingredientId: string;
+  quantity: number;
+  unit: string;
+  deletedAt?: number | null;
 };
 
 type InventoryItemRow = {
@@ -127,6 +137,7 @@ type Catalogs = {
   inventoryItems: readonly InventoryItemRow[];
   inventoryLots: readonly InventoryLotRow[];
   inventoryReservations: readonly InventoryReservationRow[];
+  dishIngredients: readonly DishIngredientRow[];
 };
 
 type Ports = {
@@ -167,6 +178,7 @@ export class EventMenuSyncController {
     inventoryItems: readonly InventoryItemRow[] | undefined;
     inventoryLots: readonly InventoryLotRow[] | undefined;
     inventoryReservations: readonly InventoryReservationRow[] | undefined;
+    dishIngredients: readonly DishIngredientRow[] | undefined;
   }): Catalogs {
     if (
       input.dishTasks === undefined ||
@@ -179,7 +191,8 @@ export class EventMenuSyncController {
       input.eventDishes === undefined ||
       input.inventoryItems === undefined ||
       input.inventoryLots === undefined ||
-      input.inventoryReservations === undefined
+      input.inventoryReservations === undefined ||
+      input.dishIngredients === undefined
     ) {
       throw new Error("Event menu sync catalogs are still loading");
     }
@@ -195,6 +208,7 @@ export class EventMenuSyncController {
       inventoryItems: input.inventoryItems,
       inventoryLots: input.inventoryLots,
       inventoryReservations: input.inventoryReservations,
+      dishIngredients: input.dishIngredients,
     };
   }
 
@@ -256,12 +270,26 @@ export class EventMenuSyncController {
     return reservationResult.shortages;
   }
 
-  async syncPrepForDish(
-    eventDish: EventDishOverride,
-  ): Promise<EventStockShortage[]> {
+  async syncPrepForDish(eventDish: EventDishOverride): Promise<{
+    shortages: EventStockShortage[];
+    taskCount: number;
+    noOpReason?: string;
+  }> {
     const prep = this.prepCoordinator();
-    await prep.sync({
+    const syncResult = await prep.sync({
       eventDish,
+      dishIngredients: this.catalogs.dishIngredients.map((line) => ({
+        id: line._id,
+        dishId: line.dishId,
+        ingredientId: line.ingredientId,
+        name:
+          this.catalogs.ingredients.find(
+            (ingredient) => ingredient._id === line.ingredientId,
+          )?.name ?? null,
+        quantity: Number(line.quantity),
+        unit: line.unit as never,
+        deletedAt: line.deletedAt,
+      })),
       templates: this.catalogs.dishTasks.map((task) => ({
         id: task._id,
         dishId: task.dishId,
@@ -309,7 +337,15 @@ export class EventMenuSyncController {
       })),
       skipDemand: true,
     });
-    return this.syncComponentDemands(eventDish.eventId, eventDish);
+    const shortages = await this.syncComponentDemands(
+      eventDish.eventId,
+      eventDish,
+    );
+    return {
+      shortages,
+      taskCount: syncResult.taskCount,
+      noOpReason: syncResult.noOpReason,
+    };
   }
 
   private prepCoordinator() {

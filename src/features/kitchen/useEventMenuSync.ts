@@ -4,6 +4,7 @@ import {
   useCreatePrepTask,
   useInventoryReservationRelease,
   useListDishComponent,
+  useListDishIngredient,
   useListDishTask,
   useListEventDish,
   useListIngredient,
@@ -32,6 +33,7 @@ export type EventDishSyncTarget = {
  */
 export function useEventMenuSync() {
   const dishTasks = useListDishTask();
+  const dishIngredients = useListDishIngredient();
   const dishComponents = useListDishComponent();
   const components = useListComponent();
   const componentIngredients = useListComponentIngredient();
@@ -58,7 +60,8 @@ export function useEventMenuSync() {
     componentIngredients !== undefined &&
     inventoryItems !== undefined &&
     inventoryLots !== undefined &&
-    inventoryReservations !== undefined;
+    inventoryReservations !== undefined &&
+    dishIngredients !== undefined;
 
   const controller = useMemo(() => {
     if (!ready) return null;
@@ -85,6 +88,7 @@ export function useEventMenuSync() {
         inventoryItems: inventoryItems as never,
         inventoryLots: inventoryLots as never,
         inventoryReservations: inventoryReservations as never,
+        dishIngredients: dishIngredients as never,
       }),
     );
   }, [
@@ -92,6 +96,7 @@ export function useEventMenuSync() {
     createReservation,
     demands,
     dishComponents,
+    dishIngredients,
     dishTasks,
     eventDishes,
     ingredients,
@@ -113,9 +118,7 @@ export function useEventMenuSync() {
     // server-side (EventDishAdded fanOut in production/task.manifest). Calling
     // this straight after a create duplicates them, because the reactive
     // catalogs have not seen the server's rows yet.
-    syncPrepForDish: async (
-      target: EventDishSyncTarget,
-    ): Promise<EventStockShortage[]> => {
+    syncPrepForDish: async (target: EventDishSyncTarget) => {
       if (!controller) {
         throw new Error("Prep sync catalogs are still loading");
       }
