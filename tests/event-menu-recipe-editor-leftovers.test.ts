@@ -21,10 +21,14 @@ import {
   recipeSearchFromTypedQuery,
   recipeSearchTrapAppliesTo,
   CREATE_NAME_AUTOCOMPLETE,
+  createNameAfterArmPointer,
   createNameAfterGuardedInput,
+  createNameAfterSearchActivity,
   createNameAfterSearchInput,
   createNameIsUserTypedInput,
   createNamePrefillFromSearch,
+  createNameReadOnly,
+  createNameStartsArmed,
   restoreCreateNameDomValue,
   searchKeyCommitsRecipeLine,
   shouldPreventRecipeAddSubmitFromSearchKey,
@@ -477,5 +481,111 @@ describe("228 leftover: Search typing never writes create-name", () => {
     expect(editor).toContain("eventMenuCreateIngredientAutofillSink");
     expect(CREATE_NAME_AUTOCOMPLETE).not.toBe("off");
     expect(CREATE_NAME_AUTOCOMPLETE).toBe("event-menu-new-ingredient-name");
+  });
+});
+
+describe("229 leftover: create-name is readOnly until armed", () => {
+  it("stays empty for search cilantro/pico and only accepts typing after arm", () => {
+    expect(createNameStartsArmed()).toBe(false);
+    expect(createNameAfterSearchActivity(true)).toBe(false);
+    expect(createNameAfterSearchActivity(false)).toBe(false);
+    expect(createNameAfterArmPointer()).toBe(true);
+    expect(createNameReadOnly(false)).toBe(true);
+    expect(createNameReadOnly(true)).toBe(false);
+
+    let createName = createNamePrefillFromSearch("");
+    expect(createName).toBe("");
+    let armed = createNameStartsArmed();
+    expect(createNameReadOnly(armed)).toBe(true);
+
+    armed = createNameAfterSearchActivity(armed);
+    createName = createNameAfterSearchInput("cilantro", createName);
+    createName = createNameAfterGuardedInput({
+      current: createName,
+      nextValue: "cilantro",
+      focused: "create-name",
+      active: true,
+      inputType: "insertText",
+      armed,
+    });
+    expect(createName).toBe("");
+    const cilantroDom = { value: "cilantro" };
+    restoreCreateNameDomValue(cilantroDom, createName);
+    expect(cilantroDom.value).toBe("");
+
+    armed = createNameAfterSearchActivity(armed);
+    createName = createNameAfterSearchInput("pico", createName);
+    createName = createNameAfterGuardedInput({
+      current: createName,
+      nextValue: "pico",
+      focused: "create-name",
+      active: true,
+      inputType: "insertText",
+      armed,
+    });
+    expect(createName).toBe("");
+    const picoDom = { value: "pico" };
+    restoreCreateNameDomValue(picoDom, createName);
+    expect(picoDom.value).toBe("");
+
+    armed = createNameAfterArmPointer();
+    expect(createNameReadOnly(armed)).toBe(false);
+    createName = createNameAfterGuardedInput({
+      current: createName,
+      nextValue: "xyz",
+      focused: "create-name",
+      active: true,
+      inputType: "insertText",
+      armed,
+    });
+    expect(createName).toBe("xyz");
+
+    armed = createNameAfterSearchActivity(armed);
+    expect(createNameReadOnly(armed)).toBe(true);
+    createName = createNameAfterGuardedInput({
+      current: createName,
+      nextValue: "cilantro",
+      focused: "create-name",
+      active: true,
+      inputType: "insertText",
+      armed,
+    });
+    expect(createName).toBe("xyz");
+
+    expect(editor).toContain("createNameStartsArmed");
+    expect(editor).toContain("createNameAfterSearchActivity");
+    expect(editor).toContain("createNameAfterArmPointer");
+    expect(editor).toContain("createNameReadOnly");
+    expect(editor).toContain("readOnly={createNameReadOnly(createNameArmed)}");
+    expect(editor).toContain("onPointerDown={armCreateNameField}");
+    expect(editor).toContain("onClick={armCreateNameField}");
+    expect(editor).toContain("armCreateNameField()");
+    expect(editor).toContain("disarmCreateNameField()");
+    expect(editor).not.toContain("showCreate");
+    expect(editor).not.toContain("key={ingredientQuery}");
+    expect(editor).not.toMatch(/setCreateName\s*\(\s*ingredientQuery/);
+    expect(editor).not.toMatch(/setCreateName\([^)]*ingredientQuery/);
+    expect(editor).not.toMatch(
+      /name="newIngredientName"[\s\S]{0,160}value=\{ingredientQuery/,
+    );
+
+    const applyAt = editor.indexOf("function applySearchState");
+    expect(applyAt).toBeGreaterThan(-1);
+    const applyBlock = editor.slice(
+      applyAt,
+      editor.indexOf("function applySearchDomInput"),
+    );
+    expect(applyBlock).not.toContain("setCreateName");
+    expect(applyBlock).not.toContain("createName");
+
+    const nameAt = editor.indexOf('name="newIngredientName"');
+    expect(nameAt).toBeGreaterThan(-1);
+    const nameBlock = editor.slice(nameAt, nameAt + 400);
+    expect(nameBlock).toContain("onKeyDown={trapSingleKeyNav}");
+    expect(nameBlock).toContain('type="text"');
+    expect(editor).toMatch(
+      /onKeyDown=\{trapSingleKeyNav\}[\s\S]{0,160}data-testid="event-menu-create-ingredient-name"/,
+    );
+    expect(editor).toContain('type="search"');
   });
 });

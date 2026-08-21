@@ -162,7 +162,11 @@ export function createNameAfterGuardedInput(input: {
   focused: RecipeEditorField;
   active?: boolean;
   inputType?: string;
+  armed?: boolean;
 }): string {
+  if (input.armed === false) {
+    return input.current;
+  }
   if (recipeEditorKeyOwner(input.focused) !== "create-name") {
     return input.current;
   }
@@ -187,3 +191,23 @@ export function restoreCreateNameDomValue(
 
 /** Chrome must not pair create-name with the type=search catalog field. */
 export const CREATE_NAME_AUTOCOMPLETE = "event-menu-new-ingredient-name";
+
+/** Create-name starts inert so Search keys cannot land there. */
+export function createNameStartsArmed(): boolean {
+  return false;
+}
+
+/** Search focus or input locks create-name before the next key. */
+export function createNameAfterSearchActivity(_armed = true): boolean {
+  return false;
+}
+
+/** Pointer on create-name or the Create ingredient button arms it. */
+export function createNameAfterArmPointer(): boolean {
+  return true;
+}
+
+/** Unarmed create-name is readOnly so the browser cannot write it. */
+export function createNameReadOnly(armed: boolean): boolean {
+  return !armed;
+}
