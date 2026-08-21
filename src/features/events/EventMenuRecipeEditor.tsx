@@ -30,6 +30,12 @@ import {
   parseEventMenuCreateIngredient,
   resolveEventMenuRecipeIngredientId,
 } from "./eventMenuRecipeIngredient";
+import {
+  RECIPE_QUANTITY_INPUT_MODE,
+  RECIPE_QUANTITY_INPUT_TYPE,
+  commitRecipeQuantity,
+  formatRecipeQuantity,
+} from "./eventMenuRecipeQuantity";
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 import {
   CREATE_NAME_AUTOCOMPLETE,
@@ -277,16 +283,17 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     }
     const form = event.currentTarget;
     const data = new FormData(form);
-    const quantity = Number(data.get("quantity") ?? 0);
+    const qtyCommit = commitRecipeQuantity(data.get("quantity"));
     const ingredientId = resolveEventMenuRecipeIngredientId(
       liveIngredients,
       selectedIngredientId,
       ingredientQuery,
     );
-    if (!ingredientId || !(quantity > 0)) {
+    if (!ingredientId || !qtyCommit.ok) {
       setError("Pick an ingredient and a per-serving quantity.");
       return;
     }
+    const quantity = qtyCommit.quantity;
     setBusy("add-ingredient");
     setError(null);
     try {
@@ -423,12 +430,15 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                     onSubmit={(event) => {
                       event.preventDefault();
                       const data = new FormData(event.currentTarget);
-                      const quantity = Number(data.get("quantity") ?? 0);
+                      const qtyCommit = commitRecipeQuantity(
+                        data.get("quantity"),
+                      );
                       const nextUnit = String(data.get("unit") ?? line.unit);
-                      if (!(quantity > 0)) {
-                        setError("Recipe quantity must be greater than 0.");
+                      if (!qtyCommit.ok) {
+                        setError(qtyCommit.error);
                         return;
                       }
+                      const quantity = qtyCommit.quantity;
                       setBusy(`qty:${line._id}`);
                       setError(null);
                       void adjustQuantity({
@@ -455,10 +465,11 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                       <input
                         className="field-input w-24"
                         name="quantity"
-                        type="number"
-                        min={0}
-                        step="any"
-                        defaultValue={line.quantity}
+                        type={RECIPE_QUANTITY_INPUT_TYPE}
+                        inputMode={RECIPE_QUANTITY_INPUT_MODE}
+                        autoComplete="off"
+                        spellCheck={false}
+                        defaultValue={formatRecipeQuantity(line.quantity)}
                         data-testid="event-menu-recipe-qty"
                       />
                     </label>
@@ -604,10 +615,10 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                 className="field-input w-24"
                 id="event-menu-recipe-add-qty"
                 name="quantity"
-                type="number"
-                min={0}
-                step="any"
-                defaultValue={1}
+                type={RECIPE_QUANTITY_INPUT_TYPE}
+                inputMode={RECIPE_QUANTITY_INPUT_MODE}
+                spellCheck={false}
+                defaultValue={formatRecipeQuantity(1)}
                 data-testid="event-menu-recipe-add-qty"
                 onMouseDown={(event) => {
                   rememberKeyOwner("qty");
