@@ -41,6 +41,9 @@ import {
   formatRecipeQuantity,
   persistRecipeQuantity,
   recipeQuantityCommitError,
+  recipeQuantityDraftAfterSave,
+  recipeQuantityDraftAfterType,
+  recipeQuantityDraftText,
 } from "../src/features/events/eventMenuRecipeQuantity";
 
 const editor = readFileSync(
@@ -635,10 +638,14 @@ describe("Save qty leftover: typed decimals persist exactly", () => {
 
     const saveAt = editor.indexOf('data-testid="event-menu-recipe-qty"');
     expect(saveAt).toBeGreaterThan(-1);
-    const saveBlock = editor.slice(Math.max(0, saveAt - 360), saveAt + 80);
+    const saveBlock = editor.slice(Math.max(0, saveAt - 1400), saveAt + 80);
     expect(saveBlock).toContain("type={RECIPE_QUANTITY_INPUT_TYPE}");
     expect(saveBlock).toContain("inputMode={RECIPE_QUANTITY_INPUT_MODE}");
-    expect(saveBlock).toContain("formatRecipeQuantity(line.quantity)");
+    expect(saveBlock).toContain("recipeQuantityDraftText");
+    expect(saveBlock).not.toContain(
+      "defaultValue={formatRecipeQuantity(line.quantity)}",
+    );
+    expect(saveBlock).not.toContain("key={line.quantity}");
     expect(saveBlock).not.toContain('type="number"');
     expect(saveBlock).not.toContain("trapSingleKeyNav");
     expect(saveBlock).not.toContain('Number(data.get("quantity")');
@@ -655,6 +662,50 @@ describe("Save qty leftover: typed decimals persist exactly", () => {
     expect(kitchen).toContain("type={RECIPE_QUANTITY_INPUT_TYPE}");
     expect(kitchen).not.toMatch(
       /data-testid="kitchen-dish-recipe-qty"[\s\S]{0,80}type="number"/,
+    );
+  });
+});
+
+describe("231 leftover: saved 0.082 does not steal the 0.062 draft", () => {
+  it("keeps typed 0.062 while the parent still holds 0.082", () => {
+    let drafts: Record<string, string> = {};
+    expect(recipeQuantityDraftText(drafts, "white-onion", 0.082)).toBe("0.082");
+
+    drafts = recipeQuantityDraftAfterType(drafts, "white-onion", "0.0");
+    expect(recipeQuantityDraftText(drafts, "white-onion", 0.082)).toBe("0.0");
+
+    drafts = recipeQuantityDraftAfterType(drafts, "white-onion", "0.06");
+    expect(recipeQuantityDraftText(drafts, "white-onion", 0.082)).toBe("0.06");
+    expect(recipeQuantityDraftText(drafts, "white-onion", 0.082)).not.toBe(
+      "0.08",
+    );
+
+    drafts = recipeQuantityDraftAfterType(drafts, "white-onion", "0.062");
+    expect(recipeQuantityDraftText(drafts, "white-onion", 0.082)).toBe("0.062");
+    expect(recipeQuantityDraftText(drafts, "white-onion", 0.082)).not.toBe(
+      "0.082",
+    );
+    expect(persistRecipeQuantity("0.062")).toBe(0.062);
+    expect(persistRecipeQuantity("0.062")).not.toBe(0.082);
+    expect(commitRecipeQuantity("0.062")).toEqual({
+      ok: true,
+      quantity: 0.062,
+    });
+
+    drafts = recipeQuantityDraftAfterSave(
+      drafts,
+      "white-onion",
+      persistRecipeQuantity("0.062") ?? 0,
+    );
+    expect(recipeQuantityDraftText(drafts, "white-onion", 0.062)).toBe("0.062");
+
+    expect(editor).toContain("recipeQuantityDraftText");
+    expect(editor).toContain("recipeQuantityDraftAfterType");
+    expect(editor).toContain("recipeQuantityDraftAfterSave");
+    expect(editor).toContain("qtyDrafts");
+    expect(editor).not.toContain("key={line.quantity}");
+    expect(editor).not.toMatch(
+      /defaultValue=\{formatRecipeQuantity\(line\.quantity\)\}/,
     );
   });
 });
