@@ -13,6 +13,12 @@ import {
 } from "./import/UnitOfMeasureMapper";
 import { useActionPrompt } from "../../ui/action-prompt";
 import { TableSkeleton } from "../../ui/primitives";
+import {
+  RECIPE_QUANTITY_INPUT_MODE,
+  RECIPE_QUANTITY_INPUT_TYPE,
+  commitRecipeQuantity,
+  formatRecipeQuantity,
+} from "../events/eventMenuRecipeQuantity";
 import { applyDishIngredientRemoval } from "./dishIngredientRemoval";
 
 type Props = {
@@ -52,15 +58,19 @@ export function DishIngredientsPanel({ dishId }: Props) {
     const form = event.currentTarget;
     const data = new FormData(form);
     const ingredientId = String(data.get("ingredientId") ?? "");
-    const quantity = Number(data.get("quantity") ?? 0);
+    const qtyCommit = commitRecipeQuantity(
+      data.get("quantity"),
+      "Quantity per serving must be greater than zero.",
+    );
     if (!ingredientId) {
       setError("Pick an ingredient.");
       return;
     }
-    if (!(quantity > 0)) {
-      setError("Quantity per serving must be greater than zero.");
+    if (!qtyCommit.ok) {
+      setError(qtyCommit.error);
       return;
     }
+    const quantity = qtyCommit.quantity;
     setBusy("add");
     setError(null);
     setNotice(null);
@@ -94,12 +104,16 @@ export function DishIngredientsPanel({ dishId }: Props) {
   ) {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    const quantity = Number(data.get("quantity") ?? 0);
+    const qtyCommit = commitRecipeQuantity(
+      data.get("quantity"),
+      "Quantity per serving must be greater than zero.",
+    );
     const nextUnit = String(data.get("unit") ?? line.unit);
-    if (!(quantity > 0)) {
-      setError("Quantity per serving must be greater than zero.");
+    if (!qtyCommit.ok) {
+      setError(qtyCommit.error);
       return;
     }
+    const quantity = qtyCommit.quantity;
     setBusy(`qty:${line._id}`);
     setError(null);
     setNotice(null);
@@ -204,10 +218,11 @@ export function DishIngredientsPanel({ dishId }: Props) {
                   <input
                     className="input mt-1 w-24"
                     name="quantity"
-                    type="number"
-                    min={0}
-                    step="any"
-                    defaultValue={line.quantity}
+                    type={RECIPE_QUANTITY_INPUT_TYPE}
+                    inputMode={RECIPE_QUANTITY_INPUT_MODE}
+                    autoComplete="off"
+                    spellCheck={false}
+                    defaultValue={formatRecipeQuantity(line.quantity)}
                     data-testid="kitchen-dish-recipe-qty"
                   />
                 </label>
@@ -272,11 +287,11 @@ export function DishIngredientsPanel({ dishId }: Props) {
           <span className="meta-term">Per serving</span>
           <input
             name="quantity"
-            type="number"
-            min={0}
-            // Per-serving rates are finer than cents on the real sheets.
-            step="any"
-            defaultValue={0}
+            type={RECIPE_QUANTITY_INPUT_TYPE}
+            inputMode={RECIPE_QUANTITY_INPUT_MODE}
+            autoComplete="off"
+            spellCheck={false}
+            defaultValue=""
             className="input mt-1"
           />
         </label>

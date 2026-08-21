@@ -33,6 +33,15 @@ import {
   searchKeyCommitsRecipeLine,
   shouldPreventRecipeAddSubmitFromSearchKey,
 } from "../src/features/events/eventMenuRecipeSearch";
+import {
+  RECIPE_QUANTITY_COMMIT_ERROR,
+  RECIPE_QUANTITY_INPUT_MODE,
+  RECIPE_QUANTITY_INPUT_TYPE,
+  commitRecipeQuantity,
+  formatRecipeQuantity,
+  persistRecipeQuantity,
+  recipeQuantityCommitError,
+} from "../src/features/events/eventMenuRecipeQuantity";
 
 const editor = readFileSync(
   "src/features/events/EventMenuRecipeEditor.tsx",
@@ -40,6 +49,10 @@ const editor = readFileSync(
 );
 const tab = readFileSync("src/features/events/EventMenuTab.tsx", "utf8");
 const nav = readFileSync("src/app/shell/singleKeyNav.ts", "utf8");
+const kitchen = readFileSync(
+  "src/features/kitchen/DishIngredientsPanel.tsx",
+  "utf8",
+);
 
 describe("218 leftover: Per serving keeps focus and keys", () => {
   it("trap applies to search and create-name only, never the qty field", () => {
@@ -587,5 +600,61 @@ describe("229 leftover: create-name is readOnly until armed", () => {
       /onKeyDown=\{trapSingleKeyNav\}[\s\S]{0,160}data-testid="event-menu-create-ingredient-name"/,
     );
     expect(editor).toContain('type="search"');
+  });
+});
+
+describe("Save qty leftover: typed decimals persist exactly", () => {
+  it("round-trips 0.02 and 0.062 through persist/format", () => {
+    expect(formatRecipeQuantity(persistRecipeQuantity("0.02"))).toBe("0.02");
+    expect(formatRecipeQuantity(persistRecipeQuantity("0.062"))).toBe("0.062");
+    expect(persistRecipeQuantity("0.02")).toBe(0.02);
+    expect(persistRecipeQuantity("0.062")).toBe(0.062);
+    expect(persistRecipeQuantity("0.02")).not.toBe(0.02002);
+    expect(persistRecipeQuantity("0.062")).not.toBe(0.082);
+    expect(formatRecipeQuantity(0.02002)).toBe("0.02");
+    expect(formatRecipeQuantity(0.03003)).toBe("0.03");
+    expect(formatRecipeQuantity(0.062)).toBe("0.062");
+    expect(commitRecipeQuantity("0.02")).toEqual({ ok: true, quantity: 0.02 });
+    expect(commitRecipeQuantity("0.062")).toEqual({
+      ok: true,
+      quantity: 0.062,
+    });
+    expect(recipeQuantityCommitError("0.02")).toBeNull();
+    expect(recipeQuantityCommitError("0.062")).toBeNull();
+    expect(recipeQuantityCommitError("0.")).toBe(RECIPE_QUANTITY_COMMIT_ERROR);
+    expect(recipeQuantityCommitError("")).toBe(RECIPE_QUANTITY_COMMIT_ERROR);
+    expect(RECIPE_QUANTITY_INPUT_TYPE).toBe("text");
+    expect(RECIPE_QUANTITY_INPUT_MODE).toBe("decimal");
+
+    expect(editor).toContain("commitRecipeQuantity");
+    expect(editor).toContain("formatRecipeQuantity");
+    expect(editor).toContain("RECIPE_QUANTITY_INPUT_TYPE");
+    expect(editor).toContain("RECIPE_QUANTITY_INPUT_MODE");
+    expect(kitchen).toContain("commitRecipeQuantity");
+    expect(kitchen).toContain("formatRecipeQuantity");
+
+    const saveAt = editor.indexOf('data-testid="event-menu-recipe-qty"');
+    expect(saveAt).toBeGreaterThan(-1);
+    const saveBlock = editor.slice(Math.max(0, saveAt - 360), saveAt + 80);
+    expect(saveBlock).toContain("type={RECIPE_QUANTITY_INPUT_TYPE}");
+    expect(saveBlock).toContain("inputMode={RECIPE_QUANTITY_INPUT_MODE}");
+    expect(saveBlock).toContain("formatRecipeQuantity(line.quantity)");
+    expect(saveBlock).not.toContain('type="number"');
+    expect(saveBlock).not.toContain("trapSingleKeyNav");
+    expect(saveBlock).not.toContain('Number(data.get("quantity")');
+
+    const addAt = editor.indexOf('data-testid="event-menu-recipe-add-qty"');
+    const addBlock = editor.slice(Math.max(0, addAt - 360), addAt + 80);
+    expect(addBlock).toContain("type={RECIPE_QUANTITY_INPUT_TYPE}");
+    expect(addBlock).not.toContain('type="number"');
+    expect(addBlock).not.toContain("trapSingleKeyNav");
+
+    expect(editor).not.toMatch(
+      /data-testid="event-menu-recipe-qty"[\s\S]{0,80}type="number"/,
+    );
+    expect(kitchen).toContain("type={RECIPE_QUANTITY_INPUT_TYPE}");
+    expect(kitchen).not.toMatch(
+      /data-testid="kitchen-dish-recipe-qty"[\s\S]{0,80}type="number"/,
+    );
   });
 });
