@@ -33,8 +33,12 @@ import {
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 import {
   CREATE_NAME_AUTOCOMPLETE,
+  createNameAfterArmPointer,
   createNameAfterGuardedInput,
+  createNameAfterSearchActivity,
   createNamePrefillFromSearch,
+  createNameReadOnly,
+  createNameStartsArmed,
   restoreCreateNameDomValue,
   recipeAddSubmitSource,
   recipeEditorFocusAfterCatalogPick,
@@ -79,10 +83,12 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
   const [createName, setCreateName] = useState(() =>
     createNamePrefillFromSearch(""),
   );
+  const [createNameArmed, setCreateNameArmed] = useState(createNameStartsArmed);
   const addQtyRef = useRef<HTMLInputElement>(null);
   const newIngredientInputRef = useRef<HTMLInputElement>(null);
   const newIngredientStateRef = useRef(createName);
   newIngredientStateRef.current = createName;
+  const createNameArmedRef = useRef(createNameStartsArmed());
   const keyOwnerRef = useRef<RecipeEditorField>("other");
   const searchHeldEmptyRef = useRef(true);
   const searchStateRef = useRef<RecipeSearchState>(recipeSearchCleared());
@@ -102,6 +108,29 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     );
   }
 
+  function applyCreateNameArmed(next: boolean) {
+    createNameArmedRef.current = next;
+    setCreateNameArmed(next);
+    const field = newIngredientInputRef.current;
+    if (field) {
+      field.readOnly = createNameReadOnly(next);
+      if (createNameReadOnly(next)) {
+        restoreCreateNameDomValue(field, newIngredientStateRef.current);
+      }
+    }
+  }
+
+  function armCreateNameField() {
+    applyCreateNameArmed(createNameAfterArmPointer());
+    rememberKeyOwner("create-name");
+  }
+
+  function disarmCreateNameField() {
+    applyCreateNameArmed(
+      createNameAfterSearchActivity(createNameArmedRef.current),
+    );
+  }
+
   function applySearchState(state: RecipeSearchState, heldEmpty: boolean) {
     searchStateRef.current = state;
     searchHeldEmptyRef.current = heldEmpty;
@@ -115,6 +144,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     nextValue: string,
     inputType?: string,
   ) {
+    disarmCreateNameField();
     const result = recipeSearchAfterGuardedInput({
       current: searchStateRef.current,
       nextValue,
@@ -131,6 +161,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
 
   function onRecipeSearchFocus(event: { currentTarget: HTMLInputElement }) {
     rememberKeyOwner("search");
+    disarmCreateNameField();
     const next = recipeSearchAfterFocus(searchStateRef.current);
     if (event.currentTarget.value !== next.query) {
       event.currentTarget.value = next.query;
@@ -156,6 +187,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     const incoming = event.target.value;
     const focused = keyOwnerRef.current;
     const inputType = (event.nativeEvent as InputEvent).inputType;
+    const armed = createNameArmedRef.current;
     setCreateName((current) => {
       const next = createNameAfterGuardedInput({
         current,
@@ -163,6 +195,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
         focused,
         active: document.activeElement === event.currentTarget,
         inputType,
+        armed,
       });
       if (event.currentTarget.value !== next) {
         event.currentTarget.value = next;
@@ -312,6 +345,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
         });
         applySearchState(recipeSearchCleared(), true);
         setCreateName(createNamePrefillFromSearch(""));
+        disarmCreateNameField();
         form.reset();
       }
     } catch (cause) {
@@ -613,7 +647,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                 const field = document.querySelector<HTMLInputElement>(
                   '[data-testid="event-menu-create-ingredient-name"]',
                 );
-                rememberKeyOwner("create-name");
+                armCreateNameField();
                 field?.focus();
               }}
             >
@@ -704,11 +738,16 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
               value={createName}
               placeholder="Carne asada"
               required
-              autoComplete={CREATE_NAME_AUTOCOMPLETE}
-              spellCheck={false}
               onKeyDown={trapSingleKeyNav}
               data-testid="event-menu-create-ingredient-name"
-              onFocus={() => rememberKeyOwner("create-name")}
+              readOnly={createNameReadOnly(createNameArmed)}
+              autoComplete={CREATE_NAME_AUTOCOMPLETE}
+              spellCheck={false}
+              onPointerDown={armCreateNameField}
+              onClick={armCreateNameField}
+              onFocus={() => {
+                if (createNameArmedRef.current) rememberKeyOwner("create-name");
+              }}
               onChange={onCreateNameChange}
             />
           </label>
