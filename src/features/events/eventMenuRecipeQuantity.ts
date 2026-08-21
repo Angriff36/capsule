@@ -81,3 +81,34 @@ export function commitRecipeQuantity(
   if (quantity == null) return { ok: false, error: message };
   return { ok: true, quantity };
 }
+
+export type RecipeQuantityDraftMap = Record<string, string>;
+
+/**
+ * Saved 0.082 must not replace an in-progress "0.062". Init from saved once;
+ * only overwrite the draft after a successful Save.
+ */
+export function recipeQuantityDraftText(
+  drafts: Readonly<RecipeQuantityDraftMap>,
+  lineId: string,
+  savedQuantity: unknown,
+): string {
+  if (Object.hasOwn(drafts, lineId)) return drafts[lineId] ?? "";
+  return formatRecipeQuantity(savedQuantity);
+}
+
+export function recipeQuantityDraftAfterType(
+  drafts: Readonly<RecipeQuantityDraftMap>,
+  lineId: string,
+  text: string,
+): RecipeQuantityDraftMap {
+  return { ...drafts, [lineId]: text };
+}
+
+export function recipeQuantityDraftAfterSave(
+  drafts: Readonly<RecipeQuantityDraftMap>,
+  lineId: string,
+  committed: number,
+): RecipeQuantityDraftMap {
+  return { ...drafts, [lineId]: formatRecipeQuantity(committed) };
+}

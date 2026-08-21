@@ -35,6 +35,9 @@ import {
   RECIPE_QUANTITY_INPUT_TYPE,
   commitRecipeQuantity,
   formatRecipeQuantity,
+  recipeQuantityDraftAfterSave,
+  recipeQuantityDraftAfterType,
+  recipeQuantityDraftText,
 } from "./eventMenuRecipeQuantity";
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 import {
@@ -90,6 +93,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     createNamePrefillFromSearch(""),
   );
   const [createNameArmed, setCreateNameArmed] = useState(createNameStartsArmed);
+  const [qtyDrafts, setQtyDrafts] = useState<Record<string, string>>({});
   const addQtyRef = useRef<HTMLInputElement>(null);
   const newIngredientInputRef = useRef<HTMLInputElement>(null);
   const newIngredientStateRef = useRef(createName);
@@ -439,6 +443,13 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                         return;
                       }
                       const quantity = qtyCommit.quantity;
+                      setQtyDrafts((current) =>
+                        recipeQuantityDraftAfterSave(
+                          current,
+                          String(line._id),
+                          quantity,
+                        ),
+                      );
                       setBusy(`qty:${line._id}`);
                       setError(null);
                       void adjustQuantity({
@@ -469,7 +480,18 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                         inputMode={RECIPE_QUANTITY_INPUT_MODE}
                         autoComplete="off"
                         spellCheck={false}
-                        defaultValue={formatRecipeQuantity(line.quantity)}
+                        value={recipeQuantityDraftText(
+                          qtyDrafts,
+                          String(line._id),
+                          line.quantity,
+                        )}
+                        onChange={(event) => {
+                          const lineId = String(line._id);
+                          const text = event.target.value;
+                          setQtyDrafts((current) =>
+                            recipeQuantityDraftAfterType(current, lineId, text),
+                          );
+                        }}
                         data-testid="event-menu-recipe-qty"
                       />
                     </label>
