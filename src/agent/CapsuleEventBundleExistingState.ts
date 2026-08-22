@@ -10,8 +10,15 @@ export interface CapsuleEventBundleDirectory {
   people: Array<{ id: string; name: string }>;
   vendors: Array<{ id: string; name: string }>;
   ingredients: Array<{ id: string; name: string }>;
-  invoiceNumbers: string[];
-  proposalNumbers: string[];
+  invoices: Array<{ id: string; invoiceNumber: string; status: string }>;
+  /** Payments on the tenant's invoices, amounts in cents. */
+  payments: Array<{
+    id: string;
+    invoiceId: string;
+    amountCents: number;
+    status: string;
+  }>;
+  proposals: Array<{ id: string; proposalNumber: string; status: string }>;
   vendorOrderNumbers: string[];
 }
 

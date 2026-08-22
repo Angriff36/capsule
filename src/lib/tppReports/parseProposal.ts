@@ -119,6 +119,8 @@ function readPricedItems(rows: readonly string[][]): BundleMenuItem[] {
 function readPayments(rows: readonly string[][]): BundlePayment[] {
   const payments: BundlePayment[] = [];
   let active = false;
+  let appliedColumn = -1;
+  let platformColumn = -1;
 
   for (const row of rows) {
     if (
@@ -126,6 +128,10 @@ function readPayments(rows: readonly string[][]): BundlePayment[] {
       (row[1] ?? "").trim() === "Method"
     ) {
       active = true;
+      // "Event" is what the client paid toward the event; "Amount" adds the
+      // platform fee, which never applies to the balance.
+      appliedColumn = row.findIndex((cell) => cell.trim() === "Event");
+      platformColumn = row.findIndex((cell) => cell.trim() === "Platform");
       continue;
     }
     if (!active) continue;
@@ -142,8 +148,25 @@ function readPayments(rows: readonly string[][]): BundlePayment[] {
     if (reference.length > 0) payment.reference = reference;
     const note = (row[3] ?? "").trim();
     if (note.length > 0) payment.note = note;
-    const amount = parseMoneyCents(row.at(-1));
+    const gross = parseMoneyCents(row.at(-1));
+    const applied =
+      appliedColumn >= 0 ? parseMoneyCents(row[appliedColumn]) : undefined;
+    const amount = applied ?? gross;
     if (amount !== undefined) payment.amountCents = amount;
+    if (gross !== undefined && applied !== undefined && gross !== applied) {
+      const fee =
+        platformColumn >= 0 ? parseMoneyCents(row[platformColumn]) : undefined;
+      const feeText =
+        fee !== undefined
+          ? ` incl. $${(fee / 100).toFixed(2)} platform fee`
+          : "";
+      payment.note = [
+        payment.note,
+        `Charged $${(gross / 100).toFixed(2)}${feeText}; $${(applied / 100).toFixed(2)} applied to the event.`,
+      ]
+        .filter(Boolean)
+        .join(" ");
+    }
     payments.push(payment);
   }
   return payments;

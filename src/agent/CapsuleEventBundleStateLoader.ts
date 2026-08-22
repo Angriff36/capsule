@@ -48,6 +48,7 @@ export class CapsuleEventBundleStateLoader {
       vendors,
       ingredients,
       invoices,
+      payments,
       proposals,
       vendorOrders,
     ] = await Promise.all([
@@ -56,6 +57,7 @@ export class CapsuleEventBundleStateLoader {
       client.query(api.queries.listVendor, {}),
       client.query(api.queries.listIngredient, {}),
       client.query(api.queries.listInvoice, {}),
+      client.query(api.queries.listPayment, {}),
       client.query(api.queries.listProposal, {}),
       client.query(api.queries.listVendorOrder, {}),
     ]);
@@ -76,12 +78,28 @@ export class CapsuleEventBundleStateLoader {
       ingredients: rows(ingredients)
         .filter(live)
         .map((row) => ({ id: String(row._id), name: text(row.name) })),
-      invoiceNumbers: rows(invoices)
+      invoices: rows(invoices)
         .filter(live)
-        .map((row) => text(row.invoiceNumber)),
-      proposalNumbers: rows(proposals)
+        .map((row) => ({
+          id: String(row._id),
+          invoiceNumber: text(row.invoiceNumber),
+          status: text(row.status),
+        })),
+      payments: rows(payments)
         .filter(live)
-        .map((row) => text(row.proposalNumber)),
+        .map((row) => ({
+          id: String(row._id),
+          invoiceId: String(row.invoiceId),
+          amountCents: Math.round(Number(row.amount ?? 0) * 100),
+          status: text(row.status),
+        })),
+      proposals: rows(proposals)
+        .filter(live)
+        .map((row) => ({
+          id: String(row._id),
+          proposalNumber: text(row.proposalNumber),
+          status: text(row.status),
+        })),
       vendorOrderNumbers: rows(vendorOrders)
         .filter(live)
         .map((row) => text(row.orderNumber)),

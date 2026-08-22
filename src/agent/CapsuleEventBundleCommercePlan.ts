@@ -1,5 +1,4 @@
 import type { EventBundle } from "../lib/tppReports/eventBundle";
-import { toEpochMillis } from "../lib/tppReports/reportValues";
 import type { CapsuleEventBundleContext } from "./CapsuleEventBundleExistingState";
 import {
   centsToDollars,
@@ -9,6 +8,7 @@ import {
   venueAddressText,
   type PlannedStep,
 } from "./CapsuleEventBundleShared";
+import { planBillingSteps } from "./CapsuleEventBundleBillingPlan";
 import { planStaffSteps } from "./CapsuleEventBundleStaffPlan";
 
 /**
@@ -29,29 +29,14 @@ export interface CommercePlanInput {
 export interface CommercePlanResult {
   steps: PlannedStep[];
   warnings: string[];
+  /** Ids that already exist, keyed by the ref the steps use. */
+  seedIds: Record<string, string>;
   counts: {
     clientContacts: number;
     proposalLines: number;
     payments: number;
     staffAssignments: number;
   };
-}
-
-function paymentMethod(
-  method: string | undefined,
-): "card" | "check" | "cash" | "ach" | "other" {
-  const text = (method ?? "").toLowerCase();
-  if (/visa|master|amex|americanexpress|discover|card|credit/.test(text)) {
-    return "card";
-  }
-  if (/check|cheque/.test(text)) return "check";
-  if (/cash/.test(text)) return "cash";
-  if (/ach|wire|bank|transfer/.test(text)) return "ach";
-  return "other";
-}
-
-function dateEpoch(date: string | undefined): number | undefined {
-  return date === undefined ? undefined : toEpochMillis(date, 0);
 }
 
 export function planCommerceSteps(
@@ -61,6 +46,7 @@ export function planCommerceSteps(
   const existing = context.existing;
   const steps: PlannedStep[] = [];
   const warnings: string[] = [];
+  const seedIds: Record<string, string> = {};
   const counts = {
     clientContacts: 0,
     proposalLines: 0,
@@ -208,8 +194,17 @@ export function planCommerceSteps(
       ? `TPP status: ${bundle.header.status}.`
       : undefined;
 
-    const proposalKnown = context.directory?.proposalNumbers.includes(invoice);
-    if (!proposalKnown) {
+    // "2- Sales Lock" and the like mean the client signed: the proposal is
+    // accepted and the invoice is out, not sitting as drafts.
+    const signed = /sales\s*lock|contract|signed|confirmed|locked|final/i.test(
+      bundle.header.status ?? "",
+    );
+
+    const knownProposal = context.directory?.proposals.find(
+      (row) => row.proposalNumber === invoice,
+    );
+    if (knownProposal) seedIds.proposal = knownProposal.id;
+    if (!knownProposal) {
       steps.push({
         capabilityId: "Proposal.draft",
         ref: "proposal",
@@ -308,79 +303,41 @@ export function planCommerceSteps(
       }
     }
 
-    const invoiceKnown = context.directory?.invoiceNumbers.includes(invoice);
-    if (invoiceKnown) {
-      if (bundle.payments.length > 0) {
-        warnings.push(
-          `Invoice ${invoice} already exists, so its ${bundle.payments.length} payment(s) were left as they are.`,
-        );
-      }
-    } else {
-      steps.push({
-        capabilityId: "Invoice.issue",
-        ref: "invoice",
-        label: `Issue invoice ${invoice}`,
-        idempotencySuffix: `invoice:${invoice}`,
-        resolveRefs: ["clientId", "eventId"],
-        args: {
-          clientId: "client",
-          eventId: "event",
-          invoiceNumber: invoice,
-          ...money,
-          dueDate: dateEpoch(totals.finalBalanceDueDate),
-          notes: [
-            `Imported from the TPP proposal for invoice ${invoice}.`,
-            totals.depositCents !== undefined
-              ? `Deposit $${centsToDollars(totals.depositCents).toFixed(2)}${totals.depositDueDate ? ` due ${totals.depositDueDate}` : ""}.`
-              : undefined,
-            statusNote,
-          ]
-            .filter(Boolean)
-            .join(" "),
-        },
-      });
-      if (totals.depositCents !== undefined && totals.depositCents > 0) {
+    if (signed) {
+      const proposalStatus = knownProposal?.status ?? "draft";
+      if (proposalStatus === "draft") {
         steps.push({
-          capabilityId: "Invoice.setDeposit",
-          ref: "invoice-deposit",
-          label: "Set the deposit on the invoice",
-          idempotencySuffix: `invoice-deposit:${invoice}`,
+          capabilityId: "Proposal.send",
+          ref: "proposal-sent",
+          label: `Mark proposal ${invoice} sent`,
+          idempotencySuffix: `proposal-send:${invoice}`,
           resolveRefs: ["docId"],
-          args: {
-            docId: "invoice",
-            depositAmount: centsToDollars(totals.depositCents),
-          },
+          args: { docId: "proposal" },
         });
       }
-      bundle.payments.forEach((payment, index) => {
-        if (payment.amountCents === undefined || payment.amountCents < 100) {
-          return;
-        }
-        counts.payments += 1;
+      if (["draft", "sent", "viewed"].includes(proposalStatus)) {
         steps.push({
-          capabilityId: "Payment.record",
-          ref: `payment:${index}`,
-          label: `Record payment of $${centsToDollars(payment.amountCents).toFixed(2)}${payment.date ? ` on ${payment.date}` : ""}`,
-          idempotencySuffix: `payment:${invoice}:${index}:${payment.amountCents}`,
-          resolveRefs: ["invoiceId", "clientId", "eventId"],
-          args: {
-            invoiceId: "invoice",
-            clientId: "client",
-            eventId: "event",
-            amount: centsToDollars(payment.amountCents),
-            method: paymentMethod(payment.method),
-            notes: [
-              payment.date,
-              payment.method,
-              payment.reference,
-              payment.note,
-            ]
-              .filter(Boolean)
-              .join(" · "),
-          },
+          capabilityId: "Proposal.accept",
+          ref: "proposal-accepted",
+          label: `Mark proposal ${invoice} accepted (${bundle.header.status})`,
+          idempotencySuffix: `proposal-accept:${invoice}`,
+          resolveRefs: ["docId", "eventId"],
+          args: { docId: "proposal", eventId: "event" },
         });
-      });
+      }
     }
+
+    const billing = planBillingSteps({
+      bundle,
+      invoice,
+      money,
+      statusNote,
+      signed,
+      context,
+    });
+    steps.push(...billing.steps);
+    Object.assign(seedIds, billing.seedIds);
+    counts.payments += billing.payments;
   }
 
   const staff = planStaffSteps({
@@ -394,5 +351,5 @@ export function planCommerceSteps(
   warnings.push(...staff.warnings);
   counts.staffAssignments = staff.count;
 
-  return { steps, warnings, counts };
+  return { steps, warnings, seedIds, counts };
 }

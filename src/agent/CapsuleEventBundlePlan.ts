@@ -409,6 +409,7 @@ export function buildEventBundlePlan(
   });
   steps.push(...commerce.steps);
   warnings.push(...commerce.warnings);
+  Object.assign(seedIds, commerce.seedIds);
   Object.assign(summary, commerce.counts);
 
   const supply = planSupplySteps({ bundle, invoice, context });

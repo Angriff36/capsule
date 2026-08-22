@@ -157,6 +157,10 @@ describe("runtime proof: TPP event bundle → governed commands", () => {
         "Invoice.issue",
         "Invoice.setDeposit",
         "Payment.record",
+        "Invoice.send",
+        "Payment.settle",
+        "Proposal.send",
+        "Proposal.accept",
       ]),
     );
 
@@ -206,18 +210,29 @@ describe("runtime proof: TPP event bundle → governed commands", () => {
     // The proposal's money, contacts and payment history land as records.
     expect(stored.clientContacts).toHaveLength(1);
     expect(stored.proposals).toHaveLength(1);
+    // The worksheet says "2- Sales Lock": the client signed.
+    expect((stored.proposals[0] as { status?: string }).status).toBe(
+      "accepted",
+    );
     expect(stored.proposalLines).toHaveLength(2);
     const invoice = stored.invoices[0] as {
       invoiceNumber?: string;
       total?: number;
       depositAmount?: number;
+      status?: string;
+      amountPaid?: number;
     };
     expect(stored.invoices).toHaveLength(1);
     expect(invoice.invoiceNumber).toBe("7001");
     expect(invoice.total).toBe(720.8);
     expect(invoice.depositAmount).toBe(200);
     expect(stored.payments).toHaveLength(1);
-    expect((stored.payments[0] as { amount?: number }).amount).toBe(200);
+    const payment = stored.payments[0] as { amount?: number; status?: string };
+    expect(payment.amount).toBe(200);
+    // Settling applies the payment to the sent invoice by reaction.
+    expect(payment.status).toBe("completed");
+    expect(invoice.status).toBe("partial");
+    expect(invoice.amountPaid).toBe(200);
   });
 
   it("attaches to an event that already exists and adds only what is missing", async () => {
@@ -252,6 +267,7 @@ describe("runtime proof: TPP event bundle → governed commands", () => {
       const packList = (await ctx.db.query("packLists").collect())[0];
       const packListItems = await ctx.db.query("packListItems").collect();
       const invoices = await ctx.db.query("invoices").collect();
+      const payments = await ctx.db.query("payments").collect();
       const proposals = await ctx.db.query("proposals").collect();
       const contacts = await ctx.db.query("clientContacts").collect();
       return {
@@ -305,12 +321,28 @@ describe("runtime proof: TPP event bundle → governed commands", () => {
           people: [],
           vendors: [],
           ingredients: [],
-          invoiceNumbers: invoices.map((row) =>
-            String((row as { invoiceNumber?: string }).invoiceNumber ?? ""),
-          ),
-          proposalNumbers: proposals.map((row) =>
-            String((row as { proposalNumber?: string }).proposalNumber ?? ""),
-          ),
+          invoices: invoices.map((row) => ({
+            id: String(row._id),
+            invoiceNumber: String(
+              (row as { invoiceNumber?: string }).invoiceNumber ?? "",
+            ),
+            status: String((row as { status?: string }).status ?? ""),
+          })),
+          payments: payments.map((row) => ({
+            id: String(row._id),
+            invoiceId: String((row as { invoiceId?: unknown }).invoiceId),
+            amountCents: Math.round(
+              Number((row as { amount?: number }).amount ?? 0) * 100,
+            ),
+            status: String((row as { status?: string }).status ?? ""),
+          })),
+          proposals: proposals.map((row) => ({
+            id: String(row._id),
+            proposalNumber: String(
+              (row as { proposalNumber?: string }).proposalNumber ?? "",
+            ),
+            status: String((row as { status?: string }).status ?? ""),
+          })),
           vendorOrderNumbers: [],
         },
       };
