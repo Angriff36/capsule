@@ -3645,3 +3645,165 @@
     grid-column: 1;
   }
 }
+
+/* Phone shell (below 768px): bottom tab bar, "More" sheet, sticky event
+   header, and the event-overview section cards. */
+.mobile-tab-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  flex-shrink: 0;
+  border-top: 1px solid var(--color-line);
+  background: var(--color-panel);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.mobile-tab {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 56px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-ink-3);
+}
+.mobile-tab.active {
+  color: var(--color-ink);
+}
+.mobile-more-sheet {
+  position: fixed;
+  right: 0;
+  bottom: calc(56px + env(safe-area-inset-bottom));
+  left: 0;
+  z-index: 35;
+  max-height: 70dvh;
+  overflow-y: auto;
+  border-top: 1px solid var(--color-line);
+  background: var(--color-panel);
+  box-shadow: 0 -12px 32px -16px rgb(34 30 22 / 0.35);
+}
+.mobile-event-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  margin: 0 calc(-1 * var(--mobile-sheet-pad-x, 1.25rem));
+  padding: 0.5rem var(--mobile-sheet-pad-x, 1.25rem);
+  border-bottom: 1px solid var(--color-line);
+  background: color-mix(in srgb, var(--color-panel) 94%, transparent);
+  backdrop-filter: blur(8px);
+}
+.mobile-section-card {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel);
+}
+.mobile-section-card > header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.85rem 0.4rem;
+}
+.mobile-section-card > header h2 {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.mobile-section-card > div {
+  padding: 0 0.85rem 0.85rem;
+}
+.mobile-row {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 0.6rem;
+  border-top: 1px solid var(--color-line);
+  padding: 0.4rem 0;
+  font-size: var(--text-lg);
+  color: var(--color-ink);
+}
+.mobile-row > * {
+  min-width: 0;
+}
+.mobile-row .mobile-row-main {
+  flex: 1 1 auto;
+}
+.mobile-row .mobile-row-sub {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--color-ink-3);
+}
+.mobile-check {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  accent-color: var(--color-brand);
+}
+@media (max-width: 767px) {
+  .event-detail-tabs button {
+    min-height: 44px;
+  }
+}
+@media (max-width: 767px) {
+  /* `.app-shell-sidebar` is declared inside @layer utilities after Tailwind's
+     own utilities, so `max-md:hidden` on the <aside> loses. Hide it here. */
+  .app-shell-sidebar {
+    display: none;
+  }
+}
+@media (min-width: 768px) {
+  /* Same layering reason as the rail above: these rules are unlayered, so
+     Tailwind's md:hidden cannot override them. Desktop never shows them. */
+  .mobile-tab-bar,
+  .mobile-more-sheet {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Phone acceptance floor: primary content and form controls read at 16px
+     (also stops iOS zooming into focused inputs); captions and chips keep
+     their token sizes. Notched phones in standalone mode get the top inset. */
+  .mobile-row,
+  .mobile-event-header h1,
+  .mobile-section-card > header h2,
+  .mobile-section-card dd,
+  .mobile-section-card > header a,
+  .mobile-section-card p.text-base,
+  .mobile-section-card span.text-base,
+  .mobile-section-card button.btn {
+    font-size: 16px;
+  }
+  .input,
+  .field-input,
+  select,
+  textarea,
+  input:not([type="checkbox"]):not([type="radio"]),
+  .btn:not(.btn-sm) {
+    font-size: 16px;
+  }
+  .app-shell-header {
+    height: auto;
+    min-height: 4rem;
+    padding-top: env(safe-area-inset-top);
+  }
+  .mobile-more-sheet .theme-toggle {
+    width: 44px;
+    height: 44px;
+    margin: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Event actions drawer on phones: every control is a 44px target. */
+  .mobile-actions .btn,
+  .mobile-actions button,
+  .mobile-actions a {
+    min-height: 44px;
+    height: auto;
+  }
+}
