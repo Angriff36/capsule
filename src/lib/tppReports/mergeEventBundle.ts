@@ -157,9 +157,10 @@ function mergeTimeline(
   const board = parts.find((part) => part.source === "battleBoard");
   for (const entry of board?.timeline ?? []) {
     const key = normalizeName(entry.name);
+    // The board rounds times its own way ("6:29 PM" for a 6:30 PM step).
     const match = base.find(
       (existing) =>
-        existing.minutes === entry.minutes &&
+        Math.abs(existing.minutes - entry.minutes) <= 10 &&
         (key.startsWith(normalizeName(existing.name)) ||
           normalizeName(existing.name).startsWith(key)),
     );
@@ -170,9 +171,7 @@ function mergeTimeline(
     match.category ??= entry.category;
     match.team ??= entry.team;
     match.staff ??= entry.staff;
-    if (match.notes === undefined && entry.name !== match.name) {
-      match.notes = entry.name;
-    }
+    match.notes ??= entry.notes;
   }
   return base.sort((a, b) => a.minutes - b.minutes);
 }

@@ -13,6 +13,13 @@ import {
  * library only; a PDF dependency is not worth carrying for one report.
  */
 
+/** One table cell: text that sits together, separated from its neighbours by a column gap. */
+export interface PdfTextCell {
+  /** PDF user-space X of the cell's first glyph. */
+  x: number;
+  text: string;
+}
+
 export interface PdfTextLine {
   /** Text of one visual line, left to right. */
   text: string;
@@ -20,6 +27,8 @@ export interface PdfTextLine {
   page: number;
   /** PDF user-space Y of the line. Higher is nearer the page top. */
   y: number;
+  /** The line split at column gaps, left to right. */
+  cells: PdfTextCell[];
 }
 
 type UnicodeMap = Map<number, string>;
@@ -265,19 +274,44 @@ function measureAdvances(runs: readonly TextRun[]): AdvanceTable {
   return table;
 }
 
-function joinRun(runs: TextRun[], advances: AdvanceTable): string {
+/**
+ * A word break is a gap a little wider than a glyph; a column break is a gap
+ * several glyphs wide. Cells keep the table shape that the flat text loses.
+ */
+function joinRun(
+  runs: TextRun[],
+  advances: AdvanceTable,
+): { text: string; cells: PdfTextCell[] } {
   const ordered = [...runs].sort((a, b) => a.x - b.x);
-  let out = ordered[0]?.text ?? "";
+  const cells: PdfTextCell[] = [];
+  let cell: PdfTextCell | undefined =
+    ordered[0] === undefined
+      ? undefined
+      : { x: ordered[0].x, text: ordered[0].text };
 
   for (let index = 1; index < ordered.length; index += 1) {
     const previous = ordered[index - 1]!;
     const current = ordered[index]!;
     const gap = current.x - previous.x;
     const width = advances.get(advanceKey(previous)) ?? gap;
-    const needsSpace = gap > width * 1.35 + 0.4 && !/\s$/.test(out);
-    out += needsSpace ? ` ${current.text}` : current.text;
+    if (cell && gap > Math.max(width * 4, 9)) {
+      cells.push(cell);
+      cell = { x: current.x, text: current.text };
+      continue;
+    }
+    const needsSpace =
+      gap > width * 1.35 + 0.4 && !/\s$/.test(cell?.text ?? "");
+    if (cell) cell.text += needsSpace ? ` ${current.text}` : current.text;
   }
-  return out.replace(/\s+/g, " ").trim();
+  if (cell) cells.push(cell);
+
+  const tidy = cells
+    .map((entry) => ({
+      x: entry.x,
+      text: entry.text.replace(/\s+/g, " ").trim(),
+    }))
+    .filter((entry) => entry.text.length > 0);
+  return { text: tidy.map((entry) => entry.text).join(" "), cells: tidy };
 }
 
 /** Group runs that share a baseline into single left-to-right lines. */
@@ -295,7 +329,7 @@ function groupIntoLines(
   }
   return [...buckets.entries()]
     .sort((a, b) => b[0] - a[0])
-    .map(([y, bucket]) => ({ page, y, text: joinRun(bucket, advances) }))
+    .map(([y, bucket]) => ({ page, y, ...joinRun(bucket, advances) }))
     .filter((line) => line.text.length > 0);
 }
 
