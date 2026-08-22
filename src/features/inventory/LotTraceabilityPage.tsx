@@ -13,6 +13,7 @@ import {
 import { formatDate, formatTime } from "../../lib/format";
 import { TableSkeleton } from "../../ui/primitives";
 import { InventoryWorkspaceNav } from "./InventoryWorkspaceNav";
+import { endOfDay, startOfDay } from "./PurchasingFormHelpers";
 import {
   buildLotTraceabilityRows,
   countUnattributedConsumptions,
@@ -326,18 +327,6 @@ function TraceStat({ label, value }: { label: string; value: number }) {
       <strong>{value}</strong>
     </div>
   );
-}
-
-function startOfDay(value: string): number | undefined {
-  if (!value) return undefined;
-  const timestamp = new Date(`${value}T00:00:00`).getTime();
-  return Number.isFinite(timestamp) ? timestamp : undefined;
-}
-
-function endOfDay(value: string): number | undefined {
-  if (!value) return undefined;
-  const timestamp = new Date(`${value}T23:59:59.999`).getTime();
-  return Number.isFinite(timestamp) ? timestamp : undefined;
 }
 
 function formatOptionalDate(value: number | null | undefined): string {

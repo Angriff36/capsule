@@ -7,9 +7,11 @@
  *   { "command": "bun", "args": ["run", "scripts/capsule-mcp.ts"], "cwd": "<capsule>" }
  */
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { CapsuleEnvLocalLoader } from "../src/agent/CapsuleEnvLocalLoader";
 import { CapsuleMcpServerFactory } from "../src/agent/mcp/CapsuleMcpServerFactory";
 
 async function main(): Promise<void> {
+  new CapsuleEnvLocalLoader().load();
   const server = new CapsuleMcpServerFactory().create();
   const transport = new StdioServerTransport();
   await server.connect(transport);
