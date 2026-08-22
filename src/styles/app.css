@@ -3684,7 +3684,7 @@
 }
 .mobile-event-header {
   position: sticky;
-  top: calc(-1 * var(--mobile-sheet-pad, 1.75rem));
+  top: 0;
   z-index: 20;
   margin: calc(-1 * var(--mobile-sheet-pad, 1.75rem))
     calc(-1 * var(--mobile-sheet-pad-x, 1.25rem)) 0;
@@ -3744,5 +3744,12 @@
 @media (max-width: 767px) {
   .event-detail-tabs button {
     min-height: 44px;
+  }
+}
+@media (max-width: 767px) {
+  /* `.app-shell-sidebar` is declared inside @layer utilities after Tailwind's
+     own utilities, so `max-md:hidden` on the <aside> loses. Hide it here. */
+  .app-shell-sidebar {
+    display: none;
   }
 }

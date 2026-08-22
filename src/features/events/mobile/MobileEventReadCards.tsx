@@ -72,7 +72,9 @@ export function MobileFactsCard({ event, venue, clients }: MobileFactsProps) {
             <dt className="text-xs font-semibold tracking-[0.06em] text-ink-3 uppercase">
               {label}
             </dt>
-            <dd className="truncate font-mono text-base text-ink">{value}</dd>
+            <dd className="font-mono text-base break-words text-ink">
+              {value}
+            </dd>
           </div>
         ))}
       </dl>
@@ -199,7 +201,7 @@ export function MobileTimelineCard({
           });
           return (
             <div key={row._id} className="mobile-row">
-              <span className="w-16 shrink-0 font-mono text-base text-ink-2">
+              <span className="w-20 shrink-0 font-mono text-base text-ink-2">
                 {at != null ? formatTime(at) : "—"}
               </span>
               <span className="mobile-row-main">
