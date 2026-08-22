@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { formatDate } from "../../lib/format";
 import {
   useListDish,
@@ -168,7 +169,9 @@ export function KitchenDashboardPage() {
         <h1>Command deck</h1>
         <p className="kcd-lede">
           Next 7 days from {formatDate(horizon.start().getTime())} — put cooks
-          on dishes and steps, and keep an eye on who is buried.
+          on dishes and steps, and keep an eye on who is buried.{" "}
+          <Link to="/kitchen/yield">Review yield variance</Link> for completed
+          batches.
         </p>
       </header>
 

@@ -98,6 +98,11 @@ const KitchenDisplayPage = lazy(() =>
     default: module.KitchenDisplayPage,
   })),
 );
+const ProductionYieldDashboardPage = lazy(() =>
+  import("../features/production/ProductionYieldDashboardPage").then(
+    (module) => ({ default: module.ProductionYieldDashboardPage }),
+  ),
+);
 const RosterPage = lazy(() =>
   import("../features/workforce/RosterPage").then((module) => ({
     default: module.RosterPage,
@@ -621,7 +626,11 @@ export function App() {
             <Route path="/kitchen/prep" element={<KitchenDashboardPage />} />
             <Route
               path="/kitchen/yield"
-              element={<Navigate to="/kitchen/dishes" replace />}
+              element={
+                <SupplyRoute>
+                  <ProductionYieldDashboardPage />
+                </SupplyRoute>
+              }
             />
             <Route
               path="/inventory"
