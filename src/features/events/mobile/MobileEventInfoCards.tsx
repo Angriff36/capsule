@@ -38,7 +38,10 @@ export function MobileClientCard({
     >
       <div className="mobile-row">
         <span className="mobile-row-main">
-          <Link to={`/clients/${event.clientId}`} className="underline">
+          <Link
+            to={`/clients/${event.clientId}`}
+            className="inline-flex min-h-11 items-center underline"
+          >
             {name}
           </Link>
           <span className="mobile-row-sub">Client</span>

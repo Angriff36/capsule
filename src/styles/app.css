@@ -3769,6 +3769,7 @@
      (also stops iOS zooming into focused inputs); captions and chips keep
      their token sizes. Notched phones in standalone mode get the top inset. */
   .mobile-row,
+  .mobile-event-header h1,
   .mobile-section-card > header h2,
   .mobile-section-card dd,
   .mobile-section-card > header a,

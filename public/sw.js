@@ -38,7 +38,7 @@ self.addEventListener("install", (event) => {
         ...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g),
       ].map((match) => match[1]);
       const cache = await caches.open(VERSION);
-      await cache.addAll([
+      await stageAssets(cache, [
         ...new Set([...SHELL.filter((path) => path !== "/"), ...assets]),
       ]);
       // The exact HTML whose bundles were just staged — never a second fetch
@@ -84,9 +84,29 @@ async function promoteShell(response) {
   for (const asset of assets) {
     if (!(await cache.match(asset))) missing.push(asset);
   }
-  if (missing.length > 0) await cache.addAll(missing);
+  if (missing.length > 0) await stageAssets(cache, missing);
   await cache.put("/", new Response(html, { headers: response.headers }));
   await pruneAssets(cache);
+}
+
+/**
+ * Fetch each static file once and keep it only if it is a real 200 of the
+ * expected kind. During a deploy switch the SPA rewrite answers a vanished
+ * /assets/ URL with index.html (200, text/html) — caching that under a JS URL
+ * would boot a blank shell offline, so it fails the stage instead.
+ */
+async function stageAssets(cache, urls) {
+  const staged = [];
+  for (const url of urls) {
+    const response = await fetch(url, { cache: "no-store" });
+    const html = isHtml(response);
+    const wantsHtml = url === "/";
+    if (!response.ok || html !== wantsHtml) {
+      throw new Error(`shell asset unavailable: ${url}`);
+    }
+    staged.push([url, response]);
+  }
+  for (const [url, response] of staged) await cache.put(url, response);
 }
 
 async function pruneAssets(cache) {

@@ -44,7 +44,10 @@ export function MobileFactsCard({
     [
       "Venue",
       venue ? (
-        <Link to="/facilities" className="underline">
+        <Link
+          to="/facilities"
+          className="inline-flex min-h-11 items-center underline"
+        >
           {venue.name}
         </Link>
       ) : (
@@ -56,7 +59,7 @@ export function MobileFactsCard({
       <Link
         key="client"
         to={`/clients/${event.clientId}`}
-        className="underline"
+        className="inline-flex min-h-11 items-center underline"
       >
         {clientDisplayName(event.clientId, clients as never)}
       </Link>,
