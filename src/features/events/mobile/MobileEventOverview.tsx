@@ -1,4 +1,6 @@
 import type { Doc } from "../../../lib/api";
+import { normalizeCurrencyCode } from "../../../lib/format";
+import { useListOrganization } from "../../../lib/manifest-convex-react";
 import {
   MobileClientCard,
   MobileMoneyCard,
@@ -38,9 +40,20 @@ export function MobileEventOverview({
   assignments,
   people,
 }: Props) {
+  const organizations = useListOrganization();
+  // Same functional currency rule as FinanceOverviewPage; one value for the page.
+  const currencyCode = normalizeCurrencyCode(
+    organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,
+    "USD",
+  );
   return (
     <div className="space-y-3" data-testid="mobile-event-overview">
-      <MobileFactsCard event={event} venue={venue} clients={clients} />
+      <MobileFactsCard
+        event={event}
+        venue={venue}
+        clients={clients}
+        currencyCode={currencyCode}
+      />
       <MobileMenuCard
         eventId={event._id}
         eventDishes={eventDishes}
@@ -60,7 +73,7 @@ export function MobileEventOverview({
       <MobilePackListCard eventId={event._id} />
       <MobileClientCard event={event} clients={clients} />
       <MobileNotesCard event={event} />
-      <MobileMoneyCard event={event} />
+      <MobileMoneyCard event={event} currencyCode={currencyCode} />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   useListPrepTask,
+  useListPrepTaskDependency,
   usePrepTaskClaim,
   usePrepTaskComplete,
   usePrepTaskStart,
@@ -8,6 +9,7 @@ import {
 import { formatStatusLabel } from "../../../lib/statusLabels";
 import { useAuthStatus } from "../../../lib/useAuthStatus";
 import { prepQuantityLabel } from "../../kitchen/prepQuantityLabel";
+import { prepTaskDependencySummary } from "../../production/PrepTaskDependencies";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { eventDetailPath } from "../eventRoutes";
 import { FailureBanner } from "../FailureBanner";
@@ -41,6 +43,7 @@ function nextAction(
 /** Prep tasks for this event with claim → start → complete on the phone. */
 export function MobilePrepCard({ eventId }: { readonly eventId: string }) {
   const tasks = useListPrepTask();
+  const dependencies = useListPrepTaskDependency();
   const authStatus = useAuthStatus();
   const claim = usePrepTaskClaim();
   const start = usePrepTaskStart();
@@ -105,6 +108,16 @@ export function MobilePrepCard({ eventId }: { readonly eventId: string }) {
       ) : (
         shown.map((task) => {
           const action = nextAction(String(task.status));
+          // PrepTask.start rejects while a predecessor is open; say so instead
+          // of offering a button that ends in a policy error.
+          const waiting =
+            action?.verb === "start"
+              ? prepTaskDependencySummary(
+                  task._id,
+                  (tasks ?? []).filter((row) => row.deletedAt == null),
+                  dependencies ?? [],
+                )
+              : null;
           const quantity = Number(task.quantity) || 0;
           const sub = [
             quantity > 0
@@ -125,7 +138,11 @@ export function MobilePrepCard({ eventId }: { readonly eventId: string }) {
                 </span>
                 <span className="mobile-row-sub truncate">{sub}</span>
               </span>
-              {action ? (
+              {waiting?.isBlocked ? (
+                <span className="mobile-row-sub shrink-0 text-right">
+                  Waiting on {waiting.blockerNames.join(", ")}
+                </span>
+              ) : action ? (
                 <button
                   type="button"
                   className={`btn ${action.verb === "complete" ? "btn-primary" : "btn-ghost"} min-h-11 shrink-0`}

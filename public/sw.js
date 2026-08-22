@@ -58,6 +58,29 @@ function isHtml(response) {
   return (response.headers.get("content-type") || "").includes("text/html");
 }
 
+/**
+ * After a deploy the HTML references new entry bundles. Cache those first and
+ * only then replace "/" — so an interrupted refresh never leaves an offline
+ * shell whose scripts are missing (the previous shell keeps working).
+ */
+async function promoteShell(response) {
+  const html = await response.text();
+  const assets = [
+    ...new Set(
+      [...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g)].map(
+        (match) => match[1],
+      ),
+    ),
+  ];
+  const cache = await caches.open(VERSION);
+  const missing = [];
+  for (const asset of assets) {
+    if (!(await cache.match(asset))) missing.push(asset);
+  }
+  if (missing.length > 0) await cache.addAll(missing);
+  await cache.put("/", new Response(html, { headers: response.headers }));
+}
+
 async function pruneAssets(cache) {
   const assets = (await cache.keys()).filter((request) =>
     new URL(request.url).pathname.startsWith("/assets/"),
@@ -79,10 +102,7 @@ self.addEventListener("fetch", (event) => {
         try {
           const response = await fetch(request);
           if (response.ok && isHtml(response)) {
-            const copy = response.clone();
-            event.waitUntil(
-              caches.open(VERSION).then((cache) => cache.put("/", copy)),
-            );
+            event.waitUntil(promoteShell(response.clone()));
           }
           return response;
         } catch {

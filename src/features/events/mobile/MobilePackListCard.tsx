@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   useListPackList,
   useListPackListItem,
@@ -79,7 +80,17 @@ export function MobilePackListCard({ eventId }: { readonly eventId: string }) {
             <div key={list._id} className="pt-2">
               <div className="flex items-center justify-between gap-2">
                 <p className="eyebrow truncate">{list.name || "Pack list"}</p>
-                <StatusChip status={String(list.status)} />
+                <span className="flex shrink-0 items-center gap-2">
+                  <StatusChip status={String(list.status)} />
+                  {eventLists.length > 1 ? (
+                    <Link
+                      to={`/logistics/packs/${list._id}`}
+                      className="flex min-h-11 items-center text-base font-semibold text-accent"
+                    >
+                      Open ›
+                    </Link>
+                  ) : null}
+                </span>
               </div>
               {draft ? (
                 <p className="text-sm text-ink-3">

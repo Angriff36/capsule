@@ -26,10 +26,16 @@ export type MobileFactsProps = {
   readonly event: Doc<"events">;
   readonly venue: { name: string } | null | undefined;
   readonly clients: readonly ClientRow[] | undefined;
+  readonly currencyCode: string;
 };
 
 /** Facts: when, how many, where, who, what kind, and the commercial snapshot. */
-export function MobileFactsCard({ event, venue, clients }: MobileFactsProps) {
+export function MobileFactsCard({
+  event,
+  venue,
+  clients,
+  currencyCode,
+}: MobileFactsProps) {
   const facts: Array<[string, ReactNode]> = [
     ["Start", `${formatDate(event.startsAt)} ${formatTime(event.startsAt)}`],
     ["End", `${formatDate(event.endsAt)} ${formatTime(event.endsAt)}`],
@@ -57,7 +63,7 @@ export function MobileFactsCard({ event, venue, clients }: MobileFactsProps) {
     ],
     [
       "Budget / quoted",
-      `${formatMoney(event.budgetAmount)} / ${formatMoney(event.quotedPrice)}`,
+      `${formatMoney(event.budgetAmount, currencyCode)} / ${formatMoney(event.quotedPrice, currencyCode)}`,
     ],
   ];
   return (
