@@ -176,12 +176,18 @@ export function MobileMoneyCard({ event }: { readonly event: Doc<"events"> }) {
   // Same rule as Finance: voided/draft/written-off invoices do not owe money.
   const open = (status: unknown) =>
     (OPEN_INVOICE_STATUSES as readonly string[]).includes(String(status));
+  // Sums are in the functional currency, like Finance: foreign invoices are
+  // converted at their stored exchangeRate (1 when unset).
+  const rate = (row: { exchangeRate?: unknown }) => {
+    const raw = Number(row.exchangeRate ?? 1);
+    return Number.isFinite(raw) && raw > 0 ? raw : 1;
+  };
   const balance = eventInvoices
     .filter((row) => open(row.status))
-    .reduce((sum, row) => sum + (Number(row.amountDue) || 0), 0);
+    .reduce((sum, row) => sum + (Number(row.amountDue) || 0) * rate(row), 0);
   const paid = eventInvoices
     .filter((row) => open(row.status) || String(row.status) === "paid")
-    .reduce((sum, row) => sum + (Number(row.amountPaid) || 0), 0);
+    .reduce((sum, row) => sum + (Number(row.amountPaid) || 0) * rate(row), 0);
   const seeAllTo =
     eventInvoices.length === 1 && eventInvoices[0]
       ? `/finance/invoices/${eventInvoices[0]._id}`
@@ -203,7 +209,7 @@ export function MobileMoneyCard({ event }: { readonly event: Doc<"events"> }) {
                 Invoice {row.invoiceNumber || "—"}
               </span>
               <span className="mobile-row-sub truncate">
-                {formatMoney(row.total)} total
+                {formatMoney(row.total, row.currencyCode)} total
                 {row.dueDate != null ? ` · due ${formatDate(row.dueDate)}` : ""}
               </span>
             </span>

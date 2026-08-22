@@ -10,6 +10,7 @@ import {
 import { formatStatusLabel } from "../../../lib/statusLabels";
 import { clientDisplayName } from "../clientName";
 import { eventDetailPath } from "../eventRoutes";
+import { compareActivities } from "../EventTimelinePanel";
 import { formatAssigneeLabel } from "../timelineAssigneeOptions";
 import {
   MobileEmpty,
@@ -157,16 +158,6 @@ function personName(person: Person | undefined): string {
   );
 }
 
-function compareActivities(left: Activity, right: Activity) {
-  const l = left.sortOrder;
-  const r = right.sortOrder;
-  if (typeof l === "number" && typeof r === "number" && l !== r) return l - r;
-  return (
-    Number(left.startsAt ?? left.scheduledAt ?? 0) -
-    Number(right.startsAt ?? right.scheduledAt ?? 0)
-  );
-}
-
 export function MobileTimelineCard({
   eventId,
   activities,
@@ -177,7 +168,13 @@ export function MobileTimelineCard({
   readonly people: readonly Person[] | undefined;
 }) {
   const rows = (activities ?? [])
-    .filter((row) => row.eventId === eventId && row.deletedAt == null)
+    // Same rows and order as the full Timeline tab.
+    .filter(
+      (row) =>
+        row.eventId === eventId &&
+        row.scheduledAt != null &&
+        row.deletedAt == null,
+    )
     .sort(compareActivities);
   const shown = rows.slice(0, ROW_LIMIT);
   return (

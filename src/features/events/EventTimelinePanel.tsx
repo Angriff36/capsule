@@ -53,7 +53,10 @@ function templateNotes(template: BattleBoardTaskTemplate): string {
   return parts.join(" · ");
 }
 
-function compareActivities(left: TimelineActivity, right: TimelineActivity) {
+export function compareActivities(
+  left: TimelineActivity,
+  right: TimelineActivity,
+) {
   const leftOrder = left.sortOrder;
   const rightOrder = right.sortOrder;
   if (typeof leftOrder === "number" && typeof rightOrder === "number") {

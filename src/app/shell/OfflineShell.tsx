@@ -83,3 +83,35 @@ export function SlowSignInNotice() {
     </div>
   );
 }
+
+/**
+ * Rendered under Clerk's <ClerkFailed>: clerk-js gave up loading (no network,
+ * blocked CDN). Explicit, protected state — nothing authenticated is shown —
+ * with a retry. Covers "Try again" while still offline, too.
+ */
+export function SignInUnreachable() {
+  return (
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-canvas px-6 py-10"
+      data-testid="sign-in-unreachable"
+    >
+      <div className="card max-w-sm p-6 text-center">
+        <WifiOffIcon className="mx-auto text-ink-3" width={28} height={28} />
+        <h1 className="mt-3 font-display text-xl font-semibold">
+          Sign-in is unreachable
+        </h1>
+        <p className="mt-2 text-base leading-relaxed text-ink-2">
+          Capsule could not reach its sign-in service. Check the connection,
+          then try again. Nothing is lost.
+        </p>
+        <button
+          type="button"
+          className="btn btn-primary mt-4 min-h-11"
+          onClick={() => window.location.reload()}
+        >
+          Try again
+        </button>
+      </div>
+    </div>
+  );
+}

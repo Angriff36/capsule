@@ -20,12 +20,17 @@ export function MobilePackListCard({ eventId }: { readonly eventId: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
 
-  const eventLists = (lists ?? []).filter(
-    (row) =>
-      row.deletedAt == null &&
-      row.eventId === eventId &&
-      row.status !== "cancelled",
+  const TERMINAL = ["cancelled", "dispatched"];
+  const allLists = (lists ?? []).filter(
+    (row) => row.deletedAt == null && row.eventId === eventId,
   );
+  // The live list (draft → loaded) is what the phone packs against; once
+  // everything is dispatched, show the latest dispatched one as history.
+  const live = allLists.filter((row) => !TERMINAL.includes(String(row.status)));
+  const dispatched = allLists
+    .filter((row) => String(row.status) === "dispatched")
+    .sort((a, b) => Number(b.dispatchedAt ?? 0) - Number(a.dispatchedAt ?? 0));
+  const eventLists = live.length > 0 ? live : dispatched.slice(0, 1);
   const first = eventLists[0];
   const allItems = (items ?? []).filter(
     (row) =>
