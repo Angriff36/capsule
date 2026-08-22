@@ -48,7 +48,6 @@ export const CAPABILITY_UI_SURFACES: Readonly<
     hooks: ["useCreatePrepTask"],
     surfaces: [
       "src/features/production/PrepBoardPage.tsx",
-      "src/features/kitchen/EventMenuPage.tsx",
       "src/features/kitchen/KitchenDashboardPage.tsx",
       "src/features/events/EventMenuTab.tsx",
     ],
@@ -61,7 +60,6 @@ export const CAPABILITY_UI_SURFACES: Readonly<
     hooks: ["usePrepTaskRefreshGenerated"],
     surfaces: [
       "src/features/production/PrepBoardPage.tsx",
-      "src/features/kitchen/EventMenuPage.tsx",
       "src/features/kitchen/KitchenDashboardPage.tsx",
       "src/features/events/EventMenuTab.tsx",
     ],
@@ -100,10 +98,11 @@ export const CAPABILITY_UI_SURFACES: Readonly<
   },
   "EventDish.addToEvent": {
     hooks: ["useCreateEventDish"],
-    surfaces: [
-      "src/features/kitchen/EventMenuPage.tsx",
-      "src/features/events/EventMenuTab.tsx",
-    ],
+    surfaces: ["src/features/events/EventMenuTab.tsx"],
+  },
+  "EventDish.setHeadcountOverride": {
+    hooks: ["useEventDishSetHeadcountOverride"],
+    surfaces: ["src/features/events/EventMenuTab.tsx"],
   },
   "Event.submitForApproval": {
     hooks: ["useEventSubmitForApproval"],

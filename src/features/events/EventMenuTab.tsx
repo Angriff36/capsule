@@ -4,19 +4,27 @@ import {
   useCreateEventDish,
   useEventDishAdjustServings,
   useEventDishRemove,
+  useEventDishSetHeadcountOverride,
   useListDish,
   useListEventDish,
+  useListIngredient,
+  useListInventoryItem,
+  useListInventoryReservation,
 } from "../../lib/manifest-convex-react";
 import { formatMoneyExact } from "../../lib/format";
 import { AllergenIconRow } from "../kitchen/AllergenIconRow";
+import { ComponentNutritionPanel } from "../kitchen/ComponentNutritionPanel";
 import { CulinaryRecordPicker } from "../kitchen/CulinaryRecordPicker";
+import { EventMenuStockShortageBanner } from "../kitchen/EventMenuStockShortageBanner";
 import { DishPrimaryImage } from "../attachments/DishPrimaryImage";
 import { dishPath } from "../kitchen/kitchenRoutes";
 import { useEventMenuSync } from "../kitchen/useEventMenuSync";
 import { ReasonCopy, useActionPrompt } from "../../ui/action-prompt";
 import { classifyCommandFailure, type CommandFailure } from "./CommandFailure";
+import type { EventStockShortage } from "./EventStockReservationCoordinator";
 import { FailureBanner } from "./FailureBanner";
 import { ComponentStockSuggestions } from "./ComponentStockSuggestions";
+import { useEventMenuNutrition } from "./useEventMenuNutrition";
 
 type Props = {
   eventId: string;
@@ -26,13 +34,24 @@ type Props = {
 export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const dishes = useListDish();
   const eventDishes = useListEventDish();
+  const ingredients = useListIngredient();
+  const inventoryItems = useListInventoryItem();
+  const inventoryReservations = useListInventoryReservation();
   const createEventDish = useCreateEventDish();
   const adjustServings = useEventDishAdjustServings();
+  const setHeadcountOverride = useEventDishSetHeadcountOverride();
   const removeDish = useEventDishRemove();
-  const { ready: prepSyncReady, syncStockForEvent } = useEventMenuSync();
+  const {
+    ready: prepSyncReady,
+    syncPrepForDish,
+    syncStockForEvent,
+  } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [failure, setFailure] = useState<CommandFailure | null>(null);
+  const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
+    [],
+  );
   const { prompt, host } = useActionPrompt(busy != null);
 
   const selections = useMemo(
@@ -45,6 +64,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
     [eventDishes, eventId],
   );
   const existingDishIds = selections.map((row) => row.dishId);
+
+  const nutrition = useEventMenuNutrition(existingDishIds);
+
+  const refreshStock = async () => {
+    if (!prepSyncReady) return;
+    setStockShortages(await syncStockForEvent(eventId));
+  };
 
   const run = async (key: string, work: () => Promise<void>) => {
     setFailure(null);
@@ -80,6 +106,34 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
       {failure ? <FailureBanner failure={failure} /> : null}
       {host}
       <ComponentStockSuggestions />
+      <EventMenuStockShortageBanner
+        shortages={stockShortages}
+        ingredients={(ingredients ?? []).map((ingredient) => ({
+          id: ingredient._id,
+          name: ingredient.name,
+          unit: String(ingredient.unit),
+          costPerUnit: Number(ingredient.costPerUnit),
+          allergens: ingredient.allergens ?? [],
+          status: String(ingredient.status),
+          substituteIngredientIds: ingredient.substituteIngredientIds,
+          deletedAt: ingredient.deletedAt,
+        }))}
+        inventoryItems={(inventoryItems ?? []).map((item) => ({
+          id: item._id,
+          ingredientId: item.ingredientId,
+          quantityOnHand: Number(item.quantityOnHand),
+          unit: String(item.unit),
+          stockedAt: item.stockedAt,
+          deletedAt: item.deletedAt,
+        }))}
+        reservations={(inventoryReservations ?? []).map((reservation) => ({
+          inventoryItemId: reservation.inventoryItemId,
+          quantity: Number(reservation.quantity),
+          status: String(reservation.status),
+          deletedAt: reservation.deletedAt,
+        }))}
+        onDismiss={() => setStockShortages([])}
+      />
       {showPicker ? (
         <CulinaryRecordPicker
           kind="dish"
@@ -107,9 +161,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
               });
               // Prep tasks are generated server-side by the EventDishAdded
               // reaction; only stock needs reconciling from the client.
-              if (prepSyncReady) {
-                await syncStockForEvent(eventId);
-              }
+              await refreshStock();
               setShowPicker(false);
             })
           }
@@ -139,6 +191,10 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
             const estimated =
               Number((selection as { estimatedCost?: number }).estimatedCost) ||
               0;
+            const headcount =
+              Number(
+                (selection as { headcountOverride?: number }).headcountOverride,
+              ) || 0;
             return (
               <li
                 key={selection._id}
@@ -166,6 +222,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     {selection.course || "Uncategorized"}
                     {" · "}
                     {selection.quantityServings} servings
+                    {headcount > 0 ? ` · costed for ${headcount} guests` : ""}
                     {estimated > 0
                       ? ` · est. ${formatMoneyExact(estimated)}`
                       : ""}
@@ -184,13 +241,23 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                       quantityServings < 0
                     )
                       return;
-                    void run(`servings:${selection._id}`, () =>
-                      adjustServings({
+                    void run(`servings:${selection._id}`, async () => {
+                      await adjustServings({
                         docId: selection._id,
                         version: selection.version,
                         quantityServings,
-                      }),
-                    );
+                      });
+                      if (!prepSyncReady) return;
+                      setStockShortages(
+                        await syncPrepForDish({
+                          id: selection._id,
+                          eventId: selection.eventId,
+                          dishId: selection.dishId,
+                          quantityServings,
+                          specialInstructions: selection.specialInstructions,
+                        }),
+                      );
+                    });
                   }}
                 >
                   <label className="field-label">
@@ -217,6 +284,42 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                     disabled={busy != null}
                     onClick={() => {
                       void (async () => {
+                        const values = await prompt.askFields({
+                          title: "Food-cost headcount",
+                          description:
+                            "Guests this dish is costed for. 0 uses the event guest count.",
+                          fields: [
+                            {
+                              name: "headcountOverride",
+                              label: "Headcount override",
+                              defaultValue: String(headcount),
+                              inputType: "number",
+                              required: true,
+                            },
+                          ],
+                          confirmLabel: "Save headcount",
+                        });
+                        if (!values) return;
+                        const override = Number(values.headcountOverride);
+                        if (!Number.isFinite(override) || override < 0) return;
+                        void run(`override:${selection._id}`, () =>
+                          setHeadcountOverride({
+                            docId: selection._id,
+                            version: selection.version,
+                            headcountOverride: override,
+                          }),
+                        );
+                      })();
+                    }}
+                  >
+                    Headcount
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    disabled={busy != null}
+                    onClick={() => {
+                      void (async () => {
                         const reason = await prompt.askReason({
                           ...ReasonCopy.removeLine,
                           title: "Remove event dish",
@@ -226,13 +329,14 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                           tone: "danger",
                         });
                         if (!reason) return;
-                        void run(`remove:${selection._id}`, () =>
-                          removeDish({
+                        void run(`remove:${selection._id}`, async () => {
+                          await removeDish({
                             docId: selection._id,
                             version: selection.version,
                             reason,
-                          }),
-                        );
+                          });
+                          await refreshStock();
+                        });
                       })();
                     }}
                   >
@@ -244,6 +348,15 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
           })}
         </ul>
       )}
+      <ComponentNutritionPanel
+        heading="Per-guest nutrition"
+        portionLabel="per guest"
+        totals={
+          nutrition.totals.componentCount > 0 ? nutrition.totals.perGuest : null
+        }
+        coverageNote={nutrition.coverageNote}
+        loading={nutrition.loading}
+      />
     </section>
   );
 }

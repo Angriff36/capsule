@@ -25,7 +25,9 @@ describe("Culinary planning slice contract", () => {
     const ingredient = read("src/features/kitchen/IngredientDetailPage.tsx");
     const dish = read("src/features/kitchen/DishDetailPage.tsx");
     const menu = read("src/features/kitchen/MenuDetailPage.tsx");
-    const eventMenu = read("src/features/kitchen/EventMenuPage.tsx");
+    const eventMenu =
+      read("src/features/events/EventMenuTab.tsx") +
+      read("src/features/kitchen/useEventMenuSync.ts");
     const componentImport = read(
       "src/features/kitchen/import/ComponentImportPage.tsx",
     );
@@ -56,8 +58,8 @@ describe("Culinary planning slice contract", () => {
     ]) {
       expect(componentImport).toContain(hook);
     }
+    // The event comes from the detail route; the tab does not list events.
     for (const hook of [
-      "useListEvent",
       "useListEventDish",
       "useEventDishAdjustServings",
       "useEventDishRemove",
@@ -77,7 +79,9 @@ describe("Culinary planning slice contract", () => {
   it("uses governed generated creation hooks without an authored allocation seam", () => {
     const catalog = read("src/features/kitchen/KitchenCatalogPage.tsx");
     const component = read("src/features/kitchen/ComponentDetailPage.tsx");
-    const eventMenu = read("src/features/kitchen/EventMenuPage.tsx");
+    const eventMenu =
+      read("src/features/events/EventMenuTab.tsx") +
+      read("src/features/kitchen/useEventMenuSync.ts");
 
     for (const hook of [
       "useCreateIngredient",
