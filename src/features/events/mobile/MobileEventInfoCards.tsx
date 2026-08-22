@@ -258,7 +258,7 @@ function Money({
       <dt className="text-xs font-semibold tracking-[0.06em] text-ink-3 uppercase">
         {label}
       </dt>
-      <dd className="truncate font-mono text-lg text-ink">
+      <dd className="font-mono text-lg break-words text-ink">
         {formatMoney(value, currency)}
       </dd>
     </div>
