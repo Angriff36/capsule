@@ -7,6 +7,7 @@ import {
 import { StatusChip } from "../../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
+import { formatQuantity } from "./formatQuantity";
 import { MobileEmpty, MobileSectionCard } from "./MobileSectionCard";
 
 type PackListItem = NonNullable<ReturnType<typeof useListPackListItem>>[number];
@@ -105,7 +106,7 @@ export function MobilePackListCard({ eventId }: { readonly eventId: string }) {
                         </span>
                         <span className="mobile-row-sub truncate">
                           {quantity > 0
-                            ? `${quantity} ${String(item.unit)}`
+                            ? `${formatQuantity(quantity)} ${String(item.unit)}`
                             : ""}
                           {item.status === "missing" ? " · missing" : ""}
                         </span>

@@ -9,6 +9,7 @@ import { formatStatusLabel } from "../../../lib/statusLabels";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { eventDetailPath } from "../eventRoutes";
 import { FailureBanner } from "../FailureBanner";
+import { formatQuantity } from "./formatQuantity";
 import {
   MobileEmpty,
   MobileMore,
@@ -92,7 +93,9 @@ export function MobilePrepCard({ eventId }: { readonly eventId: string }) {
           const action = nextAction(String(task.status));
           const quantity = Number(task.quantity) || 0;
           const sub = [
-            quantity > 0 ? `${quantity} ${String(task.unit)}` : "",
+            quantity > 0
+              ? `${formatQuantity(quantity)} ${String(task.unit)}`
+              : "",
             task.station ?? "",
             formatStatusLabel(String(task.status)),
           ]
