@@ -28,19 +28,15 @@ const MAX_ASSET_ENTRIES = 300;
 self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
+      // Atomic: the shell, its entry bundles (parsed from index.html), and the
+      // icons all land together or the install fails and the previous worker
+      // keeps serving. A half-cached shell would boot to a blank page offline.
+      const html = await (await fetch("/", { cache: "no-store" })).text();
+      const assets = [
+        ...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g),
+      ].map((match) => match[1]);
       const cache = await caches.open(VERSION);
-      await cache.addAll(SHELL);
-      // Precache the entry bundles index.html references so the shell renders
-      // with no network at all. Route chunks are cached on first use below.
-      try {
-        const html = await (await cache.match("/")).text();
-        const assets = [
-          ...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g),
-        ].map((match) => match[1]);
-        await cache.addAll([...new Set(assets)]);
-      } catch {
-        // Offline during install: the shell list above still applies.
-      }
+      await cache.addAll([...new Set([...SHELL, ...assets])]);
       await self.skipWaiting();
     })(),
   );

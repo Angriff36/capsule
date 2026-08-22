@@ -1,10 +1,15 @@
 import { Link } from "react-router-dom";
 import type { Doc } from "../../../lib/api";
-import { formatDate, formatMoney } from "../../../lib/format";
+import {
+  formatDate,
+  formatMoney,
+  normalizeCurrencyCode,
+} from "../../../lib/format";
 import {
   useListClientContact,
   useListEventTimelineComment,
   useListInvoice,
+  useListOrganization,
 } from "../../../lib/manifest-convex-react";
 import { StatusChip } from "../../../ui/primitives";
 import { OPEN_INVOICE_STATUSES } from "../../finance/invoiceBilling";
@@ -170,6 +175,12 @@ export function MobileNotesCard({ event }: { readonly event: Doc<"events"> }) {
 
 export function MobileMoneyCard({ event }: { readonly event: Doc<"events"> }) {
   const invoices = useListInvoice();
+  const organizations = useListOrganization();
+  // Same functional currency rule as FinanceOverviewPage.
+  const functionalCurrencyCode = normalizeCurrencyCode(
+    organizations?.find((row) => row.deletedAt == null)?.defaultCurrencyCode,
+    "USD",
+  );
   const eventInvoices = (invoices ?? []).filter(
     (row) => row.deletedAt == null && row.eventId === event._id,
   );
@@ -191,13 +202,21 @@ export function MobileMoneyCard({ event }: { readonly event: Doc<"events"> }) {
   const seeAllTo =
     eventInvoices.length === 1 && eventInvoices[0]
       ? `/finance/invoices/${eventInvoices[0]._id}`
-      : "/finance/invoices";
+      : `/finance/invoices?eventId=${event._id}`;
   return (
     <MobileSectionCard id="money" title="Money" seeAllTo={seeAllTo}>
       <dl className="grid grid-cols-3 gap-x-3 gap-y-2">
-        <Money label="Quoted" value={event.quotedPrice} />
-        <Money label="Paid" value={paid} />
-        <Money label="Balance" value={balance} />
+        <Money
+          label="Quoted"
+          value={event.quotedPrice}
+          currency={functionalCurrencyCode}
+        />
+        <Money label="Paid" value={paid} currency={functionalCurrencyCode} />
+        <Money
+          label="Balance"
+          value={balance}
+          currency={functionalCurrencyCode}
+        />
       </dl>
       {eventInvoices.length === 0 ? (
         <MobileEmpty>No invoice on this event yet.</MobileEmpty>
@@ -224,9 +243,11 @@ export function MobileMoneyCard({ event }: { readonly event: Doc<"events"> }) {
 function Money({
   label,
   value,
+  currency,
 }: {
   readonly label: string;
   readonly value: number | null | undefined;
+  readonly currency: string;
 }) {
   return (
     <div className="min-w-0 pt-1">
@@ -234,7 +255,7 @@ function Money({
         {label}
       </dt>
       <dd className="truncate font-mono text-lg text-ink">
-        {formatMoney(value)}
+        {formatMoney(value, currency)}
       </dd>
     </div>
   );

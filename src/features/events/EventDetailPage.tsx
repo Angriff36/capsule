@@ -302,7 +302,7 @@ export function EventDetailPage() {
             <summary className="flex min-h-11 cursor-pointer list-none items-center px-3 text-base font-semibold text-ink [&::-webkit-details-marker]:hidden">
               Actions
             </summary>
-            <div className="flex flex-wrap gap-2 px-3 pb-3">
+            <div className="mobile-actions flex flex-wrap gap-2 px-3 pb-3">
               {headerActions}
             </div>
           </details>

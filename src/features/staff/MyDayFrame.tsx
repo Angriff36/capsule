@@ -33,7 +33,7 @@ export function MyDayFrame({
     ? `${identityLabel} · ${formatDate(Date.now())}`
     : formatDate(Date.now());
   return (
-    <div className="relative flex min-h-dvh flex-col bg-canvas">
+    <div className="relative flex h-dvh flex-col overflow-clip bg-canvas">
       <header className="sticky top-0 z-10 flex items-center gap-2.5 border-b border-line-2 bg-canvas px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))]">
         <span className="grid h-6 w-6 place-items-center rounded-xs bg-accent font-mono text-sm font-bold text-white">
           C
@@ -54,7 +54,7 @@ export function MyDayFrame({
         </Link>
       </header>
       <main
-        className={`mx-auto flex w-full flex-1 flex-col gap-4 px-4 py-5 pb-16 ${
+        className={`mx-auto flex min-h-0 w-full flex-1 flex-col gap-4 overflow-y-auto px-4 py-5 pb-16 ${
           wide ? "max-w-md md:max-w-5xl" : "max-w-md"
         }`}
       >

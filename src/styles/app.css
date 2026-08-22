@@ -3795,3 +3795,13 @@
     margin: 0;
   }
 }
+
+@media (max-width: 767px) {
+  /* Event actions drawer on phones: every control is a 44px target. */
+  .mobile-actions .btn,
+  .mobile-actions button,
+  .mobile-actions a {
+    min-height: 44px;
+    height: auto;
+  }
+}
