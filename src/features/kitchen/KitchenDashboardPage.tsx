@@ -169,9 +169,7 @@ export function KitchenDashboardPage() {
         <h1>Command deck</h1>
         <p className="kcd-lede">
           Next 7 days from {formatDate(horizon.start().getTime())} — put cooks
-          on dishes and steps, and keep an eye on who is buried.{" "}
-          <Link to="/kitchen/yield">Review yield variance</Link> for completed
-          batches.
+          on dishes and steps, and keep an eye on who is buried.
         </p>
       </header>
 
@@ -209,6 +207,9 @@ export function KitchenDashboardPage() {
               ))}
           </select>
         </label>
+        <Link to="/kitchen/yield" className="btn btn-ghost ml-auto">
+          Yield variance
+        </Link>
       </div>
 
       {failure ? <CulinaryFailureBanner error={failure} /> : null}
