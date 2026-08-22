@@ -171,7 +171,8 @@ self.addEventListener("fetch", (event) => {
         const cached = await caches.match(request);
         if (cached) return cached;
         const response = await fetch(request);
-        if (response.ok) {
+        // Never cache the SPA rewrite's HTML under a bundle URL (deploy switch).
+        if (response.ok && !isHtml(response)) {
           const copy = response.clone();
           event.waitUntil(
             caches.open(VERSION).then(async (cache) => {

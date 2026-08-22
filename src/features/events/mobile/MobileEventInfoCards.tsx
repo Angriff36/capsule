@@ -26,8 +26,12 @@ export function MobileClientCard({
   readonly clients: readonly ClientRow[] | undefined;
 }) {
   const contacts = useListClientContact();
+  // Same rule as the client detail view: removed contacts stay out.
   const clientContacts = (contacts ?? []).filter(
-    (row) => row.deletedAt == null && row.clientId === event.clientId,
+    (row) =>
+      row.deletedAt == null &&
+      row.clientId === event.clientId &&
+      String(row.status) === "active",
   );
   const name = clientDisplayName(event.clientId, clients as never);
   return (
