@@ -7,7 +7,7 @@ import { NAV_GROUPS } from "../nav";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
 import { MoonIcon, SunIcon } from "../../ui/icons";
 
-function ThemeToggle() {
+export function ThemeToggle() {
   const [dark, setDark] = useState(() =>
     document.documentElement.classList.contains("dark"),
   );

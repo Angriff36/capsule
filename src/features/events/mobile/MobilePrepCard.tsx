@@ -6,10 +6,11 @@ import {
   usePrepTaskStart,
 } from "../../../lib/manifest-convex-react";
 import { formatStatusLabel } from "../../../lib/statusLabels";
+import { useAuthStatus } from "../../../lib/useAuthStatus";
+import { prepQuantityLabel } from "../../kitchen/prepQuantityLabel";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { eventDetailPath } from "../eventRoutes";
 import { FailureBanner } from "../FailureBanner";
-import { formatQuantity } from "./formatQuantity";
 import {
   MobileEmpty,
   MobileMore,
@@ -40,6 +41,7 @@ function nextAction(
 /** Prep tasks for this event with claim → start → complete on the phone. */
 export function MobilePrepCard({ eventId }: { readonly eventId: string }) {
   const tasks = useListPrepTask();
+  const authStatus = useAuthStatus();
   const claim = usePrepTaskClaim();
   const start = usePrepTaskStart();
   const complete = usePrepTaskComplete();
@@ -65,6 +67,18 @@ export function MobilePrepCard({ eventId }: { readonly eventId: string }) {
 
   const run = async (task: PrepTask, verb: "claim" | "start" | "complete") => {
     setFailure(null);
+    // PrepTask.claim writes user.personId into a Person FK; say so up front
+    // instead of surfacing a bare "requirement not met" (same as the kitchen deck).
+    if (verb === "claim" && !authStatus?.personId) {
+      setFailure(
+        classifyCommandFailure(
+          new Error(
+            "Your sign-in isn't linked to a staff profile yet, so it can't hold prep work. Ask an admin to link it under Administration → Team roles.",
+          ),
+        ),
+      );
+      return;
+    }
     setBusy(task._id);
     try {
       const args = { docId: task._id, version: task.version };
@@ -94,7 +108,7 @@ export function MobilePrepCard({ eventId }: { readonly eventId: string }) {
           const quantity = Number(task.quantity) || 0;
           const sub = [
             quantity > 0
-              ? `${formatQuantity(quantity)} ${String(task.unit)}`
+              ? `${prepQuantityLabel(quantity, String(task.unit))} ${String(task.unit)}`
               : "",
             task.station ?? "",
             formatStatusLabel(String(task.status)),

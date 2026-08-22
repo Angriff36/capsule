@@ -4,8 +4,10 @@ import { NavLink, useLocation } from "react-router-dom";
 import { api } from "../../lib/api";
 import { CalendarIcon, ClockIcon, FlameIcon, XIcon } from "../../ui/icons";
 import { navigationCatalog } from "../navigation/NavigationCatalog";
+import { ThemeToggle } from "./Sidebar";
 
-const TABS = [
+/** Primary tabs; each must also be an area the role can reach (see below). */
+const PRIMARY = [
   { to: "/events", label: "Events", icon: CalendarIcon },
   { to: "/my", label: "Today", icon: ClockIcon },
   { to: "/kitchen", label: "Kitchen", icon: FlameIcon },
@@ -24,6 +26,10 @@ export function MobileTabBar() {
   const authStatus = useQuery(api.authStatus.getAuthStatus, {});
   const areas = navigationCatalog.availableAreas(
     authStatus?.disabledCapabilities,
+  );
+  // Same capability kill-switches as the rail and the More sheet.
+  const TABS = PRIMARY.filter((tab) =>
+    areas.some((area) => area.path === tab.to),
   );
   // Navigating closes the sheet.
   useEffect(() => setMoreOpen(false), [pathname]);
@@ -44,14 +50,17 @@ export function MobileTabBar() {
         >
           <div className="flex items-center justify-between px-4 pt-3 pb-1">
             <p className="eyebrow">All workspaces</p>
-            <button
-              type="button"
-              className="grid h-11 w-11 place-items-center text-ink-2"
-              aria-label="Close"
-              onClick={() => setMoreOpen(false)}
-            >
-              <XIcon width={16} height={16} />
-            </button>
+            <div className="flex items-center gap-1">
+              <ThemeToggle />
+              <button
+                type="button"
+                className="grid h-11 w-11 place-items-center text-ink-2"
+                aria-label="Close"
+                onClick={() => setMoreOpen(false)}
+              >
+                <XIcon width={16} height={16} />
+              </button>
+            </div>
           </div>
           <nav
             aria-label="All workspaces"

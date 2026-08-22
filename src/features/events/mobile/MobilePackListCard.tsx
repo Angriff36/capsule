@@ -7,7 +7,7 @@ import {
 import { StatusChip } from "../../../ui/primitives";
 import { classifyCommandFailure, type CommandFailure } from "../CommandFailure";
 import { FailureBanner } from "../FailureBanner";
-import { formatQuantity } from "./formatQuantity";
+import { prepQuantityLabel } from "../../kitchen/prepQuantityLabel";
 import { MobileEmpty, MobileSectionCard } from "./MobileSectionCard";
 
 type PackListItem = NonNullable<ReturnType<typeof useListPackListItem>>[number];
@@ -82,7 +82,9 @@ export function MobilePackListCard({ eventId }: { readonly eventId: string }) {
                 </p>
               ) : null}
               {listItems.length === 0 ? (
-                <MobileEmpty>No items listed.</MobileEmpty>
+                <MobileEmpty>
+                  No items listed — or your role cannot read pack items.
+                </MobileEmpty>
               ) : (
                 listItems.map((item) => {
                   const isPacked = item.status === "packed";
@@ -106,7 +108,7 @@ export function MobilePackListCard({ eventId }: { readonly eventId: string }) {
                         </span>
                         <span className="mobile-row-sub truncate">
                           {quantity > 0
-                            ? `${formatQuantity(quantity)} ${String(item.unit)}`
+                            ? `${prepQuantityLabel(quantity, String(item.unit))} ${String(item.unit)}`
                             : ""}
                           {item.status === "missing" ? " · missing" : ""}
                         </span>

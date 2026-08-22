@@ -7,6 +7,7 @@ import {
   useListInvoice,
 } from "../../../lib/manifest-convex-react";
 import { StatusChip } from "../../../ui/primitives";
+import { OPEN_INVOICE_STATUSES } from "../../finance/invoiceBilling";
 import { clientDisplayName } from "../clientName";
 import { eventDetailPath } from "../eventRoutes";
 import {
@@ -172,14 +173,15 @@ export function MobileMoneyCard({ event }: { readonly event: Doc<"events"> }) {
   const eventInvoices = (invoices ?? []).filter(
     (row) => row.deletedAt == null && row.eventId === event._id,
   );
-  const balance = eventInvoices.reduce(
-    (sum, row) => sum + (Number(row.amountDue) || 0),
-    0,
-  );
-  const paid = eventInvoices.reduce(
-    (sum, row) => sum + (Number(row.amountPaid) || 0),
-    0,
-  );
+  // Same rule as Finance: voided/draft/written-off invoices do not owe money.
+  const open = (status: unknown) =>
+    (OPEN_INVOICE_STATUSES as readonly string[]).includes(String(status));
+  const balance = eventInvoices
+    .filter((row) => open(row.status))
+    .reduce((sum, row) => sum + (Number(row.amountDue) || 0), 0);
+  const paid = eventInvoices
+    .filter((row) => open(row.status) || String(row.status) === "paid")
+    .reduce((sum, row) => sum + (Number(row.amountPaid) || 0), 0);
   const seeAllTo =
     eventInvoices.length === 1 && eventInvoices[0]
       ? `/finance/invoices/${eventInvoices[0]._id}`
