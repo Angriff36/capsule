@@ -3753,3 +3753,11 @@
     display: none;
   }
 }
+@media (min-width: 768px) {
+  /* Same layering reason as the rail above: these rules are unlayered, so
+     Tailwind's md:hidden cannot override them. Desktop never shows them. */
+  .mobile-tab-bar,
+  .mobile-more-sheet {
+    display: none;
+  }
+}
