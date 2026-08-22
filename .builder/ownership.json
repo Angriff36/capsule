@@ -30,7 +30,7 @@
       "sha256": "0aa3c9acd06a0cd0008fdf88fae1e0e0aa6ac1f4c9ccdf77d377fcdc4f524251"
     },
     "manifest-context-summary.json": {
-      "sha256": "637d3791305c29aa50aa617c3891629edbf07dd5956916f02e7cf38c8e3725f1"
+      "sha256": "860472581700b82e0a69f73c6564b039cf15d30ebbb9a42ef3a840c2c03788b3"
     },
     "package.json": {
       "sha256": "615294710566b71f8a430773bd4806b68f31bbcaa1851f2f73bdb3e0f8f7c2d9"
@@ -39,28 +39,28 @@
       "sha256": "5592279ac05df6814893d52b6aef9feffa3080dfc7dab20cb124bb6b1cc2973b"
     },
     "schemas/manifest-schemas.ts": {
-      "sha256": "7b36e43139069d849136169746d64fcee45b5b7259b1d3340757969701c5e8ae"
+      "sha256": "6ddc18db9f62deb37acbe86a909bd934706cc85c7f76e02bbd10f38926d7f177"
     },
     "scripts/seed-convex.ts": {
       "sha256": "b768ef14d6f3432439c8c8006d0cf9be0caffbd125d3f4ee1be62dd74049ccfb"
     },
     "src/generated/manifest-wiring-bindings.ts": {
-      "sha256": "f173f45d3beb2f3feaa9e4b0a52eee284c541d12555d47acccc05174d51c8405"
+      "sha256": "388441d4f8ae70f99cc9a4fb69f90836fc96305e69e38f9339c4c78d5542fb7b"
     },
     "src/generated/manifest-wiring-contract.json": {
-      "sha256": "c1bdb4f75edc53e478bc289643bbc988d2980b7b17ab4794b78b78a558da6335"
+      "sha256": "98a5a54410916e2f2c1181214b7c1b77794d8520a85b3595a213d31939dfded3"
     },
     "src/lib/manifest-convex-react.ts": {
-      "sha256": "025ccc37fe580b5b885758200a364876f1fea6019b5e5a79ab43905700a4ecc2"
+      "sha256": "9f4bcc8a81ea0389c472934d80ae462fc7270aa1890437e5077ddc2d29cab256"
     },
     "tests/manifest-convex.contract.test.ts": {
-      "sha256": "c924b7e22e9a10c19c94dccd65bdb51b88f3357d0c0f859f930ed83cf96089e5"
+      "sha256": "3d7eb692af1474eae6e898dd08b9ce3b7d4bd50f7332ae3689424d78117bfa8b"
     },
     "tsconfig.builder.json": {
       "sha256": "c1ea6231987ba8f2ea2b440eba0345705a3fa1829a26d2b0f7672c7465461b6f"
     },
     "wiring/contract.json": {
-      "sha256": "0ecc300597a7e259db67cf946a705ca6f2c7748bcd45b4c1655a3943da05a607"
+      "sha256": "c01f93786d95aa2d15aed7e2d8186fd1d8f26275be888176e73a783947e03256"
     }
   },
   "package": {

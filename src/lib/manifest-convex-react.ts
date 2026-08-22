@@ -399,11 +399,13 @@ import {
   ProposalLineItemAddLineParamsSchema,
   ProposalLineItemRemoveLineParamsSchema,
   ProposalLineItemReviseLineParamsSchema,
+  ProposalLinkEventParamsSchema,
   ProposalMarkViewedParamsSchema,
   ProposalReassignClientParamsSchema,
   ProposalRevisionCaptureParamsSchema,
   ProposalSendParamsSchema,
   ProposalStageClientMergeParamsSchema,
+  ProposalStageEventLinkParamsSchema,
   ProposalSupersedeParamsSchema,
   ProposalTemplateArchiveParamsSchema,
   ProposalTemplateDefineParamsSchema,
@@ -6083,6 +6085,16 @@ export function useProposalExpire() {
   };
 }
 
+/** Mutation hook for Proposal.linkEvent. */
+export function useProposalLinkEvent() {
+  const mutate = useMutation(api.mutations.Proposal_linkEvent);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalLinkEventParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
 /** Mutation hook for Proposal.markViewed. */
 export function useProposalMarkViewed() {
   const mutate = useMutation(api.mutations.Proposal_markViewed);
@@ -6119,6 +6131,16 @@ export function useProposalStageClientMerge() {
   return (args: any) => {
     const { docId, version, idempotencyKey, ...params } = args ?? {};
     const parsed = ProposalStageClientMergeParamsSchema.parse(params) as Record<string, unknown>;
+    return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
+  };
+}
+
+/** Mutation hook for Proposal.stageEventLink. */
+export function useProposalStageEventLink() {
+  const mutate = useMutation(api.mutations.Proposal_stageEventLink);
+  return (args: any) => {
+    const { docId, version, idempotencyKey, ...params } = args ?? {};
+    const parsed = ProposalStageEventLinkParamsSchema.parse(params) as Record<string, unknown>;
     return mutate({ docId, version, idempotencyKey, ...__convexArgsFromZod(parsed) } as any);
   };
 }
@@ -9011,4 +9033,4 @@ export function useCreateWeeklyScheduleNotice() {
   };
 }
 
-export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 961 as const;
+export const MANIFEST_CONVEX_REACT_HOOK_COUNT = 963 as const;
