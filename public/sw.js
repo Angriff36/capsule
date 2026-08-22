@@ -31,12 +31,19 @@ self.addEventListener("install", (event) => {
       // Atomic: the shell, its entry bundles (parsed from index.html), and the
       // icons all land together or the install fails and the previous worker
       // keeps serving. A half-cached shell would boot to a blank page offline.
-      const html = await (await fetch("/", { cache: "no-store" })).text();
+      const shell = await fetch("/", { cache: "no-store" });
+      if (!shell.ok || !isHtml(shell)) throw new Error("shell unavailable");
+      const html = await shell.clone().text();
       const assets = [
         ...html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g),
       ].map((match) => match[1]);
       const cache = await caches.open(VERSION);
-      await cache.addAll([...new Set([...SHELL, ...assets])]);
+      await cache.addAll([
+        ...new Set([...SHELL.filter((path) => path !== "/"), ...assets]),
+      ]);
+      // The exact HTML whose bundles were just staged — never a second fetch
+      // that could land on a newer deployment.
+      await cache.put("/", shell);
       await self.skipWaiting();
     })(),
   );
@@ -79,6 +86,7 @@ async function promoteShell(response) {
   }
   if (missing.length > 0) await cache.addAll(missing);
   await cache.put("/", new Response(html, { headers: response.headers }));
+  await pruneAssets(cache);
 }
 
 async function pruneAssets(cache) {

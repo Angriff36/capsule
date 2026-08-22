@@ -139,7 +139,7 @@ export function MobilePrepCard({ eventId }: { readonly eventId: string }) {
                 <span className="mobile-row-sub truncate">{sub}</span>
               </span>
               {waiting?.isBlocked ? (
-                <span className="mobile-row-sub shrink-0 text-right">
+                <span className="mobile-row-sub max-w-40 min-w-0 text-right">
                   Waiting on {waiting.blockerNames.join(", ")}
                 </span>
               ) : action ? (
