@@ -3649,6 +3649,9 @@
 /* Phone shell (below 768px): bottom tab bar, "More" sheet, sticky event
    header, and the event-overview section cards. */
 .mobile-tab-bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 30;
   display: flex;
   flex-shrink: 0;
   border-top: 1px solid var(--color-line);
@@ -3671,7 +3674,7 @@
   color: var(--color-ink);
 }
 .mobile-more-sheet {
-  position: absolute;
+  position: fixed;
   right: 0;
   bottom: calc(56px + env(safe-area-inset-bottom));
   left: 0;
@@ -3758,5 +3761,37 @@
   .mobile-tab-bar,
   .mobile-more-sheet {
     display: none;
+  }
+}
+
+@media (max-width: 767px) {
+  /* Phone acceptance floor: primary content and form controls read at 16px
+     (also stops iOS zooming into focused inputs); captions and chips keep
+     their token sizes. Notched phones in standalone mode get the top inset. */
+  .mobile-row,
+  .mobile-section-card dd,
+  .mobile-section-card > header a,
+  .mobile-section-card p.text-base,
+  .mobile-section-card span.text-base,
+  .mobile-section-card button.btn {
+    font-size: 16px;
+  }
+  .input,
+  .field-input,
+  select,
+  textarea,
+  input:not([type="checkbox"]):not([type="radio"]),
+  .btn:not(.btn-sm) {
+    font-size: 16px;
+  }
+  .app-shell-header {
+    height: auto;
+    min-height: 4rem;
+    padding-top: env(safe-area-inset-top);
+  }
+  .mobile-more-sheet .theme-toggle {
+    width: 44px;
+    height: 44px;
+    margin: 0;
   }
 }
