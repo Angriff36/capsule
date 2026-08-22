@@ -4,6 +4,7 @@ import { PageGuide } from "../guide/PageGuide";
 import { WifiOffIcon } from "../../ui/icons";
 import { AnnouncementBanner } from "../../features/announcements/AnnouncementBanner";
 import { CommandPalette } from "./CommandPalette";
+import { MobileTabBar } from "./MobileTabBar";
 import { RouteErrorBoundary } from "./RouteErrorBoundary";
 import { ShellOnlineMonitor } from "./ShellOnlineMonitor";
 import { ShortcutReferenceOverlay } from "./ShortcutReferenceOverlay";
@@ -56,7 +57,7 @@ export function AppShell() {
     // the dark canvas "void" under the app instead of reaching the content.
     <div className="flex h-dvh overflow-clip bg-canvas">
       <Sidebar />
-      <div className="flex min-w-0 flex-1 flex-col">
+      <div className="relative flex min-w-0 flex-1 flex-col">
         <Topbar onOpenPalette={() => setPaletteOpen(true)} />
         {!online && (
           <div className="flex items-center gap-2 border-b border-warn/30 bg-warn-soft px-4 py-1.5 text-sm font-medium text-warn">
@@ -74,6 +75,7 @@ export function AppShell() {
             </RouteErrorBoundary>
           </div>
         </main>
+        <MobileTabBar />
       </div>
       <CommandPalette
         open={paletteOpen}

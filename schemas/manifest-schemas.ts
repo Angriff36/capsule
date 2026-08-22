@@ -2014,6 +2014,7 @@ export const ProposalSchema = z.object({
   clientMergeAuthorizationId: z.string().uuid().nullable().optional(),
   mergeTargetClientId: z.string().uuid().nullable().optional(),
   eventId: z.string().uuid().nullable().optional(),
+  pendingEventId: z.string().uuid().nullable().optional(),
   proposalNumber: z.string().nullable().optional(),
   title: z.string().default(""),
   eventDate: z.coerce.date().nullable().optional(),
@@ -6506,6 +6507,11 @@ export const ProposalExpireParamsSchema = z.object({});
 
 export type ProposalExpireParams = z.infer<typeof ProposalExpireParamsSchema>;
 
+// Command: linkEvent on Proposal
+export const ProposalLinkEventParamsSchema = z.object({});
+
+export type ProposalLinkEventParams = z.infer<typeof ProposalLinkEventParamsSchema>;
+
 // Command: markViewed on Proposal
 export const ProposalMarkViewedParamsSchema = z.object({});
 
@@ -6528,6 +6534,13 @@ export const ProposalStageClientMergeParamsSchema = z.object({
 });
 
 export type ProposalStageClientMergeParams = z.infer<typeof ProposalStageClientMergeParamsSchema>;
+
+// Command: stageEventLink on Proposal
+export const ProposalStageEventLinkParamsSchema = z.object({
+  eventId: z.string().min(1),
+});
+
+export type ProposalStageEventLinkParams = z.infer<typeof ProposalStageEventLinkParamsSchema>;
 
 // Command: supersede on Proposal
 export const ProposalSupersedeParamsSchema = z.object({
