@@ -251,10 +251,13 @@ export const listSignIns = action({
     }
 
     const wanted = new Set(scope.wantedEmails);
+    // Same proof as self-link: the PRIMARY email, verified by the provider.
     const byEmail = users
       .map((user) => ({ user, primary: primaryEmail(user) }))
-      .filter(({ primary }) =>
-        wanted.has(primary?.email_address.trim().toLowerCase() ?? ""),
+      .filter(
+        ({ primary }) =>
+          primary?.verification?.status === "verified" &&
+          wanted.has(primary.email_address.trim().toLowerCase()),
       );
     // Tenant proof: an account that belongs to some OTHER tenant's
     // organization is never offered here — only accounts with no

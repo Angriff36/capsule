@@ -170,8 +170,8 @@ export function TeamRolesPanel({
       form.reset();
       setNotice(
         authSubjectId
-          ? "Team member hired and linked. Their Capsule role now comes from this record, not Clerk."
-          : "Team member hired. Link their Clerk user id so sign-in uses this Capsule role.",
+          ? "Team member hired and linked. Their Capsule role now comes from this record."
+          : "Team member hired. When they sign in with this email their account links on its own; admin-role staff get linked here in their row.",
       );
     } catch (error_) {
       setError(error_ instanceof Error ? error_.message : "Could not hire.");
@@ -332,18 +332,6 @@ export function TeamRolesPanel({
               {PersonRoleDirectory.ASSIGNABLE_ROLES.map((role) => (
                 <option key={role} value={role}>
                   {PersonRoleDirectory.label(role)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="block text-sm sm:col-span-2">
-            <span className="meta-term">Link Clerk member</span>
-            <select name="authSubjectId" className="input mt-1" defaultValue="">
-              <option value="">Link later</option>
-              {clerkMembers.map((member) => (
-                <option key={member.userId} value={member.userId}>
-                  {member.name}
-                  {member.identifier ? ` · ${member.identifier}` : ""}
                 </option>
               ))}
             </select>
