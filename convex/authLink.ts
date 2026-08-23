@@ -159,19 +159,16 @@ export const linkBySubjectEmail = internalMutation({
 });
 
 /**
- * What the caller's tenant is allowed to see of the identity provider:
- * the emails of ITS OWN active, unlinked staff rows (the admin typed those
- * emails when hiring), plus every subject already held by an active Person
- * anywhere (never re-offered). Nothing from other tenants leaks through.
+ * What the caller's tenant is allowed to see of the identity provider: the
+ * emails of ITS OWN active, unlinked staff rows (the admin typed those emails
+ * when hiring). Nothing from other tenants leaks through.
  */
 export const catalogScope = internalQuery({
   args: {},
-  handler: async (
-    ctx,
-  ): Promise<{ wantedEmails: string[]; takenSubjects: string[] }> => {
+  handler: async (ctx): Promise<{ wantedEmails: string[] }> => {
     const auth = await getAuthContext(ctx);
     if (!ADMIN_ROLES.has(auth.role) || !auth.tenantId) {
-      return { wantedEmails: [], takenSubjects: [] };
+      return { wantedEmails: [] };
     }
     const own = await ctx.db
       .query("people")
@@ -184,17 +181,29 @@ export const catalogScope = internalQuery({
       const email = await readEmail(ctx, row.email);
       if (email) wantedEmails.push(email);
     }
-    const people = await ctx.db.query("people").collect();
-    const takenSubjects = people
-      .filter(
-        (row) =>
-          row.deletedAt == null &&
-          String(row.status) === "active" &&
-          typeof row.authSubjectId === "string" &&
-          row.authSubjectId.length > 0,
-      )
-      .map((row) => row.authSubjectId as string);
-    return { wantedEmails, takenSubjects };
+    return { wantedEmails };
+  },
+});
+
+/** Of these subjects, the ones an active Person already holds (indexed). */
+export const takenAmong = internalQuery({
+  args: { subjects: v.array(v.string()) },
+  handler: async (ctx, { subjects }): Promise<string[]> => {
+    const taken: string[] = [];
+    for (const subject of subjects) {
+      const rows = await ctx.db
+        .query("people")
+        .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", subject))
+        .collect();
+      if (
+        rows.some(
+          (row) => row.deletedAt == null && String(row.status) === "active",
+        )
+      ) {
+        taken.push(subject);
+      }
+    }
+    return taken;
   },
 });
 
@@ -218,41 +227,53 @@ export const listSignIns = action({
     if (!secret) return { signIns: [], error: "not_configured" };
     const scope = await ctx.runQuery(internal.authLink.catalogScope, {});
     if (scope.wantedEmails.length === 0) return { signIns: [], error: null };
-    const wanted = new Set(scope.wantedEmails);
-    const taken = new Set(scope.takenSubjects);
 
-    const signIns: SignInCatalog["signIns"] = [];
-    const pageSize = 100;
-    for (let offset = 0; offset < 2000; offset += pageSize) {
+    // Ask the provider for exactly these emails (bounded; no paging).
+    const users: ClerkUser[] = [];
+    const batch = 50;
+    for (let i = 0; i < scope.wantedEmails.length; i += batch) {
+      const params = new URLSearchParams();
+      for (const email of scope.wantedEmails.slice(i, i + batch)) {
+        params.append("email_address", email);
+      }
+      params.set("limit", String(batch));
       let response: Response;
       try {
         response = await fetch(
-          `https://api.clerk.com/v1/users?limit=${pageSize}&offset=${offset}&order_by=-created_at`,
+          `https://api.clerk.com/v1/users?${params.toString()}`,
           { headers: { Authorization: `Bearer ${secret}` } },
         );
       } catch {
         return { signIns: [], error: "provider_error" };
       }
       if (!response.ok) return { signIns: [], error: "provider_error" };
-      const users = (await response.json()) as ClerkUser[];
-      for (const user of users) {
-        if (taken.has(user.id)) continue;
-        const primary = primaryEmail(user);
-        const email = primary?.email_address.trim().toLowerCase() ?? "";
-        if (!wanted.has(email)) continue;
-        const name =
-          [user.first_name, user.last_name].filter(Boolean).join(" ") ||
-          primary?.email_address ||
-          user.id;
-        signIns.push({
-          userId: user.id,
-          name,
-          email: primary?.email_address ?? null,
-        });
-      }
-      if (users.length < pageSize) break;
+      users.push(...((await response.json()) as ClerkUser[]));
     }
-    return { signIns, error: null };
+
+    const wanted = new Set(scope.wantedEmails);
+    const candidates = users
+      .map((user) => ({ user, primary: primaryEmail(user) }))
+      .filter(({ primary }) =>
+        wanted.has(primary?.email_address.trim().toLowerCase() ?? ""),
+      );
+    const taken = new Set(
+      await ctx.runQuery(internal.authLink.takenAmong, {
+        subjects: candidates.map(({ user }) => user.id),
+      }),
+    );
+    return {
+      signIns: candidates
+        .filter(({ user }) => !taken.has(user.id))
+        .map(({ user, primary }) => ({
+          userId: user.id,
+          name:
+            [user.first_name, user.last_name].filter(Boolean).join(" ") ||
+            primary?.email_address ||
+            user.id,
+          email: primary?.email_address ?? null,
+        })),
+      error: null,
+    };
   },
 });
 

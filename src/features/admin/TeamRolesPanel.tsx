@@ -5,7 +5,7 @@ import {
   useState,
   type FormEvent,
 } from "react";
-import { useOrganization, useUser } from "@clerk/react";
+import { useUser } from "@clerk/react";
 import { useAction } from "convex/react";
 import { api } from "../../lib/api";
 import { usePayRates } from "../facilities/useLaborSummary";
@@ -60,9 +60,6 @@ export function TeamRolesPanel({
     [payRates],
   );
   const { user } = useUser();
-  const { memberships } = useOrganization({
-    memberships: { infinite: true, pageSize: 50 },
-  });
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -75,9 +72,8 @@ export function TeamRolesPanel({
     [people],
   );
 
-  // Sign-ins known to the identity provider (admin-only action) — covers
-  // accounts that are not organization members, e.g. admin-capable staff
-  // that self-link refuses. Org memberships stay as a second source.
+  // Sign-ins known to the identity provider (admin-only, tenant-scoped action)
+  // — covers admin-capable staff that self-link refuses.
   const listSignIns = useAction(api.authLink.listSignIns);
   const [signIns, setSignIns] = useState<
     Array<{ userId: string; name: string; email: string | null }>
@@ -103,30 +99,17 @@ export function TeamRolesPanel({
     loadSignIns();
   }, [loadSignIns]);
 
-  const clerkMembers = useMemo(() => {
-    const data = memberships?.data ?? [];
-    const fromOrg = data
-      .map((membership) => {
-        const profile = membership.publicUserData;
-        const userId = profile?.userId;
-        if (!profile || !userId) return null;
-        const name =
-          [profile.firstName, profile.lastName].filter(Boolean).join(" ") ||
-          profile.identifier ||
-          userId;
-        return { userId, name, identifier: profile.identifier };
-      })
-      .filter((row): row is NonNullable<typeof row> => row != null);
-    const seen = new Set(fromOrg.map((row) => row.userId));
-    const fromProvider = signIns
-      .filter((row) => !seen.has(row.userId))
-      .map((row) => ({
+  // Tenant-scoped catalog from the server (convex/authLink.ts): only
+  // sign-ins whose email matches one of this tenant's unlinked staff rows.
+  const clerkMembers = useMemo(
+    () =>
+      signIns.map((row) => ({
         userId: row.userId,
         name: row.name,
         identifier: row.email ?? undefined,
-      }));
-    return [...fromOrg, ...fromProvider];
-  }, [memberships?.data, signIns]);
+      })),
+    [signIns],
+  );
 
   // Two staff rows sharing one sign-in would make getAuthContext's lookup
   // ambiguous (it takes .first()), so an account already spoken for is not
