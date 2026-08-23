@@ -1,5 +1,7 @@
-import { useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useOrganization, useUser } from "@clerk/react";
+import { useAction } from "convex/react";
+import { api } from "../../lib/api";
 import { usePayRates } from "../facilities/useLaborSummary";
 import {
   useCreatePerson,
@@ -67,9 +69,22 @@ export function TeamRolesPanel({
     [people],
   );
 
+  // Sign-ins known to the identity provider (admin-only action) — covers
+  // accounts that are not organization members, e.g. admin-capable staff
+  // that self-link refuses. Org memberships stay as a second source.
+  const listSignIns = useAction(api.authLink.listSignIns);
+  const [signIns, setSignIns] = useState<
+    Array<{ userId: string; name: string; email: string | null }>
+  >([]);
+  useEffect(() => {
+    listSignIns({})
+      .then(setSignIns)
+      .catch(() => setSignIns([]));
+  }, [listSignIns]);
+
   const clerkMembers = useMemo(() => {
     const data = memberships?.data ?? [];
-    return data
+    const fromOrg = data
       .map((membership) => {
         const profile = membership.publicUserData;
         const userId = profile?.userId;
@@ -81,7 +96,16 @@ export function TeamRolesPanel({
         return { userId, name, identifier: profile.identifier };
       })
       .filter((row): row is NonNullable<typeof row> => row != null);
-  }, [memberships?.data]);
+    const seen = new Set(fromOrg.map((row) => row.userId));
+    const fromProvider = signIns
+      .filter((row) => !seen.has(row.userId))
+      .map((row) => ({
+        userId: row.userId,
+        name: row.name,
+        identifier: row.email ?? undefined,
+      }));
+    return [...fromOrg, ...fromProvider];
+  }, [memberships?.data, signIns]);
 
   // Two staff rows sharing one sign-in would make getAuthContext's lookup
   // ambiguous (it takes .first()), so an account already spoken for is not

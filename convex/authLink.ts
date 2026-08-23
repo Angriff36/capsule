@@ -9,11 +9,12 @@
 // admin, see src/identity/person.manifest).
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
-import { action, internalMutation } from "./_generated/server";
+import { action, internalMutation, internalQuery } from "./_generated/server";
+import { getAuthContext } from "./lib/authContext";
 import { decrypt } from "./lib/encryption";
 
 /** Roles that carry adminAccess in src/foundation/base.manifest. */
-const ADMIN_ROLES = new Set(["admin", "owner"]);
+const ADMIN_ROLES = new Set(["admin", "owner", "system"]);
 
 export type LinkOutcome =
   | { linked: true; reason: "already" | "matched" }
@@ -100,13 +101,11 @@ export const linkBySubjectEmail = internalMutation({
       .query("people")
       .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", subject))
       .collect();
-    if (
-      linkedRows.some(
-        (row) => row.deletedAt == null && String(row.status) === "active",
-      )
-    ) {
-      return { linked: true, reason: "already" };
-    }
+    const activeLinks = linkedRows.filter(
+      (row) => row.deletedAt == null && String(row.status) === "active",
+    );
+    if (activeLinks.length > 1) return { linked: false, reason: "ambiguous" };
+    if (activeLinks.length === 1) return { linked: true, reason: "already" };
 
     const people = await ctx.db.query("people").collect();
     const matches = [];
@@ -125,6 +124,57 @@ export const linkBySubjectEmail = internalMutation({
     }
     await ctx.db.patch(person._id, { authSubjectId: subject });
     return { linked: true, reason: "matched" };
+  },
+});
+
+/** The caller's resolved role (Person-first), for action-side checks. */
+export const callerRole = internalQuery({
+  args: {},
+  handler: async (ctx) => (await getAuthContext(ctx)).role,
+});
+
+/**
+ * Admin-only: sign-ins known to the identity provider, so Team roles can link
+ * a staff row to an account that is not (or no longer) an organization
+ * member — including admin-capable Persons that self-link refuses. Read-only;
+ * returns ids, names, and primary emails only.
+ */
+export const listSignIns = action({
+  args: {},
+  handler: async (
+    ctx,
+  ): Promise<Array<{ userId: string; name: string; email: string | null }>> => {
+    const role = await ctx.runQuery(internal.authLink.callerRole, {});
+    if (!ADMIN_ROLES.has(role)) return [];
+    const secret = process.env.CLERK_SECRET_KEY;
+    if (!secret) return [];
+    let response: Response;
+    try {
+      response = await fetch(
+        "https://api.clerk.com/v1/users?limit=100&order_by=-created_at",
+        { headers: { Authorization: `Bearer ${secret}` } },
+      );
+    } catch {
+      return [];
+    }
+    if (!response.ok) return [];
+    const users = (await response.json()) as Array<{
+      id: string;
+      first_name?: string | null;
+      last_name?: string | null;
+      primary_email_address_id?: string | null;
+      email_addresses?: Array<{ id: string; email_address: string }>;
+    }>;
+    return users.map((user) => {
+      const primary = user.email_addresses?.find(
+        (row) => row.id === user.primary_email_address_id,
+      );
+      const name =
+        [user.first_name, user.last_name].filter(Boolean).join(" ") ||
+        primary?.email_address ||
+        user.id;
+      return { userId: user.id, name, email: primary?.email_address ?? null };
+    });
   },
 });
 

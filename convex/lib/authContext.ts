@@ -63,6 +63,17 @@ export async function getAuthContext(ctx: {
   const linked = ctx.db
     ? await loadPersonBySubject(ctx.db, identity.subject)
     : null;
+  if (linked === "ambiguous") {
+    // Two active Persons claim this sign-in: fail closed. No IdP fallback,
+    // which could otherwise hand out a broader role than either Person.
+    return {
+      id: identity.subject,
+      role: ANONYMOUS.role,
+      tenantId: "",
+      roleSource: "anonymous",
+      disabledCapabilities: [],
+    };
+  }
   if (linked) {
     return {
       id: identity.subject,
@@ -122,7 +133,9 @@ async function loadPersonBySubject(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: { query: (table: "people") => any },
   authSubjectId: string,
-): Promise<{ role: string; personId: string; tenantId: string } | null> {
+): Promise<
+  { role: string; personId: string; tenantId: string } | "ambiguous" | null
+> {
   const rows = (await db
     .query("people")
     .withIndex(
@@ -139,8 +152,9 @@ async function loadPersonBySubject(
     .collect()) as PersonRow[];
   const active = rows.filter((row) => row.deletedAt == null);
   // One sign-in, one active Person. Two active rows (e.g. the same subject
-  // linked in two tenants) is ambiguous: fail closed rather than pick one.
-  if (active.length !== 1) return null;
+  // linked in two tenants) is ambiguous: the caller fails closed.
+  if (active.length > 1) return "ambiguous";
+  if (active.length === 0) return null;
   const person = active[0]!;
   if (typeof person.role !== "string" || person.role.length === 0) return null;
   if (typeof person.tenantId !== "string" || person.tenantId.length === 0) {
