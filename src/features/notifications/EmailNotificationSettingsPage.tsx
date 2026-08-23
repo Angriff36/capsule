@@ -1,4 +1,5 @@
-import { useOrganization, useUser } from "@clerk/react";
+import { useUser } from "@clerk/react";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../lib/api";
@@ -87,7 +88,7 @@ const preferenceSnapshot = (
 
 export function EmailNotificationSettingsPage() {
   const { user, isLoaded: userLoaded } = useUser();
-  const { organization, isLoaded: organizationLoaded } = useOrganization();
+  const authStatus = useAuthStatus();
   const rows = useListEmailNotificationSubscription();
   const createPreferences = useCreateEmailNotificationSubscription();
   const updatePreferences =
@@ -118,7 +119,7 @@ export function EmailNotificationSettingsPage() {
     category: EmailNotificationCategory,
     subscribed: boolean,
   ) {
-    if (busy || !userLoaded || !organizationLoaded || !organization) return;
+    if (busy || !userLoaded || !user || !authStatus) return;
     const field = EMAIL_NOTIFICATION_CATEGORY_DETAILS[category].preferenceField;
     const next = { ...preferences, [field]: subscribed };
     setOptimistic(next);
@@ -135,7 +136,10 @@ export function EmailNotificationSettingsPage() {
       } else {
         await createPreferences({
           ...next,
-          idempotencyKey: `email-notification-subscriptions:${organization.id}:${user?.id ?? "current-user"}`,
+          // Scoped to the resolved staff profile (tenant-specific) plus the
+          // sign-in, so a re-linked account never replays another tenant's
+          // cached create.
+          idempotencyKey: `email-notification-subscriptions:${authStatus.personId ?? `tenant:${authStatus.tenantId ?? "none"}`}:${user.id}`,
         });
       }
       const label = EMAIL_NOTIFICATION_CATEGORY_DETAILS[category].label;
@@ -155,7 +159,7 @@ export function EmailNotificationSettingsPage() {
     }
   }
 
-  if (rows === undefined || !userLoaded || !organizationLoaded) {
+  if (rows === undefined || !userLoaded) {
     return <TableSkeleton rows={6} />;
   }
 

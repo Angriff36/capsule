@@ -2,16 +2,18 @@ import {
   OrganizationSwitcher,
   SignIn,
   SignOutButton,
-  useOrganization,
+  useOrganizationList,
+  useUser,
 } from "@clerk/react";
 import {
   Authenticated,
   AuthLoading,
   AuthRefreshing,
   Unauthenticated,
+  useAction,
   useQuery,
 } from "convex/react";
-import type { ReactNode } from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { api } from "../lib/api";
 import {
   type AuthStatusSnapshot,
@@ -61,12 +63,7 @@ function ClaimGate({ children }: { children?: ReactNode }) {
     );
   }
   if (!workspaceMembershipPolicy.isReady(status as AuthStatusSnapshot)) {
-    return (
-      <MembershipRequired
-        hasRole={status.hasRole}
-        hasTenant={status.hasTenant}
-      />
-    );
+    return <MembershipRequired />;
   }
   return <>{children}</>;
 }
@@ -86,53 +83,109 @@ function SignInScreen() {
   );
 }
 
-function MembershipRequired({
-  hasRole,
-  hasTenant,
-}: {
-  hasRole: boolean;
-  hasTenant: boolean;
-}) {
-  const { organization } = useOrganization();
-  const missing = workspaceMembershipPolicy.missingRequirements({
-    authenticated: true,
-    hasRole,
-    hasTenant,
+type LinkOutcome =
+  | "linking"
+  | "already"
+  | "matched"
+  | "unauthenticated"
+  | "not_configured"
+  | "provider_error"
+  | "no_email"
+  | "email_unverified"
+  | "no_match"
+  | "ambiguous"
+  | "released"
+  | "needs_admin_link"
+  | "error";
+
+/**
+ * Signed in, but no tenant/role yet. First try to link this sign-in to the
+ * Person that carries the same verified email (convex/authLink.ts). When that
+ * works the auth-status query re-renders and the app opens on its own. When it
+ * cannot, say exactly why and what the manager must do — no identity-provider
+ * screens, no ids to paste.
+ */
+function MembershipRequired() {
+  const { user } = useUser();
+  // Legacy org-based sign-ins (no linked Person yet) that have memberships
+  // but no active organization still need a way to pick one.
+  const { userMemberships } = useOrganizationList({
+    userMemberships: { infinite: false, pageSize: 10 },
   });
+  const hasOrgMemberships = (userMemberships?.data?.length ?? 0) > 0;
+  // Display only — the server re-reads the verified email from the provider.
+  const email = user?.primaryEmailAddress?.emailAddress ?? null;
+  const linkSelf = useAction(api.authLink.linkSelfByEmail);
+  const [outcome, setOutcome] = useState<LinkOutcome>("linking");
+  const attempt = useCallback(() => {
+    setOutcome("linking");
+    linkSelf({})
+      .then((result) => setOutcome(result.reason))
+      .catch(() => setOutcome("error"));
+  }, [linkSelf]);
+  useEffect(() => {
+    attempt();
+  }, [attempt]);
+
+  const who = email ? (
+    <>
+      You are signed in as <span className="font-mono">{email}</span>.
+    </>
+  ) : (
+    "You are signed in."
+  );
+  const copy: Record<LinkOutcome, string> = {
+    linking: "Matching your sign-in to your staff profile…",
+    already: "Your profile is linked. Opening Capsule…",
+    matched: "Your profile is linked. Opening Capsule…",
+    unauthenticated: "Your session ended. Sign in again.",
+    not_configured:
+      "Self-link is not set up on this deployment yet (CLERK_SECRET_KEY). Ask your manager to link your account under Team roles.",
+    provider_error:
+      "The sign-in service could not be reached to confirm your email. Tap Try again in a moment.",
+    no_email:
+      "Your sign-in has no email address, so it cannot be matched to a staff profile. Sign in with an email or Google account.",
+    email_unverified:
+      "Your email is not verified yet. Check your inbox for the verification message, then tap Try again.",
+    no_match:
+      "No staff profile uses this email yet. Ask your manager to add you under Administration → Permissions → Team roles with this exact email, then tap Try again.",
+    ambiguous:
+      "More than one staff profile uses this email. Ask your manager to fix that under Team roles, then tap Try again.",
+    released:
+      "An admin unlinked this sign-in from your staff profile. Ask them to link it again under Administration → Permissions → Team roles.",
+    needs_admin_link:
+      "Your staff profile has an admin role, so another admin must link it under Administration → Permissions → Team roles.",
+    error: "The link could not be checked. Tap Try again.",
+  };
+
   return (
-    <GateShell title="Workspace membership setup required">
+    <GateShell title="One more step">
       <p className="leading-relaxed text-ink-2">
-        You are signed in, but your account has not been given {missing} yet, so
-        Capsule keeps everything locked. Choose or create your workspace below.
-        If it still won't unlock, ask whoever set up your sign-in to add the{" "}
-        <code className="font-mono">role</code> and{" "}
-        <code className="font-mono">tenantId</code> details to your account.
+        {who} {copy[outcome]}
       </p>
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        <OrganizationSwitcher
-          hidePersonal
-          afterCreateOrganizationUrl="/"
-          afterSelectOrganizationUrl="/"
-        />
-        {organization ? (
-          <span className="text-sm text-ink-3">
-            Active org: <span className="font-mono">{organization.id}</span>
-          </span>
-        ) : null}
-      </div>
-      <div className="mt-4 flex items-center gap-2">
+      <div className="mt-4 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          className="btn btn-primary min-h-11"
+          disabled={outcome === "linking"}
+          onClick={attempt}
+        >
+          Try again
+        </button>
         <SignOutButton>
-          <button type="button" className="btn btn-ghost">
+          <button type="button" className="btn btn-ghost min-h-11">
             Sign out
           </button>
         </SignOutButton>
-        <span className="text-sm text-ink-3">
-          Setup reference for your technician:{" "}
-          <span className="font-mono">
-            {`{"role":"{{org.role}}","tenantId":"{{org.id}}"}`}
-          </span>
-        </span>
       </div>
+      {hasOrgMemberships ? (
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <span className="text-sm text-ink-3">
+            Or open the workspace your account already belongs to:
+          </span>
+          <OrganizationSwitcher hidePersonal afterSelectOrganizationUrl="/" />
+        </div>
+      ) : null}
     </GateShell>
   );
 }

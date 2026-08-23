@@ -1,4 +1,4 @@
-import { OrganizationSwitcher, UserButton, useUser } from "@clerk/react";
+import { UserButton, useUser } from "@clerk/react";
 import { useQuery } from "convex/react";
 import { Link, useLocation } from "react-router-dom";
 import { NotificationTray } from "../../features/notifications/NotificationTray";
@@ -107,23 +107,11 @@ export function Topbar({ onOpenPalette }: { onOpenPalette: () => void }) {
   );
 }
 
-/** Clerk user + org switcher. Authorization remains server-side claims only. */
+/** Clerk user menu. Authorization stays server-side (linked Person). */
 function AccountMenu() {
   const { user } = useUser();
   return (
     <div className="flex items-center gap-2 pl-1.5">
-      <OrganizationSwitcher
-        hidePersonal
-        afterCreateOrganizationUrl="/"
-        afterSelectOrganizationUrl="/"
-        appearance={{
-          elements: {
-            rootBox: "flex items-center",
-            organizationSwitcherTrigger:
-              "h-8 rounded-xs border border-transparent px-2 text-sm text-ink-2 hover:border-line-2 hover:bg-inset",
-          },
-        }}
-      />
       <div className="text-right max-sm:hidden">
         <p className="max-w-40 truncate text-sm leading-tight font-medium">
           {user?.fullName ??

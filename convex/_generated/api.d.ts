@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as authLink from "../authLink.js";
 import type * as authStatus from "../authStatus.js";
 import type * as clientPortal from "../clientPortal.js";
 import type * as computed from "../computed.js";
@@ -35,6 +36,7 @@ import type * as lib_equipmentReservationAvailability from "../lib/equipmentRese
 import type * as lib_googleCalendar from "../lib/googleCalendar.js";
 import type * as lib_invoiceReminderPdf from "../lib/invoiceReminderPdf.js";
 import type * as lib_orgCapabilityGate from "../lib/orgCapabilityGate.js";
+import type * as lib_parseSearchQuery from "../lib/parseSearchQuery.js";
 import type * as lib_proposalDraft from "../lib/proposalDraft.js";
 import type * as lib_proposalEventCreation from "../lib/proposalEventCreation.js";
 import type * as lib_proposalPricing from "../lib/proposalPricing.js";
@@ -69,6 +71,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  authLink: typeof authLink;
   authStatus: typeof authStatus;
   clientPortal: typeof clientPortal;
   computed: typeof computed;
@@ -96,6 +99,7 @@ declare const fullApi: ApiFromModules<{
   "lib/googleCalendar": typeof lib_googleCalendar;
   "lib/invoiceReminderPdf": typeof lib_invoiceReminderPdf;
   "lib/orgCapabilityGate": typeof lib_orgCapabilityGate;
+  "lib/parseSearchQuery": typeof lib_parseSearchQuery;
   "lib/proposalDraft": typeof lib_proposalDraft;
   "lib/proposalEventCreation": typeof lib_proposalEventCreation;
   "lib/proposalPricing": typeof lib_proposalPricing;

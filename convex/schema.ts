@@ -1716,6 +1716,7 @@ export default defineSchema({
     version: v.number(),
   })
     .index("by_tenantId", ["tenantId"])
+    .index("by_authSubjectId", ["authSubjectId"])
     .searchIndex("search_givenName", { searchField: "givenName", filterFields: ["tenantId"] })
     .searchIndex("search_familyName", { searchField: "familyName", filterFields: ["tenantId"] }),
   prepTasks: defineTable({
