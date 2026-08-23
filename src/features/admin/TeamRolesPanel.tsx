@@ -97,7 +97,12 @@ export function TeamRolesPanel({
   }, [listSignIns]);
   // Reload when the roster changes (a hire or unlink makes new emails wanted).
   const unlinkedKey = (people ?? [])
-    .filter((row) => row.deletedAt == null && !row.authSubjectId)
+    .filter(
+      (row) =>
+        row.deletedAt == null &&
+        String(row.status) === "active" &&
+        !row.authSubjectId,
+    )
     .map((row) => row._id)
     .join(",");
   useEffect(() => {

@@ -251,11 +251,22 @@ export const listSignIns = action({
     }
 
     const wanted = new Set(scope.wantedEmails);
-    const candidates = users
+    const byEmail = users
       .map((user) => ({ user, primary: primaryEmail(user) }))
       .filter(({ primary }) =>
         wanted.has(primary?.email_address.trim().toLowerCase() ?? ""),
       );
+    // Tenant proof: an account that belongs to some OTHER tenant's
+    // organization is never offered here — only accounts with no
+    // organization (pure sign-ins) or members of this tenant's own.
+    const candidates = [];
+    for (const candidate of byEmail) {
+      const orgs = await organizationIds(candidate.user.id, secret);
+      if (orgs === null) return { signIns: [], error: "provider_error" };
+      if (orgs.length === 0 || orgs.includes(auth.tenantId)) {
+        candidates.push(candidate);
+      }
+    }
     const taken = new Set(
       await ctx.runQuery(internal.authLink.takenAmong, {
         subjects: candidates.map(({ user }) => user.id),
@@ -276,6 +287,28 @@ export const listSignIns = action({
     };
   },
 });
+
+/** Organization ids a provider account belongs to; null on provider error. */
+async function organizationIds(
+  userId: string,
+  secret: string,
+): Promise<string[] | null> {
+  try {
+    const response = await fetch(
+      `https://api.clerk.com/v1/users/${encodeURIComponent(userId)}/organization_memberships?limit=100`,
+      { headers: { Authorization: `Bearer ${secret}` } },
+    );
+    if (!response.ok) return null;
+    const body = (await response.json()) as {
+      data?: Array<{ organization?: { id?: string } }>;
+    };
+    return (body.data ?? [])
+      .map((row) => row.organization?.id ?? "")
+      .filter((id) => id.length > 0);
+  } catch {
+    return null;
+  }
+}
 
 /** Person.email is an encrypted field; decode the envelope, else take it raw. */
 async function readEmail(ctx: unknown, raw: unknown): Promise<string> {

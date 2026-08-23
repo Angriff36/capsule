@@ -1,4 +1,10 @@
-import { SignIn, SignOutButton, useUser } from "@clerk/react";
+import {
+  OrganizationSwitcher,
+  SignIn,
+  SignOutButton,
+  useOrganizationList,
+  useUser,
+} from "@clerk/react";
 import {
   Authenticated,
   AuthLoading,
@@ -100,6 +106,12 @@ type LinkOutcome =
  */
 function MembershipRequired() {
   const { user } = useUser();
+  // Legacy org-based sign-ins (no linked Person yet) that have memberships
+  // but no active organization still need a way to pick one.
+  const { userMemberships } = useOrganizationList({
+    userMemberships: { infinite: false, pageSize: 10 },
+  });
+  const hasOrgMemberships = (userMemberships?.data?.length ?? 0) > 0;
   // Display only — the server re-reads the verified email from the provider.
   const email = user?.primaryEmailAddress?.emailAddress ?? null;
   const linkSelf = useAction(api.authLink.linkSelfByEmail);
@@ -163,6 +175,14 @@ function MembershipRequired() {
           </button>
         </SignOutButton>
       </div>
+      {hasOrgMemberships ? (
+        <div className="mt-4 flex flex-wrap items-center gap-3">
+          <span className="text-sm text-ink-3">
+            Or open the workspace your account already belongs to:
+          </span>
+          <OrganizationSwitcher hidePersonal afterSelectOrganizationUrl="/" />
+        </div>
+      ) : null}
     </GateShell>
   );
 }
