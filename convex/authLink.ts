@@ -158,14 +158,34 @@ export const linkBySubjectEmail = internalMutation({
   },
 });
 
-/** Subjects already held by an active Person anywhere (never re-offered). */
-export const activeLinkedSubjects = internalQuery({
+/**
+ * What the caller's tenant is allowed to see of the identity provider:
+ * the emails of ITS OWN active, unlinked staff rows (the admin typed those
+ * emails when hiring), plus every subject already held by an active Person
+ * anywhere (never re-offered). Nothing from other tenants leaks through.
+ */
+export const catalogScope = internalQuery({
   args: {},
-  handler: async (ctx): Promise<string[]> => {
+  handler: async (
+    ctx,
+  ): Promise<{ wantedEmails: string[]; takenSubjects: string[] }> => {
     const auth = await getAuthContext(ctx);
-    if (!ADMIN_ROLES.has(auth.role)) return [];
+    if (!ADMIN_ROLES.has(auth.role) || !auth.tenantId) {
+      return { wantedEmails: [], takenSubjects: [] };
+    }
+    const own = await ctx.db
+      .query("people")
+      .withIndex("by_tenantId", (q) => q.eq("tenantId", auth.tenantId))
+      .collect();
+    const wantedEmails: string[] = [];
+    for (const row of own) {
+      if (row.deletedAt != null || String(row.status) !== "active") continue;
+      if (row.authSubjectId) continue;
+      const email = await readEmail(ctx, row.email);
+      if (email) wantedEmails.push(email);
+    }
     const people = await ctx.db.query("people").collect();
-    return people
+    const takenSubjects = people
       .filter(
         (row) =>
           row.deletedAt == null &&
@@ -174,6 +194,7 @@ export const activeLinkedSubjects = internalQuery({
           row.authSubjectId.length > 0,
       )
       .map((row) => row.authSubjectId as string);
+    return { wantedEmails, takenSubjects };
   },
 });
 
@@ -183,10 +204,10 @@ export type SignInCatalog = {
 };
 
 /**
- * Admin-only: sign-ins known to the identity provider that are not already
- * held by an active Person, so Team roles can link a staff row to an account
- * that is not an organization member — including admin-capable Persons that
- * self-link refuses. Read-only; ids, names, and primary emails only.
+ * Admin-only, tenant-scoped: identity-provider sign-ins whose primary email
+ * matches one of THIS tenant's active unlinked staff rows and that no active
+ * Person holds yet. That is exactly the admin-link case (admin-capable
+ * Persons that self-link refuses). Read-only; ids, names, emails only.
  */
 export const listSignIns = action({
   args: {},
@@ -195,9 +216,10 @@ export const listSignIns = action({
     if (!ADMIN_ROLES.has(auth.role)) return { signIns: [], error: "forbidden" };
     const secret = process.env.CLERK_SECRET_KEY;
     if (!secret) return { signIns: [], error: "not_configured" };
-    const taken = new Set(
-      await ctx.runQuery(internal.authLink.activeLinkedSubjects, {}),
-    );
+    const scope = await ctx.runQuery(internal.authLink.catalogScope, {});
+    if (scope.wantedEmails.length === 0) return { signIns: [], error: null };
+    const wanted = new Set(scope.wantedEmails);
+    const taken = new Set(scope.takenSubjects);
 
     const signIns: SignInCatalog["signIns"] = [];
     const pageSize = 100;
@@ -216,6 +238,8 @@ export const listSignIns = action({
       for (const user of users) {
         if (taken.has(user.id)) continue;
         const primary = primaryEmail(user);
+        const email = primary?.email_address.trim().toLowerCase() ?? "";
+        if (!wanted.has(email)) continue;
         const name =
           [user.first_name, user.last_name].filter(Boolean).join(" ") ||
           primary?.email_address ||

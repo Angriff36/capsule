@@ -634,7 +634,8 @@ function PersonLinkCell({
       <span className="text-warn">Not linked — still using Clerk role</span>
       {available.length === 0 ? (
         <span className="text-ink-3">
-          No unlinked workspace accounts available.
+          No sign-in matches an unlinked staff email yet. Ask them to sign in
+          once, then retry.
         </span>
       ) : (
         <select
