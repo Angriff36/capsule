@@ -1,10 +1,10 @@
-import { SignIn, SignOutButton } from "@clerk/react";
+import { SignIn, SignOutButton, useUser } from "@clerk/react";
 import {
   Authenticated,
   AuthLoading,
   AuthRefreshing,
   Unauthenticated,
-  useMutation,
+  useAction,
   useQuery,
 } from "convex/react";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
@@ -57,7 +57,7 @@ function ClaimGate({ children }: { children?: ReactNode }) {
     );
   }
   if (!workspaceMembershipPolicy.isReady(status as AuthStatusSnapshot)) {
-    return <MembershipRequired email={status.email ?? null} />;
+    return <MembershipRequired />;
   }
   return <>{children}</>;
 }
@@ -82,6 +82,7 @@ type LinkOutcome =
   | "already"
   | "matched"
   | "unauthenticated"
+  | "not_configured"
   | "no_email"
   | "email_unverified"
   | "no_match"
@@ -95,8 +96,11 @@ type LinkOutcome =
  * cannot, say exactly why and what the manager must do — no identity-provider
  * screens, no ids to paste.
  */
-function MembershipRequired({ email }: { email: string | null }) {
-  const linkSelf = useMutation(api.authLink.linkSelfByEmail);
+function MembershipRequired() {
+  const { user } = useUser();
+  // Display only — the server re-reads the verified email from the provider.
+  const email = user?.primaryEmailAddress?.emailAddress ?? null;
+  const linkSelf = useAction(api.authLink.linkSelfByEmail);
   const [outcome, setOutcome] = useState<LinkOutcome>("linking");
   const attempt = useCallback(() => {
     setOutcome("linking");
@@ -120,6 +124,8 @@ function MembershipRequired({ email }: { email: string | null }) {
     already: "Your profile is linked. Opening Capsule…",
     matched: "Your profile is linked. Opening Capsule…",
     unauthenticated: "Your session ended. Sign in again.",
+    not_configured:
+      "Self-link is not set up on this deployment yet (CLERK_SECRET_KEY). Ask your manager to link your account under Team roles.",
     no_email:
       "Your sign-in has no email address, so it cannot be matched to a staff profile. Sign in with an email or Google account.",
     email_unverified:

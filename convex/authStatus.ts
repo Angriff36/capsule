@@ -17,8 +17,6 @@ export const getAuthStatus = query({
       roleSource: auth.roleSource,
       personId: auth.personId ?? null,
       disabledCapabilities: auth.disabledCapabilities,
-      /** The signed-in user's own email, so the gate can name it back to them. */
-      email: identity?.email ?? null,
     };
   },
 });

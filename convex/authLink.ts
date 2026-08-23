@@ -1,42 +1,84 @@
-// AUTHOR-OWNED — not generated. First-sign-in self link: a verified sign-in
-// email that matches exactly one active, unlinked Person becomes that Person's
-// authSubjectId. After that, getAuthContext resolves tenant and role from the
-// Person (no identity-provider organization needed). The only trust anchor is
-// the IdP-verified email; nothing here grants a role — the Person already has
-// one, set by an admin under Team roles.
-import { mutation } from "./_generated/server";
+// AUTHOR-OWNED — not generated. First-sign-in self link: the sign-in's
+// verified primary email (read from the identity provider's backend, never
+// from the client) that matches exactly one active, unlinked Person becomes
+// that Person's authSubjectId. After that, getAuthContext resolves tenant and
+// role from the Person — no identity-provider organization needed. Nothing
+// here grants a role; the Person already has one, set by an admin under Team
+// roles.
+import { v } from "convex/values";
+import { internal } from "./_generated/api";
+import { action, internalMutation } from "./_generated/server";
 import { decrypt } from "./lib/encryption";
 
-type Outcome =
+export type LinkOutcome =
   | { linked: true; reason: "already" | "matched" }
   | {
       linked: false;
       reason:
         | "unauthenticated"
+        | "not_configured"
         | "no_email"
         | "email_unverified"
         | "no_match"
         | "ambiguous";
     };
 
-export const linkSelfByEmail = mutation({
+/** Client entry point: resolve the verified email, then link. */
+export const linkSelfByEmail = action({
   args: {},
-  handler: async (ctx): Promise<Outcome> => {
+  handler: async (ctx): Promise<LinkOutcome> => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return { linked: false, reason: "unauthenticated" };
-    const email = String(identity.email ?? "")
-      .trim()
-      .toLowerCase();
-    if (!email) return { linked: false, reason: "no_email" };
-    if (identity.emailVerified !== true) {
-      return { linked: false, reason: "email_unverified" };
-    }
+    const secret = process.env.CLERK_SECRET_KEY;
+    if (!secret) return { linked: false, reason: "not_configured" };
 
+    const email = await verifiedPrimaryEmail(identity.subject, secret);
+    if (email === null) return { linked: false, reason: "no_email" };
+    if (email === "") return { linked: false, reason: "email_unverified" };
+
+    return await ctx.runMutation(internal.authLink.linkBySubjectEmail, {
+      subject: identity.subject,
+      email,
+    });
+  },
+});
+
+/**
+ * Clerk backend: the user's primary email and whether the provider verified
+ * it. Returns null when there is no email, "" when it is not verified.
+ */
+async function verifiedPrimaryEmail(
+  subject: string,
+  secret: string,
+): Promise<string | null> {
+  const response = await fetch(
+    `https://api.clerk.com/v1/users/${encodeURIComponent(subject)}`,
+    { headers: { Authorization: `Bearer ${secret}` } },
+  );
+  if (!response.ok) return null;
+  const user = (await response.json()) as {
+    primary_email_address_id?: string | null;
+    email_addresses?: Array<{
+      id: string;
+      email_address: string;
+      verification?: { status?: string } | null;
+    }>;
+  };
+  const primary =
+    user.email_addresses?.find(
+      (row) => row.id === user.primary_email_address_id,
+    ) ?? user.email_addresses?.[0];
+  if (!primary?.email_address) return null;
+  if (primary.verification?.status !== "verified") return "";
+  return primary.email_address.trim().toLowerCase();
+}
+
+export const linkBySubjectEmail = internalMutation({
+  args: { subject: v.string(), email: v.string() },
+  handler: async (ctx, { subject, email }): Promise<LinkOutcome> => {
     const already = await ctx.db
       .query("people")
-      .withIndex("by_authSubjectId", (q) =>
-        q.eq("authSubjectId", identity.subject),
-      )
+      .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", subject))
       .first();
     if (already) return { linked: true, reason: "already" };
 
@@ -46,13 +88,12 @@ export const linkSelfByEmail = mutation({
       if (person.deletedAt != null) continue;
       if (String(person.status) !== "active") continue;
       if (person.authSubjectId) continue;
-      const stored = await readEmail(ctx, person.email);
-      if (stored === email) matches.push(person);
+      if ((await readEmail(ctx, person.email)) === email) matches.push(person);
     }
     if (matches.length === 0) return { linked: false, reason: "no_match" };
     if (matches.length > 1) return { linked: false, reason: "ambiguous" };
 
-    await ctx.db.patch(matches[0]!._id, { authSubjectId: identity.subject });
+    await ctx.db.patch(matches[0]!._id, { authSubjectId: subject });
     return { linked: true, reason: "matched" };
   },
 });
