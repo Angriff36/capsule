@@ -1,4 +1,5 @@
 import { useUser } from "@clerk/react";
+import { useAuthStatus } from "../../lib/useAuthStatus";
 import { useQuery } from "convex/react";
 import { useState } from "react";
 import { api } from "../../lib/api";
@@ -87,6 +88,7 @@ const preferenceSnapshot = (
 
 export function EmailNotificationSettingsPage() {
   const { user, isLoaded: userLoaded } = useUser();
+  const authStatus = useAuthStatus();
   const rows = useListEmailNotificationSubscription();
   const createPreferences = useCreateEmailNotificationSubscription();
   const updatePreferences =
@@ -117,7 +119,7 @@ export function EmailNotificationSettingsPage() {
     category: EmailNotificationCategory,
     subscribed: boolean,
   ) {
-    if (busy || !userLoaded || !user) return;
+    if (busy || !userLoaded || !user || !authStatus) return;
     const field = EMAIL_NOTIFICATION_CATEGORY_DETAILS[category].preferenceField;
     const next = { ...preferences, [field]: subscribed };
     setOptimistic(next);
@@ -134,9 +136,10 @@ export function EmailNotificationSettingsPage() {
       } else {
         await createPreferences({
           ...next,
-          // Tenant is applied server-side from the sign-in; the user id keys
-          // the one-per-person subscription.
-          idempotencyKey: `email-notification-subscriptions:${user.id}`,
+          // Scoped to the resolved staff profile (tenant-specific) plus the
+          // sign-in, so a re-linked account never replays another tenant's
+          // cached create.
+          idempotencyKey: `email-notification-subscriptions:${authStatus.personId ?? "unlinked"}:${user.id}`,
         });
       }
       const label = EMAIL_NOTIFICATION_CATEGORY_DETAILS[category].label;
