@@ -4,11 +4,16 @@
 // that Person's authSubjectId. After that, getAuthContext resolves tenant and
 // role from the Person — no identity-provider organization needed. Nothing
 // here grants a role; the Person already has one, set by an admin under Team
-// roles.
+// roles. Admin-capable Persons are never self-linked: mailbox control alone
+// must not hand out adminAccess (Person.linkAccount keeps that behind an
+// admin, see src/identity/person.manifest).
 import { v } from "convex/values";
 import { internal } from "./_generated/api";
 import { action, internalMutation } from "./_generated/server";
 import { decrypt } from "./lib/encryption";
+
+/** Roles that carry adminAccess in src/foundation/base.manifest. */
+const ADMIN_ROLES = new Set(["admin", "owner"]);
 
 export type LinkOutcome =
   | { linked: true; reason: "already" | "matched" }
@@ -17,10 +22,12 @@ export type LinkOutcome =
       reason:
         | "unauthenticated"
         | "not_configured"
+        | "provider_error"
         | "no_email"
         | "email_unverified"
         | "no_match"
-        | "ambiguous";
+        | "ambiguous"
+        | "needs_admin_link";
     };
 
 /** Client entry point: resolve the verified email, then link. */
@@ -33,29 +40,38 @@ export const linkSelfByEmail = action({
     if (!secret) return { linked: false, reason: "not_configured" };
 
     const email = await verifiedPrimaryEmail(identity.subject, secret);
-    if (email === null) return { linked: false, reason: "no_email" };
-    if (email === "") return { linked: false, reason: "email_unverified" };
+    if (email.kind !== "ok") return { linked: false, reason: email.kind };
 
     return await ctx.runMutation(internal.authLink.linkBySubjectEmail, {
       subject: identity.subject,
-      email,
+      email: email.value,
     });
   },
 });
 
+type EmailLookup =
+  | { kind: "ok"; value: string }
+  | { kind: "provider_error" | "no_email" | "email_unverified" };
+
 /**
- * Clerk backend: the user's primary email and whether the provider verified
- * it. Returns null when there is no email, "" when it is not verified.
+ * Clerk backend: the user's PRIMARY email and whether the provider verified
+ * it. No fallback to other addresses — the primary address is the trust
+ * anchor. Provider failures are reported as such, not as "no email".
  */
 async function verifiedPrimaryEmail(
   subject: string,
   secret: string,
-): Promise<string | null> {
-  const response = await fetch(
-    `https://api.clerk.com/v1/users/${encodeURIComponent(subject)}`,
-    { headers: { Authorization: `Bearer ${secret}` } },
-  );
-  if (!response.ok) return null;
+): Promise<EmailLookup> {
+  let response: Response;
+  try {
+    response = await fetch(
+      `https://api.clerk.com/v1/users/${encodeURIComponent(subject)}`,
+      { headers: { Authorization: `Bearer ${secret}` } },
+    );
+  } catch {
+    return { kind: "provider_error" };
+  }
+  if (!response.ok) return { kind: "provider_error" };
   const user = (await response.json()) as {
     primary_email_address_id?: string | null;
     email_addresses?: Array<{
@@ -64,23 +80,33 @@ async function verifiedPrimaryEmail(
       verification?: { status?: string } | null;
     }>;
   };
-  const primary =
-    user.email_addresses?.find(
-      (row) => row.id === user.primary_email_address_id,
-    ) ?? user.email_addresses?.[0];
-  if (!primary?.email_address) return null;
-  if (primary.verification?.status !== "verified") return "";
-  return primary.email_address.trim().toLowerCase();
+  if (!user.primary_email_address_id) return { kind: "no_email" };
+  const primary = user.email_addresses?.find(
+    (row) => row.id === user.primary_email_address_id,
+  );
+  if (!primary?.email_address) return { kind: "no_email" };
+  if (primary.verification?.status !== "verified") {
+    return { kind: "email_unverified" };
+  }
+  return { kind: "ok", value: primary.email_address.trim().toLowerCase() };
 }
 
 export const linkBySubjectEmail = internalMutation({
   args: { subject: v.string(), email: v.string() },
   handler: async (ctx, { subject, email }): Promise<LinkOutcome> => {
-    const already = await ctx.db
+    // A link to an active Person counts; a link left on a terminated or
+    // deleted Person does not lock the sign-in out of a fresh hire.
+    const linkedRows = await ctx.db
       .query("people")
       .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", subject))
-      .first();
-    if (already) return { linked: true, reason: "already" };
+      .collect();
+    if (
+      linkedRows.some(
+        (row) => row.deletedAt == null && String(row.status) === "active",
+      )
+    ) {
+      return { linked: true, reason: "already" };
+    }
 
     const people = await ctx.db.query("people").collect();
     const matches = [];
@@ -93,7 +119,11 @@ export const linkBySubjectEmail = internalMutation({
     if (matches.length === 0) return { linked: false, reason: "no_match" };
     if (matches.length > 1) return { linked: false, reason: "ambiguous" };
 
-    await ctx.db.patch(matches[0]!._id, { authSubjectId: subject });
+    const person = matches[0]!;
+    if (ADMIN_ROLES.has(String(person.role))) {
+      return { linked: false, reason: "needs_admin_link" };
+    }
+    await ctx.db.patch(person._id, { authSubjectId: subject });
     return { linked: true, reason: "matched" };
   },
 });

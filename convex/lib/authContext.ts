@@ -123,7 +123,7 @@ async function loadPersonBySubject(
   db: { query: (table: "people") => any },
   authSubjectId: string,
 ): Promise<{ role: string; personId: string; tenantId: string } | null> {
-  const person = (await db
+  const rows = (await db
     .query("people")
     .withIndex(
       "by_authSubjectId",
@@ -136,9 +136,12 @@ async function loadPersonBySubject(
         field: (name: string) => unknown;
       }) => q.eq(q.field("status"), "active"),
     )
-    .first()) as PersonRow | null;
-
-  if (!person || person.deletedAt != null) return null;
+    .collect()) as PersonRow[];
+  const active = rows.filter((row) => row.deletedAt == null);
+  // One sign-in, one active Person. Two active rows (e.g. the same subject
+  // linked in two tenants) is ambiguous: fail closed rather than pick one.
+  if (active.length !== 1) return null;
+  const person = active[0]!;
   if (typeof person.role !== "string" || person.role.length === 0) return null;
   if (typeof person.tenantId !== "string" || person.tenantId.length === 0) {
     return null;

@@ -83,10 +83,12 @@ type LinkOutcome =
   | "matched"
   | "unauthenticated"
   | "not_configured"
+  | "provider_error"
   | "no_email"
   | "email_unverified"
   | "no_match"
   | "ambiguous"
+  | "needs_admin_link"
   | "error";
 
 /**
@@ -126,6 +128,8 @@ function MembershipRequired() {
     unauthenticated: "Your session ended. Sign in again.",
     not_configured:
       "Self-link is not set up on this deployment yet (CLERK_SECRET_KEY). Ask your manager to link your account under Team roles.",
+    provider_error:
+      "The sign-in service could not be reached to confirm your email. Tap Try again in a moment.",
     no_email:
       "Your sign-in has no email address, so it cannot be matched to a staff profile. Sign in with an email or Google account.",
     email_unverified:
@@ -134,6 +138,8 @@ function MembershipRequired() {
       "No staff profile uses this email yet. Ask your manager to add you under Administration → Permissions → Team roles with this exact email, then tap Try again.",
     ambiguous:
       "More than one staff profile uses this email. Ask your manager to fix that under Team roles, then tap Try again.",
+    needs_admin_link:
+      "Your staff profile has an admin role, so another admin must link it under Administration → Permissions → Team roles.",
     error: "The link could not be checked. Tap Try again.",
   };
 
