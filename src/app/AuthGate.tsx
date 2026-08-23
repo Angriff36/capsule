@@ -94,6 +94,7 @@ type LinkOutcome =
   | "email_unverified"
   | "no_match"
   | "ambiguous"
+  | "released"
   | "needs_admin_link"
   | "error";
 
@@ -150,6 +151,8 @@ function MembershipRequired() {
       "No staff profile uses this email yet. Ask your manager to add you under Administration → Permissions → Team roles with this exact email, then tap Try again.",
     ambiguous:
       "More than one staff profile uses this email. Ask your manager to fix that under Team roles, then tap Try again.",
+    released:
+      "An admin unlinked this sign-in from your staff profile. Ask them to link it again under Administration → Permissions → Team roles.",
     needs_admin_link:
       "Your staff profile has an admin role, so another admin must link it under Administration → Permissions → Team roles.",
     error: "The link could not be checked. Tap Try again.",

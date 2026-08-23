@@ -28,6 +28,7 @@ export type LinkOutcome =
         | "email_unverified"
         | "no_match"
         | "ambiguous"
+        | "released"
         | "needs_admin_link";
     };
 
@@ -125,23 +126,34 @@ export const linkBySubjectEmail = internalMutation({
     if (activeLinks.length > 1) return { linked: false, reason: "ambiguous" };
     if (activeLinks.length === 1) return { linked: true, reason: "already" };
 
-    // Candidates are only the UNLINKED people (index on authSubjectId: rows
-    // with the field unset and rows with it null) — never the whole table.
+    // Candidates are only NEVER-LINKED people: rows where the field was never
+    // set (a fresh hire). Rows an admin explicitly unlinked carry null
+    // (Person.unlinkAccount) and are released on purpose — self-link must not
+    // quietly hand the same account back; an admin relinks those per row.
     const unset = await ctx.db
       .query("people")
       .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", undefined))
       .collect();
-    const nulled = await ctx.db
-      .query("people")
-      .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", null))
-      .collect();
+    const active = (rows: typeof unset) =>
+      rows.filter(
+        (row) => row.deletedAt == null && String(row.status) === "active",
+      );
     const matches = [];
-    for (const person of [...unset, ...nulled]) {
-      if (person.deletedAt != null) continue;
-      if (String(person.status) !== "active") continue;
+    for (const person of active(unset)) {
       if ((await readEmail(ctx, person.email)) === email) matches.push(person);
     }
-    if (matches.length === 0) return { linked: false, reason: "no_match" };
+    if (matches.length === 0) {
+      const released = await ctx.db
+        .query("people")
+        .withIndex("by_authSubjectId", (q) => q.eq("authSubjectId", null))
+        .collect();
+      for (const person of active(released)) {
+        if ((await readEmail(ctx, person.email)) === email) {
+          return { linked: false, reason: "released" };
+        }
+      }
+      return { linked: false, reason: "no_match" };
+    }
     if (matches.length > 1) return { linked: false, reason: "ambiguous" };
 
     const person = matches[0]!;
