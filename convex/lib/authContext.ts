@@ -2,10 +2,14 @@
  * AUTHOR SEAM — emitted by Builder convex-application preset.
  * Not Manifest domain logic. Do not inline identity into generated mutations.
  *
- * Maps Convex ctx.auth.getUserIdentity() (+ tenant membership) to Manifest
- * { id, role, tenantId, disabledCapabilities }. Capsule role is owned by Person
- * (app settings) when a linked active Person exists; IdP/Clerk claims are only
- * a bootstrap fallback until that row is hired and linked.
+ * Maps Convex ctx.auth.getUserIdentity() to Manifest
+ * { id, role, tenantId, disabledCapabilities }.
+ *
+ * Person-first: the Person row linked to the sign-in (people.authSubjectId)
+ * owns the tenant AND the role. That is what Team roles edits, and it needs no
+ * identity-provider organization. IdP/Clerk claims (org membership or a JWT
+ * template) remain a bootstrap fallback for sign-ins that are not linked yet,
+ * so existing org-based admins keep working while the link is made.
  *
  * disabledCapabilities come from OrganizationCapabilitySetting (Permissions
  * toggles) and are enforced by checkRole on generated mutations/queries.
@@ -37,6 +41,7 @@ const ANONYMOUS: AppAuthContext = {
 
 type PersonRow = {
   _id: string;
+  tenantId?: string;
   role?: string;
   status?: string;
   deletedAt?: number | null;
@@ -54,6 +59,25 @@ export async function getAuthContext(ctx: {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) return ANONYMOUS;
 
+  // 1. A linked, active Person decides tenant and role. No organization needed.
+  const linked = ctx.db
+    ? await loadPersonBySubject(ctx.db, identity.subject)
+    : null;
+  if (linked) {
+    return {
+      id: identity.subject,
+      role: linked.role,
+      tenantId: linked.tenantId,
+      roleSource: "person",
+      personId: linked.personId,
+      disabledCapabilities: ctx.db
+        ? await loadDisabledOrgCapabilities(ctx.db, linked.tenantId)
+        : [],
+    };
+  }
+
+  // 2. Bootstrap fallback: tenant/role claims from the IdP (org membership or
+  //    a JWT template) for sign-ins that are not linked to a Person yet.
   const claims = identity as Record<string, unknown>;
   const org =
     typeof claims.o === "object" && claims.o !== null
@@ -84,21 +108,6 @@ export async function getAuthContext(ctx: {
     ? await loadDisabledOrgCapabilities(ctx.db, tenantClaim)
     : [];
 
-  const linked = ctx.db
-    ? await loadLinkedPerson(ctx.db, tenantClaim, identity.subject)
-    : null;
-
-  if (linked) {
-    return {
-      id: identity.subject,
-      role: linked.role,
-      tenantId: tenantClaim,
-      roleSource: "person",
-      personId: linked.personId,
-      disabledCapabilities,
-    };
-  }
-
   return {
     id: identity.subject,
     role: roleClaim ? normalizeRole(roleClaim) : ANONYMOUS.role,
@@ -108,33 +117,37 @@ export async function getAuthContext(ctx: {
   };
 }
 
-async function loadLinkedPerson(
+/** The active Person linked to this sign-in, in whichever tenant hired them. */
+async function loadPersonBySubject(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   db: { query: (table: "people") => any },
-  tenantId: string,
   authSubjectId: string,
-): Promise<{ role: string; personId: string } | null> {
+): Promise<{ role: string; personId: string; tenantId: string } | null> {
   const person = (await db
     .query("people")
-    .withIndex("by_tenantId", (q: { eq: (f: string, v: string) => unknown }) =>
-      q.eq("tenantId", tenantId),
+    .withIndex(
+      "by_authSubjectId",
+      (q: { eq: (f: string, v: string) => unknown }) =>
+        q.eq("authSubjectId", authSubjectId),
     )
     .filter(
       (q: {
-        and: (...args: unknown[]) => unknown;
         eq: (left: unknown, right: unknown) => unknown;
         field: (name: string) => unknown;
-      }) =>
-        q.and(
-          q.eq(q.field("authSubjectId"), authSubjectId),
-          q.eq(q.field("status"), "active"),
-        ),
+      }) => q.eq(q.field("status"), "active"),
     )
     .first()) as PersonRow | null;
 
   if (!person || person.deletedAt != null) return null;
   if (typeof person.role !== "string" || person.role.length === 0) return null;
-  return { role: person.role, personId: String(person._id) };
+  if (typeof person.tenantId !== "string" || person.tenantId.length === 0) {
+    return null;
+  }
+  return {
+    role: person.role,
+    personId: String(person._id),
+    tenantId: person.tenantId,
+  };
 }
 
 /** Strip IdP role namespaces (e.g. Clerk org:admin → admin) for Manifest guards. */

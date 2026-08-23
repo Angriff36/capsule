@@ -65,7 +65,7 @@ entity Person mixin TenantScoped, SoftDeletable {
   // Person, convex/lib/authContext.ts uses this row's role as runtime
   // user.role (app settings). Clerk only supplies identity + tenant membership;
   // IdP org-role claims are a bootstrap fallback until a Person is linked.
-  property authSubjectId: string?
+  property indexed authSubjectId: string?
   property employeeNumber: string?
   property required employmentType: EmploymentType = "full_time"
   property required status: PersonStatus = "active"
