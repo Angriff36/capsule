@@ -15,6 +15,7 @@
  * toggles) and are enforced by checkRole on generated mutations/queries.
  */
 import type { Auth } from "convex/server";
+import { internal } from "../_generated/api";
 import {
   loadDisabledOrgCapabilities,
   type OrgCapabilityId,
@@ -58,6 +59,15 @@ export async function getAuthContext(ctx: {
 }): Promise<AppAuthContext> {
   const identity = await ctx.auth.getUserIdentity();
   if (!identity) return ANONYMOUS;
+
+  // Actions have no ctx.db: resolve through an internal query (same
+  // identity) so Person-linked users are authorized in actions too.
+  const runQuery = (ctx as { runQuery?: unknown }).runQuery;
+  if (!ctx.db && typeof runQuery === "function") {
+    return (await (
+      runQuery as (ref: unknown, args: unknown) => Promise<AppAuthContext>
+    )(internal.authLink.resolveAuthContext, {})) as AppAuthContext;
+  }
 
   // 1. A linked, active Person decides tenant and role. No organization needed.
   const linked = ctx.db

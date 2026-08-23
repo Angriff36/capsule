@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+} from "react";
 import { useOrganization, useUser } from "@clerk/react";
 import { useAction } from "convex/react";
 import { api } from "../../lib/api";
@@ -76,11 +82,26 @@ export function TeamRolesPanel({
   const [signIns, setSignIns] = useState<
     Array<{ userId: string; name: string; email: string | null }>
   >([]);
-  useEffect(() => {
+  const [catalogError, setCatalogError] = useState<string | null>(null);
+  const loadSignIns = useCallback(() => {
     listSignIns({})
-      .then(setSignIns)
-      .catch(() => setSignIns([]));
+      .then((catalog) => {
+        setSignIns(catalog.signIns);
+        setCatalogError(
+          catalog.error === "not_configured"
+            ? "Sign-in list unavailable: CLERK_SECRET_KEY is not set on this deployment."
+            : catalog.error === "provider_error"
+              ? "Sign-in list unavailable: the sign-in service did not answer."
+              : null,
+        );
+      })
+      .catch(() =>
+        setCatalogError("Sign-in list unavailable: the request failed."),
+      );
   }, [listSignIns]);
+  useEffect(() => {
+    loadSignIns();
+  }, [loadSignIns]);
 
   const clerkMembers = useMemo(() => {
     const data = memberships?.data ?? [];
@@ -253,6 +274,18 @@ export function TeamRolesPanel({
 
   return (
     <Section title="Team roles" count={activePeople.length}>
+      {catalogError ? (
+        <p className="flex flex-wrap items-center gap-2 text-sm text-warn">
+          {catalogError}
+          <button
+            type="button"
+            className="btn btn-ghost btn-sm"
+            onClick={loadSignIns}
+          >
+            Retry
+          </button>
+        </p>
+      ) : null}
       <div className="space-y-4 border-b border-line p-4">
         <p className="max-w-3xl text-sm leading-relaxed text-ink-3">
           Capsule permissions come from the role on each hired team member once
