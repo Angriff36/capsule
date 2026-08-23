@@ -611,8 +611,13 @@ function PersonLinkCell({
   }
 
   // Only accounts not already claimed by another staff row.
+  // Only the provider account whose verified primary email is THIS row's
+  // email — never another staff member's account.
+  const personEmail = person.email.trim().toLowerCase();
   const available = clerkMembers.filter(
-    (row) => !linkedSubjectIds.has(row.userId),
+    (row) =>
+      !linkedSubjectIds.has(row.userId) &&
+      (row.identifier ?? "").trim().toLowerCase() === personEmail,
   );
 
   return (
