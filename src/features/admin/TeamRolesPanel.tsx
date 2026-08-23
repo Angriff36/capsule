@@ -95,9 +95,14 @@ export function TeamRolesPanel({
         setCatalogError("Sign-in list unavailable: the request failed."),
       );
   }, [listSignIns]);
+  // Reload when the roster changes (a hire or unlink makes new emails wanted).
+  const unlinkedKey = (people ?? [])
+    .filter((row) => row.deletedAt == null && !row.authSubjectId)
+    .map((row) => row._id)
+    .join(",");
   useEffect(() => {
     loadSignIns();
-  }, [loadSignIns]);
+  }, [loadSignIns, unlinkedKey]);
 
   // Tenant-scoped catalog from the server (convex/authLink.ts): only
   // sign-ins whose email matches one of this tenant's unlinked staff rows.
@@ -257,18 +262,23 @@ export function TeamRolesPanel({
 
   return (
     <Section title="Team roles" count={activePeople.length}>
-      {catalogError ? (
-        <p className="flex flex-wrap items-center gap-2 text-sm text-warn">
-          {catalogError}
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={loadSignIns}
-          >
-            Retry
-          </button>
-        </p>
-      ) : null}
+      <p className="flex flex-wrap items-center gap-2 text-sm text-ink-3">
+        {catalogError ? (
+          <span className="text-warn">{catalogError}</span>
+        ) : (
+          <span>
+            Sign-ins that match an unlinked staff email appear in each row's
+            account picker.
+          </span>
+        )}
+        <button
+          type="button"
+          className="btn btn-ghost btn-sm"
+          onClick={loadSignIns}
+        >
+          Refresh sign-ins
+        </button>
+      </p>
       <div className="space-y-4 border-b border-line p-4">
         <p className="max-w-3xl text-sm leading-relaxed text-ink-3">
           Capsule permissions come from the role on each hired team member once

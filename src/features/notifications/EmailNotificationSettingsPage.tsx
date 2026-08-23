@@ -139,7 +139,7 @@ export function EmailNotificationSettingsPage() {
           // Scoped to the resolved staff profile (tenant-specific) plus the
           // sign-in, so a re-linked account never replays another tenant's
           // cached create.
-          idempotencyKey: `email-notification-subscriptions:${authStatus.personId ?? "unlinked"}:${user.id}`,
+          idempotencyKey: `email-notification-subscriptions:${authStatus.personId ?? `tenant:${authStatus.tenantId ?? "none"}`}:${user.id}`,
         });
       }
       const label = EMAIL_NOTIFICATION_CATEGORY_DETAILS[category].label;
