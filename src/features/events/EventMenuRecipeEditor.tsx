@@ -443,6 +443,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                         return;
                       }
                       const quantity = qtyCommit.quantity;
+                      const submittedText = String(data.get("quantity") ?? "");
                       setBusy(`qty:${line._id}`);
                       setError(null);
                       void adjustQuantity({
@@ -452,14 +453,17 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                         unit: nextUnit as (typeof UNIT_OF_MEASURE)[number],
                       })
                         .then(() => {
-                          // Only a persisted save may replace the typed draft;
-                          // a failed save keeps the text for retry.
+                          // Only a persisted save may replace the typed draft,
+                          // and only when the user has not typed something
+                          // newer while the save was in flight.
                           setQtyDrafts((current) =>
-                            recipeQuantityDraftAfterSave(
-                              current,
-                              String(line._id),
-                              quantity,
-                            ),
+                            current[String(line._id)] === submittedText
+                              ? recipeQuantityDraftAfterSave(
+                                  current,
+                                  String(line._id),
+                                  quantity,
+                                )
+                              : current,
                           );
                         })
                         .catch((cause) => {
