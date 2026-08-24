@@ -54,7 +54,7 @@
   "dependencies": {
     "@angriff36/manifest": "3.6.45",
     "@clerk/backend": "^3.11.7",
-    "@clerk/react": "^6.12.4",
+    "@clerk/react": "^6.14.5",
     "@fontsource-variable/archivo": "^5.2.5",
     "@fontsource/ibm-plex-mono": "^5.2.5",
     "@modelcontextprotocol/sdk": "^1.29.0",
