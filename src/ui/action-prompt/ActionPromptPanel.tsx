@@ -41,7 +41,10 @@ export function ActionPromptPanel({
       setConfirmArmed(true);
     }, ACTION_PROMPT_CONFIRM_ARM_MS);
     return () => window.clearTimeout(id);
-  }, [request.kind, request.title]);
+    // Keyed to the request object itself: replacing an open confirm with
+    // another (same title or not) re-arms the delay, so a click aimed at the
+    // first prompt can never land on the second one's destructive button.
+  }, [request]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
