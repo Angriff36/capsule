@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -19,10 +20,7 @@ import {
   SELECTABLE_UNITS,
   UNIT_OF_MEASURE,
 } from "../kitchen/import/UnitOfMeasureMapper";
-import {
-  useEffect,
-  convertComponentQuantity,
-} from "../kitchen/ComponentCostCalculator";
+import { convertComponentQuantity } from "../kitchen/ComponentCostCalculator";
 import {
   EVENT_MENU_CONTAINER_NAMES,
   eventMenuContainerCountsForDish,
