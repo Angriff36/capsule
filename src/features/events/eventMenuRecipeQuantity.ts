@@ -112,3 +112,27 @@ export function recipeQuantityDraftAfterSave(
 ): RecipeQuantityDraftMap {
   return { ...drafts, [lineId]: formatRecipeQuantity(committed) };
 }
+
+/**
+ * Once the reactive line quantity catches up with a saved draft, drop the
+ * draft so the field resumes syncing with later server-side updates instead
+ * of pinning stale text forever.
+ */
+export function pruneSyncedRecipeQuantityDrafts(
+  drafts: Readonly<RecipeQuantityDraftMap>,
+  rows: ReadonlyArray<{ _id: string; quantity: unknown }>,
+): RecipeQuantityDraftMap {
+  let changed = false;
+  const next: RecipeQuantityDraftMap = { ...drafts };
+  for (const row of rows) {
+    const id = String(row._id);
+    if (
+      Object.hasOwn(next, id) &&
+      next[id] === formatRecipeQuantity(row.quantity)
+    ) {
+      delete next[id];
+      changed = true;
+    }
+  }
+  return changed ? next : (drafts as RecipeQuantityDraftMap);
+}

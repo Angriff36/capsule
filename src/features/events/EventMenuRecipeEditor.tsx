@@ -19,7 +19,10 @@ import {
   SELECTABLE_UNITS,
   UNIT_OF_MEASURE,
 } from "../kitchen/import/UnitOfMeasureMapper";
-import { convertComponentQuantity } from "../kitchen/ComponentCostCalculator";
+import {
+  useEffect,
+  convertComponentQuantity,
+} from "../kitchen/ComponentCostCalculator";
 import {
   EVENT_MENU_CONTAINER_NAMES,
   eventMenuContainerCountsForDish,
@@ -38,6 +41,7 @@ import {
   recipeQuantityDraftAfterSave,
   recipeQuantityDraftAfterType,
   recipeQuantityDraftText,
+  pruneSyncedRecipeQuantityDrafts,
 } from "./eventMenuRecipeQuantity";
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 import {
@@ -94,6 +98,12 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
   );
   const [createNameArmed, setCreateNameArmed] = useState(createNameStartsArmed);
   const [qtyDrafts, setQtyDrafts] = useState<Record<string, string>>({});
+  // A saved draft is only a bridge until the reactive quantity catches up;
+  // then the field goes back to mirroring the server value.
+  useEffect(() => {
+    if (!lines) return;
+    setQtyDrafts((current) => pruneSyncedRecipeQuantityDrafts(current, lines));
+  }, [lines]);
   const addQtyRef = useRef<HTMLInputElement>(null);
   const newIngredientInputRef = useRef<HTMLInputElement>(null);
   const newIngredientStateRef = useRef(createName);
