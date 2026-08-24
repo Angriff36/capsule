@@ -10,8 +10,9 @@ type Props = {
 };
 
 /**
- * Shared event-tab surface matching Field photos / Documents chrome:
- * inset panel, eyebrow, title, short description, then content.
+ * Shared event-tab surface: a white elevated section with a titled header.
+ * `eyebrow` is kept for the accessible name; the visible header is title +
+ * one line of context.
  */
 export function EventTabPanel({
   eyebrow,
@@ -22,17 +23,17 @@ export function EventTabPanel({
   testId,
 }: Props) {
   return (
-    <section className="card" data-testid={testId}>
-      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-line bg-inset px-3 py-2">
-        <div className="flex min-w-0 flex-wrap items-baseline gap-x-2">
-          <h3 className="text-sm font-semibold text-ink">{title}</h3>
-          <span className="text-xs text-ink-2" aria-label={eyebrow}>
-            {description ?? eyebrow}
-          </span>
+    <section className="card" data-testid={testId} aria-label={eyebrow}>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-line px-5 py-4">
+        <div className="min-w-0">
+          <h3 className="text-lg font-semibold text-ink">{title}</h3>
+          {description ? (
+            <p className="mt-0.5 text-sm text-ink-2">{description}</p>
+          ) : null}
         </div>
         {actions ? <div className="flex flex-wrap gap-2">{actions}</div> : null}
       </div>
-      <div className="p-3">{children}</div>
+      <div className="p-5">{children}</div>
     </section>
   );
 }

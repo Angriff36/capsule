@@ -36,38 +36,31 @@ export function MobileFactsCard({
   clients,
   currencyCode,
 }: MobileFactsProps) {
+  const when = (value: number | null | undefined) => (
+    <>
+      {formatDate(value)}
+      <span className="block text-sm font-medium text-ink-2">
+        {formatTime(value)}
+      </span>
+    </>
+  );
   const facts: Array<[string, ReactNode]> = [
-    ["Start", `${formatDate(event.startsAt)} ${formatTime(event.startsAt)}`],
-    ["End", `${formatDate(event.endsAt)} ${formatTime(event.endsAt)}`],
-    ["Headcount", formatCount(event.expectedHeadcount)],
+    ["Starts", when(event.startsAt)],
+    ["Ends", when(event.endsAt)],
+    // Date, headcount, and venue already sit in the page header.
     ["Type", formatStatusLabel(event.eventType)],
-    [
-      "Venue",
-      venue ? (
-        <Link
-          to="/facilities"
-          className="inline-flex min-h-11 items-center underline"
-        >
-          {venue.name}
-        </Link>
-      ) : (
-        "—"
-      ),
-    ],
     [
       "Client",
       <Link
         key="client"
         to={`/clients/${event.clientId}`}
-        className="inline-flex min-h-11 items-center underline"
+        className="underline"
       >
         {clientDisplayName(event.clientId, clients as never)}
       </Link>,
     ],
-    [
-      "Budget / quoted",
-      `${formatMoney(event.budgetAmount, currencyCode)} / ${formatMoney(event.quotedPrice, currencyCode)}`,
-    ],
+    ["Budget", formatMoney(event.budgetAmount, currencyCode)],
+    ["Quoted", formatMoney(event.quotedPrice, currencyCode)],
   ];
   return (
     <MobileSectionCard
@@ -76,13 +69,11 @@ export function MobileFactsCard({
       seeAllTo={`${eventDetailPath(event._id, "overview")}&full=1`}
       seeAllLabel="Edit"
     >
-      <dl className="grid grid-cols-2 gap-x-3 gap-y-2">
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-3 pt-1">
         {facts.map(([label, value]) => (
           <div key={label} className="min-w-0">
-            <dt className="text-xs font-semibold tracking-[0.06em] text-ink-3 uppercase">
-              {label}
-            </dt>
-            <dd className="font-mono text-base break-words text-ink">
+            <dt className="text-xs font-semibold text-ink-2">{label}</dt>
+            <dd className="mt-0.5 text-base font-semibold break-words text-ink">
               {value}
             </dd>
           </div>

@@ -2,9 +2,7 @@ import {
   EventDetailRevisePanels,
   type EventDetailRevisePanelsProps,
 } from "./EventDetailRevisePanels";
-import { EventDetailSummaryFacts } from "./EventDetailSummaryFacts";
 import { EventSetupProgress } from "./EventSetupProgress";
-import { EventTabIntro } from "./EventTabIntro";
 import { EventTimelineCommentsPanel } from "./EventTimelineCommentsPanel";
 
 type EventSetupFlags = {
@@ -38,26 +36,8 @@ export function EventOverviewTab({
   ...reviseProps
 }: Props) {
   return (
-    <section className="space-y-4" data-testid="event-overview-tab">
-      <EventTabIntro
-        title="Overview"
-        description="See setup readiness, event facts, staff discussion, and edit schedule, headcount, venue, and contacts."
-      />
-
+    <section className="space-y-5" data-testid="event-overview-tab">
       <EventSetupProgress eventId={reviseProps.eventId} event={event} />
-
-      <EventDetailSummaryFacts
-        startsAt={startsAt}
-        endsAt={endsAt}
-        expectedHeadcount={expectedHeadcount}
-        budgetAmount={budgetAmount}
-        quotedPrice={quotedPrice}
-        venue={venue}
-        clientId={clientId}
-        clients={clients}
-        primaryContactName={primaryContactName}
-        stage={stage}
-      />
 
       <div id="event-setup-basics" className="scroll-mt-4">
         <EventDetailRevisePanels

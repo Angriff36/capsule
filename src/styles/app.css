@@ -6,15 +6,16 @@
    ink, and a small saffron gesture. Dense controls stay crisp; key pages read
    like beautifully composed service documents. */
 @theme {
+  /* One typeface. font-display and font-mono resolve to the same sans so the
+     old serif mastheads and mono figures render in the workspace face; body
+     already sets tabular-nums for aligned numbers. */
   --font-sans: "Archivo Variable", "Archivo", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", monospace;
-  --font-display:
-    "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Palatino, Georgia,
-    serif;
+  --font-mono: "Archivo Variable", "Archivo", system-ui, sans-serif;
+  --font-display: "Archivo Variable", "Archivo", system-ui, sans-serif;
 
-  --color-canvas: #dfe8da;
-  --color-panel: #fffefa;
-  --color-inset: #f1f3ed;
+  --color-canvas: #f3f2ee;
+  --color-panel: #ffffff;
+  --color-inset: #f5f4f0;
   --color-sage: #dfe8da;
   --color-sage-2: #cbd9c6;
 
@@ -24,12 +25,13 @@
   --color-brand: #31574f;
   --color-brand-soft: #e0eae4;
 
-  --color-line: #d6dbd2;
-  --color-line-2: #aeb7ad;
-  --color-rail: #f7f8f4;
-  --color-rail-2: #edf1ea;
-  --color-rail-ink: #2f3b36;
-  --color-rail-dim: #5f6b65;
+  --color-line: #e2e1dc;
+  --color-line-2: #b9bcb4;
+  --color-rail: #1e3a31;
+  --color-rail-2: #2a4d42;
+  --color-rail-active: #3a7a65;
+  --color-rail-ink: #ffffff;
+  --color-rail-dim: #a9c0b6;
   --color-service: #31574f;
 
   --color-accent: #c8783f;
@@ -45,21 +47,22 @@
   --color-danger-soft: #f7e2dc;
   --color-mute-soft: #eae5d7;
 
-  --radius-xs: 3px;
-  --radius-sm: 5px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
 
   /* Type scale — the ONLY text sizes in the app. Raw text-[Npx] is rejected by
      scripts/check-type-scale.ts; add a step here instead of a one-off size.
      Font-size only, no paired line-height: every call site inherits normal
      leading, so a size change never also shifts vertical rhythm. */
-  --text-2xs: 10px;
-  --text-xs: 11px;
-  --text-sm: 12px;
-  --text-base: 13px;
-  --text-lg: 15px;
-  --text-xl: 18px;
+  --text-2xs: 11px;
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-lg: 18px;
+  --text-xl: 20px;
   --text-2xl: 24px;
-  --text-3xl: 28px;
+  --text-3xl: 30px;
 }
 
 /* Dark scheme — same editorial palette shifted to lamplight: deep green-black
@@ -83,9 +86,10 @@
 
   --color-line: #343e37;
   --color-line-2: #4d5a51;
-  --color-rail: #1b211d;
-  --color-rail-2: #262e29;
-  --color-rail-ink: #d3dcd5;
+  --color-rail: #141c18;
+  --color-rail-2: #212b26;
+  --color-rail-active: #2f6a57;
+  --color-rail-ink: #eef3ef;
   --color-rail-dim: #97a39a;
   --color-service: #85b8a9;
 
@@ -106,7 +110,6 @@
 /* Brand is light in dark mode, so white-on-brand chips flip to dark ink,
    and hardcoded paper gradients/tints get night equivalents. */
 .dark .capsule-mark,
-.dark .sidebar-nav a.active,
 .dark .clear-check,
 .dark .schedule-notice-count,
 .dark .revenue-switch button[aria-pressed="true"],
@@ -114,7 +117,7 @@
   color: var(--color-canvas);
 }
 .dark .app-canvas {
-  background: var(--color-panel);
+  background: var(--color-canvas);
 }
 .dark .attention-ledger {
   background: #232b26;
@@ -132,7 +135,7 @@
 
 @layer base {
   html {
-    font-size: 13px;
+    font-size: 14px;
     -webkit-font-smoothing: antialiased;
   }
   body {
@@ -153,7 +156,7 @@
 
 @layer components {
   .btn {
-    @apply inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-xs border px-3 font-medium transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-45;
+    @apply inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-sm border px-3.5 text-base font-semibold transition-all duration-150 select-none disabled:cursor-not-allowed disabled:opacity-45;
   }
   .btn-primary {
     @apply border-brand bg-brand text-white hover:-translate-y-px hover:bg-ink;
@@ -169,7 +172,7 @@
     @apply border-danger/40 bg-panel text-danger hover:bg-danger-soft;
   }
   .btn-sm {
-    @apply h-6.5 px-2 text-sm;
+    @apply h-7 px-2.5 text-sm font-medium;
   }
   .input {
     @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink shadow-[inset_0_1px_1px_rgb(36_50_45/0.06)] placeholder:text-ink-3 focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none disabled:cursor-not-allowed disabled:border-line disabled:bg-inset disabled:text-ink-3 disabled:shadow-none;
@@ -184,10 +187,10 @@
     @apply grid gap-1 text-xs font-semibold text-ink-2;
   }
   .chip {
-    @apply inline-flex h-5 items-center gap-1 rounded-full border px-2 text-xs font-semibold whitespace-nowrap capitalize;
+    @apply inline-flex h-6 items-center gap-1 rounded-full border px-2.5 text-xs font-semibold whitespace-nowrap capitalize;
   }
   .card {
-    @apply rounded-sm border border-line bg-panel;
+    @apply rounded-md border border-line bg-panel shadow-[0_1px_2px_rgb(30_40_36/0.05),0_2px_8px_-2px_rgb(30_40_36/0.08)];
   }
   .th {
     @apply border-b border-line-2 bg-inset px-3 py-1.5 text-left text-xs font-semibold tracking-[0.02em] whitespace-nowrap text-ink-2;
@@ -342,11 +345,10 @@
      the whole viewport. */
   .app-canvas {
     padding: 0;
-    background: var(--color-panel);
+    background: var(--color-canvas);
   }
   .workspace-sheet {
     min-height: 100%;
-    background: var(--color-panel);
   }
 
   /* Labeled sidebar. Expanded (default) shows icon + label for every
@@ -356,10 +358,9 @@
     position: relative;
     z-index: 40;
     display: flex;
-    width: 208px;
+    width: 232px;
     flex-shrink: 0;
     flex-direction: column;
-    border-right: 1px solid var(--color-line);
     background: var(--color-rail);
     color: var(--color-rail-ink);
     transition: width 160ms ease;
@@ -369,31 +370,31 @@
   }
   .sidebar-brand {
     display: flex;
-    height: 48px;
+    height: 64px;
     flex-shrink: 0;
     align-items: center;
     gap: 10px;
-    padding: 0 10px;
-    border-bottom: 1px solid var(--color-line);
+    padding: 0 14px;
+    border-bottom: 1px solid rgb(255 255 255 / 0.1);
   }
   .sidebar-brand strong {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
     letter-spacing: -0.01em;
-    color: var(--color-ink);
+    color: var(--color-rail-ink);
     white-space: nowrap;
   }
   .capsule-mark {
     display: grid;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     flex-shrink: 0;
     place-items: center;
-    border-radius: 7px;
-    background: var(--color-brand);
-    color: white;
-    font-size: 17px;
-    font-weight: 700;
+    border-radius: 8px;
+    background: var(--color-rail-ink);
+    color: var(--color-rail);
+    font-size: 18px;
+    font-weight: 800;
   }
   .sidebar-nav {
     display: flex;
@@ -403,13 +404,13 @@
     gap: 2px;
     overflow-x: hidden;
     overflow-y: auto;
-    padding: 8px;
+    padding: 10px;
     scrollbar-width: thin;
   }
   .sidebar-group {
-    margin: 8px 8px 3px;
+    margin: 12px 10px 4px;
     color: var(--color-rail-dim);
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -418,15 +419,16 @@
   .sidebar-nav a {
     position: relative;
     display: flex;
-    height: 34px;
+    height: 38px;
     align-items: center;
-    gap: 10px;
-    border-radius: 6px;
-    padding: 0 9px;
+    gap: 11px;
+    border-radius: 8px;
+    padding: 0 11px;
     color: var(--color-rail-ink);
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 500;
     white-space: nowrap;
+    opacity: 0.86;
     transition: 120ms ease;
   }
   .sidebar-nav a svg {
@@ -434,12 +436,14 @@
   }
   .sidebar-nav a:hover {
     background: var(--color-rail-2);
-    color: var(--color-ink);
+    opacity: 1;
   }
   .sidebar-nav a.active {
-    background: var(--color-brand);
-    color: white;
+    background: var(--color-rail-active);
+    color: var(--color-rail-ink);
     font-weight: 600;
+    opacity: 1;
+    box-shadow: inset 3px 0 0 rgb(255 255 255 / 0.85);
   }
   .sidebar-nav a > span {
     overflow: hidden;
@@ -468,8 +472,8 @@
     flex-shrink: 0;
     align-items: center;
     gap: 2px;
-    border-top: 1px solid var(--color-line);
-    padding: 6px;
+    border-top: 1px solid rgb(255 255 255 / 0.1);
+    padding: 8px;
   }
   .sidebar-foot button,
   .theme-toggle {
@@ -482,8 +486,8 @@
     gap: 8px;
     border-radius: 6px;
     padding: 0 8px;
-    color: var(--color-rail-ink);
-    font-size: 12px;
+    color: var(--color-rail-dim);
+    font-size: 13px;
     font-weight: 500;
     white-space: nowrap;
     transition: 120ms ease;
@@ -491,7 +495,10 @@
   .sidebar-foot button:hover,
   .theme-toggle:hover {
     background: var(--color-rail-2);
-    color: var(--color-ink);
+    color: var(--color-rail-ink);
+  }
+  .mobile-more-sheet .theme-toggle {
+    color: var(--color-ink-2);
   }
   .app-shell-sidebar[data-collapsed="true"] .sidebar-foot {
     flex-direction: column;
@@ -1478,59 +1485,62 @@
    Both rows scroll sideways on phones so every section stays reachable. */
 .event-detail-tabs {
   display: grid;
-  gap: 0;
-  border: 1px solid var(--color-line);
-  border-radius: 5px;
-  overflow: hidden;
+  gap: 8px;
 }
 .event-tab-groups {
   display: flex;
-  gap: 2px;
+  gap: 6px;
   overflow-x: auto;
-  background: var(--color-inset);
-  padding: 4px;
+  padding: 2px;
   scrollbar-width: thin;
 }
 .event-tab-groups button {
   display: inline-flex;
-  height: 30px;
+  height: 38px;
   cursor: pointer;
   align-items: center;
   gap: 6px;
-  border-radius: 4px;
-  padding: 0 11px;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  background: var(--color-panel);
+  padding: 0 16px;
   color: var(--color-ink-2);
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   white-space: nowrap;
   transition: 120ms ease;
 }
 .event-tab-groups button:hover {
+  border-color: var(--color-line-2);
   color: var(--color-ink);
 }
 .event-tab-groups button[aria-current="page"] {
-  background: var(--color-panel);
-  color: var(--color-ink);
-  font-weight: 600;
-  box-shadow: 0 1px 2px rgb(36 50 45 / 0.12);
+  border-color: var(--color-brand);
+  background: var(--color-brand);
+  color: white;
+}
+.dark .event-tab-groups button[aria-current="page"] {
+  color: var(--color-canvas);
 }
 .event-tab-sections {
   display: flex;
-  gap: 2px;
+  gap: 4px;
   overflow-x: auto;
-  border-top: 1px solid var(--color-line);
-  padding: 4px 6px;
+  border-bottom: 1px solid var(--color-line);
+  padding: 0 2px;
   scrollbar-width: thin;
 }
 .event-tab-sections button {
   display: inline-flex;
-  height: 28px;
+  height: 36px;
   cursor: pointer;
   align-items: center;
   border-bottom: 2px solid transparent;
-  padding: 0 8px;
+  margin-bottom: -1px;
+  padding: 0 10px;
   color: var(--color-ink-2);
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 500;
   white-space: nowrap;
 }
 .event-tab-sections button:hover {
@@ -1538,7 +1548,7 @@
 }
 .event-tab-sections button[aria-current="page"] {
   border-bottom-color: var(--color-brand);
-  color: var(--color-ink);
+  color: var(--color-brand);
   font-weight: 600;
 }
 
@@ -1609,9 +1619,92 @@
 
 @media (max-width: 767px) {
   .action-menu-list {
-    right: auto;
-    left: 0;
+    right: 0;
+    left: auto;
   }
+  .mobile-actions .btn-primary {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  .mobile-actions .action-menu > summary {
+    flex: none;
+  }
+}
+
+/* Phone section picker: one button naming the current section; the menu
+   lists every destination grouped by workflow. No sideways scrolling. */
+.event-section-picker {
+  position: relative;
+}
+.event-section-picker-button {
+  display: flex;
+  width: 100%;
+  min-height: 52px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+  padding: 8px 14px;
+  text-align: left;
+  box-shadow:
+    0 1px 2px rgb(30 40 36 / 0.05),
+    0 2px 8px -2px rgb(30 40 36 / 0.08);
+}
+.event-section-picker-button[aria-expanded="true"] {
+  border-color: var(--color-brand);
+}
+.event-section-picker-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 30;
+  display: grid;
+  max-height: 70vh;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 12px;
+  overflow-y: auto;
+  border: 1px solid var(--color-line-2);
+  border-radius: var(--radius-md);
+  background: var(--color-panel);
+  padding: 10px;
+  box-shadow: 0 16px 40px -12px rgb(30 40 36 / 0.35);
+}
+.event-section-picker-group {
+  display: grid;
+  gap: 2px;
+  align-content: start;
+}
+.event-section-picker-group > p {
+  padding: 6px 8px 2px;
+  color: var(--color-ink-2);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.event-section-picker-group > button {
+  display: flex;
+  min-height: 40px;
+  cursor: pointer;
+  align-items: center;
+  border-radius: var(--radius-sm);
+  padding: 0 8px;
+  color: var(--color-ink);
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+}
+.event-section-picker-group > button:hover {
+  background: var(--color-inset);
+}
+.event-section-picker-group > button[aria-checked="true"] {
+  background: var(--color-brand-soft);
+  color: var(--color-brand);
+  font-weight: 600;
 }
 
 .supply-degraded {
@@ -3743,8 +3836,11 @@
 }
 .mobile-section-card {
   border: 1px solid var(--color-line);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--color-panel);
+  box-shadow:
+    0 1px 2px rgb(30 40 36 / 0.05),
+    0 2px 8px -2px rgb(30 40 36 / 0.08);
 }
 .mobile-section-card > header {
   display: flex;
@@ -3754,7 +3850,6 @@
   padding: 0.6rem 0.85rem 0.4rem;
 }
 .mobile-section-card > header h2 {
-  font-family: var(--font-display);
   font-size: var(--text-lg);
   font-weight: 600;
   color: var(--color-ink);

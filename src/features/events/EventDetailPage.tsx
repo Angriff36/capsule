@@ -1,7 +1,13 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useMobileViewport } from "../../app/shell/useMobileViewport";
-import { relativeDays } from "../../lib/format";
+import {
+  formatCount,
+  formatDate,
+  formatMoney,
+  formatTime,
+  relativeDays,
+} from "../../lib/format";
 import { useRouteRecord } from "../../lib/routeRecord";
 import { formatStatusLabel } from "../../lib/statusLabels";
 import {
@@ -38,7 +44,6 @@ import {
   ActionMenu,
   ActionMenuRule,
   ErrorState,
-  PageHeader,
   StatusChip,
 } from "../../ui/primitives";
 import { useSuccessToast } from "../../ui/useSuccessToast";
@@ -72,7 +77,6 @@ import { EventSourceProvenancePanel } from "./EventSourceProvenancePanel";
 import { EventLayoutsTab } from "./EventLayoutsTab";
 import { EventTimelineTab } from "./EventTimelineTab";
 import { FailureBanner } from "./FailureBanner";
-import { MobileEventHeader } from "./mobile/MobileEventHeader";
 import { MobileEventOverview } from "./mobile/MobileEventOverview";
 import { RecurringEventPanel } from "./RecurringEventPanel";
 import {
@@ -81,6 +85,19 @@ import {
   parseEventDetailTab,
 } from "./eventRoutes";
 import { rememberLastViewedEvent } from "./lastViewedEvent";
+
+function HeroFact({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-xs font-semibold tracking-[0.04em] text-ink-2 uppercase">
+        {label}
+      </dt>
+      <dd className="mt-0.5 text-base font-semibold break-words text-ink">
+        {children}
+      </dd>
+    </div>
+  );
+}
 
 export function EventDetailPage() {
   const { id } = useParams();
@@ -340,71 +357,125 @@ export function EventDetailPage() {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {mobile ? (
-        <>
-          <MobileEventHeader title={event.title} stage={String(event.stage)} />
-          <details className="card">
-            <summary className="flex min-h-11 cursor-pointer list-none items-center px-3 text-base font-semibold text-ink [&::-webkit-details-marker]:hidden">
-              Actions
-            </summary>
-            <div className="mobile-actions flex flex-wrap gap-2 px-3 pb-3">
-              {headerActions}
-            </div>
-          </details>
-        </>
-      ) : (
-        <>
-          <Link
-            to="/events"
-            className="inline-flex items-center gap-1.5 text-sm text-ink-3 hover:text-ink"
-          >
-            <ArrowLeftIcon width={12} height={12} /> All events
-          </Link>
-          <PageHeader
-            title={
-              <span className="flex flex-wrap items-center gap-2.5">
+        <section
+          className="card px-4 py-4"
+          data-testid="event-context-header-mobile"
+        >
+          <div className="flex items-start gap-2">
+            <Link
+              to="/events"
+              aria-label="All events"
+              className="-ml-1 grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-2 hover:bg-inset"
+            >
+              <ArrowLeftIcon width={18} height={18} />
+            </Link>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-xl leading-tight font-bold text-ink">
                 {event.title}
+              </h1>
+              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-sm text-ink-2">
                 <StatusChip status={String(event.stage)} />
-              </span>
-            }
-            lead={
-              <span className="text-sm">
-                {formatStatusLabel(event.eventType)} ·{" "}
-                {(() => {
-                  const client = clients?.find((c) => c._id === event.clientId);
-                  const name = clientDisplayName(event.clientId, clients);
-                  if (!client) return name;
-                  return (
-                    <HoverPreview card={<ClientPreviewCard client={client} />}>
-                      <Link
-                        to={`/clients/${client._id}`}
-                        className="underline decoration-dotted underline-offset-2 hover:text-ink"
-                      >
-                        {name}
-                      </Link>
-                    </HoverPreview>
-                  );
-                })()}
-                {venue ? (
-                  <>
-                    {" · "}
-                    <Link
-                      to="/facilities"
-                      className="underline decoration-dotted underline-offset-2 hover:text-ink"
-                    >
-                      {venue.name}
-                    </Link>
-                  </>
+                <span>{formatStatusLabel(event.eventType)}</span>
+                {event.startsAt != null ? (
+                  <span>· {relativeDays(event.startsAt)}</span>
                 ) : null}
+              </div>
+            </div>
+          </div>
+          <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
+            <HeroFact label="Date">
+              {formatDate(event.startsAt)}
+              <span className="block text-sm font-medium text-ink-2">
+                {event.startsAt != null
+                  ? `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
+                  : "—"}
+              </span>
+            </HeroFact>
+            <HeroFact label="Headcount">
+              {formatCount(event.expectedHeadcount)} guests
+            </HeroFact>
+            <HeroFact label="Venue">
+              {venue ? venue.name : "No venue yet"}
+            </HeroFact>
+            <HeroFact label="Client">
+              {clientDisplayName(event.clientId, clients)}
+            </HeroFact>
+          </dl>
+          <div className="mobile-actions mt-4 flex items-center gap-2">
+            {headerActions}
+          </div>
+        </section>
+      ) : (
+        <section className="card px-6 py-5" data-testid="event-context-header">
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="min-w-0">
+              <Link
+                to="/events"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 hover:text-ink"
+              >
+                <ArrowLeftIcon width={13} height={13} /> All events
+              </Link>
+              <div className="mt-1.5 flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl font-bold tracking-tight text-ink">
+                  {event.title}
+                </h1>
+                <StatusChip status={String(event.stage)} />
+              </div>
+              <p className="mt-1 text-base text-ink-2">
+                {formatStatusLabel(event.eventType)}
                 {event.startsAt != null
                   ? ` · ${relativeDays(event.startsAt)}`
                   : ""}
-              </span>
-            }
-            actions={headerActions}
-          />
-        </>
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {headerActions}
+            </div>
+          </div>
+          <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 border-t border-line pt-4 md:grid-cols-3 xl:grid-cols-6">
+            <HeroFact label="Date">{formatDate(event.startsAt)}</HeroFact>
+            <HeroFact label="Time">
+              {event.startsAt != null
+                ? `${formatTime(event.startsAt)} – ${formatTime(event.endsAt)}`
+                : "—"}
+            </HeroFact>
+            <HeroFact label="Headcount">
+              {formatCount(event.expectedHeadcount)} guests
+            </HeroFact>
+            <HeroFact label="Venue">
+              {venue ? (
+                <Link to="/facilities" className="hover:underline">
+                  {venue.name}
+                </Link>
+              ) : (
+                "No venue yet"
+              )}
+            </HeroFact>
+            <HeroFact label="Client">
+              {(() => {
+                const client = clients?.find((c) => c._id === event.clientId);
+                const name = clientDisplayName(event.clientId, clients);
+                if (!client) return name;
+                return (
+                  <HoverPreview card={<ClientPreviewCard client={client} />}>
+                    <Link
+                      to={`/clients/${client._id}`}
+                      className="hover:underline"
+                    >
+                      {name}
+                    </Link>
+                  </HoverPreview>
+                );
+              })()}
+            </HeroFact>
+            <HeroFact label="Budget / quoted">
+              {formatMoney(event.budgetAmount)} /{" "}
+              {formatMoney(event.quotedPrice)}
+            </HeroFact>
+          </dl>
+        </section>
       )}
 
       {savedToast}
@@ -466,7 +537,7 @@ export function EventDetailPage() {
       ) : null}
       {failure ? <FailureBanner failure={failure} /> : null}
 
-      <EventDetailTabs active={activeTab} onChange={setTab} />
+      <EventDetailTabs active={activeTab} onChange={setTab} compact={mobile} />
 
       {mobileOverview ? (
         <EventTabErrorBoundary tabLabel="Overview" key="mobile-overview">
