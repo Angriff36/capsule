@@ -19,17 +19,17 @@
   --color-sage-2: #cbd9c6;
 
   --color-ink: #24322d;
-  --color-ink-2: #53615b;
-  --color-ink-3: #7b867f;
+  --color-ink-2: #3f4b46;
+  --color-ink-3: #5f6b65;
   --color-brand: #31574f;
   --color-brand-soft: #e0eae4;
 
-  --color-line: #dde1d9;
-  --color-line-2: #c8cec5;
+  --color-line: #d6dbd2;
+  --color-line-2: #aeb7ad;
   --color-rail: #f7f8f4;
   --color-rail-2: #edf1ea;
-  --color-rail-ink: #46534e;
-  --color-rail-dim: #87918b;
+  --color-rail-ink: #2f3b36;
+  --color-rail-dim: #5f6b65;
   --color-service: #31574f;
 
   --color-accent: #c8783f;
@@ -76,17 +76,17 @@
   --color-sage-2: #38423b;
 
   --color-ink: #e3e9e2;
-  --color-ink-2: #a9b4ab;
-  --color-ink-3: #7e8981;
+  --color-ink-2: #bcc6be;
+  --color-ink-3: #97a39a;
   --color-brand: #85b8a9;
   --color-brand-soft: #26352f;
 
-  --color-line: #313a34;
-  --color-line-2: #414c44;
+  --color-line: #343e37;
+  --color-line-2: #4d5a51;
   --color-rail: #1b211d;
   --color-rail-2: #262e29;
-  --color-rail-ink: #b4bfb6;
-  --color-rail-dim: #7e8981;
+  --color-rail-ink: #d3dcd5;
+  --color-rail-dim: #97a39a;
   --color-service: #85b8a9;
 
   --color-accent: #d79860;
@@ -106,8 +106,7 @@
 /* Brand is light in dark mode, so white-on-brand chips flip to dark ink,
    and hardcoded paper gradients/tints get night equivalents. */
 .dark .capsule-mark,
-.dark .icon-nav a.active,
-.dark .icon-nav a > span,
+.dark .sidebar-nav a.active,
 .dark .clear-check,
 .dark .schedule-notice-count,
 .dark .revenue-switch button[aria-pressed="true"],
@@ -115,16 +114,7 @@
   color: var(--color-canvas);
 }
 .dark .app-canvas {
-  background:
-    radial-gradient(
-      circle at 8% 2%,
-      rgb(255 255 255 / 0.04),
-      transparent 25rem
-    ),
-    linear-gradient(135deg, #1d2420 0%, #161c19 100%);
-}
-.dark .workspace-sheet {
-  border-color: rgb(133 184 169 / 0.14);
+  background: var(--color-panel);
 }
 .dark .attention-ledger {
   background: #232b26;
@@ -182,7 +172,7 @@
     @apply h-6.5 px-2 text-sm;
   }
   .input {
-    @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink placeholder:text-ink-3 focus:border-accent;
+    @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink shadow-[inset_0_1px_1px_rgb(36_50_45/0.06)] placeholder:text-ink-3 focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none disabled:cursor-not-allowed disabled:border-line disabled:bg-inset disabled:text-ink-3 disabled:shadow-none;
   }
   textarea.input {
     @apply h-auto min-h-16 py-2;
@@ -191,35 +181,38 @@
     @apply cursor-pointer;
   }
   .field-label {
-    @apply grid gap-1 text-xs font-medium tracking-[0.02em] text-ink-2;
+    @apply grid gap-1 text-xs font-semibold text-ink-2;
   }
   .chip {
-    @apply inline-flex h-[19px] items-center gap-1 rounded-full border px-2 text-2xs font-semibold tracking-[0.07em] uppercase;
+    @apply inline-flex h-5 items-center gap-1 rounded-full border px-2 text-xs font-semibold whitespace-nowrap capitalize;
   }
   .card {
     @apply rounded-sm border border-line bg-panel;
   }
   .th {
-    @apply border-b border-line-2 px-3 py-2 text-left text-2xs font-semibold tracking-[0.08em] whitespace-nowrap text-ink-3 uppercase;
+    @apply border-b border-line-2 bg-inset px-3 py-1.5 text-left text-xs font-semibold tracking-[0.02em] whitespace-nowrap text-ink-2;
   }
   .td {
-    @apply h-9 border-b border-line px-3 py-0 align-middle whitespace-nowrap;
+    @apply h-8 border-b border-line px-3 py-0 align-middle whitespace-nowrap text-ink;
+  }
+  tbody tr:last-child > .td {
+    @apply border-b-0;
   }
   .kbd {
     @apply inline-flex h-[17px] min-w-[17px] items-center justify-center rounded-xs border border-line-2 bg-inset px-1 font-mono text-2xs text-ink-2;
   }
   .label {
-    @apply mb-1 block text-xs font-semibold tracking-[0.05em] text-ink-2 uppercase;
+    @apply mb-1 block text-xs font-semibold text-ink-2;
   }
   .meta-term {
-    @apply text-2xs font-semibold tracking-[0.08em] text-ink-3 uppercase;
+    @apply text-xs font-semibold text-ink-2;
   }
 
   .font-display {
     font-family: var(--font-display);
   }
   .eyebrow {
-    @apply text-2xs font-semibold tracking-[0.18em] text-ink-3 uppercase;
+    @apply text-xs font-semibold tracking-[0.06em] text-ink-2 uppercase;
   }
   .display-title {
     font-family: var(--font-display);
@@ -294,13 +287,13 @@
     @apply mt-3 flex flex-wrap items-center gap-2;
   }
   .field-input {
-    @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink placeholder:text-ink-3 focus:border-accent;
+    @apply h-8 w-full rounded-xs border border-line-2 bg-panel px-2.5 text-ink placeholder:text-ink-3 focus:border-accent focus:ring-2 focus:ring-accent/25 focus:outline-none disabled:border-line disabled:bg-inset disabled:text-ink-3;
   }
   .field-hint {
     @apply mt-1 text-xs text-ink-3;
   }
   .field-label-text {
-    @apply text-2xs font-semibold tracking-[0.08em] text-ink-3 uppercase;
+    @apply text-xs font-semibold text-ink-2;
   }
   .form-summary {
     @apply rounded-xs border border-line bg-inset px-3 py-2 text-sm text-ink-2;
@@ -309,7 +302,7 @@
     @apply grid gap-2 text-sm;
   }
   .supply-detail-list dt {
-    @apply text-2xs font-semibold tracking-[0.08em] text-ink-3 uppercase;
+    @apply text-xs font-semibold text-ink-2;
   }
   .supply-detail-list dd {
     @apply text-ink;
@@ -344,236 +337,165 @@
 }
 
 @layer utilities {
+  /* The work surface IS the page: no floating sheet inside a padded canvas.
+     Content runs edge to edge inside the shell so wide tables and boards get
+     the whole viewport. */
   .app-canvas {
-    padding: 22px 22px 22px 18px;
-    background:
-      radial-gradient(
-        circle at 8% 2%,
-        rgb(255 255 255 / 0.42),
-        transparent 25rem
-      ),
-      linear-gradient(135deg, #e7eee1 0%, #d7e3d3 100%);
+    padding: 0;
+    background: var(--color-panel);
   }
   .workspace-sheet {
-    min-height: calc(100dvh - 108px);
-    border: 1px solid rgb(49 87 79 / 0.09);
-    border-radius: 22px;
+    min-height: 100%;
     background: var(--color-panel);
-    box-shadow: 0 30px 70px -48px rgb(36 50 45 / 0.55);
   }
 
+  /* Labeled sidebar. Expanded (default) shows icon + label for every
+     workspace under its group heading; collapsed keeps a 56px icon rail with
+     native title tooltips. The choice persists per browser. */
   .app-shell-sidebar {
     position: relative;
     z-index: 40;
     display: flex;
-    width: 72px;
+    width: 208px;
     flex-shrink: 0;
     flex-direction: column;
-    align-items: center;
     border-right: 1px solid var(--color-line);
     background: var(--color-rail);
     color: var(--color-rail-ink);
+    transition: width 160ms ease;
+  }
+  .app-shell-sidebar[data-collapsed="true"] {
+    width: 56px;
+  }
+  .sidebar-brand {
+    display: flex;
+    height: 48px;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 10px;
+    padding: 0 10px;
+    border-bottom: 1px solid var(--color-line);
+  }
+  .sidebar-brand strong {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+    white-space: nowrap;
   }
   .capsule-mark {
     display: grid;
-    width: 42px;
-    height: 42px;
-    margin-top: 13px;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
     place-items: center;
-    border-radius: 50%;
+    border-radius: 7px;
     background: var(--color-brand);
     color: white;
-    font-family: var(--font-display);
-    font-size: 25px;
-    box-shadow: 0 8px 18px -12px rgb(36 50 45 / 0.8);
+    font-size: 17px;
+    font-weight: 700;
   }
-  .capsule-mark span {
-    transform: translateY(-1px);
-  }
-  .icon-nav {
+  .sidebar-nav {
     display: flex;
-    width: 100%;
     flex: 1;
+    min-height: 0;
     flex-direction: column;
-    align-items: center;
-    gap: 9px;
-    padding-top: 42px;
+    gap: 2px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 8px;
+    scrollbar-width: thin;
   }
-  .icon-nav a {
-    position: relative;
-    display: grid;
-    width: 42px;
-    height: 42px;
-    place-items: center;
-    border-radius: 50%;
-    color: var(--color-ink-3);
-    transition: 160ms ease;
-  }
-  .icon-nav a:hover {
-    background: var(--color-rail-2);
-    color: var(--color-brand);
-    transform: translateY(-1px);
-  }
-  .icon-nav a.active {
-    background: var(--color-brand);
-    color: white;
-  }
-  .icon-nav a > span {
-    position: absolute;
-    left: 53px;
-    z-index: 50;
-    visibility: hidden;
-    border-radius: 4px;
-    background: var(--color-ink);
-    padding: 6px 9px;
-    color: white;
+  .sidebar-group {
+    margin: 8px 8px 3px;
+    color: var(--color-rail-dim);
     font-size: 10px;
-    white-space: nowrap;
-    opacity: 0;
-    transform: translateX(-4px);
-    transition: 130ms ease;
-  }
-  .icon-nav a:hover > span,
-  .icon-nav a:focus-visible > span {
-    visibility: visible;
-    opacity: 1;
-    transform: translateX(0);
-  }
-  .icon-nav-rule {
-    width: 18px;
-    height: 1px;
-    margin: 4px 0;
-    background: var(--color-line-2);
-  }
-  /* Short windows: the full icon rail (~860px with every workspace enabled)
-     is taller than the viewport. Scroll the rail internally instead of
-     letting it spill past the h-dvh shell — the spill used to stretch the
-     document (second scrollbar + dead band under the app). The scroll
-     container would clip the floating hover labels, so hide them here;
-     each link still carries a native title tooltip. */
-  @media (max-height: 900px) {
-    .icon-nav {
-      overflow-x: hidden;
-      overflow-y: auto;
-      scrollbar-width: thin;
-    }
-    .icon-nav a > span {
-      display: none;
-    }
-  }
-  .module-drawer {
-    position: relative;
-    margin-bottom: 18px;
-  }
-  .module-drawer > summary {
-    display: grid;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    list-style: none;
-    place-items: center;
-    border-radius: 50%;
-    color: var(--color-ink-3);
-    letter-spacing: 2px;
-  }
-  .module-drawer > summary:hover {
-    background: var(--color-rail-2);
-    color: var(--color-brand);
-  }
-  .module-drawer > summary::-webkit-details-marker {
-    display: none;
-  }
-  .module-popover {
-    position: absolute;
-    bottom: 0;
-    left: 52px;
-    width: 210px;
-    border: 1px solid var(--color-line);
-    border-radius: 10px;
-    background: var(--color-panel);
-    padding: 10px;
-    box-shadow: 0 18px 44px -24px rgb(36 50 45 / 0.45);
-  }
-  .module-popover > p {
-    padding: 4px 7px 8px;
-    color: var(--color-ink-3);
-    font-size: 9px;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
+    white-space: nowrap;
   }
-  .module-popover a {
+  .sidebar-nav a {
+    position: relative;
     display: flex;
+    height: 34px;
     align-items: center;
-    gap: 9px;
-    border-radius: 5px;
-    padding: 7px;
-    color: var(--color-ink-3);
-    font-size: 11px;
-    transition: 140ms ease;
+    gap: 10px;
+    border-radius: 6px;
+    padding: 0 9px;
+    color: var(--color-rail-ink);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: 120ms ease;
   }
-  .module-popover a:hover {
-    background: var(--color-inset);
+  .sidebar-nav a svg {
+    flex-shrink: 0;
+  }
+  .sidebar-nav a:hover {
+    background: var(--color-rail-2);
     color: var(--color-ink);
   }
-  .theme-toggle {
-    display: grid;
-    width: 40px;
-    height: 40px;
-    margin-bottom: 4px;
-    cursor: pointer;
-    place-items: center;
-    border-radius: 50%;
-    color: var(--color-ink-3);
-    transition: 160ms ease;
+  .sidebar-nav a.active {
+    background: var(--color-brand);
+    color: white;
+    font-weight: 600;
   }
+  .sidebar-nav a > span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .app-shell-sidebar[data-collapsed="true"] .sidebar-brand strong,
+  .app-shell-sidebar[data-collapsed="true"] .sidebar-group,
+  .app-shell-sidebar[data-collapsed="true"] .sidebar-nav a > span,
+  .app-shell-sidebar[data-collapsed="true"] .sidebar-foot span {
+    display: none;
+  }
+  .app-shell-sidebar[data-collapsed="true"] .sidebar-nav {
+    padding: 6px;
+    gap: 3px;
+  }
+  .app-shell-sidebar[data-collapsed="true"] .sidebar-nav a {
+    justify-content: center;
+    padding: 0;
+  }
+  .app-shell-sidebar[data-collapsed="true"] .sidebar-brand {
+    justify-content: center;
+    padding: 0;
+  }
+  .sidebar-foot {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 2px;
+    border-top: 1px solid var(--color-line);
+    padding: 6px;
+  }
+  .sidebar-foot button,
+  .theme-toggle {
+    display: inline-flex;
+    height: 32px;
+    min-width: 32px;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 6px;
+    padding: 0 8px;
+    color: var(--color-rail-ink);
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: 120ms ease;
+  }
+  .sidebar-foot button:hover,
   .theme-toggle:hover {
     background: var(--color-rail-2);
-    color: var(--color-brand);
+    color: var(--color-ink);
   }
-
-  /* The icon rail is ~860px tall at full spacing (12 areas + mark + theme
-     toggle + drawer). Laptop-height windows are shorter, so without these
-     steps the rail overflows the h-dvh shell, grows the document, and creates
-     the dead second scrollbar / dark void the shell's overflow-clip now
-     guards against — but the rail must also FIT so every area stays
-     clickable. Two compression steps keep the whole rail on screen down to
-     ~600px-tall windows. */
-  @media (max-height: 900px) {
-    .capsule-mark {
-      margin-top: 8px;
-    }
-    .icon-nav {
-      gap: 5px;
-      padding-top: 16px;
-    }
-    .icon-nav a {
-      width: 38px;
-      height: 38px;
-    }
-    .module-drawer {
-      margin-bottom: 8px;
-    }
+  .app-shell-sidebar[data-collapsed="true"] .sidebar-foot {
+    flex-direction: column;
   }
-  @media (max-height: 760px) {
-    .icon-nav {
-      gap: 2px;
-      padding-top: 8px;
-    }
-    .icon-nav a {
-      width: 34px;
-      height: 34px;
-    }
-    .icon-nav-rule {
-      margin: 2px 0;
-    }
-    .theme-toggle,
-    .module-drawer > summary {
-      width: 34px;
-      height: 34px;
-    }
-  }
-
   .journal-masthead {
     display: flex;
     align-items: flex-end;
@@ -843,34 +765,38 @@
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
-    gap: 2rem;
-    padding: 0.5rem 0 3rem;
-    border-bottom: 1px solid var(--color-line-2);
+    gap: 1.5rem;
+    padding: 0 0 0.85rem;
+    border-bottom: 1px solid var(--color-line);
   }
   .component-catalog {
     padding-top: 2.4rem;
   }
   .kitchen-book-nav {
     display: flex;
-    gap: 1.6rem;
+    gap: 2px;
     overflow-x: auto;
     border-bottom: 1px solid var(--color-line);
-    padding: 0.9rem 0 0;
+    padding: 0 0 6px;
+    scrollbar-width: thin;
   }
   .kitchen-book-nav a {
     flex: none;
-    border-bottom: 2px solid transparent;
-    padding: 0.75rem 0;
-    color: var(--color-ink-3);
-    font-size: 10px;
-    font-weight: 600;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    border-radius: 5px;
+    padding: 5px 10px;
+    color: var(--color-ink-2);
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
   }
-  .kitchen-book-nav a:hover,
+  .kitchen-book-nav a:hover {
+    background: var(--color-inset);
+    color: var(--color-ink);
+  }
   .kitchen-book-nav a.active {
-    border-bottom-color: var(--color-accent);
+    background: var(--color-brand-soft);
     color: var(--color-brand);
+    font-weight: 600;
   }
   .component-index-heading {
     display: flex;
@@ -882,7 +808,7 @@
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1.8rem 0 1rem;
+    padding: 0.85rem 0 0.75rem;
   }
   .component-search {
     display: flex;
@@ -1248,8 +1174,8 @@
   }
 
   .culinary-document {
-    max-width: 1180px;
-    margin: 0 auto;
+    max-width: none;
+    margin: 0;
   }
   .culinary-header {
     padding-bottom: 2.5rem;
@@ -1482,7 +1408,7 @@
 
 .supply-stage {
   display: grid;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .supply-masthead,
@@ -1516,55 +1442,175 @@
    on narrow screens. */
 .supply-tabs {
   display: flex;
-  margin: -0.5rem 0 0;
-  gap: 1.6rem;
+  margin: 0;
+  gap: 2px;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   border-bottom: 1px solid var(--color-line);
+  padding-bottom: 6px;
 }
 
 .supply-tabs a {
   flex: none;
   white-space: nowrap;
-  border-bottom: 2px solid transparent;
-  padding: 0.6rem 0;
-  color: var(--color-ink-3);
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  border-radius: 5px;
+  padding: 5px 10px;
+  color: var(--color-ink-2);
+  font-size: 13px;
+  font-weight: 500;
   transition: 140ms ease;
 }
 
 .supply-tabs a:hover {
-  color: var(--color-brand);
+  background: var(--color-inset);
+  color: var(--color-ink);
 }
 
 .supply-tabs a.active {
-  border-bottom-color: var(--color-accent);
+  background: var(--color-brand-soft);
   color: var(--color-brand);
+  font-weight: 600;
 }
 
-/* Event detail tab bar — underline tabs over a baseline rule. Wraps on wide
-   screens; scrolls horizontally on phones so every tab stays reachable. */
+/* Event detail navigation — five workflow groups on top (Plan, Food, Day-of,
+   Records, Money); the active group's sections sit on a second, quieter row.
+   Both rows scroll sideways on phones so every section stays reachable. */
 .event-detail-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  border-bottom: 1px solid var(--color-line);
+  display: grid;
+  gap: 0;
+  border: 1px solid var(--color-line);
+  border-radius: 5px;
+  overflow: hidden;
 }
-
-.event-detail-tabs button {
+.event-tab-groups {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  background: var(--color-inset);
+  padding: 4px;
+  scrollbar-width: thin;
+}
+.event-tab-groups button {
+  display: inline-flex;
+  height: 30px;
+  cursor: pointer;
+  align-items: center;
+  gap: 6px;
+  border-radius: 4px;
+  padding: 0 11px;
+  color: var(--color-ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: 120ms ease;
+}
+.event-tab-groups button:hover {
+  color: var(--color-ink);
+}
+.event-tab-groups button[aria-current="page"] {
+  background: var(--color-panel);
+  color: var(--color-ink);
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgb(36 50 45 / 0.12);
+}
+.event-tab-sections {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  border-top: 1px solid var(--color-line);
+  padding: 4px 6px;
+  scrollbar-width: thin;
+}
+.event-tab-sections button {
+  display: inline-flex;
+  height: 28px;
+  cursor: pointer;
+  align-items: center;
+  border-bottom: 2px solid transparent;
+  padding: 0 8px;
+  color: var(--color-ink-2);
+  font-size: 13px;
   white-space: nowrap;
 }
+.event-tab-sections button:hover {
+  color: var(--color-ink);
+}
+.event-tab-sections button[aria-current="page"] {
+  border-bottom-color: var(--color-brand);
+  color: var(--color-ink);
+  font-weight: 600;
+}
 
-@media (max-width: 640px) {
-  .event-detail-tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
+/* Overflow action menu: a <details> that drops a list of secondary and
+   destructive actions under a "More" button. Destructive items sit last,
+   separated by a rule. */
+.action-menu {
+  position: relative;
+}
+.action-menu > summary {
+  list-style: none;
+}
+.action-menu > summary::-webkit-details-marker {
+  display: none;
+}
+.action-menu-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 30;
+  display: grid;
+  min-width: 210px;
+  border: 1px solid var(--color-line-2);
+  border-radius: 5px;
+  background: var(--color-panel);
+  padding: 4px;
+  box-shadow: 0 12px 32px -12px rgb(36 50 45 / 0.35);
+}
+.action-menu-list > *,
+.action-menu-list .btn {
+  display: flex;
+  height: 32px;
+  width: 100%;
+  cursor: pointer;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  padding: 0 10px;
+  box-shadow: none;
+  color: var(--color-ink);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+}
+.action-menu-list > *:hover:not(:disabled) {
+  background: var(--color-inset);
+  transform: none;
+}
+.action-menu-list > *:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.action-menu-list .action-menu-danger {
+  color: var(--color-danger);
+}
+.action-menu-list .action-menu-danger:hover:not(:disabled) {
+  background: var(--color-danger-soft);
+}
+.action-menu-rule {
+  height: 1px;
+  margin: 4px 0;
+  background: var(--color-line);
+}
+
+@media (max-width: 767px) {
+  .action-menu-list {
+    right: auto;
+    left: 0;
   }
 }
 
@@ -2667,15 +2713,15 @@
 }
 
 .culinary-header-compact {
-  padding: 0.75rem 0 1rem;
-  border-bottom: 1px solid var(--color-line-2);
+  padding: 0.75rem 0 0.85rem;
+  border-bottom: 1px solid var(--color-line);
 }
 
 .culinary-title-compact {
-  font-family: var(--font-display);
-  font-size: clamp(1.75rem, 2.8vw, 2.6rem);
-  line-height: 1.05;
-  font-weight: 500;
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .culinary-facts-compact {

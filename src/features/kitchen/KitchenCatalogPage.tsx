@@ -230,11 +230,12 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
     <div className="component-book-stage culinary-studio">
       <header className="component-book-masthead">
         <div>
-          <p className="eyebrow">Culinary book · {title}</p>
-          <h1 className="display-title mt-2">The house book</h1>
-          <p className="mt-3 max-w-150 text-ink-2">
-            Browse and open {section} as cards — then drill into the record that
-            needs work.
+          <h1 className="text-xl font-semibold tracking-tight text-ink">
+            {title}
+          </h1>
+          <p className="mt-0.5 text-sm text-ink-2">
+            Browse and open {section} — then drill into the record that needs
+            work.
           </p>
         </div>
         <div className="component-book-masthead-actions">
@@ -273,8 +274,7 @@ export function KitchenCatalogPage({ section }: { section: KitchenSection }) {
       <section className="component-catalog">
         <div className="component-index-heading">
           <div>
-            <p className="eyebrow">Live index</p>
-            <h2 className="font-display mt-1 text-2xl">{title}</h2>
+            <h2 className="text-lg font-semibold text-ink">All {section}</h2>
           </div>
           <span className="font-mono text-xs text-ink-3">
             {formatCountNoun(rows.length, "record")}

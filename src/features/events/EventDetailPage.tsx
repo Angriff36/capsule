@@ -34,7 +34,14 @@ import { useTrackRecent } from "../../lib/recents";
 import { ArrowLeftIcon } from "../../ui/icons";
 import { QueryLoadState } from "../../ui/QueryLoadState";
 import { useSlowQuery } from "../../ui/useSlowQuery";
-import { ErrorState, PageHeader, StatusChip } from "../../ui/primitives";
+import {
+  ActionMenu,
+  ActionMenuRule,
+  ErrorState,
+  PageHeader,
+  StatusChip,
+} from "../../ui/primitives";
+import { useSuccessToast } from "../../ui/useSuccessToast";
 import { useTenantBranding } from "../admin/tenantBranding";
 import { EventClientPortalShare } from "../clientPortal/EventClientPortalShare";
 import { ClientPreviewCard } from "../clients/ClientPreviewCard";
@@ -121,6 +128,7 @@ export function EventDetailPage() {
   const [reason, setReason] = useState("");
   const [busy, setBusy] = useState(false);
   const [pdfNotice, setPdfNotice] = useState<string | null>(null);
+  const { notifySuccess, host: savedToast } = useSuccessToast();
   const { loadingTooLong } = useSlowQuery(event);
 
   if (event === undefined) {
@@ -168,13 +176,14 @@ export function EventDetailPage() {
     setSearchParams(next, { replace: true });
   };
 
-  const run = async (work: () => Promise<unknown>) => {
+  const run = async (work: () => Promise<unknown>, okMessage = "Saved") => {
     setFailure(null);
     setBusy(true);
     try {
       await work();
       setReasonFor(null);
       setReason("");
+      notifySuccess(okMessage);
     } catch (error) {
       setFailure(classifyCommandFailure(error));
     } finally {
@@ -189,108 +198,145 @@ export function EventDetailPage() {
       return;
     }
     const args = { docId: event._id, version };
-    if (key === "submitForApproval") void run(() => submitForApproval(args));
-    if (key === "approve") void run(() => approve(args));
-    if (key === "lockForSales") void run(() => lockForSales(args));
-    if (key === "confirmSalesLock") void run(() => confirmSalesLock(args));
-    if (key === "finalizeEvent") void run(() => finalizeEvent(args));
-    if (key === "beginExecution") void run(() => beginExecution(args));
-    if (key === "complete") void run(() => complete(args));
-    if (key === "closeOut") void run(() => closeOut(args));
+    const done = "Stage updated";
+    if (key === "submitForApproval")
+      void run(() => submitForApproval(args), done);
+    if (key === "approve") void run(() => approve(args), done);
+    if (key === "lockForSales") void run(() => lockForSales(args), done);
+    if (key === "confirmSalesLock")
+      void run(() => confirmSalesLock(args), done);
+    if (key === "finalizeEvent") void run(() => finalizeEvent(args), done);
+    if (key === "beginExecution") void run(() => beginExecution(args), done);
+    if (key === "complete") void run(() => complete(args), done);
+    if (key === "closeOut") void run(() => closeOut(args), done);
   };
 
+  // One obvious next step: the first primary lifecycle action. Other stage
+  // moves and every utility live under "More"; destructive moves sit last.
+  const lifecycle = eventLifecyclePolicy.availableActions(String(event.stage));
+  const primaryAction = lifecycle.find((action) => action.kind === "primary");
+  const secondaryActions = lifecycle.filter(
+    (action) => action !== primaryAction && action.kind !== "danger",
+  );
+  const dangerActions = lifecycle.filter((action) => action.kind === "danger");
+  const beoReady =
+    !busy &&
+    clients !== undefined &&
+    dishes !== undefined &&
+    eventAssignments !== undefined &&
+    eventDishes !== undefined &&
+    people !== undefined &&
+    timelineActivities !== undefined;
+
   const headerActions = [
-    <EventClientPortalShare key="client-portal-share" eventId={event._id} />,
-    <button
-      key="download-beo"
-      type="button"
-      className="btn btn-ghost"
-      disabled={
-        busy ||
-        clients === undefined ||
-        dishes === undefined ||
-        eventAssignments === undefined ||
-        eventDishes === undefined ||
-        people === undefined ||
-        timelineActivities === undefined
-      }
-      onClick={() => {
-        setPdfNotice(null);
-        void downloadBeoPdf({
-          event,
-          clientName: clientDisplayName(event.clientId, clients),
-          dishes: (eventDishes ?? [])
-            .filter(
-              (selection) =>
-                selection.deletedAt == null &&
-                selection.removedAt == null &&
-                selection.eventId === event._id,
-            )
-            .map((selection) => ({
-              selection,
-              dish: dishes?.find((dish) => dish._id === selection.dishId),
-            })),
-          timeline: (timelineActivities ?? []).filter(
-            (activity) =>
-              activity.eventId === event._id &&
-              activity.scheduledAt != null &&
-              activity.deletedAt == null,
-          ),
-          staff: (eventAssignments ?? [])
-            .filter(
-              (assignment) =>
-                assignment.deletedAt == null &&
-                assignment.eventId === event._id &&
-                assignment.status !== "unassigned",
-            )
-            .map((assignment) => ({
-              assignment,
-              person: people?.find(
-                (person) => person._id === assignment.personId,
-              ),
-            })),
-          branding,
-        })
-          .then(() => setPdfNotice("BEO PDF downloaded."))
-          .catch((error) => setFailure(classifyCommandFailure(error)));
-      }}
-    >
-      Download BEO
-    </button>,
-    <Link
-      key="create-proposal"
-      className="btn btn-ghost"
-      to={`/clients/proposals?event=${event._id}`}
-    >
-      Create proposal
-    </Link>,
-    <Link
-      key="save-as-template"
-      className="btn btn-ghost"
-      to={`/events/templates?fromEvent=${event._id}`}
-    >
-      Save as template
-    </Link>,
-    <Link
-      key="allergen-briefing"
-      className="btn btn-ghost"
-      to={`/events/${event._id}/allergen-briefing`}
-    >
-      Allergen briefing
-    </Link>,
-    ...eventLifecyclePolicy
-      .availableActions(String(event.stage))
-      .map((action) => (
+    ...(primaryAction
+      ? [
+          <button
+            key={primaryAction.key}
+            type="button"
+            disabled={busy}
+            onClick={() => runAction(primaryAction.key)}
+            className="btn btn-primary"
+          >
+            {primaryAction.label}
+          </button>,
+        ]
+      : []),
+    ...secondaryActions.map((action) => (
+      <button
+        key={action.key}
+        type="button"
+        disabled={busy}
+        onClick={() => runAction(action.key)}
+        className={`btn ${action.kind === "primary" ? "btn-secondary" : "btn-ghost"}`}
+      >
+        {action.label}
+      </button>
+    )),
+    <ActionMenu key="more">
+      <EventClientPortalShare key="client-portal-share" eventId={event._id} />
+      <button
+        key="download-beo"
+        type="button"
+        className="btn btn-ghost"
+        disabled={!beoReady}
+        onClick={() => {
+          setPdfNotice(null);
+          void downloadBeoPdf({
+            event,
+            clientName: clientDisplayName(event.clientId, clients),
+            dishes: (eventDishes ?? [])
+              .filter(
+                (selection) =>
+                  selection.deletedAt == null &&
+                  selection.removedAt == null &&
+                  selection.eventId === event._id,
+              )
+              .map((selection) => ({
+                selection,
+                dish: dishes?.find((dish) => dish._id === selection.dishId),
+              })),
+            timeline: (timelineActivities ?? []).filter(
+              (activity) =>
+                activity.eventId === event._id &&
+                activity.scheduledAt != null &&
+                activity.deletedAt == null,
+            ),
+            staff: (eventAssignments ?? [])
+              .filter(
+                (assignment) =>
+                  assignment.deletedAt == null &&
+                  assignment.eventId === event._id &&
+                  assignment.status !== "unassigned",
+              )
+              .map((assignment) => ({
+                assignment,
+                person: people?.find(
+                  (person) => person._id === assignment.personId,
+                ),
+              })),
+            branding,
+          })
+            .then(() => setPdfNotice("BEO PDF downloaded."))
+            .catch((error) => setFailure(classifyCommandFailure(error)));
+        }}
+      >
+        Download BEO
+      </button>
+      <Link
+        key="create-proposal"
+        className="btn btn-ghost"
+        to={`/clients/proposals?event=${event._id}`}
+      >
+        Create proposal
+      </Link>
+      <Link
+        key="save-as-template"
+        className="btn btn-ghost"
+        to={`/events/templates?fromEvent=${event._id}`}
+      >
+        Save as template
+      </Link>
+      <Link
+        key="allergen-briefing"
+        className="btn btn-ghost"
+        to={`/events/${event._id}/allergen-briefing`}
+      >
+        Allergen briefing
+      </Link>
+      {dangerActions.length > 0 ? <ActionMenuRule /> : null}
+      {dangerActions.map((action) => (
         <button
           key={action.key}
           type="button"
           disabled={busy}
           onClick={() => runAction(action.key)}
-          className={`btn ${action.kind === "primary" ? "btn-primary" : action.kind === "danger" ? "btn-danger" : "btn-ghost"}`}
+          className="action-menu-danger"
         >
           {action.label}
         </button>
-      )),
+      ))}
+    </ActionMenu>,
   ];
 
   return (
@@ -361,8 +407,9 @@ export function EventDetailPage() {
         </>
       )}
 
+      {savedToast}
       {pdfNotice ? (
-        <p className="text-base text-ink-2" role="status">
+        <p className="banner banner-ok" role="status">
           {pdfNotice}
         </p>
       ) : null}

@@ -9,6 +9,7 @@ import {
 import { useListClient, useListEvent } from "../../lib/manifest-convex-react";
 import { PlusIcon } from "../../ui/icons";
 import {
+  ActionMenu,
   EmptyState,
   PageHeader,
   StatusChip,
@@ -18,31 +19,77 @@ import { SavedViewsBar } from "../views/SavedViewsBar";
 import { clientDisplayName } from "./clientName";
 import { EVENT_STAGES, type EventStage, STAGE_LABEL } from "./eventStatus";
 
-type Tab = "all" | EventStage;
+/** Question tabs first (what is upcoming / needs action), then the stages. */
+type Tab = "upcoming" | "attention" | "all" | EventStage;
 type EventsView = { tab: Tab; search: string; dir: "asc" | "desc" };
+
+const DAY = 86_400_000;
+const DONE_STAGES = new Set(["completed", "cancelled", "closed_out"]);
+
+type EventRow = {
+  stage: unknown;
+  startsAt?: number | null;
+  expectedHeadcount?: number | null;
+};
+
+const isUpcoming = (e: EventRow, now: number) =>
+  !DONE_STAGES.has(String(e.stage)) &&
+  (e.startsAt == null || e.startsAt >= now - DAY);
+
+/** Needs a decision or is about to happen without being ready. */
+const needsAction = (e: EventRow, now: number) => {
+  const stage = String(e.stage);
+  if (stage === "pending_approval" || stage === "quote") return true;
+  if (DONE_STAGES.has(stage)) return false;
+  const soon = e.startsAt != null && e.startsAt - now < 14 * DAY;
+  return soon && (stage === "planning" || !e.expectedHeadcount);
+};
+
+const TAB_LABEL: Record<"upcoming" | "attention" | "all", string> = {
+  upcoming: "Upcoming",
+  attention: "Needs action",
+  all: "All",
+};
 
 export function EventsListPage() {
   const navigate = useNavigate();
   const events = useListEvent();
   const clients = useListClient();
-  const [tab, setTab] = useState<Tab>("all");
+  // Open on "Upcoming"; when nothing is upcoming, fall back to "All" so the
+  // page never opens empty. A user choice always wins.
+  const [chosenTab, setTab] = useState<Tab | null>(null);
   const [search, setSearch] = useState("");
   const [dir, setDir] = useState<"asc" | "desc">("asc");
   const now = Date.now();
 
+  const live = useMemo(
+    () => (events ?? []).filter((e) => e.deletedAt == null),
+    [events],
+  );
+
   const counts = useMemo(() => {
-    const c: Record<string, number> = { all: events?.length ?? 0 };
+    const c: Record<string, number> = {
+      all: live.length,
+      upcoming: live.filter((e) => isUpcoming(e, now)).length,
+      attention: live.filter((e) => needsAction(e, now)).length,
+    };
     for (const s of EVENT_STAGES) c[s] = 0;
-    for (const e of events ?? []) {
+    for (const e of live) {
       const stage = String(e.stage);
       c[stage] = (c[stage] ?? 0) + 1;
     }
     return c;
-  }, [events]);
+  }, [live, now]);
+
+  const tab: Tab =
+    chosenTab ?? ((counts.upcoming ?? 0) > 0 ? "upcoming" : "all");
 
   const rows = useMemo(() => {
-    let list = (events ?? []).filter((e) => e.deletedAt == null);
-    if (tab !== "all") list = list.filter((e) => e.stage === tab);
+    let list = live;
+    if (tab === "upcoming") list = list.filter((e) => isUpcoming(e, now));
+    else if (tab === "attention")
+      list = list.filter((e) => needsAction(e, now));
+    else if (tab !== "all") list = list.filter((e) => e.stage === tab);
     const q = search.trim().toLowerCase();
     if (q) {
       list = list.filter(
@@ -61,27 +108,21 @@ export function EventsListPage() {
       const bDate = b.startsAt ?? 0;
       return dir === "asc" ? aDate - bDate : bDate - aDate;
     });
-  }, [events, clients, tab, search, dir]);
+  }, [live, clients, tab, search, dir, now]);
 
   return (
     <div className="space-y-4">
       <PageHeader
         title="Events"
-        lead="Every booking across the operation."
+        lead={`${counts.upcoming ?? 0} upcoming · ${counts.attention ?? 0} need action`}
         actions={[
-          <Link key="capacity" to="/events/capacity" className="btn btn-ghost">
-            Capacity calendar
-          </Link>,
-          <Link
-            key="templates"
-            to="/events/templates"
-            className="btn btn-ghost"
-          >
-            Templates
-          </Link>,
           <Link key="new" to="/events/new" className="btn btn-primary">
             <PlusIcon /> New event
           </Link>,
+          <ActionMenu key="more">
+            <Link to="/events/capacity">Capacity calendar</Link>
+            <Link to="/events/templates">Templates</Link>
+          </ActionMenu>,
         ]}
       />
 
@@ -91,23 +132,29 @@ export function EventsListPage() {
           aria-label="Filter by stage"
           className="flex max-w-full overflow-x-auto rounded-xs border border-line-2 bg-panel"
         >
-          {(["all", ...EVENT_STAGES] as Tab[]).map((t) => (
-            <button
-              key={t}
-              type="button"
-              role="tab"
-              aria-selected={tab === t}
-              onClick={() => setTab(t)}
-              className={`h-8 shrink-0 cursor-pointer border-r border-line px-3 text-sm font-medium last:border-r-0 ${
-                tab === t ? "bg-inset text-ink" : "text-ink-2 hover:text-ink"
-              }`}
-            >
-              {t === "all" ? "All" : STAGE_LABEL[t]}
-              <span className="ml-1.5 font-mono text-xs text-ink-3">
-                {counts[t] ?? 0}
-              </span>
-            </button>
-          ))}
+          {(["upcoming", "attention", "all", ...EVENT_STAGES] as Tab[]).map(
+            (t) => (
+              <button
+                key={t}
+                type="button"
+                role="tab"
+                aria-selected={tab === t}
+                onClick={() => setTab(t)}
+                className={`h-8 shrink-0 cursor-pointer border-r border-line px-3 text-sm font-medium last:border-r-0 ${
+                  tab === t
+                    ? "bg-brand-soft text-brand"
+                    : "text-ink-2 hover:bg-inset hover:text-ink"
+                } ${t === "all" ? "border-l-2 border-l-line-2" : ""}`}
+              >
+                {t in TAB_LABEL
+                  ? TAB_LABEL[t as keyof typeof TAB_LABEL]
+                  : STAGE_LABEL[t as EventStage]}
+                <span className="ml-1.5 font-mono text-xs text-ink-2">
+                  {counts[t] ?? 0}
+                </span>
+              </button>
+            ),
+          )}
         </div>
         <input
           value={search}
@@ -150,7 +197,7 @@ export function EventsListPage() {
             }
             hint={
               search || tab !== "all"
-                ? "Try a different stage tab or clear the search."
+                ? "Try another tab or clear the search."
                 : "Create the first engagement to begin planning."
             }
           />
@@ -158,12 +205,12 @@ export function EventsListPage() {
           <table className="w-full">
             <thead>
               <tr>
-                <th className="th w-full">Event</th>
-                <th className="th">Client</th>
                 <th className="th">Starts</th>
-                <th className="th text-right">Headcount</th>
-                <th className="th text-right">Budget</th>
+                <th className="th w-full">Event</th>
                 <th className="th">Stage</th>
+                <th className="th">Client</th>
+                <th className="th text-right">Guests</th>
+                <th className="th text-right">Budget</th>
               </tr>
             </thead>
             <tbody>
@@ -171,35 +218,43 @@ export function EventsListPage() {
                 <tr
                   key={e._id}
                   onClick={() => navigate(`/events/${e._id}`)}
-                  className="cursor-pointer transition-colors hover:bg-inset/60"
+                  className="cursor-pointer transition-colors hover:bg-inset"
                 >
+                  <td className="td font-mono text-sm">
+                    {formatDate(e.startsAt)}
+                    {e.startsAt != null ? (
+                      <span
+                        className={`ml-2 ${needsAction(e, now) ? "font-semibold text-warn" : "text-ink-2"}`}
+                      >
+                        {relativeDays(e.startsAt, now)}
+                      </span>
+                    ) : null}
+                  </td>
                   <td className="td w-full max-w-0 truncate">
-                    <span className="font-medium">{e.title}</span>
+                    <Link
+                      to={`/events/${e._id}`}
+                      className="font-semibold text-ink hover:underline"
+                      onClick={(click) => click.stopPropagation()}
+                    >
+                      {e.title}
+                    </Link>
                     {e.venueName ? (
-                      <span className="ml-2 text-sm text-ink-3">
+                      <span className="ml-2 text-sm text-ink-2">
                         {e.venueName}
                       </span>
                     ) : null}
                   </td>
+                  <td className="td">
+                    <StatusChip status={String(e.stage)} />
+                  </td>
                   <td className="td text-ink-2">
                     {clientDisplayName(e.clientId, clients)}
-                  </td>
-                  <td className="td font-mono text-sm">
-                    {formatDate(e.startsAt)}
-                    {e.startsAt != null ? (
-                      <span className="ml-2 text-ink-3">
-                        {relativeDays(e.startsAt, now)}
-                      </span>
-                    ) : null}
                   </td>
                   <td className="td text-right font-mono">
                     {formatCount(e.expectedHeadcount)}
                   </td>
                   <td className="td text-right font-mono">
                     {formatMoney(e.budgetAmount)}
-                  </td>
-                  <td className="td">
-                    <StatusChip status={String(e.stage)} />
                   </td>
                 </tr>
               ))}

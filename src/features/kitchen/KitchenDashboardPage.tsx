@@ -170,11 +170,11 @@ export function KitchenDashboardPage() {
     <div className="culinary-document culinary-document-compact culinary-studio kitchen-command-deck space-y-4">
       <KitchenBookNav />
       <header className="kcd-masthead">
-        <p className="eyebrow">Kitchen</p>
         <h1>Command deck</h1>
         <p className="kcd-lede">
-          Next 7 days from {formatDate(horizon.start().getTime())} — put cooks
-          on dishes and steps, and keep an eye on who is buried.
+          What needs preparing in the 7 days from{" "}
+          {formatDate(horizon.start().getTime())}, who owns it, and what is
+          blocked. Arm a cook on the right, then assign dishes or steps.
         </p>
       </header>
 

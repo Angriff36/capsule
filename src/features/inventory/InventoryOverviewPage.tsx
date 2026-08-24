@@ -79,6 +79,7 @@ const QUICK_LINKS = [
 type AttentionRow = {
   key: string;
   to: string;
+  kind: "Low stock" | "On order";
   title: string;
   detail: string;
   status: string;
@@ -139,6 +140,7 @@ export function InventoryOverviewPage() {
     ...lowStockItems.map((item) => ({
       key: item._id,
       to: stockLineLink(item._id),
+      kind: "Low stock" as const,
       title: ingredientName(item.ingredientId),
       detail: `${Number(item.quantityOnHand)} of reorder ${Number(item.reorderThreshold)} ${catalogUnitForStockLine(item, ingredients ?? [])} on hand`,
       status: "reorder now",
@@ -146,6 +148,7 @@ export function InventoryOverviewPage() {
     ...awaitingReceipt.map((order) => ({
       key: order._id,
       to: `/inventory/orders/${order._id}`,
+      kind: "On order" as const,
       title: `${vendorName(order.vendorId)} order`,
       detail: `${formatMoneyExact(vendorOrderHeaderTotal(order, lines))}${
         order.sourceRangeStart != null
@@ -167,15 +170,20 @@ export function InventoryOverviewPage() {
     <div className="operations-stage supply-stage">
       <PageHeader
         title="Inventory"
-        lead="What's low, what's on order, and what needs receiving — before it becomes a service problem."
+        lead="What is low, on order, or waiting to be received."
+        actions={
+          <Link to="/inventory/purchasing" className="btn btn-primary">
+            Review purchasing
+          </Link>
+        }
       />
       <InventoryWorkspaceNav />
 
       <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line lg:grid-cols-4">
         {kpis.map((kpi) => (
-          <div key={kpi.label} className="bg-panel px-4 py-3">
-            <dt className="eyebrow">{kpi.label}</dt>
-            <dd className="mt-1 text-xl font-semibold text-ink">
+          <div key={kpi.label} className="bg-panel px-3 py-2">
+            <dt className="text-xs font-semibold text-ink-2">{kpi.label}</dt>
+            <dd className="mt-0.5 text-xl font-semibold text-ink">
               {loading ? <Skeleton className="h-7 w-16" /> : kpi.value}
             </dd>
           </div>
@@ -207,36 +215,49 @@ export function InventoryOverviewPage() {
             }
           />
         ) : (
-          <ul className="divide-y divide-line">
-            {attention.map((row) => (
-              <li key={row.key}>
-                <Link
-                  to={row.to}
-                  className="flex items-center justify-between gap-3 px-3 py-2.5 hover:bg-inset"
-                >
-                  <span className="min-w-0">
-                    <span className="block truncate font-medium text-ink">
-                      {row.title}
-                    </span>
-                    <span className="block text-sm text-ink-3">
-                      {row.detail}
-                    </span>
-                  </span>
-                  <StatusChip status={row.status} />
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr>
+                  <th className="th">Type</th>
+                  <th className="th w-full">Item</th>
+                  <th className="th">Detail</th>
+                  <th className="th">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {attention.map((row) => (
+                  <tr key={row.key} className="hover:bg-inset">
+                    <td className="td text-ink-2">{row.kind}</td>
+                    <td className="td w-full max-w-0 truncate">
+                      <Link
+                        to={row.to}
+                        className="font-semibold text-ink hover:underline"
+                      >
+                        {row.title}
+                      </Link>
+                    </td>
+                    <td className="td text-ink-2">{row.detail}</td>
+                    <td className="td">
+                      <StatusChip status={row.status} />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </Section>
 
       <Section title="Workspace">
-        <ul className="grid grid-cols-1 divide-y divide-line sm:grid-cols-2 sm:divide-y-0">
+        <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
           {QUICK_LINKS.map((link) => (
-            <li key={link.path}>
-              <Link to={link.path} className="block px-3 py-2.5 hover:bg-inset">
-                <span className="block font-medium text-ink">{link.label}</span>
-                <span className="block text-sm text-ink-3">
+            <li key={link.path} className="border-b border-line sm:border-r">
+              <Link to={link.path} className="block px-3 py-2 hover:bg-inset">
+                <span className="block text-sm font-semibold text-ink">
+                  {link.label}
+                </span>
+                <span className="block text-xs text-ink-2">
                   {link.description}
                 </span>
               </Link>

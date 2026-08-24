@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { type EventStage, STAGE_LABEL } from "../features/events/eventStatus";
 import { formatStatusLabel, statusChipClass } from "../lib/statusLabels";
+import { ChevronDownIcon } from "./icons";
 
 const STAGE_CHIP: Record<EventStage, string> = {
   quote: "border-line-2 bg-mute-soft text-ink-2",
@@ -49,18 +50,47 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <header className="page-header flex flex-wrap items-end justify-between gap-3 border-b border-line pb-4">
-      <div>
-        <h1 className="font-display text-2xl font-semibold tracking-tight">
+    <header className="page-header flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-line pb-3">
+      <div className="min-w-0">
+        <h1 className="text-xl font-semibold tracking-tight text-ink">
           {title}
         </h1>
-        {lead ? <p className="mt-0.5 text-ink-2">{lead}</p> : null}
+        {lead ? <p className="mt-0.5 text-sm text-ink-2">{lead}</p> : null}
       </div>
       {actions ? (
         <div className="flex flex-wrap items-center gap-2">{actions}</div>
       ) : null}
     </header>
   );
+}
+
+/**
+ * "More ▾" overflow for secondary and destructive actions. Children are the
+ * menu items (buttons or links); give destructive ones `action-menu-danger`
+ * and put an <ActionMenuRule /> before them.
+ */
+export function ActionMenu({
+  label = "More",
+  children,
+}: {
+  label?: string;
+  children: ReactNode;
+}) {
+  return (
+    <details className="action-menu">
+      <summary className="btn btn-ghost">
+        {label}
+        <ChevronDownIcon width={12} height={12} />
+      </summary>
+      <div className="action-menu-list" role="menu">
+        {children}
+      </div>
+    </details>
+  );
+}
+
+export function ActionMenuRule() {
+  return <div className="action-menu-rule" role="separator" />;
 }
 
 export function Section({
@@ -76,11 +106,11 @@ export function Section({
 }) {
   return (
     <section className="card">
-      <div className="flex h-9 items-center justify-between border-b border-line px-3">
-        <h2 className="text-xs font-semibold tracking-[0.08em] text-ink-2 uppercase">
+      <div className="flex h-9 items-center justify-between border-b border-line bg-inset px-3">
+        <h2 className="text-sm font-semibold text-ink">
           {title}
           {count != null && (
-            <span className="ml-1.5 font-mono text-ink-3 normal-case">
+            <span className="ml-1.5 font-mono text-xs font-medium text-ink-2">
               {count}
             </span>
           )}
