@@ -3,6 +3,7 @@ import {
   buildEventBundlePlan,
   type EventBundlePlan,
   type PlannedStep,
+  bundleIdentity,
 } from "./CapsuleEventBundlePlan";
 import type { CapsuleCommandExecutor } from "./CapsuleCommandExecutor";
 import type { CapsuleEventBundleContext } from "./CapsuleEventBundleExistingState";
@@ -76,6 +77,13 @@ function dropEmptyArgs(args: Record<string, unknown>): Record<string, unknown> {
 const NEEDS_DECISION =
   /was skipped|were skipped|not entered|match no person|is assumed/;
 
+/** The warnings a human must accept before entering; the rest are notes. */
+export function warningsNeedingDecision(plan: {
+  warnings: string[];
+}): string[] {
+  return plan.warnings.filter((warning) => NEEDS_DECISION.test(warning));
+}
+
 export class CapsuleEventBundleCoordinator {
   constructor(private readonly executor: CapsuleCommandExecutor) {}
 
@@ -91,7 +99,7 @@ export class CapsuleEventBundleCoordinator {
         capabilityId: step.capabilityId,
         label: step.label,
       })),
-      safeToEnterWithoutApproval: plan.warnings.length === 0,
+      safeToEnterWithoutApproval: warningsNeedingDecision(plan).length === 0,
     };
   }
 
@@ -108,9 +116,7 @@ export class CapsuleEventBundleCoordinator {
     // Only warnings that mean something was LEFT OUT need a decision. Notes
     // that merely describe what was entered (rounding, a second pack list on
     // approve, vendor-less lines) are reported, never gated on.
-    const undecided = plan.warnings.filter((warning) =>
-      NEEDS_DECISION.test(warning),
-    );
+    const undecided = warningsNeedingDecision(plan);
     if (undecided.length > 0 && options.acceptWarnings !== true) {
       throw new Error(
         `Refusing to enter: ${undecided.length} warning(s) need a decision. ` +
@@ -119,14 +125,11 @@ export class CapsuleEventBundleCoordinator {
       );
     }
 
-    // Without an invoice number, scope by the bundle's own identity so two
-    // no-invoice imports never replay each other's idempotency results.
-    const header = options.bundle.header;
+    // Same identity the planner uses for business keys, so two no-invoice
+    // bundles never replay each other's idempotency results.
     const scope =
       options.idempotencyScope ??
-      (header.invoiceNumber
-        ? `tpp:${header.invoiceNumber}`
-        : `tpp:noinvoice:${header.eventDate ?? "nodate"}:${header.startMinutes ?? "notime"}:${header.guestCount ?? "noguests"}:${(header.title ?? "").trim().toLowerCase()}`);
+      `tpp:${bundleIdentity(options.bundle.header)}`;
     const keys = new CapsuleIdempotencyKeyFactory(scope);
     const createdIds: Record<string, string> = { ...plan.seedIds };
 

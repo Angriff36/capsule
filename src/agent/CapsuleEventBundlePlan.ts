@@ -1,6 +1,7 @@
 import type {
   BundlePrepTask,
   EventBundle,
+  BundleHeader,
 } from "../lib/tppReports/eventBundle";
 import { toEpochMillis } from "../lib/tppReports/reportValues";
 import { planCommerceSteps } from "./CapsuleEventBundleCommercePlan";
@@ -90,6 +91,17 @@ function emptySummary(): EventBundlePlan["summary"] {
  * The order matters: venue and client exist before the event, the event before
  * its dishes, and a dish before the prep tasks that produce it.
  */
+/**
+ * The stable identity of a bundle: its TPP invoice number, or, when the
+ * reports carry none, a key built from the header so two no-invoice bundles
+ * never share proposal/invoice/order numbers or idempotency results.
+ */
+export function bundleIdentity(header: BundleHeader): string {
+  if (header.invoiceNumber) return header.invoiceNumber;
+  const title = (header.title ?? "").trim().toLowerCase().replace(/\s+/g, "-");
+  return `noinvoice-${header.eventDate ?? "nodate"}-${header.startMinutes ?? "notime"}-${header.guestCount ?? "noguests"}${title ? `-${title}` : ""}`;
+}
+
 export function buildEventBundlePlan(
   bundle: EventBundle,
   context: CapsuleEventBundleContext = {},
@@ -98,7 +110,7 @@ export function buildEventBundlePlan(
   const seedIds: Record<string, string> = {};
   const warnings: string[] = [...bundle.warnings];
   const summary = emptySummary();
-  const invoice = bundle.header.invoiceNumber ?? "unknown";
+  const invoice = bundleIdentity(bundle.header);
   const existing = context.existing;
 
   const eventDate = bundle.header.eventDate;

@@ -118,7 +118,7 @@ export class CapsuleMcpEventBundleRegistrar {
           .boolean()
           .optional()
           .describe(
-            "Required true when the preview reported warnings. Confirms a human read them. Default false.",
+            "Required true only when the preview reports safeToEnterWithoutApproval=false (something was left out or assumed). Informational notes never need it. Default false.",
           ),
       },
       async ({ paths: given, eventId: existingEventId, acceptWarnings }) => {
