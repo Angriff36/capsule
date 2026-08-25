@@ -133,10 +133,13 @@ export function buildEventBundlePlan(
   const startsAt = toEpochMillis(eventDate, startMinutes);
   const endMinutes = bundle.header.endMinutes;
   // An end before the start (10:00 PM - 2:00 AM) is the next morning, and so
-  // is any timeline row (a 1:00 AM strike) that falls before the start.
+  // is a timeline row between midnight and the end (a 1:00 AM strike, with
+  // two hours' grace for late strike rows). A 5:00 PM load-in stays same-day.
   const crossesMidnight = endMinutes !== undefined && endMinutes < startMinutes;
   const eventRelativeMinutes = (minutes: number): number =>
-    crossesMidnight && minutes < startMinutes ? minutes + 24 * 60 : minutes;
+    crossesMidnight && minutes <= (endMinutes ?? 0) + 2 * 60
+      ? minutes + 24 * 60
+      : minutes;
   const endsAt =
     endMinutes !== undefined && endMinutes !== startMinutes
       ? toEpochMillis(
