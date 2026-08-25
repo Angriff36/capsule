@@ -3,8 +3,9 @@
 #
 #   bash scripts/release.sh --reviewer <model>
 #
-# 1. Merges the current branch into main (--no-ff) and pushes main once.
-#    That push is the only Vercel production build for the branch.
+# 1. Merges the current branch into main (--no-ff), runs `bun run check` on
+#    the merge result, and only then pushes main once. That push is the only
+#    Vercel production build and Convex prod deploy for the branch.
 # 2. Renames the branch to archive/<branch> locally and on origin.
 #
 # --reviewer names the independent cross-model reviewer that APPROVED the
@@ -33,7 +34,18 @@ fi
 
 git checkout main
 git pull --ff-only origin main
+base="$(git rev-parse HEAD)"
 git merge --no-ff "$branch" -m "[release] $branch (reviewed by $reviewer)"
+
+# The gate must be green BEFORE main is pushed: the push is the production
+# build and the Convex prod deploy, and CI on main only starts after it.
+echo "release: running bun run check on the merge result before anything is pushed."
+if ! bun run check; then
+  git reset --hard "$base"
+  git checkout "$branch"
+  echo "release: check failed. main is unchanged. Fix on $branch and release again."
+  exit 1
+fi
 
 echo "release: pushing main — this is the ONE production build for $branch."
 CAPSULE_RELEASE=1 git push origin main
