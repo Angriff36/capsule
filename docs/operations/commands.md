@@ -212,10 +212,20 @@ bun run check:production-manifest
 bun run check:workforce-manifest
 ```
 
+### Branch and release (the only path to production)
+
+**Branch and release rule (owner, 2026-08-25):** never push `main` by hand (`.githooks/pre-push` blocks it). Work on a branch; commit and push to that branch at once and often — those pushes are chores: Vercel ignores non-`main` refs (`vercel.json` `ignoreCommand`), so no build and no Convex prod deploy. Dev uses the LOCAL Convex backend. ONE merge to `main` at the end of the branch — `bash scripts/release.sh --reviewer <model>` — is the only production build and prod deploy; it then renames the branch to `archive/<branch>`.
+
+```bash
+git checkout -b feat/<name> main
+git push -u origin feat/<name>              # chore push: no build, no deploy
+bash scripts/release.sh --reviewer <model>         # ONE merge + ONE main push, then archive/<branch>
+```
+
 ### Deploy
 
 ```bash
-bun run deploy                 # convex deploy (human gate — not for loops/agents)
+bun run deploy                 # convex deploy — HUMAN-ONLY manual path; the normal path is `bash scripts/release.sh`
 ```
 
 ### Reset local state
@@ -308,7 +318,8 @@ bun run dev                    # terminal 2
 | Convex codegen     | `bun run codegen`                    |
 | Emit proof kit     | `bun run proof:emit`                 |
 | Full CI locally    | `bun run check`                      |
-| Deploy             | `bun run deploy`                     |
+| Release (one/branch) | `bash scripts/release.sh --reviewer <model>` |
+| Deploy (manual, human) | `bun run deploy`                   |
 
 ---
 

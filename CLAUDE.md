@@ -51,6 +51,16 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
 - Commit only when asked. One concern per commit; include proof (`bun run check` or a focused subset).
 - Never commit `.env.local`, credentials, or `.artifacts/` dumps.
 - Do not amend pushed history or force-push `main`.
+- **Branch and release rule (owner, 2026-08-25).** Nothing pushes to `main`
+  by hand; `.githooks/pre-push` blocks it. All work lives on a branch. Commit
+  and push to that branch at once and often — a branch push is a chore: Vercel
+  ignores non-`main` refs (`vercel.json` `ignoreCommand`), so it builds nothing
+  and never runs `convex deploy`. Dev work talks to the LOCAL Convex backend.
+  ONE merge to `main` happens at the end of the branch, via
+  `bash scripts/release.sh --reviewer <model>` after the cross-model review APPROVES.
+  That single push is the only Vercel production build and the only Convex
+  prod deploy: Vercel builds `main` only for a `[release]` commit, so a merge
+  made on GitHub never deploys. The script then renames the branch to `archive/<branch>`.
 - Put diagnostics under `.artifacts/` (gitignored).
 
 ## Format gate
