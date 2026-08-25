@@ -56,3 +56,6 @@ output/
 .vercel
 
 .playwright-mcp/
+
+# Builder regen snapshots - local cache, one 82k-line copy per contract hash
+.builder/baselines/
