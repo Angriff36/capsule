@@ -86,7 +86,7 @@ export class CapsuleMcpEventBundleRegistrar {
         );
         const preview = new CapsuleEventBundleCoordinator(
           this.executor,
-        ).preview(bundle, await this.context(existingEventId, false));
+        ).preview(bundle, await this.context(existingEventId, true));
 
         return this.text.format({
           ok: true,

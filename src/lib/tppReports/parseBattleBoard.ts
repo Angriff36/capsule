@@ -35,10 +35,15 @@ function readStaff(lines: readonly string[]): BundleStaffAssignment[] {
     const team = line.match(TEAM);
     if (team?.index === undefined) continue;
 
-    const name = line.slice(0, team.index).trim();
+    // Columns are NAME ROLE TEAM SHIFT STATION: the last word before the
+    // team is the role, not part of the name ("Bella Server FOH").
+    const words = line.slice(0, team.index).trim().split(/\s+/);
+    const role = words.length > 1 ? words.pop() : undefined;
+    const name = words.join(" ");
     const station = line.slice(team.index + team[0].length).trim();
     if (name.length === 0) continue;
     const entry: BundleStaffAssignment = { name, team: team[1] };
+    if (role) entry.role = role;
     if (station.length > 0) entry.station = station;
     staff.push(entry);
   }

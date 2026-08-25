@@ -89,13 +89,13 @@ async function main(): Promise<void> {
   const coordinator = new CapsuleEventBundleCoordinator(
     new ConvexCommandClient(),
   );
+  // Preview reads the same tenant directory as enter, so the plan you
+  // approve is the plan that runs.
   const context: CapsuleEventBundleContext = {};
-  if (!preview || eventId !== undefined) {
-    const loader = new CapsuleEventBundleStateLoader();
-    context.directory = await loader.loadDirectory();
-    if (eventId !== undefined) {
-      context.existing = await loader.loadExisting(eventId);
-    }
+  const loader = new CapsuleEventBundleStateLoader();
+  context.directory = await loader.loadDirectory();
+  if (eventId !== undefined) {
+    context.existing = await loader.loadExisting(eventId);
   }
 
   if (preview) {

@@ -69,6 +69,13 @@ function dropEmptyArgs(args: Record<string, unknown>): Record<string, unknown> {
   return kept;
 }
 
+/**
+ * Warnings that report data left out of the event, or a value that was
+ * guessed for it (an assumed start time); everything else is a note.
+ */
+const NEEDS_DECISION =
+  /was skipped|were skipped|not entered|match no person|is assumed/;
+
 export class CapsuleEventBundleCoordinator {
   constructor(private readonly executor: CapsuleCommandExecutor) {}
 
@@ -98,17 +105,28 @@ export class CapsuleEventBundleCoordinator {
         `Nothing to enter. ${plan.warnings.join(" ") || "The bundle was empty."}`,
       );
     }
-    if (plan.warnings.length > 0 && options.acceptWarnings !== true) {
+    // Only warnings that mean something was LEFT OUT need a decision. Notes
+    // that merely describe what was entered (rounding, a second pack list on
+    // approve, vendor-less lines) are reported, never gated on.
+    const undecided = plan.warnings.filter((warning) =>
+      NEEDS_DECISION.test(warning),
+    );
+    if (undecided.length > 0 && options.acceptWarnings !== true) {
       throw new Error(
-        `Refusing to enter: ${plan.warnings.length} warning(s) need a decision. ` +
+        `Refusing to enter: ${undecided.length} warning(s) need a decision. ` +
           `Run the preview, check each warning, then enter with acceptWarnings ` +
-          `(CLI: --accept-warnings).\n- ${plan.warnings.join("\n- ")}`,
+          `(CLI: --accept-warnings).\n- ${undecided.join("\n- ")}`,
       );
     }
 
+    // Without an invoice number, scope by the bundle's own identity so two
+    // no-invoice imports never replay each other's idempotency results.
+    const header = options.bundle.header;
     const scope =
       options.idempotencyScope ??
-      `tpp:${options.bundle.header.invoiceNumber ?? "unknown"}`;
+      (header.invoiceNumber
+        ? `tpp:${header.invoiceNumber}`
+        : `tpp:noinvoice:${header.eventDate ?? "nodate"}:${header.startMinutes ?? "notime"}:${header.guestCount ?? "noguests"}:${(header.title ?? "").trim().toLowerCase()}`);
     const keys = new CapsuleIdempotencyKeyFactory(scope);
     const createdIds: Record<string, string> = { ...plan.seedIds };
 

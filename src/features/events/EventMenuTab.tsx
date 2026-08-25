@@ -83,11 +83,7 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
   const removeDish = useEventDishRemove();
   const setHeadcountOverride = useEventDishSetHeadcountOverride();
   const updateInstructions = useEventDishUpdateInstructions();
-  const {
-    ready: prepSyncReady,
-    syncPrepForDish,
-    syncStockForEvent,
-  } = useEventMenuSync();
+  const { ready: prepSyncReady, syncStockForEvent } = useEventMenuSync();
   const [showPicker, setShowPicker] = useState(false);
   const [stockShortages, setStockShortages] = useState<EventStockShortage[]>(
     [],
@@ -487,16 +483,6 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                             headcountOverride: plan.quantityServings,
                           });
                         }
-                        if (prepSyncReady) {
-                          const synced = await syncPrepForDish({
-                            id: selection._id,
-                            eventId: selection.eventId,
-                            dishId: selection.dishId,
-                            quantityServings: plan.quantityServings,
-                            specialInstructions: selection.specialInstructions,
-                          });
-                          setStockShortages(synced.shortages);
-                        }
                       }
                     });
                   }}
@@ -630,6 +616,47 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                           ? "Hide recipe"
                           : "Edit recipe on this menu"}
                       </button>
+                      <button
+                        type="button"
+                        disabled={busy != null}
+                        onClick={() => {
+                          void (async () => {
+                            const current =
+                              Number(
+                                (selection as { headcountOverride?: number })
+                                  .headcountOverride,
+                              ) || 0;
+                            const values = await prompt.askFields({
+                              title: "Food-cost headcount",
+                              description:
+                                "Guests this dish is costed for. 0 uses the event guest count.",
+                              fields: [
+                                {
+                                  name: "headcountOverride",
+                                  label: "Headcount override",
+                                  defaultValue: String(current),
+                                  inputType: "number",
+                                  required: true,
+                                },
+                              ],
+                              confirmLabel: "Save headcount",
+                            });
+                            if (!values) return;
+                            const override = Number(values.headcountOverride);
+                            if (!Number.isFinite(override) || override < 0)
+                              return;
+                            void run(`override:${selection._id}`, () =>
+                              setHeadcountOverride({
+                                docId: selection._id,
+                                version: selection.version,
+                                headcountOverride: override,
+                              }),
+                            );
+                          })();
+                        }}
+                      >
+                        Set food-cost headcount
+                      </button>
                       <ActionMenuRule />
                       <button
                         type="button"
@@ -646,14 +673,13 @@ export function EventMenuTab({ eventId, expectedHeadcount }: Props) {
                               tone: "danger",
                             });
                             if (!reason) return;
-                            void run(`remove:${selection._id}`, async () => {
-                              await removeDish({
+                            void run(`remove:${selection._id}`, () =>
+                              removeDish({
                                 docId: selection._id,
                                 version: selection.version,
                                 reason,
-                              });
-                              await refreshStock();
-                            });
+                              }),
+                            );
                           })();
                         }}
                       >
