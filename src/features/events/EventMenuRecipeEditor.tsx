@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -35,6 +36,10 @@ import {
   RECIPE_QUANTITY_INPUT_TYPE,
   commitRecipeQuantity,
   formatRecipeQuantity,
+  recipeQuantityDraftAfterSave,
+  recipeQuantityDraftAfterType,
+  recipeQuantityDraftText,
+  pruneSyncedRecipeQuantityDrafts,
 } from "./eventMenuRecipeQuantity";
 import { suspectPrepQuantityFlag } from "./eventMenuSuspectQuantity";
 import {
@@ -90,6 +95,13 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
     createNamePrefillFromSearch(""),
   );
   const [createNameArmed, setCreateNameArmed] = useState(createNameStartsArmed);
+  const [qtyDrafts, setQtyDrafts] = useState<Record<string, string>>({});
+  // A saved draft is only a bridge until the reactive quantity catches up;
+  // then the field goes back to mirroring the server value.
+  useEffect(() => {
+    if (!lines) return;
+    setQtyDrafts((current) => pruneSyncedRecipeQuantityDrafts(current, lines));
+  }, [lines]);
   const addQtyRef = useRef<HTMLInputElement>(null);
   const newIngredientInputRef = useRef<HTMLInputElement>(null);
   const newIngredientStateRef = useRef(createName);
@@ -439,6 +451,7 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                         return;
                       }
                       const quantity = qtyCommit.quantity;
+                      const submittedText = String(data.get("quantity") ?? "");
                       setBusy(`qty:${line._id}`);
                       setError(null);
                       void adjustQuantity({
@@ -447,6 +460,20 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                         quantity,
                         unit: nextUnit as (typeof UNIT_OF_MEASURE)[number],
                       })
+                        .then(() => {
+                          // Only a persisted save may replace the typed draft,
+                          // and only when the user has not typed something
+                          // newer while the save was in flight.
+                          setQtyDrafts((current) =>
+                            current[String(line._id)] === submittedText
+                              ? recipeQuantityDraftAfterSave(
+                                  current,
+                                  String(line._id),
+                                  quantity,
+                                )
+                              : current,
+                          );
+                        })
                         .catch((cause) => {
                           setError(
                             cause instanceof Error
@@ -469,7 +496,18 @@ export function EventMenuRecipeEditor({ dishId, servings }: Props) {
                         inputMode={RECIPE_QUANTITY_INPUT_MODE}
                         autoComplete="off"
                         spellCheck={false}
-                        defaultValue={formatRecipeQuantity(line.quantity)}
+                        value={recipeQuantityDraftText(
+                          qtyDrafts,
+                          String(line._id),
+                          line.quantity,
+                        )}
+                        onChange={(event) => {
+                          const lineId = String(line._id);
+                          const text = event.target.value;
+                          setQtyDrafts((current) =>
+                            recipeQuantityDraftAfterType(current, lineId, text),
+                          );
+                        }}
                         data-testid="event-menu-recipe-qty"
                       />
                     </label>

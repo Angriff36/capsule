@@ -58,7 +58,8 @@ entity SavedReportDefinition mixin TenantScoped, SoftDeletable {
 
   // Per-row read gate: owner_only rows visible to owner (or managers); team /
   // tenant_wide readable by any staffAccess principal (semantics.md read gate).
-  default policy savedReportRead read: self.ownerId == user.id or self.sharingScope != "owner_only" or roleAllows(user.role, "manageAccess") "Owners and managers may read owner-only reports; team and tenant_wide scopes are staff-readable"
+  // Undefined drafts (ownerId == null) are readable by staff for create flow.
+  default policy savedReportRead read: self.ownerId == null or self.ownerId == user.id or self.sharingScope != "owner_only" or roleAllows(user.role, "manageAccess") "Undefined drafts are readable by staff; defined owner_only reports require ownership or manageAccess"
   default policy savedReportWrite write: roleAllows(user.role, "staffAccess") "Staff may write saved reports through commands"
   default policy savedReportExecute execute: roleAllows(user.role, "staffAccess") "Staff may execute saved report commands"
 
