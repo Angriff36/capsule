@@ -215,7 +215,9 @@ the diff (merge gate above). It merges `--no-ff` into `main`, runs
 `bun run check` on the merge (CI does not run on `main`; the pre-push hook
 refuses `main` without proof of that run), pushes `main`
 once with `CAPSULE_RELEASE=1` (the only Vercel production build and the only
-Convex prod deploy for that branch), then renames the branch to
+Convex prod deploy for that branch — Vercel builds `main` only for a commit
+whose subject starts with `[release]`, so a merge made on GitHub, PR button
+or auto-merge, lands but never deploys), then renames the branch to
 `archive/<branch>` locally and on origin. Start the next task from `main`.
 
 **Manual deploy commands and settings changes are HUMAN-AUTHORIZED only.** No

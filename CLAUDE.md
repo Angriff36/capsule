@@ -59,7 +59,8 @@ Behavioral rules for automated contributors. Commands live in `AGENTS.md`. Syste
   ONE merge to `main` happens at the end of the branch, via
   `bash scripts/release.sh --reviewer <model>` after the cross-model review APPROVES.
   That single push is the only Vercel production build and the only Convex
-  prod deploy. The script then renames the branch to `archive/<branch>`.
+  prod deploy: Vercel builds `main` only for a `[release]` commit, so a merge
+  made on GitHub never deploys. The script then renames the branch to `archive/<branch>`.
 - Put diagnostics under `.artifacts/` (gitignored).
 
 ## Format gate

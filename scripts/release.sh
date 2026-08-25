@@ -9,7 +9,9 @@
 # 2. Renames the branch to archive/<branch> locally and on origin.
 #
 # --reviewer names the independent cross-model reviewer that APPROVED the
-# diff (AGENTS.md merge gate). The merge commit records it.
+# diff (AGENTS.md merge gate). The merge commit records it. The merge
+# subject starts with "[release]" — vercel.json builds main ONLY for such
+# commits, so a merge made on GitHub (PR button, auto-merge) never deploys.
 set -euo pipefail
 
 reviewer=""
@@ -31,29 +33,55 @@ if [ "$(git rev-parse "$branch")" != "$(git rev-parse "origin/$branch" 2>/dev/nu
   echo "release: $branch is not pushed to origin, or differs from origin/$branch. Push it first."
   exit 1
 fi
+# Local main must be exactly origin/main: nothing is ever committed to main
+# by hand, so any extra local commit is stray and must not ride this release.
+if [ "$(git rev-parse main)" != "$(git rev-parse origin/main)" ]; then
+  echo "release: local main differs from origin/main. Reset it first:"
+  echo "  git branch -f main origin/main"
+  exit 1
+fi
+base="$(git rev-parse origin/main)"
+proof=.artifacts/release-check-passed
 
-git checkout main
-git pull --ff-only origin main
-base="$(git rev-parse HEAD)"
-git merge --no-ff "$branch" -m "[release] $branch (reviewed by $reviewer)"
+back_to_branch() {
+  git checkout -q "$branch"
+  rm -f "$proof"
+}
 
-# The gate must be green BEFORE main is pushed: the push is the production
-# build and the Convex prod deploy, and CI on main only starts after it.
+git checkout -q main
+if ! git merge --no-ff "$branch" -m "[release] $branch (reviewed by $reviewer)"; then
+  git merge --abort || true
+  back_to_branch
+  echo "release: merge conflict with main. Merge main into $branch, resolve, push, and release again."
+  exit 1
+fi
+
 # There is no flag to skip this. The pre-push hook needs the proof file
 # below, stamped with the exact commit that passed, or it refuses main.
 echo "release: running bun run check on the merge result before anything is pushed."
 if ! bun run check; then
-  git reset --hard "$base"
-  git checkout "$branch"
+  git reset -q --hard "$base"
+  back_to_branch
   echo "release: check failed. main is unchanged. Fix on $branch and release again."
   exit 1
 fi
 mkdir -p .artifacts
-git rev-parse HEAD > .artifacts/release-check-passed
+git rev-parse HEAD > "$proof"
 
 echo "release: pushing main — this is the ONE production build for $branch."
-CAPSULE_RELEASE=1 git push origin main
-rm -f .artifacts/release-check-passed
+if ! CAPSULE_RELEASE=1 git push origin main; then
+  rm -f "$proof"
+  git fetch origin --quiet
+  if [ "$(git rev-parse origin/main)" = "$(git rev-parse main)" ]; then
+    echo "release: push reported an error but origin/main has the release. Continuing."
+  else
+    git reset -q --hard "$base"
+    back_to_branch
+    echo "release: push to main failed (see above). main is unchanged. Fix and release again."
+    exit 1
+  fi
+fi
+rm -f "$proof"
 
 git branch -m "$branch" "archive/$branch"
 git push origin "archive/$branch" ":$branch"
