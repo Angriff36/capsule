@@ -207,6 +207,35 @@ describe("DesignContractGate", () => {
     expect(() => gate.enforce()).toThrow(/stale/i);
   });
 
+  it("slots a serif role by its family, not its name", () => {
+    // `breadcrumb` is serif but is neither a -display nor a -heading. Slotting
+    // by role name put it in the sans slot and blew up on a false ambiguity.
+    const withBreadcrumb = designMd().replace(
+      "typography:\n",
+      "typography:\n  breadcrumb:\n    fontFamily: Iowan Old Style\n",
+    );
+    const gate = fixture({
+      "DESIGN.md": withBreadcrumb,
+      "src/styles/app.css": appCss(),
+    });
+    expect(() => gate.designContract()).not.toThrow();
+    expect(gate.designContract().fonts.get("display")).toBe("Iowan Old Style");
+    expect(gate.designContract().fonts.get("sans")).toBe("Archivo Variable");
+    expect(gate.mismatches()).toEqual([]);
+  });
+
+  it("rejects DESIGN.md declaring two display faces", () => {
+    const twoSerifs = designMd().replace(
+      "typography:\n",
+      "typography:\n  breadcrumb:\n    fontFamily: Cormorant Garamond\n",
+    );
+    const gate = fixture({
+      "DESIGN.md": twoSerifs,
+      "src/styles/app.css": appCss(),
+    });
+    expect(() => gate.designContract()).toThrow(/more than one display face/);
+  });
+
   it("rejects an exception entry with no reason", () => {
     const gate = fixture({
       "DESIGN.md": designMd(),

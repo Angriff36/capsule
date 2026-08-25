@@ -63,48 +63,55 @@ typography:
     fontWeight: 400
     lineHeight: 1.1
     letterSpacing: -0.01em
+  breadcrumb:
+    fontFamily: Iowan Old Style
+    fontSize: 19px
+    fontWeight: 400
+    fontStyle: italic
+    lineHeight: 1.3
+    letterSpacing: 0
   body-large:
     fontFamily: Archivo Variable
-    fontSize: 14px
+    fontSize: 16px
     fontWeight: 400
     lineHeight: 1.7
     letterSpacing: 0
   body:
     fontFamily: Archivo Variable
-    fontSize: 13px
+    fontSize: 15px
     fontWeight: 400
-    lineHeight: 1.5
+    lineHeight: 1.6
     letterSpacing: 0
   button:
     fontFamily: Archivo Variable
-    fontSize: 13px
-    fontWeight: 500
+    fontSize: 14px
+    fontWeight: 600
     lineHeight: 1
-    letterSpacing: 0
+    letterSpacing: 0.06em
   label:
     fontFamily: Archivo Variable
-    fontSize: 11px
-    fontWeight: 600
-    lineHeight: 1.4
-    letterSpacing: 0.05em
-  eyebrow:
-    fontFamily: Archivo Variable
-    fontSize: 9.5px
-    fontWeight: 600
-    lineHeight: 1.4
-    letterSpacing: 0.18em
-  mono-data:
-    fontFamily: IBM Plex Mono
-    fontSize: 11px
-    fontWeight: 400
+    fontSize: 14px
+    fontWeight: 700
     lineHeight: 1.4
     letterSpacing: 0.04em
-  micro:
+  eyebrow:
     fontFamily: Archivo Variable
-    fontSize: 9px
+    fontSize: 14px
+    fontWeight: 700
+    lineHeight: 1.4
+    letterSpacing: 0.09em
+  mono-data:
+    fontFamily: IBM Plex Mono
+    fontSize: 15px
     fontWeight: 500
     lineHeight: 1.4
-    letterSpacing: 0.12em
+    letterSpacing: 0.02em
+  micro:
+    fontFamily: Archivo Variable
+    fontSize: 13px
+    fontWeight: 600
+    lineHeight: 1.4
+    letterSpacing: 0.06em
 
 rounded:
   xs: 3px
@@ -131,25 +138,25 @@ components:
     backgroundColor: "{colors.brand}"
     textColor: "{colors.on-brand}"
     typography: "{typography.button}"
-    rounded: "{rounded.xs}"
-    height: 32px
-    padding: 0 12px
+    rounded: "{rounded.pill}"
+    height: 40px
+    padding: 0 22px
   button-ghost:
     backgroundColor: "{colors.panel}"
     textColor: "{colors.ink}"
     borderColor: "{colors.line-2}"
     typography: "{typography.button}"
-    rounded: "{rounded.xs}"
-    height: 32px
-    padding: 0 12px
+    rounded: "{rounded.pill}"
+    height: 40px
+    padding: 0 20px
   button-danger:
     backgroundColor: "{colors.panel}"
     textColor: "{colors.danger}"
     borderColor: "{colors.danger}"
     typography: "{typography.button}"
-    rounded: "{rounded.xs}"
-    height: 32px
-    padding: 0 12px
+    rounded: "{rounded.pill}"
+    height: 40px
+    padding: 0 20px
   text-link:
     backgroundColor: transparent
     textColor: "{colors.brand}"
@@ -164,18 +171,47 @@ components:
     height: 32px
     padding: 0 10px
   status-chip:
-    backgroundColor: "{colors.inset}"
-    textColor: "{colors.ink-2}"
+    backgroundColor: "{colors.success}"
+    textColor: "{colors.on-brand}"
     typography: "{typography.micro}"
     rounded: "{rounded.pill}"
-    height: 19px
-    padding: 0 8px
+    height: 30px
+    padding: 0 15px
+    variants: solid semantic fill — success, warning, danger, brand
+  meta-chip:
+    backgroundColor: "{colors.inset}"
+    textColor: "{colors.ink-2}"
+    typography: "{typography.body}"
+    rounded: "{rounded.pill}"
+    height: 28px
+    padding: 0 14px
+  fact-pair:
+    labelTypography: "{typography.label}"
+    labelTransform: uppercase
+    valueTypography: "{typography.body}"
+    textColor: "{colors.ink}"
+    gap: 6px
+  section-rule:
+    labelTypography: "{typography.eyebrow}"
+    labelTransform: uppercase
+    ruleColor: "{colors.ink}"
+    ruleHeight: 1.5px
+    trailingTypography: "{typography.body}"
+    trailingColor: "{colors.ink-3}"
+  attention-band:
+    backgroundColor: "{colors.sage}"
+    borderColor: "{colors.sage-2}"
+    padding: 17px 0 19px
+    bleed: full sheet width
   navigation-rail:
-    backgroundColor: "{colors.rail}"
+    backgroundColor: "{colors.panel}"
+    borderColor: "{colors.line}"
     textColor: "{colors.rail-ink}"
     activeBackgroundColor: "{colors.brand}"
     activeTextColor: "{colors.on-brand}"
-    width: 72px
+    activeRounded: "{rounded.sm}"
+    width: 94px
+    placement: inside the workspace sheet, divided by a hairline
   workspace-sheet:
     backgroundColor: "{colors.panel}"
     borderColor: "{colors.brand}"
@@ -318,13 +354,16 @@ The serif creates identity; Archivo carries controls and dense information; IBM 
 | Section Display | Iowan Old Style | 26–47px |    400 |        0.98 |       -0.035em | Dominant section or empty-state line.    |
 | Section Heading | Iowan Old Style |    30px |    400 |        1.00 |        -0.02em | Ledger and working-document sections.    |
 | Card Heading    | Iowan Old Style |    22px |    400 |        1.10 |        -0.01em | Small document blocks and annotations.   |
-| Body Large      | Archivo         |    14px |    400 |        1.70 |              0 | Page descriptions and important help.    |
-| Body            | Archivo         |    13px |    400 |        1.50 |              0 | Default interface and table copy.        |
-| Button          | Archivo         |    13px |    500 |        1.00 |              0 | Primary and secondary actions.           |
-| Label           | Archivo         |    11px |    600 |        1.40 |         0.05em | Form and compact section labels.         |
-| Eyebrow         | Archivo         |   9.5px |    600 |        1.40 |         0.18em | Uppercase journal labels.                |
-| Mono Data       | IBM Plex Mono   |    11px |    400 |        1.40 |         0.04em | Dates, money, counts, and relative time. |
-| Micro           | Archivo         |     9px |    500 |        1.40 |         0.12em | Small uppercase status and metadata.     |
+| Breadcrumb      | Iowan Old Style |    19px | 400 it |        1.30 |              0 | Route context above a page title.        |
+| Body Large      | Archivo         |    16px |    400 |        1.70 |              0 | Page descriptions and important help.    |
+| Body            | Archivo         |    15px |    400 |        1.60 |              0 | Default interface and document copy.     |
+| Button          | Archivo         |    14px |    600 |        1.00 |         0.06em | Primary and secondary actions, uppercase.|
+| Label           | Archivo         |    14px |    700 |        1.40 |         0.04em | `fact-pair` labels, uppercase.           |
+| Eyebrow         | Archivo         |    14px |    700 |        1.40 |         0.09em | `section-rule` labels, uppercase.        |
+| Mono Data       | IBM Plex Mono   |    15px |    500 |        1.40 |         0.02em | Times, money, counts, and relative time. |
+| Micro           | Archivo         |    13px |    600 |        1.40 |         0.06em | Chip text, uppercase.                    |
+
+**Floors.** Body never falls below 15px and supporting metadata never below 13px. Uppercase is a deliberate device for labels, chips, and buttons — it is never a way to make text small. There is no type role under 13px.
 
 ### Principles
 
@@ -395,19 +434,31 @@ Botanical forms may appear in the outer frame or an authored zero state. They sh
 
 ### **`navigation-rail`**
 
-72px light vertical rail with a 42px circular Capsule mark and 42px icon targets. Active navigation uses the brand-green filled circle. Only shipped, canonical workspaces remain persistent. Planned modules live in the bottom overflow drawer and do not compete with available work; legacy Capsule-Pro areas without current Manifest authority do not appear as promises.
+94px light vertical rail that lives **inside** the workspace sheet, separated from the document by a single hairline rather than floating as its own surface. It carries a 42px circular Capsule mark and 46px icon targets. Active navigation uses a brand-green filled rounded rectangle, not a circle. Only shipped, canonical workspaces remain persistent. Planned modules live in the bottom overflow drawer and do not compete with available work; legacy Capsule-Pro areas without current Manifest authority do not appear as promises.
 
 ### **`workspace-sheet`**
 
-Warm-white route surface inside the botanical canvas. Desktop radius is 22px with a subtle green border and broad low-opacity shadow. Default desktop padding is 44px 48px. The sheet should visually contain the active work without turning every child into a card.
+Warm-white route surface inside the botanical canvas. Desktop radius is 22px with a subtle green border and broad low-opacity shadow. Default desktop padding is 44px 48px. The sheet is the **only** rounded surface on the page: it holds the rail and the whole document, and its children are separated by rules, bands, and spacing rather than by nested cards.
 
 ### **`editorial-masthead`**
 
-Eyebrow, large serif page title, one concise explanation, and one primary route action. The title may receive a restrained hand-drawn saffron underline. Search and filtering belong below or beside the masthead according to page density.
+Italic serif breadcrumb, large serif page title, a row of `fact-pair` values, and one primary route action aligned right. The breadcrumb carries the route's context — a date on an operational page, a collection name on an object page — in saffron with a fine underline. No decorative underline sits beneath the title itself. Search and filtering belong below or beside the masthead according to page density.
 
 ### **`button-primary`**
 
-Deep-green rectangular action with 3px radius, 32px default height, Archivo 13px medium label, and small lift on hover. Use once per immediate decision region. Larger 40px height is allowed for a page-defining creation action.
+Deep-green pill action with 40px height and an Archivo 14px semibold uppercase label, tracked 0.06em. Use once per immediate decision region. Secondary actions beside it are `text-link`, not a second filled button.
+
+### **`fact-pair`**
+
+The primary way operational values appear: a bold uppercase Archivo label, a colon, and the value in regular body weight on the same line — `VENUE: Willow Barn`. Pairs sit in a horizontal row separated by generous gaps and wrap as a group. Prefer a row of fact-pairs to a table whenever the values are read rather than compared.
+
+### **`section-rule`**
+
+A document section opens with a bold uppercase label, then a fine dark rule running to the right margin, then optional quiet trailing context on the far right. This is the only section divider on a working page. Do not introduce a card, a heading block, or a coloured header bar in its place.
+
+### **`attention-band`**
+
+Exceptions and open decisions sit in a pale-sage band that bleeds the full width of the sheet, bounded top and bottom by a sage hairline. It is the one surface change permitted inside the sheet, and it exists so that what needs a decision outranks everything else on the page without becoming a card.
 
 ### **`button-ghost`**
 
@@ -427,7 +478,11 @@ Small uppercase Archivo link in brand green, often paired with a directional arr
 
 ### **`status-chip`**
 
-19px pill containing uppercase micro text and a visible border or soft semantic fill. Chips are for real state, tags, allergens, dietary markers, and operational flags. Do not turn ordinary metadata into pills.
+30px pill with a **solid** semantic fill and white uppercase text at 13px, tracked 0.06em. Reserved for real lifecycle state and severity — delivered, ready, blocked, critical, high. Its weight is the point: a solid chip is a claim about state, so it must be earned.
+
+### **`meta-chip`**
+
+28px pill on the pale inset surface with dark sentence-case text. Carries tags, allergens, dietary markers, and counts — facts that qualify an object rather than state it. Do not turn ordinary metadata into either chip; most values belong in a `fact-pair`.
 
 ### **`attention-ledger`**
 
@@ -520,7 +575,7 @@ Each system's authoritative experience and implementation status lives in [`docs
 - Give every overview page one unmistakable operational focal point.
 - Use serif type for page and object identity, Archivo for controls and dense work.
 - Prefer rules, ledgers, and open document sections to repeated containers.
-- Use saffron as a small underline or exception cue.
+- Use saffron for the breadcrumb and for time-critical cues only — a countdown, a "next" marker, the edge of the service that is running out of time. It is never decoration and never an underline beneath a title.
 - Keep planned modules visually quiet or hidden.
 - Design loading skeletons to match the final composition.
 - Write authored empty states with one clear next action.

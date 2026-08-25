@@ -70,12 +70,41 @@ type Exception = {
   reason: string;
 };
 
-/** DESIGN.md front matter maps a role (`body`, `mono-data`) to a face. app.css
- *  declares three slots. A role naming a mono family is the mono slot; a
- *  `-display`/`-heading` role is the display slot; everything else is sans. */
-function fontSlot(role: string, family: string): "sans" | "mono" | "display" {
-  if (/mono/i.test(family)) return "mono";
-  return /-(display|heading)$/.test(role) ? "display" : "sans";
+/** DESIGN.md front matter maps roles (`body`, `mono-data`, `journal-display`)
+ *  to faces; app.css declares three slots. Slot by FAMILY, not by role name —
+ *  a role name is prose and drifts (`breadcrumb` is serif but is neither a
+ *  `-display` nor a `-heading`). The mono family is whichever names "mono";
+ *  the sans family is whatever the `body` role uses; anything left over is the
+ *  display face, and there must be exactly one of it. */
+function slotFamilies(
+  typography: Record<string, { fontFamily?: string }>,
+): Map<string, string> {
+  const families = new Set<string>();
+  for (const spec of Object.values(typography)) {
+    if (spec?.fontFamily !== undefined) families.add(spec.fontFamily);
+  }
+  const body = typography["body"]?.fontFamily;
+  if (body === undefined) {
+    throw new Error(
+      `${DESIGN_MD} typography has no "body" role to anchor the sans face.`,
+    );
+  }
+  const mono = [...families].filter((f) => /mono/i.test(f));
+  if (mono.length > 1) {
+    throw new Error(
+      `${DESIGN_MD} typography declares more than one mono face: ${mono.join(", ")}.`,
+    );
+  }
+  const display = [...families].filter((f) => f !== body && !/mono/i.test(f));
+  if (display.length > 1) {
+    throw new Error(
+      `${DESIGN_MD} typography declares more than one display face: ${display.join(", ")}.`,
+    );
+  }
+  const slots = new Map<string, string>([["sans", body]]);
+  if (mono[0] !== undefined) slots.set("mono", mono[0]);
+  if (display[0] !== undefined) slots.set("display", display[0]);
+  return slots;
 }
 
 /** First family in a CSS font stack, unquoted: `"Iowan Old Style", Georgia`. */
@@ -192,22 +221,7 @@ export class DesignContractGate {
       return new Map(entries.map(([k, v]) => [k, String(v)]));
     };
 
-    // One family per slot. Two different families claiming one slot means
-    // DESIGN.md itself is ambiguous — say so rather than pick.
-    const fonts = new Map<string, string>();
-    for (const [role, spec] of Object.entries(doc.typography ?? {})) {
-      const family = spec?.fontFamily;
-      if (family === undefined) continue;
-      const slot = fontSlot(role, family);
-      const held = fonts.get(slot);
-      if (held !== undefined && held !== family) {
-        throw new Error(
-          `${DESIGN_MD} typography gives the ${slot} slot two faces: ` +
-            `"${held}" and "${family}" (role "${role}").`,
-        );
-      }
-      fonts.set(slot, family);
-    }
+    const fonts = slotFamilies(doc.typography ?? {});
     if (fonts.size === 0) {
       throw new Error(`${DESIGN_MD} declares no typography fontFamily.`);
     }
