@@ -102,9 +102,14 @@ if ! CAPSULE_RELEASE=1 git push origin main; then
     echo "release: push reported an error but origin has the release. Continuing."
   elif [ -z "$remote_main" ]; then
     echo "release: push failed and origin cannot be reached. State is UNKNOWN."
-    echo "  Local main holds the unpushed release commit. When origin is back:"
-    echo "  git ls-remote origin refs/heads/main   # if it equals 'git rev-parse main', the release landed"
-    echo "  otherwise: git branch -f main origin/main && git checkout $branch, then release again."
+    echo "  Local main holds the unpushed release commit $(git rev-parse main). When origin is back:"
+    echo "  git ls-remote origin refs/heads/main"
+    echo "  If it prints that sha, the release LANDED. Finish the archive:"
+    echo "    git checkout $branch"
+    echo "    git push --atomic --force-with-lease=refs/heads/$branch:$branch_sha origin $branch_sha:refs/heads/archive/$branch :refs/heads/$branch"
+    echo "    git branch -m $branch archive/$branch"
+    echo "  If it prints a different sha, the release did NOT land. Reset and release again:"
+    echo "    git checkout $branch && git branch -f main origin/main"
     exit 1
   else
     git reset -q --hard "$base"
@@ -121,8 +126,12 @@ rm -f "$proof"
 # someone pushed to the branch during the gate, that work is not deleted.
 if ! git push --atomic --force-with-lease="refs/heads/$branch:$branch_sha" origin "$branch_sha:refs/heads/archive/$branch" ":refs/heads/$branch"; then
   echo "release: main is released, but archiving $branch on origin failed (new commits on it, or a network error). Finish by hand:"
-  echo "  git fetch origin && git log $branch_sha..origin/$branch   # anything listed was pushed after the release"
-  echo "  git push --atomic origin $branch_sha:refs/heads/archive/$branch :refs/heads/$branch"
+  echo "  git fetch origin && git log --oneline $branch_sha..origin/$branch"
+  echo "  Nothing listed (network error): retry the same leased push:"
+  echo "    git push --atomic --force-with-lease=refs/heads/$branch:$branch_sha origin $branch_sha:refs/heads/archive/$branch :refs/heads/$branch"
+  echo "  Commits listed (pushed during the gate): they are NOT released. Keep the branch, archive only the released sha:"
+  echo "    git push origin $branch_sha:refs/heads/archive/$branch"
+  echo "    git pull --ff-only origin $branch   # then continue on $branch and release again later"
   echo "  git branch -m $branch archive/$branch"
   exit 1
 fi
